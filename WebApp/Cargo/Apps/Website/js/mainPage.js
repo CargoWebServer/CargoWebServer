@@ -41,10 +41,10 @@ var MainPage = function (parent) {
 
     // The header...
     var titleDiv = this.header.appendElement({ "tag": "div", "class": "title" }).down()
-    var title = titleDiv.appendElement({ "tag": "div", "innerHtml": "Cargo" }).down()
+    //var title = titleDiv.appendElement({ "tag": "div", "innerHtml": "Cargo" }).down()
 
     // The logo...
-    title.appendElement({ "tag": "img", "src": "/Website/image/wheel.svg", "style": "width:60px; height:60px;vertical-align:middle;" })
+    //title.appendElement({ "tag": "img", "src": "/Website/image/wheel.svg", "style": "width:60px; height:60px;vertical-align:middle;" })
 
     // Now I will append the menu...
     var mainMenuDiv = this.header.appendElement({ "tag": "div", "class": "mainMenu" }).down()
@@ -53,8 +53,10 @@ var MainPage = function (parent) {
     var homeMenuItem = mainMenuDiv.appendElement({ "tag": "div", "class": "mainMenuItem", "innerHtml": "Home", "style": "border-right: 1px solid #ccc;" }).down()
     var downloadsMenuItem = mainMenuDiv.appendElement({ "tag": "div", "class": "mainMenuItem", "innerHtml": "Downloads", "style": "border-right: 1px solid #ccc;" }).down()
     var newsMenuItem = mainMenuDiv.appendElement({ "tag": "div", "class": "mainMenuItem", "innerHtml": "News", "style": "border-right: 1px solid #ccc;" }).down()
+    var tutorialsMenuItem = mainMenuDiv.appendElement({ "tag": "div", "class": "mainMenuItem", "innerHtml": "Tutorials", "style": "border-right: 1px solid #ccc;" }).down()
     var documentationsMenuItem = mainMenuDiv.appendElement({ "tag": "div", "class": "mainMenuItem", "innerHtml": "Docs", "style": "border-right: 1px solid #ccc;" }).down()
     var aboutMenuItem = mainMenuDiv.appendElement({ "tag": "div", "class": "mainMenuItem", "innerHtml": "About", "style": "" }).down()
+
 
     // Now The page content.
     var homeIntroItem = new Element(null, { "tag": "div", "id": "home-intro" })
@@ -219,5 +221,59 @@ var MainPage = function (parent) {
     // The news section
     appendSection(newsMenuItem, "NewsText", this.body)
 
+    // The tutorials section
+    var tutorialsSectionElement = appendSection(
+        tutorialsMenuItem,
+        "Tutorials",
+        this.body,
+        function (footer) {
+            return function (tutorialsSectionElement) {
+                tutorialsSectionElement.element.style = "max-width: 100%; position: absolute; top: 129px; bottom: 0px; left: 0px; right: 0px;"
+                tutorialsSectionElement.element.parentNode.style.overflow = "hidden"
+                footer.element.style.display = "none"
+                tutorialsSectionElement.removeAllChilds()
+                var homeIntro = document.getElementById("home-intro")
+                homeIntro.style.maxWidth = "100%"
+                homeIntro.style.minHeight = "100%"
+
+                var tutorialsBanner = tutorialsSectionElement.appendElement({ "tag": "div", "class": "tutorialsBanner", "innerHtml": "TUTORIALS" }).down()
+
+                var tutorialsFlexConainer = tutorialsSectionElement.appendElement({ "tag": "div", "class": "flexboxRowContainer" }).down()
+
+                var tutorialsSidebarContainer = tutorialsFlexConainer.appendElement({ "tag": "div", "class": "tutorialsSidebarContainer" }).down()
+                var tutorialsSidebarMenu = tutorialsSidebarContainer.appendElement({ "tag": "div", "id": "tutorialsSidebarMenu", "class": "flexboxColumnContainer" }).down()
+
+                tutorialsSidebarMenu.appendElement({ "tag": "div", "class": "sidebarMenuTitle", "innerHtml": "Getting Started" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "Welcome", "id": "WelcomeTutorialMenuDiv" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "Licence" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "Installation" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "Configuration" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuTitle", "innerHtml": "Basics" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "'Hello World' Project" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "Front-End JS Framework" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "Back-End Golang Server" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "Element", "id": "ElementTutorialMenuDiv" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuTitle", "innerHtml": "Core Modules" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "Events" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "Entities" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "Data" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuTitle", "innerHtml": "Advanced Tutorials" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "MVC Applications" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "Permissions" })
+                    .appendElement({ "tag": "div", "class": "sidebarMenuItem", "innerHtml": "..." })
+
+                var tutorialsContentContainer = tutorialsFlexConainer.appendElement({ "tag": "div", "class": "tutorialsContentContainer" }).down()
+
+                tutorialsSectionElement.getChildById("ElementTutorialMenuDiv").element.onclick = function (tutorialsContentContainer) {
+                    return function () {
+                        tutorialsContentContainer.removeAllChilds()
+                        new elementTutorial(tutorialsContentContainer)
+                    }
+                } (tutorialsContentContainer)
+
+            }
+        } (this.footer)
+    )
     return this
+
 }

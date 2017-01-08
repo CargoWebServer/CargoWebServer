@@ -33,7 +33,7 @@ a, a:link, a:active {
     max-width: 735px;
     margin: 0 auto;
     padding: 30px 0;
-    text-align: center;
+    /*text-align: center;*/
 }
 
 .main_page{
@@ -62,7 +62,7 @@ a, a:link, a:active {
 
 .body{
     background-color: #fff;
-    text-align: center;
+    /*text-align: center;*/
     display: table-row;
     width: 100%;
 }
@@ -132,3 +132,85 @@ Inherited from a.home-downloadbutton
 object{
     overflow: hidden;
 }
+
+.tutorialsBanner{
+    background: #333;
+    color: #FFF;
+    text-align: left;
+    padding-left:25px;
+    padding-top:15px;
+    padding-bottom:15px;
+}
+
+.flexboxRowContainer {
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	
+	-webkit-flex-flow: row nowrap;
+	flex-flow: row nowrap;
+}
+
+.flexboxColumnContainer {
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	
+	-webkit-flex-flow: column nowrap;
+	flex-flow: column nowrap;
+}
+
+.tutorialsSidebarContainer{
+    min-width: 400px;
+    min-height: 100%;
+}
+
+#tutorialsSidebarMenu{
+    width: 300px;
+    margin-top: 70px;
+    margin-left: 50px;
+    background: #f5f5f5;
+}
+
+.sidebarMenuTitle{
+    width: 100%;
+    height: 50px;
+    color: rgb(50,50,50);
+    font-weight: bold;
+    text-align : left;
+    padding-left: 25px;
+    padding-top: 15px;
+}
+
+.sidebarMenuItem{
+    width: 100%;
+    height: 50px;
+    color: rgb(150,150,150);
+    text-align : left;
+    padding-left: 25px;
+    padding-top: 12.5px;
+}
+
+.sidebarMenuItem:hover{
+    background: #333;
+    color: #FFF;
+    cursor: pointer;
+}
+
+.tutorialsContentContainer{
+    position: relative;
+    width: 100%;
+    height: 1500px;
+    margin-top: 44px;
+    margin-right: 50px;
+}
+
+.tutorialTitleHeader{
+    border-top: 15px solid rgb(251,223,144);
+    border-bottom: 15px solid rgb(251,223,144);
+}
+
