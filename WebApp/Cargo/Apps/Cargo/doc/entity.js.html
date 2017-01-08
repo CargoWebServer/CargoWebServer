@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: entity.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: entity.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * (C) Copyright 2016 Mycelius SA (http://mycelius.com/).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @fileOverview Entities related functionalities.
+ * @author Dave Courtois
+ * @version 1.0
+ */
+
+/**
+ * The entity manager give acces to ojects stored on the server.
+ * @constructor
+ * @extends EventManager
+ */
+var EntityManager = function (id) {
+
+    if (server == undefined) {
+        return
+    }
+    if (id == undefined) {
+        id = randomUUID()
+    }
+
+    EventManager.call(this, id, EntityEvent)
+
+    /**
+     * @property {object} entityPrototypes Keep track of prototypes in use.
+     */
+    this.entityPrototypes = {}
+
+    return this
+}
+
+EntityManager.prototype = new EventManager(null);
+EntityManager.prototype.constructor = EntityManager;
+
+/*
+ * Dispatch event...
+ */
+EntityManager.prototype.onEvent = function (evt) {
+    EventManager.prototype.onEvent.call(this, evt)
+}
+
+EntityManager.prototype.RegisterListener = function () {
+    // Append to the event handler...
+    server.eventHandler.AddEventManager(this,
+        // callback
+        function () {
+            console.log("Entity manager is registered!")
+        }
+    )
+}
+
+/*
+ * Server side script
+ */
+function GetObjectsByType(typeName, storeId) {
+    var objects
+    objects = server.GetEntityManager().GetObjectsByType(typeName, storeId, messageId, sessionId)
+
+    __QUERY__
+
+    return objects
+}
+
+/**
+ * That function is use to retreive objects with a given type.
+ * @param {string} typeName The name of the type we looking for in the form packageName.typeName
+ * @param {string} storeId The name of the store where the information is saved.
+ * @param {string} queryStr It contain the code of a function to be executed by the server to filter specific values.
+ * @param {function} progressCallback The function is call when chunk of response is received.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+EntityManager.prototype.getObjectsByType = function (typeName, storeId, queryStr, progressCallback, successCallback, errorCallback, caller) {
+
+    // Here I will get the function base...
+    var getObjectsByTypeStr = GetObjectsByType.toString()
+
+    // The query must be a function...
+    if (queryStr != undefined) {
+        // I will append the query call...
+        var reg = /function ([^\(]*)/;
+        var functionName = reg.exec(queryStr)[1];
+        queryStr += "objects = " + functionName + "(objects)"
+        getObjectsByTypeStr = getObjectsByTypeStr.replace("__QUERY__", queryStr)
+    } else {
+        getObjectsByTypeStr = getObjectsByTypeStr.replace("__QUERY__", "")
+    }
+
+    // server is the client side singleton...
+    var params = []
+    params.push(new RpcData({ "name": "typeName", "type": 2, "dataBytes": utf8_to_b64(typeName) }))
+    params.push(new RpcData({ "name": "storeId", "type": 2, "dataBytes": utf8_to_b64(storeId) }))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        getObjectsByTypeStr, // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Keep track of the file transfert...
+            caller.progressCallback(index, total, caller.caller)
+        },
+        function (result, caller) {
+            //console.log(result)
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback...
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message...
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+
+/*
+ * Server side script
+ */
+function GetEntityByUuid(uuid) {
+    var entity = null
+    entity = server.GetEntityManager().GetObjectByUuid(uuid, messageId, sessionId)
+    return entity
+}
+
+/**
+ * That function is use to retreive objects with a given type.
+ * @param {string} uuid The uuid of the entity we looking for. The uuid must has form typeName%UUID.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, errorCallback, caller) {
+
+    // server is the client side singleton...
+    var params = []
+    params.push(new RpcData({ "name": "uuid", "type": 2, "dataBytes": utf8_to_b64(uuid) }))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        GetEntityByUuid.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            //console.log(result)
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback...
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message...
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+
+/*
+ * Server side script
+ */
+function GetEntityById(typeName, id) {
+    var entity = null
+    entity = server.GetEntityManager().GetObjectById(typeName, id, messageId, sessionId)
+    return entity
+}
+
+/**
+ * Retrieve an entity with a given typename and id...
+ * @param {string} typeName The object type name.
+ * @param {string} id The id (not uuid) of the object to look for.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+EntityManager.prototype.getEntityById = function (typeName, id, successCallback, errorCallback, caller) {
+
+    // server is the client side singleton...
+    var params = []
+    params.push(new RpcData({ "name": "typeName", "type": 2, "dataBytes": utf8_to_b64(typeName) }))
+    params.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(id) }))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        GetEntityById.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            //console.log(result)
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Server side script
+ */
+function GetEntityUuidById(typeName, id) {
+    var entity = null
+    entity = server.GetEntityManager().GetObjectById(typeName, id, messageId, sessionId)
+    return entity.UUID
+}
+
+/**
+ * Retrieve an entity uuid with a given typename and id...
+ * @param {string} typeName The object type name.
+ * @param {string} id The id (not uuid) of the object to look for.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+EntityManager.prototype.getEntityUuidById = function (typeName, id, successCallback, errorCallback, caller) {
+
+    // server is the client side singleton...
+    var params = []
+    params.push(new RpcData({ "name": "typeName", "type": 2, "dataBytes": utf8_to_b64(typeName) }))
+    params.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(id) }))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        GetEntityById.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            //console.log(result)
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Server side code.
+ */
+function CreateEntity(parentUuid, attributeName, typeName, id) {
+    var entity = null
+    entity = server.GetEntityManager().CreateEntity(parentUuid, attributeName, typeName, id, messageId, sessionId)
+    return entity
+}
+
+/**
+ * That function is use to create a new entity of a given type..
+ * @param {string} parentUuid The uuid of the parent entity if there is one, null otherwise.
+ * @param {string} attributeName The attribute name is the name of the new entity in his parent. (parent.attributeName = this)
+ * @param {string} typeName The type name of the new entity.
+ * @param {id} id The id of the new entity.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+EntityManager.prototype.createEntity = function (parentUuid, attributeName, typeName, id, successCallback, errorCallback, caller) {
+
+    // server is the client side singleton...
+    var params = []
+    params.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(parentUuid) }))
+    params.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(attributeName) }))
+    params.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(typeName) }))
+    params.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(id) }))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        CreateEntity.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            //console.log(result)
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Recursively get all the references...
+ */
+function getReferences(entity, references) {
+    if (isArray(entity)) {
+        for (var i = 0; i &lt; entity.length; i++) {
+            getReferences(entity[i], references)
+        }
+    } else {
+        for (var propertie in entity) {
+            if (propertie.startsWith("M_")) {
+                if (isArray(entity[propertie])) {
+                    for (var i = 0; i &lt; entity[propertie].length; i++) {
+                        getReferences(entity[propertie][i], references)
+                        if (entity[propertie][i].M_id != undefined) {
+                            if (entity[propertie][i].M_id.length > 0) {
+                                if (references[entity[propertie][i].M_id] == undefined) {
+                                    references[entity[propertie][i].M_id] = entity[propertie][i]
+                                    if (entity[propertie][i].UUID != undefined) {
+                                        references[entity[propertie][i].UUID] = entity[propertie][i]
+                                    }
+
+                                    entity[propertie][i].getParent = function (entity) {
+                                        return function () {
+                                            return entity
+                                        }
+                                    } (entity)
+                                }
+                            }
+                        }
+                    }
+                } else if (isObject(entity[propertie])) {
+                    if (entity[propertie].M_id != undefined) {
+                        if (entity[propertie].M_id.length > 0) {
+                            if (references[entity[propertie].M_id] == undefined) {
+                                references[entity[propertie].M_id] = entity[propertie]
+                                if (entity[propertie].UUID != undefined) {
+                                    references[entity[propertie].UUID] = entity[propertie]
+                                }
+                                entity[propertie].getParent = function (entity) {
+                                    return function () {
+                                        return entity
+                                    }
+                                } (entity)
+                            }
+                        }
+                    }
+                    getReferences(entity[propertie], references)
+                }
+            }
+        }
+    }
+}
+
+/*
+ * Recursively set all reference inside an entity...
+ */
+function setReferences(entity, references) {
+    if (isArray(entity)) {
+        for (var i = 0; i &lt; entity.length; i++) {
+            setReferences(entity[i], references)
+        }
+    } else {
+        for (var propertie in entity) {
+            if (propertie.startsWith("M_")) {
+                if (isArray(entity[propertie])) {
+                    for (var i = 0; i &lt; entity[propertie].length; i++) {
+                        var property = entity[propertie][i]
+                        if (isObject(property)) {
+                            setReferences(property, references)
+                        } else if (isString(property)) {
+                            if (property.startsWith("#")) {
+                                property = property.substring(1);
+                            }
+                            if (references[property] != undefined) {
+                                entity[propertie][i] = references[property]
+                                /* The reset fucntion **/
+                                entity["reset_" + propertie + "_" + i] = function (entity, propertyName, index, propertyValue) {
+                                    return function () {
+                                        entity[propertyName][index] = propertyValue // Set back the id of the reference...
+                                    }
+                                } (entity, propertie, i, property)
+                            }
+                        }
+                    }
+                } else if (isObject(entity[propertie])) {
+                    setReferences(entity[propertie], references)
+                } else if (isString(entity[propertie])) {
+                    if (propertie != "M_id" &amp;&amp; propertie != "M_name") {
+                        var property = entity[propertie]
+                        if (property.startsWith("#")) {
+                            property = property.substring(1);
+                        }
+                        if (references[property] != undefined) {
+                            entity[propertie] = references[property]
+                            /* The reset fucntion **/
+                            entity["reset_" + propertie] = function (entity, propertyName, propertyValue) {
+                                return function () {
+                                    entity[propertyName] = propertyValue // Set back the id of the reference...
+                                }
+                            } (entity, propertie, property)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/*
+ * Reset all references.
+ */
+function resetReferences(entity, references) {
+    for (var propertie in entity) {
+        if (propertie.startsWith("M_")) {
+            if (isArray(entity[propertie])) {
+                for (var i = 0; i &lt; entity[propertie].length; i++) {
+                    if (entity[propertie][i].M_id != undefined) {
+                        if (references[entity[propertie][i].M_id] == undefined) {
+                            references[entity[propertie][i].M_id] = "" // Just not undefined...
+                            resetReferences(entity[propertie][i], references)
+                        }
+
+
+                        if (entity["reset_" + propertie + "_" + i] != undefined) {
+                            // Call reset...
+                            entity["reset_" + propertie + "_" + i]()
+                        }
+                    }
+
+                }
+
+            } else if (isObject(entity[propertie])) {
+                if (entity[propertie].M_id != undefined) {
+                    if (references[entity[propertie].M_id] == undefined) {
+                        references[entity[propertie].M_id] = "" // Just not undefined...
+                        resetReferences(entity[propertie], references)
+                    }
+                    if (entity["reset_" + propertie] != undefined) {
+                        // Call reset...
+                        entity["reset_" + propertie]()
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Initialyse references (localy) of a given entity.
+ * @param {Entity} entity The entity to initialyse.
+ * @param {function} initCallback The function to call when the initialization is done.
+ */
+EntityManager.prototype.initEntityRef = function (entity, initCallback) {
+
+    /* First of all i will get all the references in the entity... **/
+    var references = {}
+    // Set the map of references.
+    getReferences(entity, references)
+
+    // replace reference string by it actual object...
+    setReferences(entity, references)
+
+    // In order to do specific initializations init 
+    // will be call.
+    if (entity.init != undefined) {
+        entity.init()
+    }
+
+    // I will keep the reference array for futur use here...
+    entity.getReferences = function (references) {
+        return function () {
+            return references
+        }
+    } (references)
+
+    // If more than one call is necessary to intialyse the entity 
+    // the init callback will be call asynchronously.
+    if (initCallback != undefined) {
+        return initCallback(entity)
+    }
+}
+
+/*
+ * Sever side code.
+ */
+function RemoveEntity(uuid) {
+    entity = server.GetEntityManager().RemoveEntity(uuid, messageId, sessionId)
+}
+
+/*
+ * That function is use to remove an entity with a given uuid.
+ * @param {string} uuid The uuid of entity to delete. Must have the form TypeName%UUID
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+EntityManager.prototype.removeEntity = function (uuid, successCallback, errorCallback, caller) {
+
+    // server is the client side singleton...
+    var params = []
+    params.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(uuid) }))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        RemoveEntity.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            //console.log(result)
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Server side script.
+ */
+function SaveEntity(object) {
+    // get the entity.
+    if (server.GetEntityManager().__NEW_ENTITY_CREATOR_FUNCTION__ != undefined) {
+        // The entity is native entity...
+        var entity = server.GetEntityManager().__NEW_ENTITY_CREATOR_FUNCTION__(object)
+
+        if (entity != null) {
+            entity.NeedSave = true
+            entity.SaveEntity()
+            // Reflect the value in parent...
+            var parent = entity.GetParentPtr()
+            if (parent != null) {
+                parent.InitEntity(parent.GetUuid())
+            }
+        }
+
+        // Return entity object...
+        return entity.GetObject()
+
+    } else {
+        var entity = server.GetEntityManager().CreateDynamicEntity(object, messageId, sessionId)
+        return entity
+    }
+}
+
+/**
+ * Save The entity. If the entity does not exist it create it.
+ * @param {Entity} entity The entity to save.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+EntityManager.prototype.saveEntity = function (entity, successCallback, errorCallback, caller) {
+    var references = {}
+    resetReferences(entity, references)
+
+    // Here I will disconnect recursive reference.
+    var entityStr = JSON.stringify(entity)
+
+    // Here I will set back the reference...
+    this.initEntityRef(entity)
+
+    // server is the client side singleton...
+    var params = []
+    params.push(new RpcData({ "name": "entity", "type": 4, "dataBytes": utf8_to_b64(entityStr) }))
+
+    var functionStr = SaveEntity.toString()
+    //NewCargoConfigSmtpConfigurationEntityFromOject
+    functionStr = functionStr.replaceAll("__NEW_ENTITY_CREATOR_FUNCTION__", "New" + entity.TYPENAME.replace(".", "") + "EntityFromObject")
+
+    // Call it on the server.
+    server.executeJsFunction(
+        functionStr, // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            //console.log(result)
+            if (caller.successCallback != undefined) {
+                caller.successCallback(result[0], caller.caller)
+            }
+        },
+        function (errMsg, caller) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Sever side script.
+ */
+function CreateEntityPrototype(storeId, prototype) {
+    var proto = null
+    proto = server.GetEntityManager().CreateEntityPrototype(storeId, prototype, messageId, sessionId)
+    return proto
+}
+
+/**
+ * Create a new entity prototype.
+ * @param {string} storeId The store id, where to create the new prototype.
+ * @param {EntityPrototype} prototype The prototype object to create.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+EntityManager.prototype.createEntityPrototype = function (storeId, prototype, successCallback, errorCallback, caller) {
+
+    // server is the client side singleton...
+    var params = []
+    params.push(new RpcData({ "name": "storeId", "type": 2, "dataBytes": utf8_to_b64(storeId) }))
+    params.push(new RpcData({ "name": "typeName", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(prototype)) }))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        CreateEntityPrototype.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Server side code.
+ */
+function GetEntityPrototype(typeName, storeId) {
+    var proto = null
+    proto = server.GetEntityManager().GetEntityPrototype(typeName, storeId, messageId, sessionId)
+    return proto
+}
+
+/**
+ * That function will retreive the entity prototype with a given type name.
+ * @param {string} typeName The type name of the prototype to retreive.
+ * @param {string} storeId The store id, where to create the new prototype.
+ * @param {EntityPrototype} The prototype object to create.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+EntityManager.prototype.getEntityPrototype = function (typeName, storeId, successCallback, errorCallback, caller) {
+
+    // Retrun entity prototype that aleady exist...
+    if (server.entityManager.entityPrototypes[typeName] != undefined) {
+        successCallback(server.entityManager.entityPrototypes[typeName])
+    }
+
+    // little trick here, i use the same db for bpmn elements...
+    if (storeId == "BPMNDI" || storeId == "DC" || storeId == "DI") {
+        storeId = "BPMN20"
+    }
+
+    // server is the client side singleton...
+    var params = []
+    params.push(new RpcData({ "name": "typeName", "type": 2, "dataBytes": utf8_to_b64(typeName) }))
+    params.push(new RpcData({ "name": "storeId", "type": 2, "dataBytes": utf8_to_b64(storeId) }))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        GetEntityPrototype.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            var proto = new EntityPrototype()
+            server.entityManager.entityPrototypes[results[0].TypeName] = proto
+            proto.init(results[0])
+            protoypes.push(proto)
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Server side code.
+ */
+function GetEntityPrototypes(storeId) {
+    var protos = null
+    protos = server.GetEntityManager().GetEntityPrototypes(storeId, messageId, sessionId)
+    return protos
+}
+
+/**
+ * That function will retreive all prototypes of a store.
+ * @param {string} storeId The store id, where to create the new prototype.
+ * @param {EntityPrototype} The prototype object to create.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+EntityManager.prototype.getEntityPrototypes = function (storeId, successCallback, errorCallback, caller) {
+
+    // little trick here, i use the same db for bpmn elements...
+    if (storeId == "BPMNDI" || storeId == "DC" || storeId == "DI") {
+        storeId = "BPMN20"
+    }
+
+    // server is the client side singleton...
+    var params = []
+    params.push(new RpcData({ "name": "storeId", "type": 2, "dataBytes": utf8_to_b64(storeId) }))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        GetEntityPrototypes.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (results, caller) {
+            //console.log(result)
+            var results = results[0]
+            var protoypes = []
+            for (var i = 0; i &lt; results.length; i++) {
+                var proto = new EntityPrototype()
+                server.entityManager.entityPrototypes[results[i].TypeName] = proto
+                proto.init(results[i])
+                protoypes.push(proto)
+            }
+            caller.successCallback(protoypes, caller.caller)
+        },
+        function (errMsg, caller) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/**
+  Restriction are expression defining limitation on the
+  range of value that a variable can take. Type of restriction
+  are :
+    &lt;ul>
+        &lt;li>Enumeration&lt;/li>
+        &lt;li>FractionDigits&lt;/li>
+        &lt;li>Length&lt;/li>
+        &lt;li>MaxExclusive&lt;/li>
+        &lt;li> MaxInclusive&lt;/li>
+        &lt;li>MaxLength&lt;/li>
+        &lt;li>MinExclusive&lt;/li>
+        &lt;li> MinInclusive&lt;/li>
+        &lt;li>MinLength&lt;/li>
+        &lt;li>Pattern&lt;/li>
+        &lt;li>TotalDigits&lt;/li>
+        &lt;li>WhiteSpace&lt;/li>
+    &lt;/ul>
+ */
+var Restriction = function () {
+    // The the of the restriction (Facet)
+    this.Type
+
+    // The value...
+    this.Value
+}
+
+/**
+ * The entity prototype define the schema of an entity. Entity prototype
+ * are usefull to make entity persistent, to export and import schema from
+ * other data source like xml schema. It's also possible to create at runtime
+ * new kind of entity and make query over it...
+ * &lt;/br>note: Fields, FieldsType, FieldsDocumentation, FieldsNillable and FieldsOrder 
+ * must have the same number of elements.
+ * @constructor 
+ */
+var EntityPrototype = function () {
+    this.TYPENAME = "Server.EntityPrototype"
+
+    /**
+     * @property {string} TypeName The type name of the entity must be write 'packageName.className'
+     */
+    this.TypeName = "" // string
+
+    /** 
+     * @property {string} Documentation The entity type documentation.
+     */
+    this.Documentation
+
+    /** 
+     * @property {boolean} IsAbstract True if the entity prototype is an abstrac class...
+     */
+    this.IsAbstract = false
+
+    /**
+     * @property ListOf The prototype consiste of a list of other type
+     */
+    this.ListOf = ""
+
+    /**
+     * @property SubstitutionGroup The list of substitution group, must be use in abstract class.
+     */
+    this.SubstitutionGroup = []
+
+    /**
+     * @property SyperTypeNames The list of super class name.
+     */
+    this.SyperTypeNames = [] // string
+
+    /**
+     *  @property Restrictions The field restrictions.
+     */
+    this.Restrictions = [] // Restriction
+
+    /**
+     * @property Ids The list of fields used as ids.
+     */
+    this.Ids = [] // string
+
+    /**
+     * @property Indexs The list of fields used as index.
+     */
+    this.Indexs = [] // string
+
+    /**
+     * @property {function} initCallback That function is call when the initialization is completed successfully
+     */
+    this.initCallback = undefined
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  Field's properties.
+    ////////////////////////////////////////////////////////////////////////////
+
+    /** 
+     * @property Fields The fields name 
+     */
+    this.Fields = []
+
+    /**
+     * @property FieldsDocumentation The field documentation
+     */
+    this.FieldsDocumentation = []
+
+    /**
+     * @property FieldsType The fields type
+     */
+    this.FieldsType = [] // string
+
+    /**
+     * @property FieldsVisibility The fields visibility
+     */
+    this.FieldsVisibility = [] // bool
+
+    /**
+     * @property FieldsNillable If the field can be nil
+     */
+    this.FieldsNillable = [] // bool
+
+    /**
+     * @property FieldsOrder The field order
+     */
+    this.FieldsOrder = [] // int
+
+    return this
+}
+
+/**
+ * Create a new class form json object.
+ * @param {object} object The object that regroup the prototype properties.
+ */
+EntityPrototype.prototype.init = function (object) {
+    if (object == null) {
+        return
+    }
+
+    // The type name...
+    this.TypeName = object.TypeName
+
+    // The package will be an object on the global scope...
+    this.PackageName = object.TypeName.split(".")[0]
+    if (window[this.PackageName] == undefined) {
+        window[this.PackageName] = eval(this.PackageName + " = {}")
+    }
+
+    this.ClassName = object.TypeName.split(".")[1]
+
+    // The object ids
+    this.appendIds(object.Ids)
+
+    // The object indexs
+    this.appendIndexs(object.Indexs)
+
+
+    // Now the fields...
+    if (object.Fields != null &amp;&amp; object.FieldsType != null &amp;&amp; object.FieldsVisibility != null &amp;&amp; object.FieldsOrder != null) {
+
+        // Append parent uuid if none is define...
+        if (!contains(object.Fields, "parentUuid")) {
+            for (var i = 0; i &lt; object.FieldsOrder.length; i++) {
+                object.FieldsOrder[i] = object.FieldsOrder[i] + 1
+            }
+            object.Fields.unshift("parentUuid")
+            object.FieldsType.unshift("string")
+            object.FieldsVisibility.unshift(false)
+            object.FieldsOrder.unshift(0)
+        }
+
+        // Append the uuid if none is define...
+        if (!contains(object.Fields, "uuid")) {
+            for (var i = 0; i &lt; object.FieldsOrder.length; i++) {
+                object.FieldsOrder[i] = object.FieldsOrder[i] + 1
+            }
+            object.Fields.unshift("uuid")
+            object.FieldsType.unshift("string")
+            object.FieldsVisibility.unshift(false)
+            object.FieldsOrder.unshift(0)
+        }
+
+        for (var i = 0; i &lt; object.Fields.length; i++) {
+            this.appendField(object.Fields[i], object.FieldsType[i], object.FieldsVisibility[i], object.FieldsOrder[i])
+            if (object.Fields[i] == "uuid") {
+                if (!contains(this.Ids, "uuid")) {
+                    this.Ids.push("uuid")
+                }
+            } else if (object.Fields[i] == "parentUuid") {
+                if (!contains(this.Indexs, "parentUuid")) {
+                    this.Indexs.push("parentUuid")
+                }
+            }
+        }
+
+    } else {
+        console.log(object.TypeName + " has no fields!!!")
+    }
+
+    // Now the restriction
+    this.Restrictions = object.Restrictions
+
+    // If the object is abstract
+    this.IsAbstract = object.IsAbstract
+
+    // The list of substitution type.
+    this.SubstitutionGroup = object.SubstitutionGroup
+
+    // The list of Supertype 
+    this.SyperTypeNames = object.SyperTypeNames
+
+    // if the type is a collection...
+    this.ListOf = object.ListOf
+
+    // other standard fields...
+    this.appendField("childsUuid", "[]string", false, this.FieldsOrder.length)
+    this.appendField("referenced", "[]EntityRef", false, this.FieldsOrder.length)
+
+    // Generate the class code.
+    this.generateConstructor()
+
+    // The init function.
+    this.generateInit()
+}
+
+/**
+ * That function initialyse an object created from a given prototype constructor with the values from a plain JSON object.
+ * @param {object} object The object to initialyse.
+ * @param {object} values The plain JSON object that contain values.
+ */
+function setObjectValues(object, values) {
+    if (values == undefined) {
+        return
+    }
+    var prototype = server.entityManager.entityPrototypes[values["TYPENAME"]]
+    // Here I will iterate over the values and set it into the 
+    // object.
+    for (var property in values) {
+
+        var propertyType = null
+        for (var i = 0; i &lt; prototype.Fields.length; i++) {
+            if (prototype.Fields[i] == property) {
+                propertyType = prototype.FieldsType[i]
+                break
+            }
+        }
+
+        if (propertyType != null) {
+            if (propertyType.startsWith("[]")) {
+                // The property is an array...
+                if (values[property] != null) {
+                    if (values[property].length > 0) {
+                        for (var i = 0; i &lt; values[property].length; i++) {
+                            /*if(endsWith(propertyType, ":Ref") == false){
+    
+                            }*/
+                            var typeName = propertyType.replace("[]", "").replace(":Ref", "")
+                            if (server.entityManager.entityPrototypes[typeName] != undefined) {
+                                var object_ = eval("new " + typeName + "()")
+                                setObjectValues(object_, values[property][i])
+                                object[property].push(object_)
+                            } else {
+                                object[property] = values[property]
+                            }
+                        }
+                    }
+                }
+            } else {
+                // The property is not an array...
+                var typeName = propertyType.replace("[]", "").replace(":Ref", "")
+                if (server.entityManager.entityPrototypes[typeName] != undefined) {
+                    var object_ = eval("new " + typeName + "()")
+                    setObjectValues(object_, values[property])
+                    object[property] = object_
+                } else {
+                    object[property] = values[property]
+                }
+            }
+        } else {
+            object[property] = values[property]
+        }
+    }
+
+    // Set the uuid...
+    object["uuid"] = values["UUID"]
+    object["NeedSave"] = false
+}
+
+/**
+ * Generate the initialization function.
+ */
+EntityPrototype.prototype.generateInit = function () {
+    // Now the initialization from object value...
+    initFunction = this.PackageName + "." + this.ClassName + ".prototype.init = function(object){\n"
+    // First of all i will set reference in the result...
+    initFunction += "	var references = {}\n"
+    initFunction += "   setReferences(object, references)\n"
+    initFunction += "   setObjectValues(this, object)\n"
+    initFunction += "}\n"
+    eval(initFunction)
+}
+
+/**
+ * This function generate the js class base on the entity prototype.
+ */
+EntityPrototype.prototype.generateConstructor = function () {
+    // I will create the object constructor from the information
+    // of the fields...
+    var constructorSrc = this.PackageName + "." + this.ClassName + " = function(entityPrototype){\n"
+
+    // Common properties share by all entity...
+    constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
+    constructorSrc += " this.UUID = \"\"\n"
+    constructorSrc += " this.NeedSave = true\n"
+
+    // Fields...
+    for (var i = 0; i &lt; this.Fields.length; i++) {
+        constructorSrc += " this." + this.Fields[i]
+        if (this.FieldsType[i].startsWith("[]")) {
+            constructorSrc += " = []\n"
+        } else {
+            if (this.FieldsType[i] == "string") {
+                constructorSrc += " = \"\"\n"
+            } else if (this.FieldsType[i] == "bool") {
+                constructorSrc += " = false\n"
+            } else if (this.FieldsType[i] == "int") {
+                constructorSrc += " = 0\n"
+            } else if (this.FieldsType[i] == "float") {
+                constructorSrc += " = 0.0\n"
+            } else {
+                // Object here...
+                constructorSrc += " = undefined\n"
+            }
+        }
+    }
+
+    // Keep the reference on the entity prototype...
+    constructorSrc += " this.getEntityPrototype = function(entityPrototype){return function(){ return entityPrototype }}(entityPrototype)\n"
+
+    constructorSrc += " return this\n"
+    constructorSrc += "}\n"
+
+    // Set the function...
+    eval(constructorSrc)
+}
+
+/**
+ * Create a new prototypeField.
+ * @param {string} name The field name.
+ * @param {string} name The field type name.
+ * @param {boolean} isVisible True, if the field is visible.
+ * @param {int} order The order the field will be return, usefull to display.
+ */
+EntityPrototype.prototype.appendField = function (name, typeName, isVisible, order) {
+    // Set the field name.
+    if (!contains(this.Fields, name)) {
+        this.Fields.push(name)
+
+        // Set the field type name
+        this.FieldsType.push(typeName)
+
+        // Set the field visibility
+        this.FieldsVisibility.push(isVisible)
+        // And the order (index in the list of fields...)
+        this.FieldsOrder.push(parseInt(order))
+    }
+}
+
+/**
+ * Append the list of indexs
+ * @param indexs The list of indexs to append.
+ */
+EntityPrototype.prototype.appendIndexs = function (indexs) {
+    if (indexs != null) {
+        for (var i = 0; i &lt; indexs.length; i++) {
+            this.Indexs.push(indexs[i])
+        }
+    }
+}
+
+/**
+ * Append the list of id's
+ * @param ids The list of ids to append.
+ */
+EntityPrototype.prototype.appendIds = function (ids) {
+    if (ids != null) {
+        for (var i = 0; i &lt; ids.length; i++) {
+            this.Ids.push(ids[i])
+        }
+    }
+}
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AccountManager.html">AccountManager</a></li><li><a href="Attachment.html">Attachment</a></li><li><a href="CarbonCopy.html">CarbonCopy</a></li><li><a href="ColumnFilter.html">ColumnFilter</a></li><li><a href="ColumnFormater.html">ColumnFormater</a></li><li><a href="ColumnSorter.html">ColumnSorter</a></li><li><a href="DataManager.html">DataManager</a></li><li><a href="Element.html">Element</a></li><li><a href="EmailManager.html">EmailManager</a></li><li><a href="EmailManager_sendEmail.html">sendEmail</a></li><li><a href="EntityManager.html">EntityManager</a></li><li><a href="EntityPrototype.html">EntityPrototype</a></li><li><a href="EntityTableModel.html">EntityTableModel</a></li><li><a href="EventChannel.html">EventChannel</a></li><li><a href="EventChannel_BroadcastEvent.html">BroadcastEvent</a></li><li><a href="EventHandler.html">EventHandler</a></li><li><a href="EventManager.html">EventManager</a></li><li><a href="ExecuteJsFunction.html">ExecuteJsFunction</a></li><li><a href="FileManager.html">FileManager</a></li><li><a href="LanguageManager.html">LanguageManager</a></li><li><a href="Request.html">Request</a></li><li><a href="Response.html">Response</a></li><li><a href="Server.html">Server</a></li><li><a href="SessionManager.html">SessionManager</a></li><li><a href="SqlTableModel.html">SqlTableModel</a></li><li><a href="SVG_Canvas.html">SVG_Canvas</a></li><li><a href="SVG_Circle.html">SVG_Circle</a></li><li><a href="SVG_ClipPath.html">SVG_ClipPath</a></li><li><a href="SVG_Element.html">SVG_Element</a></li><li><a href="SVG_Ellipse.html">SVG_Ellipse</a></li><li><a href="SVG_ForeignObject.html">SVG_ForeignObject</a></li><li><a href="SVG_Gradient.html">SVG_Gradient</a></li><li><a href="SVG_Group.html">SVG_Group</a></li><li><a href="SVG_Image.html">SVG_Image</a></li><li><a href="SVG_Line.html">SVG_Line</a></li><li><a href="SVG_Mask.html">SVG_Mask</a></li><li><a href="SVG_Path.html">SVG_Path</a></li><li><a href="SVG_Pattern.html">SVG_Pattern</a></li><li><a href="SVG_Polygon.html">SVG_Polygon</a></li><li><a href="SVG_Polyline.html">SVG_Polyline</a></li><li><a href="SVG_Rectangle.html">SVG_Rectangle</a></li><li><a href="SVG_Text.html">SVG_Text</a></li><li><a href="SVG_Text_appendSpan.html">appendSpan</a></li><li><a href="SVG_tRef.html">SVG_tRef</a></li><li><a href="SVG_Use.html">SVG_Use</a></li><li><a href="Table.html">Table</a></li><li><a href="TableCell.html">TableCell</a></li><li><a href="TableHeader.html">TableHeader</a></li><li><a href="TableModel.html">TableModel</a></li><li><a href="TableRow.html">TableRow</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ab2str">ab2str</a></li><li><a href="global.html#addStyleString">addStyleString</a></li><li><a href="global.html#applySat">applySat</a></li><li><a href="global.html#b64_to_utf8">b64_to_utf8</a></li><li><a href="global.html#base64toBlob">base64toBlob</a></li><li><a href="global.html#contains">contains</a></li><li><a href="global.html#convertDataURIToBinary">convertDataURIToBinary</a></li><li><a href="global.html#CountSpace">CountSpace</a></li><li><a href="global.html#createElementFromHtml">createElementFromHtml</a></li><li><a href="global.html#createElementFromXml">createElementFromXml</a></li><li><a href="global.html#decode64">decode64</a></li><li><a href="global.html#encode64">encode64</a></li><li><a href="global.html#findKeyframesRule">findKeyframesRule</a></li><li><a href="global.html#framesRules">framesRules</a></li><li><a href="global.html#getContrastYIQ">getContrastYIQ</a></li><li><a href="global.html#getCurrentDateStr">getCurrentDateStr</a></li><li><a href="global.html#getNavigatorName">getNavigatorName</a></li><li><a href="global.html#getStyleRuleValue">getStyleRuleValue</a></li><li><a href="global.html#getStyleSheetByFileName">getStyleSheetByFileName</a></li><li><a href="global.html#getTextWidth">getTextWidth</a></li><li><a href="global.html#getTimeSinceStr">getTimeSinceStr</a></li><li><a href="global.html#hexToB">hexToB</a></li><li><a href="global.html#hexToG">hexToG</a></li><li><a href="global.html#hexToR">hexToR</a></li><li><a href="global.html#hexToRgb">hexToRgb</a></li><li><a href="global.html#includeJavascript">includeJavascript</a></li><li><a href="global.html#invertHex">invertHex</a></li><li><a href="global.html#isArray">isArray</a></li><li><a href="global.html#isEmail">isEmail</a></li><li><a href="global.html#isInt">isInt</a></li><li><a href="global.html#isNumeric">isNumeric</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#localToGlobal">localToGlobal</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#mergeJSON">mergeJSON</a></li><li><a href="global.html#Message">Message</a></li><li><a href="global.html#MessageData">MessageData</a></li><li><a href="global.html#Name">Name</a></li><li><a href="global.html#propertyFromStylesheet">propertyFromStylesheet</a></li><li><a href="global.html#randomArray">randomArray</a></li><li><a href="global.html#randomColor">randomColor</a></li><li><a href="global.html#randomIntFromInterval">randomIntFromInterval</a></li><li><a href="global.html#randomUUID">randomUUID</a></li><li><a href="global.html#resizeImage">resizeImage</a></li><li><a href="global.html#Restriction">Restriction</a></li><li><a href="global.html#rgbToHsl">rgbToHsl</a></li><li><a href="global.html#selectText">selectText</a></li><li><a href="global.html#server">server</a></li><li><a href="global.html#setObjectValues">setObjectValues</a></li><li><a href="global.html#shuffleArray">shuffleArray</a></li><li><a href="global.html#StartWith">StartWith</a></li><li><a href="global.html#str2ab">str2ab</a></li><li><a href="global.html#This">This</a></li><li><a href="global.html#Uint8ToBase64">Uint8ToBase64</a></li><li><a href="global.html#utf8_to_b64">utf8_to_b64</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#Value">Value</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Jul 27 2016 17:16:32 GMT-0400 (EDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

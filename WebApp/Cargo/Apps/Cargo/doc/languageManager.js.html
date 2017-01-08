@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: languageManager.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: languageManager.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * (C) Copyright 2016 Mycelius SA (http://mycelius.com/).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @fileOverview Language manipulation.
+ * @author Dave Courtois
+ * @version 1.0
+ */
+
+/**
+ * The language manager is use to manage text translation.
+ * @constructor
+ */
+var LanguageManager = function(){
+	/**
+	 * @property The language map that contain the language information.
+	 */
+	this.languageInfo = {}
+	
+	/**
+	 * @property The references to text elements that contain text managed by this class.
+	 */
+	this.textElements = {}
+
+	/**
+	 * @property The current language.
+	 */
+	this.language = null
+
+	var language = navigator.language || navigator.userLanguage;
+
+	if(language != undefined){
+		this.language = language.split("-")[0]
+	}
+	this.elements = {}
+
+	return this
+}
+
+/**
+ * Merge a map containning the language information with the member language info of this object.
+ * @param {*} languageInfo The map containning the information to append.
+ */
+LanguageManager.prototype.appendLanguageInfo = function(languageInfo){
+	for (var languageId in languageInfo){
+		if(this.languageInfo[languageId] == undefined ){
+			this.languageInfo[languageId] = languageInfo[languageId]
+		}else{
+			for (var textId in languageInfo[languageId]){
+				this.languageInfo[languageId][textId] = languageInfo[languageId][textId]
+			}
+		}
+	}
+}
+
+/**
+ * Associated an element (span, div, textarea...) with a text information in the map with a given id.
+ */
+LanguageManager.prototype.registerElementText = function(element, textId){
+	if (this.textElements[textId] == undefined){
+		this.textElements[textId] = []
+	}
+	this.textElements[textId].push(element)
+
+	if (this.elements[element.id] == undefined){
+		this.elements[element.id] = element
+	}
+
+}
+
+/**
+ * Set the current language and update all text elements.
+ * @param {} language The language to set. {'fr', 'en', 'sp'...}
+ */
+LanguageManager.prototype.setLanguage = function(language){
+	this.language = language
+	for (var textElementsId in this.textElements){
+		for (var i = 0; i &lt; this.textElements[textElementsId].length; i++){
+			var text = this.languageInfo[language][textElementsId]
+			var element = this.textElements[textElementsId][i]
+			element.setAttribute("innerHTML", text)
+		}
+	}
+}
+
+/**
+ * Set the text of an element with the text in the languageInfo map with a given id.
+ * @param {Element} element The element that contain the text.
+ * @param {string} textId The id of an element in the languageInfo map.
+ */
+LanguageManager.prototype.setElementText= function(element, textId){
+	this.registerElementText(element, textId)
+	if(this.elements[element.id].tagName == "SPAN"){
+		this.elements[element.id].textContent = this.languageInfo[this.language][textId]
+	}else{
+		this.elements[element.id].setAttribute("innerHTML", this.languageInfo[this.language][textId])
+	}
+}
+
+/**
+ * Get the text of an item with a given id for the current language.
+ * @param {string} textId The text item id.
+ * @returns {string} The corresponding text.
+ */
+LanguageManager.prototype.getText= function(textId){
+	return this.languageInfo[this.language][textId]
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AccountManager.html">AccountManager</a></li><li><a href="Attachment.html">Attachment</a></li><li><a href="CarbonCopy.html">CarbonCopy</a></li><li><a href="ColumnFilter.html">ColumnFilter</a></li><li><a href="ColumnFormater.html">ColumnFormater</a></li><li><a href="ColumnSorter.html">ColumnSorter</a></li><li><a href="DataManager.html">DataManager</a></li><li><a href="Element.html">Element</a></li><li><a href="EmailManager.html">EmailManager</a></li><li><a href="EmailManager_sendEmail.html">sendEmail</a></li><li><a href="EntityManager.html">EntityManager</a></li><li><a href="EntityPrototype.html">EntityPrototype</a></li><li><a href="EntityTableModel.html">EntityTableModel</a></li><li><a href="EventChannel.html">EventChannel</a></li><li><a href="EventChannel_BroadcastEvent.html">BroadcastEvent</a></li><li><a href="EventHandler.html">EventHandler</a></li><li><a href="EventManager.html">EventManager</a></li><li><a href="ExecuteJsFunction.html">ExecuteJsFunction</a></li><li><a href="FileManager.html">FileManager</a></li><li><a href="LanguageManager.html">LanguageManager</a></li><li><a href="Request.html">Request</a></li><li><a href="Response.html">Response</a></li><li><a href="Server.html">Server</a></li><li><a href="SessionManager.html">SessionManager</a></li><li><a href="SqlTableModel.html">SqlTableModel</a></li><li><a href="SVG_Canvas.html">SVG_Canvas</a></li><li><a href="SVG_Circle.html">SVG_Circle</a></li><li><a href="SVG_ClipPath.html">SVG_ClipPath</a></li><li><a href="SVG_Element.html">SVG_Element</a></li><li><a href="SVG_Ellipse.html">SVG_Ellipse</a></li><li><a href="SVG_ForeignObject.html">SVG_ForeignObject</a></li><li><a href="SVG_Gradient.html">SVG_Gradient</a></li><li><a href="SVG_Group.html">SVG_Group</a></li><li><a href="SVG_Image.html">SVG_Image</a></li><li><a href="SVG_Line.html">SVG_Line</a></li><li><a href="SVG_Mask.html">SVG_Mask</a></li><li><a href="SVG_Path.html">SVG_Path</a></li><li><a href="SVG_Pattern.html">SVG_Pattern</a></li><li><a href="SVG_Polygon.html">SVG_Polygon</a></li><li><a href="SVG_Polyline.html">SVG_Polyline</a></li><li><a href="SVG_Rectangle.html">SVG_Rectangle</a></li><li><a href="SVG_Text.html">SVG_Text</a></li><li><a href="SVG_Text_appendSpan.html">appendSpan</a></li><li><a href="SVG_tRef.html">SVG_tRef</a></li><li><a href="SVG_Use.html">SVG_Use</a></li><li><a href="Table.html">Table</a></li><li><a href="TableCell.html">TableCell</a></li><li><a href="TableHeader.html">TableHeader</a></li><li><a href="TableModel.html">TableModel</a></li><li><a href="TableRow.html">TableRow</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ab2str">ab2str</a></li><li><a href="global.html#addStyleString">addStyleString</a></li><li><a href="global.html#applySat">applySat</a></li><li><a href="global.html#b64_to_utf8">b64_to_utf8</a></li><li><a href="global.html#base64toBlob">base64toBlob</a></li><li><a href="global.html#contains">contains</a></li><li><a href="global.html#convertDataURIToBinary">convertDataURIToBinary</a></li><li><a href="global.html#CountSpace">CountSpace</a></li><li><a href="global.html#createElementFromHtml">createElementFromHtml</a></li><li><a href="global.html#createElementFromXml">createElementFromXml</a></li><li><a href="global.html#decode64">decode64</a></li><li><a href="global.html#encode64">encode64</a></li><li><a href="global.html#findKeyframesRule">findKeyframesRule</a></li><li><a href="global.html#framesRules">framesRules</a></li><li><a href="global.html#getContrastYIQ">getContrastYIQ</a></li><li><a href="global.html#getCurrentDateStr">getCurrentDateStr</a></li><li><a href="global.html#getNavigatorName">getNavigatorName</a></li><li><a href="global.html#getStyleRuleValue">getStyleRuleValue</a></li><li><a href="global.html#getStyleSheetByFileName">getStyleSheetByFileName</a></li><li><a href="global.html#getTextWidth">getTextWidth</a></li><li><a href="global.html#getTimeSinceStr">getTimeSinceStr</a></li><li><a href="global.html#hexToB">hexToB</a></li><li><a href="global.html#hexToG">hexToG</a></li><li><a href="global.html#hexToR">hexToR</a></li><li><a href="global.html#hexToRgb">hexToRgb</a></li><li><a href="global.html#includeJavascript">includeJavascript</a></li><li><a href="global.html#invertHex">invertHex</a></li><li><a href="global.html#isArray">isArray</a></li><li><a href="global.html#isEmail">isEmail</a></li><li><a href="global.html#isInt">isInt</a></li><li><a href="global.html#isNumeric">isNumeric</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#localToGlobal">localToGlobal</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#mergeJSON">mergeJSON</a></li><li><a href="global.html#Message">Message</a></li><li><a href="global.html#MessageData">MessageData</a></li><li><a href="global.html#Name">Name</a></li><li><a href="global.html#propertyFromStylesheet">propertyFromStylesheet</a></li><li><a href="global.html#randomArray">randomArray</a></li><li><a href="global.html#randomColor">randomColor</a></li><li><a href="global.html#randomIntFromInterval">randomIntFromInterval</a></li><li><a href="global.html#randomUUID">randomUUID</a></li><li><a href="global.html#resizeImage">resizeImage</a></li><li><a href="global.html#Restriction">Restriction</a></li><li><a href="global.html#rgbToHsl">rgbToHsl</a></li><li><a href="global.html#selectText">selectText</a></li><li><a href="global.html#server">server</a></li><li><a href="global.html#setObjectValues">setObjectValues</a></li><li><a href="global.html#shuffleArray">shuffleArray</a></li><li><a href="global.html#StartWith">StartWith</a></li><li><a href="global.html#str2ab">str2ab</a></li><li><a href="global.html#This">This</a></li><li><a href="global.html#Uint8ToBase64">Uint8ToBase64</a></li><li><a href="global.html#utf8_to_b64">utf8_to_b64</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#Value">Value</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Jul 27 2016 17:16:32 GMT-0400 (EDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

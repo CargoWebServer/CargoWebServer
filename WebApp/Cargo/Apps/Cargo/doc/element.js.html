@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: element.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: element.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * (C) Copyright 2016 Mycelius SA (http://mycelius.com/).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @fileOverview Html element wrapper class.
+ * @author Dave Courtois,Philippe Séguin-Boies,Eric Kavalec
+ * @version 1.0
+ */
+
+/*
+ * Create a child element for a given parent.
+ */
+function createChildElement(parent, node) {
+
+    var nodeElement = new Element(parent, null, null)
+    nodeElement.parent = parent
+    nodeElement.element = node
+
+    if (node.id != undefined) {
+        nodeElement.id = node.id
+    } else {
+        nodeElement.id = randomUUID()
+        node.id = nodeElement.id
+    }
+    if (parent == null) {
+        document.getElementsByTagName("body")[0].appendChild(node)
+    } else {
+        parent.appendElement(nodeElement)
+    }
+
+    // I will wrap those html element inside the js element structure...
+    for (var i = 0; i &lt; node.childNodes.length; i++) {
+        createChildElement(nodeElement, node.childNodes[i])
+    }
+}
+
+/**
+ * That function built element from a plain xml string.
+ * @param parent the parent of the resulting element.
+ * @param xml The xml string...
+ */
+function createElementFromXml(parent, xml) {
+
+    var parser = new DOMParser();
+    // So the parser will do the job to create the html element...
+    var xmlDoc = parser.parseFromString(xml, "text/xml");
+
+    // I will wrap those html element inside the js element structure...
+    for (var i = 0; i &lt; xmlDoc.childNodes.length; i++) {
+        createChildElement(parent, xmlDoc.childNodes[i])
+    }
+}
+
+/**
+ * That function built element from a plain html string.
+ * @param parent the parent of the resulting element.
+ * @param html The xml string...
+ */
+function createElementFromHtml(parent, html) {
+    var parser = new DOMParser();
+    var htmlDoc = parser.parseFromString(html, "text/html")
+    var body = htmlDoc.getElementsByTagName("body")[0]
+
+    for (var i = 0; i &lt; body.childNodes.length; i++) {
+        var node = body.childNodes[i];
+        if (node.nodeName != "#text" &amp;&amp; node.nodeName != "#comment" &amp;&amp; node.nodeName != "#script") {
+            createChildElement(parent, body.childNodes[i])
+        }
+    }
+}
+
+/**
+ * Element wrap element of DOM. Simple and efficient,
+ * you can do more with less.
+  *@param parent The parent element of this element. Can be an Element or a DOM element.
+ * @param params The list parameter.
+ * @param callback That function is call after the initialisation is completed.
+ * @param isAppendAtFront If true the element is put at front of other element, otherwise it will be append at the end.
+ * @returns {HTMLElement}
+ * @constructor
+ */
+var Element = function (parent, params, callback, isAppendAtFront) {
+
+    /**
+     * @property {function} callback The function to call after the initialisation.
+     */
+    this.callback = callback
+
+    /**
+     * @property {Element} parent The parent element, can be a plain HTML element or an Element.
+     */
+    this.parentElement = parent;
+
+    /**
+     * @property {string} id a uuid. If the params contain id, the param id will be use.
+     */
+    this.id = randomUUID()
+
+    /**
+     * @property {Element[]} childs The map of child element indexed by their id.
+     */
+    this.childs = {};
+
+    // Keep reference to te lastChild, use by the down function.
+    this.lastChild = null;
+
+    if (params != null) {
+        // If there is no tag or params, that mean the initialisation is
+        // made outside the constructor... see createElementFromXml for exemple...
+        var innerHtml = ""
+        if (params["tag"] != undefined) {
+            if (params["NS"] != undefined) {
+                this.element = document.createElementNS(params.NS, params.tag);
+            } else {
+                this.element = document.createElement(params.tag);
+            }
+
+            this.element._ParentObject_ = this
+            var isScript = params["tag"] == "script"
+            delete params["tag"]
+
+            // Set attributes...
+            for (var param in params) {
+                // The child element...
+                if (param === "childs") {
+                    for (var i = 0; i &lt; params[param].length; i++) {
+                        this.appendElement(params[param][i])
+                    }
+                } else if (param == "init") {
+                    this.init = params[param]
+                } else if (param == "innerHtml") {
+                    innerHtml = params[param]
+                }
+                else if (param == "id") {
+                    this.id = params[param]
+                    if (params["NS"] != undefined) {
+                        this.element.setAttributeNS(param.NS, param, params[param])
+                    } else {
+                        this.element.setAttribute(param, params[param])
+                    }
+                } else {
+                    if (params["NS"] != undefined) {
+                        this.element.setAttributeNS(param.NS, param, params[param])
+                    } else {
+                        this.element.setAttribute(param, params[param])
+                    }
+                }
+            }
+
+            if (parent != null) {
+                // Append child
+                if (isAppendAtFront == undefined) {
+                    if (parent.element == undefined) {
+                        parent.appendChild(this.element)
+                    } else {
+                        parent.element.appendChild(this.element);
+                        parent.appendElement(this)
+                    }
+                } else {
+                    // Prepend child
+                    if (parent.element == undefined) {
+                        if (parent.childNodes.length > 0) {
+                            var firstChild = parent.childNodes[0]
+                            parent.insertBefore(this.element, firstChild)
+                        } else {
+                            parent.appendChild(this.element)
+                        }
+
+                    } else {
+                        if (parent.element.childNodes.length > 0) {
+                            var firstChild = parent.element.childNodes[0]
+                            parent.element.insertBefore(this.element, firstChild)
+                        } else {
+                            parent.element.appendChild(this.element)
+                        }
+                        parent.prependElement(this)
+                    }
+                }
+
+            }
+
+            if (innerHtml != null) {
+                // the inner html...
+                if (innerHtml.length > 0) {
+                    this.element.innerHTML = innerHtml + this.element.innerHTML
+                }
+            }
+        }
+    }
+    return this;
+};
+
+/**
+ * Append a child element to an existing element.
+ * @param {Element} e The element to append. It can be an existing element, or a list of element properties.
+ * @returns {HTMLElement}
+ * @example var child = parent.appendElement({"tag":"div", "class":"myClass", "style":"position:absolute; with:1px;"}).down()
+ */
+Element.prototype.appendElement = function (e) {
+    if (e.element != undefined) {
+        //alert("toto")
+        e.parentElement = this
+        this.childs[e.id] = e
+        this.lastChild = e
+        if (e.element.innerHTML != undefined) {
+            if (e.element.innerHTML.length > 0) {
+                this.element.appendChild(e.element)
+            }
+        }
+
+    } else {
+        for (var i = 0; i &lt; arguments.length; i++) {
+            var child = new Element(this, arguments[i]);
+            child.parentElement = this
+            this.childs[child.id] = child;
+            this.lastChild = child
+        }
+    }
+
+    return this;
+};
+
+/**
+ * Prepend a child element to an existing element.
+ * @param e The element to append. It can be an existing element, or a list of element properties.
+ * @returns {HTMLElement}
+ * @example var child = parent.prependElement({"tag":"div", "class":"myClass", "style":"position:absolute; with:1px;"}).down()
+ */
+Element.prototype.prependElement = function (e) {
+    if (e.element != undefined) {
+        //alert("toto")
+        e.parentElement = this
+        this.childs[e.id] = e
+        this.lastChild = e
+        if (e.element.innerHTML != undefined) {
+            if (e.element.innerHTML.length > 0) {
+                if (this.element.childNodes.length > 0) {
+                    var firstChild = this.element.childNodes[0]
+                    this.element.insertBefore(e.element, firstChild)
+                } else {
+                    this.element.appendChild(e.element)
+                }
+            }
+        }
+
+    } else {
+        for (var i = 0; i &lt; arguments.length; i++) {
+            var child = new Element(this, arguments[i], undefined, true);
+            child.parentElement = this
+
+            this.childs[child.id] = child;
+            this.lastChild = child
+        }
+    }
+
+    return this;
+};
+
+/**
+ * Remove a child element from childs.
+ * @param {Element} e The child element to remove.
+ */
+Element.prototype.removeElement = function (e) {
+    // Remove it from the dom
+    this.element.removeChild(e.element)
+
+    // Remove it from memory...
+    delete this.childs[e.id]
+}
+
+/**
+ * Clear all the childs of an element.
+ */
+Element.prototype.removeAllChilds = function () {
+    for (var id in this.childs) {
+        if (this.childs[id].element.parentNode != null) {
+            this.childs[id].element.parentNode.removeChild(this.childs[id].element)
+        }
+    }
+
+    this.childs = {}
+}
+
+/**
+ * Recursive function call from the most exterior Element.
+ * @returns {HTMLElement}
+ */
+Element.prototype.init = function () {
+    var keys = Object.keys(this.childs)
+        , i = 0
+        , len = keys.length
+        , child = null
+
+    for (; i &lt; len; i++) {
+        child = this.childs[keys[i]]
+        if (child.init != undefined) {
+            child.init()
+        }
+    }
+
+    if (this.callback != undefined) {
+        this.callback(); // Call the call back...
+    }
+    return this
+}
+
+
+/**
+ * A recursive function to find a child inside
+ * the element, or inside one of the child element.
+ * @param {string} id The id to retreive.
+ * @returns {Element}
+ */
+Element.prototype.getChildById = function (id) {
+    var keys = Object.keys(this.childs)
+        , i = 0
+        , len = keys.length
+        , found = null
+        , child = null
+
+    for (i = 0; i &lt; len; i++) {
+        child = this.childs[keys[i]]
+        if (child.id == id) {
+            return child
+        } else {
+            found = child.getChildById(id)
+            if (found != null) {
+                return found
+            }
+        }
+    }
+
+    return found
+}
+
+/**
+ * Get the root element.
+ * @returns {Element} The root element.
+ */
+Element.prototype.getTopParent = function () {
+    var topParent = null
+    if (this.parentElement != null) {
+        topParent = this.parentElement.getTopParent()
+    } else {
+        topParent = this
+    }
+    return topParent
+}
+
+/**
+ * Navigation function to use to navigate the Element hierarchy.
+ * @returns {Element} Return the immediate parent.
+ */
+Element.prototype.up = function () {
+    if (this.parentElement == null) {
+        var bodyElement = new Element(null, {})
+        bodyElement.element = document.getElementsByTagName("body")[0]
+        //this.parentElement = bodyElement
+        return bodyElement
+    }
+    return this.parentElement
+}
+
+/**
+ * Navigation function to use to navigate the Element hierarchy.
+ * @returns {Element} Return the last child.
+ */
+Element.prototype.down = function () {
+    return this.lastChild
+}
+
+/**
+ * Move childs from one element to another element.
+ * @param {Element} childs The Childs to move.
+ */
+Element.prototype.moveChildElements = function (childs) {
+    for (var childId in childs) {
+        var childElement = childs[childId]
+        if (childElement.element != undefined) {
+            if (childElement.element.parentNode != undefined) {
+                childElement.element.parentNode.removeChild(childElement.element)
+            }
+
+            if (childElement.element.innerHTML == "") {
+                this.element.appendChild(childElement.element)
+            }
+            this.appendElement(childElement)
+        }
+    }
+}
+
+/**
+ * Copy childs from one element into another element.
+ * @param {Element} childs The Childs to move.
+ */
+Element.prototype.copyChildElements = function (childs) {
+    for (var childId in childs) {
+        this.element.appendChild(childs[childId].element.cloneNode(true))
+    }
+}
+
+/*
+ * Clone childs of element
+ * DEPRECATED
+ */
+/*****************************************************/
+Element.prototype.cloneChildElements = function (childs) {
+    for (var childId in childs) {
+        var childElement = childs[childId]
+        var copy = childElement.element.cloneNode(true);
+        this.element.appendChild(copy)
+        copyComputedStyle(childElement.element, copy);
+    }
+}
+
+var realStyle = function (_elem, _style) {
+    var computedStyle;
+    if (typeof _elem.currentStyle != 'undefined') {
+        computedStyle = _elem.currentStyle;
+    } else {
+        computedStyle = document.defaultView.getComputedStyle(_elem, null);
+    }
+
+    return _style ? computedStyle[_style] : computedStyle;
+}
+
+var copyComputedStyle = function (src, dest) {
+    var s = realStyle(src);
+    for (var i in s) {
+        if (typeof i == "string" &amp;&amp; i != "cssText" &amp;&amp; !/\d/.test(i)) {
+            try {
+                dest.style[i] = s[i];
+                if (i == "font") {
+                    dest.style.fontSize = s.fontSize;
+                }
+            } catch (e) { }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////
+// Shortcut's
+////////////////////////////////////////////////////////////////////////////
+
+/** 
+ * Set Style attribute of an element.
+ * @param attribute: string
+ * @param value: string
+ */
+Element.prototype.setStyle = function (attribute, value) {
+    this.element.style[attribute] = value
+}
+
+/**
+ * Set Attribute of an element.
+ * @param attribute: string
+ * @param value: string
+ */
+Element.prototype.setAttribute = function (attribute, value) {
+    this.element[attribute] = value
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AccountManager.html">AccountManager</a></li><li><a href="Attachment.html">Attachment</a></li><li><a href="CarbonCopy.html">CarbonCopy</a></li><li><a href="ColumnFilter.html">ColumnFilter</a></li><li><a href="ColumnFormater.html">ColumnFormater</a></li><li><a href="ColumnSorter.html">ColumnSorter</a></li><li><a href="DataManager.html">DataManager</a></li><li><a href="Element.html">Element</a></li><li><a href="EmailManager.html">EmailManager</a></li><li><a href="EmailManager_sendEmail.html">sendEmail</a></li><li><a href="EntityManager.html">EntityManager</a></li><li><a href="EntityPrototype.html">EntityPrototype</a></li><li><a href="EntityTableModel.html">EntityTableModel</a></li><li><a href="EventChannel.html">EventChannel</a></li><li><a href="EventChannel_BroadcastEvent.html">BroadcastEvent</a></li><li><a href="EventHandler.html">EventHandler</a></li><li><a href="EventManager.html">EventManager</a></li><li><a href="ExecuteJsFunction.html">ExecuteJsFunction</a></li><li><a href="FileManager.html">FileManager</a></li><li><a href="LanguageManager.html">LanguageManager</a></li><li><a href="Request.html">Request</a></li><li><a href="Response.html">Response</a></li><li><a href="Server.html">Server</a></li><li><a href="SessionManager.html">SessionManager</a></li><li><a href="SqlTableModel.html">SqlTableModel</a></li><li><a href="SVG_Canvas.html">SVG_Canvas</a></li><li><a href="SVG_Circle.html">SVG_Circle</a></li><li><a href="SVG_ClipPath.html">SVG_ClipPath</a></li><li><a href="SVG_Element.html">SVG_Element</a></li><li><a href="SVG_Ellipse.html">SVG_Ellipse</a></li><li><a href="SVG_ForeignObject.html">SVG_ForeignObject</a></li><li><a href="SVG_Gradient.html">SVG_Gradient</a></li><li><a href="SVG_Group.html">SVG_Group</a></li><li><a href="SVG_Image.html">SVG_Image</a></li><li><a href="SVG_Line.html">SVG_Line</a></li><li><a href="SVG_Mask.html">SVG_Mask</a></li><li><a href="SVG_Path.html">SVG_Path</a></li><li><a href="SVG_Pattern.html">SVG_Pattern</a></li><li><a href="SVG_Polygon.html">SVG_Polygon</a></li><li><a href="SVG_Polyline.html">SVG_Polyline</a></li><li><a href="SVG_Rectangle.html">SVG_Rectangle</a></li><li><a href="SVG_Text.html">SVG_Text</a></li><li><a href="SVG_Text_appendSpan.html">appendSpan</a></li><li><a href="SVG_tRef.html">SVG_tRef</a></li><li><a href="SVG_Use.html">SVG_Use</a></li><li><a href="Table.html">Table</a></li><li><a href="TableCell.html">TableCell</a></li><li><a href="TableHeader.html">TableHeader</a></li><li><a href="TableModel.html">TableModel</a></li><li><a href="TableRow.html">TableRow</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ab2str">ab2str</a></li><li><a href="global.html#addStyleString">addStyleString</a></li><li><a href="global.html#applySat">applySat</a></li><li><a href="global.html#b64_to_utf8">b64_to_utf8</a></li><li><a href="global.html#base64toBlob">base64toBlob</a></li><li><a href="global.html#contains">contains</a></li><li><a href="global.html#convertDataURIToBinary">convertDataURIToBinary</a></li><li><a href="global.html#CountSpace">CountSpace</a></li><li><a href="global.html#createElementFromHtml">createElementFromHtml</a></li><li><a href="global.html#createElementFromXml">createElementFromXml</a></li><li><a href="global.html#decode64">decode64</a></li><li><a href="global.html#encode64">encode64</a></li><li><a href="global.html#findKeyframesRule">findKeyframesRule</a></li><li><a href="global.html#framesRules">framesRules</a></li><li><a href="global.html#getContrastYIQ">getContrastYIQ</a></li><li><a href="global.html#getCurrentDateStr">getCurrentDateStr</a></li><li><a href="global.html#getNavigatorName">getNavigatorName</a></li><li><a href="global.html#getStyleRuleValue">getStyleRuleValue</a></li><li><a href="global.html#getStyleSheetByFileName">getStyleSheetByFileName</a></li><li><a href="global.html#getTextWidth">getTextWidth</a></li><li><a href="global.html#getTimeSinceStr">getTimeSinceStr</a></li><li><a href="global.html#hexToB">hexToB</a></li><li><a href="global.html#hexToG">hexToG</a></li><li><a href="global.html#hexToR">hexToR</a></li><li><a href="global.html#hexToRgb">hexToRgb</a></li><li><a href="global.html#includeJavascript">includeJavascript</a></li><li><a href="global.html#invertHex">invertHex</a></li><li><a href="global.html#isArray">isArray</a></li><li><a href="global.html#isEmail">isEmail</a></li><li><a href="global.html#isInt">isInt</a></li><li><a href="global.html#isNumeric">isNumeric</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#localToGlobal">localToGlobal</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#mergeJSON">mergeJSON</a></li><li><a href="global.html#Message">Message</a></li><li><a href="global.html#MessageData">MessageData</a></li><li><a href="global.html#Name">Name</a></li><li><a href="global.html#propertyFromStylesheet">propertyFromStylesheet</a></li><li><a href="global.html#randomArray">randomArray</a></li><li><a href="global.html#randomColor">randomColor</a></li><li><a href="global.html#randomIntFromInterval">randomIntFromInterval</a></li><li><a href="global.html#randomUUID">randomUUID</a></li><li><a href="global.html#resizeImage">resizeImage</a></li><li><a href="global.html#Restriction">Restriction</a></li><li><a href="global.html#rgbToHsl">rgbToHsl</a></li><li><a href="global.html#selectText">selectText</a></li><li><a href="global.html#server">server</a></li><li><a href="global.html#setObjectValues">setObjectValues</a></li><li><a href="global.html#shuffleArray">shuffleArray</a></li><li><a href="global.html#StartWith">StartWith</a></li><li><a href="global.html#str2ab">str2ab</a></li><li><a href="global.html#This">This</a></li><li><a href="global.html#Uint8ToBase64">Uint8ToBase64</a></li><li><a href="global.html#utf8_to_b64">utf8_to_b64</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#Value">Value</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Jul 27 2016 17:16:32 GMT-0400 (EDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
