@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified" attributeFormDefault="unqualified"	
+	xmlns="http://www.cargowebserver/spec/CARGO/20151213/MODEL"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.cargowebserver/spec/CARGO/20151213/MODEL">
+	
+	<xsd:element name="account" type="tAccount" substitutionGroup="entity"/> 
+	<xsd:complexType name="tAccount"> 
+		<xsd:complexContent> 
+			<xsd:extension base="tEntity">
+				<xsd:attribute name="name" type="xsd:string"/> 
+				<xsd:attribute name="password" type="xsd:string"/> 
+				<xsd:attribute name="email" type="xsd:string"/>
+				<xsd:sequence>
+					<xsd:element ref="userRef" type="tUser" minOccurs="0" maxOccurs="1"/> 
+					<xsd:element ref="rolesRef" type="tRole" minOccurs="0" maxOccurs="unbounded"/> 
+					<xsd:element name="sessions" type="tSession" minOccurs="0" maxOccurs="unbounded"/> 
+					<xsd:element name="messages" type="tMessage" minOccurs="0" maxOccurs="unbounded"/> jk
+				</xsd:sequence>
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+
+	<xsd:element name="role" type="tRole"/> 
+	<xsd:complexType name="tRole">
+		<xsd:attribute name="id" type="xsd:ID"/>
+		<xsd:complexContent> 
+			<xsd:sequence>
+				<xsd:element ref="accountsRef" type="tAccount" minOccurs="0" maxOccurs="unbounded"/> 
+			</xsd:sequence>
+		</xsd:complexContent> 
+	</xsd:complexType>
+
+	<xsd:element name="restriction" type="tRestriction"/> 
+	<xsd:complexType name="tRestriction"> 
+		<xsd:complexContent> 
+			<xsd:element ref="rolesRef" type="tRole" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="actionRef" type="tAction" minOccurs="1" maxOccurs="1"/> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+
+	<xsd:simpleType name="tFileType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="dbFile"/>
+			<xsd:enumeration value="diskFile"/>
+		</xsd:restriction>
+	</xsd:simpleType>	
+	
+	<xsd:element name="file" type="tFile" substitutionGroup="entity"/> 
+	<xsd:complexType name="tFile"> 
+		<xsd:complexContent>
+			<xsd:extension base="tEntity"> 
+				<xsd:sequence>
+					<xsd:element name="files" type="tFile" minOccurs="0" maxOccurs="unbounded"/> 
+				</xsd:sequence>
+				<xsd:attribute name="name" type="xsd:string"/> 
+				<xsd:attribute name="path" type="xsd:string"/> 
+				<xsd:attribute name="size" type="xsd:integer"/> 
+				<xsd:attribute name="modeTime" type="xsd:date"/>
+				<xsd:attribute name="isDir" type="xsd:boolean"/>
+				<xsd:attribute name="checksum" type="xsd:string"/> 
+				<xsd:attribute name="data" type="xsd:string"/> 
+				<xsd:attribute name="thumbnail" type="xsd:string"/>
+				<xsd:attribute name="mime" type="xsd:string"/> 
+				<xsd:attribute name="fileType" type="tFileType" default="dbFile"/>
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:simpleType name="tOsType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Unknown"/>
+			<xsd:enumeration value="Linux"/>
+			<xsd:enumeration value="Windows7"/>
+			<xsd:enumeration value="Windows8"/>
+			<xsd:enumeration value="Windows10"/>
+			<xsd:enumeration value="OSX"/>
+			<xsd:enumeration value="IOS"/>
+		</xsd:restriction>
+	</xsd:simpleType>	
+
+	<xsd:simpleType name="tPlatformType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Unknown"/>
+			<xsd:enumeration value="Tablet"/>
+			<xsd:enumeration value="Phone"/>
+			<xsd:enumeration value="Desktop"/>
+			<xsd:enumeration value="Laptop"/>
+		</xsd:restriction>
+	</xsd:simpleType>	
+	<xsd:element name="project" type="tProject" substitutionGroup="entity"/> 
+	<xsd:complexType name="tProject"> 
+		<xsd:complexContent> 
+			<xsd:extension base="tEntity"> 
+				<xsd:sequence>
+					<xsd:element ref="filesRef" type="tFile" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:attribute name="name" type="xsd:string"/> 
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	<xsd:element name="computer" type="tComputer" substitutionGroup="entity"/> 
+	<xsd:complexType name="tComputer"> 
+		<xsd:complexContent> 
+			<xsd:extension base="tEntity"> 
+				<xsd:attribute name="osType" type="tOsType" default="Unknown"/>
+				<xsd:attribute name="platformType" type="tPlatformType" default="Unknown"/>
+				<xsd:attribute name="name" type="xsd:string"/> 
+				<xsd:attribute name="ipv4" type="xsd:string"/> 
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:simpleType name="tSessionState">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Online"/>
+			<xsd:enumeration value="Away"/>
+			<xsd:enumeration value="Offline"/>
+		</xsd:restriction>
+	</xsd:simpleType>	
+
+	<xsd:element name="session" type="tSession"/> 
+	<xsd:complexType name="tSession"> 
+	   	<xsd:sequence>
+			<xsd:element ref="computerRef" type="tComputer" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID"/>
+		<xsd:attribute name="sessionState" type="tSessionState" default="Online"/>
+		<xsd:attribute name="startTime" type="xsd:date"/> 
+		<xsd:attribute name="endTime" type="xsd:date"/> 
+		<xsd:attribute name="statutTime" type="xsd:date"/> 
+	</xsd:complexType>
+	
+	<xsd:element name="user" type="tUser" substitutionGroup="entity"/> 
+	<xsd:complexType name="tUser"> 
+		<xsd:complexContent> 
+			<xsd:extension base="tEntity"> 
+				<xsd:sequence>
+					<xsd:element ref="memberOfRef" type="tGroup" minOccurs="0" maxOccurs="unbounded"/> 
+				</xsd:sequence>
+				<xsd:attribute name="firstName" type="xsd:string"/> 
+				<xsd:attribute name="lastName" type="xsd:string"/>
+				<xsd:attribute name="middle" type="xsd:string"/>  
+				<xsd:attribute name="email" type="xsd:string"/> 
+				<xsd:attribute name="phone" type="xsd:string"/>
+				<xsd:element name="accounts" type="tAccount" minOccurs="0" maxOccurs="unbounded"/> 
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:element name="group" type="tGroup" substitutionGroup="entity"/> 
+	<xsd:complexType name="tGroup"> 
+		<xsd:complexContent> 
+			<xsd:extension base="tEntity"> 
+				<xsd:sequence>
+					<xsd:element ref="membersRef" type="tUser" minOccurs="0" maxOccurs="unbounded"/> 
+				</xsd:sequence>
+				<xsd:attribute name="name" type="xsd:string"/> 
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+
+	<xsd:element name="entities" type="tEntities"/>
+	<xsd:complexType name="tEntities">
+		<xsd:sequence>
+			<xsd:element name="entities" type="tEntity" minOccurs="0" maxOccurs="unbounded"/> 
+			<xsd:element name="roles" type="tRole" minOccurs="0" maxOccurs="unbounded"/> 
+			<xsd:element name="restrictions" type="tRestriction" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="version" type="xsd:string"/>
+	</xsd:complexType>
+
+	<xsd:element name="entity" type="tEntity"/>
+	<xsd:complexType name="tEntity" abstract="true">
+		<xsd:attribute name="id" type="xsd:ID"/>
+	</xsd:complexType>
+	
+	<xsd:element name="message" type="tMessage" substitutionGroup="entity"/>
+	<xsd:complexType name="tMessage" abstract="true">
+		<xsd:attribute name="body" type="xsd:string"/>
+		<xsd:sequence>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:element name="textMessage" type="tTextMessage" substitutionGroup="entity message"/> 
+	<xsd:complexType name="tTextMessage"> 
+		<xsd:complexContent> 
+			<xsd:extension base="tMessage">
+				<xsd:attribute name="title" type="xsd:string"/>
+				<xsd:attribute name="creationTime" type="xsd:date"/>
+				<xsd:sequence>
+					<xsd:element ref="fromRef" type="tAccount" minOccurs="0" maxOccurs="1"/> 
+					<xsd:element ref="toRef" type="tAccount" minOccurs="0" maxOccurs="1"/> 
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:element name="notification" type="tNotification" substitutionGroup="entity message"/> 
+	<xsd:complexType name="tNotification">
+		<xsd:complexContent> 
+			<xsd:extension base="tMessage">
+				<xsd:attribute name="type" type="xsd:string"/>
+				<xsd:attribute name="code" type="xsd:int"/>
+				<xsd:sequence>
+					<xsd:element ref="fromRef" type="tAccount" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="toRef" type="tAccount" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:element name="logEntry" type="tLogEntry" substitutionGroup="entity"/>
+	<xsd:complexType name="tLog">
+		<xsd:attribute name="creationTime" type="xsd:date"/> 
+		<xsd:sequence>
+			<xsd:element ref="entityRef" type="tEntity" minOccurs="1" maxOccurs="1"/> 
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:element name="log" type="tLog" substitutionGroup="entity"/>
+	<xsd:complexType name="tLog">
+		<xsd:attribute name="creationTime" type="xsd:date"/> 
+		<xsd:sequence>
+			<xsd:element name="entries" type="tLogEntry" minOccurs="0" maxOccurs="unbounded"/> 
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:element name="error" type="tError" substitutionGroup="entity message"/>
+	<xsd:complexType name="tError">
+		<xsd:attribute name="code" type="xsd:int"/>
+		<xsd:attribute name="errorPath" type="xsd:string"/>
+		<xsd:element ref="accountRef" type="tAccount" minOccurs="0" maxOccurs="1"/>
+		<xsd:sequence>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	
+</xsd:schema>

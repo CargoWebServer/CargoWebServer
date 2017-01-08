@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:cmof="http://schema.omg.org/spec/MOF/2.0/cmof.xml">
+  <cmof:Package xmi:id="_0" name="BPMS_Runtime" uri="http://www.omg.org/spec/BPMN/20100524/MODEL-XMI">
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_Instance_ItemAwareElementInstance" name="A_Instance_ItemAwareElementInstance" visibility="private" memberEnd="Instance-ItemAwareElementInstance A_Instance_ItemAwareElementInstance-ItemAwareElementInstance">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_Instance_ItemAwareElementInstance-parent" name="parent" _type="Instance" lower="0" owningAssociation="A_Instance_ItemAwareElementInstance" association="A_Instance_ItemAwareElementInstance"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="Instance" name="Instance" isAbstract="true">
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="Instance-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Instance-bpmnElementId" name="bpmnElementId">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Instance-participants" name="participants" lower="0"  upper="*">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Instance-dataRef" visibility="public" name="dataRef" _type="ItemAwareElementInstance" lower="0"  upper="*"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Instance-data" visibility="public" name="data" _type="ItemAwareElementInstance" lower="0"  upper="*" isComposite="true" association="A_Instance_ItemAwareElementInstance"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Instance-logInfoRef" visibility="public" name="logInfoRef" _type="LogInfo" lower="0"  upper="*"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="ConnectingObjectType" name="ConnectingObjectType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ConnectingObjectType-SequenceFlow" name="SequenceFlow" classifier="ConnectingObjectType" enumeration="ConnectingObjectType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ConnectingObjectType-MessageFlow" name="MessageFlow" classifier="ConnectingObjectType" enumeration="ConnectingObjectType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ConnectingObjectType-Association" name="Association" classifier="ConnectingObjectType" enumeration="ConnectingObjectType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ConnectingObjectType-DataAssociation" name="DataAssociation" classifier="ConnectingObjectType" enumeration="ConnectingObjectType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="ConnectingObject" name="ConnectingObject" superClass="Instance">
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ConnectingObject-connectingObjectType" name="connectingObjectType" _type="ConnectingObjectType"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ConnectingObject-sourceRef" name="sourceRef" _type="FlowNodeInstance" lower="0"  upper="1"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ConnectingObject-targetRef" name="targetRef" _type="FlowNodeInstance" lower="0"  upper="1"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="FlowNodeType" name="FlowNodeType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-AbstractTask" name="AbstractTask" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-ServiceTask" name="ServiceTask" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-UserTask" name="UserTask" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-ManualTask" name="ManualTask" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-BusinessRuleTask" name="BusinessRuleTask" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-ScriptTask" name="ScriptTask" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-EmbeddedSubprocess" name="EmbeddedSubprocess" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-EventSubprocess" name="EventSubprocess" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-AdHocSubprocess" name="AdHocSubprocess" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-Transaction" name="Transaction" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-CallActivity" name="CallActivity" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-ParallelGateway" name="ParallelGateway" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-ExclusiveGateway" name="ExclusiveGateway" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-InclusiveGateway" name="InclusiveGateway" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-EventBasedGateway" name="EventBasedGateway" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-ComplexGateway" name="ComplexGateway" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-StartEvent" name="StartEvent" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-IntermediateCatchEvent" name="IntermediateCatchEvent" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-BoundaryEvent" name="BoundaryEvent" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-EndEvent" name="EndEvent" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-IntermediateThrowEvent" name="IntermediateThrowEvent" classifier="FlowNodeType" enumeration="FlowNodeType"/>
+	</ownedMember>
+
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="FlowNodeInstance" name="FlowNodeInstance" superClass="Instance" isAbstract="true">
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="FlowNodeInstance-flowNodeType" name="flowNodeType" _type="FlowNodeType"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="FlowNodeInstance-lifecycleState" name="lifecycleState" _type="LifecycleState"/>
+		<ownedAttribute xmi:type="cmof:Property" visibility="public" xmi:id="FlowNodeInstance-inputRef" name="inputRef" _type="ConnectingObject" lower="0"  upper="1"/>
+		<ownedAttribute xmi:type="cmof:Property" visibility="public" xmi:id="FlowNodeInstance-outputRef" name="outputRef" _type="ConnectingObject" lower="0"  upper="1"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="ActivityType" name="ActivityType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-AbstractTask" name="AbstractTask" classifier="ActivityType" enumeration="ActivityType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-ServiceTask" name="ServiceTask" classifier="ActivityType" enumeration="ActivityType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-UserTask" name="UserTask" classifier="ActivityType" enumeration="ActivityType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-ManualTask" name="ManualTask" classifier="ActivityType" enumeration="ActivityType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-BusinessRuleTask" name="BusinessRuleTask" classifier="ActivityType" enumeration="ActivityType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-ScriptTask" name="ScriptTask" classifier="ActivityType" enumeration="ActivityType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-EmbeddedSubprocess" name="EmbeddedSubprocess" classifier="ActivityType" enumeration="ActivityType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-EventSubprocess" name="EventSubprocess" classifier="ActivityType" enumeration="ActivityType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-AdHocSubprocess" name="AdHocSubprocess" classifier="ActivityType" enumeration="ActivityType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-Transaction" name="Transaction" classifier="ActivityType" enumeration="ActivityType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-CallActivity" name="CallActivity" classifier="ActivityType" enumeration="ActivityType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="ActivityInstance" name="ActivityInstance" superClass="Instance FlowNodeInstance">
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ActivityInstance-ActivityType" name="activityType" _type="ActivityType"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ActivityInstance-multiInstanceBehaviorType" name="multiInstanceBehaviorType" _type="MultiInstanceBehaviorType"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ActivityInstance-loopCharacteristicType" name="loopCharacteristicType" _type="LoopCharacteristicType"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ActivityInstance-tokenCount" name="tokenCount">
+        	<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+     	</ownedAttribute>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="SubprocessType" name="SubprocessType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="SubprocessType-EmbeddedSubprocess" name="EmbeddedSubprocess" classifier="SubprocessType" enumeration="SubprocessType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="SubprocessType-EventSubprocess" name="EventSubprocess" classifier="SubprocessType" enumeration="SubprocessType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="SubprocessType-AdHocSubprocess" name="AdHocSubprocess" classifier="SubprocessType" enumeration="SubprocessType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="SubprocessType-Transaction" name="Transaction" classifier="SubprocessType" enumeration="SubprocessType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_flowNode_Subprocess" name="A_flowNode_Subprocess" visibility="private" memberEnd="Subprocess-FlowNode A_flowNode_Subprocess-Subprocess">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_flowNode_Subprocess-Subprocess" name="SubprocessInstance" _type="SubprocessInstance" lower="0" owningAssociation="A_flowNode_Subprocess" association="A_flowNode_Subprocess"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_connectingObject_Subprocess" name="A_connectingObject_Subprocess" visibility="private" memberEnd="Subprocess-ConnectingObject A_connectingObject_Subprocess-Subprocess">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_connectingObject_Subprocess-Subprocess" name="SubprocessInstance" _type="SubprocessInstance" lower="0" owningAssociation="A_connectingObject_Subprocess" association="A_connectingObject_Subprocess"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="SubprocessInstance" name="SubprocessInstance" superClass="Instance FlowNodeInstance">
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="SubprocessInstance-SubprocessType" name="SubprocessType" _type="SubprocessType"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="SubprocessInstance-flowNodes" name="flowNodeInstances" _type="FlowNodeInstance" lower="0"  upper="*" isComposite="true" association="A_flowNode_Subprocess"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="SubprocessInstance-connectingObjects" name="connectingObjects" _type="ConnectingObject" lower="0"  upper="*" isComposite="true" association="A_connectingObject_Subprocess"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="GatewayType" name="GatewayType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="GatewayType-ParallelGateway" name="ParallelGateway" classifier="GatewayType" enumeration="GatewayType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="GatewayType-ExclusiveGateway" name="ExclusiveGateway" classifier="GatewayType" enumeration="GatewayType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="GatewayType-InclusiveGateway" name="InclusiveGateway" classifier="GatewayType" enumeration="GatewayType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="GatewayType-EventBasedGateway" name="EventBasedGateway" classifier="GatewayType" enumeration="GatewayType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="GatewayType-ComplexGateway" name="ComplexGateway" classifier="GatewayType" enumeration="GatewayType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="GatewayInstance" name="GatewayInstance" superClass="Instance FlowNodeInstance">
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Gateway-gatewayType" name="gatewayType" _type="GatewayType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="EventType" name="EventType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventType-StartEvent" name="StartEvent" classifier="EventType" enumeration="EventType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventType-IntermediateCatchEvent" name="IntermediateCatchEvent" classifier="EventType" enumeration="EventType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventType-BoundaryEvent" name="BoundaryEvent" classifier="EventType" enumeration="EventType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventType-EndEvent" name="EndEvent" classifier="EventType" enumeration="EventType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventType-IntermediateThrowEvent" name="IntermediateThrowEvent" classifier="EventType" enumeration="EventType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_eventDefinition_Event" name="A_eventDefinition_Event" visibility="private" memberEnd="Event-EventDefintion A_eventDefinition_Event-Event">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_eventDefinition_Event-event" name="eventInstance" _type="EventInstance" lower="0" owningAssociation="A_eventDefinition_Event" association="A_eventDefinition_Event"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="EventInstance" name="EventInstance" superClass="Instance FlowNodeInstance">
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Event-eventType" name="eventType" _type="EventType"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Event-eventDefintions" name="eventDefintionInstances" _type="EventDefinitionInstance" lower="0"  upper="*" isComposite="true" association="A_eventDefinition_Event"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_processInstance_DefinitionsInstance" name="A_processInstance_DefinitionsInstance" visibility="private" memberEnd="Process-DefinitionsInstance A_processInstance_DefinitionsInstance-Process">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_processInstance_DefinitionsInstance-parent" name="parent" _type="DefinitionsInstance" lower="0" owningAssociation="A_processInstance_DefinitionsInstance" association="A_processInstance_DefinitionsInstance"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="DefinitionsInstance" name="DefinitionsInstance" superClass="Instance">
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="DefinitionsInstance-processInstances" name="processInstances" _type="ProcessInstance" lower="0"  upper="*" isComposite="true" association="A_processInstance_DefinitionsInstance"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_flowNode_Process" name="A_flowNode_Process" visibility="private" memberEnd="Process-FlowNode A_flowNode_Process-Process">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_flowNode_Process-process" name="processInstance" _type="ProcessInstance" lower="0" owningAssociation="A_flowNode_Process" association="A_flowNode_Process"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_connectingObject_Process" name="A_connectingObject_Process" visibility="private" memberEnd="Process-ConnectingObject A_connectingObject_Process-Process">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_connectingObject_Process-process" name="processInstance" _type="ProcessInstance" lower="0" owningAssociation="A_connectingObject_Process" association="A_connectingObject_Process"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="ProcessInstance" name="ProcessInstance" superClass="Instance">
+	    <ownedAttribute xmi:type="cmof:Property" xmi:id="ProcessInstance-number" name="number">
+        	<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+     	</ownedAttribute>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ProcessInstance-colorName" name="colorName">
+        	<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+     	</ownedAttribute>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ProcessInstance-colorNumber" name="colorNumber">
+        	<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+     	</ownedAttribute>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ProcessInstance-flowNodeInstances" name="flowNodeInstances" _type="FlowNodeInstance" lower="0"  upper="*" isComposite="true" association="A_flowNode_Process"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ProcessInstance-connectingObjects" name="connectingObjects" _type="ConnectingObject" lower="0"  upper="*" isComposite="true" association="A_connectingObject_Process"/>
+	</ownedMember>
+	
+	
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="EventDefinitionType" name="EventDefinitionType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventDefinitionType-MessageEventDefinition" name="MessageEventDefinition" classifier="EventDefinitionType" enumeration="EventDefinitionType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventDefinitionType-LinkEventDefinition" name="LinkEventDefinition" classifier="EventDefinitionType" enumeration="EventDefinitionType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventDefinitionType-ErrorEventDefinition" name="ErrorEventDefinition" classifier="EventDefinitionType" enumeration="EventDefinitionType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventDefinitionType-TerminateEventDefinition" name="TerminateEventDefinition" classifier="EventDefinitionType" enumeration="EventDefinitionType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventDefinitionType-CompensationEventDefinition" name="CompensationEventDefinition" classifier="EventDefinitionType" enumeration="EventDefinitionType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventDefinitionType-ConditionalEventDefinition" name="ConditionalEventDefinition" classifier="EventDefinitionType" enumeration="EventDefinitionType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventDefinitionType-TimerEventDefinition" name="TimerEventDefinition" classifier="EventDefinitionType" enumeration="EventDefinitionType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventDefinitionType-CancelEventDefinition" name="CancelEventDefinition" classifier="EventDefinitionType" enumeration="EventDefinitionType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventDefinitionType-EscalationEventDefinition" name="EscalationEventDefinition" classifier="EventDefinitionType" enumeration="EventDefinitionType"/>
+ 	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="EventDefinitionInstance" name="EventDefinitionInstance" superClass="Instance">
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="EventDefinition-eventDefinitionType" name="eventDefinitionType" _type="EventDefinitionType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="LoopCharacteristicType" name="LoopCharacteristicType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LoopCharacteristicType-StandardLoopCharacteristics" name="StandardLoopCharacteristics" classifier="LoopCharacteristicType" enumeration="LoopCharacteristicType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LoopCharacteristicType-MultiInstanceLoopCharacteristics" name="MultiInstanceLoopCharacteristics" classifier="LoopCharacteristicType" enumeration="LoopCharacteristicType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="MultiInstanceBehaviorType" name="MultiInstanceBehaviorType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="MultiInstanceBehaviorType-None" name="None" classifier="MultiInstanceBehaviorType" enumeration="MultiInstanceBehaviorType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="MultiInstanceBehaviorType-One" name="One" classifier="MultiInstanceBehaviorType" enumeration="MultiInstanceBehaviorType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="MultiInstanceBehaviorType-All" name="All" classifier="MultiInstanceBehaviorType" enumeration="MultiInstanceBehaviorType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="MultiInstanceBehaviorType-Complex" name="Complex" classifier="MultiInstanceBehaviorType" enumeration="MultiInstanceBehaviorType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="LifecycleState" name="LifecycleState">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LifecycleState-Completed" name="Completed" classifier="LifecycleState" enumeration="LifecycleState"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LifecycleState-Compensated" name="Compensated" classifier="LifecycleState" enumeration="LifecycleState"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LifecycleState-Failed" name="Failed" classifier="LifecycleState" enumeration="LifecycleState"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LifecycleState-Terminated" name="Terminated" classifier="LifecycleState" enumeration="LifecycleState"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LifecycleState-Completing" name="Completing" classifier="LifecycleState" enumeration="LifecycleState"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LifecycleState-Compensating" name="Compensating" classifier="LifecycleState" enumeration="LifecycleState"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LifecycleState-Failing" name="Failing" classifier="LifecycleState" enumeration="LifecycleState"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LifecycleState-Terminating" name="Terminating" classifier="LifecycleState" enumeration="LifecycleState"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LifecycleState-Ready" name="Ready" classifier="LifecycleState" enumeration="LifecycleState"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="LifecycleState-Active" name="Active" classifier="LifecycleState" enumeration="LifecycleState"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="CorrelationInfo" name="CorrelationInfo" isAbstract="false">
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="CorrelationInfo-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	</ownedMember>
+
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="EventTriggerType" name="EventTriggerType">
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-None" name="None" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Timer" name="Timer" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Conditional" name="Conditional" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Message" name="Message" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Signal" name="Signal" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Multiple" name="Multiple" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-ParallelMultiple" name="ParallelMultiple" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Escalation" name="Escalation" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Error" name="Error" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Compensation" name="Compensation" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Terminate" name="Terminate" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Cancel" name="Cancel" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Link" name="Link" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Start" name="Start" classifier="EventTriggerType" enumeration="EventTriggerType"/>
+	</ownedMember>
+	
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="ItemAwareElementInstance" name="ItemAwareElementInstance">
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Instance-id" name="id">
+	    	<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+	    </ownedAttribute>
+	  	<ownedAttribute xmi:type="cmof:Property" xmi:id="Instance-bpmnElementId" name="bpmnElementId">
+        	<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      	</ownedAttribute>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ItemAwareElementInstance-data" name="data">
+		   <type xmi:type="cmof:PrimitiveType" href="Byte"/>
+		</ownedAttribute>
+	</ownedMember>
+
+	<ownedMember xmi:type="cmof:Class" xmi:id="EventData" name="EventData" isAbstract="false">
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="EventData-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	</ownedMember>
+
+	<!-- MessageInstance -->
+	
+	<!-- SignalInstance -->
+	
+	<!-- Expression -->
+	
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_eventData_Triger" name="A_eventData_Triger" visibility="private" memberEnd="Trigger-EventData A_eventData_Triger-Trigger">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_eventData_Triger-EventData" name="trigger" _type="Trigger" lower="0" owningAssociation="A_eventData_Triger" association="A_eventData_Triger"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="Trigger" name="Trigger">
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Trigger-id" name="id">
+		   <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+		</ownedAttribute>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Trigger-processUUID" name="processUUID">
+		   <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+		</ownedAttribute>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Trigger-sessionId" name="sessionId">
+		   <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+		</ownedAttribute>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Trigger-eventTriggerType" name="eventTriggerType" _type="EventTriggerType"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Trigger-eventDatas" name="eventDatas" _type="EventData" lower="0"  upper="*" isComposite="true" association="A_eventData_Triger"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Trigger-dataRef" name="dataRef" _type="ItemAwareElementInstance" lower="0"  upper="*"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Trigger-sourceRef" name="sourceRef" _type="EventDefinitionInstance" lower="1"  upper="1"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="Trigger-targetRef" name="targetRef" _type="FlowNodeInstance" lower="1"  upper="1"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="ExceptionType" name="ExceptionType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ExceptionType-NoIORuleException" name="NoIORuleException" classifier="ExceptionType" enumeration="ExceptionType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ExceptionType-GatewayException" name="GatewayException" classifier="ExceptionType" enumeration="ExceptionType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ExceptionType-NoAvailableOutputSetException" name="NoAvailableOutputSetException" classifier="ExceptionType" enumeration="ExceptionType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ExceptionType-NotMatchingIOSpecification" name="NotMatchingIOSpecification" classifier="ExceptionType" enumeration="ExceptionType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ExceptionType-IllegalStartEventException" name="IllegalStartEventException" classifier="ExceptionType" enumeration="ExceptionType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="Exception" name="Exception">
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="Exception-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+	  </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Exception-exceptionType" name="exceptionType" _type="ExceptionType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="LogInfo" name="LogInfo">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="LogInfo-id" name="id">
+		<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+	  </ownedAttribute>
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="LogInfo-date" name="date">
+        <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
+	  </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="actor" name="actor">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Element"/>
+	  </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="action" name="action">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+	  </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Instance-LogInfo" name="object" _type="Instance" lower="0"  upper="1"/>
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="description" name="description">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+	  </ownedAttribute>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_definitionsInstances_Runtimes" name="A_definitionsInstances_Runtimes" visibility="private" memberEnd="Runtimes-definitionsInstances A_definitionsInstances_Runtimes-Runtimes">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_definitionsInstances_Runtimes-Runtimes" name="parent" _type="Runtimes" lower="0" owningAssociation="A_definitionsInstances_Runtimes" association="A_definitionsInstances_Runtimes"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_exception_Runtimes" name="A_exception_Runtimes" visibility="private" memberEnd="Runtimes-exception A_exception_Runtimes-Runtimes">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_exception_Runtimes-Runtimes" name="runtimes" _type="Runtimes" lower="0" owningAssociation="A_exception_Runtimes" association="A_exception_Runtimes"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_trigger_Runtimes" name="A_trigger_Runtimes" visibility="private" memberEnd="Runtimes-trigger A_trigger_Runtimes-Runtimes">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_trigger_Runtimes-Runtimes" name="runtimes" _type="Runtimes" lower="0" owningAssociation="A_trigger_Runtimes" association="A_trigger_Runtimes"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_correlationInfo_Runtimes" name="A_correlationInfo_Runtimes" visibility="private" memberEnd="Runtimes-correlationInfo A_correlationInfo_Runtimes-Runtimes">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_correlationInfo_Runtimes-Runtimes" name="runtimes" _type="Runtimes" lower="0" owningAssociation="A_correlationInfo_Runtimes" association="A_correlationInfo_Runtimes"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_logInfo_Runtimes" name="A_logInfo_Runtimes" visibility="private" memberEnd="Runtimes-logInfo A_logInfo_Runtimes-Runtimes">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_logInfo_Runtimes-Runtimes" name="runtimes" _type="Runtimes" lower="0" owningAssociation="A_logInfo_Runtimes" association="A_logInfo_Runtimes"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="Runtimes" name="Runtimes">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Runtimes-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="Runtimes-name" name="name" visibility="public">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Runtimes-version" name="version" visibility="public">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Runtimes-Runtimes" name="definitions" _type="DefinitionsInstance" lower="0"  upper="*" isComposite="true" association="A_definitionsInstances_Runtimes"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Runtimes-exceptions" name="exceptions" _type="Exception" lower="0"  upper="*" isComposite="true" association="A_exception_Runtimes"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Runtimes-triggers" name="triggers" _type="Trigger" lower="0"  upper="*" isComposite="true" association="A_trigger_Runtimes"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Runtimes-correlationInfos" name="correlationInfos" _type="CorrelationInfo" lower="0"  upper="*" isComposite="true" association="A_correlationInfo_Runtimes"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Runtimes-logInfos" name="logInfos" _type="LogInfo" lower="0"  upper="*" isComposite="true" association="A_logInfo_Runtimes"/>
+	</ownedMember>
+	
+  </cmof:Package>
+</xmi:XMI>

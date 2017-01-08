@@ -1,0 +1,14 @@
+package BPMS_Runtime
+
+type EventDefinitionType int
+const(
+	EventDefinitionType_MessageEventDefinition EventDefinitionType = 1+iota
+	EventDefinitionType_LinkEventDefinition
+	EventDefinitionType_ErrorEventDefinition
+	EventDefinitionType_TerminateEventDefinition
+	EventDefinitionType_CompensationEventDefinition
+	EventDefinitionType_ConditionalEventDefinition
+	EventDefinitionType_TimerEventDefinition
+	EventDefinitionType_CancelEventDefinition
+	EventDefinitionType_EscalationEventDefinition
+)

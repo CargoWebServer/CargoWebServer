@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:cmof="http://schema.omg.org/spec/MOF/2.0/cmof.xml">
+  <cmof:Package xmi:id="_0" name="CargoConfig" uri="http://www.omg.org/spec/BPMN/20100524/MODEL-XMI">
+	
+	<!-- The data store type... -->
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="DataStoreType" name="DataStoreType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreType-SQL_STORE" name="SQL_STORE" classifier="DataStoreType" enumeration="DataStoreType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreType-MEMORY_STORE" name="MEMORY_STORE" classifier="DataStoreType" enumeration="DataStoreType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreType-KEY_VALUE_STORE" name="KEY_VALUE_STORE" classifier="DataStoreType" enumeration="DataStoreType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreType-GRAPH_STORE" name="GRAPH_STORE" classifier="DataStoreType" enumeration="DataStoreType"/>
+	</ownedMember>
+	
+	<!-- The data store product id... -->
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="DataStoreVendor" name="DataStoreVendor">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-MYCELIUS" name="MYCELIUS" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-MYSQL" name="MYSQL" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-MSSQL" name="MSSQL" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-ODBC" name="ODBC" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-KNOWLEDGEBASE" name="KNOWLEDGEBASE" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
+	</ownedMember>
+	
+	<!-- Abstract configuration -->
+	<ownedMember xmi:type="cmof:Class" xmi:id="Configuration" name="Configuration" isAbstract="true">
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="Configuration-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	</ownedMember>
+			
+	<ownedMember xmi:type="cmof:Class" xmi:id="SmtpConfiguration" name="SmtpConfiguration" superClass="Configuration">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hostName" name="hostName">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="ipv4" name="ipv4">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="port" name="port">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="user" name="user">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="pwd" name="pwd">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	</ownedMember>
+
+	<ownedMember xmi:type="cmof:Class" xmi:id="DataStoreConfiguration" name="DataStoreConfiguration" superClass="Configuration">
+
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="DataStoreConfiguration-DataStoreType" name="dataStoreType" _type="DataStoreType"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="DataStoreConfiguration-DataStoreVendor" name="dataStoreVendor" _type="DataStoreVendor"/>
+
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hostName" name="hostName">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="ipv4" name="ipv4">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="user" name="user">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="pwd" name="pwd">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="port" name="port">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="LdapConfiguration" name="LdapConfiguration" superClass="Configuration">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hostName" name="hostName">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="ipv4" name="ipv4">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="port" name="port">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="user" name="user">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="pwd" name="pwd">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="domain" name="domain">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="searchBase" name="searchBase">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	</ownedMember>
+
+	<ownedMember xmi:type="cmof:Class" xmi:id="ApplicationConfiguration" name="ApplicationConfiguration" superClass="Configuration">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="indexPage" name="indexPage">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="ServerConfiguration" name="ServerConfiguration" superClass="Configuration">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hostName" name="hostName">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="ipv4" name="ipv4">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="port" name="port">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="applicationsPath" name="applicationsPath">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="dataPath" name="dataPath">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="scriptsPath" name="scriptsPath">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="definitionsPath" name="definitionsPath">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="schemasPath" name="schemasPath">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="tmpPath" name="tmpPath">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="binPath" name="binPath">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_serverConfiguration_Configurations" name="A_serverConfiguration_Configurations" visibility="private" memberEnd="Configurations-ServerConfiguration A_serverConfiguration_Configurations-Configurations">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_serverConfiguration_Configurations-Configuration" name="parent" _type="Configurations" lower="0" upper="1" owningAssociation="A_serverConfiguration_Configurations" association="A_serverConfiguration_Configurations"/>
+    </ownedMember>
+
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_dataConfiguration_Configurations" name="A_dataConfiguration_Configurations" visibility="private" memberEnd="Configurations-DataStoreConfiguration A_dataConfiguration_Configurations-Configurations">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_dataConfiguration_Configurations-Configuration" name="parent" _type="Configurations" lower="0" owningAssociation="A_dataConfiguration_Configurations" association="A_dataConfiguration_Configurations"/>
+    </ownedMember>
+
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_smptConfiguration_Configurations" name="A_smptConfiguration_Configurations" visibility="private" memberEnd="Configurations-SmtpConfiguration A_smptConfiguration_Configurations-Configurations">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_smptConfiguration_Configurations-Configuration" name="parent" _type="Configurations" lower="0" upper="1" owningAssociation="A_smptConfiguration_Configurations" association="A_smptConfiguration_Configurations"/>
+    </ownedMember>
+
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_ldapConfiguration_Configurations" name="A_ldapConfiguration_Configurations" visibility="private" memberEnd="Configurations-LdapConfiguration A_ldapConfiguration_Configurations-Configurations">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_ldapConfiguration_Configurations-Configuration" name="parent" _type="Configurations" lower="0" upper="1" owningAssociation="A_ldapConfiguration_Configurations" association="A_ldapConfiguration_Configurations"/>
+    </ownedMember>
+
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_applicationConfiguration_Configurations" name="A_applicationConfiguration_Configurations" visibility="private" memberEnd="Configurations-ApplicationConfiguration A_applicationConfiguration_Configurations-Configurations">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_applicationConfiguration_Configurations-Configuration" name="parent" _type="Configurations" lower="0" upper="1" owningAssociation="A_applicationConfiguration_Configurations" association="A_applicationConfiguration_Configurations"/>
+    </ownedMember>
+	
+	<!-- Contain the list of configuration -->
+	<ownedMember xmi:type="cmof:Class" xmi:id="Configurations" name="Configurations">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="config-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="config-name" name="name" visibility="public">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="config-version" name="version" visibility="public">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="config-version" name="filePath" visibility="public">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-ServerConfiguration" name="serverConfig" _type="ServerConfiguration" lower="1"  upper="1" isComposite="true" association="A_serverConfiguration_Configurations"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-DataStoreConfiguration" name="dataStoreConfigs" _type="DataStoreConfiguration" lower="0"  upper="*" isComposite="true" association="A_dataConfiguration_Configurations"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-SmtpConfiguration" name="smtpConfigs" _type="SmtpConfiguration" lower="0"  upper="*" isComposite="true" association="A_smptConfiguration_Configurations"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-LdapConfiguration" name="ldapConfigs" _type="LdapConfiguration" lower="0"  upper="*" isComposite="true" association="A_ldapConfiguration_Configurations"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-ApplicationConfiguration" name="applicationConfigs" _type="ApplicationConfiguration" lower="0"  upper="*" isComposite="true" association="A_applicationConfiguration_Configurations"/>
+	
+	</ownedMember>
+	
+  </cmof:Package>
+</xmi:XMI>

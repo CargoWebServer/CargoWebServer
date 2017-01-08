@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified" attributeFormDefault="unqualified"	
+	xmlns="http://www.cargowebserver/spec/CARGO/20151213/MODEL"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.cargowebserver/spec/CARGO/20151213/MODEL">
+	
+	<xsd:element name="correlationInfo" type="tCorrelationInfo"/>
+	<xsd:complexType name="tCorrelationInfo" abstract="false">
+		<xsd:attribute name="id" type="xsd:ID"/>
+	</xsd:complexType>
+	
+	<xsd:simpleType name="tConnectingObjectType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="SequenceFlow"/>
+			<xsd:enumeration value="MessageFlow"/>
+			<xsd:enumeration value="Association"/>
+			<xsd:enumeration value="DataAssociation"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:element name="connectingObject" type="tConnectingObject" substitutionGroup="instance"/>
+	<xsd:complexType name="tConnectingObject" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tInstance"> 
+				<xsd:attribute name="connectingObjectType" type="tConnectingObjectType" />
+				<xsd:sequence>
+					<xsd:element ref="sourceRef" type="tFlowNodeInstance" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="targetRef" type="tFlowNodeInstance" minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:simpleType name="tFlowNodeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="AbstractTask"/>
+			<xsd:enumeration value="ServiceTask"/>
+			<xsd:enumeration value="UserTask"/>
+			<xsd:enumeration value="ManualTask"/>
+			<xsd:enumeration value="BusinessRuleTask"/>
+			<xsd:enumeration value="ScriptTask"/>
+			<xsd:enumeration value="EmbeddedSubprocess"/>
+			<xsd:enumeration value="EventSubprocess"/>
+			<xsd:enumeration value="AdHocSubprocess"/>
+			<xsd:enumeration value="Transaction"/>
+			<xsd:enumeration value="CallActivity"/>
+			<xsd:enumeration value="ParallelGateway"/>
+			<xsd:enumeration value="ExclusiveGateway"/>
+			<xsd:enumeration value="InclusiveGateway"/>
+			<xsd:enumeration value="EventBasedGateway"/>
+			<xsd:enumeration value="ComplexGateway"/>
+			<xsd:enumeration value="StartEvent"/>
+			<xsd:enumeration value="IntermediateCatchEvent"/>
+			<xsd:enumeration value="BoundaryEvent"/>
+			<xsd:enumeration value="EndEvent"/>
+			<xsd:enumeration value="IntermediateThrowEvent"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="tMultiInstanceBehaviorType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="None"/>
+			<xsd:enumeration value="One"/>
+			<xsd:enumeration value="All"/>
+			<xsd:enumeration value="Complex"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:element name="flowNodeInstance" type="tFlowNodeInstance" substitutionGroup="instance"/>
+	<xsd:complexType name="tFlowNodeInstance" abstract="true">
+		<xsd:complexContent> 
+			<xsd:extension base="tInstance"> 
+				<xsd:attribute name="flowNodeType" type="tFlowNodeType" />
+				<xsd:attribute name="lifecycleState" type="tLifecycleState" />
+				<xsd:sequence>
+					<xsd:element ref="inputRef" type="tConnectingObject" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="outputRef" type="tConnectingObject" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:simpleType name="tLoopCharacteristicType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="StandardLoopCharacteristics"/>
+			<xsd:enumeration value="MultiInstanceLoopCharacteristics"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="tActivityType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="AbstractTask"/>
+			<xsd:enumeration value="ServiceTask"/>
+			<xsd:enumeration value="UserTask"/>
+			<xsd:enumeration value="ManualTask"/>
+			<xsd:enumeration value="BusinessRuleTask"/>
+			<xsd:enumeration value="ScriptTask"/>
+			<xsd:enumeration value="EmbeddedSubprocess"/>
+			<xsd:enumeration value="EventSubprocess"/>
+			<xsd:enumeration value="AdHocSubprocess"/>
+			<xsd:enumeration value="Transaction"/>
+			<xsd:enumeration value="CallActivity"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:element name="activityInstance" type="tActivityInstance" substitutionGroup="flowNodeInstance"/>
+	<xsd:complexType name="tActivityInstance" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tFlowNodeInstance"> 
+				<xsd:attribute name="activityType" type="tActivityType" />
+				<xsd:attribute name="loopCharacteristicType" type="tLoopCharacteristicType" />
+				<xsd:attribute name="multiInstanceBehaviorType" type="tMultiInstanceBehaviorType" />
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:simpleType name="tSubprocessType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="EmbeddedSubprocess"/>
+			<xsd:enumeration value="EventSubprocess"/>
+			<xsd:enumeration value="AdHocSubprocess"/>
+			<xsd:enumeration value="Transaction"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:element name="SubprocessInstance" type="tSubprocessInstance" substitutionGroup="flowNodeInstance"/>
+	<xsd:complexType name="tSubprocessInstance" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tFlowNodeInstance"> 
+				<xsd:attribute name="SubprocessType" type="tSubprocessType" />
+				<xsd:sequence>
+					<xsd:element name="flowNodeInstances" type="tFlowNodeInstance" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="connectingObjects" type="tConnectingObject" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:simpleType name="tGatewayType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ParallelGateway"/>
+			<xsd:enumeration value="ExclusiveGateway"/>
+			<xsd:enumeration value="InclusiveGateway"/>
+			<xsd:enumeration value="EventBasedGateway"/>
+			<xsd:enumeration value="ComplexGateway"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:element name="gatewayInstance" type="tGatewayInstance" substitutionGroup="flowNodeInstance"/>
+	<xsd:complexType name="tGatewayInstance" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tFlowNodeInstance"> 
+				<xsd:attribute name="gatewayType" type="tGatewayType" />
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+		
+	<xsd:simpleType name="tEventType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="StartEvent"/>
+			<xsd:enumeration value="IntermediateCatchEvent"/>
+			<xsd:enumeration value="BoundaryEvent"/>
+			<xsd:enumeration value="EndEvent"/>
+			<xsd:enumeration value="IntermediateThrowEvent"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:element name="eventInstance" type="tEventInstance" substitutionGroup="flowNodeInstance"/>
+	<xsd:complexType name="tEventInstance" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tFlowNodeInstance"> 
+				<xsd:attribute name="eventType" type="tEventType" />
+				<xsd:sequence>
+					<xsd:element name="eventDefintionInstances" type="tEventDefinitionInstance" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+		
+	<xsd:element name="definitions" type="tDefinitionsInstance" substitutionGroup="instance"/>
+	<xsd:complexType name="tDefinitionsInstance" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tInstance"> 
+				<xsd:sequence>
+					<xsd:element name="processInstances" type="tProcessInstance" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+
+	<xsd:element name="process" type="tProcessInstance" substitutionGroup="instance"/>
+	<xsd:complexType name="tProcessInstance" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tInstance"> 
+				<xsd:attribute name="number" type="xsd:integer" />
+			    <xsd:attribute name="colorNumber" type="xsd:string" />
+				<xsd:attribute name="colorName" type="xsd:string" />
+				<xsd:sequence>
+					<xsd:element name="flowNodeInstances" type="tFlowNodeInstance" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:simpleType name="tEventDefinitionType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MessageEventDefinition"/>
+			<xsd:enumeration value="LinkEventDefinition"/>
+			<xsd:enumeration value="ErrorEventDefinition"/>
+			<xsd:enumeration value="TerminateEventDefinition"/>
+			<xsd:enumeration value="CompensationEventDefinition"/>
+			<xsd:enumeration value="ConditionalEventDefinition"/>
+			<xsd:enumeration value="TimerEventDefinition"/>
+			<xsd:enumeration value="CancelEventDefinition"/>
+			<xsd:enumeration value="EscalationEventDefinition"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:element name="eventDefinitionInstance" type="tEventDefinitionInstance" substitutionGroup="instance"/>
+	<xsd:complexType name="tEventDefinitionInstance" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tInstance"> 
+				<xsd:attribute name="eventDefinitionType" type="tEventDefinitionType" />
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:element name="itemAwareElementInstance" type="tItemAwareElementInstance" />
+	<xsd:complexType name="tItemAwareElementInstance" abstract="false">
+	    <xsd:attribute name="id" type="xsd:ID"/>
+		<xsd:attribute name="bpmnElementId" type="xsd:string"/>
+		<xsd:attribute name="data" type="xsd:byte" />
+	</xsd:complexType>
+
+	<xsd:simpleType name="tLifecycleState">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Completed"/>
+			<xsd:enumeration value="Compensated"/>
+			<xsd:enumeration value="Failed"/>
+			<xsd:enumeration value="Terminated"/>
+			<xsd:enumeration value="Ready"/>
+			<xsd:enumeration value="Active"/>
+			<xsd:enumeration value="Completing"/>
+			<xsd:enumeration value="Compensating"/>
+			<xsd:enumeration value="Failing"/>
+			<xsd:enumeration value="Terminating"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="tEventTriggerType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="None"/>
+			<xsd:enumeration value="Timer"/>
+			<xsd:enumeration value="Conditional"/>
+			<xsd:enumeration value="Message"/>
+			<xsd:enumeration value="Signal"/>
+			<xsd:enumeration value="Multiple"/>
+			<xsd:enumeration value="ParallelMultiple"/>
+			<xsd:enumeration value="Escalation"/>
+			<xsd:enumeration value="Error"/>
+			<xsd:enumeration value="Compensation"/>
+			<xsd:enumeration value="Terminate"/>
+			<xsd:enumeration value="Cancel"/>
+			<xsd:enumeration value="Link"/>
+			<xsd:enumeration value="Start"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:element name="eventData" type="tEventData"/>
+	<xsd:complexType name="tEventData" abstract="false">
+		<xsd:attribute name="id" type="xsd:ID"/>
+	</xsd:complexType>
+	
+	<xsd:element name="trigger" type="tTrigger" />
+	<xsd:complexType name="tTrigger" abstract="false">
+		<xsd:attribute name="id" type="xsd:string"/> 
+		<xsd:attribute name="processUUID" type="xsd:string"/>
+		<xsd:attribute name="sessionId" type="xsd:string"/>
+		<xsd:attribute name="eventTriggerType" type="tEventTriggerType" />
+		<xsd:sequence>
+			<xsd:element name="eventDatas" type="tEventData" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="dataRef" type="tItemAwareElementInstance" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="sourceRef" type="tEventDefinitionInstance" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="targetRef" type="tFlowNodeInstance" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:simpleType name="tExceptionType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="GatewayException"/>
+			<xsd:enumeration value="NoIORuleException"/>
+			<xsd:enumeration value="NoAvailableOutputSetException"/>
+			<xsd:enumeration value="NotMatchingIOSpecification"/>
+			<xsd:enumeration value="IllegalStartEventException"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:element name="exception" type="tException" />
+	<xsd:complexType name="tException" abstract="false">
+		<xsd:attribute name="name" type="xsd:string"/> 
+		<xsd:attribute name="exceptionType" type="tExceptionType" />
+	</xsd:complexType>
+
+	<xsd:element name="logInfo" type="tLogInfo" />
+	<xsd:complexType name="tLogInfo" abstract="false">
+		<xsd:attribute name="id" type="xsd:string"/> 
+		<xsd:attribute name="date" type="xsd:date"/> 
+		<xsd:attribute name="actor" type="xsd:QName"/> 
+		<xsd:attribute name="action" type="xsd:string"/>
+		<xsd:element name="object" type="tInstance" minOccurs="0" maxOccurs="1"/>
+		<xsd:attribute name="description" type="xsd:string"/>
+	</xsd:complexType>
+	
+	<xsd:element name="instance" type="tInstance"/>
+	<xsd:complexType name="tInstance" abstract="true">
+		<xsd:attribute name="id" type="xsd:ID"/>
+		<xsd:attribute name="bpmnElementId" type="xsd:string"/>
+		<xsd:element ref="participants" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element ref="dataRef" type="tItemAwareElementInstance" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element name="data" type="tItemAwareElementInstance" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element ref="logInfoRef" type="tLogInfo" minOccurs="0" maxOccurs="unbounded"/>
+	</xsd:complexType>
+	
+	<xsd:element name="runtimes" type="tRuntimes"/>
+	<xsd:complexType name="tRuntimes">
+		<xsd:sequence>
+			<xsd:element name="definitions" type="tDefinitionsInstance" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="exceptions" type="tException" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="triggers" type="tTrigger" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="correlationInfos" type="tCorrelationInfo" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="version" type="xsd:string"/>
+	</xsd:complexType>
+
+</xsd:schema>

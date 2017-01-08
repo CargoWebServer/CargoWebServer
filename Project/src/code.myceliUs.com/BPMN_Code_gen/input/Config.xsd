@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified" attributeFormDefault="unqualified"	
+	xmlns="http://www.cargowebserver/spec/CARGO/20151213/MODEL"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.cargowebserver/spec/CARGO/20151213/MODEL">
+
+	<xsd:simpleType name="tDataStoreType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="SQL_STORE"/>
+			<xsd:enumeration value="KEY_VALUE_STORE"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="tDataStoreVendor">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MYCELIUS"/>
+			<xsd:enumeration value="MYSQL"/>
+			<xsd:enumeration value="MSSQL"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:element name="configuration" type="tConfiguration"/>
+	<xsd:complexType name="tConfiguration" abstract="true">
+		<xsd:attribute name="id" type="xsd:ID"/>
+	</xsd:complexType>
+	
+	<xsd:element name="serverConfiguration" type="tServerConfiguration" substitutionGroup="configuration"/>
+	<xsd:complexType name="tServerConfiguration" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tConfiguration"> 
+				<xsd:attribute name="ipv4" type="xsd:string" />
+				<xsd:attribute name="hostName" type="xsd:string" />
+				<xsd:attribute name="port" type="xsd:integer" />
+				<xsd:attribute name="applicationsPath" type="xsd:string" />
+				<xsd:attribute name="dataPath" type="xsd:string" />
+				<xsd:attribute name="scriptsPath" type="xsd:string" />
+				<xsd:attribute name="definitionsPath" type="xsd:string" />
+				<xsd:attribute name="schemasPath" type="xsd:string" />
+				<xsd:attribute name="tmpPath" type="xsd:string" />
+				<xsd:attribute name="binPath" type="xsd:string" />
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:element name="applicationConfiguration" type="tApplicationConfiguration" substitutionGroup="configuration"/>
+	<xsd:complexType name="tApplicationConfiguration" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tConfiguration"> 
+				<xsd:attribute name="indexPage" type="xsd:string" />
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
+	<xsd:element name="smtpConfiguration" type="tSmtpConfiguration" substitutionGroup="configuration"/>
+	<xsd:complexType name="tSmtpConfiguration" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tConfiguration"> 
+				<xsd:attribute name="hostName" type="xsd:string" />
+				<xsd:attribute name="ipv4" type="xsd:string" />
+				<xsd:attribute name="port" type="xsd:integer" />
+				<xsd:attribute name="user" type="xsd:string" />
+				<xsd:attribute name="pwd" type="xsd:string" />
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+
+	<xsd:element name="dataStoreConfiguration" type="tDataStoreConfiguration" substitutionGroup="configuration"/>
+	<xsd:complexType name="tDataStoreConfiguration" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tConfiguration"> 
+				<xsd:attribute name="hostName" type="xsd:string" />
+				<xsd:attribute name="ipv4" type="xsd:string" />
+				<xsd:attribute name="port" type="xsd:integer" />
+				<xsd:attribute name="user" type="xsd:string" />
+				<xsd:attribute name="pwd" type="xsd:string" />
+				<xsd:attribute name="dataStoreType" type="tDataStoreType" />
+				<xsd:attribute name="dataStoreVendor" type="tDataStoreVendor" />
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+
+	<xsd:element name="ldapConfiguration" type="tLdapConfiguration" substitutionGroup="configuration"/>
+	<xsd:complexType name="tLdapConfiguration" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tConfiguration"> 
+				<xsd:attribute name="hostName" type="xsd:string" />
+				<xsd:attribute name="ipv4" type="xsd:string" />
+				<xsd:attribute name="port" type="xsd:integer" />
+				<xsd:attribute name="user" type="xsd:string" />
+				<xsd:attribute name="pwd" type="xsd:string" />
+				<xsd:attribute name="domain" type="xsd:string" />
+				<xsd:attribute name="searchBase" type="xsd:string" />
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+
+	<xsd:element name="configurations" type="tConfigurations"/>
+	<xsd:complexType name="tConfigurations">
+		<xsd:sequence>
+			<xsd:element name="serverConfig" type="tServerConfiguration" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="applicationConfigs" type="tApplicationConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="smtpConfigs" type="tSmtpConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="ldapConfigs" type="tLdapConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="dataStoreConfigs" type="tDataStoreConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID"/>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="version" type="xsd:string"/>
+	</xsd:complexType>
+
+</xsd:schema>
