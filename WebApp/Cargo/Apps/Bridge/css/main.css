@@ -1,0 +1,84 @@
+html{
+	overflow: hidden;
+}
+
+body {
+  color: fff;
+  
+  /** IE **/
+  scrollbar-base-color: #C0C0C0; 
+  scrollbar-3dlight-color: #C0C0C0; 
+  scrollbar-highlight-color: #C0C0C0; 
+  scrollbar-track-color: #EBEBEB; 
+  scrollbar-arrow-color: black; 
+  scrollbar-shadow-color: #C0C0C0; 
+  scrollbar-dark-shadow-color: #C0C0C0; 
+
+  /*-ms-overflow-style: -ms-autohiding-scrollbar;*/
+  
+}
+
+/** Here I will set the scroll bar style **/
+::-webkit-scrollbar
+{
+  width: 5px;  /* for vertical scrollbars */
+  height: 12px; /* for horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track
+{
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb
+{
+  background: #657383;;
+}
+
+::-webkit-scrollbar-thumb:active
+{
+  background: #428bca;
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+  cursor: pointer;
+}
+
+/** The splitters **/
+.splitter_v{
+	border-right: 1px solid #657383;
+  border-left: 	1px solid grey;
+}
+
+.splitter_v:hover{
+	cursor: ew-resize;
+}
+
+
+.splitter_h{
+	border-top: 1px solid #657383;
+	border-bottom: 1px solid grey;
+	background-color: lightgrey;
+}
+
+.splitter_h:hover{
+	cursor: ns-resize;
+}
+
+.scrolltable > .table_header{
+  background-color: rgb(101, 115, 131);
+}
+
+.scrolltable th{
+  font-size: 10pt;
+}
+
+.scrolltable > .table_body {
+  /* width: -webkit-fit-content;*/
+  overflow-y: auto;
+}
+
+#leftDiv {
+  width: 431px;
+}

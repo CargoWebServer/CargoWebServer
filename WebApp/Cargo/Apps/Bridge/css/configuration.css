@@ -1,0 +1,14 @@
+/** The server configuration **/
+.severConfiguration{
+    width: calc(100%-1px);
+    color: #657383;
+    padding: 2px;
+    font-size: 12pt;
+}
+
+.severConfiguration select {
+    border: 1px solid transparent;
+    transition: all .2s ease;
+    color: #657383;
+    font-size: 10pt;
+}

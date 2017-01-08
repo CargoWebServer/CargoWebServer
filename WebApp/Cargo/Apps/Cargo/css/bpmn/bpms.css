@@ -1,0 +1,54 @@
+
+/** The process instance header **/
+.process_instance_header{
+	border: 1px solid black;
+}
+
+/** The flow node instance inside the process instance list **/
+.flowNode_instance{
+	border: 1px solid black;
+}
+
+/** The process wizard **/
+.process_wizard_content{
+	display: table;
+	width: 100%;
+	height: 100%;
+	color: #657383;
+	padding: 2px;
+}
+
+.process_wizard_content{
+	width: 100%;
+	height: 100%;
+	display: table-row;
+}
+
+.process_wizard_content_label{
+	padding: 2px;
+	text-align: left;
+	padding-left: 12px;
+}
+
+.process_wizard_content_value{
+	padding: 2px;
+	padding-right: 12px;
+}
+
+.process_wizard_content_value input {
+	width: 100%;
+}
+
+.new_item_definition_button{
+
+}
+
+.new_item_definition_button:hover{
+	cursor: pointer;
+	color: #428bca;
+}
+
+.wizard_row_delete_btn:hover{
+	cursor: pointer;
+	color: #428bca;
+}

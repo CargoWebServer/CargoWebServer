@@ -1,0 +1,75 @@
+html,body {
+    height:100%;
+    padding:0;
+    margin:0;
+}
+
+#main_window {
+    height: 100%;
+    width: 100%;
+    min-height: 600px;
+    min-width: 800px;
+    background-color: #ececec;
+    overflow: auto;
+}
+
+.console_div{
+    position: absolute;
+    top: 0; left: 0;
+    width:auto;
+    height: auto;
+    z-index: 3;
+    display: inline-block;
+}
+
+/**
+ * Various element style...
+ */
+.autoCompleteDiv{
+    position: absolute;
+    background-color: white;
+    -webkit-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
+    -moz-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
+    box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
+    border: 1px solid darkgrey;
+    z-index: 1;
+    max-height: 300px;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.autoCompleteDiv div:hover {
+    cursor: pointer;
+    background-color:  darkgrey;
+}
+
+.autoCompleteDiv div {
+    font-size: 10pt;
+    font-family: arial;
+    padding-left: 2px;
+    border: 1px solid transparent;
+}
+
+.errorDiv {
+    width: auto;
+    height: auto;
+    position: absolute;
+    font-size: 0px;
+    z-index: 3;
+}
+
+.errorMsgDiv {
+    max-width: 250px;
+    min-width: 150px;
+    height: auto;
+    padding: 4px;
+    top: 0px;
+    border: 1px solid red;
+    background-color: #f5f5f5;
+    z-index: 3;
+    box-shadow: 5px 5px 2px #aaaaaa;
+    font-size: 10pt;
+    font-family: arial;
+    position: relative;
+
+}

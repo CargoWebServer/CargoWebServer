@@ -1,0 +1,301 @@
+{
+  "bootstrap" : {
+    "modalDialog": {
+      "tag": "div",
+      "id": "modal_div_id",
+      "class": "modal fade",
+      "childs": [
+        {
+          "tag": "div",
+          "id": "modal_id",
+          "class": "modal-dialog",
+          "childs": [
+            {
+              "tag": "div",
+              "id": "modal_content_id",
+              "class": "modal-content",
+              "childs": [
+                {
+                  "id": "modal_header_id",
+                  "tag": "div",
+                  "class": "modal-header",
+                  "childs": [
+                    {
+                      "tag": "button",
+                      "id": "modal_header_close_button_id",
+                      "type": "button",
+                      "class": "close",
+                      "data-dismiss": "modal",
+                      "aria-hidden": "true",
+                      "innerHtml": "x"
+                    },
+                    {
+                      "tag": "h4",
+                      "id": "modal_title_id",
+                      "class": "modal-title",
+                      "innerHtml": "modal title"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "id": "modal_body_id",
+                  "class": "modal-body",
+                  "childs": [
+                    {
+                      "tag": "p",
+                      "innerHtml": "One fine body..."
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "id": "modal_footer_id",
+                  "class": "modal-footer",
+                  "childs": [
+                    {
+                      "id": "modal_footer_close_button_id",
+                      "tag": "button",
+                      "class": "btn",
+                      "data-dismiss": "modal",
+                      "aria-hidden": "true",
+                      "innerHtml": "Close"
+                    },
+                    {
+                      "id": "modal_footer_save_button_id",
+                      "tag": "button",
+                      "class": "btn btn-primary",
+                      "innerHtml": "Save changes"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "loginDialog": {
+      "tag": "div",
+      "id": "login_div_id",
+      "class": "modal fade",
+      "childs": [
+        {
+          "tag": "div",
+          "id": "login_dialog_div_id",
+          "class": "modal-dialog",
+          "style": "width:300px",
+          "childs": [
+            {
+              "tag": "div",
+              "id": "login_content_div_id",
+              "class": "modal-content",
+              "childs": [
+                {
+                  "tag": "div",
+                  "id": "login_header_div_id",
+                  "class": "modal-header",
+                  "childs": [
+                    {
+                      "tag": "button",
+                      "id": "login_close_button_id",
+                      "class": "close",
+                      "data-dimiss": "modal",
+                      "aria-hidden": "true",
+                      "innerHtml": "x"
+                    },
+                    {
+                      "tag": "h4",
+                      "id": "login_title_div_id",
+                      "class": "modal-title",
+                      "innerHtml":"Login"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "id": "login_body_div_id",
+                  "class": "modal-body",
+                  "childs": [
+                    {
+                      "tag": "form",
+                      "id": "login_form_id",
+                      "role": "form",
+                      "childs": [
+                        {
+                          "tag": "div",
+                          "id": "login_form_group_0_id",
+                          "class": "form-group",
+                          "childs": [
+                            {
+                              "tag": "div",
+                              "id": "login_form_group_input_group_0_id",
+                              "class": "input-group",
+                              "childs": [
+                                {
+                                  "tag": "input",
+                                  "type": "text",
+                                  "id": "login_user_input_id",
+                                  "class": "form-control",
+                                  "placeholder": "Login",
+                                  "autofocus":"autofocus",
+                                  "required": "",
+                                  "data-error":"You must enter your user id!!!"
+                                },
+                                {
+                                  "tag": "label",
+                                  "for": "login_user_input_id",
+                                  "id": "login_user_label_id",
+                                  "class": "input-group-addon glyphicon glyphicon-user"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "div",
+                              "id": "login_user_error_div_id",
+                              "class": "help-block with-errors"
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "id": "login_form_group_1_id",
+                          "class": "form-group",
+                          "childs": [
+                            {
+                              "tag": "div",
+                              "id": "login_form_group_input_group_1_id",
+                              "class": "input-group",
+                              "childs": [
+                                {
+                                  "tag": "input",
+                                  "type": "password",
+                                  "id": "login_password_input_id",
+                                  "class": "form-control",
+                                  "placeholder": "Password",
+                                  "required": "",
+                                  "data-minlength":"6",
+                                  "data-error":"Invalid password."
+                                },
+                                {
+                                  "tag": "label",
+                                  "for": "login_password_input_id",
+                                  "id": "login_password_label_id",
+                                  "class": "input-group-addon glyphicon glyphicon-lock"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "id": "login_pwd_length_error_div_id",
+                              "class": "help-block",
+                              "innerHtml": "Minimum of 6 characters"
+                            },
+                            {
+                              "tag": "div",
+                              "id": "login_password_error_div_id",
+                              "class": "help-block with-errors"
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "id": "login_form_group_2_id",
+                          "class": "form-group",
+                          "childs": [
+                            {
+                              "tag": "div",
+                              "id": "login_form_group_input_group_2_id",
+                              "class": "input-group",
+                              "childs": [
+                                {
+                                  "tag": "div",
+                                  "id": "login_remember_checkbox_div_id",
+                                  "class": "checkbox",
+                                  "childs": [
+                                    {
+                                      "tag": "label",
+                                      "id": "login_remember_checkbox_label_id",
+                                      "childs": [
+                                        {
+                                          "tag": "input",
+                                          "id": "login_remember_checkbox_id",
+                                          "type": "checkbox"
+                                        }
+                                      , {
+                                          "tag": "span",
+                                          "id": "login_remember_span_id",
+                                          "innerHtml" : " Remember me"
+                                        }
+
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "id": "login_footer_div_id",
+                  "class": "modal-footer",
+                  "childs": [
+                    {
+                      "tag": "button",
+                      "id": "login_button_ok_id",
+                      "class": "form-control btn btn-primary",
+                      "innerHtml": "Ok"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "sidePanel" : {
+      "tag": "div",
+      "id": "side_panel_div_id",
+      "class": "container sidebar sidebar-left",
+      "childs": [
+        {
+          "tag": "div",
+          "id": "side_panel_row_div_id_",
+          "class": "row",
+          "childs": [
+            {
+              "tag": "div",
+              "id": "side_panel_row_div_id",
+              "data-side": "left",
+              "childs": [
+
+              ]
+            }
+          ]
+        },{
+          "tag": "div",
+          "id": "toggler_id",
+          "class": "toggler",
+          "childs": [
+            {
+              "tag": "span",
+              "class": "glyphicon glyphicon-chevron-right",
+              "innerHtml": "&nbsp;"
+            },
+            {
+              "tag": "span",
+              "class": "glyphicon glyphicon-chevron-left",
+              "innerHtml": "&nbsp;"
+            }
+          ]
+        }
+        ]
+    }
+  }
+}

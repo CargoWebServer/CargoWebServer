@@ -1,0 +1,107 @@
+
+#growl_panel{
+	position: absolute;
+	right: 3px;
+	top: 0px;
+	display: inline-block;
+}
+
+.growl_message_panel {
+	/** Give the space for the button **/
+	text-align: center;
+
+	display: inline-block;
+	z-index: 100;
+	width: 250px;
+	min-height: 100px;
+	margin-top: 1px;
+
+	background-color: white;
+	border: 1px solid darkgrey;
+
+	-webkit-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+	-moz-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+	box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+}
+
+.growl_message_panel_header {
+	width: 100%;
+	height: 18px;
+	position: relative;
+}
+
+.growl_message_panel span{
+	font-size: 12pt;
+	color: #428bca;
+	width: 100%;
+	height: 100%;
+	vertical-align: middle;
+}
+
+.message_icon{
+	position: absolute;
+	color: darkgrey;
+	display: none;
+	left: 2px;
+	top: 2px;
+	width: 20px;
+	height: 20px;
+}
+
+.message_delete_button{
+	position: absolute;
+	color: darkgrey;
+	display: none;
+	right: 1px;
+	top: 1px;
+}
+
+.message_delete_button:hover{
+	background-color: rgb(204,0,0);
+	color: white;
+	transition: all .2s ease;
+	cursor: pointer;
+}
+
+/******************************************************************************/
+/* animation */
+/******************************************************************************/
+.show {
+    -webkit-animation-name: show_message; /* Chrome, Safari, Opera */
+    -webkit-animation-duration: .5s; /* Chrome, Safari, Opera */
+    animation-name: show_message;
+    animation-duration: .5s;
+}
+
+@-webkit-keyframes show_message {
+    0%{ 
+    	 transform: translateX(250px);
+    }
+}
+
+@keyframes show_message {
+    0%{ 
+    	 transform: translateX(250px);
+    }
+}
+
+.hide {
+    -webkit-animation-name: hide_message; /* Chrome, Safari, Opera */
+    -webkit-animation-duration: .5s; /* Chrome, Safari, Opera */
+    animation-name: hide_message;
+    animation-duration: .5s;
+}
+
+@-webkit-keyframes hide_message {
+    100%{ 
+    	 transform: translateX(250px);
+    	 display: none;
+    }
+}
+
+@keyframes hide_message {
+    100%{ 
+    	 transform: translateX(250px);
+    	 display: none;
+    }
+}

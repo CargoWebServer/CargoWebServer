@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: gui/tableModel.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: gui/tableModel.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * (C) Copyright 2016 Mycelius SA (http://mycelius.com/).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @fileOverview Table model functionality.
+ * @author Dave Courtois
+ * @version 1.0
+ */
+
+/**
+ * This is an abstract class that help to connect the table with the data to display
+ * by the Table class.
+ * @constructor
+ * @param titles The list of table headers
+ */
+var TableModel = function (titles) {
+
+    // The titles to display in the headers, this must follow the fields...
+    this.titles = titles
+    this.values = []
+    this.fields = []
+    this.editable = {}
+
+    if (this.titles != null) {
+        for (var i = 0; i &lt; this.titles.length; i++) {
+            this.editable[i] = false
+        }
+    }
+    return this
+}
+
+/**
+ * Initialyse the data of the table.
+ * @param {function} callback The function to call when the funtion has finish it's work.
+ */
+TableModel.prototype.init = function (callback) {
+    // Here i will get the value for the given type name.
+}
+
+/**
+ *  Return the number of row of the model.
+ *  @returns {int} The number of row of the model.
+ */
+TableModel.prototype.getRowCount = function () {
+    return this.values.length
+}
+
+/**
+ *  Return the number of column of the model
+ *  @returns The number of colunm display in the model.
+ */
+TableModel.prototype.getColumnCount = function () {
+    return this.titles.length
+}
+
+/**
+ * Get the value of a cell.
+ * @param row The row index.
+ * @param column The colum index.
+ */
+TableModel.prototype.getValueAt = function (row, column) {
+    return this.values[row][column]
+}
+
+/**
+ * Get the column header value
+ * @param column Return the diplayed value at a given index.
+ */
+TableModel.prototype.getColumnName = function (column) {
+    return this.titles[column]
+}
+
+/*
+ * Get the data type of a column
+ * @param column The datatype of a given column, usefull to know how to display the cell content.
+ */
+TableModel.prototype.getColumnClass = function (column) {
+    return this.fields[column]
+}
+
+/**
+ * Get the editable state of a cell.
+ * @param {int} row The row index
+ * @param {int} column The column index
+ */
+TableModel.prototype.isCellEditable = function (column) {
+    return this.editable[column]
+}
+
+TableModel.prototype.setIsCellEditable = function (column, val) {
+    this.editable[column] = val
+}
+
+/**
+ * Set the value of a given cell, the change are local util the summit function is call.
+ * @param value The value to set
+ * @param {int} row The row of index of the cell
+ * @param {int} column The column index of the cell
+ */
+TableModel.prototype.setValueAt = function (value, row, column) {
+    // Must be implemented in the derived class.
+}
+
+////////////////////////////////////////////////////////////
+// Entity Table model
+////////////////////////////////////////////////////////////
+
+/**
+ * Implementation of the TableModel for the Entity class. It display
+ * the content of entities in tabular form.
+ * @extends TableModel
+ * @constructor
+ * @param proto The entity prototype.
+ */
+var EntityTableModel = function (proto) {
+
+    // Here i will display the 
+    if (proto != undefined) {
+        this.proto = proto
+    }
+
+    var titles = []
+    TableModel.call(this, titles);
+
+    /* I will simply get all entities for the given type. **/
+
+    // Here I will intialyse the fields and corresponding title...
+    for (var i = 0; i &lt; this.proto.Fields.length; i++) {
+        if (proto.FieldsVisibility[i] == true) {
+            var fieldIndex = proto.FieldsOrder[i]
+            titles.push(proto.Fields[fieldIndex].replace("M_", ""))
+            this.fields.push(proto.FieldsType[fieldIndex])
+        }
+    }
+
+    /*
+     * Here I will keep the entities display in the model...
+     */
+    this.entities = []
+
+    return this
+}
+
+// inherit from TableModel object...
+EntityTableModel.prototype = new TableModel(null);
+EntityTableModel.prototype.constructor = EntityTableModel;
+
+/**
+ * Initialisation of the table model.
+ * @successCallback The function to be call when the initialisation succed
+ * @progressCallback The function to be call to display the operation progression.
+ * @errorCallback The function to call in case of error.
+ * @caller A container for transfert variables from the request context to response/error context.
+ */
+EntityTableModel.prototype.init = function (successCallback, progressCallback, errorCallback, caller) {
+    server.entityManager.getObjectsByType(this.proto.TypeName, this.proto.TypeName.split(".")[0], undefined,
+        // Progress call back
+        function (index, total, caller) { // The progress callback
+            // Keep track of the file transfert...
+            caller.progressCallback(index, total, caller.caller)
+        },
+        function (result, caller) {
+            // So here I will put the value in a 2 dimension array...
+            var values = []
+            for (var i = 0; i &lt; result.length; i++) {
+                // I will keep the entity in references...
+                var entity = eval("new " + result[i].TYPENAME + "()")
+                entity.init(result[i])
+                caller.tableModel.entities.push(entity)
+
+                var objectValues = []
+                for (var j = 0; j &lt; caller.tableModel.titles.length; j++) {
+                    // The title contain the name of the field to display.
+                    var field = "M_" + caller.tableModel.titles[j]
+                    objectValues[j] = result[i][field]
+                    if (j == caller.tableModel.fields.length - 1) {
+                        values.push(objectValues)
+                    }
+                }
+            }
+
+            caller.tableModel.values = values
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback...
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message...
+            server.errorManager.onError(errMsg)
+        },
+        { "tableModel": this, "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback })
+}
+
+/**
+ * Remove a row whit a given id from the model.
+ * @param {string} The id of the row to remove.
+ */
+EntityTableModel.prototype.removeRow = function (id) {
+    var values = []
+    for (var i = 0; i &lt; this.values.length; i++) {
+        // The id must be the first value of the row...
+        if (this.values[i][0] != id) {
+            values.push(this.values[i])
+        }
+    }
+    // Set the new array...
+    this.values = values
+}
+
+/**
+ * Append a new row in the model.
+ * @param {values} The entity to append to the model.
+ */
+EntityTableModel.prototype.appendRow = function (values) {
+    if (values == undefined) {
+        return []
+    }
+    var entity = eval("new " + values.TYPENAME + "()")
+    entity.init(values)
+    this.entities.push(entity)
+
+    var objectValues = []
+    for (var j = 0; j &lt; this.titles.length; j++) {
+        var field = "M_" + this.titles[j]
+        objectValues[j] = values[field]
+        if (j == this.titles.length - 1) {
+            this.values.push(objectValues)
+        }
+    }
+    return objectValues
+}
+
+/**
+ * Set entity propertie value.
+ * @param {} value The map of value. Can be an entity or a value.
+ * @param {int} row The row index.
+ * @param {int} column The column index.
+ */
+EntityTableModel.prototype.setValueAt = function (value, row, column) {
+    var field = "M_" + this.titles[column]
+    if (value[field] != undefined) {
+        this.entities[row][field] = value[field]
+        this.values[row][column] = value[field]
+    } else {
+        this.entities[row][field] = value
+        this.values[row][column] = value
+    }
+}
+
+////////////////////////////////////////////////////////////
+// Sql Table model
+////////////////////////////////////////////////////////////
+/**
+ * This implement de model for a sql table.
+ * @param db The name of the database.
+ * @param query The query that generate the value.
+ * @param fields  The data type for each column
+ * @param params  The parameter of the where close if any
+ * @param titles  The column textual title.
+ * @returns {*}
+ * @constructor
+ */
+var SqlTableModel = function (db, query, fields, params, titles) {
+    TableModel.call(this, titles);
+
+    // Sql base request...
+    this.db = db
+    this.params = params
+    this.fields = fields
+
+    // The query...
+    this.query = query.replace(", ", ",") // Read query...
+
+    return this
+}
+
+// inherit from TableModel object...
+SqlTableModel.prototype = new TableModel(null);
+SqlTableModel.prototype.constructor = SqlTableModel;
+
+////////////////////////////////////////////////////////////
+// Sql Table model function
+////////////////////////////////////////////////////////////
+/**
+ * Initialyse the sql data...
+ * @param callback the function to call when the initialisation is done...
+ */
+SqlTableModel.prototype.init = function (successCallback, progressCallback, errorCallback, caller) {
+
+    server.dataManager.read(this.db, this.query, this.fields, this.params,
+        function (result, caller) {
+            caller.tableModel.values = result[0]
+            caller.successCallback(result[0], caller.caller)
+        },
+        // Progress call back
+        function (index, total, caller) { // The progress callback
+            // Keep track of the file transfert...
+            caller.progressCallback(index, total, caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback...
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message...
+            server.errorManager.onError(errMsg)
+        },
+        { "tableModel": this, "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback })
+}
+
+
+/**
+ * Remove a row whit a given id from the model.
+ * @param {string} The id of the row to remove.
+ */
+SqlTableModel.prototype.removeRow = function (id) {
+    var values = []
+    for (var i = 0; i &lt; this.values.length; i++) {
+        // The id must be the first value of the row...
+        if (this.values[i][0] != id) {
+            values.push(this.values[i])
+        }
+    }
+    // Set the new array...
+    this.values = values
+}
+
+/**
+ * Append a new row in the model.
+ * @param {values} The array of values to append to the model.
+ */
+SqlTableModel.prototype.appendRow = function (values) {
+    this.values.push(values)
+}
+
+/**
+ * Set model propertie value.
+ * @param {} value The map of value.
+ * @param {int} row The row index.
+ * @param {int} column The column index.
+ */
+SqlTableModel.prototype.setValueAt = function (value, row, column) {
+
+    // Check if the value need to be update...
+    if (this.getValueAt(row, column) == value) {
+        return /* Nothing todo here **/
+    }
+
+    // The query values...
+    var queryValues = this.query.split(" ")
+    var select = queryValues[0]
+    var fields = queryValues[1].split(",")
+    var from = queryValues[2]
+    var tableName = queryValues[3]
+
+    if (this.values == null) {
+        return
+    }
+
+    /* The the dataManager... **/
+    var values = new Array()
+    values[0] = value
+    if (this.getColumnClass(column) == 'date') {
+        values[0] = moment(value).format('YYYY-MM-DD HH:mm:ss');
+    }
+
+    var params = new Array()
+    var updateQuery = ""
+
+    // So here I will create the update query whit the info I know...
+    updateQuery += "Update " + tableName + " Set " + fields[column] + "=? WHERE "
+
+    // The other field will be use has parameters...
+    var index = 0
+    for (var i = 0; i &lt; fields.length; i++) {
+        var val = this.getValueAt(row, i)
+        if (i != column &amp;&amp; this.getColumnClass(i) != 'real') {
+            if (i &lt; fields.length &amp;&amp; i != 0) {
+                updateQuery += " AND "
+            }
+            if (this.getColumnClass(i) == 'string') {
+                updateQuery += fields[i] + "LIKE ? "
+            } else {
+                updateQuery += fields[i] + "=? "
+            }
+
+            if (this.getColumnClass(i) == 'date') {
+                params[index] = moment(val).format('YYYY-MM-DD HH:mm:ss.SSS');
+            } else {
+                params[index] = val
+            }
+            index += 1
+        }
+
+    }
+
+    // Send the update query...
+    server.dataManager.update(this.db, updateQuery, values, params,
+        // Success call back
+        function (result, caller) {
+            // Update the model value...
+            var model = caller.caller
+            var rowIndex = caller.rowIndex
+            var colIndex = caller.colIndex
+            var value = caller.value
+            model.values[rowIndex][colIndex] = value
+        },
+        // Error callback
+        function () {
+
+        },
+        { "caller": this, "rowIndex": row, "colIndex": column, "value": value })
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AccountManager.html">AccountManager</a></li><li><a href="Attachment.html">Attachment</a></li><li><a href="CarbonCopy.html">CarbonCopy</a></li><li><a href="ColumnFilter.html">ColumnFilter</a></li><li><a href="ColumnFormater.html">ColumnFormater</a></li><li><a href="ColumnSorter.html">ColumnSorter</a></li><li><a href="DataManager.html">DataManager</a></li><li><a href="Element.html">Element</a></li><li><a href="EmailManager.html">EmailManager</a></li><li><a href="EmailManager_sendEmail.html">sendEmail</a></li><li><a href="EntityManager.html">EntityManager</a></li><li><a href="EntityPrototype.html">EntityPrototype</a></li><li><a href="EntityTableModel.html">EntityTableModel</a></li><li><a href="EventChannel.html">EventChannel</a></li><li><a href="EventChannel_BroadcastEvent.html">BroadcastEvent</a></li><li><a href="EventHandler.html">EventHandler</a></li><li><a href="EventManager.html">EventManager</a></li><li><a href="ExecuteJsFunction.html">ExecuteJsFunction</a></li><li><a href="FileManager.html">FileManager</a></li><li><a href="LanguageManager.html">LanguageManager</a></li><li><a href="Request.html">Request</a></li><li><a href="Response.html">Response</a></li><li><a href="Server.html">Server</a></li><li><a href="SessionManager.html">SessionManager</a></li><li><a href="SqlTableModel.html">SqlTableModel</a></li><li><a href="SVG_Canvas.html">SVG_Canvas</a></li><li><a href="SVG_Circle.html">SVG_Circle</a></li><li><a href="SVG_ClipPath.html">SVG_ClipPath</a></li><li><a href="SVG_Element.html">SVG_Element</a></li><li><a href="SVG_Ellipse.html">SVG_Ellipse</a></li><li><a href="SVG_ForeignObject.html">SVG_ForeignObject</a></li><li><a href="SVG_Gradient.html">SVG_Gradient</a></li><li><a href="SVG_Group.html">SVG_Group</a></li><li><a href="SVG_Image.html">SVG_Image</a></li><li><a href="SVG_Line.html">SVG_Line</a></li><li><a href="SVG_Mask.html">SVG_Mask</a></li><li><a href="SVG_Path.html">SVG_Path</a></li><li><a href="SVG_Pattern.html">SVG_Pattern</a></li><li><a href="SVG_Polygon.html">SVG_Polygon</a></li><li><a href="SVG_Polyline.html">SVG_Polyline</a></li><li><a href="SVG_Rectangle.html">SVG_Rectangle</a></li><li><a href="SVG_Text.html">SVG_Text</a></li><li><a href="SVG_Text_appendSpan.html">appendSpan</a></li><li><a href="SVG_tRef.html">SVG_tRef</a></li><li><a href="SVG_Use.html">SVG_Use</a></li><li><a href="Table.html">Table</a></li><li><a href="TableCell.html">TableCell</a></li><li><a href="TableHeader.html">TableHeader</a></li><li><a href="TableModel.html">TableModel</a></li><li><a href="TableRow.html">TableRow</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ab2str">ab2str</a></li><li><a href="global.html#addStyleString">addStyleString</a></li><li><a href="global.html#applySat">applySat</a></li><li><a href="global.html#b64_to_utf8">b64_to_utf8</a></li><li><a href="global.html#base64toBlob">base64toBlob</a></li><li><a href="global.html#contains">contains</a></li><li><a href="global.html#convertDataURIToBinary">convertDataURIToBinary</a></li><li><a href="global.html#CountSpace">CountSpace</a></li><li><a href="global.html#createElementFromHtml">createElementFromHtml</a></li><li><a href="global.html#createElementFromXml">createElementFromXml</a></li><li><a href="global.html#decode64">decode64</a></li><li><a href="global.html#encode64">encode64</a></li><li><a href="global.html#findKeyframesRule">findKeyframesRule</a></li><li><a href="global.html#framesRules">framesRules</a></li><li><a href="global.html#getContrastYIQ">getContrastYIQ</a></li><li><a href="global.html#getCurrentDateStr">getCurrentDateStr</a></li><li><a href="global.html#getNavigatorName">getNavigatorName</a></li><li><a href="global.html#getStyleRuleValue">getStyleRuleValue</a></li><li><a href="global.html#getStyleSheetByFileName">getStyleSheetByFileName</a></li><li><a href="global.html#getTextWidth">getTextWidth</a></li><li><a href="global.html#getTimeSinceStr">getTimeSinceStr</a></li><li><a href="global.html#hexToB">hexToB</a></li><li><a href="global.html#hexToG">hexToG</a></li><li><a href="global.html#hexToR">hexToR</a></li><li><a href="global.html#hexToRgb">hexToRgb</a></li><li><a href="global.html#includeJavascript">includeJavascript</a></li><li><a href="global.html#invertHex">invertHex</a></li><li><a href="global.html#isArray">isArray</a></li><li><a href="global.html#isEmail">isEmail</a></li><li><a href="global.html#isInt">isInt</a></li><li><a href="global.html#isNumeric">isNumeric</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#localToGlobal">localToGlobal</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#mergeJSON">mergeJSON</a></li><li><a href="global.html#Message">Message</a></li><li><a href="global.html#MessageData">MessageData</a></li><li><a href="global.html#Name">Name</a></li><li><a href="global.html#propertyFromStylesheet">propertyFromStylesheet</a></li><li><a href="global.html#randomArray">randomArray</a></li><li><a href="global.html#randomColor">randomColor</a></li><li><a href="global.html#randomIntFromInterval">randomIntFromInterval</a></li><li><a href="global.html#randomUUID">randomUUID</a></li><li><a href="global.html#resizeImage">resizeImage</a></li><li><a href="global.html#Restriction">Restriction</a></li><li><a href="global.html#rgbToHsl">rgbToHsl</a></li><li><a href="global.html#selectText">selectText</a></li><li><a href="global.html#server">server</a></li><li><a href="global.html#setObjectValues">setObjectValues</a></li><li><a href="global.html#shuffleArray">shuffleArray</a></li><li><a href="global.html#StartWith">StartWith</a></li><li><a href="global.html#str2ab">str2ab</a></li><li><a href="global.html#This">This</a></li><li><a href="global.html#Uint8ToBase64">Uint8ToBase64</a></li><li><a href="global.html#utf8_to_b64">utf8_to_b64</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#Value">Value</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Jul 27 2016 17:16:32 GMT-0400 (EDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

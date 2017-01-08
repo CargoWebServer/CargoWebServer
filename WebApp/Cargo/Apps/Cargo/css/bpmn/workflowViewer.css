@@ -1,0 +1,398 @@
+.workflow-viewer {
+	/*margin-bottom: 15px;
+	padding: 10px*/
+	height: auto;
+}
+
+.workflow-definition-view {
+	padding: 20px 10px 20px 10px;
+	display: none;
+	position: relative;
+}
+
+/** The menus **/
+.workflow-definition-context-menu {
+	position: absolute;
+	z-index: 3;
+}
+
+/** The defintion panel **/
+.bpmn_definitions_panel {
+
+}
+
+.bpmn_definitions_title_lst{
+   height: 300px;
+    overflow: auto;
+}
+
+.bpmn_definitions_title_lst a{
+
+}
+
+/** The instance **/
+.bpmn_process_instances_panel {
+    margin-top: 5px;
+    min-height: 300px;
+
+}
+
+.bpmn_process_instances_panel .selected {
+
+    background-color: aliceblue;
+}
+
+.bpmn_process_instance_panel:hover{
+    cursor: pointer;
+    border: 1px solid cyan;
+}
+
+.bpmn_process_instance_panel {
+    min-height: 30px;
+    font-size: 11pt;
+    color: #000000;
+}
+
+.bpmn_process_instance_img_div{
+    text-align: center;
+    /*min-height: 75px; */
+    vertical-align: middle;
+    background-color: #ffffff;
+    border-radius: 4px;
+}
+
+.bpmn_process_instance_current_steps_panel{
+	text-align: center;
+	padding: 0px 2px 0px 2px;
+	/*min-height: 75px;*/
+	background-color: white;
+	border: none;
+}
+
+.bpmn_process_instance_current_step_panel {
+	background-color: white;
+	padding: 4px;
+    border-radius: 4px;
+    margin-top: 2px;
+}
+
+.bpmn_process_instance_current_step_panel:first-child{
+    margin-top: 0px;
+}
+
+.bpmn_process_instance_current_step_panel span{
+	border: none;
+	padding: 0px;
+}
+.bpmn_process_instance_color_tag {
+    padding: 0px;
+    border: none;
+    background-color: #ffffff;
+}
+
+/** Log table **/
+.bpmn_step_log_view{
+    background-color: white;
+    padding: 4px;
+    border-radius: 4px;
+    margin-top: 2px;
+}
+
+.bpmn_step_log_view td, th{
+    padding-left: 3px;
+}
+
+/** log table header **/
+.bpmn_step_log_view_title{
+    background-color: lightgray;
+    padding: 4px;
+    border-radius: 4px;
+    margin-top: 2px;
+    font-style: normal;
+}
+
+/** log table row **/
+.bpmn_step_log_view_infos{
+
+}
+
+/** log table view **/
+.bpmn_step_log_view_info{
+}
+
+.workflow-viewer .activity{
+	/** The style are define in the filters file... **/
+	/**filter: url(../svg/filters.svg#shadow);**/
+    filter: url(#shadow);
+}
+
+.workflow-viewer .activity:hover {
+	/** The style are define in the filters file... **/
+	filter: url(#glow);
+}
+
+.workflow-viewer .event {
+	/** The style are define in the filters file... **/
+	filter: url(#shadow);
+}
+
+.workflow-viewer .event:hover {
+	/** The style are define in the filters file... **/
+	filter: url(#glow);
+}
+
+.workflow-viewer .svg_text{
+
+}
+
+.workflow-viewer .svg_text:hover{
+	cursor: pointer;
+}
+
+.workflow-viewer .event.StartEvent ellipse,
+.workflow-viewer .event.EndEvent ellipse {
+	/*fill: hsl(206, 9%, 80%); /* grey */
+	stroke: gray;
+	stroke-width: 2;
+}
+
+.workflow-viewer .activity.ManualTask rect,
+.workflow-viewer .activity.ReceiveTask rect,
+.workflow-viewer .activity.SendTask rect,
+.workflow-viewer .activity.ServiceTask rect,
+.workflow-viewer .activity.ScriptTask rect,
+.workflow-viewer .activity.Task rect,
+.workflow-viewer .activity.UserTask rect {
+	/**fill: hsl(206, 9%, 80%); /* grey */
+	stroke: gray;
+	stroke-width: 2;
+}
+
+/** Completed state **/
+.workflow-viewer .event.StartEvent ellipse:hover,
+.workflow-viewer .event.EndEvent ellipse:hover{
+	cursor: pointer;
+	stroke: black;
+}
+
+.workflow-viewer .activity.ManualTask rect:hover,
+.workflow-viewer .activity.ReceiveTask rect:hover,
+.workflow-viewer .activity.SendTask rect:hover,
+.workflow-viewer .activity.ServiceTask rect:hover,
+.workflow-viewer .activity.ScriptTask rect:hover,
+.workflow-viewer .activity.Task rect:hover,
+.workflow-viewer .activity.UserTask rect:hover {
+	cursor: pointer;
+	stroke: black;
+}
+
+.workflow-viewer .completed{
+    border: 2px solid gray;
+    fill: url(#greyGradient);
+}
+
+.workflow-viewer .event.completed.StartEvent ellipse{
+    stroke: hsl(121, 32%, 40%); /* Green */
+    fill: url(#greenGradient);
+    stroke-width: 3;
+
+}
+
+.workflow-viewer .event.completed.EndEvent ellipse {
+    stroke: hsl(348, 32%, 40%); /* Red */
+    fill: url(#redGradient);
+    stroke-width: 3;
+
+}
+
+.workflow-viewer .activity.completed.ManualTask rect,
+.workflow-viewer .activity.completed.ReceiveTask rect,
+.workflow-viewer .activity.completed.SendTask rect,
+.workflow-viewer .activity.completed.ServiceTask rect,
+.workflow-viewer .activity.completed.ScriptTask rect,
+.workflow-viewer .activity.completed.Task rect,
+.workflow-viewer .activity.completed.UserTask rect {
+	stroke: gray; /* gray */
+	fill: url(#greyGradient);
+}
+
+/** Canceled state **/
+.workflow-viewer .canceled{
+    border: 2px solid hsl(350, 92%, 50%);
+}
+
+.workflow-viewer .event.canceled.StartEvent ellipse,
+.workflow-viewer .event.canceled.EndEvent ellipse{
+	stroke: hsl(350, 92%, 50%); /* red */
+	-webkit-animation: canceled-pulse 3s infinite;
+	-moz-animation: canceled-pulse 3s infinite;
+	animation: canceled-pulse 3s infinite;
+	stroke-width: 3;
+}
+
+.workflow-viewer .activity.canceled.ManualTask rect,
+.workflow-viewer .activity.canceled.ReceiveTask rect,
+.workflow-viewer .activity.canceled.SendTask rect,
+.workflow-viewer .activity.canceled.ServiceTask rect,
+.workflow-viewer .activity.canceled.ScriptTask rect,
+.workflow-viewer .activity.canceled.Task rect,
+.workflow-viewer .activity.canceled.UserTask rect {
+	stroke: hsl(350, 92%, 50%); /* red */
+	-webkit-animation: canceled-pulse 3s infinite;
+	-moz-animation: canceled-pulse 3s infinite;
+	animation: canceled-pulse 3s infinite;
+	stroke-width: 3;
+}
+
+@keyframes canceled-pulse {
+	0%   { stroke: hsl(350, 92%, 60%); }
+	50%  { stroke: hsl(344, 89%, 30%); }
+	100% { stroke: hsl(350, 92%, 60%); }
+}
+
+@-webkit-keyframes canceled-pulse {
+	0%   { stroke: hsl(350, 92%, 60%); }
+	50%  { stroke: hsl(344, 89%, 30%); }
+	100% { stroke: hsl(350, 92%, 60%); }
+}
+
+/** Waiting state **/
+.workflow-viewer .waiting{
+    border: 2px solid hsl(30, 92%, 50%);
+}
+
+.workflow-viewer .event.waiting.StartEvent ellipse,
+.workflow-viewer .event.waiting.EndEvent ellipse{
+	stroke: hsl(30, 92%, 50%); /* red */
+	-webkit-animation: waiting-pulse 3s infinite;
+	-moz-animation: waiting-pulse 3s infinite;
+	animation: waiting-pulse 3s infinite;
+	stroke-width: 3;
+}
+
+.workflow-viewer .activity.waiting.ManualTask rect,
+.workflow-viewer .activity.waiting.ReceiveTask rect,
+.workflow-viewer .activity.waiting.SendTask rect,
+.workflow-viewer .activity.waiting.ServiceTask rect,
+.workflow-viewer .activity.waiting.ScriptTask rect,
+.workflow-viewer .activity.waiting.Task rect,
+.workflow-viewer .activity.waiting.UserTask rect {
+	stroke: hsl(30, 92%, 50%); /* red */
+	-webkit-animation: waiting-pulse 3s infinite;
+	-moz-animation: waiting-pulse 3s infinite;
+	animation: waiting-pulse 3s infinite;
+	stroke-width: 3;
+}
+
+@keyframes waiting-pulse {
+	0%   { stroke: hsl(30, 92%, 60%); }
+	50%  { stroke: hsl(24, 89%, 30%); }
+	100% { stroke: hsl(30, 92%, 60%); }
+}
+
+@-webkit-keyframes waiting-pulse {
+	0%   { stroke: hsl(30, 92%, 60%); }
+	50%  { stroke: hsl(24, 89%, 30%); }
+	100% { stroke: hsl(30, 92%, 60%); }
+}
+
+
+/** Ready state **/
+.workflow-viewer .ready{
+    border: 2px solid hsl(121, 62%, 73%);
+}
+
+.workflow-viewer .event.ready.StartEvent ellipse,
+.workflow-viewer .event.ready.EndEvent ellipse{
+	stroke: hsl(121, 62%, 73%); /* green */
+	-webkit-animation: ready-pulse 3s infinite;
+	-moz-animation: ready-pulse 3s infinite;
+	animation: ready-pulse 3s infinite;
+	stroke-width: 3;
+}
+
+.workflow-viewer .activity.ready.ManualTask rect,
+.workflow-viewer .activity.ready.ReceiveTask rect,
+.workflow-viewer .activity.ready.SendTask rect,
+.workflow-viewer .activity.ready.ServiceTask rect,
+.workflow-viewer .activity.ready.ScriptTask rect,
+.workflow-viewer .activity.ready.Task rect,
+.workflow-viewer .activity.ready.UserTask rect {
+	stroke: hsl(121, 62%, 73%); /* green */
+	-webkit-animation: ready-pulse 3s infinite;
+	-moz-animation: ready-pulse 3s infinite;
+	animation: ready-pulse 3s infinite;
+	stroke-width: 3;
+}
+
+@keyframes ready-pulse {
+	0%   { stroke: hsl(121, 62%, 73%); }
+	50%  { stroke: hsl(122, 26%, 42%); }
+	100% { stroke: hsl(121, 62%, 73%); }
+}
+
+@-webkit-keyframes ready-pulse {
+	0%   { stroke: hsl(121, 62%, 73%); }
+	50%  { stroke: hsl(122, 26%, 42%); }
+	100% { stroke: hsl(121, 62%, 73%); }
+}
+
+/** Active state **/
+.workflow-viewer .event.active,
+.workflow-viewer .event.active {
+    border: 2px solid hsl(194, 66%, 70%);
+}
+
+.workflow-viewer .event.active.StartEvent ellipse,
+.workflow-viewer .event.active.EndEvent ellipse{
+	stroke: hsl(194, 66%, 70%); /* blue */
+	-webkit-animation: active-pulse 3s infinite;
+	-moz-animation: active-pulse 3s infinite;
+	animation: active-pulse 3s infinite;
+	stroke-width: 3;
+}
+
+.workflow-viewer .activity.active.ManualTask rect,
+.workflow-viewer .activity.active.ReceiveTask rect,
+.workflow-viewer .activity.active.SendTask rect,
+.workflow-viewer .activity.active.ServiceTask rect,
+.workflow-viewer .activity.active.ScriptTask rect,
+.workflow-viewer .activity.active.Task rect,
+.workflow-viewer .activity.active.UserTask rect {
+	stroke: hsl(194, 66%, 70%); /* blue */
+	-webkit-animation: active-pulse 3s infinite;
+	-moz-animation: active-pulse 3s infinite;
+	animation: active-pulse 3s infinite;
+	stroke-width: 3;
+}
+
+@keyframes active-pulse {
+	0%   { stroke: hsl(194, 66%, 70%); }
+	50%  { stroke: hsl(197, 53%, 45%); }
+	100% { stroke: hsl(194, 66%, 70%); }
+}
+
+@-webkit-keyframes active-pulse {
+	0%   { stroke: hsl(194, 66%, 70%); }
+	50%  { stroke: hsl(197, 53%, 45%); }
+	100% { stroke: hsl(194, 66%, 70%); }
+}
+
+
+.entity_view{
+	background-color: white;
+	padding: 0px;
+}
+
+.bpmn_process_instance_img_div{
+	background-color: white;
+	margin: 0px;
+}
+
+.bpmn_process_instances_panel{
+	border: 1px solid lightgray;
+}
+
+.tabbable{
+	border: 1px solid lightgray;
+}

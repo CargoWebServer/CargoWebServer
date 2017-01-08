@@ -1,0 +1,85 @@
+{
+  "test" : {
+    "containerInfo": {
+      "tag": "div",
+      "id": "boostrap_elements_container",
+      "class": "container",
+      "childs": [
+        {
+          "tag": "div",
+          "id": "div1",
+          "class": "row",
+          "childs": [
+            {
+              "tag": "div",
+              "id": "div2",
+              "class": "col-md-12",
+              "childs": [
+                {
+                  "tag": "div",
+                  "id": "txtEditor"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "id": "div3",
+          "class": "row",
+          "childs": [
+            {
+              "tag": "div",
+              "id": "div4",
+              "class": "col-md-6",
+              "childs": [
+                {
+                  "id": "myModalLnk",
+                  "tag": "a",
+                  "role": "button ",
+                  "class": "btn",
+                  "data-backdrop": "false",
+                  "data-toggle": "popover",
+                  "data-placement" : "top",
+                  "data-content" : "Click to open a dialog!!!",
+                  "innerHtml": "Launch demo modal"
+                },
+                {
+                  "id": "myLoginLnk",
+                  "tag": "a",
+                  "role": "button",
+                  "class": "btn",
+                  "data-backdrop": "false",
+                  "data-toggle": "tooltip",
+                  "data-placement" : "top",
+                  "data-original-title" : "Click here to login!",
+                  "innerHtml": "test login"
+                },
+                {
+                  "tag": "div",
+                  "id": "divx",
+                  "class": "row",
+                  "childs": [
+                    {
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "id": "div5",
+              "class": "col-md-6",
+              "childs": [
+                {
+                  "id": "uploadDiv",
+                  "tag": "div"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

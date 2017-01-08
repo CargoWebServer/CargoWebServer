@@ -1,0 +1,155 @@
+
+#logout_btn{
+	display: block;
+	border-radius: 1px;
+	padding: 10px;
+	color: #646464;
+	cursor: pointer;
+	transition: all .2s ease;
+	border: 1px solid transparent;
+	width: 100%;
+	text-align: center;
+	vertical-align: middle;
+	font-size: 10pt;
+}
+
+#logout_btn:hover{
+	border: 1px solid #bbb;
+	cursor: pointer;
+}
+
+#logout_btn:active{
+	border: 1px solid #428bca;
+}
+
+/** The session panel **/
+.session_panel{
+	display: table;
+	width: auto;
+	height: 100%;
+	text-align: center;
+	position: relative;
+}
+
+.styled-select select {
+   background: transparent;
+   line-height: 1;
+   border: 0px;
+   border-radius: 0px;
+   padding-top: 4px;
+   padding-bottom: 4px;
+   -webkit-appearance: none;
+   color: #657383;
+   font-size: 8pt;
+}
+
+/** Class that display to color of 
+ *  session state...
+ */
+.active{
+	color: #428bca;
+}
+
+.away{
+	color: orange;
+}
+
+.innactive{
+	color: #bbb;
+}
+
+.state_select{
+	border: 1px solid transparent;
+	transition: all .2s ease;
+	color: #bbb;
+}
+
+.state_select:hover{
+	cursor: pointer;
+	border-bottom: 1px solid #657383;
+	color: #657383;
+}
+
+/** Div here act like button **/
+.session_panel div{
+	display: table-cell;
+	vertical-align: middle;
+	height: 100%;
+	width: auto;
+	min-width: 60px;
+	border: 1px solid transparent;
+	transition: all .2s ease;
+}
+
+.session_panel span{
+	display: table-cell;
+	vertical-align: middle;
+	height: 100%;
+	width: auto;
+	min-width: 60px;
+	padding-right: 10px;
+	padding-left: 10px;
+	color: #657383;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+/** Mouse over style **/
+.session_panel div:hover{
+	border: 1px solid darkgrey;
+	cursor: pointer;
+}
+
+/** The panel that contain menu **/
+.session_display_panel {
+	min-width: 180px;
+	min-height: 50px;
+	max-height: 300px;
+	overflow-y: auto;
+	font-size: 10pt;
+	font-family: Arial, Helvetica, sans-serif;
+	padding: 1px;
+	position: absolute;
+	background-color: white;
+	padding: 2px;
+	display: none;
+	border: 1px solid darkgrey;
+	transition: all .2s ease;
+	-webkit-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+	-moz-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+	box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+}
+
+.active_session {
+	display: table;
+	padding: 10px;
+}
+
+.active_session div{
+	display: table-cell;
+	padding-right: 10px;
+}
+
+.active_session i{
+	width: 16px;
+	height: 16px;
+}
+
+.active_session span{
+	font-family: Arial, Helvetica, sans-serif;
+	color: #657383;
+	font-size: 10pt;
+}
+
+.session_state_menu{
+	position: absolute;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	background-color: white;
+	z-index: 10;
+	transition: all .2s ease;
+	-webkit-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+	-moz-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+	box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+}

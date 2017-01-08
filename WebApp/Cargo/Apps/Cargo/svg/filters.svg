@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg"  height="0" width="0" style="position: absolute">
+    <defs>
+        <filter id="blur" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="8" />
+        </filter>
+
+        <filter id="shadow" width="1.5" height="1.5" x="-.25" y="-.25">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" result="blur"/>
+            <feColorMatrix result="bluralpha" type="matrix" values=
+                    "1 0 0 0   0
+                        0 1 0 0   0
+                        0 0 1 0   0
+                        0 0 0 0.4 0 "/>
+            <feOffset in="bluralpha" dx="3" dy="3" result="offsetBlur"/>
+            <feMerge>
+                <feMergeNode in="offsetBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+
+        <!-- a transparent grey glow with no offset -->
+        <filter id="black-glow">
+            <feColorMatrix type="matrix" values=
+                    "0 0 0 0   0
+                        0 0 0 0   0
+                        0 0 0 0   0
+                        0 0 0 0.7 0"/>
+            <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+
+        <!-- a transparent glow that takes on the colour of the object it's applied to -->
+        <filter id="glow">
+            <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+
+        <radialGradient id="greenGradient" cx="50%" cy="50%" r="75%" > 
+            <stop offset="0%" style="stop-color:rgb(89,212,118);stop-opacity:1" />
+            <stop offset="99%" style="stop-color:rgb(63,150,84);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:rgb(63,150,84);stop-opacity:1" />
+        </radialGradient> 
+
+        <radialGradient id="redGradient" cx="50%" cy="50%" r="75%" > 
+            <stop offset="0%" style="stop-color:rgb(247,0,0);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:rgb(115,0,0);stop-opacity:1" />
+        </radialGradient> 
+
+        <linearGradient id="darkGreyGradient" x1="49%" y1="0%" x2="51%" y2="100%" > 
+            <stop offset="0%" style="stop-color:rgb(209,209,209);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:rgb(176,176,176);stop-opacity:1" />
+        </linearGradient> 
+
+        <linearGradient id="ligthGreyGradient" x1="49%" y1="0%" x2="51%" y2="100%" > 
+            <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:rgb(225,225,225);stop-opacity:1" />
+        </linearGradient>
+
+
+        <!-- The start point of an arrow -->
+        <marker id="sequenceflow-end"
+          viewBox="0 0 10 10" 
+            refX="10" refY="5" 
+            markerUnits="strokeWidth"
+            markerWidth="5" 
+            markerHeight="5"
+            orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" style="stroke-dasharray:1 0; stroke-width: 1px; stroke: black; fill: black;"/>
+        </marker>
+
+        <marker id="messageflow-start" 
+            viewBox="0 0 10 10"
+            markerUnits="strokeWidth"
+            markerWidth="20" 
+            markerHeight="20" 
+            refX="5" 
+            refY="5">
+            <circle cx="5" cy="5" r="2.5" style="stroke-dasharray:1 0; stroke-width: 1px; stroke: black; fill: white;"/>
+        </marker>
+
+        <marker id='messageflow-end' 
+            viewBox="0 0 10 10" 
+            refX="10" refY="5" 
+            markerUnits="strokeWidth"
+            markerWidth="10" 
+            markerHeight="10"
+            orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" style="stroke-dasharray:1 0; stroke-width: 1px; stroke: black; fill: white;"/>
+        </marker>
+
+        <marker id='association-end' 
+            viewBox="0 0 10 10" 
+            refX="10" refY="5" 
+            markerUnits="strokeWidth"
+            markerWidth="10" 
+            markerHeight="10"
+            orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10" style="stroke-dasharray:1 0; stroke-width: 1px; stroke: black; fill: none;"/>
+        </marker>
+
+        <marker id='conditional-flow-marker' 
+            viewBox="0 0 16 14" 
+            refX="-1" refY="10" 
+            markerUnits="strokeWidth"
+            markerWidth="10" 
+            markerHeight="10"
+            orient="auto">
+            <path d="M 0 10 L 8 6 L 16 10 L 8 14 Z" style="stroke-dasharray:1 0; stroke-width: 1px; stroke: black; fill: white;"/>
+        </marker>
+
+        <marker id='conditional-default-flow-marker' 
+            viewBox="0 0 16 16" 
+            refX="-5" refY="10" 
+            markerUnits="strokeWidth"
+            markerWidth="10" 
+            markerHeight="10"
+            orient="auto">
+            <path d="M 1 4 L 5 16" style="stroke-dasharray:1 0; stroke-width: 1px; stroke: black; fill: none;"/>
+        </marker>
+
+        </defs>
+</svg>

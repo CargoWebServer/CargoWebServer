@@ -1,0 +1,184 @@
+/**
+ * Contain the code for the entity view(s)
+ /** The panel **/
+.panel{
+	height: auto;
+	display: table;
+	border-spacing:2px 2px;
+}
+
+/** The entity panel **/
+.entity_panel{
+	width: 100%;
+	color: #657383;
+	display: table-row; 
+	box-sizing: content-box;
+	border: none;
+	background-color: white;
+}
+
+/** The entity type display **/
+.entity_type{
+	display: table-cell;
+	vertical-align: middle;
+	font-size: 1em;
+}
+
+.entity_type div {
+	display: table-cell;
+}
+
+.entity {
+	color: #657383;
+	display: table-row;
+	font-size: 10pt;
+	transition: all .2s ease;
+}
+
+.entity > div:first-child {
+	vertical-align: top;
+	display: table-cell;
+}
+
+.entity > div {
+	vertical-align: middle;
+	display: table-cell;
+}
+
+.entity  span {
+	display: table-cell;
+	vertical-align: middle;
+	padding-right: 4px;
+}
+
+.entity  input {
+	border: 1px solid transparent;
+	transition: all .2s ease;
+	color: #657383;
+	width: 20em;
+	text-align: left;
+	min-width: 20em;
+	max-width: 95%;
+}
+
+.entity input[type="checkbox"]  {
+	width: auto;
+	min-width: auto;
+	max-width: auto;
+}
+
+.entity  textarea {
+	border: 1px solid transparent;
+	transition: all .2s ease;
+	color: #657383;
+	max-width: 300px;
+	max-height: 50px;
+	width: 20em;
+}
+
+.entity select  {
+	border: 1px solid transparent;
+	transition: all .2s ease;
+	color: #657383;
+	
+}
+
+.entity input:hover{
+	border: 1px solid #bbb;
+}
+
+.entity select:hover{
+	border: 1px solid #bbb;
+	cursor: pointer;
+}
+
+.entity a{
+	color: #657383;
+	font-size: 1em;
+}
+
+.entity a:hover {
+	color: #428bca;
+	cursor: pointer;
+}
+
+.entity.scrolltable {
+	display:table; 
+	width: 100%; 
+	min-width: 200px;
+}
+
+.entities_panel_header{
+	position: relative;
+	display: table-row;
+	background-color:#bbb; 
+	color:white;
+	transition: all .2s ease;
+}
+.entities_panel_header > div:first-child {
+    width:100%; 
+	height:100%; 
+	overflow-y:auto;
+	display: table;
+}
+
+.entities_header_btn {
+	text-align: center;
+	display: none;
+	vertical-align: middle;
+	padding-left: 2px;
+	padding-right: 2px;
+	color: lightgray;
+}
+
+.entities_header_btn i{
+	font-size: .8em;
+	transition: all .2s ease;
+	padding: 2px;
+}
+
+.entities_header_btn.enabled {
+	color: white;
+}
+
+.entities_header_btn.enabled:hover {
+	cursor: pointer;
+}
+
+.entities_header_btn.enabled i:hover {
+	color: #428bca;
+}
+
+.entities_btn{
+	display: table-cell;
+}
+
+.entities_btn i {
+ 	color: lightgrey;
+	margin-left: 8px;
+}
+
+.entities_btn_container {
+	display: table-row;
+}
+
+.entities_btn_container div {
+	vertical-align: middle;
+}
+
+.entities_btn_container > div:first-child{
+	display: table-cell;
+}
+
+.entities_btn i:hover {
+	color: #428bca;
+	cursor: pointer;
+}
+
+.entities_btn > div:first-child {
+	display:table;
+}
+
+.sub_entity .entities_panel_header{
+	display: none;
+}

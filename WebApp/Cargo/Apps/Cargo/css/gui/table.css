@@ -1,0 +1,219 @@
+.scrolltable {
+    display: table;
+    border-collapse:collapse;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.table_header{
+    display: table-header-group;
+}
+
+.table_body{
+  display: table-row-group;
+}
+
+.header_cell{
+    background-color:  #bbb;
+    border-right: 1px solid white;
+    color: white;
+    padding: 2px;
+    display: table-cell
+}
+
+.header_cell:first-child{
+    border-left: 1px solid white;
+}
+
+.body_cell{
+    display: table-cell;
+    border-right: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    text-align: left;
+    height: 100%;
+    padding: 2px;
+    min-height: 20px;
+}
+
+.body_cell textarea {
+    resize: none;
+    overflow: hidden;
+    border: none;
+}
+
+.cell_content {
+    display: table; 
+    width: 100%; 
+    text-align: center;
+}
+
+.cell_value {
+    min-height: 16px;
+}
+
+.xs_number {
+    min-width: 75px;
+    text-align: center;
+    height: auto;
+}
+
+.xs_date {
+    min-width: 75px;
+    text-align: center;
+    height: auto;
+}
+
+.xs_string {
+    min-width: 75px;
+    text-align: left;
+    height: auto;
+}
+
+.xs_id {
+    min-width: 75px;
+    text-align: center;
+}
+
+.table_row {
+    display: table-row
+}
+
+
+/** The sorter **/
+.column_sorter {
+     display: table-cell;
+}
+
+.column_sorter:hover {
+    cursor: pointer;
+}
+
+.column_sorter div{
+    display: table-cell;
+}
+
+.column_sorter span{
+    display: table-cell;
+    font-size: 8pt;
+    padding-left: 2px;
+}
+
+/** The column filter **/
+.column_filter{
+   display: table-cell;
+}
+
+.column_filter:hover {
+    cursor: pointer;
+}
+
+.filter_panel_div{
+    font-size: 10pt;
+    font-style: normal;
+    font-family: Arial, Helvetica, sans-serif;
+    color: black;
+    text-align: left;
+    position: absolute;
+    display: none;
+    background-color: white;
+    border: 1px solid lightgrey;
+    z-index: 4;
+    -webkit-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.50);
+    -moz-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.50);
+    box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.50);
+    overflow: hidden;
+    width: 200px;
+}
+
+.filter_panel{
+    overflow-y: auto;
+    max-height: 250px;
+}
+
+.filter_panel_buttons{
+    display: block;
+    width: 198px;
+    height: 29px;
+    padding:1px;
+    border-top: 1px solid darkgrey;
+}
+
+.filter_panel_buttons div{
+    display: inline-block;
+    width: 50%;
+    height: 26px;
+    text-align: center;
+    padding-top: 5px;
+    border: 1px solid transparent;
+}
+
+.filter_panel_buttons div:hover{
+    transition: all .2s ease;
+    border: 1px solid darkgrey;
+}
+
+.filter_panel_buttons div:active{
+    border: 1px solid lightblue;
+}
+
+.filter-applied{
+    color: white;
+    text-shadow: -1px 1px 8px #ade9ff, 1px -1px 8px #fff
+}
+
+.filter{
+    color: lightgrey;
+}
+
+.line{
+    vertical-align: middle;
+}
+
+.row_button{
+    padding: 4px;
+    vertical-align: middle;
+    display: inline; 
+    padding-left: 2px;
+}
+
+.row_button i {
+    color: lightgrey;
+}
+
+.row_button i:hover {
+    color: #428bca;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.new_row_button{
+    vertical-align: top;
+}
+
+.number_of_row_label{
+    color: white;
+    background-color:#428bca;
+    border: 1px solid white;
+    font-size: 8pt;
+    width: 1em;
+    text-align: center; 
+    padding: 2px; 
+}
+
+.table_header_btn_div {
+    display: table-cell; 
+    background-color: transparent; 
+    vertical-align: middle;
+}
+
+.table_header_size_btn{
+    text-align: right; 
+    padding: 2px;
+    color: #bbb;
+}
+
+.table_header_size_btn i:hover {
+    color: #428bca;
+    cursor: pointer;
+    transition: all .2s ease;
+}

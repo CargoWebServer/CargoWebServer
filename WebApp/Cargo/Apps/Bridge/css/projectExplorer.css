@@ -1,0 +1,42 @@
+
+/** The project explorer panel **/
+.project_explorer{
+    background-color: white;
+    width: 100%;
+    padding: 2px 2px 2px 2px;
+}
+
+/** The view of a single project **/ 
+.project_view{
+    display: table;
+    width: 100%;
+    color: #657383;
+}
+
+.project_title{
+  border: 1px solid transparent;
+  padding: 2px 2px 2px 4px;
+}
+
+.project_title:hover{
+    cursor: pointer;
+    border: 1px solid lightgray;
+}
+
+.project_folder{
+    padding-left: 10px;
+    transition: all .2s ease;
+}
+
+.project_file{
+    padding-left: 20px;
+}
+
+.project_folder:hover {
+    cursor: pointer;
+}
+
+.project_file:hover {
+    cursor: pointer;
+    text-decoration: underline
+}

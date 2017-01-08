@@ -1,0 +1,127 @@
+.info_bubble_panel{
+    height: auto;
+    width: auto;
+    display: none;
+    border: 1px solid black;
+    border-radius: 5px;
+    position: absolute;
+    padding: 15px;
+
+    -webkit-box-shadow: -4px 3px 10px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    -4px 3px 10px 0px rgba(50, 50, 50, 0.75);
+    box-shadow:         -4px 3px 10px 0px rgba(50, 50, 50, 0.75);
+    z-index: 3;
+
+    background-color: #f4f4f4;
+}
+
+#files{
+    data-input: false;
+    tab-index: -1;
+    clip: rect(0px 0px 0px 0px);
+    position: absolute;
+}
+
+.load_dialog_panel {
+    min-width: 220px;
+    width: auto;
+    min-height: 75px;
+    padding: 5px;
+    display: inline-block;
+}
+
+/**
+ Classe de base...
+*/
+.upload_file_panel{
+    min-height: 50px;
+    width: auto;
+    border: 1px solid #cccccc;
+    margin: 10px 10px 25px 10px;
+    position: relative;
+    padding: 4px;
+}
+
+.upload_file_panel input{
+   min-width: 500px;
+   width: auto;
+}
+
+#loadButton{
+    height: auto;
+    /*position: absolute; */
+    /*bottom: -25px; right: -15px; */
+    vertical-align: middle;
+    font-size: 10pt;
+
+}
+
+.selected_files_div div:nth-child(odd)
+{
+    background: #ecebf0;
+}
+.selected_files_div div:nth-child(even)
+{
+    background: #f5f5f5;
+}
+
+/** The list of file to upload **/
+.selected_files_div{
+    width: 100%;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    height: 150px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.file_entry_div{
+    display: inline-block;
+    width: 100%;
+    position: relative;
+    vertical-align: middle;
+}
+
+.file_entry_div progress{
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    display: none;
+    vertical-align: middle;
+    text-align: right;
+}
+
+.file_entry_div span{
+    margin-left: 2px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.file_entry_div img{
+    width: 10px;
+    position: absolute;
+    right: 3px;
+    top: 5px;
+}
+
+.file_entry_div img:hover{
+    cursor: pointer;
+}
+
+.file_entry_div img:active{
+    -webkit-box-shadow: 0px 0px 7px 0px #ea8511;
+    -moz-box-shadow:    0px 0px 7px 0px #ea8511;
+    box-shadow:         0px 0px 7px 0px #ea8511;
+}
+
+.drop_zone{
+    padding: 25px;
+    text-align: center;
+    font-family: bold, Vollkorn;
+    font-size: 20pt;
+    color: #bbb;
+    border: 2px dashed #bbb;
+    display: none;
+}

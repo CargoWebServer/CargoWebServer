@@ -1,0 +1,137 @@
+
+/** simple dialog **/
+.dialog{
+	position: absolute;
+	background-color: white;
+	top: 0px;
+	left: 0px;
+	z-index: 10;
+	border: 1px solid darkgrey;
+
+	min-width: 200px;
+	max-width: 300px;
+
+	-webkit-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
+	-moz-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
+	box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
+	border: 1px solid darkgrey;
+	color: #657383;
+
+}
+
+.dialog_header{
+	width: 100%;
+	height: 21px;
+	display: table;
+	border-bottom: 1px solid darkgrey;
+	text-align: center;
+	vertical-align: middle;
+}
+
+/** The title **/
+.dialog_header span{
+	font-size: 10pt;
+	font-family: Arial, Helvetica, sans-serif;
+    color: black;
+    text-align: left;
+}
+
+/** Buttons of the dialog **/
+.dialog_buttons{
+	position: absolute;
+	display: table;
+	vertical-align: middle;
+	top: 1px;
+	right: 2px;
+}
+
+/** The title **/
+.dialog_title{
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    width: 100%;
+    padding: 1px;
+}
+
+/** The delete button **/
+.dialog_delete_button{
+    display: table-cell;
+    vertical-align: middle;
+    padding-right: 2px;
+    padding-left: 2px;
+    text-align: center;
+}
+
+.dialog_delete_button:hover{
+    background: linear-gradient(to bottom, rgba(204,0,0,1) 0%,rgba(204,0,0,1) 100%);
+    transition: all .2s ease;
+}
+
+.dialog_delete_button i {
+    color: lightgrey;
+    height: 100%;
+}
+
+.dialog_delete_button i:hover {
+    color: white;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.unselectable{
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.dialog_footer{
+	display: table;
+	width: 100%;
+	height: 30px;
+	position: relative;
+	text-align: center;
+	vertical-align: middle;
+	padding: 1px;
+}
+
+.dialog_content{
+	display: table;
+	width: 100%;
+	min-height: 50px;
+	font-size: 10pt;
+	font-family: Arial, Helvetica, sans-serif;
+    color: black;
+    text-align: center;
+    vertical-align: middle;
+	overflow: hidden;
+}
+
+.dialog_content span{
+	display: table-cell;
+	vertical-align: middle;
+	padding: 10px;
+}
+
+.diablog_button{
+	display: table-cell;
+	height: 28px;
+	text-align: center;
+	vertical-align: middle;
+	min-width: 50px;
+	border: solid 1px transparent;
+	padding-right: 5px;
+	padding-left: 5px;
+}
+
+.diablog_button:hover{
+	cursor: pointer;
+	border: solid 1px darkgrey;
+}
+
+.diablog_button:active{
+	border: solid 1px lightblue;
+}

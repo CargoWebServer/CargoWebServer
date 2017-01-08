@@ -1,0 +1,38 @@
+
+/** The splitter container **/
+.splitter_panel{
+    width: 100%;
+    height: 100%;
+    display: table;
+}
+
+.splitter {
+    width: 5px;
+    height: 100%;
+    background-color: white;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;   /* Chrome/Safari/Opera */
+    -khtml-user-select: none;    /* Konqueror */
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;       /* Internet Explorer/Edge */
+    user-select: none;           /* Non-prefixed version, currently
+                                 not supported by any browser */
+}
+
+.splitter.vertical{
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+}
+
+.splitter.vertical:active {
+    cursor: col-resize;
+}
+
+.splitter.horizontal{
+    border-top: 1px solid grey;
+    border-bottom: 1px solid grey;
+}
+
+.splitter.horizontal:active {
+    cursor: row-resize;
+}

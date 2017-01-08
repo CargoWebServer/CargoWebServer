@@ -1,0 +1,70 @@
+
+/** The file navigator **/
+.fileNavigator{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.fileNavigationBtn{
+    display: inline;
+    text-align: center;
+}
+
+.fileNavigationBtn {
+    display: table-cell;
+    height: 30px;
+    width: 20px;
+    vertical-align: middle;
+    font-size: 14pt;
+    color: lightgray;
+}
+
+.fileNavigationBtn.active{
+    color:  #657383;
+}
+
+.fileNavigationBtn.active:hover{
+    cursor: pointer;
+}
+
+.file_tab{
+    display: table-cell;
+    border-top: 1px solid lightgrey;
+    border-left: 1px solid lightgrey;
+    border-right: 1px solid lightgrey;
+    min-width: 50px;
+    vertical-align: middle;
+    text-align: center;
+    padding: 4px 4px 4px 4px;
+    color:  lightgrey;
+    min-width: 75px;
+    max-height: 30px;
+    transition: all .1s ease;
+}
+
+.file_tab:hover{
+    border-top: 1px solid grey;
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+    color:  #657383;
+    cursor: pointer;
+}
+
+.file_tab.active{
+    border-top: 2px solid  #428bca;;
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+    color:  #657383;
+}
+
+.file_tab_close_btn{
+    display: table-cell; 
+    color: transparent;
+    padding-left: 2px;
+}
+
+.file_tab_close_btn:hover{
+    color:  #657383;
+    cursor: pointer;
+}

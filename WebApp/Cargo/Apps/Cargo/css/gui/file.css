@@ -1,0 +1,106 @@
+
+
+.file_upload{
+	border: 3px dashed  lightgray;
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 0px;
+    right: 5px;
+    overflow-y: auto;
+    font-size: 0px;
+    vertical-align: top;
+    min-height: 250px;
+}
+
+
+/** The panel that contain the file image, icon... **/
+.file_panel {
+	width: 150px;
+	height: 150px;
+	display: inline-block;
+	position:relative;
+	border: 2px solid transparent;
+	margin: 3px;
+	text-align: center;
+	font-size: 0px;
+	vertical-align: top;
+}
+
+.file_panel progress{
+	position: absolute;
+	bottom: 2px;
+	left: 2px;
+  	height: 10px;
+  	width: 142px;
+}
+
+.file_panel img{
+	max-width: 140px !important;
+    height: auto !important;
+    max-height: 146px;
+}
+
+.file_panel:hover{
+	border: 2px solid darkgrey;
+	cursor: pointer;
+}
+
+.file_panel_delete_button{
+	height: 16px;
+	width: 16px;
+	font-size: 10pt;
+	display: none;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+
+
+.file_panel_delete_button:hover{
+	background: linear-gradient(to bottom, rgba(204,0,0,1) 0%,rgba(204,0,0,1) 100%);
+	transition: all .2s ease;
+}
+
+.file_panel_delete_button i {
+	color: lightgrey;
+
+}
+
+.file_panel_delete_button i:hover {
+	color: white;
+	cursor: pointer;
+	transition: all .2s ease;
+}
+
+.file_title{
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	height: auto;
+	color: white;
+	background-color: rgba(0,0,0,.65);
+	color: white;
+	font-size: 8pt;
+	padding: 2px;
+	max-height: 35px;
+}
+
+.upload_file_btn{
+	position: absolute;
+	right: 15px;
+	top: 15px;
+	padding: 2px;
+	vertical-align: middle;
+	text-align: center;
+	background-color: grey;
+}
+
+.upload_file_btn:hover{
+
+	border-width: 2px;
+	background: linear-gradient(to bottom, rgba(0,204,0,1) 0%,rgba(0,204,0,1) 100%);
+	transition: all .2s ease;
+	cursor: pointer;
+}
