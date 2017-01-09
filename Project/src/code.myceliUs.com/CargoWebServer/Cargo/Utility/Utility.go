@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -341,26 +340,4 @@ func ForeignIP(ip string) (*IPInfo, error) {
 		return nil, err
 	}
 	return &ipinfo, nil
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Those function work with go-daddy only...
-/////////////////////////////////////////////////////////////////////////////
-
-/**
- * Get the current goDaddy address for a given domain.
- * The key and secret must be generate once for the go daddy account.
- */
-func GetCurrentGoDaddyIp(domain string, key string, secret string) string {
-
-	req, err := http.NewRequest("GET", "https://api.godaddy.com/v1/domains/"+domain+"/records/A", nil)
-	req.SetBasicAuth(key, secret)
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println(err)
-	}
-	bodyText, err := ioutil.ReadAll(resp.Body)
-	s := string(bodyText)
-	return s
 }

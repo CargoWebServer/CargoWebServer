@@ -213,18 +213,18 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
  */
 func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []interface{}) ([][]interface{}, error) {
 
-	/*err := this.Ping()
+	err := this.Ping()
 	if err != nil {
 		err = this.Connect()
 		if err != nil {
 			log.Println("---> sql connection error:", err)
 			return nil, err
 		}
-	}*/
+	}
 
 	// TODO Try to figure out why the connection is lost...
 	// Lost of connection so I will reconnect anyway...
-	this.Connect()
+	//this.Connect()
 
 	rows, err := this.m_db.Query(query, params...)
 	if err != nil {
