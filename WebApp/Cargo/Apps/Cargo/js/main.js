@@ -26,7 +26,10 @@
  */
 var server = new Server("localhost", "127.0.0.1", 9393)
 //var server = new Server("MON104", "10.67.44.73", 9393)
-//var server = new Server("cargowebserver.com", "65.92.81.11", 9393)
+
+// Amazon ec2 sever...
+//var server = new Server("www.cargowebserver.com", "54.214.130.226", 8080)
+
 //var server = new Server("MON176", "10.67.44.61", 9393)
 //var server = new Server("MON-UTIL-01", "10.2.128.70", 9393)
 //var server = new Server("localhost", "192.168.2.10", 9393)
@@ -44,7 +47,7 @@ var main = null
 function load() {
 
     // Open a new connection whit the web server.
-    server.conn = initConnection("ws://" + server.hostName + ":" + server.port.toString() + "/ws",
+    server.conn = initConnection("ws://" + server.ipv4 + ":" + server.port.toString() + "/ws",
         function () {
             // Get the session id from the server.
             server.setSessionId()
@@ -70,7 +73,7 @@ function load() {
             server.dataManager.RegisterListener()
             server.emailManager.RegisterListener()
             server.projectManager.RegisterListener()
-            server.securityManager.RegisterListener()
+            //server.securityManager.RegisterListener()
 
         },  // onOpen callback
         function () { // onClose callback
