@@ -882,8 +882,9 @@ SvgDiagram.prototype.drawStartEvent = function(diagramElement){
 			
 			// Now I will append the menu element...
 			startMenu = popup.appendElement({"tag":"div","class":"popupMenuItem", "innerHtml":"Start"}).down()
-			startMenu.element.onclick = function(popup, parent, startEvent){
+			startMenu.element.onclick = function(popup, parent, diagramElement){
 				return function(){
+					var startEvent = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
 					// Remove the menu.
 					popup.element.parentNode.removeChild(popup.element)
 
@@ -893,7 +894,7 @@ SvgDiagram.prototype.drawStartEvent = function(diagramElement){
 			}(popup, parent, diagramElement)
 			
 		}
-	}(this.parent, diagramElement.M_bpmnElement)
+	}(this.parent, diagramElement)
 
 	return group
 }
