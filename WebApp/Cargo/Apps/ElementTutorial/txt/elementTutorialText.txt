@@ -1,0 +1,123 @@
+###elementTutorial_h1###
+
+###sectionTitle_introduction_h2###
+Introduction
+
+###introduction_p###
+The 'Element' class included in the Cargo javascript framework offers a basic Html element wrapper class to help you create client side graphical interfaces. 
+All the functionnalities related to this class can be found within the file <a>element.js</a>. 
+You do <b>not</b> need to use the 'Element' class or any of it's related functionnalities 
+to develop a web application using the Cargo framework. If you are an experienced front-end web application developper and 
+already have techniques which you are familiar with, feel free to skip to the next tutorial.
+-> can use with jquery, etc
+
+###sectionTitle_elementClassOverview_h2###
+Element class overview
+
+###sectionTitle_elementConstructor_h3###
+Element constructor
+
+###newElement_p###
+To create a new 'Element', simply call it's constructor function:
+
+###aceEditor_reference_newElement_div###
+var myElement = new Element(parent, params, callback, isAppendAtFront)
+
+###newElementParent_li###
+<b>parent</b> The parent element of this element. Can be an Element or a DOM element.
+
+###newElementParams_li###
+<b>params</b> The list of parameters.
+
+###newElementCallback_li###
+<b>callback</b> This function called after the initialization is completed.
+
+###newElementIsAppendFront_li###
+<b>isAppendAtFront</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;True: the element is put in front of the other elements.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;False: it will be at the end.
+
+###sectionTitle_essentialFunctions_h3###
+Element essential functions
+
+###sectionTitle_appendElement_h4###
+appendElement()
+
+###appendElement_p###
+This function is used to append a child element to an existing element. 
+
+###aceEditor_reference_appendElement_div###
+myElement.appendElement(childElement)
+
+###appendElementChildElement_li###
+<b>childElement</b> The element to append. It can be an existing element, or a list of element properties.
+
+###sectionTitle_removeElement_h4###
+removeElement()
+
+###removeElement_p###
+This function is used to remove a child element from an existing element.
+ 
+###aceEditor_reference_removeElement_div###
+myElement.removeElement(childElement)
+
+###removeElementChildElement_li###
+<b>childElement</b> The child element to remove.
+
+###sectionTitle_getChildById_h4###
+getChildById()
+
+###getChildById_p###
+This function is used to find a child recursively inside the element's childs hierarchy.
+ 
+###aceEditor_reference_getChildById_div###
+myElement.getChildById("childElementId")
+
+###getChildByIdChildElement_li###
+<b>childElement</b> {string} id The id of the element to retreive.
+
+###sectionTitle_down_h4###
+down()
+
+###down_p###
+This function is used to navigate downwards in the Element hierarchy. It returns the last child of the element.
+ 
+###aceEditor_reference_down_div###
+myElement.down()
+
+###sectionTitle_up_h4###
+up()
+
+###up_p###
+This function is used to navigate upwards in the Element hierarchy. It returns the immediate parent of the element.
+ 
+###aceEditor_reference_up_div###
+myElement.up()
+
+###sectionTitle_example1_h2###
+Example #1: Basic web page layout
+
+###example1_01_p###
+<b>Overview:</b> In this example we will create a basic web page layout from scratch using the 'element' class
+
+###example1_02_p###
+First of all lets create a cargo element that wraps the html 'body' of our wep page
+
+###aceEditor_example_example1_02_div###
+var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
+
+###example1_03_p###
+For our 'bodyElement', the parent is a DOM element rather than a cargo element, since it is our first cargo element in this page.
+The list of 'params' that we passed this cargo element indicate that we want to make it a 'div' that takes 100% of the given height
+and 100% of the given width. In this case, this means it will take 100% of the space of the DOM 'body' element.
+
+###example1_04_p###
+<br>We will now add a new div to this 'bodyElement'. 
+
+###aceEditor_example_example1_04_div###
+var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" }); 
+var headerElement = bodyElement.appendElement({"tag": "div", "style": "height: 80px; width: 100%;"}).down()
+
+###example1_05_p###
+When we call appendElement() on a cargo element we must remember that this function returns the element on which we called the function.
+This is why we must call the .down() function if we want to get the newly created child element.
