@@ -297,7 +297,7 @@ WorkflowManager.prototype.newItemAwareElementInstance = function (bpmnElementId,
     // server is the client side singleton...
     var params = []
     params[0] = new RpcData({ "name": "bpmnElementId", "type": 2, "dataBytes": utf8_to_b64(bpmnElementId) })
-    params[1] = new RpcData({ "name": "data", "type": 2, "dataBytes": utf8_to_b64(data) })
+    params[1] = new RpcData({ "name": "data", "type": 3, "dataBytes": utf8_to_b64(data) })
     
     // Call it on the server.
     server.executeJsFunction(

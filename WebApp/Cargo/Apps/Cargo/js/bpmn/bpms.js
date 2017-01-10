@@ -127,22 +127,22 @@ var ProcessWizard = function (parent, startEvent) {
 
 				// append item...
 				var table = this.content.appendElement({ "tag": "div", "style": "display: table; position: relative; width:100%;" }).down()
-				var entities = {}
-				this.values[itemDefinition] = entities
+				var entities = []
+				this.values[data.UUID] = entities
 
 				this.appendItemDefinition(table, data, itemDefinition, data.M_isCollection,
 					// Append item callback 
 					function (entities) {
-						return function (entity) {
+						return function (value) {
 							// append the entity
-							entities[entity.UUID] = entity
+							entities.push(value)
 						}
 					} (entities),
 					// Remove item callback
 					function (entities) {
-						return function (entity) {
+						return function (value) {
 							// remove the entity.
-							delete entities[entity.UUId]
+							entities.pop(value)
 						}
 					} (entities))
 			}
@@ -156,11 +156,14 @@ var ProcessWizard = function (parent, startEvent) {
 			var index = 0
 			var itemAwareInstances = []
 			for (var dataId in values) {
-
 				var data = []
-				for (var id in values[dataId]) {
+				for (var i = 0; i < values[dataId].length; i++) {
 					// serialyse the object...
-					data.push(values[dataId][id].stringify())
+					if (values[dataId][i].stringify != undefined) {
+						data.push(values[dataId][i].stringify())
+					} else {
+						data.push(values[dataId][i])
+					}
 				}
 
 				// The array of item aware instances.
@@ -188,7 +191,7 @@ var ProcessWizard = function (parent, startEvent) {
 				index++
 
 			}
-			
+
 			// release the values
 			wizard.values = {}
 
@@ -205,33 +208,81 @@ ProcessWizard.prototype.appendItemDefinition = function (parent, data, itemDefin
 
 	// It must be at lest one row...
 	var table = parent.appendElement({ "tag": "div", "style": "position: relative; width:100%;" }).down()
+	
+	// Here I will create a table.
+	parent.appendElement({ "tag": "div", "style": "display: table;" }).down()
+		.appendElement({ "tag": "div", "id": "labelDiv", "style": "display: table-cell; padding: 2px;" })
+		.appendElement({ "tag": "i", "id": "editEntityBtn", "class": "new_item_definition_button fa fa-pencil-square-o", "style": "display: none;" })
+		.appendElement({ "tag": "i", "id": "appendEntityBtn", "class": "new_item_definition_button fa fa-plus", "style": "display: none;" })
+		.appendElement({ "tag": "div", "id": "valueDiv", "style": "display: table-cell;padding: 2px; width: 100%;" })
+
+	var labelDiv = parent.getChildById("labelDiv")
+	var valueDiv = parent.getChildById("valueDiv")
+
+	labelDiv.element.innerHTML = data.M_id
+
+	var appendEntityBtn = null
+	if (isCollection) {
+		appendEntityBtn = parent.getChildById("appendEntityBtn")
+		appendEntityBtn.element.style.display = ""
+	}
+
 	var itemDefintionRef = ""
 	if (isString(itemDefinition)) {
 		itemDefintionRef = itemDefinition
 	} else {
 		itemDefintionRef = itemDefinition.UUID
 	}
-	data["set_M_itemSubjectRef_" + itemDefintionRef + "_ref"](function (parent, isCollection, onSelect, onRemove) {
-		return function (itemDefinition) {
-			if (itemDefinition.M_structureRef != undefined) {
-				if (itemDefinition.M_structureRef.indexOf(".") != -1) {
-					server.entityManager.getEntityPrototypes(itemDefinition.M_structureRef.split(".")[0],
-						function (result, caller) {
-							var itemPrototype = server.entityManager.entityPrototypes[caller.itemDefinition.M_structureRef]
-							var isCollection = caller.isCollection
-							var parent = caller.parent
 
-							// Here I will display the panel.
-							if (isCollection) {
-								// Here I will create a table.
-								parent.appendElement({ "tag": "div", "style": "display: table;" }).down()
-									.appendElement({ "tag": "div", "style": "display: table-cell; padding: 2px;", "innerHtml": caller.itemDefinition.M_id })
-									.appendElement({ "tag": "div", "style": "display: table-cell;padding: 2px;" }).down()
-									.appendElement({ "tag": "i", "id": "appendEntityBtn", "class": "new_item_definition_button fa fa-plus" }).up()
-									.appendElement({ "tag": "div", "id": "valueDiv", "style": "display: table-cell;padding: 2px; width: 100%;" })
+	var control = null
 
-								var valueDiv = parent.getChildById("valueDiv")
-								var appendEntityBtn = parent.getChildById("appendEntityBtn")
+	// Here the data is a primitive xsd type...
+	if (itemDefinition == "xsd:string") {
+		if (!isCollection) {
+			control = valueDiv.appendElement({ "tag": "textarea" }).down()
+			labelDiv.element.style.verticalAlign = "top"
+			control.element.onblur = function (onSelect, id) {
+				return function () {
+					// Set the text element.
+					this.value.UUID = id
+					onSelect(this.value)
+				}
+			} (onSelect, data.M_id)
+		} else {
+			// TODO write code for multiple input...
+		}
+	} else if (itemDefinition == "xsd:boolean") {
+
+	} else if (itemDefinition == "xsd:int" || itemDefinition == "xsd:integer") {
+
+	} else if (itemDefinition == "xsd:byte") {
+
+	} else if (itemDefinition == "xsd:long") {
+
+	} else if (itemDefinition == "xsd:date") {
+
+	} else if (itemDefinition == "xsd:double" || itemDefinition == "xsd:float") {
+
+	} else {
+
+		// Object reference here.
+		if (!isCollection) {
+			appendEntityBtn = parent.getChildById("editEntityBtn")
+			appendEntityBtn.element.style.display = ""
+		}
+
+		data["set_M_itemSubjectRef_" + itemDefintionRef + "_ref"](function (parent, isCollection, onSelect, onRemove) {
+			return function (itemDefinition) {
+				if (itemDefinition.M_structureRef != undefined) {
+					// If the itemfinition is a structure.
+					if (itemDefinition.M_structureRef.indexOf(".") != -1) {
+						server.entityManager.getEntityPrototypes(itemDefinition.M_structureRef.split(".")[0],
+							function (result, caller) {
+
+								// Get the ui's object.
+								var itemPrototype = server.entityManager.entityPrototypes[caller.itemDefinition.M_structureRef]
+								var isCollection = caller.isCollection
+								var parent = caller.parent
 								var typeName = itemPrototype.TypeName
 
 								appendEntityBtn.element.onclick = function (valueDiv, itemPrototype, isCollection, onSelect, onRemove) {
@@ -240,20 +291,11 @@ ProcessWizard.prototype.appendItemDefinition = function (parent, data, itemDefin
 										var id = itemPrototype.TypeName
 										var control = valueDiv.getChildById(id + "_new")
 										if (control == undefined) {
-											if (isCollection) {
-												control = valueDiv.appendElement({ "tag": "input", "id": id + "_new" }).down()
-											} else {
+											control = valueDiv.appendElement({ "tag": "input", "id": id + "_new" }).down()
+											if (!isCollection) {
 												var parentElement
-												if (valueDiv.element.firstChild.firstChild == undefined) {
-													parentElement = valueDiv.element
-												} else {
-													parentElement = valueDiv.element.firstChild.firstChild.firstChild
-												}
-
-												control = new Element(parentElement, { "tag": "input", "id": id + "_new" })
-												if (parentElement.firstChild != null) {
-													parentElement.firstChild.style.display = "none"
-													entityPanel.controls[id + "_new"].element.value = parentElement.firstChild.innerHTML
+												if (valueDiv.element.firstChild != control.element) {
+													valueDiv.removeAllChilds()
 												}
 											}
 
@@ -285,7 +327,6 @@ ProcessWizard.prototype.appendItemDefinition = function (parent, data, itemDefin
 															var titles = result.getTitles()
 															for (var j = 0; j < titles.length; j++) {
 																lst.push(titles[j])
-
 																// Link the title with the object...
 																objMap[titles[j]] = result
 															}
@@ -303,7 +344,6 @@ ProcessWizard.prototype.appendItemDefinition = function (parent, data, itemDefin
 																	var titles = value.getTitles()
 																	var refName = ""
 																	for (var j = 0; j < titles.length; j++) {
-
 																		refName += titles[j]
 																		if (j < titles.length - 1) {
 																			refName += " "
@@ -344,37 +384,16 @@ ProcessWizard.prototype.appendItemDefinition = function (parent, data, itemDefin
 									}
 								} (valueDiv, itemPrototype, isCollection, caller.onSelect, caller.onRemove)
 
-							} else {
-								// Here I will create a panel.
+							},
+							function (errMsg, caller) {
 
-							}
-
-						},
-						function (errMsg, caller) {
-
-						},
-						{ "parent": parent, "isCollection": isCollection, "itemDefinition": itemDefinition, "onSelect": onSelect, "onRemove": onRemove })
-				}
-			} else {
-				// Here the data is a primitive xsd type...
-				if (itemDefinition == "xsd:string") {
-
-				} else if (itemDefinition == "xsd:boolean") {
-
-				} else if (itemDefinition == "xsd:int" || itemDefinition == "xsd:integer") {
-
-				} else if (itemDefinition == "xsd:byte") {
-
-				} else if (itemDefinition == "xsd:long") {
-
-				} else if (itemDefinition == "xsd:date") {
-
-				} else if (itemDefinition == "xsd:double" || itemDefinition == "xsd:float") {
-
+							},
+							{ "parent": parent, "isCollection": isCollection, "itemDefinition": itemDefinition, "onSelect": onSelect, "onRemove": onRemove })
+					}
 				}
 			}
-		}
-	} (table, isCollection, onSelect, onRemove))
+		} (table, isCollection, onSelect, onRemove))
+	}
 
 	return table
 }
