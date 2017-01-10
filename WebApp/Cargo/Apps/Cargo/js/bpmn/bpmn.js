@@ -283,7 +283,7 @@ WorkflowManager.prototype.getDefinitionInstances = function (definitions, succes
 
 
 /*
- * Create a new item definition.
+ * Create a new item definition instance.
  */
 function NewItemAwareElementInstance(bpmnElementId, data) {
     // Now create the new process...
@@ -294,25 +294,11 @@ function NewItemAwareElementInstance(bpmnElementId, data) {
 
 WorkflowManager.prototype.newItemAwareElementInstance = function (bpmnElementId, data, successCallback, errorCallback, caller) {
 
-    // Here I will disconnect recursive reference.
-    var entityStr = JSON.stringify(data)
-
     // server is the client side singleton...
     var params = []
     params[0] = new RpcData({ "name": "bpmnElementId", "type": 2, "dataBytes": utf8_to_b64(bpmnElementId) })
-    if (isObject(data)) {
-        params[1] = new RpcData({ "name": "data", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(data)) })
-    } else {
-        params[1] = new RpcData({ "name": "data", "type": 2, "dataBytes": utf8_to_b64(data) })
-    }
-
-    // set back the reference...
-    for (var i = 0; i < data.length; i++) {
-        if (data[i] != undefined) {
-            setObjectValues(data[i])
-        }
-    }
-
+    params[1] = new RpcData({ "name": "data", "type": 2, "dataBytes": utf8_to_b64(data) })
+    
     // Call it on the server.
     server.executeJsFunction(
         NewItemAwareElementInstance.toString(), // The function to execute remotely on server

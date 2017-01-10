@@ -17,7 +17,7 @@ function attachAutoComplete(control, elementLst, autoComplete) {
     }
 
     // I will always append the auto complete inside the body element.
-    control.autocompleteDiv = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "autoCompleteDiv", "style": " display:none;" })
+    control.autocompleteDiv = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "autoCompleteDiv", "style": " display:none; z-index: 10;" })
     var currentIndex = -1
 
     /* Save the key down event **/

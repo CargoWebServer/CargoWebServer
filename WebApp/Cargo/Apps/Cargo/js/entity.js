@@ -106,21 +106,28 @@ EntityManager.prototype.RegisterListener = function () {
  * Set an entity.
  */
 EntityManager.prototype.setEntity = function (entity) {
-    var prototype = this.entityPrototypes[entity.TYPENAME]
-    for (var i = 0; i < prototype.Ids.length; i++) {
-        var id = prototype.Ids[i]
-        if (id == "uuid") {
-            server.entityManager.entities[entity.UUID] = entity
-        } else {
-            if (entity[id].length > 0) {
-                server.entityManager.entities[entity.TYPENAME + "_" + entity[id]] = entity
-                // register the element in the workflow manager as needed.
-                if (entity.TYPENAME.startsWith("BPMN20")) {
-                    server.workflowManager.bpmnElements[entity[id]] = entity
+
+    this.getEntityPrototype(entity.TYPENAME, entity.TYPENAME.split(".")[0],
+        function (prototype, caller) {
+            for (var i = 0; i < prototype.Ids.length; i++) {
+                var id = prototype.Ids[i]
+                if (id == "uuid") {
+                    server.entityManager.entities[entity.UUID] = entity
+                } else {
+                    if (entity[id].length > 0) {
+                        server.entityManager.entities[entity.TYPENAME + "_" + entity[id]] = entity
+                        // register the element in the workflow manager as needed.
+                        if (entity.TYPENAME.startsWith("BPMN20")) {
+                            server.workflowManager.bpmnElements[entity[id]] = entity
+                        }
+                    }
                 }
             }
-        }
-    }
+        },
+        function (errMsg, caller) {
+            /** Nothing to do here. */
+        },
+        {})
 }
 
 /*
@@ -195,17 +202,25 @@ EntityManager.prototype.getObjectsByType = function (typeName, storeId, queryStr
                     if (result[0] != undefined) {
                         for (var i = 0; i < result[0].length; i++) {
                             var entity = eval("new " + caller.prototype.TypeName + "(caller.prototype)")
-                            entity.initCallback = function (entities, count, caller) {
-                                return function (entity) {
-                                    entities.push(entity)
-                                    server.entityManager.setEntity(entity)
-                                    if (count == entities.length) {
+                            if (i == result[0].length - 1) {
+                                entity.initCallback = function (caller) {
+                                    return function (entity) {
+                                        server.entityManager.setEntity(entity)
                                         caller.successCallback(entities, caller.caller)
                                     }
+                                } (caller)
+                            } else {
+                                entity.initCallback = function (entity) {
+                                    server.entityManager.setEntity(entity)
                                 }
-                            } (entities, result[0].length, caller)
+                            }
 
+                            // push the entitie before init it...
+                            entities.push(entity)
+
+                            // call init...
                             entity.init(result[0][i])
+
                         }
                     }
                     if (result[0] == null) {
@@ -1380,38 +1395,54 @@ function setSubObject(parent, property, values, isArray) {
         return parent
     }
 
-    var object = server.entityManager.entities[values.UUID]
-    if (object == undefined) {
-        object = eval("new " + values.TYPENAME + "()")
-        object.UUID = values.UUID
-        server.entityManager.setEntity(object)
-    }
+    server.entityManager.getEntityPrototype(values.TYPENAME, values.TYPENAME.split(".")[0],
+        function (result, caller) {
+            var parent = caller.parent
+            var property = caller.property
+            var values = caller.values
+            var isArray = caller.isArray
+            if (values.TYPENAME == "BPMN20.StartEvent") {
+                i = 0;
+            }
 
-    // Keep track of the parent uuid in the child.
-    object.parentUuid = parent.UUID
+            var object = server.entityManager.entities[values.UUID]
+            if (object == undefined) {
+                object = eval("new " + values.TYPENAME + "()")
+                // Keep track of the parent uuid in the child.
+                object.UUID = values.UUID
+                server.entityManager.setEntity(object)
+            }
 
-    // Keep track of the child uuid inside the parent.
-    if (parent.childsUuid == undefined) {
-        parent.childsUuid = []
-    }
+            // Keep track of the child uuid inside the parent.
+            if (parent.childsUuid == undefined) {
+                parent.childsUuid = []
+            }
 
-    if (parent.childsUuid.indexOf(object.UUID)) {
-        parent.childsUuid.push(object.UUID)
-    }
+            if (parent.childsUuid.indexOf(object.UUID)) {
+                parent.childsUuid.push(object.UUID)
+            }
 
-    if (isArray) {
-        if (parent[property] == undefined) {
-            parent[property] = []
-        }
-        object.init(values)
-        parent[property].push(object)
+            if (isArray) {
+                if (parent[property] == undefined) {
+                    parent[property] = []
+                }
+                object.init(values)
+                parent[property].push(object)
 
-    } else {
-        object.init(values)
-        parent[property] = object
-    }
+            } else {
+                object.init(values)
+                parent[property] = object
+            }
+         
+            object.parentUuid = parent.UUID
 
-    server.entityManager.setEntity(object)
+            server.entityManager.setEntity(object)
+
+        },
+        function () {
+
+        }, { "parent": parent, "property": property, "values": values, "isArray": isArray })
+
 
     return parent
 }
@@ -1550,6 +1581,7 @@ function setObjectValues(object, values) {
     // Call the init callback.
     if (object.initCallback != undefined) {
         object.initCallback(object)
+        object.initCallback == undefined
     }
 }
 
