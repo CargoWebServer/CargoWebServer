@@ -1,0 +1,15 @@
+.navbar {
+	margin-bottom: 0px;
+}
+
+#cargo-intro-container{
+	background-color: #333;
+	color: white;
+	padding-top:50px;
+	padding-bottom:50px;
+}
+
+#cargo-intro-wheel{
+	max-height: 300px;
+	padding: 20px;
+}
