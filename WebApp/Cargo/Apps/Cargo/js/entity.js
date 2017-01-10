@@ -106,21 +106,28 @@ EntityManager.prototype.RegisterListener = function () {
  * Set an entity.
  */
 EntityManager.prototype.setEntity = function (entity) {
-    var prototype = this.entityPrototypes[entity.TYPENAME]
-    for (var i = 0; i < prototype.Ids.length; i++) {
-        var id = prototype.Ids[i]
-        if (id == "uuid") {
-            server.entityManager.entities[entity.UUID] = entity
-        } else {
-            if (entity[id].length > 0) {
-                server.entityManager.entities[entity.TYPENAME + "_" + entity[id]] = entity
-                // register the element in the workflow manager as needed.
-                if(entity.TYPENAME.startsWith("BPMN20")){
-                    server.workflowManager.bpmnElements[entity[id]] = entity
+
+    this.getEntityPrototype(entity.TYPENAME, entity.TYPENAME.split(".")[0],
+        function (prototype, caller) {
+            for (var i = 0; i < prototype.Ids.length; i++) {
+                var id = prototype.Ids[i]
+                if (id == "uuid") {
+                    server.entityManager.entities[entity.UUID] = entity
+                } else {
+                    if (entity[id].length > 0) {
+                        server.entityManager.entities[entity.TYPENAME + "_" + entity[id]] = entity
+                        // register the element in the workflow manager as needed.
+                        if (entity.TYPENAME.startsWith("BPMN20")) {
+                            server.workflowManager.bpmnElements[entity[id]] = entity
+                        }
+                    }
                 }
             }
-        }
-    }
+        },
+        function (errMsg, caller) {
+            /** Nothing to do here. */
+        },
+        {})
 }
 
 /*
@@ -195,17 +202,25 @@ EntityManager.prototype.getObjectsByType = function (typeName, storeId, queryStr
                     if (result[0] != undefined) {
                         for (var i = 0; i < result[0].length; i++) {
                             var entity = eval("new " + caller.prototype.TypeName + "(caller.prototype)")
-                            entity.initCallback = function (entities, count, caller) {
-                                return function (entity) {
-                                    entities.push(entity)
-                                    server.entityManager.setEntity(entity)
-                                    if (count == entities.length) {
+                            if (i == result[0].length - 1) {
+                                entity.initCallback = function (caller) {
+                                    return function (entity) {
+                                        server.entityManager.setEntity(entity)
                                         caller.successCallback(entities, caller.caller)
                                     }
+                                } (caller)
+                            } else {
+                                entity.initCallback = function (entity) {
+                                    server.entityManager.setEntity(entity)
                                 }
-                            } (entities, result[0].length, caller)
+                            }
 
+                            // push the entitie before init it...
+                            entities.push(entity)
+
+                            // call init...
                             entity.init(result[0][i])
+
                         }
                     }
                     if (result[0] == null) {
@@ -800,7 +815,7 @@ EntityManager.prototype.getDerivedEntityPrototypes = function (typeName, success
                     } else {
                         var proto = new EntityPrototype()
                         proto.init(results[0][i])
-                        server.entityManager.entityPrototypes[results[i].TypeName] = proto
+                        server.entityManager.entityPrototypes[results[0][i].TypeName] = proto
                     }
                 }
             }
@@ -1329,16 +1344,16 @@ function setRef(owner, property, refValue, isArray) {
         /* The set fucntion **/
         owner["set_" + property + "_" + refValue + "_ref"] = function (entityUuid, propertyName, refValue) {
             return function (initCallback) {
-                
+
                 var isExist = server.entityManager.entities[refValue] != undefined
                 var isInit = false
 
-                if(isExist){
+                if (isExist) {
                     isInit = server.entityManager.entities[refValue].IsInit
                 }
-                
+
                 // If the entity is already on the client side...
-                if (isExist &&  isInit) {
+                if (isExist && isInit) {
                     // Here the reference exist on the server.
                     var entity = server.entityManager.entities[entityUuid]
                     var ref = server.entityManager.entities[refValue]
@@ -1380,38 +1395,54 @@ function setSubObject(parent, property, values, isArray) {
         return parent
     }
 
-    var object = server.entityManager.entities[values.UUID]
-    if (object == undefined) {
-        object = eval("new " + values.TYPENAME + "()")
-        object.UUID = values.UUID
-        server.entityManager.setEntity(object)
-    }
+    server.entityManager.getEntityPrototype(values.TYPENAME, values.TYPENAME.split(".")[0],
+        function (result, caller) {
+            var parent = caller.parent
+            var property = caller.property
+            var values = caller.values
+            var isArray = caller.isArray
+            if (values.TYPENAME == "BPMN20.StartEvent") {
+                i = 0;
+            }
 
-    // Keep track of the parent uuid in the child.
-    object.parentUuid = parent.UUID
+            var object = server.entityManager.entities[values.UUID]
+            if (object == undefined) {
+                object = eval("new " + values.TYPENAME + "()")
+                // Keep track of the parent uuid in the child.
+                object.UUID = values.UUID
+                server.entityManager.setEntity(object)
+            }
 
-    // Keep track of the child uuid inside the parent.
-    if (parent.childsUuid == undefined) {
-        parent.childsUuid = []
-    }
+            // Keep track of the child uuid inside the parent.
+            if (parent.childsUuid == undefined) {
+                parent.childsUuid = []
+            }
 
-    if (parent.childsUuid.indexOf(object.UUID)) {
-        parent.childsUuid.push(object.UUID)
-    }
+            if (parent.childsUuid.indexOf(object.UUID)) {
+                parent.childsUuid.push(object.UUID)
+            }
 
-    if (isArray) {
-        if (parent[property] == undefined) {
-            parent[property] = []
-        }
-        object.init(values)
-        parent[property].push(object)
+            if (isArray) {
+                if (parent[property] == undefined) {
+                    parent[property] = []
+                }
+                object.init(values)
+                parent[property].push(object)
 
-    } else {
-        object.init(values)
-        parent[property] = object
-    }
+            } else {
+                object.init(values)
+                parent[property] = object
+            }
+         
+            object.parentUuid = parent.UUID
 
-    server.entityManager.setEntity(object)
+            server.entityManager.setEntity(object)
+
+        },
+        function () {
+
+        }, { "parent": parent, "property": property, "values": values, "isArray": isArray })
+
 
     return parent
 }
@@ -1550,6 +1581,7 @@ function setObjectValues(object, values) {
     // Call the init callback.
     if (object.initCallback != undefined) {
         object.initCallback(object)
+        object.initCallback == undefined
     }
 }
 
@@ -1611,41 +1643,28 @@ EntityPrototype.prototype.generateConstructor = function () {
                 constructorSrc += " = undefined\n"
             }
         }
-
-        constructorSrc += " this.getTitles = function(){ return []}\n"
-
     }
 
-    // Keep the reference on the entity prototype.
-    constructorSrc += "     return this\n"
-    constructorSrc += "}\n"
-
-    // Set the function.
-    eval(constructorSrc)
-
     // Now the stringify function.
-    var stringifySrc = this.PackageName + "." + this.ClassName + ".prototype.stringify = function(){\n"
-    stringifySrc += "   resetObjectValues(this)\n"
-    stringifySrc += "   var entityStr = JSON.stringify(this)\n"
-    stringifySrc += "   setObjectValues(this)\n"
-    stringifySrc += "   return entityStr\n"
-    stringifySrc += "}\n"
-    eval(stringifySrc)
+    constructorSrc += " this.stringify = function(){\n"
+    constructorSrc += "       resetObjectValues(this)\n"
+    constructorSrc += "       var entityStr = JSON.stringify(this)\n"
+    constructorSrc += "       setObjectValues(this)\n"
+    constructorSrc += "       return entityStr\n"
+    constructorSrc += "   }\n"
 
     // The get parent function
-    var stringifySrc = this.PackageName + "." + this.ClassName + ".prototype.getParent = function(){\n"
-    stringifySrc += "   return server.entityManager.entities[this.parentUuid]\n"
-    stringifySrc += "}\n"
-    eval(stringifySrc)
+    constructorSrc += " this.getParent = function(){\n"
+    constructorSrc += "       return server.entityManager.entities[this.parentUuid]\n"
+    constructorSrc += "  }\n"
 
     // The setter function.
     for (var i = 0; i < this.Fields.length; i++) {
         if (!this.FieldsType[i].startsWith("xs.") && !this.FieldsType[i].startsWith("[]xs.")) {
             // So its not a basic type.
-            var setterSrc = this.PackageName + "." + this.ClassName + ".prototype.set" + this.Fields[i].replace("M_", "").capitalizeFirstLetter() + " = function(value){\n"
-            setterSrc += "   appendObjectValue(this,\"" + this.Fields[i] + "\", value)\n"
-            setterSrc += "}\n"
-            eval(setterSrc)
+            constructorSrc += " this.set" + this.Fields[i].replace("M_", "").capitalizeFirstLetter() + " = function(value){\n"
+            constructorSrc += "     appendObjectValue(this,\"" + this.Fields[i] + "\", value)\n"
+            constructorSrc += " }\n"
         }
     }
 
@@ -1653,10 +1672,9 @@ EntityPrototype.prototype.generateConstructor = function () {
     for (var i = 0; i < this.Fields.length; i++) {
         if (!this.FieldsType[i].startsWith("xs.") && !this.FieldsType[i].startsWith("[]xs.")) {
             // So its not a basic type.
-            var deleteSrc = this.PackageName + "." + this.ClassName + ".prototype.remove" + this.Fields[i].replace("M_", "").capitalizeFirstLetter() + " = function(value){\n"
-            deleteSrc += "   removeObjectValue(this,\"" + this.Fields[i] + "\", value)\n"
-            deleteSrc += "}\n"
-            eval(deleteSrc)
+            constructorSrc += " this.remove" + this.Fields[i].replace("M_", "").capitalizeFirstLetter() + " = function(value){\n"
+            constructorSrc += "     removeObjectValue(this,\"" + this.Fields[i] + "\", value)\n"
+            constructorSrc += " }\n"
         }
     }
 
@@ -1665,13 +1683,20 @@ EntityPrototype.prototype.generateConstructor = function () {
         var fieldIndex = this.getFieldIndex(this.Ids[i])
         var field = this.Fields[fieldIndex]
         if (this.FieldsVisibility[fieldIndex] == true) {
-            var getTitleSrc = this.PackageName + "." + this.ClassName + ".prototype.getTitles = function(){\n"
-            getTitleSrc += "  return [this." + field + "]\n"
-            getTitleSrc += "}\n"
-            eval(getTitleSrc)
+            constructorSrc += " this.getTitles = function(){\n"
+            constructorSrc += "     return [this." + field + "]\n"
+            constructorSrc += " }\n"
             break
         }
     }
+
+    // Keep the reference on the entity prototype.
+    constructorSrc += " return this\n"
+    constructorSrc += "}\n"
+
+    // Set the function.
+    eval(constructorSrc)
+
 }
 
 /**

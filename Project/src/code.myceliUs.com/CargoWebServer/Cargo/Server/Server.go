@@ -197,7 +197,7 @@ func (this *Server) initialize() {
 
 	this.fileManager.Initialize()
 	//this.ldapManager.Initialize()
-	//this.projectManager.Initialyze()
+	this.projectManager.Initialyze()
 }
 
 /**
@@ -265,7 +265,7 @@ func GetServer() *Server {
 func (this *Server) Start() {
 	//this.profiler = profile.Start(profile.CPUProfile, profile.ProfilePath("."), profile.NoShutdownHook).(*profile.Profile)
 
-	log.Println("Start the server...", Utility.GetCurrentGoDaddyIp("cargowebserver.com", "9uDkh8o3CjH_Hbwn2A6pLQeNQbUPaSxH7Y", "HbwqU4MjPjAiPS9RCKc9qC"))
+	log.Println("Start the server...", this.addressInfo.IP)
 	// Start the server...
 	server.startMessageProcessor()
 	server.startHub()

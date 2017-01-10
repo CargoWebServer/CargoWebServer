@@ -342,3 +342,46 @@ DataManager.prototype.deleteDataStore = function (storeId, successCallback, erro
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
 }
+
+/*
+ * Server side code.
+ */
+function Ping_(connectionId) {
+    // No value are return.
+    server.GetDataManager().Ping(connectionId, messageId, sessionId)
+}
+
+/**
+ * Test if a datastore is reachable.
+ * @param {string} connectionId The data server connection (configuration) id
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+DataManager.prototype.ping = function (connectionId, successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params_ = []
+    params_.push(new RpcData({ "name": "connectionId", "type": 2, "dataBytes": utf8_to_b64(connectionId) }))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        Ping_.toString(), // The function to execute remotely on server
+        params_, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            console.log(result[0])
+            caller.successCallback(result, caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback.
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}

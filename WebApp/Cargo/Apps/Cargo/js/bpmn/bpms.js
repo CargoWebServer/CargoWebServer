@@ -123,22 +123,46 @@ var ProcessWizard = function (parent, startEvent) {
 			var itemDefinition = data.M_itemSubjectRef
 
 			//console.log(itemDefinition)
-			if (itemDefinition != undefined) {
+			if (itemDefinition != undefined && itemDefinition != "") {
+
 				// append item...
 				var table = this.content.appendElement({ "tag": "div", "style": "display: table; position: relative; width:100%;" }).down()
-				this.appendItemDefinition(table, data, itemDefinition, data.M_isCollection)
+				var entities = {}
+				this.values[itemDefinition] = entities
+
+				this.appendItemDefinition(table, data, itemDefinition, data.M_isCollection,
+					// Append item callback 
+					function (entities) {
+						return function (entity) {
+							// append the entity
+							entities[entity.UUID] = entity
+						}
+					} (entities),
+					// Remove item callback
+					function (entities) {
+						return function (entity) {
+							// remove the entity.
+							delete entities[entity.UUId]
+						}
+					} (entities))
 			}
 		}
 	}
 
-	this.dialog.ok.element.onclick = function (values, process, dialog) {
+	this.dialog.ok.element.onclick = function (values, process, dialog, wizard) {
 		return function () {
 
 			// Here I will the itemAwareInstance...
 			var index = 0
 			var itemAwareInstances = []
 			for (var dataId in values) {
-				var data = values[dataId]
+
+				var data = []
+				for (var id in values[dataId]) {
+					// serialyse the object...
+					data.push(values[dataId][id].stringify())
+				}
+
 				// The array of item aware instances.
 				if (data != undefined) {
 					server.workflowManager.newItemAwareElementInstance(dataId, data,
@@ -164,9 +188,12 @@ var ProcessWizard = function (parent, startEvent) {
 				index++
 
 			}
+			
+			// release the values
+			wizard.values = {}
 
 		}
-	} (this.values, startEvent.getParent(), this.dialog)
+	} (this.values, startEvent.getParent(), this.dialog, this)
 
 	return this
 }
@@ -174,196 +201,180 @@ var ProcessWizard = function (parent, startEvent) {
 /*
  * Create the interface to enter the data about an item definition.
  */
-ProcessWizard.prototype.appendItemDefinition = function (parent, data, itemDefinition, isCollection) {
+ProcessWizard.prototype.appendItemDefinition = function (parent, data, itemDefinition, isCollection, onSelect, onRemove) {
 
 	// It must be at lest one row...
-	var table = parent.appendElement({ "tag": "div", "style": "display: table; position: relative; width:100%;" }).down()
-	var row = table.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
-
-	// Append the first value here...
-	var labelTxt = data.M_name
-
-	if (isCollection && this.values[data.UUID] == undefined) {
-		this.values[data.UUID] = []
-
-		// The append button for that collection...
-		var newRowButton = parent.appendElement({ "tag": "div", "style": "position: absolute; top:0px; left:2px;" }).down()
-		newRowButton.appendElement({ "tag": "i", "class": "fa fa-plus new_item_definition_button", "style": "font-size: .8em;" }).down()
-
-		newRowButton.element.onclick = function (wizard, parent, data, itemDefintion) {
-			return function () {
-				wizard.appendItemDefinition(parent, data, itemDefinition, isCollection)
-			}
-		} (this, parent, data, itemDefinition, isCollection)
-	}
-
-	var index = -1
-	var label = row.appendElement({ "tag": "div", "class": "process_wizard_content_label", "style": "display: table-cell; width:35%; vertical-align: top;", "innerHtml": labelTxt }).down()
-	var value = row.appendElement({ "tag": "div", "class": "process_wizard_content_value", "style": "display: table-cell; width:65%;" }).down()
-
-	// if the item is a collection...
-	if (isCollection) {
-		value.element.style.paddingRight = "6px"
-		this.values[data.UUID].push(undefined)
-		index = this.values[data.UUID].length - 1
-		labelTxt += "[" + (index + 1) + "]"
-		label.element.innerHTML = labelTxt
-		// I will also append a delete button for the row...
-		var deleteButton = row.appendElement({ "tag": "div", "class": "", "style": "display: table-cell;padding-right:6px;" }).down()
-			.appendElement({ "tag": "i", "class": "fa fa-minus wizard_row_delete_btn", "style": "font-size: .8em;" }).down()
-
-		deleteButton.element.onclick = function (table, values, uuid, index) {
-			return function () {
-				var values_ = []
-				for (var i = 0; i < values[uuid].length; i++) {
-					if (i != index) {
-						values_.push(values[uuid][i])
-					}
-				}
-				values[uuid] = values_
-				table.element.parentNode.removeChild(table.element)
-
-			}
-		} (table, this.values, data.UUID, index)
-	}
-
-	if (itemDefinition.M_structureRef != undefined) {
-		// The cargo entities...
-		if (itemDefinition.M_structureRef == "CargoEntities.User" || itemDefinition.M_structureRef == "CargoEntities.Group") {
-			// I will create the autocomplete list...
-			var input = value.appendElement({ "tag": "input", "style": "" }).down()
-			server.entityManager.getObjectsByType(itemDefinition.M_structureRef, "CargoEntities", null,
-				// Progress...
-				function () {
-
-				},
-				// success...
-				function (results, caller) {
-					var lst = []
-					var objMap = {}
-					var input = caller.input
-					var output = caller.output
-					var uuid = caller.uuid
-					var values = caller.values
-					var index = caller.index
-
-					for (var i = 0; i < results.length; i++) {
-						var result = results[i]
-						var id = ""
-						if (result.TYPENAME == "CargoEntities.User") {
-							// User...
-							id = result.M_firstName
-							if (result.M_middle.length > 0) {
-								id += " " + result.M_middle
-							}
-							id += " " + result.M_lastName
-
-						} else {
-							// Group...
-							id = result.M_name
-						}
-
-						lst.push(id)
-						objMap[id] = result
-					}
-
-					attachAutoComplete(input, lst)
-
-					// Here I will implement the keyup listener. When 
-					// the value is enter and the object is found then I will
-					// append it in the list of result...
-					input.element.onblur = input.element.onchange = function (objMap, values, uuid, index) {
-						return function (evt) {
-							var value = objMap[this.value]
-							if (value != undefined) {
-								if (index > -1) {
-									values[uuid][index] = value
-								} else {
-									values[uuid] = value
-								}
-							}
-						}
-					} (objMap, values, uuid, index)
-				},
-				// Error callback
-				function () { },
-				{ "input": input, "output": row, "values": this.values, "uuid": data.UUID, "index": index })
-
-		} else if (itemDefinition.M_structureRef == "CargoEntities.File") {
-
-		} else {
-			// Here it's a late binding structure...
-			console.log("definition found with item: ")
-			var input = value.appendElement({ "tag": "input", "style": "" }).down()
-			var objMap = {}
-
-			server.entityManager.getObjectsByType(itemDefinition.M_structureRef, itemDefinition.M_structureRef.split(".")[0], null,
-				// Progress...
-				function () {
-
-				},
-				// success...
-				function (results, caller) {
-					var input = caller.input
-					var values = caller.values
-					var objMap = caller.objMap
-					var uuid = caller.uuid
-					var index = caller.index
-
-					var lst = []
-					for (var i = 0; i < results.length; i++) {
-						var result = results[i]
-						// See if the object must contain M_id...
-						objMap[result.M_id] = result
-						lst.push(result.M_id)
-					}
-					attachAutoComplete(input, lst)
-
-					input.element.onblur = input.element.onchange = function (objMap, values, uuid, index) {
-						return function (evt) {
-							var value = objMap[this.value]
-							if (value != undefined) {
-								if (index > -1) {
-									values[uuid][index] = value
-								} else {
-									values[uuid] = value
-								}
-							}
-						}
-					} (objMap, values, uuid, index)
-
-				}, { "input": input, "objMap": objMap, "values": this.values, "uuid": data.UUID, "index": index })
-
-
-		}
+	var table = parent.appendElement({ "tag": "div", "style": "position: relative; width:100%;" }).down()
+	var itemDefintionRef = ""
+	if (isString(itemDefinition)) {
+		itemDefintionRef = itemDefinition
 	} else {
-
-		// Here the data is a primitive xsd type...
-		if (itemDefinition == "xsd:string") {
-			var input = value.appendElement({ "tag": "textArea", "style": "width: 100%" }).down()
-			input.element.onblur = function (values, uuid, index) {
-				return function () {
-					if (index > -1) {
-						values[uuid][index] = this.value
-					} else {
-						values[uuid] = this.value
-					}
-				}
-			} (this.values, data.UUID, index)
-		} else if (itemDefinition == "xsd:boolean") {
-
-		} else if (itemDefinition == "xsd:int" || itemDefinition == "xsd:integer") {
-
-		} else if (itemDefinition == "xsd:byte") {
-
-		} else if (itemDefinition == "xsd:long") {
-
-		} else if (itemDefinition == "xsd:date") {
-
-		} else if (itemDefinition == "xsd:double" || itemDefinition == "xsd:float") {
-
-		}
+		itemDefintionRef = itemDefinition.UUID
 	}
+	data["set_M_itemSubjectRef_" + itemDefintionRef + "_ref"](function (parent, isCollection, onSelect, onRemove) {
+		return function (itemDefinition) {
+			if (itemDefinition.M_structureRef != undefined) {
+				if (itemDefinition.M_structureRef.indexOf(".") != -1) {
+					server.entityManager.getEntityPrototypes(itemDefinition.M_structureRef.split(".")[0],
+						function (result, caller) {
+							var itemPrototype = server.entityManager.entityPrototypes[caller.itemDefinition.M_structureRef]
+							var isCollection = caller.isCollection
+							var parent = caller.parent
+
+							// Here I will display the panel.
+							if (isCollection) {
+								// Here I will create a table.
+								parent.appendElement({ "tag": "div", "style": "display: table;" }).down()
+									.appendElement({ "tag": "div", "style": "display: table-cell; padding: 2px;", "innerHtml": caller.itemDefinition.M_id })
+									.appendElement({ "tag": "div", "style": "display: table-cell;padding: 2px;" }).down()
+									.appendElement({ "tag": "i", "id": "appendEntityBtn", "class": "new_item_definition_button fa fa-plus" }).up()
+									.appendElement({ "tag": "div", "id": "valueDiv", "style": "display: table-cell;padding: 2px; width: 100%;" })
+
+								var valueDiv = parent.getChildById("valueDiv")
+								var appendEntityBtn = parent.getChildById("appendEntityBtn")
+								var typeName = itemPrototype.TypeName
+
+								appendEntityBtn.element.onclick = function (valueDiv, itemPrototype, isCollection, onSelect, onRemove) {
+									return function (evt) {
+										// get the child by it's id.
+										var id = itemPrototype.TypeName
+										var control = valueDiv.getChildById(id + "_new")
+										if (control == undefined) {
+											if (isCollection) {
+												control = valueDiv.appendElement({ "tag": "input", "id": id + "_new" }).down()
+											} else {
+												var parentElement
+												if (valueDiv.element.firstChild.firstChild == undefined) {
+													parentElement = valueDiv.element
+												} else {
+													parentElement = valueDiv.element.firstChild.firstChild.firstChild
+												}
+
+												control = new Element(parentElement, { "tag": "input", "id": id + "_new" })
+												if (parentElement.firstChild != null) {
+													parentElement.firstChild.style.display = "none"
+													entityPanel.controls[id + "_new"].element.value = parentElement.firstChild.innerHTML
+												}
+											}
+
+											control.element.readOnly = true
+											control.element.style.cursor = "progress"
+											control.element.style.width = "auto"
+
+											server.entityManager.getObjectsByType(itemPrototype.TypeName, itemPrototype.TypeName.split(".")[0], "",
+												// Progress...
+												function () { },
+												// Sucess...
+												function (results, caller) {
+													var control = caller.control
+													var onSelect = caller.onSelect
+													var onRemove = caller.onRemove
+
+													control.element.readOnly = false
+													control.element.style.cursor = "default"
+
+													if (results.length > 0) {
+														// get title display a readable name for the end user
+														// or the first entity id.
+														var lst = []
+														var objMap = {}
+
+														for (var i = 0; i < results.length; i++) {
+															var result = results[i]
+															var prototype = server.entityManager.entityPrototypes[result.TYPENAME]
+															var titles = result.getTitles()
+															for (var j = 0; j < titles.length; j++) {
+																lst.push(titles[j])
+
+																// Link the title with the object...
+																objMap[titles[j]] = result
+															}
+														}
+
+														// Now i will set it autocompletion list...
+														attachAutoComplete(control, lst, true)
+														control.element.onblur = control.element.onchange = function (objMap, onSelect, onRemove, control, valueDiv) {
+															return function (evt) {
+																var value = objMap[this.value]
+																if (value != undefined) {
+																	onSelect(value)
+
+																	// Compose the ref name...
+																	var titles = value.getTitles()
+																	var refName = ""
+																	for (var j = 0; j < titles.length; j++) {
+
+																		refName += titles[j]
+																		if (j < titles.length - 1) {
+																			refName += " "
+																		}
+																	}
+
+																	// Remove the parent element.
+																	valueDiv.removeElement(control)
+
+																	// So now I will create a new lnk and display it...
+																	var ln = valueDiv.appendElement({ "tag": "div", "class": "entities_btn_container" }).down()
+																	var ref = ln.appendElement({ "tag": "div" }).down().appendElement({ "tag": "a", "href": "#", "title": value.TYPENAME, "innerHtml": refName }).down()
+																	var deleteLnkButton = ln.appendElement({ "tag": "div", "class": "entities_btn" }).down().appendElement({ "tag": "i", "class": "fa fa-trash" }).down()
+
+																	// todo display it in the propertie panel...
+																	deleteLnkButton.element.onclick = function (valueDiv, ln, value, onRemove) {
+																		return function () {
+																			// I will call on remove with the value...
+																			onRemove(value)
+																			valueDiv.removeElement(ln)
+																		}
+																	} (valueDiv, ln, value, onRemove)
+																}
+
+															}
+														} (objMap, onSelect, onRemove, control, valueDiv)
+
+														control.element.focus()
+														control.element.select();
+													}
+												},
+												// error
+												function () { }, { "control": control, "onSelect": onSelect, "onRemove": onRemove })
+										}
+
+										// Display it
+										control.element.style.display = ""
+									}
+								} (valueDiv, itemPrototype, isCollection, caller.onSelect, caller.onRemove)
+
+							} else {
+								// Here I will create a panel.
+
+							}
+
+						},
+						function (errMsg, caller) {
+
+						},
+						{ "parent": parent, "isCollection": isCollection, "itemDefinition": itemDefinition, "onSelect": onSelect, "onRemove": onRemove })
+				}
+			} else {
+				// Here the data is a primitive xsd type...
+				if (itemDefinition == "xsd:string") {
+
+				} else if (itemDefinition == "xsd:boolean") {
+
+				} else if (itemDefinition == "xsd:int" || itemDefinition == "xsd:integer") {
+
+				} else if (itemDefinition == "xsd:byte") {
+
+				} else if (itemDefinition == "xsd:long") {
+
+				} else if (itemDefinition == "xsd:date") {
+
+				} else if (itemDefinition == "xsd:double" || itemDefinition == "xsd:float") {
+
+				}
+			}
+		}
+	} (table, isCollection, onSelect, onRemove))
 
 	return table
 }

@@ -271,6 +271,26 @@ func (this *DataManager) close() {
  * Execute a query that read information from the store and
  * return the result and an array of interface...
  */
+func (this *DataManager) Ping(storeName string, messageId string, sessionId string) {
+	store := this.getDataStore(storeName)
+	if store == nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("The datastore '"+storeName+"' does not exist."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+	err := store.Ping()
+
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Fail to ping the data store "+err.Error()+"'."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+}
+
+/**
+ * Execute a query that read information from the store and
+ * return the result and an array of interface...
+ */
 func (this *DataManager) Read(storeName string, query string, fieldsType []interface{}, params []interface{}, messageId string, sessionId string) [][]interface{} {
 	data, err := this.readData(storeName, query, fieldsType, params)
 	if err != nil {

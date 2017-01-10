@@ -36,23 +36,33 @@ function main() {
                                                 "CargoEntities.",
                                                 "SecurityEvent",
                                                 function () {
-                                                    var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
 
-                                                    // The body element....
-                                                    var mainLayout = new Element(bodyElement, { "tag": "div", "style": "position: absolute; top:0px; left:0px; right:0px; bottom: 0px;" });
+                                                    // now the prototypes...
+                                                    server.entityManager.getEntityPrototypes("BPMS_Runtime",
+                                                        function () {
+                                                            var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
 
-                                                    // The page to display when the user is logged in
-                                                    homePage = new HomePage(mainLayout)
+                                                            // The body element....
+                                                            var mainLayout = new Element(bodyElement, { "tag": "div", "style": "position: absolute; top:0px; left:0px; right:0px; bottom: 0px;" });
 
-                                                    // The login page...
-                                                    var loginPage = new LoginPage(function (mainLayout, homePage) {
-                                                        return function (sessionsInfo) {
-                                                            homePage.init(mainLayout, sessionsInfo)
-                                                        }
-                                                    } (mainLayout, homePage))
+                                                            // The page to display when the user is logged in
+                                                            homePage = new HomePage(mainLayout)
 
-                                                    // the main page...
-                                                    mainPage = new MainPage(mainLayout, loginPage)
+                                                            // The login page...
+                                                            var loginPage = new LoginPage(function (mainLayout, homePage) {
+                                                                return function (sessionsInfo) {
+                                                                    homePage.init(mainLayout, sessionsInfo)
+                                                                }
+                                                            } (mainLayout, homePage))
+                                                            // the main page...
+                                                            mainPage = new MainPage(mainLayout, loginPage)
+                                                        },
+                                                        // error callback
+                                                        function () {
+
+                                                        }, {})
+
+
                                                 },
                                                 function () { },
                                                 undefined

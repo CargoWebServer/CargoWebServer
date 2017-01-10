@@ -207,7 +207,15 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                     contentView.connectBtn.element.onclick = function(contentView){
                         return function(){
                             // Here I will try to open or close the connection...
-                            
+                            server.dataManager.ping(contentView.entity.M_id,
+                            function(result, caller){
+                                // Here the data store can be reach so I will try to connect.
+
+                            }, 
+                            function(errMsg, caller){
+                                // Here There is an error...
+                                
+                            }, contentView)
                         }
                     }(contentView)
 
