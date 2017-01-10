@@ -14,11 +14,7 @@
 
 <body>
 	<div class="container-fluid">
-		<div class="row text-center" style="background-color: #333;">
-			<div class="col-12">
-				<img src="img/wheel.svg" style="max-height: 100px;"/>
-			</div>
-		</div>
+		
 		<div class="row">
 			<nav class="navbar navbar-default">
 				<div class="container-fluid">
@@ -33,26 +29,60 @@
 					</div>
 
 					<!-- Collect the nav links, forms, and other content for toggling -->
-					<div class="collapse navbar-collapse" id="top-navbar">
+					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 						<ul class="nav navbar-nav">
 
-							<li><a href="#">Getting Started</a></li>
-							<li><a href="#">Tutorials</a></li>
-							<li><a href="#">Docs</a></li>
+							<li id="li-gettingStarted"><a href="#">Getting Started</a></li>
+							<li id="li-tutorials"><a href="#">Tutorials</a></li>
+							<li id="li-docs"><a href="#">Docs</a></li>
 
 						</ul>
 
 						<ul class="nav navbar-nav navbar-right">
-							<li><a href="#">About</a></li>
+							<li id="li-about"><a href="#">About</a></li>
 						</ul>
 					</div><!-- /.navbar-collapse -->
 				</div><!-- /.container-fluid -->
 			</nav>
 		</div>
+
+		<div class="row pageRow" id="page-cargo">
+			<div class="col-xs-12 text-center" id="cargo-intro-container">
+				<div class="col-xs-12">
+					<img src="img/wheel.svg" id="cargo-intro-wheel"/>
+				</div>
+				<div class="col-sm-6 col-sm-offset-3 text-center">
+					<h2>Cargo is a complete web application framework. It's fast, easy to configure and lightweight.<br><br></h2>
+					<p><a class="btn btn-primary btn-lg" href="#" role="button">Download Cargo</a></p>
+					<p>v1.0</p>
+				</div>
+			</div>
+		</div>
 	</div>
-	<script src="lib/js/jquery-3.1.1.min.js"></script>
-	<script src="lib/js/bootstrap.min.js"></script>
-	<script src="js/main.js"></script>
+	<div class="row hidden pageRow" id="page-gettingStarted">
+		<div class="col-12">
+			<a href="#">Getting Started</a>
+		</div>
+	</div>
+	<div class="row hidden pageRow" id="page-tutorials">
+		<div class="col-12">
+			<a href="#">Tutorials</a>
+		</div>
+	</div>
+	<div class="row hidden pageRow" id="page-docs">
+		<div class="col-12">
+			<a href="#">Docs</a>
+		</div>
+	</div>
+	<div class="row hidden pageRow" id="page-about">
+		<div class="col-12">
+			<a href="#">About</a>
+		</div>
+	</div>
+</div>
+<script src="lib/js/jquery-3.1.1.min.js"></script>
+<script src="lib/js/bootstrap.min.js"></script>
+<script src="js/main.js"></script>
 </body>
 
 </html>
