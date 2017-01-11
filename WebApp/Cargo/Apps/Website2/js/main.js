@@ -21,9 +21,10 @@ function hidePages(exceptId){
 }
 
 // tutorials navigation
-$('.tutorials-link').click(function(e) {
-    $('.tutorialsRow').addClass('hidden')
-    $('#tutorialsPage-' + this.id.split('-')[1]).removeClass('hidden')
+$(".tutorials-link").click(function() {
+    $('html, body').animate({
+        scrollTop: $('#tutorialsSection-' + this.id.split('-')[1]).offset().top
+    }, 500);
 });
 
 // main

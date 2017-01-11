@@ -19,3 +19,7 @@
 	cursor: pointer;
 }
 
+.tutorialsSideBar{
+	position: fixed;
+}
+
