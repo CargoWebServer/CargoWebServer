@@ -13,3 +13,9 @@
 	max-height: 300px;
 	padding: 20px;
 }
+
+.tutorialsHeader{
+	padding-left:10px;
+	cursor: pointer;
+}
+
