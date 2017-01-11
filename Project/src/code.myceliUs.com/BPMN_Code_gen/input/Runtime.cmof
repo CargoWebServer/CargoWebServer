@@ -62,8 +62,8 @@
 	<ownedMember xmi:type="cmof:Class" xmi:id="FlowNodeInstance" name="FlowNodeInstance" superClass="Instance" isAbstract="true">
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="FlowNodeInstance-flowNodeType" name="flowNodeType" _type="FlowNodeType"/>
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="FlowNodeInstance-lifecycleState" name="lifecycleState" _type="LifecycleState"/>
-		<ownedAttribute xmi:type="cmof:Property" visibility="public" xmi:id="FlowNodeInstance-inputRef" name="inputRef" _type="ConnectingObject" lower="0"  upper="1"/>
-		<ownedAttribute xmi:type="cmof:Property" visibility="public" xmi:id="FlowNodeInstance-outputRef" name="outputRef" _type="ConnectingObject" lower="0"  upper="1"/>
+		<ownedAttribute xmi:type="cmof:Property" visibility="public" xmi:id="FlowNodeInstance-inputRef" name="inputRef" _type="ConnectingObject" lower="0"  upper="*"/>
+		<ownedAttribute xmi:type="cmof:Property" visibility="public" xmi:id="FlowNodeInstance-outputRef" name="outputRef" _type="ConnectingObject" lower="0"  upper="*"/>
 	</ownedMember>
 	
 	<ownedMember xmi:type="cmof:Enumeration" xmi:id="ActivityType" name="ActivityType">

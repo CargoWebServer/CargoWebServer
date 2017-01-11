@@ -13,10 +13,10 @@ type FlowNodeInstance interface {
 	GetLifecycleState() LifecycleState
 
 	/** InputRef **/
-	GetInputRef() *ConnectingObject
+	GetInputRef() []*ConnectingObject
 	SetInputRef(interface{})
 
 	/** OutputRef **/
-	GetOutputRef() *ConnectingObject
+	GetOutputRef() []*ConnectingObject
 	SetOutputRef(interface{})
 }

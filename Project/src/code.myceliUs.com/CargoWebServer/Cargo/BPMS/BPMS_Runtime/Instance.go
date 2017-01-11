@@ -17,7 +17,6 @@ type Instance interface {
 
 	/** DataRef **/
 	GetDataRef() []*ItemAwareElementInstance
-	SetDataRef(interface{})
 
 	/** Data **/
 	GetData() []*ItemAwareElementInstance

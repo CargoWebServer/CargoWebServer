@@ -265,7 +265,7 @@ func GetServer() *Server {
 func (this *Server) Start() {
 	//this.profiler = profile.Start(profile.CPUProfile, profile.ProfilePath("."), profile.NoShutdownHook).(*profile.Profile)
 
-	log.Println("Start the server...", this.addressInfo.IP)
+	log.Println("Start the server..." /*, this.addressInfo.IP*/)
 	// Start the server...
 	server.startMessageProcessor()
 	server.startHub()

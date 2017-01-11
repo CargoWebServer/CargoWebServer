@@ -567,6 +567,10 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 								params := make([]interface{}, 1)
 								params[0] = ref.GetObject()
 								Utility.CallMethod(target.GetObject(), setMethode, params)
+							} else {
+								params := make([]interface{}, 1)
+								params[0] = sourceField.Index(i).String()
+								Utility.CallMethod(target.GetObject(), setMethode, params)
 							}
 						}
 					}
@@ -594,6 +598,10 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 							// Now I will call the append method...
 							params := make([]interface{}, 1)
 							params[0] = ref.GetObject()
+							Utility.CallMethod(target.GetObject(), setMethode, params)
+						} else {
+							params := make([]interface{}, 1)
+							params[0] = sourceField.String()
 							Utility.CallMethod(target.GetObject(), setMethode, params)
 						}
 					}
@@ -628,6 +636,7 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 
 		if sourceField.IsValid() {
 			if targetField.IsValid() {
+
 				if isBaseType || isEnum {
 					// set the value(s)...
 					targetField.Set(sourceField)
@@ -722,10 +731,6 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 										log.Println("fail to call method ", setMethodName, " on ", target.GetObject())
 									}
 								}
-							} else {
-								// TODO remove the value here.
-								// Remove the actual value here...
-
 							}
 						}
 					}

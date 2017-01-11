@@ -185,14 +185,14 @@ func (this *WorkflowProcessor) evaluateProcesses() {
  * Evaluate the transition.
  */
 func (this *WorkflowProcessor) workflowTransitionInterpreter(process *BPMN20.Process) {
-	/*activeProcessInstances := this.getActiveProcessInstances(process)
+	activeProcessInstances := this.getActiveProcessInstances(process)
 	for i := 0; i < len(activeProcessInstances); i++ {
 		log.Println("Evalute transition for process ", activeProcessInstances[i].M_id)
-		for j := 0; j < len(activeProcessInstances[i].GetFlowNodeInstances()); j++ {
+		/*for j := 0; j < len(activeProcessInstances[i].GetFlowNodeInstances()); j++ {
 			this.workflowTransition(activeProcessInstances[i].GetFlowNodeInstances()[j])
 
-		}
-	}*/
+		}*/
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
