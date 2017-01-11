@@ -7,7 +7,9 @@
 	<title>Cargo</title>
 
 	<!-- css -->
-	<link rel="stylesheet" type="text/css" href="lib/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="lib/highlight/styles/default.css">
+
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 
 </head>
@@ -33,7 +35,7 @@
 						<ul class="nav navbar-nav">
 
 							<li id="li-gettingStarted"><a href="#">Getting Started</a></li>
-							<li id="li-tutorials"><a href="#">Tutorials</a></li>							
+							<li id="li-tutorials"><a href="#">Tutorials</a></li>
 							<li id="li-docs"><a href="#">Docs</a></li>
 
 						</ul>
@@ -63,7 +65,7 @@
 		<div class="col-lg-12">
 			<p>-Comment installer, configurer, expliquer les fichiers, la configuration, etc.
 				<br>-Comment créer un projet (hello world)
-				<br>-Télécharger le projet hello world
+				<br>-Télécharger le projet hello world: complet A à Z (comme angular)
 			</p>
 		</div>
 	</div>
@@ -88,42 +90,60 @@
 		<div class="col-sm-10" role="main">
 			<div class="row tutorialsRow" id="tutorialsSection-intro">
 				<div class="col-xs-12">
-					<p>Creating a web app is made easy with cargo.</p>
-					<p>These tutorials will go through all the components of the framework to make you a web development pro as soon as possible.</p>
-					<p>If it hasn't been done, we suggest starting with the 'Getting Started' page.</p>
+					<div class="jumbotron">
+						<div class="container">
+							<p>Creating a web app is made easy with cargo.</p>
+							<p>These tutorials will go through all the components of the framework to make you a web development pro as soon as possible. If it hasn't been done, we suggest starting with the 'Getting Started' page.</p>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div class="row tutorialsRow" style="height: 1500px;" id="tutorialsSection-userInterface">
+			<div class="row tutorialsRow" id="tutorialsSection-userInterface">
 				<div class="col-xs-12">
-					<a href="#">userInterface</a>
+					<h2> 
+						User Interface
+					</h2>
+					<h3> 
+						Element
+					</h3>
+					<p>
+						The 'Element' class included in the Cargo javascript framework offers a basic Html element wrapper class to help you create client side graphical interfaces. It gives you the ability to create and manupulate html elements within your javascript files rather than in the traditionnal html and css files. All the functionnalities related to this class can be found within the file 'element.js'. 
+					</p>
+					<p>
+						You do not need to use the 'Element' class or any of it's related functionnalities 
+						to develop a web application using the Cargo framework. It can be used in conjunction with other javascript libraries such as Jquery and Bootstrap. If you are an experienced front-end web application developper and already have techniques which you are familiar with, feel free to skip to the next tutorial.
+					</p>
+					<pre><code class="javascript">var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" }); <br>var headerElement = bodyElement.appendElement({"tag": "div", "style": "height: 80px; width: 100%;"}).down()</code></pre>
 				</div>
-			</div>
-			<div class="row tutorialsRow" id="tutorialsSection-clientSidePrinciples">
-				<div class="col-xs-12">
-					<a href="#">clientSidePrinciples</a>
+				<div class="row tutorialsRow" id="tutorialsSection-clientSidePrinciples">
+					<div class="col-xs-12">
+						<a href="#">clientSidePrinciples</a>
+					</div>
 				</div>
-			</div>
-			<div class="row tutorialsRow" id="tutorialsSection-serverSidePrinciples">
-				<div class="col-xs-12">
-					<a href="#">serverSidePrinciples</a>
+				<div class="row tutorialsRow" id="tutorialsSection-serverSidePrinciples">
+					<div class="col-xs-12">
+						<a href="#">serverSidePrinciples</a>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="row hidden pageRow" id="page-docs">
-		<div class="col-12">
-			<a href="#">Docs</a>
+		<div class="row hidden pageRow" id="page-docs">
+			<div class="col-12">
+				<a href="#">Docs</a>
+			</div>
+		</div>
+		<div class="row hidden pageRow" id="page-about">
+			<div class="col-12">
+				<a href="#">About</a>
+			</div>
 		</div>
 	</div>
-	<div class="row hidden pageRow" id="page-about">
-		<div class="col-12">
-			<a href="#">About</a>
-		</div>
-	</div>
-</div>
-<script src="lib/js/jquery-3.1.1.min.js"></script>
-<script src="lib/js/bootstrap.min.js"></script>
-<script src="js/main.js"></script>
+	<!-- Libs -->
+	<script src="lib/jquery/js/jquery-3.1.1.min.js"></script>
+	<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+	<script src="lib/highlight/highlight.pack.js"></script>
+
+	<script src="js/main.js"></script>
 </body>
 
 </html>

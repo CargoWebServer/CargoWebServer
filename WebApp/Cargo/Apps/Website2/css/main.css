@@ -19,7 +19,8 @@
 	cursor: pointer;
 }
 
-.tutorialsSideBar{
-	position: fixed;
+.pageRow{
+	padding-right: 10px;
 }
+
 
