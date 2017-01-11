@@ -348,7 +348,6 @@ EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, error
                     // Nothing special to do here.
                 },
                 function (result, caller) {
-                    //var entity = eval("new " + caller.prototype.TypeName + "(caller.prototype)")
                     var entity = server.entityManager.entities[result[0].UUID]
                     entity.initCallback = function (caller) {
                         return function (entity) {
