@@ -160,9 +160,11 @@ var ProcessWizard = function (parent, startEvent) {
 				for (var i = 0; i < values[dataId].length; i++) {
 					// serialyse the object...
 					if (values[dataId][i].stringify != undefined) {
-						data.push(values[dataId][i].stringify())
+						var objStr = values[dataId][i].stringify()
+						console.log(objStr)
+						data.push(objStr)
 					} else {
-						data.push(values[dataId][i])m
+						data.push(values[dataId][i])
 					}
 				}
 

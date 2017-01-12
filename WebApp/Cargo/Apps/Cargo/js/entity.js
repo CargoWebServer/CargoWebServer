@@ -1432,7 +1432,7 @@ function setSubObject(parent, property, values, isArray) {
                 object.init(values)
                 parent[property] = object
             }
-         
+
             object.parentUuid = parent.UUID
 
             server.entityManager.setEntity(object)
@@ -1530,7 +1530,9 @@ function setObjectValues(object, values) {
     ////////////////////////////////////////////////////////////////////////////////
     // Generate sub-object and reference set and reset function
     for (var property in values) {
+
         var propertyType = prototype.FieldsType[prototype.getFieldIndex(property)]
+
         if (propertyType != null) {
             // Condition...
             var isRef = propertyType.endsWith(":Ref")
@@ -1542,6 +1544,12 @@ function setObjectValues(object, values) {
             if (values[property] != null) {
                 if (isBaseType) {
                     // String, int, double...
+                    if (propertyType == "xs.[]uint8") {
+                        //console.log("property: ", property, ":", propertyType)
+                        var objStr = b64_to_utf8(values[property])
+                        objStr = decode64(values[property])
+                        console.log(objStr)
+                    }
                     object[property] = values[property]
                 } else {
                     // Set object ref or values... only property begenin with M_ will be set here...
