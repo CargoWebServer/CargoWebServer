@@ -37,4 +37,31 @@ function main() {
 	// TODO delete this
 	$('#li-tutorials').click()
 
+	// Element example
+	var containerElement = new Element(
+		document.getElementById( "elementExampleContainer"), 
+		{ "tag": "div", "style": "height: 100%; width: 100%;" }
+		); 
+	var headerElement = containerElement.appendElement({
+		"tag": "div", 
+		"style": "height: 10%; width: 100%; background: black; color: white; text-align:center"
+	}).down();
+
+	headerElement.element.innerHTML = "header"
+
+	containerElement.appendElement({
+		"id" : "middle",
+		"tag": "div", 
+		"style": "height: 80%; width: 100%; color: white; text-align:center",
+	}).down().appendElement({
+		"tag": "div", 
+		"style": "height: 50px; width: 200px; background: lightgray; color: black;",
+		"innerHtml" : "rectangle"
+	}).up().appendElement({
+		"tag": "div", 
+		"style": "height: 10%; width: 100%; background: darkgray; color: white; text-align:center",
+		"innerHtml" : "footer"
+	})
+
+	containerElement.getChildById("middle").element.style.background = "gray"
 }

@@ -8,7 +8,7 @@
 
 	<!-- css -->
 	<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="lib/highlight/styles/default.css">
+	<link rel="stylesheet" type="text/css" href="lib/highlight/styles/github.css">
 
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 
@@ -78,11 +78,11 @@
 					<li id="tutorialsLink-userInterface" class="tutorials-link"> 
 						<a href="#">User interface</a> 
 					</li>
-					<li id="tutorialsLink-clientSidePrinciples" class="tutorials-link"> 
-						<a href="#">Client-side principles</a> 
+					<li id="tutorialsLink-clientSide" class="tutorials-link"> 
+						<a href="#">Client-side</a> 
 					</li>
-					<li id="tutorialsLink-serverSidePrinciples" class="tutorials-link"> 
-						<a href="#">Server-side principles</a> 
+					<li id="tutorialsLink-serverSide" class="tutorials-link"> 
+						<a href="#">Server-side</a> 
 					</li>
 				</ul>		
 			</nav>
@@ -100,50 +100,140 @@
 			</div>
 			<div class="row tutorialsRow" id="tutorialsSection-userInterface">
 				<div class="col-xs-12">
-					<h2> 
-						User Interface
-					</h2>
-					<h3> 
-						Element
-					</h3>
+					<h2> User Interface </h2>
+					<h3> Element </h3>
 					<p>
-						The 'Element' class included in the Cargo javascript framework offers a basic Html element wrapper class to help you create client side graphical interfaces. It gives you the ability to create and manupulate html elements within your javascript files rather than in the traditionnal html and css files. All the functionnalities related to this class can be found within the file 'element.js'. 
+						The 'Element' class included in the Cargo javascript framework offers a basic Html element wrapper class to help you create client side graphical interfaces. It gives you the ability to create and manipulate html elements within your javascript files rather than in the traditionnal html and css files. All the functionnalities related to this class can be found within the file 'element.js'. 
 					</p>
 					<p>
 						You do not need to use the 'Element' class or any of it's related functionnalities 
 						to develop a web application using the Cargo framework. It can be used in conjunction with other javascript libraries such as Jquery and Bootstrap. If you are an experienced front-end web application developper and already have techniques which you are familiar with, feel free to skip to the next tutorial.
 					</p>
-					<pre><code class="javascript">var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" }); <br>var headerElement = bodyElement.appendElement({"tag": "div", "style": "height: 80px; width: 100%;"}).down()</code></pre>
-				</div>
-				<div class="row tutorialsRow" id="tutorialsSection-clientSidePrinciples">
-					<div class="col-xs-12">
-						<a href="#">clientSidePrinciples</a>
+
+					<h4> Element essential functions </h4>
+
+					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseElementConstructor">
+						Element constructor
+					</button>
+					<div class="collapse" id="collapseElementConstructor">
+						<p> 
+							To create a new element, simply call it's constructor function.
+						</p>
+						<pre><code class="javascript">var myElement = new Element(parent, params, callback, isAppendAtFront)</code></pre>
+						<ul>
+							<li><b>parent</b> Parent element of this element. Can be an Element or a DOM element.</li>
+							<li><b>params</b> List of parameters.</li>
+							<li><b>callback</b> Function called after the initialization is completed.</li>
+							<li><b>isAppendAtFront</b> 'true': the element is put in front of the other elements. 'false': it will be at the end.</li>
+						</ul>
 					</div>
-				</div>
-				<div class="row tutorialsRow" id="tutorialsSection-serverSidePrinciples">
-					<div class="col-xs-12">
-						<a href="#">serverSidePrinciples</a>
+
+					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseAppendElement">
+						.appendElement()
+					</button>
+					<div class="collapse" id="collapseAppendElement">
+						<p> 
+							This function is used to append a child element to an existing element. 
+						</p>
+						<pre><code class="javascript">myElement.appendElement(childElement)</code></pre>
+						<ul>
+							<li><b>childElement</b> The element to append. It can be an existing element, or a list of element properties.</li>
+						</ul>
 					</div>
+
+					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseRemoveElement">
+						.removeElement()
+					</button>
+					<div class="collapse" id="collapseRemoveElement">
+						<p> 
+							This function is used to remove a child element from an existing element. 
+						</p>
+						<pre><code class="javascript">myElement.removeElement(childElement)</code></pre>
+						<ul>
+							<li><b>childElement</b> The child element to remove.</li>
+						</ul>
+					</div>
+
+					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseGetChildById">
+						.getChildById()
+					</button>
+					<div class="collapse" id="collapseGetChildById">
+						<p> 
+							This function is used to find a child recursively inside the element's childs hierarchy. 
+						</p>
+						<pre><code class="javascript">myElement.getChildById("childElementId")</code></pre>
+						<ul>
+							<li><b>childElement</b> {string} id The id of the element to retreive.</li>
+						</ul>
+					</div>
+
+					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseDown">
+						.down()
+					</button>
+					<div class="collapse" id="collapseDown">
+						<p> 
+							This function is used to navigate downwards in the Element hierarchy. It returns the last child of the element.
+						</p>
+						<pre><code class="javascript">myElement.down()</code></pre>
+					</div>
+
+					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseUp">
+						.up()
+					</button>
+					<div class="collapse" id="collapseUp">
+						<p> 
+							This function is used to navigate upwards in the Element hierarchy. It returns the immediate parent of the element.
+						</p>
+						<pre><code class="javascript">myElement.up()</code></pre>
+					</div>
+
+					<h4> Example </h4>
+
+					<p>Basic layout</p>
+
+					<pre><code class="javascript">/* In this example we use the DOM element with the id 'elementExampleContainer' as a parent to <br>our first element. When creating a web page from scratch you can use <br>'document.getElementsByTagName("body")[0]'' instead to get the DOM body element. */ <br>var containerElement = new Element(<br>&#09;document.getElementById( "elementExampleContainer"),<br>&#09;{ "tag": "div", "style": "height: 100%; width: 100%;" }<br>);<br><br>/* Storing the 'headerElement' in a variable using the .down() function */<br>var headerElement = containerElement.appendElement({<br>&#09;"tag": "div",<br>&#09;"style": "height: 10%; width: 100%; background: black; color: white; text-align:center"<br>}).down();<br><br>/* You can use '.element' to access the DOM element and change it's properties. */ <br>headerElement.element.innerHTML = "header"<br><br>/* You can also create all the elements consecutiveley using the '.down()' and 'up()' functions to navigate. */ <br>containerElement.appendElement({<br>&#09;"id" : "middle",<br>&#09;"tag": "div",<br>&#09;"style": "height: 80%; width: 100%; background: gray; color: white; text-align:center",<br>}).down().appendElement({<br>&#09;"tag": "div",<br>&#09;"style": "height: 50px; width: 200px; background: lightgray; color: black;",<br>&#09;"innerHtml" : "rectangle"<br>}).up().appendElement({<br>&#09;"tag": "div",<br>&#09;"style": "height: 10%; width: 100%; background: darkgray; color: white; text-align:center",<br>&#09;"innerHtml" : "footer"<br>})<br><br>/* '.getChildById' gives you the ability to later retreive a child element with a given id. */<br>containerElement.getChildById("middle").element.style.background = "gray"</code></pre>
+
+					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#elementExampleResult">
+						View result
+					</button>
+					<div class="collapse" id="elementExampleResult">
+						<div class="exampleContainer" id="elementExampleContainer">
+						</div>
+					</div>
+
 				</div>
 			</div>
-		</div>
-		<div class="row hidden pageRow" id="page-docs">
-			<div class="col-12">
-				<a href="#">Docs</a>
+			<div class="row tutorialsRow" id="tutorialsSection-clientSide">
+				<div class="col-xs-12">
+					<h2> Client Side </h2>
+				</div>
 			</div>
-		</div>
-		<div class="row hidden pageRow" id="page-about">
-			<div class="col-12">
-				<a href="#">About</a>
+			<div class="row tutorialsRow" id="tutorialsSection-serverSide">
+				<div class="col-xs-12">
+					<h2> Server Side </h2>
+				</div>
 			</div>
 		</div>
 	</div>
-	<!-- Libs -->
-	<script src="lib/jquery/js/jquery-3.1.1.min.js"></script>
-	<script src="lib/bootstrap/js/bootstrap.min.js"></script>
-	<script src="lib/highlight/highlight.pack.js"></script>
+	<div class="row hidden pageRow" id="page-docs">
+		<div class="col-12">
+			<a href="#">Docs</a>
+		</div>
+	</div>
+	<div class="row hidden pageRow" id="page-about">
+		<div class="col-12">
+			<a href="#">About</a>
+		</div>
+	</div>
+</div>
+<!-- Libs -->
+<script src="lib/jquery/js/jquery-3.1.1.min.js"></script>
+<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="lib/highlight/highlight.pack.js"></script>
+<script src="lib/cargo/element.js"></script>
+<script src="lib/cargo/utility.js"></script>
 
-	<script src="js/main.js"></script>
+<script src="js/main.js"></script>
 </body>
 
 </html>
