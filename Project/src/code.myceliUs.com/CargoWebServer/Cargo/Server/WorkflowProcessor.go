@@ -114,7 +114,7 @@ func (this *WorkflowProcessor) Initialize() {
 
 	// That function will evaluate the processes and put it in the good
 	// state to start...
-	this.evaluateProcesses()
+	this.runTopLevelProcesses()
 }
 
 // Start processing the workflow...
@@ -171,7 +171,7 @@ func (this *WorkflowProcessor) getNextProcessInstanceNumber() int {
 /**
  * Evaluate processes instance.
  */
-func (this *WorkflowProcessor) evaluateProcesses() {
+func (this *WorkflowProcessor) runTopLevelProcesses() {
 
 	// Get all processes...
 	processes := GetServer().GetWorkflowManager().getProcess()
@@ -255,7 +255,7 @@ func (this *WorkflowProcessor) getDefinitionInstance(definitionsId string, bpmnD
 
 /**
  * Process new trigger... The trigger contain information, data, that the
- * workflow processor use to evaluate the next action todo...
+ * workflow processor use to evaluate the next action evalute...
  */
 func (this *WorkflowProcessor) processTrigger(trigger *BPMS_Runtime.Trigger) *CargoEntities.Error {
 	// Now i will process the trigger...
@@ -310,7 +310,7 @@ func (this *WorkflowProcessor) processTrigger(trigger *BPMS_Runtime.Trigger) *Ca
 		this.runtime.SaveEntity()
 
 		// Now I will create the start event...
-		this.createInstance(startEvent, processInstance, trigger.GetDataRef(), trigger.M_sessionId)
+		this.createInstance(startEvent, processInstance, nil, trigger.GetDataRef(), trigger.M_sessionId)
 
 	} else if trigger.GetEventTriggerType() == BPMS_Runtime.EventTriggerType_None {
 
@@ -698,23 +698,28 @@ func (this *WorkflowProcessor) createEventInstance(event BPMN20.Event, processIn
 /**
  * Create the instance from
  */
-func (this *WorkflowProcessor) createInstance(flowNode BPMN20.FlowNode, processInstance *BPMS_Runtime.ProcessInstance, items []*BPMS_Runtime.ItemAwareElementInstance, sessionId string) BPMS_Runtime.Instance {
+func (this *WorkflowProcessor) createInstance(flowNode BPMN20.FlowNode, processInstance *BPMS_Runtime.ProcessInstance, input *BPMS_Runtime.ConnectingObject, items []*BPMS_Runtime.ItemAwareElementInstance, sessionId string) BPMS_Runtime.Instance {
 	var instance BPMS_Runtime.Instance
 
 	switch v := flowNode.(type) {
 	case BPMN20.Activity:
 		log.Println("-------> create activity ", v)
 		instance = this.createActivityInstance(v, processInstance, items, sessionId)
+		instance.(*BPMS_Runtime.ActivityInstance).SetInputRef(input)
 		log.Println("-------> after create activity process data:", processInstance.GetData())
 	case BPMN20.Gateway:
 		log.Println("-------> create gateway ", v)
+		instance.(*BPMS_Runtime.GatewayInstance).SetInputRef(input)
 
 	case BPMN20.Event:
 		log.Println("-------> create event ", v)
 		instance = this.createEventInstance(v, processInstance, items, sessionId)
+		if input != nil {
+			instance.(*BPMS_Runtime.EventInstance).SetInputRef(input)
+		}
 		log.Println("-------> after start event creation process data:", processInstance.GetData())
 	case *BPMN20.Transaction:
-		// Nothing todo here...
+		// Nothing todo here... for now...
 
 	default:
 		log.Println("-------> not define ", v)
@@ -725,6 +730,7 @@ func (this *WorkflowProcessor) createInstance(flowNode BPMN20.FlowNode, processI
 		this.setLogInfo(instance.(BPMS_Runtime.FlowNodeInstance), sessionId)
 	}
 
+	// Get the entity for the process instance.
 	processInstance.NeedSave = true
 	processEntity := GetServer().GetEntityManager().NewBPMS_RuntimeProcessInstanceEntityFromObject(processInstance)
 	processEntity.SaveEntity()
@@ -784,12 +790,11 @@ func (this *WorkflowProcessor) workflowTransition(flowNode BPMS_Runtime.FlowNode
 			items := make([]*BPMS_Runtime.ItemAwareElementInstance, 0)
 
 			// Create the new instance.
-			nextStep := this.createInstance(seqFlow.GetTargetRef(), processInstance, items, sessionId)
+			nextStep := this.createInstance(seqFlow.GetTargetRef(), processInstance, connectingObj, items, sessionId)
 
 			connectingObj.SetTargetRef(nextStep)
 
 			flowNode.SetOutputRef(connectingObj)
-			flowNode.SetInputRef(connectingObj)
 
 			// Set the connecting object and save it...
 			processInstance.SetConnectingObjects(connectingObj)

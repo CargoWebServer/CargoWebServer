@@ -162,7 +162,7 @@ var ProcessWizard = function (parent, startEvent) {
 					if (values[dataId][i].stringify != undefined) {
 						data.push(values[dataId][i].stringify())
 					} else {
-						data.push(values[dataId][i])
+						data.push(values[dataId][i])m
 					}
 				}
 
