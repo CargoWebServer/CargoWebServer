@@ -73,8 +73,8 @@
 				<xsd:attribute name="flowNodeType" type="tFlowNodeType" />
 				<xsd:attribute name="lifecycleState" type="tLifecycleState" />
 				<xsd:sequence>
-					<xsd:element ref="inputRef" type="tConnectingObject" minOccurs="0" maxOccurs="1"/>
-					<xsd:element ref="outputRef" type="tConnectingObject" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="inputRef" type="tConnectingObject" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="outputRef" type="tConnectingObject" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension> 
 		</xsd:complexContent> 

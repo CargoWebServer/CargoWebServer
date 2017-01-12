@@ -31,12 +31,12 @@ type ActivityInstance struct{
 	/** members of FlowNodeInstance **/
 	M_flowNodeType FlowNodeType
 	M_lifecycleState LifecycleState
-	m_inputRef *ConnectingObject
+	m_inputRef []*ConnectingObject
 	/** If the ref is a string and not an object **/
-	M_inputRef string
-	m_outputRef *ConnectingObject
+	M_inputRef []string
+	m_outputRef []*ConnectingObject
 	/** If the ref is a string and not an object **/
-	M_outputRef string
+	M_outputRef []string
 
 	/** members of ActivityInstance **/
 	M_activityType ActivityType
@@ -63,8 +63,8 @@ type XsdActivityInstance struct {
 
 
 	/** FlowNodeInstance **/
-	M_inputRef	*string	`xml:"inputRef"`
-	M_outputRef	*string	`xml:"outputRef"`
+	M_inputRef	[]string	`xml:"inputRef"`
+	M_outputRef	[]string	`xml:"outputRef"`
 	M_flowNodeType	string	`xml:"flowNodeType,attr"`
 	M_lifecycleState	string	`xml:"lifecycleState,attr"`
 
@@ -271,18 +271,24 @@ func (this *ActivityInstance) SetLifecycleState(ref interface{}){
 /** Remove reference LifecycleState **/
 
 /** InputRef **/
-func (this *ActivityInstance) GetInputRef() *ConnectingObject{
+func (this *ActivityInstance) GetInputRef() []*ConnectingObject{
 	return this.m_inputRef
 }
 
 /** Init reference InputRef **/
 func (this *ActivityInstance) SetInputRef(ref interface{}){
 	this.NeedSave = true
-	if _, ok := ref.(string); ok {
-		this.M_inputRef = ref.(string)
+	if refStr, ok := ref.(string); ok {
+		for i:=0; i < len(this.M_inputRef); i++ {
+			if this.M_inputRef[i] == refStr {
+				return
+			}
+		}
+		this.M_inputRef = append(this.M_inputRef, ref.(string))
 	}else{
-		this.m_inputRef = ref.(*ConnectingObject)
-		this.M_inputRef = ref.(Instance).GetUUID()
+		this.RemoveInputRef(ref)
+		this.m_inputRef = append(this.m_inputRef, ref.(*ConnectingObject))
+		this.M_inputRef = append(this.M_inputRef, ref.(Instance).GetUUID())
 	}
 }
 
@@ -290,25 +296,37 @@ func (this *ActivityInstance) SetInputRef(ref interface{}){
 func (this *ActivityInstance) RemoveInputRef(ref interface{}){
 	this.NeedSave = true
 	toDelete := ref.(Instance)
-	if toDelete.GetUUID() == this.m_inputRef.GetUUID() {
-		this.m_inputRef = nil
-		this.M_inputRef = ""
+	inputRef_ := make([]*ConnectingObject, 0)
+	inputRefUuid := make([]string, 0)
+	for i := 0; i < len(this.m_inputRef); i++ {
+		if toDelete.GetUUID() != this.m_inputRef[i].GetUUID() {
+			inputRef_ = append(inputRef_, this.m_inputRef[i])
+			inputRefUuid = append(inputRefUuid, this.M_inputRef[i])
+		}
 	}
+	this.m_inputRef = inputRef_
+	this.M_inputRef = inputRefUuid
 }
 
 /** OutputRef **/
-func (this *ActivityInstance) GetOutputRef() *ConnectingObject{
+func (this *ActivityInstance) GetOutputRef() []*ConnectingObject{
 	return this.m_outputRef
 }
 
 /** Init reference OutputRef **/
 func (this *ActivityInstance) SetOutputRef(ref interface{}){
 	this.NeedSave = true
-	if _, ok := ref.(string); ok {
-		this.M_outputRef = ref.(string)
+	if refStr, ok := ref.(string); ok {
+		for i:=0; i < len(this.M_outputRef); i++ {
+			if this.M_outputRef[i] == refStr {
+				return
+			}
+		}
+		this.M_outputRef = append(this.M_outputRef, ref.(string))
 	}else{
-		this.m_outputRef = ref.(*ConnectingObject)
-		this.M_outputRef = ref.(Instance).GetUUID()
+		this.RemoveOutputRef(ref)
+		this.m_outputRef = append(this.m_outputRef, ref.(*ConnectingObject))
+		this.M_outputRef = append(this.M_outputRef, ref.(Instance).GetUUID())
 	}
 }
 
@@ -316,10 +334,16 @@ func (this *ActivityInstance) SetOutputRef(ref interface{}){
 func (this *ActivityInstance) RemoveOutputRef(ref interface{}){
 	this.NeedSave = true
 	toDelete := ref.(Instance)
-	if toDelete.GetUUID() == this.m_outputRef.GetUUID() {
-		this.m_outputRef = nil
-		this.M_outputRef = ""
+	outputRef_ := make([]*ConnectingObject, 0)
+	outputRefUuid := make([]string, 0)
+	for i := 0; i < len(this.m_outputRef); i++ {
+		if toDelete.GetUUID() != this.m_outputRef[i].GetUUID() {
+			outputRef_ = append(outputRef_, this.m_outputRef[i])
+			outputRefUuid = append(outputRefUuid, this.M_outputRef[i])
+		}
 	}
+	this.m_outputRef = outputRef_
+	this.M_outputRef = outputRefUuid
 }
 
 /** ActivityType **/

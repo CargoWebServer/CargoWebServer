@@ -185,14 +185,14 @@ func (this *WorkflowProcessor) evaluateProcesses() {
  * Evaluate the transition.
  */
 func (this *WorkflowProcessor) workflowTransitionInterpreter(process *BPMN20.Process) {
-	/*activeProcessInstances := this.getActiveProcessInstances(process)
+	activeProcessInstances := this.getActiveProcessInstances(process)
 	for i := 0; i < len(activeProcessInstances); i++ {
 		log.Println("Evalute transition for process ", activeProcessInstances[i].M_id)
-		for j := 0; j < len(activeProcessInstances[i].GetFlowNodeInstances()); j++ {
+		/*for j := 0; j < len(activeProcessInstances[i].GetFlowNodeInstances()); j++ {
 			this.workflowTransition(activeProcessInstances[i].GetFlowNodeInstances()[j])
 
-		}
-	}*/
+		}*/
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -275,6 +275,7 @@ func (this *WorkflowProcessor) processTrigger(trigger *BPMS_Runtime.Trigger) *Ca
 
 		/** So Here I will create a new process instance **/
 		processInstance := new(BPMS_Runtime.ProcessInstance)
+		processInstance.UUID = "BPMS_Runtime.ProcessInstance%" + Utility.RandomUUID()
 		processInstance.M_number = this.getNextProcessInstanceNumber()
 
 		index := rand.Intn(len(this.availableTagNumber))
@@ -347,6 +348,7 @@ func (this *WorkflowProcessor) setLogInfo(instance BPMS_Runtime.FlowNodeInstance
 
 	// Now the log information...
 	logInfo := new(BPMS_Runtime.LogInfo)
+	logInfo.UUID = "BPMS_Runtime.LogInfo%" + Utility.RandomUUID()
 	logInfo.SetRuntimesPtr(this.runtime.object)
 	logInfo.M_date = Utility.MakeTimestamp()
 	logInfo.M_id = Utility.RandomUUID()
@@ -457,6 +459,7 @@ func (this *WorkflowProcessor) setDataAssocication(source BPMS_Runtime.Instance,
 					}
 					if itemawareElementTrg == nil {
 						itemawareElementTrg = new(BPMS_Runtime.ItemAwareElementInstance)
+						itemawareElementTrg.UUID = "BPMS_Runtime.ItemAwareElementInstance%" + Utility.RandomUUID()
 						itemawareElementTrg.M_bpmnElementId = itemawareElementSrc.M_bpmnElementId
 						itemawareElementTrg.M_id = targetRef.(BPMN20.BaseElement).GetId()
 						target.SetData(itemawareElementTrg)
@@ -771,6 +774,7 @@ func (this *WorkflowProcessor) workflowTransition(flowNode BPMS_Runtime.FlowNode
 		for i := 0; i < len(bpmnElement.GetOutgoing()); i++ {
 			seqFlow := bpmnElement.GetOutgoing()[i]
 			connectingObj := new(BPMS_Runtime.ConnectingObject)
+			connectingObj.UUID = "BPMS_Runtime.ConnectingObject%" + Utility.RandomUUID()
 			connectingObj.M_bpmnElementId = seqFlow.GetId()
 			connectingObj.SetSourceRef(flowNode)
 

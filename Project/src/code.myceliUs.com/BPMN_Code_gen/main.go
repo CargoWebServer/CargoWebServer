@@ -143,14 +143,14 @@ func main() {
 	//	generateEntity("BPMN20")
 
 	////////////////////////////////////////////////////////////////////////////////
-	//	clearMaps()
-	//	load_XSD_File("input/Runtime.xsd")
-	//	load_CMOF_File("input/Runtime.cmof")
-	//	generateCode("BPMS_Runtime")
-	//	generateFactory("runtimes", "BPMS", "code.myceliUs.com/CargoWebServer/Cargo/BPMS", "Runtime")
+	clearMaps()
+	load_XSD_File("input/Runtime.xsd")
+	load_CMOF_File("input/Runtime.cmof")
+	generateCode("BPMS_Runtime")
+	generateFactory("runtimes", "BPMS", "code.myceliUs.com/CargoWebServer/Cargo/BPMS", "Runtime")
 
-	//	// The Entity...
-	//	generateEntity("BPMS_Runtime")
+	// The Entity...
+	generateEntity("BPMS_Runtime")
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//	clearMaps()
@@ -164,14 +164,14 @@ func main() {
 	//	generateEntity("CargoEntities")
 
 	//////////////////////////////////////////////////////////////////////////////////
-	outputPath = "code.myceliUs.com/CargoWebServer/Cargo/Config/"
-	// Configuration entities...
-	load_XSD_File("input/Config.xsd")
-	load_CMOF_File("input/Config.cmof")
-	generateCode("CargoConfig")
-	generateFactory("configurations", "Config", "code.myceliUs.com/CargoWebServer/Cargo/Config", "Config")
+	//	outputPath = "code.myceliUs.com/CargoWebServer/Cargo/Config/"
+	//	// Configuration entities...
+	//	load_XSD_File("input/Config.xsd")
+	//	load_CMOF_File("input/Config.cmof")
+	//	generateCode("CargoConfig")
+	//	generateFactory("configurations", "Config", "code.myceliUs.com/CargoWebServer/Cargo/Config", "Config")
 
-	//The Entity...
-	generateEntity("CargoConfig")
+	//	//The Entity...
+	//	generateEntity("CargoConfig")
 
 }
