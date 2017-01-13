@@ -175,7 +175,8 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 					if ft.Type.String() != fv.Type().String() {
 
 						// So here a conversion is necessary...
-						if ft.Type.String() == "[]uint8" && fv.Type().String() == "string" {
+						if ft.Type.String() == "[]uint8" || fv.Type().String() == "string" {
+
 							val := fv.String()
 							val_, err := b64.StdEncoding.DecodeString(val)
 

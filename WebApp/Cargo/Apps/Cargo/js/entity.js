@@ -1546,7 +1546,7 @@ function setObjectValues(object, values) {
                     // String, int, double...
                     if (propertyType == "xs.[]uint8") {
                         //console.log("property: ", property, ":", propertyType)
-                        var objStr = b64_to_utf8(values[property])
+                        var objStr = decode64(values[property])
                         objStr = decode64(values[property])
                         console.log(objStr)
                     }

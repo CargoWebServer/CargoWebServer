@@ -161,9 +161,11 @@ func (this *WorkflowManager) getInstances(bpmnElementId string, typeName string)
 			// Append to the list...
 			instances = append(instances, instance.GetObject().(BPMS_Runtime.Instance))
 		}
+	} else {
+		return instances, NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No instance was found with id "+bpmnElementId+" and type name"+typeName))
 	}
 
-	return instances, NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No instance was found with id "+bpmnElementId+" and type name"+typeName))
+	return instances, nil
 
 }
 
