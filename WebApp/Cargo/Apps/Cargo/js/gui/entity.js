@@ -184,6 +184,9 @@ EntityPanel.prototype.setEntity = function (entity) {
 		return
 	}
 
+	// Set the panel id with the entity id.
+	this.panel.element.id = entity.UUID
+
 	// Here I will associate the panel and the entity.
 	if (this.entity != null) {
 
@@ -252,7 +255,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 		var field = this.proto.Fields[index]
 		var fieldType = this.proto.FieldsType[index]
 		var fieldVisibility = this.proto.FieldsVisibility[index]
-		
+
 		if (fieldVisibility == true) {
 			var control = this.controls[this.proto.TypeName + "_" + field]
 			var value = this.entity[field]
@@ -261,9 +264,14 @@ EntityPanel.prototype.setEntity = function (entity) {
 					control.parentEntity = entity
 				}
 			}
+
 			if (value != null && control != null && value != "") {
 				if (control.setFieldValue == undefined) {
-					this.setFieldValue(control, field, fieldType, value, entity.UUID)
+					if (fieldType == "xs.[]uint8") {
+						this.setGenericFieldValue(control, field, value, entity.UUID)
+					} else {
+						this.setFieldValue(control, field, fieldType, value, entity.UUID)
+					}
 				} else {
 					// Here the control is a entity panel so i will redirect 
 					// the entity to the control.
@@ -272,7 +280,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 					}
 				}
 			} else if (control == null) {
-				console.log("No control found for display value " + value)
+				console.log("No control found for display value " + value + " with type name " + fieldType)
 			} else if (value == null || value == "") {
 				console.log("The value is null or empty.")
 			}
@@ -548,6 +556,13 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 	// The entity div.
 	var entityDiv = parent.appendElement({ "tag": "div", "class": "entity" }).down()
+	var id = this.proto.TypeName + "_" + field
+
+	// In case of a generic value....
+	if (fieldType == "xs.[]uint8") {
+		this.controls[id] = parent
+		return
+	}
 
 	// The entity label here...
 	var label = entityDiv.appendElement({ "tag": "div", id: this.proto.TypeName + "_" + field + "_lbl" }).down()
@@ -557,7 +572,6 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 	// Now the entity value...
 	var valueDiv = entityDiv.appendElement({ "tag": "div" }).down()
-	var id = this.proto.TypeName + "_" + field
 	var control = null
 	var isArray = fieldType.startsWith("[]")
 	var isRef = fieldType.endsWith(":Ref")
@@ -833,6 +847,70 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 }
 
 /**
+ * That function is use to display a field when there is no hint about the way to display it,
+ * so introspection will be use instead of entity prototype.
+ */
+EntityPanel.prototype.setGenericFieldValue = function (control, field, value, parentUuid) {
+
+	// First I will get the parent entity.
+	var parentEntity = server.entityManager.entities[parentUuid]
+	var id = parentEntity.TYPENAME + "_" + field
+	var fieldType
+
+	if (isString(value)) {
+		// Here I will create a xs control...
+		fieldType = "xs.string"
+	} else {
+		// Here I will create a xs control to display an object reference.
+		if (!isArray(value)) {
+			fieldType = value.TYPENAME + ":Ref"
+
+			// Here I must implement the set and reset function 
+			parentEntity["set_" + field + "_" + value.UUID + "_ref"] = function (value) {
+				return function (initCallback) {
+					initCallback(value)
+				}
+			} (value)
+
+			parentEntity["reset_" + field + "_" + value.UUID + "_ref"] = function (value) {
+				return function (initCallback) {
+					initCallback(value.UUID)
+				}
+			} (value)
+		} else {
+			for (var i = 0; i < value.length; i++) {
+				// In the case of an array...
+				if (isObject(value[i])) {
+					fieldType = "[]" + value[0].TYPENAME + ":Ref"
+					// Here I must implement the set and reset function 
+					parentEntity["set_" + field + "_" + value[i].UUID + "_ref"] = function (value) {
+						return function (initCallback) {
+							initCallback(value)
+						}
+					} (value[i])
+
+					parentEntity["reset_" + field + "_" + value[i].UUID + "_ref"] = function (value) {
+						return function (initCallback) {
+							initCallback(value[i].UUID)
+						}
+					} (value)
+				}else{
+					if (isString(value[i])) {
+						// an array of string...
+						fieldType = "[]xs.string"
+					}
+					// TODO implement other field type here.
+				}
+			}
+		}
+
+	}
+
+	this.initField(control, field, fieldType, [])
+	this.setFieldValue(this.controls[id], field, fieldType, value, parentUuid)
+}
+
+/**
  * (Multiple value) If the object is a sub-object I will display a table with the value of the sub-object.
  * Composition
  */
@@ -921,6 +999,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 		valueDiv.element.style.width = "auto"
 		var ln = valueDiv.appendElement({ "tag": "div", "class": "entities_btn_container" }).down()
 		var ref = ln.appendElement({ "tag": "div" }).down().appendElement({ "tag": "a", "href": "#", "title": object.TYPENAME, "innerHtml": refName }).down()
+		ref.element.id = object.UUID
 		var deleteLnkButton = ln.appendElement({ "tag": "div", "class": "entities_btn" }).down().appendElement({ "tag": "i", "class": "fa fa-trash" }).down()
 
 		// Now the action...

@@ -115,6 +115,7 @@ func (this *WorkflowProcessor) Initialize() {
 	// That function will evaluate the processes and put it in the good
 	// state to start...
 	this.runTopLevelProcesses()
+	this.getNextProcessInstanceNumber()
 }
 
 // Start processing the workflow...
@@ -146,13 +147,15 @@ func (this *WorkflowProcessor) getNextProcessInstanceNumber() int {
 	// Now I will get all defintions names...
 	var intancesQuery EntityQuery
 	intancesQuery.TypeName = "BPMS_Runtime.ProcessInstance"
-	intancesQuery.Fields = append(intancesQuery.Fields, "number")
+
+	intancesQuery.Fields = append(intancesQuery.Fields, "M_number")
 
 	var filedsType []interface{} // not use...
 	var params []interface{}
 	query, _ := json.Marshal(intancesQuery)
 
 	values, err := GetServer().GetDataManager().readData(BPMS_RuntimeDB, string(query), filedsType, params)
+
 	if err == nil {
 		for i := 0; i < len(values); i++ {
 			n := values[i][0].(int)
@@ -160,6 +163,8 @@ func (this *WorkflowProcessor) getNextProcessInstanceNumber() int {
 				number = n
 			}
 		}
+	} else {
+		log.Println("-------> process number error: ", err)
 	}
 
 	// The next number...
@@ -169,7 +174,7 @@ func (this *WorkflowProcessor) getNextProcessInstanceNumber() int {
 }
 
 /**
- * Evaluate processes instance.
+ * Evaluate processes instance for each bpmn processes.
  */
 func (this *WorkflowProcessor) runTopLevelProcesses() {
 

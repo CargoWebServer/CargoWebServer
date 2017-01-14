@@ -1267,7 +1267,7 @@ function appendReferenced(refName, target, owner) {
  * Set object reference.
  */
 function setRef(owner, property, refValue, isArray) {
-    if (refValue.length == 0) {
+    if (refValue.length == 0 || !isObjectReference(refValue)) {
         return owner
     }
 

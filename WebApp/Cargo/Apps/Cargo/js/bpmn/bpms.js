@@ -209,8 +209,9 @@ var ProcessWizard = function (parent, startEvent) {
 	return this
 }
 
-/*
- * Create the interface to enter the data about an item definition.
+/**
+ * Create the interface to enter the data about an item definition. Item definition contain the definition 
+ * of the value to display. It can be a xsd:type or an entity type name.
  */
 ProcessWizard.prototype.appendItemDefinition = function (parent, data, itemDefinition, isCollection, onSelect, onRemove) {
 

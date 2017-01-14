@@ -9,8 +9,10 @@
  * @param finishCallback this is call when the value is retreive from the list...
  */
 function attachAutoComplete(control, elementLst, autoComplete) {
-    control.element.parentNode.style.position = "relative"
-
+    if (control.element.parentNode != undefined) {
+        control.element.parentNode.style.position = "relative"
+    }
+    
     // The value must be in the list...
     if (autoComplete == undefined) {
         autoComplete = true
@@ -32,7 +34,7 @@ function attachAutoComplete(control, elementLst, autoComplete) {
             var coord = getCoords(control.element)
             var minWidth = control.element.offsetWidth + "px"
             autocompleteDiv.element.style.minWidth = minWidth
-            autocompleteDiv.element.style.top =  coord.top + control.element.offsetHeight + "px";
+            autocompleteDiv.element.style.top = coord.top + control.element.offsetHeight + "px";
             autocompleteDiv.element.style.left = coord.left + -1 + "px";
             autocompleteDiv.removeAllChilds()
 

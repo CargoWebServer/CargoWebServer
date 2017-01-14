@@ -654,9 +654,6 @@ var TableCell = function (row, index, value) {
 
 	if (value != null) {
 		var formatedValue
-		if(value.M_listOf != undefined){
-			console.log("--------> test!")
-		}
 		if (isObject(value)) {
 			if (value.M_valueOf != undefined) {
 				formatedValue = this.formatValue(value.M_valueOf)
@@ -708,6 +705,7 @@ function createItemLnk(entity, value, field, valueDiv) {
 	// I will display the remove button on case of user want to remove the linked entity.
 	var content = valueDiv.appendElement({ "tag": "div" }).down()
 	var ref = content.appendElement({ "tag": "div", "style": "display: inline; padding-left: 3px; vertical-align: text-bottom;" }).down().appendElement({ "tag": "a", "href": "#", "title": value.TYPENAME, "innerHtml": refName }).down()
+	ref.element.id = value.UUID
 	var deleteLnkButton = content.appendElement({ "tag": "div", "style": "display: inline; width: 100%;", "class": "row_button" }).down().appendElement({ "tag": "i", "class": "fa fa-trash", "style": "margin-left: 8px;" }).down()
 
 	ref.element.onclick = function (entity, ref, valueDiv, field) {
@@ -763,6 +761,39 @@ TableCell.prototype.formatValue = function (value) {
 		return value
 	}
 
+	// In case of a reference string...
+	if (fieldType == "xs.string") {
+		if (isObjectReference(value)) {
+			// In that case I will create the link object to reach the 
+			// reference...
+			fieldType = value.split("%")[0] + ":Ref"
+		}
+	}
+
+	// In case of generic value I will try to determine the type of the entity... 
+	if (fieldType == "xs.[]uint8") {
+		if (isString(value)) {
+			fieldType = "xs.string"
+		} else {
+			if (isArray(value)) {
+				for (var i = 0; i < value.length; i++) {
+					if (isObject(value[i])) {
+						fieldType = "[]" + value[i].TYPENAME + ":Ref"
+					} else if (isString(value[i])) {
+						fieldType = "xs.string"
+					}
+					// TODO do other types here...
+				}
+			} else {
+				if (isObject(value)) {
+					if (value.TYPENAME != undefined) {
+						fieldType = value.TYPENAME + ":Ref"
+					}
+				}
+			}
+		}
+	}
+
 	// if is extension of a base type.
 	var baseType = fieldType
 	if (!baseType.startsWith('[]xs.')) {
@@ -770,16 +801,18 @@ TableCell.prototype.formatValue = function (value) {
 	}
 
 	var field = "M_" + this.row.table.model.titles[this.index]
-	var isArray = fieldType.startsWith("[]")
+	var isArray_ = fieldType.startsWith("[]")
 	var formater = this.row.table.columnFormater
 	var isRef = fieldType.endsWith(":Ref")
-	
+
+
+
 	fieldType = fieldType.replace("[]", "")
 
 	// if its xs type... 
 	var isBaseType = fieldType.startsWith("xs.") || fieldType == "string" || fieldType == "int" || fieldType == "double" || fieldType == "date" || fieldType == "dateTime" || field == "M_valueOf" || field == "M_listOf"
 	if (isBaseType) {
-		if (!isArray) {
+		if (!isArray_) {
 			if (fieldType == "xs.dateTime" || fieldType == "dateTime" || fieldType == "date" || fieldType == "date") {
 				value = formater.formatDate(value);
 				this.valueDiv.element.className = "xs_date"
@@ -930,7 +963,7 @@ TableCell.prototype.formatValue = function (value) {
 			return itemTable
 		}
 	} else {
-		if (isArray) {
+		if (isArray_) {
 			var entity = server.entityManager.entities[this.row.table.model.entities[this.row.index].UUID]
 			if (entity == undefined) {
 				// In case of newly created entity.
@@ -966,6 +999,48 @@ TableCell.prototype.formatValue = function (value) {
 
 					var entity = this.row.table.model.entities[this.row.index]
 					entity = server.entityManager.entities[entity.uuid]
+
+					if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
+						// In that case the value is a generic entity from arrary of byte so I will 
+						// create the function here.
+						// Here I must implement the set and reset function 
+						if (value[i].UUID != undefined) {
+							entity["set_" + field + "_" + value[i].UUID + "_ref"] = function (value) {
+								return function (initCallback) {
+									initCallback(value)
+								}
+							} (value[i])
+
+							entity["reset_" + field + "_" + value[i].UUID + "_ref"] = function (value) {
+								return function (initCallback) {
+									initCallback(value.UUID)
+								}
+							} (value[i])
+						} else {
+							// In that case the reference is a string...
+							entity["set_" + field + "_" + value[i] + "_ref"] = function (value) {
+								return function (initCallback) {
+									server.entityManager.getEntityByUuid(
+										value,
+										// result callback
+										function (value, initCallback) {
+											initCallback(value)
+										},
+										// error callback
+										function () { },
+										initCallback)
+
+								}
+							} (value[i])
+
+							entity["reset_" + field + "_" + value[i] + "_ref"] = function (value) {
+								return function (initCallback) {
+									initCallback(value)
+								}
+							} (value[i])
+						}
+					}
+
 					entity["set_" + field + "_" + uuid + "_ref"](
 						function (entity, field, valueDiv, createItemLnk) {
 							return function (ref) {
@@ -1102,6 +1177,47 @@ TableCell.prototype.formatValue = function (value) {
 				entity = server.entityManager.entities[entity.UUID]
 				if (uuid != undefined) {
 					if (uuid.length > 0) {
+
+						if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
+							// In that case the value is a generic entity from arrary of byte so I will 
+							// create the function here.
+							// Here I must implement the set and reset function 
+							if (value.UUID != undefined) {
+								entity["set_" + field + "_" + value.UUID + "_ref"] = function (value) {
+									return function (initCallback) {
+										initCallback(value)
+									}
+								} (value)
+
+								entity["reset_" + field + "_" + value.UUID + "_ref"] = function (value) {
+									return function (initCallback) {
+										initCallback(value.UUID)
+									}
+								} (value)
+							} else {
+								// In that case the reference is a string...
+								entity["set_" + field + "_" + value + "_ref"] = function (value) {
+									return function (initCallback) {
+										server.entityManager.getEntityByUuid(
+											value,
+											// result callback
+											function (value, initCallback) {
+												initCallback(value)
+											},
+											// error callback
+											function () { },
+											initCallback)
+									}
+								} (value)
+
+								entity["reset_" + field + "_" + value + "_ref"] = function (value) {
+									return function (initCallback) {
+										initCallback(value)
+									}
+								} (value)
+							}
+						}
+
 						entity["set_" + field + "_" + uuid + "_ref"](
 							function (entity, field, valueDiv, createItemLnk) {
 								return function (ref) {
