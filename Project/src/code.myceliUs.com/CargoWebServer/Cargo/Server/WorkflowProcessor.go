@@ -414,7 +414,7 @@ func (this *WorkflowProcessor) setDataAssocication(source BPMS_Runtime.Instance,
 	// Index the item aware in a map to access it by theire id's
 	srcItemawareElementMap := make(map[string]*BPMS_Runtime.ItemAwareElementInstance, 0)
 
-	// I will copy the data reference into the start event...
+	// I will copy the data reference into the instance.
 	for i := 0; i < len(source.GetDataRef()); i++ {
 		// Todo evaluate the expression here...
 		log.Println("--> src data :", source.GetDataRef()[i].M_id)
@@ -423,7 +423,7 @@ func (this *WorkflowProcessor) setDataAssocication(source BPMS_Runtime.Instance,
 
 	for i := 0; i < len(source.GetData()); i++ {
 		// Todo evaluate the expression here...
-		log.Println("--> src data :", source.GetData()[i].M_id)
+		log.Println("--> src data :", source.GetData()[i].M_id, "value: ", source.GetData()[i])
 		srcItemawareElementMap[source.GetData()[i].M_id] = source.GetData()[i]
 	}
 

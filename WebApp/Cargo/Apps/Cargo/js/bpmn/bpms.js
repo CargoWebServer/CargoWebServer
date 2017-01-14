@@ -153,18 +153,26 @@ var ProcessWizard = function (parent, startEvent) {
 		return function () {
 
 			// Here I will the itemAwareInstance...
-			var index = 0
 			var itemAwareInstances = []
+			
 			for (var dataId in values) {
-				var data = []
-				for (var i = 0; i < values[dataId].length; i++) {
-					// serialyse the object...
-					if (values[dataId][i].stringify != undefined) {
-						var objStr = values[dataId][i].stringify()
-						console.log(objStr)
-						data.push(objStr)
+				var data
+				if (values[dataId].length > 1) {
+					data = []
+					for (var i = 0; i < values[dataId].length; i++) {
+						// serialyse the object...
+						if (values[dataId][i].stringify != undefined) {
+							data.push(values[dataId][i].stringify())
+						} else {
+							data.push(values[dataId][i])
+						}
+					}
+					data = JSON.stringify(data)
+				} else {
+					if (values[dataId][0].stringify != undefined) {
+						data = values[dataId][0].stringify()
 					} else {
-						data.push(values[dataId][i])
+						data = values[dataId][0]
 					}
 				}
 
@@ -173,8 +181,7 @@ var ProcessWizard = function (parent, startEvent) {
 					server.workflowManager.newItemAwareElementInstance(dataId, data,
 						function (result, caller) {
 							caller.itemAwareInstances.push(result)
-
-							if (caller.createProcess == true) {
+							if (caller.itemAwareInstances.length == caller.count) {
 								// Todo set the event definiton data and event properties...
 								server.workflowManager.startProcess(caller.process.UUID, caller.itemAwareInstances, [],
 									// Success Callback
@@ -188,9 +195,8 @@ var ProcessWizard = function (parent, startEvent) {
 
 						},
 						function () { /* Nothing here */ },
-						{ "dialog": dialog, "process": process, "itemAwareInstances": itemAwareInstances, "createProcess": index == Object.keys(values).length - 1 })
+						{ "dialog": dialog, "process": process, "itemAwareInstances": itemAwareInstances, "count": Object.keys(values).length })
 				}
-				index++
 
 			}
 
@@ -210,7 +216,7 @@ ProcessWizard.prototype.appendItemDefinition = function (parent, data, itemDefin
 
 	// It must be at lest one row...
 	var table = parent.appendElement({ "tag": "div", "style": "position: relative; width:100%;" }).down()
-	
+
 	// Here I will create a table.
 	parent.appendElement({ "tag": "div", "style": "display: table;" }).down()
 		.appendElement({ "tag": "div", "id": "labelDiv", "style": "display: table-cell; padding: 2px;" })

@@ -374,7 +374,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
 
 			} else if param.GetType() == Data_BYTES {
 				a.Params = append(a.Params, param.GetDataBytes())
-
 			} else if param.GetType() == Data_JSON_STR {
 				val := string(param.GetDataBytes())
 				val_, err := b64.StdEncoding.DecodeString(val)

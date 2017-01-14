@@ -75,7 +75,13 @@ function main() {
                             server.workflowManager.getDefinitionInstances(result,
                                 // success callback
                                 function (results, caller) {
-                                    console.log(results)
+                                    var result = results[0]
+                                    var parent = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; width: auto; height: auto;" })
+                                    new EntityPanel(parent, result.TYPENAME, function (entity) {
+                                        return function (panel) {
+                                            panel.setEntity(entity)
+                                        }
+                                    } (result), undefined, false, result, "")
                                 },
                                 // error callback 
                                 function (errMsg, caller) {

@@ -173,13 +173,10 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 					// Here the value is a base type...
 					fv := initializeBaseTypeValue(reflect.TypeOf(value), value)
 					if ft.Type.String() != fv.Type().String() {
-
 						// So here a conversion is necessary...
-						if ft.Type.String() == "[]uint8" || fv.Type().String() == "string" {
-
+						if ft.Type.String() == "[]uint8" || ft.Type.String() == "[]byte" || fv.Type().String() == "string" {
 							val := fv.String()
 							val_, err := b64.StdEncoding.DecodeString(val)
-
 							if err == nil {
 								val = string(val_)
 							}
