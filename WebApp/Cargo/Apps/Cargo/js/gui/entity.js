@@ -1198,7 +1198,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 						} else {
 							uuid = value[i]
 						}
-						if (uuid.length > 0) {
+						if (uuid.length > 0 && isObjectReference(uuid)) {
 							this.entity["set_" + field + "_" + uuid + "_ref"](
 								function (panel, control, field, fieldType) {
 									return function (ref) {
@@ -1232,7 +1232,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 					} else {
 						uuid = value
 					}
-					if (uuid.length > 0) {
+					if (uuid.length > 0 && isObjectReference(uuid)) {
 
 						this.entity["set_" + field + "_" + uuid + "_ref"](
 							function (panel, control, field, fieldType) {

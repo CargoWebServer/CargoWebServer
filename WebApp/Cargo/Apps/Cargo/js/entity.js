@@ -1267,7 +1267,7 @@ function appendReferenced(refName, target, owner) {
  * Set object reference.
  */
 function setRef(owner, property, refValue, isArray) {
-    if (refValue.length == 0 || !isObjectReference(refValue)) {
+    if (refValue.length == 0) {
         return owner
     }
 
@@ -1275,6 +1275,12 @@ function setRef(owner, property, refValue, isArray) {
     if (owner.references.indexOf(refValue) == -1) {
         owner.references.push(refValue)
     }
+
+    if (!isObjectReference(refValue)) {
+        owner[property] = refValue
+        return owner
+    }
+
 
     if (isArray) {
         var index = owner[property].length
@@ -1294,7 +1300,14 @@ function setRef(owner, property, refValue, isArray) {
             /* The set reference fucntion **/
             owner["set_" + property + "_" + refValue + "_ref"] = function (entityUuid, propertyName, index, refValue) {
                 return function (initCallback) {
-                    if (server.entityManager.entities[refValue] != undefined) {
+                    var isExist = server.entityManager.entities[refValue] != undefined
+                    var isInit = false
+
+                    if (isExist) {
+                        isInit = server.entityManager.entities[refValue].IsInit
+                    }
+
+                    if (isExist && isInit) {
                         // Here the reference exist on the server.
                         var entity = server.entityManager.entities[entityUuid]
                         var ref = server.entityManager.entities[refValue]
@@ -1555,7 +1568,7 @@ function setObjectValues(object, values) {
                                     return function (val) {
                                         server.entityManager.entities[uuid][property] = val
                                     }
-                                }(object.UUID, property)
+                                } (object.UUID, property)
 
                                 obj.init(jsonObj)
                             } else {
@@ -1564,12 +1577,12 @@ function setObjectValues(object, values) {
                                     var obj = eval("new " + jsonObj_.TYPENAME + "()")
                                     obj.initCallback = function (uuid, property) {
                                         return function (val) {
-                                            if(server.entityManager.entities[uuid][property]==""){
-                                                server.entityManager.entities[uuid][property]=[]
+                                            if (server.entityManager.entities[uuid][property] == "") {
+                                                server.entityManager.entities[uuid][property] = []
                                             }
                                             server.entityManager.entities[uuid][property].push(val)
                                         }
-                                    }(object.UUID, property)
+                                    } (object.UUID, property)
                                     obj.init(jsonObj_)
                                 }
                             }

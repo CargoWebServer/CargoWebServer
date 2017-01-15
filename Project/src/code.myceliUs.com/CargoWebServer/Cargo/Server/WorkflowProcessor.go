@@ -14,6 +14,7 @@ import (
 	"math/rand"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -42,7 +43,6 @@ func newWorkflowProcessor() *WorkflowProcessor {
 	runtimeUUID := BPMS_RuntimeRuntimesExists("runtime")
 	if len(runtimeUUID) == 0 {
 		// Create a new runtime...
-		log.Println("Create and save a new runtime.")
 		workflowProcessor.runtime = GetServer().GetEntityManager().NewBPMS_RuntimeRuntimesEntity("runtime", nil)
 		workflowProcessor.runtime.SaveEntity()
 
@@ -421,14 +421,10 @@ func (this *WorkflowProcessor) setDataAssocication(source BPMS_Runtime.Instance,
 
 	// I will copy the data reference into the instance.
 	for i := 0; i < len(source.GetDataRef()); i++ {
-		// Todo evaluate the expression here...
-		log.Println("--> src data :", source.GetDataRef()[i].M_id)
 		srcItemawareElementMap[source.GetDataRef()[i].M_id] = source.GetDataRef()[i]
 	}
 
 	for i := 0; i < len(source.GetData()); i++ {
-		// Todo evaluate the expression here...
-		log.Println("--> src data :", source.GetData()[i].M_id, "value: ", source.GetData()[i])
 		srcItemawareElementMap[source.GetData()[i].M_id] = source.GetData()[i]
 	}
 
@@ -436,7 +432,6 @@ func (this *WorkflowProcessor) setDataAssocication(source BPMS_Runtime.Instance,
 
 	// The data to be set...
 	for i := 0; i < len(data); i++ {
-		log.Println("--> trg data :", data[i].GetId())
 		trgItemawareElementMap[data[i].GetId()] = data[i].(BPMN20.ItemAwareElement)
 	}
 
@@ -788,6 +783,7 @@ func (this *WorkflowProcessor) workflowTransition(flowNode BPMS_Runtime.FlowNode
 			connectingObj.UUID = "BPMS_Runtime.ConnectingObject%" + Utility.RandomUUID()
 			connectingObj.M_bpmnElementId = seqFlow.GetId()
 			connectingObj.SetSourceRef(flowNode)
+			connectingObj.NeedSave = true
 
 			// Now I will create the next node
 
@@ -804,8 +800,14 @@ func (this *WorkflowProcessor) workflowTransition(flowNode BPMS_Runtime.FlowNode
 			// Set the connecting object and save it...
 			processInstance.SetConnectingObjects(connectingObj)
 
+			// Get the connectiong object index.
+			index := len(processInstance.GetConnectingObjects())
+			connectingObj.SetId("lnk_" + strconv.Itoa(index))
+
+			processInstanceEntity := GetServer().GetEntityManager().NewBPMS_RuntimeProcessInstanceEntityFromObject(processInstance)
 			// Save the change...
-			this.runtime.SaveEntity()
+			processInstanceEntity.SaveEntity()
+
 		}
 
 	}
@@ -836,8 +838,6 @@ func (this *WorkflowProcessor) getActiveProcessInstances(process *BPMN20.Process
 	// The list of processes instance...
 	for i := 0; i < len(instances); i++ {
 		processInstance := instances[i].(*BPMS_Runtime.ProcessInstance)
-
-		log.Println("-------> process ", processInstance.GetData())
 
 		if this.stillActive(processInstance) == false {
 			this.deleteInstance(processInstance)
