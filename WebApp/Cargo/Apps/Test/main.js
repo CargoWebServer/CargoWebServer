@@ -55,7 +55,8 @@ function main() {
     //entitiesDump("COLLADASchema.COLLADA")
 
     //entitiesDump("XPDMXML.ProcessStructureType")
-
+    //entitiesDump("DT3_informations.Workpoint")
+    
     //testEntityQuery()
 
     //TestWebRtc2()
@@ -64,6 +65,7 @@ function main() {
     // TestUploadFile()
 
     // Test get bmpn defintion instance...
+    /*
     server.entityManager.getEntityPrototypes("Test",
         // Success callback.
         function (result, caller) {
@@ -109,7 +111,7 @@ function main() {
         function () {
 
         }, {})
-
+        */
 }
 
 

@@ -1541,7 +1541,6 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 	entity, err := Utility.CallMethod(this, funcName, params)
 
 	if err != nil {
-		log.Println("no function with name ", funcName)
 		// I will try with dynamic entity insted...
 		var errObj *CargoEntities.Error
 		entity, errObj = this.NewDynamicEntity(values.(map[string]interface{}))

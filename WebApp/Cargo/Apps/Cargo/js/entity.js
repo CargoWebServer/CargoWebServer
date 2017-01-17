@@ -1200,7 +1200,6 @@ function resetObjectValues(object) {
         /** Only reference must be reset here. */
         if (propertyId.startsWith("reset_") && propertyId.endsWith("_ref")) {
             // Call the reset function.
-            console.log("call ", propertyId)
             object[propertyId]()
         }
     }

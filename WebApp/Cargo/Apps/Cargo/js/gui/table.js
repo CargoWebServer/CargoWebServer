@@ -1005,6 +1005,7 @@ TableCell.prototype.formatValue = function (value) {
 						// create the function here.
 						// Here I must implement the set and reset function 
 						if (value[i].UUID != undefined) {
+							// TODO use setRef(owner, property, refValue, isArray) insted
 							entity["set_" + field + "_" + value[i].UUID + "_ref"] = function (value) {
 								return function (initCallback) {
 									initCallback(value)
@@ -1177,7 +1178,7 @@ TableCell.prototype.formatValue = function (value) {
 				entity = server.entityManager.entities[entity.UUID]
 				if (uuid != undefined) {
 					if (uuid.length > 0) {
-
+						// TODO use setRef(owner, property, refValue, isArray) insted
 						if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
 							// In that case the value is a generic entity from arrary of byte so I will 
 							// create the function here.
