@@ -557,6 +557,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 	// The entity div.
 	var entityDiv = parent.appendElement({ "tag": "div", "class": "entity" }).down()
 	var id = this.proto.TypeName + "_" + field
+	
 
 	// In case of a generic value....
 	if (fieldType == "xs.[]uint8") {
@@ -604,6 +605,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 			// Here I will create the add button...
 			newLnkButton = label.appendElement({ "tag": "div", "class": "entities_btn", "style": "display: none;", "id": this.proto.TypeName + "_" + fieldType + "_" + field + "_plus_btn" }).down()
 			newLnkButton.appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
+			newLnkButton.element.style.verticalAlign = "middle"
 			if (!isRef) {
 				var itemTable = undefined
 				if (field != "M_listOf" && !fieldType.startsWith("xs.")) {
@@ -711,7 +713,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							},
 							// The error callback.
 							function () {
-							}, { "entityPanel": entityPanel, "field": field, "id": id, "typeName":typeName })
+							}, { "entityPanel": entityPanel, "field": field, "id": id, "typeName": typeName })
 
 					} else {
 						// In that case I will create a new entity
@@ -879,36 +881,13 @@ EntityPanel.prototype.setGenericFieldValue = function (control, field, value, pa
 		// Here I will create a xs control to display an object reference.
 		if (!isArray(value)) {
 			fieldType = value.TYPENAME + ":Ref"
-
-			// Here I must implement the set and reset function 
-			parentEntity["set_" + field + "_" + value.UUID + "_ref"] = function (value) {
-				return function (initCallback) {
-					initCallback(value)
-				}
-			} (value)
-
-			parentEntity["reset_" + field + "_" + value.UUID + "_ref"] = function (value) {
-				return function (initCallback) {
-					initCallback(value.UUID)
-				}
-			} (value)
+			setRef(parentEntity, field, value, false)
 		} else {
 			for (var i = 0; i < value.length; i++) {
 				// In the case of an array...
 				if (isObject(value[i])) {
 					fieldType = "[]" + value[0].TYPENAME + ":Ref"
-					// Here I must implement the set and reset function 
-					parentEntity["set_" + field + "_" + value[i].UUID + "_ref"] = function (value) {
-						return function (initCallback) {
-							initCallback(value)
-						}
-					} (value[i])
-
-					parentEntity["reset_" + field + "_" + value[i].UUID + "_ref"] = function (value) {
-						return function (initCallback) {
-							initCallback(value[i].UUID)
-						}
-					} (value)
+					setRef(parentEntity, field, value, true)
 				} else {
 					if (isString(value[i])) {
 						// an array of string...
@@ -1136,6 +1115,10 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 						// nothing to here.
 					},
 					undefined)
+				// in case of local object.
+				if (entity.onChange != undefined) {
+					entity.onChange(entity)
+				}
 			}
 		} (this.entity.UUID, object, field)
 	}
@@ -1158,6 +1141,20 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 	if (control == undefined) {
 		return
 	}
+
+	// In case of a reference string...
+	if (fieldType == "xs.string") {
+		if (isObjectReference(value)) {
+			// In that case I will create the link object to reach the 
+			// reference...
+			fieldType = value.split("%")[0] + ":Ref"
+
+			// Here I will remove the default control and replace it by a div where the reference will be placed.
+			control.element.parentNode.removeChild(control.element)
+			control = control.parentElement.appendElement({"tag":"div"}).down()
+		}
+	}
+
 	this.maximizeBtn.element.click()
 	// Here I will see if the type is derived basetype...
 	if (fieldType.startsWith("enum:")) {
@@ -1214,6 +1211,9 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 							uuid = value[i]
 						}
 						if (uuid.length > 0 && isObjectReference(uuid)) {
+							if (this.entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
+								setRef(this.entity, field, uuid, true)
+							}
 							this.entity["set_" + field + "_" + uuid + "_ref"](
 								function (panel, control, field, fieldType) {
 									return function (ref) {
@@ -1248,7 +1248,9 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 						uuid = value
 					}
 					if (uuid.length > 0 && isObjectReference(uuid)) {
-
+						if (this.entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
+							setRef(this.entity, field, uuid, false)
+						}
 						this.entity["set_" + field + "_" + uuid + "_ref"](
 							function (panel, control, field, fieldType) {
 								return function (ref) {

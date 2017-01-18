@@ -1000,55 +1000,27 @@ TableCell.prototype.formatValue = function (value) {
 					var entity = this.row.table.model.entities[this.row.index]
 					entity = server.entityManager.entities[entity.uuid]
 
-					if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
-						// In that case the value is a generic entity from arrary of byte so I will 
-						// create the function here.
-						// Here I must implement the set and reset function 
-						if (value[i].UUID != undefined) {
-							// TODO use setRef(owner, property, refValue, isArray) insted
-							entity["set_" + field + "_" + value[i].UUID + "_ref"] = function (value) {
-								return function (initCallback) {
-									initCallback(value)
-								}
-							} (value[i])
-
-							entity["reset_" + field + "_" + value[i].UUID + "_ref"] = function (value) {
-								return function (initCallback) {
-									initCallback(value.UUID)
-								}
-							} (value[i])
-						} else {
-							// In that case the reference is a string...
-							entity["set_" + field + "_" + value[i] + "_ref"] = function (value) {
-								return function (initCallback) {
-									server.entityManager.getEntityByUuid(
-										value,
-										// result callback
-										function (value, initCallback) {
-											initCallback(value)
-										},
-										// error callback
-										function () { },
-										initCallback)
-
-								}
-							} (value[i])
-
-							entity["reset_" + field + "_" + value[i] + "_ref"] = function (value) {
-								return function (initCallback) {
-									initCallback(value)
-								}
-							} (value[i])
-						}
-					}
-
-					entity["set_" + field + "_" + uuid + "_ref"](
-						function (entity, field, valueDiv, createItemLnk) {
-							return function (ref) {
-								createItemLnk(entity, ref, field, valueDiv)
+					if (uuid.length > 0 && isObjectReference(uuid)) {
+						if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
+							// In that case the value is a generic entity from arrary of byte so I will 
+							// create the function here.
+							// Here I must implement the set and reset function 
+							if (value[i].UUID != undefined) {
+								setRef(entity, field, value[i].UUID, false)
+							} else {
+								// In that case the reference is a string...
+								setRef(entity, field, value[i], false)
 							}
-						} (entity, field, lnkDiv, createItemLnk)
-					)
+						}
+
+						entity["set_" + field + "_" + uuid + "_ref"](
+							function (entity, field, valueDiv, createItemLnk) {
+								return function (ref) {
+									createItemLnk(entity, ref, field, valueDiv)
+								}
+							} (entity, field, lnkDiv, createItemLnk)
+						)
+					}
 				}
 
 				newLnkButton.element.onclick = function (valueDiv, entity, fieldType, field) {
@@ -1177,45 +1149,17 @@ TableCell.prototype.formatValue = function (value) {
 
 				entity = server.entityManager.entities[entity.UUID]
 				if (uuid != undefined) {
-					if (uuid.length > 0) {
+					if (uuid.length > 0 && isObjectReference(uuid)) {
 						// TODO use setRef(owner, property, refValue, isArray) insted
 						if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
 							// In that case the value is a generic entity from arrary of byte so I will 
 							// create the function here.
 							// Here I must implement the set and reset function 
 							if (value.UUID != undefined) {
-								entity["set_" + field + "_" + value.UUID + "_ref"] = function (value) {
-									return function (initCallback) {
-										initCallback(value)
-									}
-								} (value)
-
-								entity["reset_" + field + "_" + value.UUID + "_ref"] = function (value) {
-									return function (initCallback) {
-										initCallback(value.UUID)
-									}
-								} (value)
+								setRef(entity, field, value.UUID, false)
 							} else {
 								// In that case the reference is a string...
-								entity["set_" + field + "_" + value + "_ref"] = function (value) {
-									return function (initCallback) {
-										server.entityManager.getEntityByUuid(
-											value,
-											// result callback
-											function (value, initCallback) {
-												initCallback(value)
-											},
-											// error callback
-											function () { },
-											initCallback)
-									}
-								} (value)
-
-								entity["reset_" + field + "_" + value + "_ref"] = function (value) {
-									return function (initCallback) {
-										initCallback(value)
-									}
-								} (value)
+								setRef(entity, field, value, false)
 							}
 						}
 

@@ -65,7 +65,7 @@ function main() {
     // TestUploadFile()
 
     // Test get bmpn defintion instance...
-    /*
+    
     server.entityManager.getEntityPrototypes("Test",
         // Success callback.
         function (result, caller) {
@@ -111,7 +111,7 @@ function main() {
         function () {
 
         }, {})
-        */
+        
 }
 
 

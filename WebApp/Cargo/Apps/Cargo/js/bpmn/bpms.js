@@ -110,18 +110,30 @@ var ProcessWizard = function (parent, startEvent) {
 	this.content = this.dialog.content.appendElement({ "tag": "div", "class": "process_wizard_content" }).down()
 
 	// That will contain the values ask by the user...
-	this.values = {}
+	this.dataView = new BpmnDataView(this.content, startEvent)
 
-	// Now initialyse the dataouput...
-	if (startEvent.M_dataOutput != undefined) {
-		var dataView = new BpmnDataView(this.content, startEvent)
-	}
-
-	this.dialog.ok.element.onclick = function (values, process, dialog, wizard) {
+	this.dialog.ok.element.onclick = function (dataView, process, dialog) {
 		return function () {
+			// I will close the dialogue first...
+			dialog.close()
 
+			// I will save the data view...
+			dataView.save(function (process) {
+				return function (itemAwareInstances) {
+					// Here I will create the new process...
+					server.workflowManager.startProcess(process.UUID, itemAwareInstances, [],
+						// Success Callback
+						function (result, caller) {
+							/* Nothing here */
+						},
+						// Error Callback
+						function () {/* Nothing here */ },
+						{})
+				}
+			} (process))
+			
 		}
-	} (this.values, startEvent.getParent(), this.dialog, this)
+	} (this.dataView, startEvent.getParent(), this.dialog)
 
 	return this
 }
