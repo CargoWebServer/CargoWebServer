@@ -681,23 +681,38 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						// Display it
 						entityPanel.controls[id + "_new"].element.style.display = ""
 
-						// Now i will set it autocompletion list...
-						attachAutoCompleteInput(entityPanel.controls[id + "_new"], fieldType, field, entityPanel, entityPanel.entity.getTitles(),
-							function (entityPanel, field, fieldsType) {
-								return function (value) {
-									// Here I will set the field of the entity...
-									if (entityPanel.entity != undefined) {
-										// Set the new object value.
-										appendObjectValue(entityPanel.entity, field, value)
-										// Automatically saved...
-										server.entityManager.saveEntity(entityPanel.entity)
+						// Get the pacakge prototypes...
+						var typeName = fieldType.replace("[]", "").replace(":Ref", "")
+						server.entityManager.getEntityPrototypes(typeName.split(".")[0],
+							function (result, caller) {
 
-									}
-								}
-							} (entityPanel, field))
+								// Set variables...
+								var entityPanel = caller.entityPanel
+								var id = caller.id
+								var field = caller.field
+								var prototype = server.entityManager.entityPrototypes[caller.typeName]
 
-						entityPanel.controls[id + "_new"].element.focus()
-						entityPanel.controls[id + "_new"].element.select();
+								// Now i will set it autocompletion list...
+								attachAutoCompleteInput(entityPanel.controls[id + "_new"], fieldType, field, entityPanel, prototype.getTitles(),
+									function (entityPanel, field, fieldsType) {
+										return function (value) {
+											// Here I will set the field of the entity...
+											if (entityPanel.entity != undefined) {
+												// Set the new object value.
+												appendObjectValue(entityPanel.entity, field, value)
+												// Automatically saved...
+												server.entityManager.saveEntity(entityPanel.entity)
+											}
+										}
+									} (entityPanel, field))
+
+								entityPanel.controls[id + "_new"].element.focus()
+								entityPanel.controls[id + "_new"].element.select();
+							},
+							// The error callback.
+							function () {
+							}, { "entityPanel": entityPanel, "field": field, "id": id, "typeName":typeName })
+
 					} else {
 						// In that case I will create a new entity
 						if (itemPrototype != undefined) {
@@ -894,7 +909,7 @@ EntityPanel.prototype.setGenericFieldValue = function (control, field, value, pa
 							initCallback(value[i].UUID)
 						}
 					} (value)
-				}else{
+				} else {
 					if (isString(value[i])) {
 						// an array of string...
 						fieldType = "[]xs.string"
@@ -1272,6 +1287,9 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 		ids = []
 	}
 
+	input.element.readOnly = true
+	input.element.style.cursor = "progress"
+	input.element.style.width = "auto"
 
 	server.entityManager.getObjectsByType(typeName, typeName.split(".")[0], "",
 		// Progress...
@@ -1290,6 +1308,9 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 			var ids = caller.ids
 			var field = caller.field
 			var lst = []
+
+			input.element.readOnly = false
+			input.element.style.cursor = "default"
 
 			if (results.length > 0) {
 				var prototype = server.entityManager.entityPrototypes[results[0].TYPENAME]

@@ -1546,6 +1546,7 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 		entity, errObj = this.NewDynamicEntity(values.(map[string]interface{}))
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
 		}
 	}
 
