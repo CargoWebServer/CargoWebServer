@@ -30,13 +30,21 @@ $(".tutorials-link").click(function() {
 	}, 500);
 });
 
+$("#frontEndNextTutorialLink").click(function() {
+	$('html, body').animate({
+		scrollTop: $('#tutorialsSection-javascriptPrinciples').offset().top
+	}, 500);
+});
+
 // main
 main()
 
 function main() {
 	// TODO delete this
+	/*
 	$('#li-tutorials').click()
-
+	*/
+	
 	// Element example
 	var containerElement = new Element(
 		document.getElementById( "elementExampleContainer"), 

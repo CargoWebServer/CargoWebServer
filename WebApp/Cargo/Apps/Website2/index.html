@@ -49,16 +49,43 @@
 		</div>
 
 		<div class="row pageRow" id="page-cargo">
-			<div class="col-xs-12 text-center" id="cargo-intro-container">
-				<div class="col-xs-12">
-					<img src="img/wheel.svg" id="cargo-intro-wheel"/>
-				</div>
-				<div class="col-sm-6 col-sm-offset-3 text-center">
-					<h2>Cargo is a complete web application framework. It's fast, easy and lightweight.<br><br></h2>
-					<p><a class="btn btn-primary btn-lg" href="#" role="button">Download Cargo</a></p>
-					<p>v1.0</p>
+			<div class="row"> 
+				<div class="col-xs-12 text-center" id="cargo-intro-container">
+					<div class="col-xs-12">
+						<img src="img/wheel.svg" id="cargo-intro-wheel"/>
+					</div>
+					<div class="col-sm-6 col-sm-offset-3 text-center">
+						<h2>Cargo is a complete web application framework. It's fast, easy and lightweight.<br><br></h2>
+						<p><a class="btn btn-primary btn-lg" href="#" role="button">Download Cargo</a></p>
+						<p>v1.0</p>
+					</div>
 				</div>
 			</div>
+			<div class="row marketing">
+				<div class="col-md-3 marketing1">
+					<span class="glyphicon glyphicon glyphicon-ok"></span>
+					<h2>Complete</h2>
+					<p>Front-end, server, database. All in one.</p>
+				</div>
+				<div class="col-md-3 marketing2">
+					<span class="glyphicon glyphicon-play"></span>
+					<h2>Easiest setup</h2>
+					<p> Start coding right away. </p>
+				</div>
+				<div class="col-md-3 marketing3">
+					<span class="glyphicon glyphicon-road"></span>
+					<h2>Smooth learning curve</h2>
+					<p>
+						Code everything in one language: javascript. 
+					</p>
+				</div>
+				<div class="col-md-3 marketing4">
+					<span class="glyphicon glyphicon-flash"></span>
+					<h2>Lightweight, fast, non-blocking</h2>
+					<p>Golang background.</p>
+				</div>
+			</div>
+
 		</div>
 	</div>
 	<div class="row hidden pageRow" id="page-gettingStarted">
@@ -78,8 +105,8 @@
 					<li id="tutorialsLink-frontEnd" class="tutorials-link"> 
 						<a href="#">Front End</a> 
 					</li>
-					<li id="tutorialsLink-clientSide" class="tutorials-link"> 
-						<a href="#">Client-side</a> 
+					<li id="tutorialsLink-javascriptPrinciples" class="tutorials-link"> 
+						<a href="#">Javascript principles</a> 
 					</li>
 					<li id="tutorialsLink-serverSide" class="tutorials-link"> 
 						<a href="#">Server-side</a> 
@@ -107,7 +134,7 @@
 					</p>
 					<p>
 						You do not need to use the 'Element' class or any of it's related functionnalities 
-						to develop a web application using the Cargo framework. It can be used in conjunction with other javascript libraries such as Jquery and Bootstrap. If you are an experienced front-end web application developper and already have techniques which you are familiar with, feel free to skip to the <a href="#"> next tutorial </a>.
+						to develop a web application using the Cargo framework. It can be used in conjunction with other javascript libraries such as Jquery and Bootstrap. If you are an experienced front-end web application developper and already have techniques which you are familiar with, feel free to skip to the <a href="#" id="frontEndNextTutorialLink"> next tutorial</a>.
 					</p>
 
 					<h4> Element essential functions </h4>
@@ -203,14 +230,22 @@
 
 				</div>
 			</div>
-			<div class="row tutorialsRow" id="tutorialsSection-clientSide">
+			<div class="row tutorialsRow" id="tutorialsSection-javascriptPrinciples">
 				<div class="col-xs-12">
-					<h2> Client Side </h2>
+					<h2> Javascript principles </h2>
+					<h3> Asynchronous programming </h3>
+					Asynchronous programming means that your web application can keep running without waiting for another peice of code to finish. To do so, Cargo uses 'callbacks'. 
+					<br>
+					Principes js du framework
+					- Asynchronisité
+					- Callback
+
 				</div>
 			</div>
 			<div class="row tutorialsRow" id="tutorialsSection-serverSide">
 				<div class="col-xs-12">
 					<h2> Server Side </h2>
+					When developing a web app using Cargo, you never need to code in another language than javasript.
 				</div>
 			</div>
 		</div>

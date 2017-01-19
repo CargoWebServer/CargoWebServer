@@ -1,3 +1,14 @@
 -> Correction fautes orthographe
 -> Element tutorial
 	- Animate
+-> Tutorials sidebar scroll avec la page
+-> front page
+	- Complete.
+		- Front-end, server, database. All in one.
+	- Ridiculously Easy setup.
+		-The easiest complete web framework to setup! 1. Install 2. Start coding.
+	- Easy learning curve.
+		- Only JS
+		- For beginners & pros
+	- Lightweight, fast, non-blocking
+		- Go background
