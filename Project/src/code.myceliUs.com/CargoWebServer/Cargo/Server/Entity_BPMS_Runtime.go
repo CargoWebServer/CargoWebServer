@@ -14,14 +14,14 @@ func (this *EntityManager) Create_BPMS_Runtime_InstanceEntityPrototype() {
 	var instanceEntityProto EntityPrototype
 	instanceEntityProto.TypeName = "BPMS_Runtime.Instance"
 	instanceEntityProto.IsAbstract=true
-	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.ProcessInstance")
-	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.EventDefinitionInstance")
-	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.DefinitionsInstance")
 	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.ActivityInstance")
+	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.EventInstance")
+	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.DefinitionsInstance")
+	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.ProcessInstance")
+	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.ConnectingObject")
 	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.SubprocessInstance")
 	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.GatewayInstance")
-	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.EventInstance")
-	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.ConnectingObject")
+	instanceEntityProto.SubstitutionGroup = append(instanceEntityProto.SubstitutionGroup, "BPMS_Runtime.EventDefinitionInstance")
 	instanceEntityProto.Ids = append(instanceEntityProto.Ids,"uuid")
 	instanceEntityProto.Fields = append(instanceEntityProto.Fields,"uuid")
 	instanceEntityProto.FieldsType = append(instanceEntityProto.FieldsType,"xs.string")
@@ -39,6 +39,7 @@ func (this *EntityManager) Create_BPMS_Runtime_InstanceEntityPrototype() {
 	instanceEntityProto.FieldsVisibility = append(instanceEntityProto.FieldsVisibility,true)
 	instanceEntityProto.Fields = append(instanceEntityProto.Fields,"M_id")
 	instanceEntityProto.FieldsType = append(instanceEntityProto.FieldsType,"xs.ID")
+	instanceEntityProto.Indexs = append(instanceEntityProto.Indexs,"M_bpmnElementId")
 	instanceEntityProto.FieldsOrder = append(instanceEntityProto.FieldsOrder,3)
 	instanceEntityProto.FieldsVisibility = append(instanceEntityProto.FieldsVisibility,true)
 	instanceEntityProto.Fields = append(instanceEntityProto.Fields,"M_bpmnElementId")
@@ -335,6 +336,7 @@ func (this *EntityManager) Create_BPMS_Runtime_ConnectingObjectEntityPrototype()
 	connectingObjectEntityProto.FieldsVisibility = append(connectingObjectEntityProto.FieldsVisibility,true)
 	connectingObjectEntityProto.Fields = append(connectingObjectEntityProto.Fields,"M_id")
 	connectingObjectEntityProto.FieldsType = append(connectingObjectEntityProto.FieldsType,"xs.ID")
+	connectingObjectEntityProto.Indexs = append(connectingObjectEntityProto.Indexs,"M_bpmnElementId")
 	connectingObjectEntityProto.FieldsOrder = append(connectingObjectEntityProto.FieldsOrder,3)
 	connectingObjectEntityProto.FieldsVisibility = append(connectingObjectEntityProto.FieldsVisibility,true)
 	connectingObjectEntityProto.Fields = append(connectingObjectEntityProto.Fields,"M_bpmnElementId")
@@ -830,10 +832,10 @@ func (this *EntityManager) Create_BPMS_Runtime_FlowNodeInstanceEntityPrototype()
 	flowNodeInstanceEntityProto.TypeName = "BPMS_Runtime.FlowNodeInstance"
 	flowNodeInstanceEntityProto.IsAbstract=true
 	flowNodeInstanceEntityProto.SuperTypeNames = append(flowNodeInstanceEntityProto.SuperTypeNames, "BPMS_Runtime.Instance")
-	flowNodeInstanceEntityProto.SubstitutionGroup = append(flowNodeInstanceEntityProto.SubstitutionGroup, "BPMS_Runtime.SubprocessInstance")
-	flowNodeInstanceEntityProto.SubstitutionGroup = append(flowNodeInstanceEntityProto.SubstitutionGroup, "BPMS_Runtime.GatewayInstance")
 	flowNodeInstanceEntityProto.SubstitutionGroup = append(flowNodeInstanceEntityProto.SubstitutionGroup, "BPMS_Runtime.EventInstance")
 	flowNodeInstanceEntityProto.SubstitutionGroup = append(flowNodeInstanceEntityProto.SubstitutionGroup, "BPMS_Runtime.ActivityInstance")
+	flowNodeInstanceEntityProto.SubstitutionGroup = append(flowNodeInstanceEntityProto.SubstitutionGroup, "BPMS_Runtime.SubprocessInstance")
+	flowNodeInstanceEntityProto.SubstitutionGroup = append(flowNodeInstanceEntityProto.SubstitutionGroup, "BPMS_Runtime.GatewayInstance")
 	flowNodeInstanceEntityProto.Ids = append(flowNodeInstanceEntityProto.Ids,"uuid")
 	flowNodeInstanceEntityProto.Fields = append(flowNodeInstanceEntityProto.Fields,"uuid")
 	flowNodeInstanceEntityProto.FieldsType = append(flowNodeInstanceEntityProto.FieldsType,"xs.string")
@@ -851,6 +853,7 @@ func (this *EntityManager) Create_BPMS_Runtime_FlowNodeInstanceEntityPrototype()
 	flowNodeInstanceEntityProto.FieldsVisibility = append(flowNodeInstanceEntityProto.FieldsVisibility,true)
 	flowNodeInstanceEntityProto.Fields = append(flowNodeInstanceEntityProto.Fields,"M_id")
 	flowNodeInstanceEntityProto.FieldsType = append(flowNodeInstanceEntityProto.FieldsType,"xs.ID")
+	flowNodeInstanceEntityProto.Indexs = append(flowNodeInstanceEntityProto.Indexs,"M_bpmnElementId")
 	flowNodeInstanceEntityProto.FieldsOrder = append(flowNodeInstanceEntityProto.FieldsOrder,3)
 	flowNodeInstanceEntityProto.FieldsVisibility = append(flowNodeInstanceEntityProto.FieldsVisibility,true)
 	flowNodeInstanceEntityProto.Fields = append(flowNodeInstanceEntityProto.Fields,"M_bpmnElementId")
@@ -1176,6 +1179,7 @@ func (this *EntityManager) Create_BPMS_Runtime_ActivityInstanceEntityPrototype()
 	activityInstanceEntityProto.FieldsVisibility = append(activityInstanceEntityProto.FieldsVisibility,true)
 	activityInstanceEntityProto.Fields = append(activityInstanceEntityProto.Fields,"M_id")
 	activityInstanceEntityProto.FieldsType = append(activityInstanceEntityProto.FieldsType,"xs.ID")
+	activityInstanceEntityProto.Indexs = append(activityInstanceEntityProto.Indexs,"M_bpmnElementId")
 	activityInstanceEntityProto.FieldsOrder = append(activityInstanceEntityProto.FieldsOrder,3)
 	activityInstanceEntityProto.FieldsVisibility = append(activityInstanceEntityProto.FieldsVisibility,true)
 	activityInstanceEntityProto.Fields = append(activityInstanceEntityProto.Fields,"M_bpmnElementId")
@@ -2208,6 +2212,7 @@ func (this *EntityManager) Create_BPMS_Runtime_SubprocessInstanceEntityPrototype
 	subprocessInstanceEntityProto.FieldsVisibility = append(subprocessInstanceEntityProto.FieldsVisibility,true)
 	subprocessInstanceEntityProto.Fields = append(subprocessInstanceEntityProto.Fields,"M_id")
 	subprocessInstanceEntityProto.FieldsType = append(subprocessInstanceEntityProto.FieldsType,"xs.ID")
+	subprocessInstanceEntityProto.Indexs = append(subprocessInstanceEntityProto.Indexs,"M_bpmnElementId")
 	subprocessInstanceEntityProto.FieldsOrder = append(subprocessInstanceEntityProto.FieldsOrder,3)
 	subprocessInstanceEntityProto.FieldsVisibility = append(subprocessInstanceEntityProto.FieldsVisibility,true)
 	subprocessInstanceEntityProto.Fields = append(subprocessInstanceEntityProto.Fields,"M_bpmnElementId")
@@ -2838,20 +2843,7 @@ func (this *BPMS_Runtime_SubprocessInstanceEntity) InitEntity(id string) error{
 				log.Println("type ", typeName, " not found!")
 				return err
 			}
-				if typeName == "BPMS_Runtime.ActivityInstance"{
-						if len(uuids[i]) > 0 {
-							var flowNodeInstancesEntity *BPMS_Runtime_ActivityInstanceEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								flowNodeInstancesEntity = instance.(*BPMS_Runtime_ActivityInstanceEntity)
-							}else{
-								flowNodeInstancesEntity = GetServer().GetEntityManager().NewBPMS_RuntimeActivityInstanceEntity(uuids[i], nil)
-								flowNodeInstancesEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(flowNodeInstancesEntity)
-							}
-							flowNodeInstancesEntity.AppendReferenced("flowNodeInstances", this)
-							this.AppendChild("flowNodeInstances",flowNodeInstancesEntity)
-						}
-				} else if typeName == "BPMS_Runtime.SubprocessInstance"{
+				if typeName == "BPMS_Runtime.SubprocessInstance"{
 						if len(uuids[i]) > 0 {
 							var flowNodeInstancesEntity *BPMS_Runtime_SubprocessInstanceEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
@@ -2884,6 +2876,19 @@ func (this *BPMS_Runtime_SubprocessInstanceEntity) InitEntity(id string) error{
 								flowNodeInstancesEntity = instance.(*BPMS_Runtime_EventInstanceEntity)
 							}else{
 								flowNodeInstancesEntity = GetServer().GetEntityManager().NewBPMS_RuntimeEventInstanceEntity(uuids[i], nil)
+								flowNodeInstancesEntity.InitEntity(uuids[i])
+								GetServer().GetEntityManager().insert(flowNodeInstancesEntity)
+							}
+							flowNodeInstancesEntity.AppendReferenced("flowNodeInstances", this)
+							this.AppendChild("flowNodeInstances",flowNodeInstancesEntity)
+						}
+				} else if typeName == "BPMS_Runtime.ActivityInstance"{
+						if len(uuids[i]) > 0 {
+							var flowNodeInstancesEntity *BPMS_Runtime_ActivityInstanceEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								flowNodeInstancesEntity = instance.(*BPMS_Runtime_ActivityInstanceEntity)
+							}else{
+								flowNodeInstancesEntity = GetServer().GetEntityManager().NewBPMS_RuntimeActivityInstanceEntity(uuids[i], nil)
 								flowNodeInstancesEntity.InitEntity(uuids[i])
 								GetServer().GetEntityManager().insert(flowNodeInstancesEntity)
 							}
@@ -3303,6 +3308,7 @@ func (this *EntityManager) Create_BPMS_Runtime_GatewayInstanceEntityPrototype() 
 	gatewayInstanceEntityProto.FieldsVisibility = append(gatewayInstanceEntityProto.FieldsVisibility,true)
 	gatewayInstanceEntityProto.Fields = append(gatewayInstanceEntityProto.Fields,"M_id")
 	gatewayInstanceEntityProto.FieldsType = append(gatewayInstanceEntityProto.FieldsType,"xs.ID")
+	gatewayInstanceEntityProto.Indexs = append(gatewayInstanceEntityProto.Indexs,"M_bpmnElementId")
 	gatewayInstanceEntityProto.FieldsOrder = append(gatewayInstanceEntityProto.FieldsOrder,3)
 	gatewayInstanceEntityProto.FieldsVisibility = append(gatewayInstanceEntityProto.FieldsVisibility,true)
 	gatewayInstanceEntityProto.Fields = append(gatewayInstanceEntityProto.Fields,"M_bpmnElementId")
@@ -4241,6 +4247,7 @@ func (this *EntityManager) Create_BPMS_Runtime_EventInstanceEntityPrototype() {
 	eventInstanceEntityProto.FieldsVisibility = append(eventInstanceEntityProto.FieldsVisibility,true)
 	eventInstanceEntityProto.Fields = append(eventInstanceEntityProto.Fields,"M_id")
 	eventInstanceEntityProto.FieldsType = append(eventInstanceEntityProto.FieldsType,"xs.ID")
+	eventInstanceEntityProto.Indexs = append(eventInstanceEntityProto.Indexs,"M_bpmnElementId")
 	eventInstanceEntityProto.FieldsOrder = append(eventInstanceEntityProto.FieldsOrder,3)
 	eventInstanceEntityProto.FieldsVisibility = append(eventInstanceEntityProto.FieldsVisibility,true)
 	eventInstanceEntityProto.Fields = append(eventInstanceEntityProto.Fields,"M_bpmnElementId")
@@ -5222,6 +5229,7 @@ func (this *EntityManager) Create_BPMS_Runtime_DefinitionsInstanceEntityPrototyp
 	definitionsInstanceEntityProto.FieldsVisibility = append(definitionsInstanceEntityProto.FieldsVisibility,true)
 	definitionsInstanceEntityProto.Fields = append(definitionsInstanceEntityProto.Fields,"M_id")
 	definitionsInstanceEntityProto.FieldsType = append(definitionsInstanceEntityProto.FieldsType,"xs.ID")
+	definitionsInstanceEntityProto.Indexs = append(definitionsInstanceEntityProto.Indexs,"M_bpmnElementId")
 	definitionsInstanceEntityProto.FieldsOrder = append(definitionsInstanceEntityProto.FieldsOrder,3)
 	definitionsInstanceEntityProto.FieldsVisibility = append(definitionsInstanceEntityProto.FieldsVisibility,true)
 	definitionsInstanceEntityProto.Fields = append(definitionsInstanceEntityProto.Fields,"M_bpmnElementId")
@@ -5922,6 +5930,7 @@ func (this *EntityManager) Create_BPMS_Runtime_ProcessInstanceEntityPrototype() 
 	processInstanceEntityProto.FieldsVisibility = append(processInstanceEntityProto.FieldsVisibility,true)
 	processInstanceEntityProto.Fields = append(processInstanceEntityProto.Fields,"M_id")
 	processInstanceEntityProto.FieldsType = append(processInstanceEntityProto.FieldsType,"xs.ID")
+	processInstanceEntityProto.Indexs = append(processInstanceEntityProto.Indexs,"M_bpmnElementId")
 	processInstanceEntityProto.FieldsOrder = append(processInstanceEntityProto.FieldsOrder,3)
 	processInstanceEntityProto.FieldsVisibility = append(processInstanceEntityProto.FieldsVisibility,true)
 	processInstanceEntityProto.Fields = append(processInstanceEntityProto.Fields,"M_bpmnElementId")
@@ -6322,33 +6331,7 @@ func (this *BPMS_Runtime_ProcessInstanceEntity) InitEntity(id string) error{
 				log.Println("type ", typeName, " not found!")
 				return err
 			}
-				if typeName == "BPMS_Runtime.SubprocessInstance"{
-						if len(uuids[i]) > 0 {
-							var flowNodeInstancesEntity *BPMS_Runtime_SubprocessInstanceEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								flowNodeInstancesEntity = instance.(*BPMS_Runtime_SubprocessInstanceEntity)
-							}else{
-								flowNodeInstancesEntity = GetServer().GetEntityManager().NewBPMS_RuntimeSubprocessInstanceEntity(uuids[i], nil)
-								flowNodeInstancesEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(flowNodeInstancesEntity)
-							}
-							flowNodeInstancesEntity.AppendReferenced("flowNodeInstances", this)
-							this.AppendChild("flowNodeInstances",flowNodeInstancesEntity)
-						}
-				} else if typeName == "BPMS_Runtime.GatewayInstance"{
-						if len(uuids[i]) > 0 {
-							var flowNodeInstancesEntity *BPMS_Runtime_GatewayInstanceEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								flowNodeInstancesEntity = instance.(*BPMS_Runtime_GatewayInstanceEntity)
-							}else{
-								flowNodeInstancesEntity = GetServer().GetEntityManager().NewBPMS_RuntimeGatewayInstanceEntity(uuids[i], nil)
-								flowNodeInstancesEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(flowNodeInstancesEntity)
-							}
-							flowNodeInstancesEntity.AppendReferenced("flowNodeInstances", this)
-							this.AppendChild("flowNodeInstances",flowNodeInstancesEntity)
-						}
-				} else if typeName == "BPMS_Runtime.EventInstance"{
+				if typeName == "BPMS_Runtime.EventInstance"{
 						if len(uuids[i]) > 0 {
 							var flowNodeInstancesEntity *BPMS_Runtime_EventInstanceEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
@@ -6368,6 +6351,32 @@ func (this *BPMS_Runtime_ProcessInstanceEntity) InitEntity(id string) error{
 								flowNodeInstancesEntity = instance.(*BPMS_Runtime_ActivityInstanceEntity)
 							}else{
 								flowNodeInstancesEntity = GetServer().GetEntityManager().NewBPMS_RuntimeActivityInstanceEntity(uuids[i], nil)
+								flowNodeInstancesEntity.InitEntity(uuids[i])
+								GetServer().GetEntityManager().insert(flowNodeInstancesEntity)
+							}
+							flowNodeInstancesEntity.AppendReferenced("flowNodeInstances", this)
+							this.AppendChild("flowNodeInstances",flowNodeInstancesEntity)
+						}
+				} else if typeName == "BPMS_Runtime.SubprocessInstance"{
+						if len(uuids[i]) > 0 {
+							var flowNodeInstancesEntity *BPMS_Runtime_SubprocessInstanceEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								flowNodeInstancesEntity = instance.(*BPMS_Runtime_SubprocessInstanceEntity)
+							}else{
+								flowNodeInstancesEntity = GetServer().GetEntityManager().NewBPMS_RuntimeSubprocessInstanceEntity(uuids[i], nil)
+								flowNodeInstancesEntity.InitEntity(uuids[i])
+								GetServer().GetEntityManager().insert(flowNodeInstancesEntity)
+							}
+							flowNodeInstancesEntity.AppendReferenced("flowNodeInstances", this)
+							this.AppendChild("flowNodeInstances",flowNodeInstancesEntity)
+						}
+				} else if typeName == "BPMS_Runtime.GatewayInstance"{
+						if len(uuids[i]) > 0 {
+							var flowNodeInstancesEntity *BPMS_Runtime_GatewayInstanceEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								flowNodeInstancesEntity = instance.(*BPMS_Runtime_GatewayInstanceEntity)
+							}else{
+								flowNodeInstancesEntity = GetServer().GetEntityManager().NewBPMS_RuntimeGatewayInstanceEntity(uuids[i], nil)
 								flowNodeInstancesEntity.InitEntity(uuids[i])
 								GetServer().GetEntityManager().insert(flowNodeInstancesEntity)
 							}
@@ -6775,6 +6784,7 @@ func (this *EntityManager) Create_BPMS_Runtime_EventDefinitionInstanceEntityProt
 	eventDefinitionInstanceEntityProto.FieldsVisibility = append(eventDefinitionInstanceEntityProto.FieldsVisibility,true)
 	eventDefinitionInstanceEntityProto.Fields = append(eventDefinitionInstanceEntityProto.Fields,"M_id")
 	eventDefinitionInstanceEntityProto.FieldsType = append(eventDefinitionInstanceEntityProto.FieldsType,"xs.ID")
+	eventDefinitionInstanceEntityProto.Indexs = append(eventDefinitionInstanceEntityProto.Indexs,"M_bpmnElementId")
 	eventDefinitionInstanceEntityProto.FieldsOrder = append(eventDefinitionInstanceEntityProto.FieldsOrder,3)
 	eventDefinitionInstanceEntityProto.FieldsVisibility = append(eventDefinitionInstanceEntityProto.FieldsVisibility,true)
 	eventDefinitionInstanceEntityProto.Fields = append(eventDefinitionInstanceEntityProto.Fields,"M_bpmnElementId")
@@ -8004,6 +8014,7 @@ func (this *EntityManager) Create_BPMS_Runtime_ItemAwareElementInstanceEntityPro
 	itemAwareElementInstanceEntityProto.FieldsVisibility = append(itemAwareElementInstanceEntityProto.FieldsVisibility,true)
 	itemAwareElementInstanceEntityProto.Fields = append(itemAwareElementInstanceEntityProto.Fields,"M_id")
 	itemAwareElementInstanceEntityProto.FieldsType = append(itemAwareElementInstanceEntityProto.FieldsType,"xs.ID")
+	itemAwareElementInstanceEntityProto.Indexs = append(itemAwareElementInstanceEntityProto.Indexs,"M_bpmnElementId")
 	itemAwareElementInstanceEntityProto.FieldsOrder = append(itemAwareElementInstanceEntityProto.FieldsOrder,3)
 	itemAwareElementInstanceEntityProto.FieldsVisibility = append(itemAwareElementInstanceEntityProto.FieldsVisibility,true)
 	itemAwareElementInstanceEntityProto.Fields = append(itemAwareElementInstanceEntityProto.Fields,"M_bpmnElementId")
@@ -9065,10 +9076,11 @@ func (this *EntityManager) Create_BPMS_Runtime_TriggerEntityPrototype() {
 	triggerEntityProto.FieldsVisibility = append(triggerEntityProto.FieldsVisibility,false)
 
 	/** members of Trigger **/
+	triggerEntityProto.Ids = append(triggerEntityProto.Ids,"M_id")
 	triggerEntityProto.FieldsOrder = append(triggerEntityProto.FieldsOrder,2)
 	triggerEntityProto.FieldsVisibility = append(triggerEntityProto.FieldsVisibility,true)
 	triggerEntityProto.Fields = append(triggerEntityProto.Fields,"M_id")
-	triggerEntityProto.FieldsType = append(triggerEntityProto.FieldsType,"xs.string")
+	triggerEntityProto.FieldsType = append(triggerEntityProto.FieldsType,"xs.ID")
 	triggerEntityProto.FieldsOrder = append(triggerEntityProto.FieldsOrder,3)
 	triggerEntityProto.FieldsVisibility = append(triggerEntityProto.FieldsVisibility,true)
 	triggerEntityProto.Fields = append(triggerEntityProto.Fields,"M_processUUID")
@@ -10351,10 +10363,11 @@ func (this *EntityManager) Create_BPMS_Runtime_LogInfoEntityPrototype() {
 	logInfoEntityProto.FieldsVisibility = append(logInfoEntityProto.FieldsVisibility,false)
 
 	/** members of LogInfo **/
+	logInfoEntityProto.Ids = append(logInfoEntityProto.Ids,"M_id")
 	logInfoEntityProto.FieldsOrder = append(logInfoEntityProto.FieldsOrder,2)
 	logInfoEntityProto.FieldsVisibility = append(logInfoEntityProto.FieldsVisibility,true)
 	logInfoEntityProto.Fields = append(logInfoEntityProto.Fields,"M_id")
-	logInfoEntityProto.FieldsType = append(logInfoEntityProto.FieldsType,"xs.string")
+	logInfoEntityProto.FieldsType = append(logInfoEntityProto.FieldsType,"xs.ID")
 	logInfoEntityProto.FieldsOrder = append(logInfoEntityProto.FieldsOrder,3)
 	logInfoEntityProto.FieldsVisibility = append(logInfoEntityProto.FieldsVisibility,true)
 	logInfoEntityProto.Fields = append(logInfoEntityProto.Fields,"M_date")
@@ -10945,10 +10958,11 @@ func (this *EntityManager) Create_BPMS_Runtime_RuntimesEntityPrototype() {
 	runtimesEntityProto.FieldsVisibility = append(runtimesEntityProto.FieldsVisibility,false)
 
 	/** members of Runtimes **/
+	runtimesEntityProto.Ids = append(runtimesEntityProto.Ids,"M_id")
 	runtimesEntityProto.FieldsOrder = append(runtimesEntityProto.FieldsOrder,2)
 	runtimesEntityProto.FieldsVisibility = append(runtimesEntityProto.FieldsVisibility,true)
 	runtimesEntityProto.Fields = append(runtimesEntityProto.Fields,"M_id")
-	runtimesEntityProto.FieldsType = append(runtimesEntityProto.FieldsType,"xs.string")
+	runtimesEntityProto.FieldsType = append(runtimesEntityProto.FieldsType,"xs.ID")
 	runtimesEntityProto.FieldsOrder = append(runtimesEntityProto.FieldsOrder,3)
 	runtimesEntityProto.FieldsVisibility = append(runtimesEntityProto.FieldsVisibility,true)
 	runtimesEntityProto.Fields = append(runtimesEntityProto.Fields,"M_name")

@@ -61,6 +61,49 @@ function main() {
 
     // Test get media source...
     // TestUploadFile()
+
+    // Test get bmpn defintion instance...
+    server.entityManager.getEntityPrototypes("BPMN20",
+        // Success callback.
+        function (result, caller) {
+            server.entityManager.getEntityPrototypes("BPMS_Runtime",
+                // Success callback.
+                function (result, caller) {
+                    server.entityManager.getEntityById("BPMN20.Definitions", "_1466081328431",
+                        // success callbacak
+                        function (result, caller) {
+                            server.workflowManager.getDefinitionInstances(result,
+                                // success callback
+                                function (results, caller) {
+                                    var result = results[0]
+                                    var parent = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; width: auto; height: auto;" })
+                                    new EntityPanel(parent, result.TYPENAME, function (entity) {
+                                        return function (panel) {
+                                            panel.setEntity(entity)
+                                        }
+                                    } (result), undefined, false, result, "")
+                                },
+                                // error callback 
+                                function (errMsg, caller) {
+                                },
+                                {})
+                        },
+                        // Error callback 
+                        function (errMsg, caller) {
+                        }, {})
+                },
+                // Error callback.
+                function () {
+                }, {})
+        },
+        // Error callback.
+        function () {
+
+        }, {})
+
+
+
+
 }
 
 

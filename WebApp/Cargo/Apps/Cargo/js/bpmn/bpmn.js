@@ -258,19 +258,43 @@ WorkflowManager.prototype.getDefinitionInstances = function (definitions, succes
         },
         function (result, caller) {
 
-            var definitions = caller.definitions
-            var results = result[0]
-            for (var i = 0; i < results.length; i++) {
-                setReferences(results[i], definitions.getReferences())
-                // Here I will link the definition itself...
-                results[i].getDefinitions = function (definitions) {
-                    return function () {
-                        return definitions
+            var entities = []
+            if (result[0] != undefined) {
+                for (var i = 0; i < result[0].length; i++) {
+                    var entity = eval("new " + result[0][i].TYPENAME + "(caller.prototype)")
+                    if (i == result[0].length - 1) {
+                        entity.initCallback = function (caller) {
+                            return function (entity) {
+                                server.entityManager.setEntity(entity)
+                                caller.successCallback(entities, caller.caller)
+                            }
+                        } (caller)
+                    } else {
+                        entity.initCallback = function (entity) {
+                            server.entityManager.setEntity(entity)
+                        }
                     }
-                } (definitions)
-            }
 
-            caller.successCallback(results, caller.caller)
+                    var definitions = caller.definitions
+
+                    // Here I will link the definition itself...
+                    entity.getDefinitions = function (definitions) {
+                        return function () {
+                            return definitions
+                        }
+                    } (definitions)
+
+                    // push the entitie before init it...
+                    entities.push(entity)
+
+                    // call init...
+                    entity.init(result[0][i])
+
+                }
+            }
+            if (result[0] == null) {
+                caller.successCallback(entities, caller.caller)
+            }
         },
         function (errMsg) {
             console.log(errMsg)
@@ -297,8 +321,8 @@ WorkflowManager.prototype.newItemAwareElementInstance = function (bpmnElementId,
     // server is the client side singleton...
     var params = []
     params[0] = new RpcData({ "name": "bpmnElementId", "type": 2, "dataBytes": utf8_to_b64(bpmnElementId) })
-    params[1] = new RpcData({ "name": "data", "type": 3, "dataBytes": utf8_to_b64(data) })
-    
+    params[1] = new RpcData({ "name": "data", "type": 3, "dataBytes": utf8_to_b64(data)})
+
     // Call it on the server.
     server.executeJsFunction(
         NewItemAwareElementInstance.toString(), // The function to execute remotely on server

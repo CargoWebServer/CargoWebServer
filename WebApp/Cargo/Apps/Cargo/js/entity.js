@@ -1432,7 +1432,7 @@ function setSubObject(parent, property, values, isArray) {
                 object.init(values)
                 parent[property] = object
             }
-         
+
             object.parentUuid = parent.UUID
 
             server.entityManager.setEntity(object)
@@ -1465,8 +1465,7 @@ function setObjectValues(object, values) {
             var propertyType = getPropertyType(object["TYPENAME"], property)
             if (propertyType != null) {
                 var isRef = propertyType.endsWith(":Ref")
-                var isArray = propertyType.startsWith("[]")
-                if (isArray) {
+                if (propertyType.startsWith("[]")) {
                     // The property is an array.
                     if (object[property] != null) {
                         if (object[property].length > 0) {
@@ -1530,11 +1529,12 @@ function setObjectValues(object, values) {
     ////////////////////////////////////////////////////////////////////////////////
     // Generate sub-object and reference set and reset function
     for (var property in values) {
+
         var propertyType = prototype.FieldsType[prototype.getFieldIndex(property)]
+
         if (propertyType != null) {
             // Condition...
             var isRef = propertyType.endsWith(":Ref")
-            var isArray = propertyType.startsWith("[]")
 
             // M_listOf, M_valueOf field or enumeration type contain plain value.
             var isBaseType = propertyType.startsWith("[]xs.") || propertyType.startsWith("xs.") || property == "M_listOf" || property == "M_valueOf" || propertyType.startsWith("enum:")
@@ -1542,24 +1542,62 @@ function setObjectValues(object, values) {
             if (values[property] != null) {
                 if (isBaseType) {
                     // String, int, double...
-                    object[property] = values[property]
+                    if (propertyType == "xs.[]uint8") {
+                        // In case of binairy object I will try to create object if information is given for it.
+                        // TODO see why to decode is necessary here...
+                        var strVal = decode64(decode64(values[property]))
+                        if (strVal.indexOf("TYPENAME") != -1 && strVal.indexOf("__class__") != -1) {
+                            var jsonObj = JSON.parse(strVal)
+                            if (!isArray(jsonObj)) {
+                                // In case of the object is not an array...
+                                var obj = eval("new " + jsonObj.TYPENAME + "()")
+                                obj.initCallback = function (uuid, property) {
+                                    return function (val) {
+                                        server.entityManager.entities[uuid][property] = val
+                                    }
+                                }(object.UUID, property)
+
+                                obj.init(jsonObj)
+                            } else {
+                                for (var i = 0; i < jsonObj.length; i++) {
+                                    var jsonObj_ = JSON.parse(jsonObj[i])
+                                    var obj = eval("new " + jsonObj_.TYPENAME + "()")
+                                    obj.initCallback = function (uuid, property) {
+                                        return function (val) {
+                                            if(server.entityManager.entities[uuid][property]==""){
+                                                server.entityManager.entities[uuid][property]=[]
+                                            }
+                                            server.entityManager.entities[uuid][property].push(val)
+                                        }
+                                    }(object.UUID, property)
+                                    obj.init(jsonObj_)
+                                }
+                            }
+                        } else {
+                            // No information available to create an object, so the string will be use....
+                            object[property] = strVal
+                        }
+                    } else {
+                        object[property] = values[property]
+                    }
                 } else {
                     // Set object ref or values... only property begenin with M_ will be set here...
+                    var isArray_ = propertyType.startsWith("[]")
                     if (property.startsWith("[]M_") || property.startsWith("M_")) {
-                        if (isArray) {
+                        if (isArray_) {
                             object[property] = []
                             for (var i = 0; i < values[property].length; i++) {
                                 if (isRef) {
-                                    object = setRef(object, property, values[property][i], isArray)
+                                    object = setRef(object, property, values[property][i], isArray_)
                                 } else {
-                                    object = setSubObject(object, property, values[property][i], isArray)
+                                    object = setSubObject(object, property, values[property][i], isArray_)
                                 }
                             }
                         } else {
                             if (isRef) {
-                                object = setRef(object, property, values[property], isArray)
+                                object = setRef(object, property, values[property], isArray_)
                             } else {
-                                object = setSubObject(object, property, values[property], isArray)
+                                object = setSubObject(object, property, values[property], isArray_)
                             }
                         }
                     }

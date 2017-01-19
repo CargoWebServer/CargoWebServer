@@ -228,7 +228,7 @@
 	<xsd:element name="itemAwareElementInstance" type="tItemAwareElementInstance" />
 	<xsd:complexType name="tItemAwareElementInstance" abstract="false">
 	    <xsd:attribute name="id" type="xsd:ID"/>
-		<xsd:attribute name="bpmnElementId" type="xsd:string"/>
+		<xsd:attribute name="bpmnElementId" type="xsd:IDREF"/>
 		<xsd:attribute name="data" type="xsd:byte" />
 	</xsd:complexType>
 
@@ -273,7 +273,7 @@
 	
 	<xsd:element name="trigger" type="tTrigger" />
 	<xsd:complexType name="tTrigger" abstract="false">
-		<xsd:attribute name="id" type="xsd:string"/> 
+		<xsd:attribute name="id" type="xsd:ID"/> 
 		<xsd:attribute name="processUUID" type="xsd:string"/>
 		<xsd:attribute name="sessionId" type="xsd:string"/>
 		<xsd:attribute name="eventTriggerType" type="tEventTriggerType" />
@@ -303,7 +303,7 @@
 
 	<xsd:element name="logInfo" type="tLogInfo" />
 	<xsd:complexType name="tLogInfo" abstract="false">
-		<xsd:attribute name="id" type="xsd:string"/> 
+		<xsd:attribute name="id" type="xsd:ID"/> 
 		<xsd:attribute name="date" type="xsd:date"/> 
 		<xsd:attribute name="actor" type="xsd:QName"/> 
 		<xsd:attribute name="action" type="xsd:string"/>
@@ -314,7 +314,7 @@
 	<xsd:element name="instance" type="tInstance"/>
 	<xsd:complexType name="tInstance" abstract="true">
 		<xsd:attribute name="id" type="xsd:ID"/>
-		<xsd:attribute name="bpmnElementId" type="xsd:string"/>
+		<xsd:attribute name="bpmnElementId" type="xsd:IDREF"/>
 		<xsd:element ref="participants" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 		<xsd:element ref="dataRef" type="tItemAwareElementInstance" minOccurs="0" maxOccurs="unbounded"/>
 		<xsd:element name="data" type="tItemAwareElementInstance" minOccurs="0" maxOccurs="unbounded"/>
@@ -329,7 +329,7 @@
 			<xsd:element name="triggers" type="tTrigger" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="correlationInfos" type="tCorrelationInfo" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="id" type="xsd:string"/>
+		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="version" type="xsd:string"/>
 	</xsd:complexType>

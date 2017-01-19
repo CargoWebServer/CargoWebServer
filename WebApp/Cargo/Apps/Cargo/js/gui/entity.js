@@ -252,6 +252,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 		var field = this.proto.Fields[index]
 		var fieldType = this.proto.FieldsType[index]
 		var fieldVisibility = this.proto.FieldsVisibility[index]
+		
 		if (fieldVisibility == true) {
 			var control = this.controls[this.proto.TypeName + "_" + field]
 			var value = this.entity[field]
