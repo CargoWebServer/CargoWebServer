@@ -52,12 +52,11 @@ h5{
 	height: 100%;
 	text-align: center;
 	font-size: 16px;
-	transition: all .1s ease;
+	transition: all .0s ease;
 }
 
 .marketing .col-md-3:hover {
 	color:white;
-	border: 2px solid black;
 }
 
 .marketing .col-md-3 .glyphicon {

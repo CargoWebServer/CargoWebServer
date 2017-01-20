@@ -40,11 +40,11 @@ $("#frontEndNextTutorialLink").click(function() {
 main()
 
 function main() {
-	// TODO delete this
-	/*
+	// TODO delete auto clicks
 	$('#li-tutorials').click()
-	*/
-	
+	$('#tutorialsLink-javascriptPrinciples').click()
+
+
 	// Element example
 	var containerElement = new Element(
 		document.getElementById( "elementExampleContainer"), 
@@ -72,4 +72,26 @@ function main() {
 	})
 
 	containerElement.getChildById("middle").element.style.background = "gray"
+
+	//server.sessionManager.login(name, password, successCallback, errorCallback, caller)
+	var user = {
+		"userName" : "myUserName",
+		"password" : "password01"
+	}
+	server.sessionManager.login(
+		// name
+		user.userName, 
+		// password
+		user.password,
+		// Success Callback
+		function (result, caller) {
+			console.log(caller.userName + " logged in.")
+		},
+		// Error Callback
+		function (err, caller) {
+			console.log("Login error ", err)
+		}, 
+		// caller
+		{ "user": user});
+
 }
