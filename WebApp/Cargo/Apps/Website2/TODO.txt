@@ -1,5 +1,9 @@
 -> Correction fautes orthographe
 -> Element tutorial
 	- Animate
+-> JS 
+	- Events 
+		- local
+		- network
 -> Tutorials sidebar scroll avec la page
 
