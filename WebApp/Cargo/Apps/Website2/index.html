@@ -49,16 +49,43 @@
 		</div>
 
 		<div class="row pageRow" id="page-cargo">
-			<div class="col-xs-12 text-center" id="cargo-intro-container">
-				<div class="col-xs-12">
-					<img src="img/wheel.svg" id="cargo-intro-wheel"/>
-				</div>
-				<div class="col-sm-6 col-sm-offset-3 text-center">
-					<h2>Cargo is a complete web application framework. It's fast, easy and lightweight.<br><br></h2>
-					<p><a class="btn btn-primary btn-lg" href="#" role="button">Download Cargo</a></p>
-					<p>v1.0</p>
+			<div class="row"> 
+				<div class="col-xs-12 text-center" id="cargo-intro-container">
+					<div class="col-xs-12">
+						<img src="img/wheel.svg" id="cargo-intro-wheel"/>
+					</div>
+					<div class="col-sm-6 col-sm-offset-3 text-center">
+						<h2>Cargo is a complete web application framework. It's fast, easy and lightweight.<br><br></h2>
+						<p><a class="btn btn-primary btn-lg" href="#" role="button">Download Cargo</a></p>
+						<p>v1.0</p>
+					</div>
 				</div>
 			</div>
+			<div class="row marketing">
+				<div class="col-md-3 marketing1">
+					<span class="glyphicon glyphicon glyphicon-ok"></span>
+					<h2>Complete</h2>
+					<p>Front-end, server, database. All in one.</p>
+				</div>
+				<div class="col-md-3 marketing2">
+					<span class="glyphicon glyphicon-play"></span>
+					<h2>Easiest setup</h2>
+					<p> Start coding right away. </p>
+				</div>
+				<div class="col-md-3 marketing3">
+					<span class="glyphicon glyphicon-road"></span>
+					<h2>Smooth learning curve</h2>
+					<p>
+						Code everything in one language: javascript. 
+					</p>
+				</div>
+				<div class="col-md-3 marketing4">
+					<span class="glyphicon glyphicon-flash"></span>
+					<h2>Lightweight, fast, non-blocking</h2>
+					<p>Golang background.</p>
+				</div>
+			</div>
+
 		</div>
 	</div>
 	<div class="row hidden pageRow" id="page-gettingStarted">
@@ -75,11 +102,11 @@
 			<nav class="bs-docs-sidebar affix-top tutorialsSideBar">	
 				<h3 id="tutorialsLink-intro" class="tutorials-link tutorialsHeader">Tutorials</h3>
 				<ul class="nav bs-docs-sidenav">
-					<li id="tutorialsLink-userInterface" class="tutorials-link"> 
-						<a href="#">User interface</a> 
+					<li id="tutorialsLink-frontEnd" class="tutorials-link"> 
+						<a href="#">Front End</a> 
 					</li>
-					<li id="tutorialsLink-clientSide" class="tutorials-link"> 
-						<a href="#">Client-side</a> 
+					<li id="tutorialsLink-javascriptPrinciples" class="tutorials-link"> 
+						<a href="#">Javascript principles</a> 
 					</li>
 					<li id="tutorialsLink-serverSide" class="tutorials-link"> 
 						<a href="#">Server-side</a> 
@@ -98,16 +125,16 @@
 					</div>
 				</div>
 			</div>
-			<div class="row tutorialsRow" id="tutorialsSection-userInterface">
+			<div class="row tutorialsRow" id="tutorialsSection-frontEnd">
 				<div class="col-xs-12">
-					<h2> User Interface </h2>
+					<h2> Front End </h2>
 					<h3> Element </h3>
 					<p>
 						The 'Element' class included in the Cargo javascript framework offers a basic Html element wrapper class to help you create client side graphical interfaces. It gives you the ability to create and manipulate html elements within your javascript files rather than in the traditionnal html and css files. All the functionnalities related to this class can be found within the file 'element.js'. 
 					</p>
 					<p>
 						You do not need to use the 'Element' class or any of it's related functionnalities 
-						to develop a web application using the Cargo framework. It can be used in conjunction with other javascript libraries such as Jquery and Bootstrap. If you are an experienced front-end web application developper and already have techniques which you are familiar with, feel free to skip to the next tutorial.
+						to develop a web application using the Cargo framework. It can be used in conjunction with other javascript libraries such as Jquery and Bootstrap. If you are an experienced front-end web application developper and already have techniques which you are familiar with, feel free to skip to the <a href="#" id="frontEndNextTutorialLink"> next tutorial</a>.
 					</p>
 
 					<h4> Element essential functions </h4>
@@ -191,8 +218,8 @@
 
 					<p>Basic layout</p>
 
-					<pre><code class="javascript">/* In this example we use the DOM element with the id 'elementExampleContainer' as a parent to <br>our first element. When creating a web page from scratch you can use <br>'document.getElementsByTagName("body")[0]'' instead to get the DOM body element. */ <br>var containerElement = new Element(<br>&#09;document.getElementById( "elementExampleContainer"),<br>&#09;{ "tag": "div", "style": "height: 100%; width: 100%;" }<br>);<br><br>/* Storing the 'headerElement' in a variable using the .down() function */<br>var headerElement = containerElement.appendElement({<br>&#09;"tag": "div",<br>&#09;"style": "height: 10%; width: 100%; background: black; color: white; text-align:center"<br>}).down();<br><br>/* You can use '.element' to access the DOM element and change it's properties. */ <br>headerElement.element.innerHTML = "header"<br><br>/* You can also create all the elements consecutiveley using the '.down()' and 'up()' functions to navigate. */ <br>containerElement.appendElement({<br>&#09;"id" : "middle",<br>&#09;"tag": "div",<br>&#09;"style": "height: 80%; width: 100%; background: gray; color: white; text-align:center",<br>}).down().appendElement({<br>&#09;"tag": "div",<br>&#09;"style": "height: 50px; width: 200px; background: lightgray; color: black;",<br>&#09;"innerHtml" : "rectangle"<br>}).up().appendElement({<br>&#09;"tag": "div",<br>&#09;"style": "height: 10%; width: 100%; background: darkgray; color: white; text-align:center",<br>&#09;"innerHtml" : "footer"<br>})<br><br>/* '.getChildById' gives you the ability to later retreive a child element with a given id. */<br>containerElement.getChildById("middle").element.style.background = "gray"</code></pre>
 
+					<pre><code class="javascript">/* In this example we use the DOM element with the id 'elementExampleContainer' as a parent to <br>our first element. When creating a web page from scratch you can use <br>'document.getElementsByTagName("body")[0]'' instead to get the DOM body element. */ <br>var containerElement = new Element(<br>&#09;document.getElementById( "elementExampleContainer"),<br>&#09;{ "tag": "div", "style": "height: 100%; width: 100%;" }<br>);<br><br>/* Storing the 'headerElement' in a variable using the .down() function */<br>var headerElement = containerElement.appendElement({<br>&#09;"tag": "div",<br>&#09;"style": "height: 10%; width: 100%; background: black; color: white; text-align:center"<br>}).down();<br><br>/* You can use '.element' to access the DOM element and change it's properties. */ <br>headerElement.element.innerHTML = "header";<br><br>/* You can also create all the elements consecutiveley using the '.down()' and 'up()' functions to navigate. */ <br>containerElement.appendElement({<br>&#09;"id" : "middle",<br>&#09;"tag": "div",<br>&#09;"style": "height: 80%; width: 100%; background: gray; color: white; text-align:center",<br>}).down().appendElement({<br>&#09;"tag": "div",<br>&#09;"style": "height: 50px; width: 200px; background: lightgray; color: black;",<br>&#09;"innerHtml" : "rectangle"<br>}).up().appendElement({<br>&#09;"tag": "div",<br>&#09;"style": "height: 10%; width: 100%; background: darkgray; color: white; text-align:center",<br>&#09;"innerHtml" : "footer"<br>});<br><br>/* '.getChildById' gives you the ability to later retreive a child element with a given id. */<br>containerElement.getChildById("middle").element.style.background = "gray";</code></pre>
 					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#elementExampleResult">
 						View result
 					</button>
@@ -203,14 +230,35 @@
 
 				</div>
 			</div>
-			<div class="row tutorialsRow" id="tutorialsSection-clientSide">
+			<div class="row tutorialsRow" id="tutorialsSection-javascriptPrinciples">
 				<div class="col-xs-12">
-					<h2> Client Side </h2>
+					<h2> Javascript principles </h2>
+					<h3> Asynchronous programming </h3>
+					<p>
+						Asynchronous programming means that your web application can execute multiple segments of code simultaneously. To do so, Cargo uses 'callbacks'. A callback is a function that can be passed as an argument in another function. Cargo has three types of callbacks.
+					</p>
+					<ul>
+						<li> Progress callbacks: executed during the progress of the function. (For example used as feedback when transfering a file through the network).</li>
+						<li> Success callbacks: executed when the function has succeded.</li>
+						<li> Error callbacks: executed when the function fails.</li>
+					</ul>
+					<p>
+						Callbacks are in most cases optional parameters, meaning that if you can pass an empty function (<code>function(){}</code>) or <code>undefined</code> as a callback.
+					</p>
+					<p>
+						Some functions have a parameter named 'caller'. The caller is a JSON in which you can store object from the request context and get it back from the response context. This means you can place a variable in the 'caller', pass it as a parameter to the function, modify it in the callback functions, and retrieve it afterwards.
+					</p>
+					<h4> Example </h4>
+					<p>Session manager's login function</p>
+					<pre><code class="javascript">var user = {<br>&#09;"userName" : "myUserName",<br>&#09;"password" : "password01"<br>};<br><br>server.sessionManager.login(<br>&#09;/* name */<br>&#09;user.userName,<br>&#09;/* password */<br>&#09;user.password,<br>&#09;/* Success Callback */<br>&#09;function (result, caller){<br>&#09;&#09;console.log(caller.userName + " logged in.");<br>&#09;},<br>&#09;/* Error Callback */<br>&#09;function (err, caller) {<br>&#09;&#09;console.log("Login error ", err);<br>&#09;},<br>&#09;/* caller */<br>&#09;{ "user": user}<br>);</code></pre>
+					<p>Note that the 'login' function has a success callback, an error callback and a caller but it does not have a progress callback.</p>
+
 				</div>
 			</div>
 			<div class="row tutorialsRow" id="tutorialsSection-serverSide">
 				<div class="col-xs-12">
 					<h2> Server Side </h2>
+					When developing a web app using Cargo, you never need to code in another language than javasript.
 				</div>
 			</div>
 		</div>

@@ -30,12 +30,20 @@ $(".tutorials-link").click(function() {
 	}, 500);
 });
 
+$("#frontEndNextTutorialLink").click(function() {
+	$('html, body').animate({
+		scrollTop: $('#tutorialsSection-javascriptPrinciples').offset().top
+	}, 500);
+});
+
 // main
 main()
 
 function main() {
-	// TODO delete this
+	// TODO delete auto clicks
 	$('#li-tutorials').click()
+	$('#tutorialsLink-javascriptPrinciples').click()
+
 
 	// Element example
 	var containerElement = new Element(
@@ -64,4 +72,5 @@ function main() {
 	})
 
 	containerElement.getChildById("middle").element.style.background = "gray"
+
 }

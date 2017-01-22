@@ -1,3 +1,7 @@
+body{
+	overflow-x: hidden;
+}
+
 h5{
 	font-size: 16px;
 }
@@ -36,6 +40,52 @@ h5{
 .tutorialsSectionIntro{
 	padding-top: 20px;
 }
+
+/* MARKETING
+-------------------------------------------------- */
+
+.marketing {
+	height: 300px;
+	padding-right: 150px;
+	padding-left: 150px;
+}
+
+.marketing .col-md-3 {
+	height: 100%;
+	text-align: center;
+	font-size: 16px;
+	transition: all .0s ease;
+}
+
+.marketing .col-md-3:hover {
+	color:white;
+}
+
+.marketing .col-md-3 .glyphicon {
+	font-size: 60px;
+	background-color: #EAEAEA;
+	border-radius: 50%;
+	padding: 40px;
+	color: #444;
+	margin-top: 20px;
+}
+
+.marketing1:hover{
+	background: rgb(22, 39, 86);
+}
+
+.marketing2:hover{
+	background: rgb(47, 65, 114);
+}
+
+.marketing3:hover{
+	background: rgb(79, 96, 143);
+}
+
+.marketing4:hover{
+	background: rgb(121, 134, 172);
+}
+
 
 
 
