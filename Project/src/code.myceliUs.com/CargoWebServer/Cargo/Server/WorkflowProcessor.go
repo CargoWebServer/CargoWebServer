@@ -13,7 +13,7 @@ import (
 	"math/rand"
 	"os"
 	"reflect"
-	//"strconv"
+	"strconv"
 	"strings"
 	"time"
 
@@ -22,6 +22,7 @@ import (
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"github.com/robertkrimen/otto"
 )
 
 const (
@@ -252,7 +253,7 @@ func (this *WorkflowProcessor) workflowTransitionInterpreter(process *BPMN20.Pro
 	for i := 0; i < len(activeProcessInstances); i++ {
 		//log.Println("Evalute transition for process ", activeProcessInstances[i].M_id)
 		for j := 0; j < len(activeProcessInstances[i].GetFlowNodeInstances()); j++ {
-			this.workflowTransition(activeProcessInstances[i].GetFlowNodeInstances()[j], activeProcessInstances[i])
+			this.workflowTransition(activeProcessInstances[i].GetFlowNodeInstances()[j], activeProcessInstances[i], "")
 		}
 	}
 }
@@ -260,7 +261,7 @@ func (this *WorkflowProcessor) workflowTransitionInterpreter(process *BPMN20.Pro
 /**
  * Evaluate the transition...
  */
-func (this *WorkflowProcessor) workflowTransition(flowNode BPMS_Runtime.FlowNodeInstance, processInstance *BPMS_Runtime.ProcessInstance) {
+func (this *WorkflowProcessor) workflowTransition(flowNode BPMS_Runtime.FlowNodeInstance, processInstance *BPMS_Runtime.ProcessInstance, sessionId string) {
 
 	// I will retreive the entity related to the instance...
 	bpmnElementEntity, err := GetServer().GetEntityManager().getEntityByUuid(flowNode.(BPMS_Runtime.Instance).GetBpmnElementId())
@@ -294,6 +295,7 @@ func (this *WorkflowProcessor) workflowTransition(flowNode BPMS_Runtime.FlowNode
 
 				// TODO in case of a gateway evaluate the sequence flow condition...
 				seqFlow := bpmnElement.GetOutgoing()[i]
+
 				connectingObj := new(BPMS_Runtime.ConnectingObject)
 				connectingObj.UUID = "BPMS_Runtime.ConnectingObject%" + Utility.RandomUUID()
 				connectingObj.M_bpmnElementId = seqFlow.GetUUID()
@@ -323,7 +325,7 @@ func (this *WorkflowProcessor) workflowTransition(flowNode BPMS_Runtime.FlowNode
 			}
 
 			// Set completed...
-			this.completeInstance(flowNode)
+			this.completeInstance(flowNode, sessionId)
 		}
 	}
 }
@@ -355,14 +357,37 @@ func (this *WorkflowProcessor) executeActivityInstance(instance BPMS_Runtime.Ins
 
 	case *BPMN20.ScriptTask:
 		instances := make(map[string]interface{}, 0)
-		instances["instance"] = instance
+
+		// This is the instance itself...
+		instances["task"] = instance.(*BPMS_Runtime.ActivityInstance)
+
+		// I will set all of it's itemawere element in the vm context...
+		for i := 0; i < len(instance.GetData()); i++ {
+			itemawareElement := instance.GetData()[i]
+			var err error
+			var isCollection bool
+			var objects []interface{}
+
+			objects, isCollection, err = this.getItemawareElementData(itemawareElement)
+			if err == nil {
+				if isCollection {
+					instances[itemawareElement.M_id] = objects
+				} else {
+					if len(objects) > 0 {
+						instances[itemawareElement.M_id] = objects[0]
+					} else {
+						instances[itemawareElement.M_id] = nil
+					}
+				}
+			}
+		}
+
 		script := "function run(){\n" + activity.(*BPMN20.ScriptTask).GetScript().GetScript() + "\n}"
 		_, err := this.runScript(script, "run", instances, sessionId)
 
 		// Set state to completing...
 		if err != nil {
 			instance.(*BPMS_Runtime.ActivityInstance).M_lifecycleState = BPMS_Runtime.LifecycleState_Failed
-			//instance.SetLogInfoRef()
 		} else {
 			instance.(*BPMS_Runtime.ActivityInstance).M_lifecycleState = BPMS_Runtime.LifecycleState_Completed
 		}
@@ -382,7 +407,7 @@ func (this *WorkflowProcessor) executeActivityInstance(instance BPMS_Runtime.Ins
 /**
  * That function is use to evaluate a given script.
  */
-func (this *WorkflowProcessor) runScript(functionStr string, functionName string, instances map[string]interface{}, sessionId string) (result interface{}, err error) {
+func (this *WorkflowProcessor) runScript(functionStr string, functionName string, instances map[string]interface{}, sessionId string) (result otto.Value, err error) {
 
 	// Remove the xml tag here...
 	functionStr = strings.Replace(functionStr, "<![CDATA[", "", -1)
@@ -422,21 +447,21 @@ func (this *WorkflowProcessor) createInstance(flowNode BPMN20.FlowNode, processI
 
 	switch v := flowNode.(type) {
 	case BPMN20.Activity:
-		log.Println("-------> create activity ", v)
+		//log.Println("-------> create activity ", v)
 		instance = this.createActivityInstance(v, processInstance, items, sessionId)
 		instance.(*BPMS_Runtime.ActivityInstance).SetInputRef(input)
-		log.Println("-------> after create activity process data:", processInstance.GetData())
+		//log.Println("-------> after create activity process data:", processInstance.GetData())
 	case BPMN20.Gateway:
-		log.Println("-------> create gateway ", v)
+		//log.Println("-------> create gateway ", v)
 		instance.(*BPMS_Runtime.GatewayInstance).SetInputRef(input)
 
 	case BPMN20.Event:
-		log.Println("-------> create event ", v)
+		//log.Println("-------> create event ", v)
 		instance = this.createEventInstance(v, processInstance, items, sessionId)
 		if input != nil {
 			instance.(*BPMS_Runtime.EventInstance).SetInputRef(input)
 		}
-		log.Println("-------> after start event creation process data:", processInstance.GetData())
+		//log.Println("-------> after start event creation process data:", processInstance.GetData())
 	case *BPMN20.Transaction:
 		// Nothing todo here... for now...
 
@@ -466,8 +491,10 @@ func (this *WorkflowProcessor) createActivityInstance(activity BPMN20.Activity, 
 	instance := instanceEntity.GetObject().(*BPMS_Runtime.ActivityInstance)
 	instance.M_bpmnElementId = activity.GetUUID()
 	instance.M_id = activity.(BPMN20.BaseElement).GetId()
-
 	instance.M_bpmnElementId = activity.GetUUID()
+
+	// Set the process instance here.
+	instance.SetProcessInstancePtr(processInstance)
 
 	// Set state to ready...
 	instance.M_lifecycleState = BPMS_Runtime.LifecycleState_Ready
@@ -476,20 +503,6 @@ func (this *WorkflowProcessor) createActivityInstance(activity BPMN20.Activity, 
 	for i := 0; i < len(items); i++ {
 		instance.SetDataRef(items[i])
 	}
-
-	// Now I will set the data association...
-	var dataInput []BPMN20.BaseElement
-	if activity.GetIoSpecification() != nil {
-		for i := 0; i < len(activity.GetIoSpecification().GetDataInput()); i++ {
-			dataInput = append(dataInput, activity.GetIoSpecification().GetDataInput()[i])
-		}
-	}
-	var dataInputAssociations []BPMN20.DataAssociation
-	for i := 0; i < len(activity.GetDataInputAssociation()); i++ {
-		dataInputAssociations = append(dataInputAssociations, activity.GetDataInputAssociation()[i])
-	}
-
-	this.setDataAssocication(processInstance, instance, dataInputAssociations, dataInput, sessionId)
 
 	switch v := activity.(type) {
 	case *BPMN20.AdHocSubProcess:
@@ -520,24 +533,11 @@ func (this *WorkflowProcessor) createActivityInstance(activity BPMN20.Activity, 
 		log.Println("-------> Unknow activity type ", v)
 	}
 
-	var dataOutput []BPMN20.BaseElement
-	if activity.GetIoSpecification() != nil {
-		for i := 0; i < len(activity.GetIoSpecification().GetDataOutput()); i++ {
-			dataOutput = append(dataOutput, activity.GetIoSpecification().GetDataOutput()[i])
-		}
-	}
-	var dataOutputAssociations []BPMN20.DataAssociation
-	for i := 0; i < len(activity.GetDataOutputAssociation()); i++ {
-		dataOutputAssociations = append(dataOutputAssociations, activity.GetDataOutputAssociation()[i])
-	}
-
-	this.setDataAssocication(instance, processInstance, dataOutputAssociations, dataOutput, sessionId)
-
 	// Set the start event for the processInstance...
 	processInstance.SetFlowNodeInstances(instance)
 
 	// I can activate the instance...
-	this.activateInstance(instance)
+	this.activateInstance(instance, sessionId)
 
 	return instance
 }
@@ -551,6 +551,7 @@ func (this *WorkflowProcessor) createEventInstance(event BPMN20.Event, processIn
 	instance := instanceEntity.GetObject().(*BPMS_Runtime.EventInstance)
 	instance.M_bpmnElementId = event.GetUUID()
 	instance.M_id = event.(BPMN20.BaseElement).GetId()
+	instance.SetProcessInstancePtr(processInstance)
 
 	// I will copy the data reference into the start event...
 	for i := 0; i < len(items); i++ {
@@ -584,39 +585,8 @@ func (this *WorkflowProcessor) createEventInstance(event BPMN20.Event, processIn
 	// Set the start event for the processInstance...
 	processInstance.SetFlowNodeInstances(instance)
 
-	// Get the data objects from the flow elements
-	bpmnElementEntity, err := GetServer().GetEntityManager().getEntityByUuid(processInstance.GetBpmnElementId())
-
-	if err == nil {
-		process := bpmnElementEntity.GetObject().(*BPMN20.Process)
-
-		var dataAssociations []BPMN20.DataAssociation
-
-		// Set output data association...
-		switch v := event.(type) {
-		case BPMN20.CatchEvent:
-			for i := 0; i < len(v.GetDataOutputAssociation()); i++ {
-				dataAssociations = append(dataAssociations, v.GetDataOutputAssociation()[i])
-			}
-			// Get the data...
-			if len(v.GetDataOutputAssociation()) > 0 {
-				data := this.getProcessDataInput(process)
-				this.setDataAssocication(instance, processInstance, dataAssociations, data, sessionId)
-			}
-		case BPMN20.ThrowEvent:
-			for i := 0; i < len(v.GetDataInputAssociation()); i++ {
-				dataAssociations = append(dataAssociations, v.GetDataInputAssociation()[i])
-			}
-			if len(v.GetDataInputAssociation()) > 0 {
-				data := this.getProcessDataOutput(process)
-				this.setDataAssocication(processInstance, instance, dataAssociations, data, sessionId)
-			}
-
-		}
-	}
-
 	// I can activate the instance...
-	this.activateInstance(instance)
+	this.activateInstance(instance, sessionId)
 
 	return instance
 }
@@ -681,12 +651,59 @@ func (this *WorkflowProcessor) saveInstance(instance BPMS_Runtime.Instance) {
 /**
  * Activate a given instance.
  */
-func (this *WorkflowProcessor) activateInstance(instance BPMS_Runtime.FlowNodeInstance) error {
+func (this *WorkflowProcessor) activateInstance(instance BPMS_Runtime.FlowNodeInstance, sessionId string) error {
 	if instance.GetLifecycleState() != BPMS_Runtime.LifecycleState_Ready {
 		return errors.New("The input flow node instance must have life cycle state at Ready")
 	}
 
-	// TODO do activation stuff here.
+	// Initialisation of the data input.
+	switch v := instance.(type) {
+	case *BPMS_Runtime.ActivityInstance:
+
+		bpmnElement, _ := GetServer().GetEntityManager().getEntityByUuid(v.M_bpmnElementId)
+		activity := bpmnElement.GetObject().(BPMN20.Activity)
+
+		var dataInputAssociations []BPMN20.DataAssociation
+		for i := 0; i < len(activity.GetDataInputAssociation()); i++ {
+			dataInputAssociations = append(dataInputAssociations, activity.GetDataInputAssociation()[i])
+		}
+
+		this.setDataAssocication(v.GetProcessInstancePtr(), v, dataInputAssociations, sessionId)
+
+	case *BPMS_Runtime.EventInstance:
+
+		// Get the data objects from the flow elements
+		var dataAssociations []BPMN20.DataAssociation
+		properties := make([]BPMN20.BaseElement, 0)
+		bpmnElement, _ := GetServer().GetEntityManager().getEntityByUuid(v.M_bpmnElementId)
+		event := bpmnElement.GetObject().(BPMN20.Event)
+		processInstance := v.GetProcessInstancePtr()
+
+		for i := 0; i < len(event.GetProperty()); i++ {
+			properties = append(properties, event.GetProperty()[i])
+		}
+
+		// Set output data association...
+		switch v_ := event.(type) {
+		case BPMN20.CatchEvent:
+			for i := 0; i < len(v_.GetDataOutputAssociation()); i++ {
+				dataAssociations = append(dataAssociations, v_.GetDataOutputAssociation()[i])
+			}
+			if len(v_.GetDataOutputAssociation()) > 0 {
+				this.setDataAssocication(v, processInstance, dataAssociations, sessionId)
+			}
+		case BPMN20.ThrowEvent:
+			for i := 0; i < len(v_.GetDataInputAssociation()); i++ {
+				dataAssociations = append(dataAssociations, v_.GetDataInputAssociation()[i])
+			}
+			if len(v_.GetDataInputAssociation()) > 0 {
+				this.setDataAssocication(processInstance, v, dataAssociations, sessionId)
+			}
+		}
+
+	case *BPMS_Runtime.GatewayInstance:
+
+	}
 
 	instance.SetLifecycleState(BPMS_Runtime.LifecycleState_Active)
 	this.saveInstance(instance.(BPMS_Runtime.Instance))
@@ -696,12 +713,31 @@ func (this *WorkflowProcessor) activateInstance(instance BPMS_Runtime.FlowNodeIn
 /**
  * Terminate a given instance.
  */
-func (this *WorkflowProcessor) completeInstance(instance BPMS_Runtime.FlowNodeInstance) error {
+func (this *WorkflowProcessor) completeInstance(instance BPMS_Runtime.FlowNodeInstance, sessionId string) error {
 	if instance.GetLifecycleState() != BPMS_Runtime.LifecycleState_Completing {
 		return errors.New("The input flow node instance must have life cycle state at Completing")
 	}
 
-	// TODO do completing stuff here.
+	// Set the data associations.
+	switch v := instance.(type) {
+	case *BPMS_Runtime.ActivityInstance:
+		bpmnElement, _ := GetServer().GetEntityManager().getEntityByUuid(v.M_bpmnElementId)
+		activity := bpmnElement.GetObject().(BPMN20.Activity)
+
+		var dataOutputAssociations []BPMN20.DataAssociation
+		for i := 0; i < len(activity.GetDataOutputAssociation()); i++ {
+			dataOutputAssociations = append(dataOutputAssociations, activity.GetDataOutputAssociation()[i])
+		}
+
+		// Contain regular data associations.
+		this.setDataAssocication(v, v.GetProcessInstancePtr(), dataOutputAssociations, sessionId)
+
+	case *BPMS_Runtime.EventInstance:
+
+	case *BPMS_Runtime.GatewayInstance:
+
+	}
+
 	instance.SetLifecycleState(BPMS_Runtime.LifecycleState_Completed)
 	this.saveInstance(instance.(BPMS_Runtime.Instance))
 	return nil
@@ -762,7 +798,7 @@ func (this *WorkflowProcessor) deleteInstance(processInstance *BPMS_Runtime.Proc
 	if processInstaceEntity != nil {
 		//log.Println("---------> remove process instance: ", processInstance.GetUUID())
 		// Remove the entity...
-		processInstaceEntity.DeleteEntity()
+		//processInstaceEntity.DeleteEntity()
 	}
 }
 
@@ -788,6 +824,305 @@ func (this *WorkflowProcessor) stillActive(processInstance *BPMS_Runtime.Process
 	// innactive.
 
 	return true
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Data evaluation function.
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Set data associations
+ * source represent the instance where the data to be are.
+ * target represent the instance where the data must be created.
+ * dataAssociations contain the list of dataAssociations to set.
+ */
+func (this *WorkflowProcessor) setDataAssocication(source BPMS_Runtime.Instance, target BPMS_Runtime.Instance, dataAssociations []BPMN20.DataAssociation, sessionId string) {
+	// Index the item aware in a map to access it by theire id's
+	srcItemawareElementMap := make(map[string]*BPMS_Runtime.ItemAwareElementInstance, 0)
+	trgItemawareElementMap := make(map[string]*BPMS_Runtime.ItemAwareElementInstance, 0)
+
+	// The source...
+	for i := 0; i < len(source.GetDataRef()); i++ {
+		srcItemawareElementMap[source.GetDataRef()[i].M_id] = source.GetDataRef()[i]
+	}
+
+	for i := 0; i < len(source.GetData()); i++ {
+		srcItemawareElementMap[source.GetData()[i].M_id] = source.GetData()[i]
+	}
+
+	// The target
+	for i := 0; i < len(target.GetDataRef()); i++ {
+		trgItemawareElementMap[target.GetDataRef()[i].M_id] = target.GetDataRef()[i]
+	}
+
+	for i := 0; i < len(target.GetData()); i++ {
+		trgItemawareElementMap[target.GetData()[i].M_id] = target.GetData()[i]
+	}
+
+	// Set the data from the source instance to the
+	// target instance.
+	for i := 0; i < len(dataAssociations); i++ {
+		dataAssociation := dataAssociations[i]
+		sourceRefs := dataAssociation.GetSourceRef()
+		targetRef := dataAssociation.GetTargetRef()
+		transformation := dataAssociation.GetTransformation()
+
+		// The target id...
+		var targetId string
+		var tagetBpmnElementId string
+		if reflect.TypeOf(targetRef).String() == "*BPMN20.DataObjectReference" {
+			targetId = targetRef.(*BPMN20.DataObjectReference).GetDataObjectRef().GetId()
+			tagetBpmnElementId = targetRef.(*BPMN20.DataObjectReference).GetDataObjectRef().GetUUID()
+		} else {
+			targetId = targetRef.(BPMN20.BaseElement).GetId()
+			tagetBpmnElementId = targetRef.(BPMN20.BaseElement).GetUUID()
+		}
+
+		// Here I will iterate over the list of sources.
+		for j := 0; j < len(sourceRefs); j++ {
+
+			sourceRef := sourceRefs[j]
+			var sourceId string
+			if reflect.TypeOf(sourceRef).String() == "*BPMN20.DataObjectReference" {
+				sourceId = sourceRef.(*BPMN20.DataObjectReference).GetDataObjectRef().GetId()
+			} else {
+				sourceId = sourceRef.(BPMN20.BaseElement).GetId()
+			}
+
+			srcItemawareElement := srcItemawareElementMap[sourceId]
+			if srcItemawareElement != nil {
+				trgItemawareElement := trgItemawareElementMap[targetId]
+				if trgItemawareElement == nil {
+					if trgItemawareElement == nil {
+						trgItemawareElement = new(BPMS_Runtime.ItemAwareElementInstance)
+						trgItemawareElement.UUID = "BPMS_Runtime.ItemAwareElementInstance%" + Utility.RandomUUID()
+						trgItemawareElement.M_bpmnElementId = tagetBpmnElementId
+						trgItemawareElement.M_id = targetId
+						trgItemawareElementMap[targetId] = trgItemawareElement
+						target.SetData(trgItemawareElement)
+					}
+				}
+
+				// Apply a transformation over data.
+				if transformation != nil {
+					instances := make(map[string]interface{}, 0)
+					// The value display in the javasript side are the value of the M_data...
+					var err error
+					var isCollection bool
+					var objects []interface{}
+
+					objects, isCollection, err = this.getItemawareElementData(srcItemawareElement)
+					if err == nil {
+						if isCollection {
+							instances[srcItemawareElement.M_id] = objects
+						} else {
+							if len(objects) > 0 {
+								instances[srcItemawareElement.M_id] = objects[0]
+							} else {
+								instances[srcItemawareElement.M_id] = nil
+							}
+						}
+					} else {
+						log.Println("----->1004 data error: ", err.Error())
+					}
+
+					script := "function transform(){\n" + transformation.GetOther().(string) + "\n}"
+					var targetRefData otto.Value
+					targetRefData, err = this.runScript(script, "transform", instances, sessionId)
+
+					if err != nil {
+						// TODO log error here.
+						log.Println("--------> script error ", err)
+					} else {
+						// Dependending of the data type of targetData I will
+						this.setItemawareElementData(trgItemawareElement, &targetRefData)
+					}
+				} else {
+					// Set the data directly...
+					trgItemawareElement.SetData(srcItemawareElement.M_data)
+				}
+			}
+		}
+	}
+}
+
+/**
+ * That function is use to set the
+ */
+func (this *WorkflowProcessor) setItemawareElementData(instance *BPMS_Runtime.ItemAwareElementInstance, data *otto.Value) error {
+	var strVal string
+
+	bpmnElementEntity, _ := GetServer().GetEntityManager().getEntityByUuid(instance.M_bpmnElementId)
+	itemAwareElement := bpmnElementEntity.GetObject().(BPMN20.ItemAwareElement)
+	typeName, isCollection := this.getItemawareElementItemDefinitionType(itemAwareElement)
+
+	if strings.HasPrefix(typeName, "xsd:") == true {
+		// Here I have a base type
+		if isCollection == true {
+			// In case of a collection.
+			val, err := json.Marshal(data)
+			if err == nil {
+				strVal = string(val)
+			} else {
+				return err
+			}
+		} else {
+			// Here I got a simple value...
+			if typeName == "xsd:boolean" {
+				val, err := data.ToBoolean()
+				if err == nil {
+					strVal = strconv.FormatBool(val)
+				}
+			} else if typeName == "xsd:anyURI" || typeName == "xsd:base61Binary" || typeName == "xsd:string" || typeName == "xsd:byte" {
+				val, err := data.ToString()
+				if err == nil {
+					strVal = val
+				}
+			} else if typeName == "xsd:int" || typeName == "xsd:integer" || typeName == "xsd:long" {
+				val, err := data.ToInteger()
+				if err == nil {
+					strVal = strconv.FormatInt(val, 10)
+				}
+			} else if typeName == "xsd:date" {
+				// TODO implement it...
+
+			} else if typeName == "xsd:float" || typeName == "xsd:double" {
+				val, err := data.ToFloat()
+				if err == nil {
+					strVal = strconv.FormatFloat(val, 'E', -1, 64)
+				}
+			}
+		}
+	} else {
+		log.Println("----------- line 1090", typeName)
+		if isCollection {
+
+		} else {
+
+		}
+	}
+
+	// Set back the value here.
+	instance.SetData([]byte(b64.StdEncoding.EncodeToString([]byte(strVal))))
+
+	return nil
+}
+
+/**
+ * That function is use to recreate the information from itemawre element data.
+ */
+func (this *WorkflowProcessor) getItemawareElementData(itemawareElement *BPMS_Runtime.ItemAwareElementInstance) ([]interface{}, bool, error) {
+
+	objects := make([]interface{}, 0)
+
+	// Double encoding here...
+	input := Utility.BytesToString(itemawareElement.M_data)
+	input = strings.Replace(input, `"`, "", -1)
+
+	data, err := b64.StdEncoding.DecodeString(input)
+
+	if err != nil {
+		log.Println("--------> ", input)
+		return nil, false, err
+	}
+
+	// So  now I will get the item definition...
+	bpmnElementEntity, _ := GetServer().GetEntityManager().getEntityByUuid(itemawareElement.M_bpmnElementId)
+
+	itemAwareElement := bpmnElementEntity.GetObject().(BPMN20.ItemAwareElement)
+
+	// The item definition object can be either an itemDefinition objet or a string.
+	typeName, isCollection := this.getItemawareElementItemDefinitionType(itemAwareElement)
+
+	if strings.HasPrefix(typeName, "xsd:") {
+		// Here I have a base type
+		if isCollection {
+			// In case of a collection.
+			err := json.Unmarshal(data, &objects)
+			if err == nil {
+				return objects, true, nil
+			} else {
+				return nil, true, err
+			}
+		} else {
+			// Here I got a json structure...
+			if typeName == "xsd:boolean" {
+				val, err := strconv.ParseBool(string(data))
+				if err != nil {
+					return nil, false, err
+				}
+				objects = append(objects, val)
+				return objects, false, nil
+			} else if typeName == "xsd:anyURI" || typeName == "xsd:base61Binary" || typeName == "xsd:string" {
+				objects = append(objects, string(data))
+				return objects, false, nil
+			} else if typeName == "xsd:int" || typeName == "xsd:integer" || typeName == "xsd:long" {
+				val, err := strconv.ParseInt(string(data), 10, 64)
+				if err != nil {
+					return nil, false, err
+				}
+				objects = append(objects, val)
+				return objects, false, nil
+			} else if typeName == "xsd:byte" {
+				objects = append(objects, data)
+				return objects, false, nil
+
+			} else if typeName == "xsd:date" {
+				// TODO implement it...
+
+			} else if typeName == "xsd:float" || typeName == "xsd:double" {
+				val, err := strconv.ParseFloat(string(data), 64)
+				if err != nil {
+					return nil, false, err
+				}
+				objects = append(objects, val)
+				return objects, false, nil
+			}
+		}
+	} else {
+		if isCollection {
+			values := make([]string, 0)
+			err := json.Unmarshal(data, &values)
+			// Now each element of the values array contain a json string.
+			if err == nil {
+				for i := 0; i < len(values); i++ {
+					var object interface{}
+					err := json.Unmarshal([]byte(values[i]), &object)
+					if err == nil {
+						// Here I got a json object.
+						objects = append(objects, object)
+					} else {
+						if Utility.IsValidEntityReferenceName(values[i]) {
+
+							// Here I have a reference value.
+							entity, errObj := GetServer().GetEntityManager().getEntityByUuid(values[i])
+							if errObj == nil {
+								// Append the object...
+								objects = append(objects, entity.GetObject())
+							} else {
+								// TODO log error here.
+							}
+
+						} else {
+							return nil, false, err
+						}
+					}
+				}
+			} else {
+				return nil, false, err
+			}
+
+		} else {
+			var object interface{}
+			err := json.Unmarshal(data, &object)
+			if err == nil {
+				objects = append(objects, object)
+			}
+		}
+	}
+
+	return objects, isCollection, nil
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -884,253 +1219,38 @@ func (this *WorkflowProcessor) getNextProcessInstanceNumber() int {
 	return number
 }
 
-func (this *WorkflowProcessor) getProcessData(process *BPMN20.Process) []BPMN20.BaseElement {
-	var data []BPMN20.BaseElement
-	for i := 0; i < len(process.GetFlowElement()); i++ {
-		flowElement := process.GetFlowElement()[i]
-		if reflect.TypeOf(flowElement).String() == "*BPMN20.DataObject" {
-			data = append(data, flowElement.(BPMN20.BaseElement))
-		}
-	}
-
-	// Apppend process properties...
-	for i := 0; i < len(process.GetProperty()); i++ {
-		data = append(data, process.GetProperty()[i])
-	}
-
-	return data
-}
-
-func (this *WorkflowProcessor) getProcessDataInput(process *BPMN20.Process) []BPMN20.BaseElement {
-	data := this.getProcessData(process)
-	if process.GetIoSpecification() != nil {
-		for i := 0; i < len(process.GetIoSpecification().GetDataInput()); i++ {
-			data = append(data, process.GetIoSpecification().GetDataInput()[i])
-		}
-	}
-
-	return data
-}
-
-func (this *WorkflowProcessor) getProcessDataOutput(process *BPMN20.Process) []BPMN20.BaseElement {
-	data := this.getProcessData(process)
-	if process.GetIoSpecification() != nil {
-		for i := 0; i < len(process.GetIoSpecification().GetDataOutput()); i++ {
-			data = append(data, process.GetIoSpecification().GetDataOutput()[i])
-		}
-	}
-	return data
-}
-
 /**
- * Set output data association
+ * Utility function to retreive the item definitions.
  */
-func (this *WorkflowProcessor) setDataAssocication(source BPMS_Runtime.Instance, target BPMS_Runtime.Instance, dataAssociations []BPMN20.DataAssociation, data []BPMN20.BaseElement, sessionId string) {
-	// Index the item aware in a map to access it by theire id's
-	srcItemawareElementMap := make(map[string]*BPMS_Runtime.ItemAwareElementInstance, 0)
-
-	// I will copy the data reference into the instance.
-	for i := 0; i < len(source.GetDataRef()); i++ {
-		srcItemawareElementMap[source.GetDataRef()[i].M_id] = source.GetDataRef()[i]
-	}
-
-	for i := 0; i < len(source.GetData()); i++ {
-		srcItemawareElementMap[source.GetData()[i].M_id] = source.GetData()[i]
-	}
-
-	trgItemawareElementMap := make(map[string]BPMN20.ItemAwareElement)
-
-	// The data to be set...
-	for i := 0; i < len(data); i++ {
-		trgItemawareElementMap[data[i].GetId()] = data[i].(BPMN20.ItemAwareElement)
-	}
-
-	// Set the data from the source instance to the
-	// target instance.
-	for i := 0; i < len(dataAssociations); i++ {
-		dataAssociation := dataAssociations[i]
-		sourceRefs := dataAssociation.GetSourceRef()
-		targetRef := dataAssociation.GetTargetRef()
-		transformation := dataAssociation.GetTransformation()
-
-		for j := 0; j < len(sourceRefs); j++ {
-			sourceRef := sourceRefs[j]
-			if itemawareElementSrc, ok := srcItemawareElementMap[sourceRef.(BPMN20.BaseElement).GetId()]; ok {
-				if _, ok := trgItemawareElementMap[targetRef.(BPMN20.BaseElement).GetId()]; ok {
-					var itemawareElementTrg *BPMS_Runtime.ItemAwareElementInstance
-					// I will try to find the item in the item...
-					for i := 0; i < len(target.GetData()); i++ {
-						if target.GetData()[i].M_id == targetRef.(BPMN20.BaseElement).GetId() {
-							itemawareElementTrg = target.GetData()[i]
-						}
-					}
-					for i := 0; i < len(target.GetDataRef()); i++ {
-						if target.GetDataRef()[i].M_id == targetRef.(BPMN20.BaseElement).GetId() {
-							itemawareElementTrg = target.GetDataRef()[i]
-						}
-					}
-					if itemawareElementTrg == nil {
-						itemawareElementTrg = new(BPMS_Runtime.ItemAwareElementInstance)
-						itemawareElementTrg.UUID = "BPMS_Runtime.ItemAwareElementInstance%" + Utility.RandomUUID()
-						itemawareElementTrg.M_bpmnElementId = itemawareElementSrc.M_bpmnElementId
-						itemawareElementTrg.M_id = targetRef.(BPMN20.BaseElement).GetId()
-						target.SetData(itemawareElementTrg)
-					}
-
-					itemawareElementTrg.SetData(itemawareElementSrc.M_data)
-
-					if transformation != nil {
-						instances := make(map[string]interface{}, 0)
-
-						// The value display in the javasript side are the value of the M_data...
-						var err error
-						var isCollection bool
-						var objects []interface{}
-
-						objects, isCollection, err = this.getItemawareElementData(itemawareElementSrc)
-						if err == nil {
-							if isCollection {
-								instances["sourceRef"] = objects
-							} else {
-								if len(objects) > 0 {
-									instances["sourceRef"] = objects[0]
-								} else {
-									instances["sourceRef"] = nil
-								}
-							}
-						} else {
-							log.Println("-----------> err 1004", err.Error())
-						}
-
-						objects, isCollection, err = this.getItemawareElementData(itemawareElementTrg)
-						if err == nil {
-							if isCollection {
-								instances["targetRef"] = objects
-							} else {
-								if len(objects) > 0 {
-									instances["targetRef"] = objects[0]
-								} else {
-									instances["targetRef"] = nil
-								}
-							}
-						} else {
-							log.Println("-----------> err 1019", err.Error())
-						}
-
-						script := "function transform(){\n" + transformation.GetOther().(string) + "\n}"
-						_, err = this.runScript(script, "transform", instances, sessionId)
-						if err != nil {
-							log.Println("--------> script error ", err)
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-func (this *WorkflowProcessor) getItemawareElementItemDefinitionType(itemawareElement BPMN20.ItemAwareElement) (interface{}, bool) {
+func (this *WorkflowProcessor) getItemawareElementItemDefinitionType(itemawareElement BPMN20.ItemAwareElement) (string, bool) {
 	// Can be one of those class...
+	var typeName string
+	var isCollection bool
+
 	if itemawareElement.GetItemSubjectRef() != nil {
-		return itemawareElement.GetItemSubjectRef(), itemawareElement.GetItemSubjectRef().IsCollection()
+		typeName = itemawareElement.GetItemSubjectRef().M_structureRef
+		isCollection = itemawareElement.GetItemSubjectRef().IsCollection()
 	} else if reflect.TypeOf(itemawareElement).String() == "*BPMN20.ItemAwareElement_impl" {
-		return itemawareElement.(*BPMN20.ItemAwareElement_impl).M_itemSubjectRef, false
+		typeName = itemawareElement.(*BPMN20.ItemAwareElement_impl).M_itemSubjectRef
 	} else if reflect.TypeOf(itemawareElement).String() == "*BPMN20.Property" {
-		return itemawareElement.(*BPMN20.Property).M_itemSubjectRef, false
+		typeName = itemawareElement.(*BPMN20.Property).M_itemSubjectRef
 	} else if reflect.TypeOf(itemawareElement).String() == "*BPMN20.DataOutput" {
-		return itemawareElement.(*BPMN20.DataOutput).M_itemSubjectRef, itemawareElement.(*BPMN20.DataOutput).M_isCollection
+		typeName = itemawareElement.(*BPMN20.DataOutput).M_itemSubjectRef
+		isCollection = itemawareElement.(*BPMN20.DataOutput).IsCollection()
 	} else if reflect.TypeOf(itemawareElement).String() == "*BPMN20.DataInput" {
-		return itemawareElement.(*BPMN20.DataInput).M_itemSubjectRef, itemawareElement.(*BPMN20.DataInput).M_isCollection
+		typeName = itemawareElement.(*BPMN20.DataInput).M_itemSubjectRef
+		isCollection = itemawareElement.(*BPMN20.DataInput).M_isCollection
 	} else if reflect.TypeOf(itemawareElement).String() == "*BPMN20.DataObject" {
-		return itemawareElement.(*BPMN20.DataObject).M_itemSubjectRef, itemawareElement.(*BPMN20.DataObject).M_isCollection
+		typeName = itemawareElement.(*BPMN20.DataObject).M_itemSubjectRef
+		isCollection = itemawareElement.(*BPMN20.DataObject).M_isCollection
 	}
-	return nil, false
+
+	return typeName, isCollection
 }
 
 /**
- * That function is use to recreate the information from itemawre element data.
+ * Set log information for a given evenement.
  */
-func (this *WorkflowProcessor) getItemawareElementData(itemawareElement *BPMS_Runtime.ItemAwareElementInstance) ([]interface{}, bool, error) {
-
-	objects := make([]interface{}, 0)
-
-	// Double encoding here...
-	input := Utility.BytesToString(itemawareElement.M_data)
-	data, err := b64.StdEncoding.DecodeString(input[1 : len(input)-2])
-
-	if err != nil {
-		return nil, false, err
-	}
-
-	// So  now I will get the item definition...
-	bpmnElementEntity, _ := GetServer().GetEntityManager().getEntityByUuid(itemawareElement.M_bpmnElementId)
-
-	itemAwareElement := bpmnElementEntity.GetObject().(BPMN20.ItemAwareElement)
-	var typeName string
-
-	// The item definition object can be either an itemDefinition objet or a string.
-	itemDefinition, isCollection := this.getItemawareElementItemDefinitionType(itemAwareElement)
-
-	if reflect.TypeOf(itemDefinition).Kind() == reflect.String {
-		// In that case I got an xsd base type.
-		typeName = itemDefinition.(string)
-	} else if reflect.TypeOf(itemDefinition).String() == "*BPMN20.ItemDefinition" {
-		typeName = itemDefinition.(*BPMN20.ItemDefinition).M_structureRef
-	}
-
-	if strings.HasPrefix("xsd:", typeName) {
-		// Here I have a base type
-		if isCollection {
-			// In case of a collection.
-			err := json.Unmarshal(data, &objects)
-			if err == nil {
-				return objects, true, nil
-			} else {
-				return nil, true, err
-			}
-		} else {
-			// Here I got a json structure...
-			var object interface{}
-			err := json.Unmarshal(data, &object)
-			if err == nil {
-				objects = append(objects, object)
-				return objects, false, nil
-			} else {
-				return nil, false, err
-			}
-		}
-	} else {
-		if isCollection {
-			values := make([]string, 0)
-			err := json.Unmarshal(data, &values)
-			// Now each element of the values array contain a json string.
-			if err == nil {
-				for i := 0; i < len(values); i++ {
-					var object interface{}
-					err := json.Unmarshal([]byte(values[i]), &object)
-					if err == nil {
-						objects = append(objects, object)
-					} else {
-						return nil, false, err
-					}
-				}
-			} else {
-				return nil, false, err
-			}
-
-		} else {
-			var object interface{}
-			err := json.Unmarshal(data, &object)
-			if err == nil {
-				objects = append(objects, object)
-			}
-		}
-	}
-
-	return objects, isCollection, nil
-
-}
-
 func (this *WorkflowProcessor) setLogInfo(instance BPMS_Runtime.FlowNodeInstance, descripion string, sessionId string) {
 
 	// Now the log information...

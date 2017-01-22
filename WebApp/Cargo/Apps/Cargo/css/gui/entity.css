@@ -42,6 +42,7 @@
 
 .entity > div {
 	vertical-align: middle;
+	text-align: left;
 	display: table-cell;
 }
 
@@ -151,6 +152,7 @@
 
 .entities_btn{
 	display: table-cell;
+	vertical-align: middle;
 }
 
 .entities_btn i {

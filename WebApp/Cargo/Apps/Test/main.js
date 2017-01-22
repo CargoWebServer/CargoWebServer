@@ -75,7 +75,7 @@ function main() {
                     server.entityManager.getEntityPrototypes("BPMS_Runtime",
                         // Success callback.
                         function (result, caller) {
-                            server.entityManager.getEntityById("BPMN20.Definitions", "_1466081328431",
+                            server.entityManager.getEntityById("BPMN20.Definitions", "_1484846640138",
                                 // success callbacak
                                 function (result, caller) {
                                     server.workflowManager.getDefinitionInstances(result,

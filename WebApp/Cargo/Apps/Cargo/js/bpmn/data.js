@@ -127,7 +127,7 @@ BpmnDataView.prototype.generateEntityPrototype = function (data, typeName, callb
 
                     prototype.FieldsOrder.push(prototype.Fields.length)
                     prototype.FieldsId.push(data[i].UUID)
-                    prototype.Fields.push("M_" + data[i].M_name)
+                    prototype.Fields.push("M_" + data[i].M_name.replaceAll(" ", "_"))
                     prototype.FieldsType.push(fieldType)
                     prototype.FieldsVisibility.push(true)
                     prototype.FieldsNillable.push(true)
@@ -149,7 +149,7 @@ BpmnDataView.prototype.generateEntityPrototype = function (data, typeName, callb
             }
             prototype.FieldsOrder.push(prototype.Fields.length)
             prototype.FieldsId.push(data[i].UUID) // Set the uuid...
-            prototype.Fields.push("M_" + data[i].M_name)
+            prototype.Fields.push("M_" + data[i].M_name.replaceAll(" ", "_"))
             prototype.FieldsType.push(fieldType)
             prototype.FieldsVisibility.push(true)
             prototype.FieldsNillable.push(true)

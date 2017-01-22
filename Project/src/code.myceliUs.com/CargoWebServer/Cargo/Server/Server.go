@@ -195,9 +195,9 @@ func (this *Server) initialize() {
 	logger := NewLogger("defaultErrorLogger")
 	this.loggers["defaultErrorLogger"] = logger
 
-	this.fileManager.Initialize()
+	//this.fileManager.Initialize()
 	//this.ldapManager.Initialize()
-	this.projectManager.Initialyze()
+	//this.projectManager.Initialyze()
 }
 
 /**
