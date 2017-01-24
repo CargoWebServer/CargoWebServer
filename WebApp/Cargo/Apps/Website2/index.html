@@ -93,6 +93,7 @@
 			<p>-Comment installer, configurer, expliquer les fichiers, la configuration, etc.
 				<br>-Comment créer un projet (hello world)
 				<br>-Télécharger le projet hello world: complet A à Z (comme angular)
+				<br>-Bridge
 			</p>
 		</div>
 	</div>
@@ -253,6 +254,9 @@
 					<pre><code class="javascript">var user = {<br>&#09;"userName" : "myUserName",<br>&#09;"password" : "password01"<br>};<br><br>server.sessionManager.login(<br>&#09;/* name */<br>&#09;user.userName,<br>&#09;/* password */<br>&#09;user.password,<br>&#09;/* Success Callback */<br>&#09;function (result, caller){<br>&#09;&#09;console.log(caller.userName + " logged in.");<br>&#09;},<br>&#09;/* Error Callback */<br>&#09;function (err, caller) {<br>&#09;&#09;console.log("Login error ", err);<br>&#09;},<br>&#09;/* caller */<br>&#09;{ "user": user}<br>);</code></pre>
 					<p>Note that the 'login' function has a success callback, an error callback and a caller but it does not have a progress callback.</p>
 
+					<h3> Events </h3>
+					<h4> Local events </h4>
+					<h4> Network events </h4>
 				</div>
 			</div>
 			<div class="row tutorialsRow" id="tutorialsSection-serverSide">
