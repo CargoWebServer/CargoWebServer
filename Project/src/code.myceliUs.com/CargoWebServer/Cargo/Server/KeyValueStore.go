@@ -1090,7 +1090,7 @@ func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, p
 		} else {
 			// Use the type name as indexation...
 			ids_, err := this.getIndexation(query.TypeName)
-			if err != nil {
+			if err == nil {
 				for i := 0; i < len(ids_); i++ {
 					ids = append(ids, ids_[i].(string))
 				}

@@ -1,10 +1,10 @@
 package BPMS_Runtime
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type ProcessInstance struct{
+type ProcessInstance struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,27 +14,26 @@ type ProcessInstance struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Instance **/
-	M_id string
+	M_id            string
 	M_bpmnElementId string
-	M_participants []string
-	m_dataRef []*ItemAwareElementInstance
+	M_participants  []string
+	m_dataRef       []*ItemAwareElementInstance
 	/** If the ref is a string and not an object **/
-	M_dataRef []string
-	M_data []*ItemAwareElementInstance
+	M_dataRef    []string
+	M_data       []*ItemAwareElementInstance
 	m_logInfoRef []*LogInfo
 	/** If the ref is a string and not an object **/
 	M_logInfoRef []string
 
 	/** members of ProcessInstance **/
-	M_number int
-	M_colorName string
-	M_colorNumber string
+	M_number            int
+	M_colorName         string
+	M_colorNumber       string
 	M_flowNodeInstances []FlowNodeInstance
 	M_connectingObjects []*ConnectingObject
-
 
 	/** Associations **/
 	m_parentPtr *DefinitionsInstance
@@ -44,34 +43,33 @@ type ProcessInstance struct{
 
 /** Xml parser for ProcessInstance **/
 type XsdProcessInstance struct {
-	XMLName xml.Name	`xml:"process"`
+	XMLName xml.Name `xml:"process"`
 	/** Instance **/
-	M_id	string	`xml:"id,attr"`
-	M_bpmnElementId	string	`xml:"bpmnElementId,attr"`
+	M_id            string `xml:"id,attr"`
+	M_bpmnElementId string `xml:"bpmnElementId,attr"`
 
+	M_flowNodeInstances_0 []*XsdActivityInstance   `xml:"activityInstance,omitempty"`
+	M_flowNodeInstances_1 []*XsdSubprocessInstance `xml:"SubprocessInstance,omitempty"`
+	M_flowNodeInstances_2 []*XsdGatewayInstance    `xml:"gatewayInstance,omitempty"`
+	M_flowNodeInstances_3 []*XsdEventInstance      `xml:"eventInstance,omitempty"`
 
-	M_flowNodeInstances_0	[]*XsdActivityInstance	`xml:"activityInstance,omitempty"`
-	M_flowNodeInstances_1	[]*XsdSubprocessInstance	`xml:"SubprocessInstance,omitempty"`
-	M_flowNodeInstances_2	[]*XsdGatewayInstance	`xml:"gatewayInstance,omitempty"`
-	M_flowNodeInstances_3	[]*XsdEventInstance	`xml:"eventInstance,omitempty"`
-
-	M_number	int	`xml:"number,attr"`
-	M_colorNumber	string	`xml:"colorNumber,attr"`
-	M_colorName	string	`xml:"colorName,attr"`
-
+	M_number      int    `xml:"number,attr"`
+	M_colorNumber string `xml:"colorNumber,attr"`
+	M_colorName   string `xml:"colorName,attr"`
 }
+
 /** UUID **/
-func (this *ProcessInstance) GetUUID() string{
+func (this *ProcessInstance) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *ProcessInstance) GetId() string{
+func (this *ProcessInstance) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *ProcessInstance) SetId(ref interface{}){
+func (this *ProcessInstance) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -79,12 +77,12 @@ func (this *ProcessInstance) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** BpmnElementId **/
-func (this *ProcessInstance) GetBpmnElementId() string{
+func (this *ProcessInstance) GetBpmnElementId() string {
 	return this.M_bpmnElementId
 }
 
 /** Init reference BpmnElementId **/
-func (this *ProcessInstance) SetBpmnElementId(ref interface{}){
+func (this *ProcessInstance) SetBpmnElementId(ref interface{}) {
 	this.NeedSave = true
 	this.M_bpmnElementId = ref.(string)
 }
@@ -92,16 +90,16 @@ func (this *ProcessInstance) SetBpmnElementId(ref interface{}){
 /** Remove reference BpmnElementId **/
 
 /** Participants **/
-func (this *ProcessInstance) GetParticipants() []string{
+func (this *ProcessInstance) GetParticipants() []string {
 	return this.M_participants
 }
 
 /** Init reference Participants **/
-func (this *ProcessInstance) SetParticipants(ref interface{}){
+func (this *ProcessInstance) SetParticipants(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var participantss []string
-	for i:=0; i<len(this.M_participants); i++ {
+	for i := 0; i < len(this.M_participants); i++ {
 		if this.M_participants[i] != ref.(string) {
 			participantss = append(participantss, this.M_participants[i])
 		} else {
@@ -118,21 +116,21 @@ func (this *ProcessInstance) SetParticipants(ref interface{}){
 /** Remove reference Participants **/
 
 /** DataRef **/
-func (this *ProcessInstance) GetDataRef() []*ItemAwareElementInstance{
+func (this *ProcessInstance) GetDataRef() []*ItemAwareElementInstance {
 	return this.m_dataRef
 }
 
 /** Init reference DataRef **/
-func (this *ProcessInstance) SetDataRef(ref interface{}){
+func (this *ProcessInstance) SetDataRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_dataRef); i++ {
+		for i := 0; i < len(this.M_dataRef); i++ {
 			if this.M_dataRef[i] == refStr {
 				return
 			}
 		}
 		this.M_dataRef = append(this.M_dataRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveDataRef(ref)
 		this.m_dataRef = append(this.m_dataRef, ref.(*ItemAwareElementInstance))
 		this.M_dataRef = append(this.M_dataRef, ref.(*ItemAwareElementInstance).GetUUID())
@@ -140,7 +138,7 @@ func (this *ProcessInstance) SetDataRef(ref interface{}){
 }
 
 /** Remove reference DataRef **/
-func (this *ProcessInstance) RemoveDataRef(ref interface{}){
+func (this *ProcessInstance) RemoveDataRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*ItemAwareElementInstance)
 	dataRef_ := make([]*ItemAwareElementInstance, 0)
@@ -156,16 +154,16 @@ func (this *ProcessInstance) RemoveDataRef(ref interface{}){
 }
 
 /** Data **/
-func (this *ProcessInstance) GetData() []*ItemAwareElementInstance{
+func (this *ProcessInstance) GetData() []*ItemAwareElementInstance {
 	return this.M_data
 }
 
 /** Init reference Data **/
-func (this *ProcessInstance) SetData(ref interface{}){
+func (this *ProcessInstance) SetData(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var datas []*ItemAwareElementInstance
-	for i:=0; i<len(this.M_data); i++ {
+	for i := 0; i < len(this.M_data); i++ {
 		if this.M_data[i].GetUUID() != ref.(*ItemAwareElementInstance).GetUUID() {
 			datas = append(datas, this.M_data[i])
 		} else {
@@ -180,7 +178,7 @@ func (this *ProcessInstance) SetData(ref interface{}){
 }
 
 /** Remove reference Data **/
-func (this *ProcessInstance) RemoveData(ref interface{}){
+func (this *ProcessInstance) RemoveData(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(ItemAwareElementInstance)
 	data_ := make([]*ItemAwareElementInstance, 0)
@@ -193,21 +191,21 @@ func (this *ProcessInstance) RemoveData(ref interface{}){
 }
 
 /** LogInfoRef **/
-func (this *ProcessInstance) GetLogInfoRef() []*LogInfo{
+func (this *ProcessInstance) GetLogInfoRef() []*LogInfo {
 	return this.m_logInfoRef
 }
 
 /** Init reference LogInfoRef **/
-func (this *ProcessInstance) SetLogInfoRef(ref interface{}){
+func (this *ProcessInstance) SetLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_logInfoRef); i++ {
+		for i := 0; i < len(this.M_logInfoRef); i++ {
 			if this.M_logInfoRef[i] == refStr {
 				return
 			}
 		}
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveLogInfoRef(ref)
 		this.m_logInfoRef = append(this.m_logInfoRef, ref.(*LogInfo))
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(*LogInfo).GetUUID())
@@ -215,7 +213,7 @@ func (this *ProcessInstance) SetLogInfoRef(ref interface{}){
 }
 
 /** Remove reference LogInfoRef **/
-func (this *ProcessInstance) RemoveLogInfoRef(ref interface{}){
+func (this *ProcessInstance) RemoveLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*LogInfo)
 	logInfoRef_ := make([]*LogInfo, 0)
@@ -231,12 +229,12 @@ func (this *ProcessInstance) RemoveLogInfoRef(ref interface{}){
 }
 
 /** Number **/
-func (this *ProcessInstance) GetNumber() int{
+func (this *ProcessInstance) GetNumber() int {
 	return this.M_number
 }
 
 /** Init reference Number **/
-func (this *ProcessInstance) SetNumber(ref interface{}){
+func (this *ProcessInstance) SetNumber(ref interface{}) {
 	this.NeedSave = true
 	this.M_number = ref.(int)
 }
@@ -244,12 +242,12 @@ func (this *ProcessInstance) SetNumber(ref interface{}){
 /** Remove reference Number **/
 
 /** ColorName **/
-func (this *ProcessInstance) GetColorName() string{
+func (this *ProcessInstance) GetColorName() string {
 	return this.M_colorName
 }
 
 /** Init reference ColorName **/
-func (this *ProcessInstance) SetColorName(ref interface{}){
+func (this *ProcessInstance) SetColorName(ref interface{}) {
 	this.NeedSave = true
 	this.M_colorName = ref.(string)
 }
@@ -257,12 +255,12 @@ func (this *ProcessInstance) SetColorName(ref interface{}){
 /** Remove reference ColorName **/
 
 /** ColorNumber **/
-func (this *ProcessInstance) GetColorNumber() string{
+func (this *ProcessInstance) GetColorNumber() string {
 	return this.M_colorNumber
 }
 
 /** Init reference ColorNumber **/
-func (this *ProcessInstance) SetColorNumber(ref interface{}){
+func (this *ProcessInstance) SetColorNumber(ref interface{}) {
 	this.NeedSave = true
 	this.M_colorNumber = ref.(string)
 }
@@ -270,16 +268,16 @@ func (this *ProcessInstance) SetColorNumber(ref interface{}){
 /** Remove reference ColorNumber **/
 
 /** FlowNodeInstances **/
-func (this *ProcessInstance) GetFlowNodeInstances() []FlowNodeInstance{
+func (this *ProcessInstance) GetFlowNodeInstances() []FlowNodeInstance {
 	return this.M_flowNodeInstances
 }
 
 /** Init reference FlowNodeInstances **/
-func (this *ProcessInstance) SetFlowNodeInstances(ref interface{}){
+func (this *ProcessInstance) SetFlowNodeInstances(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var flowNodeInstancess []FlowNodeInstance
-	for i:=0; i<len(this.M_flowNodeInstances); i++ {
+	for i := 0; i < len(this.M_flowNodeInstances); i++ {
 		if this.M_flowNodeInstances[i].(Instance).GetUUID() != ref.(Instance).GetUUID() {
 			flowNodeInstancess = append(flowNodeInstancess, this.M_flowNodeInstances[i])
 		} else {
@@ -294,7 +292,7 @@ func (this *ProcessInstance) SetFlowNodeInstances(ref interface{}){
 }
 
 /** Remove reference FlowNodeInstances **/
-func (this *ProcessInstance) RemoveFlowNodeInstances(ref interface{}){
+func (this *ProcessInstance) RemoveFlowNodeInstances(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	flowNodeInstances_ := make([]FlowNodeInstance, 0)
@@ -307,16 +305,16 @@ func (this *ProcessInstance) RemoveFlowNodeInstances(ref interface{}){
 }
 
 /** ConnectingObjects **/
-func (this *ProcessInstance) GetConnectingObjects() []*ConnectingObject{
+func (this *ProcessInstance) GetConnectingObjects() []*ConnectingObject {
 	return this.M_connectingObjects
 }
 
 /** Init reference ConnectingObjects **/
-func (this *ProcessInstance) SetConnectingObjects(ref interface{}){
+func (this *ProcessInstance) SetConnectingObjects(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var connectingObjectss []*ConnectingObject
-	for i:=0; i<len(this.M_connectingObjects); i++ {
+	for i := 0; i < len(this.M_connectingObjects); i++ {
 		if this.M_connectingObjects[i].GetUUID() != ref.(Instance).GetUUID() {
 			connectingObjectss = append(connectingObjectss, this.M_connectingObjects[i])
 		} else {
@@ -325,13 +323,14 @@ func (this *ProcessInstance) SetConnectingObjects(ref interface{}){
 		}
 	}
 	if !isExist {
+
 		connectingObjectss = append(connectingObjectss, ref.(*ConnectingObject))
 	}
 	this.M_connectingObjects = connectingObjectss
 }
 
 /** Remove reference ConnectingObjects **/
-func (this *ProcessInstance) RemoveConnectingObjects(ref interface{}){
+func (this *ProcessInstance) RemoveConnectingObjects(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	connectingObjects_ := make([]*ConnectingObject, 0)
@@ -344,23 +343,23 @@ func (this *ProcessInstance) RemoveConnectingObjects(ref interface{}){
 }
 
 /** Parent **/
-func (this *ProcessInstance) GetParentPtr() *DefinitionsInstance{
+func (this *ProcessInstance) GetParentPtr() *DefinitionsInstance {
 	return this.m_parentPtr
 }
 
 /** Init reference Parent **/
-func (this *ProcessInstance) SetParentPtr(ref interface{}){
+func (this *ProcessInstance) SetParentPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_parentPtr = ref.(string)
-	}else{
+	} else {
 		this.m_parentPtr = ref.(*DefinitionsInstance)
 		this.M_parentPtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference Parent **/
-func (this *ProcessInstance) RemoveParentPtr(ref interface{}){
+func (this *ProcessInstance) RemoveParentPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {

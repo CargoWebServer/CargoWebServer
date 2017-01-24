@@ -11,6 +11,7 @@ type FlowNodeInstance interface {
 
 	/** LifecycleState **/
 	GetLifecycleState() LifecycleState
+	SetLifecycleState(interface{})
 
 	/** InputRef **/
 	GetInputRef() []*ConnectingObject
@@ -19,4 +20,7 @@ type FlowNodeInstance interface {
 	/** OutputRef **/
 	GetOutputRef() []*ConnectingObject
 	SetOutputRef(interface{})
+
+	/** Get the parent process instance pointer **/
+	GetProcessInstancePtr() *ProcessInstance
 }

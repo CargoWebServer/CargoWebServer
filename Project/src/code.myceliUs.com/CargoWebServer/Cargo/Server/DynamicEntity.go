@@ -79,6 +79,9 @@ func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error)
  * Create a new dynamic entity...
  */
 func (this *EntityManager) NewDynamicEntity(values map[string]interface{}) (*DynamicEntity, *CargoEntities.Error) {
+	this.Lock()
+	defer this.Unlock()
+
 	var entity *DynamicEntity
 
 	if len(values["UUID"].(string)) > 0 {

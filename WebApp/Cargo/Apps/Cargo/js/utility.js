@@ -58,6 +58,12 @@ function isString(o) {
     return (Object.prototype.toString.call(o) === '[object String]');
 }
 
+/**
+ * Test if a given string is an object reference.
+ */
+function isObjectReference(ref){
+    return /^[a-zA-Z_$][a-zA-Z_$0-9]*(\.[a-zA-Z_$][a-zA-Z_$0-9]*)+(\.[a-zA-Z_$][a-zA-Z_$0-9]*)*\%[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(ref)
+}
 
 /**
  * Test if a given input is a json string.

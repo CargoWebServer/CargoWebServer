@@ -184,6 +184,9 @@ EntityPanel.prototype.setEntity = function (entity) {
 		return
 	}
 
+	// Set the panel id with the entity id.
+	this.panel.element.id = entity.UUID
+
 	// Here I will associate the panel and the entity.
 	if (this.entity != null) {
 
@@ -252,7 +255,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 		var field = this.proto.Fields[index]
 		var fieldType = this.proto.FieldsType[index]
 		var fieldVisibility = this.proto.FieldsVisibility[index]
-		
+
 		if (fieldVisibility == true) {
 			var control = this.controls[this.proto.TypeName + "_" + field]
 			var value = this.entity[field]
@@ -261,9 +264,14 @@ EntityPanel.prototype.setEntity = function (entity) {
 					control.parentEntity = entity
 				}
 			}
+
 			if (value != null && control != null && value != "") {
 				if (control.setFieldValue == undefined) {
-					this.setFieldValue(control, field, fieldType, value, entity.UUID)
+					if (fieldType == "xs.[]uint8") {
+						this.setGenericFieldValue(control, field, value, entity.UUID)
+					} else {
+						this.setFieldValue(control, field, fieldType, value, entity.UUID)
+					}
 				} else {
 					// Here the control is a entity panel so i will redirect 
 					// the entity to the control.
@@ -272,7 +280,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 					}
 				}
 			} else if (control == null) {
-				console.log("No control found for display value " + value)
+				console.log("No control found for display value " + value + " with type name " + fieldType)
 			} else if (value == null || value == "") {
 				console.log("The value is null or empty.")
 			}
@@ -548,6 +556,14 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 	// The entity div.
 	var entityDiv = parent.appendElement({ "tag": "div", "class": "entity" }).down()
+	var id = this.proto.TypeName + "_" + field
+	
+
+	// In case of a generic value....
+	if (fieldType == "xs.[]uint8") {
+		this.controls[id] = parent
+		return
+	}
 
 	// The entity label here...
 	var label = entityDiv.appendElement({ "tag": "div", id: this.proto.TypeName + "_" + field + "_lbl" }).down()
@@ -557,7 +573,6 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 	// Now the entity value...
 	var valueDiv = entityDiv.appendElement({ "tag": "div" }).down()
-	var id = this.proto.TypeName + "_" + field
 	var control = null
 	var isArray = fieldType.startsWith("[]")
 	var isRef = fieldType.endsWith(":Ref")
@@ -590,6 +605,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 			// Here I will create the add button...
 			newLnkButton = label.appendElement({ "tag": "div", "class": "entities_btn", "style": "display: none;", "id": this.proto.TypeName + "_" + fieldType + "_" + field + "_plus_btn" }).down()
 			newLnkButton.appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
+			newLnkButton.element.style.verticalAlign = "middle"
 			if (!isRef) {
 				var itemTable = undefined
 				if (field != "M_listOf" && !fieldType.startsWith("xs.")) {
@@ -667,23 +683,38 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						// Display it
 						entityPanel.controls[id + "_new"].element.style.display = ""
 
-						// Now i will set it autocompletion list...
-						attachAutoCompleteInput(entityPanel.controls[id + "_new"], fieldType, field, entityPanel, entityPanel.entity.getTitles(),
-							function (entityPanel, field, fieldsType) {
-								return function (value) {
-									// Here I will set the field of the entity...
-									if (entityPanel.entity != undefined) {
-										// Set the new object value.
-										appendObjectValue(entityPanel.entity, field, value)
-										// Automatically saved...
-										server.entityManager.saveEntity(entityPanel.entity)
+						// Get the pacakge prototypes...
+						var typeName = fieldType.replace("[]", "").replace(":Ref", "")
+						server.entityManager.getEntityPrototypes(typeName.split(".")[0],
+							function (result, caller) {
 
-									}
-								}
-							} (entityPanel, field))
+								// Set variables...
+								var entityPanel = caller.entityPanel
+								var id = caller.id
+								var field = caller.field
+								var prototype = server.entityManager.entityPrototypes[caller.typeName]
 
-						entityPanel.controls[id + "_new"].element.focus()
-						entityPanel.controls[id + "_new"].element.select();
+								// Now i will set it autocompletion list...
+								attachAutoCompleteInput(entityPanel.controls[id + "_new"], fieldType, field, entityPanel, prototype.getTitles(),
+									function (entityPanel, field, fieldsType) {
+										return function (value) {
+											// Here I will set the field of the entity...
+											if (entityPanel.entity != undefined) {
+												// Set the new object value.
+												appendObjectValue(entityPanel.entity, field, value)
+												// Automatically saved...
+												server.entityManager.saveEntity(entityPanel.entity)
+											}
+										}
+									} (entityPanel, field))
+
+								entityPanel.controls[id + "_new"].element.focus()
+								entityPanel.controls[id + "_new"].element.select();
+							},
+							// The error callback.
+							function () {
+							}, { "entityPanel": entityPanel, "field": field, "id": id, "typeName": typeName })
+
 					} else {
 						// In that case I will create a new entity
 						if (itemPrototype != undefined) {
@@ -833,6 +864,47 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 }
 
 /**
+ * That function is use to display a field when there is no hint about the way to display it,
+ * so introspection will be use instead of entity prototype.
+ */
+EntityPanel.prototype.setGenericFieldValue = function (control, field, value, parentUuid) {
+
+	// First I will get the parent entity.
+	var parentEntity = server.entityManager.entities[parentUuid]
+	var id = parentEntity.TYPENAME + "_" + field
+	var fieldType
+
+	if (isString(value)) {
+		// Here I will create a xs control...
+		fieldType = "xs.string"
+	} else {
+		// Here I will create a xs control to display an object reference.
+		if (!isArray(value)) {
+			fieldType = value.TYPENAME + ":Ref"
+			setRef(parentEntity, field, value, false)
+		} else {
+			for (var i = 0; i < value.length; i++) {
+				// In the case of an array...
+				if (isObject(value[i])) {
+					fieldType = "[]" + value[0].TYPENAME + ":Ref"
+					setRef(parentEntity, field, value, true)
+				} else {
+					if (isString(value[i])) {
+						// an array of string...
+						fieldType = "[]xs.string"
+					}
+					// TODO implement other field type here.
+				}
+			}
+		}
+
+	}
+
+	this.initField(control, field, fieldType, [])
+	this.setFieldValue(this.controls[id], field, fieldType, value, parentUuid)
+}
+
+/**
  * (Multiple value) If the object is a sub-object I will display a table with the value of the sub-object.
  * Composition
  */
@@ -921,6 +993,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 		valueDiv.element.style.width = "auto"
 		var ln = valueDiv.appendElement({ "tag": "div", "class": "entities_btn_container" }).down()
 		var ref = ln.appendElement({ "tag": "div" }).down().appendElement({ "tag": "a", "href": "#", "title": object.TYPENAME, "innerHtml": refName }).down()
+		ref.element.id = object.UUID
 		var deleteLnkButton = ln.appendElement({ "tag": "div", "class": "entities_btn" }).down().appendElement({ "tag": "i", "class": "fa fa-trash" }).down()
 
 		// Now the action...
@@ -1042,6 +1115,10 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 						// nothing to here.
 					},
 					undefined)
+				// in case of local object.
+				if (entity.onChange != undefined) {
+					entity.onChange(entity)
+				}
 			}
 		} (this.entity.UUID, object, field)
 	}
@@ -1064,6 +1141,20 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 	if (control == undefined) {
 		return
 	}
+
+	// In case of a reference string...
+	if (fieldType == "xs.string") {
+		if (isObjectReference(value)) {
+			// In that case I will create the link object to reach the 
+			// reference...
+			fieldType = value.split("%")[0] + ":Ref"
+
+			// Here I will remove the default control and replace it by a div where the reference will be placed.
+			control.element.parentNode.removeChild(control.element)
+			control = control.parentElement.appendElement({"tag":"div"}).down()
+		}
+	}
+
 	this.maximizeBtn.element.click()
 	// Here I will see if the type is derived basetype...
 	if (fieldType.startsWith("enum:")) {
@@ -1119,7 +1210,10 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 						} else {
 							uuid = value[i]
 						}
-						if (uuid.length > 0) {
+						if (uuid.length > 0 && isObjectReference(uuid)) {
+							if (this.entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
+								setRef(this.entity, field, uuid, true)
+							}
 							this.entity["set_" + field + "_" + uuid + "_ref"](
 								function (panel, control, field, fieldType) {
 									return function (ref) {
@@ -1153,8 +1247,10 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 					} else {
 						uuid = value
 					}
-					if (uuid.length > 0) {
-
+					if (uuid.length > 0 && isObjectReference(uuid)) {
+						if (this.entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
+							setRef(this.entity, field, uuid, false)
+						}
 						this.entity["set_" + field + "_" + uuid + "_ref"](
 							function (panel, control, field, fieldType) {
 								return function (ref) {
@@ -1193,6 +1289,9 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 		ids = []
 	}
 
+	input.element.readOnly = true
+	input.element.style.cursor = "progress"
+	input.element.style.width = "auto"
 
 	server.entityManager.getObjectsByType(typeName, typeName.split(".")[0], "",
 		// Progress...
@@ -1211,6 +1310,9 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 			var ids = caller.ids
 			var field = caller.field
 			var lst = []
+
+			input.element.readOnly = false
+			input.element.style.cursor = "default"
 
 			if (results.length > 0) {
 				var prototype = server.entityManager.entityPrototypes[results[0].TYPENAME]

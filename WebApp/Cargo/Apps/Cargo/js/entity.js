@@ -576,7 +576,6 @@ function SaveEntity(entity, typeName) {
  * @param {object} caller A place to store object from the request context and get it back from the response context.
  */
 EntityManager.prototype.saveEntity = function (entity, successCallback, errorCallback, caller) {
-
     // server is the client side singleton.
     entity.NeedSave = true
     var params = []
@@ -605,7 +604,9 @@ EntityManager.prototype.saveEntity = function (entity, successCallback, errorCal
         function (errMsg, caller) {
             console.log(errMsg)
             server.errorManager.onError(errMsg)
-            caller.errorCallback(errMsg, caller.caller)
+            if (caller.errorCallback != undefined) {
+                caller.errorCallback(errMsg, caller.caller)
+            }
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
@@ -952,6 +953,14 @@ var EntityPrototype = function () {
 }
 
 /**
+ * Return the list of field to be used as title.
+ */
+EntityPrototype.prototype.getTitles = function () {
+    // The get title default function... can be overload.
+    return [this.Ids[1]] // The first index only...
+}
+
+/**
  * Create a new class form json object.
  * @param {object} object The object that regroup the prototype properties.
  */
@@ -1068,53 +1077,35 @@ function appendObjectValue(object, field, value) {
                     }
                 }
             }
-            // Append or replace the value.
-            if (!isExist) {
-                index = object[field].length
-                object[field].push(value)
-            } else {
-                object[field][index] = value
-            }
 
-            // The set and reset function.
+            // Set the reference in case of reference
             if (isRef) {
-                // The reset function.
-                object["reset_" + field + "_" + value.UUID + "_ref"] = function (entity, propertyName, index, refUuid) {
-                    return function () {
-                        entity[propertyName][index] = refUuid
-                    }
-                } (object, field, index, value.UUID)
-
-                // The set function.
-                object["set_" + field + "_" + value.UUID + "_ref"] = function (entity, propertyName, index, refUuid) {
-                    return function () {
-                        entity[propertyName][index] = server.entityManager.entities[refUuid] // Set back the id of the reference.
-                    }
-                } (object, field, index, value.UUID)
+                setRef(object, field, value.UUID, true)
+            } else {
+                // Append or replace the value in case of an array.
+                if (!isExist) {
+                    index = object[field].length
+                    object[field].push(value)
+                } else {
+                    object[field][index] = value
+                }
             }
 
         } else {
             object[field] = value
             if (isRef) {
-                // The reset function.
-                object["reset_" + field + "_" + value.UUID + "_ref"] = function (entity, propertyName, refUuid) {
-                    return function () {
-                        entity[propertyName] = refUuid // Set back the id of the reference.
-                    }
-                } (object, field, value.UUID)
-
-                // The set function.
-                object["set_" + field + "_" + value.UUID + "_ref"] = function (entity, propertyName, refUuid) {
-                    return function () {
-                        entity[propertyName] = server.entityManager.entities[refUuid] // Set back the id of the reference.
-                    }
-                } (object, field, value.UUID)
+                setRef(object, field, value.UUID, false)
             }
         }
     }
 
     // Set need save to the object.
     object["NeedSave"] = true
+
+    // Can be usefull to intercept change event...
+    if (object.onChange != undefined) {
+        object.onChange(object)
+    }
 }
 
 /**
@@ -1200,7 +1191,6 @@ function resetObjectValues(object) {
         /** Only reference must be reset here. */
         if (propertyId.startsWith("reset_") && propertyId.endsWith("_ref")) {
             // Call the reset function.
-            console.log("call ", propertyId)
             object[propertyId]()
         }
     }
@@ -1276,6 +1266,12 @@ function setRef(owner, property, refValue, isArray) {
         owner.references.push(refValue)
     }
 
+    if (!isObjectReference(refValue)) {
+        owner[property] = refValue
+        return owner
+    }
+
+
     if (isArray) {
         var index = owner[property].length
         if (owner[property].indexOf(refValue) == -1) {
@@ -1294,7 +1290,14 @@ function setRef(owner, property, refValue, isArray) {
             /* The set reference fucntion **/
             owner["set_" + property + "_" + refValue + "_ref"] = function (entityUuid, propertyName, index, refValue) {
                 return function (initCallback) {
-                    if (server.entityManager.entities[refValue] != undefined) {
+                    var isExist = server.entityManager.entities[refValue] != undefined
+                    var isInit = false
+
+                    if (isExist) {
+                        isInit = server.entityManager.entities[refValue].IsInit
+                    }
+
+                    if (isExist && isInit) {
                         // Here the reference exist on the server.
                         var entity = server.entityManager.entities[entityUuid]
                         var ref = server.entityManager.entities[refValue]
@@ -1455,6 +1458,10 @@ function setObjectValues(object, values) {
 
     // Get the entity prototype.
     var prototype = server.entityManager.entityPrototypes[object["TYPENAME"]]
+    if (prototype == undefined) {
+        return
+    }
+
     server.entityManager.setEntity(object)
 
     ////////////////////////////////////////////////////////////////////////
@@ -1555,7 +1562,7 @@ function setObjectValues(object, values) {
                                     return function (val) {
                                         server.entityManager.entities[uuid][property] = val
                                     }
-                                }(object.UUID, property)
+                                } (object.UUID, property)
 
                                 obj.init(jsonObj)
                             } else {
@@ -1564,12 +1571,12 @@ function setObjectValues(object, values) {
                                     var obj = eval("new " + jsonObj_.TYPENAME + "()")
                                     obj.initCallback = function (uuid, property) {
                                         return function (val) {
-                                            if(server.entityManager.entities[uuid][property]==""){
-                                                server.entityManager.entities[uuid][property]=[]
+                                            if (server.entityManager.entities[uuid][property] == "") {
+                                                server.entityManager.entities[uuid][property] = []
                                             }
                                             server.entityManager.entities[uuid][property].push(val)
                                         }
-                                    }(object.UUID, property)
+                                    } (object.UUID, property)
                                     obj.init(jsonObj_)
                                 }
                             }
