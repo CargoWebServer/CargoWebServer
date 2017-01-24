@@ -24,6 +24,7 @@
 * Creates a child element for a given parent.
 * @param parent The parent of the child element.
 * @param node The child element node.
+* @stability 1
 */
 function createChildElement(parent, node) {
 
@@ -53,6 +54,7 @@ function createChildElement(parent, node) {
 * Builds an element from a plain xml string.
 * @param parent The parent of the resulting element.
 * @param xml The xml string.
+* @stability 1
 */
 function createElementFromXml(parent, xml) {
 
@@ -70,6 +72,7 @@ function createElementFromXml(parent, xml) {
 * Builds an element from a plain html string.
 * @param parent The parent of the resulting element.
 * @param html The xml string.
+* @stability 0
 */
 function createElementFromHtml(parent, html) {
     var parser = new DOMParser();
@@ -89,11 +92,12 @@ function createElementFromHtml(parent, html) {
   *@param parent The parent element of this element. Can be an Element or a DOM element.
 * @param params The list of parameters.
 * @param callback This function is called after the initialization is completed.
-* @param isAppendAtFront If true the element is put in front of the other elements, otherwise it will be at the end.
+* @param isFirstChild If true the element is put in front of the other elements, otherwise it will be at the end.
 * @returns {HTMLElement}
 * @constructor
+* @stability 1
 */
-var Element = function (parent, params, callback, isAppendAtFront) {
+var Element = function (parent, params, callback, isFirstChild) {
 
     /**
      * @property {function} callback The function to call after the initialization.
@@ -163,7 +167,7 @@ var Element = function (parent, params, callback, isAppendAtFront) {
 
             if (parent != null) {
                 // Append child
-                if (isAppendAtFront == undefined) {
+                if (!isFirstChild) {
                     if (parent.element == undefined) {
                         parent.appendChild(this.element)
                     } else {
@@ -209,6 +213,7 @@ var Element = function (parent, params, callback, isAppendAtFront) {
 * @param {Element} e The element to append. It can be an existing element, or a list of element properties.
 * @returns {HTMLElement}
 * @example var child = parent.appendElement({"tag":"div", "class":"myClass", "style":"position:absolute; with:1px;"}).down()
+* @stability 1
 */
 Element.prototype.appendElement = function (e) {
     if(e == undefined){
@@ -242,6 +247,7 @@ Element.prototype.appendElement = function (e) {
 * @param e The element to append. It can be an existing element, or a list of element properties.
 * @returns {HTMLElement}
 * @example var child = parent.prependElement({"tag":"div", "class":"myClass", "style":"position:absolute; with:1px;"}).down()
+* @stability 1
 */
 Element.prototype.prependElement = function (e) {
     if (e.element != undefined) {
@@ -275,6 +281,7 @@ Element.prototype.prependElement = function (e) {
 /**
 * Remove a child element.
 * @param {Element} e The child element to remove.
+* @stability 1
 */
 Element.prototype.removeElement = function (e) {
     // Remove it from the DOM
@@ -286,6 +293,7 @@ Element.prototype.removeElement = function (e) {
 
 /**
 * Remove all the childs of an element.
+* @stability 1
 */
 Element.prototype.removeAllChilds = function () {
     for (var id in this.childs) {
@@ -303,6 +311,7 @@ Element.prototype.removeAllChilds = function () {
 * Initialization of the element
 * Recursive function called from the most exterior Element.
 * @returns {HTMLElement}
+* @stability 1
 */
 Element.prototype.init = function () {
     var keys = Object.keys(this.childs)
@@ -329,6 +338,7 @@ Element.prototype.init = function () {
  * recursively with a given Id. 
  * @param {string} id The id of the element to retreive.
 * @returns {Element}
+* @stability 1
 */
 Element.prototype.getChildById = function (id) {
     //console.log(id)
@@ -356,6 +366,7 @@ Element.prototype.getChildById = function (id) {
 /**
 * Get the root element.
 * @returns {Element} The root element.
+* @stability 1
 */
 Element.prototype.getTopParent = function () {
     var topParent = null
@@ -370,6 +381,7 @@ Element.prototype.getTopParent = function () {
 /**
 * Navigation function used to navigate upwards in the Element hierarchy.
 * @returns {Element} The immediate parent.
+* @stability 1
 */
 Element.prototype.up = function () {
     if (this.parentElement == null) {
@@ -383,6 +395,7 @@ Element.prototype.up = function () {
 /**
 * Navigation function used to navigate downwards in the Element hierarchy.
 * @returns {Element} The last child.
+* @stability 1
 */
 Element.prototype.down = function () {
     return this.lastChild
@@ -393,6 +406,7 @@ Element.prototype.down = function () {
 * The childs that are moved into this element will be removed from their 
  * previous parents.
 * @param {Element} childs The Childs to move.
+* @stability 1
 */
 Element.prototype.moveChildElements = function (childs) {
     for (var childId in childs) {
@@ -415,6 +429,7 @@ Element.prototype.moveChildElements = function (childs) {
 * The childs that are copied into this element will still be 
  * childs of their previous parents.
 * @param {Element} childs The Childs to copy.
+* @stability 1
 */
 Element.prototype.copyChildElements = function (childs) {
     for (var childId in childs) {
@@ -430,6 +445,7 @@ Element.prototype.copyChildElements = function (childs) {
  * Set Style attribute of an element.
 * @param attribute: string
 * @param value: string
+* @stability 1
 */
 Element.prototype.setStyle = function (attribute, value) {
     this.element.style[attribute] = value
@@ -439,6 +455,7 @@ Element.prototype.setStyle = function (attribute, value) {
 * Set Attribute of an element.
 * @param attribute: string
 * @param value: string
+* @stability 1
 */
 Element.prototype.setAttribute = function (attribute, value) {
     this.element[attribute] = value
@@ -452,6 +469,7 @@ Element.prototype.setAttribute = function (attribute, value) {
 * @param transition The function to use for transition.
 * @param fillMode CSS3 animation-fill-mode Property.
 * @param iteration The number of animation repetition.
+* @stability 1
 */
 Element.prototype.animate = function (keyframe, time, endAnimationCallback, transition, fillMode, iteration) {
 
