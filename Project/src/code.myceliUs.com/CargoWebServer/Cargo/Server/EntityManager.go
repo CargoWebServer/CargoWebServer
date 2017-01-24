@@ -184,9 +184,19 @@ type Entity interface {
 ////////////////////////////////////////////////////////////////////////////////
 //						Entity Manager
 ////////////////////////////////////////////////////////////////////////////////
+
+var entityManager *EntityManager
+
+func (this *Server) GetEntityManager() *EntityManager {
+	if entityManager == nil {
+		entityManager = newEntityManager()
+	}
+	return entityManager
+}
+
 func newEntityManager() *EntityManager {
 
-	entityManager := new(EntityManager)
+	entityManager = new(EntityManager)
 
 	// Create prototypes...
 	// Workflow manager.
@@ -281,7 +291,7 @@ func (this *EntityManager) getCargoEntities() *CargoEntities_EntitiesEntity {
  * Determines if the entity exists in the cacheManager map.
  */
 func (this *EntityManager) contain(uuid string) (Entity, bool) {
-	return server.cacheManager.contains(uuid)
+	return server.GetCacheManager().contains(uuid)
 }
 
 /**
@@ -292,7 +302,7 @@ func (this *EntityManager) contain(uuid string) (Entity, bool) {
 func (this *EntityManager) insert(entity Entity) {
 
 	// Set the cache...
-	server.cacheManager.setEntity(entity)
+	server.GetCacheManager().setEntity(entity)
 
 }
 
@@ -301,7 +311,7 @@ func (this *EntityManager) insert(entity Entity) {
  * Removes an existing entity with a given uuid from the cacheManager's map.
  */
 func (this *EntityManager) removeEntity(uuid string) {
-	server.cacheManager.removeEntity(uuid)
+	server.GetCacheManager().removeEntity(uuid)
 }
 
 /**

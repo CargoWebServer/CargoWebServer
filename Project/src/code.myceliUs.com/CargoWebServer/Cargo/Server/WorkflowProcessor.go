@@ -61,6 +61,15 @@ type WorkflowProcessor struct {
 	availableTagNumber []string
 }
 
+var workflowProcessor *WorkflowProcessor
+
+func (this *Server) GetWorkflowProcessor() *WorkflowProcessor {
+	if workflowProcessor == nil {
+		workflowProcessor = newWorkflowProcessor()
+	}
+	return workflowProcessor
+}
+
 func newWorkflowProcessor() *WorkflowProcessor {
 
 	// The workflow manger...

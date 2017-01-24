@@ -44,6 +44,15 @@ type FileManager struct {
 	mimeTypeMap map[string]*MimeType
 }
 
+var fileManager *FileManager
+
+func (this *Server) GetFileManager() *FileManager {
+	if fileManager == nil {
+		fileManager = newFileManager()
+	}
+	return fileManager
+}
+
 /**
  * Create a new file manager...
  */

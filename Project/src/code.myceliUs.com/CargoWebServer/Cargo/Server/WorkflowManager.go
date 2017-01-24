@@ -18,6 +18,15 @@ import (
 type WorkflowManager struct {
 }
 
+var workflowManager *WorkflowManager
+
+func (this *Server) GetWorkflowManager() *WorkflowManager {
+	if workflowManager == nil {
+		workflowManager = newWorkflowManager()
+	}
+	return workflowManager
+}
+
 func newWorkflowManager() *WorkflowManager {
 	// The workflow manger...
 	workflowManager := new(WorkflowManager)

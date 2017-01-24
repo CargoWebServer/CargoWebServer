@@ -24,8 +24,8 @@ func NewLogger(id string) *Logger {
 		logger.logEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(id, nil)
 		logger.logEntity.GetObject().(*CargoEntities.Log).SetId(id)
 
-		server.entityManager.getCargoEntities().GetObject().(*CargoEntities.Entities).SetEntities(logger.logEntity.GetObject())
-		server.entityManager.getCargoEntities().SaveEntity()
+		server.GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetEntities(logger.logEntity.GetObject())
+		server.GetEntityManager().getCargoEntities().SaveEntity()
 	}
 
 	return logger

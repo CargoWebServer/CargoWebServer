@@ -59,6 +59,15 @@ type EventManager struct {
 	sync.Mutex
 }
 
+var eventManager *EventManager
+
+func (this *Server) GetEventManager() *EventManager {
+	if eventManager == nil {
+		eventManager = newEventManager()
+	}
+	return eventManager
+}
+
 /**
  * A singleton that manage the event channels...
  */

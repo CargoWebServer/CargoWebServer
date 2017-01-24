@@ -45,6 +45,15 @@ type SchemaManager struct {
 	prototypes map[string]*EntityPrototype
 }
 
+var schemaManager *SchemaManager
+
+func (this *Server) GetSchemaManager() *SchemaManager {
+	if schemaManager == nil {
+		schemaManager = newSchemaManager()
+	}
+	return schemaManager
+}
+
 func newSchemaManager() *SchemaManager {
 	schemaManager := new(SchemaManager)
 

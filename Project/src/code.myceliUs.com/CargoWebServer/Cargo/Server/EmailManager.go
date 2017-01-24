@@ -18,6 +18,15 @@ type EmailManager struct {
 	m_infos map[string]CargoConfig.SmtpConfiguration
 }
 
+var emailManager *EmailManager
+
+func (this *Server) GetEmailManager() *EmailManager {
+	if emailManager == nil {
+		emailManager = newEmailManager()
+	}
+	return emailManager
+}
+
 /**
  * Carbon copy list...
  */

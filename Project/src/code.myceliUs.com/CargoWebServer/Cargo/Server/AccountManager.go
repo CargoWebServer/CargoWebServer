@@ -16,12 +16,20 @@ import (
 type AccountManager struct {
 }
 
+var accountManager *AccountManager
+
 /**
  * Create a new account manager
  */
 func newAccountManager() *AccountManager {
 	accountManager := new(AccountManager)
+	return accountManager
+}
 
+func (this *Server) GetAccountManager() *AccountManager {
+	if accountManager == nil {
+		accountManager = newAccountManager()
+	}
 	return accountManager
 }
 
@@ -120,7 +128,7 @@ func (this *AccountManager) GetAccountById(name string, messageId string, sessio
 		return nil
 	}
 
-	accountEntity, errObj := server.entityManager.getEntityByUuid(accountUuid)
+	accountEntity, errObj := server.GetEntityManager().getEntityByUuid(accountUuid)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
@@ -142,7 +150,7 @@ func (this *AccountManager) GetUserById(id string, messageId string, sessionId s
 		return nil
 	}
 
-	userEntity, errObj := server.entityManager.getEntityByUuid(userUuid)
+	userEntity, errObj := server.GetEntityManager().getEntityByUuid(userUuid)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil

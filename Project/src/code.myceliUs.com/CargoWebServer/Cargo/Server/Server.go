@@ -8,9 +8,6 @@ import (
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
-
-	"github.com/pkg/profile"
-	//"github.com/skratchdot/open-golang/open"
 )
 
 var (
@@ -18,51 +15,9 @@ var (
 )
 
 type Server struct {
-	// Singleton...
-	// The configuration manager.
-	configurationManager *ConfigurationManager
-
-	// The security manager.
-	securityManager *SecurityManager
-
-	// The event manager
-	eventManager *EventManager
-
-	// Session manager
-	sessionManager *SessionManager
-
-	// The account manager
-	accountManager *AccountManager
-
-	// Database accessor...
-	dataManager *DataManager
-
-	// The ldap manager
-	ldapManager *LdapManager
-
-	// The mail
-	emailManager *EmailManager
 
 	// The map of logger.
 	loggers map[string]*Logger
-
-	// The workflow manager
-	workflowManager *WorkflowManager
-
-	// The workflow processor
-	workflowProcessor *WorkflowProcessor
-
-	// The entity manager
-	entityManager *EntityManager
-
-	// File manager
-	fileManager *FileManager
-
-	// Project manager
-	projectManager *ProjectManager
-
-	// XSD/XML schma...
-	schemaManager *SchemaManager
 
 	// The network related stuff...
 	hub              *Hub
@@ -71,14 +26,8 @@ type Server struct {
 	// That map contain list of other server on the network.
 	peers map[string]connection
 
-	// Cache Manager
-	cacheManager *CacheManager
-
 	// The address information.
 	addressInfo *Utility.IPInfo
-
-	// The profiler...
-	profiler *profile.Profile
 }
 
 /**
@@ -88,49 +37,9 @@ func newServer() *Server {
 	// The server object itself...
 	server = new(Server)
 
-	// The configuration manager...
-	server.configurationManager = newConfigurationManager()
-
-	// Database accessor...
-	server.dataManager = newDataManager()
-
-	// The mail
-	// output mail...
-	server.emailManager = newEmailManager()
-
-	// The event manager.
-	server.eventManager = newEventManager()
-
-	// The account manager.
-	server.accountManager = newAccountManager()
-
-	// Session
-	server.sessionManager = newSessionManager()
-
-	// The ldap manager
-	server.ldapManager = newLdapManager()
-
-	// The entity manager
-	server.entityManager = newEntityManager()
-
-	// File manager
-	server.fileManager = newFileManager()
-
-	// Schema manager
-	server.schemaManager = newSchemaManager()
-
-	// The project manager
-	server.projectManager = newProjectManager()
-
-	// The security manager
-	server.securityManager = newSecurityManager()
-
 	// Network...
 	server.hub = NewHub()
 	server.messageProcessor = newMessageProcessor()
-
-	// The cache manager
-	server.cacheManager = newCacheManager()
 
 	// Initialyse with the default configuration.
 	server.initialize()
@@ -166,27 +75,22 @@ func (this *Server) initialize() {
 	this.peers = make(map[string]connection)
 
 	// Initialyse managers...
-	this.cacheManager.Initialize()
-	this.eventManager.Initialize()
-	this.configurationManager.Initialyze()
-	this.dataManager.Initialyze()
-	this.entityManager.Initialize()
-	this.sessionManager.Initialize()
-	this.accountManager.Initialize()
-	this.emailManager.Initialyze()
-	this.schemaManager.Initialyze()
+	this.GetCacheManager().Initialize()
+	this.GetEventManager().Initialize()
+
+	this.GetConfigurationManager().Initialyze()
+	this.GetDataManager().Initialyze()
+	this.GetEntityManager().Initialize()
+	this.GetSessionManager().Initialize()
+	this.GetAccountManager().Initialize()
+	this.GetEmailManager().Initialyze()
+	this.GetSchemaManager().Initialyze()
 
 	// The BPMN functionality...
-	// The workflow manager.
-	server.workflowManager = newWorkflowManager()
+	this.GetWorkflowManager().Initialize()
+	this.GetWorkflowProcessor().Initialize()
 
-	// The workflow processor.
-	server.workflowProcessor = newWorkflowProcessor()
-
-	this.workflowManager.Initialize()
-	this.workflowProcessor.Initialize()
-
-	this.securityManager.Initialize()
+	this.GetSecurityManager().Initialize()
 
 	// The map of loggers.
 	this.loggers = make(map[string]*Logger)
@@ -195,9 +99,9 @@ func (this *Server) initialize() {
 	logger := NewLogger("defaultErrorLogger")
 	this.loggers["defaultErrorLogger"] = logger
 
-	//this.fileManager.Initialize()
-	//this.ldapManager.Initialize()
-	//this.projectManager.Initialyze()
+	//this.GetFileManager().Initialize()
+	//this.GetLdapManager().Initialize()
+	//this.GetProjectManager().Initialyze()
 }
 
 /**
@@ -221,7 +125,7 @@ func (this *Server) startMessageProcessor() {
 }
 
 func (this *Server) startWorkflowProcessor() {
-	go this.workflowProcessor.run()
+	go this.GetWorkflowProcessor().run()
 }
 
 /**
@@ -263,13 +167,11 @@ func GetServer() *Server {
  * Start the server.
  */
 func (this *Server) Start() {
-	//this.profiler = profile.Start(profile.CPUProfile, profile.ProfilePath("."), profile.NoShutdownHook).(*profile.Profile)
 
-	log.Println("Start the server..." /*, this.addressInfo.IP*/)
+	log.Println("Start the server...")
 	// Start the server...
 	server.startMessageProcessor()
 	server.startHub()
-
 	server.startWorkflowProcessor()
 
 }
@@ -282,13 +184,14 @@ func (this *Server) Stop() {
 	// Stop processing...
 	server.messageProcessor.abortedByEnvironment <- true
 	server.hub.abortedByEnvironment <- true
-	server.cacheManager.abortedByEnvironment <- true
+
+	// Free the cache
+	server.GetCacheManager().abortedByEnvironment <- true
+
 	// Close all connection.
-	server.dataManager.close()
+	server.GetDataManager().close()
 
 	log.Println("Bye Bye :-)")
-
-	//this.profiler.Stop()
 
 	// Now stop the process.
 	os.Exit(0)
@@ -366,68 +269,13 @@ func (this *Server) Disconnect(host string, port int) {
 //////////////////////////////////////////////////////////
 // Getter
 //////////////////////////////////////////////////////////
-func (this *Server) GetAccountManager() *AccountManager {
-	return this.accountManager
-}
-
-func (this *Server) GetEntityManager() *EntityManager {
-	return this.entityManager
-}
-
-func (this *Server) GetLdapManager() *LdapManager {
-	return this.ldapManager
-}
-
-func (this *Server) GetDataManager() *DataManager {
-	return this.dataManager
-}
-
-func (this *Server) GetSessionManager() *SessionManager {
-	return this.sessionManager
-}
-
-func (this *Server) GetEventManager() *EventManager {
-	return this.eventManager
-}
-
-func (this *Server) GetSmtpManager() *EmailManager {
-	return this.emailManager
-}
-
-func (this *Server) GetSchemaManager() *SchemaManager {
-	return this.schemaManager
-}
 
 func (this *Server) GetProcessor() *MessageProcessor {
 	return this.messageProcessor
 }
 
-func (this *Server) GetWorkflowManager() *WorkflowManager {
-	return this.workflowManager
-}
-
-func (this *Server) GetWorkflowProcessor() *WorkflowProcessor {
-	return this.workflowProcessor
-}
-
 func (this *Server) GetHub() *Hub {
 	return this.hub
-}
-
-func (this *Server) GetFileManager() *FileManager {
-	return this.fileManager
-}
-
-func (this *Server) GetConfigurationManager() *ConfigurationManager {
-	return this.configurationManager
-}
-
-func (this *Server) GetSecurityManager() *SecurityManager {
-	return this.securityManager
-}
-
-func (this *Server) GetCacheManager() *CacheManager {
-	return this.cacheManager
 }
 
 func (this *Server) AppendLogger(logger *Logger) {

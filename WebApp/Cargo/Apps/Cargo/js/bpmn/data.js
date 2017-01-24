@@ -217,4 +217,9 @@ BpmnDataView.prototype.save = function (callback) {
     if (this.dataOutputsPanel != undefined) {
         saveData(this.dataOutputsPanel.entity, callback)
     }
+
+    if(this.dataOutputsPanel == undefined && this.dataInputsPanel == undefined){
+        // call the callback function...
+        callback([])
+    }
 }

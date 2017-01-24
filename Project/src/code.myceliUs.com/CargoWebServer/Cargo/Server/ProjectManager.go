@@ -18,6 +18,15 @@ type ProjectManager struct {
 	root           string
 }
 
+var projectManager *ProjectManager
+
+func (this *Server) GetProjectManager() *ProjectManager {
+	if projectManager == nil {
+		projectManager = newProjectManager()
+	}
+	return projectManager
+}
+
 /**
  * This function create and return the session manager...
  */
@@ -44,7 +53,7 @@ func (this *ProjectManager) Initialyze() {
 func (this *ProjectManager) synchronize() {
 	// Each directory contain an application...
 	files, _ := ioutil.ReadDir(this.root)
-	cargoEntities := server.entityManager.getCargoEntities()
+	cargoEntities := server.GetEntityManager().getCargoEntities()
 	for _, f := range files {
 		if f.IsDir() {
 			log.Println("Synchronize project ", f.Name())

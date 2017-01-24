@@ -46,6 +46,15 @@ type DataManager struct {
 	sync.RWMutex
 }
 
+var dataManager *DataManager
+
+func (this *Server) GetDataManager() *DataManager {
+	if dataManager == nil {
+		dataManager = newDataManager()
+	}
+	return dataManager
+}
+
 /**
  * This is the accessing function to dataStore...
  */

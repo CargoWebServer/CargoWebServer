@@ -63,6 +63,15 @@ type CacheManager struct {
 	ticker *time.Ticker
 }
 
+var cacheManager *CacheManager
+
+func (this *Server) GetCacheManager() *CacheManager {
+	if cacheManager == nil {
+		cacheManager = newCacheManager()
+	}
+	return cacheManager
+}
+
 /**
  * The cacheManager manages the memory and the lifetime of entities.
  */

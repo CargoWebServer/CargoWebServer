@@ -18,6 +18,15 @@ type SecurityManager struct {
 	guestRole *CargoEntities.Role
 }
 
+var securityManager *SecurityManager
+
+func (this *Server) GetSecurityManager() *SecurityManager {
+	if securityManager == nil {
+		securityManager = newSecurityManager()
+	}
+	return securityManager
+}
+
 func newSecurityManager() *SecurityManager {
 
 	securityManager := new(SecurityManager)
@@ -31,7 +40,7 @@ func (this *SecurityManager) Initialize() *CargoEntities.Error {
 
 	// Create the admin role if it doesn't exist
 	adminRoleUuid := CargoEntitiesRoleExists("adminRole")
-	cargoEntities := server.entityManager.getCargoEntities()
+	cargoEntities := server.GetEntityManager().getCargoEntities()
 
 	if len(adminRoleUuid) == 0 {
 
@@ -87,7 +96,7 @@ func (this *SecurityManager) createRole(id string) (*CargoEntities.Role, *CargoE
 	// Create the role with this id if it doesn't exist
 	uuid := CargoEntitiesRoleExists(id)
 	var role *CargoEntities.Role
-	cargoEntities := server.entityManager.getCargoEntities()
+	cargoEntities := server.GetEntityManager().getCargoEntities()
 
 	if len(uuid) == 0 {
 		roleEntity := GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(id, nil)
@@ -288,7 +297,7 @@ func (this *SecurityManager) setRestrictionRole(roleId string, action *CargoEnti
 	restriction.SetRolesRef(roleEntity.GetObject())
 
 	// Save the information.
-	cargoEntities := server.entityManager.getCargoEntities()
+	cargoEntities := server.GetEntityManager().getCargoEntities()
 	cargoEntities.GetObject().(*CargoEntities.Entities).SetRestrictions(restriction)
 	cargoEntities.SaveEntity()
 
@@ -486,7 +495,7 @@ func validateRestriction(actionId string, sessionId string) *CargoEntities.Error
 		actionEntity := GetServer().GetEntityManager().NewCargoEntitiesActionEntity(actionId, nil)
 		action = actionEntity.GetObject().(*CargoEntities.Action)
 		action.SetId(actionId)
-		cargoEntities := server.entityManager.getCargoEntities()
+		cargoEntities := server.GetEntityManager().getCargoEntities()
 		cargoEntities.GetObject().(*CargoEntities.Entities).SetEntities(action)
 		cargoEntities.SaveEntity()
 

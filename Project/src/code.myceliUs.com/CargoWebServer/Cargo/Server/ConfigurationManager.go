@@ -27,6 +27,15 @@ type ConfigurationManager struct {
 	m_configurationEntity *CargoConfig_ConfigurationsEntity
 }
 
+var configurationManager *ConfigurationManager
+
+func (this *Server) GetConfigurationManager() *ConfigurationManager {
+	if configurationManager == nil {
+		configurationManager = newConfigurationManager()
+	}
+	return configurationManager
+}
+
 func newConfigurationManager() *ConfigurationManager {
 
 	configurationManager := new(ConfigurationManager)

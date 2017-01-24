@@ -20,6 +20,15 @@ type LdapManager struct {
 	m_configsInfo map[string]CargoConfig.LdapConfiguration
 }
 
+var ldapManager *LdapManager
+
+func (this *Server) GetLdapManager() *LdapManager {
+	if ldapManager == nil {
+		ldapManager = newLdapManager()
+	}
+	return ldapManager
+}
+
 func newLdapManager() *LdapManager {
 
 	ldapManager := new(LdapManager)

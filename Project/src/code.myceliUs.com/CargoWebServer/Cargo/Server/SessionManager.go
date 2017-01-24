@@ -44,6 +44,15 @@ type SessionManager struct {
 	}
 }
 
+var sessionManager *SessionManager
+
+func (this *Server) GetSessionManager() *SessionManager {
+	if sessionManager == nil {
+		sessionManager = newSessionManager()
+	}
+	return sessionManager
+}
+
 /**
  * This function creates and return the session manager...
  */
