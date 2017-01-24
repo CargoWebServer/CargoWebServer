@@ -57,10 +57,6 @@ h5{
 	transition: all .0s ease;
 }
 
-.marketing .col-md-3:hover {
-	color:white;
-}
-
 .marketing .col-md-3 .glyphicon {
 	font-size: 60px;
 	background-color: #EAEAEA;
