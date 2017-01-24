@@ -2,6 +2,7 @@ package Server
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
@@ -28,6 +29,9 @@ type Server struct {
 
 	// The address information.
 	addressInfo *Utility.IPInfo
+
+	// The list of services...
+	services []ServiceInfo
 }
 
 /**
@@ -41,6 +45,8 @@ func newServer() *Server {
 	server.hub = NewHub()
 	server.messageProcessor = newMessageProcessor()
 
+	server.services = make([]ServiceInfo, 0)
+
 	// Initialyse with the default configuration.
 	server.initialize()
 
@@ -50,7 +56,6 @@ func newServer() *Server {
 	// if Cargoroot is not set...
 	if len(os.Getenv("CARGOROOT")) == 0 {
 		// In that case I will install the server...
-
 	}
 
 	// if the admin has password adminadmin I will display the setup wizard..
@@ -76,29 +81,52 @@ func (this *Server) initialize() {
 
 	// Initialyse managers...
 	this.GetCacheManager().Initialize()
+	// Must be start before other service initialization.
+	this.GetCacheManager().Start()
+
 	this.GetEventManager().Initialize()
 
+	// Basic services...
 	this.GetConfigurationManager().Initialyze()
 	this.GetDataManager().Initialyze()
+
 	this.GetEntityManager().Initialize()
 	this.GetSessionManager().Initialize()
 	this.GetAccountManager().Initialize()
+	this.GetSecurityManager().Initialize()
+
 	this.GetEmailManager().Initialyze()
 	this.GetSchemaManager().Initialyze()
 
-	// The BPMN functionality...
-	this.GetWorkflowManager().Initialize()
-	this.GetWorkflowProcessor().Initialize()
-
-	this.GetSecurityManager().Initialize()
-
 	// The map of loggers.
 	this.loggers = make(map[string]*Logger)
-
 	// The default error logger...
 	logger := NewLogger("defaultErrorLogger")
 	this.loggers["defaultErrorLogger"] = logger
 
+	// TODO load other module here...
+	root := this.GetConfigurationManager().GetApplicationDirectoryPath()
+	servicesInfo_, err := ioutil.ReadFile(root + "/services.json")
+	if err != nil {
+		log.Println("--> no services configuration was found!")
+	} else {
+		json.Unmarshal(servicesInfo_, &this.services)
+	}
+
+	// Optional services loading...
+	for i := 0; i < len(this.services); i++ {
+		// First of all I will retreive the service object...
+		/*params := make([]interface{})
+		service, err := Utility.CallMethod("Get"+this.services[i].Name, this.services)
+		if err != nil {
+			log.Println("--> service whit name ", this.services[i].Name, " dosen't exist!")
+		} else {
+
+		}*/
+	}
+
+	this.GetWorkflowManager().Initialize()
+	this.GetWorkflowProcessor().Initialize()
 	//this.GetFileManager().Initialize()
 	//this.GetLdapManager().Initialize()
 	//this.GetProjectManager().Initialyze()
@@ -122,10 +150,6 @@ func (this *Server) getConnectionById(id string) connection {
  */
 func (this *Server) startMessageProcessor() {
 	go this.messageProcessor.run()
-}
-
-func (this *Server) startWorkflowProcessor() {
-	go this.GetWorkflowProcessor().run()
 }
 
 /**
@@ -172,7 +196,21 @@ func (this *Server) Start() {
 	// Start the server...
 	server.startMessageProcessor()
 	server.startHub()
-	server.startWorkflowProcessor()
+
+	this.GetEventManager().Start()
+
+	// Starting basic services...
+	this.GetConfigurationManager().Start()
+	this.GetDataManager().Start()
+	this.GetEntityManager().Start()
+	this.GetSessionManager().Start()
+	this.GetAccountManager().Start()
+	this.GetEmailManager().Start()
+	this.GetSchemaManager().Start()
+	this.GetSecurityManager().Start()
+
+	// TODO start other other services here...
+	this.GetWorkflowProcessor().Start()
 
 }
 
@@ -185,11 +223,18 @@ func (this *Server) Stop() {
 	server.messageProcessor.abortedByEnvironment <- true
 	server.hub.abortedByEnvironment <- true
 
-	// Free the cache
-	server.GetCacheManager().abortedByEnvironment <- true
+	// Stoping service...
+	this.GetConfigurationManager().Stop()
+	this.GetDataManager().Stop()
+	this.GetEntityManager().Stop()
+	this.GetSessionManager().Stop()
+	this.GetAccountManager().Stop()
+	this.GetEmailManager().Stop()
+	this.GetSchemaManager().Stop()
+	this.GetSecurityManager().Stop()
 
-	// Close all connection.
-	server.GetDataManager().close()
+	// TODO stop other other services here...
+	this.GetWorkflowProcessor().Stop()
 
 	log.Println("Bye Bye :-)")
 

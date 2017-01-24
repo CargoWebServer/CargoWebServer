@@ -3,7 +3,7 @@ package Server
 import (
 	"encoding/json"
 
-	//"log"
+	"log"
 	"regexp"
 	"sync"
 
@@ -83,6 +83,14 @@ func newEventManager() *EventManager {
  */
 func (this *EventManager) Initialize() {
 	this.m_eventDataMap = make(map[*Event]string, 0)
+}
+
+func (this *EventManager) Start() {
+	log.Println("--> Start EventManager")
+}
+
+func (this *EventManager) Stop() {
+	log.Println("--> Stop EventManager")
 }
 
 /**

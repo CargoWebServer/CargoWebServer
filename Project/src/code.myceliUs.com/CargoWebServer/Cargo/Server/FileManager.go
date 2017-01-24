@@ -67,13 +67,19 @@ func newFileManager() *FileManager {
 }
 
 func (this *FileManager) Initialize() {
+
+}
+
+func (this *FileManager) Start() {
+	log.Println("--> Start FileManager")
 	// Now I will synchronize files...
 	rootDir := this.synchronize(this.root)
 	rootEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntityFromObject(rootDir)
 	rootEntity.SaveEntity()
+}
 
-	//server.entityManager.cargoEntities.GetObject().(*CargoEntities.Entities).SetEntities(rootEntity.GetObject())
-	//server.entityManager.cargoEntities.SaveEntity()
+func (this *FileManager) Stop() {
+	log.Println("--> Stop FileManager")
 }
 
 /**

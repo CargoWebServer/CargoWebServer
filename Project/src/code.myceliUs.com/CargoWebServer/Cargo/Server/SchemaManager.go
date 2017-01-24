@@ -172,6 +172,14 @@ func (this *SchemaManager) Initialyze() {
 	}
 }
 
+func (this *SchemaManager) Start() {
+	log.Println("--> Start SchemaManager")
+}
+
+func (this *SchemaManager) Stop() {
+	log.Println("--> Stop SchemaManager")
+}
+
 /**
  * Return the list of fields including parent fields
  */

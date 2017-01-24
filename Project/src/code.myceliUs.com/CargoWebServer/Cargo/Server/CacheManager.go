@@ -3,7 +3,7 @@ package Server
 import (
 	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
 
-	//"log"
+	"log"
 
 	"strings"
 	"time"
@@ -81,6 +81,47 @@ func newCacheManager() *CacheManager {
 }
 
 /**
+ * Intilialization of the cacheManager
+ */
+func (this *CacheManager) Initialize() {
+	this.entitiesMap = make(map[string]Entity, 0)
+	this.sessionIdsMap = make(map[string][]string, 0)
+
+	this.inputEntityChannel = make(chan Entity)
+	this.outputEntityChannel = make(chan struct {
+		entityUuid          string
+		entityOutputChannel chan Entity
+	})
+
+	this.sessionIdsChannel = make(chan struct {
+		entityUuid string
+		sessionId  string
+	})
+	this.removeEntityChannel = make(chan string)
+	this.removeSessionIdChannel = make(chan string)
+	this.abortedByEnvironment = make(chan bool)
+}
+
+func (this *CacheManager) Start() {
+	log.Println("--> Start CacheManager")
+	go this.run()
+
+	this.ticker = time.NewTicker(time.Millisecond * 2000)
+
+	go func(ticker *time.Ticker) {
+		for _ = range ticker.C {
+			GetServer().GetCacheManager().flushCache()
+		}
+	}(this.ticker)
+}
+
+func (this *CacheManager) Stop() {
+	log.Println("--> Stop CacheManager")
+	// Free the cache
+	this.abortedByEnvironment <- true
+}
+
+/**
  * Processing message from outside threads
  */
 func (this *CacheManager) run() {
@@ -125,38 +166,6 @@ func (this *CacheManager) run() {
 
 	// Stop the ticker.
 	this.ticker.Stop()
-}
-
-/**
- * Intilialization of the cacheManager
- */
-func (this *CacheManager) Initialize() {
-	this.entitiesMap = make(map[string]Entity, 0)
-	this.sessionIdsMap = make(map[string][]string, 0)
-
-	this.inputEntityChannel = make(chan Entity)
-	this.outputEntityChannel = make(chan struct {
-		entityUuid          string
-		entityOutputChannel chan Entity
-	})
-
-	this.sessionIdsChannel = make(chan struct {
-		entityUuid string
-		sessionId  string
-	})
-	this.removeEntityChannel = make(chan string)
-	this.removeSessionIdChannel = make(chan string)
-	this.abortedByEnvironment = make(chan bool)
-
-	go this.run()
-
-	this.ticker = time.NewTicker(time.Millisecond * 2000)
-
-	go func(ticker *time.Ticker) {
-		for _ = range ticker.C {
-			GetServer().GetCacheManager().flushCache()
-		}
-	}(this.ticker)
 }
 
 /**

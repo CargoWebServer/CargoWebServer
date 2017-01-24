@@ -3,7 +3,7 @@ package Server
 import (
 	"errors"
 
-	//	"log"
+	"log"
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
@@ -72,6 +72,14 @@ func (this *AccountManager) Initialize() {
 		// Save the account
 		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
 	}
+}
+
+func (this *AccountManager) Start() {
+	log.Println("--> Start AccountManager")
+}
+
+func (this *AccountManager) Stop() {
+	log.Println("--> Stop AccountManager")
 }
 
 /**

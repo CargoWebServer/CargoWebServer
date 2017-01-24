@@ -41,8 +41,12 @@ func newLdapManager() *LdapManager {
  * That function is use to synchronize the information of a ldap server
  * with a given id.
  */
-func (this *LdapManager) Initialize() error {
+func (this *LdapManager) Initialize() {
 
+}
+
+func (this *LdapManager) Start() {
+	log.Println("--> Start LdapManager")
 	ldapConfigurations := GetServer().GetConfigurationManager().GetLdapConfigurations()
 
 	for i := 0; i < len(ldapConfigurations); i++ {
@@ -56,25 +60,25 @@ func (this *LdapManager) Initialize() error {
 		err := this.SynchronizeUsers(info.M_id)
 		if err != nil {
 			log.Println("Synchronize Users Error ", err)
-			return err
 		}
 
 		// Synchronize the list of group...
 		err = this.SynchronizeGroups(info.M_id)
 		if err != nil {
 			log.Println("Synchronize Groups Error ", err)
-			return err
 		}
 
 		// Synchronize the list of computer...
 		err = this.SynchronizeComputers(info.M_id)
 		if err != nil {
 			log.Println("Synchronize Computers Error ", err)
-			return err
 		}
 
 	}
-	return nil
+}
+
+func (this *LdapManager) Stop() {
+	log.Println("--> Stop LdapManager")
 }
 
 /**

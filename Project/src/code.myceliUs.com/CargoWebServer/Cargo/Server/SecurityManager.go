@@ -3,7 +3,7 @@ package Server
 import (
 	"errors"
 
-	//	"log"
+	"log"
 	"reflect"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
@@ -86,6 +86,14 @@ func (this *SecurityManager) Initialize() *CargoEntities.Error {
 	}
 
 	return nil
+}
+
+func (this *SecurityManager) Start() {
+	log.Println("--> Start SecurityManager")
+}
+
+func (this *SecurityManager) Stop() {
+	log.Println("--> Stop SecurityManager")
 }
 
 /**

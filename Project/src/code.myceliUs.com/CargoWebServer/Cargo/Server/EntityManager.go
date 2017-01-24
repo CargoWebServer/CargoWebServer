@@ -205,6 +205,7 @@ func newEntityManager() *EntityManager {
 	entityManager.CreateDIPrototypes()
 	entityManager.CreateBPMN20Prototypes()
 	entityManager.CreateBPMS_RuntimePrototypes()
+
 	// Entity manager.
 	entityManager.CreateCargoConfigPrototypes()
 	entityManager.CreateCargoEntitiesPrototypes()
@@ -252,6 +253,14 @@ func (this *EntityManager) Initialize() {
 		this.cargoEntities.SaveEntity()
 	}
 
+}
+
+func (this *EntityManager) Start() {
+	log.Println("--> Start EntityManager")
+}
+
+func (this *EntityManager) Stop() {
+	log.Println("--> Stop EntityManager")
 }
 
 type EntityManager struct {

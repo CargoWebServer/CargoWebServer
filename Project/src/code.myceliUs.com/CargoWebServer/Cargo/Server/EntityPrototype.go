@@ -209,6 +209,69 @@ func (this *EntityPrototype) Create() {
 }
 
 /**
+ * Generate the JavaScript class defefinition.
+ */
+func (this *EntityPrototype) generateConstructor() string {
+	var packageName string
+
+	values := strings.Split(this.TypeName, ".")
+	packageName = values[0]
+	var constructorSrc = "var " + packageName + " = " + packageName + "|| {};\n"
+
+	// create sub-namspace if there is some.
+	if len(values) > 2 {
+		for i := 1; i < len(values)-1; i++ {
+			packageName += values[i]
+			constructorSrc += "var " + packageName + " = " + packageName + "|| {};\n"
+		}
+	}
+
+	constructorSrc += this.TypeName + " = function(){\n"
+
+	// Common properties share by all entity.
+	constructorSrc += " this.__class__ = \"" + this.TypeName + "\"\n"
+	constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
+	constructorSrc += " this.UUID = this.TYPENAME + \"%\" + randomUUID()\n"
+	constructorSrc += " this.uuid = this.UUID\n"
+	constructorSrc += " this.parentUuid = \"\"\n"
+	constructorSrc += " this.childsUuid = []\n"
+	constructorSrc += " this.references = []\n"
+	constructorSrc += " this.NeedSave = true\n"
+	constructorSrc += " this.IsInit = false\n"
+	constructorSrc += " this.exist = false\n"
+	constructorSrc += " this.initCallback = undefined\n"
+
+	// Fields.
+	for i := 0; i < len(this.Fields); i++ {
+		constructorSrc += " this." + this.Fields[i]
+		if strings.HasPrefix(this.FieldsType[i], "[]") {
+			constructorSrc += " = undefined\n"
+		} else {
+			if this.FieldsType[i] == "xs.string" || this.FieldsType[i] == "xs.ID" || this.FieldsType[i] == "xs.NCName" {
+				constructorSrc += " = \"\"\n"
+			} else if this.FieldsType[i] == "xs.int" || this.FieldsType[i] == "xs.double" {
+				constructorSrc += " = 0\n"
+			} else if this.FieldsType[i] == "xs.float64" || this.FieldsType[i] == "xs.double" {
+				constructorSrc += " = 0.0\n"
+			} else if this.FieldsType[i] == "xs.date" || this.FieldsType[i] == "xs.dateTime" {
+				constructorSrc += " = new Date()\n"
+			} else if this.FieldsType[i] == "xs.boolean" {
+				constructorSrc += " = false\n"
+			} else {
+				// Object here.
+				constructorSrc += " = undefined\n"
+			}
+		}
+	}
+
+	// Keep the reference on the entity prototype.
+	constructorSrc += " return this\n"
+	constructorSrc += "}\n"
+
+	return constructorSrc
+}
+
+/**
  * For debug purpose only...
  */
 func (this *EntityPrototype) Print() {

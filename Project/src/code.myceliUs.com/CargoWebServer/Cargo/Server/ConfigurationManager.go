@@ -107,6 +107,14 @@ func (this *ConfigurationManager) Initialyze() {
 	}
 }
 
+func (this *ConfigurationManager) Start() {
+	log.Println("--> Start ConfigurationManager")
+}
+
+func (this *ConfigurationManager) Stop() {
+	log.Println("--> Stop ConfigurationManager")
+}
+
 /**
  * Server configuration values...
  */

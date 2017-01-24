@@ -83,6 +83,14 @@ func (this *SessionManager) Initialize() {
 
 }
 
+func (this *SessionManager) Start() {
+	log.Println("--> Start SessionManager")
+}
+
+func (this *SessionManager) Stop() {
+	log.Println("--> Stop SessionManager")
+}
+
 /**
  * Processing message from outside threads
  */

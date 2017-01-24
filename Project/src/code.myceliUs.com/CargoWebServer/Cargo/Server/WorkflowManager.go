@@ -18,19 +18,19 @@ import (
 type WorkflowManager struct {
 }
 
+func newWorkflowManager() *WorkflowManager {
+	// The workflow manger...
+	workflowManager := new(WorkflowManager)
+
+	return workflowManager
+}
+
 var workflowManager *WorkflowManager
 
 func (this *Server) GetWorkflowManager() *WorkflowManager {
 	if workflowManager == nil {
 		workflowManager = newWorkflowManager()
 	}
-	return workflowManager
-}
-
-func newWorkflowManager() *WorkflowManager {
-	// The workflow manger...
-	workflowManager := new(WorkflowManager)
-
 	return workflowManager
 }
 
@@ -41,6 +41,18 @@ func (this *WorkflowManager) Initialize() {
 	// Here i will load the list of all definition into the
 	// entity mananager entity map.
 	GetServer().GetEntityManager().getEntitiesByType("BPMN20.Definitions", "", "BPMN20")
+}
+
+/**
+ * Start the service.
+ */
+func (this *WorkflowManager) Start() {
+	log.Println("--> Start WorkflowManager")
+}
+
+func (this *WorkflowManager) Stop() {
+	log.Println("--> Stop WorkflowManager")
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -318,14 +330,14 @@ func (this *WorkflowManager) GetDefinitionsById(id string, messageId string, ses
  * The start event definition data will be attach to the event definition,
  * as message data or signal data...
  */
-func (this *WorkflowManager) StartProcess(processUUID string, startEventData []*BPMS_Runtime.ItemAwareElementInstance, startEventDefinitionData interface{}, messageId string, sessionId string) {
+func (this *WorkflowManager) StartProcess(processUUID string, startEventData []interface{}, startEventDefinitionData interface{}, messageId string, sessionId string) {
 	trigger := new(BPMS_Runtime.Trigger)
 	trigger.UUID = "BPMS_Runtime.Trigger%" + Utility.RandomUUID()
 	trigger.M_processUUID = processUUID
 
 	// The event data...
 	for i := 0; i < len(startEventData); i++ {
-		trigger.SetDataRef(startEventData[i])
+		trigger.SetDataRef(startEventData[i].(*BPMS_Runtime.ItemAwareElementInstance))
 	}
 
 	trigger.M_eventTriggerType = BPMS_Runtime.EventTriggerType_Start

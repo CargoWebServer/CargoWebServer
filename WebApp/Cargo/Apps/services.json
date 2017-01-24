@@ -1,0 +1,9 @@
+[ {"Name":"EmailManager", "Start":true}, 
+  {"Name":"SchemaManager", "Start":true},	
+  {"Name":"LdapManager", "Start":false},
+  {"Name":"ProjectManager", "Start":false},
+  {"Name":"FileManager", "Start":false},
+  {"Name":"WorkflowManager", "Start":true}, 
+  {"Name":"WorkflowProcessor", "Start":true}
+]
+

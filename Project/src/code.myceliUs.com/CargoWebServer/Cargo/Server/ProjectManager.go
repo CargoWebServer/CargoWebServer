@@ -47,6 +47,14 @@ func (this *ProjectManager) Initialyze() {
 	this.synchronize()
 }
 
+func (this *ProjectManager) Start() {
+	log.Println("--> Start ProjectManager")
+}
+
+func (this *ProjectManager) Stop() {
+	log.Println("--> Stop ProjectManager")
+}
+
 /**
  * Synchronize all the project from application root directory.
  */

@@ -96,6 +96,15 @@ func (this *DataManager) Initialyze() {
 	}
 }
 
+func (this *DataManager) Start() {
+	log.Println("--> Start DataManager")
+}
+
+func (this *DataManager) Stop() {
+	log.Println("--> Stop DataManager")
+	this.close()
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private function
 ////////////////////////////////////////////////////////////////////////////////

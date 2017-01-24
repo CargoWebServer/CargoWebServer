@@ -75,6 +75,14 @@ func (this *EmailManager) Initialyze() {
 
 }
 
+func (this *EmailManager) Start() {
+	log.Println("--> Start EmailManager")
+}
+
+func (this *EmailManager) Stop() {
+	log.Println("--> Stop EmailManager")
+}
+
 /**
  * Validate email
  */
