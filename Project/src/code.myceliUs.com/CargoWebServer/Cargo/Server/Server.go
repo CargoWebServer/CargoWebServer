@@ -87,16 +87,13 @@ func (this *Server) initialize() {
 	this.GetEventManager().Initialize()
 
 	// Basic services...
-	this.GetConfigurationManager().Initialyze()
-	this.GetDataManager().Initialyze()
+	this.GetConfigurationManager().Initialize()
+	this.GetDataManager().Initialize()
 
 	this.GetEntityManager().Initialize()
 	this.GetSessionManager().Initialize()
 	this.GetAccountManager().Initialize()
 	this.GetSecurityManager().Initialize()
-
-	this.GetEmailManager().Initialyze()
-	this.GetSchemaManager().Initialyze()
 
 	// The map of loggers.
 	this.loggers = make(map[string]*Logger)
@@ -113,23 +110,18 @@ func (this *Server) initialize() {
 		json.Unmarshal(servicesInfo_, &this.services)
 	}
 
-	// Optional services loading...
+	// Optional services Initialysation...
 	for i := 0; i < len(this.services); i++ {
 		// First of all I will retreive the service object...
-		/*params := make([]interface{})
-		service, err := Utility.CallMethod("Get"+this.services[i].Name, this.services)
+		params := make([]interface{}, 0)
+		service, err := Utility.CallMethod(this, "Get"+this.services[i].Name, params)
 		if err != nil {
 			log.Println("--> service whit name ", this.services[i].Name, " dosen't exist!")
 		} else {
-
-		}*/
+			service.(Service).Initialize()
+		}
 	}
 
-	this.GetWorkflowManager().Initialize()
-	this.GetWorkflowProcessor().Initialize()
-	//this.GetFileManager().Initialize()
-	//this.GetLdapManager().Initialize()
-	//this.GetProjectManager().Initialyze()
 }
 
 /**
@@ -205,12 +197,21 @@ func (this *Server) Start() {
 	this.GetEntityManager().Start()
 	this.GetSessionManager().Start()
 	this.GetAccountManager().Start()
-	this.GetEmailManager().Start()
-	this.GetSchemaManager().Start()
 	this.GetSecurityManager().Start()
 
-	// TODO start other other services here...
-	this.GetWorkflowProcessor().Start()
+	// Optional services Initialysation...
+	for i := 0; i < len(this.services); i++ {
+		// First of all I will retreive the service object...
+		params := make([]interface{}, 0)
+		service, err := Utility.CallMethod(this, "Get"+this.services[i].Name, params)
+		if err != nil {
+			log.Println("--> service whit name ", this.services[i].Name, " dosen't exist!")
+		} else {
+			if this.services[i].Start {
+				service.(Service).Start()
+			}
+		}
+	}
 
 }
 
@@ -229,12 +230,20 @@ func (this *Server) Stop() {
 	this.GetEntityManager().Stop()
 	this.GetSessionManager().Stop()
 	this.GetAccountManager().Stop()
-	this.GetEmailManager().Stop()
-	this.GetSchemaManager().Stop()
 	this.GetSecurityManager().Stop()
+	this.GetCacheManager().Stop()
 
-	// TODO stop other other services here...
-	this.GetWorkflowProcessor().Stop()
+	// Optional services Initialysation...
+	for i := 0; i < len(this.services); i++ {
+		// First of all I will retreive the service object...
+		params := make([]interface{}, 0)
+		service, err := Utility.CallMethod(this, "Get"+this.services[i].Name, params)
+		if err != nil {
+			log.Println("--> service whit name ", this.services[i].Name, " dosen't exist!")
+		} else {
+			service.(Service).Stop()
+		}
+	}
 
 	log.Println("Bye Bye :-)")
 

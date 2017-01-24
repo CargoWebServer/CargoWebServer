@@ -53,15 +53,15 @@ func newEmailManager() *EmailManager {
 	Utility.RegisterType((*Attachment)(nil))
 	Utility.RegisterType((*CarbonCopy)(nil))
 
-	smtpManager := new(EmailManager)
+	emailManager := new(EmailManager)
 
-	return smtpManager
+	return emailManager
 }
 
 /**
  * Do intialysation stuff here.
  */
-func (this *EmailManager) Initialyze() {
+func (this *EmailManager) Initialize() {
 	this.m_infos = make(map[string]CargoConfig.SmtpConfiguration, 0)
 	smtpConfigurations := GetServer().GetConfigurationManager().GetSmtpConfigurations()
 
@@ -69,10 +69,6 @@ func (this *EmailManager) Initialyze() {
 	for i := 0; i < len(smtpConfigurations); i++ {
 		this.m_infos[smtpConfigurations[i].M_id] = smtpConfigurations[i]
 	}
-
-	// Pop configuration...
-	//this.ReceiveMailFunc("pop.gmail.com:995", "dave.courtois60@gmail.com", "400zm89a")
-
 }
 
 func (this *EmailManager) Start() {

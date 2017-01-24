@@ -68,7 +68,7 @@ func newConfigurationManager() *ConfigurationManager {
 /**
  * Do intialysation stuff here.
  */
-func (this *ConfigurationManager) Initialyze() {
+func (this *ConfigurationManager) Initialize() {
 	// So here if there is no configuration...
 	cargoConfigsUuid := CargoConfigConfigurationsExists("CARGO_CONFIGURATIONS")
 	if len(cargoConfigsUuid) > 0 {

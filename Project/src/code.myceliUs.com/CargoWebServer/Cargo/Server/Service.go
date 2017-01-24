@@ -15,7 +15,7 @@ type ServiceInfo struct {
  */
 type Service interface {
 	/**
-	 * Initilaysation of the service.
+	 * Initialisation of the service.
 	 */
 	Initialize()
 

@@ -41,14 +41,15 @@ func newProjectManager() *ProjectManager {
 /**
  * Do intialysation stuff here.
  */
-func (this *ProjectManager) Initialyze() {
-	// First of all I will scan the application directory to see if project
-	// project exist...
-	this.synchronize()
+func (this *ProjectManager) Initialize() {
+
 }
 
 func (this *ProjectManager) Start() {
 	log.Println("--> Start ProjectManager")
+	// First of all I will scan the application directory to see if project
+	// project exist...
+	this.synchronize()
 }
 
 func (this *ProjectManager) Stop() {

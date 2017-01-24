@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"reflect"
 
 	"code.google.com/p/go-uuid/uuid"
 	"code.myceliUs.com/CargoWebServer/Cargo/BPMS"
@@ -330,14 +331,16 @@ func (this *WorkflowManager) GetDefinitionsById(id string, messageId string, ses
  * The start event definition data will be attach to the event definition,
  * as message data or signal data...
  */
-func (this *WorkflowManager) StartProcess(processUUID string, startEventData []interface{}, startEventDefinitionData interface{}, messageId string, sessionId string) {
+func (this *WorkflowManager) StartProcess(processUUID string, startEventData interface{}, startEventDefinitionData interface{}, messageId string, sessionId string) {
 	trigger := new(BPMS_Runtime.Trigger)
 	trigger.UUID = "BPMS_Runtime.Trigger%" + Utility.RandomUUID()
 	trigger.M_processUUID = processUUID
 
 	// The event data...
-	for i := 0; i < len(startEventData); i++ {
-		trigger.SetDataRef(startEventData[i].(*BPMS_Runtime.ItemAwareElementInstance))
+	if reflect.TypeOf(startEventData).String() == "[]*BPMS_Runtime.ItemAwareElementInstance" {
+		for i := 0; i < len(startEventData.([]*BPMS_Runtime.ItemAwareElementInstance)); i++ {
+			trigger.SetDataRef(startEventData.([]*BPMS_Runtime.ItemAwareElementInstance)[i])
+		}
 	}
 
 	trigger.M_eventTriggerType = BPMS_Runtime.EventTriggerType_Start

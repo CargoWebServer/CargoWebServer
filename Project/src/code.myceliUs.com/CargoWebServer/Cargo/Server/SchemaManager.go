@@ -84,7 +84,7 @@ func newSchemaManager() *SchemaManager {
 	return schemaManager
 }
 
-func (this *SchemaManager) Initialyze() {
+func (this *SchemaManager) Initialize() {
 
 	// Here I will initialyse the schema found in the schema directory.
 	// Those schema must be xml schema...

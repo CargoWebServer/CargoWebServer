@@ -82,7 +82,7 @@ func newDataManager() *DataManager {
 ////////////////////////////////////////////////////////////////////////////////
 //                   		DataManager function
 ////////////////////////////////////////////////////////////////////////////////
-func (this *DataManager) Initialyze() {
+func (this *DataManager) Initialize() {
 	// Here I will get the datastore configuration...
 	storeConfigurations := GetServer().GetConfigurationManager().GetDataStoreConfigurations()
 
