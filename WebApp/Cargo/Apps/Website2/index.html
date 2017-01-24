@@ -70,7 +70,7 @@
 				<div class="col-md-3 marketing2">
 					<span class="glyphicon glyphicon-play"></span>
 					<h2>Easiest setup</h2>
-					<p> Start coding right away. </p>
+					<p> One download. </p>
 				</div>
 				<div class="col-md-3 marketing3">
 					<span class="glyphicon glyphicon-road"></span>
@@ -106,8 +106,11 @@
 					<li id="tutorialsLink-frontEnd" class="tutorials-link"> 
 						<a href="#">Front End</a> 
 					</li>
-					<li id="tutorialsLink-javascriptPrinciples" class="tutorials-link"> 
-						<a href="#">Javascript principles</a> 
+					<li id="tutorialsLink-AsynchronousProgramming" class="tutorials-link"> 
+						<a href="#">Asynchronous Programming</a> 
+					</li>
+					<li id="tutorialsLink-events" class="tutorials-link"> 
+						<a href="#">Events</a> 
 					</li>
 					<li id="tutorialsLink-serverSide" class="tutorials-link"> 
 						<a href="#">Server-side</a> 
@@ -231,10 +234,9 @@
 
 				</div>
 			</div>
-			<div class="row tutorialsRow" id="tutorialsSection-javascriptPrinciples">
+			<div class="row tutorialsRow" id="tutorialsSection-AsynchronousProgramming">
 				<div class="col-xs-12">
-					<h2> Javascript principles </h2>
-					<h3> Asynchronous programming </h3>
+					<h2> Asynchronous programming </h2>
 					<p>
 						Asynchronous programming means that your web application can execute multiple segments of code simultaneously. To do so, Cargo uses 'callbacks'. A callback is a function that can be passed as an argument in another function. Cargo has three types of callbacks.
 					</p>
@@ -253,12 +255,22 @@
 					<p>Session manager's login function</p>
 					<pre><code class="javascript">var user = {<br>&#09;"userName" : "myUserName",<br>&#09;"password" : "password01"<br>};<br><br>server.sessionManager.login(<br>&#09;/* name */<br>&#09;user.userName,<br>&#09;/* password */<br>&#09;user.password,<br>&#09;/* Success Callback */<br>&#09;function (result, caller){<br>&#09;&#09;console.log(caller.userName + " logged in.");<br>&#09;},<br>&#09;/* Error Callback */<br>&#09;function (err, caller) {<br>&#09;&#09;console.log("Login error ", err);<br>&#09;},<br>&#09;/* caller */<br>&#09;{ "user": user}<br>);</code></pre>
 					<p>Note that the 'login' function has a success callback, an error callback and a caller but it does not have a progress callback.</p>
-
-					<h3> Events </h3>
-					<h4> Local events </h4>
-					<h4> Network events </h4>
 				</div>
 			</div>
+			<div class="row tutorialsRow" id="tutorialsSection-events">
+				<div class="col-xs-12">
+					<h2> Events </h2>
+					<h3> Event Manager </h3>
+					<h3> Local events </h3>
+					Local events will be accessible only from within the running application, meaning that other applications on the network will not be able to respond to those events.
+					<h4> Example </h4>
+					<h3> Network events </h3>
+					Network events are available to all other applications connected to the server.
+					<h3> Attaching events </h3>
+				</div>
+
+			</div>
+
 			<div class="row tutorialsRow" id="tutorialsSection-serverSide">
 				<div class="col-xs-12">
 					<h2> Server Side </h2>

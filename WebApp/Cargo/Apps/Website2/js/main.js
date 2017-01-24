@@ -32,7 +32,7 @@ $(".tutorials-link").click(function() {
 
 $("#frontEndNextTutorialLink").click(function() {
 	$('html, body').animate({
-		scrollTop: $('#tutorialsSection-javascriptPrinciples').offset().top
+		scrollTop: $('#tutorialsSection-AsynchronousProgramming').offset().top
 	}, 500);
 });
 
@@ -42,7 +42,7 @@ main()
 function main() {
 	// TODO delete auto clicks
 	$('#li-tutorials').click()
-	$('#tutorialsLink-javascriptPrinciples').click()
+	$('#tutorialsLink-AsynchronousProgramming').click()
 
 
 	// Element example
@@ -72,5 +72,60 @@ function main() {
 	})
 
 	containerElement.getChildById("middle").element.style.background = "gray"
+
+	/*
+	// Event manager
+	var myEventManager = new EventManager("myEventManager", "myEvent")
+
+	server.eventHandler.AddEventManager(
+		myEventManager,
+		function () {
+			server.eventHandler.appendEventFilter(
+				"\\.*",
+				"myEvent",
+				function () { },
+				function () { },
+				undefined)
+		}
+		)
+
+	// broadcast local event 
+	var evt = {
+		"code": 100, 
+		"name": "myEvent",
+		"dataMap": {
+			"message" : "hello"
+		}
+	}
+
+	server.eventHandler.BroadcastEvent(evt)
+
+	// broadcast network event 
+
+	var entityInfo = {
+		"TYPENAME": "Server.MessageData",
+		"Name": "name",
+		"Value": { 
+			"message": "hello world" 
+		}
+	}
+
+	server.eventHandler.broadcastEventData(
+		101,
+		"myEvent",
+		[entityInfo],
+		function () { },
+		function () { },
+		undefined
+		)
+
+	// attach event 
+	myEventManager.attach(
+		element,
+		100,
+		function (evt) {
+			element.innerHTML = evt.dataMap["message"]
+		})
+	*/
 
 }
