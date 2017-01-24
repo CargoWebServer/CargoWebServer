@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type InteractionNode interface{
+type InteractionNode interface {
 	/** Method of InteractionNode **/
 
 	/** UUID **/
@@ -11,5 +12,4 @@ type InteractionNode interface{
 
 	/** OutgoingConversationLinks **/
 	GetOutgoingConversationLinks() []*ConversationLink
-
 }

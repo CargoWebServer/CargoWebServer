@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMS_Runtime
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type ActivityInstance struct{
+type ActivityInstance struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,78 +15,75 @@ type ActivityInstance struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Instance **/
-	M_id string
+	M_id            string
 	M_bpmnElementId string
-	M_participants []string
-	m_dataRef []*ItemAwareElementInstance
+	M_participants  []string
+	m_dataRef       []*ItemAwareElementInstance
 	/** If the ref is a string and not an object **/
-	M_dataRef []string
-	M_data []*ItemAwareElementInstance
+	M_dataRef    []string
+	M_data       []*ItemAwareElementInstance
 	m_logInfoRef []*LogInfo
 	/** If the ref is a string and not an object **/
 	M_logInfoRef []string
 
 	/** members of FlowNodeInstance **/
-	M_flowNodeType FlowNodeType
+	M_flowNodeType   FlowNodeType
 	M_lifecycleState LifecycleState
-	m_inputRef []*ConnectingObject
+	m_inputRef       []*ConnectingObject
 	/** If the ref is a string and not an object **/
-	M_inputRef []string
+	M_inputRef  []string
 	m_outputRef []*ConnectingObject
 	/** If the ref is a string and not an object **/
 	M_outputRef []string
 
 	/** members of ActivityInstance **/
-	M_activityType ActivityType
+	M_activityType              ActivityType
 	M_multiInstanceBehaviorType MultiInstanceBehaviorType
-	M_loopCharacteristicType LoopCharacteristicType
-	M_tokenCount int
-
+	M_loopCharacteristicType    LoopCharacteristicType
+	M_tokenCount                int
 
 	/** Associations **/
 	m_SubprocessInstancePtr *SubprocessInstance
 	/** If the ref is a string and not an object **/
 	M_SubprocessInstancePtr string
-	m_processInstancePtr *ProcessInstance
+	m_processInstancePtr    *ProcessInstance
 	/** If the ref is a string and not an object **/
 	M_processInstancePtr string
 }
 
 /** Xml parser for ActivityInstance **/
 type XsdActivityInstance struct {
-	XMLName xml.Name	`xml:"activityInstance"`
+	XMLName xml.Name `xml:"activityInstance"`
 	/** Instance **/
-	M_id	string	`xml:"id,attr"`
-	M_bpmnElementId	string	`xml:"bpmnElementId,attr"`
-
+	M_id            string `xml:"id,attr"`
+	M_bpmnElementId string `xml:"bpmnElementId,attr"`
 
 	/** FlowNodeInstance **/
-	M_inputRef	[]string	`xml:"inputRef"`
-	M_outputRef	[]string	`xml:"outputRef"`
-	M_flowNodeType	string	`xml:"flowNodeType,attr"`
-	M_lifecycleState	string	`xml:"lifecycleState,attr"`
+	M_inputRef       []string `xml:"inputRef"`
+	M_outputRef      []string `xml:"outputRef"`
+	M_flowNodeType   string   `xml:"flowNodeType,attr"`
+	M_lifecycleState string   `xml:"lifecycleState,attr"`
 
-
-	M_activityType	string	`xml:"activityType,attr"`
-	M_loopCharacteristicType	string	`xml:"loopCharacteristicType,attr"`
-	M_multiInstanceBehaviorType	string	`xml:"multiInstanceBehaviorType,attr"`
-
+	M_activityType              string `xml:"activityType,attr"`
+	M_loopCharacteristicType    string `xml:"loopCharacteristicType,attr"`
+	M_multiInstanceBehaviorType string `xml:"multiInstanceBehaviorType,attr"`
 }
+
 /** UUID **/
-func (this *ActivityInstance) GetUUID() string{
+func (this *ActivityInstance) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *ActivityInstance) GetId() string{
+func (this *ActivityInstance) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *ActivityInstance) SetId(ref interface{}){
+func (this *ActivityInstance) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -93,12 +91,12 @@ func (this *ActivityInstance) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** BpmnElementId **/
-func (this *ActivityInstance) GetBpmnElementId() string{
+func (this *ActivityInstance) GetBpmnElementId() string {
 	return this.M_bpmnElementId
 }
 
 /** Init reference BpmnElementId **/
-func (this *ActivityInstance) SetBpmnElementId(ref interface{}){
+func (this *ActivityInstance) SetBpmnElementId(ref interface{}) {
 	this.NeedSave = true
 	this.M_bpmnElementId = ref.(string)
 }
@@ -106,16 +104,16 @@ func (this *ActivityInstance) SetBpmnElementId(ref interface{}){
 /** Remove reference BpmnElementId **/
 
 /** Participants **/
-func (this *ActivityInstance) GetParticipants() []string{
+func (this *ActivityInstance) GetParticipants() []string {
 	return this.M_participants
 }
 
 /** Init reference Participants **/
-func (this *ActivityInstance) SetParticipants(ref interface{}){
+func (this *ActivityInstance) SetParticipants(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var participantss []string
-	for i:=0; i<len(this.M_participants); i++ {
+	for i := 0; i < len(this.M_participants); i++ {
 		if this.M_participants[i] != ref.(string) {
 			participantss = append(participantss, this.M_participants[i])
 		} else {
@@ -132,21 +130,21 @@ func (this *ActivityInstance) SetParticipants(ref interface{}){
 /** Remove reference Participants **/
 
 /** DataRef **/
-func (this *ActivityInstance) GetDataRef() []*ItemAwareElementInstance{
+func (this *ActivityInstance) GetDataRef() []*ItemAwareElementInstance {
 	return this.m_dataRef
 }
 
 /** Init reference DataRef **/
-func (this *ActivityInstance) SetDataRef(ref interface{}){
+func (this *ActivityInstance) SetDataRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_dataRef); i++ {
+		for i := 0; i < len(this.M_dataRef); i++ {
 			if this.M_dataRef[i] == refStr {
 				return
 			}
 		}
 		this.M_dataRef = append(this.M_dataRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveDataRef(ref)
 		this.m_dataRef = append(this.m_dataRef, ref.(*ItemAwareElementInstance))
 		this.M_dataRef = append(this.M_dataRef, ref.(*ItemAwareElementInstance).GetUUID())
@@ -154,7 +152,7 @@ func (this *ActivityInstance) SetDataRef(ref interface{}){
 }
 
 /** Remove reference DataRef **/
-func (this *ActivityInstance) RemoveDataRef(ref interface{}){
+func (this *ActivityInstance) RemoveDataRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*ItemAwareElementInstance)
 	dataRef_ := make([]*ItemAwareElementInstance, 0)
@@ -170,16 +168,16 @@ func (this *ActivityInstance) RemoveDataRef(ref interface{}){
 }
 
 /** Data **/
-func (this *ActivityInstance) GetData() []*ItemAwareElementInstance{
+func (this *ActivityInstance) GetData() []*ItemAwareElementInstance {
 	return this.M_data
 }
 
 /** Init reference Data **/
-func (this *ActivityInstance) SetData(ref interface{}){
+func (this *ActivityInstance) SetData(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var datas []*ItemAwareElementInstance
-	for i:=0; i<len(this.M_data); i++ {
+	for i := 0; i < len(this.M_data); i++ {
 		if this.M_data[i].GetUUID() != ref.(*ItemAwareElementInstance).GetUUID() {
 			datas = append(datas, this.M_data[i])
 		} else {
@@ -194,7 +192,7 @@ func (this *ActivityInstance) SetData(ref interface{}){
 }
 
 /** Remove reference Data **/
-func (this *ActivityInstance) RemoveData(ref interface{}){
+func (this *ActivityInstance) RemoveData(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(ItemAwareElementInstance)
 	data_ := make([]*ItemAwareElementInstance, 0)
@@ -207,21 +205,21 @@ func (this *ActivityInstance) RemoveData(ref interface{}){
 }
 
 /** LogInfoRef **/
-func (this *ActivityInstance) GetLogInfoRef() []*LogInfo{
+func (this *ActivityInstance) GetLogInfoRef() []*LogInfo {
 	return this.m_logInfoRef
 }
 
 /** Init reference LogInfoRef **/
-func (this *ActivityInstance) SetLogInfoRef(ref interface{}){
+func (this *ActivityInstance) SetLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_logInfoRef); i++ {
+		for i := 0; i < len(this.M_logInfoRef); i++ {
 			if this.M_logInfoRef[i] == refStr {
 				return
 			}
 		}
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveLogInfoRef(ref)
 		this.m_logInfoRef = append(this.m_logInfoRef, ref.(*LogInfo))
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(*LogInfo).GetUUID())
@@ -229,7 +227,7 @@ func (this *ActivityInstance) SetLogInfoRef(ref interface{}){
 }
 
 /** Remove reference LogInfoRef **/
-func (this *ActivityInstance) RemoveLogInfoRef(ref interface{}){
+func (this *ActivityInstance) RemoveLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*LogInfo)
 	logInfoRef_ := make([]*LogInfo, 0)
@@ -245,12 +243,12 @@ func (this *ActivityInstance) RemoveLogInfoRef(ref interface{}){
 }
 
 /** FlowNodeType **/
-func (this *ActivityInstance) GetFlowNodeType() FlowNodeType{
+func (this *ActivityInstance) GetFlowNodeType() FlowNodeType {
 	return this.M_flowNodeType
 }
 
 /** Init reference FlowNodeType **/
-func (this *ActivityInstance) SetFlowNodeType(ref interface{}){
+func (this *ActivityInstance) SetFlowNodeType(ref interface{}) {
 	this.NeedSave = true
 	this.M_flowNodeType = ref.(FlowNodeType)
 }
@@ -258,12 +256,12 @@ func (this *ActivityInstance) SetFlowNodeType(ref interface{}){
 /** Remove reference FlowNodeType **/
 
 /** LifecycleState **/
-func (this *ActivityInstance) GetLifecycleState() LifecycleState{
+func (this *ActivityInstance) GetLifecycleState() LifecycleState {
 	return this.M_lifecycleState
 }
 
 /** Init reference LifecycleState **/
-func (this *ActivityInstance) SetLifecycleState(ref interface{}){
+func (this *ActivityInstance) SetLifecycleState(ref interface{}) {
 	this.NeedSave = true
 	this.M_lifecycleState = ref.(LifecycleState)
 }
@@ -271,21 +269,21 @@ func (this *ActivityInstance) SetLifecycleState(ref interface{}){
 /** Remove reference LifecycleState **/
 
 /** InputRef **/
-func (this *ActivityInstance) GetInputRef() []*ConnectingObject{
+func (this *ActivityInstance) GetInputRef() []*ConnectingObject {
 	return this.m_inputRef
 }
 
 /** Init reference InputRef **/
-func (this *ActivityInstance) SetInputRef(ref interface{}){
+func (this *ActivityInstance) SetInputRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_inputRef); i++ {
+		for i := 0; i < len(this.M_inputRef); i++ {
 			if this.M_inputRef[i] == refStr {
 				return
 			}
 		}
 		this.M_inputRef = append(this.M_inputRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveInputRef(ref)
 		this.m_inputRef = append(this.m_inputRef, ref.(*ConnectingObject))
 		this.M_inputRef = append(this.M_inputRef, ref.(Instance).GetUUID())
@@ -293,7 +291,7 @@ func (this *ActivityInstance) SetInputRef(ref interface{}){
 }
 
 /** Remove reference InputRef **/
-func (this *ActivityInstance) RemoveInputRef(ref interface{}){
+func (this *ActivityInstance) RemoveInputRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	inputRef_ := make([]*ConnectingObject, 0)
@@ -309,21 +307,21 @@ func (this *ActivityInstance) RemoveInputRef(ref interface{}){
 }
 
 /** OutputRef **/
-func (this *ActivityInstance) GetOutputRef() []*ConnectingObject{
+func (this *ActivityInstance) GetOutputRef() []*ConnectingObject {
 	return this.m_outputRef
 }
 
 /** Init reference OutputRef **/
-func (this *ActivityInstance) SetOutputRef(ref interface{}){
+func (this *ActivityInstance) SetOutputRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outputRef); i++ {
+		for i := 0; i < len(this.M_outputRef); i++ {
 			if this.M_outputRef[i] == refStr {
 				return
 			}
 		}
 		this.M_outputRef = append(this.M_outputRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutputRef(ref)
 		this.m_outputRef = append(this.m_outputRef, ref.(*ConnectingObject))
 		this.M_outputRef = append(this.M_outputRef, ref.(Instance).GetUUID())
@@ -331,7 +329,7 @@ func (this *ActivityInstance) SetOutputRef(ref interface{}){
 }
 
 /** Remove reference OutputRef **/
-func (this *ActivityInstance) RemoveOutputRef(ref interface{}){
+func (this *ActivityInstance) RemoveOutputRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	outputRef_ := make([]*ConnectingObject, 0)
@@ -347,12 +345,12 @@ func (this *ActivityInstance) RemoveOutputRef(ref interface{}){
 }
 
 /** ActivityType **/
-func (this *ActivityInstance) GetActivityType() ActivityType{
+func (this *ActivityInstance) GetActivityType() ActivityType {
 	return this.M_activityType
 }
 
 /** Init reference ActivityType **/
-func (this *ActivityInstance) SetActivityType(ref interface{}){
+func (this *ActivityInstance) SetActivityType(ref interface{}) {
 	this.NeedSave = true
 	this.M_activityType = ref.(ActivityType)
 }
@@ -360,12 +358,12 @@ func (this *ActivityInstance) SetActivityType(ref interface{}){
 /** Remove reference ActivityType **/
 
 /** MultiInstanceBehaviorType **/
-func (this *ActivityInstance) GetMultiInstanceBehaviorType() MultiInstanceBehaviorType{
+func (this *ActivityInstance) GetMultiInstanceBehaviorType() MultiInstanceBehaviorType {
 	return this.M_multiInstanceBehaviorType
 }
 
 /** Init reference MultiInstanceBehaviorType **/
-func (this *ActivityInstance) SetMultiInstanceBehaviorType(ref interface{}){
+func (this *ActivityInstance) SetMultiInstanceBehaviorType(ref interface{}) {
 	this.NeedSave = true
 	this.M_multiInstanceBehaviorType = ref.(MultiInstanceBehaviorType)
 }
@@ -373,12 +371,12 @@ func (this *ActivityInstance) SetMultiInstanceBehaviorType(ref interface{}){
 /** Remove reference MultiInstanceBehaviorType **/
 
 /** LoopCharacteristicType **/
-func (this *ActivityInstance) GetLoopCharacteristicType() LoopCharacteristicType{
+func (this *ActivityInstance) GetLoopCharacteristicType() LoopCharacteristicType {
 	return this.M_loopCharacteristicType
 }
 
 /** Init reference LoopCharacteristicType **/
-func (this *ActivityInstance) SetLoopCharacteristicType(ref interface{}){
+func (this *ActivityInstance) SetLoopCharacteristicType(ref interface{}) {
 	this.NeedSave = true
 	this.M_loopCharacteristicType = ref.(LoopCharacteristicType)
 }
@@ -386,12 +384,12 @@ func (this *ActivityInstance) SetLoopCharacteristicType(ref interface{}){
 /** Remove reference LoopCharacteristicType **/
 
 /** TokenCount **/
-func (this *ActivityInstance) GetTokenCount() int{
+func (this *ActivityInstance) GetTokenCount() int {
 	return this.M_tokenCount
 }
 
 /** Init reference TokenCount **/
-func (this *ActivityInstance) SetTokenCount(ref interface{}){
+func (this *ActivityInstance) SetTokenCount(ref interface{}) {
 	this.NeedSave = true
 	this.M_tokenCount = ref.(int)
 }
@@ -399,23 +397,23 @@ func (this *ActivityInstance) SetTokenCount(ref interface{}){
 /** Remove reference TokenCount **/
 
 /** SubprocessInstance **/
-func (this *ActivityInstance) GetSubprocessInstancePtr() *SubprocessInstance{
+func (this *ActivityInstance) GetSubprocessInstancePtr() *SubprocessInstance {
 	return this.m_SubprocessInstancePtr
 }
 
 /** Init reference SubprocessInstance **/
-func (this *ActivityInstance) SetSubprocessInstancePtr(ref interface{}){
+func (this *ActivityInstance) SetSubprocessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_SubprocessInstancePtr = ref.(string)
-	}else{
+	} else {
 		this.m_SubprocessInstancePtr = ref.(*SubprocessInstance)
 		this.M_SubprocessInstancePtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference SubprocessInstance **/
-func (this *ActivityInstance) RemoveSubprocessInstancePtr(ref interface{}){
+func (this *ActivityInstance) RemoveSubprocessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_SubprocessInstancePtr.GetUUID() {
@@ -425,23 +423,23 @@ func (this *ActivityInstance) RemoveSubprocessInstancePtr(ref interface{}){
 }
 
 /** ProcessInstance **/
-func (this *ActivityInstance) GetProcessInstancePtr() *ProcessInstance{
+func (this *ActivityInstance) GetProcessInstancePtr() *ProcessInstance {
 	return this.m_processInstancePtr
 }
 
 /** Init reference ProcessInstance **/
-func (this *ActivityInstance) SetProcessInstancePtr(ref interface{}){
+func (this *ActivityInstance) SetProcessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_processInstancePtr = ref.(string)
-	}else{
+	} else {
 		this.m_processInstancePtr = ref.(*ProcessInstance)
 		this.M_processInstancePtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference ProcessInstance **/
-func (this *ActivityInstance) RemoveProcessInstancePtr(ref interface{}){
+func (this *ActivityInstance) RemoveProcessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_processInstancePtr.GetUUID() {

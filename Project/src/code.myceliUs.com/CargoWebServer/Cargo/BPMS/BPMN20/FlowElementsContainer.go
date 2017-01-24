@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type FlowElementsContainer interface{
+type FlowElementsContainer interface {
 	/** Method of FlowElementsContainer **/
 
 	/** UUID **/
@@ -11,5 +12,4 @@ type FlowElementsContainer interface{
 
 	/** LaneSet **/
 	GetLaneSet() []*LaneSet
-
 }

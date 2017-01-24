@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type ConversationNode interface{
+type ConversationNode interface {
 	/** Method of ConversationNode **/
 
 	/** UUID **/
@@ -17,5 +18,4 @@ type ConversationNode interface{
 
 	/** CorrelationKey **/
 	GetCorrelationKey() []*CorrelationKey
-
 }

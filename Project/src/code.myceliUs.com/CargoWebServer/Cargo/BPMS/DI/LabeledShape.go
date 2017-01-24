@@ -1,6 +1,7 @@
+//+build DI
 package DI
 
-type LabeledShape interface{
+type LabeledShape interface {
 	/** Method of LabeledShape **/
 
 	/** UUID **/
@@ -8,5 +9,4 @@ type LabeledShape interface{
 
 	/** OwnedLabel **/
 	GetOwnedLabel() []Label
-
 }

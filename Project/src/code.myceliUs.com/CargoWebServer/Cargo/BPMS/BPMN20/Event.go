@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type Event interface{
+type Event interface {
 	/** Method of Event **/
 
 	/** UUID **/
@@ -8,5 +9,4 @@ type Event interface{
 
 	/** Property **/
 	GetProperty() []*Property
-
 }

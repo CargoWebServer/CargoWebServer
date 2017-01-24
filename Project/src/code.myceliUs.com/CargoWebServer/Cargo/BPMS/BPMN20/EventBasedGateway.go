@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type EventBasedGateway struct{
+type EventBasedGateway struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,22 +15,22 @@ type EventBasedGateway struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of FlowElement **/
-	M_name string
-	M_auditing *Auditing
-	M_monitoring *Monitoring
+	M_name             string
+	M_auditing         *Auditing
+	M_monitoring       *Monitoring
 	m_categoryValueRef []*CategoryValue
 	/** If the ref is a string and not an object **/
 	M_categoryValueRef []string
@@ -41,7 +42,7 @@ type EventBasedGateway struct{
 	m_incoming []*SequenceFlow
 	/** If the ref is a string and not an object **/
 	M_incoming []string
-	m_lanes []*Lane
+	m_lanes    []*Lane
 	/** If the ref is a string and not an object **/
 	M_lanes []string
 
@@ -49,20 +50,19 @@ type EventBasedGateway struct{
 	M_gatewayDirection GatewayDirection
 
 	/** members of EventBasedGateway **/
-	M_instantiate bool
+	M_instantiate      bool
 	M_eventGatewayType EventBasedGatewayType
-
 
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr  []string
 	m_containerPtr FlowElementsContainer
 	/** If the ref is a string and not an object **/
 	M_containerPtr string
@@ -70,46 +70,42 @@ type EventBasedGateway struct{
 
 /** Xml parser for EventBasedGateway **/
 type XsdEventBasedGateway struct {
-	XMLName xml.Name	`xml:"eventBasedGateway"`
+	XMLName xml.Name `xml:"eventBasedGateway"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** FlowElement **/
-	M_auditing	*XsdAuditing	`xml:"auditing,omitempty"`
-	M_monitoring	*XsdMonitoring	`xml:"monitoring,omitempty"`
-	M_categoryValueRef	[]string	`xml:"categoryValueRef"`
-	M_name	string	`xml:"name,attr"`
-
+	M_auditing         *XsdAuditing   `xml:"auditing,omitempty"`
+	M_monitoring       *XsdMonitoring `xml:"monitoring,omitempty"`
+	M_categoryValueRef []string       `xml:"categoryValueRef"`
+	M_name             string         `xml:"name,attr"`
 
 	/** FlowNode **/
-	M_incoming	[]string	`xml:"incoming"`
-	M_outgoing	[]string	`xml:"outgoing"`
-
+	M_incoming []string `xml:"incoming"`
+	M_outgoing []string `xml:"outgoing"`
 
 	/** Gateway **/
-	M_gatewayDirection	string	`xml:"gatewayDirection,attr"`
+	M_gatewayDirection string `xml:"gatewayDirection,attr"`
 
-
-	M_instantiate	bool	`xml:"instantiate,attr"`
-	M_eventGatewayType	string	`xml:"eventGatewayType,attr"`
-
+	M_instantiate      bool   `xml:"instantiate,attr"`
+	M_eventGatewayType string `xml:"eventGatewayType,attr"`
 }
+
 /** UUID **/
-func (this *EventBasedGateway) GetUUID() string{
+func (this *EventBasedGateway) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *EventBasedGateway) GetId() string{
+func (this *EventBasedGateway) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *EventBasedGateway) SetId(ref interface{}){
+func (this *EventBasedGateway) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -117,16 +113,16 @@ func (this *EventBasedGateway) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *EventBasedGateway) GetOther() interface{}{
+func (this *EventBasedGateway) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *EventBasedGateway) SetOther(ref interface{}){
+func (this *EventBasedGateway) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -134,12 +130,12 @@ func (this *EventBasedGateway) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *EventBasedGateway) GetExtensionElements() *ExtensionElements{
+func (this *EventBasedGateway) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *EventBasedGateway) SetExtensionElements(ref interface{}){
+func (this *EventBasedGateway) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -147,16 +143,16 @@ func (this *EventBasedGateway) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *EventBasedGateway) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *EventBasedGateway) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *EventBasedGateway) SetExtensionDefinitions(ref interface{}){
+func (this *EventBasedGateway) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -173,16 +169,16 @@ func (this *EventBasedGateway) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *EventBasedGateway) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *EventBasedGateway) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *EventBasedGateway) SetExtensionValues(ref interface{}){
+func (this *EventBasedGateway) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -199,16 +195,16 @@ func (this *EventBasedGateway) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *EventBasedGateway) GetDocumentation() []*Documentation{
+func (this *EventBasedGateway) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *EventBasedGateway) SetDocumentation(ref interface{}){
+func (this *EventBasedGateway) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -223,7 +219,7 @@ func (this *EventBasedGateway) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *EventBasedGateway) RemoveDocumentation(ref interface{}){
+func (this *EventBasedGateway) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -236,12 +232,12 @@ func (this *EventBasedGateway) RemoveDocumentation(ref interface{}){
 }
 
 /** Name **/
-func (this *EventBasedGateway) GetName() string{
+func (this *EventBasedGateway) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *EventBasedGateway) SetName(ref interface{}){
+func (this *EventBasedGateway) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -249,18 +245,18 @@ func (this *EventBasedGateway) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** Auditing **/
-func (this *EventBasedGateway) GetAuditing() *Auditing{
+func (this *EventBasedGateway) GetAuditing() *Auditing {
 	return this.M_auditing
 }
 
 /** Init reference Auditing **/
-func (this *EventBasedGateway) SetAuditing(ref interface{}){
+func (this *EventBasedGateway) SetAuditing(ref interface{}) {
 	this.NeedSave = true
 	this.M_auditing = ref.(*Auditing)
 }
 
 /** Remove reference Auditing **/
-func (this *EventBasedGateway) RemoveAuditing(ref interface{}){
+func (this *EventBasedGateway) RemoveAuditing(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_auditing.GetUUID() {
@@ -269,18 +265,18 @@ func (this *EventBasedGateway) RemoveAuditing(ref interface{}){
 }
 
 /** Monitoring **/
-func (this *EventBasedGateway) GetMonitoring() *Monitoring{
+func (this *EventBasedGateway) GetMonitoring() *Monitoring {
 	return this.M_monitoring
 }
 
 /** Init reference Monitoring **/
-func (this *EventBasedGateway) SetMonitoring(ref interface{}){
+func (this *EventBasedGateway) SetMonitoring(ref interface{}) {
 	this.NeedSave = true
 	this.M_monitoring = ref.(*Monitoring)
 }
 
 /** Remove reference Monitoring **/
-func (this *EventBasedGateway) RemoveMonitoring(ref interface{}){
+func (this *EventBasedGateway) RemoveMonitoring(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_monitoring.GetUUID() {
@@ -289,21 +285,21 @@ func (this *EventBasedGateway) RemoveMonitoring(ref interface{}){
 }
 
 /** CategoryValueRef **/
-func (this *EventBasedGateway) GetCategoryValueRef() []*CategoryValue{
+func (this *EventBasedGateway) GetCategoryValueRef() []*CategoryValue {
 	return this.m_categoryValueRef
 }
 
 /** Init reference CategoryValueRef **/
-func (this *EventBasedGateway) SetCategoryValueRef(ref interface{}){
+func (this *EventBasedGateway) SetCategoryValueRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_categoryValueRef); i++ {
+		for i := 0; i < len(this.M_categoryValueRef); i++ {
 			if this.M_categoryValueRef[i] == refStr {
 				return
 			}
 		}
 		this.M_categoryValueRef = append(this.M_categoryValueRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveCategoryValueRef(ref)
 		this.m_categoryValueRef = append(this.m_categoryValueRef, ref.(*CategoryValue))
 		this.M_categoryValueRef = append(this.M_categoryValueRef, ref.(BaseElement).GetUUID())
@@ -311,7 +307,7 @@ func (this *EventBasedGateway) SetCategoryValueRef(ref interface{}){
 }
 
 /** Remove reference CategoryValueRef **/
-func (this *EventBasedGateway) RemoveCategoryValueRef(ref interface{}){
+func (this *EventBasedGateway) RemoveCategoryValueRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	categoryValueRef_ := make([]*CategoryValue, 0)
@@ -327,21 +323,21 @@ func (this *EventBasedGateway) RemoveCategoryValueRef(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *EventBasedGateway) GetOutgoing() []*SequenceFlow{
+func (this *EventBasedGateway) GetOutgoing() []*SequenceFlow {
 	return this.m_outgoing
 }
 
 /** Init reference Outgoing **/
-func (this *EventBasedGateway) SetOutgoing(ref interface{}){
+func (this *EventBasedGateway) SetOutgoing(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoing); i++ {
+		for i := 0; i < len(this.M_outgoing); i++ {
 			if this.M_outgoing[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoing = append(this.M_outgoing, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoing(ref)
 		this.m_outgoing = append(this.m_outgoing, ref.(*SequenceFlow))
 		this.M_outgoing = append(this.M_outgoing, ref.(BaseElement).GetUUID())
@@ -349,7 +345,7 @@ func (this *EventBasedGateway) SetOutgoing(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *EventBasedGateway) RemoveOutgoing(ref interface{}){
+func (this *EventBasedGateway) RemoveOutgoing(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoing_ := make([]*SequenceFlow, 0)
@@ -365,21 +361,21 @@ func (this *EventBasedGateway) RemoveOutgoing(ref interface{}){
 }
 
 /** Incoming **/
-func (this *EventBasedGateway) GetIncoming() []*SequenceFlow{
+func (this *EventBasedGateway) GetIncoming() []*SequenceFlow {
 	return this.m_incoming
 }
 
 /** Init reference Incoming **/
-func (this *EventBasedGateway) SetIncoming(ref interface{}){
+func (this *EventBasedGateway) SetIncoming(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incoming); i++ {
+		for i := 0; i < len(this.M_incoming); i++ {
 			if this.M_incoming[i] == refStr {
 				return
 			}
 		}
 		this.M_incoming = append(this.M_incoming, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncoming(ref)
 		this.m_incoming = append(this.m_incoming, ref.(*SequenceFlow))
 		this.M_incoming = append(this.M_incoming, ref.(BaseElement).GetUUID())
@@ -387,7 +383,7 @@ func (this *EventBasedGateway) SetIncoming(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *EventBasedGateway) RemoveIncoming(ref interface{}){
+func (this *EventBasedGateway) RemoveIncoming(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incoming_ := make([]*SequenceFlow, 0)
@@ -403,21 +399,21 @@ func (this *EventBasedGateway) RemoveIncoming(ref interface{}){
 }
 
 /** Lanes **/
-func (this *EventBasedGateway) GetLanes() []*Lane{
+func (this *EventBasedGateway) GetLanes() []*Lane {
 	return this.m_lanes
 }
 
 /** Init reference Lanes **/
-func (this *EventBasedGateway) SetLanes(ref interface{}){
+func (this *EventBasedGateway) SetLanes(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanes); i++ {
+		for i := 0; i < len(this.M_lanes); i++ {
 			if this.M_lanes[i] == refStr {
 				return
 			}
 		}
 		this.M_lanes = append(this.M_lanes, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanes(ref)
 		this.m_lanes = append(this.m_lanes, ref.(*Lane))
 		this.M_lanes = append(this.M_lanes, ref.(BaseElement).GetUUID())
@@ -425,7 +421,7 @@ func (this *EventBasedGateway) SetLanes(ref interface{}){
 }
 
 /** Remove reference Lanes **/
-func (this *EventBasedGateway) RemoveLanes(ref interface{}){
+func (this *EventBasedGateway) RemoveLanes(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanes_ := make([]*Lane, 0)
@@ -441,12 +437,12 @@ func (this *EventBasedGateway) RemoveLanes(ref interface{}){
 }
 
 /** GatewayDirection **/
-func (this *EventBasedGateway) GetGatewayDirection() GatewayDirection{
+func (this *EventBasedGateway) GetGatewayDirection() GatewayDirection {
 	return this.M_gatewayDirection
 }
 
 /** Init reference GatewayDirection **/
-func (this *EventBasedGateway) SetGatewayDirection(ref interface{}){
+func (this *EventBasedGateway) SetGatewayDirection(ref interface{}) {
 	this.NeedSave = true
 	this.M_gatewayDirection = ref.(GatewayDirection)
 }
@@ -454,12 +450,12 @@ func (this *EventBasedGateway) SetGatewayDirection(ref interface{}){
 /** Remove reference GatewayDirection **/
 
 /** Instantiate **/
-func (this *EventBasedGateway) GetInstantiate() bool{
+func (this *EventBasedGateway) GetInstantiate() bool {
 	return this.M_instantiate
 }
 
 /** Init reference Instantiate **/
-func (this *EventBasedGateway) SetInstantiate(ref interface{}){
+func (this *EventBasedGateway) SetInstantiate(ref interface{}) {
 	this.NeedSave = true
 	this.M_instantiate = ref.(bool)
 }
@@ -467,12 +463,12 @@ func (this *EventBasedGateway) SetInstantiate(ref interface{}){
 /** Remove reference Instantiate **/
 
 /** EventGatewayType **/
-func (this *EventBasedGateway) GetEventGatewayType() EventBasedGatewayType{
+func (this *EventBasedGateway) GetEventGatewayType() EventBasedGatewayType {
 	return this.M_eventGatewayType
 }
 
 /** Init reference EventGatewayType **/
-func (this *EventBasedGateway) SetEventGatewayType(ref interface{}){
+func (this *EventBasedGateway) SetEventGatewayType(ref interface{}) {
 	this.NeedSave = true
 	this.M_eventGatewayType = ref.(EventBasedGatewayType)
 }
@@ -480,21 +476,21 @@ func (this *EventBasedGateway) SetEventGatewayType(ref interface{}){
 /** Remove reference EventGatewayType **/
 
 /** Lane **/
-func (this *EventBasedGateway) GetLanePtr() []*Lane{
+func (this *EventBasedGateway) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *EventBasedGateway) SetLanePtr(ref interface{}){
+func (this *EventBasedGateway) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -502,7 +498,7 @@ func (this *EventBasedGateway) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *EventBasedGateway) RemoveLanePtr(ref interface{}){
+func (this *EventBasedGateway) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -518,21 +514,21 @@ func (this *EventBasedGateway) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *EventBasedGateway) GetOutgoingPtr() []*Association{
+func (this *EventBasedGateway) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *EventBasedGateway) SetOutgoingPtr(ref interface{}){
+func (this *EventBasedGateway) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -540,7 +536,7 @@ func (this *EventBasedGateway) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *EventBasedGateway) RemoveOutgoingPtr(ref interface{}){
+func (this *EventBasedGateway) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -556,21 +552,21 @@ func (this *EventBasedGateway) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *EventBasedGateway) GetIncomingPtr() []*Association{
+func (this *EventBasedGateway) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *EventBasedGateway) SetIncomingPtr(ref interface{}){
+func (this *EventBasedGateway) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -578,7 +574,7 @@ func (this *EventBasedGateway) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *EventBasedGateway) RemoveIncomingPtr(ref interface{}){
+func (this *EventBasedGateway) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -594,23 +590,23 @@ func (this *EventBasedGateway) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Container **/
-func (this *EventBasedGateway) GetContainerPtr() FlowElementsContainer{
+func (this *EventBasedGateway) GetContainerPtr() FlowElementsContainer {
 	return this.m_containerPtr
 }
 
 /** Init reference Container **/
-func (this *EventBasedGateway) SetContainerPtr(ref interface{}){
+func (this *EventBasedGateway) SetContainerPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_containerPtr = ref.(string)
-	}else{
+	} else {
 		this.m_containerPtr = ref.(FlowElementsContainer)
 		this.M_containerPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Container **/
-func (this *EventBasedGateway) RemoveContainerPtr(ref interface{}){
+func (this *EventBasedGateway) RemoveContainerPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_containerPtr.(BaseElement).GetUUID() {

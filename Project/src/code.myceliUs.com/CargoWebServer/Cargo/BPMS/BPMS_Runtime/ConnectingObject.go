@@ -1,10 +1,11 @@
+//+build BPMN
 package BPMS_Runtime
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type ConnectingObject struct{
+type ConnectingObject struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,64 +15,62 @@ type ConnectingObject struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Instance **/
-	M_id string
+	M_id            string
 	M_bpmnElementId string
-	M_participants []string
-	m_dataRef []*ItemAwareElementInstance
+	M_participants  []string
+	m_dataRef       []*ItemAwareElementInstance
 	/** If the ref is a string and not an object **/
-	M_dataRef []string
-	M_data []*ItemAwareElementInstance
+	M_dataRef    []string
+	M_data       []*ItemAwareElementInstance
 	m_logInfoRef []*LogInfo
 	/** If the ref is a string and not an object **/
 	M_logInfoRef []string
 
 	/** members of ConnectingObject **/
 	M_connectingObjectType ConnectingObjectType
-	m_sourceRef FlowNodeInstance
+	m_sourceRef            FlowNodeInstance
 	/** If the ref is a string and not an object **/
 	M_sourceRef string
 	m_targetRef FlowNodeInstance
 	/** If the ref is a string and not an object **/
 	M_targetRef string
 
-
 	/** Associations **/
 	m_SubprocessInstancePtr *SubprocessInstance
 	/** If the ref is a string and not an object **/
 	M_SubprocessInstancePtr string
-	m_processInstancePtr *ProcessInstance
+	m_processInstancePtr    *ProcessInstance
 	/** If the ref is a string and not an object **/
 	M_processInstancePtr string
 }
 
 /** Xml parser for ConnectingObject **/
 type XsdConnectingObject struct {
-	XMLName xml.Name	`xml:"connectingObject"`
+	XMLName xml.Name `xml:"connectingObject"`
 	/** Instance **/
-	M_id	string	`xml:"id,attr"`
-	M_bpmnElementId	string	`xml:"bpmnElementId,attr"`
+	M_id            string `xml:"id,attr"`
+	M_bpmnElementId string `xml:"bpmnElementId,attr"`
 
-
-	M_sourceRef	*string	`xml:"sourceRef"`
-	M_targetRef	*string	`xml:"targetRef"`
-	M_connectingObjectType	string	`xml:"connectingObjectType,attr"`
-
+	M_sourceRef            *string `xml:"sourceRef"`
+	M_targetRef            *string `xml:"targetRef"`
+	M_connectingObjectType string  `xml:"connectingObjectType,attr"`
 }
+
 /** UUID **/
-func (this *ConnectingObject) GetUUID() string{
+func (this *ConnectingObject) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *ConnectingObject) GetId() string{
+func (this *ConnectingObject) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *ConnectingObject) SetId(ref interface{}){
+func (this *ConnectingObject) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -79,12 +78,12 @@ func (this *ConnectingObject) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** BpmnElementId **/
-func (this *ConnectingObject) GetBpmnElementId() string{
+func (this *ConnectingObject) GetBpmnElementId() string {
 	return this.M_bpmnElementId
 }
 
 /** Init reference BpmnElementId **/
-func (this *ConnectingObject) SetBpmnElementId(ref interface{}){
+func (this *ConnectingObject) SetBpmnElementId(ref interface{}) {
 	this.NeedSave = true
 	this.M_bpmnElementId = ref.(string)
 }
@@ -92,16 +91,16 @@ func (this *ConnectingObject) SetBpmnElementId(ref interface{}){
 /** Remove reference BpmnElementId **/
 
 /** Participants **/
-func (this *ConnectingObject) GetParticipants() []string{
+func (this *ConnectingObject) GetParticipants() []string {
 	return this.M_participants
 }
 
 /** Init reference Participants **/
-func (this *ConnectingObject) SetParticipants(ref interface{}){
+func (this *ConnectingObject) SetParticipants(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var participantss []string
-	for i:=0; i<len(this.M_participants); i++ {
+	for i := 0; i < len(this.M_participants); i++ {
 		if this.M_participants[i] != ref.(string) {
 			participantss = append(participantss, this.M_participants[i])
 		} else {
@@ -118,21 +117,21 @@ func (this *ConnectingObject) SetParticipants(ref interface{}){
 /** Remove reference Participants **/
 
 /** DataRef **/
-func (this *ConnectingObject) GetDataRef() []*ItemAwareElementInstance{
+func (this *ConnectingObject) GetDataRef() []*ItemAwareElementInstance {
 	return this.m_dataRef
 }
 
 /** Init reference DataRef **/
-func (this *ConnectingObject) SetDataRef(ref interface{}){
+func (this *ConnectingObject) SetDataRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_dataRef); i++ {
+		for i := 0; i < len(this.M_dataRef); i++ {
 			if this.M_dataRef[i] == refStr {
 				return
 			}
 		}
 		this.M_dataRef = append(this.M_dataRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveDataRef(ref)
 		this.m_dataRef = append(this.m_dataRef, ref.(*ItemAwareElementInstance))
 		this.M_dataRef = append(this.M_dataRef, ref.(*ItemAwareElementInstance).GetUUID())
@@ -140,7 +139,7 @@ func (this *ConnectingObject) SetDataRef(ref interface{}){
 }
 
 /** Remove reference DataRef **/
-func (this *ConnectingObject) RemoveDataRef(ref interface{}){
+func (this *ConnectingObject) RemoveDataRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*ItemAwareElementInstance)
 	dataRef_ := make([]*ItemAwareElementInstance, 0)
@@ -156,16 +155,16 @@ func (this *ConnectingObject) RemoveDataRef(ref interface{}){
 }
 
 /** Data **/
-func (this *ConnectingObject) GetData() []*ItemAwareElementInstance{
+func (this *ConnectingObject) GetData() []*ItemAwareElementInstance {
 	return this.M_data
 }
 
 /** Init reference Data **/
-func (this *ConnectingObject) SetData(ref interface{}){
+func (this *ConnectingObject) SetData(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var datas []*ItemAwareElementInstance
-	for i:=0; i<len(this.M_data); i++ {
+	for i := 0; i < len(this.M_data); i++ {
 		if this.M_data[i].GetUUID() != ref.(*ItemAwareElementInstance).GetUUID() {
 			datas = append(datas, this.M_data[i])
 		} else {
@@ -180,7 +179,7 @@ func (this *ConnectingObject) SetData(ref interface{}){
 }
 
 /** Remove reference Data **/
-func (this *ConnectingObject) RemoveData(ref interface{}){
+func (this *ConnectingObject) RemoveData(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(ItemAwareElementInstance)
 	data_ := make([]*ItemAwareElementInstance, 0)
@@ -193,21 +192,21 @@ func (this *ConnectingObject) RemoveData(ref interface{}){
 }
 
 /** LogInfoRef **/
-func (this *ConnectingObject) GetLogInfoRef() []*LogInfo{
+func (this *ConnectingObject) GetLogInfoRef() []*LogInfo {
 	return this.m_logInfoRef
 }
 
 /** Init reference LogInfoRef **/
-func (this *ConnectingObject) SetLogInfoRef(ref interface{}){
+func (this *ConnectingObject) SetLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_logInfoRef); i++ {
+		for i := 0; i < len(this.M_logInfoRef); i++ {
 			if this.M_logInfoRef[i] == refStr {
 				return
 			}
 		}
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveLogInfoRef(ref)
 		this.m_logInfoRef = append(this.m_logInfoRef, ref.(*LogInfo))
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(*LogInfo).GetUUID())
@@ -215,7 +214,7 @@ func (this *ConnectingObject) SetLogInfoRef(ref interface{}){
 }
 
 /** Remove reference LogInfoRef **/
-func (this *ConnectingObject) RemoveLogInfoRef(ref interface{}){
+func (this *ConnectingObject) RemoveLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*LogInfo)
 	logInfoRef_ := make([]*LogInfo, 0)
@@ -231,12 +230,12 @@ func (this *ConnectingObject) RemoveLogInfoRef(ref interface{}){
 }
 
 /** ConnectingObjectType **/
-func (this *ConnectingObject) GetConnectingObjectType() ConnectingObjectType{
+func (this *ConnectingObject) GetConnectingObjectType() ConnectingObjectType {
 	return this.M_connectingObjectType
 }
 
 /** Init reference ConnectingObjectType **/
-func (this *ConnectingObject) SetConnectingObjectType(ref interface{}){
+func (this *ConnectingObject) SetConnectingObjectType(ref interface{}) {
 	this.NeedSave = true
 	this.M_connectingObjectType = ref.(ConnectingObjectType)
 }
@@ -244,23 +243,23 @@ func (this *ConnectingObject) SetConnectingObjectType(ref interface{}){
 /** Remove reference ConnectingObjectType **/
 
 /** SourceRef **/
-func (this *ConnectingObject) GetSourceRef() FlowNodeInstance{
+func (this *ConnectingObject) GetSourceRef() FlowNodeInstance {
 	return this.m_sourceRef
 }
 
 /** Init reference SourceRef **/
-func (this *ConnectingObject) SetSourceRef(ref interface{}){
+func (this *ConnectingObject) SetSourceRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_sourceRef = ref.(string)
-	}else{
+	} else {
 		this.m_sourceRef = ref.(FlowNodeInstance)
 		this.M_sourceRef = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference SourceRef **/
-func (this *ConnectingObject) RemoveSourceRef(ref interface{}){
+func (this *ConnectingObject) RemoveSourceRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_sourceRef.(Instance).GetUUID() {
@@ -270,23 +269,23 @@ func (this *ConnectingObject) RemoveSourceRef(ref interface{}){
 }
 
 /** TargetRef **/
-func (this *ConnectingObject) GetTargetRef() FlowNodeInstance{
+func (this *ConnectingObject) GetTargetRef() FlowNodeInstance {
 	return this.m_targetRef
 }
 
 /** Init reference TargetRef **/
-func (this *ConnectingObject) SetTargetRef(ref interface{}){
+func (this *ConnectingObject) SetTargetRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_targetRef = ref.(string)
-	}else{
+	} else {
 		this.m_targetRef = ref.(FlowNodeInstance)
 		this.M_targetRef = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference TargetRef **/
-func (this *ConnectingObject) RemoveTargetRef(ref interface{}){
+func (this *ConnectingObject) RemoveTargetRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_targetRef.(Instance).GetUUID() {
@@ -296,23 +295,23 @@ func (this *ConnectingObject) RemoveTargetRef(ref interface{}){
 }
 
 /** SubprocessInstance **/
-func (this *ConnectingObject) GetSubprocessInstancePtr() *SubprocessInstance{
+func (this *ConnectingObject) GetSubprocessInstancePtr() *SubprocessInstance {
 	return this.m_SubprocessInstancePtr
 }
 
 /** Init reference SubprocessInstance **/
-func (this *ConnectingObject) SetSubprocessInstancePtr(ref interface{}){
+func (this *ConnectingObject) SetSubprocessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_SubprocessInstancePtr = ref.(string)
-	}else{
+	} else {
 		this.m_SubprocessInstancePtr = ref.(*SubprocessInstance)
 		this.M_SubprocessInstancePtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference SubprocessInstance **/
-func (this *ConnectingObject) RemoveSubprocessInstancePtr(ref interface{}){
+func (this *ConnectingObject) RemoveSubprocessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_SubprocessInstancePtr.GetUUID() {
@@ -322,23 +321,23 @@ func (this *ConnectingObject) RemoveSubprocessInstancePtr(ref interface{}){
 }
 
 /** ProcessInstance **/
-func (this *ConnectingObject) GetProcessInstancePtr() *ProcessInstance{
+func (this *ConnectingObject) GetProcessInstancePtr() *ProcessInstance {
 	return this.m_processInstancePtr
 }
 
 /** Init reference ProcessInstance **/
-func (this *ConnectingObject) SetProcessInstancePtr(ref interface{}){
+func (this *ConnectingObject) SetProcessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_processInstancePtr = ref.(string)
-	}else{
+	} else {
 		this.m_processInstancePtr = ref.(*ProcessInstance)
 		this.M_processInstancePtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference ProcessInstance **/
-func (this *ConnectingObject) RemoveProcessInstancePtr(ref interface{}){
+func (this *ConnectingObject) RemoveProcessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_processInstancePtr.GetUUID() {

@@ -1,12 +1,14 @@
+// +build BPMN
 package BPMNDI
 
-import(
-"code.myceliUs.com/CargoWebServer/Cargo/BPMS/DI"
-"code.myceliUs.com/CargoWebServer/Cargo/BPMS/DC"
-"encoding/xml"
+import (
+	"encoding/xml"
+
+	"code.myceliUs.com/CargoWebServer/Cargo/BPMS/DC"
+	"code.myceliUs.com/CargoWebServer/Cargo/BPMS/DI"
 )
 
-type BPMNLabelStyle struct{
+type BPMNLabelStyle struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -16,7 +18,7 @@ type BPMNLabelStyle struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Style **/
 	M_id string
@@ -24,44 +26,42 @@ type BPMNLabelStyle struct{
 	/** members of BPMNLabelStyle **/
 	M_Font *DC.Font
 
-
 	/** Associations **/
 	m_diagramPtr *BPMNDiagram
 	/** If the ref is a string and not an object **/
 	M_diagramPtr string
-	m_labelPtr []*BPMNLabel
+	m_labelPtr   []*BPMNLabel
 	/** If the ref is a string and not an object **/
-	M_labelPtr []string
+	M_labelPtr          []string
 	m_diagramElementPtr []DI.DiagramElement
 	/** If the ref is a string and not an object **/
 	M_diagramElementPtr []string
-	m_owningDiagramPtr DI.Diagram
+	m_owningDiagramPtr  DI.Diagram
 	/** If the ref is a string and not an object **/
 	M_owningDiagramPtr string
 }
 
 /** Xml parser for BPMNLabelStyle **/
 type XsdBPMNLabelStyle struct {
-	XMLName xml.Name	`xml:"BPMNLabelStyle"`
+	XMLName xml.Name `xml:"BPMNLabelStyle"`
 	/** Style **/
-	M_id	string	`xml:"id,attr"`
+	M_id string `xml:"id,attr"`
 
-
-	M_Font	DC.XsdFont	`xml:"Font"`
-
+	M_Font DC.XsdFont `xml:"Font"`
 }
+
 /** UUID **/
-func (this *BPMNLabelStyle) GetUUID() string{
+func (this *BPMNLabelStyle) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *BPMNLabelStyle) GetId() string{
+func (this *BPMNLabelStyle) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *BPMNLabelStyle) SetId(ref interface{}){
+func (this *BPMNLabelStyle) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -69,12 +69,12 @@ func (this *BPMNLabelStyle) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Font **/
-func (this *BPMNLabelStyle) GetFont() *DC.Font{
+func (this *BPMNLabelStyle) GetFont() *DC.Font {
 	return this.M_Font
 }
 
 /** Init reference Font **/
-func (this *BPMNLabelStyle) SetFont(ref interface{}){
+func (this *BPMNLabelStyle) SetFont(ref interface{}) {
 	this.NeedSave = true
 	this.M_Font = ref.(*DC.Font)
 }
@@ -82,22 +82,22 @@ func (this *BPMNLabelStyle) SetFont(ref interface{}){
 /** Remove reference Font **/
 
 /** Diagram **/
-func (this *BPMNLabelStyle) GetDiagramPtr() *BPMNDiagram{
+func (this *BPMNLabelStyle) GetDiagramPtr() *BPMNDiagram {
 	return this.m_diagramPtr
 }
 
 /** Init reference Diagram **/
-func (this *BPMNLabelStyle) SetDiagramPtr(ref interface{}){
+func (this *BPMNLabelStyle) SetDiagramPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_diagramPtr = ref.(string)
-	}else{
+	} else {
 		this.m_diagramPtr = ref.(*BPMNDiagram)
 	}
 }
 
 /** Remove reference Diagram **/
-func (this *BPMNLabelStyle) RemoveDiagramPtr(ref interface{}){
+func (this *BPMNLabelStyle) RemoveDiagramPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(DI.Diagram)
 	if toDelete.GetUUID() == this.m_diagramPtr.GetUUID() {
@@ -107,28 +107,28 @@ func (this *BPMNLabelStyle) RemoveDiagramPtr(ref interface{}){
 }
 
 /** Label **/
-func (this *BPMNLabelStyle) GetLabelPtr() []*BPMNLabel{
+func (this *BPMNLabelStyle) GetLabelPtr() []*BPMNLabel {
 	return this.m_labelPtr
 }
 
 /** Init reference Label **/
-func (this *BPMNLabelStyle) SetLabelPtr(ref interface{}){
+func (this *BPMNLabelStyle) SetLabelPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_labelPtr); i++ {
+		for i := 0; i < len(this.M_labelPtr); i++ {
 			if this.M_labelPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_labelPtr = append(this.M_labelPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLabelPtr(ref)
 		this.m_labelPtr = append(this.m_labelPtr, ref.(*BPMNLabel))
 	}
 }
 
 /** Remove reference Label **/
-func (this *BPMNLabelStyle) RemoveLabelPtr(ref interface{}){
+func (this *BPMNLabelStyle) RemoveLabelPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(DI.DiagramElement)
 	labelPtr_ := make([]*BPMNLabel, 0)
@@ -144,28 +144,28 @@ func (this *BPMNLabelStyle) RemoveLabelPtr(ref interface{}){
 }
 
 /** DiagramElement **/
-func (this *BPMNLabelStyle) GetDiagramElementPtr() []DI.DiagramElement{
+func (this *BPMNLabelStyle) GetDiagramElementPtr() []DI.DiagramElement {
 	return this.m_diagramElementPtr
 }
 
 /** Init reference DiagramElement **/
-func (this *BPMNLabelStyle) SetDiagramElementPtr(ref interface{}){
+func (this *BPMNLabelStyle) SetDiagramElementPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_diagramElementPtr); i++ {
+		for i := 0; i < len(this.M_diagramElementPtr); i++ {
 			if this.M_diagramElementPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_diagramElementPtr = append(this.M_diagramElementPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveDiagramElementPtr(ref)
 		this.m_diagramElementPtr = append(this.m_diagramElementPtr, ref.(DI.DiagramElement))
 	}
 }
 
 /** Remove reference DiagramElement **/
-func (this *BPMNLabelStyle) RemoveDiagramElementPtr(ref interface{}){
+func (this *BPMNLabelStyle) RemoveDiagramElementPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(DI.DiagramElement)
 	diagramElementPtr_ := make([]DI.DiagramElement, 0)
@@ -181,22 +181,22 @@ func (this *BPMNLabelStyle) RemoveDiagramElementPtr(ref interface{}){
 }
 
 /** OwningDiagram **/
-func (this *BPMNLabelStyle) GetOwningDiagramPtr() DI.Diagram{
+func (this *BPMNLabelStyle) GetOwningDiagramPtr() DI.Diagram {
 	return this.m_owningDiagramPtr
 }
 
 /** Init reference OwningDiagram **/
-func (this *BPMNLabelStyle) SetOwningDiagramPtr(ref interface{}){
+func (this *BPMNLabelStyle) SetOwningDiagramPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_owningDiagramPtr = ref.(string)
-	}else{
+	} else {
 		this.m_owningDiagramPtr = ref.(DI.Diagram)
 	}
 }
 
 /** Remove reference OwningDiagram **/
-func (this *BPMNLabelStyle) RemoveOwningDiagramPtr(ref interface{}){
+func (this *BPMNLabelStyle) RemoveOwningDiagramPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(DI.Diagram)
 	if toDelete.GetUUID() == this.m_owningDiagramPtr.(DI.Diagram).GetUUID() {

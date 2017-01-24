@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type CorrelationKey struct{
+type CorrelationKey struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,41 +15,40 @@ type CorrelationKey struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of CorrelationKey **/
 	m_correlationPropertyRef []*CorrelationProperty
 	/** If the ref is a string and not an object **/
 	M_correlationPropertyRef []string
-	M_name string
-
+	M_name                   string
 
 	/** Associations **/
 	m_conversationNodePtr ConversationNode
 	/** If the ref is a string and not an object **/
-	M_conversationNodePtr string
+	M_conversationNodePtr        string
 	m_correlationSubscriptionPtr []*CorrelationSubscription
 	/** If the ref is a string and not an object **/
 	M_correlationSubscriptionPtr []string
-	m_collaborationPtr Collaboration
+	m_collaborationPtr           Collaboration
 	/** If the ref is a string and not an object **/
-	M_collaborationPtr string
+	M_collaborationPtr        string
 	m_choreographyActivityPtr ChoreographyActivity
 	/** If the ref is a string and not an object **/
 	M_choreographyActivityPtr string
-	m_lanePtr []*Lane
+	m_lanePtr                 []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -59,30 +59,29 @@ type CorrelationKey struct{
 
 /** Xml parser for CorrelationKey **/
 type XsdCorrelationKey struct {
-	XMLName xml.Name	`xml:"correlationKey"`
+	XMLName xml.Name `xml:"correlationKey"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_correlationPropertyRef	[]string	`xml:"correlationPropertyRef"`
-	M_name	string	`xml:"name,attr"`
-
+	M_correlationPropertyRef []string `xml:"correlationPropertyRef"`
+	M_name                   string   `xml:"name,attr"`
 }
+
 /** UUID **/
-func (this *CorrelationKey) GetUUID() string{
+func (this *CorrelationKey) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *CorrelationKey) GetId() string{
+func (this *CorrelationKey) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *CorrelationKey) SetId(ref interface{}){
+func (this *CorrelationKey) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -90,16 +89,16 @@ func (this *CorrelationKey) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *CorrelationKey) GetOther() interface{}{
+func (this *CorrelationKey) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *CorrelationKey) SetOther(ref interface{}){
+func (this *CorrelationKey) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -107,12 +106,12 @@ func (this *CorrelationKey) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *CorrelationKey) GetExtensionElements() *ExtensionElements{
+func (this *CorrelationKey) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *CorrelationKey) SetExtensionElements(ref interface{}){
+func (this *CorrelationKey) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -120,16 +119,16 @@ func (this *CorrelationKey) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *CorrelationKey) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *CorrelationKey) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *CorrelationKey) SetExtensionDefinitions(ref interface{}){
+func (this *CorrelationKey) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -146,16 +145,16 @@ func (this *CorrelationKey) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *CorrelationKey) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *CorrelationKey) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *CorrelationKey) SetExtensionValues(ref interface{}){
+func (this *CorrelationKey) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -172,16 +171,16 @@ func (this *CorrelationKey) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *CorrelationKey) GetDocumentation() []*Documentation{
+func (this *CorrelationKey) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *CorrelationKey) SetDocumentation(ref interface{}){
+func (this *CorrelationKey) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -196,7 +195,7 @@ func (this *CorrelationKey) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *CorrelationKey) RemoveDocumentation(ref interface{}){
+func (this *CorrelationKey) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -209,21 +208,21 @@ func (this *CorrelationKey) RemoveDocumentation(ref interface{}){
 }
 
 /** CorrelationPropertyRef **/
-func (this *CorrelationKey) GetCorrelationPropertyRef() []*CorrelationProperty{
+func (this *CorrelationKey) GetCorrelationPropertyRef() []*CorrelationProperty {
 	return this.m_correlationPropertyRef
 }
 
 /** Init reference CorrelationPropertyRef **/
-func (this *CorrelationKey) SetCorrelationPropertyRef(ref interface{}){
+func (this *CorrelationKey) SetCorrelationPropertyRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_correlationPropertyRef); i++ {
+		for i := 0; i < len(this.M_correlationPropertyRef); i++ {
 			if this.M_correlationPropertyRef[i] == refStr {
 				return
 			}
 		}
 		this.M_correlationPropertyRef = append(this.M_correlationPropertyRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveCorrelationPropertyRef(ref)
 		this.m_correlationPropertyRef = append(this.m_correlationPropertyRef, ref.(*CorrelationProperty))
 		this.M_correlationPropertyRef = append(this.M_correlationPropertyRef, ref.(BaseElement).GetUUID())
@@ -231,7 +230,7 @@ func (this *CorrelationKey) SetCorrelationPropertyRef(ref interface{}){
 }
 
 /** Remove reference CorrelationPropertyRef **/
-func (this *CorrelationKey) RemoveCorrelationPropertyRef(ref interface{}){
+func (this *CorrelationKey) RemoveCorrelationPropertyRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	correlationPropertyRef_ := make([]*CorrelationProperty, 0)
@@ -247,12 +246,12 @@ func (this *CorrelationKey) RemoveCorrelationPropertyRef(ref interface{}){
 }
 
 /** Name **/
-func (this *CorrelationKey) GetName() string{
+func (this *CorrelationKey) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *CorrelationKey) SetName(ref interface{}){
+func (this *CorrelationKey) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -260,23 +259,23 @@ func (this *CorrelationKey) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** ConversationNode **/
-func (this *CorrelationKey) GetConversationNodePtr() ConversationNode{
+func (this *CorrelationKey) GetConversationNodePtr() ConversationNode {
 	return this.m_conversationNodePtr
 }
 
 /** Init reference ConversationNode **/
-func (this *CorrelationKey) SetConversationNodePtr(ref interface{}){
+func (this *CorrelationKey) SetConversationNodePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_conversationNodePtr = ref.(string)
-	}else{
+	} else {
 		this.m_conversationNodePtr = ref.(ConversationNode)
 		this.M_conversationNodePtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference ConversationNode **/
-func (this *CorrelationKey) RemoveConversationNodePtr(ref interface{}){
+func (this *CorrelationKey) RemoveConversationNodePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_conversationNodePtr.(BaseElement).GetUUID() {
@@ -286,21 +285,21 @@ func (this *CorrelationKey) RemoveConversationNodePtr(ref interface{}){
 }
 
 /** CorrelationSubscription **/
-func (this *CorrelationKey) GetCorrelationSubscriptionPtr() []*CorrelationSubscription{
+func (this *CorrelationKey) GetCorrelationSubscriptionPtr() []*CorrelationSubscription {
 	return this.m_correlationSubscriptionPtr
 }
 
 /** Init reference CorrelationSubscription **/
-func (this *CorrelationKey) SetCorrelationSubscriptionPtr(ref interface{}){
+func (this *CorrelationKey) SetCorrelationSubscriptionPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_correlationSubscriptionPtr); i++ {
+		for i := 0; i < len(this.M_correlationSubscriptionPtr); i++ {
 			if this.M_correlationSubscriptionPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_correlationSubscriptionPtr = append(this.M_correlationSubscriptionPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCorrelationSubscriptionPtr(ref)
 		this.m_correlationSubscriptionPtr = append(this.m_correlationSubscriptionPtr, ref.(*CorrelationSubscription))
 		this.M_correlationSubscriptionPtr = append(this.M_correlationSubscriptionPtr, ref.(BaseElement).GetUUID())
@@ -308,7 +307,7 @@ func (this *CorrelationKey) SetCorrelationSubscriptionPtr(ref interface{}){
 }
 
 /** Remove reference CorrelationSubscription **/
-func (this *CorrelationKey) RemoveCorrelationSubscriptionPtr(ref interface{}){
+func (this *CorrelationKey) RemoveCorrelationSubscriptionPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	correlationSubscriptionPtr_ := make([]*CorrelationSubscription, 0)
@@ -324,23 +323,23 @@ func (this *CorrelationKey) RemoveCorrelationSubscriptionPtr(ref interface{}){
 }
 
 /** Collaboration **/
-func (this *CorrelationKey) GetCollaborationPtr() Collaboration{
+func (this *CorrelationKey) GetCollaborationPtr() Collaboration {
 	return this.m_collaborationPtr
 }
 
 /** Init reference Collaboration **/
-func (this *CorrelationKey) SetCollaborationPtr(ref interface{}){
+func (this *CorrelationKey) SetCollaborationPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_collaborationPtr = ref.(string)
-	}else{
+	} else {
 		this.m_collaborationPtr = ref.(Collaboration)
 		this.M_collaborationPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Collaboration **/
-func (this *CorrelationKey) RemoveCollaborationPtr(ref interface{}){
+func (this *CorrelationKey) RemoveCollaborationPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_collaborationPtr.(BaseElement).GetUUID() {
@@ -350,23 +349,23 @@ func (this *CorrelationKey) RemoveCollaborationPtr(ref interface{}){
 }
 
 /** ChoreographyActivity **/
-func (this *CorrelationKey) GetChoreographyActivityPtr() ChoreographyActivity{
+func (this *CorrelationKey) GetChoreographyActivityPtr() ChoreographyActivity {
 	return this.m_choreographyActivityPtr
 }
 
 /** Init reference ChoreographyActivity **/
-func (this *CorrelationKey) SetChoreographyActivityPtr(ref interface{}){
+func (this *CorrelationKey) SetChoreographyActivityPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_choreographyActivityPtr = ref.(string)
-	}else{
+	} else {
 		this.m_choreographyActivityPtr = ref.(ChoreographyActivity)
 		this.M_choreographyActivityPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference ChoreographyActivity **/
-func (this *CorrelationKey) RemoveChoreographyActivityPtr(ref interface{}){
+func (this *CorrelationKey) RemoveChoreographyActivityPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_choreographyActivityPtr.(BaseElement).GetUUID() {
@@ -376,21 +375,21 @@ func (this *CorrelationKey) RemoveChoreographyActivityPtr(ref interface{}){
 }
 
 /** Lane **/
-func (this *CorrelationKey) GetLanePtr() []*Lane{
+func (this *CorrelationKey) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *CorrelationKey) SetLanePtr(ref interface{}){
+func (this *CorrelationKey) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -398,7 +397,7 @@ func (this *CorrelationKey) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *CorrelationKey) RemoveLanePtr(ref interface{}){
+func (this *CorrelationKey) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -414,21 +413,21 @@ func (this *CorrelationKey) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *CorrelationKey) GetOutgoingPtr() []*Association{
+func (this *CorrelationKey) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *CorrelationKey) SetOutgoingPtr(ref interface{}){
+func (this *CorrelationKey) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -436,7 +435,7 @@ func (this *CorrelationKey) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *CorrelationKey) RemoveOutgoingPtr(ref interface{}){
+func (this *CorrelationKey) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -452,21 +451,21 @@ func (this *CorrelationKey) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *CorrelationKey) GetIncomingPtr() []*Association{
+func (this *CorrelationKey) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *CorrelationKey) SetIncomingPtr(ref interface{}){
+func (this *CorrelationKey) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -474,7 +473,7 @@ func (this *CorrelationKey) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *CorrelationKey) RemoveIncomingPtr(ref interface{}){
+func (this *CorrelationKey) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)

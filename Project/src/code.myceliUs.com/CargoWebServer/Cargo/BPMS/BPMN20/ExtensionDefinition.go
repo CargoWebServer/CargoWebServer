@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type ExtensionDefinition struct{
+type ExtensionDefinition struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -10,32 +11,31 @@ type ExtensionDefinition struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of ExtensionDefinition **/
-	M_name string
+	M_name                         string
 	M_extensionAttributeDefinition []*ExtensionAttributeDefinition
-
 
 	/** Associations **/
 	m_baseElementPtr []BaseElement
 	/** If the ref is a string and not an object **/
 	M_baseElementPtr []string
-	m_extensionPtr *Extension
+	m_extensionPtr   *Extension
 	/** If the ref is a string and not an object **/
 	M_extensionPtr string
-}/** UUID **/
-func (this *ExtensionDefinition) GetUUID() string{
+} /** UUID **/
+func (this *ExtensionDefinition) GetUUID() string {
 	return this.UUID
 }
 
 /** Name **/
-func (this *ExtensionDefinition) GetName() string{
+func (this *ExtensionDefinition) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *ExtensionDefinition) SetName(ref interface{}){
+func (this *ExtensionDefinition) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -43,16 +43,16 @@ func (this *ExtensionDefinition) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** ExtensionAttributeDefinition **/
-func (this *ExtensionDefinition) GetExtensionAttributeDefinition() []*ExtensionAttributeDefinition{
+func (this *ExtensionDefinition) GetExtensionAttributeDefinition() []*ExtensionAttributeDefinition {
 	return this.M_extensionAttributeDefinition
 }
 
 /** Init reference ExtensionAttributeDefinition **/
-func (this *ExtensionDefinition) SetExtensionAttributeDefinition(ref interface{}){
+func (this *ExtensionDefinition) SetExtensionAttributeDefinition(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionAttributeDefinitions []*ExtensionAttributeDefinition
-	for i:=0; i<len(this.M_extensionAttributeDefinition); i++ {
+	for i := 0; i < len(this.M_extensionAttributeDefinition); i++ {
 		if this.M_extensionAttributeDefinition[i].GetName() != ref.(*ExtensionAttributeDefinition).GetName() {
 			extensionAttributeDefinitions = append(extensionAttributeDefinitions, this.M_extensionAttributeDefinition[i])
 		} else {
@@ -69,21 +69,21 @@ func (this *ExtensionDefinition) SetExtensionAttributeDefinition(ref interface{}
 /** Remove reference ExtensionAttributeDefinition **/
 
 /** BaseElement **/
-func (this *ExtensionDefinition) GetBaseElementPtr() []BaseElement{
+func (this *ExtensionDefinition) GetBaseElementPtr() []BaseElement {
 	return this.m_baseElementPtr
 }
 
 /** Init reference BaseElement **/
-func (this *ExtensionDefinition) SetBaseElementPtr(ref interface{}){
+func (this *ExtensionDefinition) SetBaseElementPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_baseElementPtr); i++ {
+		for i := 0; i < len(this.M_baseElementPtr); i++ {
 			if this.M_baseElementPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_baseElementPtr = append(this.M_baseElementPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveBaseElementPtr(ref)
 		this.m_baseElementPtr = append(this.m_baseElementPtr, ref.(BaseElement))
 		this.M_baseElementPtr = append(this.M_baseElementPtr, ref.(BaseElement).GetUUID())
@@ -91,7 +91,7 @@ func (this *ExtensionDefinition) SetBaseElementPtr(ref interface{}){
 }
 
 /** Remove reference BaseElement **/
-func (this *ExtensionDefinition) RemoveBaseElementPtr(ref interface{}){
+func (this *ExtensionDefinition) RemoveBaseElementPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	baseElementPtr_ := make([]BaseElement, 0)
@@ -107,16 +107,16 @@ func (this *ExtensionDefinition) RemoveBaseElementPtr(ref interface{}){
 }
 
 /** Extension **/
-func (this *ExtensionDefinition) GetExtensionPtr() *Extension{
+func (this *ExtensionDefinition) GetExtensionPtr() *Extension {
 	return this.m_extensionPtr
 }
 
 /** Init reference Extension **/
-func (this *ExtensionDefinition) SetExtensionPtr(ref interface{}){
+func (this *ExtensionDefinition) SetExtensionPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_extensionPtr = ref.(string)
-	}else{
+	} else {
 		this.m_extensionPtr = ref.(*Extension)
 	}
 }

@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type SubProcess interface{
+type SubProcess interface {
 	/** Method of SubProcess **/
 
 	/** UUID **/
@@ -11,5 +12,4 @@ type SubProcess interface{
 
 	/** Artifact **/
 	GetArtifact() []Artifact
-
 }

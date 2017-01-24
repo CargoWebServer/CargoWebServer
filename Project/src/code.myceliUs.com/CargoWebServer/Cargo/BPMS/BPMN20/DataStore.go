@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type DataStore struct{
+type DataStore struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,17 +15,17 @@ type DataStore struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of RootElement **/
 	/** No members **/
@@ -33,33 +34,32 @@ type DataStore struct{
 	m_itemSubjectRef *ItemDefinition
 	/** If the ref is a string and not an object **/
 	M_itemSubjectRef string
-	M_dataState *DataState
+	M_dataState      *DataState
 
 	/** members of DataStore **/
-	M_name string
-	M_capacity int
+	M_name        string
+	M_capacity    int
 	M_isUnlimited bool
-
 
 	/** Associations **/
 	m_dataStoreReferencePtr []*DataStoreReference
 	/** If the ref is a string and not an object **/
 	M_dataStoreReferencePtr []string
-	m_lanePtr []*Lane
+	m_lanePtr               []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr    []string
 	m_definitionsPtr *Definitions
 	/** If the ref is a string and not an object **/
-	M_definitionsPtr string
+	M_definitionsPtr     string
 	m_dataAssociationPtr []DataAssociation
 	/** If the ref is a string and not an object **/
-	M_dataAssociationPtr []string
+	M_dataAssociationPtr                  []string
 	m_multiInstanceLoopCharacteristicsPtr *MultiInstanceLoopCharacteristics
 	/** If the ref is a string and not an object **/
 	M_multiInstanceLoopCharacteristicsPtr string
@@ -67,36 +67,34 @@ type DataStore struct{
 
 /** Xml parser for DataStore **/
 type XsdDataStore struct {
-	XMLName xml.Name	`xml:"dataStore"`
+	XMLName xml.Name `xml:"dataStore"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** RootElement **/
 
-
-	M_dataState	*XsdDataState	`xml:"dataState,omitempty"`
-	M_name	string	`xml:"name,attr"`
-	M_capacity	int	`xml:"capacity,attr"`
-	M_isUnlimited	bool	`xml:"isUnlimited,attr"`
-	M_itemSubjectRef	string	`xml:"itemSubjectRef,attr"`
-
+	M_dataState      *XsdDataState `xml:"dataState,omitempty"`
+	M_name           string        `xml:"name,attr"`
+	M_capacity       int           `xml:"capacity,attr"`
+	M_isUnlimited    bool          `xml:"isUnlimited,attr"`
+	M_itemSubjectRef string        `xml:"itemSubjectRef,attr"`
 }
+
 /** UUID **/
-func (this *DataStore) GetUUID() string{
+func (this *DataStore) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *DataStore) GetId() string{
+func (this *DataStore) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *DataStore) SetId(ref interface{}){
+func (this *DataStore) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -104,16 +102,16 @@ func (this *DataStore) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *DataStore) GetOther() interface{}{
+func (this *DataStore) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *DataStore) SetOther(ref interface{}){
+func (this *DataStore) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -121,12 +119,12 @@ func (this *DataStore) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *DataStore) GetExtensionElements() *ExtensionElements{
+func (this *DataStore) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *DataStore) SetExtensionElements(ref interface{}){
+func (this *DataStore) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -134,16 +132,16 @@ func (this *DataStore) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *DataStore) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *DataStore) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *DataStore) SetExtensionDefinitions(ref interface{}){
+func (this *DataStore) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -160,16 +158,16 @@ func (this *DataStore) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *DataStore) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *DataStore) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *DataStore) SetExtensionValues(ref interface{}){
+func (this *DataStore) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -186,16 +184,16 @@ func (this *DataStore) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *DataStore) GetDocumentation() []*Documentation{
+func (this *DataStore) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *DataStore) SetDocumentation(ref interface{}){
+func (this *DataStore) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -210,7 +208,7 @@ func (this *DataStore) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *DataStore) RemoveDocumentation(ref interface{}){
+func (this *DataStore) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -223,23 +221,23 @@ func (this *DataStore) RemoveDocumentation(ref interface{}){
 }
 
 /** ItemSubjectRef **/
-func (this *DataStore) GetItemSubjectRef() *ItemDefinition{
+func (this *DataStore) GetItemSubjectRef() *ItemDefinition {
 	return this.m_itemSubjectRef
 }
 
 /** Init reference ItemSubjectRef **/
-func (this *DataStore) SetItemSubjectRef(ref interface{}){
+func (this *DataStore) SetItemSubjectRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_itemSubjectRef = ref.(string)
-	}else{
+	} else {
 		this.m_itemSubjectRef = ref.(*ItemDefinition)
 		this.M_itemSubjectRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference ItemSubjectRef **/
-func (this *DataStore) RemoveItemSubjectRef(ref interface{}){
+func (this *DataStore) RemoveItemSubjectRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_itemSubjectRef.GetUUID() {
@@ -249,18 +247,18 @@ func (this *DataStore) RemoveItemSubjectRef(ref interface{}){
 }
 
 /** DataState **/
-func (this *DataStore) GetDataState() *DataState{
+func (this *DataStore) GetDataState() *DataState {
 	return this.M_dataState
 }
 
 /** Init reference DataState **/
-func (this *DataStore) SetDataState(ref interface{}){
+func (this *DataStore) SetDataState(ref interface{}) {
 	this.NeedSave = true
 	this.M_dataState = ref.(*DataState)
 }
 
 /** Remove reference DataState **/
-func (this *DataStore) RemoveDataState(ref interface{}){
+func (this *DataStore) RemoveDataState(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_dataState.GetUUID() {
@@ -269,12 +267,12 @@ func (this *DataStore) RemoveDataState(ref interface{}){
 }
 
 /** Name **/
-func (this *DataStore) GetName() string{
+func (this *DataStore) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *DataStore) SetName(ref interface{}){
+func (this *DataStore) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -282,12 +280,12 @@ func (this *DataStore) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** Capacity **/
-func (this *DataStore) GetCapacity() int{
+func (this *DataStore) GetCapacity() int {
 	return this.M_capacity
 }
 
 /** Init reference Capacity **/
-func (this *DataStore) SetCapacity(ref interface{}){
+func (this *DataStore) SetCapacity(ref interface{}) {
 	this.NeedSave = true
 	this.M_capacity = ref.(int)
 }
@@ -295,12 +293,12 @@ func (this *DataStore) SetCapacity(ref interface{}){
 /** Remove reference Capacity **/
 
 /** IsUnlimited **/
-func (this *DataStore) IsUnlimited() bool{
+func (this *DataStore) IsUnlimited() bool {
 	return this.M_isUnlimited
 }
 
 /** Init reference IsUnlimited **/
-func (this *DataStore) SetIsUnlimited(ref interface{}){
+func (this *DataStore) SetIsUnlimited(ref interface{}) {
 	this.NeedSave = true
 	this.M_isUnlimited = ref.(bool)
 }
@@ -308,21 +306,21 @@ func (this *DataStore) SetIsUnlimited(ref interface{}){
 /** Remove reference IsUnlimited **/
 
 /** DataStoreReference **/
-func (this *DataStore) GetDataStoreReferencePtr() []*DataStoreReference{
+func (this *DataStore) GetDataStoreReferencePtr() []*DataStoreReference {
 	return this.m_dataStoreReferencePtr
 }
 
 /** Init reference DataStoreReference **/
-func (this *DataStore) SetDataStoreReferencePtr(ref interface{}){
+func (this *DataStore) SetDataStoreReferencePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_dataStoreReferencePtr); i++ {
+		for i := 0; i < len(this.M_dataStoreReferencePtr); i++ {
 			if this.M_dataStoreReferencePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_dataStoreReferencePtr = append(this.M_dataStoreReferencePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveDataStoreReferencePtr(ref)
 		this.m_dataStoreReferencePtr = append(this.m_dataStoreReferencePtr, ref.(*DataStoreReference))
 		this.M_dataStoreReferencePtr = append(this.M_dataStoreReferencePtr, ref.(BaseElement).GetUUID())
@@ -330,7 +328,7 @@ func (this *DataStore) SetDataStoreReferencePtr(ref interface{}){
 }
 
 /** Remove reference DataStoreReference **/
-func (this *DataStore) RemoveDataStoreReferencePtr(ref interface{}){
+func (this *DataStore) RemoveDataStoreReferencePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	dataStoreReferencePtr_ := make([]*DataStoreReference, 0)
@@ -346,21 +344,21 @@ func (this *DataStore) RemoveDataStoreReferencePtr(ref interface{}){
 }
 
 /** Lane **/
-func (this *DataStore) GetLanePtr() []*Lane{
+func (this *DataStore) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *DataStore) SetLanePtr(ref interface{}){
+func (this *DataStore) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -368,7 +366,7 @@ func (this *DataStore) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *DataStore) RemoveLanePtr(ref interface{}){
+func (this *DataStore) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -384,21 +382,21 @@ func (this *DataStore) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *DataStore) GetOutgoingPtr() []*Association{
+func (this *DataStore) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *DataStore) SetOutgoingPtr(ref interface{}){
+func (this *DataStore) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -406,7 +404,7 @@ func (this *DataStore) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *DataStore) RemoveOutgoingPtr(ref interface{}){
+func (this *DataStore) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -422,21 +420,21 @@ func (this *DataStore) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *DataStore) GetIncomingPtr() []*Association{
+func (this *DataStore) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *DataStore) SetIncomingPtr(ref interface{}){
+func (this *DataStore) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -444,7 +442,7 @@ func (this *DataStore) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *DataStore) RemoveIncomingPtr(ref interface{}){
+func (this *DataStore) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -460,23 +458,23 @@ func (this *DataStore) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Definitions **/
-func (this *DataStore) GetDefinitionsPtr() *Definitions{
+func (this *DataStore) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *DataStore) SetDefinitionsPtr(ref interface{}){
+func (this *DataStore) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *DataStore) RemoveDefinitionsPtr(ref interface{}){
+func (this *DataStore) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {
@@ -486,21 +484,21 @@ func (this *DataStore) RemoveDefinitionsPtr(ref interface{}){
 }
 
 /** DataAssociation **/
-func (this *DataStore) GetDataAssociationPtr() []DataAssociation{
+func (this *DataStore) GetDataAssociationPtr() []DataAssociation {
 	return this.m_dataAssociationPtr
 }
 
 /** Init reference DataAssociation **/
-func (this *DataStore) SetDataAssociationPtr(ref interface{}){
+func (this *DataStore) SetDataAssociationPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_dataAssociationPtr); i++ {
+		for i := 0; i < len(this.M_dataAssociationPtr); i++ {
 			if this.M_dataAssociationPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_dataAssociationPtr = append(this.M_dataAssociationPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveDataAssociationPtr(ref)
 		this.m_dataAssociationPtr = append(this.m_dataAssociationPtr, ref.(DataAssociation))
 		this.M_dataAssociationPtr = append(this.M_dataAssociationPtr, ref.(BaseElement).GetUUID())
@@ -508,7 +506,7 @@ func (this *DataStore) SetDataAssociationPtr(ref interface{}){
 }
 
 /** Remove reference DataAssociation **/
-func (this *DataStore) RemoveDataAssociationPtr(ref interface{}){
+func (this *DataStore) RemoveDataAssociationPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	dataAssociationPtr_ := make([]DataAssociation, 0)
@@ -524,23 +522,23 @@ func (this *DataStore) RemoveDataAssociationPtr(ref interface{}){
 }
 
 /** MultiInstanceLoopCharacteristics **/
-func (this *DataStore) GetMultiInstanceLoopCharacteristicsPtr() *MultiInstanceLoopCharacteristics{
+func (this *DataStore) GetMultiInstanceLoopCharacteristicsPtr() *MultiInstanceLoopCharacteristics {
 	return this.m_multiInstanceLoopCharacteristicsPtr
 }
 
 /** Init reference MultiInstanceLoopCharacteristics **/
-func (this *DataStore) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *DataStore) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_multiInstanceLoopCharacteristicsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_multiInstanceLoopCharacteristicsPtr = ref.(*MultiInstanceLoopCharacteristics)
 		this.M_multiInstanceLoopCharacteristicsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference MultiInstanceLoopCharacteristics **/
-func (this *DataStore) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *DataStore) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_multiInstanceLoopCharacteristicsPtr.GetUUID() {

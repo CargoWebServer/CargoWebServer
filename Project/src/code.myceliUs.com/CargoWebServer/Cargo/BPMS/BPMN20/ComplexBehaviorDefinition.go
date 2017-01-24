@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type ComplexBehaviorDefinition struct{
+type ComplexBehaviorDefinition struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,30 +15,29 @@ type ComplexBehaviorDefinition struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of ComplexBehaviorDefinition **/
 	M_condition *FormalExpression
-	M_event *ImplicitThrowEvent
-
+	M_event     *ImplicitThrowEvent
 
 	/** Associations **/
 	m_multiInstanceLoopCharacteristicsPtr *MultiInstanceLoopCharacteristics
 	/** If the ref is a string and not an object **/
 	M_multiInstanceLoopCharacteristicsPtr string
-	m_lanePtr []*Lane
+	m_lanePtr                             []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -48,30 +48,29 @@ type ComplexBehaviorDefinition struct{
 
 /** Xml parser for ComplexBehaviorDefinition **/
 type XsdComplexBehaviorDefinition struct {
-	XMLName xml.Name	`xml:"complexBehaviorDefinition"`
+	XMLName xml.Name `xml:"complexBehaviorDefinition"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_condition	*XsdCondition	`xml:"condition,omitempty"`
-	M_event	*XsdEvent	`xml:"event,omitempty"`
-
+	M_condition *XsdCondition `xml:"condition,omitempty"`
+	M_event     *XsdEvent     `xml:"event,omitempty"`
 }
+
 /** UUID **/
-func (this *ComplexBehaviorDefinition) GetUUID() string{
+func (this *ComplexBehaviorDefinition) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *ComplexBehaviorDefinition) GetId() string{
+func (this *ComplexBehaviorDefinition) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *ComplexBehaviorDefinition) SetId(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -79,16 +78,16 @@ func (this *ComplexBehaviorDefinition) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *ComplexBehaviorDefinition) GetOther() interface{}{
+func (this *ComplexBehaviorDefinition) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *ComplexBehaviorDefinition) SetOther(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -96,12 +95,12 @@ func (this *ComplexBehaviorDefinition) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *ComplexBehaviorDefinition) GetExtensionElements() *ExtensionElements{
+func (this *ComplexBehaviorDefinition) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *ComplexBehaviorDefinition) SetExtensionElements(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -109,16 +108,16 @@ func (this *ComplexBehaviorDefinition) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *ComplexBehaviorDefinition) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *ComplexBehaviorDefinition) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *ComplexBehaviorDefinition) SetExtensionDefinitions(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -135,16 +134,16 @@ func (this *ComplexBehaviorDefinition) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *ComplexBehaviorDefinition) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *ComplexBehaviorDefinition) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *ComplexBehaviorDefinition) SetExtensionValues(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -161,16 +160,16 @@ func (this *ComplexBehaviorDefinition) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *ComplexBehaviorDefinition) GetDocumentation() []*Documentation{
+func (this *ComplexBehaviorDefinition) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *ComplexBehaviorDefinition) SetDocumentation(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -185,7 +184,7 @@ func (this *ComplexBehaviorDefinition) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *ComplexBehaviorDefinition) RemoveDocumentation(ref interface{}){
+func (this *ComplexBehaviorDefinition) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -198,18 +197,18 @@ func (this *ComplexBehaviorDefinition) RemoveDocumentation(ref interface{}){
 }
 
 /** Condition **/
-func (this *ComplexBehaviorDefinition) GetCondition() *FormalExpression{
+func (this *ComplexBehaviorDefinition) GetCondition() *FormalExpression {
 	return this.M_condition
 }
 
 /** Init reference Condition **/
-func (this *ComplexBehaviorDefinition) SetCondition(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetCondition(ref interface{}) {
 	this.NeedSave = true
 	this.M_condition = ref.(*FormalExpression)
 }
 
 /** Remove reference Condition **/
-func (this *ComplexBehaviorDefinition) RemoveCondition(ref interface{}){
+func (this *ComplexBehaviorDefinition) RemoveCondition(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_condition.GetUUID() {
@@ -218,18 +217,18 @@ func (this *ComplexBehaviorDefinition) RemoveCondition(ref interface{}){
 }
 
 /** Event **/
-func (this *ComplexBehaviorDefinition) GetEvent() *ImplicitThrowEvent{
+func (this *ComplexBehaviorDefinition) GetEvent() *ImplicitThrowEvent {
 	return this.M_event
 }
 
 /** Init reference Event **/
-func (this *ComplexBehaviorDefinition) SetEvent(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetEvent(ref interface{}) {
 	this.NeedSave = true
 	this.M_event = ref.(*ImplicitThrowEvent)
 }
 
 /** Remove reference Event **/
-func (this *ComplexBehaviorDefinition) RemoveEvent(ref interface{}){
+func (this *ComplexBehaviorDefinition) RemoveEvent(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_event.GetUUID() {
@@ -238,23 +237,23 @@ func (this *ComplexBehaviorDefinition) RemoveEvent(ref interface{}){
 }
 
 /** MultiInstanceLoopCharacteristics **/
-func (this *ComplexBehaviorDefinition) GetMultiInstanceLoopCharacteristicsPtr() *MultiInstanceLoopCharacteristics{
+func (this *ComplexBehaviorDefinition) GetMultiInstanceLoopCharacteristicsPtr() *MultiInstanceLoopCharacteristics {
 	return this.m_multiInstanceLoopCharacteristicsPtr
 }
 
 /** Init reference MultiInstanceLoopCharacteristics **/
-func (this *ComplexBehaviorDefinition) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_multiInstanceLoopCharacteristicsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_multiInstanceLoopCharacteristicsPtr = ref.(*MultiInstanceLoopCharacteristics)
 		this.M_multiInstanceLoopCharacteristicsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference MultiInstanceLoopCharacteristics **/
-func (this *ComplexBehaviorDefinition) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *ComplexBehaviorDefinition) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_multiInstanceLoopCharacteristicsPtr.GetUUID() {
@@ -264,21 +263,21 @@ func (this *ComplexBehaviorDefinition) RemoveMultiInstanceLoopCharacteristicsPtr
 }
 
 /** Lane **/
-func (this *ComplexBehaviorDefinition) GetLanePtr() []*Lane{
+func (this *ComplexBehaviorDefinition) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *ComplexBehaviorDefinition) SetLanePtr(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -286,7 +285,7 @@ func (this *ComplexBehaviorDefinition) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *ComplexBehaviorDefinition) RemoveLanePtr(ref interface{}){
+func (this *ComplexBehaviorDefinition) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -302,21 +301,21 @@ func (this *ComplexBehaviorDefinition) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *ComplexBehaviorDefinition) GetOutgoingPtr() []*Association{
+func (this *ComplexBehaviorDefinition) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *ComplexBehaviorDefinition) SetOutgoingPtr(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -324,7 +323,7 @@ func (this *ComplexBehaviorDefinition) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *ComplexBehaviorDefinition) RemoveOutgoingPtr(ref interface{}){
+func (this *ComplexBehaviorDefinition) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -340,21 +339,21 @@ func (this *ComplexBehaviorDefinition) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *ComplexBehaviorDefinition) GetIncomingPtr() []*Association{
+func (this *ComplexBehaviorDefinition) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *ComplexBehaviorDefinition) SetIncomingPtr(ref interface{}){
+func (this *ComplexBehaviorDefinition) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -362,7 +361,7 @@ func (this *ComplexBehaviorDefinition) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *ComplexBehaviorDefinition) RemoveIncomingPtr(ref interface{}){
+func (this *ComplexBehaviorDefinition) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)

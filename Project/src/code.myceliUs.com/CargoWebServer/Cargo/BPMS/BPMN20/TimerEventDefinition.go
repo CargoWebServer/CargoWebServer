@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type TimerEventDefinition struct{
+type TimerEventDefinition struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,17 +15,17 @@ type TimerEventDefinition struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of RootElement **/
 	/** No members **/
@@ -33,30 +34,29 @@ type TimerEventDefinition struct{
 	/** No members **/
 
 	/** members of TimerEventDefinition **/
-	M_timeDate Expression
-	M_timeCycle Expression
+	M_timeDate     Expression
+	M_timeCycle    Expression
 	M_timeDuration Expression
-
 
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr    []string
 	m_definitionsPtr *Definitions
 	/** If the ref is a string and not an object **/
 	M_definitionsPtr string
-	m_throwEventPtr []ThrowEvent
+	m_throwEventPtr  []ThrowEvent
 	/** If the ref is a string and not an object **/
 	M_throwEventPtr []string
 	m_catchEventPtr []CatchEvent
 	/** If the ref is a string and not an object **/
-	M_catchEventPtr []string
+	M_catchEventPtr                       []string
 	m_multiInstanceLoopCharacteristicsPtr []*MultiInstanceLoopCharacteristics
 	/** If the ref is a string and not an object **/
 	M_multiInstanceLoopCharacteristicsPtr []string
@@ -64,34 +64,31 @@ type TimerEventDefinition struct{
 
 /** Xml parser for TimerEventDefinition **/
 type XsdTimerEventDefinition struct {
-	XMLName xml.Name	`xml:"timerEventDefinition"`
+	XMLName xml.Name `xml:"timerEventDefinition"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** RootElement **/
 
-
 	/** EventDefinition **/
 
-
-
 }
+
 /** UUID **/
-func (this *TimerEventDefinition) GetUUID() string{
+func (this *TimerEventDefinition) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *TimerEventDefinition) GetId() string{
+func (this *TimerEventDefinition) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *TimerEventDefinition) SetId(ref interface{}){
+func (this *TimerEventDefinition) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -99,16 +96,16 @@ func (this *TimerEventDefinition) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *TimerEventDefinition) GetOther() interface{}{
+func (this *TimerEventDefinition) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *TimerEventDefinition) SetOther(ref interface{}){
+func (this *TimerEventDefinition) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -116,12 +113,12 @@ func (this *TimerEventDefinition) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *TimerEventDefinition) GetExtensionElements() *ExtensionElements{
+func (this *TimerEventDefinition) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *TimerEventDefinition) SetExtensionElements(ref interface{}){
+func (this *TimerEventDefinition) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -129,16 +126,16 @@ func (this *TimerEventDefinition) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *TimerEventDefinition) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *TimerEventDefinition) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *TimerEventDefinition) SetExtensionDefinitions(ref interface{}){
+func (this *TimerEventDefinition) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -155,16 +152,16 @@ func (this *TimerEventDefinition) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *TimerEventDefinition) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *TimerEventDefinition) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *TimerEventDefinition) SetExtensionValues(ref interface{}){
+func (this *TimerEventDefinition) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -181,16 +178,16 @@ func (this *TimerEventDefinition) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *TimerEventDefinition) GetDocumentation() []*Documentation{
+func (this *TimerEventDefinition) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *TimerEventDefinition) SetDocumentation(ref interface{}){
+func (this *TimerEventDefinition) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -205,7 +202,7 @@ func (this *TimerEventDefinition) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *TimerEventDefinition) RemoveDocumentation(ref interface{}){
+func (this *TimerEventDefinition) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -218,18 +215,18 @@ func (this *TimerEventDefinition) RemoveDocumentation(ref interface{}){
 }
 
 /** TimeDate **/
-func (this *TimerEventDefinition) GetTimeDate() Expression{
+func (this *TimerEventDefinition) GetTimeDate() Expression {
 	return this.M_timeDate
 }
 
 /** Init reference TimeDate **/
-func (this *TimerEventDefinition) SetTimeDate(ref interface{}){
+func (this *TimerEventDefinition) SetTimeDate(ref interface{}) {
 	this.NeedSave = true
 	this.M_timeDate = ref.(Expression)
 }
 
 /** Remove reference TimeDate **/
-func (this *TimerEventDefinition) RemoveTimeDate(ref interface{}){
+func (this *TimerEventDefinition) RemoveTimeDate(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_timeDate.(BaseElement).GetUUID() {
@@ -238,18 +235,18 @@ func (this *TimerEventDefinition) RemoveTimeDate(ref interface{}){
 }
 
 /** TimeCycle **/
-func (this *TimerEventDefinition) GetTimeCycle() Expression{
+func (this *TimerEventDefinition) GetTimeCycle() Expression {
 	return this.M_timeCycle
 }
 
 /** Init reference TimeCycle **/
-func (this *TimerEventDefinition) SetTimeCycle(ref interface{}){
+func (this *TimerEventDefinition) SetTimeCycle(ref interface{}) {
 	this.NeedSave = true
 	this.M_timeCycle = ref.(Expression)
 }
 
 /** Remove reference TimeCycle **/
-func (this *TimerEventDefinition) RemoveTimeCycle(ref interface{}){
+func (this *TimerEventDefinition) RemoveTimeCycle(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_timeCycle.(BaseElement).GetUUID() {
@@ -258,18 +255,18 @@ func (this *TimerEventDefinition) RemoveTimeCycle(ref interface{}){
 }
 
 /** TimeDuration **/
-func (this *TimerEventDefinition) GetTimeDuration() Expression{
+func (this *TimerEventDefinition) GetTimeDuration() Expression {
 	return this.M_timeDuration
 }
 
 /** Init reference TimeDuration **/
-func (this *TimerEventDefinition) SetTimeDuration(ref interface{}){
+func (this *TimerEventDefinition) SetTimeDuration(ref interface{}) {
 	this.NeedSave = true
 	this.M_timeDuration = ref.(Expression)
 }
 
 /** Remove reference TimeDuration **/
-func (this *TimerEventDefinition) RemoveTimeDuration(ref interface{}){
+func (this *TimerEventDefinition) RemoveTimeDuration(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_timeDuration.(BaseElement).GetUUID() {
@@ -278,21 +275,21 @@ func (this *TimerEventDefinition) RemoveTimeDuration(ref interface{}){
 }
 
 /** Lane **/
-func (this *TimerEventDefinition) GetLanePtr() []*Lane{
+func (this *TimerEventDefinition) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *TimerEventDefinition) SetLanePtr(ref interface{}){
+func (this *TimerEventDefinition) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -300,7 +297,7 @@ func (this *TimerEventDefinition) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *TimerEventDefinition) RemoveLanePtr(ref interface{}){
+func (this *TimerEventDefinition) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -316,21 +313,21 @@ func (this *TimerEventDefinition) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *TimerEventDefinition) GetOutgoingPtr() []*Association{
+func (this *TimerEventDefinition) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *TimerEventDefinition) SetOutgoingPtr(ref interface{}){
+func (this *TimerEventDefinition) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -338,7 +335,7 @@ func (this *TimerEventDefinition) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *TimerEventDefinition) RemoveOutgoingPtr(ref interface{}){
+func (this *TimerEventDefinition) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -354,21 +351,21 @@ func (this *TimerEventDefinition) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *TimerEventDefinition) GetIncomingPtr() []*Association{
+func (this *TimerEventDefinition) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *TimerEventDefinition) SetIncomingPtr(ref interface{}){
+func (this *TimerEventDefinition) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -376,7 +373,7 @@ func (this *TimerEventDefinition) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *TimerEventDefinition) RemoveIncomingPtr(ref interface{}){
+func (this *TimerEventDefinition) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -392,23 +389,23 @@ func (this *TimerEventDefinition) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Definitions **/
-func (this *TimerEventDefinition) GetDefinitionsPtr() *Definitions{
+func (this *TimerEventDefinition) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *TimerEventDefinition) SetDefinitionsPtr(ref interface{}){
+func (this *TimerEventDefinition) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *TimerEventDefinition) RemoveDefinitionsPtr(ref interface{}){
+func (this *TimerEventDefinition) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {
@@ -418,21 +415,21 @@ func (this *TimerEventDefinition) RemoveDefinitionsPtr(ref interface{}){
 }
 
 /** ThrowEvent **/
-func (this *TimerEventDefinition) GetThrowEventPtr() []ThrowEvent{
+func (this *TimerEventDefinition) GetThrowEventPtr() []ThrowEvent {
 	return this.m_throwEventPtr
 }
 
 /** Init reference ThrowEvent **/
-func (this *TimerEventDefinition) SetThrowEventPtr(ref interface{}){
+func (this *TimerEventDefinition) SetThrowEventPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_throwEventPtr); i++ {
+		for i := 0; i < len(this.M_throwEventPtr); i++ {
 			if this.M_throwEventPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_throwEventPtr = append(this.M_throwEventPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveThrowEventPtr(ref)
 		this.m_throwEventPtr = append(this.m_throwEventPtr, ref.(ThrowEvent))
 		this.M_throwEventPtr = append(this.M_throwEventPtr, ref.(BaseElement).GetUUID())
@@ -440,7 +437,7 @@ func (this *TimerEventDefinition) SetThrowEventPtr(ref interface{}){
 }
 
 /** Remove reference ThrowEvent **/
-func (this *TimerEventDefinition) RemoveThrowEventPtr(ref interface{}){
+func (this *TimerEventDefinition) RemoveThrowEventPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	throwEventPtr_ := make([]ThrowEvent, 0)
@@ -456,21 +453,21 @@ func (this *TimerEventDefinition) RemoveThrowEventPtr(ref interface{}){
 }
 
 /** CatchEvent **/
-func (this *TimerEventDefinition) GetCatchEventPtr() []CatchEvent{
+func (this *TimerEventDefinition) GetCatchEventPtr() []CatchEvent {
 	return this.m_catchEventPtr
 }
 
 /** Init reference CatchEvent **/
-func (this *TimerEventDefinition) SetCatchEventPtr(ref interface{}){
+func (this *TimerEventDefinition) SetCatchEventPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_catchEventPtr); i++ {
+		for i := 0; i < len(this.M_catchEventPtr); i++ {
 			if this.M_catchEventPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_catchEventPtr = append(this.M_catchEventPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCatchEventPtr(ref)
 		this.m_catchEventPtr = append(this.m_catchEventPtr, ref.(CatchEvent))
 		this.M_catchEventPtr = append(this.M_catchEventPtr, ref.(BaseElement).GetUUID())
@@ -478,7 +475,7 @@ func (this *TimerEventDefinition) SetCatchEventPtr(ref interface{}){
 }
 
 /** Remove reference CatchEvent **/
-func (this *TimerEventDefinition) RemoveCatchEventPtr(ref interface{}){
+func (this *TimerEventDefinition) RemoveCatchEventPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	catchEventPtr_ := make([]CatchEvent, 0)
@@ -494,21 +491,21 @@ func (this *TimerEventDefinition) RemoveCatchEventPtr(ref interface{}){
 }
 
 /** MultiInstanceLoopCharacteristics **/
-func (this *TimerEventDefinition) GetMultiInstanceLoopCharacteristicsPtr() []*MultiInstanceLoopCharacteristics{
+func (this *TimerEventDefinition) GetMultiInstanceLoopCharacteristicsPtr() []*MultiInstanceLoopCharacteristics {
 	return this.m_multiInstanceLoopCharacteristicsPtr
 }
 
 /** Init reference MultiInstanceLoopCharacteristics **/
-func (this *TimerEventDefinition) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *TimerEventDefinition) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_multiInstanceLoopCharacteristicsPtr); i++ {
+		for i := 0; i < len(this.M_multiInstanceLoopCharacteristicsPtr); i++ {
 			if this.M_multiInstanceLoopCharacteristicsPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_multiInstanceLoopCharacteristicsPtr = append(this.M_multiInstanceLoopCharacteristicsPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveMultiInstanceLoopCharacteristicsPtr(ref)
 		this.m_multiInstanceLoopCharacteristicsPtr = append(this.m_multiInstanceLoopCharacteristicsPtr, ref.(*MultiInstanceLoopCharacteristics))
 		this.M_multiInstanceLoopCharacteristicsPtr = append(this.M_multiInstanceLoopCharacteristicsPtr, ref.(BaseElement).GetUUID())
@@ -516,7 +513,7 @@ func (this *TimerEventDefinition) SetMultiInstanceLoopCharacteristicsPtr(ref int
 }
 
 /** Remove reference MultiInstanceLoopCharacteristics **/
-func (this *TimerEventDefinition) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *TimerEventDefinition) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	multiInstanceLoopCharacteristicsPtr_ := make([]*MultiInstanceLoopCharacteristics, 0)

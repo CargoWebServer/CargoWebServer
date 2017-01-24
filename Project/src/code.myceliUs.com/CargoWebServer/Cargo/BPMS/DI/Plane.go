@@ -1,6 +1,7 @@
+//+build DI
 package DI
 
-type Plane interface{
+type Plane interface {
 	/** Method of Plane **/
 
 	/** UUID **/
@@ -8,5 +9,4 @@ type Plane interface{
 
 	/** DiagramElement **/
 	GetDiagramElement() []DiagramElement
-
 }

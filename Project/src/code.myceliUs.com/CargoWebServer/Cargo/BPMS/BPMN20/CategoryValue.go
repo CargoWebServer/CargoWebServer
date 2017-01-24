@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type CategoryValue struct{
+type CategoryValue struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,35 +15,34 @@ type CategoryValue struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of CategoryValue **/
 	m_categorizedFlowElements []FlowElement
 	/** If the ref is a string and not an object **/
 	M_categorizedFlowElements []string
-	M_value string
-
+	M_value                   string
 
 	/** Associations **/
 	m_categoryValueRefPtr []*Group
 	/** If the ref is a string and not an object **/
 	M_categoryValueRefPtr []string
-	m_categoryPtr *Category
+	m_categoryPtr         *Category
 	/** If the ref is a string and not an object **/
 	M_categoryPtr string
-	m_lanePtr []*Lane
+	m_lanePtr     []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -53,29 +53,28 @@ type CategoryValue struct{
 
 /** Xml parser for CategoryValue **/
 type XsdCategoryValue struct {
-	XMLName xml.Name	`xml:"categoryValue"`
+	XMLName xml.Name `xml:"categoryValue"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_value	string	`xml:"value,attr"`
-
+	M_value string `xml:"value,attr"`
 }
+
 /** UUID **/
-func (this *CategoryValue) GetUUID() string{
+func (this *CategoryValue) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *CategoryValue) GetId() string{
+func (this *CategoryValue) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *CategoryValue) SetId(ref interface{}){
+func (this *CategoryValue) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -83,16 +82,16 @@ func (this *CategoryValue) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *CategoryValue) GetOther() interface{}{
+func (this *CategoryValue) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *CategoryValue) SetOther(ref interface{}){
+func (this *CategoryValue) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -100,12 +99,12 @@ func (this *CategoryValue) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *CategoryValue) GetExtensionElements() *ExtensionElements{
+func (this *CategoryValue) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *CategoryValue) SetExtensionElements(ref interface{}){
+func (this *CategoryValue) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -113,16 +112,16 @@ func (this *CategoryValue) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *CategoryValue) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *CategoryValue) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *CategoryValue) SetExtensionDefinitions(ref interface{}){
+func (this *CategoryValue) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -139,16 +138,16 @@ func (this *CategoryValue) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *CategoryValue) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *CategoryValue) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *CategoryValue) SetExtensionValues(ref interface{}){
+func (this *CategoryValue) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -165,16 +164,16 @@ func (this *CategoryValue) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *CategoryValue) GetDocumentation() []*Documentation{
+func (this *CategoryValue) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *CategoryValue) SetDocumentation(ref interface{}){
+func (this *CategoryValue) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -189,7 +188,7 @@ func (this *CategoryValue) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *CategoryValue) RemoveDocumentation(ref interface{}){
+func (this *CategoryValue) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -202,21 +201,21 @@ func (this *CategoryValue) RemoveDocumentation(ref interface{}){
 }
 
 /** CategorizedFlowElements **/
-func (this *CategoryValue) GetCategorizedFlowElements() []FlowElement{
+func (this *CategoryValue) GetCategorizedFlowElements() []FlowElement {
 	return this.m_categorizedFlowElements
 }
 
 /** Init reference CategorizedFlowElements **/
-func (this *CategoryValue) SetCategorizedFlowElements(ref interface{}){
+func (this *CategoryValue) SetCategorizedFlowElements(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_categorizedFlowElements); i++ {
+		for i := 0; i < len(this.M_categorizedFlowElements); i++ {
 			if this.M_categorizedFlowElements[i] == refStr {
 				return
 			}
 		}
 		this.M_categorizedFlowElements = append(this.M_categorizedFlowElements, ref.(string))
-	}else{
+	} else {
 		this.RemoveCategorizedFlowElements(ref)
 		this.m_categorizedFlowElements = append(this.m_categorizedFlowElements, ref.(FlowElement))
 		this.M_categorizedFlowElements = append(this.M_categorizedFlowElements, ref.(BaseElement).GetUUID())
@@ -224,7 +223,7 @@ func (this *CategoryValue) SetCategorizedFlowElements(ref interface{}){
 }
 
 /** Remove reference CategorizedFlowElements **/
-func (this *CategoryValue) RemoveCategorizedFlowElements(ref interface{}){
+func (this *CategoryValue) RemoveCategorizedFlowElements(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	categorizedFlowElements_ := make([]FlowElement, 0)
@@ -240,12 +239,12 @@ func (this *CategoryValue) RemoveCategorizedFlowElements(ref interface{}){
 }
 
 /** Value **/
-func (this *CategoryValue) GetValue() string{
+func (this *CategoryValue) GetValue() string {
 	return this.M_value
 }
 
 /** Init reference Value **/
-func (this *CategoryValue) SetValue(ref interface{}){
+func (this *CategoryValue) SetValue(ref interface{}) {
 	this.NeedSave = true
 	this.M_value = ref.(string)
 }
@@ -253,21 +252,21 @@ func (this *CategoryValue) SetValue(ref interface{}){
 /** Remove reference Value **/
 
 /** CategoryValueRef **/
-func (this *CategoryValue) GetCategoryValueRefPtr() []*Group{
+func (this *CategoryValue) GetCategoryValueRefPtr() []*Group {
 	return this.m_categoryValueRefPtr
 }
 
 /** Init reference CategoryValueRef **/
-func (this *CategoryValue) SetCategoryValueRefPtr(ref interface{}){
+func (this *CategoryValue) SetCategoryValueRefPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_categoryValueRefPtr); i++ {
+		for i := 0; i < len(this.M_categoryValueRefPtr); i++ {
 			if this.M_categoryValueRefPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_categoryValueRefPtr = append(this.M_categoryValueRefPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCategoryValueRefPtr(ref)
 		this.m_categoryValueRefPtr = append(this.m_categoryValueRefPtr, ref.(*Group))
 		this.M_categoryValueRefPtr = append(this.M_categoryValueRefPtr, ref.(BaseElement).GetUUID())
@@ -275,7 +274,7 @@ func (this *CategoryValue) SetCategoryValueRefPtr(ref interface{}){
 }
 
 /** Remove reference CategoryValueRef **/
-func (this *CategoryValue) RemoveCategoryValueRefPtr(ref interface{}){
+func (this *CategoryValue) RemoveCategoryValueRefPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	categoryValueRefPtr_ := make([]*Group, 0)
@@ -291,23 +290,23 @@ func (this *CategoryValue) RemoveCategoryValueRefPtr(ref interface{}){
 }
 
 /** Category **/
-func (this *CategoryValue) GetCategoryPtr() *Category{
+func (this *CategoryValue) GetCategoryPtr() *Category {
 	return this.m_categoryPtr
 }
 
 /** Init reference Category **/
-func (this *CategoryValue) SetCategoryPtr(ref interface{}){
+func (this *CategoryValue) SetCategoryPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_categoryPtr = ref.(string)
-	}else{
+	} else {
 		this.m_categoryPtr = ref.(*Category)
 		this.M_categoryPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Category **/
-func (this *CategoryValue) RemoveCategoryPtr(ref interface{}){
+func (this *CategoryValue) RemoveCategoryPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_categoryPtr.GetUUID() {
@@ -317,21 +316,21 @@ func (this *CategoryValue) RemoveCategoryPtr(ref interface{}){
 }
 
 /** Lane **/
-func (this *CategoryValue) GetLanePtr() []*Lane{
+func (this *CategoryValue) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *CategoryValue) SetLanePtr(ref interface{}){
+func (this *CategoryValue) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -339,7 +338,7 @@ func (this *CategoryValue) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *CategoryValue) RemoveLanePtr(ref interface{}){
+func (this *CategoryValue) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -355,21 +354,21 @@ func (this *CategoryValue) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *CategoryValue) GetOutgoingPtr() []*Association{
+func (this *CategoryValue) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *CategoryValue) SetOutgoingPtr(ref interface{}){
+func (this *CategoryValue) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -377,7 +376,7 @@ func (this *CategoryValue) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *CategoryValue) RemoveOutgoingPtr(ref interface{}){
+func (this *CategoryValue) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -393,21 +392,21 @@ func (this *CategoryValue) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *CategoryValue) GetIncomingPtr() []*Association{
+func (this *CategoryValue) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *CategoryValue) SetIncomingPtr(ref interface{}){
+func (this *CategoryValue) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -415,7 +414,7 @@ func (this *CategoryValue) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *CategoryValue) RemoveIncomingPtr(ref interface{}){
+func (this *CategoryValue) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)

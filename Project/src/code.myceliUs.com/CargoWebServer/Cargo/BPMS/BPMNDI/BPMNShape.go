@@ -1,3 +1,4 @@
+// +build BPMN
 package BPMNDI
 
 import (

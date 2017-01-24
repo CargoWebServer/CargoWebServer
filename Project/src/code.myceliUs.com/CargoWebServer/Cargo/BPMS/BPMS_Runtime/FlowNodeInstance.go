@@ -1,3 +1,4 @@
+//+build BPMN
 package BPMS_Runtime
 
 type FlowNodeInstance interface {

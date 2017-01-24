@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type ResourceRole_impl struct{
+type ResourceRole_impl struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,40 +15,39 @@ type ResourceRole_impl struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of ResourceRole **/
 	m_resourceRef *Resource
 	/** If the ref is a string and not an object **/
-	M_resourceRef string
-	M_resourceParameterBinding []*ResourceParameterBinding
+	M_resourceRef                  string
+	M_resourceParameterBinding     []*ResourceParameterBinding
 	M_resourceAssignmentExpression *ResourceAssignmentExpression
-	M_name string
-
+	M_name                         string
 
 	/** Associations **/
 	m_globalTaskPtr GlobalTask
 	/** If the ref is a string and not an object **/
 	M_globalTaskPtr string
-	m_processPtr *Process
+	m_processPtr    *Process
 	/** If the ref is a string and not an object **/
-	M_processPtr string
+	M_processPtr  string
 	m_activityPtr Activity
 	/** If the ref is a string and not an object **/
 	M_activityPtr string
-	m_lanePtr []*Lane
+	m_lanePtr     []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -58,32 +58,31 @@ type ResourceRole_impl struct{
 
 /** Xml parser for ResourceRole **/
 type XsdResourceRole struct {
-	XMLName xml.Name	`xml:"resourceRole"`
+	XMLName xml.Name `xml:"resourceRole"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_name	string	`xml:"name,attr"`
-	M_resourceRef	*string	`xml:"resourceRef"`
-	M_resourceParameterBinding	[]*XsdResourceParameterBinding	`xml:"resourceParameterBinding,omitempty"`
-	M_resourceAssignmentExpression	*XsdResourceAssignmentExpression	`xml:"resourceAssignmentExpression,omitempty"`
-
+	M_name                         string                           `xml:"name,attr"`
+	M_resourceRef                  *string                          `xml:"resourceRef"`
+	M_resourceParameterBinding     []*XsdResourceParameterBinding   `xml:"resourceParameterBinding,omitempty"`
+	M_resourceAssignmentExpression *XsdResourceAssignmentExpression `xml:"resourceAssignmentExpression,omitempty"`
 }
+
 /** UUID **/
-func (this *ResourceRole_impl) GetUUID() string{
+func (this *ResourceRole_impl) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *ResourceRole_impl) GetId() string{
+func (this *ResourceRole_impl) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *ResourceRole_impl) SetId(ref interface{}){
+func (this *ResourceRole_impl) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -91,16 +90,16 @@ func (this *ResourceRole_impl) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *ResourceRole_impl) GetOther() interface{}{
+func (this *ResourceRole_impl) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *ResourceRole_impl) SetOther(ref interface{}){
+func (this *ResourceRole_impl) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -108,12 +107,12 @@ func (this *ResourceRole_impl) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *ResourceRole_impl) GetExtensionElements() *ExtensionElements{
+func (this *ResourceRole_impl) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *ResourceRole_impl) SetExtensionElements(ref interface{}){
+func (this *ResourceRole_impl) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -121,16 +120,16 @@ func (this *ResourceRole_impl) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *ResourceRole_impl) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *ResourceRole_impl) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *ResourceRole_impl) SetExtensionDefinitions(ref interface{}){
+func (this *ResourceRole_impl) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -147,16 +146,16 @@ func (this *ResourceRole_impl) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *ResourceRole_impl) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *ResourceRole_impl) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *ResourceRole_impl) SetExtensionValues(ref interface{}){
+func (this *ResourceRole_impl) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -173,16 +172,16 @@ func (this *ResourceRole_impl) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *ResourceRole_impl) GetDocumentation() []*Documentation{
+func (this *ResourceRole_impl) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *ResourceRole_impl) SetDocumentation(ref interface{}){
+func (this *ResourceRole_impl) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -197,7 +196,7 @@ func (this *ResourceRole_impl) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *ResourceRole_impl) RemoveDocumentation(ref interface{}){
+func (this *ResourceRole_impl) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -210,23 +209,23 @@ func (this *ResourceRole_impl) RemoveDocumentation(ref interface{}){
 }
 
 /** ResourceRef **/
-func (this *ResourceRole_impl) GetResourceRef() *Resource{
+func (this *ResourceRole_impl) GetResourceRef() *Resource {
 	return this.m_resourceRef
 }
 
 /** Init reference ResourceRef **/
-func (this *ResourceRole_impl) SetResourceRef(ref interface{}){
+func (this *ResourceRole_impl) SetResourceRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_resourceRef = ref.(string)
-	}else{
+	} else {
 		this.m_resourceRef = ref.(*Resource)
 		this.M_resourceRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference ResourceRef **/
-func (this *ResourceRole_impl) RemoveResourceRef(ref interface{}){
+func (this *ResourceRole_impl) RemoveResourceRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_resourceRef.GetUUID() {
@@ -236,16 +235,16 @@ func (this *ResourceRole_impl) RemoveResourceRef(ref interface{}){
 }
 
 /** ResourceParameterBinding **/
-func (this *ResourceRole_impl) GetResourceParameterBinding() []*ResourceParameterBinding{
+func (this *ResourceRole_impl) GetResourceParameterBinding() []*ResourceParameterBinding {
 	return this.M_resourceParameterBinding
 }
 
 /** Init reference ResourceParameterBinding **/
-func (this *ResourceRole_impl) SetResourceParameterBinding(ref interface{}){
+func (this *ResourceRole_impl) SetResourceParameterBinding(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var resourceParameterBindings []*ResourceParameterBinding
-	for i:=0; i<len(this.M_resourceParameterBinding); i++ {
+	for i := 0; i < len(this.M_resourceParameterBinding); i++ {
 		if this.M_resourceParameterBinding[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			resourceParameterBindings = append(resourceParameterBindings, this.M_resourceParameterBinding[i])
 		} else {
@@ -260,7 +259,7 @@ func (this *ResourceRole_impl) SetResourceParameterBinding(ref interface{}){
 }
 
 /** Remove reference ResourceParameterBinding **/
-func (this *ResourceRole_impl) RemoveResourceParameterBinding(ref interface{}){
+func (this *ResourceRole_impl) RemoveResourceParameterBinding(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	resourceParameterBinding_ := make([]*ResourceParameterBinding, 0)
@@ -273,18 +272,18 @@ func (this *ResourceRole_impl) RemoveResourceParameterBinding(ref interface{}){
 }
 
 /** ResourceAssignmentExpression **/
-func (this *ResourceRole_impl) GetResourceAssignmentExpression() *ResourceAssignmentExpression{
+func (this *ResourceRole_impl) GetResourceAssignmentExpression() *ResourceAssignmentExpression {
 	return this.M_resourceAssignmentExpression
 }
 
 /** Init reference ResourceAssignmentExpression **/
-func (this *ResourceRole_impl) SetResourceAssignmentExpression(ref interface{}){
+func (this *ResourceRole_impl) SetResourceAssignmentExpression(ref interface{}) {
 	this.NeedSave = true
 	this.M_resourceAssignmentExpression = ref.(*ResourceAssignmentExpression)
 }
 
 /** Remove reference ResourceAssignmentExpression **/
-func (this *ResourceRole_impl) RemoveResourceAssignmentExpression(ref interface{}){
+func (this *ResourceRole_impl) RemoveResourceAssignmentExpression(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_resourceAssignmentExpression.GetUUID() {
@@ -293,12 +292,12 @@ func (this *ResourceRole_impl) RemoveResourceAssignmentExpression(ref interface{
 }
 
 /** Name **/
-func (this *ResourceRole_impl) GetName() string{
+func (this *ResourceRole_impl) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *ResourceRole_impl) SetName(ref interface{}){
+func (this *ResourceRole_impl) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -306,23 +305,23 @@ func (this *ResourceRole_impl) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** GlobalTask **/
-func (this *ResourceRole_impl) GetGlobalTaskPtr() GlobalTask{
+func (this *ResourceRole_impl) GetGlobalTaskPtr() GlobalTask {
 	return this.m_globalTaskPtr
 }
 
 /** Init reference GlobalTask **/
-func (this *ResourceRole_impl) SetGlobalTaskPtr(ref interface{}){
+func (this *ResourceRole_impl) SetGlobalTaskPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_globalTaskPtr = ref.(string)
-	}else{
+	} else {
 		this.m_globalTaskPtr = ref.(GlobalTask)
 		this.M_globalTaskPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference GlobalTask **/
-func (this *ResourceRole_impl) RemoveGlobalTaskPtr(ref interface{}){
+func (this *ResourceRole_impl) RemoveGlobalTaskPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_globalTaskPtr.(BaseElement).GetUUID() {
@@ -332,23 +331,23 @@ func (this *ResourceRole_impl) RemoveGlobalTaskPtr(ref interface{}){
 }
 
 /** Process **/
-func (this *ResourceRole_impl) GetProcessPtr() *Process{
+func (this *ResourceRole_impl) GetProcessPtr() *Process {
 	return this.m_processPtr
 }
 
 /** Init reference Process **/
-func (this *ResourceRole_impl) SetProcessPtr(ref interface{}){
+func (this *ResourceRole_impl) SetProcessPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_processPtr = ref.(string)
-	}else{
+	} else {
 		this.m_processPtr = ref.(*Process)
 		this.M_processPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Process **/
-func (this *ResourceRole_impl) RemoveProcessPtr(ref interface{}){
+func (this *ResourceRole_impl) RemoveProcessPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_processPtr.GetUUID() {
@@ -358,23 +357,23 @@ func (this *ResourceRole_impl) RemoveProcessPtr(ref interface{}){
 }
 
 /** Activity **/
-func (this *ResourceRole_impl) GetActivityPtr() Activity{
+func (this *ResourceRole_impl) GetActivityPtr() Activity {
 	return this.m_activityPtr
 }
 
 /** Init reference Activity **/
-func (this *ResourceRole_impl) SetActivityPtr(ref interface{}){
+func (this *ResourceRole_impl) SetActivityPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_activityPtr = ref.(string)
-	}else{
+	} else {
 		this.m_activityPtr = ref.(Activity)
 		this.M_activityPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Activity **/
-func (this *ResourceRole_impl) RemoveActivityPtr(ref interface{}){
+func (this *ResourceRole_impl) RemoveActivityPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_activityPtr.(BaseElement).GetUUID() {
@@ -384,21 +383,21 @@ func (this *ResourceRole_impl) RemoveActivityPtr(ref interface{}){
 }
 
 /** Lane **/
-func (this *ResourceRole_impl) GetLanePtr() []*Lane{
+func (this *ResourceRole_impl) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *ResourceRole_impl) SetLanePtr(ref interface{}){
+func (this *ResourceRole_impl) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -406,7 +405,7 @@ func (this *ResourceRole_impl) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *ResourceRole_impl) RemoveLanePtr(ref interface{}){
+func (this *ResourceRole_impl) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -422,21 +421,21 @@ func (this *ResourceRole_impl) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *ResourceRole_impl) GetOutgoingPtr() []*Association{
+func (this *ResourceRole_impl) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *ResourceRole_impl) SetOutgoingPtr(ref interface{}){
+func (this *ResourceRole_impl) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -444,7 +443,7 @@ func (this *ResourceRole_impl) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *ResourceRole_impl) RemoveOutgoingPtr(ref interface{}){
+func (this *ResourceRole_impl) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -460,21 +459,21 @@ func (this *ResourceRole_impl) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *ResourceRole_impl) GetIncomingPtr() []*Association{
+func (this *ResourceRole_impl) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *ResourceRole_impl) SetIncomingPtr(ref interface{}){
+func (this *ResourceRole_impl) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -482,7 +481,7 @@ func (this *ResourceRole_impl) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *ResourceRole_impl) RemoveIncomingPtr(ref interface{}){
+func (this *ResourceRole_impl) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)

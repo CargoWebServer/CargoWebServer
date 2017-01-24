@@ -1,7 +1,7 @@
+//+build DI
 package DI
 
-type Node interface{
+type Node interface {
 	/** UUID **/
 	GetUUID() string
-
 }

@@ -1,6 +1,7 @@
+//+build DI
 package DI
 
-type LabeledEdge interface{
+type LabeledEdge interface {
 	/** Method of LabeledEdge **/
 
 	/** UUID **/
@@ -8,5 +9,4 @@ type LabeledEdge interface{
 
 	/** OwnedLabel **/
 	GetOwnedLabel() []Label
-
 }

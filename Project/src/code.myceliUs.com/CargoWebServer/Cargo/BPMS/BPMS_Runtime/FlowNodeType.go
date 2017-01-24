@@ -1,8 +1,10 @@
+//+build BPMN
 package BPMS_Runtime
 
 type FlowNodeType int
-const(
-	FlowNodeType_AbstractTask FlowNodeType = 1+iota
+
+const (
+	FlowNodeType_AbstractTask FlowNodeType = 1 + iota
 	FlowNodeType_ServiceTask
 	FlowNodeType_UserTask
 	FlowNodeType_ManualTask

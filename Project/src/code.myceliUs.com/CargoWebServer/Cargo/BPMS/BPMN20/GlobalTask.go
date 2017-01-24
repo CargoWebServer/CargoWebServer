@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type GlobalTask interface{
+type GlobalTask interface {
 	/** Method of GlobalTask **/
 
 	/** UUID **/
@@ -8,5 +9,4 @@ type GlobalTask interface{
 
 	/** ResourceRole **/
 	GetResourceRole() []ResourceRole
-
 }

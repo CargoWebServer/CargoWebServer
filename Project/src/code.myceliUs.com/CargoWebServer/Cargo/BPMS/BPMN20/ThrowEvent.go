@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type ThrowEvent interface{
+type ThrowEvent interface {
 	/** Method of ThrowEvent **/
 
 	/** UUID **/
@@ -20,5 +21,4 @@ type ThrowEvent interface{
 
 	/** EventDefinition **/
 	GetEventDefinition() []EventDefinition
-
 }

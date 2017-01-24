@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type MessageFlowAssociation struct{
+type MessageFlowAssociation struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,17 +15,17 @@ type MessageFlowAssociation struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of MessageFlowAssociation **/
 	m_innerMessageFlowRef *MessageFlow
@@ -34,14 +35,13 @@ type MessageFlowAssociation struct{
 	/** If the ref is a string and not an object **/
 	M_outerMessageFlowRef string
 
-
 	/** Associations **/
 	m_collaborationPtr Collaboration
 	/** If the ref is a string and not an object **/
 	M_collaborationPtr string
-	m_lanePtr []*Lane
+	m_lanePtr          []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -52,30 +52,29 @@ type MessageFlowAssociation struct{
 
 /** Xml parser for MessageFlowAssociation **/
 type XsdMessageFlowAssociation struct {
-	XMLName xml.Name	`xml:"messageFlowAssociation"`
+	XMLName xml.Name `xml:"messageFlowAssociation"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_innerMessageFlowRef	string	`xml:"innerMessageFlowRef,attr"`
-	M_outerMessageFlowRef	string	`xml:"outerMessageFlowRef,attr"`
-
+	M_innerMessageFlowRef string `xml:"innerMessageFlowRef,attr"`
+	M_outerMessageFlowRef string `xml:"outerMessageFlowRef,attr"`
 }
+
 /** UUID **/
-func (this *MessageFlowAssociation) GetUUID() string{
+func (this *MessageFlowAssociation) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *MessageFlowAssociation) GetId() string{
+func (this *MessageFlowAssociation) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *MessageFlowAssociation) SetId(ref interface{}){
+func (this *MessageFlowAssociation) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -83,16 +82,16 @@ func (this *MessageFlowAssociation) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *MessageFlowAssociation) GetOther() interface{}{
+func (this *MessageFlowAssociation) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *MessageFlowAssociation) SetOther(ref interface{}){
+func (this *MessageFlowAssociation) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -100,12 +99,12 @@ func (this *MessageFlowAssociation) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *MessageFlowAssociation) GetExtensionElements() *ExtensionElements{
+func (this *MessageFlowAssociation) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *MessageFlowAssociation) SetExtensionElements(ref interface{}){
+func (this *MessageFlowAssociation) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -113,16 +112,16 @@ func (this *MessageFlowAssociation) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *MessageFlowAssociation) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *MessageFlowAssociation) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *MessageFlowAssociation) SetExtensionDefinitions(ref interface{}){
+func (this *MessageFlowAssociation) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -139,16 +138,16 @@ func (this *MessageFlowAssociation) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *MessageFlowAssociation) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *MessageFlowAssociation) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *MessageFlowAssociation) SetExtensionValues(ref interface{}){
+func (this *MessageFlowAssociation) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -165,16 +164,16 @@ func (this *MessageFlowAssociation) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *MessageFlowAssociation) GetDocumentation() []*Documentation{
+func (this *MessageFlowAssociation) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *MessageFlowAssociation) SetDocumentation(ref interface{}){
+func (this *MessageFlowAssociation) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -189,7 +188,7 @@ func (this *MessageFlowAssociation) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *MessageFlowAssociation) RemoveDocumentation(ref interface{}){
+func (this *MessageFlowAssociation) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -202,23 +201,23 @@ func (this *MessageFlowAssociation) RemoveDocumentation(ref interface{}){
 }
 
 /** InnerMessageFlowRef **/
-func (this *MessageFlowAssociation) GetInnerMessageFlowRef() *MessageFlow{
+func (this *MessageFlowAssociation) GetInnerMessageFlowRef() *MessageFlow {
 	return this.m_innerMessageFlowRef
 }
 
 /** Init reference InnerMessageFlowRef **/
-func (this *MessageFlowAssociation) SetInnerMessageFlowRef(ref interface{}){
+func (this *MessageFlowAssociation) SetInnerMessageFlowRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_innerMessageFlowRef = ref.(string)
-	}else{
+	} else {
 		this.m_innerMessageFlowRef = ref.(*MessageFlow)
 		this.M_innerMessageFlowRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference InnerMessageFlowRef **/
-func (this *MessageFlowAssociation) RemoveInnerMessageFlowRef(ref interface{}){
+func (this *MessageFlowAssociation) RemoveInnerMessageFlowRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_innerMessageFlowRef.GetUUID() {
@@ -228,23 +227,23 @@ func (this *MessageFlowAssociation) RemoveInnerMessageFlowRef(ref interface{}){
 }
 
 /** OuterMessageFlowRef **/
-func (this *MessageFlowAssociation) GetOuterMessageFlowRef() *MessageFlow{
+func (this *MessageFlowAssociation) GetOuterMessageFlowRef() *MessageFlow {
 	return this.m_outerMessageFlowRef
 }
 
 /** Init reference OuterMessageFlowRef **/
-func (this *MessageFlowAssociation) SetOuterMessageFlowRef(ref interface{}){
+func (this *MessageFlowAssociation) SetOuterMessageFlowRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_outerMessageFlowRef = ref.(string)
-	}else{
+	} else {
 		this.m_outerMessageFlowRef = ref.(*MessageFlow)
 		this.M_outerMessageFlowRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference OuterMessageFlowRef **/
-func (this *MessageFlowAssociation) RemoveOuterMessageFlowRef(ref interface{}){
+func (this *MessageFlowAssociation) RemoveOuterMessageFlowRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_outerMessageFlowRef.GetUUID() {
@@ -254,23 +253,23 @@ func (this *MessageFlowAssociation) RemoveOuterMessageFlowRef(ref interface{}){
 }
 
 /** Collaboration **/
-func (this *MessageFlowAssociation) GetCollaborationPtr() Collaboration{
+func (this *MessageFlowAssociation) GetCollaborationPtr() Collaboration {
 	return this.m_collaborationPtr
 }
 
 /** Init reference Collaboration **/
-func (this *MessageFlowAssociation) SetCollaborationPtr(ref interface{}){
+func (this *MessageFlowAssociation) SetCollaborationPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_collaborationPtr = ref.(string)
-	}else{
+	} else {
 		this.m_collaborationPtr = ref.(Collaboration)
 		this.M_collaborationPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Collaboration **/
-func (this *MessageFlowAssociation) RemoveCollaborationPtr(ref interface{}){
+func (this *MessageFlowAssociation) RemoveCollaborationPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_collaborationPtr.(BaseElement).GetUUID() {
@@ -280,21 +279,21 @@ func (this *MessageFlowAssociation) RemoveCollaborationPtr(ref interface{}){
 }
 
 /** Lane **/
-func (this *MessageFlowAssociation) GetLanePtr() []*Lane{
+func (this *MessageFlowAssociation) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *MessageFlowAssociation) SetLanePtr(ref interface{}){
+func (this *MessageFlowAssociation) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -302,7 +301,7 @@ func (this *MessageFlowAssociation) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *MessageFlowAssociation) RemoveLanePtr(ref interface{}){
+func (this *MessageFlowAssociation) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -318,21 +317,21 @@ func (this *MessageFlowAssociation) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *MessageFlowAssociation) GetOutgoingPtr() []*Association{
+func (this *MessageFlowAssociation) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *MessageFlowAssociation) SetOutgoingPtr(ref interface{}){
+func (this *MessageFlowAssociation) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -340,7 +339,7 @@ func (this *MessageFlowAssociation) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *MessageFlowAssociation) RemoveOutgoingPtr(ref interface{}){
+func (this *MessageFlowAssociation) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -356,21 +355,21 @@ func (this *MessageFlowAssociation) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *MessageFlowAssociation) GetIncomingPtr() []*Association{
+func (this *MessageFlowAssociation) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *MessageFlowAssociation) SetIncomingPtr(ref interface{}){
+func (this *MessageFlowAssociation) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -378,7 +377,7 @@ func (this *MessageFlowAssociation) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *MessageFlowAssociation) RemoveIncomingPtr(ref interface{}){
+func (this *MessageFlowAssociation) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)

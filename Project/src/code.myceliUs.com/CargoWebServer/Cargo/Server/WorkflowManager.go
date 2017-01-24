@@ -1,3 +1,5 @@
+// +build BPMN
+
 package Server
 
 import (

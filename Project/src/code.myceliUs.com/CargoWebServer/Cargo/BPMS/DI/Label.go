@@ -1,10 +1,11 @@
+//+build DI
 package DI
 
-import(
-"code.myceliUs.com/CargoWebServer/Cargo/BPMS/DC"
+import (
+	"code.myceliUs.com/CargoWebServer/Cargo/BPMS/DC"
 )
 
-type Label interface{
+type Label interface {
 	/** Method of Label **/
 
 	/** UUID **/
@@ -12,5 +13,4 @@ type Label interface{
 
 	/** Bounds **/
 	GetBounds() *DC.Bounds
-
 }

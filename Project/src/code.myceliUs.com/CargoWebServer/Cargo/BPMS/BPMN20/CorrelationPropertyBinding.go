@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type CorrelationPropertyBinding struct{
+type CorrelationPropertyBinding struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,32 +15,31 @@ type CorrelationPropertyBinding struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of CorrelationPropertyBinding **/
-	M_dataPath *FormalExpression
+	M_dataPath               *FormalExpression
 	m_correlationPropertyRef *CorrelationProperty
 	/** If the ref is a string and not an object **/
 	M_correlationPropertyRef string
-
 
 	/** Associations **/
 	m_correlationSubscriptionPtr *CorrelationSubscription
 	/** If the ref is a string and not an object **/
 	M_correlationSubscriptionPtr string
-	m_lanePtr []*Lane
+	m_lanePtr                    []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -50,30 +50,29 @@ type CorrelationPropertyBinding struct{
 
 /** Xml parser for CorrelationPropertyBinding **/
 type XsdCorrelationPropertyBinding struct {
-	XMLName xml.Name	`xml:"correlationPropertyBinding"`
+	XMLName xml.Name `xml:"correlationPropertyBinding"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_dataPath	*XsdDataPath	`xml:"dataPath,omitempty"`
-	M_correlationPropertyRef	string	`xml:"correlationPropertyRef,attr"`
-
+	M_dataPath               *XsdDataPath `xml:"dataPath,omitempty"`
+	M_correlationPropertyRef string       `xml:"correlationPropertyRef,attr"`
 }
+
 /** UUID **/
-func (this *CorrelationPropertyBinding) GetUUID() string{
+func (this *CorrelationPropertyBinding) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *CorrelationPropertyBinding) GetId() string{
+func (this *CorrelationPropertyBinding) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *CorrelationPropertyBinding) SetId(ref interface{}){
+func (this *CorrelationPropertyBinding) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -81,16 +80,16 @@ func (this *CorrelationPropertyBinding) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *CorrelationPropertyBinding) GetOther() interface{}{
+func (this *CorrelationPropertyBinding) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *CorrelationPropertyBinding) SetOther(ref interface{}){
+func (this *CorrelationPropertyBinding) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -98,12 +97,12 @@ func (this *CorrelationPropertyBinding) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *CorrelationPropertyBinding) GetExtensionElements() *ExtensionElements{
+func (this *CorrelationPropertyBinding) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *CorrelationPropertyBinding) SetExtensionElements(ref interface{}){
+func (this *CorrelationPropertyBinding) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -111,16 +110,16 @@ func (this *CorrelationPropertyBinding) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *CorrelationPropertyBinding) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *CorrelationPropertyBinding) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *CorrelationPropertyBinding) SetExtensionDefinitions(ref interface{}){
+func (this *CorrelationPropertyBinding) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -137,16 +136,16 @@ func (this *CorrelationPropertyBinding) SetExtensionDefinitions(ref interface{})
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *CorrelationPropertyBinding) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *CorrelationPropertyBinding) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *CorrelationPropertyBinding) SetExtensionValues(ref interface{}){
+func (this *CorrelationPropertyBinding) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -163,16 +162,16 @@ func (this *CorrelationPropertyBinding) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *CorrelationPropertyBinding) GetDocumentation() []*Documentation{
+func (this *CorrelationPropertyBinding) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *CorrelationPropertyBinding) SetDocumentation(ref interface{}){
+func (this *CorrelationPropertyBinding) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -187,7 +186,7 @@ func (this *CorrelationPropertyBinding) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *CorrelationPropertyBinding) RemoveDocumentation(ref interface{}){
+func (this *CorrelationPropertyBinding) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -200,18 +199,18 @@ func (this *CorrelationPropertyBinding) RemoveDocumentation(ref interface{}){
 }
 
 /** DataPath **/
-func (this *CorrelationPropertyBinding) GetDataPath() *FormalExpression{
+func (this *CorrelationPropertyBinding) GetDataPath() *FormalExpression {
 	return this.M_dataPath
 }
 
 /** Init reference DataPath **/
-func (this *CorrelationPropertyBinding) SetDataPath(ref interface{}){
+func (this *CorrelationPropertyBinding) SetDataPath(ref interface{}) {
 	this.NeedSave = true
 	this.M_dataPath = ref.(*FormalExpression)
 }
 
 /** Remove reference DataPath **/
-func (this *CorrelationPropertyBinding) RemoveDataPath(ref interface{}){
+func (this *CorrelationPropertyBinding) RemoveDataPath(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_dataPath.GetUUID() {
@@ -220,23 +219,23 @@ func (this *CorrelationPropertyBinding) RemoveDataPath(ref interface{}){
 }
 
 /** CorrelationPropertyRef **/
-func (this *CorrelationPropertyBinding) GetCorrelationPropertyRef() *CorrelationProperty{
+func (this *CorrelationPropertyBinding) GetCorrelationPropertyRef() *CorrelationProperty {
 	return this.m_correlationPropertyRef
 }
 
 /** Init reference CorrelationPropertyRef **/
-func (this *CorrelationPropertyBinding) SetCorrelationPropertyRef(ref interface{}){
+func (this *CorrelationPropertyBinding) SetCorrelationPropertyRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_correlationPropertyRef = ref.(string)
-	}else{
+	} else {
 		this.m_correlationPropertyRef = ref.(*CorrelationProperty)
 		this.M_correlationPropertyRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference CorrelationPropertyRef **/
-func (this *CorrelationPropertyBinding) RemoveCorrelationPropertyRef(ref interface{}){
+func (this *CorrelationPropertyBinding) RemoveCorrelationPropertyRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_correlationPropertyRef.GetUUID() {
@@ -246,23 +245,23 @@ func (this *CorrelationPropertyBinding) RemoveCorrelationPropertyRef(ref interfa
 }
 
 /** CorrelationSubscription **/
-func (this *CorrelationPropertyBinding) GetCorrelationSubscriptionPtr() *CorrelationSubscription{
+func (this *CorrelationPropertyBinding) GetCorrelationSubscriptionPtr() *CorrelationSubscription {
 	return this.m_correlationSubscriptionPtr
 }
 
 /** Init reference CorrelationSubscription **/
-func (this *CorrelationPropertyBinding) SetCorrelationSubscriptionPtr(ref interface{}){
+func (this *CorrelationPropertyBinding) SetCorrelationSubscriptionPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_correlationSubscriptionPtr = ref.(string)
-	}else{
+	} else {
 		this.m_correlationSubscriptionPtr = ref.(*CorrelationSubscription)
 		this.M_correlationSubscriptionPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference CorrelationSubscription **/
-func (this *CorrelationPropertyBinding) RemoveCorrelationSubscriptionPtr(ref interface{}){
+func (this *CorrelationPropertyBinding) RemoveCorrelationSubscriptionPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_correlationSubscriptionPtr.GetUUID() {
@@ -272,21 +271,21 @@ func (this *CorrelationPropertyBinding) RemoveCorrelationSubscriptionPtr(ref int
 }
 
 /** Lane **/
-func (this *CorrelationPropertyBinding) GetLanePtr() []*Lane{
+func (this *CorrelationPropertyBinding) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *CorrelationPropertyBinding) SetLanePtr(ref interface{}){
+func (this *CorrelationPropertyBinding) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -294,7 +293,7 @@ func (this *CorrelationPropertyBinding) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *CorrelationPropertyBinding) RemoveLanePtr(ref interface{}){
+func (this *CorrelationPropertyBinding) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -310,21 +309,21 @@ func (this *CorrelationPropertyBinding) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *CorrelationPropertyBinding) GetOutgoingPtr() []*Association{
+func (this *CorrelationPropertyBinding) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *CorrelationPropertyBinding) SetOutgoingPtr(ref interface{}){
+func (this *CorrelationPropertyBinding) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -332,7 +331,7 @@ func (this *CorrelationPropertyBinding) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *CorrelationPropertyBinding) RemoveOutgoingPtr(ref interface{}){
+func (this *CorrelationPropertyBinding) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -348,21 +347,21 @@ func (this *CorrelationPropertyBinding) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *CorrelationPropertyBinding) GetIncomingPtr() []*Association{
+func (this *CorrelationPropertyBinding) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *CorrelationPropertyBinding) SetIncomingPtr(ref interface{}){
+func (this *CorrelationPropertyBinding) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -370,7 +369,7 @@ func (this *CorrelationPropertyBinding) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *CorrelationPropertyBinding) RemoveIncomingPtr(ref interface{}){
+func (this *CorrelationPropertyBinding) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)

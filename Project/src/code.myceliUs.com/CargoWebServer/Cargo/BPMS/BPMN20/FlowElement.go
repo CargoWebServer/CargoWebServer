@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type FlowElement interface{
+type FlowElement interface {
 	/** Method of FlowElement **/
 
 	/** UUID **/
@@ -17,5 +18,4 @@ type FlowElement interface{
 
 	/** CategoryValueRef **/
 	GetCategoryValueRef() []*CategoryValue
-
 }

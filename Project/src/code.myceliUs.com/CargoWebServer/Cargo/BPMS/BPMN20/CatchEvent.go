@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type CatchEvent interface{
+type CatchEvent interface {
 	/** Method of CatchEvent **/
 
 	/** UUID **/
@@ -23,5 +24,4 @@ type CatchEvent interface{
 
 	/** EventDefinition **/
 	GetEventDefinition() []EventDefinition
-
 }

@@ -9,6 +9,7 @@ import (
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"github.com/skratchdot/open-golang/open"
 )
 
 var (
@@ -63,7 +64,7 @@ func newServer() *Server {
 	if err == nil {
 		adminAccount := adminAccountEntity.GetObject().(*CargoEntities.Account)
 		if adminAccount.GetPassword() == "adminadmin" {
-			//open.Run("http://127.0.0.1:9393/Bridge")
+			open.Run("http://127.0.0.1:9393/Bridge")
 		}
 	}
 
@@ -89,7 +90,6 @@ func (this *Server) initialize() {
 	// Basic services...
 	this.GetConfigurationManager().Initialize()
 	this.GetDataManager().Initialize()
-
 	this.GetEntityManager().Initialize()
 	this.GetSessionManager().Initialize()
 	this.GetAccountManager().Initialize()
@@ -101,7 +101,6 @@ func (this *Server) initialize() {
 	logger := NewLogger("defaultErrorLogger")
 	this.loggers["defaultErrorLogger"] = logger
 
-	// TODO load other module here...
 	root := this.GetConfigurationManager().GetApplicationDirectoryPath()
 	servicesInfo_, err := ioutil.ReadFile(root + "/services.json")
 	if err != nil {
@@ -199,7 +198,7 @@ func (this *Server) Start() {
 	this.GetAccountManager().Start()
 	this.GetSecurityManager().Start()
 
-	// Optional services Initialysation...
+	// Optional services Initialisation...
 	for i := 0; i < len(this.services); i++ {
 		// First of all I will retreive the service object...
 		params := make([]interface{}, 0)
@@ -233,7 +232,7 @@ func (this *Server) Stop() {
 	this.GetSecurityManager().Stop()
 	this.GetCacheManager().Stop()
 
-	// Optional services Initialysation...
+	// stop optional services...
 	for i := 0; i < len(this.services); i++ {
 		// First of all I will retreive the service object...
 		params := make([]interface{}, 0)

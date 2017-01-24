@@ -1,10 +1,11 @@
+//+build BPMN
 package BPMS_Runtime
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type SubprocessInstance struct{
+type SubprocessInstance struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,81 +15,78 @@ type SubprocessInstance struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Instance **/
-	M_id string
+	M_id            string
 	M_bpmnElementId string
-	M_participants []string
-	m_dataRef []*ItemAwareElementInstance
+	M_participants  []string
+	m_dataRef       []*ItemAwareElementInstance
 	/** If the ref is a string and not an object **/
-	M_dataRef []string
-	M_data []*ItemAwareElementInstance
+	M_dataRef    []string
+	M_data       []*ItemAwareElementInstance
 	m_logInfoRef []*LogInfo
 	/** If the ref is a string and not an object **/
 	M_logInfoRef []string
 
 	/** members of FlowNodeInstance **/
-	M_flowNodeType FlowNodeType
+	M_flowNodeType   FlowNodeType
 	M_lifecycleState LifecycleState
-	m_inputRef []*ConnectingObject
+	m_inputRef       []*ConnectingObject
 	/** If the ref is a string and not an object **/
-	M_inputRef []string
+	M_inputRef  []string
 	m_outputRef []*ConnectingObject
 	/** If the ref is a string and not an object **/
 	M_outputRef []string
 
 	/** members of SubprocessInstance **/
-	M_SubprocessType SubprocessType
+	M_SubprocessType    SubprocessType
 	M_flowNodeInstances []FlowNodeInstance
 	M_connectingObjects []*ConnectingObject
-
 
 	/** Associations **/
 	m_SubprocessInstancePtr *SubprocessInstance
 	/** If the ref is a string and not an object **/
 	M_SubprocessInstancePtr string
-	m_processInstancePtr *ProcessInstance
+	m_processInstancePtr    *ProcessInstance
 	/** If the ref is a string and not an object **/
 	M_processInstancePtr string
 }
 
 /** Xml parser for SubprocessInstance **/
 type XsdSubprocessInstance struct {
-	XMLName xml.Name	`xml:"SubprocessInstance"`
+	XMLName xml.Name `xml:"SubprocessInstance"`
 	/** Instance **/
-	M_id	string	`xml:"id,attr"`
-	M_bpmnElementId	string	`xml:"bpmnElementId,attr"`
-
+	M_id            string `xml:"id,attr"`
+	M_bpmnElementId string `xml:"bpmnElementId,attr"`
 
 	/** FlowNodeInstance **/
-	M_inputRef	[]string	`xml:"inputRef"`
-	M_outputRef	[]string	`xml:"outputRef"`
-	M_flowNodeType	string	`xml:"flowNodeType,attr"`
-	M_lifecycleState	string	`xml:"lifecycleState,attr"`
+	M_inputRef       []string `xml:"inputRef"`
+	M_outputRef      []string `xml:"outputRef"`
+	M_flowNodeType   string   `xml:"flowNodeType,attr"`
+	M_lifecycleState string   `xml:"lifecycleState,attr"`
 
+	M_flowNodeInstances_0 []*XsdActivityInstance   `xml:"activityInstance,omitempty"`
+	M_flowNodeInstances_1 []*XsdSubprocessInstance `xml:"SubprocessInstance,omitempty"`
+	M_flowNodeInstances_2 []*XsdGatewayInstance    `xml:"gatewayInstance,omitempty"`
+	M_flowNodeInstances_3 []*XsdEventInstance      `xml:"eventInstance,omitempty"`
 
-	M_flowNodeInstances_0	[]*XsdActivityInstance	`xml:"activityInstance,omitempty"`
-	M_flowNodeInstances_1	[]*XsdSubprocessInstance	`xml:"SubprocessInstance,omitempty"`
-	M_flowNodeInstances_2	[]*XsdGatewayInstance	`xml:"gatewayInstance,omitempty"`
-	M_flowNodeInstances_3	[]*XsdEventInstance	`xml:"eventInstance,omitempty"`
-
-	M_connectingObjects	[]*XsdConnectingObject	`xml:"connectingObjects,omitempty"`
-	M_SubprocessType	string	`xml:"SubprocessType,attr"`
-
+	M_connectingObjects []*XsdConnectingObject `xml:"connectingObjects,omitempty"`
+	M_SubprocessType    string                 `xml:"SubprocessType,attr"`
 }
+
 /** UUID **/
-func (this *SubprocessInstance) GetUUID() string{
+func (this *SubprocessInstance) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *SubprocessInstance) GetId() string{
+func (this *SubprocessInstance) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *SubprocessInstance) SetId(ref interface{}){
+func (this *SubprocessInstance) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -96,12 +94,12 @@ func (this *SubprocessInstance) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** BpmnElementId **/
-func (this *SubprocessInstance) GetBpmnElementId() string{
+func (this *SubprocessInstance) GetBpmnElementId() string {
 	return this.M_bpmnElementId
 }
 
 /** Init reference BpmnElementId **/
-func (this *SubprocessInstance) SetBpmnElementId(ref interface{}){
+func (this *SubprocessInstance) SetBpmnElementId(ref interface{}) {
 	this.NeedSave = true
 	this.M_bpmnElementId = ref.(string)
 }
@@ -109,16 +107,16 @@ func (this *SubprocessInstance) SetBpmnElementId(ref interface{}){
 /** Remove reference BpmnElementId **/
 
 /** Participants **/
-func (this *SubprocessInstance) GetParticipants() []string{
+func (this *SubprocessInstance) GetParticipants() []string {
 	return this.M_participants
 }
 
 /** Init reference Participants **/
-func (this *SubprocessInstance) SetParticipants(ref interface{}){
+func (this *SubprocessInstance) SetParticipants(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var participantss []string
-	for i:=0; i<len(this.M_participants); i++ {
+	for i := 0; i < len(this.M_participants); i++ {
 		if this.M_participants[i] != ref.(string) {
 			participantss = append(participantss, this.M_participants[i])
 		} else {
@@ -135,21 +133,21 @@ func (this *SubprocessInstance) SetParticipants(ref interface{}){
 /** Remove reference Participants **/
 
 /** DataRef **/
-func (this *SubprocessInstance) GetDataRef() []*ItemAwareElementInstance{
+func (this *SubprocessInstance) GetDataRef() []*ItemAwareElementInstance {
 	return this.m_dataRef
 }
 
 /** Init reference DataRef **/
-func (this *SubprocessInstance) SetDataRef(ref interface{}){
+func (this *SubprocessInstance) SetDataRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_dataRef); i++ {
+		for i := 0; i < len(this.M_dataRef); i++ {
 			if this.M_dataRef[i] == refStr {
 				return
 			}
 		}
 		this.M_dataRef = append(this.M_dataRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveDataRef(ref)
 		this.m_dataRef = append(this.m_dataRef, ref.(*ItemAwareElementInstance))
 		this.M_dataRef = append(this.M_dataRef, ref.(*ItemAwareElementInstance).GetUUID())
@@ -157,7 +155,7 @@ func (this *SubprocessInstance) SetDataRef(ref interface{}){
 }
 
 /** Remove reference DataRef **/
-func (this *SubprocessInstance) RemoveDataRef(ref interface{}){
+func (this *SubprocessInstance) RemoveDataRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*ItemAwareElementInstance)
 	dataRef_ := make([]*ItemAwareElementInstance, 0)
@@ -173,16 +171,16 @@ func (this *SubprocessInstance) RemoveDataRef(ref interface{}){
 }
 
 /** Data **/
-func (this *SubprocessInstance) GetData() []*ItemAwareElementInstance{
+func (this *SubprocessInstance) GetData() []*ItemAwareElementInstance {
 	return this.M_data
 }
 
 /** Init reference Data **/
-func (this *SubprocessInstance) SetData(ref interface{}){
+func (this *SubprocessInstance) SetData(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var datas []*ItemAwareElementInstance
-	for i:=0; i<len(this.M_data); i++ {
+	for i := 0; i < len(this.M_data); i++ {
 		if this.M_data[i].GetUUID() != ref.(*ItemAwareElementInstance).GetUUID() {
 			datas = append(datas, this.M_data[i])
 		} else {
@@ -197,7 +195,7 @@ func (this *SubprocessInstance) SetData(ref interface{}){
 }
 
 /** Remove reference Data **/
-func (this *SubprocessInstance) RemoveData(ref interface{}){
+func (this *SubprocessInstance) RemoveData(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(ItemAwareElementInstance)
 	data_ := make([]*ItemAwareElementInstance, 0)
@@ -210,21 +208,21 @@ func (this *SubprocessInstance) RemoveData(ref interface{}){
 }
 
 /** LogInfoRef **/
-func (this *SubprocessInstance) GetLogInfoRef() []*LogInfo{
+func (this *SubprocessInstance) GetLogInfoRef() []*LogInfo {
 	return this.m_logInfoRef
 }
 
 /** Init reference LogInfoRef **/
-func (this *SubprocessInstance) SetLogInfoRef(ref interface{}){
+func (this *SubprocessInstance) SetLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_logInfoRef); i++ {
+		for i := 0; i < len(this.M_logInfoRef); i++ {
 			if this.M_logInfoRef[i] == refStr {
 				return
 			}
 		}
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveLogInfoRef(ref)
 		this.m_logInfoRef = append(this.m_logInfoRef, ref.(*LogInfo))
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(*LogInfo).GetUUID())
@@ -232,7 +230,7 @@ func (this *SubprocessInstance) SetLogInfoRef(ref interface{}){
 }
 
 /** Remove reference LogInfoRef **/
-func (this *SubprocessInstance) RemoveLogInfoRef(ref interface{}){
+func (this *SubprocessInstance) RemoveLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*LogInfo)
 	logInfoRef_ := make([]*LogInfo, 0)
@@ -248,12 +246,12 @@ func (this *SubprocessInstance) RemoveLogInfoRef(ref interface{}){
 }
 
 /** FlowNodeType **/
-func (this *SubprocessInstance) GetFlowNodeType() FlowNodeType{
+func (this *SubprocessInstance) GetFlowNodeType() FlowNodeType {
 	return this.M_flowNodeType
 }
 
 /** Init reference FlowNodeType **/
-func (this *SubprocessInstance) SetFlowNodeType(ref interface{}){
+func (this *SubprocessInstance) SetFlowNodeType(ref interface{}) {
 	this.NeedSave = true
 	this.M_flowNodeType = ref.(FlowNodeType)
 }
@@ -261,12 +259,12 @@ func (this *SubprocessInstance) SetFlowNodeType(ref interface{}){
 /** Remove reference FlowNodeType **/
 
 /** LifecycleState **/
-func (this *SubprocessInstance) GetLifecycleState() LifecycleState{
+func (this *SubprocessInstance) GetLifecycleState() LifecycleState {
 	return this.M_lifecycleState
 }
 
 /** Init reference LifecycleState **/
-func (this *SubprocessInstance) SetLifecycleState(ref interface{}){
+func (this *SubprocessInstance) SetLifecycleState(ref interface{}) {
 	this.NeedSave = true
 	this.M_lifecycleState = ref.(LifecycleState)
 }
@@ -274,21 +272,21 @@ func (this *SubprocessInstance) SetLifecycleState(ref interface{}){
 /** Remove reference LifecycleState **/
 
 /** InputRef **/
-func (this *SubprocessInstance) GetInputRef() []*ConnectingObject{
+func (this *SubprocessInstance) GetInputRef() []*ConnectingObject {
 	return this.m_inputRef
 }
 
 /** Init reference InputRef **/
-func (this *SubprocessInstance) SetInputRef(ref interface{}){
+func (this *SubprocessInstance) SetInputRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_inputRef); i++ {
+		for i := 0; i < len(this.M_inputRef); i++ {
 			if this.M_inputRef[i] == refStr {
 				return
 			}
 		}
 		this.M_inputRef = append(this.M_inputRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveInputRef(ref)
 		this.m_inputRef = append(this.m_inputRef, ref.(*ConnectingObject))
 		this.M_inputRef = append(this.M_inputRef, ref.(Instance).GetUUID())
@@ -296,7 +294,7 @@ func (this *SubprocessInstance) SetInputRef(ref interface{}){
 }
 
 /** Remove reference InputRef **/
-func (this *SubprocessInstance) RemoveInputRef(ref interface{}){
+func (this *SubprocessInstance) RemoveInputRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	inputRef_ := make([]*ConnectingObject, 0)
@@ -312,21 +310,21 @@ func (this *SubprocessInstance) RemoveInputRef(ref interface{}){
 }
 
 /** OutputRef **/
-func (this *SubprocessInstance) GetOutputRef() []*ConnectingObject{
+func (this *SubprocessInstance) GetOutputRef() []*ConnectingObject {
 	return this.m_outputRef
 }
 
 /** Init reference OutputRef **/
-func (this *SubprocessInstance) SetOutputRef(ref interface{}){
+func (this *SubprocessInstance) SetOutputRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outputRef); i++ {
+		for i := 0; i < len(this.M_outputRef); i++ {
 			if this.M_outputRef[i] == refStr {
 				return
 			}
 		}
 		this.M_outputRef = append(this.M_outputRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutputRef(ref)
 		this.m_outputRef = append(this.m_outputRef, ref.(*ConnectingObject))
 		this.M_outputRef = append(this.M_outputRef, ref.(Instance).GetUUID())
@@ -334,7 +332,7 @@ func (this *SubprocessInstance) SetOutputRef(ref interface{}){
 }
 
 /** Remove reference OutputRef **/
-func (this *SubprocessInstance) RemoveOutputRef(ref interface{}){
+func (this *SubprocessInstance) RemoveOutputRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	outputRef_ := make([]*ConnectingObject, 0)
@@ -350,12 +348,12 @@ func (this *SubprocessInstance) RemoveOutputRef(ref interface{}){
 }
 
 /** SubprocessType **/
-func (this *SubprocessInstance) GetSubprocessType() SubprocessType{
+func (this *SubprocessInstance) GetSubprocessType() SubprocessType {
 	return this.M_SubprocessType
 }
 
 /** Init reference SubprocessType **/
-func (this *SubprocessInstance) SetSubprocessType(ref interface{}){
+func (this *SubprocessInstance) SetSubprocessType(ref interface{}) {
 	this.NeedSave = true
 	this.M_SubprocessType = ref.(SubprocessType)
 }
@@ -363,16 +361,16 @@ func (this *SubprocessInstance) SetSubprocessType(ref interface{}){
 /** Remove reference SubprocessType **/
 
 /** FlowNodeInstances **/
-func (this *SubprocessInstance) GetFlowNodeInstances() []FlowNodeInstance{
+func (this *SubprocessInstance) GetFlowNodeInstances() []FlowNodeInstance {
 	return this.M_flowNodeInstances
 }
 
 /** Init reference FlowNodeInstances **/
-func (this *SubprocessInstance) SetFlowNodeInstances(ref interface{}){
+func (this *SubprocessInstance) SetFlowNodeInstances(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var flowNodeInstancess []FlowNodeInstance
-	for i:=0; i<len(this.M_flowNodeInstances); i++ {
+	for i := 0; i < len(this.M_flowNodeInstances); i++ {
 		if this.M_flowNodeInstances[i].(Instance).GetUUID() != ref.(Instance).GetUUID() {
 			flowNodeInstancess = append(flowNodeInstancess, this.M_flowNodeInstances[i])
 		} else {
@@ -387,7 +385,7 @@ func (this *SubprocessInstance) SetFlowNodeInstances(ref interface{}){
 }
 
 /** Remove reference FlowNodeInstances **/
-func (this *SubprocessInstance) RemoveFlowNodeInstances(ref interface{}){
+func (this *SubprocessInstance) RemoveFlowNodeInstances(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	flowNodeInstances_ := make([]FlowNodeInstance, 0)
@@ -400,16 +398,16 @@ func (this *SubprocessInstance) RemoveFlowNodeInstances(ref interface{}){
 }
 
 /** ConnectingObjects **/
-func (this *SubprocessInstance) GetConnectingObjects() []*ConnectingObject{
+func (this *SubprocessInstance) GetConnectingObjects() []*ConnectingObject {
 	return this.M_connectingObjects
 }
 
 /** Init reference ConnectingObjects **/
-func (this *SubprocessInstance) SetConnectingObjects(ref interface{}){
+func (this *SubprocessInstance) SetConnectingObjects(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var connectingObjectss []*ConnectingObject
-	for i:=0; i<len(this.M_connectingObjects); i++ {
+	for i := 0; i < len(this.M_connectingObjects); i++ {
 		if this.M_connectingObjects[i].GetUUID() != ref.(Instance).GetUUID() {
 			connectingObjectss = append(connectingObjectss, this.M_connectingObjects[i])
 		} else {
@@ -424,7 +422,7 @@ func (this *SubprocessInstance) SetConnectingObjects(ref interface{}){
 }
 
 /** Remove reference ConnectingObjects **/
-func (this *SubprocessInstance) RemoveConnectingObjects(ref interface{}){
+func (this *SubprocessInstance) RemoveConnectingObjects(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	connectingObjects_ := make([]*ConnectingObject, 0)
@@ -437,23 +435,23 @@ func (this *SubprocessInstance) RemoveConnectingObjects(ref interface{}){
 }
 
 /** SubprocessInstance **/
-func (this *SubprocessInstance) GetSubprocessInstancePtr() *SubprocessInstance{
+func (this *SubprocessInstance) GetSubprocessInstancePtr() *SubprocessInstance {
 	return this.m_SubprocessInstancePtr
 }
 
 /** Init reference SubprocessInstance **/
-func (this *SubprocessInstance) SetSubprocessInstancePtr(ref interface{}){
+func (this *SubprocessInstance) SetSubprocessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_SubprocessInstancePtr = ref.(string)
-	}else{
+	} else {
 		this.m_SubprocessInstancePtr = ref.(*SubprocessInstance)
 		this.M_SubprocessInstancePtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference SubprocessInstance **/
-func (this *SubprocessInstance) RemoveSubprocessInstancePtr(ref interface{}){
+func (this *SubprocessInstance) RemoveSubprocessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_SubprocessInstancePtr.GetUUID() {
@@ -463,23 +461,23 @@ func (this *SubprocessInstance) RemoveSubprocessInstancePtr(ref interface{}){
 }
 
 /** ProcessInstance **/
-func (this *SubprocessInstance) GetProcessInstancePtr() *ProcessInstance{
+func (this *SubprocessInstance) GetProcessInstancePtr() *ProcessInstance {
 	return this.m_processInstancePtr
 }
 
 /** Init reference ProcessInstance **/
-func (this *SubprocessInstance) SetProcessInstancePtr(ref interface{}){
+func (this *SubprocessInstance) SetProcessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_processInstancePtr = ref.(string)
-	}else{
+	} else {
 		this.m_processInstancePtr = ref.(*ProcessInstance)
 		this.M_processInstancePtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference ProcessInstance **/
-func (this *SubprocessInstance) RemoveProcessInstancePtr(ref interface{}){
+func (this *SubprocessInstance) RemoveProcessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_processInstancePtr.GetUUID() {

@@ -1,6 +1,7 @@
+//+build DI
 package DI
 
-type Style interface{
+type Style interface {
 	/** Method of Style **/
 
 	/** UUID **/
@@ -8,5 +9,4 @@ type Style interface{
 
 	/** Id **/
 	GetId() string
-
 }

@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type ParallelGateway struct{
+type ParallelGateway struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,22 +15,22 @@ type ParallelGateway struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of FlowElement **/
-	M_name string
-	M_auditing *Auditing
-	M_monitoring *Monitoring
+	M_name             string
+	M_auditing         *Auditing
+	M_monitoring       *Monitoring
 	m_categoryValueRef []*CategoryValue
 	/** If the ref is a string and not an object **/
 	M_categoryValueRef []string
@@ -41,7 +42,7 @@ type ParallelGateway struct{
 	m_incoming []*SequenceFlow
 	/** If the ref is a string and not an object **/
 	M_incoming []string
-	m_lanes []*Lane
+	m_lanes    []*Lane
 	/** If the ref is a string and not an object **/
 	M_lanes []string
 
@@ -51,17 +52,16 @@ type ParallelGateway struct{
 	/** members of ParallelGateway **/
 	/** No members **/
 
-
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr  []string
 	m_containerPtr FlowElementsContainer
 	/** If the ref is a string and not an object **/
 	M_containerPtr string
@@ -69,44 +69,39 @@ type ParallelGateway struct{
 
 /** Xml parser for ParallelGateway **/
 type XsdParallelGateway struct {
-	XMLName xml.Name	`xml:"parallelGateway"`
+	XMLName xml.Name `xml:"parallelGateway"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** FlowElement **/
-	M_auditing	*XsdAuditing	`xml:"auditing,omitempty"`
-	M_monitoring	*XsdMonitoring	`xml:"monitoring,omitempty"`
-	M_categoryValueRef	[]string	`xml:"categoryValueRef"`
-	M_name	string	`xml:"name,attr"`
-
+	M_auditing         *XsdAuditing   `xml:"auditing,omitempty"`
+	M_monitoring       *XsdMonitoring `xml:"monitoring,omitempty"`
+	M_categoryValueRef []string       `xml:"categoryValueRef"`
+	M_name             string         `xml:"name,attr"`
 
 	/** FlowNode **/
-	M_incoming	[]string	`xml:"incoming"`
-	M_outgoing	[]string	`xml:"outgoing"`
-
+	M_incoming []string `xml:"incoming"`
+	M_outgoing []string `xml:"outgoing"`
 
 	/** Gateway **/
-	M_gatewayDirection	string	`xml:"gatewayDirection,attr"`
-
-
-
+	M_gatewayDirection string `xml:"gatewayDirection,attr"`
 }
+
 /** UUID **/
-func (this *ParallelGateway) GetUUID() string{
+func (this *ParallelGateway) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *ParallelGateway) GetId() string{
+func (this *ParallelGateway) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *ParallelGateway) SetId(ref interface{}){
+func (this *ParallelGateway) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -114,16 +109,16 @@ func (this *ParallelGateway) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *ParallelGateway) GetOther() interface{}{
+func (this *ParallelGateway) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *ParallelGateway) SetOther(ref interface{}){
+func (this *ParallelGateway) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -131,12 +126,12 @@ func (this *ParallelGateway) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *ParallelGateway) GetExtensionElements() *ExtensionElements{
+func (this *ParallelGateway) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *ParallelGateway) SetExtensionElements(ref interface{}){
+func (this *ParallelGateway) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -144,16 +139,16 @@ func (this *ParallelGateway) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *ParallelGateway) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *ParallelGateway) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *ParallelGateway) SetExtensionDefinitions(ref interface{}){
+func (this *ParallelGateway) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -170,16 +165,16 @@ func (this *ParallelGateway) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *ParallelGateway) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *ParallelGateway) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *ParallelGateway) SetExtensionValues(ref interface{}){
+func (this *ParallelGateway) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -196,16 +191,16 @@ func (this *ParallelGateway) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *ParallelGateway) GetDocumentation() []*Documentation{
+func (this *ParallelGateway) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *ParallelGateway) SetDocumentation(ref interface{}){
+func (this *ParallelGateway) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -220,7 +215,7 @@ func (this *ParallelGateway) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *ParallelGateway) RemoveDocumentation(ref interface{}){
+func (this *ParallelGateway) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -233,12 +228,12 @@ func (this *ParallelGateway) RemoveDocumentation(ref interface{}){
 }
 
 /** Name **/
-func (this *ParallelGateway) GetName() string{
+func (this *ParallelGateway) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *ParallelGateway) SetName(ref interface{}){
+func (this *ParallelGateway) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -246,18 +241,18 @@ func (this *ParallelGateway) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** Auditing **/
-func (this *ParallelGateway) GetAuditing() *Auditing{
+func (this *ParallelGateway) GetAuditing() *Auditing {
 	return this.M_auditing
 }
 
 /** Init reference Auditing **/
-func (this *ParallelGateway) SetAuditing(ref interface{}){
+func (this *ParallelGateway) SetAuditing(ref interface{}) {
 	this.NeedSave = true
 	this.M_auditing = ref.(*Auditing)
 }
 
 /** Remove reference Auditing **/
-func (this *ParallelGateway) RemoveAuditing(ref interface{}){
+func (this *ParallelGateway) RemoveAuditing(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_auditing.GetUUID() {
@@ -266,18 +261,18 @@ func (this *ParallelGateway) RemoveAuditing(ref interface{}){
 }
 
 /** Monitoring **/
-func (this *ParallelGateway) GetMonitoring() *Monitoring{
+func (this *ParallelGateway) GetMonitoring() *Monitoring {
 	return this.M_monitoring
 }
 
 /** Init reference Monitoring **/
-func (this *ParallelGateway) SetMonitoring(ref interface{}){
+func (this *ParallelGateway) SetMonitoring(ref interface{}) {
 	this.NeedSave = true
 	this.M_monitoring = ref.(*Monitoring)
 }
 
 /** Remove reference Monitoring **/
-func (this *ParallelGateway) RemoveMonitoring(ref interface{}){
+func (this *ParallelGateway) RemoveMonitoring(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_monitoring.GetUUID() {
@@ -286,21 +281,21 @@ func (this *ParallelGateway) RemoveMonitoring(ref interface{}){
 }
 
 /** CategoryValueRef **/
-func (this *ParallelGateway) GetCategoryValueRef() []*CategoryValue{
+func (this *ParallelGateway) GetCategoryValueRef() []*CategoryValue {
 	return this.m_categoryValueRef
 }
 
 /** Init reference CategoryValueRef **/
-func (this *ParallelGateway) SetCategoryValueRef(ref interface{}){
+func (this *ParallelGateway) SetCategoryValueRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_categoryValueRef); i++ {
+		for i := 0; i < len(this.M_categoryValueRef); i++ {
 			if this.M_categoryValueRef[i] == refStr {
 				return
 			}
 		}
 		this.M_categoryValueRef = append(this.M_categoryValueRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveCategoryValueRef(ref)
 		this.m_categoryValueRef = append(this.m_categoryValueRef, ref.(*CategoryValue))
 		this.M_categoryValueRef = append(this.M_categoryValueRef, ref.(BaseElement).GetUUID())
@@ -308,7 +303,7 @@ func (this *ParallelGateway) SetCategoryValueRef(ref interface{}){
 }
 
 /** Remove reference CategoryValueRef **/
-func (this *ParallelGateway) RemoveCategoryValueRef(ref interface{}){
+func (this *ParallelGateway) RemoveCategoryValueRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	categoryValueRef_ := make([]*CategoryValue, 0)
@@ -324,21 +319,21 @@ func (this *ParallelGateway) RemoveCategoryValueRef(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *ParallelGateway) GetOutgoing() []*SequenceFlow{
+func (this *ParallelGateway) GetOutgoing() []*SequenceFlow {
 	return this.m_outgoing
 }
 
 /** Init reference Outgoing **/
-func (this *ParallelGateway) SetOutgoing(ref interface{}){
+func (this *ParallelGateway) SetOutgoing(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoing); i++ {
+		for i := 0; i < len(this.M_outgoing); i++ {
 			if this.M_outgoing[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoing = append(this.M_outgoing, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoing(ref)
 		this.m_outgoing = append(this.m_outgoing, ref.(*SequenceFlow))
 		this.M_outgoing = append(this.M_outgoing, ref.(BaseElement).GetUUID())
@@ -346,7 +341,7 @@ func (this *ParallelGateway) SetOutgoing(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *ParallelGateway) RemoveOutgoing(ref interface{}){
+func (this *ParallelGateway) RemoveOutgoing(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoing_ := make([]*SequenceFlow, 0)
@@ -362,21 +357,21 @@ func (this *ParallelGateway) RemoveOutgoing(ref interface{}){
 }
 
 /** Incoming **/
-func (this *ParallelGateway) GetIncoming() []*SequenceFlow{
+func (this *ParallelGateway) GetIncoming() []*SequenceFlow {
 	return this.m_incoming
 }
 
 /** Init reference Incoming **/
-func (this *ParallelGateway) SetIncoming(ref interface{}){
+func (this *ParallelGateway) SetIncoming(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incoming); i++ {
+		for i := 0; i < len(this.M_incoming); i++ {
 			if this.M_incoming[i] == refStr {
 				return
 			}
 		}
 		this.M_incoming = append(this.M_incoming, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncoming(ref)
 		this.m_incoming = append(this.m_incoming, ref.(*SequenceFlow))
 		this.M_incoming = append(this.M_incoming, ref.(BaseElement).GetUUID())
@@ -384,7 +379,7 @@ func (this *ParallelGateway) SetIncoming(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *ParallelGateway) RemoveIncoming(ref interface{}){
+func (this *ParallelGateway) RemoveIncoming(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incoming_ := make([]*SequenceFlow, 0)
@@ -400,21 +395,21 @@ func (this *ParallelGateway) RemoveIncoming(ref interface{}){
 }
 
 /** Lanes **/
-func (this *ParallelGateway) GetLanes() []*Lane{
+func (this *ParallelGateway) GetLanes() []*Lane {
 	return this.m_lanes
 }
 
 /** Init reference Lanes **/
-func (this *ParallelGateway) SetLanes(ref interface{}){
+func (this *ParallelGateway) SetLanes(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanes); i++ {
+		for i := 0; i < len(this.M_lanes); i++ {
 			if this.M_lanes[i] == refStr {
 				return
 			}
 		}
 		this.M_lanes = append(this.M_lanes, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanes(ref)
 		this.m_lanes = append(this.m_lanes, ref.(*Lane))
 		this.M_lanes = append(this.M_lanes, ref.(BaseElement).GetUUID())
@@ -422,7 +417,7 @@ func (this *ParallelGateway) SetLanes(ref interface{}){
 }
 
 /** Remove reference Lanes **/
-func (this *ParallelGateway) RemoveLanes(ref interface{}){
+func (this *ParallelGateway) RemoveLanes(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanes_ := make([]*Lane, 0)
@@ -438,12 +433,12 @@ func (this *ParallelGateway) RemoveLanes(ref interface{}){
 }
 
 /** GatewayDirection **/
-func (this *ParallelGateway) GetGatewayDirection() GatewayDirection{
+func (this *ParallelGateway) GetGatewayDirection() GatewayDirection {
 	return this.M_gatewayDirection
 }
 
 /** Init reference GatewayDirection **/
-func (this *ParallelGateway) SetGatewayDirection(ref interface{}){
+func (this *ParallelGateway) SetGatewayDirection(ref interface{}) {
 	this.NeedSave = true
 	this.M_gatewayDirection = ref.(GatewayDirection)
 }
@@ -451,21 +446,21 @@ func (this *ParallelGateway) SetGatewayDirection(ref interface{}){
 /** Remove reference GatewayDirection **/
 
 /** Lane **/
-func (this *ParallelGateway) GetLanePtr() []*Lane{
+func (this *ParallelGateway) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *ParallelGateway) SetLanePtr(ref interface{}){
+func (this *ParallelGateway) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -473,7 +468,7 @@ func (this *ParallelGateway) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *ParallelGateway) RemoveLanePtr(ref interface{}){
+func (this *ParallelGateway) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -489,21 +484,21 @@ func (this *ParallelGateway) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *ParallelGateway) GetOutgoingPtr() []*Association{
+func (this *ParallelGateway) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *ParallelGateway) SetOutgoingPtr(ref interface{}){
+func (this *ParallelGateway) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -511,7 +506,7 @@ func (this *ParallelGateway) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *ParallelGateway) RemoveOutgoingPtr(ref interface{}){
+func (this *ParallelGateway) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -527,21 +522,21 @@ func (this *ParallelGateway) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *ParallelGateway) GetIncomingPtr() []*Association{
+func (this *ParallelGateway) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *ParallelGateway) SetIncomingPtr(ref interface{}){
+func (this *ParallelGateway) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -549,7 +544,7 @@ func (this *ParallelGateway) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *ParallelGateway) RemoveIncomingPtr(ref interface{}){
+func (this *ParallelGateway) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -565,23 +560,23 @@ func (this *ParallelGateway) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Container **/
-func (this *ParallelGateway) GetContainerPtr() FlowElementsContainer{
+func (this *ParallelGateway) GetContainerPtr() FlowElementsContainer {
 	return this.m_containerPtr
 }
 
 /** Init reference Container **/
-func (this *ParallelGateway) SetContainerPtr(ref interface{}){
+func (this *ParallelGateway) SetContainerPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_containerPtr = ref.(string)
-	}else{
+	} else {
 		this.m_containerPtr = ref.(FlowElementsContainer)
 		this.M_containerPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Container **/
-func (this *ParallelGateway) RemoveContainerPtr(ref interface{}){
+func (this *ParallelGateway) RemoveContainerPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_containerPtr.(BaseElement).GetUUID() {

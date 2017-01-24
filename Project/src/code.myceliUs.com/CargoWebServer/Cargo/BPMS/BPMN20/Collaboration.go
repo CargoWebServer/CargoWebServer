@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type Collaboration interface{
+type Collaboration interface {
 	/** Method of Collaboration **/
 
 	/** UUID **/
@@ -41,5 +42,4 @@ type Collaboration interface{
 
 	/** ConversationLink **/
 	GetConversationLink() []*ConversationLink
-
 }

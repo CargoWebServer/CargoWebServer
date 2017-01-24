@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type CancelEventDefinition struct{
+type CancelEventDefinition struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,17 +15,17 @@ type CancelEventDefinition struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of RootElement **/
 	/** No members **/
@@ -35,26 +36,25 @@ type CancelEventDefinition struct{
 	/** members of CancelEventDefinition **/
 	/** No members **/
 
-
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr    []string
 	m_definitionsPtr *Definitions
 	/** If the ref is a string and not an object **/
 	M_definitionsPtr string
-	m_throwEventPtr []ThrowEvent
+	m_throwEventPtr  []ThrowEvent
 	/** If the ref is a string and not an object **/
 	M_throwEventPtr []string
 	m_catchEventPtr []CatchEvent
 	/** If the ref is a string and not an object **/
-	M_catchEventPtr []string
+	M_catchEventPtr                       []string
 	m_multiInstanceLoopCharacteristicsPtr []*MultiInstanceLoopCharacteristics
 	/** If the ref is a string and not an object **/
 	M_multiInstanceLoopCharacteristicsPtr []string
@@ -62,34 +62,31 @@ type CancelEventDefinition struct{
 
 /** Xml parser for CancelEventDefinition **/
 type XsdCancelEventDefinition struct {
-	XMLName xml.Name	`xml:"cancelEventDefinition"`
+	XMLName xml.Name `xml:"cancelEventDefinition"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** RootElement **/
 
-
 	/** EventDefinition **/
 
-
-
 }
+
 /** UUID **/
-func (this *CancelEventDefinition) GetUUID() string{
+func (this *CancelEventDefinition) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *CancelEventDefinition) GetId() string{
+func (this *CancelEventDefinition) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *CancelEventDefinition) SetId(ref interface{}){
+func (this *CancelEventDefinition) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -97,16 +94,16 @@ func (this *CancelEventDefinition) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *CancelEventDefinition) GetOther() interface{}{
+func (this *CancelEventDefinition) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *CancelEventDefinition) SetOther(ref interface{}){
+func (this *CancelEventDefinition) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -114,12 +111,12 @@ func (this *CancelEventDefinition) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *CancelEventDefinition) GetExtensionElements() *ExtensionElements{
+func (this *CancelEventDefinition) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *CancelEventDefinition) SetExtensionElements(ref interface{}){
+func (this *CancelEventDefinition) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -127,16 +124,16 @@ func (this *CancelEventDefinition) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *CancelEventDefinition) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *CancelEventDefinition) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *CancelEventDefinition) SetExtensionDefinitions(ref interface{}){
+func (this *CancelEventDefinition) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -153,16 +150,16 @@ func (this *CancelEventDefinition) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *CancelEventDefinition) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *CancelEventDefinition) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *CancelEventDefinition) SetExtensionValues(ref interface{}){
+func (this *CancelEventDefinition) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -179,16 +176,16 @@ func (this *CancelEventDefinition) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *CancelEventDefinition) GetDocumentation() []*Documentation{
+func (this *CancelEventDefinition) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *CancelEventDefinition) SetDocumentation(ref interface{}){
+func (this *CancelEventDefinition) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -203,7 +200,7 @@ func (this *CancelEventDefinition) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *CancelEventDefinition) RemoveDocumentation(ref interface{}){
+func (this *CancelEventDefinition) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -216,21 +213,21 @@ func (this *CancelEventDefinition) RemoveDocumentation(ref interface{}){
 }
 
 /** Lane **/
-func (this *CancelEventDefinition) GetLanePtr() []*Lane{
+func (this *CancelEventDefinition) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *CancelEventDefinition) SetLanePtr(ref interface{}){
+func (this *CancelEventDefinition) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -238,7 +235,7 @@ func (this *CancelEventDefinition) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *CancelEventDefinition) RemoveLanePtr(ref interface{}){
+func (this *CancelEventDefinition) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -254,21 +251,21 @@ func (this *CancelEventDefinition) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *CancelEventDefinition) GetOutgoingPtr() []*Association{
+func (this *CancelEventDefinition) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *CancelEventDefinition) SetOutgoingPtr(ref interface{}){
+func (this *CancelEventDefinition) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -276,7 +273,7 @@ func (this *CancelEventDefinition) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *CancelEventDefinition) RemoveOutgoingPtr(ref interface{}){
+func (this *CancelEventDefinition) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -292,21 +289,21 @@ func (this *CancelEventDefinition) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *CancelEventDefinition) GetIncomingPtr() []*Association{
+func (this *CancelEventDefinition) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *CancelEventDefinition) SetIncomingPtr(ref interface{}){
+func (this *CancelEventDefinition) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -314,7 +311,7 @@ func (this *CancelEventDefinition) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *CancelEventDefinition) RemoveIncomingPtr(ref interface{}){
+func (this *CancelEventDefinition) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -330,23 +327,23 @@ func (this *CancelEventDefinition) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Definitions **/
-func (this *CancelEventDefinition) GetDefinitionsPtr() *Definitions{
+func (this *CancelEventDefinition) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *CancelEventDefinition) SetDefinitionsPtr(ref interface{}){
+func (this *CancelEventDefinition) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *CancelEventDefinition) RemoveDefinitionsPtr(ref interface{}){
+func (this *CancelEventDefinition) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {
@@ -356,21 +353,21 @@ func (this *CancelEventDefinition) RemoveDefinitionsPtr(ref interface{}){
 }
 
 /** ThrowEvent **/
-func (this *CancelEventDefinition) GetThrowEventPtr() []ThrowEvent{
+func (this *CancelEventDefinition) GetThrowEventPtr() []ThrowEvent {
 	return this.m_throwEventPtr
 }
 
 /** Init reference ThrowEvent **/
-func (this *CancelEventDefinition) SetThrowEventPtr(ref interface{}){
+func (this *CancelEventDefinition) SetThrowEventPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_throwEventPtr); i++ {
+		for i := 0; i < len(this.M_throwEventPtr); i++ {
 			if this.M_throwEventPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_throwEventPtr = append(this.M_throwEventPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveThrowEventPtr(ref)
 		this.m_throwEventPtr = append(this.m_throwEventPtr, ref.(ThrowEvent))
 		this.M_throwEventPtr = append(this.M_throwEventPtr, ref.(BaseElement).GetUUID())
@@ -378,7 +375,7 @@ func (this *CancelEventDefinition) SetThrowEventPtr(ref interface{}){
 }
 
 /** Remove reference ThrowEvent **/
-func (this *CancelEventDefinition) RemoveThrowEventPtr(ref interface{}){
+func (this *CancelEventDefinition) RemoveThrowEventPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	throwEventPtr_ := make([]ThrowEvent, 0)
@@ -394,21 +391,21 @@ func (this *CancelEventDefinition) RemoveThrowEventPtr(ref interface{}){
 }
 
 /** CatchEvent **/
-func (this *CancelEventDefinition) GetCatchEventPtr() []CatchEvent{
+func (this *CancelEventDefinition) GetCatchEventPtr() []CatchEvent {
 	return this.m_catchEventPtr
 }
 
 /** Init reference CatchEvent **/
-func (this *CancelEventDefinition) SetCatchEventPtr(ref interface{}){
+func (this *CancelEventDefinition) SetCatchEventPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_catchEventPtr); i++ {
+		for i := 0; i < len(this.M_catchEventPtr); i++ {
 			if this.M_catchEventPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_catchEventPtr = append(this.M_catchEventPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCatchEventPtr(ref)
 		this.m_catchEventPtr = append(this.m_catchEventPtr, ref.(CatchEvent))
 		this.M_catchEventPtr = append(this.M_catchEventPtr, ref.(BaseElement).GetUUID())
@@ -416,7 +413,7 @@ func (this *CancelEventDefinition) SetCatchEventPtr(ref interface{}){
 }
 
 /** Remove reference CatchEvent **/
-func (this *CancelEventDefinition) RemoveCatchEventPtr(ref interface{}){
+func (this *CancelEventDefinition) RemoveCatchEventPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	catchEventPtr_ := make([]CatchEvent, 0)
@@ -432,21 +429,21 @@ func (this *CancelEventDefinition) RemoveCatchEventPtr(ref interface{}){
 }
 
 /** MultiInstanceLoopCharacteristics **/
-func (this *CancelEventDefinition) GetMultiInstanceLoopCharacteristicsPtr() []*MultiInstanceLoopCharacteristics{
+func (this *CancelEventDefinition) GetMultiInstanceLoopCharacteristicsPtr() []*MultiInstanceLoopCharacteristics {
 	return this.m_multiInstanceLoopCharacteristicsPtr
 }
 
 /** Init reference MultiInstanceLoopCharacteristics **/
-func (this *CancelEventDefinition) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *CancelEventDefinition) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_multiInstanceLoopCharacteristicsPtr); i++ {
+		for i := 0; i < len(this.M_multiInstanceLoopCharacteristicsPtr); i++ {
 			if this.M_multiInstanceLoopCharacteristicsPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_multiInstanceLoopCharacteristicsPtr = append(this.M_multiInstanceLoopCharacteristicsPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveMultiInstanceLoopCharacteristicsPtr(ref)
 		this.m_multiInstanceLoopCharacteristicsPtr = append(this.m_multiInstanceLoopCharacteristicsPtr, ref.(*MultiInstanceLoopCharacteristics))
 		this.M_multiInstanceLoopCharacteristicsPtr = append(this.M_multiInstanceLoopCharacteristicsPtr, ref.(BaseElement).GetUUID())
@@ -454,7 +451,7 @@ func (this *CancelEventDefinition) SetMultiInstanceLoopCharacteristicsPtr(ref in
 }
 
 /** Remove reference MultiInstanceLoopCharacteristics **/
-func (this *CancelEventDefinition) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *CancelEventDefinition) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	multiInstanceLoopCharacteristicsPtr_ := make([]*MultiInstanceLoopCharacteristics, 0)

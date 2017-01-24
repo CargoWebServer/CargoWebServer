@@ -1,10 +1,11 @@
+//+build DI
 package DI
 
-import(
-"code.myceliUs.com/CargoWebServer/Cargo/BPMS/DC"
+import (
+	"code.myceliUs.com/CargoWebServer/Cargo/BPMS/DC"
 )
 
-type Edge interface{
+type Edge interface {
 	/** Method of Edge **/
 
 	/** UUID **/
@@ -18,5 +19,4 @@ type Edge interface{
 
 	/** Waypoint **/
 	GetWaypoint() []*DC.Point
-
 }

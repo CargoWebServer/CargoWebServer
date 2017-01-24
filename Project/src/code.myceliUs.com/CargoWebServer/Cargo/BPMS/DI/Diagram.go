@@ -1,6 +1,7 @@
+//+build DI
 package DI
 
-type Diagram interface{
+type Diagram interface {
 	/** Method of Diagram **/
 
 	/** UUID **/
@@ -23,5 +24,4 @@ type Diagram interface{
 
 	/** OwnedStyle **/
 	GetOwnedStyle() []Style
-
 }

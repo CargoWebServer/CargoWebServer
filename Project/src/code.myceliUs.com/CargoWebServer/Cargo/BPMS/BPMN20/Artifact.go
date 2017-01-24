@@ -1,7 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type Artifact interface{
+type Artifact interface {
 	/** UUID **/
 	GetUUID() string
-
 }

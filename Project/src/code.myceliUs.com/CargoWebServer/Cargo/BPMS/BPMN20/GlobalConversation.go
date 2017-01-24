@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type GlobalConversation struct{
+type GlobalConversation struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,57 +15,56 @@ type GlobalConversation struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of RootElement **/
 	/** No members **/
 
 	/** members of Collaboration **/
-	M_name string
-	M_isClosed bool
+	M_name            string
+	M_isClosed        bool
 	m_choreographyRef []Choreography
 	/** If the ref is a string and not an object **/
-	M_choreographyRef []string
-	M_artifact []Artifact
-	M_participantAssociation []*ParticipantAssociation
-	M_messageFlowAssociation []*MessageFlowAssociation
+	M_choreographyRef         []string
+	M_artifact                []Artifact
+	M_participantAssociation  []*ParticipantAssociation
+	M_messageFlowAssociation  []*MessageFlowAssociation
 	M_conversationAssociation []*ConversationAssociation
-	M_participant []*Participant
-	M_messageFlow []*MessageFlow
-	M_correlationKey []*CorrelationKey
-	M_conversationNode []ConversationNode
-	M_conversationLink []*ConversationLink
+	M_participant             []*Participant
+	M_messageFlow             []*MessageFlow
+	M_correlationKey          []*CorrelationKey
+	M_conversationNode        []ConversationNode
+	M_conversationLink        []*ConversationLink
 
 	/** members of GlobalConversation **/
 	/** No members **/
 
-
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr    []string
 	m_definitionsPtr *Definitions
 	/** If the ref is a string and not an object **/
 	M_definitionsPtr string
-	m_processPtr []*Process
+	m_processPtr     []*Process
 	/** If the ref is a string and not an object **/
-	M_processPtr []string
+	M_processPtr          []string
 	m_callConversationPtr []*CallConversation
 	/** If the ref is a string and not an object **/
 	M_callConversationPtr []string
@@ -72,52 +72,48 @@ type GlobalConversation struct{
 
 /** Xml parser for GlobalConversation **/
 type XsdGlobalConversation struct {
-	XMLName xml.Name	`xml:"globalConversation"`
+	XMLName xml.Name `xml:"globalConversation"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** RootElement **/
 
-
 	/** Collaboration **/
-	M_participant	[]*XsdParticipant	`xml:"participant,omitempty"`
-	M_messageFlow	[]*XsdMessageFlow	`xml:"messageFlow,omitempty"`
-	M_artifact_0	[]*XsdAssociation	`xml:"association,omitempty"`
-	M_artifact_1	[]*XsdGroup	`xml:"group,omitempty"`
-	M_artifact_2	[]*XsdTextAnnotation	`xml:"textAnnotation,omitempty"`
+	M_participant []*XsdParticipant    `xml:"participant,omitempty"`
+	M_messageFlow []*XsdMessageFlow    `xml:"messageFlow,omitempty"`
+	M_artifact_0  []*XsdAssociation    `xml:"association,omitempty"`
+	M_artifact_1  []*XsdGroup          `xml:"group,omitempty"`
+	M_artifact_2  []*XsdTextAnnotation `xml:"textAnnotation,omitempty"`
 
-	M_conversationNode_0	[]*XsdCallConversation	`xml:"callConversation,omitempty"`
-	M_conversationNode_1	[]*XsdConversation	`xml:"conversation,omitempty"`
-	M_conversationNode_2	[]*XsdSubConversation	`xml:"subConversation,omitempty"`
+	M_conversationNode_0 []*XsdCallConversation `xml:"callConversation,omitempty"`
+	M_conversationNode_1 []*XsdConversation     `xml:"conversation,omitempty"`
+	M_conversationNode_2 []*XsdSubConversation  `xml:"subConversation,omitempty"`
 
-	M_conversationAssociation	[]*XsdConversationAssociation	`xml:"conversationAssociation,omitempty"`
-	M_participantAssociation	[]*XsdParticipantAssociation	`xml:"participantAssociation,omitempty"`
-	M_messageFlowAssociation	[]*XsdMessageFlowAssociation	`xml:"messageFlowAssociation,omitempty"`
-	M_correlationKey	[]*XsdCorrelationKey	`xml:"correlationKey,omitempty"`
-	M_choreographyRef	[]string	`xml:"choreographyRef"`
-	M_conversationLink	[]*XsdConversationLink	`xml:"conversationLink,omitempty"`
-	M_name	string	`xml:"name,attr"`
-	M_isClosed	bool	`xml:"isClosed,attr"`
-
-
-
+	M_conversationAssociation []*XsdConversationAssociation `xml:"conversationAssociation,omitempty"`
+	M_participantAssociation  []*XsdParticipantAssociation  `xml:"participantAssociation,omitempty"`
+	M_messageFlowAssociation  []*XsdMessageFlowAssociation  `xml:"messageFlowAssociation,omitempty"`
+	M_correlationKey          []*XsdCorrelationKey          `xml:"correlationKey,omitempty"`
+	M_choreographyRef         []string                      `xml:"choreographyRef"`
+	M_conversationLink        []*XsdConversationLink        `xml:"conversationLink,omitempty"`
+	M_name                    string                        `xml:"name,attr"`
+	M_isClosed                bool                          `xml:"isClosed,attr"`
 }
+
 /** UUID **/
-func (this *GlobalConversation) GetUUID() string{
+func (this *GlobalConversation) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *GlobalConversation) GetId() string{
+func (this *GlobalConversation) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *GlobalConversation) SetId(ref interface{}){
+func (this *GlobalConversation) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -125,16 +121,16 @@ func (this *GlobalConversation) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *GlobalConversation) GetOther() interface{}{
+func (this *GlobalConversation) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *GlobalConversation) SetOther(ref interface{}){
+func (this *GlobalConversation) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -142,12 +138,12 @@ func (this *GlobalConversation) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *GlobalConversation) GetExtensionElements() *ExtensionElements{
+func (this *GlobalConversation) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *GlobalConversation) SetExtensionElements(ref interface{}){
+func (this *GlobalConversation) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -155,16 +151,16 @@ func (this *GlobalConversation) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *GlobalConversation) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *GlobalConversation) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *GlobalConversation) SetExtensionDefinitions(ref interface{}){
+func (this *GlobalConversation) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -181,16 +177,16 @@ func (this *GlobalConversation) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *GlobalConversation) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *GlobalConversation) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *GlobalConversation) SetExtensionValues(ref interface{}){
+func (this *GlobalConversation) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -207,16 +203,16 @@ func (this *GlobalConversation) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *GlobalConversation) GetDocumentation() []*Documentation{
+func (this *GlobalConversation) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *GlobalConversation) SetDocumentation(ref interface{}){
+func (this *GlobalConversation) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -231,7 +227,7 @@ func (this *GlobalConversation) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *GlobalConversation) RemoveDocumentation(ref interface{}){
+func (this *GlobalConversation) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -244,12 +240,12 @@ func (this *GlobalConversation) RemoveDocumentation(ref interface{}){
 }
 
 /** Name **/
-func (this *GlobalConversation) GetName() string{
+func (this *GlobalConversation) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *GlobalConversation) SetName(ref interface{}){
+func (this *GlobalConversation) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -257,12 +253,12 @@ func (this *GlobalConversation) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** IsClosed **/
-func (this *GlobalConversation) IsClosed() bool{
+func (this *GlobalConversation) IsClosed() bool {
 	return this.M_isClosed
 }
 
 /** Init reference IsClosed **/
-func (this *GlobalConversation) SetIsClosed(ref interface{}){
+func (this *GlobalConversation) SetIsClosed(ref interface{}) {
 	this.NeedSave = true
 	this.M_isClosed = ref.(bool)
 }
@@ -270,21 +266,21 @@ func (this *GlobalConversation) SetIsClosed(ref interface{}){
 /** Remove reference IsClosed **/
 
 /** ChoreographyRef **/
-func (this *GlobalConversation) GetChoreographyRef() []Choreography{
+func (this *GlobalConversation) GetChoreographyRef() []Choreography {
 	return this.m_choreographyRef
 }
 
 /** Init reference ChoreographyRef **/
-func (this *GlobalConversation) SetChoreographyRef(ref interface{}){
+func (this *GlobalConversation) SetChoreographyRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_choreographyRef); i++ {
+		for i := 0; i < len(this.M_choreographyRef); i++ {
 			if this.M_choreographyRef[i] == refStr {
 				return
 			}
 		}
 		this.M_choreographyRef = append(this.M_choreographyRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveChoreographyRef(ref)
 		this.m_choreographyRef = append(this.m_choreographyRef, ref.(Choreography))
 		this.M_choreographyRef = append(this.M_choreographyRef, ref.(BaseElement).GetUUID())
@@ -292,7 +288,7 @@ func (this *GlobalConversation) SetChoreographyRef(ref interface{}){
 }
 
 /** Remove reference ChoreographyRef **/
-func (this *GlobalConversation) RemoveChoreographyRef(ref interface{}){
+func (this *GlobalConversation) RemoveChoreographyRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	choreographyRef_ := make([]Choreography, 0)
@@ -308,16 +304,16 @@ func (this *GlobalConversation) RemoveChoreographyRef(ref interface{}){
 }
 
 /** Artifact **/
-func (this *GlobalConversation) GetArtifact() []Artifact{
+func (this *GlobalConversation) GetArtifact() []Artifact {
 	return this.M_artifact
 }
 
 /** Init reference Artifact **/
-func (this *GlobalConversation) SetArtifact(ref interface{}){
+func (this *GlobalConversation) SetArtifact(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var artifacts []Artifact
-	for i:=0; i<len(this.M_artifact); i++ {
+	for i := 0; i < len(this.M_artifact); i++ {
 		if this.M_artifact[i].(BaseElement).GetUUID() != ref.(BaseElement).GetUUID() {
 			artifacts = append(artifacts, this.M_artifact[i])
 		} else {
@@ -332,7 +328,7 @@ func (this *GlobalConversation) SetArtifact(ref interface{}){
 }
 
 /** Remove reference Artifact **/
-func (this *GlobalConversation) RemoveArtifact(ref interface{}){
+func (this *GlobalConversation) RemoveArtifact(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	artifact_ := make([]Artifact, 0)
@@ -345,16 +341,16 @@ func (this *GlobalConversation) RemoveArtifact(ref interface{}){
 }
 
 /** ParticipantAssociation **/
-func (this *GlobalConversation) GetParticipantAssociation() []*ParticipantAssociation{
+func (this *GlobalConversation) GetParticipantAssociation() []*ParticipantAssociation {
 	return this.M_participantAssociation
 }
 
 /** Init reference ParticipantAssociation **/
-func (this *GlobalConversation) SetParticipantAssociation(ref interface{}){
+func (this *GlobalConversation) SetParticipantAssociation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var participantAssociations []*ParticipantAssociation
-	for i:=0; i<len(this.M_participantAssociation); i++ {
+	for i := 0; i < len(this.M_participantAssociation); i++ {
 		if this.M_participantAssociation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			participantAssociations = append(participantAssociations, this.M_participantAssociation[i])
 		} else {
@@ -369,7 +365,7 @@ func (this *GlobalConversation) SetParticipantAssociation(ref interface{}){
 }
 
 /** Remove reference ParticipantAssociation **/
-func (this *GlobalConversation) RemoveParticipantAssociation(ref interface{}){
+func (this *GlobalConversation) RemoveParticipantAssociation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	participantAssociation_ := make([]*ParticipantAssociation, 0)
@@ -382,16 +378,16 @@ func (this *GlobalConversation) RemoveParticipantAssociation(ref interface{}){
 }
 
 /** MessageFlowAssociation **/
-func (this *GlobalConversation) GetMessageFlowAssociation() []*MessageFlowAssociation{
+func (this *GlobalConversation) GetMessageFlowAssociation() []*MessageFlowAssociation {
 	return this.M_messageFlowAssociation
 }
 
 /** Init reference MessageFlowAssociation **/
-func (this *GlobalConversation) SetMessageFlowAssociation(ref interface{}){
+func (this *GlobalConversation) SetMessageFlowAssociation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var messageFlowAssociations []*MessageFlowAssociation
-	for i:=0; i<len(this.M_messageFlowAssociation); i++ {
+	for i := 0; i < len(this.M_messageFlowAssociation); i++ {
 		if this.M_messageFlowAssociation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			messageFlowAssociations = append(messageFlowAssociations, this.M_messageFlowAssociation[i])
 		} else {
@@ -406,7 +402,7 @@ func (this *GlobalConversation) SetMessageFlowAssociation(ref interface{}){
 }
 
 /** Remove reference MessageFlowAssociation **/
-func (this *GlobalConversation) RemoveMessageFlowAssociation(ref interface{}){
+func (this *GlobalConversation) RemoveMessageFlowAssociation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	messageFlowAssociation_ := make([]*MessageFlowAssociation, 0)
@@ -419,16 +415,16 @@ func (this *GlobalConversation) RemoveMessageFlowAssociation(ref interface{}){
 }
 
 /** ConversationAssociation **/
-func (this *GlobalConversation) GetConversationAssociation() []*ConversationAssociation{
+func (this *GlobalConversation) GetConversationAssociation() []*ConversationAssociation {
 	return this.M_conversationAssociation
 }
 
 /** Init reference ConversationAssociation **/
-func (this *GlobalConversation) SetConversationAssociation(ref interface{}){
+func (this *GlobalConversation) SetConversationAssociation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var conversationAssociations []*ConversationAssociation
-	for i:=0; i<len(this.M_conversationAssociation); i++ {
+	for i := 0; i < len(this.M_conversationAssociation); i++ {
 		if this.M_conversationAssociation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			conversationAssociations = append(conversationAssociations, this.M_conversationAssociation[i])
 		} else {
@@ -443,7 +439,7 @@ func (this *GlobalConversation) SetConversationAssociation(ref interface{}){
 }
 
 /** Remove reference ConversationAssociation **/
-func (this *GlobalConversation) RemoveConversationAssociation(ref interface{}){
+func (this *GlobalConversation) RemoveConversationAssociation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	conversationAssociation_ := make([]*ConversationAssociation, 0)
@@ -456,16 +452,16 @@ func (this *GlobalConversation) RemoveConversationAssociation(ref interface{}){
 }
 
 /** Participant **/
-func (this *GlobalConversation) GetParticipant() []*Participant{
+func (this *GlobalConversation) GetParticipant() []*Participant {
 	return this.M_participant
 }
 
 /** Init reference Participant **/
-func (this *GlobalConversation) SetParticipant(ref interface{}){
+func (this *GlobalConversation) SetParticipant(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var participants []*Participant
-	for i:=0; i<len(this.M_participant); i++ {
+	for i := 0; i < len(this.M_participant); i++ {
 		if this.M_participant[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			participants = append(participants, this.M_participant[i])
 		} else {
@@ -480,7 +476,7 @@ func (this *GlobalConversation) SetParticipant(ref interface{}){
 }
 
 /** Remove reference Participant **/
-func (this *GlobalConversation) RemoveParticipant(ref interface{}){
+func (this *GlobalConversation) RemoveParticipant(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	participant_ := make([]*Participant, 0)
@@ -493,16 +489,16 @@ func (this *GlobalConversation) RemoveParticipant(ref interface{}){
 }
 
 /** MessageFlow **/
-func (this *GlobalConversation) GetMessageFlow() []*MessageFlow{
+func (this *GlobalConversation) GetMessageFlow() []*MessageFlow {
 	return this.M_messageFlow
 }
 
 /** Init reference MessageFlow **/
-func (this *GlobalConversation) SetMessageFlow(ref interface{}){
+func (this *GlobalConversation) SetMessageFlow(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var messageFlows []*MessageFlow
-	for i:=0; i<len(this.M_messageFlow); i++ {
+	for i := 0; i < len(this.M_messageFlow); i++ {
 		if this.M_messageFlow[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			messageFlows = append(messageFlows, this.M_messageFlow[i])
 		} else {
@@ -517,7 +513,7 @@ func (this *GlobalConversation) SetMessageFlow(ref interface{}){
 }
 
 /** Remove reference MessageFlow **/
-func (this *GlobalConversation) RemoveMessageFlow(ref interface{}){
+func (this *GlobalConversation) RemoveMessageFlow(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	messageFlow_ := make([]*MessageFlow, 0)
@@ -530,16 +526,16 @@ func (this *GlobalConversation) RemoveMessageFlow(ref interface{}){
 }
 
 /** CorrelationKey **/
-func (this *GlobalConversation) GetCorrelationKey() []*CorrelationKey{
+func (this *GlobalConversation) GetCorrelationKey() []*CorrelationKey {
 	return this.M_correlationKey
 }
 
 /** Init reference CorrelationKey **/
-func (this *GlobalConversation) SetCorrelationKey(ref interface{}){
+func (this *GlobalConversation) SetCorrelationKey(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var correlationKeys []*CorrelationKey
-	for i:=0; i<len(this.M_correlationKey); i++ {
+	for i := 0; i < len(this.M_correlationKey); i++ {
 		if this.M_correlationKey[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			correlationKeys = append(correlationKeys, this.M_correlationKey[i])
 		} else {
@@ -554,7 +550,7 @@ func (this *GlobalConversation) SetCorrelationKey(ref interface{}){
 }
 
 /** Remove reference CorrelationKey **/
-func (this *GlobalConversation) RemoveCorrelationKey(ref interface{}){
+func (this *GlobalConversation) RemoveCorrelationKey(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	correlationKey_ := make([]*CorrelationKey, 0)
@@ -567,16 +563,16 @@ func (this *GlobalConversation) RemoveCorrelationKey(ref interface{}){
 }
 
 /** ConversationNode **/
-func (this *GlobalConversation) GetConversationNode() []ConversationNode{
+func (this *GlobalConversation) GetConversationNode() []ConversationNode {
 	return this.M_conversationNode
 }
 
 /** Init reference ConversationNode **/
-func (this *GlobalConversation) SetConversationNode(ref interface{}){
+func (this *GlobalConversation) SetConversationNode(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var conversationNodes []ConversationNode
-	for i:=0; i<len(this.M_conversationNode); i++ {
+	for i := 0; i < len(this.M_conversationNode); i++ {
 		if this.M_conversationNode[i].(BaseElement).GetUUID() != ref.(BaseElement).GetUUID() {
 			conversationNodes = append(conversationNodes, this.M_conversationNode[i])
 		} else {
@@ -591,7 +587,7 @@ func (this *GlobalConversation) SetConversationNode(ref interface{}){
 }
 
 /** Remove reference ConversationNode **/
-func (this *GlobalConversation) RemoveConversationNode(ref interface{}){
+func (this *GlobalConversation) RemoveConversationNode(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	conversationNode_ := make([]ConversationNode, 0)
@@ -604,16 +600,16 @@ func (this *GlobalConversation) RemoveConversationNode(ref interface{}){
 }
 
 /** ConversationLink **/
-func (this *GlobalConversation) GetConversationLink() []*ConversationLink{
+func (this *GlobalConversation) GetConversationLink() []*ConversationLink {
 	return this.M_conversationLink
 }
 
 /** Init reference ConversationLink **/
-func (this *GlobalConversation) SetConversationLink(ref interface{}){
+func (this *GlobalConversation) SetConversationLink(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var conversationLinks []*ConversationLink
-	for i:=0; i<len(this.M_conversationLink); i++ {
+	for i := 0; i < len(this.M_conversationLink); i++ {
 		if this.M_conversationLink[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			conversationLinks = append(conversationLinks, this.M_conversationLink[i])
 		} else {
@@ -628,7 +624,7 @@ func (this *GlobalConversation) SetConversationLink(ref interface{}){
 }
 
 /** Remove reference ConversationLink **/
-func (this *GlobalConversation) RemoveConversationLink(ref interface{}){
+func (this *GlobalConversation) RemoveConversationLink(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	conversationLink_ := make([]*ConversationLink, 0)
@@ -641,21 +637,21 @@ func (this *GlobalConversation) RemoveConversationLink(ref interface{}){
 }
 
 /** Lane **/
-func (this *GlobalConversation) GetLanePtr() []*Lane{
+func (this *GlobalConversation) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *GlobalConversation) SetLanePtr(ref interface{}){
+func (this *GlobalConversation) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -663,7 +659,7 @@ func (this *GlobalConversation) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *GlobalConversation) RemoveLanePtr(ref interface{}){
+func (this *GlobalConversation) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -679,21 +675,21 @@ func (this *GlobalConversation) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *GlobalConversation) GetOutgoingPtr() []*Association{
+func (this *GlobalConversation) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *GlobalConversation) SetOutgoingPtr(ref interface{}){
+func (this *GlobalConversation) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -701,7 +697,7 @@ func (this *GlobalConversation) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *GlobalConversation) RemoveOutgoingPtr(ref interface{}){
+func (this *GlobalConversation) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -717,21 +713,21 @@ func (this *GlobalConversation) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *GlobalConversation) GetIncomingPtr() []*Association{
+func (this *GlobalConversation) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *GlobalConversation) SetIncomingPtr(ref interface{}){
+func (this *GlobalConversation) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -739,7 +735,7 @@ func (this *GlobalConversation) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *GlobalConversation) RemoveIncomingPtr(ref interface{}){
+func (this *GlobalConversation) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -755,23 +751,23 @@ func (this *GlobalConversation) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Definitions **/
-func (this *GlobalConversation) GetDefinitionsPtr() *Definitions{
+func (this *GlobalConversation) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *GlobalConversation) SetDefinitionsPtr(ref interface{}){
+func (this *GlobalConversation) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *GlobalConversation) RemoveDefinitionsPtr(ref interface{}){
+func (this *GlobalConversation) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {
@@ -781,21 +777,21 @@ func (this *GlobalConversation) RemoveDefinitionsPtr(ref interface{}){
 }
 
 /** Process **/
-func (this *GlobalConversation) GetProcessPtr() []*Process{
+func (this *GlobalConversation) GetProcessPtr() []*Process {
 	return this.m_processPtr
 }
 
 /** Init reference Process **/
-func (this *GlobalConversation) SetProcessPtr(ref interface{}){
+func (this *GlobalConversation) SetProcessPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_processPtr); i++ {
+		for i := 0; i < len(this.M_processPtr); i++ {
 			if this.M_processPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_processPtr = append(this.M_processPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveProcessPtr(ref)
 		this.m_processPtr = append(this.m_processPtr, ref.(*Process))
 		this.M_processPtr = append(this.M_processPtr, ref.(BaseElement).GetUUID())
@@ -803,7 +799,7 @@ func (this *GlobalConversation) SetProcessPtr(ref interface{}){
 }
 
 /** Remove reference Process **/
-func (this *GlobalConversation) RemoveProcessPtr(ref interface{}){
+func (this *GlobalConversation) RemoveProcessPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	processPtr_ := make([]*Process, 0)
@@ -819,21 +815,21 @@ func (this *GlobalConversation) RemoveProcessPtr(ref interface{}){
 }
 
 /** CallConversation **/
-func (this *GlobalConversation) GetCallConversationPtr() []*CallConversation{
+func (this *GlobalConversation) GetCallConversationPtr() []*CallConversation {
 	return this.m_callConversationPtr
 }
 
 /** Init reference CallConversation **/
-func (this *GlobalConversation) SetCallConversationPtr(ref interface{}){
+func (this *GlobalConversation) SetCallConversationPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_callConversationPtr); i++ {
+		for i := 0; i < len(this.M_callConversationPtr); i++ {
 			if this.M_callConversationPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_callConversationPtr = append(this.M_callConversationPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCallConversationPtr(ref)
 		this.m_callConversationPtr = append(this.m_callConversationPtr, ref.(*CallConversation))
 		this.M_callConversationPtr = append(this.M_callConversationPtr, ref.(BaseElement).GetUUID())
@@ -841,7 +837,7 @@ func (this *GlobalConversation) SetCallConversationPtr(ref interface{}){
 }
 
 /** Remove reference CallConversation **/
-func (this *GlobalConversation) RemoveCallConversationPtr(ref interface{}){
+func (this *GlobalConversation) RemoveCallConversationPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	callConversationPtr_ := make([]*CallConversation, 0)

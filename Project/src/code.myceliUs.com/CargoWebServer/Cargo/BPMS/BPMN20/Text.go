@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type Text struct{
+type Text struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,11 +15,10 @@ type Text struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Text **/
 	M_text string
-
 
 	/** Associations **/
 	m_textAnnotationPtr *TextAnnotation
@@ -28,22 +28,22 @@ type Text struct{
 
 /** Xml parser for Text **/
 type XsdText struct {
-	XMLName xml.Name	`xml:"text"`
-	M_text	string	`xml:",innerxml"`
-
+	XMLName xml.Name `xml:"text"`
+	M_text  string   `xml:",innerxml"`
 }
+
 /** UUID **/
-func (this *Text) GetUUID() string{
+func (this *Text) GetUUID() string {
 	return this.UUID
 }
 
 /** Text **/
-func (this *Text) GetText() string{
+func (this *Text) GetText() string {
 	return this.M_text
 }
 
 /** Init reference Text **/
-func (this *Text) SetText(ref interface{}){
+func (this *Text) SetText(ref interface{}) {
 	this.NeedSave = true
 	this.M_text = ref.(string)
 }
@@ -51,23 +51,23 @@ func (this *Text) SetText(ref interface{}){
 /** Remove reference Text **/
 
 /** TextAnnotation **/
-func (this *Text) GetTextAnnotationPtr() *TextAnnotation{
+func (this *Text) GetTextAnnotationPtr() *TextAnnotation {
 	return this.m_textAnnotationPtr
 }
 
 /** Init reference TextAnnotation **/
-func (this *Text) SetTextAnnotationPtr(ref interface{}){
+func (this *Text) SetTextAnnotationPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_textAnnotationPtr = ref.(string)
-	}else{
+	} else {
 		this.m_textAnnotationPtr = ref.(*TextAnnotation)
 		this.M_textAnnotationPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference TextAnnotation **/
-func (this *Text) RemoveTextAnnotationPtr(ref interface{}){
+func (this *Text) RemoveTextAnnotationPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_textAnnotationPtr.GetUUID() {

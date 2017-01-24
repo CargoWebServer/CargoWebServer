@@ -1,8 +1,10 @@
+//+build BPMN
 package BPMS_Runtime
 
 type ActivityType int
-const(
-	ActivityType_AbstractTask ActivityType = 1+iota
+
+const (
+	ActivityType_AbstractTask ActivityType = 1 + iota
 	ActivityType_ServiceTask
 	ActivityType_UserTask
 	ActivityType_ManualTask

@@ -1,10 +1,11 @@
+//+build DI
 package DI
 
-import(
-"code.myceliUs.com/CargoWebServer/Cargo/BPMS/DC"
+import (
+	"code.myceliUs.com/CargoWebServer/Cargo/BPMS/DC"
 )
 
-type Shape interface{
+type Shape interface {
 	/** Method of Shape **/
 
 	/** UUID **/
@@ -12,5 +13,4 @@ type Shape interface{
 
 	/** Bounds **/
 	GetBounds() *DC.Bounds
-
 }

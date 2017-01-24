@@ -1,8 +1,10 @@
+//+build BPMN
 package BPMS_Runtime
 
 type MultiInstanceBehaviorType int
-const(
-	MultiInstanceBehaviorType_None MultiInstanceBehaviorType = 1+iota
+
+const (
+	MultiInstanceBehaviorType_None MultiInstanceBehaviorType = 1 + iota
 	MultiInstanceBehaviorType_One
 	MultiInstanceBehaviorType_All
 	MultiInstanceBehaviorType_Complex

@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type ConversationAssociation struct{
+type ConversationAssociation struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,17 +15,17 @@ type ConversationAssociation struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of ConversationAssociation **/
 	m_innerConversationNodeRef ConversationNode
@@ -34,14 +35,13 @@ type ConversationAssociation struct{
 	/** If the ref is a string and not an object **/
 	M_outerConversationNodeRef string
 
-
 	/** Associations **/
 	m_converstaionAssociationsPtr Collaboration
 	/** If the ref is a string and not an object **/
 	M_converstaionAssociationsPtr string
-	m_lanePtr []*Lane
+	m_lanePtr                     []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -52,30 +52,29 @@ type ConversationAssociation struct{
 
 /** Xml parser for ConversationAssociation **/
 type XsdConversationAssociation struct {
-	XMLName xml.Name	`xml:"conversationAssociation"`
+	XMLName xml.Name `xml:"conversationAssociation"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_innerConversationNodeRef	string	`xml:"innerConversationNodeRef,attr"`
-	M_outerConversationNodeRef	string	`xml:"outerConversationNodeRef,attr"`
-
+	M_innerConversationNodeRef string `xml:"innerConversationNodeRef,attr"`
+	M_outerConversationNodeRef string `xml:"outerConversationNodeRef,attr"`
 }
+
 /** UUID **/
-func (this *ConversationAssociation) GetUUID() string{
+func (this *ConversationAssociation) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *ConversationAssociation) GetId() string{
+func (this *ConversationAssociation) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *ConversationAssociation) SetId(ref interface{}){
+func (this *ConversationAssociation) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -83,16 +82,16 @@ func (this *ConversationAssociation) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *ConversationAssociation) GetOther() interface{}{
+func (this *ConversationAssociation) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *ConversationAssociation) SetOther(ref interface{}){
+func (this *ConversationAssociation) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -100,12 +99,12 @@ func (this *ConversationAssociation) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *ConversationAssociation) GetExtensionElements() *ExtensionElements{
+func (this *ConversationAssociation) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *ConversationAssociation) SetExtensionElements(ref interface{}){
+func (this *ConversationAssociation) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -113,16 +112,16 @@ func (this *ConversationAssociation) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *ConversationAssociation) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *ConversationAssociation) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *ConversationAssociation) SetExtensionDefinitions(ref interface{}){
+func (this *ConversationAssociation) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -139,16 +138,16 @@ func (this *ConversationAssociation) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *ConversationAssociation) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *ConversationAssociation) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *ConversationAssociation) SetExtensionValues(ref interface{}){
+func (this *ConversationAssociation) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -165,16 +164,16 @@ func (this *ConversationAssociation) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *ConversationAssociation) GetDocumentation() []*Documentation{
+func (this *ConversationAssociation) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *ConversationAssociation) SetDocumentation(ref interface{}){
+func (this *ConversationAssociation) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -189,7 +188,7 @@ func (this *ConversationAssociation) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *ConversationAssociation) RemoveDocumentation(ref interface{}){
+func (this *ConversationAssociation) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -202,23 +201,23 @@ func (this *ConversationAssociation) RemoveDocumentation(ref interface{}){
 }
 
 /** InnerConversationNodeRef **/
-func (this *ConversationAssociation) GetInnerConversationNodeRef() ConversationNode{
+func (this *ConversationAssociation) GetInnerConversationNodeRef() ConversationNode {
 	return this.m_innerConversationNodeRef
 }
 
 /** Init reference InnerConversationNodeRef **/
-func (this *ConversationAssociation) SetInnerConversationNodeRef(ref interface{}){
+func (this *ConversationAssociation) SetInnerConversationNodeRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_innerConversationNodeRef = ref.(string)
-	}else{
+	} else {
 		this.m_innerConversationNodeRef = ref.(ConversationNode)
 		this.M_innerConversationNodeRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference InnerConversationNodeRef **/
-func (this *ConversationAssociation) RemoveInnerConversationNodeRef(ref interface{}){
+func (this *ConversationAssociation) RemoveInnerConversationNodeRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_innerConversationNodeRef.(BaseElement).GetUUID() {
@@ -228,23 +227,23 @@ func (this *ConversationAssociation) RemoveInnerConversationNodeRef(ref interfac
 }
 
 /** OuterConversationNodeRef **/
-func (this *ConversationAssociation) GetOuterConversationNodeRef() ConversationNode{
+func (this *ConversationAssociation) GetOuterConversationNodeRef() ConversationNode {
 	return this.m_outerConversationNodeRef
 }
 
 /** Init reference OuterConversationNodeRef **/
-func (this *ConversationAssociation) SetOuterConversationNodeRef(ref interface{}){
+func (this *ConversationAssociation) SetOuterConversationNodeRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_outerConversationNodeRef = ref.(string)
-	}else{
+	} else {
 		this.m_outerConversationNodeRef = ref.(ConversationNode)
 		this.M_outerConversationNodeRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference OuterConversationNodeRef **/
-func (this *ConversationAssociation) RemoveOuterConversationNodeRef(ref interface{}){
+func (this *ConversationAssociation) RemoveOuterConversationNodeRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_outerConversationNodeRef.(BaseElement).GetUUID() {
@@ -254,23 +253,23 @@ func (this *ConversationAssociation) RemoveOuterConversationNodeRef(ref interfac
 }
 
 /** ConverstaionAssociations **/
-func (this *ConversationAssociation) GetConverstaionAssociationsPtr() Collaboration{
+func (this *ConversationAssociation) GetConverstaionAssociationsPtr() Collaboration {
 	return this.m_converstaionAssociationsPtr
 }
 
 /** Init reference ConverstaionAssociations **/
-func (this *ConversationAssociation) SetConverstaionAssociationsPtr(ref interface{}){
+func (this *ConversationAssociation) SetConverstaionAssociationsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_converstaionAssociationsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_converstaionAssociationsPtr = ref.(Collaboration)
 		this.M_converstaionAssociationsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference ConverstaionAssociations **/
-func (this *ConversationAssociation) RemoveConverstaionAssociationsPtr(ref interface{}){
+func (this *ConversationAssociation) RemoveConverstaionAssociationsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_converstaionAssociationsPtr.(BaseElement).GetUUID() {
@@ -280,21 +279,21 @@ func (this *ConversationAssociation) RemoveConverstaionAssociationsPtr(ref inter
 }
 
 /** Lane **/
-func (this *ConversationAssociation) GetLanePtr() []*Lane{
+func (this *ConversationAssociation) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *ConversationAssociation) SetLanePtr(ref interface{}){
+func (this *ConversationAssociation) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -302,7 +301,7 @@ func (this *ConversationAssociation) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *ConversationAssociation) RemoveLanePtr(ref interface{}){
+func (this *ConversationAssociation) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -318,21 +317,21 @@ func (this *ConversationAssociation) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *ConversationAssociation) GetOutgoingPtr() []*Association{
+func (this *ConversationAssociation) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *ConversationAssociation) SetOutgoingPtr(ref interface{}){
+func (this *ConversationAssociation) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -340,7 +339,7 @@ func (this *ConversationAssociation) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *ConversationAssociation) RemoveOutgoingPtr(ref interface{}){
+func (this *ConversationAssociation) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -356,21 +355,21 @@ func (this *ConversationAssociation) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *ConversationAssociation) GetIncomingPtr() []*Association{
+func (this *ConversationAssociation) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *ConversationAssociation) SetIncomingPtr(ref interface{}){
+func (this *ConversationAssociation) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -378,7 +377,7 @@ func (this *ConversationAssociation) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *ConversationAssociation) RemoveIncomingPtr(ref interface{}){
+func (this *ConversationAssociation) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)

@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type ResourceRole interface{
+type ResourceRole interface {
 	/** Method of ResourceRole **/
 
 	/** UUID **/
@@ -17,5 +18,4 @@ type ResourceRole interface{
 
 	/** Name **/
 	GetName() string
-
 }

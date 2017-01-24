@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type UserTask struct{
+type UserTask struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,22 +15,22 @@ type UserTask struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of FlowElement **/
-	M_name string
-	M_auditing *Auditing
-	M_monitoring *Monitoring
+	M_name             string
+	M_auditing         *Auditing
+	M_monitoring       *Monitoring
 	m_categoryValueRef []*CategoryValue
 	/** If the ref is a string and not an object **/
 	M_categoryValueRef []string
@@ -41,26 +42,26 @@ type UserTask struct{
 	m_incoming []*SequenceFlow
 	/** If the ref is a string and not an object **/
 	M_incoming []string
-	m_lanes []*Lane
+	m_lanes    []*Lane
 	/** If the ref is a string and not an object **/
 	M_lanes []string
 
 	/** members of Activity **/
-	M_isForCompensation bool
+	M_isForCompensation   bool
 	M_loopCharacteristics LoopCharacteristics
-	M_resourceRole []ResourceRole
-	m_default *SequenceFlow
+	M_resourceRole        []ResourceRole
+	m_default             *SequenceFlow
 	/** If the ref is a string and not an object **/
-	M_default string
-	M_property []*Property
-	M_ioSpecification *InputOutputSpecification
+	M_default           string
+	M_property          []*Property
+	M_ioSpecification   *InputOutputSpecification
 	m_boundaryEventRefs []*BoundaryEvent
 	/** If the ref is a string and not an object **/
-	M_boundaryEventRefs []string
-	M_dataInputAssociation []*DataInputAssociation
+	M_boundaryEventRefs     []string
+	M_dataInputAssociation  []*DataInputAssociation
 	M_dataOutputAssociation []*DataOutputAssociation
-	M_startQuantity int
-	M_completionQuantity int
+	M_startQuantity         int
+	M_completionQuantity    int
 
 	/** members of InteractionNode **/
 	m_incomingConversationLinks []*ConversationLink
@@ -74,91 +75,85 @@ type UserTask struct{
 	/** No members **/
 
 	/** members of UserTask **/
-	M_rendering []*Rendering
-	M_implementation Implementation
+	M_rendering         []*Rendering
+	M_implementation    Implementation
 	M_implementationStr string
-
 
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr  []string
 	m_containerPtr FlowElementsContainer
 	/** If the ref is a string and not an object **/
-	M_containerPtr string
+	M_containerPtr                 string
 	m_compensateEventDefinitionPtr []*CompensateEventDefinition
 	/** If the ref is a string and not an object **/
 	M_compensateEventDefinitionPtr []string
-	m_messageFlowPtr []*MessageFlow
+	m_messageFlowPtr               []*MessageFlow
 	/** If the ref is a string and not an object **/
 	M_messageFlowPtr []string
 }
 
 /** Xml parser for UserTask **/
 type XsdUserTask struct {
-	XMLName xml.Name	`xml:"userTask"`
+	XMLName xml.Name `xml:"userTask"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** FlowElement **/
-	M_auditing	*XsdAuditing	`xml:"auditing,omitempty"`
-	M_monitoring	*XsdMonitoring	`xml:"monitoring,omitempty"`
-	M_categoryValueRef	[]string	`xml:"categoryValueRef"`
-	M_name	string	`xml:"name,attr"`
-
+	M_auditing         *XsdAuditing   `xml:"auditing,omitempty"`
+	M_monitoring       *XsdMonitoring `xml:"monitoring,omitempty"`
+	M_categoryValueRef []string       `xml:"categoryValueRef"`
+	M_name             string         `xml:"name,attr"`
 
 	/** FlowNode **/
-	M_incoming	[]string	`xml:"incoming"`
-	M_outgoing	[]string	`xml:"outgoing"`
-
+	M_incoming []string `xml:"incoming"`
+	M_outgoing []string `xml:"outgoing"`
 
 	/** Activity **/
-	M_ioSpecification	*XsdInputOutputSpecification	`xml:"ioSpecification,omitempty"`
-	M_property	[]*XsdProperty	`xml:"property,omitempty"`
-	M_dataInputAssociation	[]*XsdDataInputAssociation	`xml:"dataInputAssociation,omitempty"`
-	M_dataOutputAssociation	[]*XsdDataOutputAssociation	`xml:"dataOutputAssociation,omitempty"`
-	M_resourceRole_0	[]*XsdHumanPerformer	`xml:"humanPerformer,omitempty"`
-	M_resourceRole_1	[]*XsdPotentialOwner	`xml:"potentialOwner,omitempty"`
-	M_resourceRole_2	[]*XsdPerformer	`xml:"performer,omitempty"`
-	M_resourceRole_3	[]*XsdResourceRole	`xml:"resourceRole,omitempty"`
-	M_loopCharacteristics_0	*XsdMultiInstanceLoopCharacteristics	`xml:"multiInstanceLoopCharacteristics,omitempty"`
-	M_loopCharacteristics_1	*XsdStandardLoopCharacteristics	`xml:"standardLoopCharacteristics,omitempty"`
+	M_ioSpecification       *XsdInputOutputSpecification         `xml:"ioSpecification,omitempty"`
+	M_property              []*XsdProperty                       `xml:"property,omitempty"`
+	M_dataInputAssociation  []*XsdDataInputAssociation           `xml:"dataInputAssociation,omitempty"`
+	M_dataOutputAssociation []*XsdDataOutputAssociation          `xml:"dataOutputAssociation,omitempty"`
+	M_resourceRole_0        []*XsdHumanPerformer                 `xml:"humanPerformer,omitempty"`
+	M_resourceRole_1        []*XsdPotentialOwner                 `xml:"potentialOwner,omitempty"`
+	M_resourceRole_2        []*XsdPerformer                      `xml:"performer,omitempty"`
+	M_resourceRole_3        []*XsdResourceRole                   `xml:"resourceRole,omitempty"`
+	M_loopCharacteristics_0 *XsdMultiInstanceLoopCharacteristics `xml:"multiInstanceLoopCharacteristics,omitempty"`
+	M_loopCharacteristics_1 *XsdStandardLoopCharacteristics      `xml:"standardLoopCharacteristics,omitempty"`
 
-	M_isForCompensation	bool	`xml:"isForCompensation,attr"`
-	M_startQuantity	int	`xml:"startQuantity,attr"`
-	M_completionQuantity	int	`xml:"completionQuantity,attr"`
-	M_default	string	`xml:"default,attr"`
-
+	M_isForCompensation  bool   `xml:"isForCompensation,attr"`
+	M_startQuantity      int    `xml:"startQuantity,attr"`
+	M_completionQuantity int    `xml:"completionQuantity,attr"`
+	M_default            string `xml:"default,attr"`
 
 	/** Task **/
 
-
-	M_rendering	[]*XsdRendering	`xml:"rendering,omitempty"`
-	M_implementation	string	`xml:"implementation,attr"`
-
+	M_rendering      []*XsdRendering `xml:"rendering,omitempty"`
+	M_implementation string          `xml:"implementation,attr"`
 }
+
 /** UUID **/
-func (this *UserTask) GetUUID() string{
+func (this *UserTask) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *UserTask) GetId() string{
+func (this *UserTask) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *UserTask) SetId(ref interface{}){
+func (this *UserTask) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -166,16 +161,16 @@ func (this *UserTask) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *UserTask) GetOther() interface{}{
+func (this *UserTask) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *UserTask) SetOther(ref interface{}){
+func (this *UserTask) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -183,12 +178,12 @@ func (this *UserTask) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *UserTask) GetExtensionElements() *ExtensionElements{
+func (this *UserTask) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *UserTask) SetExtensionElements(ref interface{}){
+func (this *UserTask) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -196,16 +191,16 @@ func (this *UserTask) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *UserTask) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *UserTask) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *UserTask) SetExtensionDefinitions(ref interface{}){
+func (this *UserTask) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -222,16 +217,16 @@ func (this *UserTask) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *UserTask) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *UserTask) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *UserTask) SetExtensionValues(ref interface{}){
+func (this *UserTask) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -248,16 +243,16 @@ func (this *UserTask) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *UserTask) GetDocumentation() []*Documentation{
+func (this *UserTask) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *UserTask) SetDocumentation(ref interface{}){
+func (this *UserTask) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -272,7 +267,7 @@ func (this *UserTask) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *UserTask) RemoveDocumentation(ref interface{}){
+func (this *UserTask) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -285,12 +280,12 @@ func (this *UserTask) RemoveDocumentation(ref interface{}){
 }
 
 /** Name **/
-func (this *UserTask) GetName() string{
+func (this *UserTask) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *UserTask) SetName(ref interface{}){
+func (this *UserTask) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -298,18 +293,18 @@ func (this *UserTask) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** Auditing **/
-func (this *UserTask) GetAuditing() *Auditing{
+func (this *UserTask) GetAuditing() *Auditing {
 	return this.M_auditing
 }
 
 /** Init reference Auditing **/
-func (this *UserTask) SetAuditing(ref interface{}){
+func (this *UserTask) SetAuditing(ref interface{}) {
 	this.NeedSave = true
 	this.M_auditing = ref.(*Auditing)
 }
 
 /** Remove reference Auditing **/
-func (this *UserTask) RemoveAuditing(ref interface{}){
+func (this *UserTask) RemoveAuditing(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_auditing.GetUUID() {
@@ -318,18 +313,18 @@ func (this *UserTask) RemoveAuditing(ref interface{}){
 }
 
 /** Monitoring **/
-func (this *UserTask) GetMonitoring() *Monitoring{
+func (this *UserTask) GetMonitoring() *Monitoring {
 	return this.M_monitoring
 }
 
 /** Init reference Monitoring **/
-func (this *UserTask) SetMonitoring(ref interface{}){
+func (this *UserTask) SetMonitoring(ref interface{}) {
 	this.NeedSave = true
 	this.M_monitoring = ref.(*Monitoring)
 }
 
 /** Remove reference Monitoring **/
-func (this *UserTask) RemoveMonitoring(ref interface{}){
+func (this *UserTask) RemoveMonitoring(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_monitoring.GetUUID() {
@@ -338,21 +333,21 @@ func (this *UserTask) RemoveMonitoring(ref interface{}){
 }
 
 /** CategoryValueRef **/
-func (this *UserTask) GetCategoryValueRef() []*CategoryValue{
+func (this *UserTask) GetCategoryValueRef() []*CategoryValue {
 	return this.m_categoryValueRef
 }
 
 /** Init reference CategoryValueRef **/
-func (this *UserTask) SetCategoryValueRef(ref interface{}){
+func (this *UserTask) SetCategoryValueRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_categoryValueRef); i++ {
+		for i := 0; i < len(this.M_categoryValueRef); i++ {
 			if this.M_categoryValueRef[i] == refStr {
 				return
 			}
 		}
 		this.M_categoryValueRef = append(this.M_categoryValueRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveCategoryValueRef(ref)
 		this.m_categoryValueRef = append(this.m_categoryValueRef, ref.(*CategoryValue))
 		this.M_categoryValueRef = append(this.M_categoryValueRef, ref.(BaseElement).GetUUID())
@@ -360,7 +355,7 @@ func (this *UserTask) SetCategoryValueRef(ref interface{}){
 }
 
 /** Remove reference CategoryValueRef **/
-func (this *UserTask) RemoveCategoryValueRef(ref interface{}){
+func (this *UserTask) RemoveCategoryValueRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	categoryValueRef_ := make([]*CategoryValue, 0)
@@ -376,21 +371,21 @@ func (this *UserTask) RemoveCategoryValueRef(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *UserTask) GetOutgoing() []*SequenceFlow{
+func (this *UserTask) GetOutgoing() []*SequenceFlow {
 	return this.m_outgoing
 }
 
 /** Init reference Outgoing **/
-func (this *UserTask) SetOutgoing(ref interface{}){
+func (this *UserTask) SetOutgoing(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoing); i++ {
+		for i := 0; i < len(this.M_outgoing); i++ {
 			if this.M_outgoing[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoing = append(this.M_outgoing, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoing(ref)
 		this.m_outgoing = append(this.m_outgoing, ref.(*SequenceFlow))
 		this.M_outgoing = append(this.M_outgoing, ref.(BaseElement).GetUUID())
@@ -398,7 +393,7 @@ func (this *UserTask) SetOutgoing(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *UserTask) RemoveOutgoing(ref interface{}){
+func (this *UserTask) RemoveOutgoing(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoing_ := make([]*SequenceFlow, 0)
@@ -414,21 +409,21 @@ func (this *UserTask) RemoveOutgoing(ref interface{}){
 }
 
 /** Incoming **/
-func (this *UserTask) GetIncoming() []*SequenceFlow{
+func (this *UserTask) GetIncoming() []*SequenceFlow {
 	return this.m_incoming
 }
 
 /** Init reference Incoming **/
-func (this *UserTask) SetIncoming(ref interface{}){
+func (this *UserTask) SetIncoming(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incoming); i++ {
+		for i := 0; i < len(this.M_incoming); i++ {
 			if this.M_incoming[i] == refStr {
 				return
 			}
 		}
 		this.M_incoming = append(this.M_incoming, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncoming(ref)
 		this.m_incoming = append(this.m_incoming, ref.(*SequenceFlow))
 		this.M_incoming = append(this.M_incoming, ref.(BaseElement).GetUUID())
@@ -436,7 +431,7 @@ func (this *UserTask) SetIncoming(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *UserTask) RemoveIncoming(ref interface{}){
+func (this *UserTask) RemoveIncoming(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incoming_ := make([]*SequenceFlow, 0)
@@ -452,21 +447,21 @@ func (this *UserTask) RemoveIncoming(ref interface{}){
 }
 
 /** Lanes **/
-func (this *UserTask) GetLanes() []*Lane{
+func (this *UserTask) GetLanes() []*Lane {
 	return this.m_lanes
 }
 
 /** Init reference Lanes **/
-func (this *UserTask) SetLanes(ref interface{}){
+func (this *UserTask) SetLanes(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanes); i++ {
+		for i := 0; i < len(this.M_lanes); i++ {
 			if this.M_lanes[i] == refStr {
 				return
 			}
 		}
 		this.M_lanes = append(this.M_lanes, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanes(ref)
 		this.m_lanes = append(this.m_lanes, ref.(*Lane))
 		this.M_lanes = append(this.M_lanes, ref.(BaseElement).GetUUID())
@@ -474,7 +469,7 @@ func (this *UserTask) SetLanes(ref interface{}){
 }
 
 /** Remove reference Lanes **/
-func (this *UserTask) RemoveLanes(ref interface{}){
+func (this *UserTask) RemoveLanes(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanes_ := make([]*Lane, 0)
@@ -490,12 +485,12 @@ func (this *UserTask) RemoveLanes(ref interface{}){
 }
 
 /** IsForCompensation **/
-func (this *UserTask) IsForCompensation() bool{
+func (this *UserTask) IsForCompensation() bool {
 	return this.M_isForCompensation
 }
 
 /** Init reference IsForCompensation **/
-func (this *UserTask) SetIsForCompensation(ref interface{}){
+func (this *UserTask) SetIsForCompensation(ref interface{}) {
 	this.NeedSave = true
 	this.M_isForCompensation = ref.(bool)
 }
@@ -503,18 +498,18 @@ func (this *UserTask) SetIsForCompensation(ref interface{}){
 /** Remove reference IsForCompensation **/
 
 /** LoopCharacteristics **/
-func (this *UserTask) GetLoopCharacteristics() LoopCharacteristics{
+func (this *UserTask) GetLoopCharacteristics() LoopCharacteristics {
 	return this.M_loopCharacteristics
 }
 
 /** Init reference LoopCharacteristics **/
-func (this *UserTask) SetLoopCharacteristics(ref interface{}){
+func (this *UserTask) SetLoopCharacteristics(ref interface{}) {
 	this.NeedSave = true
 	this.M_loopCharacteristics = ref.(LoopCharacteristics)
 }
 
 /** Remove reference LoopCharacteristics **/
-func (this *UserTask) RemoveLoopCharacteristics(ref interface{}){
+func (this *UserTask) RemoveLoopCharacteristics(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_loopCharacteristics.(BaseElement).GetUUID() {
@@ -523,16 +518,16 @@ func (this *UserTask) RemoveLoopCharacteristics(ref interface{}){
 }
 
 /** ResourceRole **/
-func (this *UserTask) GetResourceRole() []ResourceRole{
+func (this *UserTask) GetResourceRole() []ResourceRole {
 	return this.M_resourceRole
 }
 
 /** Init reference ResourceRole **/
-func (this *UserTask) SetResourceRole(ref interface{}){
+func (this *UserTask) SetResourceRole(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var resourceRoles []ResourceRole
-	for i:=0; i<len(this.M_resourceRole); i++ {
+	for i := 0; i < len(this.M_resourceRole); i++ {
 		if this.M_resourceRole[i].(BaseElement).GetUUID() != ref.(BaseElement).GetUUID() {
 			resourceRoles = append(resourceRoles, this.M_resourceRole[i])
 		} else {
@@ -547,7 +542,7 @@ func (this *UserTask) SetResourceRole(ref interface{}){
 }
 
 /** Remove reference ResourceRole **/
-func (this *UserTask) RemoveResourceRole(ref interface{}){
+func (this *UserTask) RemoveResourceRole(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	resourceRole_ := make([]ResourceRole, 0)
@@ -560,23 +555,23 @@ func (this *UserTask) RemoveResourceRole(ref interface{}){
 }
 
 /** Default **/
-func (this *UserTask) GetDefault() *SequenceFlow{
+func (this *UserTask) GetDefault() *SequenceFlow {
 	return this.m_default
 }
 
 /** Init reference Default **/
-func (this *UserTask) SetDefault(ref interface{}){
+func (this *UserTask) SetDefault(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_default = ref.(string)
-	}else{
+	} else {
 		this.m_default = ref.(*SequenceFlow)
 		this.M_default = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Default **/
-func (this *UserTask) RemoveDefault(ref interface{}){
+func (this *UserTask) RemoveDefault(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_default.GetUUID() {
@@ -586,16 +581,16 @@ func (this *UserTask) RemoveDefault(ref interface{}){
 }
 
 /** Property **/
-func (this *UserTask) GetProperty() []*Property{
+func (this *UserTask) GetProperty() []*Property {
 	return this.M_property
 }
 
 /** Init reference Property **/
-func (this *UserTask) SetProperty(ref interface{}){
+func (this *UserTask) SetProperty(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var propertys []*Property
-	for i:=0; i<len(this.M_property); i++ {
+	for i := 0; i < len(this.M_property); i++ {
 		if this.M_property[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			propertys = append(propertys, this.M_property[i])
 		} else {
@@ -610,7 +605,7 @@ func (this *UserTask) SetProperty(ref interface{}){
 }
 
 /** Remove reference Property **/
-func (this *UserTask) RemoveProperty(ref interface{}){
+func (this *UserTask) RemoveProperty(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	property_ := make([]*Property, 0)
@@ -623,18 +618,18 @@ func (this *UserTask) RemoveProperty(ref interface{}){
 }
 
 /** IoSpecification **/
-func (this *UserTask) GetIoSpecification() *InputOutputSpecification{
+func (this *UserTask) GetIoSpecification() *InputOutputSpecification {
 	return this.M_ioSpecification
 }
 
 /** Init reference IoSpecification **/
-func (this *UserTask) SetIoSpecification(ref interface{}){
+func (this *UserTask) SetIoSpecification(ref interface{}) {
 	this.NeedSave = true
 	this.M_ioSpecification = ref.(*InputOutputSpecification)
 }
 
 /** Remove reference IoSpecification **/
-func (this *UserTask) RemoveIoSpecification(ref interface{}){
+func (this *UserTask) RemoveIoSpecification(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_ioSpecification.GetUUID() {
@@ -643,21 +638,21 @@ func (this *UserTask) RemoveIoSpecification(ref interface{}){
 }
 
 /** BoundaryEventRefs **/
-func (this *UserTask) GetBoundaryEventRefs() []*BoundaryEvent{
+func (this *UserTask) GetBoundaryEventRefs() []*BoundaryEvent {
 	return this.m_boundaryEventRefs
 }
 
 /** Init reference BoundaryEventRefs **/
-func (this *UserTask) SetBoundaryEventRefs(ref interface{}){
+func (this *UserTask) SetBoundaryEventRefs(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_boundaryEventRefs); i++ {
+		for i := 0; i < len(this.M_boundaryEventRefs); i++ {
 			if this.M_boundaryEventRefs[i] == refStr {
 				return
 			}
 		}
 		this.M_boundaryEventRefs = append(this.M_boundaryEventRefs, ref.(string))
-	}else{
+	} else {
 		this.RemoveBoundaryEventRefs(ref)
 		this.m_boundaryEventRefs = append(this.m_boundaryEventRefs, ref.(*BoundaryEvent))
 		this.M_boundaryEventRefs = append(this.M_boundaryEventRefs, ref.(BaseElement).GetUUID())
@@ -665,7 +660,7 @@ func (this *UserTask) SetBoundaryEventRefs(ref interface{}){
 }
 
 /** Remove reference BoundaryEventRefs **/
-func (this *UserTask) RemoveBoundaryEventRefs(ref interface{}){
+func (this *UserTask) RemoveBoundaryEventRefs(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	boundaryEventRefs_ := make([]*BoundaryEvent, 0)
@@ -681,16 +676,16 @@ func (this *UserTask) RemoveBoundaryEventRefs(ref interface{}){
 }
 
 /** DataInputAssociation **/
-func (this *UserTask) GetDataInputAssociation() []*DataInputAssociation{
+func (this *UserTask) GetDataInputAssociation() []*DataInputAssociation {
 	return this.M_dataInputAssociation
 }
 
 /** Init reference DataInputAssociation **/
-func (this *UserTask) SetDataInputAssociation(ref interface{}){
+func (this *UserTask) SetDataInputAssociation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var dataInputAssociations []*DataInputAssociation
-	for i:=0; i<len(this.M_dataInputAssociation); i++ {
+	for i := 0; i < len(this.M_dataInputAssociation); i++ {
 		if this.M_dataInputAssociation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			dataInputAssociations = append(dataInputAssociations, this.M_dataInputAssociation[i])
 		} else {
@@ -705,7 +700,7 @@ func (this *UserTask) SetDataInputAssociation(ref interface{}){
 }
 
 /** Remove reference DataInputAssociation **/
-func (this *UserTask) RemoveDataInputAssociation(ref interface{}){
+func (this *UserTask) RemoveDataInputAssociation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	dataInputAssociation_ := make([]*DataInputAssociation, 0)
@@ -718,16 +713,16 @@ func (this *UserTask) RemoveDataInputAssociation(ref interface{}){
 }
 
 /** DataOutputAssociation **/
-func (this *UserTask) GetDataOutputAssociation() []*DataOutputAssociation{
+func (this *UserTask) GetDataOutputAssociation() []*DataOutputAssociation {
 	return this.M_dataOutputAssociation
 }
 
 /** Init reference DataOutputAssociation **/
-func (this *UserTask) SetDataOutputAssociation(ref interface{}){
+func (this *UserTask) SetDataOutputAssociation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var dataOutputAssociations []*DataOutputAssociation
-	for i:=0; i<len(this.M_dataOutputAssociation); i++ {
+	for i := 0; i < len(this.M_dataOutputAssociation); i++ {
 		if this.M_dataOutputAssociation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			dataOutputAssociations = append(dataOutputAssociations, this.M_dataOutputAssociation[i])
 		} else {
@@ -742,7 +737,7 @@ func (this *UserTask) SetDataOutputAssociation(ref interface{}){
 }
 
 /** Remove reference DataOutputAssociation **/
-func (this *UserTask) RemoveDataOutputAssociation(ref interface{}){
+func (this *UserTask) RemoveDataOutputAssociation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	dataOutputAssociation_ := make([]*DataOutputAssociation, 0)
@@ -755,12 +750,12 @@ func (this *UserTask) RemoveDataOutputAssociation(ref interface{}){
 }
 
 /** StartQuantity **/
-func (this *UserTask) GetStartQuantity() int{
+func (this *UserTask) GetStartQuantity() int {
 	return this.M_startQuantity
 }
 
 /** Init reference StartQuantity **/
-func (this *UserTask) SetStartQuantity(ref interface{}){
+func (this *UserTask) SetStartQuantity(ref interface{}) {
 	this.NeedSave = true
 	this.M_startQuantity = ref.(int)
 }
@@ -768,12 +763,12 @@ func (this *UserTask) SetStartQuantity(ref interface{}){
 /** Remove reference StartQuantity **/
 
 /** CompletionQuantity **/
-func (this *UserTask) GetCompletionQuantity() int{
+func (this *UserTask) GetCompletionQuantity() int {
 	return this.M_completionQuantity
 }
 
 /** Init reference CompletionQuantity **/
-func (this *UserTask) SetCompletionQuantity(ref interface{}){
+func (this *UserTask) SetCompletionQuantity(ref interface{}) {
 	this.NeedSave = true
 	this.M_completionQuantity = ref.(int)
 }
@@ -781,21 +776,21 @@ func (this *UserTask) SetCompletionQuantity(ref interface{}){
 /** Remove reference CompletionQuantity **/
 
 /** IncomingConversationLinks **/
-func (this *UserTask) GetIncomingConversationLinks() []*ConversationLink{
+func (this *UserTask) GetIncomingConversationLinks() []*ConversationLink {
 	return this.m_incomingConversationLinks
 }
 
 /** Init reference IncomingConversationLinks **/
-func (this *UserTask) SetIncomingConversationLinks(ref interface{}){
+func (this *UserTask) SetIncomingConversationLinks(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingConversationLinks); i++ {
+		for i := 0; i < len(this.M_incomingConversationLinks); i++ {
 			if this.M_incomingConversationLinks[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingConversationLinks = append(this.M_incomingConversationLinks, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingConversationLinks(ref)
 		this.m_incomingConversationLinks = append(this.m_incomingConversationLinks, ref.(*ConversationLink))
 		this.M_incomingConversationLinks = append(this.M_incomingConversationLinks, ref.(BaseElement).GetUUID())
@@ -803,7 +798,7 @@ func (this *UserTask) SetIncomingConversationLinks(ref interface{}){
 }
 
 /** Remove reference IncomingConversationLinks **/
-func (this *UserTask) RemoveIncomingConversationLinks(ref interface{}){
+func (this *UserTask) RemoveIncomingConversationLinks(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingConversationLinks_ := make([]*ConversationLink, 0)
@@ -819,21 +814,21 @@ func (this *UserTask) RemoveIncomingConversationLinks(ref interface{}){
 }
 
 /** OutgoingConversationLinks **/
-func (this *UserTask) GetOutgoingConversationLinks() []*ConversationLink{
+func (this *UserTask) GetOutgoingConversationLinks() []*ConversationLink {
 	return this.m_outgoingConversationLinks
 }
 
 /** Init reference OutgoingConversationLinks **/
-func (this *UserTask) SetOutgoingConversationLinks(ref interface{}){
+func (this *UserTask) SetOutgoingConversationLinks(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingConversationLinks); i++ {
+		for i := 0; i < len(this.M_outgoingConversationLinks); i++ {
 			if this.M_outgoingConversationLinks[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingConversationLinks = append(this.M_outgoingConversationLinks, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingConversationLinks(ref)
 		this.m_outgoingConversationLinks = append(this.m_outgoingConversationLinks, ref.(*ConversationLink))
 		this.M_outgoingConversationLinks = append(this.M_outgoingConversationLinks, ref.(BaseElement).GetUUID())
@@ -841,7 +836,7 @@ func (this *UserTask) SetOutgoingConversationLinks(ref interface{}){
 }
 
 /** Remove reference OutgoingConversationLinks **/
-func (this *UserTask) RemoveOutgoingConversationLinks(ref interface{}){
+func (this *UserTask) RemoveOutgoingConversationLinks(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingConversationLinks_ := make([]*ConversationLink, 0)
@@ -857,16 +852,16 @@ func (this *UserTask) RemoveOutgoingConversationLinks(ref interface{}){
 }
 
 /** Rendering **/
-func (this *UserTask) GetRendering() []*Rendering{
+func (this *UserTask) GetRendering() []*Rendering {
 	return this.M_rendering
 }
 
 /** Init reference Rendering **/
-func (this *UserTask) SetRendering(ref interface{}){
+func (this *UserTask) SetRendering(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var renderings []*Rendering
-	for i:=0; i<len(this.M_rendering); i++ {
+	for i := 0; i < len(this.M_rendering); i++ {
 		if this.M_rendering[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			renderings = append(renderings, this.M_rendering[i])
 		} else {
@@ -881,7 +876,7 @@ func (this *UserTask) SetRendering(ref interface{}){
 }
 
 /** Remove reference Rendering **/
-func (this *UserTask) RemoveRendering(ref interface{}){
+func (this *UserTask) RemoveRendering(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	rendering_ := make([]*Rendering, 0)
@@ -894,12 +889,12 @@ func (this *UserTask) RemoveRendering(ref interface{}){
 }
 
 /** Implementation **/
-func (this *UserTask) GetImplementation() Implementation{
+func (this *UserTask) GetImplementation() Implementation {
 	return this.M_implementation
 }
 
 /** Init reference Implementation **/
-func (this *UserTask) SetImplementation(ref interface{}){
+func (this *UserTask) SetImplementation(ref interface{}) {
 	this.NeedSave = true
 	this.M_implementation = ref.(Implementation)
 }
@@ -907,12 +902,12 @@ func (this *UserTask) SetImplementation(ref interface{}){
 /** Remove reference Implementation **/
 
 /** ImplementationStr **/
-func (this *UserTask) GetImplementationStr() string{
+func (this *UserTask) GetImplementationStr() string {
 	return this.M_implementationStr
 }
 
 /** Init reference ImplementationStr **/
-func (this *UserTask) SetImplementationStr(ref interface{}){
+func (this *UserTask) SetImplementationStr(ref interface{}) {
 	this.NeedSave = true
 	this.M_implementationStr = ref.(string)
 }
@@ -920,21 +915,21 @@ func (this *UserTask) SetImplementationStr(ref interface{}){
 /** Remove reference ImplementationStr **/
 
 /** Lane **/
-func (this *UserTask) GetLanePtr() []*Lane{
+func (this *UserTask) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *UserTask) SetLanePtr(ref interface{}){
+func (this *UserTask) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -942,7 +937,7 @@ func (this *UserTask) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *UserTask) RemoveLanePtr(ref interface{}){
+func (this *UserTask) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -958,21 +953,21 @@ func (this *UserTask) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *UserTask) GetOutgoingPtr() []*Association{
+func (this *UserTask) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *UserTask) SetOutgoingPtr(ref interface{}){
+func (this *UserTask) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -980,7 +975,7 @@ func (this *UserTask) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *UserTask) RemoveOutgoingPtr(ref interface{}){
+func (this *UserTask) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -996,21 +991,21 @@ func (this *UserTask) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *UserTask) GetIncomingPtr() []*Association{
+func (this *UserTask) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *UserTask) SetIncomingPtr(ref interface{}){
+func (this *UserTask) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -1018,7 +1013,7 @@ func (this *UserTask) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *UserTask) RemoveIncomingPtr(ref interface{}){
+func (this *UserTask) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -1034,23 +1029,23 @@ func (this *UserTask) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Container **/
-func (this *UserTask) GetContainerPtr() FlowElementsContainer{
+func (this *UserTask) GetContainerPtr() FlowElementsContainer {
 	return this.m_containerPtr
 }
 
 /** Init reference Container **/
-func (this *UserTask) SetContainerPtr(ref interface{}){
+func (this *UserTask) SetContainerPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_containerPtr = ref.(string)
-	}else{
+	} else {
 		this.m_containerPtr = ref.(FlowElementsContainer)
 		this.M_containerPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Container **/
-func (this *UserTask) RemoveContainerPtr(ref interface{}){
+func (this *UserTask) RemoveContainerPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_containerPtr.(BaseElement).GetUUID() {
@@ -1060,21 +1055,21 @@ func (this *UserTask) RemoveContainerPtr(ref interface{}){
 }
 
 /** CompensateEventDefinition **/
-func (this *UserTask) GetCompensateEventDefinitionPtr() []*CompensateEventDefinition{
+func (this *UserTask) GetCompensateEventDefinitionPtr() []*CompensateEventDefinition {
 	return this.m_compensateEventDefinitionPtr
 }
 
 /** Init reference CompensateEventDefinition **/
-func (this *UserTask) SetCompensateEventDefinitionPtr(ref interface{}){
+func (this *UserTask) SetCompensateEventDefinitionPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_compensateEventDefinitionPtr); i++ {
+		for i := 0; i < len(this.M_compensateEventDefinitionPtr); i++ {
 			if this.M_compensateEventDefinitionPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_compensateEventDefinitionPtr = append(this.M_compensateEventDefinitionPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCompensateEventDefinitionPtr(ref)
 		this.m_compensateEventDefinitionPtr = append(this.m_compensateEventDefinitionPtr, ref.(*CompensateEventDefinition))
 		this.M_compensateEventDefinitionPtr = append(this.M_compensateEventDefinitionPtr, ref.(BaseElement).GetUUID())
@@ -1082,7 +1077,7 @@ func (this *UserTask) SetCompensateEventDefinitionPtr(ref interface{}){
 }
 
 /** Remove reference CompensateEventDefinition **/
-func (this *UserTask) RemoveCompensateEventDefinitionPtr(ref interface{}){
+func (this *UserTask) RemoveCompensateEventDefinitionPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	compensateEventDefinitionPtr_ := make([]*CompensateEventDefinition, 0)
@@ -1098,21 +1093,21 @@ func (this *UserTask) RemoveCompensateEventDefinitionPtr(ref interface{}){
 }
 
 /** MessageFlow **/
-func (this *UserTask) GetMessageFlowPtr() []*MessageFlow{
+func (this *UserTask) GetMessageFlowPtr() []*MessageFlow {
 	return this.m_messageFlowPtr
 }
 
 /** Init reference MessageFlow **/
-func (this *UserTask) SetMessageFlowPtr(ref interface{}){
+func (this *UserTask) SetMessageFlowPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_messageFlowPtr); i++ {
+		for i := 0; i < len(this.M_messageFlowPtr); i++ {
 			if this.M_messageFlowPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_messageFlowPtr = append(this.M_messageFlowPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveMessageFlowPtr(ref)
 		this.m_messageFlowPtr = append(this.m_messageFlowPtr, ref.(*MessageFlow))
 		this.M_messageFlowPtr = append(this.M_messageFlowPtr, ref.(BaseElement).GetUUID())
@@ -1120,7 +1115,7 @@ func (this *UserTask) SetMessageFlowPtr(ref interface{}){
 }
 
 /** Remove reference MessageFlow **/
-func (this *UserTask) RemoveMessageFlowPtr(ref interface{}){
+func (this *UserTask) RemoveMessageFlowPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	messageFlowPtr_ := make([]*MessageFlow, 0)

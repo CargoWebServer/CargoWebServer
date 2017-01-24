@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type BaseElement interface{
+type BaseElement interface {
 	/** Method of BaseElement **/
 
 	/** UUID **/
@@ -23,5 +24,4 @@ type BaseElement interface{
 
 	/** Documentation **/
 	GetDocumentation() []*Documentation
-
 }

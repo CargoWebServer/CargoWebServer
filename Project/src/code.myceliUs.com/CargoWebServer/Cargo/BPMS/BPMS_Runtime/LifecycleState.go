@@ -1,8 +1,10 @@
+//+build BPMN
 package BPMS_Runtime
 
 type LifecycleState int
-const(
-	LifecycleState_Completed LifecycleState = 1+iota
+
+const (
+	LifecycleState_Completed LifecycleState = 1 + iota
 	LifecycleState_Compensated
 	LifecycleState_Failed
 	LifecycleState_Terminated

@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type Gateway interface{
+type Gateway interface {
 	/** Method of Gateway **/
 
 	/** UUID **/
@@ -8,5 +9,4 @@ type Gateway interface{
 
 	/** GatewayDirection **/
 	GetGatewayDirection() GatewayDirection
-
 }

@@ -1,8 +1,10 @@
+//+build BPMN
 package BPMS_Runtime
 
 type EventTriggerType int
-const(
-	EventTriggerType_None EventTriggerType = 1+iota
+
+const (
+	EventTriggerType_None EventTriggerType = 1 + iota
 	EventTriggerType_Timer
 	EventTriggerType_Conditional
 	EventTriggerType_Message

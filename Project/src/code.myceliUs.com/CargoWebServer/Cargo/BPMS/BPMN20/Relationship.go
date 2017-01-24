@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type Relationship struct{
+type Relationship struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,36 +15,35 @@ type Relationship struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of Relationship **/
-	M_type string
+	M_type      string
 	M_direction RelationshipDirection
-	m_source []interface{}
+	m_source    []interface{}
 	/** If the ref is a string and not an object **/
 	M_source []string
 	m_target []interface{}
 	/** If the ref is a string and not an object **/
 	M_target []string
 
-
 	/** Associations **/
 	m_definitionsPtr *Definitions
 	/** If the ref is a string and not an object **/
 	M_definitionsPtr string
-	m_lanePtr []*Lane
+	m_lanePtr        []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -54,32 +54,31 @@ type Relationship struct{
 
 /** Xml parser for Relationship **/
 type XsdRelationship struct {
-	XMLName xml.Name	`xml:"relationship"`
+	XMLName xml.Name `xml:"relationship"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_source	[]string	`xml:"source"`
-	M_target	[]string	`xml:"target"`
-	M_type	string	`xml:"type,attr"`
-	M_direction	string	`xml:"direction,attr"`
-
+	M_source    []string `xml:"source"`
+	M_target    []string `xml:"target"`
+	M_type      string   `xml:"type,attr"`
+	M_direction string   `xml:"direction,attr"`
 }
+
 /** UUID **/
-func (this *Relationship) GetUUID() string{
+func (this *Relationship) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *Relationship) GetId() string{
+func (this *Relationship) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *Relationship) SetId(ref interface{}){
+func (this *Relationship) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -87,16 +86,16 @@ func (this *Relationship) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *Relationship) GetOther() interface{}{
+func (this *Relationship) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *Relationship) SetOther(ref interface{}){
+func (this *Relationship) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -104,12 +103,12 @@ func (this *Relationship) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *Relationship) GetExtensionElements() *ExtensionElements{
+func (this *Relationship) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *Relationship) SetExtensionElements(ref interface{}){
+func (this *Relationship) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -117,16 +116,16 @@ func (this *Relationship) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *Relationship) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *Relationship) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *Relationship) SetExtensionDefinitions(ref interface{}){
+func (this *Relationship) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -143,16 +142,16 @@ func (this *Relationship) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *Relationship) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *Relationship) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *Relationship) SetExtensionValues(ref interface{}){
+func (this *Relationship) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -169,16 +168,16 @@ func (this *Relationship) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *Relationship) GetDocumentation() []*Documentation{
+func (this *Relationship) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *Relationship) SetDocumentation(ref interface{}){
+func (this *Relationship) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -193,7 +192,7 @@ func (this *Relationship) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *Relationship) RemoveDocumentation(ref interface{}){
+func (this *Relationship) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -206,12 +205,12 @@ func (this *Relationship) RemoveDocumentation(ref interface{}){
 }
 
 /** Type **/
-func (this *Relationship) GetType() string{
+func (this *Relationship) GetType() string {
 	return this.M_type
 }
 
 /** Init reference Type **/
-func (this *Relationship) SetType(ref interface{}){
+func (this *Relationship) SetType(ref interface{}) {
 	this.NeedSave = true
 	this.M_type = ref.(string)
 }
@@ -219,12 +218,12 @@ func (this *Relationship) SetType(ref interface{}){
 /** Remove reference Type **/
 
 /** Direction **/
-func (this *Relationship) GetDirection() RelationshipDirection{
+func (this *Relationship) GetDirection() RelationshipDirection {
 	return this.M_direction
 }
 
 /** Init reference Direction **/
-func (this *Relationship) SetDirection(ref interface{}){
+func (this *Relationship) SetDirection(ref interface{}) {
 	this.NeedSave = true
 	this.M_direction = ref.(RelationshipDirection)
 }
@@ -232,21 +231,21 @@ func (this *Relationship) SetDirection(ref interface{}){
 /** Remove reference Direction **/
 
 /** Source **/
-func (this *Relationship) GetSource() []interface{}{
+func (this *Relationship) GetSource() []interface{} {
 	return this.m_source
 }
 
 /** Init reference Source **/
-func (this *Relationship) SetSource(ref interface{}){
+func (this *Relationship) SetSource(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_source); i++ {
+		for i := 0; i < len(this.M_source); i++ {
 			if this.M_source[i] == refStr {
 				return
 			}
 		}
 		this.M_source = append(this.M_source, ref.(string))
-	}else{
+	} else {
 		this.m_source = append(this.m_source, ref.(interface{}))
 	}
 }
@@ -254,21 +253,21 @@ func (this *Relationship) SetSource(ref interface{}){
 /** Remove reference Source **/
 
 /** Target **/
-func (this *Relationship) GetTarget() []interface{}{
+func (this *Relationship) GetTarget() []interface{} {
 	return this.m_target
 }
 
 /** Init reference Target **/
-func (this *Relationship) SetTarget(ref interface{}){
+func (this *Relationship) SetTarget(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_target); i++ {
+		for i := 0; i < len(this.M_target); i++ {
 			if this.M_target[i] == refStr {
 				return
 			}
 		}
 		this.M_target = append(this.M_target, ref.(string))
-	}else{
+	} else {
 		this.m_target = append(this.m_target, ref.(interface{}))
 	}
 }
@@ -276,23 +275,23 @@ func (this *Relationship) SetTarget(ref interface{}){
 /** Remove reference Target **/
 
 /** Definitions **/
-func (this *Relationship) GetDefinitionsPtr() *Definitions{
+func (this *Relationship) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *Relationship) SetDefinitionsPtr(ref interface{}){
+func (this *Relationship) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *Relationship) RemoveDefinitionsPtr(ref interface{}){
+func (this *Relationship) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {
@@ -302,21 +301,21 @@ func (this *Relationship) RemoveDefinitionsPtr(ref interface{}){
 }
 
 /** Lane **/
-func (this *Relationship) GetLanePtr() []*Lane{
+func (this *Relationship) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *Relationship) SetLanePtr(ref interface{}){
+func (this *Relationship) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -324,7 +323,7 @@ func (this *Relationship) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *Relationship) RemoveLanePtr(ref interface{}){
+func (this *Relationship) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -340,21 +339,21 @@ func (this *Relationship) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *Relationship) GetOutgoingPtr() []*Association{
+func (this *Relationship) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *Relationship) SetOutgoingPtr(ref interface{}){
+func (this *Relationship) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -362,7 +361,7 @@ func (this *Relationship) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *Relationship) RemoveOutgoingPtr(ref interface{}){
+func (this *Relationship) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -378,21 +377,21 @@ func (this *Relationship) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *Relationship) GetIncomingPtr() []*Association{
+func (this *Relationship) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *Relationship) SetIncomingPtr(ref interface{}){
+func (this *Relationship) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -400,7 +399,7 @@ func (this *Relationship) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *Relationship) RemoveIncomingPtr(ref interface{}){
+func (this *Relationship) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)

@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type ParticipantMultiplicity struct{
+type ParticipantMultiplicity struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,30 +15,29 @@ type ParticipantMultiplicity struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of ParticipantMultiplicity **/
 	M_minimum int
 	M_maximum int
 
-
 	/** Associations **/
 	m_participantPtr *Participant
 	/** If the ref is a string and not an object **/
 	M_participantPtr string
-	m_lanePtr []*Lane
+	m_lanePtr        []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -48,30 +48,29 @@ type ParticipantMultiplicity struct{
 
 /** Xml parser for ParticipantMultiplicity **/
 type XsdParticipantMultiplicity struct {
-	XMLName xml.Name	`xml:"participantMultiplicity"`
+	XMLName xml.Name `xml:"participantMultiplicity"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_minimum	int	`xml:"minimum,attr"`
-	M_maximum	int	`xml:"maximum,attr"`
-
+	M_minimum int `xml:"minimum,attr"`
+	M_maximum int `xml:"maximum,attr"`
 }
+
 /** UUID **/
-func (this *ParticipantMultiplicity) GetUUID() string{
+func (this *ParticipantMultiplicity) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *ParticipantMultiplicity) GetId() string{
+func (this *ParticipantMultiplicity) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *ParticipantMultiplicity) SetId(ref interface{}){
+func (this *ParticipantMultiplicity) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -79,16 +78,16 @@ func (this *ParticipantMultiplicity) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *ParticipantMultiplicity) GetOther() interface{}{
+func (this *ParticipantMultiplicity) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *ParticipantMultiplicity) SetOther(ref interface{}){
+func (this *ParticipantMultiplicity) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -96,12 +95,12 @@ func (this *ParticipantMultiplicity) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *ParticipantMultiplicity) GetExtensionElements() *ExtensionElements{
+func (this *ParticipantMultiplicity) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *ParticipantMultiplicity) SetExtensionElements(ref interface{}){
+func (this *ParticipantMultiplicity) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -109,16 +108,16 @@ func (this *ParticipantMultiplicity) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *ParticipantMultiplicity) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *ParticipantMultiplicity) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *ParticipantMultiplicity) SetExtensionDefinitions(ref interface{}){
+func (this *ParticipantMultiplicity) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -135,16 +134,16 @@ func (this *ParticipantMultiplicity) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *ParticipantMultiplicity) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *ParticipantMultiplicity) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *ParticipantMultiplicity) SetExtensionValues(ref interface{}){
+func (this *ParticipantMultiplicity) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -161,16 +160,16 @@ func (this *ParticipantMultiplicity) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *ParticipantMultiplicity) GetDocumentation() []*Documentation{
+func (this *ParticipantMultiplicity) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *ParticipantMultiplicity) SetDocumentation(ref interface{}){
+func (this *ParticipantMultiplicity) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -185,7 +184,7 @@ func (this *ParticipantMultiplicity) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *ParticipantMultiplicity) RemoveDocumentation(ref interface{}){
+func (this *ParticipantMultiplicity) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -198,12 +197,12 @@ func (this *ParticipantMultiplicity) RemoveDocumentation(ref interface{}){
 }
 
 /** Minimum **/
-func (this *ParticipantMultiplicity) GetMinimum() int{
+func (this *ParticipantMultiplicity) GetMinimum() int {
 	return this.M_minimum
 }
 
 /** Init reference Minimum **/
-func (this *ParticipantMultiplicity) SetMinimum(ref interface{}){
+func (this *ParticipantMultiplicity) SetMinimum(ref interface{}) {
 	this.NeedSave = true
 	this.M_minimum = ref.(int)
 }
@@ -211,12 +210,12 @@ func (this *ParticipantMultiplicity) SetMinimum(ref interface{}){
 /** Remove reference Minimum **/
 
 /** Maximum **/
-func (this *ParticipantMultiplicity) GetMaximum() int{
+func (this *ParticipantMultiplicity) GetMaximum() int {
 	return this.M_maximum
 }
 
 /** Init reference Maximum **/
-func (this *ParticipantMultiplicity) SetMaximum(ref interface{}){
+func (this *ParticipantMultiplicity) SetMaximum(ref interface{}) {
 	this.NeedSave = true
 	this.M_maximum = ref.(int)
 }
@@ -224,23 +223,23 @@ func (this *ParticipantMultiplicity) SetMaximum(ref interface{}){
 /** Remove reference Maximum **/
 
 /** Participant **/
-func (this *ParticipantMultiplicity) GetParticipantPtr() *Participant{
+func (this *ParticipantMultiplicity) GetParticipantPtr() *Participant {
 	return this.m_participantPtr
 }
 
 /** Init reference Participant **/
-func (this *ParticipantMultiplicity) SetParticipantPtr(ref interface{}){
+func (this *ParticipantMultiplicity) SetParticipantPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_participantPtr = ref.(string)
-	}else{
+	} else {
 		this.m_participantPtr = ref.(*Participant)
 		this.M_participantPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Participant **/
-func (this *ParticipantMultiplicity) RemoveParticipantPtr(ref interface{}){
+func (this *ParticipantMultiplicity) RemoveParticipantPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_participantPtr.GetUUID() {
@@ -250,21 +249,21 @@ func (this *ParticipantMultiplicity) RemoveParticipantPtr(ref interface{}){
 }
 
 /** Lane **/
-func (this *ParticipantMultiplicity) GetLanePtr() []*Lane{
+func (this *ParticipantMultiplicity) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *ParticipantMultiplicity) SetLanePtr(ref interface{}){
+func (this *ParticipantMultiplicity) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -272,7 +271,7 @@ func (this *ParticipantMultiplicity) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *ParticipantMultiplicity) RemoveLanePtr(ref interface{}){
+func (this *ParticipantMultiplicity) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -288,21 +287,21 @@ func (this *ParticipantMultiplicity) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *ParticipantMultiplicity) GetOutgoingPtr() []*Association{
+func (this *ParticipantMultiplicity) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *ParticipantMultiplicity) SetOutgoingPtr(ref interface{}){
+func (this *ParticipantMultiplicity) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -310,7 +309,7 @@ func (this *ParticipantMultiplicity) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *ParticipantMultiplicity) RemoveOutgoingPtr(ref interface{}){
+func (this *ParticipantMultiplicity) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -326,21 +325,21 @@ func (this *ParticipantMultiplicity) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *ParticipantMultiplicity) GetIncomingPtr() []*Association{
+func (this *ParticipantMultiplicity) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *ParticipantMultiplicity) SetIncomingPtr(ref interface{}){
+func (this *ParticipantMultiplicity) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -348,7 +347,7 @@ func (this *ParticipantMultiplicity) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *ParticipantMultiplicity) RemoveIncomingPtr(ref interface{}){
+func (this *ParticipantMultiplicity) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)

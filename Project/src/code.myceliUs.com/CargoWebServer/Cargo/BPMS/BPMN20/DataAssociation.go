@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type DataAssociation interface{
+type DataAssociation interface {
 	/** Method of DataAssociation **/
 
 	/** UUID **/
@@ -17,5 +18,4 @@ type DataAssociation interface{
 
 	/** SourceRef **/
 	GetSourceRef() []ItemAwareElement
-
 }

@@ -1,10 +1,11 @@
+//+build BPMN
 package BPMS_Runtime
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type EventData struct{
+type EventData struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,11 +15,10 @@ type EventData struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of EventData **/
 	M_id string
-
 
 	/** Associations **/
 	m_triggerPtr *Trigger
@@ -28,22 +28,22 @@ type EventData struct{
 
 /** Xml parser for EventData **/
 type XsdEventData struct {
-	XMLName xml.Name	`xml:"eventData"`
-	M_id	string	`xml:"id,attr"`
-
+	XMLName xml.Name `xml:"eventData"`
+	M_id    string   `xml:"id,attr"`
 }
+
 /** UUID **/
-func (this *EventData) GetUUID() string{
+func (this *EventData) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *EventData) GetId() string{
+func (this *EventData) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *EventData) SetId(ref interface{}){
+func (this *EventData) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -51,23 +51,23 @@ func (this *EventData) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Trigger **/
-func (this *EventData) GetTriggerPtr() *Trigger{
+func (this *EventData) GetTriggerPtr() *Trigger {
 	return this.m_triggerPtr
 }
 
 /** Init reference Trigger **/
-func (this *EventData) SetTriggerPtr(ref interface{}){
+func (this *EventData) SetTriggerPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_triggerPtr = ref.(string)
-	}else{
+	} else {
 		this.m_triggerPtr = ref.(*Trigger)
 		this.M_triggerPtr = ref.(*Trigger).GetUUID()
 	}
 }
 
 /** Remove reference Trigger **/
-func (this *EventData) RemoveTriggerPtr(ref interface{}){
+func (this *EventData) RemoveTriggerPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*Trigger)
 	if toDelete.GetUUID() == this.m_triggerPtr.GetUUID() {

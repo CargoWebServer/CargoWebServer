@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type Interface struct{
+type Interface struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,47 +15,46 @@ type Interface struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of RootElement **/
 	/** No members **/
 
 	/** members of Interface **/
-	M_name string
-	M_operation []*Operation
+	M_name              string
+	M_operation         []*Operation
 	m_implementationRef interface{}
 	/** If the ref is a string and not an object **/
 	M_implementationRef string
-	M_implementation Implementation
+	M_implementation    Implementation
 	M_implementationStr string
-
 
 	/** Associations **/
 	m_callableElementsPtr []CallableElement
 	/** If the ref is a string and not an object **/
 	M_callableElementsPtr []string
-	m_participantPtr []*Participant
+	m_participantPtr      []*Participant
 	/** If the ref is a string and not an object **/
 	M_participantPtr []string
-	m_lanePtr []*Lane
+	m_lanePtr        []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr    []string
 	m_definitionsPtr *Definitions
 	/** If the ref is a string and not an object **/
 	M_definitionsPtr string
@@ -62,34 +62,32 @@ type Interface struct{
 
 /** Xml parser for Interface **/
 type XsdInterface struct {
-	XMLName xml.Name	`xml:"interface"`
+	XMLName xml.Name `xml:"interface"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** RootElement **/
 
-
-	M_operation	[]*XsdOperation	`xml:"operation,omitempty"`
-	M_name	string	`xml:"name,attr"`
-	M_implementationRef	string	`xml:"implementationRef,attr"`
-
+	M_operation         []*XsdOperation `xml:"operation,omitempty"`
+	M_name              string          `xml:"name,attr"`
+	M_implementationRef string          `xml:"implementationRef,attr"`
 }
+
 /** UUID **/
-func (this *Interface) GetUUID() string{
+func (this *Interface) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *Interface) GetId() string{
+func (this *Interface) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *Interface) SetId(ref interface{}){
+func (this *Interface) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -97,16 +95,16 @@ func (this *Interface) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *Interface) GetOther() interface{}{
+func (this *Interface) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *Interface) SetOther(ref interface{}){
+func (this *Interface) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -114,12 +112,12 @@ func (this *Interface) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *Interface) GetExtensionElements() *ExtensionElements{
+func (this *Interface) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *Interface) SetExtensionElements(ref interface{}){
+func (this *Interface) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -127,16 +125,16 @@ func (this *Interface) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *Interface) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *Interface) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *Interface) SetExtensionDefinitions(ref interface{}){
+func (this *Interface) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -153,16 +151,16 @@ func (this *Interface) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *Interface) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *Interface) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *Interface) SetExtensionValues(ref interface{}){
+func (this *Interface) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -179,16 +177,16 @@ func (this *Interface) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *Interface) GetDocumentation() []*Documentation{
+func (this *Interface) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *Interface) SetDocumentation(ref interface{}){
+func (this *Interface) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -203,7 +201,7 @@ func (this *Interface) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *Interface) RemoveDocumentation(ref interface{}){
+func (this *Interface) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -216,12 +214,12 @@ func (this *Interface) RemoveDocumentation(ref interface{}){
 }
 
 /** Name **/
-func (this *Interface) GetName() string{
+func (this *Interface) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *Interface) SetName(ref interface{}){
+func (this *Interface) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -229,16 +227,16 @@ func (this *Interface) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** Operation **/
-func (this *Interface) GetOperation() []*Operation{
+func (this *Interface) GetOperation() []*Operation {
 	return this.M_operation
 }
 
 /** Init reference Operation **/
-func (this *Interface) SetOperation(ref interface{}){
+func (this *Interface) SetOperation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var operations []*Operation
-	for i:=0; i<len(this.M_operation); i++ {
+	for i := 0; i < len(this.M_operation); i++ {
 		if this.M_operation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			operations = append(operations, this.M_operation[i])
 		} else {
@@ -253,7 +251,7 @@ func (this *Interface) SetOperation(ref interface{}){
 }
 
 /** Remove reference Operation **/
-func (this *Interface) RemoveOperation(ref interface{}){
+func (this *Interface) RemoveOperation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	operation_ := make([]*Operation, 0)
@@ -266,16 +264,16 @@ func (this *Interface) RemoveOperation(ref interface{}){
 }
 
 /** ImplementationRef **/
-func (this *Interface) GetImplementationRef() interface{}{
+func (this *Interface) GetImplementationRef() interface{} {
 	return this.m_implementationRef
 }
 
 /** Init reference ImplementationRef **/
-func (this *Interface) SetImplementationRef(ref interface{}){
+func (this *Interface) SetImplementationRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_implementationRef = ref.(string)
-	}else{
+	} else {
 		this.m_implementationRef = ref.(interface{})
 	}
 }
@@ -283,12 +281,12 @@ func (this *Interface) SetImplementationRef(ref interface{}){
 /** Remove reference ImplementationRef **/
 
 /** Implementation **/
-func (this *Interface) GetImplementation() Implementation{
+func (this *Interface) GetImplementation() Implementation {
 	return this.M_implementation
 }
 
 /** Init reference Implementation **/
-func (this *Interface) SetImplementation(ref interface{}){
+func (this *Interface) SetImplementation(ref interface{}) {
 	this.NeedSave = true
 	this.M_implementation = ref.(Implementation)
 }
@@ -296,12 +294,12 @@ func (this *Interface) SetImplementation(ref interface{}){
 /** Remove reference Implementation **/
 
 /** ImplementationStr **/
-func (this *Interface) GetImplementationStr() string{
+func (this *Interface) GetImplementationStr() string {
 	return this.M_implementationStr
 }
 
 /** Init reference ImplementationStr **/
-func (this *Interface) SetImplementationStr(ref interface{}){
+func (this *Interface) SetImplementationStr(ref interface{}) {
 	this.NeedSave = true
 	this.M_implementationStr = ref.(string)
 }
@@ -309,21 +307,21 @@ func (this *Interface) SetImplementationStr(ref interface{}){
 /** Remove reference ImplementationStr **/
 
 /** CallableElements **/
-func (this *Interface) GetCallableElementsPtr() []CallableElement{
+func (this *Interface) GetCallableElementsPtr() []CallableElement {
 	return this.m_callableElementsPtr
 }
 
 /** Init reference CallableElements **/
-func (this *Interface) SetCallableElementsPtr(ref interface{}){
+func (this *Interface) SetCallableElementsPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_callableElementsPtr); i++ {
+		for i := 0; i < len(this.M_callableElementsPtr); i++ {
 			if this.M_callableElementsPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_callableElementsPtr = append(this.M_callableElementsPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCallableElementsPtr(ref)
 		this.m_callableElementsPtr = append(this.m_callableElementsPtr, ref.(CallableElement))
 		this.M_callableElementsPtr = append(this.M_callableElementsPtr, ref.(BaseElement).GetUUID())
@@ -331,7 +329,7 @@ func (this *Interface) SetCallableElementsPtr(ref interface{}){
 }
 
 /** Remove reference CallableElements **/
-func (this *Interface) RemoveCallableElementsPtr(ref interface{}){
+func (this *Interface) RemoveCallableElementsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	callableElementsPtr_ := make([]CallableElement, 0)
@@ -347,21 +345,21 @@ func (this *Interface) RemoveCallableElementsPtr(ref interface{}){
 }
 
 /** Participant **/
-func (this *Interface) GetParticipantPtr() []*Participant{
+func (this *Interface) GetParticipantPtr() []*Participant {
 	return this.m_participantPtr
 }
 
 /** Init reference Participant **/
-func (this *Interface) SetParticipantPtr(ref interface{}){
+func (this *Interface) SetParticipantPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_participantPtr); i++ {
+		for i := 0; i < len(this.M_participantPtr); i++ {
 			if this.M_participantPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_participantPtr = append(this.M_participantPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveParticipantPtr(ref)
 		this.m_participantPtr = append(this.m_participantPtr, ref.(*Participant))
 		this.M_participantPtr = append(this.M_participantPtr, ref.(BaseElement).GetUUID())
@@ -369,7 +367,7 @@ func (this *Interface) SetParticipantPtr(ref interface{}){
 }
 
 /** Remove reference Participant **/
-func (this *Interface) RemoveParticipantPtr(ref interface{}){
+func (this *Interface) RemoveParticipantPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	participantPtr_ := make([]*Participant, 0)
@@ -385,21 +383,21 @@ func (this *Interface) RemoveParticipantPtr(ref interface{}){
 }
 
 /** Lane **/
-func (this *Interface) GetLanePtr() []*Lane{
+func (this *Interface) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *Interface) SetLanePtr(ref interface{}){
+func (this *Interface) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -407,7 +405,7 @@ func (this *Interface) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *Interface) RemoveLanePtr(ref interface{}){
+func (this *Interface) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -423,21 +421,21 @@ func (this *Interface) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *Interface) GetOutgoingPtr() []*Association{
+func (this *Interface) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *Interface) SetOutgoingPtr(ref interface{}){
+func (this *Interface) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -445,7 +443,7 @@ func (this *Interface) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *Interface) RemoveOutgoingPtr(ref interface{}){
+func (this *Interface) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -461,21 +459,21 @@ func (this *Interface) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *Interface) GetIncomingPtr() []*Association{
+func (this *Interface) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *Interface) SetIncomingPtr(ref interface{}){
+func (this *Interface) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -483,7 +481,7 @@ func (this *Interface) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *Interface) RemoveIncomingPtr(ref interface{}){
+func (this *Interface) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -499,23 +497,23 @@ func (this *Interface) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Definitions **/
-func (this *Interface) GetDefinitionsPtr() *Definitions{
+func (this *Interface) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *Interface) SetDefinitionsPtr(ref interface{}){
+func (this *Interface) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *Interface) RemoveDefinitionsPtr(ref interface{}){
+func (this *Interface) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {

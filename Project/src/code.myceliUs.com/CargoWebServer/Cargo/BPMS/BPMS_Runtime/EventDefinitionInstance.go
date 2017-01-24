@@ -1,10 +1,11 @@
+//+build BPMN
 package BPMS_Runtime
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type EventDefinitionInstance struct{
+type EventDefinitionInstance struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,23 +15,22 @@ type EventDefinitionInstance struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Instance **/
-	M_id string
+	M_id            string
 	M_bpmnElementId string
-	M_participants []string
-	m_dataRef []*ItemAwareElementInstance
+	M_participants  []string
+	m_dataRef       []*ItemAwareElementInstance
 	/** If the ref is a string and not an object **/
-	M_dataRef []string
-	M_data []*ItemAwareElementInstance
+	M_dataRef    []string
+	M_data       []*ItemAwareElementInstance
 	m_logInfoRef []*LogInfo
 	/** If the ref is a string and not an object **/
 	M_logInfoRef []string
 
 	/** members of EventDefinitionInstance **/
 	M_eventDefinitionType EventDefinitionType
-
 
 	/** Associations **/
 	m_eventInstancePtr *EventInstance
@@ -40,27 +40,26 @@ type EventDefinitionInstance struct{
 
 /** Xml parser for EventDefinitionInstance **/
 type XsdEventDefinitionInstance struct {
-	XMLName xml.Name	`xml:"eventDefinitionInstance"`
+	XMLName xml.Name `xml:"eventDefinitionInstance"`
 	/** Instance **/
-	M_id	string	`xml:"id,attr"`
-	M_bpmnElementId	string	`xml:"bpmnElementId,attr"`
+	M_id            string `xml:"id,attr"`
+	M_bpmnElementId string `xml:"bpmnElementId,attr"`
 
-
-	M_eventDefinitionType	string	`xml:"eventDefinitionType,attr"`
-
+	M_eventDefinitionType string `xml:"eventDefinitionType,attr"`
 }
+
 /** UUID **/
-func (this *EventDefinitionInstance) GetUUID() string{
+func (this *EventDefinitionInstance) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *EventDefinitionInstance) GetId() string{
+func (this *EventDefinitionInstance) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *EventDefinitionInstance) SetId(ref interface{}){
+func (this *EventDefinitionInstance) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -68,12 +67,12 @@ func (this *EventDefinitionInstance) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** BpmnElementId **/
-func (this *EventDefinitionInstance) GetBpmnElementId() string{
+func (this *EventDefinitionInstance) GetBpmnElementId() string {
 	return this.M_bpmnElementId
 }
 
 /** Init reference BpmnElementId **/
-func (this *EventDefinitionInstance) SetBpmnElementId(ref interface{}){
+func (this *EventDefinitionInstance) SetBpmnElementId(ref interface{}) {
 	this.NeedSave = true
 	this.M_bpmnElementId = ref.(string)
 }
@@ -81,16 +80,16 @@ func (this *EventDefinitionInstance) SetBpmnElementId(ref interface{}){
 /** Remove reference BpmnElementId **/
 
 /** Participants **/
-func (this *EventDefinitionInstance) GetParticipants() []string{
+func (this *EventDefinitionInstance) GetParticipants() []string {
 	return this.M_participants
 }
 
 /** Init reference Participants **/
-func (this *EventDefinitionInstance) SetParticipants(ref interface{}){
+func (this *EventDefinitionInstance) SetParticipants(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var participantss []string
-	for i:=0; i<len(this.M_participants); i++ {
+	for i := 0; i < len(this.M_participants); i++ {
 		if this.M_participants[i] != ref.(string) {
 			participantss = append(participantss, this.M_participants[i])
 		} else {
@@ -107,21 +106,21 @@ func (this *EventDefinitionInstance) SetParticipants(ref interface{}){
 /** Remove reference Participants **/
 
 /** DataRef **/
-func (this *EventDefinitionInstance) GetDataRef() []*ItemAwareElementInstance{
+func (this *EventDefinitionInstance) GetDataRef() []*ItemAwareElementInstance {
 	return this.m_dataRef
 }
 
 /** Init reference DataRef **/
-func (this *EventDefinitionInstance) SetDataRef(ref interface{}){
+func (this *EventDefinitionInstance) SetDataRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_dataRef); i++ {
+		for i := 0; i < len(this.M_dataRef); i++ {
 			if this.M_dataRef[i] == refStr {
 				return
 			}
 		}
 		this.M_dataRef = append(this.M_dataRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveDataRef(ref)
 		this.m_dataRef = append(this.m_dataRef, ref.(*ItemAwareElementInstance))
 		this.M_dataRef = append(this.M_dataRef, ref.(*ItemAwareElementInstance).GetUUID())
@@ -129,7 +128,7 @@ func (this *EventDefinitionInstance) SetDataRef(ref interface{}){
 }
 
 /** Remove reference DataRef **/
-func (this *EventDefinitionInstance) RemoveDataRef(ref interface{}){
+func (this *EventDefinitionInstance) RemoveDataRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*ItemAwareElementInstance)
 	dataRef_ := make([]*ItemAwareElementInstance, 0)
@@ -145,16 +144,16 @@ func (this *EventDefinitionInstance) RemoveDataRef(ref interface{}){
 }
 
 /** Data **/
-func (this *EventDefinitionInstance) GetData() []*ItemAwareElementInstance{
+func (this *EventDefinitionInstance) GetData() []*ItemAwareElementInstance {
 	return this.M_data
 }
 
 /** Init reference Data **/
-func (this *EventDefinitionInstance) SetData(ref interface{}){
+func (this *EventDefinitionInstance) SetData(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var datas []*ItemAwareElementInstance
-	for i:=0; i<len(this.M_data); i++ {
+	for i := 0; i < len(this.M_data); i++ {
 		if this.M_data[i].GetUUID() != ref.(*ItemAwareElementInstance).GetUUID() {
 			datas = append(datas, this.M_data[i])
 		} else {
@@ -169,7 +168,7 @@ func (this *EventDefinitionInstance) SetData(ref interface{}){
 }
 
 /** Remove reference Data **/
-func (this *EventDefinitionInstance) RemoveData(ref interface{}){
+func (this *EventDefinitionInstance) RemoveData(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(ItemAwareElementInstance)
 	data_ := make([]*ItemAwareElementInstance, 0)
@@ -182,21 +181,21 @@ func (this *EventDefinitionInstance) RemoveData(ref interface{}){
 }
 
 /** LogInfoRef **/
-func (this *EventDefinitionInstance) GetLogInfoRef() []*LogInfo{
+func (this *EventDefinitionInstance) GetLogInfoRef() []*LogInfo {
 	return this.m_logInfoRef
 }
 
 /** Init reference LogInfoRef **/
-func (this *EventDefinitionInstance) SetLogInfoRef(ref interface{}){
+func (this *EventDefinitionInstance) SetLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_logInfoRef); i++ {
+		for i := 0; i < len(this.M_logInfoRef); i++ {
 			if this.M_logInfoRef[i] == refStr {
 				return
 			}
 		}
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveLogInfoRef(ref)
 		this.m_logInfoRef = append(this.m_logInfoRef, ref.(*LogInfo))
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(*LogInfo).GetUUID())
@@ -204,7 +203,7 @@ func (this *EventDefinitionInstance) SetLogInfoRef(ref interface{}){
 }
 
 /** Remove reference LogInfoRef **/
-func (this *EventDefinitionInstance) RemoveLogInfoRef(ref interface{}){
+func (this *EventDefinitionInstance) RemoveLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*LogInfo)
 	logInfoRef_ := make([]*LogInfo, 0)
@@ -220,12 +219,12 @@ func (this *EventDefinitionInstance) RemoveLogInfoRef(ref interface{}){
 }
 
 /** EventDefinitionType **/
-func (this *EventDefinitionInstance) GetEventDefinitionType() EventDefinitionType{
+func (this *EventDefinitionInstance) GetEventDefinitionType() EventDefinitionType {
 	return this.M_eventDefinitionType
 }
 
 /** Init reference EventDefinitionType **/
-func (this *EventDefinitionInstance) SetEventDefinitionType(ref interface{}){
+func (this *EventDefinitionInstance) SetEventDefinitionType(ref interface{}) {
 	this.NeedSave = true
 	this.M_eventDefinitionType = ref.(EventDefinitionType)
 }
@@ -233,23 +232,23 @@ func (this *EventDefinitionInstance) SetEventDefinitionType(ref interface{}){
 /** Remove reference EventDefinitionType **/
 
 /** EventInstance **/
-func (this *EventDefinitionInstance) GetEventInstancePtr() *EventInstance{
+func (this *EventDefinitionInstance) GetEventInstancePtr() *EventInstance {
 	return this.m_eventInstancePtr
 }
 
 /** Init reference EventInstance **/
-func (this *EventDefinitionInstance) SetEventInstancePtr(ref interface{}){
+func (this *EventDefinitionInstance) SetEventInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_eventInstancePtr = ref.(string)
-	}else{
+	} else {
 		this.m_eventInstancePtr = ref.(*EventInstance)
 		this.M_eventInstancePtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference EventInstance **/
-func (this *EventDefinitionInstance) RemoveEventInstancePtr(ref interface{}){
+func (this *EventDefinitionInstance) RemoveEventInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_eventInstancePtr.GetUUID() {

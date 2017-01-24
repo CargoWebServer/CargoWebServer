@@ -1,10 +1,11 @@
+//+build BPMN
 package BPMS_Runtime
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type Runtimes struct{
+type Runtimes struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,44 +15,43 @@ type Runtimes struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Runtimes **/
-	M_id string
-	M_name string
-	M_version string
-	M_definitions []*DefinitionsInstance
-	M_exceptions []*Exception
-	M_triggers []*Trigger
+	M_id               string
+	M_name             string
+	M_version          string
+	M_definitions      []*DefinitionsInstance
+	M_exceptions       []*Exception
+	M_triggers         []*Trigger
 	M_correlationInfos []*CorrelationInfo
-	M_logInfos []*LogInfo
-
+	M_logInfos         []*LogInfo
 }
 
 /** Xml parser for Runtimes **/
 type XsdRuntimes struct {
-	XMLName xml.Name	`xml:"runtimes"`
-	M_definitions	[]*XsdDefinitionsInstance	`xml:"definitions,omitempty"`
-	M_exceptions	[]*XsdException	`xml:"exceptions,omitempty"`
-	M_triggers	[]*XsdTrigger	`xml:"triggers,omitempty"`
-	M_correlationInfos	[]*XsdCorrelationInfo	`xml:"correlationInfos,omitempty"`
-	M_id	string	`xml:"id,attr"`
-	M_name	string	`xml:"name,attr"`
-	M_version	string	`xml:"version,attr"`
-
+	XMLName            xml.Name                  `xml:"runtimes"`
+	M_definitions      []*XsdDefinitionsInstance `xml:"definitions,omitempty"`
+	M_exceptions       []*XsdException           `xml:"exceptions,omitempty"`
+	M_triggers         []*XsdTrigger             `xml:"triggers,omitempty"`
+	M_correlationInfos []*XsdCorrelationInfo     `xml:"correlationInfos,omitempty"`
+	M_id               string                    `xml:"id,attr"`
+	M_name             string                    `xml:"name,attr"`
+	M_version          string                    `xml:"version,attr"`
 }
+
 /** UUID **/
-func (this *Runtimes) GetUUID() string{
+func (this *Runtimes) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *Runtimes) GetId() string{
+func (this *Runtimes) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *Runtimes) SetId(ref interface{}){
+func (this *Runtimes) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -59,12 +59,12 @@ func (this *Runtimes) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Name **/
-func (this *Runtimes) GetName() string{
+func (this *Runtimes) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *Runtimes) SetName(ref interface{}){
+func (this *Runtimes) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -72,12 +72,12 @@ func (this *Runtimes) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** Version **/
-func (this *Runtimes) GetVersion() string{
+func (this *Runtimes) GetVersion() string {
 	return this.M_version
 }
 
 /** Init reference Version **/
-func (this *Runtimes) SetVersion(ref interface{}){
+func (this *Runtimes) SetVersion(ref interface{}) {
 	this.NeedSave = true
 	this.M_version = ref.(string)
 }
@@ -85,16 +85,16 @@ func (this *Runtimes) SetVersion(ref interface{}){
 /** Remove reference Version **/
 
 /** Definitions **/
-func (this *Runtimes) GetDefinitions() []*DefinitionsInstance{
+func (this *Runtimes) GetDefinitions() []*DefinitionsInstance {
 	return this.M_definitions
 }
 
 /** Init reference Definitions **/
-func (this *Runtimes) SetDefinitions(ref interface{}){
+func (this *Runtimes) SetDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var definitionss []*DefinitionsInstance
-	for i:=0; i<len(this.M_definitions); i++ {
+	for i := 0; i < len(this.M_definitions); i++ {
 		if this.M_definitions[i].GetUUID() != ref.(Instance).GetUUID() {
 			definitionss = append(definitionss, this.M_definitions[i])
 		} else {
@@ -109,7 +109,7 @@ func (this *Runtimes) SetDefinitions(ref interface{}){
 }
 
 /** Remove reference Definitions **/
-func (this *Runtimes) RemoveDefinitions(ref interface{}){
+func (this *Runtimes) RemoveDefinitions(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	definitions_ := make([]*DefinitionsInstance, 0)
@@ -122,16 +122,16 @@ func (this *Runtimes) RemoveDefinitions(ref interface{}){
 }
 
 /** Exceptions **/
-func (this *Runtimes) GetExceptions() []*Exception{
+func (this *Runtimes) GetExceptions() []*Exception {
 	return this.M_exceptions
 }
 
 /** Init reference Exceptions **/
-func (this *Runtimes) SetExceptions(ref interface{}){
+func (this *Runtimes) SetExceptions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var exceptionss []*Exception
-	for i:=0; i<len(this.M_exceptions); i++ {
+	for i := 0; i < len(this.M_exceptions); i++ {
 		if this.M_exceptions[i].GetUUID() != ref.(*Exception).GetUUID() {
 			exceptionss = append(exceptionss, this.M_exceptions[i])
 		} else {
@@ -146,7 +146,7 @@ func (this *Runtimes) SetExceptions(ref interface{}){
 }
 
 /** Remove reference Exceptions **/
-func (this *Runtimes) RemoveExceptions(ref interface{}){
+func (this *Runtimes) RemoveExceptions(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Exception)
 	exceptions_ := make([]*Exception, 0)
@@ -159,16 +159,16 @@ func (this *Runtimes) RemoveExceptions(ref interface{}){
 }
 
 /** Triggers **/
-func (this *Runtimes) GetTriggers() []*Trigger{
+func (this *Runtimes) GetTriggers() []*Trigger {
 	return this.M_triggers
 }
 
 /** Init reference Triggers **/
-func (this *Runtimes) SetTriggers(ref interface{}){
+func (this *Runtimes) SetTriggers(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var triggerss []*Trigger
-	for i:=0; i<len(this.M_triggers); i++ {
+	for i := 0; i < len(this.M_triggers); i++ {
 		if this.M_triggers[i].GetUUID() != ref.(*Trigger).GetUUID() {
 			triggerss = append(triggerss, this.M_triggers[i])
 		} else {
@@ -183,7 +183,7 @@ func (this *Runtimes) SetTriggers(ref interface{}){
 }
 
 /** Remove reference Triggers **/
-func (this *Runtimes) RemoveTriggers(ref interface{}){
+func (this *Runtimes) RemoveTriggers(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Trigger)
 	triggers_ := make([]*Trigger, 0)
@@ -196,16 +196,16 @@ func (this *Runtimes) RemoveTriggers(ref interface{}){
 }
 
 /** CorrelationInfos **/
-func (this *Runtimes) GetCorrelationInfos() []*CorrelationInfo{
+func (this *Runtimes) GetCorrelationInfos() []*CorrelationInfo {
 	return this.M_correlationInfos
 }
 
 /** Init reference CorrelationInfos **/
-func (this *Runtimes) SetCorrelationInfos(ref interface{}){
+func (this *Runtimes) SetCorrelationInfos(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var correlationInfoss []*CorrelationInfo
-	for i:=0; i<len(this.M_correlationInfos); i++ {
+	for i := 0; i < len(this.M_correlationInfos); i++ {
 		if this.M_correlationInfos[i].GetUUID() != ref.(*CorrelationInfo).GetUUID() {
 			correlationInfoss = append(correlationInfoss, this.M_correlationInfos[i])
 		} else {
@@ -220,7 +220,7 @@ func (this *Runtimes) SetCorrelationInfos(ref interface{}){
 }
 
 /** Remove reference CorrelationInfos **/
-func (this *Runtimes) RemoveCorrelationInfos(ref interface{}){
+func (this *Runtimes) RemoveCorrelationInfos(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(CorrelationInfo)
 	correlationInfos_ := make([]*CorrelationInfo, 0)
@@ -233,16 +233,16 @@ func (this *Runtimes) RemoveCorrelationInfos(ref interface{}){
 }
 
 /** LogInfos **/
-func (this *Runtimes) GetLogInfos() []*LogInfo{
+func (this *Runtimes) GetLogInfos() []*LogInfo {
 	return this.M_logInfos
 }
 
 /** Init reference LogInfos **/
-func (this *Runtimes) SetLogInfos(ref interface{}){
+func (this *Runtimes) SetLogInfos(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var logInfoss []*LogInfo
-	for i:=0; i<len(this.M_logInfos); i++ {
+	for i := 0; i < len(this.M_logInfos); i++ {
 		if this.M_logInfos[i].GetUUID() != ref.(*LogInfo).GetUUID() {
 			logInfoss = append(logInfoss, this.M_logInfos[i])
 		} else {
@@ -257,7 +257,7 @@ func (this *Runtimes) SetLogInfos(ref interface{}){
 }
 
 /** Remove reference LogInfos **/
-func (this *Runtimes) RemoveLogInfos(ref interface{}){
+func (this *Runtimes) RemoveLogInfos(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(LogInfo)
 	logInfos_ := make([]*LogInfo, 0)

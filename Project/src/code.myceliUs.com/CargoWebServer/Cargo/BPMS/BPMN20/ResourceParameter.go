@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type ResourceParameter struct{
+type ResourceParameter struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,36 +15,35 @@ type ResourceParameter struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of ResourceParameter **/
-	M_name string
+	M_name       string
 	M_isRequired bool
-	m_type *ItemDefinition
+	m_type       *ItemDefinition
 	/** If the ref is a string and not an object **/
 	M_type string
-
 
 	/** Associations **/
 	m_resourcePtr *Resource
 	/** If the ref is a string and not an object **/
-	M_resourcePtr string
+	M_resourcePtr                 string
 	m_resourceParameterBindingPtr []*ResourceParameterBinding
 	/** If the ref is a string and not an object **/
 	M_resourceParameterBindingPtr []string
-	m_lanePtr []*Lane
+	m_lanePtr                     []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -54,31 +54,30 @@ type ResourceParameter struct{
 
 /** Xml parser for ResourceParameter **/
 type XsdResourceParameter struct {
-	XMLName xml.Name	`xml:"resourceParameter"`
+	XMLName xml.Name `xml:"resourceParameter"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_name	string	`xml:"name,attr"`
-	M_type	string	`xml:"type,attr"`
-	M_isRequired	bool	`xml:"isRequired,attr"`
-
+	M_name       string `xml:"name,attr"`
+	M_type       string `xml:"type,attr"`
+	M_isRequired bool   `xml:"isRequired,attr"`
 }
+
 /** UUID **/
-func (this *ResourceParameter) GetUUID() string{
+func (this *ResourceParameter) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *ResourceParameter) GetId() string{
+func (this *ResourceParameter) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *ResourceParameter) SetId(ref interface{}){
+func (this *ResourceParameter) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -86,16 +85,16 @@ func (this *ResourceParameter) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *ResourceParameter) GetOther() interface{}{
+func (this *ResourceParameter) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *ResourceParameter) SetOther(ref interface{}){
+func (this *ResourceParameter) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -103,12 +102,12 @@ func (this *ResourceParameter) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *ResourceParameter) GetExtensionElements() *ExtensionElements{
+func (this *ResourceParameter) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *ResourceParameter) SetExtensionElements(ref interface{}){
+func (this *ResourceParameter) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -116,16 +115,16 @@ func (this *ResourceParameter) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *ResourceParameter) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *ResourceParameter) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *ResourceParameter) SetExtensionDefinitions(ref interface{}){
+func (this *ResourceParameter) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -142,16 +141,16 @@ func (this *ResourceParameter) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *ResourceParameter) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *ResourceParameter) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *ResourceParameter) SetExtensionValues(ref interface{}){
+func (this *ResourceParameter) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -168,16 +167,16 @@ func (this *ResourceParameter) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *ResourceParameter) GetDocumentation() []*Documentation{
+func (this *ResourceParameter) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *ResourceParameter) SetDocumentation(ref interface{}){
+func (this *ResourceParameter) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -192,7 +191,7 @@ func (this *ResourceParameter) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *ResourceParameter) RemoveDocumentation(ref interface{}){
+func (this *ResourceParameter) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -205,12 +204,12 @@ func (this *ResourceParameter) RemoveDocumentation(ref interface{}){
 }
 
 /** Name **/
-func (this *ResourceParameter) GetName() string{
+func (this *ResourceParameter) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *ResourceParameter) SetName(ref interface{}){
+func (this *ResourceParameter) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -218,12 +217,12 @@ func (this *ResourceParameter) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** IsRequired **/
-func (this *ResourceParameter) IsRequired() bool{
+func (this *ResourceParameter) IsRequired() bool {
 	return this.M_isRequired
 }
 
 /** Init reference IsRequired **/
-func (this *ResourceParameter) SetIsRequired(ref interface{}){
+func (this *ResourceParameter) SetIsRequired(ref interface{}) {
 	this.NeedSave = true
 	this.M_isRequired = ref.(bool)
 }
@@ -231,23 +230,23 @@ func (this *ResourceParameter) SetIsRequired(ref interface{}){
 /** Remove reference IsRequired **/
 
 /** Type **/
-func (this *ResourceParameter) GetType() *ItemDefinition{
+func (this *ResourceParameter) GetType() *ItemDefinition {
 	return this.m_type
 }
 
 /** Init reference Type **/
-func (this *ResourceParameter) SetType(ref interface{}){
+func (this *ResourceParameter) SetType(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_type = ref.(string)
-	}else{
+	} else {
 		this.m_type = ref.(*ItemDefinition)
 		this.M_type = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Type **/
-func (this *ResourceParameter) RemoveType(ref interface{}){
+func (this *ResourceParameter) RemoveType(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_type.GetUUID() {
@@ -257,23 +256,23 @@ func (this *ResourceParameter) RemoveType(ref interface{}){
 }
 
 /** Resource **/
-func (this *ResourceParameter) GetResourcePtr() *Resource{
+func (this *ResourceParameter) GetResourcePtr() *Resource {
 	return this.m_resourcePtr
 }
 
 /** Init reference Resource **/
-func (this *ResourceParameter) SetResourcePtr(ref interface{}){
+func (this *ResourceParameter) SetResourcePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_resourcePtr = ref.(string)
-	}else{
+	} else {
 		this.m_resourcePtr = ref.(*Resource)
 		this.M_resourcePtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Resource **/
-func (this *ResourceParameter) RemoveResourcePtr(ref interface{}){
+func (this *ResourceParameter) RemoveResourcePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_resourcePtr.GetUUID() {
@@ -283,21 +282,21 @@ func (this *ResourceParameter) RemoveResourcePtr(ref interface{}){
 }
 
 /** ResourceParameterBinding **/
-func (this *ResourceParameter) GetResourceParameterBindingPtr() []*ResourceParameterBinding{
+func (this *ResourceParameter) GetResourceParameterBindingPtr() []*ResourceParameterBinding {
 	return this.m_resourceParameterBindingPtr
 }
 
 /** Init reference ResourceParameterBinding **/
-func (this *ResourceParameter) SetResourceParameterBindingPtr(ref interface{}){
+func (this *ResourceParameter) SetResourceParameterBindingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_resourceParameterBindingPtr); i++ {
+		for i := 0; i < len(this.M_resourceParameterBindingPtr); i++ {
 			if this.M_resourceParameterBindingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_resourceParameterBindingPtr = append(this.M_resourceParameterBindingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveResourceParameterBindingPtr(ref)
 		this.m_resourceParameterBindingPtr = append(this.m_resourceParameterBindingPtr, ref.(*ResourceParameterBinding))
 		this.M_resourceParameterBindingPtr = append(this.M_resourceParameterBindingPtr, ref.(BaseElement).GetUUID())
@@ -305,7 +304,7 @@ func (this *ResourceParameter) SetResourceParameterBindingPtr(ref interface{}){
 }
 
 /** Remove reference ResourceParameterBinding **/
-func (this *ResourceParameter) RemoveResourceParameterBindingPtr(ref interface{}){
+func (this *ResourceParameter) RemoveResourceParameterBindingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	resourceParameterBindingPtr_ := make([]*ResourceParameterBinding, 0)
@@ -321,21 +320,21 @@ func (this *ResourceParameter) RemoveResourceParameterBindingPtr(ref interface{}
 }
 
 /** Lane **/
-func (this *ResourceParameter) GetLanePtr() []*Lane{
+func (this *ResourceParameter) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *ResourceParameter) SetLanePtr(ref interface{}){
+func (this *ResourceParameter) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -343,7 +342,7 @@ func (this *ResourceParameter) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *ResourceParameter) RemoveLanePtr(ref interface{}){
+func (this *ResourceParameter) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -359,21 +358,21 @@ func (this *ResourceParameter) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *ResourceParameter) GetOutgoingPtr() []*Association{
+func (this *ResourceParameter) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *ResourceParameter) SetOutgoingPtr(ref interface{}){
+func (this *ResourceParameter) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -381,7 +380,7 @@ func (this *ResourceParameter) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *ResourceParameter) RemoveOutgoingPtr(ref interface{}){
+func (this *ResourceParameter) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -397,21 +396,21 @@ func (this *ResourceParameter) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *ResourceParameter) GetIncomingPtr() []*Association{
+func (this *ResourceParameter) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *ResourceParameter) SetIncomingPtr(ref interface{}){
+func (this *ResourceParameter) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -419,7 +418,7 @@ func (this *ResourceParameter) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *ResourceParameter) RemoveIncomingPtr(ref interface{}){
+func (this *ResourceParameter) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)

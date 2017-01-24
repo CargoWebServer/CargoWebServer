@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type SignalEventDefinition struct{
+type SignalEventDefinition struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,17 +15,17 @@ type SignalEventDefinition struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of RootElement **/
 	/** No members **/
@@ -37,26 +38,25 @@ type SignalEventDefinition struct{
 	/** If the ref is a string and not an object **/
 	M_signalRef string
 
-
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr    []string
 	m_definitionsPtr *Definitions
 	/** If the ref is a string and not an object **/
 	M_definitionsPtr string
-	m_throwEventPtr []ThrowEvent
+	m_throwEventPtr  []ThrowEvent
 	/** If the ref is a string and not an object **/
 	M_throwEventPtr []string
 	m_catchEventPtr []CatchEvent
 	/** If the ref is a string and not an object **/
-	M_catchEventPtr []string
+	M_catchEventPtr                       []string
 	m_multiInstanceLoopCharacteristicsPtr []*MultiInstanceLoopCharacteristics
 	/** If the ref is a string and not an object **/
 	M_multiInstanceLoopCharacteristicsPtr []string
@@ -64,35 +64,32 @@ type SignalEventDefinition struct{
 
 /** Xml parser for SignalEventDefinition **/
 type XsdSignalEventDefinition struct {
-	XMLName xml.Name	`xml:"signalEventDefinition"`
+	XMLName xml.Name `xml:"signalEventDefinition"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** RootElement **/
 
-
 	/** EventDefinition **/
 
-
-	M_signalRef	string	`xml:"signalRef,attr"`
-
+	M_signalRef string `xml:"signalRef,attr"`
 }
+
 /** UUID **/
-func (this *SignalEventDefinition) GetUUID() string{
+func (this *SignalEventDefinition) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *SignalEventDefinition) GetId() string{
+func (this *SignalEventDefinition) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *SignalEventDefinition) SetId(ref interface{}){
+func (this *SignalEventDefinition) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -100,16 +97,16 @@ func (this *SignalEventDefinition) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *SignalEventDefinition) GetOther() interface{}{
+func (this *SignalEventDefinition) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *SignalEventDefinition) SetOther(ref interface{}){
+func (this *SignalEventDefinition) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -117,12 +114,12 @@ func (this *SignalEventDefinition) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *SignalEventDefinition) GetExtensionElements() *ExtensionElements{
+func (this *SignalEventDefinition) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *SignalEventDefinition) SetExtensionElements(ref interface{}){
+func (this *SignalEventDefinition) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -130,16 +127,16 @@ func (this *SignalEventDefinition) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *SignalEventDefinition) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *SignalEventDefinition) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *SignalEventDefinition) SetExtensionDefinitions(ref interface{}){
+func (this *SignalEventDefinition) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -156,16 +153,16 @@ func (this *SignalEventDefinition) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *SignalEventDefinition) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *SignalEventDefinition) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *SignalEventDefinition) SetExtensionValues(ref interface{}){
+func (this *SignalEventDefinition) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -182,16 +179,16 @@ func (this *SignalEventDefinition) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *SignalEventDefinition) GetDocumentation() []*Documentation{
+func (this *SignalEventDefinition) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *SignalEventDefinition) SetDocumentation(ref interface{}){
+func (this *SignalEventDefinition) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -206,7 +203,7 @@ func (this *SignalEventDefinition) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *SignalEventDefinition) RemoveDocumentation(ref interface{}){
+func (this *SignalEventDefinition) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -219,23 +216,23 @@ func (this *SignalEventDefinition) RemoveDocumentation(ref interface{}){
 }
 
 /** SignalRef **/
-func (this *SignalEventDefinition) GetSignalRef() *Signal{
+func (this *SignalEventDefinition) GetSignalRef() *Signal {
 	return this.m_signalRef
 }
 
 /** Init reference SignalRef **/
-func (this *SignalEventDefinition) SetSignalRef(ref interface{}){
+func (this *SignalEventDefinition) SetSignalRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_signalRef = ref.(string)
-	}else{
+	} else {
 		this.m_signalRef = ref.(*Signal)
 		this.M_signalRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference SignalRef **/
-func (this *SignalEventDefinition) RemoveSignalRef(ref interface{}){
+func (this *SignalEventDefinition) RemoveSignalRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_signalRef.GetUUID() {
@@ -245,21 +242,21 @@ func (this *SignalEventDefinition) RemoveSignalRef(ref interface{}){
 }
 
 /** Lane **/
-func (this *SignalEventDefinition) GetLanePtr() []*Lane{
+func (this *SignalEventDefinition) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *SignalEventDefinition) SetLanePtr(ref interface{}){
+func (this *SignalEventDefinition) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -267,7 +264,7 @@ func (this *SignalEventDefinition) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *SignalEventDefinition) RemoveLanePtr(ref interface{}){
+func (this *SignalEventDefinition) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -283,21 +280,21 @@ func (this *SignalEventDefinition) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *SignalEventDefinition) GetOutgoingPtr() []*Association{
+func (this *SignalEventDefinition) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *SignalEventDefinition) SetOutgoingPtr(ref interface{}){
+func (this *SignalEventDefinition) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -305,7 +302,7 @@ func (this *SignalEventDefinition) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *SignalEventDefinition) RemoveOutgoingPtr(ref interface{}){
+func (this *SignalEventDefinition) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -321,21 +318,21 @@ func (this *SignalEventDefinition) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *SignalEventDefinition) GetIncomingPtr() []*Association{
+func (this *SignalEventDefinition) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *SignalEventDefinition) SetIncomingPtr(ref interface{}){
+func (this *SignalEventDefinition) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -343,7 +340,7 @@ func (this *SignalEventDefinition) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *SignalEventDefinition) RemoveIncomingPtr(ref interface{}){
+func (this *SignalEventDefinition) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -359,23 +356,23 @@ func (this *SignalEventDefinition) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Definitions **/
-func (this *SignalEventDefinition) GetDefinitionsPtr() *Definitions{
+func (this *SignalEventDefinition) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *SignalEventDefinition) SetDefinitionsPtr(ref interface{}){
+func (this *SignalEventDefinition) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *SignalEventDefinition) RemoveDefinitionsPtr(ref interface{}){
+func (this *SignalEventDefinition) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {
@@ -385,21 +382,21 @@ func (this *SignalEventDefinition) RemoveDefinitionsPtr(ref interface{}){
 }
 
 /** ThrowEvent **/
-func (this *SignalEventDefinition) GetThrowEventPtr() []ThrowEvent{
+func (this *SignalEventDefinition) GetThrowEventPtr() []ThrowEvent {
 	return this.m_throwEventPtr
 }
 
 /** Init reference ThrowEvent **/
-func (this *SignalEventDefinition) SetThrowEventPtr(ref interface{}){
+func (this *SignalEventDefinition) SetThrowEventPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_throwEventPtr); i++ {
+		for i := 0; i < len(this.M_throwEventPtr); i++ {
 			if this.M_throwEventPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_throwEventPtr = append(this.M_throwEventPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveThrowEventPtr(ref)
 		this.m_throwEventPtr = append(this.m_throwEventPtr, ref.(ThrowEvent))
 		this.M_throwEventPtr = append(this.M_throwEventPtr, ref.(BaseElement).GetUUID())
@@ -407,7 +404,7 @@ func (this *SignalEventDefinition) SetThrowEventPtr(ref interface{}){
 }
 
 /** Remove reference ThrowEvent **/
-func (this *SignalEventDefinition) RemoveThrowEventPtr(ref interface{}){
+func (this *SignalEventDefinition) RemoveThrowEventPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	throwEventPtr_ := make([]ThrowEvent, 0)
@@ -423,21 +420,21 @@ func (this *SignalEventDefinition) RemoveThrowEventPtr(ref interface{}){
 }
 
 /** CatchEvent **/
-func (this *SignalEventDefinition) GetCatchEventPtr() []CatchEvent{
+func (this *SignalEventDefinition) GetCatchEventPtr() []CatchEvent {
 	return this.m_catchEventPtr
 }
 
 /** Init reference CatchEvent **/
-func (this *SignalEventDefinition) SetCatchEventPtr(ref interface{}){
+func (this *SignalEventDefinition) SetCatchEventPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_catchEventPtr); i++ {
+		for i := 0; i < len(this.M_catchEventPtr); i++ {
 			if this.M_catchEventPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_catchEventPtr = append(this.M_catchEventPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCatchEventPtr(ref)
 		this.m_catchEventPtr = append(this.m_catchEventPtr, ref.(CatchEvent))
 		this.M_catchEventPtr = append(this.M_catchEventPtr, ref.(BaseElement).GetUUID())
@@ -445,7 +442,7 @@ func (this *SignalEventDefinition) SetCatchEventPtr(ref interface{}){
 }
 
 /** Remove reference CatchEvent **/
-func (this *SignalEventDefinition) RemoveCatchEventPtr(ref interface{}){
+func (this *SignalEventDefinition) RemoveCatchEventPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	catchEventPtr_ := make([]CatchEvent, 0)
@@ -461,21 +458,21 @@ func (this *SignalEventDefinition) RemoveCatchEventPtr(ref interface{}){
 }
 
 /** MultiInstanceLoopCharacteristics **/
-func (this *SignalEventDefinition) GetMultiInstanceLoopCharacteristicsPtr() []*MultiInstanceLoopCharacteristics{
+func (this *SignalEventDefinition) GetMultiInstanceLoopCharacteristicsPtr() []*MultiInstanceLoopCharacteristics {
 	return this.m_multiInstanceLoopCharacteristicsPtr
 }
 
 /** Init reference MultiInstanceLoopCharacteristics **/
-func (this *SignalEventDefinition) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *SignalEventDefinition) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_multiInstanceLoopCharacteristicsPtr); i++ {
+		for i := 0; i < len(this.M_multiInstanceLoopCharacteristicsPtr); i++ {
 			if this.M_multiInstanceLoopCharacteristicsPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_multiInstanceLoopCharacteristicsPtr = append(this.M_multiInstanceLoopCharacteristicsPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveMultiInstanceLoopCharacteristicsPtr(ref)
 		this.m_multiInstanceLoopCharacteristicsPtr = append(this.m_multiInstanceLoopCharacteristicsPtr, ref.(*MultiInstanceLoopCharacteristics))
 		this.M_multiInstanceLoopCharacteristicsPtr = append(this.M_multiInstanceLoopCharacteristicsPtr, ref.(BaseElement).GetUUID())
@@ -483,7 +480,7 @@ func (this *SignalEventDefinition) SetMultiInstanceLoopCharacteristicsPtr(ref in
 }
 
 /** Remove reference MultiInstanceLoopCharacteristics **/
-func (this *SignalEventDefinition) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *SignalEventDefinition) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	multiInstanceLoopCharacteristicsPtr_ := make([]*MultiInstanceLoopCharacteristics, 0)

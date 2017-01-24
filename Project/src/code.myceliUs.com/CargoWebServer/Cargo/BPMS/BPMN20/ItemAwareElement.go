@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type ItemAwareElement interface{
+type ItemAwareElement interface {
 	/** Method of ItemAwareElement **/
 
 	/** UUID **/
@@ -11,5 +12,4 @@ type ItemAwareElement interface{
 
 	/** DataState **/
 	GetDataState() *DataState
-
 }

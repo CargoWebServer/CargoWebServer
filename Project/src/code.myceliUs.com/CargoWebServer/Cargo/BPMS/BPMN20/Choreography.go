@@ -1,7 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type Choreography interface{
+type Choreography interface {
 	/** UUID **/
 	GetUUID() string
-
 }

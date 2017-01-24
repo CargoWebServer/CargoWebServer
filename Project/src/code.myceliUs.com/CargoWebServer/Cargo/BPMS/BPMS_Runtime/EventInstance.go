@@ -1,10 +1,11 @@
+//+build BPMN
 package BPMS_Runtime
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type EventInstance struct{
+type EventInstance struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,75 +15,72 @@ type EventInstance struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Instance **/
-	M_id string
+	M_id            string
 	M_bpmnElementId string
-	M_participants []string
-	m_dataRef []*ItemAwareElementInstance
+	M_participants  []string
+	m_dataRef       []*ItemAwareElementInstance
 	/** If the ref is a string and not an object **/
-	M_dataRef []string
-	M_data []*ItemAwareElementInstance
+	M_dataRef    []string
+	M_data       []*ItemAwareElementInstance
 	m_logInfoRef []*LogInfo
 	/** If the ref is a string and not an object **/
 	M_logInfoRef []string
 
 	/** members of FlowNodeInstance **/
-	M_flowNodeType FlowNodeType
+	M_flowNodeType   FlowNodeType
 	M_lifecycleState LifecycleState
-	m_inputRef []*ConnectingObject
+	m_inputRef       []*ConnectingObject
 	/** If the ref is a string and not an object **/
-	M_inputRef []string
+	M_inputRef  []string
 	m_outputRef []*ConnectingObject
 	/** If the ref is a string and not an object **/
 	M_outputRef []string
 
 	/** members of EventInstance **/
-	M_eventType EventType
+	M_eventType               EventType
 	M_eventDefintionInstances []*EventDefinitionInstance
-
 
 	/** Associations **/
 	m_SubprocessInstancePtr *SubprocessInstance
 	/** If the ref is a string and not an object **/
 	M_SubprocessInstancePtr string
-	m_processInstancePtr *ProcessInstance
+	m_processInstancePtr    *ProcessInstance
 	/** If the ref is a string and not an object **/
 	M_processInstancePtr string
 }
 
 /** Xml parser for EventInstance **/
 type XsdEventInstance struct {
-	XMLName xml.Name	`xml:"eventInstance"`
+	XMLName xml.Name `xml:"eventInstance"`
 	/** Instance **/
-	M_id	string	`xml:"id,attr"`
-	M_bpmnElementId	string	`xml:"bpmnElementId,attr"`
-
+	M_id            string `xml:"id,attr"`
+	M_bpmnElementId string `xml:"bpmnElementId,attr"`
 
 	/** FlowNodeInstance **/
-	M_inputRef	[]string	`xml:"inputRef"`
-	M_outputRef	[]string	`xml:"outputRef"`
-	M_flowNodeType	string	`xml:"flowNodeType,attr"`
-	M_lifecycleState	string	`xml:"lifecycleState,attr"`
+	M_inputRef       []string `xml:"inputRef"`
+	M_outputRef      []string `xml:"outputRef"`
+	M_flowNodeType   string   `xml:"flowNodeType,attr"`
+	M_lifecycleState string   `xml:"lifecycleState,attr"`
 
-
-	M_eventDefintionInstances	[]*XsdEventDefinitionInstance	`xml:"eventDefintionInstances,omitempty"`
-	M_eventType	string	`xml:"eventType,attr"`
-
+	M_eventDefintionInstances []*XsdEventDefinitionInstance `xml:"eventDefintionInstances,omitempty"`
+	M_eventType               string                        `xml:"eventType,attr"`
 }
+
 /** UUID **/
-func (this *EventInstance) GetUUID() string{
+func (this *EventInstance) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *EventInstance) GetId() string{
+func (this *EventInstance) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *EventInstance) SetId(ref interface{}){
+func (this *EventInstance) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -90,12 +88,12 @@ func (this *EventInstance) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** BpmnElementId **/
-func (this *EventInstance) GetBpmnElementId() string{
+func (this *EventInstance) GetBpmnElementId() string {
 	return this.M_bpmnElementId
 }
 
 /** Init reference BpmnElementId **/
-func (this *EventInstance) SetBpmnElementId(ref interface{}){
+func (this *EventInstance) SetBpmnElementId(ref interface{}) {
 	this.NeedSave = true
 	this.M_bpmnElementId = ref.(string)
 }
@@ -103,16 +101,16 @@ func (this *EventInstance) SetBpmnElementId(ref interface{}){
 /** Remove reference BpmnElementId **/
 
 /** Participants **/
-func (this *EventInstance) GetParticipants() []string{
+func (this *EventInstance) GetParticipants() []string {
 	return this.M_participants
 }
 
 /** Init reference Participants **/
-func (this *EventInstance) SetParticipants(ref interface{}){
+func (this *EventInstance) SetParticipants(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var participantss []string
-	for i:=0; i<len(this.M_participants); i++ {
+	for i := 0; i < len(this.M_participants); i++ {
 		if this.M_participants[i] != ref.(string) {
 			participantss = append(participantss, this.M_participants[i])
 		} else {
@@ -129,21 +127,21 @@ func (this *EventInstance) SetParticipants(ref interface{}){
 /** Remove reference Participants **/
 
 /** DataRef **/
-func (this *EventInstance) GetDataRef() []*ItemAwareElementInstance{
+func (this *EventInstance) GetDataRef() []*ItemAwareElementInstance {
 	return this.m_dataRef
 }
 
 /** Init reference DataRef **/
-func (this *EventInstance) SetDataRef(ref interface{}){
+func (this *EventInstance) SetDataRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_dataRef); i++ {
+		for i := 0; i < len(this.M_dataRef); i++ {
 			if this.M_dataRef[i] == refStr {
 				return
 			}
 		}
 		this.M_dataRef = append(this.M_dataRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveDataRef(ref)
 		this.m_dataRef = append(this.m_dataRef, ref.(*ItemAwareElementInstance))
 		this.M_dataRef = append(this.M_dataRef, ref.(*ItemAwareElementInstance).GetUUID())
@@ -151,7 +149,7 @@ func (this *EventInstance) SetDataRef(ref interface{}){
 }
 
 /** Remove reference DataRef **/
-func (this *EventInstance) RemoveDataRef(ref interface{}){
+func (this *EventInstance) RemoveDataRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*ItemAwareElementInstance)
 	dataRef_ := make([]*ItemAwareElementInstance, 0)
@@ -167,16 +165,16 @@ func (this *EventInstance) RemoveDataRef(ref interface{}){
 }
 
 /** Data **/
-func (this *EventInstance) GetData() []*ItemAwareElementInstance{
+func (this *EventInstance) GetData() []*ItemAwareElementInstance {
 	return this.M_data
 }
 
 /** Init reference Data **/
-func (this *EventInstance) SetData(ref interface{}){
+func (this *EventInstance) SetData(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var datas []*ItemAwareElementInstance
-	for i:=0; i<len(this.M_data); i++ {
+	for i := 0; i < len(this.M_data); i++ {
 		if this.M_data[i].GetUUID() != ref.(*ItemAwareElementInstance).GetUUID() {
 			datas = append(datas, this.M_data[i])
 		} else {
@@ -191,7 +189,7 @@ func (this *EventInstance) SetData(ref interface{}){
 }
 
 /** Remove reference Data **/
-func (this *EventInstance) RemoveData(ref interface{}){
+func (this *EventInstance) RemoveData(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(ItemAwareElementInstance)
 	data_ := make([]*ItemAwareElementInstance, 0)
@@ -204,21 +202,21 @@ func (this *EventInstance) RemoveData(ref interface{}){
 }
 
 /** LogInfoRef **/
-func (this *EventInstance) GetLogInfoRef() []*LogInfo{
+func (this *EventInstance) GetLogInfoRef() []*LogInfo {
 	return this.m_logInfoRef
 }
 
 /** Init reference LogInfoRef **/
-func (this *EventInstance) SetLogInfoRef(ref interface{}){
+func (this *EventInstance) SetLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_logInfoRef); i++ {
+		for i := 0; i < len(this.M_logInfoRef); i++ {
 			if this.M_logInfoRef[i] == refStr {
 				return
 			}
 		}
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveLogInfoRef(ref)
 		this.m_logInfoRef = append(this.m_logInfoRef, ref.(*LogInfo))
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(*LogInfo).GetUUID())
@@ -226,7 +224,7 @@ func (this *EventInstance) SetLogInfoRef(ref interface{}){
 }
 
 /** Remove reference LogInfoRef **/
-func (this *EventInstance) RemoveLogInfoRef(ref interface{}){
+func (this *EventInstance) RemoveLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*LogInfo)
 	logInfoRef_ := make([]*LogInfo, 0)
@@ -242,12 +240,12 @@ func (this *EventInstance) RemoveLogInfoRef(ref interface{}){
 }
 
 /** FlowNodeType **/
-func (this *EventInstance) GetFlowNodeType() FlowNodeType{
+func (this *EventInstance) GetFlowNodeType() FlowNodeType {
 	return this.M_flowNodeType
 }
 
 /** Init reference FlowNodeType **/
-func (this *EventInstance) SetFlowNodeType(ref interface{}){
+func (this *EventInstance) SetFlowNodeType(ref interface{}) {
 	this.NeedSave = true
 	this.M_flowNodeType = ref.(FlowNodeType)
 }
@@ -255,12 +253,12 @@ func (this *EventInstance) SetFlowNodeType(ref interface{}){
 /** Remove reference FlowNodeType **/
 
 /** LifecycleState **/
-func (this *EventInstance) GetLifecycleState() LifecycleState{
+func (this *EventInstance) GetLifecycleState() LifecycleState {
 	return this.M_lifecycleState
 }
 
 /** Init reference LifecycleState **/
-func (this *EventInstance) SetLifecycleState(ref interface{}){
+func (this *EventInstance) SetLifecycleState(ref interface{}) {
 	this.NeedSave = true
 	this.M_lifecycleState = ref.(LifecycleState)
 }
@@ -268,21 +266,21 @@ func (this *EventInstance) SetLifecycleState(ref interface{}){
 /** Remove reference LifecycleState **/
 
 /** InputRef **/
-func (this *EventInstance) GetInputRef() []*ConnectingObject{
+func (this *EventInstance) GetInputRef() []*ConnectingObject {
 	return this.m_inputRef
 }
 
 /** Init reference InputRef **/
-func (this *EventInstance) SetInputRef(ref interface{}){
+func (this *EventInstance) SetInputRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_inputRef); i++ {
+		for i := 0; i < len(this.M_inputRef); i++ {
 			if this.M_inputRef[i] == refStr {
 				return
 			}
 		}
 		this.M_inputRef = append(this.M_inputRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveInputRef(ref)
 		this.m_inputRef = append(this.m_inputRef, ref.(*ConnectingObject))
 		this.M_inputRef = append(this.M_inputRef, ref.(Instance).GetUUID())
@@ -290,7 +288,7 @@ func (this *EventInstance) SetInputRef(ref interface{}){
 }
 
 /** Remove reference InputRef **/
-func (this *EventInstance) RemoveInputRef(ref interface{}){
+func (this *EventInstance) RemoveInputRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	inputRef_ := make([]*ConnectingObject, 0)
@@ -306,21 +304,21 @@ func (this *EventInstance) RemoveInputRef(ref interface{}){
 }
 
 /** OutputRef **/
-func (this *EventInstance) GetOutputRef() []*ConnectingObject{
+func (this *EventInstance) GetOutputRef() []*ConnectingObject {
 	return this.m_outputRef
 }
 
 /** Init reference OutputRef **/
-func (this *EventInstance) SetOutputRef(ref interface{}){
+func (this *EventInstance) SetOutputRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outputRef); i++ {
+		for i := 0; i < len(this.M_outputRef); i++ {
 			if this.M_outputRef[i] == refStr {
 				return
 			}
 		}
 		this.M_outputRef = append(this.M_outputRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutputRef(ref)
 		this.m_outputRef = append(this.m_outputRef, ref.(*ConnectingObject))
 		this.M_outputRef = append(this.M_outputRef, ref.(Instance).GetUUID())
@@ -328,7 +326,7 @@ func (this *EventInstance) SetOutputRef(ref interface{}){
 }
 
 /** Remove reference OutputRef **/
-func (this *EventInstance) RemoveOutputRef(ref interface{}){
+func (this *EventInstance) RemoveOutputRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	outputRef_ := make([]*ConnectingObject, 0)
@@ -344,12 +342,12 @@ func (this *EventInstance) RemoveOutputRef(ref interface{}){
 }
 
 /** EventType **/
-func (this *EventInstance) GetEventType() EventType{
+func (this *EventInstance) GetEventType() EventType {
 	return this.M_eventType
 }
 
 /** Init reference EventType **/
-func (this *EventInstance) SetEventType(ref interface{}){
+func (this *EventInstance) SetEventType(ref interface{}) {
 	this.NeedSave = true
 	this.M_eventType = ref.(EventType)
 }
@@ -357,16 +355,16 @@ func (this *EventInstance) SetEventType(ref interface{}){
 /** Remove reference EventType **/
 
 /** EventDefintionInstances **/
-func (this *EventInstance) GetEventDefintionInstances() []*EventDefinitionInstance{
+func (this *EventInstance) GetEventDefintionInstances() []*EventDefinitionInstance {
 	return this.M_eventDefintionInstances
 }
 
 /** Init reference EventDefintionInstances **/
-func (this *EventInstance) SetEventDefintionInstances(ref interface{}){
+func (this *EventInstance) SetEventDefintionInstances(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var eventDefintionInstancess []*EventDefinitionInstance
-	for i:=0; i<len(this.M_eventDefintionInstances); i++ {
+	for i := 0; i < len(this.M_eventDefintionInstances); i++ {
 		if this.M_eventDefintionInstances[i].GetUUID() != ref.(Instance).GetUUID() {
 			eventDefintionInstancess = append(eventDefintionInstancess, this.M_eventDefintionInstances[i])
 		} else {
@@ -381,7 +379,7 @@ func (this *EventInstance) SetEventDefintionInstances(ref interface{}){
 }
 
 /** Remove reference EventDefintionInstances **/
-func (this *EventInstance) RemoveEventDefintionInstances(ref interface{}){
+func (this *EventInstance) RemoveEventDefintionInstances(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	eventDefintionInstances_ := make([]*EventDefinitionInstance, 0)
@@ -394,23 +392,23 @@ func (this *EventInstance) RemoveEventDefintionInstances(ref interface{}){
 }
 
 /** SubprocessInstance **/
-func (this *EventInstance) GetSubprocessInstancePtr() *SubprocessInstance{
+func (this *EventInstance) GetSubprocessInstancePtr() *SubprocessInstance {
 	return this.m_SubprocessInstancePtr
 }
 
 /** Init reference SubprocessInstance **/
-func (this *EventInstance) SetSubprocessInstancePtr(ref interface{}){
+func (this *EventInstance) SetSubprocessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_SubprocessInstancePtr = ref.(string)
-	}else{
+	} else {
 		this.m_SubprocessInstancePtr = ref.(*SubprocessInstance)
 		this.M_SubprocessInstancePtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference SubprocessInstance **/
-func (this *EventInstance) RemoveSubprocessInstancePtr(ref interface{}){
+func (this *EventInstance) RemoveSubprocessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_SubprocessInstancePtr.GetUUID() {
@@ -420,23 +418,23 @@ func (this *EventInstance) RemoveSubprocessInstancePtr(ref interface{}){
 }
 
 /** ProcessInstance **/
-func (this *EventInstance) GetProcessInstancePtr() *ProcessInstance{
+func (this *EventInstance) GetProcessInstancePtr() *ProcessInstance {
 	return this.m_processInstancePtr
 }
 
 /** Init reference ProcessInstance **/
-func (this *EventInstance) SetProcessInstancePtr(ref interface{}){
+func (this *EventInstance) SetProcessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_processInstancePtr = ref.(string)
-	}else{
+	} else {
 		this.m_processInstancePtr = ref.(*ProcessInstance)
 		this.M_processInstancePtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference ProcessInstance **/
-func (this *EventInstance) RemoveProcessInstancePtr(ref interface{}){
+func (this *EventInstance) RemoveProcessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_processInstancePtr.GetUUID() {

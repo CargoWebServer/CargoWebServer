@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type ExtensionElements struct{
+type ExtensionElements struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,11 +15,10 @@ type ExtensionElements struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of ExtensionElements **/
 	M_value string
-
 
 	/** Associations **/
 	m_baseElementPtr []BaseElement
@@ -28,22 +28,22 @@ type ExtensionElements struct{
 
 /** Xml parser for ExtensionElements **/
 type XsdExtensionElements struct {
-	XMLName xml.Name	`xml:"extensionElements"`
-	M_value	string	`xml:",innerxml"`
-
+	XMLName xml.Name `xml:"extensionElements"`
+	M_value string   `xml:",innerxml"`
 }
+
 /** UUID **/
-func (this *ExtensionElements) GetUUID() string{
+func (this *ExtensionElements) GetUUID() string {
 	return this.UUID
 }
 
 /** Value **/
-func (this *ExtensionElements) GetValue() string{
+func (this *ExtensionElements) GetValue() string {
 	return this.M_value
 }
 
 /** Init reference Value **/
-func (this *ExtensionElements) SetValue(ref interface{}){
+func (this *ExtensionElements) SetValue(ref interface{}) {
 	this.NeedSave = true
 	this.M_value = ref.(string)
 }
@@ -51,21 +51,21 @@ func (this *ExtensionElements) SetValue(ref interface{}){
 /** Remove reference Value **/
 
 /** BaseElement **/
-func (this *ExtensionElements) GetBaseElementPtr() []BaseElement{
+func (this *ExtensionElements) GetBaseElementPtr() []BaseElement {
 	return this.m_baseElementPtr
 }
 
 /** Init reference BaseElement **/
-func (this *ExtensionElements) SetBaseElementPtr(ref interface{}){
+func (this *ExtensionElements) SetBaseElementPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_baseElementPtr); i++ {
+		for i := 0; i < len(this.M_baseElementPtr); i++ {
 			if this.M_baseElementPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_baseElementPtr = append(this.M_baseElementPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveBaseElementPtr(ref)
 		this.m_baseElementPtr = append(this.m_baseElementPtr, ref.(BaseElement))
 		this.M_baseElementPtr = append(this.M_baseElementPtr, ref.(BaseElement).GetUUID())
@@ -73,7 +73,7 @@ func (this *ExtensionElements) SetBaseElementPtr(ref interface{}){
 }
 
 /** Remove reference BaseElement **/
-func (this *ExtensionElements) RemoveBaseElementPtr(ref interface{}){
+func (this *ExtensionElements) RemoveBaseElementPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	baseElementPtr_ := make([]BaseElement, 0)

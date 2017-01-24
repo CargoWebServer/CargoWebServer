@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type Lane struct{
+type Lane struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,37 +15,36 @@ type Lane struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of Lane **/
-	M_name string
-	M_childLaneSet *LaneSet
+	M_name                string
+	M_childLaneSet        *LaneSet
 	m_partitionElementRef BaseElement
 	/** If the ref is a string and not an object **/
 	M_partitionElementRef string
-	m_flowNodeRef []FlowNode
+	m_flowNodeRef         []FlowNode
 	/** If the ref is a string and not an object **/
-	M_flowNodeRef []string
+	M_flowNodeRef      []string
 	M_partitionElement BaseElement
-
 
 	/** Associations **/
 	m_laneSetPtr *LaneSet
 	/** If the ref is a string and not an object **/
 	M_laneSetPtr string
-	m_lanePtr []*Lane
+	m_lanePtr    []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -55,33 +55,31 @@ type Lane struct{
 
 /** Xml parser for Lane **/
 type XsdLane struct {
-	XMLName xml.Name	`xml:"lane"`
+	XMLName xml.Name `xml:"lane"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-
-	M_flowNodeRef	[]string	`xml:"flowNodeRef"`
-	M_childLaneSet	*XsdChildLaneSet	`xml:"childLaneSet,omitempty"`
-	M_name	string	`xml:"name,attr"`
-	M_partitionElementRef	string	`xml:"partitionElementRef,attr"`
-
+	M_flowNodeRef         []string         `xml:"flowNodeRef"`
+	M_childLaneSet        *XsdChildLaneSet `xml:"childLaneSet,omitempty"`
+	M_name                string           `xml:"name,attr"`
+	M_partitionElementRef string           `xml:"partitionElementRef,attr"`
 }
+
 /** UUID **/
-func (this *Lane) GetUUID() string{
+func (this *Lane) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *Lane) GetId() string{
+func (this *Lane) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *Lane) SetId(ref interface{}){
+func (this *Lane) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -89,16 +87,16 @@ func (this *Lane) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *Lane) GetOther() interface{}{
+func (this *Lane) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *Lane) SetOther(ref interface{}){
+func (this *Lane) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -106,12 +104,12 @@ func (this *Lane) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *Lane) GetExtensionElements() *ExtensionElements{
+func (this *Lane) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *Lane) SetExtensionElements(ref interface{}){
+func (this *Lane) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -119,16 +117,16 @@ func (this *Lane) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *Lane) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *Lane) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *Lane) SetExtensionDefinitions(ref interface{}){
+func (this *Lane) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -145,16 +143,16 @@ func (this *Lane) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *Lane) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *Lane) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *Lane) SetExtensionValues(ref interface{}){
+func (this *Lane) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -171,16 +169,16 @@ func (this *Lane) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *Lane) GetDocumentation() []*Documentation{
+func (this *Lane) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *Lane) SetDocumentation(ref interface{}){
+func (this *Lane) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -195,7 +193,7 @@ func (this *Lane) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *Lane) RemoveDocumentation(ref interface{}){
+func (this *Lane) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -208,12 +206,12 @@ func (this *Lane) RemoveDocumentation(ref interface{}){
 }
 
 /** Name **/
-func (this *Lane) GetName() string{
+func (this *Lane) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *Lane) SetName(ref interface{}){
+func (this *Lane) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -221,18 +219,18 @@ func (this *Lane) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** ChildLaneSet **/
-func (this *Lane) GetChildLaneSet() *LaneSet{
+func (this *Lane) GetChildLaneSet() *LaneSet {
 	return this.M_childLaneSet
 }
 
 /** Init reference ChildLaneSet **/
-func (this *Lane) SetChildLaneSet(ref interface{}){
+func (this *Lane) SetChildLaneSet(ref interface{}) {
 	this.NeedSave = true
 	this.M_childLaneSet = ref.(*LaneSet)
 }
 
 /** Remove reference ChildLaneSet **/
-func (this *Lane) RemoveChildLaneSet(ref interface{}){
+func (this *Lane) RemoveChildLaneSet(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_childLaneSet.GetUUID() {
@@ -241,23 +239,23 @@ func (this *Lane) RemoveChildLaneSet(ref interface{}){
 }
 
 /** PartitionElementRef **/
-func (this *Lane) GetPartitionElementRef() BaseElement{
+func (this *Lane) GetPartitionElementRef() BaseElement {
 	return this.m_partitionElementRef
 }
 
 /** Init reference PartitionElementRef **/
-func (this *Lane) SetPartitionElementRef(ref interface{}){
+func (this *Lane) SetPartitionElementRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_partitionElementRef = ref.(string)
-	}else{
+	} else {
 		this.m_partitionElementRef = ref.(BaseElement)
 		this.M_partitionElementRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference PartitionElementRef **/
-func (this *Lane) RemovePartitionElementRef(ref interface{}){
+func (this *Lane) RemovePartitionElementRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_partitionElementRef.(BaseElement).GetUUID() {
@@ -267,21 +265,21 @@ func (this *Lane) RemovePartitionElementRef(ref interface{}){
 }
 
 /** FlowNodeRef **/
-func (this *Lane) GetFlowNodeRef() []FlowNode{
+func (this *Lane) GetFlowNodeRef() []FlowNode {
 	return this.m_flowNodeRef
 }
 
 /** Init reference FlowNodeRef **/
-func (this *Lane) SetFlowNodeRef(ref interface{}){
+func (this *Lane) SetFlowNodeRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_flowNodeRef); i++ {
+		for i := 0; i < len(this.M_flowNodeRef); i++ {
 			if this.M_flowNodeRef[i] == refStr {
 				return
 			}
 		}
 		this.M_flowNodeRef = append(this.M_flowNodeRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveFlowNodeRef(ref)
 		this.m_flowNodeRef = append(this.m_flowNodeRef, ref.(FlowNode))
 		this.M_flowNodeRef = append(this.M_flowNodeRef, ref.(BaseElement).GetUUID())
@@ -289,7 +287,7 @@ func (this *Lane) SetFlowNodeRef(ref interface{}){
 }
 
 /** Remove reference FlowNodeRef **/
-func (this *Lane) RemoveFlowNodeRef(ref interface{}){
+func (this *Lane) RemoveFlowNodeRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	flowNodeRef_ := make([]FlowNode, 0)
@@ -305,18 +303,18 @@ func (this *Lane) RemoveFlowNodeRef(ref interface{}){
 }
 
 /** PartitionElement **/
-func (this *Lane) GetPartitionElement() BaseElement{
+func (this *Lane) GetPartitionElement() BaseElement {
 	return this.M_partitionElement
 }
 
 /** Init reference PartitionElement **/
-func (this *Lane) SetPartitionElement(ref interface{}){
+func (this *Lane) SetPartitionElement(ref interface{}) {
 	this.NeedSave = true
 	this.M_partitionElement = ref.(BaseElement)
 }
 
 /** Remove reference PartitionElement **/
-func (this *Lane) RemovePartitionElement(ref interface{}){
+func (this *Lane) RemovePartitionElement(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_partitionElement.(BaseElement).GetUUID() {
@@ -325,23 +323,23 @@ func (this *Lane) RemovePartitionElement(ref interface{}){
 }
 
 /** LaneSet **/
-func (this *Lane) GetLaneSetPtr() *LaneSet{
+func (this *Lane) GetLaneSetPtr() *LaneSet {
 	return this.m_laneSetPtr
 }
 
 /** Init reference LaneSet **/
-func (this *Lane) SetLaneSetPtr(ref interface{}){
+func (this *Lane) SetLaneSetPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_laneSetPtr = ref.(string)
-	}else{
+	} else {
 		this.m_laneSetPtr = ref.(*LaneSet)
 		this.M_laneSetPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference LaneSet **/
-func (this *Lane) RemoveLaneSetPtr(ref interface{}){
+func (this *Lane) RemoveLaneSetPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_laneSetPtr.GetUUID() {
@@ -351,21 +349,21 @@ func (this *Lane) RemoveLaneSetPtr(ref interface{}){
 }
 
 /** Lane **/
-func (this *Lane) GetLanePtr() []*Lane{
+func (this *Lane) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *Lane) SetLanePtr(ref interface{}){
+func (this *Lane) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -373,7 +371,7 @@ func (this *Lane) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *Lane) RemoveLanePtr(ref interface{}){
+func (this *Lane) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -389,21 +387,21 @@ func (this *Lane) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *Lane) GetOutgoingPtr() []*Association{
+func (this *Lane) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *Lane) SetOutgoingPtr(ref interface{}){
+func (this *Lane) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -411,7 +409,7 @@ func (this *Lane) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *Lane) RemoveOutgoingPtr(ref interface{}){
+func (this *Lane) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -427,21 +425,21 @@ func (this *Lane) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *Lane) GetIncomingPtr() []*Association{
+func (this *Lane) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *Lane) SetIncomingPtr(ref interface{}){
+func (this *Lane) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -449,7 +447,7 @@ func (this *Lane) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *Lane) RemoveIncomingPtr(ref interface{}){
+func (this *Lane) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)

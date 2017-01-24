@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type Transaction struct{
+type Transaction struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,22 +15,22 @@ type Transaction struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of FlowElement **/
-	M_name string
-	M_auditing *Auditing
-	M_monitoring *Monitoring
+	M_name             string
+	M_auditing         *Auditing
+	M_monitoring       *Monitoring
 	m_categoryValueRef []*CategoryValue
 	/** If the ref is a string and not an object **/
 	M_categoryValueRef []string
@@ -41,54 +42,53 @@ type Transaction struct{
 	m_incoming []*SequenceFlow
 	/** If the ref is a string and not an object **/
 	M_incoming []string
-	m_lanes []*Lane
+	m_lanes    []*Lane
 	/** If the ref is a string and not an object **/
 	M_lanes []string
 
 	/** members of Activity **/
-	M_isForCompensation bool
+	M_isForCompensation   bool
 	M_loopCharacteristics LoopCharacteristics
-	M_resourceRole []ResourceRole
-	m_default *SequenceFlow
+	M_resourceRole        []ResourceRole
+	m_default             *SequenceFlow
 	/** If the ref is a string and not an object **/
-	M_default string
-	M_property []*Property
-	M_ioSpecification *InputOutputSpecification
+	M_default           string
+	M_property          []*Property
+	M_ioSpecification   *InputOutputSpecification
 	m_boundaryEventRefs []*BoundaryEvent
 	/** If the ref is a string and not an object **/
-	M_boundaryEventRefs []string
-	M_dataInputAssociation []*DataInputAssociation
+	M_boundaryEventRefs     []string
+	M_dataInputAssociation  []*DataInputAssociation
 	M_dataOutputAssociation []*DataOutputAssociation
-	M_startQuantity int
-	M_completionQuantity int
+	M_startQuantity         int
+	M_completionQuantity    int
 
 	/** members of FlowElementsContainer **/
 	M_flowElement []FlowElement
-	M_laneSet []*LaneSet
+	M_laneSet     []*LaneSet
 
 	/** members of SubProcess **/
 	M_triggeredByEvent bool
-	M_artifact []Artifact
+	M_artifact         []Artifact
 
 	/** members of Transaction **/
-	M_protocol string
-	M_method TransactionMethod
+	M_protocol  string
+	M_method    TransactionMethod
 	M_methodStr string
-
 
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr  []string
 	m_containerPtr FlowElementsContainer
 	/** If the ref is a string and not an object **/
-	M_containerPtr string
+	M_containerPtr                 string
 	m_compensateEventDefinitionPtr []*CompensateEventDefinition
 	/** If the ref is a string and not an object **/
 	M_compensateEventDefinitionPtr []string
@@ -96,99 +96,94 @@ type Transaction struct{
 
 /** Xml parser for Transaction **/
 type XsdTransaction struct {
-	XMLName xml.Name	`xml:"transaction"`
+	XMLName xml.Name `xml:"transaction"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** FlowElement **/
-	M_auditing	*XsdAuditing	`xml:"auditing,omitempty"`
-	M_monitoring	*XsdMonitoring	`xml:"monitoring,omitempty"`
-	M_categoryValueRef	[]string	`xml:"categoryValueRef"`
-	M_name	string	`xml:"name,attr"`
-
+	M_auditing         *XsdAuditing   `xml:"auditing,omitempty"`
+	M_monitoring       *XsdMonitoring `xml:"monitoring,omitempty"`
+	M_categoryValueRef []string       `xml:"categoryValueRef"`
+	M_name             string         `xml:"name,attr"`
 
 	/** FlowNode **/
-	M_incoming	[]string	`xml:"incoming"`
-	M_outgoing	[]string	`xml:"outgoing"`
-
+	M_incoming []string `xml:"incoming"`
+	M_outgoing []string `xml:"outgoing"`
 
 	/** Activity **/
-	M_ioSpecification	*XsdInputOutputSpecification	`xml:"ioSpecification,omitempty"`
-	M_property	[]*XsdProperty	`xml:"property,omitempty"`
-	M_dataInputAssociation	[]*XsdDataInputAssociation	`xml:"dataInputAssociation,omitempty"`
-	M_dataOutputAssociation	[]*XsdDataOutputAssociation	`xml:"dataOutputAssociation,omitempty"`
-	M_resourceRole_0	[]*XsdHumanPerformer	`xml:"humanPerformer,omitempty"`
-	M_resourceRole_1	[]*XsdPotentialOwner	`xml:"potentialOwner,omitempty"`
-	M_resourceRole_2	[]*XsdPerformer	`xml:"performer,omitempty"`
-	M_resourceRole_3	[]*XsdResourceRole	`xml:"resourceRole,omitempty"`
-	M_loopCharacteristics_0	*XsdMultiInstanceLoopCharacteristics	`xml:"multiInstanceLoopCharacteristics,omitempty"`
-	M_loopCharacteristics_1	*XsdStandardLoopCharacteristics	`xml:"standardLoopCharacteristics,omitempty"`
+	M_ioSpecification       *XsdInputOutputSpecification         `xml:"ioSpecification,omitempty"`
+	M_property              []*XsdProperty                       `xml:"property,omitempty"`
+	M_dataInputAssociation  []*XsdDataInputAssociation           `xml:"dataInputAssociation,omitempty"`
+	M_dataOutputAssociation []*XsdDataOutputAssociation          `xml:"dataOutputAssociation,omitempty"`
+	M_resourceRole_0        []*XsdHumanPerformer                 `xml:"humanPerformer,omitempty"`
+	M_resourceRole_1        []*XsdPotentialOwner                 `xml:"potentialOwner,omitempty"`
+	M_resourceRole_2        []*XsdPerformer                      `xml:"performer,omitempty"`
+	M_resourceRole_3        []*XsdResourceRole                   `xml:"resourceRole,omitempty"`
+	M_loopCharacteristics_0 *XsdMultiInstanceLoopCharacteristics `xml:"multiInstanceLoopCharacteristics,omitempty"`
+	M_loopCharacteristics_1 *XsdStandardLoopCharacteristics      `xml:"standardLoopCharacteristics,omitempty"`
 
-	M_isForCompensation	bool	`xml:"isForCompensation,attr"`
-	M_startQuantity	int	`xml:"startQuantity,attr"`
-	M_completionQuantity	int	`xml:"completionQuantity,attr"`
-	M_default	string	`xml:"default,attr"`
-
+	M_isForCompensation  bool   `xml:"isForCompensation,attr"`
+	M_startQuantity      int    `xml:"startQuantity,attr"`
+	M_completionQuantity int    `xml:"completionQuantity,attr"`
+	M_default            string `xml:"default,attr"`
 
 	/** SubProcess **/
-	M_laneSet	[]*XsdLaneSet	`xml:"laneSet,omitempty"`
-	M_flowElement_0	[]*XsdAdHocSubProcess	`xml:"adHocSubProcess,omitempty"`
-	M_flowElement_1	[]*XsdBoundaryEvent	`xml:"boundaryEvent,omitempty"`
-	M_flowElement_2	[]*XsdBusinessRuleTask	`xml:"businessRuleTask,omitempty"`
-	M_flowElement_3	[]*XsdCallActivity	`xml:"callActivity,omitempty"`
-	M_flowElement_4	[]*XsdCallChoreography	`xml:"callChoreography,omitempty"`
-	M_flowElement_5	[]*XsdChoreographyTask	`xml:"choreographyTask,omitempty"`
-	M_flowElement_6	[]*XsdComplexGateway	`xml:"complexGateway,omitempty"`
-	M_flowElement_7	[]*XsdDataObject	`xml:"dataObject,omitempty"`
-	M_flowElement_8	[]*XsdDataObjectReference	`xml:"dataObjectReference,omitempty"`
-	M_flowElement_9	[]*XsdDataStoreReference	`xml:"dataStoreReference,omitempty"`
-	M_flowElement_10	[]*XsdEndEvent	`xml:"endEvent,omitempty"`
-	M_flowElement_11	[]*XsdEventBasedGateway	`xml:"eventBasedGateway,omitempty"`
-	M_flowElement_12	[]*XsdExclusiveGateway	`xml:"exclusiveGateway,omitempty"`
-	M_flowElement_13	[]*XsdImplicitThrowEvent	`xml:"implicitThrowEvent,omitempty"`
-	M_flowElement_14	[]*XsdInclusiveGateway	`xml:"inclusiveGateway,omitempty"`
-	M_flowElement_15	[]*XsdIntermediateCatchEvent	`xml:"intermediateCatchEvent,omitempty"`
-	M_flowElement_16	[]*XsdIntermediateThrowEvent	`xml:"intermediateThrowEvent,omitempty"`
-	M_flowElement_17	[]*XsdManualTask	`xml:"manualTask,omitempty"`
-	M_flowElement_18	[]*XsdParallelGateway	`xml:"parallelGateway,omitempty"`
-	M_flowElement_19	[]*XsdReceiveTask	`xml:"receiveTask,omitempty"`
-	M_flowElement_20	[]*XsdScriptTask	`xml:"scriptTask,omitempty"`
-	M_flowElement_21	[]*XsdSendTask	`xml:"sendTask,omitempty"`
-	M_flowElement_22	[]*XsdSequenceFlow	`xml:"sequenceFlow,omitempty"`
-	M_flowElement_23	[]*XsdServiceTask	`xml:"serviceTask,omitempty"`
-	M_flowElement_24	[]*XsdStartEvent	`xml:"startEvent,omitempty"`
-	M_flowElement_25	[]*XsdSubChoreography	`xml:"subChoreography,omitempty"`
-	M_flowElement_26	[]*XsdSubProcess	`xml:"subProcess,omitempty"`
-	M_flowElement_27	[]*XsdTask	`xml:"task,omitempty"`
-	M_flowElement_28	[]*XsdTransaction	`xml:"transaction,omitempty"`
-	M_flowElement_29	[]*XsdUserTask	`xml:"userTask,omitempty"`
+	M_laneSet        []*XsdLaneSet                `xml:"laneSet,omitempty"`
+	M_flowElement_0  []*XsdAdHocSubProcess        `xml:"adHocSubProcess,omitempty"`
+	M_flowElement_1  []*XsdBoundaryEvent          `xml:"boundaryEvent,omitempty"`
+	M_flowElement_2  []*XsdBusinessRuleTask       `xml:"businessRuleTask,omitempty"`
+	M_flowElement_3  []*XsdCallActivity           `xml:"callActivity,omitempty"`
+	M_flowElement_4  []*XsdCallChoreography       `xml:"callChoreography,omitempty"`
+	M_flowElement_5  []*XsdChoreographyTask       `xml:"choreographyTask,omitempty"`
+	M_flowElement_6  []*XsdComplexGateway         `xml:"complexGateway,omitempty"`
+	M_flowElement_7  []*XsdDataObject             `xml:"dataObject,omitempty"`
+	M_flowElement_8  []*XsdDataObjectReference    `xml:"dataObjectReference,omitempty"`
+	M_flowElement_9  []*XsdDataStoreReference     `xml:"dataStoreReference,omitempty"`
+	M_flowElement_10 []*XsdEndEvent               `xml:"endEvent,omitempty"`
+	M_flowElement_11 []*XsdEventBasedGateway      `xml:"eventBasedGateway,omitempty"`
+	M_flowElement_12 []*XsdExclusiveGateway       `xml:"exclusiveGateway,omitempty"`
+	M_flowElement_13 []*XsdImplicitThrowEvent     `xml:"implicitThrowEvent,omitempty"`
+	M_flowElement_14 []*XsdInclusiveGateway       `xml:"inclusiveGateway,omitempty"`
+	M_flowElement_15 []*XsdIntermediateCatchEvent `xml:"intermediateCatchEvent,omitempty"`
+	M_flowElement_16 []*XsdIntermediateThrowEvent `xml:"intermediateThrowEvent,omitempty"`
+	M_flowElement_17 []*XsdManualTask             `xml:"manualTask,omitempty"`
+	M_flowElement_18 []*XsdParallelGateway        `xml:"parallelGateway,omitempty"`
+	M_flowElement_19 []*XsdReceiveTask            `xml:"receiveTask,omitempty"`
+	M_flowElement_20 []*XsdScriptTask             `xml:"scriptTask,omitempty"`
+	M_flowElement_21 []*XsdSendTask               `xml:"sendTask,omitempty"`
+	M_flowElement_22 []*XsdSequenceFlow           `xml:"sequenceFlow,omitempty"`
+	M_flowElement_23 []*XsdServiceTask            `xml:"serviceTask,omitempty"`
+	M_flowElement_24 []*XsdStartEvent             `xml:"startEvent,omitempty"`
+	M_flowElement_25 []*XsdSubChoreography        `xml:"subChoreography,omitempty"`
+	M_flowElement_26 []*XsdSubProcess             `xml:"subProcess,omitempty"`
+	M_flowElement_27 []*XsdTask                   `xml:"task,omitempty"`
+	M_flowElement_28 []*XsdTransaction            `xml:"transaction,omitempty"`
+	M_flowElement_29 []*XsdUserTask               `xml:"userTask,omitempty"`
 
-	M_artifact_0	[]*XsdAssociation	`xml:"association,omitempty"`
-	M_artifact_1	[]*XsdGroup	`xml:"group,omitempty"`
-	M_artifact_2	[]*XsdTextAnnotation	`xml:"textAnnotation,omitempty"`
+	M_artifact_0 []*XsdAssociation    `xml:"association,omitempty"`
+	M_artifact_1 []*XsdGroup          `xml:"group,omitempty"`
+	M_artifact_2 []*XsdTextAnnotation `xml:"textAnnotation,omitempty"`
 
-	M_triggeredByEvent	bool	`xml:"triggeredByEvent,attr"`
+	M_triggeredByEvent bool `xml:"triggeredByEvent,attr"`
 
-
-	M_method	string	`xml:"method,attr"`
-
+	M_method string `xml:"method,attr"`
 }
+
 /** UUID **/
-func (this *Transaction) GetUUID() string{
+func (this *Transaction) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *Transaction) GetId() string{
+func (this *Transaction) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *Transaction) SetId(ref interface{}){
+func (this *Transaction) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -196,16 +191,16 @@ func (this *Transaction) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *Transaction) GetOther() interface{}{
+func (this *Transaction) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *Transaction) SetOther(ref interface{}){
+func (this *Transaction) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -213,12 +208,12 @@ func (this *Transaction) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *Transaction) GetExtensionElements() *ExtensionElements{
+func (this *Transaction) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *Transaction) SetExtensionElements(ref interface{}){
+func (this *Transaction) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -226,16 +221,16 @@ func (this *Transaction) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *Transaction) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *Transaction) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *Transaction) SetExtensionDefinitions(ref interface{}){
+func (this *Transaction) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -252,16 +247,16 @@ func (this *Transaction) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *Transaction) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *Transaction) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *Transaction) SetExtensionValues(ref interface{}){
+func (this *Transaction) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -278,16 +273,16 @@ func (this *Transaction) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *Transaction) GetDocumentation() []*Documentation{
+func (this *Transaction) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *Transaction) SetDocumentation(ref interface{}){
+func (this *Transaction) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -302,7 +297,7 @@ func (this *Transaction) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *Transaction) RemoveDocumentation(ref interface{}){
+func (this *Transaction) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -315,12 +310,12 @@ func (this *Transaction) RemoveDocumentation(ref interface{}){
 }
 
 /** Name **/
-func (this *Transaction) GetName() string{
+func (this *Transaction) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *Transaction) SetName(ref interface{}){
+func (this *Transaction) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -328,18 +323,18 @@ func (this *Transaction) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** Auditing **/
-func (this *Transaction) GetAuditing() *Auditing{
+func (this *Transaction) GetAuditing() *Auditing {
 	return this.M_auditing
 }
 
 /** Init reference Auditing **/
-func (this *Transaction) SetAuditing(ref interface{}){
+func (this *Transaction) SetAuditing(ref interface{}) {
 	this.NeedSave = true
 	this.M_auditing = ref.(*Auditing)
 }
 
 /** Remove reference Auditing **/
-func (this *Transaction) RemoveAuditing(ref interface{}){
+func (this *Transaction) RemoveAuditing(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_auditing.GetUUID() {
@@ -348,18 +343,18 @@ func (this *Transaction) RemoveAuditing(ref interface{}){
 }
 
 /** Monitoring **/
-func (this *Transaction) GetMonitoring() *Monitoring{
+func (this *Transaction) GetMonitoring() *Monitoring {
 	return this.M_monitoring
 }
 
 /** Init reference Monitoring **/
-func (this *Transaction) SetMonitoring(ref interface{}){
+func (this *Transaction) SetMonitoring(ref interface{}) {
 	this.NeedSave = true
 	this.M_monitoring = ref.(*Monitoring)
 }
 
 /** Remove reference Monitoring **/
-func (this *Transaction) RemoveMonitoring(ref interface{}){
+func (this *Transaction) RemoveMonitoring(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_monitoring.GetUUID() {
@@ -368,21 +363,21 @@ func (this *Transaction) RemoveMonitoring(ref interface{}){
 }
 
 /** CategoryValueRef **/
-func (this *Transaction) GetCategoryValueRef() []*CategoryValue{
+func (this *Transaction) GetCategoryValueRef() []*CategoryValue {
 	return this.m_categoryValueRef
 }
 
 /** Init reference CategoryValueRef **/
-func (this *Transaction) SetCategoryValueRef(ref interface{}){
+func (this *Transaction) SetCategoryValueRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_categoryValueRef); i++ {
+		for i := 0; i < len(this.M_categoryValueRef); i++ {
 			if this.M_categoryValueRef[i] == refStr {
 				return
 			}
 		}
 		this.M_categoryValueRef = append(this.M_categoryValueRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveCategoryValueRef(ref)
 		this.m_categoryValueRef = append(this.m_categoryValueRef, ref.(*CategoryValue))
 		this.M_categoryValueRef = append(this.M_categoryValueRef, ref.(BaseElement).GetUUID())
@@ -390,7 +385,7 @@ func (this *Transaction) SetCategoryValueRef(ref interface{}){
 }
 
 /** Remove reference CategoryValueRef **/
-func (this *Transaction) RemoveCategoryValueRef(ref interface{}){
+func (this *Transaction) RemoveCategoryValueRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	categoryValueRef_ := make([]*CategoryValue, 0)
@@ -406,21 +401,21 @@ func (this *Transaction) RemoveCategoryValueRef(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *Transaction) GetOutgoing() []*SequenceFlow{
+func (this *Transaction) GetOutgoing() []*SequenceFlow {
 	return this.m_outgoing
 }
 
 /** Init reference Outgoing **/
-func (this *Transaction) SetOutgoing(ref interface{}){
+func (this *Transaction) SetOutgoing(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoing); i++ {
+		for i := 0; i < len(this.M_outgoing); i++ {
 			if this.M_outgoing[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoing = append(this.M_outgoing, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoing(ref)
 		this.m_outgoing = append(this.m_outgoing, ref.(*SequenceFlow))
 		this.M_outgoing = append(this.M_outgoing, ref.(BaseElement).GetUUID())
@@ -428,7 +423,7 @@ func (this *Transaction) SetOutgoing(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *Transaction) RemoveOutgoing(ref interface{}){
+func (this *Transaction) RemoveOutgoing(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoing_ := make([]*SequenceFlow, 0)
@@ -444,21 +439,21 @@ func (this *Transaction) RemoveOutgoing(ref interface{}){
 }
 
 /** Incoming **/
-func (this *Transaction) GetIncoming() []*SequenceFlow{
+func (this *Transaction) GetIncoming() []*SequenceFlow {
 	return this.m_incoming
 }
 
 /** Init reference Incoming **/
-func (this *Transaction) SetIncoming(ref interface{}){
+func (this *Transaction) SetIncoming(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incoming); i++ {
+		for i := 0; i < len(this.M_incoming); i++ {
 			if this.M_incoming[i] == refStr {
 				return
 			}
 		}
 		this.M_incoming = append(this.M_incoming, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncoming(ref)
 		this.m_incoming = append(this.m_incoming, ref.(*SequenceFlow))
 		this.M_incoming = append(this.M_incoming, ref.(BaseElement).GetUUID())
@@ -466,7 +461,7 @@ func (this *Transaction) SetIncoming(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *Transaction) RemoveIncoming(ref interface{}){
+func (this *Transaction) RemoveIncoming(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incoming_ := make([]*SequenceFlow, 0)
@@ -482,21 +477,21 @@ func (this *Transaction) RemoveIncoming(ref interface{}){
 }
 
 /** Lanes **/
-func (this *Transaction) GetLanes() []*Lane{
+func (this *Transaction) GetLanes() []*Lane {
 	return this.m_lanes
 }
 
 /** Init reference Lanes **/
-func (this *Transaction) SetLanes(ref interface{}){
+func (this *Transaction) SetLanes(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanes); i++ {
+		for i := 0; i < len(this.M_lanes); i++ {
 			if this.M_lanes[i] == refStr {
 				return
 			}
 		}
 		this.M_lanes = append(this.M_lanes, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanes(ref)
 		this.m_lanes = append(this.m_lanes, ref.(*Lane))
 		this.M_lanes = append(this.M_lanes, ref.(BaseElement).GetUUID())
@@ -504,7 +499,7 @@ func (this *Transaction) SetLanes(ref interface{}){
 }
 
 /** Remove reference Lanes **/
-func (this *Transaction) RemoveLanes(ref interface{}){
+func (this *Transaction) RemoveLanes(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanes_ := make([]*Lane, 0)
@@ -520,12 +515,12 @@ func (this *Transaction) RemoveLanes(ref interface{}){
 }
 
 /** IsForCompensation **/
-func (this *Transaction) IsForCompensation() bool{
+func (this *Transaction) IsForCompensation() bool {
 	return this.M_isForCompensation
 }
 
 /** Init reference IsForCompensation **/
-func (this *Transaction) SetIsForCompensation(ref interface{}){
+func (this *Transaction) SetIsForCompensation(ref interface{}) {
 	this.NeedSave = true
 	this.M_isForCompensation = ref.(bool)
 }
@@ -533,18 +528,18 @@ func (this *Transaction) SetIsForCompensation(ref interface{}){
 /** Remove reference IsForCompensation **/
 
 /** LoopCharacteristics **/
-func (this *Transaction) GetLoopCharacteristics() LoopCharacteristics{
+func (this *Transaction) GetLoopCharacteristics() LoopCharacteristics {
 	return this.M_loopCharacteristics
 }
 
 /** Init reference LoopCharacteristics **/
-func (this *Transaction) SetLoopCharacteristics(ref interface{}){
+func (this *Transaction) SetLoopCharacteristics(ref interface{}) {
 	this.NeedSave = true
 	this.M_loopCharacteristics = ref.(LoopCharacteristics)
 }
 
 /** Remove reference LoopCharacteristics **/
-func (this *Transaction) RemoveLoopCharacteristics(ref interface{}){
+func (this *Transaction) RemoveLoopCharacteristics(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_loopCharacteristics.(BaseElement).GetUUID() {
@@ -553,16 +548,16 @@ func (this *Transaction) RemoveLoopCharacteristics(ref interface{}){
 }
 
 /** ResourceRole **/
-func (this *Transaction) GetResourceRole() []ResourceRole{
+func (this *Transaction) GetResourceRole() []ResourceRole {
 	return this.M_resourceRole
 }
 
 /** Init reference ResourceRole **/
-func (this *Transaction) SetResourceRole(ref interface{}){
+func (this *Transaction) SetResourceRole(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var resourceRoles []ResourceRole
-	for i:=0; i<len(this.M_resourceRole); i++ {
+	for i := 0; i < len(this.M_resourceRole); i++ {
 		if this.M_resourceRole[i].(BaseElement).GetUUID() != ref.(BaseElement).GetUUID() {
 			resourceRoles = append(resourceRoles, this.M_resourceRole[i])
 		} else {
@@ -577,7 +572,7 @@ func (this *Transaction) SetResourceRole(ref interface{}){
 }
 
 /** Remove reference ResourceRole **/
-func (this *Transaction) RemoveResourceRole(ref interface{}){
+func (this *Transaction) RemoveResourceRole(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	resourceRole_ := make([]ResourceRole, 0)
@@ -590,23 +585,23 @@ func (this *Transaction) RemoveResourceRole(ref interface{}){
 }
 
 /** Default **/
-func (this *Transaction) GetDefault() *SequenceFlow{
+func (this *Transaction) GetDefault() *SequenceFlow {
 	return this.m_default
 }
 
 /** Init reference Default **/
-func (this *Transaction) SetDefault(ref interface{}){
+func (this *Transaction) SetDefault(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_default = ref.(string)
-	}else{
+	} else {
 		this.m_default = ref.(*SequenceFlow)
 		this.M_default = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Default **/
-func (this *Transaction) RemoveDefault(ref interface{}){
+func (this *Transaction) RemoveDefault(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_default.GetUUID() {
@@ -616,16 +611,16 @@ func (this *Transaction) RemoveDefault(ref interface{}){
 }
 
 /** Property **/
-func (this *Transaction) GetProperty() []*Property{
+func (this *Transaction) GetProperty() []*Property {
 	return this.M_property
 }
 
 /** Init reference Property **/
-func (this *Transaction) SetProperty(ref interface{}){
+func (this *Transaction) SetProperty(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var propertys []*Property
-	for i:=0; i<len(this.M_property); i++ {
+	for i := 0; i < len(this.M_property); i++ {
 		if this.M_property[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			propertys = append(propertys, this.M_property[i])
 		} else {
@@ -640,7 +635,7 @@ func (this *Transaction) SetProperty(ref interface{}){
 }
 
 /** Remove reference Property **/
-func (this *Transaction) RemoveProperty(ref interface{}){
+func (this *Transaction) RemoveProperty(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	property_ := make([]*Property, 0)
@@ -653,18 +648,18 @@ func (this *Transaction) RemoveProperty(ref interface{}){
 }
 
 /** IoSpecification **/
-func (this *Transaction) GetIoSpecification() *InputOutputSpecification{
+func (this *Transaction) GetIoSpecification() *InputOutputSpecification {
 	return this.M_ioSpecification
 }
 
 /** Init reference IoSpecification **/
-func (this *Transaction) SetIoSpecification(ref interface{}){
+func (this *Transaction) SetIoSpecification(ref interface{}) {
 	this.NeedSave = true
 	this.M_ioSpecification = ref.(*InputOutputSpecification)
 }
 
 /** Remove reference IoSpecification **/
-func (this *Transaction) RemoveIoSpecification(ref interface{}){
+func (this *Transaction) RemoveIoSpecification(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_ioSpecification.GetUUID() {
@@ -673,21 +668,21 @@ func (this *Transaction) RemoveIoSpecification(ref interface{}){
 }
 
 /** BoundaryEventRefs **/
-func (this *Transaction) GetBoundaryEventRefs() []*BoundaryEvent{
+func (this *Transaction) GetBoundaryEventRefs() []*BoundaryEvent {
 	return this.m_boundaryEventRefs
 }
 
 /** Init reference BoundaryEventRefs **/
-func (this *Transaction) SetBoundaryEventRefs(ref interface{}){
+func (this *Transaction) SetBoundaryEventRefs(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_boundaryEventRefs); i++ {
+		for i := 0; i < len(this.M_boundaryEventRefs); i++ {
 			if this.M_boundaryEventRefs[i] == refStr {
 				return
 			}
 		}
 		this.M_boundaryEventRefs = append(this.M_boundaryEventRefs, ref.(string))
-	}else{
+	} else {
 		this.RemoveBoundaryEventRefs(ref)
 		this.m_boundaryEventRefs = append(this.m_boundaryEventRefs, ref.(*BoundaryEvent))
 		this.M_boundaryEventRefs = append(this.M_boundaryEventRefs, ref.(BaseElement).GetUUID())
@@ -695,7 +690,7 @@ func (this *Transaction) SetBoundaryEventRefs(ref interface{}){
 }
 
 /** Remove reference BoundaryEventRefs **/
-func (this *Transaction) RemoveBoundaryEventRefs(ref interface{}){
+func (this *Transaction) RemoveBoundaryEventRefs(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	boundaryEventRefs_ := make([]*BoundaryEvent, 0)
@@ -711,16 +706,16 @@ func (this *Transaction) RemoveBoundaryEventRefs(ref interface{}){
 }
 
 /** DataInputAssociation **/
-func (this *Transaction) GetDataInputAssociation() []*DataInputAssociation{
+func (this *Transaction) GetDataInputAssociation() []*DataInputAssociation {
 	return this.M_dataInputAssociation
 }
 
 /** Init reference DataInputAssociation **/
-func (this *Transaction) SetDataInputAssociation(ref interface{}){
+func (this *Transaction) SetDataInputAssociation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var dataInputAssociations []*DataInputAssociation
-	for i:=0; i<len(this.M_dataInputAssociation); i++ {
+	for i := 0; i < len(this.M_dataInputAssociation); i++ {
 		if this.M_dataInputAssociation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			dataInputAssociations = append(dataInputAssociations, this.M_dataInputAssociation[i])
 		} else {
@@ -735,7 +730,7 @@ func (this *Transaction) SetDataInputAssociation(ref interface{}){
 }
 
 /** Remove reference DataInputAssociation **/
-func (this *Transaction) RemoveDataInputAssociation(ref interface{}){
+func (this *Transaction) RemoveDataInputAssociation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	dataInputAssociation_ := make([]*DataInputAssociation, 0)
@@ -748,16 +743,16 @@ func (this *Transaction) RemoveDataInputAssociation(ref interface{}){
 }
 
 /** DataOutputAssociation **/
-func (this *Transaction) GetDataOutputAssociation() []*DataOutputAssociation{
+func (this *Transaction) GetDataOutputAssociation() []*DataOutputAssociation {
 	return this.M_dataOutputAssociation
 }
 
 /** Init reference DataOutputAssociation **/
-func (this *Transaction) SetDataOutputAssociation(ref interface{}){
+func (this *Transaction) SetDataOutputAssociation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var dataOutputAssociations []*DataOutputAssociation
-	for i:=0; i<len(this.M_dataOutputAssociation); i++ {
+	for i := 0; i < len(this.M_dataOutputAssociation); i++ {
 		if this.M_dataOutputAssociation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			dataOutputAssociations = append(dataOutputAssociations, this.M_dataOutputAssociation[i])
 		} else {
@@ -772,7 +767,7 @@ func (this *Transaction) SetDataOutputAssociation(ref interface{}){
 }
 
 /** Remove reference DataOutputAssociation **/
-func (this *Transaction) RemoveDataOutputAssociation(ref interface{}){
+func (this *Transaction) RemoveDataOutputAssociation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	dataOutputAssociation_ := make([]*DataOutputAssociation, 0)
@@ -785,12 +780,12 @@ func (this *Transaction) RemoveDataOutputAssociation(ref interface{}){
 }
 
 /** StartQuantity **/
-func (this *Transaction) GetStartQuantity() int{
+func (this *Transaction) GetStartQuantity() int {
 	return this.M_startQuantity
 }
 
 /** Init reference StartQuantity **/
-func (this *Transaction) SetStartQuantity(ref interface{}){
+func (this *Transaction) SetStartQuantity(ref interface{}) {
 	this.NeedSave = true
 	this.M_startQuantity = ref.(int)
 }
@@ -798,12 +793,12 @@ func (this *Transaction) SetStartQuantity(ref interface{}){
 /** Remove reference StartQuantity **/
 
 /** CompletionQuantity **/
-func (this *Transaction) GetCompletionQuantity() int{
+func (this *Transaction) GetCompletionQuantity() int {
 	return this.M_completionQuantity
 }
 
 /** Init reference CompletionQuantity **/
-func (this *Transaction) SetCompletionQuantity(ref interface{}){
+func (this *Transaction) SetCompletionQuantity(ref interface{}) {
 	this.NeedSave = true
 	this.M_completionQuantity = ref.(int)
 }
@@ -811,16 +806,16 @@ func (this *Transaction) SetCompletionQuantity(ref interface{}){
 /** Remove reference CompletionQuantity **/
 
 /** FlowElement **/
-func (this *Transaction) GetFlowElement() []FlowElement{
+func (this *Transaction) GetFlowElement() []FlowElement {
 	return this.M_flowElement
 }
 
 /** Init reference FlowElement **/
-func (this *Transaction) SetFlowElement(ref interface{}){
+func (this *Transaction) SetFlowElement(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var flowElements []FlowElement
-	for i:=0; i<len(this.M_flowElement); i++ {
+	for i := 0; i < len(this.M_flowElement); i++ {
 		if this.M_flowElement[i].(BaseElement).GetUUID() != ref.(BaseElement).GetUUID() {
 			flowElements = append(flowElements, this.M_flowElement[i])
 		} else {
@@ -835,7 +830,7 @@ func (this *Transaction) SetFlowElement(ref interface{}){
 }
 
 /** Remove reference FlowElement **/
-func (this *Transaction) RemoveFlowElement(ref interface{}){
+func (this *Transaction) RemoveFlowElement(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	flowElement_ := make([]FlowElement, 0)
@@ -848,16 +843,16 @@ func (this *Transaction) RemoveFlowElement(ref interface{}){
 }
 
 /** LaneSet **/
-func (this *Transaction) GetLaneSet() []*LaneSet{
+func (this *Transaction) GetLaneSet() []*LaneSet {
 	return this.M_laneSet
 }
 
 /** Init reference LaneSet **/
-func (this *Transaction) SetLaneSet(ref interface{}){
+func (this *Transaction) SetLaneSet(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var laneSets []*LaneSet
-	for i:=0; i<len(this.M_laneSet); i++ {
+	for i := 0; i < len(this.M_laneSet); i++ {
 		if this.M_laneSet[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			laneSets = append(laneSets, this.M_laneSet[i])
 		} else {
@@ -872,7 +867,7 @@ func (this *Transaction) SetLaneSet(ref interface{}){
 }
 
 /** Remove reference LaneSet **/
-func (this *Transaction) RemoveLaneSet(ref interface{}){
+func (this *Transaction) RemoveLaneSet(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	laneSet_ := make([]*LaneSet, 0)
@@ -885,12 +880,12 @@ func (this *Transaction) RemoveLaneSet(ref interface{}){
 }
 
 /** TriggeredByEvent **/
-func (this *Transaction) GetTriggeredByEvent() bool{
+func (this *Transaction) GetTriggeredByEvent() bool {
 	return this.M_triggeredByEvent
 }
 
 /** Init reference TriggeredByEvent **/
-func (this *Transaction) SetTriggeredByEvent(ref interface{}){
+func (this *Transaction) SetTriggeredByEvent(ref interface{}) {
 	this.NeedSave = true
 	this.M_triggeredByEvent = ref.(bool)
 }
@@ -898,16 +893,16 @@ func (this *Transaction) SetTriggeredByEvent(ref interface{}){
 /** Remove reference TriggeredByEvent **/
 
 /** Artifact **/
-func (this *Transaction) GetArtifact() []Artifact{
+func (this *Transaction) GetArtifact() []Artifact {
 	return this.M_artifact
 }
 
 /** Init reference Artifact **/
-func (this *Transaction) SetArtifact(ref interface{}){
+func (this *Transaction) SetArtifact(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var artifacts []Artifact
-	for i:=0; i<len(this.M_artifact); i++ {
+	for i := 0; i < len(this.M_artifact); i++ {
 		if this.M_artifact[i].(BaseElement).GetUUID() != ref.(BaseElement).GetUUID() {
 			artifacts = append(artifacts, this.M_artifact[i])
 		} else {
@@ -922,7 +917,7 @@ func (this *Transaction) SetArtifact(ref interface{}){
 }
 
 /** Remove reference Artifact **/
-func (this *Transaction) RemoveArtifact(ref interface{}){
+func (this *Transaction) RemoveArtifact(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	artifact_ := make([]Artifact, 0)
@@ -935,12 +930,12 @@ func (this *Transaction) RemoveArtifact(ref interface{}){
 }
 
 /** Protocol **/
-func (this *Transaction) GetProtocol() string{
+func (this *Transaction) GetProtocol() string {
 	return this.M_protocol
 }
 
 /** Init reference Protocol **/
-func (this *Transaction) SetProtocol(ref interface{}){
+func (this *Transaction) SetProtocol(ref interface{}) {
 	this.NeedSave = true
 	this.M_protocol = ref.(string)
 }
@@ -948,12 +943,12 @@ func (this *Transaction) SetProtocol(ref interface{}){
 /** Remove reference Protocol **/
 
 /** Method **/
-func (this *Transaction) GetMethod() TransactionMethod{
+func (this *Transaction) GetMethod() TransactionMethod {
 	return this.M_method
 }
 
 /** Init reference Method **/
-func (this *Transaction) SetMethod(ref interface{}){
+func (this *Transaction) SetMethod(ref interface{}) {
 	this.NeedSave = true
 	this.M_method = ref.(TransactionMethod)
 }
@@ -961,12 +956,12 @@ func (this *Transaction) SetMethod(ref interface{}){
 /** Remove reference Method **/
 
 /** MethodStr **/
-func (this *Transaction) GetMethodStr() string{
+func (this *Transaction) GetMethodStr() string {
 	return this.M_methodStr
 }
 
 /** Init reference MethodStr **/
-func (this *Transaction) SetMethodStr(ref interface{}){
+func (this *Transaction) SetMethodStr(ref interface{}) {
 	this.NeedSave = true
 	this.M_methodStr = ref.(string)
 }
@@ -974,21 +969,21 @@ func (this *Transaction) SetMethodStr(ref interface{}){
 /** Remove reference MethodStr **/
 
 /** Lane **/
-func (this *Transaction) GetLanePtr() []*Lane{
+func (this *Transaction) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *Transaction) SetLanePtr(ref interface{}){
+func (this *Transaction) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -996,7 +991,7 @@ func (this *Transaction) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *Transaction) RemoveLanePtr(ref interface{}){
+func (this *Transaction) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -1012,21 +1007,21 @@ func (this *Transaction) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *Transaction) GetOutgoingPtr() []*Association{
+func (this *Transaction) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *Transaction) SetOutgoingPtr(ref interface{}){
+func (this *Transaction) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -1034,7 +1029,7 @@ func (this *Transaction) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *Transaction) RemoveOutgoingPtr(ref interface{}){
+func (this *Transaction) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -1050,21 +1045,21 @@ func (this *Transaction) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *Transaction) GetIncomingPtr() []*Association{
+func (this *Transaction) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *Transaction) SetIncomingPtr(ref interface{}){
+func (this *Transaction) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -1072,7 +1067,7 @@ func (this *Transaction) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *Transaction) RemoveIncomingPtr(ref interface{}){
+func (this *Transaction) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -1088,23 +1083,23 @@ func (this *Transaction) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Container **/
-func (this *Transaction) GetContainerPtr() FlowElementsContainer{
+func (this *Transaction) GetContainerPtr() FlowElementsContainer {
 	return this.m_containerPtr
 }
 
 /** Init reference Container **/
-func (this *Transaction) SetContainerPtr(ref interface{}){
+func (this *Transaction) SetContainerPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_containerPtr = ref.(string)
-	}else{
+	} else {
 		this.m_containerPtr = ref.(FlowElementsContainer)
 		this.M_containerPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Container **/
-func (this *Transaction) RemoveContainerPtr(ref interface{}){
+func (this *Transaction) RemoveContainerPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_containerPtr.(BaseElement).GetUUID() {
@@ -1114,21 +1109,21 @@ func (this *Transaction) RemoveContainerPtr(ref interface{}){
 }
 
 /** CompensateEventDefinition **/
-func (this *Transaction) GetCompensateEventDefinitionPtr() []*CompensateEventDefinition{
+func (this *Transaction) GetCompensateEventDefinitionPtr() []*CompensateEventDefinition {
 	return this.m_compensateEventDefinitionPtr
 }
 
 /** Init reference CompensateEventDefinition **/
-func (this *Transaction) SetCompensateEventDefinitionPtr(ref interface{}){
+func (this *Transaction) SetCompensateEventDefinitionPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_compensateEventDefinitionPtr); i++ {
+		for i := 0; i < len(this.M_compensateEventDefinitionPtr); i++ {
 			if this.M_compensateEventDefinitionPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_compensateEventDefinitionPtr = append(this.M_compensateEventDefinitionPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCompensateEventDefinitionPtr(ref)
 		this.m_compensateEventDefinitionPtr = append(this.m_compensateEventDefinitionPtr, ref.(*CompensateEventDefinition))
 		this.M_compensateEventDefinitionPtr = append(this.M_compensateEventDefinitionPtr, ref.(BaseElement).GetUUID())
@@ -1136,7 +1131,7 @@ func (this *Transaction) SetCompensateEventDefinitionPtr(ref interface{}){
 }
 
 /** Remove reference CompensateEventDefinition **/
-func (this *Transaction) RemoveCompensateEventDefinitionPtr(ref interface{}){
+func (this *Transaction) RemoveCompensateEventDefinitionPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	compensateEventDefinitionPtr_ := make([]*CompensateEventDefinition, 0)

@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type ChoreographyActivity interface{
+type ChoreographyActivity interface {
 	/** Method of ChoreographyActivity **/
 
 	/** UUID **/
@@ -17,5 +18,4 @@ type ChoreographyActivity interface{
 
 	/** LoopType **/
 	GetLoopType() ChoreographyLoopType
-
 }

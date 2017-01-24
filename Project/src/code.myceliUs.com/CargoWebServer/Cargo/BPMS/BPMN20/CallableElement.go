@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type CallableElement interface{
+type CallableElement interface {
 	/** Method of CallableElement **/
 
 	/** UUID **/
@@ -17,5 +18,4 @@ type CallableElement interface{
 
 	/** IoBinding **/
 	GetIoBinding() []*InputOutputBinding
-
 }

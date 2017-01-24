@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type GlobalBusinessRuleTask struct{
+type GlobalBusinessRuleTask struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,50 +15,49 @@ type GlobalBusinessRuleTask struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of RootElement **/
 	/** No members **/
 
 	/** members of CallableElement **/
-	M_name string
-	M_ioSpecification *InputOutputSpecification
+	M_name                  string
+	M_ioSpecification       *InputOutputSpecification
 	m_supportedInterfaceRef []*Interface
 	/** If the ref is a string and not an object **/
 	M_supportedInterfaceRef []string
-	M_ioBinding []*InputOutputBinding
+	M_ioBinding             []*InputOutputBinding
 
 	/** members of GlobalTask **/
 	M_resourceRole []ResourceRole
 
 	/** members of GlobalBusinessRuleTask **/
-	M_implementation Implementation
+	M_implementation    Implementation
 	M_implementationStr string
-
 
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr    []string
 	m_definitionsPtr *Definitions
 	/** If the ref is a string and not an object **/
-	M_definitionsPtr string
+	M_definitionsPtr  string
 	m_callActivityPtr []*CallActivity
 	/** If the ref is a string and not an object **/
 	M_callActivityPtr []string
@@ -65,46 +65,42 @@ type GlobalBusinessRuleTask struct{
 
 /** Xml parser for GlobalBusinessRuleTask **/
 type XsdGlobalBusinessRuleTask struct {
-	XMLName xml.Name	`xml:"globalBusinessRuleTask"`
+	XMLName xml.Name `xml:"globalBusinessRuleTask"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** RootElement **/
 
-
 	/** CallableElement **/
-	M_supportedInterfaceRef	[]string	`xml:"supportedInterfaceRef"`
-	M_ioSpecification	*XsdInputOutputSpecification	`xml:"ioSpecification,omitempty"`
-	M_ioBinding	[]*XsdInputOutputBinding	`xml:"ioBinding,omitempty"`
-	M_name	string	`xml:"name,attr"`
-
+	M_supportedInterfaceRef []string                     `xml:"supportedInterfaceRef"`
+	M_ioSpecification       *XsdInputOutputSpecification `xml:"ioSpecification,omitempty"`
+	M_ioBinding             []*XsdInputOutputBinding     `xml:"ioBinding,omitempty"`
+	M_name                  string                       `xml:"name,attr"`
 
 	/** GlobalTask **/
-	M_resourceRole_0	[]*XsdHumanPerformer	`xml:"humanPerformer,omitempty"`
-	M_resourceRole_1	[]*XsdPotentialOwner	`xml:"potentialOwner,omitempty"`
-	M_resourceRole_2	[]*XsdPerformer	`xml:"performer,omitempty"`
-	M_resourceRole_3	[]*XsdResourceRole	`xml:"resourceRole,omitempty"`
+	M_resourceRole_0 []*XsdHumanPerformer `xml:"humanPerformer,omitempty"`
+	M_resourceRole_1 []*XsdPotentialOwner `xml:"potentialOwner,omitempty"`
+	M_resourceRole_2 []*XsdPerformer      `xml:"performer,omitempty"`
+	M_resourceRole_3 []*XsdResourceRole   `xml:"resourceRole,omitempty"`
 
-
-	M_implementation	string	`xml:"implementation,attr"`
-
+	M_implementation string `xml:"implementation,attr"`
 }
+
 /** UUID **/
-func (this *GlobalBusinessRuleTask) GetUUID() string{
+func (this *GlobalBusinessRuleTask) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *GlobalBusinessRuleTask) GetId() string{
+func (this *GlobalBusinessRuleTask) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *GlobalBusinessRuleTask) SetId(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -112,16 +108,16 @@ func (this *GlobalBusinessRuleTask) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *GlobalBusinessRuleTask) GetOther() interface{}{
+func (this *GlobalBusinessRuleTask) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *GlobalBusinessRuleTask) SetOther(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -129,12 +125,12 @@ func (this *GlobalBusinessRuleTask) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *GlobalBusinessRuleTask) GetExtensionElements() *ExtensionElements{
+func (this *GlobalBusinessRuleTask) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *GlobalBusinessRuleTask) SetExtensionElements(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -142,16 +138,16 @@ func (this *GlobalBusinessRuleTask) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *GlobalBusinessRuleTask) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *GlobalBusinessRuleTask) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *GlobalBusinessRuleTask) SetExtensionDefinitions(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -168,16 +164,16 @@ func (this *GlobalBusinessRuleTask) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *GlobalBusinessRuleTask) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *GlobalBusinessRuleTask) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *GlobalBusinessRuleTask) SetExtensionValues(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -194,16 +190,16 @@ func (this *GlobalBusinessRuleTask) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *GlobalBusinessRuleTask) GetDocumentation() []*Documentation{
+func (this *GlobalBusinessRuleTask) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *GlobalBusinessRuleTask) SetDocumentation(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -218,7 +214,7 @@ func (this *GlobalBusinessRuleTask) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *GlobalBusinessRuleTask) RemoveDocumentation(ref interface{}){
+func (this *GlobalBusinessRuleTask) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -231,12 +227,12 @@ func (this *GlobalBusinessRuleTask) RemoveDocumentation(ref interface{}){
 }
 
 /** Name **/
-func (this *GlobalBusinessRuleTask) GetName() string{
+func (this *GlobalBusinessRuleTask) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *GlobalBusinessRuleTask) SetName(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -244,18 +240,18 @@ func (this *GlobalBusinessRuleTask) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** IoSpecification **/
-func (this *GlobalBusinessRuleTask) GetIoSpecification() *InputOutputSpecification{
+func (this *GlobalBusinessRuleTask) GetIoSpecification() *InputOutputSpecification {
 	return this.M_ioSpecification
 }
 
 /** Init reference IoSpecification **/
-func (this *GlobalBusinessRuleTask) SetIoSpecification(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetIoSpecification(ref interface{}) {
 	this.NeedSave = true
 	this.M_ioSpecification = ref.(*InputOutputSpecification)
 }
 
 /** Remove reference IoSpecification **/
-func (this *GlobalBusinessRuleTask) RemoveIoSpecification(ref interface{}){
+func (this *GlobalBusinessRuleTask) RemoveIoSpecification(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_ioSpecification.GetUUID() {
@@ -264,21 +260,21 @@ func (this *GlobalBusinessRuleTask) RemoveIoSpecification(ref interface{}){
 }
 
 /** SupportedInterfaceRef **/
-func (this *GlobalBusinessRuleTask) GetSupportedInterfaceRef() []*Interface{
+func (this *GlobalBusinessRuleTask) GetSupportedInterfaceRef() []*Interface {
 	return this.m_supportedInterfaceRef
 }
 
 /** Init reference SupportedInterfaceRef **/
-func (this *GlobalBusinessRuleTask) SetSupportedInterfaceRef(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetSupportedInterfaceRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_supportedInterfaceRef); i++ {
+		for i := 0; i < len(this.M_supportedInterfaceRef); i++ {
 			if this.M_supportedInterfaceRef[i] == refStr {
 				return
 			}
 		}
 		this.M_supportedInterfaceRef = append(this.M_supportedInterfaceRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveSupportedInterfaceRef(ref)
 		this.m_supportedInterfaceRef = append(this.m_supportedInterfaceRef, ref.(*Interface))
 		this.M_supportedInterfaceRef = append(this.M_supportedInterfaceRef, ref.(BaseElement).GetUUID())
@@ -286,7 +282,7 @@ func (this *GlobalBusinessRuleTask) SetSupportedInterfaceRef(ref interface{}){
 }
 
 /** Remove reference SupportedInterfaceRef **/
-func (this *GlobalBusinessRuleTask) RemoveSupportedInterfaceRef(ref interface{}){
+func (this *GlobalBusinessRuleTask) RemoveSupportedInterfaceRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	supportedInterfaceRef_ := make([]*Interface, 0)
@@ -302,16 +298,16 @@ func (this *GlobalBusinessRuleTask) RemoveSupportedInterfaceRef(ref interface{})
 }
 
 /** IoBinding **/
-func (this *GlobalBusinessRuleTask) GetIoBinding() []*InputOutputBinding{
+func (this *GlobalBusinessRuleTask) GetIoBinding() []*InputOutputBinding {
 	return this.M_ioBinding
 }
 
 /** Init reference IoBinding **/
-func (this *GlobalBusinessRuleTask) SetIoBinding(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetIoBinding(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var ioBindings []*InputOutputBinding
-	for i:=0; i<len(this.M_ioBinding); i++ {
+	for i := 0; i < len(this.M_ioBinding); i++ {
 		if this.M_ioBinding[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			ioBindings = append(ioBindings, this.M_ioBinding[i])
 		} else {
@@ -326,7 +322,7 @@ func (this *GlobalBusinessRuleTask) SetIoBinding(ref interface{}){
 }
 
 /** Remove reference IoBinding **/
-func (this *GlobalBusinessRuleTask) RemoveIoBinding(ref interface{}){
+func (this *GlobalBusinessRuleTask) RemoveIoBinding(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	ioBinding_ := make([]*InputOutputBinding, 0)
@@ -339,16 +335,16 @@ func (this *GlobalBusinessRuleTask) RemoveIoBinding(ref interface{}){
 }
 
 /** ResourceRole **/
-func (this *GlobalBusinessRuleTask) GetResourceRole() []ResourceRole{
+func (this *GlobalBusinessRuleTask) GetResourceRole() []ResourceRole {
 	return this.M_resourceRole
 }
 
 /** Init reference ResourceRole **/
-func (this *GlobalBusinessRuleTask) SetResourceRole(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetResourceRole(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var resourceRoles []ResourceRole
-	for i:=0; i<len(this.M_resourceRole); i++ {
+	for i := 0; i < len(this.M_resourceRole); i++ {
 		if this.M_resourceRole[i].(BaseElement).GetUUID() != ref.(BaseElement).GetUUID() {
 			resourceRoles = append(resourceRoles, this.M_resourceRole[i])
 		} else {
@@ -363,7 +359,7 @@ func (this *GlobalBusinessRuleTask) SetResourceRole(ref interface{}){
 }
 
 /** Remove reference ResourceRole **/
-func (this *GlobalBusinessRuleTask) RemoveResourceRole(ref interface{}){
+func (this *GlobalBusinessRuleTask) RemoveResourceRole(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	resourceRole_ := make([]ResourceRole, 0)
@@ -376,12 +372,12 @@ func (this *GlobalBusinessRuleTask) RemoveResourceRole(ref interface{}){
 }
 
 /** Implementation **/
-func (this *GlobalBusinessRuleTask) GetImplementation() Implementation{
+func (this *GlobalBusinessRuleTask) GetImplementation() Implementation {
 	return this.M_implementation
 }
 
 /** Init reference Implementation **/
-func (this *GlobalBusinessRuleTask) SetImplementation(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetImplementation(ref interface{}) {
 	this.NeedSave = true
 	this.M_implementation = ref.(Implementation)
 }
@@ -389,12 +385,12 @@ func (this *GlobalBusinessRuleTask) SetImplementation(ref interface{}){
 /** Remove reference Implementation **/
 
 /** ImplementationStr **/
-func (this *GlobalBusinessRuleTask) GetImplementationStr() string{
+func (this *GlobalBusinessRuleTask) GetImplementationStr() string {
 	return this.M_implementationStr
 }
 
 /** Init reference ImplementationStr **/
-func (this *GlobalBusinessRuleTask) SetImplementationStr(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetImplementationStr(ref interface{}) {
 	this.NeedSave = true
 	this.M_implementationStr = ref.(string)
 }
@@ -402,21 +398,21 @@ func (this *GlobalBusinessRuleTask) SetImplementationStr(ref interface{}){
 /** Remove reference ImplementationStr **/
 
 /** Lane **/
-func (this *GlobalBusinessRuleTask) GetLanePtr() []*Lane{
+func (this *GlobalBusinessRuleTask) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *GlobalBusinessRuleTask) SetLanePtr(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -424,7 +420,7 @@ func (this *GlobalBusinessRuleTask) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *GlobalBusinessRuleTask) RemoveLanePtr(ref interface{}){
+func (this *GlobalBusinessRuleTask) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -440,21 +436,21 @@ func (this *GlobalBusinessRuleTask) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *GlobalBusinessRuleTask) GetOutgoingPtr() []*Association{
+func (this *GlobalBusinessRuleTask) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *GlobalBusinessRuleTask) SetOutgoingPtr(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -462,7 +458,7 @@ func (this *GlobalBusinessRuleTask) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *GlobalBusinessRuleTask) RemoveOutgoingPtr(ref interface{}){
+func (this *GlobalBusinessRuleTask) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -478,21 +474,21 @@ func (this *GlobalBusinessRuleTask) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *GlobalBusinessRuleTask) GetIncomingPtr() []*Association{
+func (this *GlobalBusinessRuleTask) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *GlobalBusinessRuleTask) SetIncomingPtr(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -500,7 +496,7 @@ func (this *GlobalBusinessRuleTask) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *GlobalBusinessRuleTask) RemoveIncomingPtr(ref interface{}){
+func (this *GlobalBusinessRuleTask) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -516,23 +512,23 @@ func (this *GlobalBusinessRuleTask) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Definitions **/
-func (this *GlobalBusinessRuleTask) GetDefinitionsPtr() *Definitions{
+func (this *GlobalBusinessRuleTask) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *GlobalBusinessRuleTask) SetDefinitionsPtr(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *GlobalBusinessRuleTask) RemoveDefinitionsPtr(ref interface{}){
+func (this *GlobalBusinessRuleTask) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {
@@ -542,21 +538,21 @@ func (this *GlobalBusinessRuleTask) RemoveDefinitionsPtr(ref interface{}){
 }
 
 /** CallActivity **/
-func (this *GlobalBusinessRuleTask) GetCallActivityPtr() []*CallActivity{
+func (this *GlobalBusinessRuleTask) GetCallActivityPtr() []*CallActivity {
 	return this.m_callActivityPtr
 }
 
 /** Init reference CallActivity **/
-func (this *GlobalBusinessRuleTask) SetCallActivityPtr(ref interface{}){
+func (this *GlobalBusinessRuleTask) SetCallActivityPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_callActivityPtr); i++ {
+		for i := 0; i < len(this.M_callActivityPtr); i++ {
 			if this.M_callActivityPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_callActivityPtr = append(this.M_callActivityPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCallActivityPtr(ref)
 		this.m_callActivityPtr = append(this.m_callActivityPtr, ref.(*CallActivity))
 		this.M_callActivityPtr = append(this.M_callActivityPtr, ref.(BaseElement).GetUUID())
@@ -564,7 +560,7 @@ func (this *GlobalBusinessRuleTask) SetCallActivityPtr(ref interface{}){
 }
 
 /** Remove reference CallActivity **/
-func (this *GlobalBusinessRuleTask) RemoveCallActivityPtr(ref interface{}){
+func (this *GlobalBusinessRuleTask) RemoveCallActivityPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	callActivityPtr_ := make([]*CallActivity, 0)

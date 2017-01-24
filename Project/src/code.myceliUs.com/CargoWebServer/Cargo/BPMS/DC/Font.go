@@ -1,10 +1,11 @@
+//+build BPMN
 package DC
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type Font struct{
+type Font struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,41 +15,40 @@ type Font struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Font **/
-	M_name string
-	M_size float64
-	M_isBold bool
-	M_isItalic bool
-	M_isUnderline bool
+	M_name            string
+	M_size            float64
+	M_isBold          bool
+	M_isItalic        bool
+	M_isUnderline     bool
 	M_isStrikeThrough bool
-
 }
 
 /** Xml parser for Font **/
 type XsdFont struct {
-	XMLName xml.Name	`xml:"Font"`
-	M_name	string	`xml:"name,attr"`
-	M_size	float64	`xml:"size,attr"`
-	M_isBold	bool	`xml:"isBold,attr"`
-	M_isItalic	bool	`xml:"isItalic,attr"`
-	M_isUnderline	bool	`xml:"isUnderline,attr"`
-	M_isStrikeThrough	bool	`xml:"isStrikeThrough,attr"`
-
+	XMLName           xml.Name `xml:"Font"`
+	M_name            string   `xml:"name,attr"`
+	M_size            float64  `xml:"size,attr"`
+	M_isBold          bool     `xml:"isBold,attr"`
+	M_isItalic        bool     `xml:"isItalic,attr"`
+	M_isUnderline     bool     `xml:"isUnderline,attr"`
+	M_isStrikeThrough bool     `xml:"isStrikeThrough,attr"`
 }
+
 /** UUID **/
-func (this *Font) GetUUID() string{
+func (this *Font) GetUUID() string {
 	return this.UUID
 }
 
 /** Name **/
-func (this *Font) GetName() string{
+func (this *Font) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *Font) SetName(ref interface{}){
+func (this *Font) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -56,12 +56,12 @@ func (this *Font) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** Size **/
-func (this *Font) GetSize() float64{
+func (this *Font) GetSize() float64 {
 	return this.M_size
 }
 
 /** Init reference Size **/
-func (this *Font) SetSize(ref interface{}){
+func (this *Font) SetSize(ref interface{}) {
 	this.NeedSave = true
 	this.M_size = ref.(float64)
 }
@@ -69,12 +69,12 @@ func (this *Font) SetSize(ref interface{}){
 /** Remove reference Size **/
 
 /** IsBold **/
-func (this *Font) IsBold() bool{
+func (this *Font) IsBold() bool {
 	return this.M_isBold
 }
 
 /** Init reference IsBold **/
-func (this *Font) SetIsBold(ref interface{}){
+func (this *Font) SetIsBold(ref interface{}) {
 	this.NeedSave = true
 	this.M_isBold = ref.(bool)
 }
@@ -82,12 +82,12 @@ func (this *Font) SetIsBold(ref interface{}){
 /** Remove reference IsBold **/
 
 /** IsItalic **/
-func (this *Font) IsItalic() bool{
+func (this *Font) IsItalic() bool {
 	return this.M_isItalic
 }
 
 /** Init reference IsItalic **/
-func (this *Font) SetIsItalic(ref interface{}){
+func (this *Font) SetIsItalic(ref interface{}) {
 	this.NeedSave = true
 	this.M_isItalic = ref.(bool)
 }
@@ -95,12 +95,12 @@ func (this *Font) SetIsItalic(ref interface{}){
 /** Remove reference IsItalic **/
 
 /** IsUnderline **/
-func (this *Font) IsUnderline() bool{
+func (this *Font) IsUnderline() bool {
 	return this.M_isUnderline
 }
 
 /** Init reference IsUnderline **/
-func (this *Font) SetIsUnderline(ref interface{}){
+func (this *Font) SetIsUnderline(ref interface{}) {
 	this.NeedSave = true
 	this.M_isUnderline = ref.(bool)
 }
@@ -108,12 +108,12 @@ func (this *Font) SetIsUnderline(ref interface{}){
 /** Remove reference IsUnderline **/
 
 /** IsStrikeThrough **/
-func (this *Font) IsStrikeThrough() bool{
+func (this *Font) IsStrikeThrough() bool {
 	return this.M_isStrikeThrough
 }
 
 /** Init reference IsStrikeThrough **/
-func (this *Font) SetIsStrikeThrough(ref interface{}){
+func (this *Font) SetIsStrikeThrough(ref interface{}) {
 	this.NeedSave = true
 	this.M_isStrikeThrough = ref.(bool)
 }

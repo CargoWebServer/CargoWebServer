@@ -1,3 +1,4 @@
+//+build BPMN
 package Server
 
 /** Entity Prototype creation **/

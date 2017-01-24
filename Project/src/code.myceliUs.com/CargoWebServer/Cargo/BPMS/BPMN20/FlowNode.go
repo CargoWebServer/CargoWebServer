@@ -1,6 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type FlowNode interface{
+type FlowNode interface {
 	/** Method of FlowNode **/
 
 	/** UUID **/
@@ -14,5 +15,4 @@ type FlowNode interface{
 
 	/** Lanes **/
 	GetLanes() []*Lane
-
 }

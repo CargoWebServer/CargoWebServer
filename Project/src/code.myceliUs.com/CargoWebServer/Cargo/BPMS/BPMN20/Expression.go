@@ -1,7 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type Expression interface{
+type Expression interface {
 	/** UUID **/
 	GetUUID() string
-
 }

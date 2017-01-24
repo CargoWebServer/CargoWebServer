@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type StartEvent struct{
+type StartEvent struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,22 +15,22 @@ type StartEvent struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of FlowElement **/
-	M_name string
-	M_auditing *Auditing
-	M_monitoring *Monitoring
+	M_name             string
+	M_auditing         *Auditing
+	M_monitoring       *Monitoring
 	m_categoryValueRef []*CategoryValue
 	/** If the ref is a string and not an object **/
 	M_categoryValueRef []string
@@ -41,7 +42,7 @@ type StartEvent struct{
 	m_incoming []*SequenceFlow
 	/** If the ref is a string and not an object **/
 	M_incoming []string
-	m_lanes []*Lane
+	m_lanes    []*Lane
 	/** If the ref is a string and not an object **/
 	M_lanes []string
 
@@ -57,32 +58,31 @@ type StartEvent struct{
 	M_property []*Property
 
 	/** members of CatchEvent **/
-	M_parallelMultiple bool
-	M_outputSet *OutputSet
+	M_parallelMultiple   bool
+	M_outputSet          *OutputSet
 	m_eventDefinitionRef []EventDefinition
 	/** If the ref is a string and not an object **/
-	M_eventDefinitionRef []string
+	M_eventDefinitionRef    []string
 	M_dataOutputAssociation []*DataOutputAssociation
-	M_dataOutput []*DataOutput
-	M_eventDefinition []EventDefinition
+	M_dataOutput            []*DataOutput
+	M_eventDefinition       []EventDefinition
 
 	/** members of StartEvent **/
 	M_isInterrupting bool
 
-
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr  []string
 	m_containerPtr FlowElementsContainer
 	/** If the ref is a string and not an object **/
-	M_containerPtr string
+	M_containerPtr   string
 	m_messageFlowPtr []*MessageFlow
 	/** If the ref is a string and not an object **/
 	M_messageFlowPtr []string
@@ -90,64 +90,59 @@ type StartEvent struct{
 
 /** Xml parser for StartEvent **/
 type XsdStartEvent struct {
-	XMLName xml.Name	`xml:"startEvent"`
+	XMLName xml.Name `xml:"startEvent"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** FlowElement **/
-	M_auditing	*XsdAuditing	`xml:"auditing,omitempty"`
-	M_monitoring	*XsdMonitoring	`xml:"monitoring,omitempty"`
-	M_categoryValueRef	[]string	`xml:"categoryValueRef"`
-	M_name	string	`xml:"name,attr"`
-
+	M_auditing         *XsdAuditing   `xml:"auditing,omitempty"`
+	M_monitoring       *XsdMonitoring `xml:"monitoring,omitempty"`
+	M_categoryValueRef []string       `xml:"categoryValueRef"`
+	M_name             string         `xml:"name,attr"`
 
 	/** FlowNode **/
-	M_incoming	[]string	`xml:"incoming"`
-	M_outgoing	[]string	`xml:"outgoing"`
-
+	M_incoming []string `xml:"incoming"`
+	M_outgoing []string `xml:"outgoing"`
 
 	/** Event **/
-	M_property	[]*XsdProperty	`xml:"property,omitempty"`
-
+	M_property []*XsdProperty `xml:"property,omitempty"`
 
 	/** CatchEvent **/
-	M_dataOutput	[]*XsdDataOutput	`xml:"dataOutput,omitempty"`
-	M_dataOutputAssociation	[]*XsdDataOutputAssociation	`xml:"dataOutputAssociation,omitempty"`
-	M_outputSet	*XsdOutputSet	`xml:"outputSet,omitempty"`
-	M_eventDefinition_0	[]*XsdCancelEventDefinition	`xml:"cancelEventDefinition,omitempty"`
-	M_eventDefinition_1	[]*XsdCompensateEventDefinition	`xml:"compensateEventDefinition,omitempty"`
-	M_eventDefinition_2	[]*XsdConditionalEventDefinition	`xml:"conditionalEventDefinition,omitempty"`
-	M_eventDefinition_3	[]*XsdErrorEventDefinition	`xml:"errorEventDefinition,omitempty"`
-	M_eventDefinition_4	[]*XsdEscalationEventDefinition	`xml:"escalationEventDefinition,omitempty"`
-	M_eventDefinition_5	[]*XsdLinkEventDefinition	`xml:"linkEventDefinition,omitempty"`
-	M_eventDefinition_6	[]*XsdMessageEventDefinition	`xml:"messageEventDefinition,omitempty"`
-	M_eventDefinition_7	[]*XsdSignalEventDefinition	`xml:"signalEventDefinition,omitempty"`
-	M_eventDefinition_8	[]*XsdTerminateEventDefinition	`xml:"terminateEventDefinition,omitempty"`
-	M_eventDefinition_9	[]*XsdTimerEventDefinition	`xml:"timerEventDefinition,omitempty"`
+	M_dataOutput            []*XsdDataOutput                 `xml:"dataOutput,omitempty"`
+	M_dataOutputAssociation []*XsdDataOutputAssociation      `xml:"dataOutputAssociation,omitempty"`
+	M_outputSet             *XsdOutputSet                    `xml:"outputSet,omitempty"`
+	M_eventDefinition_0     []*XsdCancelEventDefinition      `xml:"cancelEventDefinition,omitempty"`
+	M_eventDefinition_1     []*XsdCompensateEventDefinition  `xml:"compensateEventDefinition,omitempty"`
+	M_eventDefinition_2     []*XsdConditionalEventDefinition `xml:"conditionalEventDefinition,omitempty"`
+	M_eventDefinition_3     []*XsdErrorEventDefinition       `xml:"errorEventDefinition,omitempty"`
+	M_eventDefinition_4     []*XsdEscalationEventDefinition  `xml:"escalationEventDefinition,omitempty"`
+	M_eventDefinition_5     []*XsdLinkEventDefinition        `xml:"linkEventDefinition,omitempty"`
+	M_eventDefinition_6     []*XsdMessageEventDefinition     `xml:"messageEventDefinition,omitempty"`
+	M_eventDefinition_7     []*XsdSignalEventDefinition      `xml:"signalEventDefinition,omitempty"`
+	M_eventDefinition_8     []*XsdTerminateEventDefinition   `xml:"terminateEventDefinition,omitempty"`
+	M_eventDefinition_9     []*XsdTimerEventDefinition       `xml:"timerEventDefinition,omitempty"`
 
-	M_eventDefinitionRef	[]string	`xml:"eventDefinitionRef"`
-	M_parallelMultiple	bool	`xml:"parallelMultiple,attr"`
+	M_eventDefinitionRef []string `xml:"eventDefinitionRef"`
+	M_parallelMultiple   bool     `xml:"parallelMultiple,attr"`
 
-
-	M_isInterrupting	bool	`xml:"isInterrupting,attr"`
-
+	M_isInterrupting bool `xml:"isInterrupting,attr"`
 }
+
 /** UUID **/
-func (this *StartEvent) GetUUID() string{
+func (this *StartEvent) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *StartEvent) GetId() string{
+func (this *StartEvent) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *StartEvent) SetId(ref interface{}){
+func (this *StartEvent) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -155,16 +150,16 @@ func (this *StartEvent) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *StartEvent) GetOther() interface{}{
+func (this *StartEvent) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *StartEvent) SetOther(ref interface{}){
+func (this *StartEvent) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -172,12 +167,12 @@ func (this *StartEvent) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *StartEvent) GetExtensionElements() *ExtensionElements{
+func (this *StartEvent) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *StartEvent) SetExtensionElements(ref interface{}){
+func (this *StartEvent) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -185,16 +180,16 @@ func (this *StartEvent) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *StartEvent) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *StartEvent) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *StartEvent) SetExtensionDefinitions(ref interface{}){
+func (this *StartEvent) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -211,16 +206,16 @@ func (this *StartEvent) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *StartEvent) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *StartEvent) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *StartEvent) SetExtensionValues(ref interface{}){
+func (this *StartEvent) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -237,16 +232,16 @@ func (this *StartEvent) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *StartEvent) GetDocumentation() []*Documentation{
+func (this *StartEvent) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *StartEvent) SetDocumentation(ref interface{}){
+func (this *StartEvent) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -261,7 +256,7 @@ func (this *StartEvent) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *StartEvent) RemoveDocumentation(ref interface{}){
+func (this *StartEvent) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -274,12 +269,12 @@ func (this *StartEvent) RemoveDocumentation(ref interface{}){
 }
 
 /** Name **/
-func (this *StartEvent) GetName() string{
+func (this *StartEvent) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *StartEvent) SetName(ref interface{}){
+func (this *StartEvent) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -287,18 +282,18 @@ func (this *StartEvent) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** Auditing **/
-func (this *StartEvent) GetAuditing() *Auditing{
+func (this *StartEvent) GetAuditing() *Auditing {
 	return this.M_auditing
 }
 
 /** Init reference Auditing **/
-func (this *StartEvent) SetAuditing(ref interface{}){
+func (this *StartEvent) SetAuditing(ref interface{}) {
 	this.NeedSave = true
 	this.M_auditing = ref.(*Auditing)
 }
 
 /** Remove reference Auditing **/
-func (this *StartEvent) RemoveAuditing(ref interface{}){
+func (this *StartEvent) RemoveAuditing(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_auditing.GetUUID() {
@@ -307,18 +302,18 @@ func (this *StartEvent) RemoveAuditing(ref interface{}){
 }
 
 /** Monitoring **/
-func (this *StartEvent) GetMonitoring() *Monitoring{
+func (this *StartEvent) GetMonitoring() *Monitoring {
 	return this.M_monitoring
 }
 
 /** Init reference Monitoring **/
-func (this *StartEvent) SetMonitoring(ref interface{}){
+func (this *StartEvent) SetMonitoring(ref interface{}) {
 	this.NeedSave = true
 	this.M_monitoring = ref.(*Monitoring)
 }
 
 /** Remove reference Monitoring **/
-func (this *StartEvent) RemoveMonitoring(ref interface{}){
+func (this *StartEvent) RemoveMonitoring(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_monitoring.GetUUID() {
@@ -327,21 +322,21 @@ func (this *StartEvent) RemoveMonitoring(ref interface{}){
 }
 
 /** CategoryValueRef **/
-func (this *StartEvent) GetCategoryValueRef() []*CategoryValue{
+func (this *StartEvent) GetCategoryValueRef() []*CategoryValue {
 	return this.m_categoryValueRef
 }
 
 /** Init reference CategoryValueRef **/
-func (this *StartEvent) SetCategoryValueRef(ref interface{}){
+func (this *StartEvent) SetCategoryValueRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_categoryValueRef); i++ {
+		for i := 0; i < len(this.M_categoryValueRef); i++ {
 			if this.M_categoryValueRef[i] == refStr {
 				return
 			}
 		}
 		this.M_categoryValueRef = append(this.M_categoryValueRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveCategoryValueRef(ref)
 		this.m_categoryValueRef = append(this.m_categoryValueRef, ref.(*CategoryValue))
 		this.M_categoryValueRef = append(this.M_categoryValueRef, ref.(BaseElement).GetUUID())
@@ -349,7 +344,7 @@ func (this *StartEvent) SetCategoryValueRef(ref interface{}){
 }
 
 /** Remove reference CategoryValueRef **/
-func (this *StartEvent) RemoveCategoryValueRef(ref interface{}){
+func (this *StartEvent) RemoveCategoryValueRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	categoryValueRef_ := make([]*CategoryValue, 0)
@@ -365,21 +360,21 @@ func (this *StartEvent) RemoveCategoryValueRef(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *StartEvent) GetOutgoing() []*SequenceFlow{
+func (this *StartEvent) GetOutgoing() []*SequenceFlow {
 	return this.m_outgoing
 }
 
 /** Init reference Outgoing **/
-func (this *StartEvent) SetOutgoing(ref interface{}){
+func (this *StartEvent) SetOutgoing(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoing); i++ {
+		for i := 0; i < len(this.M_outgoing); i++ {
 			if this.M_outgoing[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoing = append(this.M_outgoing, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoing(ref)
 		this.m_outgoing = append(this.m_outgoing, ref.(*SequenceFlow))
 		this.M_outgoing = append(this.M_outgoing, ref.(BaseElement).GetUUID())
@@ -387,7 +382,7 @@ func (this *StartEvent) SetOutgoing(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *StartEvent) RemoveOutgoing(ref interface{}){
+func (this *StartEvent) RemoveOutgoing(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoing_ := make([]*SequenceFlow, 0)
@@ -403,21 +398,21 @@ func (this *StartEvent) RemoveOutgoing(ref interface{}){
 }
 
 /** Incoming **/
-func (this *StartEvent) GetIncoming() []*SequenceFlow{
+func (this *StartEvent) GetIncoming() []*SequenceFlow {
 	return this.m_incoming
 }
 
 /** Init reference Incoming **/
-func (this *StartEvent) SetIncoming(ref interface{}){
+func (this *StartEvent) SetIncoming(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incoming); i++ {
+		for i := 0; i < len(this.M_incoming); i++ {
 			if this.M_incoming[i] == refStr {
 				return
 			}
 		}
 		this.M_incoming = append(this.M_incoming, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncoming(ref)
 		this.m_incoming = append(this.m_incoming, ref.(*SequenceFlow))
 		this.M_incoming = append(this.M_incoming, ref.(BaseElement).GetUUID())
@@ -425,7 +420,7 @@ func (this *StartEvent) SetIncoming(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *StartEvent) RemoveIncoming(ref interface{}){
+func (this *StartEvent) RemoveIncoming(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incoming_ := make([]*SequenceFlow, 0)
@@ -441,21 +436,21 @@ func (this *StartEvent) RemoveIncoming(ref interface{}){
 }
 
 /** Lanes **/
-func (this *StartEvent) GetLanes() []*Lane{
+func (this *StartEvent) GetLanes() []*Lane {
 	return this.m_lanes
 }
 
 /** Init reference Lanes **/
-func (this *StartEvent) SetLanes(ref interface{}){
+func (this *StartEvent) SetLanes(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanes); i++ {
+		for i := 0; i < len(this.M_lanes); i++ {
 			if this.M_lanes[i] == refStr {
 				return
 			}
 		}
 		this.M_lanes = append(this.M_lanes, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanes(ref)
 		this.m_lanes = append(this.m_lanes, ref.(*Lane))
 		this.M_lanes = append(this.M_lanes, ref.(BaseElement).GetUUID())
@@ -463,7 +458,7 @@ func (this *StartEvent) SetLanes(ref interface{}){
 }
 
 /** Remove reference Lanes **/
-func (this *StartEvent) RemoveLanes(ref interface{}){
+func (this *StartEvent) RemoveLanes(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanes_ := make([]*Lane, 0)
@@ -479,21 +474,21 @@ func (this *StartEvent) RemoveLanes(ref interface{}){
 }
 
 /** IncomingConversationLinks **/
-func (this *StartEvent) GetIncomingConversationLinks() []*ConversationLink{
+func (this *StartEvent) GetIncomingConversationLinks() []*ConversationLink {
 	return this.m_incomingConversationLinks
 }
 
 /** Init reference IncomingConversationLinks **/
-func (this *StartEvent) SetIncomingConversationLinks(ref interface{}){
+func (this *StartEvent) SetIncomingConversationLinks(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingConversationLinks); i++ {
+		for i := 0; i < len(this.M_incomingConversationLinks); i++ {
 			if this.M_incomingConversationLinks[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingConversationLinks = append(this.M_incomingConversationLinks, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingConversationLinks(ref)
 		this.m_incomingConversationLinks = append(this.m_incomingConversationLinks, ref.(*ConversationLink))
 		this.M_incomingConversationLinks = append(this.M_incomingConversationLinks, ref.(BaseElement).GetUUID())
@@ -501,7 +496,7 @@ func (this *StartEvent) SetIncomingConversationLinks(ref interface{}){
 }
 
 /** Remove reference IncomingConversationLinks **/
-func (this *StartEvent) RemoveIncomingConversationLinks(ref interface{}){
+func (this *StartEvent) RemoveIncomingConversationLinks(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingConversationLinks_ := make([]*ConversationLink, 0)
@@ -517,21 +512,21 @@ func (this *StartEvent) RemoveIncomingConversationLinks(ref interface{}){
 }
 
 /** OutgoingConversationLinks **/
-func (this *StartEvent) GetOutgoingConversationLinks() []*ConversationLink{
+func (this *StartEvent) GetOutgoingConversationLinks() []*ConversationLink {
 	return this.m_outgoingConversationLinks
 }
 
 /** Init reference OutgoingConversationLinks **/
-func (this *StartEvent) SetOutgoingConversationLinks(ref interface{}){
+func (this *StartEvent) SetOutgoingConversationLinks(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingConversationLinks); i++ {
+		for i := 0; i < len(this.M_outgoingConversationLinks); i++ {
 			if this.M_outgoingConversationLinks[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingConversationLinks = append(this.M_outgoingConversationLinks, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingConversationLinks(ref)
 		this.m_outgoingConversationLinks = append(this.m_outgoingConversationLinks, ref.(*ConversationLink))
 		this.M_outgoingConversationLinks = append(this.M_outgoingConversationLinks, ref.(BaseElement).GetUUID())
@@ -539,7 +534,7 @@ func (this *StartEvent) SetOutgoingConversationLinks(ref interface{}){
 }
 
 /** Remove reference OutgoingConversationLinks **/
-func (this *StartEvent) RemoveOutgoingConversationLinks(ref interface{}){
+func (this *StartEvent) RemoveOutgoingConversationLinks(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingConversationLinks_ := make([]*ConversationLink, 0)
@@ -555,16 +550,16 @@ func (this *StartEvent) RemoveOutgoingConversationLinks(ref interface{}){
 }
 
 /** Property **/
-func (this *StartEvent) GetProperty() []*Property{
+func (this *StartEvent) GetProperty() []*Property {
 	return this.M_property
 }
 
 /** Init reference Property **/
-func (this *StartEvent) SetProperty(ref interface{}){
+func (this *StartEvent) SetProperty(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var propertys []*Property
-	for i:=0; i<len(this.M_property); i++ {
+	for i := 0; i < len(this.M_property); i++ {
 		if this.M_property[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			propertys = append(propertys, this.M_property[i])
 		} else {
@@ -579,7 +574,7 @@ func (this *StartEvent) SetProperty(ref interface{}){
 }
 
 /** Remove reference Property **/
-func (this *StartEvent) RemoveProperty(ref interface{}){
+func (this *StartEvent) RemoveProperty(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	property_ := make([]*Property, 0)
@@ -592,12 +587,12 @@ func (this *StartEvent) RemoveProperty(ref interface{}){
 }
 
 /** ParallelMultiple **/
-func (this *StartEvent) GetParallelMultiple() bool{
+func (this *StartEvent) GetParallelMultiple() bool {
 	return this.M_parallelMultiple
 }
 
 /** Init reference ParallelMultiple **/
-func (this *StartEvent) SetParallelMultiple(ref interface{}){
+func (this *StartEvent) SetParallelMultiple(ref interface{}) {
 	this.NeedSave = true
 	this.M_parallelMultiple = ref.(bool)
 }
@@ -605,18 +600,18 @@ func (this *StartEvent) SetParallelMultiple(ref interface{}){
 /** Remove reference ParallelMultiple **/
 
 /** OutputSet **/
-func (this *StartEvent) GetOutputSet() *OutputSet{
+func (this *StartEvent) GetOutputSet() *OutputSet {
 	return this.M_outputSet
 }
 
 /** Init reference OutputSet **/
-func (this *StartEvent) SetOutputSet(ref interface{}){
+func (this *StartEvent) SetOutputSet(ref interface{}) {
 	this.NeedSave = true
 	this.M_outputSet = ref.(*OutputSet)
 }
 
 /** Remove reference OutputSet **/
-func (this *StartEvent) RemoveOutputSet(ref interface{}){
+func (this *StartEvent) RemoveOutputSet(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_outputSet.GetUUID() {
@@ -625,21 +620,21 @@ func (this *StartEvent) RemoveOutputSet(ref interface{}){
 }
 
 /** EventDefinitionRef **/
-func (this *StartEvent) GetEventDefinitionRef() []EventDefinition{
+func (this *StartEvent) GetEventDefinitionRef() []EventDefinition {
 	return this.m_eventDefinitionRef
 }
 
 /** Init reference EventDefinitionRef **/
-func (this *StartEvent) SetEventDefinitionRef(ref interface{}){
+func (this *StartEvent) SetEventDefinitionRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_eventDefinitionRef); i++ {
+		for i := 0; i < len(this.M_eventDefinitionRef); i++ {
 			if this.M_eventDefinitionRef[i] == refStr {
 				return
 			}
 		}
 		this.M_eventDefinitionRef = append(this.M_eventDefinitionRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveEventDefinitionRef(ref)
 		this.m_eventDefinitionRef = append(this.m_eventDefinitionRef, ref.(EventDefinition))
 		this.M_eventDefinitionRef = append(this.M_eventDefinitionRef, ref.(BaseElement).GetUUID())
@@ -647,7 +642,7 @@ func (this *StartEvent) SetEventDefinitionRef(ref interface{}){
 }
 
 /** Remove reference EventDefinitionRef **/
-func (this *StartEvent) RemoveEventDefinitionRef(ref interface{}){
+func (this *StartEvent) RemoveEventDefinitionRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	eventDefinitionRef_ := make([]EventDefinition, 0)
@@ -663,16 +658,16 @@ func (this *StartEvent) RemoveEventDefinitionRef(ref interface{}){
 }
 
 /** DataOutputAssociation **/
-func (this *StartEvent) GetDataOutputAssociation() []*DataOutputAssociation{
+func (this *StartEvent) GetDataOutputAssociation() []*DataOutputAssociation {
 	return this.M_dataOutputAssociation
 }
 
 /** Init reference DataOutputAssociation **/
-func (this *StartEvent) SetDataOutputAssociation(ref interface{}){
+func (this *StartEvent) SetDataOutputAssociation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var dataOutputAssociations []*DataOutputAssociation
-	for i:=0; i<len(this.M_dataOutputAssociation); i++ {
+	for i := 0; i < len(this.M_dataOutputAssociation); i++ {
 		if this.M_dataOutputAssociation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			dataOutputAssociations = append(dataOutputAssociations, this.M_dataOutputAssociation[i])
 		} else {
@@ -687,7 +682,7 @@ func (this *StartEvent) SetDataOutputAssociation(ref interface{}){
 }
 
 /** Remove reference DataOutputAssociation **/
-func (this *StartEvent) RemoveDataOutputAssociation(ref interface{}){
+func (this *StartEvent) RemoveDataOutputAssociation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	dataOutputAssociation_ := make([]*DataOutputAssociation, 0)
@@ -700,16 +695,16 @@ func (this *StartEvent) RemoveDataOutputAssociation(ref interface{}){
 }
 
 /** DataOutput **/
-func (this *StartEvent) GetDataOutput() []*DataOutput{
+func (this *StartEvent) GetDataOutput() []*DataOutput {
 	return this.M_dataOutput
 }
 
 /** Init reference DataOutput **/
-func (this *StartEvent) SetDataOutput(ref interface{}){
+func (this *StartEvent) SetDataOutput(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var dataOutputs []*DataOutput
-	for i:=0; i<len(this.M_dataOutput); i++ {
+	for i := 0; i < len(this.M_dataOutput); i++ {
 		if this.M_dataOutput[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			dataOutputs = append(dataOutputs, this.M_dataOutput[i])
 		} else {
@@ -724,7 +719,7 @@ func (this *StartEvent) SetDataOutput(ref interface{}){
 }
 
 /** Remove reference DataOutput **/
-func (this *StartEvent) RemoveDataOutput(ref interface{}){
+func (this *StartEvent) RemoveDataOutput(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	dataOutput_ := make([]*DataOutput, 0)
@@ -737,16 +732,16 @@ func (this *StartEvent) RemoveDataOutput(ref interface{}){
 }
 
 /** EventDefinition **/
-func (this *StartEvent) GetEventDefinition() []EventDefinition{
+func (this *StartEvent) GetEventDefinition() []EventDefinition {
 	return this.M_eventDefinition
 }
 
 /** Init reference EventDefinition **/
-func (this *StartEvent) SetEventDefinition(ref interface{}){
+func (this *StartEvent) SetEventDefinition(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var eventDefinitions []EventDefinition
-	for i:=0; i<len(this.M_eventDefinition); i++ {
+	for i := 0; i < len(this.M_eventDefinition); i++ {
 		if this.M_eventDefinition[i].(BaseElement).GetUUID() != ref.(BaseElement).GetUUID() {
 			eventDefinitions = append(eventDefinitions, this.M_eventDefinition[i])
 		} else {
@@ -761,7 +756,7 @@ func (this *StartEvent) SetEventDefinition(ref interface{}){
 }
 
 /** Remove reference EventDefinition **/
-func (this *StartEvent) RemoveEventDefinition(ref interface{}){
+func (this *StartEvent) RemoveEventDefinition(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	eventDefinition_ := make([]EventDefinition, 0)
@@ -774,12 +769,12 @@ func (this *StartEvent) RemoveEventDefinition(ref interface{}){
 }
 
 /** IsInterrupting **/
-func (this *StartEvent) IsInterrupting() bool{
+func (this *StartEvent) IsInterrupting() bool {
 	return this.M_isInterrupting
 }
 
 /** Init reference IsInterrupting **/
-func (this *StartEvent) SetIsInterrupting(ref interface{}){
+func (this *StartEvent) SetIsInterrupting(ref interface{}) {
 	this.NeedSave = true
 	this.M_isInterrupting = ref.(bool)
 }
@@ -787,21 +782,21 @@ func (this *StartEvent) SetIsInterrupting(ref interface{}){
 /** Remove reference IsInterrupting **/
 
 /** Lane **/
-func (this *StartEvent) GetLanePtr() []*Lane{
+func (this *StartEvent) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *StartEvent) SetLanePtr(ref interface{}){
+func (this *StartEvent) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -809,7 +804,7 @@ func (this *StartEvent) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *StartEvent) RemoveLanePtr(ref interface{}){
+func (this *StartEvent) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -825,21 +820,21 @@ func (this *StartEvent) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *StartEvent) GetOutgoingPtr() []*Association{
+func (this *StartEvent) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *StartEvent) SetOutgoingPtr(ref interface{}){
+func (this *StartEvent) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -847,7 +842,7 @@ func (this *StartEvent) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *StartEvent) RemoveOutgoingPtr(ref interface{}){
+func (this *StartEvent) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -863,21 +858,21 @@ func (this *StartEvent) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *StartEvent) GetIncomingPtr() []*Association{
+func (this *StartEvent) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *StartEvent) SetIncomingPtr(ref interface{}){
+func (this *StartEvent) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -885,7 +880,7 @@ func (this *StartEvent) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *StartEvent) RemoveIncomingPtr(ref interface{}){
+func (this *StartEvent) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -901,23 +896,23 @@ func (this *StartEvent) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Container **/
-func (this *StartEvent) GetContainerPtr() FlowElementsContainer{
+func (this *StartEvent) GetContainerPtr() FlowElementsContainer {
 	return this.m_containerPtr
 }
 
 /** Init reference Container **/
-func (this *StartEvent) SetContainerPtr(ref interface{}){
+func (this *StartEvent) SetContainerPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_containerPtr = ref.(string)
-	}else{
+	} else {
 		this.m_containerPtr = ref.(FlowElementsContainer)
 		this.M_containerPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Container **/
-func (this *StartEvent) RemoveContainerPtr(ref interface{}){
+func (this *StartEvent) RemoveContainerPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_containerPtr.(BaseElement).GetUUID() {
@@ -927,21 +922,21 @@ func (this *StartEvent) RemoveContainerPtr(ref interface{}){
 }
 
 /** MessageFlow **/
-func (this *StartEvent) GetMessageFlowPtr() []*MessageFlow{
+func (this *StartEvent) GetMessageFlowPtr() []*MessageFlow {
 	return this.m_messageFlowPtr
 }
 
 /** Init reference MessageFlow **/
-func (this *StartEvent) SetMessageFlowPtr(ref interface{}){
+func (this *StartEvent) SetMessageFlowPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_messageFlowPtr); i++ {
+		for i := 0; i < len(this.M_messageFlowPtr); i++ {
 			if this.M_messageFlowPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_messageFlowPtr = append(this.M_messageFlowPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveMessageFlowPtr(ref)
 		this.m_messageFlowPtr = append(this.m_messageFlowPtr, ref.(*MessageFlow))
 		this.M_messageFlowPtr = append(this.M_messageFlowPtr, ref.(BaseElement).GetUUID())
@@ -949,7 +944,7 @@ func (this *StartEvent) SetMessageFlowPtr(ref interface{}){
 }
 
 /** Remove reference MessageFlow **/
-func (this *StartEvent) RemoveMessageFlowPtr(ref interface{}){
+func (this *StartEvent) RemoveMessageFlowPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	messageFlowPtr_ := make([]*MessageFlow, 0)

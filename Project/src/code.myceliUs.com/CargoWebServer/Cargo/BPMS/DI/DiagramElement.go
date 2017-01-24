@@ -1,6 +1,7 @@
+//+build DI
 package DI
 
-type DiagramElement interface{
+type DiagramElement interface {
 	/** Method of DiagramElement **/
 
 	/** UUID **/
@@ -23,5 +24,4 @@ type DiagramElement interface{
 
 	/** Id **/
 	GetId() string
-
 }

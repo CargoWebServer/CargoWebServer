@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type Extension struct{
+type Extension struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,13 +15,12 @@ type Extension struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Extension **/
-	M_mustUnderstand bool
-	M_documentation []*Documentation
+	M_mustUnderstand      bool
+	M_documentation       []*Documentation
 	M_extensionDefinition *ExtensionDefinition
-
 
 	/** Associations **/
 	m_definitionsPtr *Definitions
@@ -30,24 +30,24 @@ type Extension struct{
 
 /** Xml parser for Extension **/
 type XsdExtension struct {
-	XMLName xml.Name	`xml:"extension"`
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionDefinition	string	`xml:"extensionDefinition,attr"`
-	M_mustUnderstand	bool	`xml:"mustUnderstand,attr"`
-
+	XMLName               xml.Name            `xml:"extension"`
+	M_documentation       []*XsdDocumentation `xml:"documentation,omitempty"`
+	M_extensionDefinition string              `xml:"extensionDefinition,attr"`
+	M_mustUnderstand      bool                `xml:"mustUnderstand,attr"`
 }
+
 /** UUID **/
-func (this *Extension) GetUUID() string{
+func (this *Extension) GetUUID() string {
 	return this.UUID
 }
 
 /** MustUnderstand **/
-func (this *Extension) GetMustUnderstand() bool{
+func (this *Extension) GetMustUnderstand() bool {
 	return this.M_mustUnderstand
 }
 
 /** Init reference MustUnderstand **/
-func (this *Extension) SetMustUnderstand(ref interface{}){
+func (this *Extension) SetMustUnderstand(ref interface{}) {
 	this.NeedSave = true
 	this.M_mustUnderstand = ref.(bool)
 }
@@ -55,16 +55,16 @@ func (this *Extension) SetMustUnderstand(ref interface{}){
 /** Remove reference MustUnderstand **/
 
 /** Documentation **/
-func (this *Extension) GetDocumentation() []*Documentation{
+func (this *Extension) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *Extension) SetDocumentation(ref interface{}){
+func (this *Extension) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -79,7 +79,7 @@ func (this *Extension) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *Extension) RemoveDocumentation(ref interface{}){
+func (this *Extension) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -92,12 +92,12 @@ func (this *Extension) RemoveDocumentation(ref interface{}){
 }
 
 /** ExtensionDefinition **/
-func (this *Extension) GetExtensionDefinition() *ExtensionDefinition{
+func (this *Extension) GetExtensionDefinition() *ExtensionDefinition {
 	return this.M_extensionDefinition
 }
 
 /** Init reference ExtensionDefinition **/
-func (this *Extension) SetExtensionDefinition(ref interface{}){
+func (this *Extension) SetExtensionDefinition(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionDefinition = ref.(*ExtensionDefinition)
 }
@@ -105,23 +105,23 @@ func (this *Extension) SetExtensionDefinition(ref interface{}){
 /** Remove reference ExtensionDefinition **/
 
 /** Definitions **/
-func (this *Extension) GetDefinitionsPtr() *Definitions{
+func (this *Extension) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *Extension) SetDefinitionsPtr(ref interface{}){
+func (this *Extension) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *Extension) RemoveDefinitionsPtr(ref interface{}){
+func (this *Extension) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {

@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type DataInput struct{
+type DataInput struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,57 +15,56 @@ type DataInput struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of ItemAwareElement **/
 	m_itemSubjectRef *ItemDefinition
 	/** If the ref is a string and not an object **/
 	M_itemSubjectRef string
-	M_dataState *DataState
+	M_dataState      *DataState
 
 	/** members of DataInput **/
-	M_name string
+	M_name         string
 	M_isCollection bool
 	m_inputSetRefs []*InputSet
 	/** If the ref is a string and not an object **/
-	M_inputSetRefs []string
+	M_inputSetRefs         []string
 	m_inputSetWithOptional []*InputSet
 	/** If the ref is a string and not an object **/
-	M_inputSetWithOptional []string
+	M_inputSetWithOptional       []string
 	m_inputSetWithWhileExecuting []*InputSet
 	/** If the ref is a string and not an object **/
 	M_inputSetWithWhileExecuting []string
 
-
 	/** Associations **/
 	m_throwEventPtr ThrowEvent
 	/** If the ref is a string and not an object **/
-	M_throwEventPtr string
+	M_throwEventPtr               string
 	m_inputOutputSpecificationPtr *InputOutputSpecification
 	/** If the ref is a string and not an object **/
-	M_inputOutputSpecificationPtr string
+	M_inputOutputSpecificationPtr         string
 	m_multiInstanceLoopCharacteristicsPtr *MultiInstanceLoopCharacteristics
 	/** If the ref is a string and not an object **/
 	M_multiInstanceLoopCharacteristicsPtr string
-	m_lanePtr []*Lane
+	m_lanePtr                             []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr        []string
 	m_dataAssociationPtr []DataAssociation
 	/** If the ref is a string and not an object **/
 	M_dataAssociationPtr []string
@@ -72,50 +72,47 @@ type DataInput struct{
 
 /** Xml parser for DataInput **/
 type XsdDataInput struct {
-	XMLName xml.Name	`xml:"dataInput"`
+	XMLName xml.Name `xml:"dataInput"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_dataState	*XsdDataState	`xml:"dataState,omitempty"`
-	M_name	string	`xml:"name,attr"`
-	M_itemSubjectRef	string	`xml:"itemSubjectRef,attr"`
-	M_isCollection	bool	`xml:"isCollection,attr"`
-
+	M_dataState      *XsdDataState `xml:"dataState,omitempty"`
+	M_name           string        `xml:"name,attr"`
+	M_itemSubjectRef string        `xml:"itemSubjectRef,attr"`
+	M_isCollection   bool          `xml:"isCollection,attr"`
 }
+
 /** Alias Xsd parser **/
 
- 
 type XsdInputDataItem struct {
-	XMLName xml.Name	`xml:"inputDataItem"`
+	XMLName xml.Name `xml:"inputDataItem"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
-
-	M_dataState	*XsdDataState	`xml:"dataState,omitempty"`
-	M_name	string	`xml:"name,attr"`
-	M_itemSubjectRef	string	`xml:"itemSubjectRef,attr"`
-	M_isCollection	bool	`xml:"isCollection,attr"`
-
+	M_dataState      *XsdDataState `xml:"dataState,omitempty"`
+	M_name           string        `xml:"name,attr"`
+	M_itemSubjectRef string        `xml:"itemSubjectRef,attr"`
+	M_isCollection   bool          `xml:"isCollection,attr"`
 }
+
 /** UUID **/
-func (this *DataInput) GetUUID() string{
+func (this *DataInput) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *DataInput) GetId() string{
+func (this *DataInput) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *DataInput) SetId(ref interface{}){
+func (this *DataInput) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -123,16 +120,16 @@ func (this *DataInput) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *DataInput) GetOther() interface{}{
+func (this *DataInput) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *DataInput) SetOther(ref interface{}){
+func (this *DataInput) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -140,12 +137,12 @@ func (this *DataInput) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *DataInput) GetExtensionElements() *ExtensionElements{
+func (this *DataInput) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *DataInput) SetExtensionElements(ref interface{}){
+func (this *DataInput) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -153,16 +150,16 @@ func (this *DataInput) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *DataInput) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *DataInput) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *DataInput) SetExtensionDefinitions(ref interface{}){
+func (this *DataInput) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -179,16 +176,16 @@ func (this *DataInput) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *DataInput) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *DataInput) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *DataInput) SetExtensionValues(ref interface{}){
+func (this *DataInput) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -205,16 +202,16 @@ func (this *DataInput) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *DataInput) GetDocumentation() []*Documentation{
+func (this *DataInput) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *DataInput) SetDocumentation(ref interface{}){
+func (this *DataInput) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -229,7 +226,7 @@ func (this *DataInput) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *DataInput) RemoveDocumentation(ref interface{}){
+func (this *DataInput) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -242,23 +239,23 @@ func (this *DataInput) RemoveDocumentation(ref interface{}){
 }
 
 /** ItemSubjectRef **/
-func (this *DataInput) GetItemSubjectRef() *ItemDefinition{
+func (this *DataInput) GetItemSubjectRef() *ItemDefinition {
 	return this.m_itemSubjectRef
 }
 
 /** Init reference ItemSubjectRef **/
-func (this *DataInput) SetItemSubjectRef(ref interface{}){
+func (this *DataInput) SetItemSubjectRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_itemSubjectRef = ref.(string)
-	}else{
+	} else {
 		this.m_itemSubjectRef = ref.(*ItemDefinition)
 		this.M_itemSubjectRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference ItemSubjectRef **/
-func (this *DataInput) RemoveItemSubjectRef(ref interface{}){
+func (this *DataInput) RemoveItemSubjectRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_itemSubjectRef.GetUUID() {
@@ -268,18 +265,18 @@ func (this *DataInput) RemoveItemSubjectRef(ref interface{}){
 }
 
 /** DataState **/
-func (this *DataInput) GetDataState() *DataState{
+func (this *DataInput) GetDataState() *DataState {
 	return this.M_dataState
 }
 
 /** Init reference DataState **/
-func (this *DataInput) SetDataState(ref interface{}){
+func (this *DataInput) SetDataState(ref interface{}) {
 	this.NeedSave = true
 	this.M_dataState = ref.(*DataState)
 }
 
 /** Remove reference DataState **/
-func (this *DataInput) RemoveDataState(ref interface{}){
+func (this *DataInput) RemoveDataState(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_dataState.GetUUID() {
@@ -288,12 +285,12 @@ func (this *DataInput) RemoveDataState(ref interface{}){
 }
 
 /** Name **/
-func (this *DataInput) GetName() string{
+func (this *DataInput) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *DataInput) SetName(ref interface{}){
+func (this *DataInput) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -301,12 +298,12 @@ func (this *DataInput) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** IsCollection **/
-func (this *DataInput) IsCollection() bool{
+func (this *DataInput) IsCollection() bool {
 	return this.M_isCollection
 }
 
 /** Init reference IsCollection **/
-func (this *DataInput) SetIsCollection(ref interface{}){
+func (this *DataInput) SetIsCollection(ref interface{}) {
 	this.NeedSave = true
 	this.M_isCollection = ref.(bool)
 }
@@ -314,21 +311,21 @@ func (this *DataInput) SetIsCollection(ref interface{}){
 /** Remove reference IsCollection **/
 
 /** InputSetRefs **/
-func (this *DataInput) GetInputSetRefs() []*InputSet{
+func (this *DataInput) GetInputSetRefs() []*InputSet {
 	return this.m_inputSetRefs
 }
 
 /** Init reference InputSetRefs **/
-func (this *DataInput) SetInputSetRefs(ref interface{}){
+func (this *DataInput) SetInputSetRefs(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_inputSetRefs); i++ {
+		for i := 0; i < len(this.M_inputSetRefs); i++ {
 			if this.M_inputSetRefs[i] == refStr {
 				return
 			}
 		}
 		this.M_inputSetRefs = append(this.M_inputSetRefs, ref.(string))
-	}else{
+	} else {
 		this.RemoveInputSetRefs(ref)
 		this.m_inputSetRefs = append(this.m_inputSetRefs, ref.(*InputSet))
 		this.M_inputSetRefs = append(this.M_inputSetRefs, ref.(BaseElement).GetUUID())
@@ -336,7 +333,7 @@ func (this *DataInput) SetInputSetRefs(ref interface{}){
 }
 
 /** Remove reference InputSetRefs **/
-func (this *DataInput) RemoveInputSetRefs(ref interface{}){
+func (this *DataInput) RemoveInputSetRefs(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	inputSetRefs_ := make([]*InputSet, 0)
@@ -352,21 +349,21 @@ func (this *DataInput) RemoveInputSetRefs(ref interface{}){
 }
 
 /** InputSetWithOptional **/
-func (this *DataInput) GetInputSetWithOptional() []*InputSet{
+func (this *DataInput) GetInputSetWithOptional() []*InputSet {
 	return this.m_inputSetWithOptional
 }
 
 /** Init reference InputSetWithOptional **/
-func (this *DataInput) SetInputSetWithOptional(ref interface{}){
+func (this *DataInput) SetInputSetWithOptional(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_inputSetWithOptional); i++ {
+		for i := 0; i < len(this.M_inputSetWithOptional); i++ {
 			if this.M_inputSetWithOptional[i] == refStr {
 				return
 			}
 		}
 		this.M_inputSetWithOptional = append(this.M_inputSetWithOptional, ref.(string))
-	}else{
+	} else {
 		this.RemoveInputSetWithOptional(ref)
 		this.m_inputSetWithOptional = append(this.m_inputSetWithOptional, ref.(*InputSet))
 		this.M_inputSetWithOptional = append(this.M_inputSetWithOptional, ref.(BaseElement).GetUUID())
@@ -374,7 +371,7 @@ func (this *DataInput) SetInputSetWithOptional(ref interface{}){
 }
 
 /** Remove reference InputSetWithOptional **/
-func (this *DataInput) RemoveInputSetWithOptional(ref interface{}){
+func (this *DataInput) RemoveInputSetWithOptional(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	inputSetWithOptional_ := make([]*InputSet, 0)
@@ -390,21 +387,21 @@ func (this *DataInput) RemoveInputSetWithOptional(ref interface{}){
 }
 
 /** InputSetWithWhileExecuting **/
-func (this *DataInput) GetInputSetWithWhileExecuting() []*InputSet{
+func (this *DataInput) GetInputSetWithWhileExecuting() []*InputSet {
 	return this.m_inputSetWithWhileExecuting
 }
 
 /** Init reference InputSetWithWhileExecuting **/
-func (this *DataInput) SetInputSetWithWhileExecuting(ref interface{}){
+func (this *DataInput) SetInputSetWithWhileExecuting(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_inputSetWithWhileExecuting); i++ {
+		for i := 0; i < len(this.M_inputSetWithWhileExecuting); i++ {
 			if this.M_inputSetWithWhileExecuting[i] == refStr {
 				return
 			}
 		}
 		this.M_inputSetWithWhileExecuting = append(this.M_inputSetWithWhileExecuting, ref.(string))
-	}else{
+	} else {
 		this.RemoveInputSetWithWhileExecuting(ref)
 		this.m_inputSetWithWhileExecuting = append(this.m_inputSetWithWhileExecuting, ref.(*InputSet))
 		this.M_inputSetWithWhileExecuting = append(this.M_inputSetWithWhileExecuting, ref.(BaseElement).GetUUID())
@@ -412,7 +409,7 @@ func (this *DataInput) SetInputSetWithWhileExecuting(ref interface{}){
 }
 
 /** Remove reference InputSetWithWhileExecuting **/
-func (this *DataInput) RemoveInputSetWithWhileExecuting(ref interface{}){
+func (this *DataInput) RemoveInputSetWithWhileExecuting(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	inputSetWithWhileExecuting_ := make([]*InputSet, 0)
@@ -428,23 +425,23 @@ func (this *DataInput) RemoveInputSetWithWhileExecuting(ref interface{}){
 }
 
 /** ThrowEvent **/
-func (this *DataInput) GetThrowEventPtr() ThrowEvent{
+func (this *DataInput) GetThrowEventPtr() ThrowEvent {
 	return this.m_throwEventPtr
 }
 
 /** Init reference ThrowEvent **/
-func (this *DataInput) SetThrowEventPtr(ref interface{}){
+func (this *DataInput) SetThrowEventPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_throwEventPtr = ref.(string)
-	}else{
+	} else {
 		this.m_throwEventPtr = ref.(ThrowEvent)
 		this.M_throwEventPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference ThrowEvent **/
-func (this *DataInput) RemoveThrowEventPtr(ref interface{}){
+func (this *DataInput) RemoveThrowEventPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_throwEventPtr.(BaseElement).GetUUID() {
@@ -454,23 +451,23 @@ func (this *DataInput) RemoveThrowEventPtr(ref interface{}){
 }
 
 /** InputOutputSpecification **/
-func (this *DataInput) GetInputOutputSpecificationPtr() *InputOutputSpecification{
+func (this *DataInput) GetInputOutputSpecificationPtr() *InputOutputSpecification {
 	return this.m_inputOutputSpecificationPtr
 }
 
 /** Init reference InputOutputSpecification **/
-func (this *DataInput) SetInputOutputSpecificationPtr(ref interface{}){
+func (this *DataInput) SetInputOutputSpecificationPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_inputOutputSpecificationPtr = ref.(string)
-	}else{
+	} else {
 		this.m_inputOutputSpecificationPtr = ref.(*InputOutputSpecification)
 		this.M_inputOutputSpecificationPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference InputOutputSpecification **/
-func (this *DataInput) RemoveInputOutputSpecificationPtr(ref interface{}){
+func (this *DataInput) RemoveInputOutputSpecificationPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_inputOutputSpecificationPtr.GetUUID() {
@@ -480,23 +477,23 @@ func (this *DataInput) RemoveInputOutputSpecificationPtr(ref interface{}){
 }
 
 /** MultiInstanceLoopCharacteristics **/
-func (this *DataInput) GetMultiInstanceLoopCharacteristicsPtr() *MultiInstanceLoopCharacteristics{
+func (this *DataInput) GetMultiInstanceLoopCharacteristicsPtr() *MultiInstanceLoopCharacteristics {
 	return this.m_multiInstanceLoopCharacteristicsPtr
 }
 
 /** Init reference MultiInstanceLoopCharacteristics **/
-func (this *DataInput) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *DataInput) SetMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_multiInstanceLoopCharacteristicsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_multiInstanceLoopCharacteristicsPtr = ref.(*MultiInstanceLoopCharacteristics)
 		this.M_multiInstanceLoopCharacteristicsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference MultiInstanceLoopCharacteristics **/
-func (this *DataInput) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}){
+func (this *DataInput) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_multiInstanceLoopCharacteristicsPtr.GetUUID() {
@@ -506,21 +503,21 @@ func (this *DataInput) RemoveMultiInstanceLoopCharacteristicsPtr(ref interface{}
 }
 
 /** Lane **/
-func (this *DataInput) GetLanePtr() []*Lane{
+func (this *DataInput) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *DataInput) SetLanePtr(ref interface{}){
+func (this *DataInput) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -528,7 +525,7 @@ func (this *DataInput) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *DataInput) RemoveLanePtr(ref interface{}){
+func (this *DataInput) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -544,21 +541,21 @@ func (this *DataInput) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *DataInput) GetOutgoingPtr() []*Association{
+func (this *DataInput) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *DataInput) SetOutgoingPtr(ref interface{}){
+func (this *DataInput) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -566,7 +563,7 @@ func (this *DataInput) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *DataInput) RemoveOutgoingPtr(ref interface{}){
+func (this *DataInput) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -582,21 +579,21 @@ func (this *DataInput) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *DataInput) GetIncomingPtr() []*Association{
+func (this *DataInput) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *DataInput) SetIncomingPtr(ref interface{}){
+func (this *DataInput) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -604,7 +601,7 @@ func (this *DataInput) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *DataInput) RemoveIncomingPtr(ref interface{}){
+func (this *DataInput) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -620,21 +617,21 @@ func (this *DataInput) RemoveIncomingPtr(ref interface{}){
 }
 
 /** DataAssociation **/
-func (this *DataInput) GetDataAssociationPtr() []DataAssociation{
+func (this *DataInput) GetDataAssociationPtr() []DataAssociation {
 	return this.m_dataAssociationPtr
 }
 
 /** Init reference DataAssociation **/
-func (this *DataInput) SetDataAssociationPtr(ref interface{}){
+func (this *DataInput) SetDataAssociationPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_dataAssociationPtr); i++ {
+		for i := 0; i < len(this.M_dataAssociationPtr); i++ {
 			if this.M_dataAssociationPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_dataAssociationPtr = append(this.M_dataAssociationPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveDataAssociationPtr(ref)
 		this.m_dataAssociationPtr = append(this.m_dataAssociationPtr, ref.(DataAssociation))
 		this.M_dataAssociationPtr = append(this.M_dataAssociationPtr, ref.(BaseElement).GetUUID())
@@ -642,7 +639,7 @@ func (this *DataInput) SetDataAssociationPtr(ref interface{}){
 }
 
 /** Remove reference DataAssociation **/
-func (this *DataInput) RemoveDataAssociationPtr(ref interface{}){
+func (this *DataInput) RemoveDataAssociationPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	dataAssociationPtr_ := make([]DataAssociation, 0)

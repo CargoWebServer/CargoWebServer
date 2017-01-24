@@ -1,7 +1,7 @@
+// +build BPMN
 package BPMN20
 
-type RootElement interface{
+type RootElement interface {
 	/** UUID **/
 	GetUUID() string
-
 }

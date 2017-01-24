@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type PartnerRole struct{
+type PartnerRole struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,38 +15,37 @@ type PartnerRole struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of RootElement **/
 	/** No members **/
 
 	/** members of PartnerRole **/
-	M_name string
+	M_name           string
 	m_participantRef []*Participant
 	/** If the ref is a string and not an object **/
 	M_participantRef []string
 
-
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr    []string
 	m_definitionsPtr *Definitions
 	/** If the ref is a string and not an object **/
 	M_definitionsPtr string
@@ -53,33 +53,31 @@ type PartnerRole struct{
 
 /** Xml parser for PartnerRole **/
 type XsdPartnerRole struct {
-	XMLName xml.Name	`xml:"partnerRole"`
+	XMLName xml.Name `xml:"partnerRole"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** RootElement **/
 
-
-	M_participantRef	[]string	`xml:"participantRef"`
-	M_name	string	`xml:"name,attr"`
-
+	M_participantRef []string `xml:"participantRef"`
+	M_name           string   `xml:"name,attr"`
 }
+
 /** UUID **/
-func (this *PartnerRole) GetUUID() string{
+func (this *PartnerRole) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *PartnerRole) GetId() string{
+func (this *PartnerRole) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *PartnerRole) SetId(ref interface{}){
+func (this *PartnerRole) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -87,16 +85,16 @@ func (this *PartnerRole) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *PartnerRole) GetOther() interface{}{
+func (this *PartnerRole) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *PartnerRole) SetOther(ref interface{}){
+func (this *PartnerRole) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -104,12 +102,12 @@ func (this *PartnerRole) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *PartnerRole) GetExtensionElements() *ExtensionElements{
+func (this *PartnerRole) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *PartnerRole) SetExtensionElements(ref interface{}){
+func (this *PartnerRole) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -117,16 +115,16 @@ func (this *PartnerRole) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *PartnerRole) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *PartnerRole) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *PartnerRole) SetExtensionDefinitions(ref interface{}){
+func (this *PartnerRole) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -143,16 +141,16 @@ func (this *PartnerRole) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *PartnerRole) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *PartnerRole) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *PartnerRole) SetExtensionValues(ref interface{}){
+func (this *PartnerRole) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -169,16 +167,16 @@ func (this *PartnerRole) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *PartnerRole) GetDocumentation() []*Documentation{
+func (this *PartnerRole) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *PartnerRole) SetDocumentation(ref interface{}){
+func (this *PartnerRole) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -193,7 +191,7 @@ func (this *PartnerRole) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *PartnerRole) RemoveDocumentation(ref interface{}){
+func (this *PartnerRole) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -206,12 +204,12 @@ func (this *PartnerRole) RemoveDocumentation(ref interface{}){
 }
 
 /** Name **/
-func (this *PartnerRole) GetName() string{
+func (this *PartnerRole) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *PartnerRole) SetName(ref interface{}){
+func (this *PartnerRole) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -219,21 +217,21 @@ func (this *PartnerRole) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** ParticipantRef **/
-func (this *PartnerRole) GetParticipantRef() []*Participant{
+func (this *PartnerRole) GetParticipantRef() []*Participant {
 	return this.m_participantRef
 }
 
 /** Init reference ParticipantRef **/
-func (this *PartnerRole) SetParticipantRef(ref interface{}){
+func (this *PartnerRole) SetParticipantRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_participantRef); i++ {
+		for i := 0; i < len(this.M_participantRef); i++ {
 			if this.M_participantRef[i] == refStr {
 				return
 			}
 		}
 		this.M_participantRef = append(this.M_participantRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveParticipantRef(ref)
 		this.m_participantRef = append(this.m_participantRef, ref.(*Participant))
 		this.M_participantRef = append(this.M_participantRef, ref.(BaseElement).GetUUID())
@@ -241,7 +239,7 @@ func (this *PartnerRole) SetParticipantRef(ref interface{}){
 }
 
 /** Remove reference ParticipantRef **/
-func (this *PartnerRole) RemoveParticipantRef(ref interface{}){
+func (this *PartnerRole) RemoveParticipantRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	participantRef_ := make([]*Participant, 0)
@@ -257,21 +255,21 @@ func (this *PartnerRole) RemoveParticipantRef(ref interface{}){
 }
 
 /** Lane **/
-func (this *PartnerRole) GetLanePtr() []*Lane{
+func (this *PartnerRole) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *PartnerRole) SetLanePtr(ref interface{}){
+func (this *PartnerRole) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -279,7 +277,7 @@ func (this *PartnerRole) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *PartnerRole) RemoveLanePtr(ref interface{}){
+func (this *PartnerRole) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -295,21 +293,21 @@ func (this *PartnerRole) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *PartnerRole) GetOutgoingPtr() []*Association{
+func (this *PartnerRole) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *PartnerRole) SetOutgoingPtr(ref interface{}){
+func (this *PartnerRole) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -317,7 +315,7 @@ func (this *PartnerRole) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *PartnerRole) RemoveOutgoingPtr(ref interface{}){
+func (this *PartnerRole) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -333,21 +331,21 @@ func (this *PartnerRole) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *PartnerRole) GetIncomingPtr() []*Association{
+func (this *PartnerRole) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *PartnerRole) SetIncomingPtr(ref interface{}){
+func (this *PartnerRole) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -355,7 +353,7 @@ func (this *PartnerRole) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *PartnerRole) RemoveIncomingPtr(ref interface{}){
+func (this *PartnerRole) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -371,23 +369,23 @@ func (this *PartnerRole) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Definitions **/
-func (this *PartnerRole) GetDefinitionsPtr() *Definitions{
+func (this *PartnerRole) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *PartnerRole) SetDefinitionsPtr(ref interface{}){
+func (this *PartnerRole) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *PartnerRole) RemoveDefinitionsPtr(ref interface{}){
+func (this *PartnerRole) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {

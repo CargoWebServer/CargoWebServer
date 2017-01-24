@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type MultiInstanceLoopCharacteristics struct{
+type MultiInstanceLoopCharacteristics struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,47 +15,46 @@ type MultiInstanceLoopCharacteristics struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of LoopCharacteristics **/
 	/** No members **/
 
 	/** members of MultiInstanceLoopCharacteristics **/
-	M_isSequential bool
-	M_behavior MultiInstanceFlowCondition
-	M_loopCardinality *FormalExpression
+	M_isSequential     bool
+	M_behavior         MultiInstanceFlowCondition
+	M_loopCardinality  *FormalExpression
 	m_loopDataInputRef ItemAwareElement
 	/** If the ref is a string and not an object **/
-	M_loopDataInputRef string
+	M_loopDataInputRef  string
 	m_loopDataOutputRef ItemAwareElement
 	/** If the ref is a string and not an object **/
-	M_loopDataOutputRef string
-	M_inputDataItem *DataInput
-	M_outputDataItem *DataOutput
-	M_completionCondition *FormalExpression
+	M_loopDataOutputRef         string
+	M_inputDataItem             *DataInput
+	M_outputDataItem            *DataOutput
+	M_completionCondition       *FormalExpression
 	M_complexBehaviorDefinition []*ComplexBehaviorDefinition
-	m_oneBehaviorEventRef EventDefinition
+	m_oneBehaviorEventRef       EventDefinition
 	/** If the ref is a string and not an object **/
-	M_oneBehaviorEventRef string
+	M_oneBehaviorEventRef  string
 	m_noneBehaviorEventRef EventDefinition
 	/** If the ref is a string and not an object **/
 	M_noneBehaviorEventRef string
 
-
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
@@ -68,42 +68,40 @@ type MultiInstanceLoopCharacteristics struct{
 
 /** Xml parser for MultiInstanceLoopCharacteristics **/
 type XsdMultiInstanceLoopCharacteristics struct {
-	XMLName xml.Name	`xml:"multiInstanceLoopCharacteristics"`
+	XMLName xml.Name `xml:"multiInstanceLoopCharacteristics"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** LoopCharacteristics **/
 
-
-	M_loopCardinality	*XsdLoopCardinality	`xml:"loopCardinality,omitempty"`
-	M_loopDataInputRef	*string	`xml:"loopDataInputRef"`
-	M_loopDataOutputRef	*string	`xml:"loopDataOutputRef"`
-	M_inputDataItem	*XsdInputDataItem	`xml:"inputDataItem,omitempty"`
-	M_outputDataItem	*XsdOutputDataItem	`xml:"outputDataItem,omitempty"`
-	M_complexBehaviorDefinition	[]*XsdComplexBehaviorDefinition	`xml:"complexBehaviorDefinition,omitempty"`
-	M_completionCondition	*XsdCompletionCondition	`xml:"completionCondition,omitempty"`
-	M_isSequential	bool	`xml:"isSequential,attr"`
-	M_behavior	string	`xml:"behavior,attr"`
-	M_oneBehaviorEventRef	string	`xml:"oneBehaviorEventRef,attr"`
-	M_noneBehaviorEventRef	string	`xml:"noneBehaviorEventRef,attr"`
-
+	M_loopCardinality           *XsdLoopCardinality             `xml:"loopCardinality,omitempty"`
+	M_loopDataInputRef          *string                         `xml:"loopDataInputRef"`
+	M_loopDataOutputRef         *string                         `xml:"loopDataOutputRef"`
+	M_inputDataItem             *XsdInputDataItem               `xml:"inputDataItem,omitempty"`
+	M_outputDataItem            *XsdOutputDataItem              `xml:"outputDataItem,omitempty"`
+	M_complexBehaviorDefinition []*XsdComplexBehaviorDefinition `xml:"complexBehaviorDefinition,omitempty"`
+	M_completionCondition       *XsdCompletionCondition         `xml:"completionCondition,omitempty"`
+	M_isSequential              bool                            `xml:"isSequential,attr"`
+	M_behavior                  string                          `xml:"behavior,attr"`
+	M_oneBehaviorEventRef       string                          `xml:"oneBehaviorEventRef,attr"`
+	M_noneBehaviorEventRef      string                          `xml:"noneBehaviorEventRef,attr"`
 }
+
 /** UUID **/
-func (this *MultiInstanceLoopCharacteristics) GetUUID() string{
+func (this *MultiInstanceLoopCharacteristics) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *MultiInstanceLoopCharacteristics) GetId() string{
+func (this *MultiInstanceLoopCharacteristics) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *MultiInstanceLoopCharacteristics) SetId(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -111,16 +109,16 @@ func (this *MultiInstanceLoopCharacteristics) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *MultiInstanceLoopCharacteristics) GetOther() interface{}{
+func (this *MultiInstanceLoopCharacteristics) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *MultiInstanceLoopCharacteristics) SetOther(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -128,12 +126,12 @@ func (this *MultiInstanceLoopCharacteristics) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *MultiInstanceLoopCharacteristics) GetExtensionElements() *ExtensionElements{
+func (this *MultiInstanceLoopCharacteristics) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *MultiInstanceLoopCharacteristics) SetExtensionElements(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -141,16 +139,16 @@ func (this *MultiInstanceLoopCharacteristics) SetExtensionElements(ref interface
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *MultiInstanceLoopCharacteristics) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *MultiInstanceLoopCharacteristics) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *MultiInstanceLoopCharacteristics) SetExtensionDefinitions(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -167,16 +165,16 @@ func (this *MultiInstanceLoopCharacteristics) SetExtensionDefinitions(ref interf
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *MultiInstanceLoopCharacteristics) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *MultiInstanceLoopCharacteristics) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *MultiInstanceLoopCharacteristics) SetExtensionValues(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -193,16 +191,16 @@ func (this *MultiInstanceLoopCharacteristics) SetExtensionValues(ref interface{}
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *MultiInstanceLoopCharacteristics) GetDocumentation() []*Documentation{
+func (this *MultiInstanceLoopCharacteristics) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *MultiInstanceLoopCharacteristics) SetDocumentation(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -217,7 +215,7 @@ func (this *MultiInstanceLoopCharacteristics) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *MultiInstanceLoopCharacteristics) RemoveDocumentation(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -230,12 +228,12 @@ func (this *MultiInstanceLoopCharacteristics) RemoveDocumentation(ref interface{
 }
 
 /** IsSequential **/
-func (this *MultiInstanceLoopCharacteristics) IsSequential() bool{
+func (this *MultiInstanceLoopCharacteristics) IsSequential() bool {
 	return this.M_isSequential
 }
 
 /** Init reference IsSequential **/
-func (this *MultiInstanceLoopCharacteristics) SetIsSequential(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetIsSequential(ref interface{}) {
 	this.NeedSave = true
 	this.M_isSequential = ref.(bool)
 }
@@ -243,12 +241,12 @@ func (this *MultiInstanceLoopCharacteristics) SetIsSequential(ref interface{}){
 /** Remove reference IsSequential **/
 
 /** Behavior **/
-func (this *MultiInstanceLoopCharacteristics) GetBehavior() MultiInstanceFlowCondition{
+func (this *MultiInstanceLoopCharacteristics) GetBehavior() MultiInstanceFlowCondition {
 	return this.M_behavior
 }
 
 /** Init reference Behavior **/
-func (this *MultiInstanceLoopCharacteristics) SetBehavior(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetBehavior(ref interface{}) {
 	this.NeedSave = true
 	this.M_behavior = ref.(MultiInstanceFlowCondition)
 }
@@ -256,18 +254,18 @@ func (this *MultiInstanceLoopCharacteristics) SetBehavior(ref interface{}){
 /** Remove reference Behavior **/
 
 /** LoopCardinality **/
-func (this *MultiInstanceLoopCharacteristics) GetLoopCardinality() *FormalExpression{
+func (this *MultiInstanceLoopCharacteristics) GetLoopCardinality() *FormalExpression {
 	return this.M_loopCardinality
 }
 
 /** Init reference LoopCardinality **/
-func (this *MultiInstanceLoopCharacteristics) SetLoopCardinality(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetLoopCardinality(ref interface{}) {
 	this.NeedSave = true
 	this.M_loopCardinality = ref.(*FormalExpression)
 }
 
 /** Remove reference LoopCardinality **/
-func (this *MultiInstanceLoopCharacteristics) RemoveLoopCardinality(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveLoopCardinality(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_loopCardinality.GetUUID() {
@@ -276,23 +274,23 @@ func (this *MultiInstanceLoopCharacteristics) RemoveLoopCardinality(ref interfac
 }
 
 /** LoopDataInputRef **/
-func (this *MultiInstanceLoopCharacteristics) GetLoopDataInputRef() ItemAwareElement{
+func (this *MultiInstanceLoopCharacteristics) GetLoopDataInputRef() ItemAwareElement {
 	return this.m_loopDataInputRef
 }
 
 /** Init reference LoopDataInputRef **/
-func (this *MultiInstanceLoopCharacteristics) SetLoopDataInputRef(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetLoopDataInputRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_loopDataInputRef = ref.(string)
-	}else{
+	} else {
 		this.m_loopDataInputRef = ref.(ItemAwareElement)
 		this.M_loopDataInputRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference LoopDataInputRef **/
-func (this *MultiInstanceLoopCharacteristics) RemoveLoopDataInputRef(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveLoopDataInputRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_loopDataInputRef.(BaseElement).GetUUID() {
@@ -302,23 +300,23 @@ func (this *MultiInstanceLoopCharacteristics) RemoveLoopDataInputRef(ref interfa
 }
 
 /** LoopDataOutputRef **/
-func (this *MultiInstanceLoopCharacteristics) GetLoopDataOutputRef() ItemAwareElement{
+func (this *MultiInstanceLoopCharacteristics) GetLoopDataOutputRef() ItemAwareElement {
 	return this.m_loopDataOutputRef
 }
 
 /** Init reference LoopDataOutputRef **/
-func (this *MultiInstanceLoopCharacteristics) SetLoopDataOutputRef(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetLoopDataOutputRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_loopDataOutputRef = ref.(string)
-	}else{
+	} else {
 		this.m_loopDataOutputRef = ref.(ItemAwareElement)
 		this.M_loopDataOutputRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference LoopDataOutputRef **/
-func (this *MultiInstanceLoopCharacteristics) RemoveLoopDataOutputRef(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveLoopDataOutputRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_loopDataOutputRef.(BaseElement).GetUUID() {
@@ -328,18 +326,18 @@ func (this *MultiInstanceLoopCharacteristics) RemoveLoopDataOutputRef(ref interf
 }
 
 /** InputDataItem **/
-func (this *MultiInstanceLoopCharacteristics) GetInputDataItem() *DataInput{
+func (this *MultiInstanceLoopCharacteristics) GetInputDataItem() *DataInput {
 	return this.M_inputDataItem
 }
 
 /** Init reference InputDataItem **/
-func (this *MultiInstanceLoopCharacteristics) SetInputDataItem(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetInputDataItem(ref interface{}) {
 	this.NeedSave = true
 	this.M_inputDataItem = ref.(*DataInput)
 }
 
 /** Remove reference InputDataItem **/
-func (this *MultiInstanceLoopCharacteristics) RemoveInputDataItem(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveInputDataItem(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_inputDataItem.GetUUID() {
@@ -348,18 +346,18 @@ func (this *MultiInstanceLoopCharacteristics) RemoveInputDataItem(ref interface{
 }
 
 /** OutputDataItem **/
-func (this *MultiInstanceLoopCharacteristics) GetOutputDataItem() *DataOutput{
+func (this *MultiInstanceLoopCharacteristics) GetOutputDataItem() *DataOutput {
 	return this.M_outputDataItem
 }
 
 /** Init reference OutputDataItem **/
-func (this *MultiInstanceLoopCharacteristics) SetOutputDataItem(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetOutputDataItem(ref interface{}) {
 	this.NeedSave = true
 	this.M_outputDataItem = ref.(*DataOutput)
 }
 
 /** Remove reference OutputDataItem **/
-func (this *MultiInstanceLoopCharacteristics) RemoveOutputDataItem(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveOutputDataItem(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_outputDataItem.GetUUID() {
@@ -368,18 +366,18 @@ func (this *MultiInstanceLoopCharacteristics) RemoveOutputDataItem(ref interface
 }
 
 /** CompletionCondition **/
-func (this *MultiInstanceLoopCharacteristics) GetCompletionCondition() *FormalExpression{
+func (this *MultiInstanceLoopCharacteristics) GetCompletionCondition() *FormalExpression {
 	return this.M_completionCondition
 }
 
 /** Init reference CompletionCondition **/
-func (this *MultiInstanceLoopCharacteristics) SetCompletionCondition(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetCompletionCondition(ref interface{}) {
 	this.NeedSave = true
 	this.M_completionCondition = ref.(*FormalExpression)
 }
 
 /** Remove reference CompletionCondition **/
-func (this *MultiInstanceLoopCharacteristics) RemoveCompletionCondition(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveCompletionCondition(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.M_completionCondition.GetUUID() {
@@ -388,16 +386,16 @@ func (this *MultiInstanceLoopCharacteristics) RemoveCompletionCondition(ref inte
 }
 
 /** ComplexBehaviorDefinition **/
-func (this *MultiInstanceLoopCharacteristics) GetComplexBehaviorDefinition() []*ComplexBehaviorDefinition{
+func (this *MultiInstanceLoopCharacteristics) GetComplexBehaviorDefinition() []*ComplexBehaviorDefinition {
 	return this.M_complexBehaviorDefinition
 }
 
 /** Init reference ComplexBehaviorDefinition **/
-func (this *MultiInstanceLoopCharacteristics) SetComplexBehaviorDefinition(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetComplexBehaviorDefinition(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var complexBehaviorDefinitions []*ComplexBehaviorDefinition
-	for i:=0; i<len(this.M_complexBehaviorDefinition); i++ {
+	for i := 0; i < len(this.M_complexBehaviorDefinition); i++ {
 		if this.M_complexBehaviorDefinition[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			complexBehaviorDefinitions = append(complexBehaviorDefinitions, this.M_complexBehaviorDefinition[i])
 		} else {
@@ -412,7 +410,7 @@ func (this *MultiInstanceLoopCharacteristics) SetComplexBehaviorDefinition(ref i
 }
 
 /** Remove reference ComplexBehaviorDefinition **/
-func (this *MultiInstanceLoopCharacteristics) RemoveComplexBehaviorDefinition(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveComplexBehaviorDefinition(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	complexBehaviorDefinition_ := make([]*ComplexBehaviorDefinition, 0)
@@ -425,23 +423,23 @@ func (this *MultiInstanceLoopCharacteristics) RemoveComplexBehaviorDefinition(re
 }
 
 /** OneBehaviorEventRef **/
-func (this *MultiInstanceLoopCharacteristics) GetOneBehaviorEventRef() EventDefinition{
+func (this *MultiInstanceLoopCharacteristics) GetOneBehaviorEventRef() EventDefinition {
 	return this.m_oneBehaviorEventRef
 }
 
 /** Init reference OneBehaviorEventRef **/
-func (this *MultiInstanceLoopCharacteristics) SetOneBehaviorEventRef(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetOneBehaviorEventRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_oneBehaviorEventRef = ref.(string)
-	}else{
+	} else {
 		this.m_oneBehaviorEventRef = ref.(EventDefinition)
 		this.M_oneBehaviorEventRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference OneBehaviorEventRef **/
-func (this *MultiInstanceLoopCharacteristics) RemoveOneBehaviorEventRef(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveOneBehaviorEventRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_oneBehaviorEventRef.(BaseElement).GetUUID() {
@@ -451,23 +449,23 @@ func (this *MultiInstanceLoopCharacteristics) RemoveOneBehaviorEventRef(ref inte
 }
 
 /** NoneBehaviorEventRef **/
-func (this *MultiInstanceLoopCharacteristics) GetNoneBehaviorEventRef() EventDefinition{
+func (this *MultiInstanceLoopCharacteristics) GetNoneBehaviorEventRef() EventDefinition {
 	return this.m_noneBehaviorEventRef
 }
 
 /** Init reference NoneBehaviorEventRef **/
-func (this *MultiInstanceLoopCharacteristics) SetNoneBehaviorEventRef(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetNoneBehaviorEventRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_noneBehaviorEventRef = ref.(string)
-	}else{
+	} else {
 		this.m_noneBehaviorEventRef = ref.(EventDefinition)
 		this.M_noneBehaviorEventRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference NoneBehaviorEventRef **/
-func (this *MultiInstanceLoopCharacteristics) RemoveNoneBehaviorEventRef(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveNoneBehaviorEventRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_noneBehaviorEventRef.(BaseElement).GetUUID() {
@@ -477,21 +475,21 @@ func (this *MultiInstanceLoopCharacteristics) RemoveNoneBehaviorEventRef(ref int
 }
 
 /** Lane **/
-func (this *MultiInstanceLoopCharacteristics) GetLanePtr() []*Lane{
+func (this *MultiInstanceLoopCharacteristics) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *MultiInstanceLoopCharacteristics) SetLanePtr(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -499,7 +497,7 @@ func (this *MultiInstanceLoopCharacteristics) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *MultiInstanceLoopCharacteristics) RemoveLanePtr(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -515,21 +513,21 @@ func (this *MultiInstanceLoopCharacteristics) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *MultiInstanceLoopCharacteristics) GetOutgoingPtr() []*Association{
+func (this *MultiInstanceLoopCharacteristics) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *MultiInstanceLoopCharacteristics) SetOutgoingPtr(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -537,7 +535,7 @@ func (this *MultiInstanceLoopCharacteristics) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *MultiInstanceLoopCharacteristics) RemoveOutgoingPtr(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -553,21 +551,21 @@ func (this *MultiInstanceLoopCharacteristics) RemoveOutgoingPtr(ref interface{})
 }
 
 /** Incoming **/
-func (this *MultiInstanceLoopCharacteristics) GetIncomingPtr() []*Association{
+func (this *MultiInstanceLoopCharacteristics) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *MultiInstanceLoopCharacteristics) SetIncomingPtr(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -575,7 +573,7 @@ func (this *MultiInstanceLoopCharacteristics) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *MultiInstanceLoopCharacteristics) RemoveIncomingPtr(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -591,23 +589,23 @@ func (this *MultiInstanceLoopCharacteristics) RemoveIncomingPtr(ref interface{})
 }
 
 /** Activity **/
-func (this *MultiInstanceLoopCharacteristics) GetActivityPtr() Activity{
+func (this *MultiInstanceLoopCharacteristics) GetActivityPtr() Activity {
 	return this.m_activityPtr
 }
 
 /** Init reference Activity **/
-func (this *MultiInstanceLoopCharacteristics) SetActivityPtr(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) SetActivityPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_activityPtr = ref.(string)
-	}else{
+	} else {
 		this.m_activityPtr = ref.(Activity)
 		this.M_activityPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Activity **/
-func (this *MultiInstanceLoopCharacteristics) RemoveActivityPtr(ref interface{}){
+func (this *MultiInstanceLoopCharacteristics) RemoveActivityPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_activityPtr.(BaseElement).GetUUID() {

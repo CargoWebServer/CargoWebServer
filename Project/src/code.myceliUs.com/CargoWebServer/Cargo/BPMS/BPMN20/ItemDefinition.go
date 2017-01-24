@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type ItemDefinition struct{
+type ItemDefinition struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,66 +15,65 @@ type ItemDefinition struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of RootElement **/
 	/** No members **/
 
 	/** members of ItemDefinition **/
-	M_itemKind ItemKind
+	M_itemKind     ItemKind
 	m_structureRef interface{}
 	/** If the ref is a string and not an object **/
 	M_structureRef string
 	M_isCollection bool
-	m_import *Import
+	m_import       *Import
 	/** If the ref is a string and not an object **/
 	M_import string
-
 
 	/** Associations **/
 	m_escalationPtr []*Escalation
 	/** If the ref is a string and not an object **/
 	M_escalationPtr []string
-	m_signalPtr []*Signal
+	m_signalPtr     []*Signal
 	/** If the ref is a string and not an object **/
-	M_signalPtr []string
+	M_signalPtr           []string
 	m_itemAwareElementPtr []ItemAwareElement
 	/** If the ref is a string and not an object **/
-	M_itemAwareElementPtr []string
+	M_itemAwareElementPtr    []string
 	m_correlationPropertyPtr []*CorrelationProperty
 	/** If the ref is a string and not an object **/
 	M_correlationPropertyPtr []string
-	m_errorPtr []*Error
+	m_errorPtr               []*Error
 	/** If the ref is a string and not an object **/
-	M_errorPtr []string
+	M_errorPtr            []string
 	m_formalExpressionPtr []*FormalExpression
 	/** If the ref is a string and not an object **/
 	M_formalExpressionPtr []string
-	m_messagePtr []*Message
+	m_messagePtr          []*Message
 	/** If the ref is a string and not an object **/
-	M_messagePtr []string
+	M_messagePtr           []string
 	m_resourceParameterPtr []*ResourceParameter
 	/** If the ref is a string and not an object **/
 	M_resourceParameterPtr []string
-	m_lanePtr []*Lane
+	m_lanePtr              []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr    []string
 	m_definitionsPtr *Definitions
 	/** If the ref is a string and not an object **/
 	M_definitionsPtr string
@@ -81,34 +81,32 @@ type ItemDefinition struct{
 
 /** Xml parser for ItemDefinition **/
 type XsdItemDefinition struct {
-	XMLName xml.Name	`xml:"itemDefinition"`
+	XMLName xml.Name `xml:"itemDefinition"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** RootElement **/
 
-
-	M_structureRef	string	`xml:"structureRef,attr"`
-	M_isCollection	bool	`xml:"isCollection,attr"`
-	M_itemKind	string	`xml:"itemKind,attr"`
-
+	M_structureRef string `xml:"structureRef,attr"`
+	M_isCollection bool   `xml:"isCollection,attr"`
+	M_itemKind     string `xml:"itemKind,attr"`
 }
+
 /** UUID **/
-func (this *ItemDefinition) GetUUID() string{
+func (this *ItemDefinition) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *ItemDefinition) GetId() string{
+func (this *ItemDefinition) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *ItemDefinition) SetId(ref interface{}){
+func (this *ItemDefinition) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -116,16 +114,16 @@ func (this *ItemDefinition) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *ItemDefinition) GetOther() interface{}{
+func (this *ItemDefinition) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *ItemDefinition) SetOther(ref interface{}){
+func (this *ItemDefinition) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -133,12 +131,12 @@ func (this *ItemDefinition) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *ItemDefinition) GetExtensionElements() *ExtensionElements{
+func (this *ItemDefinition) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *ItemDefinition) SetExtensionElements(ref interface{}){
+func (this *ItemDefinition) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -146,16 +144,16 @@ func (this *ItemDefinition) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *ItemDefinition) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *ItemDefinition) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *ItemDefinition) SetExtensionDefinitions(ref interface{}){
+func (this *ItemDefinition) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -172,16 +170,16 @@ func (this *ItemDefinition) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *ItemDefinition) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *ItemDefinition) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *ItemDefinition) SetExtensionValues(ref interface{}){
+func (this *ItemDefinition) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -198,16 +196,16 @@ func (this *ItemDefinition) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *ItemDefinition) GetDocumentation() []*Documentation{
+func (this *ItemDefinition) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *ItemDefinition) SetDocumentation(ref interface{}){
+func (this *ItemDefinition) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -222,7 +220,7 @@ func (this *ItemDefinition) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *ItemDefinition) RemoveDocumentation(ref interface{}){
+func (this *ItemDefinition) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -235,12 +233,12 @@ func (this *ItemDefinition) RemoveDocumentation(ref interface{}){
 }
 
 /** ItemKind **/
-func (this *ItemDefinition) GetItemKind() ItemKind{
+func (this *ItemDefinition) GetItemKind() ItemKind {
 	return this.M_itemKind
 }
 
 /** Init reference ItemKind **/
-func (this *ItemDefinition) SetItemKind(ref interface{}){
+func (this *ItemDefinition) SetItemKind(ref interface{}) {
 	this.NeedSave = true
 	this.M_itemKind = ref.(ItemKind)
 }
@@ -248,16 +246,16 @@ func (this *ItemDefinition) SetItemKind(ref interface{}){
 /** Remove reference ItemKind **/
 
 /** StructureRef **/
-func (this *ItemDefinition) GetStructureRef() interface{}{
+func (this *ItemDefinition) GetStructureRef() interface{} {
 	return this.m_structureRef
 }
 
 /** Init reference StructureRef **/
-func (this *ItemDefinition) SetStructureRef(ref interface{}){
+func (this *ItemDefinition) SetStructureRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_structureRef = ref.(string)
-	}else{
+	} else {
 		this.m_structureRef = ref.(interface{})
 	}
 }
@@ -265,12 +263,12 @@ func (this *ItemDefinition) SetStructureRef(ref interface{}){
 /** Remove reference StructureRef **/
 
 /** IsCollection **/
-func (this *ItemDefinition) IsCollection() bool{
+func (this *ItemDefinition) IsCollection() bool {
 	return this.M_isCollection
 }
 
 /** Init reference IsCollection **/
-func (this *ItemDefinition) SetIsCollection(ref interface{}){
+func (this *ItemDefinition) SetIsCollection(ref interface{}) {
 	this.NeedSave = true
 	this.M_isCollection = ref.(bool)
 }
@@ -278,16 +276,16 @@ func (this *ItemDefinition) SetIsCollection(ref interface{}){
 /** Remove reference IsCollection **/
 
 /** Import **/
-func (this *ItemDefinition) GetImport() *Import{
+func (this *ItemDefinition) GetImport() *Import {
 	return this.m_import
 }
 
 /** Init reference Import **/
-func (this *ItemDefinition) SetImport(ref interface{}){
+func (this *ItemDefinition) SetImport(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_import = ref.(string)
-	}else{
+	} else {
 		this.m_import = ref.(*Import)
 	}
 }
@@ -295,21 +293,21 @@ func (this *ItemDefinition) SetImport(ref interface{}){
 /** Remove reference Import **/
 
 /** Escalation **/
-func (this *ItemDefinition) GetEscalationPtr() []*Escalation{
+func (this *ItemDefinition) GetEscalationPtr() []*Escalation {
 	return this.m_escalationPtr
 }
 
 /** Init reference Escalation **/
-func (this *ItemDefinition) SetEscalationPtr(ref interface{}){
+func (this *ItemDefinition) SetEscalationPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_escalationPtr); i++ {
+		for i := 0; i < len(this.M_escalationPtr); i++ {
 			if this.M_escalationPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_escalationPtr = append(this.M_escalationPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveEscalationPtr(ref)
 		this.m_escalationPtr = append(this.m_escalationPtr, ref.(*Escalation))
 		this.M_escalationPtr = append(this.M_escalationPtr, ref.(BaseElement).GetUUID())
@@ -317,7 +315,7 @@ func (this *ItemDefinition) SetEscalationPtr(ref interface{}){
 }
 
 /** Remove reference Escalation **/
-func (this *ItemDefinition) RemoveEscalationPtr(ref interface{}){
+func (this *ItemDefinition) RemoveEscalationPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	escalationPtr_ := make([]*Escalation, 0)
@@ -333,21 +331,21 @@ func (this *ItemDefinition) RemoveEscalationPtr(ref interface{}){
 }
 
 /** Signal **/
-func (this *ItemDefinition) GetSignalPtr() []*Signal{
+func (this *ItemDefinition) GetSignalPtr() []*Signal {
 	return this.m_signalPtr
 }
 
 /** Init reference Signal **/
-func (this *ItemDefinition) SetSignalPtr(ref interface{}){
+func (this *ItemDefinition) SetSignalPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_signalPtr); i++ {
+		for i := 0; i < len(this.M_signalPtr); i++ {
 			if this.M_signalPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_signalPtr = append(this.M_signalPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveSignalPtr(ref)
 		this.m_signalPtr = append(this.m_signalPtr, ref.(*Signal))
 		this.M_signalPtr = append(this.M_signalPtr, ref.(BaseElement).GetUUID())
@@ -355,7 +353,7 @@ func (this *ItemDefinition) SetSignalPtr(ref interface{}){
 }
 
 /** Remove reference Signal **/
-func (this *ItemDefinition) RemoveSignalPtr(ref interface{}){
+func (this *ItemDefinition) RemoveSignalPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	signalPtr_ := make([]*Signal, 0)
@@ -371,21 +369,21 @@ func (this *ItemDefinition) RemoveSignalPtr(ref interface{}){
 }
 
 /** ItemAwareElement **/
-func (this *ItemDefinition) GetItemAwareElementPtr() []ItemAwareElement{
+func (this *ItemDefinition) GetItemAwareElementPtr() []ItemAwareElement {
 	return this.m_itemAwareElementPtr
 }
 
 /** Init reference ItemAwareElement **/
-func (this *ItemDefinition) SetItemAwareElementPtr(ref interface{}){
+func (this *ItemDefinition) SetItemAwareElementPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_itemAwareElementPtr); i++ {
+		for i := 0; i < len(this.M_itemAwareElementPtr); i++ {
 			if this.M_itemAwareElementPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_itemAwareElementPtr = append(this.M_itemAwareElementPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveItemAwareElementPtr(ref)
 		this.m_itemAwareElementPtr = append(this.m_itemAwareElementPtr, ref.(ItemAwareElement))
 		this.M_itemAwareElementPtr = append(this.M_itemAwareElementPtr, ref.(BaseElement).GetUUID())
@@ -393,7 +391,7 @@ func (this *ItemDefinition) SetItemAwareElementPtr(ref interface{}){
 }
 
 /** Remove reference ItemAwareElement **/
-func (this *ItemDefinition) RemoveItemAwareElementPtr(ref interface{}){
+func (this *ItemDefinition) RemoveItemAwareElementPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	itemAwareElementPtr_ := make([]ItemAwareElement, 0)
@@ -409,21 +407,21 @@ func (this *ItemDefinition) RemoveItemAwareElementPtr(ref interface{}){
 }
 
 /** CorrelationProperty **/
-func (this *ItemDefinition) GetCorrelationPropertyPtr() []*CorrelationProperty{
+func (this *ItemDefinition) GetCorrelationPropertyPtr() []*CorrelationProperty {
 	return this.m_correlationPropertyPtr
 }
 
 /** Init reference CorrelationProperty **/
-func (this *ItemDefinition) SetCorrelationPropertyPtr(ref interface{}){
+func (this *ItemDefinition) SetCorrelationPropertyPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_correlationPropertyPtr); i++ {
+		for i := 0; i < len(this.M_correlationPropertyPtr); i++ {
 			if this.M_correlationPropertyPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_correlationPropertyPtr = append(this.M_correlationPropertyPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCorrelationPropertyPtr(ref)
 		this.m_correlationPropertyPtr = append(this.m_correlationPropertyPtr, ref.(*CorrelationProperty))
 		this.M_correlationPropertyPtr = append(this.M_correlationPropertyPtr, ref.(BaseElement).GetUUID())
@@ -431,7 +429,7 @@ func (this *ItemDefinition) SetCorrelationPropertyPtr(ref interface{}){
 }
 
 /** Remove reference CorrelationProperty **/
-func (this *ItemDefinition) RemoveCorrelationPropertyPtr(ref interface{}){
+func (this *ItemDefinition) RemoveCorrelationPropertyPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	correlationPropertyPtr_ := make([]*CorrelationProperty, 0)
@@ -447,21 +445,21 @@ func (this *ItemDefinition) RemoveCorrelationPropertyPtr(ref interface{}){
 }
 
 /** Error **/
-func (this *ItemDefinition) GetErrorPtr() []*Error{
+func (this *ItemDefinition) GetErrorPtr() []*Error {
 	return this.m_errorPtr
 }
 
 /** Init reference Error **/
-func (this *ItemDefinition) SetErrorPtr(ref interface{}){
+func (this *ItemDefinition) SetErrorPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_errorPtr); i++ {
+		for i := 0; i < len(this.M_errorPtr); i++ {
 			if this.M_errorPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_errorPtr = append(this.M_errorPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveErrorPtr(ref)
 		this.m_errorPtr = append(this.m_errorPtr, ref.(*Error))
 		this.M_errorPtr = append(this.M_errorPtr, ref.(BaseElement).GetUUID())
@@ -469,7 +467,7 @@ func (this *ItemDefinition) SetErrorPtr(ref interface{}){
 }
 
 /** Remove reference Error **/
-func (this *ItemDefinition) RemoveErrorPtr(ref interface{}){
+func (this *ItemDefinition) RemoveErrorPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	errorPtr_ := make([]*Error, 0)
@@ -485,21 +483,21 @@ func (this *ItemDefinition) RemoveErrorPtr(ref interface{}){
 }
 
 /** FormalExpression **/
-func (this *ItemDefinition) GetFormalExpressionPtr() []*FormalExpression{
+func (this *ItemDefinition) GetFormalExpressionPtr() []*FormalExpression {
 	return this.m_formalExpressionPtr
 }
 
 /** Init reference FormalExpression **/
-func (this *ItemDefinition) SetFormalExpressionPtr(ref interface{}){
+func (this *ItemDefinition) SetFormalExpressionPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_formalExpressionPtr); i++ {
+		for i := 0; i < len(this.M_formalExpressionPtr); i++ {
 			if this.M_formalExpressionPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_formalExpressionPtr = append(this.M_formalExpressionPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveFormalExpressionPtr(ref)
 		this.m_formalExpressionPtr = append(this.m_formalExpressionPtr, ref.(*FormalExpression))
 		this.M_formalExpressionPtr = append(this.M_formalExpressionPtr, ref.(BaseElement).GetUUID())
@@ -507,7 +505,7 @@ func (this *ItemDefinition) SetFormalExpressionPtr(ref interface{}){
 }
 
 /** Remove reference FormalExpression **/
-func (this *ItemDefinition) RemoveFormalExpressionPtr(ref interface{}){
+func (this *ItemDefinition) RemoveFormalExpressionPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	formalExpressionPtr_ := make([]*FormalExpression, 0)
@@ -523,21 +521,21 @@ func (this *ItemDefinition) RemoveFormalExpressionPtr(ref interface{}){
 }
 
 /** Message **/
-func (this *ItemDefinition) GetMessagePtr() []*Message{
+func (this *ItemDefinition) GetMessagePtr() []*Message {
 	return this.m_messagePtr
 }
 
 /** Init reference Message **/
-func (this *ItemDefinition) SetMessagePtr(ref interface{}){
+func (this *ItemDefinition) SetMessagePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_messagePtr); i++ {
+		for i := 0; i < len(this.M_messagePtr); i++ {
 			if this.M_messagePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_messagePtr = append(this.M_messagePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveMessagePtr(ref)
 		this.m_messagePtr = append(this.m_messagePtr, ref.(*Message))
 		this.M_messagePtr = append(this.M_messagePtr, ref.(BaseElement).GetUUID())
@@ -545,7 +543,7 @@ func (this *ItemDefinition) SetMessagePtr(ref interface{}){
 }
 
 /** Remove reference Message **/
-func (this *ItemDefinition) RemoveMessagePtr(ref interface{}){
+func (this *ItemDefinition) RemoveMessagePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	messagePtr_ := make([]*Message, 0)
@@ -561,21 +559,21 @@ func (this *ItemDefinition) RemoveMessagePtr(ref interface{}){
 }
 
 /** ResourceParameter **/
-func (this *ItemDefinition) GetResourceParameterPtr() []*ResourceParameter{
+func (this *ItemDefinition) GetResourceParameterPtr() []*ResourceParameter {
 	return this.m_resourceParameterPtr
 }
 
 /** Init reference ResourceParameter **/
-func (this *ItemDefinition) SetResourceParameterPtr(ref interface{}){
+func (this *ItemDefinition) SetResourceParameterPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_resourceParameterPtr); i++ {
+		for i := 0; i < len(this.M_resourceParameterPtr); i++ {
 			if this.M_resourceParameterPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_resourceParameterPtr = append(this.M_resourceParameterPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveResourceParameterPtr(ref)
 		this.m_resourceParameterPtr = append(this.m_resourceParameterPtr, ref.(*ResourceParameter))
 		this.M_resourceParameterPtr = append(this.M_resourceParameterPtr, ref.(BaseElement).GetUUID())
@@ -583,7 +581,7 @@ func (this *ItemDefinition) SetResourceParameterPtr(ref interface{}){
 }
 
 /** Remove reference ResourceParameter **/
-func (this *ItemDefinition) RemoveResourceParameterPtr(ref interface{}){
+func (this *ItemDefinition) RemoveResourceParameterPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	resourceParameterPtr_ := make([]*ResourceParameter, 0)
@@ -599,21 +597,21 @@ func (this *ItemDefinition) RemoveResourceParameterPtr(ref interface{}){
 }
 
 /** Lane **/
-func (this *ItemDefinition) GetLanePtr() []*Lane{
+func (this *ItemDefinition) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *ItemDefinition) SetLanePtr(ref interface{}){
+func (this *ItemDefinition) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -621,7 +619,7 @@ func (this *ItemDefinition) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *ItemDefinition) RemoveLanePtr(ref interface{}){
+func (this *ItemDefinition) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -637,21 +635,21 @@ func (this *ItemDefinition) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *ItemDefinition) GetOutgoingPtr() []*Association{
+func (this *ItemDefinition) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *ItemDefinition) SetOutgoingPtr(ref interface{}){
+func (this *ItemDefinition) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -659,7 +657,7 @@ func (this *ItemDefinition) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *ItemDefinition) RemoveOutgoingPtr(ref interface{}){
+func (this *ItemDefinition) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -675,21 +673,21 @@ func (this *ItemDefinition) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *ItemDefinition) GetIncomingPtr() []*Association{
+func (this *ItemDefinition) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *ItemDefinition) SetIncomingPtr(ref interface{}){
+func (this *ItemDefinition) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -697,7 +695,7 @@ func (this *ItemDefinition) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *ItemDefinition) RemoveIncomingPtr(ref interface{}){
+func (this *ItemDefinition) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -713,23 +711,23 @@ func (this *ItemDefinition) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Definitions **/
-func (this *ItemDefinition) GetDefinitionsPtr() *Definitions{
+func (this *ItemDefinition) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *ItemDefinition) SetDefinitionsPtr(ref interface{}){
+func (this *ItemDefinition) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *ItemDefinition) RemoveDefinitionsPtr(ref interface{}){
+func (this *ItemDefinition) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {

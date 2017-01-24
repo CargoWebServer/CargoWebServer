@@ -1,10 +1,11 @@
+//+build BPMN
 package BPMS_Runtime
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type GatewayInstance struct{
+type GatewayInstance struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,26 +15,26 @@ type GatewayInstance struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Instance **/
-	M_id string
+	M_id            string
 	M_bpmnElementId string
-	M_participants []string
-	m_dataRef []*ItemAwareElementInstance
+	M_participants  []string
+	m_dataRef       []*ItemAwareElementInstance
 	/** If the ref is a string and not an object **/
-	M_dataRef []string
-	M_data []*ItemAwareElementInstance
+	M_dataRef    []string
+	M_data       []*ItemAwareElementInstance
 	m_logInfoRef []*LogInfo
 	/** If the ref is a string and not an object **/
 	M_logInfoRef []string
 
 	/** members of FlowNodeInstance **/
-	M_flowNodeType FlowNodeType
+	M_flowNodeType   FlowNodeType
 	M_lifecycleState LifecycleState
-	m_inputRef []*ConnectingObject
+	m_inputRef       []*ConnectingObject
 	/** If the ref is a string and not an object **/
-	M_inputRef []string
+	M_inputRef  []string
 	m_outputRef []*ConnectingObject
 	/** If the ref is a string and not an object **/
 	M_outputRef []string
@@ -41,46 +42,43 @@ type GatewayInstance struct{
 	/** members of GatewayInstance **/
 	M_gatewayType GatewayType
 
-
 	/** Associations **/
 	m_SubprocessInstancePtr *SubprocessInstance
 	/** If the ref is a string and not an object **/
 	M_SubprocessInstancePtr string
-	m_processInstancePtr *ProcessInstance
+	m_processInstancePtr    *ProcessInstance
 	/** If the ref is a string and not an object **/
 	M_processInstancePtr string
 }
 
 /** Xml parser for GatewayInstance **/
 type XsdGatewayInstance struct {
-	XMLName xml.Name	`xml:"gatewayInstance"`
+	XMLName xml.Name `xml:"gatewayInstance"`
 	/** Instance **/
-	M_id	string	`xml:"id,attr"`
-	M_bpmnElementId	string	`xml:"bpmnElementId,attr"`
-
+	M_id            string `xml:"id,attr"`
+	M_bpmnElementId string `xml:"bpmnElementId,attr"`
 
 	/** FlowNodeInstance **/
-	M_inputRef	[]string	`xml:"inputRef"`
-	M_outputRef	[]string	`xml:"outputRef"`
-	M_flowNodeType	string	`xml:"flowNodeType,attr"`
-	M_lifecycleState	string	`xml:"lifecycleState,attr"`
+	M_inputRef       []string `xml:"inputRef"`
+	M_outputRef      []string `xml:"outputRef"`
+	M_flowNodeType   string   `xml:"flowNodeType,attr"`
+	M_lifecycleState string   `xml:"lifecycleState,attr"`
 
-
-	M_gatewayType	string	`xml:"gatewayType,attr"`
-
+	M_gatewayType string `xml:"gatewayType,attr"`
 }
+
 /** UUID **/
-func (this *GatewayInstance) GetUUID() string{
+func (this *GatewayInstance) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *GatewayInstance) GetId() string{
+func (this *GatewayInstance) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *GatewayInstance) SetId(ref interface{}){
+func (this *GatewayInstance) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -88,12 +86,12 @@ func (this *GatewayInstance) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** BpmnElementId **/
-func (this *GatewayInstance) GetBpmnElementId() string{
+func (this *GatewayInstance) GetBpmnElementId() string {
 	return this.M_bpmnElementId
 }
 
 /** Init reference BpmnElementId **/
-func (this *GatewayInstance) SetBpmnElementId(ref interface{}){
+func (this *GatewayInstance) SetBpmnElementId(ref interface{}) {
 	this.NeedSave = true
 	this.M_bpmnElementId = ref.(string)
 }
@@ -101,16 +99,16 @@ func (this *GatewayInstance) SetBpmnElementId(ref interface{}){
 /** Remove reference BpmnElementId **/
 
 /** Participants **/
-func (this *GatewayInstance) GetParticipants() []string{
+func (this *GatewayInstance) GetParticipants() []string {
 	return this.M_participants
 }
 
 /** Init reference Participants **/
-func (this *GatewayInstance) SetParticipants(ref interface{}){
+func (this *GatewayInstance) SetParticipants(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var participantss []string
-	for i:=0; i<len(this.M_participants); i++ {
+	for i := 0; i < len(this.M_participants); i++ {
 		if this.M_participants[i] != ref.(string) {
 			participantss = append(participantss, this.M_participants[i])
 		} else {
@@ -127,21 +125,21 @@ func (this *GatewayInstance) SetParticipants(ref interface{}){
 /** Remove reference Participants **/
 
 /** DataRef **/
-func (this *GatewayInstance) GetDataRef() []*ItemAwareElementInstance{
+func (this *GatewayInstance) GetDataRef() []*ItemAwareElementInstance {
 	return this.m_dataRef
 }
 
 /** Init reference DataRef **/
-func (this *GatewayInstance) SetDataRef(ref interface{}){
+func (this *GatewayInstance) SetDataRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_dataRef); i++ {
+		for i := 0; i < len(this.M_dataRef); i++ {
 			if this.M_dataRef[i] == refStr {
 				return
 			}
 		}
 		this.M_dataRef = append(this.M_dataRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveDataRef(ref)
 		this.m_dataRef = append(this.m_dataRef, ref.(*ItemAwareElementInstance))
 		this.M_dataRef = append(this.M_dataRef, ref.(*ItemAwareElementInstance).GetUUID())
@@ -149,7 +147,7 @@ func (this *GatewayInstance) SetDataRef(ref interface{}){
 }
 
 /** Remove reference DataRef **/
-func (this *GatewayInstance) RemoveDataRef(ref interface{}){
+func (this *GatewayInstance) RemoveDataRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*ItemAwareElementInstance)
 	dataRef_ := make([]*ItemAwareElementInstance, 0)
@@ -165,16 +163,16 @@ func (this *GatewayInstance) RemoveDataRef(ref interface{}){
 }
 
 /** Data **/
-func (this *GatewayInstance) GetData() []*ItemAwareElementInstance{
+func (this *GatewayInstance) GetData() []*ItemAwareElementInstance {
 	return this.M_data
 }
 
 /** Init reference Data **/
-func (this *GatewayInstance) SetData(ref interface{}){
+func (this *GatewayInstance) SetData(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var datas []*ItemAwareElementInstance
-	for i:=0; i<len(this.M_data); i++ {
+	for i := 0; i < len(this.M_data); i++ {
 		if this.M_data[i].GetUUID() != ref.(*ItemAwareElementInstance).GetUUID() {
 			datas = append(datas, this.M_data[i])
 		} else {
@@ -189,7 +187,7 @@ func (this *GatewayInstance) SetData(ref interface{}){
 }
 
 /** Remove reference Data **/
-func (this *GatewayInstance) RemoveData(ref interface{}){
+func (this *GatewayInstance) RemoveData(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(ItemAwareElementInstance)
 	data_ := make([]*ItemAwareElementInstance, 0)
@@ -202,21 +200,21 @@ func (this *GatewayInstance) RemoveData(ref interface{}){
 }
 
 /** LogInfoRef **/
-func (this *GatewayInstance) GetLogInfoRef() []*LogInfo{
+func (this *GatewayInstance) GetLogInfoRef() []*LogInfo {
 	return this.m_logInfoRef
 }
 
 /** Init reference LogInfoRef **/
-func (this *GatewayInstance) SetLogInfoRef(ref interface{}){
+func (this *GatewayInstance) SetLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_logInfoRef); i++ {
+		for i := 0; i < len(this.M_logInfoRef); i++ {
 			if this.M_logInfoRef[i] == refStr {
 				return
 			}
 		}
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveLogInfoRef(ref)
 		this.m_logInfoRef = append(this.m_logInfoRef, ref.(*LogInfo))
 		this.M_logInfoRef = append(this.M_logInfoRef, ref.(*LogInfo).GetUUID())
@@ -224,7 +222,7 @@ func (this *GatewayInstance) SetLogInfoRef(ref interface{}){
 }
 
 /** Remove reference LogInfoRef **/
-func (this *GatewayInstance) RemoveLogInfoRef(ref interface{}){
+func (this *GatewayInstance) RemoveLogInfoRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*LogInfo)
 	logInfoRef_ := make([]*LogInfo, 0)
@@ -240,12 +238,12 @@ func (this *GatewayInstance) RemoveLogInfoRef(ref interface{}){
 }
 
 /** FlowNodeType **/
-func (this *GatewayInstance) GetFlowNodeType() FlowNodeType{
+func (this *GatewayInstance) GetFlowNodeType() FlowNodeType {
 	return this.M_flowNodeType
 }
 
 /** Init reference FlowNodeType **/
-func (this *GatewayInstance) SetFlowNodeType(ref interface{}){
+func (this *GatewayInstance) SetFlowNodeType(ref interface{}) {
 	this.NeedSave = true
 	this.M_flowNodeType = ref.(FlowNodeType)
 }
@@ -253,12 +251,12 @@ func (this *GatewayInstance) SetFlowNodeType(ref interface{}){
 /** Remove reference FlowNodeType **/
 
 /** LifecycleState **/
-func (this *GatewayInstance) GetLifecycleState() LifecycleState{
+func (this *GatewayInstance) GetLifecycleState() LifecycleState {
 	return this.M_lifecycleState
 }
 
 /** Init reference LifecycleState **/
-func (this *GatewayInstance) SetLifecycleState(ref interface{}){
+func (this *GatewayInstance) SetLifecycleState(ref interface{}) {
 	this.NeedSave = true
 	this.M_lifecycleState = ref.(LifecycleState)
 }
@@ -266,21 +264,21 @@ func (this *GatewayInstance) SetLifecycleState(ref interface{}){
 /** Remove reference LifecycleState **/
 
 /** InputRef **/
-func (this *GatewayInstance) GetInputRef() []*ConnectingObject{
+func (this *GatewayInstance) GetInputRef() []*ConnectingObject {
 	return this.m_inputRef
 }
 
 /** Init reference InputRef **/
-func (this *GatewayInstance) SetInputRef(ref interface{}){
+func (this *GatewayInstance) SetInputRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_inputRef); i++ {
+		for i := 0; i < len(this.M_inputRef); i++ {
 			if this.M_inputRef[i] == refStr {
 				return
 			}
 		}
 		this.M_inputRef = append(this.M_inputRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveInputRef(ref)
 		this.m_inputRef = append(this.m_inputRef, ref.(*ConnectingObject))
 		this.M_inputRef = append(this.M_inputRef, ref.(Instance).GetUUID())
@@ -288,7 +286,7 @@ func (this *GatewayInstance) SetInputRef(ref interface{}){
 }
 
 /** Remove reference InputRef **/
-func (this *GatewayInstance) RemoveInputRef(ref interface{}){
+func (this *GatewayInstance) RemoveInputRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	inputRef_ := make([]*ConnectingObject, 0)
@@ -304,21 +302,21 @@ func (this *GatewayInstance) RemoveInputRef(ref interface{}){
 }
 
 /** OutputRef **/
-func (this *GatewayInstance) GetOutputRef() []*ConnectingObject{
+func (this *GatewayInstance) GetOutputRef() []*ConnectingObject {
 	return this.m_outputRef
 }
 
 /** Init reference OutputRef **/
-func (this *GatewayInstance) SetOutputRef(ref interface{}){
+func (this *GatewayInstance) SetOutputRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outputRef); i++ {
+		for i := 0; i < len(this.M_outputRef); i++ {
 			if this.M_outputRef[i] == refStr {
 				return
 			}
 		}
 		this.M_outputRef = append(this.M_outputRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutputRef(ref)
 		this.m_outputRef = append(this.m_outputRef, ref.(*ConnectingObject))
 		this.M_outputRef = append(this.M_outputRef, ref.(Instance).GetUUID())
@@ -326,7 +324,7 @@ func (this *GatewayInstance) SetOutputRef(ref interface{}){
 }
 
 /** Remove reference OutputRef **/
-func (this *GatewayInstance) RemoveOutputRef(ref interface{}){
+func (this *GatewayInstance) RemoveOutputRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	outputRef_ := make([]*ConnectingObject, 0)
@@ -342,12 +340,12 @@ func (this *GatewayInstance) RemoveOutputRef(ref interface{}){
 }
 
 /** GatewayType **/
-func (this *GatewayInstance) GetGatewayType() GatewayType{
+func (this *GatewayInstance) GetGatewayType() GatewayType {
 	return this.M_gatewayType
 }
 
 /** Init reference GatewayType **/
-func (this *GatewayInstance) SetGatewayType(ref interface{}){
+func (this *GatewayInstance) SetGatewayType(ref interface{}) {
 	this.NeedSave = true
 	this.M_gatewayType = ref.(GatewayType)
 }
@@ -355,23 +353,23 @@ func (this *GatewayInstance) SetGatewayType(ref interface{}){
 /** Remove reference GatewayType **/
 
 /** SubprocessInstance **/
-func (this *GatewayInstance) GetSubprocessInstancePtr() *SubprocessInstance{
+func (this *GatewayInstance) GetSubprocessInstancePtr() *SubprocessInstance {
 	return this.m_SubprocessInstancePtr
 }
 
 /** Init reference SubprocessInstance **/
-func (this *GatewayInstance) SetSubprocessInstancePtr(ref interface{}){
+func (this *GatewayInstance) SetSubprocessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_SubprocessInstancePtr = ref.(string)
-	}else{
+	} else {
 		this.m_SubprocessInstancePtr = ref.(*SubprocessInstance)
 		this.M_SubprocessInstancePtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference SubprocessInstance **/
-func (this *GatewayInstance) RemoveSubprocessInstancePtr(ref interface{}){
+func (this *GatewayInstance) RemoveSubprocessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_SubprocessInstancePtr.GetUUID() {
@@ -381,23 +379,23 @@ func (this *GatewayInstance) RemoveSubprocessInstancePtr(ref interface{}){
 }
 
 /** ProcessInstance **/
-func (this *GatewayInstance) GetProcessInstancePtr() *ProcessInstance{
+func (this *GatewayInstance) GetProcessInstancePtr() *ProcessInstance {
 	return this.m_processInstancePtr
 }
 
 /** Init reference ProcessInstance **/
-func (this *GatewayInstance) SetProcessInstancePtr(ref interface{}){
+func (this *GatewayInstance) SetProcessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_processInstancePtr = ref.(string)
-	}else{
+	} else {
 		this.m_processInstancePtr = ref.(*ProcessInstance)
 		this.M_processInstancePtr = ref.(Instance).GetUUID()
 	}
 }
 
 /** Remove reference ProcessInstance **/
-func (this *GatewayInstance) RemoveProcessInstancePtr(ref interface{}){
+func (this *GatewayInstance) RemoveProcessInstancePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Instance)
 	if toDelete.GetUUID() == this.m_processInstancePtr.GetUUID() {

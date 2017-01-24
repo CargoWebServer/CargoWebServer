@@ -1,10 +1,11 @@
+// +build BPMN
 package BPMN20
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type GlobalChoreographyTask struct{
+type GlobalChoreographyTask struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -14,40 +15,40 @@ type GlobalChoreographyTask struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of BaseElement **/
-	M_id string
+	M_id    string
 	m_other interface{}
 	/** If the ref is a string and not an object **/
-	M_other string
-	M_extensionElements *ExtensionElements
+	M_other                string
+	M_extensionElements    *ExtensionElements
 	M_extensionDefinitions []*ExtensionDefinition
-	M_extensionValues []*ExtensionAttributeValue
-	M_documentation []*Documentation
+	M_extensionValues      []*ExtensionAttributeValue
+	M_documentation        []*Documentation
 
 	/** members of FlowElementsContainer **/
 	M_flowElement []FlowElement
-	M_laneSet []*LaneSet
+	M_laneSet     []*LaneSet
 
 	/** members of RootElement **/
 	/** No members **/
 
 	/** members of Collaboration **/
-	M_name string
-	M_isClosed bool
+	M_name            string
+	M_isClosed        bool
 	m_choreographyRef []Choreography
 	/** If the ref is a string and not an object **/
-	M_choreographyRef []string
-	M_artifact []Artifact
-	M_participantAssociation []*ParticipantAssociation
-	M_messageFlowAssociation []*MessageFlowAssociation
+	M_choreographyRef         []string
+	M_artifact                []Artifact
+	M_participantAssociation  []*ParticipantAssociation
+	M_messageFlowAssociation  []*MessageFlowAssociation
 	M_conversationAssociation []*ConversationAssociation
-	M_participant []*Participant
-	M_messageFlow []*MessageFlow
-	M_correlationKey []*CorrelationKey
-	M_conversationNode []ConversationNode
-	M_conversationLink []*ConversationLink
+	M_participant             []*Participant
+	M_messageFlow             []*MessageFlow
+	M_correlationKey          []*CorrelationKey
+	M_conversationNode        []ConversationNode
+	M_conversationLink        []*ConversationLink
 
 	/** members of Choreography **/
 	/** No members **/
@@ -57,29 +58,28 @@ type GlobalChoreographyTask struct{
 	/** If the ref is a string and not an object **/
 	M_initiatingParticipantRef string
 
-
 	/** Associations **/
 	m_lanePtr []*Lane
 	/** If the ref is a string and not an object **/
-	M_lanePtr []string
+	M_lanePtr     []string
 	m_outgoingPtr []*Association
 	/** If the ref is a string and not an object **/
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr []string
+	M_incomingPtr    []string
 	m_definitionsPtr *Definitions
 	/** If the ref is a string and not an object **/
 	M_definitionsPtr string
-	m_processPtr []*Process
+	m_processPtr     []*Process
 	/** If the ref is a string and not an object **/
-	M_processPtr []string
+	M_processPtr          []string
 	m_callConversationPtr []*CallConversation
 	/** If the ref is a string and not an object **/
 	M_callConversationPtr []string
-	m_collaborationPtr []Collaboration
+	m_collaborationPtr    []Collaboration
 	/** If the ref is a string and not an object **/
-	M_collaborationPtr []string
+	M_collaborationPtr            []string
 	m_callChoreographyActivityPtr []*CallChoreography
 	/** If the ref is a string and not an object **/
 	M_callChoreographyActivityPtr []string
@@ -87,87 +87,82 @@ type GlobalChoreographyTask struct{
 
 /** Xml parser for GlobalChoreographyTask **/
 type XsdGlobalChoreographyTask struct {
-	XMLName xml.Name	`xml:"globalChoreographyTask"`
+	XMLName xml.Name `xml:"globalChoreographyTask"`
 	/** BaseElement **/
-	M_documentation	[]*XsdDocumentation	`xml:"documentation,omitempty"`
-	M_extensionElements	*XsdExtensionElements	`xml:"extensionElements,omitempty"`
-	M_id	string	`xml:"id,attr"`
-//	M_other	string	`xml:",innerxml"`
-
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	//	M_other	string	`xml:",innerxml"`
 
 	/** RootElement **/
 
-
 	/** Collaboration **/
-	M_participant	[]*XsdParticipant	`xml:"participant,omitempty"`
-	M_messageFlow	[]*XsdMessageFlow	`xml:"messageFlow,omitempty"`
-	M_artifact_0	[]*XsdAssociation	`xml:"association,omitempty"`
-	M_artifact_1	[]*XsdGroup	`xml:"group,omitempty"`
-	M_artifact_2	[]*XsdTextAnnotation	`xml:"textAnnotation,omitempty"`
+	M_participant []*XsdParticipant    `xml:"participant,omitempty"`
+	M_messageFlow []*XsdMessageFlow    `xml:"messageFlow,omitempty"`
+	M_artifact_0  []*XsdAssociation    `xml:"association,omitempty"`
+	M_artifact_1  []*XsdGroup          `xml:"group,omitempty"`
+	M_artifact_2  []*XsdTextAnnotation `xml:"textAnnotation,omitempty"`
 
-	M_conversationNode_0	[]*XsdCallConversation	`xml:"callConversation,omitempty"`
-	M_conversationNode_1	[]*XsdConversation	`xml:"conversation,omitempty"`
-	M_conversationNode_2	[]*XsdSubConversation	`xml:"subConversation,omitempty"`
+	M_conversationNode_0 []*XsdCallConversation `xml:"callConversation,omitempty"`
+	M_conversationNode_1 []*XsdConversation     `xml:"conversation,omitempty"`
+	M_conversationNode_2 []*XsdSubConversation  `xml:"subConversation,omitempty"`
 
-	M_conversationAssociation	[]*XsdConversationAssociation	`xml:"conversationAssociation,omitempty"`
-	M_participantAssociation	[]*XsdParticipantAssociation	`xml:"participantAssociation,omitempty"`
-	M_messageFlowAssociation	[]*XsdMessageFlowAssociation	`xml:"messageFlowAssociation,omitempty"`
-	M_correlationKey	[]*XsdCorrelationKey	`xml:"correlationKey,omitempty"`
-	M_choreographyRef	[]string	`xml:"choreographyRef"`
-	M_conversationLink	[]*XsdConversationLink	`xml:"conversationLink,omitempty"`
-	M_name	string	`xml:"name,attr"`
-	M_isClosed	bool	`xml:"isClosed,attr"`
-
+	M_conversationAssociation []*XsdConversationAssociation `xml:"conversationAssociation,omitempty"`
+	M_participantAssociation  []*XsdParticipantAssociation  `xml:"participantAssociation,omitempty"`
+	M_messageFlowAssociation  []*XsdMessageFlowAssociation  `xml:"messageFlowAssociation,omitempty"`
+	M_correlationKey          []*XsdCorrelationKey          `xml:"correlationKey,omitempty"`
+	M_choreographyRef         []string                      `xml:"choreographyRef"`
+	M_conversationLink        []*XsdConversationLink        `xml:"conversationLink,omitempty"`
+	M_name                    string                        `xml:"name,attr"`
+	M_isClosed                bool                          `xml:"isClosed,attr"`
 
 	/** Choreography **/
-	M_flowElement_0	[]*XsdAdHocSubProcess	`xml:"adHocSubProcess,omitempty"`
-	M_flowElement_1	[]*XsdBoundaryEvent	`xml:"boundaryEvent,omitempty"`
-	M_flowElement_2	[]*XsdBusinessRuleTask	`xml:"businessRuleTask,omitempty"`
-	M_flowElement_3	[]*XsdCallActivity	`xml:"callActivity,omitempty"`
-	M_flowElement_4	[]*XsdCallChoreography	`xml:"callChoreography,omitempty"`
-	M_flowElement_5	[]*XsdChoreographyTask	`xml:"choreographyTask,omitempty"`
-	M_flowElement_6	[]*XsdComplexGateway	`xml:"complexGateway,omitempty"`
-	M_flowElement_7	[]*XsdDataObject	`xml:"dataObject,omitempty"`
-	M_flowElement_8	[]*XsdDataObjectReference	`xml:"dataObjectReference,omitempty"`
-	M_flowElement_9	[]*XsdDataStoreReference	`xml:"dataStoreReference,omitempty"`
-	M_flowElement_10	[]*XsdEndEvent	`xml:"endEvent,omitempty"`
-	M_flowElement_11	[]*XsdEventBasedGateway	`xml:"eventBasedGateway,omitempty"`
-	M_flowElement_12	[]*XsdExclusiveGateway	`xml:"exclusiveGateway,omitempty"`
-	M_flowElement_13	[]*XsdImplicitThrowEvent	`xml:"implicitThrowEvent,omitempty"`
-	M_flowElement_14	[]*XsdInclusiveGateway	`xml:"inclusiveGateway,omitempty"`
-	M_flowElement_15	[]*XsdIntermediateCatchEvent	`xml:"intermediateCatchEvent,omitempty"`
-	M_flowElement_16	[]*XsdIntermediateThrowEvent	`xml:"intermediateThrowEvent,omitempty"`
-	M_flowElement_17	[]*XsdManualTask	`xml:"manualTask,omitempty"`
-	M_flowElement_18	[]*XsdParallelGateway	`xml:"parallelGateway,omitempty"`
-	M_flowElement_19	[]*XsdReceiveTask	`xml:"receiveTask,omitempty"`
-	M_flowElement_20	[]*XsdScriptTask	`xml:"scriptTask,omitempty"`
-	M_flowElement_21	[]*XsdSendTask	`xml:"sendTask,omitempty"`
-	M_flowElement_22	[]*XsdSequenceFlow	`xml:"sequenceFlow,omitempty"`
-	M_flowElement_23	[]*XsdServiceTask	`xml:"serviceTask,omitempty"`
-	M_flowElement_24	[]*XsdStartEvent	`xml:"startEvent,omitempty"`
-	M_flowElement_25	[]*XsdSubChoreography	`xml:"subChoreography,omitempty"`
-	M_flowElement_26	[]*XsdSubProcess	`xml:"subProcess,omitempty"`
-	M_flowElement_27	[]*XsdTask	`xml:"task,omitempty"`
-	M_flowElement_28	[]*XsdTransaction	`xml:"transaction,omitempty"`
-	M_flowElement_29	[]*XsdUserTask	`xml:"userTask,omitempty"`
+	M_flowElement_0  []*XsdAdHocSubProcess        `xml:"adHocSubProcess,omitempty"`
+	M_flowElement_1  []*XsdBoundaryEvent          `xml:"boundaryEvent,omitempty"`
+	M_flowElement_2  []*XsdBusinessRuleTask       `xml:"businessRuleTask,omitempty"`
+	M_flowElement_3  []*XsdCallActivity           `xml:"callActivity,omitempty"`
+	M_flowElement_4  []*XsdCallChoreography       `xml:"callChoreography,omitempty"`
+	M_flowElement_5  []*XsdChoreographyTask       `xml:"choreographyTask,omitempty"`
+	M_flowElement_6  []*XsdComplexGateway         `xml:"complexGateway,omitempty"`
+	M_flowElement_7  []*XsdDataObject             `xml:"dataObject,omitempty"`
+	M_flowElement_8  []*XsdDataObjectReference    `xml:"dataObjectReference,omitempty"`
+	M_flowElement_9  []*XsdDataStoreReference     `xml:"dataStoreReference,omitempty"`
+	M_flowElement_10 []*XsdEndEvent               `xml:"endEvent,omitempty"`
+	M_flowElement_11 []*XsdEventBasedGateway      `xml:"eventBasedGateway,omitempty"`
+	M_flowElement_12 []*XsdExclusiveGateway       `xml:"exclusiveGateway,omitempty"`
+	M_flowElement_13 []*XsdImplicitThrowEvent     `xml:"implicitThrowEvent,omitempty"`
+	M_flowElement_14 []*XsdInclusiveGateway       `xml:"inclusiveGateway,omitempty"`
+	M_flowElement_15 []*XsdIntermediateCatchEvent `xml:"intermediateCatchEvent,omitempty"`
+	M_flowElement_16 []*XsdIntermediateThrowEvent `xml:"intermediateThrowEvent,omitempty"`
+	M_flowElement_17 []*XsdManualTask             `xml:"manualTask,omitempty"`
+	M_flowElement_18 []*XsdParallelGateway        `xml:"parallelGateway,omitempty"`
+	M_flowElement_19 []*XsdReceiveTask            `xml:"receiveTask,omitempty"`
+	M_flowElement_20 []*XsdScriptTask             `xml:"scriptTask,omitempty"`
+	M_flowElement_21 []*XsdSendTask               `xml:"sendTask,omitempty"`
+	M_flowElement_22 []*XsdSequenceFlow           `xml:"sequenceFlow,omitempty"`
+	M_flowElement_23 []*XsdServiceTask            `xml:"serviceTask,omitempty"`
+	M_flowElement_24 []*XsdStartEvent             `xml:"startEvent,omitempty"`
+	M_flowElement_25 []*XsdSubChoreography        `xml:"subChoreography,omitempty"`
+	M_flowElement_26 []*XsdSubProcess             `xml:"subProcess,omitempty"`
+	M_flowElement_27 []*XsdTask                   `xml:"task,omitempty"`
+	M_flowElement_28 []*XsdTransaction            `xml:"transaction,omitempty"`
+	M_flowElement_29 []*XsdUserTask               `xml:"userTask,omitempty"`
 
-
-
-	M_initiatingParticipantRef	string	`xml:"initiatingParticipantRef,attr"`
-
+	M_initiatingParticipantRef string `xml:"initiatingParticipantRef,attr"`
 }
+
 /** UUID **/
-func (this *GlobalChoreographyTask) GetUUID() string{
+func (this *GlobalChoreographyTask) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *GlobalChoreographyTask) GetId() string{
+func (this *GlobalChoreographyTask) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *GlobalChoreographyTask) SetId(ref interface{}){
+func (this *GlobalChoreographyTask) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -175,16 +170,16 @@ func (this *GlobalChoreographyTask) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Other **/
-func (this *GlobalChoreographyTask) GetOther() interface{}{
+func (this *GlobalChoreographyTask) GetOther() interface{} {
 	return this.M_other
 }
 
 /** Init reference Other **/
-func (this *GlobalChoreographyTask) SetOther(ref interface{}){
+func (this *GlobalChoreographyTask) SetOther(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_other = ref.(string)
-	}else{
+	} else {
 		this.m_other = ref.(interface{})
 	}
 }
@@ -192,12 +187,12 @@ func (this *GlobalChoreographyTask) SetOther(ref interface{}){
 /** Remove reference Other **/
 
 /** ExtensionElements **/
-func (this *GlobalChoreographyTask) GetExtensionElements() *ExtensionElements{
+func (this *GlobalChoreographyTask) GetExtensionElements() *ExtensionElements {
 	return this.M_extensionElements
 }
 
 /** Init reference ExtensionElements **/
-func (this *GlobalChoreographyTask) SetExtensionElements(ref interface{}){
+func (this *GlobalChoreographyTask) SetExtensionElements(ref interface{}) {
 	this.NeedSave = true
 	this.M_extensionElements = ref.(*ExtensionElements)
 }
@@ -205,16 +200,16 @@ func (this *GlobalChoreographyTask) SetExtensionElements(ref interface{}){
 /** Remove reference ExtensionElements **/
 
 /** ExtensionDefinitions **/
-func (this *GlobalChoreographyTask) GetExtensionDefinitions() []*ExtensionDefinition{
+func (this *GlobalChoreographyTask) GetExtensionDefinitions() []*ExtensionDefinition {
 	return this.M_extensionDefinitions
 }
 
 /** Init reference ExtensionDefinitions **/
-func (this *GlobalChoreographyTask) SetExtensionDefinitions(ref interface{}){
+func (this *GlobalChoreographyTask) SetExtensionDefinitions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
-	for i:=0; i<len(this.M_extensionDefinitions); i++ {
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
 		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
@@ -231,16 +226,16 @@ func (this *GlobalChoreographyTask) SetExtensionDefinitions(ref interface{}){
 /** Remove reference ExtensionDefinitions **/
 
 /** ExtensionValues **/
-func (this *GlobalChoreographyTask) GetExtensionValues() []*ExtensionAttributeValue{
+func (this *GlobalChoreographyTask) GetExtensionValues() []*ExtensionAttributeValue {
 	return this.M_extensionValues
 }
 
 /** Init reference ExtensionValues **/
-func (this *GlobalChoreographyTask) SetExtensionValues(ref interface{}){
+func (this *GlobalChoreographyTask) SetExtensionValues(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var extensionValuess []*ExtensionAttributeValue
-	for i:=0; i<len(this.M_extensionValues); i++ {
+	for i := 0; i < len(this.M_extensionValues); i++ {
 		if this.M_extensionValues[i].GetUUID() != ref.(*ExtensionAttributeValue).GetUUID() {
 			extensionValuess = append(extensionValuess, this.M_extensionValues[i])
 		} else {
@@ -257,16 +252,16 @@ func (this *GlobalChoreographyTask) SetExtensionValues(ref interface{}){
 /** Remove reference ExtensionValues **/
 
 /** Documentation **/
-func (this *GlobalChoreographyTask) GetDocumentation() []*Documentation{
+func (this *GlobalChoreographyTask) GetDocumentation() []*Documentation {
 	return this.M_documentation
 }
 
 /** Init reference Documentation **/
-func (this *GlobalChoreographyTask) SetDocumentation(ref interface{}){
+func (this *GlobalChoreographyTask) SetDocumentation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var documentations []*Documentation
-	for i:=0; i<len(this.M_documentation); i++ {
+	for i := 0; i < len(this.M_documentation); i++ {
 		if this.M_documentation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			documentations = append(documentations, this.M_documentation[i])
 		} else {
@@ -281,7 +276,7 @@ func (this *GlobalChoreographyTask) SetDocumentation(ref interface{}){
 }
 
 /** Remove reference Documentation **/
-func (this *GlobalChoreographyTask) RemoveDocumentation(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveDocumentation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	documentation_ := make([]*Documentation, 0)
@@ -294,16 +289,16 @@ func (this *GlobalChoreographyTask) RemoveDocumentation(ref interface{}){
 }
 
 /** FlowElement **/
-func (this *GlobalChoreographyTask) GetFlowElement() []FlowElement{
+func (this *GlobalChoreographyTask) GetFlowElement() []FlowElement {
 	return this.M_flowElement
 }
 
 /** Init reference FlowElement **/
-func (this *GlobalChoreographyTask) SetFlowElement(ref interface{}){
+func (this *GlobalChoreographyTask) SetFlowElement(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var flowElements []FlowElement
-	for i:=0; i<len(this.M_flowElement); i++ {
+	for i := 0; i < len(this.M_flowElement); i++ {
 		if this.M_flowElement[i].(BaseElement).GetUUID() != ref.(BaseElement).GetUUID() {
 			flowElements = append(flowElements, this.M_flowElement[i])
 		} else {
@@ -318,7 +313,7 @@ func (this *GlobalChoreographyTask) SetFlowElement(ref interface{}){
 }
 
 /** Remove reference FlowElement **/
-func (this *GlobalChoreographyTask) RemoveFlowElement(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveFlowElement(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	flowElement_ := make([]FlowElement, 0)
@@ -331,16 +326,16 @@ func (this *GlobalChoreographyTask) RemoveFlowElement(ref interface{}){
 }
 
 /** LaneSet **/
-func (this *GlobalChoreographyTask) GetLaneSet() []*LaneSet{
+func (this *GlobalChoreographyTask) GetLaneSet() []*LaneSet {
 	return this.M_laneSet
 }
 
 /** Init reference LaneSet **/
-func (this *GlobalChoreographyTask) SetLaneSet(ref interface{}){
+func (this *GlobalChoreographyTask) SetLaneSet(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var laneSets []*LaneSet
-	for i:=0; i<len(this.M_laneSet); i++ {
+	for i := 0; i < len(this.M_laneSet); i++ {
 		if this.M_laneSet[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			laneSets = append(laneSets, this.M_laneSet[i])
 		} else {
@@ -355,7 +350,7 @@ func (this *GlobalChoreographyTask) SetLaneSet(ref interface{}){
 }
 
 /** Remove reference LaneSet **/
-func (this *GlobalChoreographyTask) RemoveLaneSet(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveLaneSet(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	laneSet_ := make([]*LaneSet, 0)
@@ -368,12 +363,12 @@ func (this *GlobalChoreographyTask) RemoveLaneSet(ref interface{}){
 }
 
 /** Name **/
-func (this *GlobalChoreographyTask) GetName() string{
+func (this *GlobalChoreographyTask) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *GlobalChoreographyTask) SetName(ref interface{}){
+func (this *GlobalChoreographyTask) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -381,12 +376,12 @@ func (this *GlobalChoreographyTask) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** IsClosed **/
-func (this *GlobalChoreographyTask) IsClosed() bool{
+func (this *GlobalChoreographyTask) IsClosed() bool {
 	return this.M_isClosed
 }
 
 /** Init reference IsClosed **/
-func (this *GlobalChoreographyTask) SetIsClosed(ref interface{}){
+func (this *GlobalChoreographyTask) SetIsClosed(ref interface{}) {
 	this.NeedSave = true
 	this.M_isClosed = ref.(bool)
 }
@@ -394,21 +389,21 @@ func (this *GlobalChoreographyTask) SetIsClosed(ref interface{}){
 /** Remove reference IsClosed **/
 
 /** ChoreographyRef **/
-func (this *GlobalChoreographyTask) GetChoreographyRef() []Choreography{
+func (this *GlobalChoreographyTask) GetChoreographyRef() []Choreography {
 	return this.m_choreographyRef
 }
 
 /** Init reference ChoreographyRef **/
-func (this *GlobalChoreographyTask) SetChoreographyRef(ref interface{}){
+func (this *GlobalChoreographyTask) SetChoreographyRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_choreographyRef); i++ {
+		for i := 0; i < len(this.M_choreographyRef); i++ {
 			if this.M_choreographyRef[i] == refStr {
 				return
 			}
 		}
 		this.M_choreographyRef = append(this.M_choreographyRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveChoreographyRef(ref)
 		this.m_choreographyRef = append(this.m_choreographyRef, ref.(Choreography))
 		this.M_choreographyRef = append(this.M_choreographyRef, ref.(BaseElement).GetUUID())
@@ -416,7 +411,7 @@ func (this *GlobalChoreographyTask) SetChoreographyRef(ref interface{}){
 }
 
 /** Remove reference ChoreographyRef **/
-func (this *GlobalChoreographyTask) RemoveChoreographyRef(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveChoreographyRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	choreographyRef_ := make([]Choreography, 0)
@@ -432,16 +427,16 @@ func (this *GlobalChoreographyTask) RemoveChoreographyRef(ref interface{}){
 }
 
 /** Artifact **/
-func (this *GlobalChoreographyTask) GetArtifact() []Artifact{
+func (this *GlobalChoreographyTask) GetArtifact() []Artifact {
 	return this.M_artifact
 }
 
 /** Init reference Artifact **/
-func (this *GlobalChoreographyTask) SetArtifact(ref interface{}){
+func (this *GlobalChoreographyTask) SetArtifact(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var artifacts []Artifact
-	for i:=0; i<len(this.M_artifact); i++ {
+	for i := 0; i < len(this.M_artifact); i++ {
 		if this.M_artifact[i].(BaseElement).GetUUID() != ref.(BaseElement).GetUUID() {
 			artifacts = append(artifacts, this.M_artifact[i])
 		} else {
@@ -456,7 +451,7 @@ func (this *GlobalChoreographyTask) SetArtifact(ref interface{}){
 }
 
 /** Remove reference Artifact **/
-func (this *GlobalChoreographyTask) RemoveArtifact(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveArtifact(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	artifact_ := make([]Artifact, 0)
@@ -469,16 +464,16 @@ func (this *GlobalChoreographyTask) RemoveArtifact(ref interface{}){
 }
 
 /** ParticipantAssociation **/
-func (this *GlobalChoreographyTask) GetParticipantAssociation() []*ParticipantAssociation{
+func (this *GlobalChoreographyTask) GetParticipantAssociation() []*ParticipantAssociation {
 	return this.M_participantAssociation
 }
 
 /** Init reference ParticipantAssociation **/
-func (this *GlobalChoreographyTask) SetParticipantAssociation(ref interface{}){
+func (this *GlobalChoreographyTask) SetParticipantAssociation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var participantAssociations []*ParticipantAssociation
-	for i:=0; i<len(this.M_participantAssociation); i++ {
+	for i := 0; i < len(this.M_participantAssociation); i++ {
 		if this.M_participantAssociation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			participantAssociations = append(participantAssociations, this.M_participantAssociation[i])
 		} else {
@@ -493,7 +488,7 @@ func (this *GlobalChoreographyTask) SetParticipantAssociation(ref interface{}){
 }
 
 /** Remove reference ParticipantAssociation **/
-func (this *GlobalChoreographyTask) RemoveParticipantAssociation(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveParticipantAssociation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	participantAssociation_ := make([]*ParticipantAssociation, 0)
@@ -506,16 +501,16 @@ func (this *GlobalChoreographyTask) RemoveParticipantAssociation(ref interface{}
 }
 
 /** MessageFlowAssociation **/
-func (this *GlobalChoreographyTask) GetMessageFlowAssociation() []*MessageFlowAssociation{
+func (this *GlobalChoreographyTask) GetMessageFlowAssociation() []*MessageFlowAssociation {
 	return this.M_messageFlowAssociation
 }
 
 /** Init reference MessageFlowAssociation **/
-func (this *GlobalChoreographyTask) SetMessageFlowAssociation(ref interface{}){
+func (this *GlobalChoreographyTask) SetMessageFlowAssociation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var messageFlowAssociations []*MessageFlowAssociation
-	for i:=0; i<len(this.M_messageFlowAssociation); i++ {
+	for i := 0; i < len(this.M_messageFlowAssociation); i++ {
 		if this.M_messageFlowAssociation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			messageFlowAssociations = append(messageFlowAssociations, this.M_messageFlowAssociation[i])
 		} else {
@@ -530,7 +525,7 @@ func (this *GlobalChoreographyTask) SetMessageFlowAssociation(ref interface{}){
 }
 
 /** Remove reference MessageFlowAssociation **/
-func (this *GlobalChoreographyTask) RemoveMessageFlowAssociation(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveMessageFlowAssociation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	messageFlowAssociation_ := make([]*MessageFlowAssociation, 0)
@@ -543,16 +538,16 @@ func (this *GlobalChoreographyTask) RemoveMessageFlowAssociation(ref interface{}
 }
 
 /** ConversationAssociation **/
-func (this *GlobalChoreographyTask) GetConversationAssociation() []*ConversationAssociation{
+func (this *GlobalChoreographyTask) GetConversationAssociation() []*ConversationAssociation {
 	return this.M_conversationAssociation
 }
 
 /** Init reference ConversationAssociation **/
-func (this *GlobalChoreographyTask) SetConversationAssociation(ref interface{}){
+func (this *GlobalChoreographyTask) SetConversationAssociation(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var conversationAssociations []*ConversationAssociation
-	for i:=0; i<len(this.M_conversationAssociation); i++ {
+	for i := 0; i < len(this.M_conversationAssociation); i++ {
 		if this.M_conversationAssociation[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			conversationAssociations = append(conversationAssociations, this.M_conversationAssociation[i])
 		} else {
@@ -567,7 +562,7 @@ func (this *GlobalChoreographyTask) SetConversationAssociation(ref interface{}){
 }
 
 /** Remove reference ConversationAssociation **/
-func (this *GlobalChoreographyTask) RemoveConversationAssociation(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveConversationAssociation(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	conversationAssociation_ := make([]*ConversationAssociation, 0)
@@ -580,16 +575,16 @@ func (this *GlobalChoreographyTask) RemoveConversationAssociation(ref interface{
 }
 
 /** Participant **/
-func (this *GlobalChoreographyTask) GetParticipant() []*Participant{
+func (this *GlobalChoreographyTask) GetParticipant() []*Participant {
 	return this.M_participant
 }
 
 /** Init reference Participant **/
-func (this *GlobalChoreographyTask) SetParticipant(ref interface{}){
+func (this *GlobalChoreographyTask) SetParticipant(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var participants []*Participant
-	for i:=0; i<len(this.M_participant); i++ {
+	for i := 0; i < len(this.M_participant); i++ {
 		if this.M_participant[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			participants = append(participants, this.M_participant[i])
 		} else {
@@ -604,7 +599,7 @@ func (this *GlobalChoreographyTask) SetParticipant(ref interface{}){
 }
 
 /** Remove reference Participant **/
-func (this *GlobalChoreographyTask) RemoveParticipant(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveParticipant(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	participant_ := make([]*Participant, 0)
@@ -617,16 +612,16 @@ func (this *GlobalChoreographyTask) RemoveParticipant(ref interface{}){
 }
 
 /** MessageFlow **/
-func (this *GlobalChoreographyTask) GetMessageFlow() []*MessageFlow{
+func (this *GlobalChoreographyTask) GetMessageFlow() []*MessageFlow {
 	return this.M_messageFlow
 }
 
 /** Init reference MessageFlow **/
-func (this *GlobalChoreographyTask) SetMessageFlow(ref interface{}){
+func (this *GlobalChoreographyTask) SetMessageFlow(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var messageFlows []*MessageFlow
-	for i:=0; i<len(this.M_messageFlow); i++ {
+	for i := 0; i < len(this.M_messageFlow); i++ {
 		if this.M_messageFlow[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			messageFlows = append(messageFlows, this.M_messageFlow[i])
 		} else {
@@ -641,7 +636,7 @@ func (this *GlobalChoreographyTask) SetMessageFlow(ref interface{}){
 }
 
 /** Remove reference MessageFlow **/
-func (this *GlobalChoreographyTask) RemoveMessageFlow(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveMessageFlow(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	messageFlow_ := make([]*MessageFlow, 0)
@@ -654,16 +649,16 @@ func (this *GlobalChoreographyTask) RemoveMessageFlow(ref interface{}){
 }
 
 /** CorrelationKey **/
-func (this *GlobalChoreographyTask) GetCorrelationKey() []*CorrelationKey{
+func (this *GlobalChoreographyTask) GetCorrelationKey() []*CorrelationKey {
 	return this.M_correlationKey
 }
 
 /** Init reference CorrelationKey **/
-func (this *GlobalChoreographyTask) SetCorrelationKey(ref interface{}){
+func (this *GlobalChoreographyTask) SetCorrelationKey(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var correlationKeys []*CorrelationKey
-	for i:=0; i<len(this.M_correlationKey); i++ {
+	for i := 0; i < len(this.M_correlationKey); i++ {
 		if this.M_correlationKey[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			correlationKeys = append(correlationKeys, this.M_correlationKey[i])
 		} else {
@@ -678,7 +673,7 @@ func (this *GlobalChoreographyTask) SetCorrelationKey(ref interface{}){
 }
 
 /** Remove reference CorrelationKey **/
-func (this *GlobalChoreographyTask) RemoveCorrelationKey(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveCorrelationKey(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	correlationKey_ := make([]*CorrelationKey, 0)
@@ -691,16 +686,16 @@ func (this *GlobalChoreographyTask) RemoveCorrelationKey(ref interface{}){
 }
 
 /** ConversationNode **/
-func (this *GlobalChoreographyTask) GetConversationNode() []ConversationNode{
+func (this *GlobalChoreographyTask) GetConversationNode() []ConversationNode {
 	return this.M_conversationNode
 }
 
 /** Init reference ConversationNode **/
-func (this *GlobalChoreographyTask) SetConversationNode(ref interface{}){
+func (this *GlobalChoreographyTask) SetConversationNode(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var conversationNodes []ConversationNode
-	for i:=0; i<len(this.M_conversationNode); i++ {
+	for i := 0; i < len(this.M_conversationNode); i++ {
 		if this.M_conversationNode[i].(BaseElement).GetUUID() != ref.(BaseElement).GetUUID() {
 			conversationNodes = append(conversationNodes, this.M_conversationNode[i])
 		} else {
@@ -715,7 +710,7 @@ func (this *GlobalChoreographyTask) SetConversationNode(ref interface{}){
 }
 
 /** Remove reference ConversationNode **/
-func (this *GlobalChoreographyTask) RemoveConversationNode(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveConversationNode(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	conversationNode_ := make([]ConversationNode, 0)
@@ -728,16 +723,16 @@ func (this *GlobalChoreographyTask) RemoveConversationNode(ref interface{}){
 }
 
 /** ConversationLink **/
-func (this *GlobalChoreographyTask) GetConversationLink() []*ConversationLink{
+func (this *GlobalChoreographyTask) GetConversationLink() []*ConversationLink {
 	return this.M_conversationLink
 }
 
 /** Init reference ConversationLink **/
-func (this *GlobalChoreographyTask) SetConversationLink(ref interface{}){
+func (this *GlobalChoreographyTask) SetConversationLink(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var conversationLinks []*ConversationLink
-	for i:=0; i<len(this.M_conversationLink); i++ {
+	for i := 0; i < len(this.M_conversationLink); i++ {
 		if this.M_conversationLink[i].GetUUID() != ref.(BaseElement).GetUUID() {
 			conversationLinks = append(conversationLinks, this.M_conversationLink[i])
 		} else {
@@ -752,7 +747,7 @@ func (this *GlobalChoreographyTask) SetConversationLink(ref interface{}){
 }
 
 /** Remove reference ConversationLink **/
-func (this *GlobalChoreographyTask) RemoveConversationLink(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveConversationLink(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	conversationLink_ := make([]*ConversationLink, 0)
@@ -765,23 +760,23 @@ func (this *GlobalChoreographyTask) RemoveConversationLink(ref interface{}){
 }
 
 /** InitiatingParticipantRef **/
-func (this *GlobalChoreographyTask) GetInitiatingParticipantRef() *Participant{
+func (this *GlobalChoreographyTask) GetInitiatingParticipantRef() *Participant {
 	return this.m_initiatingParticipantRef
 }
 
 /** Init reference InitiatingParticipantRef **/
-func (this *GlobalChoreographyTask) SetInitiatingParticipantRef(ref interface{}){
+func (this *GlobalChoreographyTask) SetInitiatingParticipantRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_initiatingParticipantRef = ref.(string)
-	}else{
+	} else {
 		this.m_initiatingParticipantRef = ref.(*Participant)
 		this.M_initiatingParticipantRef = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference InitiatingParticipantRef **/
-func (this *GlobalChoreographyTask) RemoveInitiatingParticipantRef(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveInitiatingParticipantRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_initiatingParticipantRef.GetUUID() {
@@ -791,21 +786,21 @@ func (this *GlobalChoreographyTask) RemoveInitiatingParticipantRef(ref interface
 }
 
 /** Lane **/
-func (this *GlobalChoreographyTask) GetLanePtr() []*Lane{
+func (this *GlobalChoreographyTask) GetLanePtr() []*Lane {
 	return this.m_lanePtr
 }
 
 /** Init reference Lane **/
-func (this *GlobalChoreographyTask) SetLanePtr(ref interface{}){
+func (this *GlobalChoreographyTask) SetLanePtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_lanePtr); i++ {
+		for i := 0; i < len(this.M_lanePtr); i++ {
 			if this.M_lanePtr[i] == refStr {
 				return
 			}
 		}
 		this.M_lanePtr = append(this.M_lanePtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveLanePtr(ref)
 		this.m_lanePtr = append(this.m_lanePtr, ref.(*Lane))
 		this.M_lanePtr = append(this.M_lanePtr, ref.(BaseElement).GetUUID())
@@ -813,7 +808,7 @@ func (this *GlobalChoreographyTask) SetLanePtr(ref interface{}){
 }
 
 /** Remove reference Lane **/
-func (this *GlobalChoreographyTask) RemoveLanePtr(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveLanePtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	lanePtr_ := make([]*Lane, 0)
@@ -829,21 +824,21 @@ func (this *GlobalChoreographyTask) RemoveLanePtr(ref interface{}){
 }
 
 /** Outgoing **/
-func (this *GlobalChoreographyTask) GetOutgoingPtr() []*Association{
+func (this *GlobalChoreographyTask) GetOutgoingPtr() []*Association {
 	return this.m_outgoingPtr
 }
 
 /** Init reference Outgoing **/
-func (this *GlobalChoreographyTask) SetOutgoingPtr(ref interface{}){
+func (this *GlobalChoreographyTask) SetOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_outgoingPtr); i++ {
+		for i := 0; i < len(this.M_outgoingPtr); i++ {
 			if this.M_outgoingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveOutgoingPtr(ref)
 		this.m_outgoingPtr = append(this.m_outgoingPtr, ref.(*Association))
 		this.M_outgoingPtr = append(this.M_outgoingPtr, ref.(BaseElement).GetUUID())
@@ -851,7 +846,7 @@ func (this *GlobalChoreographyTask) SetOutgoingPtr(ref interface{}){
 }
 
 /** Remove reference Outgoing **/
-func (this *GlobalChoreographyTask) RemoveOutgoingPtr(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveOutgoingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	outgoingPtr_ := make([]*Association, 0)
@@ -867,21 +862,21 @@ func (this *GlobalChoreographyTask) RemoveOutgoingPtr(ref interface{}){
 }
 
 /** Incoming **/
-func (this *GlobalChoreographyTask) GetIncomingPtr() []*Association{
+func (this *GlobalChoreographyTask) GetIncomingPtr() []*Association {
 	return this.m_incomingPtr
 }
 
 /** Init reference Incoming **/
-func (this *GlobalChoreographyTask) SetIncomingPtr(ref interface{}){
+func (this *GlobalChoreographyTask) SetIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_incomingPtr); i++ {
+		for i := 0; i < len(this.M_incomingPtr); i++ {
 			if this.M_incomingPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveIncomingPtr(ref)
 		this.m_incomingPtr = append(this.m_incomingPtr, ref.(*Association))
 		this.M_incomingPtr = append(this.M_incomingPtr, ref.(BaseElement).GetUUID())
@@ -889,7 +884,7 @@ func (this *GlobalChoreographyTask) SetIncomingPtr(ref interface{}){
 }
 
 /** Remove reference Incoming **/
-func (this *GlobalChoreographyTask) RemoveIncomingPtr(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveIncomingPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	incomingPtr_ := make([]*Association, 0)
@@ -905,23 +900,23 @@ func (this *GlobalChoreographyTask) RemoveIncomingPtr(ref interface{}){
 }
 
 /** Definitions **/
-func (this *GlobalChoreographyTask) GetDefinitionsPtr() *Definitions{
+func (this *GlobalChoreographyTask) GetDefinitionsPtr() *Definitions {
 	return this.m_definitionsPtr
 }
 
 /** Init reference Definitions **/
-func (this *GlobalChoreographyTask) SetDefinitionsPtr(ref interface{}){
+func (this *GlobalChoreographyTask) SetDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_definitionsPtr = ref.(string)
-	}else{
+	} else {
 		this.m_definitionsPtr = ref.(*Definitions)
 		this.M_definitionsPtr = ref.(BaseElement).GetUUID()
 	}
 }
 
 /** Remove reference Definitions **/
-func (this *GlobalChoreographyTask) RemoveDefinitionsPtr(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveDefinitionsPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	if toDelete.GetUUID() == this.m_definitionsPtr.GetUUID() {
@@ -931,21 +926,21 @@ func (this *GlobalChoreographyTask) RemoveDefinitionsPtr(ref interface{}){
 }
 
 /** Process **/
-func (this *GlobalChoreographyTask) GetProcessPtr() []*Process{
+func (this *GlobalChoreographyTask) GetProcessPtr() []*Process {
 	return this.m_processPtr
 }
 
 /** Init reference Process **/
-func (this *GlobalChoreographyTask) SetProcessPtr(ref interface{}){
+func (this *GlobalChoreographyTask) SetProcessPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_processPtr); i++ {
+		for i := 0; i < len(this.M_processPtr); i++ {
 			if this.M_processPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_processPtr = append(this.M_processPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveProcessPtr(ref)
 		this.m_processPtr = append(this.m_processPtr, ref.(*Process))
 		this.M_processPtr = append(this.M_processPtr, ref.(BaseElement).GetUUID())
@@ -953,7 +948,7 @@ func (this *GlobalChoreographyTask) SetProcessPtr(ref interface{}){
 }
 
 /** Remove reference Process **/
-func (this *GlobalChoreographyTask) RemoveProcessPtr(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveProcessPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	processPtr_ := make([]*Process, 0)
@@ -969,21 +964,21 @@ func (this *GlobalChoreographyTask) RemoveProcessPtr(ref interface{}){
 }
 
 /** CallConversation **/
-func (this *GlobalChoreographyTask) GetCallConversationPtr() []*CallConversation{
+func (this *GlobalChoreographyTask) GetCallConversationPtr() []*CallConversation {
 	return this.m_callConversationPtr
 }
 
 /** Init reference CallConversation **/
-func (this *GlobalChoreographyTask) SetCallConversationPtr(ref interface{}){
+func (this *GlobalChoreographyTask) SetCallConversationPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_callConversationPtr); i++ {
+		for i := 0; i < len(this.M_callConversationPtr); i++ {
 			if this.M_callConversationPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_callConversationPtr = append(this.M_callConversationPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCallConversationPtr(ref)
 		this.m_callConversationPtr = append(this.m_callConversationPtr, ref.(*CallConversation))
 		this.M_callConversationPtr = append(this.M_callConversationPtr, ref.(BaseElement).GetUUID())
@@ -991,7 +986,7 @@ func (this *GlobalChoreographyTask) SetCallConversationPtr(ref interface{}){
 }
 
 /** Remove reference CallConversation **/
-func (this *GlobalChoreographyTask) RemoveCallConversationPtr(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveCallConversationPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	callConversationPtr_ := make([]*CallConversation, 0)
@@ -1007,21 +1002,21 @@ func (this *GlobalChoreographyTask) RemoveCallConversationPtr(ref interface{}){
 }
 
 /** Collaboration **/
-func (this *GlobalChoreographyTask) GetCollaborationPtr() []Collaboration{
+func (this *GlobalChoreographyTask) GetCollaborationPtr() []Collaboration {
 	return this.m_collaborationPtr
 }
 
 /** Init reference Collaboration **/
-func (this *GlobalChoreographyTask) SetCollaborationPtr(ref interface{}){
+func (this *GlobalChoreographyTask) SetCollaborationPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_collaborationPtr); i++ {
+		for i := 0; i < len(this.M_collaborationPtr); i++ {
 			if this.M_collaborationPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_collaborationPtr = append(this.M_collaborationPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCollaborationPtr(ref)
 		this.m_collaborationPtr = append(this.m_collaborationPtr, ref.(Collaboration))
 		this.M_collaborationPtr = append(this.M_collaborationPtr, ref.(BaseElement).GetUUID())
@@ -1029,7 +1024,7 @@ func (this *GlobalChoreographyTask) SetCollaborationPtr(ref interface{}){
 }
 
 /** Remove reference Collaboration **/
-func (this *GlobalChoreographyTask) RemoveCollaborationPtr(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveCollaborationPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	collaborationPtr_ := make([]Collaboration, 0)
@@ -1045,21 +1040,21 @@ func (this *GlobalChoreographyTask) RemoveCollaborationPtr(ref interface{}){
 }
 
 /** CallChoreographyActivity **/
-func (this *GlobalChoreographyTask) GetCallChoreographyActivityPtr() []*CallChoreography{
+func (this *GlobalChoreographyTask) GetCallChoreographyActivityPtr() []*CallChoreography {
 	return this.m_callChoreographyActivityPtr
 }
 
 /** Init reference CallChoreographyActivity **/
-func (this *GlobalChoreographyTask) SetCallChoreographyActivityPtr(ref interface{}){
+func (this *GlobalChoreographyTask) SetCallChoreographyActivityPtr(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_callChoreographyActivityPtr); i++ {
+		for i := 0; i < len(this.M_callChoreographyActivityPtr); i++ {
 			if this.M_callChoreographyActivityPtr[i] == refStr {
 				return
 			}
 		}
 		this.M_callChoreographyActivityPtr = append(this.M_callChoreographyActivityPtr, ref.(string))
-	}else{
+	} else {
 		this.RemoveCallChoreographyActivityPtr(ref)
 		this.m_callChoreographyActivityPtr = append(this.m_callChoreographyActivityPtr, ref.(*CallChoreography))
 		this.M_callChoreographyActivityPtr = append(this.M_callChoreographyActivityPtr, ref.(BaseElement).GetUUID())
@@ -1067,7 +1062,7 @@ func (this *GlobalChoreographyTask) SetCallChoreographyActivityPtr(ref interface
 }
 
 /** Remove reference CallChoreographyActivity **/
-func (this *GlobalChoreographyTask) RemoveCallChoreographyActivityPtr(ref interface{}){
+func (this *GlobalChoreographyTask) RemoveCallChoreographyActivityPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
 	callChoreographyActivityPtr_ := make([]*CallChoreography, 0)
