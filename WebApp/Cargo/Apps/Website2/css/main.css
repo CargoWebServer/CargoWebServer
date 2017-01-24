@@ -18,7 +18,7 @@ h5{
 }
 
 #cargo-intro-wheel{
-	max-height: 300px;
+	max-height: 250px;
 	padding: 20px;
 }
 
@@ -57,10 +57,6 @@ h5{
 	transition: all .0s ease;
 }
 
-.marketing .col-md-3:hover {
-	color:white;
-}
-
 .marketing .col-md-3 .glyphicon {
 	font-size: 60px;
 	background-color: #EAEAEA;
@@ -69,23 +65,6 @@ h5{
 	color: #444;
 	margin-top: 20px;
 }
-
-.marketing1:hover{
-	background: rgb(22, 39, 86);
-}
-
-.marketing2:hover{
-	background: rgb(47, 65, 114);
-}
-
-.marketing3:hover{
-	background: rgb(79, 96, 143);
-}
-
-.marketing4:hover{
-	background: rgb(121, 134, 172);
-}
-
 
 
 
