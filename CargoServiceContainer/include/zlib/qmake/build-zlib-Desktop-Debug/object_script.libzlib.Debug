@@ -1,0 +1,17 @@
+CREATE debug/libzlib.a
+ADDMOD debug/zutil.o
+ADDMOD debug/uncompr.o
+ADDMOD debug/trees.o
+ADDMOD debug/inftrees.o
+ADDMOD debug/inflate.o
+ADDMOD debug/inffast.o
+ADDMOD debug/infback.o
+ADDMOD debug/gzwrite.o
+ADDMOD debug/gzread.o
+ADDMOD debug/gzlib.o
+ADDMOD debug/gzclose.o
+ADDMOD debug/deflate.o
+ADDMOD debug/crc32.o
+ADDMOD debug/compress.o
+ADDMOD debug/adler32.o
+SAVE

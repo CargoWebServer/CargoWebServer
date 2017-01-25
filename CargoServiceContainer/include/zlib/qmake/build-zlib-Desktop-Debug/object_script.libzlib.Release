@@ -1,0 +1,17 @@
+CREATE release/libzlib.a
+ADDMOD release/zutil.o
+ADDMOD release/uncompr.o
+ADDMOD release/trees.o
+ADDMOD release/inftrees.o
+ADDMOD release/inflate.o
+ADDMOD release/inffast.o
+ADDMOD release/infback.o
+ADDMOD release/gzwrite.o
+ADDMOD release/gzread.o
+ADDMOD release/gzlib.o
+ADDMOD release/gzclose.o
+ADDMOD release/deflate.o
+ADDMOD release/crc32.o
+ADDMOD release/compress.o
+ADDMOD release/adler32.o
+SAVE

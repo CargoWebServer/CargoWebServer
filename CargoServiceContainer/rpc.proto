@@ -1,0 +1,148 @@
+syntax = "proto2";
+
+package com.mycelius.message;
+
+// The inspiration came from http://www.jsonrpc.org/specification
+// This is not a standard implementation, but it's follow the same principle.
+message Data {
+	required string name = 1;
+
+	/**
+	* Interpretation of the data depend of the data type and is managed at the application level...
+	**/
+	required bytes dataBytes = 2;
+
+	/**
+	 * The tow target language are Java and JavaScript, so I will keep it close to there data type.
+	 **/
+	enum DataType{
+		DOUBLE = 0;
+		INTEGER = 1;
+		STRING = 2;
+		BYTES = 3;
+	
+		// A JSON data structure if complex
+		// data structure is needed. In that case the data will contain a JSON string.
+		JSON_STR = 4;
+		BOOLEAN = 5;
+	}
+
+	required DataType type = 3 [default = BYTES];
+
+	/**
+	 * Use to know how to interpret the JSON struct type...
+	 */
+	optional string typeName = 4;
+}
+
+message Request{
+	/**
+	 * A String containing the name of the method to be invoked. 
+	 */
+	required string method = 1;
+
+	/**
+	 * A Structured value that holds the parameter values to be used during the invocation of the method. 
+	 * This member MAY be omitted.
+	 **/
+	 repeated Data params = 2;
+
+	/**
+	 * An identifier established by the Client, it's a uuid
+	 **/
+	required string id = 3;
+}
+
+/**
+ * When a rpc call is made, the Server MUST reply with a Response, except for in the case of Notifications.
+ **/
+message Response{
+
+	/**
+	 * At least on result is return for a given request, but more than one result can be return... it can be view as a tuple...
+	 **/
+	 repeated Data results = 1;
+
+	/**
+	 * The id matching the associated request.
+	 **/
+	 required string id = 2;
+	
+}
+
+message Error{
+	/**
+	 * An error code to identify the error...
+	 **/
+	required int32 code = 1;
+	
+	/**
+	 * The description of the error...
+	 **/
+	required string message = 2;
+	
+	/**
+	 * The id of the request that fail.
+	 */
+	required string id = 3;
+	
+	/**
+	* Optional data dump if needed...
+	*/
+	optional bytes data = 4;
+}
+
+message Event{
+	/**
+	* The event number...
+	**/
+	required int32 code = 1;
+
+	/**
+	* The event name, mostly use if error append...
+	**/
+	required string name = 2;
+
+	/**
+	* The data associated whit the event.
+	*/
+	repeated Data evtData = 3;
+}
+
+/**
+ * A container to handle all message type as the same way...
+ **/
+ message Message{
+	enum MessageType {
+		REQUEST = 0;
+		RESPONSE = 1;
+		ERROR = 2;
+		EVENT = 3;
+		TRANSFER=4;
+	}
+
+	required MessageType type = 1 [default = ERROR];
+
+	/** If the message is bigger than the allowed size it will be split into
+	 *  multiple smaller message.
+	 **/
+	required sint32 index = 2;
+	required int32 total = 3;
+
+	/** depending of type of these tree type will contain the message. **/
+	optional Request rqst = 4;
+	optional Response rsp = 5;
+	optional Error err = 6;
+	optional Event evt = 7;
+
+	/**
+	* If the message is sent in multiple pass, this will contain the chunk...
+	*/
+	optional bytes data = 8;
+
+	/**
+	*  The message id if any...
+	*  the same id of sub-message...
+	*/
+	optional string id = 9;
+ }
