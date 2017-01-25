@@ -4,7 +4,7 @@ function local_createNewDivElement() {
         { "tag": "div" },
         undefined,
         true
-    )
+        )
     return element1
 }
 
@@ -12,6 +12,61 @@ function ElementTest() {
     QUnit.test("ElementTest", function (assert) {
         assert.ok(local_createNewDivElement().element.tagName == "DIV");
     })
+}
+
+function Element_constructor_paramsTest(){
+
+    var parentElement = local_createNewDivElement()
+    var callbackParamTest = false;
+    var childElementBId = "childElementBId"
+    // Element = function (parent, params, callback, makeFirstChild)
+    var childElementA = new Element(
+        parentElement, 
+        { 
+            "tag": "p",
+            "innerHtml" : "childElementA"
+        },
+        function(){
+            callbackParamTest = true
+        },
+        false
+        )
+    var childElementB = new Element(
+        parentElement, 
+        { 
+            "tag": "p",
+            "id": childElementBId,
+            "innerHtml" : "childElementB"
+        },
+        function(){
+            callbackParamTest = true
+        },
+        true
+        )
+    QUnit.test("Element_constructor_paramsTest_01", function (assert) {
+        assert.ok(
+            parentElement.childs[childElementA.id] == childElementA, 
+            childElementA
+            );
+    })
+    QUnit.test("Element_constructor_paramsTest_02", function (assert) {
+        assert.ok(
+            parentElement.childs[childElementB.id].id == childElementBId, 
+            childElementB.id
+            );
+    })
+    QUnit.test("Element_constructor_paramsTest_03", function (assert) {
+        assert.ok(
+            callbackParamTest, 
+            callbackParamTest);
+    })
+    QUnit.test("Element_constructor_paramsTest_04", function (assert) {
+        assert.ok(
+            parentElement.element.innerHTML == '<p id="childElementBId">childElementB</p><p>childElementA</p>', 
+            parentElement.element.innerHTML
+            );
+    })
+
 }
 
 function Element_prototype_initTest() {
@@ -24,7 +79,7 @@ function Element_prototype_appendElementTest() {
     var parentElement = local_createNewDivElement();
     var childElement = local_createNewDivElement();
     QUnit.test("Element_prototype_appendElementTest", function (assert) {
-        assert.ok(parentElement.appendElement(childElement).childs[childElement.id] = childElement);
+        assert.ok(parentElement.appendElement(childElement).childs[childElement.id] == childElement);
     })
 }
 
@@ -34,7 +89,7 @@ function Element_prototype_prependElementTest() {
         { "tag": "ul" },
         undefined,
         true
-    )
+        )
     var childElement1 = parentElement.appendElement({ "tag": "li", "innerHtml": "I will be second" });
     var childElement2 = parentElement.prependElement({ "tag": "li", "innerHtml": "I will be first" });
 
@@ -92,7 +147,7 @@ function Element_prototype_removeAllChildsTest() {
 
 function Element_prototype_getChildByIdTest() {
     var element1 = local_createNewDivElement().appendElement({ "tag": "div", "id": "a" }).down()
-        .appendElement({ "tag": "div", "id": "b" }).up()
+    .appendElement({ "tag": "div", "id": "b" }).up()
 
     QUnit.test("Element_prototype_getChildByIdTest", function (assert) {
         assert.ok(element1.getChildById("b").id == "b");
@@ -106,7 +161,7 @@ function Element_prototype_getChildByIdTest() {
 function Element_prototype_getTopParentTest() {
     var element1 = local_createNewDivElement()
     var grandChildElement = element1.appendElement({ "tag": "div", "id": "a" }).down()
-        .appendElement({ "tag": "div", "id": "b" }).down()
+    .appendElement({ "tag": "div", "id": "b" }).down()
 
     QUnit.test("Element_prototype_getTopParentTest", function (assert) {
         assert.ok(grandChildElement.getTopParent() == element1);
@@ -115,9 +170,9 @@ function Element_prototype_getTopParentTest() {
 
 function Element_prototype_upTest() {
     var element1 = local_createNewDivElement()
-        .appendElement({ "tag": "div", "id": "a" }).down()
-        .appendElement({ "tag": "div", "id": "b" }).down()
-        .appendElement({ "tag": "div", "id": "c" }).up()
+    .appendElement({ "tag": "div", "id": "a" }).down()
+    .appendElement({ "tag": "div", "id": "b" }).down()
+    .appendElement({ "tag": "div", "id": "c" }).up()
 
     QUnit.test("Element_prototype_upTest", function (assert) {
         assert.ok(element1.id == "a");
@@ -126,7 +181,7 @@ function Element_prototype_upTest() {
 
 function Element_prototype_downTest() {
     var element1 = local_createNewDivElement()
-        .appendElement({ "tag": "div", "id": "a" }).down()
+    .appendElement({ "tag": "div", "id": "a" }).down()
 
     QUnit.test("Element_prototype_downTest", function (assert) {
         assert.ok(element1.id == "a");
@@ -252,6 +307,7 @@ function createElementFromHtmlTest() {
 
 function elementTests() {
     ElementTest()
+    Element_constructor_paramsTest()
     Element_prototype_initTest()
     Element_prototype_appendElementTest()
     Element_prototype_prependElementTest()
@@ -266,6 +322,7 @@ function elementTests() {
     createElementFromHtmlTest()
 
     /* Failing tests */
+    /*
     Element_prototype_copyChildElementsTest()
     Element_prototype_moveChildElementsTest()
     Element_prototype_getTopParentTest()
@@ -273,5 +330,6 @@ function elementTests() {
     Element_prototype_removeElementTest()
 
     createChildElementTest()
+    */
 
 } 

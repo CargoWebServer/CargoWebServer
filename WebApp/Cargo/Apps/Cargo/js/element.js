@@ -92,32 +92,32 @@ function createElementFromHtml(parent, html) {
   *@param parent The parent element of this element. Can be an Element or a DOM element.
 * @param params The list of parameters.
 * @param callback This function is called after the initialization is completed.
-* @param isFirstChild If true the element is put in front of the other elements, otherwise it will be at the end.
+* @param appendFront If true the element is put in front of the other elements, otherwise it will be at the end.
 * @returns {HTMLElement}
 * @constructor
-* @stability 1
+* @stability 2
 */
-var Element = function (parent, params, callback, isFirstChild) {
+var Element = function (parent, params, callback, appendFront) {
 
     /**
      * @property {function} callback The function to call after the initialization.
      */
-    this.callback = callback;
+     this.callback = callback;
 
     /**
      * @property {Element} parent The parent element, can be a plain HTML element or an Element.
      */
-    this.parentElement = parent;
+     this.parentElement = parent;
 
     /**
      * @property {string} id a uuid. If the params contain id, the param id will be used.
      */
-    this.id = randomUUID();
+     this.id = randomUUID();
 
     /**
      * @property {Element[]} childs The map of child elements indexed by their id.
      */
-    this.childs = {};
+     this.childs = {};
 
     // Keeping a reference of the lastChild. Used by the down function.
     this.lastChild = null;
@@ -167,7 +167,7 @@ var Element = function (parent, params, callback, isFirstChild) {
 
             if (parent != null) {
                 // Append child
-                if (!isFirstChild) {
+                if (!appendFront) {
                     if (parent.element == undefined) {
                         parent.appendChild(this.element)
                     } else {
@@ -204,6 +204,10 @@ var Element = function (parent, params, callback, isFirstChild) {
                 }
             }
         }
+    }
+
+    if (this.callback != undefined) {
+        this.callback(); // Calls the callback function
     }
     return this;
 };
@@ -311,13 +315,13 @@ Element.prototype.removeAllChilds = function () {
 * Initialization of the element
 * Recursive function called from the most exterior Element.
 * @returns {HTMLElement}
-* @stability 1
+* @stability 0
 */
 Element.prototype.init = function () {
     var keys = Object.keys(this.childs)
-        , i = 0
-        , len = keys.length
-        , child = null
+    , i = 0
+    , len = keys.length
+    , child = null
 
     for (; i < len; i++) {
         child = this.childs[keys[i]]
@@ -343,10 +347,10 @@ Element.prototype.init = function () {
 Element.prototype.getChildById = function (id) {
     //console.log(id)
     var keys = Object.keys(this.childs)
-        , i = 0
-        , len = keys.length
-        , found = null
-        , child = null
+    , i = 0
+    , len = keys.length
+    , found = null
+    , child = null
 
     for (i = 0; i < len; i++) {
         child = this.childs[keys[i]]

@@ -9,11 +9,12 @@ var languageInfo = {
 /**
  * This function is the entry point of the application...
  */
-function main() {
+ function main() {
     // Append filter to receive all session event message
     // on the sessionEvent channel.
     //securityTests()
-    /*server.eventHandler.appendEventFilter(
+    /*
+    server.eventHandler.appendEventFilter(
          "CargoEntities.",
          "EntityEvent",
          function () {
@@ -33,13 +34,14 @@ function main() {
          function () { },
          undefined
      )
+    */
      
 
     // utilityTests()
     //serverTests()
     //sessionTests()
     //languageManagerTests()
-    //elementTests()
+    elementTests()
 
     //accountTests()
     //fileTests()
@@ -47,7 +49,7 @@ function main() {
     //dataTests()
 
     //entityTests()
-*/
+
     //testDynamicEntity()
 
     // entityDump("item_1", "Test.Item")
@@ -65,7 +67,7 @@ function main() {
     // TestUploadFile()
 
     // Test get bmpn defintion instance...
-    
+    /*
     server.entityManager.getEntityPrototypes("Test",
         // Success callback.
         function (result, caller) {
@@ -111,7 +113,7 @@ function main() {
         function () {
 
         }, {})
-        
+    */
 }
 
 
@@ -279,7 +281,7 @@ function TestWebRtc1() {
                 }
             } (videoPanel),
             function (err) { }
-        );
+            );
     } else {
         alert("Sorry, your browser does not support getUserMedia.");
     }
@@ -289,8 +291,8 @@ function TestWebRtc1() {
 function TestWebRtc2() {
     var panel = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "display: table" })
     panel.appendElement({ "tag": "div", "style": "display:table-row" }).down().appendElement({ "tag": "video", "id": "video", autoplay: "", "style": "diplay: table-cell" })
-        .appendElement({ "tag": "canvas", "id": "canvas", "style": "diplay: table-cell, min-width: 640px;" }).up()
-        .appendElement({ "tag": "div", "style": "display:table-row; text-align: center;" }).down().appendElement({ "tag": "button", "id": "button", "style": "display: table-cell;", "innerHtml": "Selfy!" })
+    .appendElement({ "tag": "canvas", "id": "canvas", "style": "diplay: table-cell, min-width: 640px;" }).up()
+    .appendElement({ "tag": "div", "style": "display:table-row; text-align: center;" }).down().appendElement({ "tag": "button", "id": "button", "style": "display: table-cell;", "innerHtml": "Selfy!" })
 
     var video = panel.getChildById("video")
     var canvas = panel.getChildById("canvas")
@@ -310,9 +312,9 @@ function TestWebRtc2() {
                 streaming = true
             }
         } (video, canvas),
-            function (error) {
-                console.log("Raised an error when capturing:", error);
-            });
+        function (error) {
+            console.log("Raised an error when capturing:", error);
+        });
 
         button.element.addEventListener('click',
             function (canvas, video) {
