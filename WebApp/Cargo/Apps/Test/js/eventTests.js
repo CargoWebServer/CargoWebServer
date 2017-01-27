@@ -2,6 +2,7 @@ var events_nbTests = 0;
 var events_nbTestsAsserted = 0;
 var events_EventManager_attach_test_number = 300;
 var events_EventManager_detach_test_number = 301;
+var events_EventChannel_broadcastEvent_test_number = 302;
 
 function events_allTestsAsserted_Test() {
     QUnit.test("events_allTestsAsserted_Test",
@@ -15,25 +16,22 @@ function events_allTestsAsserted_Test() {
 
 function events_EventManager_constructor_test() {
     events_nbTests++
-    var eventManagerId = "myEventManager"
     var eventManagerEventsGroup = "TestEvent"
-    var myEventManager = new EventManager(eventManagerId, eventManagerEventsGroup)
+    var myEventManager = new EventManager(eventManagerEventsGroup)
 
     QUnit.test("events_EventManager_constructor_test",
         function (assert) {
             assert.ok(
-                myEventManager.id == eventManagerId && 
-                myEventManager.eventsGroup == eventManagerEventsGroup,
-                "id: " + myEventManager.id + " eventsGroup: " + myEventManager.eventsGroup)
+                myEventManager.channelId == eventManagerEventsGroup,
+                " eventsGroup: " + myEventManager.eventsGroup)
             events_nbTestsAsserted++
         })
 }
 
 function events_EventManager_attach_test() {
     events_nbTests++
-    var eventManagerId = "myEventManager_attach"
     var eventManagerEventsGroup = "TestEvent"
-    var myEventManager_attach = new EventManager(eventManagerId, eventManagerEventsGroup)
+    var myEventManager_attach = new EventManager(eventManagerEventsGroup)
     var myElement = new Element(
         document.getElementsByTagName("body")[0],
         { "tag": "div" })
@@ -47,7 +45,7 @@ function events_EventManager_attach_test() {
     QUnit.test("events_EventManager_attach_test",
         function (assert) {
             assert.ok(
-                myElement.observable.id == eventManagerId && 
+                myElement.observable.id == myEventManager_attach.id && 
                 myElement.observable.observers[300] != undefined,
                 "myElement.observable.id: " + myElement.observable.id)
             events_nbTestsAsserted++
@@ -56,9 +54,8 @@ function events_EventManager_attach_test() {
 
 function events_EventManager_detach_test() {
     events_nbTests++
-    var eventManagerId = "myEventManager_detach"
     var eventManagerEventsGroup = "TestEvent"
-    var myEventManager_detach = new EventManager(eventManagerId, eventManagerEventsGroup)
+    var myEventManager_detach = new EventManager(eventManagerEventsGroup)
     var myElement = new Element(
         document.getElementsByTagName("body")[0],
         { "tag": "div" })
@@ -81,12 +78,74 @@ function events_EventManager_detach_test() {
         })
 }
 
+function events_EventChannel_broadcastEvent_test() {
+    events_nbTests++
+    var eventManagerEventsGroup = "TestEvent"
+    var myEventManager_broadcastEvent = new EventManager(eventManagerEventsGroup)
+
+    server.eventHandler.AddEventManager(
+        myEventManager_broadcastEvent,
+        function () {
+            server.eventHandler.appendEventFilter(
+                "\\.*",
+                eventManagerEventsGroup,
+                function () { 
+
+                    var myElement = new Element(
+                        document.getElementsByTagName("body")[0],
+                        { "tag": "div" })
+                    var message = "events_EventChannel_broadcastEvent_test_message"
+
+                    myEventManager_broadcastEvent.attach(
+                        myElement, 
+                        events_EventChannel_broadcastEvent_test_number, 
+                        function(evt){
+                            console.log(evt)
+                            myElement.element.innerHTML += evt.dataMap.message
+
+                            QUnit.test("events_EventChannel_broadcastEvent_test",
+                                function (assert) {
+                                    assert.ok(
+                                        evt.dataMap.message == message, 
+                                        evt.dataMap.message)
+                                    events_nbTestsAsserted++
+                                })
+
+                        })
+
+                    var evt = {
+                        "code": events_EventChannel_broadcastEvent_test_number, 
+                        "channelId": eventManagerEventsGroup,
+                        "dataMap": {
+                            "message" : message
+                        }
+                    }
+
+                    server.eventHandler.BroadcastEvent(evt)
+                },
+                function () { },
+                undefined)
+        }
+        )
+
+
+
+
+    
+
+    
+    
+
+    
+}
+
 
 function eventTests() {
 
     events_EventManager_constructor_test()
     events_EventManager_attach_test()
     events_EventManager_detach_test()
+    events_EventChannel_broadcastEvent_test()
 
     setTimeout(function () {
         return function () {
