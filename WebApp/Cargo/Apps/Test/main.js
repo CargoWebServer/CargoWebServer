@@ -10,6 +10,7 @@ var languageInfo = {
  * This function is the entry point of the application...
  */
  function main() {
+    eventTests()
     // Append filter to receive all session event message
     // on the sessionEvent channel.
     //securityTests()
@@ -41,7 +42,7 @@ var languageInfo = {
     //serverTests()
     //sessionTests()
     //languageManagerTests()
-    elementTests()
+    //elementTests()
 
     //accountTests()
     //fileTests()

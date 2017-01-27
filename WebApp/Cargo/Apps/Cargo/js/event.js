@@ -16,10 +16,11 @@
 
 /**
 * @fileOverview Event management functinality.
-* @author Dave Courtois
+* @author Dave Courtois, Eric Kavalec
 * @version 1.0
 */
 
+// Default event groups and events
 AccountEvent = "AccountEvent"
 AccountRegisterSuccessEvent = 0
 AccountConfirmationSucessEvent = 1
@@ -55,26 +56,24 @@ ProjectEvent = "ProjectEvent"
 EmailEvent = "EmailEvent"
 
 /**
-* This function is call
-* @param {string} id The string id.
-* @param {string} name The name of the event to mananage.
-* @returns {EventManager}
+* EventManager contructor
 * @constructor
+* @param {string} id The id of the eventManager
+* @param {string} eventsGroup The group of events to mananage.
+* @returns {EventManager}
+* @stability 1
+* @public true
 */
-var EventManager = function (id, name) {
+var EventManager = function (id, eventsGroup) {
+
     if (id == null) {
         return
     }
 
-    /**
-     * @property The event id.
-     */
     this.id = id
 
-    /**
-     * @property The name of the event
-     */
-    this.name = name
+    this.eventsGroup = eventsGroup
+
     this.observers = {}
 
     return this
@@ -82,15 +81,17 @@ var EventManager = function (id, name) {
 
 /**
 * Attach observer to event.
-* @param obeserver The objserver to attach.
+* @param obeserver The observer to attach.
 * @param eventNumber The event number.
-* @param {function} updateFct The function to execute when the event is receive.
+* @param {function} updateFct The function to execute when the event is received.
+* @stability 1
+* @public true
 */
 EventManager.prototype.attach = function (observer, eventNumber, updateFct) {
     observer.observable = this
 
     if (observer.id == undefined) {
-        // observer need a uuid or an id.
+        // observer needs a UUID
         observer.id = randomUUID()
     }
 
@@ -101,7 +102,7 @@ EventManager.prototype.attach = function (observer, eventNumber, updateFct) {
     var observerExistsForEventNumber = false
     for (var i = 0; i < this.observers[eventNumber].length; i++) {
         if (this.observers[eventNumber][i].id == observer.id) {
-            // only on obeserver with the same id are allow.
+            // only on obeserver with the same id are allowed.
             observerExistsForEventNumber = true
         }
     }
@@ -118,9 +119,11 @@ EventManager.prototype.attach = function (observer, eventNumber, updateFct) {
 }
 
 /**
-* Detach an observer from event.
+* Detach observer from event.
 * @param obeserver The to detach
 * @param eventNumber The event number
+* @stability 1
+* @public true
 */
 EventManager.prototype.detach = function (observer, eventNumber) {
     if (observer.observable != null) {
@@ -137,8 +140,10 @@ EventManager.prototype.detach = function (observer, eventNumber) {
 }
 
 /**
-* When an event is received, the observer callback function is call.
+* When an event is received, the observer callback function is called.
 * @param evt The event to dispatch.
+* @stability 1
+* @public unknown
 */
 EventManager.prototype.onEvent = function (evt) {
     console.log("Event received: ", evt)
@@ -159,24 +164,28 @@ EventManager.prototype.onEvent = function (evt) {
 }
 
 /**
+* EventChannel constructor
+* @constructor
 * Each event type has its own channel.
 * @param id The channel id, most of the time the event type name.
 * @returns {EventChannel}
-* @constructor
+* @stability 1
+* @public unknown
 */
 var EventChannel = function (id) {
     // The event id
     this.id = id
-    // This map contain
+
     this.listeners = {}
 
     return this
 }
 
 /**
-* Send event to listener.
+* Broadcast local event
 * @param evt
-* @constructor
+* @stability 1
+* @public true
 */
 EventChannel.prototype.BroadcastEvent = function (evt) {
     for (var l in this.listeners) {
@@ -186,26 +195,28 @@ EventChannel.prototype.BroadcastEvent = function (evt) {
 }
 
 /**
-* A singleton used to receive and send event. Use it instead of
-* directly use event listener and channel.
-* @returns {EventHandler}
+* Singleton used to receive and send events. 
+* Alternative to using event listeners and channels.
 * @constructor
+* @returns {EventHandler}
+* @stability 1
+* @public true
 */
 var EventHandler = function () {
     /**
      * @property channels The channel 
      */
-    this.channels = {}
+     this.channels = {}
 
-    return this
-}
-
-// Open listening channel,
+     return this
+ }
 
 /**
-* Append a new event listner.
+* Append a new event manager.
 * @param listener The listener to append.
 * @param callback The function to call when an event happen.
+* @stability 1
+* @public true
 */
 EventHandler.prototype.AddEventManager = function (listener, callback) {
     /* Add it to the local event listener **/
@@ -307,7 +318,7 @@ EventHandler.prototype.appendEventFilter = function (filter, eventType, successC
             server.errorManager.onError(errMsg)
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
+        )
 }
 
 /**
@@ -339,7 +350,7 @@ function BroadcastEventData(evtNumber, eventType, eventDatas) {
 * Here is an example To send a file open event over the network.
 * var entityInfo = {"TYPENAME":"Server.MessageData", "Name":"entityInfo", "Value":file.stringify()}
 * server.eventHandler.broadcastEventData(OpenEntityEvent, EntityEvent, [entityInfo], function(){}, function(){}, undefined) 
- */
+*/
 EventHandler.prototype.broadcastEventData = function (evtNumber, eventType, eventDatas, successCallback, errorCallback, caller) {
 
     // server is the client side singleton.
@@ -365,5 +376,5 @@ EventHandler.prototype.broadcastEventData = function (evtNumber, eventType, even
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
+        )
 }
