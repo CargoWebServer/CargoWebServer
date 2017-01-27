@@ -21,6 +21,7 @@
 */
 
 // Default channels and events
+// TODO revoir cette section
 AccountEvent = "AccountEvent"
 AccountRegisterSuccessEvent = 0
 AccountConfirmationSucessEvent = 1
@@ -75,14 +76,14 @@ var EventManager = function (channelId) {
 }
 
 /**
-* Attach observer to event.
+* Attach observer to a specific event.
 * @param obeserver The observer to attach.
-* @param eventNumber The event number.
+* @param eventId The event id.
 * @param {function} updateFct The function to execute when the event is received.
 * @stability 1
 * @public true
 */
-EventManager.prototype.attach = function (observer, eventNumber, updateFct) {
+EventManager.prototype.attach = function (observer, eventId, updateFct) {
     observer.observable = this
 
     if (observer.id == undefined) {
@@ -90,45 +91,45 @@ EventManager.prototype.attach = function (observer, eventNumber, updateFct) {
         observer.id = randomUUID()
     }
 
-    if (this.observers[eventNumber] == undefined) {
-        this.observers[eventNumber] = []
+    if (this.observers[eventId] == undefined) {
+        this.observers[eventId] = []
     }
 
-    var observerExistsForEventNumber = false
-    for (var i = 0; i < this.observers[eventNumber].length; i++) {
-        if (this.observers[eventNumber][i].id == observer.id) {
+    var observerExistsForEventId = false
+    for (var i = 0; i < this.observers[eventId].length; i++) {
+        if (this.observers[eventId][i].id == observer.id) {
             // only on obeserver with the same id are allowed.
-            observerExistsForEventNumber = true
+            observerExistsForEventId = true
         }
     }
 
-    if (!observerExistsForEventNumber) {
-        this.observers[eventNumber].push(observer)
+    if (!observerExistsForEventId) {
+        this.observers[eventId].push(observer)
     }
 
     if (observer.updateFunctions == undefined){
         observer.updateFunctions = {}
     }
 
-    observer.updateFunctions[this.id + "_" + eventNumber] = updateFct
+    observer.updateFunctions[this.id + "_" + eventId] = updateFct
 }
 
 /**
 * Detach observer from event.
 * @param obeserver The to detach
-* @param eventNumber The event number
+* @param eventId The event id
 * @stability 1
 * @public true
 */
-EventManager.prototype.detach = function (observer, eventNumber) {
+EventManager.prototype.detach = function (observer, eventId) {
     if (observer.observable != null) {
         observer.observable = null
     }
     if (observer.updateFunctions != undefined) {
-        if (observer.updateFunctions[this.id + "_" + eventNumber] != null) {
-            delete observer.updateFunctions[this.id + "_" + eventNumber]
+        if (observer.updateFunctions[this.id + "_" + eventId] != null) {
+            delete observer.updateFunctions[this.id + "_" + eventId]
             if (Object.keys(observer.updateFunctions).length == 0) {
-                this.observers[eventNumber].pop(observer)
+                this.observers[eventId].pop(observer)
             }
         }
     }
@@ -150,7 +151,7 @@ EventManager.prototype.onEvent = function (evt) {
                     observers[i].updateFunctions[this.id + "_" + evt.code](evt, observers[i])
                 } else {
                     if (Object.keys(observers[i].updateFunctions).length == 0) {
-                        this.observers[eventNumber].pop(observers[i])
+                        this.observers[eventId].pop(observers[i])
                     }
                 }
             }
