@@ -143,7 +143,7 @@ EventManager.prototype.detach = function (observer, eventNumber) {
 * When an event is received, the observer callback function is called.
 * @param evt The event to dispatch.
 * @stability 1
-* @public unknown
+* @public false
 */
 EventManager.prototype.onEvent = function (evt) {
     console.log("Event received: ", evt)

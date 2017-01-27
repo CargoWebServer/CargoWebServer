@@ -1,6 +1,7 @@
 var events_nbTests = 0;
 var events_nbTestsAsserted = 0;
 var events_EventManager_attach_test_number = 300;
+var events_EventManager_detach_test_number = 301;
 
 function events_allTestsAsserted_Test() {
     QUnit.test("events_allTestsAsserted_Test",
@@ -53,11 +54,39 @@ function events_EventManager_attach_test() {
         })
 }
 
+function events_EventManager_detach_test() {
+    events_nbTests++
+    var eventManagerId = "myEventManager_detach"
+    var eventManagerEventsGroup = "TestEvent"
+    var myEventManager_detach = new EventManager(eventManagerId, eventManagerEventsGroup)
+    var myElement = new Element(
+        document.getElementsByTagName("body")[0],
+        { "tag": "div" })
+    myEventManager_detach.attach(
+        myElement, 
+        events_EventManager_detach_test_number, 
+        function(){
+            myElement.element.innerHTML += "Event Received"
+        })
+    myEventManager_detach.detach(
+        myElement, 
+        events_EventManager_detach_test_number)
+
+    QUnit.test("events_EventManager_detach_test",
+        function (assert) {
+            assert.ok(
+                myElement.observable == undefined,
+                "myElement.observable: " + myElement.observable)
+            events_nbTestsAsserted++
+        })
+}
+
 
 function eventTests() {
 
     events_EventManager_constructor_test()
     events_EventManager_attach_test()
+    events_EventManager_detach_test()
 
     setTimeout(function () {
         return function () {
