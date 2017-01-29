@@ -15,11 +15,13 @@
 */
 
 /**
-* @fileOverview Event management functinality.
-* @author Dave Courtois
+* @fileOverview Events functionnalities.
+* @author Dave Courtois, Eric Kavalec
 * @version 1.0
 */
 
+// Default channels and events
+// TODO revoir cette section
 AccountEvent = "AccountEvent"
 AccountRegisterSuccessEvent = 0
 AccountConfirmationSucessEvent = 1
@@ -55,90 +57,89 @@ ProjectEvent = "ProjectEvent"
 EmailEvent = "EmailEvent"
 
 /**
-* This function is call
-* @param {string} id The string id.
-* @param {string} name The name of the event to mananage.
-* @returns {EventManager}
+* EventManager contructor
 * @constructor
+* @param {string} channelId The id of the channel of events to manage
+* @returns {EventManager}
+* @stability 2
+* @public true
 */
-var EventManager = function (id, name) {
-    if (id == null) {
-        return
-    }
+var EventManager = function (channelId) {
 
-    /**
-     * @property The event id.
-     */
-    this.id = id
+    this.id = randomUUID();
 
-    /**
-     * @property The name of the event
-     */
-    this.name = name
+    this.channelId = channelId;
+
     this.observers = {}
 
     return this
 }
 
 /**
-* Attach observer to event.
-* @param obeserver The objserver to attach.
-* @param eventNumber The event number.
-* @param {function} updateFct The function to execute when the event is receive.
+* Attach observer to a specific event.
+* @param obeserver The observer to attach.
+* @param eventId The event id.
+* @param {function} updateFct The function to execute when the event is received.
+* @stability 1
+* @public true
 */
-EventManager.prototype.attach = function (observer, eventNumber, updateFct) {
+EventManager.prototype.attach = function (observer, eventId, updateFct) {
     observer.observable = this
 
     if (observer.id == undefined) {
-        // observer need a uuid or an id.
+        // observer needs a UUID
         observer.id = randomUUID()
     }
 
-    if (this.observers[eventNumber] == undefined) {
-        this.observers[eventNumber] = []
+    if (this.observers[eventId] == undefined) {
+        this.observers[eventId] = []
     }
 
-    var observerExistsForEventNumber = false
-    for (var i = 0; i < this.observers[eventNumber].length; i++) {
-        if (this.observers[eventNumber][i].id == observer.id) {
-            // only on obeserver with the same id are allow.
-            observerExistsForEventNumber = true
+    var observerExistsForEventId = false
+    for (var i = 0; i < this.observers[eventId].length; i++) {
+        if (this.observers[eventId][i].id == observer.id) {
+            // only on obeserver with the same id are allowed.
+            observerExistsForEventId = true
         }
     }
 
-    if (!observerExistsForEventNumber) {
-        this.observers[eventNumber].push(observer)
+    if (!observerExistsForEventId) {
+        this.observers[eventId].push(observer)
     }
 
     if (observer.updateFunctions == undefined){
         observer.updateFunctions = {}
     }
 
-    observer.updateFunctions[this.id + "_" + eventNumber] = updateFct
+    observer.updateFunctions[this.id + "_" + eventId] = updateFct
 }
 
 /**
-* Detach an observer from event.
+* Detach observer from event.
 * @param obeserver The to detach
-* @param eventNumber The event number
+* @param eventId The event id
+* @stability 1
+* @public true
 */
-EventManager.prototype.detach = function (observer, eventNumber) {
+EventManager.prototype.detach = function (observer, eventId) {
     if (observer.observable != null) {
         observer.observable = null
     }
     if (observer.updateFunctions != undefined) {
-        if (observer.updateFunctions[this.id + "_" + eventNumber] != null) {
-            delete observer.updateFunctions[this.id + "_" + eventNumber]
+        if (observer.updateFunctions[this.id + "_" + eventId] != null) {
+            delete observer.updateFunctions[this.id + "_" + eventId]
             if (Object.keys(observer.updateFunctions).length == 0) {
-                this.observers[eventNumber].pop(observer)
+                this.observers[eventId].pop(observer)
             }
         }
     }
 }
 
 /**
-* When an event is received, the observer callback function is call.
+* When an event is received, the observer callback function is called.
 * @param evt The event to dispatch.
+* @stability 1
+* @public false
 */
 EventManager.prototype.onEvent = function (evt) {
     console.log("Event received: ", evt)
@@ -150,7 +151,7 @@ EventManager.prototype.onEvent = function (evt) {
                     observers[i].updateFunctions[this.id + "_" + evt.code](evt, observers[i])
                 } else {
                     if (Object.keys(observers[i].updateFunctions).length == 0) {
-                        this.observers[eventNumber].pop(observers[i])
+                        this.observers[eventId].pop(observers[i])
                     }
                 }
             }
@@ -159,24 +160,27 @@ EventManager.prototype.onEvent = function (evt) {
 }
 
 /**
-* Each event type has its own channel.
-* @param id The channel id, most of the time the event type name.
-* @returns {EventChannel}
+* EventChannel constructor
 * @constructor
+* Each event type has its own channel.
+* @param id The channel id.
+* @returns {EventChannel}
+* @stability 1
+* @public unknown
 */
 var EventChannel = function (id) {
     // The event id
     this.id = id
-    // This map contain
+
     this.listeners = {}
 
     return this
 }
 
 /**
-* Send event to listener.
 * @param evt
-* @constructor
+* @stability 1
+* @public true
 */
 EventChannel.prototype.BroadcastEvent = function (evt) {
     for (var l in this.listeners) {
@@ -186,38 +190,40 @@ EventChannel.prototype.BroadcastEvent = function (evt) {
 }
 
 /**
-* A singleton used to receive and send event. Use it instead of
-* directly use event listener and channel.
-* @returns {EventHandler}
+* Singleton used to receive and send events. 
+* Alternative to using event listeners and channels.
 * @constructor
+* @returns {EventHandler}
+* @stability 1
+* @public true
 */
 var EventHandler = function () {
     /**
      * @property channels The channel 
      */
-    this.channels = {}
+     this.channels = {}
 
-    return this
-}
-
-// Open listening channel,
+     return this
+ }
 
 /**
-* Append a new event listner.
+* Append a new event manager.
 * @param listener The listener to append.
 * @param callback The function to call when an event happen.
+* @stability 1
+* @public true
 */
 EventHandler.prototype.AddEventManager = function (listener, callback) {
     /* Add it to the local event listener **/
-    if (this.channels[listener.name] == undefined) {
-        this.channels[listener.name] = new EventChannel(listener.name)
+    if (this.channels[listener.channelId] == undefined) {
+        this.channels[listener.channelId] = new EventChannel(listener.channelId)
     }
     // append the listener
-    this.channels[listener.name].listeners[listener.id] = listener
+    this.channels[listener.channelId].listeners[listener.id] = listener
 
     /* Append to the remote event listener **/
     // Create a request
-    var p1 = new RpcData({ "name": "name", "type": 2, "dataBytes": utf8_to_b64(listener.name) });
+    var p1 = new RpcData({ "name": "name", "type": 2, "dataBytes": utf8_to_b64(listener.channelId) });
 
     var params = new Array();
     params[0] = p1;
@@ -227,7 +233,7 @@ EventHandler.prototype.AddEventManager = function (listener, callback) {
         function () { },
         // Success callback
         function () {
-            // I will call the success call back function
+            // calling success call back function
             callback();
         },
         // Error callback.
@@ -244,18 +250,18 @@ EventHandler.prototype.AddEventManager = function (listener, callback) {
 */
 EventHandler.prototype.RemoveEventManager = function (listener, callback) {
     /* Delete the local listener **/
-    if (this.channels[listener.name] != undefined) {
-        if (this.channels[listener.name].listeners[listener.id] != undefined) {
-            delete this.channels[listener.name].listeners[listener.id]
+    if (this.channels[listener.channelId] != undefined) {
+        if (this.channels[listener.channelId].listeners[listener.id] != undefined) {
+            delete this.channels[listener.channelId].listeners[listener.id]
         }
-        if (Object.keys(this.channels[listener.name]).length == 0) {
-            delete this.channels[listener.name]
+        if (Object.keys(this.channels[listener.channelId]).length == 0) {
+            delete this.channels[listener.channelId]
         }
     }
 
     /* Delete the remote listener **/
     // Create a request
-    var p1 = new RpcData({ "name": "name", "type": 2, "dataBytes": utf8_to_b64(listener.name) });
+    var p1 = new RpcData({ "name": "name", "type": 2, "dataBytes": utf8_to_b64(listener.channelId) });
 
     var params = new Array();
     params[0] = p1;
@@ -271,22 +277,22 @@ EventHandler.prototype.RemoveEventManager = function (listener, callback) {
 /*
 * Server side script
 */
-function AppendEventFilter(filter, eventType) {
-    server.GetEventManager().AppendEventFilter(filter, eventType, messageId, sessionId)
+function AppendEventFilter(filter, channelId) {
+    server.GetEventManager().AppendEventFilter(filter, channelId, messageId, sessionId)
 }
 
 /**
 * Append a new filter to a listener
 * @param {string} filter The filter to append
-* @param {string} eventType The name of the channel. Usually the eventType
+* @param {string} channelId The id of the channel. 
 * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 * @param {function} errorCallback In case of error.
 * @param {object} caller A place to store object from the request context and get it back from the response context.
 */
-EventHandler.prototype.appendEventFilter = function (filter, eventType, successCallback, errorCallback, caller) {
+EventHandler.prototype.appendEventFilter = function (filter, channelId, successCallback, errorCallback, caller) {
     var params = []
     params.push(createRpcData(filter, "STRING", "filter"))
-    params.push(createRpcData(eventType, "STRING", "eventType"))
+    params.push(createRpcData(channelId, "STRING", "channelId"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -307,18 +313,21 @@ EventHandler.prototype.appendEventFilter = function (filter, eventType, successC
             server.errorManager.onError(errMsg)
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
+        )
 }
 
 /**
-* Broadcast an event localy over a given channel, usualy the event type..
-* @param evt The event to broadcast locally.
-* var evt = {"code":OpenEntityEvent, "name":FileEvent, "dataMap":{"fileInfo": file}}
+* Broadcast an event localy over a given channel
+* var evt = {"code":OpenEntityEvent, "channelId":FileEvent, "dataMap":{"fileInfo": file}}
 * server.eventHandler.BroadcastEvent(evt)
+* @param evt The event to broadcast locally
+* @stability 1
+* @public true
 */
 EventHandler.prototype.BroadcastEvent = function (evt) {
-    var channel = this.channels[evt.name]
+    var channel = this.channels[evt.channelId]
     if (channel != undefined) {
+
         channel.BroadcastEvent(evt)
     }
 }
@@ -326,26 +335,26 @@ EventHandler.prototype.BroadcastEvent = function (evt) {
 /*
 * Server side script
 */
-function BroadcastEventData(evtNumber, eventType, eventDatas) {
+function BroadcastEventData(evtNumber, channelId, eventDatas) {
     // Call the method.
-    server.GetEventManager().BroadcastEventData(evtNumber, eventType, eventDatas, messageId, sessionId)
+    server.GetEventManager().BroadcastEventData(evtNumber, channelId, eventDatas, messageId, sessionId)
 }
 
 /**
 * Broadcast event over the network.
 * @param {int} evtNumber The event number.
-* @param {string} evtType The event type.
+* @param {string} channelId The event type.
 * @param {MessageData} eventDatas An array of Message Data structures.
 * Here is an example To send a file open event over the network.
 * var entityInfo = {"TYPENAME":"Server.MessageData", "Name":"entityInfo", "Value":file.stringify()}
 * server.eventHandler.broadcastEventData(OpenEntityEvent, EntityEvent, [entityInfo], function(){}, function(){}, undefined) 
- */
-EventHandler.prototype.broadcastEventData = function (evtNumber, eventType, eventDatas, successCallback, errorCallback, caller) {
+*/
+EventHandler.prototype.broadcastEventData = function (evtNumber, channelId, eventDatas, successCallback, errorCallback, caller) {
 
     // server is the client side singleton.
     var params = []
     params.push(new RpcData({ "name": "evtNumber", "type": 1, "dataBytes": utf8_to_b64(evtNumber) }))
-    params.push(new RpcData({ "name": "eventType", "type": 2, "dataBytes": utf8_to_b64(eventType) }))
+    params.push(new RpcData({ "name": "channelId", "type": 2, "dataBytes": utf8_to_b64(channelId) }))
     params.push(new RpcData({ "name": "eventDatas", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(eventDatas)) }))
 
     // Call it on the server.
@@ -365,5 +374,5 @@ EventHandler.prototype.broadcastEventData = function (evtNumber, eventType, even
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
+        )
 }

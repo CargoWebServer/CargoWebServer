@@ -342,10 +342,9 @@ Element.prototype.init = function () {
  * recursively with a given Id. 
  * @param {string} id The id of the element to retreive.
 * @returns {Element}
-* @stability 1
+* @stability 2
 */
 Element.prototype.getChildById = function (id) {
-    //console.log(id)
     var keys = Object.keys(this.childs)
     , i = 0
     , len = keys.length
