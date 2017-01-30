@@ -325,7 +325,7 @@ EventHandler.prototype.appendEventFilter = function (filter, channelId, successC
 * @public true
 */
 EventHandler.prototype.BroadcastEvent = function (evt) {
-    var channel = this.channels[evt.channelId]
+    var channel = this.channels[evt.name]
     if (channel != undefined) {
 
         channel.BroadcastEvent(evt)
@@ -335,9 +335,9 @@ EventHandler.prototype.BroadcastEvent = function (evt) {
 /*
 * Server side script
 */
-function BroadcastEventData(evtNumber, channelId, eventDatas) {
+function BroadcastEventData(evtNumber, eventName, eventDatas) {
     // Call the method.
-    server.GetEventManager().BroadcastEventData(evtNumber, channelId, eventDatas, messageId, sessionId)
+    server.GetEventManager().BroadcastEventData(evtNumber, eventName, eventDatas, messageId, sessionId)
 }
 
 /**
@@ -349,12 +349,12 @@ function BroadcastEventData(evtNumber, channelId, eventDatas) {
 * var entityInfo = {"TYPENAME":"Server.MessageData", "Name":"entityInfo", "Value":file.stringify()}
 * server.eventHandler.broadcastEventData(OpenEntityEvent, EntityEvent, [entityInfo], function(){}, function(){}, undefined) 
 */
-EventHandler.prototype.broadcastEventData = function (evtNumber, channelId, eventDatas, successCallback, errorCallback, caller) {
+EventHandler.prototype.broadcastEventData = function (evtNumber, evtName, eventDatas, successCallback, errorCallback, caller) {
 
     // server is the client side singleton.
     var params = []
     params.push(new RpcData({ "name": "evtNumber", "type": 1, "dataBytes": utf8_to_b64(evtNumber) }))
-    params.push(new RpcData({ "name": "channelId", "type": 2, "dataBytes": utf8_to_b64(channelId) }))
+    params.push(new RpcData({ "name": "channelId", "type": 2, "dataBytes": utf8_to_b64(evtName) }))
     params.push(new RpcData({ "name": "eventDatas", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(eventDatas)) }))
 
     // Call it on the server.

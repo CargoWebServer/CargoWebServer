@@ -88,6 +88,10 @@ func (this *SecurityManager) Initialize() *CargoEntities.Error {
 	return nil
 }
 
+func (this *SecurityManager) GetId() string {
+	return "SecurityManager"
+}
+
 func (this *SecurityManager) Start() {
 	log.Println("--> Start SecurityManager")
 }

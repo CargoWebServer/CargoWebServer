@@ -2,7 +2,7 @@
 #define SESSION_H
 
 #include <QThread>
-#include <QTcpSocket>
+#include <QWebSocket>
 #include <QDebug>
 #include <QMap>
 #include <QVector>
@@ -14,14 +14,15 @@ class Session : public QThread
 
      Q_OBJECT
 public:
-    explicit Session(qintptr ID, QObject *parent = 0);
+    explicit Session(QWebSocket* socket, QObject *parent = 0);
+    ~Session();
     void run();
 
 signals:
-    void error(QTcpSocket::SocketError socketerror);
+    //void error(QWebSocket::SocketError socketerror);
 
-public slots:
-    void readyRead();
+private Q_SLOTS:
+    void processBinaryMessage(QByteArray);
     void disconnected();
 
     /**
@@ -31,8 +32,7 @@ public slots:
     void completeProcessMessageData(com::mycelius::message::Message*);
 
 private:
-    QTcpSocket *socket;
-    qintptr socketDescriptor;
+    QWebSocket *socket;
     QMap<QString, QList<com::mycelius::message::Message*> > pending;
     QMap<QString, QVector<QByteArray> > pendingMsgChunk;
 

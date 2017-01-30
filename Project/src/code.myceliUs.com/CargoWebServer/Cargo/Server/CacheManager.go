@@ -115,6 +115,10 @@ func (this *CacheManager) Start() {
 	}(this.ticker)
 }
 
+func (this *CacheManager) GetId() string {
+	return "CacheManager"
+}
+
 func (this *CacheManager) Stop() {
 	log.Println("--> Stop CacheManager")
 	// Free the cache

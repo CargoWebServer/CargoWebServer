@@ -45,6 +45,10 @@ func (this *ProjectManager) Initialize() {
 
 }
 
+func (this *ProjectManager) GetId() string {
+	return "ProjectManager"
+}
+
 func (this *ProjectManager) Start() {
 	log.Println("--> Start ProjectManager")
 	// First of all I will scan the application directory to see if project

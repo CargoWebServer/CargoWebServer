@@ -70,6 +70,10 @@ func (this *FileManager) Initialize() {
 
 }
 
+func (this *FileManager) GetId() string {
+	return "FileManager"
+}
+
 func (this *FileManager) Start() {
 	log.Println("--> Start FileManager")
 	// Now I will synchronize files...

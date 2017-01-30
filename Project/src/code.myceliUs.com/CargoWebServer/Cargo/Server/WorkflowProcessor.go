@@ -130,6 +130,10 @@ func (this *WorkflowProcessor) Initialize() {
 	this.getNextProcessInstanceNumber()
 }
 
+func (this *WorkflowProcessor) GetId() string {
+	return "WorkflowProcessor"
+}
+
 /**
  * Start the service.
  */
@@ -930,25 +934,30 @@ func (this *WorkflowProcessor) initDatastore(storeId string, vm *otto.Otto) {
  * dataAssociations contain the list of dataAssociations to set.
  */
 func (this *WorkflowProcessor) setDataAssocication(source BPMS_Runtime.Instance, target BPMS_Runtime.Instance, dataAssociations []BPMN20.DataAssociation, sessionId string) {
+
 	// Index the item aware in a map to access it by theire id's
 	srcItemawareElementMap := make(map[string]*BPMS_Runtime.ItemAwareElementInstance, 0)
 	trgItemawareElementMap := make(map[string]*BPMS_Runtime.ItemAwareElementInstance, 0)
 
 	// The source...
 	for i := 0; i < len(source.GetDataRef()); i++ {
+		log.Println("src item data: ", source.GetDataRef()[i].M_id)
 		srcItemawareElementMap[source.GetDataRef()[i].M_id] = source.GetDataRef()[i]
 	}
-
+	// Ref
 	for i := 0; i < len(source.GetData()); i++ {
+		log.Println("src item data ref: ", source.GetData()[i].M_id)
 		srcItemawareElementMap[source.GetData()[i].M_id] = source.GetData()[i]
 	}
 
 	// The target
 	for i := 0; i < len(target.GetDataRef()); i++ {
+		log.Println("trg item data: ", target.GetDataRef()[i].M_id)
 		trgItemawareElementMap[target.GetDataRef()[i].M_id] = target.GetDataRef()[i]
 	}
-
+	// Ref
 	for i := 0; i < len(target.GetData()); i++ {
+		log.Println("trg item data ref: ", target.GetData()[i].M_id)
 		trgItemawareElementMap[target.GetData()[i].M_id] = target.GetData()[i]
 	}
 
@@ -960,8 +969,11 @@ func (this *WorkflowProcessor) setDataAssocication(source BPMS_Runtime.Instance,
 		dataAssociation := dataAssociations[i]
 		sourceRefs := dataAssociation.GetSourceRef()
 		targetRef := dataAssociation.GetTargetRef()
+
+		// Get transtformamtion if there one.
 		transformation := dataAssociation.GetTransformation()
 
+		// Get assignement (to, from)
 		assignments := dataAssociation.GetAssignment()
 
 		// The target id...

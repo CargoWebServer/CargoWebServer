@@ -45,6 +45,10 @@ func (this *LdapManager) Initialize() {
 
 }
 
+func (this *LdapManager) GetId() string {
+	return "LdapManager"
+}
+
 func (this *LdapManager) Start() {
 	log.Println("--> Start LdapManager")
 	ldapConfigurations := GetServer().GetConfigurationManager().GetLdapConfigurations()

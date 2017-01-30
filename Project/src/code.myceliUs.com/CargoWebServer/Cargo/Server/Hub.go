@@ -49,17 +49,9 @@ func NewHub() *Hub {
 					id := Utility.RandomUUID()
 					method := "Ping"
 					params := make([]*MessageData, 0)
-
 					to := make([]connection, 1)
 					to[0] = conn
-
-					// The success callback.
-					successCallback := func(msg *message) {
-						//log.Println("This is the end!!!")
-						/* nothing todo here */
-					}
-
-					ping, err := NewRequestMessage(id, method, params, to, successCallback)
+					ping, err := NewRequestMessage(id, method, params, to, nil, nil, nil)
 					if err != nil {
 						log.Println(err, " at time ", t)
 					}

@@ -26,7 +26,7 @@
   *@constructor
  * @extends EventManager
  */
-var AccountManager = function (id) {
+var AccountManager = function () {
 
     this.account = null
 
@@ -34,11 +34,7 @@ var AccountManager = function (id) {
         return
     }
 
-    if (id == undefined) {
-        id = randomUUID()
-    }
-
-    EventManager.call(this, id, AccountEvent)
+    EventManager.call(this, AccountEvent)
 
     return this
 }

@@ -151,6 +151,7 @@ EntityPanel.prototype.init = function (proto, initCallback) {
 	// Call after the initialisation....
 	if (initCallback != undefined) {
 		initCallback(this)
+		initCallback = null
 	}
 }
 

@@ -172,6 +172,10 @@ func (this *SchemaManager) Initialize() {
 	}
 }
 
+func (this *SchemaManager) GetId() string {
+	return "SchemaManager"
+}
+
 func (this *SchemaManager) Start() {
 	log.Println("--> Start SchemaManager")
 }

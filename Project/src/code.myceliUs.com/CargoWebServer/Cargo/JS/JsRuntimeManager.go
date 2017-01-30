@@ -164,7 +164,7 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
 	// Set the current session id.
 	vm.Set("sessionId", sessionId)
 	vm.Set("messageId", messageId)
-
+	
 	_, err = vm.Run(functionStr)
 	if err != nil {
 		log.Println("Error in code of ", functionName)

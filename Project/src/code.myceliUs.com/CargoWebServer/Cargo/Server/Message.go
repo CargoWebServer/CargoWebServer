@@ -24,14 +24,15 @@ type MessageData struct {
  * the myceliUs.Message.
  */
 type message struct {
-	from connection
-	to   []connection // One ore more destinnation for a message...
-	msg  *Message     // The underlying message...
+	from   connection
+	to     []connection // One ore more destinnation for a message...
+	msg    *Message     // The underlying message...
+	caller interface{}  // a generic pointer holder.
 
 	// asynchronous execution...
-	successCallback  func(rspMsg *message)
-	errorCallback    func(errMsg *message)
-	progressCallback func(tranfertMsg *message)
+	successCallback  func(rspMsg *message, caller interface{})
+	errorCallback    func(errMsg *message, caller interface{})
+	progressCallback func(tranfertMsg *message, index int, total int, caller interface{})
 }
 
 func (self *message) GetBytes() []byte {
@@ -177,7 +178,7 @@ func NewErrorMessage(id string, code int32, errMsg string, errData []byte, to []
 /**
  * Create a request to send.
  */
-func NewRequestMessage(id string, method string, params []*MessageData, to []connection, successCallback func(rspMsg *message)) (*message, error) {
+func NewRequestMessage(id string, method string, params []*MessageData, to []connection, successCallback func(rspMsg *message, caller interface{}), progressCallback func(rspMsg *message, index int, total int, caller interface{}), errorCallback func(rspMsg *message, caller interface{})) (*message, error) {
 
 	// Create the protobuffer message...
 	m := new(message)

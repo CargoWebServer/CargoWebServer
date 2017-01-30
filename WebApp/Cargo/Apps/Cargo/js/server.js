@@ -136,7 +136,7 @@ Server.prototype.executeJsFunction = function (functionSrc, functionParams, prog
         params.push(functionParams[i])
     }
 
-    var rqst = new Request(randomUUID(), server.conn, "ExecuteJsFunction", params,
+    var rqst = new Request(randomUUID(), this.conn, "ExecuteJsFunction", params,
         // Progress call back
         function (index, total, caller) {
             progressCallback(index, total, caller)
@@ -204,7 +204,7 @@ Server.prototype.handleMessage = function (conn, data) {
         // event
         //console.log("Event received.");
         var evt = new EventMsg(msg.evt.id, conn, msg.evt.name, msg.evt.code, msg.evt.evtData, null, null, null)
-        server.eventHandler.BroadcastEvent(evt)
+        this.eventHandler.BroadcastEvent(evt)
     }
     // This is a transfer message use whit chunk message.
     else if (msg.type === 4) {
@@ -244,14 +244,16 @@ Server.prototype.handleMessage = function (conn, data) {
 
 
             var fileReader = new FileReader();
-            fileReader.onload = function () {
-                if (this.result != null) {
-                    var arrayBuffer = this.result;
-                    server.handleMessage(server.conn, arrayBuffer);
-                } else {
-                    console.log("File data cannot be read!!!")
+            fileReader.onload = function (server) {
+                return function () {
+                    if (this.result != null) {
+                        var arrayBuffer = this.result;
+                        server.handleMessage(server.conn, arrayBuffer);
+                    } else {
+                        console.log("File data cannot be read!!!")
+                    }
                 }
-            };
+            } (this);
 
             fileReader.readAsArrayBuffer(new Blob(data));
         }
@@ -264,7 +266,7 @@ Server.prototype.handleMessage = function (conn, data) {
 Server.prototype.setSessionId = function () {
     var params = new Array();
     // Register this listener to the server.
-    var rqst = new Request(randomUUID(), server.conn, "GetSessionId", params,
+    var rqst = new Request(randomUUID(), this.conn, "GetSessionId", params,
         // Progress callback
         function () { },
         // Success callback
@@ -374,10 +376,10 @@ Server.prototype.connect = function (host, port, successCallback, errorCallback,
         },
         function (errMsg, caller) {
             console.log(errMsg)
-            server.errorManager.onError(errMsg)
+            caller.server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "server": this } // The caller
     )
 }
 
@@ -413,10 +415,10 @@ Server.prototype.disconnect = function (host, port, successCallback, errorCallba
         },
         function (errMsg, caller) {
             console.log(errMsg)
-            server.errorManager.onError(errMsg)
+            caller.server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "server": this } // The caller
     )
 }
 
@@ -444,9 +446,9 @@ Server.prototype.stop = function (successCallback, errorCallback, caller) {
         },
         function (errMsg, caller) {
             console.log(errMsg)
-            server.errorManager.onError(errMsg)
+            caller.server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "server": this } // The caller
     )
 }

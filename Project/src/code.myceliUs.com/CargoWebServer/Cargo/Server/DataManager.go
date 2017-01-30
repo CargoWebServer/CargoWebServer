@@ -96,6 +96,10 @@ func (this *DataManager) Initialize() {
 	}
 }
 
+func (this *DataManager) GetId() string {
+	return "DataManager"
+}
+
 func (this *DataManager) Start() {
 	log.Println("--> Start DataManager")
 }

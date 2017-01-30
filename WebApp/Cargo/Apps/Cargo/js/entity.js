@@ -26,16 +26,13 @@
  * @constructor
  * @extends EventManager
  */
-var EntityManager = function (id) {
+var EntityManager = function () {
 
     if (server == undefined) {
         return
     }
-    if (id == undefined) {
-        id = randomUUID()
-    }
 
-    EventManager.call(this, id, EntityEvent)
+    EventManager.call(this, EntityEvent)
 
     /**
      * @property {object} entityPrototypes Keeps track of prototypes in use.
@@ -351,10 +348,16 @@ EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, error
                     var entity = server.entityManager.entities[result[0].UUID]
                     entity.initCallback = function (caller) {
                         return function (entity) {
+                            server.entityManager.setEntity(entity)
                             caller.successCallback(entity, caller.caller)
                         }
                     } (caller)
-                    entity.init(result[0])
+                    if(entity.IsInit == false){
+                        entity.init(result[0])
+                    }else{
+                        caller.successCallback(entity, caller.caller)
+                    }
+
                 },
                 function (errMsg, caller) {
                     console.log(errMsg)
@@ -1374,7 +1377,6 @@ function setRef(owner, property, refValue, isArray) {
                             appendReferenced(propertyName, ref, entity)
                             if (caller.initCallback != undefined) {
                                 caller.initCallback(ref)
-                                caller.initCallback = undefined // cut the recursion...
                             }
                         },
                         function () { },

@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/port.h>
 #include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/wire_format_lite_inl.h>
@@ -46,6 +47,7 @@ const ::google::protobuf::EnumDescriptor* Message_MessageType_descriptor_ = NULL
 }  // namespace
 
 
+void protobuf_AssignDesc_rpc_2eproto() GOOGLE_ATTRIBUTE_COLD;
 void protobuf_AssignDesc_rpc_2eproto() {
   protobuf_AddDesc_rpc_2eproto();
   const ::google::protobuf::FileDescriptor* file =
@@ -53,22 +55,22 @@ void protobuf_AssignDesc_rpc_2eproto() {
       "rpc.proto");
   GOOGLE_CHECK(file != NULL);
   Data_descriptor_ = file->message_type(0);
-  static const int Data_offsets_[3] = {
+  static const int Data_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Data, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Data, databytes_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Data, type_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Data, typename__),
   };
   Data_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
       Data_descriptor_,
-      Data::default_instance_,
+      Data::internal_default_instance(),
       Data_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Data, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Data, _has_bits_),
       -1,
       -1,
       sizeof(Data),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Data, _internal_metadata_),
-      -1);
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Data, _internal_metadata_));
   Data_DataType_descriptor_ = Data_descriptor_->enum_type(0);
   Request_descriptor_ = file->message_type(1);
   static const int Request_offsets_[3] = {
@@ -79,14 +81,13 @@ void protobuf_AssignDesc_rpc_2eproto() {
   Request_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
       Request_descriptor_,
-      Request::default_instance_,
+      Request::internal_default_instance(),
       Request_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, _has_bits_),
       -1,
       -1,
       sizeof(Request),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, _internal_metadata_),
-      -1);
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, _internal_metadata_));
   Response_descriptor_ = file->message_type(2);
   static const int Response_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, results_),
@@ -95,14 +96,13 @@ void protobuf_AssignDesc_rpc_2eproto() {
   Response_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
       Response_descriptor_,
-      Response::default_instance_,
+      Response::internal_default_instance(),
       Response_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, _has_bits_),
       -1,
       -1,
       sizeof(Response),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, _internal_metadata_),
-      -1);
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, _internal_metadata_));
   Error_descriptor_ = file->message_type(3);
   static const int Error_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Error, code_),
@@ -113,14 +113,13 @@ void protobuf_AssignDesc_rpc_2eproto() {
   Error_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
       Error_descriptor_,
-      Error::default_instance_,
+      Error::internal_default_instance(),
       Error_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Error, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Error, _has_bits_),
       -1,
       -1,
       sizeof(Error),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Error, _internal_metadata_),
-      -1);
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Error, _internal_metadata_));
   Event_descriptor_ = file->message_type(4);
   static const int Event_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, code_),
@@ -130,14 +129,13 @@ void protobuf_AssignDesc_rpc_2eproto() {
   Event_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
       Event_descriptor_,
-      Event::default_instance_,
+      Event::internal_default_instance(),
       Event_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, _has_bits_),
       -1,
       -1,
       sizeof(Event),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, _internal_metadata_),
-      -1);
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, _internal_metadata_));
   Message_descriptor_ = file->message_type(5);
   static const int Message_offsets_[9] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, type_),
@@ -153,105 +151,125 @@ void protobuf_AssignDesc_rpc_2eproto() {
   Message_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
       Message_descriptor_,
-      Message::default_instance_,
+      Message::internal_default_instance(),
       Message_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, _has_bits_),
       -1,
       -1,
       sizeof(Message),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, _internal_metadata_),
-      -1);
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, _internal_metadata_));
   Message_MessageType_descriptor_ = Message_descriptor_->enum_type(0);
 }
 
 namespace {
 
 GOOGLE_PROTOBUF_DECLARE_ONCE(protobuf_AssignDescriptors_once_);
-inline void protobuf_AssignDescriptorsOnce() {
+void protobuf_AssignDescriptorsOnce() {
   ::google::protobuf::GoogleOnceInit(&protobuf_AssignDescriptors_once_,
                  &protobuf_AssignDesc_rpc_2eproto);
 }
 
+void protobuf_RegisterTypes(const ::std::string&) GOOGLE_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-      Data_descriptor_, &Data::default_instance());
+      Data_descriptor_, Data::internal_default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-      Request_descriptor_, &Request::default_instance());
+      Request_descriptor_, Request::internal_default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-      Response_descriptor_, &Response::default_instance());
+      Response_descriptor_, Response::internal_default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-      Error_descriptor_, &Error::default_instance());
+      Error_descriptor_, Error::internal_default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-      Event_descriptor_, &Event::default_instance());
+      Event_descriptor_, Event::internal_default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-      Message_descriptor_, &Message::default_instance());
+      Message_descriptor_, Message::internal_default_instance());
 }
 
 }  // namespace
 
 void protobuf_ShutdownFile_rpc_2eproto() {
-  delete Data::default_instance_;
+  Data_default_instance_.Shutdown();
   delete Data_reflection_;
-  delete Request::default_instance_;
+  Request_default_instance_.Shutdown();
   delete Request_reflection_;
-  delete Response::default_instance_;
+  Response_default_instance_.Shutdown();
   delete Response_reflection_;
-  delete Error::default_instance_;
+  Error_default_instance_.Shutdown();
   delete Error_reflection_;
-  delete Event::default_instance_;
+  Event_default_instance_.Shutdown();
   delete Event_reflection_;
-  delete Message::default_instance_;
+  Message_default_instance_.Shutdown();
   delete Message_reflection_;
 }
 
-void protobuf_AddDesc_rpc_2eproto() {
-  static bool already_here = false;
-  if (already_here) return;
-  already_here = true;
+void protobuf_InitDefaults_rpc_2eproto_impl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+  ::google::protobuf::internal::GetEmptyString();
+  Data_default_instance_.DefaultConstruct();
+  ::google::protobuf::internal::GetEmptyString();
+  Request_default_instance_.DefaultConstruct();
+  ::google::protobuf::internal::GetEmptyString();
+  Response_default_instance_.DefaultConstruct();
+  ::google::protobuf::internal::GetEmptyString();
+  Error_default_instance_.DefaultConstruct();
+  ::google::protobuf::internal::GetEmptyString();
+  Event_default_instance_.DefaultConstruct();
+  ::google::protobuf::internal::GetEmptyString();
+  Message_default_instance_.DefaultConstruct();
+  Data_default_instance_.get_mutable()->InitAsDefaultInstance();
+  Request_default_instance_.get_mutable()->InitAsDefaultInstance();
+  Response_default_instance_.get_mutable()->InitAsDefaultInstance();
+  Error_default_instance_.get_mutable()->InitAsDefaultInstance();
+  Event_default_instance_.get_mutable()->InitAsDefaultInstance();
+  Message_default_instance_.get_mutable()->InitAsDefaultInstance();
+}
+
+GOOGLE_PROTOBUF_DECLARE_ONCE(protobuf_InitDefaults_rpc_2eproto_once_);
+void protobuf_InitDefaults_rpc_2eproto() {
+  ::google::protobuf::GoogleOnceInit(&protobuf_InitDefaults_rpc_2eproto_once_,
+                 &protobuf_InitDefaults_rpc_2eproto_impl);
+}
+void protobuf_AddDesc_rpc_2eproto_impl() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  protobuf_InitDefaults_rpc_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\trpc.proto\022\024com.mycelius.message\"\253\001\n\004Da"
+    "\n\trpc.proto\022\024com.mycelius.message\"\312\001\n\004Da"
     "ta\022\014\n\004name\030\001 \002(\t\022\021\n\tdataBytes\030\002 \002(\014\0228\n\004t"
     "ype\030\003 \002(\0162#.com.mycelius.message.Data.Da"
-    "taType:\005BYTES\"H\n\010DataType\022\n\n\006DOUBLE\020\000\022\013\n"
-    "\007INTEGER\020\001\022\n\n\006STRING\020\002\022\t\n\005BYTES\020\003\022\014\n\010JSO"
-    "N_STR\020\004\"Q\n\007Request\022\016\n\006method\030\001 \002(\t\022*\n\006pa"
-    "rams\030\002 \003(\0132\032.com.mycelius.message.Data\022\n"
-    "\n\002id\030\003 \002(\t\"C\n\010Response\022+\n\007results\030\001 \003(\0132"
-    "\032.com.mycelius.message.Data\022\n\n\002id\030\002 \002(\t\""
-    "@\n\005Error\022\014\n\004code\030\001 \002(\005\022\017\n\007message\030\002 \002(\t\022"
-    "\n\n\002id\030\003 \002(\t\022\014\n\004data\030\004 \001(\014\"P\n\005Event\022\014\n\004co"
-    "de\030\001 \002(\005\022\014\n\004name\030\002 \002(\t\022+\n\007evtData\030\003 \003(\0132"
-    "\032.com.mycelius.message.Data\"\375\002\n\007Message\022"
-    ">\n\004type\030\001 \002(\0162).com.mycelius.message.Mes"
-    "sage.MessageType:\005ERROR\022\r\n\005index\030\002 \002(\005\022\r"
-    "\n\005total\030\003 \002(\005\022+\n\004rqst\030\004 \001(\0132\035.com.myceli"
-    "us.message.Request\022+\n\003rsp\030\005 \001(\0132\036.com.my"
-    "celius.message.Response\022(\n\003err\030\006 \001(\0132\033.c"
-    "om.mycelius.message.Error\022(\n\003evt\030\007 \001(\0132\033"
-    ".com.mycelius.message.Event\022\014\n\004data\030\010 \001("
-    "\014\022\n\n\002id\030\t \001(\t\"L\n\013MessageType\022\013\n\007REQUEST\020"
-    "\000\022\014\n\010RESPONSE\020\001\022\t\n\005ERROR\020\002\022\t\n\005EVENT\020\003\022\014\n"
-    "\010TRANSFER\020\004", 891);
+    "taType:\005BYTES\022\020\n\010typeName\030\004 \001(\t\"U\n\010DataT"
+    "ype\022\n\n\006DOUBLE\020\000\022\013\n\007INTEGER\020\001\022\n\n\006STRING\020\002"
+    "\022\t\n\005BYTES\020\003\022\014\n\010JSON_STR\020\004\022\013\n\007BOOLEAN\020\005\"Q"
+    "\n\007Request\022\016\n\006method\030\001 \002(\t\022*\n\006params\030\002 \003("
+    "\0132\032.com.mycelius.message.Data\022\n\n\002id\030\003 \002("
+    "\t\"C\n\010Response\022+\n\007results\030\001 \003(\0132\032.com.myc"
+    "elius.message.Data\022\n\n\002id\030\002 \002(\t\"@\n\005Error\022"
+    "\014\n\004code\030\001 \002(\005\022\017\n\007message\030\002 \002(\t\022\n\n\002id\030\003 \002"
+    "(\t\022\014\n\004data\030\004 \001(\014\"P\n\005Event\022\014\n\004code\030\001 \002(\005\022"
+    "\014\n\004name\030\002 \002(\t\022+\n\007evtData\030\003 \003(\0132\032.com.myc"
+    "elius.message.Data\"\375\002\n\007Message\022>\n\004type\030\001"
+    " \002(\0162).com.mycelius.message.Message.Mess"
+    "ageType:\005ERROR\022\r\n\005index\030\002 \002(\021\022\r\n\005total\030\003"
+    " \002(\005\022+\n\004rqst\030\004 \001(\0132\035.com.mycelius.messag"
+    "e.Request\022+\n\003rsp\030\005 \001(\0132\036.com.mycelius.me"
+    "ssage.Response\022(\n\003err\030\006 \001(\0132\033.com.myceli"
+    "us.message.Error\022(\n\003evt\030\007 \001(\0132\033.com.myce"
+    "lius.message.Event\022\014\n\004data\030\010 \001(\014\022\n\n\002id\030\t"
+    " \001(\t\"L\n\013MessageType\022\013\n\007REQUEST\020\000\022\014\n\010RESP"
+    "ONSE\020\001\022\t\n\005ERROR\020\002\022\t\n\005EVENT\020\003\022\014\n\010TRANSFER"
+    "\020\004", 922);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "rpc.proto", &protobuf_RegisterTypes);
-  Data::default_instance_ = new Data();
-  Request::default_instance_ = new Request();
-  Response::default_instance_ = new Response();
-  Error::default_instance_ = new Error();
-  Event::default_instance_ = new Event();
-  Message::default_instance_ = new Message();
-  Data::default_instance_->InitAsDefaultInstance();
-  Request::default_instance_->InitAsDefaultInstance();
-  Response::default_instance_->InitAsDefaultInstance();
-  Error::default_instance_->InitAsDefaultInstance();
-  Event::default_instance_->InitAsDefaultInstance();
-  Message::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_rpc_2eproto);
 }
 
+GOOGLE_PROTOBUF_DECLARE_ONCE(protobuf_AddDesc_rpc_2eproto_once_);
+void protobuf_AddDesc_rpc_2eproto() {
+  ::google::protobuf::GoogleOnceInit(&protobuf_AddDesc_rpc_2eproto_once_,
+                 &protobuf_AddDesc_rpc_2eproto_impl);
+}
 // Force AddDescriptors() to be called at static initialization time.
 struct StaticDescriptorInitializer_rpc_2eproto {
   StaticDescriptorInitializer_rpc_2eproto() {
@@ -261,9 +279,9 @@ struct StaticDescriptorInitializer_rpc_2eproto {
 
 namespace {
 
-static void MergeFromFail(int line) GOOGLE_ATTRIBUTE_COLD;
+static void MergeFromFail(int line) GOOGLE_ATTRIBUTE_COLD GOOGLE_ATTRIBUTE_NORETURN;
 static void MergeFromFail(int line) {
-  GOOGLE_CHECK(false) << __FILE__ << ":" << line;
+  ::google::protobuf::internal::MergeFromFail(__FILE__, line);
 }
 
 }  // namespace
@@ -276,36 +294,40 @@ const ::google::protobuf::EnumDescriptor* Data_DataType_descriptor() {
   return Data_DataType_descriptor_;
 }
 bool Data_DataType_IsValid(int value) {
-  switch(value) {
+  switch (value) {
     case 0:
     case 1:
     case 2:
     case 3:
     case 4:
+    case 5:
       return true;
     default:
       return false;
   }
 }
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
 const Data_DataType Data::DOUBLE;
 const Data_DataType Data::INTEGER;
 const Data_DataType Data::STRING;
 const Data_DataType Data::BYTES;
 const Data_DataType Data::JSON_STR;
+const Data_DataType Data::BOOLEAN;
 const Data_DataType Data::DataType_MIN;
 const Data_DataType Data::DataType_MAX;
 const int Data::DataType_ARRAYSIZE;
-#endif  // _MSC_VER
-#ifndef _MSC_VER
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Data::kNameFieldNumber;
 const int Data::kDataBytesFieldNumber;
 const int Data::kTypeFieldNumber;
-#endif  // !_MSC_VER
+const int Data::kTypeNameFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Data::Data()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (this != internal_default_instance()) protobuf_InitDefaults_rpc_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Data)
 }
@@ -317,17 +339,16 @@ Data::Data(const Data& from)
   : ::google::protobuf::Message(),
     _internal_metadata_(NULL) {
   SharedCtor();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:com.mycelius.message.Data)
 }
 
 void Data::SharedCtor() {
-  ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   databytes_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  typename__.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   type_ = 3;
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
 Data::~Data() {
@@ -338,8 +359,7 @@ Data::~Data() {
 void Data::SharedDtor() {
   name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   databytes_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != default_instance_) {
-  }
+  typename__.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void Data::SetCachedSize(int size) const {
@@ -353,11 +373,11 @@ const ::google::protobuf::Descriptor* Data::descriptor() {
 }
 
 const Data& Data::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_rpc_2eproto();
-  return *default_instance_;
+  protobuf_InitDefaults_rpc_2eproto();
+  return *internal_default_instance();
 }
 
-Data* Data::default_instance_ = NULL;
+::google::protobuf::internal::ExplicitlyConstructed<Data> Data_default_instance_;
 
 Data* Data::New(::google::protobuf::Arena* arena) const {
   Data* n = new Data;
@@ -368,7 +388,8 @@ Data* Data::New(::google::protobuf::Arena* arena) const {
 }
 
 void Data::Clear() {
-  if (_has_bits_[0 / 32] & 7u) {
+// @@protoc_insertion_point(message_clear_start:com.mycelius.message.Data)
+  if (_has_bits_[0 / 32] & 15u) {
     if (has_name()) {
       name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
@@ -376,8 +397,11 @@ void Data::Clear() {
       databytes_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
     type_ = 3;
+    if (has_typename_()) {
+      typename__.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    }
   }
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  _has_bits_.Clear();
   if (_internal_metadata_.have_unknown_fields()) {
     mutable_unknown_fields()->Clear();
   }
@@ -385,7 +409,7 @@ void Data::Clear() {
 
 bool Data::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Data)
   for (;;) {
@@ -435,6 +459,23 @@ bool Data::MergePartialFromCodedStream(
           } else {
             mutable_unknown_fields()->AddVarint(3, value);
           }
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(34)) goto parse_typeName;
+        break;
+      }
+
+      // optional string typeName = 4;
+      case 4: {
+        if (tag == 34) {
+         parse_typeName:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_typename_()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->typename_().data(), this->typename_().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "com.mycelius.message.Data.typeName");
         } else {
           goto handle_unusual;
         }
@@ -489,6 +530,16 @@ void Data::SerializeWithCachedSizes(
       3, this->type(), output);
   }
 
+  // optional string typeName = 4;
+  if (has_typename_()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->typename_().data(), this->typename_().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "com.mycelius.message.Data.typeName");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->typename_(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -496,8 +547,9 @@ void Data::SerializeWithCachedSizes(
   // @@protoc_insertion_point(serialize_end:com.mycelius.message.Data)
 }
 
-::google::protobuf::uint8* Data::SerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::google::protobuf::uint8* Data::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:com.mycelius.message.Data)
   // required string name = 1;
   if (has_name()) {
@@ -523,6 +575,17 @@ void Data::SerializeWithCachedSizes(
       3, this->type(), target);
   }
 
+  // optional string typeName = 4;
+  if (has_typename_()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->typename_().data(), this->typename_().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "com.mycelius.message.Data.typeName");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->typename_(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -531,8 +594,9 @@ void Data::SerializeWithCachedSizes(
   return target;
 }
 
-int Data::RequiredFieldsByteSizeFallback() const {
-  int total_size = 0;
+size_t Data::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:com.mycelius.message.Data)
+  size_t total_size = 0;
 
   if (has_name()) {
     // required string name = 1;
@@ -556,8 +620,9 @@ int Data::RequiredFieldsByteSizeFallback() const {
 
   return total_size;
 }
-int Data::ByteSize() const {
-  int total_size = 0;
+size_t Data::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:com.mycelius.message.Data)
+  size_t total_size = 0;
 
   if (((_has_bits_[0] & 0x00000007) ^ 0x00000007) == 0) {  // All required fields are present.
     // required string name = 1;
@@ -577,31 +642,51 @@ int Data::ByteSize() const {
   } else {
     total_size += RequiredFieldsByteSizeFallback();
   }
+  // optional string typeName = 4;
+  if (has_typename_()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->typename_());
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         unknown_fields());
   }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = total_size;
+  _cached_size_ = cached_size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
   return total_size;
 }
 
 void Data::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:com.mycelius.message.Data)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  const Data* source = 
+  const Data* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const Data>(
           &from);
   if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:com.mycelius.message.Data)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-    MergeFrom(*source);
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:com.mycelius.message.Data)
+    UnsafeMergeFrom(*source);
   }
 }
 
 void Data::MergeFrom(const Data& from) {
-  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+// @@protoc_insertion_point(class_specific_merge_from_start:com.mycelius.message.Data)
+  if (GOOGLE_PREDICT_TRUE(&from != this)) {
+    UnsafeMergeFrom(from);
+  } else {
+    MergeFromFail(__LINE__);
+  }
+}
+
+void Data::UnsafeMergeFrom(const Data& from) {
+  GOOGLE_DCHECK(&from != this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_name()) {
       set_has_name();
@@ -614,22 +699,29 @@ void Data::MergeFrom(const Data& from) {
     if (from.has_type()) {
       set_type(from.type());
     }
+    if (from.has_typename_()) {
+      set_has_typename_();
+      typename__.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.typename__);
+    }
   }
   if (from._internal_metadata_.have_unknown_fields()) {
-    mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+    ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
+      from.unknown_fields(), &_internal_metadata_);
   }
 }
 
 void Data::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:com.mycelius.message.Data)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Data::CopyFrom(const Data& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:com.mycelius.message.Data)
   if (&from == this) return;
   Clear();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
 }
 
 bool Data::IsInitialized() const {
@@ -646,6 +738,7 @@ void Data::InternalSwap(Data* other) {
   name_.Swap(&other->name_);
   databytes_.Swap(&other->databytes_);
   std::swap(type_, other->type_);
+  typename__.Swap(&other->typename__);
   std::swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
@@ -676,36 +769,37 @@ void Data::clear_name() {
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_name();
 }
- const ::std::string& Data::name() const {
+const ::std::string& Data::name() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Data.name)
   return name_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Data::set_name(const ::std::string& value) {
+void Data::set_name(const ::std::string& value) {
   set_has_name();
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:com.mycelius.message.Data.name)
 }
- void Data::set_name(const char* value) {
+void Data::set_name(const char* value) {
   set_has_name();
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:com.mycelius.message.Data.name)
 }
- void Data::set_name(const char* value, size_t size) {
+void Data::set_name(const char* value, size_t size) {
   set_has_name();
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Data.name)
 }
- ::std::string* Data::mutable_name() {
+::std::string* Data::mutable_name() {
   set_has_name();
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Data.name)
   return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* Data::release_name() {
+::std::string* Data::release_name() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Data.name)
   clear_has_name();
   return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Data::set_allocated_name(::std::string* name) {
+void Data::set_allocated_name(::std::string* name) {
   if (name != NULL) {
     set_has_name();
   } else {
@@ -729,36 +823,37 @@ void Data::clear_databytes() {
   databytes_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_databytes();
 }
- const ::std::string& Data::databytes() const {
+const ::std::string& Data::databytes() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Data.dataBytes)
   return databytes_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Data::set_databytes(const ::std::string& value) {
+void Data::set_databytes(const ::std::string& value) {
   set_has_databytes();
   databytes_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:com.mycelius.message.Data.dataBytes)
 }
- void Data::set_databytes(const char* value) {
+void Data::set_databytes(const char* value) {
   set_has_databytes();
   databytes_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:com.mycelius.message.Data.dataBytes)
 }
- void Data::set_databytes(const void* value, size_t size) {
+void Data::set_databytes(const void* value, size_t size) {
   set_has_databytes();
   databytes_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Data.dataBytes)
 }
- ::std::string* Data::mutable_databytes() {
+::std::string* Data::mutable_databytes() {
   set_has_databytes();
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Data.dataBytes)
   return databytes_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* Data::release_databytes() {
+::std::string* Data::release_databytes() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Data.dataBytes)
   clear_has_databytes();
   return databytes_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Data::set_allocated_databytes(::std::string* databytes) {
+void Data::set_allocated_databytes(::std::string* databytes) {
   if (databytes != NULL) {
     set_has_databytes();
   } else {
@@ -782,29 +877,87 @@ void Data::clear_type() {
   type_ = 3;
   clear_has_type();
 }
- ::com::mycelius::message::Data_DataType Data::type() const {
+::com::mycelius::message::Data_DataType Data::type() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Data.type)
   return static_cast< ::com::mycelius::message::Data_DataType >(type_);
 }
- void Data::set_type(::com::mycelius::message::Data_DataType value) {
+void Data::set_type(::com::mycelius::message::Data_DataType value) {
   assert(::com::mycelius::message::Data_DataType_IsValid(value));
   set_has_type();
   type_ = value;
   // @@protoc_insertion_point(field_set:com.mycelius.message.Data.type)
 }
 
+// optional string typeName = 4;
+bool Data::has_typename_() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+void Data::set_has_typename_() {
+  _has_bits_[0] |= 0x00000008u;
+}
+void Data::clear_has_typename_() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+void Data::clear_typename_() {
+  typename__.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_typename_();
+}
+const ::std::string& Data::typename_() const {
+  // @@protoc_insertion_point(field_get:com.mycelius.message.Data.typeName)
+  return typename__.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void Data::set_typename_(const ::std::string& value) {
+  set_has_typename_();
+  typename__.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.mycelius.message.Data.typeName)
+}
+void Data::set_typename_(const char* value) {
+  set_has_typename_();
+  typename__.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.mycelius.message.Data.typeName)
+}
+void Data::set_typename_(const char* value, size_t size) {
+  set_has_typename_();
+  typename__.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Data.typeName)
+}
+::std::string* Data::mutable_typename_() {
+  set_has_typename_();
+  // @@protoc_insertion_point(field_mutable:com.mycelius.message.Data.typeName)
+  return typename__.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+::std::string* Data::release_typename_() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Data.typeName)
+  clear_has_typename_();
+  return typename__.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void Data::set_allocated_typename_(::std::string* typename_) {
+  if (typename_ != NULL) {
+    set_has_typename_();
+  } else {
+    clear_has_typename_();
+  }
+  typename__.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), typename_);
+  // @@protoc_insertion_point(field_set_allocated:com.mycelius.message.Data.typeName)
+}
+
+inline const Data* Data::internal_default_instance() {
+  return &Data_default_instance_.get();
+}
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // ===================================================================
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Request::kMethodFieldNumber;
 const int Request::kParamsFieldNumber;
 const int Request::kIdFieldNumber;
-#endif  // !_MSC_VER
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Request::Request()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (this != internal_default_instance()) protobuf_InitDefaults_rpc_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Request)
 }
@@ -816,16 +969,14 @@ Request::Request(const Request& from)
   : ::google::protobuf::Message(),
     _internal_metadata_(NULL) {
   SharedCtor();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:com.mycelius.message.Request)
 }
 
 void Request::SharedCtor() {
-  ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
   method_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
 Request::~Request() {
@@ -836,8 +987,6 @@ Request::~Request() {
 void Request::SharedDtor() {
   method_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != default_instance_) {
-  }
 }
 
 void Request::SetCachedSize(int size) const {
@@ -851,11 +1000,11 @@ const ::google::protobuf::Descriptor* Request::descriptor() {
 }
 
 const Request& Request::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_rpc_2eproto();
-  return *default_instance_;
+  protobuf_InitDefaults_rpc_2eproto();
+  return *internal_default_instance();
 }
 
-Request* Request::default_instance_ = NULL;
+::google::protobuf::internal::ExplicitlyConstructed<Request> Request_default_instance_;
 
 Request* Request::New(::google::protobuf::Arena* arena) const {
   Request* n = new Request;
@@ -866,6 +1015,7 @@ Request* Request::New(::google::protobuf::Arena* arena) const {
 }
 
 void Request::Clear() {
+// @@protoc_insertion_point(message_clear_start:com.mycelius.message.Request)
   if (_has_bits_[0 / 32] & 5u) {
     if (has_method()) {
       method_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -875,7 +1025,7 @@ void Request::Clear() {
     }
   }
   params_.Clear();
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  _has_bits_.Clear();
   if (_internal_metadata_.have_unknown_fields()) {
     mutable_unknown_fields()->Clear();
   }
@@ -883,7 +1033,7 @@ void Request::Clear() {
 
 bool Request::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Request)
   for (;;) {
@@ -999,8 +1149,9 @@ void Request::SerializeWithCachedSizes(
   // @@protoc_insertion_point(serialize_end:com.mycelius.message.Request)
 }
 
-::google::protobuf::uint8* Request::SerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::google::protobuf::uint8* Request::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:com.mycelius.message.Request)
   // required string method = 1;
   if (has_method()) {
@@ -1016,8 +1167,8 @@ void Request::SerializeWithCachedSizes(
   // repeated .com.mycelius.message.Data params = 2;
   for (unsigned int i = 0, n = this->params_size(); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        2, this->params(i), target);
+      InternalWriteMessageNoVirtualToArray(
+        2, this->params(i), false, target);
   }
 
   // required string id = 3;
@@ -1039,8 +1190,9 @@ void Request::SerializeWithCachedSizes(
   return target;
 }
 
-int Request::RequiredFieldsByteSizeFallback() const {
-  int total_size = 0;
+size_t Request::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:com.mycelius.message.Request)
+  size_t total_size = 0;
 
   if (has_method()) {
     // required string method = 1;
@@ -1058,8 +1210,9 @@ int Request::RequiredFieldsByteSizeFallback() const {
 
   return total_size;
 }
-int Request::ByteSize() const {
-  int total_size = 0;
+size_t Request::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:com.mycelius.message.Request)
+  size_t total_size = 0;
 
   if (((_has_bits_[0] & 0x00000005) ^ 0x00000005) == 0) {  // All required fields are present.
     // required string method = 1;
@@ -1076,11 +1229,14 @@ int Request::ByteSize() const {
     total_size += RequiredFieldsByteSizeFallback();
   }
   // repeated .com.mycelius.message.Data params = 2;
-  total_size += 1 * this->params_size();
-  for (int i = 0; i < this->params_size(); i++) {
-    total_size +=
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->params(i));
+  {
+    unsigned int count = this->params_size();
+    total_size += 1UL * count;
+    for (unsigned int i = 0; i < count; i++) {
+      total_size +=
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->params(i));
+    }
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1088,26 +1244,39 @@ int Request::ByteSize() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         unknown_fields());
   }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = total_size;
+  _cached_size_ = cached_size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
   return total_size;
 }
 
 void Request::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:com.mycelius.message.Request)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  const Request* source = 
+  const Request* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const Request>(
           &from);
   if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:com.mycelius.message.Request)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-    MergeFrom(*source);
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:com.mycelius.message.Request)
+    UnsafeMergeFrom(*source);
   }
 }
 
 void Request::MergeFrom(const Request& from) {
-  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+// @@protoc_insertion_point(class_specific_merge_from_start:com.mycelius.message.Request)
+  if (GOOGLE_PREDICT_TRUE(&from != this)) {
+    UnsafeMergeFrom(from);
+  } else {
+    MergeFromFail(__LINE__);
+  }
+}
+
+void Request::UnsafeMergeFrom(const Request& from) {
+  GOOGLE_DCHECK(&from != this);
   params_.MergeFrom(from.params_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_method()) {
@@ -1120,20 +1289,23 @@ void Request::MergeFrom(const Request& from) {
     }
   }
   if (from._internal_metadata_.have_unknown_fields()) {
-    mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+    ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
+      from.unknown_fields(), &_internal_metadata_);
   }
 }
 
 void Request::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:com.mycelius.message.Request)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Request::CopyFrom(const Request& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:com.mycelius.message.Request)
   if (&from == this) return;
   Clear();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
 }
 
 bool Request::IsInitialized() const {
@@ -1181,36 +1353,37 @@ void Request::clear_method() {
   method_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_method();
 }
- const ::std::string& Request::method() const {
+const ::std::string& Request::method() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Request.method)
   return method_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Request::set_method(const ::std::string& value) {
+void Request::set_method(const ::std::string& value) {
   set_has_method();
   method_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:com.mycelius.message.Request.method)
 }
- void Request::set_method(const char* value) {
+void Request::set_method(const char* value) {
   set_has_method();
   method_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:com.mycelius.message.Request.method)
 }
- void Request::set_method(const char* value, size_t size) {
+void Request::set_method(const char* value, size_t size) {
   set_has_method();
   method_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Request.method)
 }
- ::std::string* Request::mutable_method() {
+::std::string* Request::mutable_method() {
   set_has_method();
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Request.method)
   return method_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* Request::release_method() {
+::std::string* Request::release_method() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Request.method)
   clear_has_method();
   return method_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Request::set_allocated_method(::std::string* method) {
+void Request::set_allocated_method(::std::string* method) {
   if (method != NULL) {
     set_has_method();
   } else {
@@ -1227,27 +1400,27 @@ int Request::params_size() const {
 void Request::clear_params() {
   params_.Clear();
 }
- const ::com::mycelius::message::Data& Request::params(int index) const {
+const ::com::mycelius::message::Data& Request::params(int index) const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Request.params)
   return params_.Get(index);
 }
- ::com::mycelius::message::Data* Request::mutable_params(int index) {
+::com::mycelius::message::Data* Request::mutable_params(int index) {
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Request.params)
   return params_.Mutable(index);
 }
- ::com::mycelius::message::Data* Request::add_params() {
+::com::mycelius::message::Data* Request::add_params() {
   // @@protoc_insertion_point(field_add:com.mycelius.message.Request.params)
   return params_.Add();
 }
- const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >&
-Request::params() const {
-  // @@protoc_insertion_point(field_list:com.mycelius.message.Request.params)
-  return params_;
-}
- ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >*
+::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >*
 Request::mutable_params() {
   // @@protoc_insertion_point(field_mutable_list:com.mycelius.message.Request.params)
   return &params_;
+}
+const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >&
+Request::params() const {
+  // @@protoc_insertion_point(field_list:com.mycelius.message.Request.params)
+  return params_;
 }
 
 // required string id = 3;
@@ -1264,36 +1437,37 @@ void Request::clear_id() {
   id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_id();
 }
- const ::std::string& Request::id() const {
+const ::std::string& Request::id() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Request.id)
   return id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Request::set_id(const ::std::string& value) {
+void Request::set_id(const ::std::string& value) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:com.mycelius.message.Request.id)
 }
- void Request::set_id(const char* value) {
+void Request::set_id(const char* value) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:com.mycelius.message.Request.id)
 }
- void Request::set_id(const char* value, size_t size) {
+void Request::set_id(const char* value, size_t size) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Request.id)
 }
- ::std::string* Request::mutable_id() {
+::std::string* Request::mutable_id() {
   set_has_id();
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Request.id)
   return id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* Request::release_id() {
+::std::string* Request::release_id() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Request.id)
   clear_has_id();
   return id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Request::set_allocated_id(::std::string* id) {
+void Request::set_allocated_id(::std::string* id) {
   if (id != NULL) {
     set_has_id();
   } else {
@@ -1303,17 +1477,21 @@ void Request::clear_id() {
   // @@protoc_insertion_point(field_set_allocated:com.mycelius.message.Request.id)
 }
 
+inline const Request* Request::internal_default_instance() {
+  return &Request_default_instance_.get();
+}
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // ===================================================================
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Response::kResultsFieldNumber;
 const int Response::kIdFieldNumber;
-#endif  // !_MSC_VER
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Response::Response()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (this != internal_default_instance()) protobuf_InitDefaults_rpc_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Response)
 }
@@ -1325,15 +1503,13 @@ Response::Response(const Response& from)
   : ::google::protobuf::Message(),
     _internal_metadata_(NULL) {
   SharedCtor();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:com.mycelius.message.Response)
 }
 
 void Response::SharedCtor() {
-  ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
 Response::~Response() {
@@ -1343,8 +1519,6 @@ Response::~Response() {
 
 void Response::SharedDtor() {
   id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != default_instance_) {
-  }
 }
 
 void Response::SetCachedSize(int size) const {
@@ -1358,11 +1532,11 @@ const ::google::protobuf::Descriptor* Response::descriptor() {
 }
 
 const Response& Response::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_rpc_2eproto();
-  return *default_instance_;
+  protobuf_InitDefaults_rpc_2eproto();
+  return *internal_default_instance();
 }
 
-Response* Response::default_instance_ = NULL;
+::google::protobuf::internal::ExplicitlyConstructed<Response> Response_default_instance_;
 
 Response* Response::New(::google::protobuf::Arena* arena) const {
   Response* n = new Response;
@@ -1373,11 +1547,12 @@ Response* Response::New(::google::protobuf::Arena* arena) const {
 }
 
 void Response::Clear() {
+// @@protoc_insertion_point(message_clear_start:com.mycelius.message.Response)
   if (has_id()) {
     id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
   results_.Clear();
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  _has_bits_.Clear();
   if (_internal_metadata_.have_unknown_fields()) {
     mutable_unknown_fields()->Clear();
   }
@@ -1385,7 +1560,7 @@ void Response::Clear() {
 
 bool Response::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Response)
   for (;;) {
@@ -1474,14 +1649,15 @@ void Response::SerializeWithCachedSizes(
   // @@protoc_insertion_point(serialize_end:com.mycelius.message.Response)
 }
 
-::google::protobuf::uint8* Response::SerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::google::protobuf::uint8* Response::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:com.mycelius.message.Response)
   // repeated .com.mycelius.message.Data results = 1;
   for (unsigned int i = 0, n = this->results_size(); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        1, this->results(i), target);
+      InternalWriteMessageNoVirtualToArray(
+        1, this->results(i), false, target);
   }
 
   // required string id = 2;
@@ -1503,8 +1679,9 @@ void Response::SerializeWithCachedSizes(
   return target;
 }
 
-int Response::ByteSize() const {
-  int total_size = 0;
+size_t Response::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:com.mycelius.message.Response)
+  size_t total_size = 0;
 
   // required string id = 2;
   if (has_id()) {
@@ -1513,11 +1690,14 @@ int Response::ByteSize() const {
         this->id());
   }
   // repeated .com.mycelius.message.Data results = 1;
-  total_size += 1 * this->results_size();
-  for (int i = 0; i < this->results_size(); i++) {
-    total_size +=
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->results(i));
+  {
+    unsigned int count = this->results_size();
+    total_size += 1UL * count;
+    for (unsigned int i = 0; i < count; i++) {
+      total_size +=
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->results(i));
+    }
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1525,26 +1705,39 @@ int Response::ByteSize() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         unknown_fields());
   }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = total_size;
+  _cached_size_ = cached_size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
   return total_size;
 }
 
 void Response::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:com.mycelius.message.Response)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  const Response* source = 
+  const Response* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const Response>(
           &from);
   if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:com.mycelius.message.Response)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-    MergeFrom(*source);
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:com.mycelius.message.Response)
+    UnsafeMergeFrom(*source);
   }
 }
 
 void Response::MergeFrom(const Response& from) {
-  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+// @@protoc_insertion_point(class_specific_merge_from_start:com.mycelius.message.Response)
+  if (GOOGLE_PREDICT_TRUE(&from != this)) {
+    UnsafeMergeFrom(from);
+  } else {
+    MergeFromFail(__LINE__);
+  }
+}
+
+void Response::UnsafeMergeFrom(const Response& from) {
+  GOOGLE_DCHECK(&from != this);
   results_.MergeFrom(from.results_);
   if (from._has_bits_[1 / 32] & (0xffu << (1 % 32))) {
     if (from.has_id()) {
@@ -1553,20 +1746,23 @@ void Response::MergeFrom(const Response& from) {
     }
   }
   if (from._internal_metadata_.have_unknown_fields()) {
-    mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+    ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
+      from.unknown_fields(), &_internal_metadata_);
   }
 }
 
 void Response::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:com.mycelius.message.Response)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Response::CopyFrom(const Response& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:com.mycelius.message.Response)
   if (&from == this) return;
   Clear();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
 }
 
 bool Response::IsInitialized() const {
@@ -1606,27 +1802,27 @@ int Response::results_size() const {
 void Response::clear_results() {
   results_.Clear();
 }
- const ::com::mycelius::message::Data& Response::results(int index) const {
+const ::com::mycelius::message::Data& Response::results(int index) const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Response.results)
   return results_.Get(index);
 }
- ::com::mycelius::message::Data* Response::mutable_results(int index) {
+::com::mycelius::message::Data* Response::mutable_results(int index) {
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Response.results)
   return results_.Mutable(index);
 }
- ::com::mycelius::message::Data* Response::add_results() {
+::com::mycelius::message::Data* Response::add_results() {
   // @@protoc_insertion_point(field_add:com.mycelius.message.Response.results)
   return results_.Add();
 }
- const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >&
-Response::results() const {
-  // @@protoc_insertion_point(field_list:com.mycelius.message.Response.results)
-  return results_;
-}
- ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >*
+::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >*
 Response::mutable_results() {
   // @@protoc_insertion_point(field_mutable_list:com.mycelius.message.Response.results)
   return &results_;
+}
+const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >&
+Response::results() const {
+  // @@protoc_insertion_point(field_list:com.mycelius.message.Response.results)
+  return results_;
 }
 
 // required string id = 2;
@@ -1643,36 +1839,37 @@ void Response::clear_id() {
   id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_id();
 }
- const ::std::string& Response::id() const {
+const ::std::string& Response::id() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Response.id)
   return id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Response::set_id(const ::std::string& value) {
+void Response::set_id(const ::std::string& value) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:com.mycelius.message.Response.id)
 }
- void Response::set_id(const char* value) {
+void Response::set_id(const char* value) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:com.mycelius.message.Response.id)
 }
- void Response::set_id(const char* value, size_t size) {
+void Response::set_id(const char* value, size_t size) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Response.id)
 }
- ::std::string* Response::mutable_id() {
+::std::string* Response::mutable_id() {
   set_has_id();
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Response.id)
   return id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* Response::release_id() {
+::std::string* Response::release_id() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Response.id)
   clear_has_id();
   return id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Response::set_allocated_id(::std::string* id) {
+void Response::set_allocated_id(::std::string* id) {
   if (id != NULL) {
     set_has_id();
   } else {
@@ -1682,19 +1879,23 @@ void Response::clear_id() {
   // @@protoc_insertion_point(field_set_allocated:com.mycelius.message.Response.id)
 }
 
+inline const Response* Response::internal_default_instance() {
+  return &Response_default_instance_.get();
+}
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // ===================================================================
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Error::kCodeFieldNumber;
 const int Error::kMessageFieldNumber;
 const int Error::kIdFieldNumber;
 const int Error::kDataFieldNumber;
-#endif  // !_MSC_VER
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Error::Error()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (this != internal_default_instance()) protobuf_InitDefaults_rpc_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Error)
 }
@@ -1706,18 +1907,16 @@ Error::Error(const Error& from)
   : ::google::protobuf::Message(),
     _internal_metadata_(NULL) {
   SharedCtor();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:com.mycelius.message.Error)
 }
 
 void Error::SharedCtor() {
-  ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
-  code_ = 0;
   message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  code_ = 0;
 }
 
 Error::~Error() {
@@ -1729,8 +1928,6 @@ void Error::SharedDtor() {
   message_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   data_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != default_instance_) {
-  }
 }
 
 void Error::SetCachedSize(int size) const {
@@ -1744,11 +1941,11 @@ const ::google::protobuf::Descriptor* Error::descriptor() {
 }
 
 const Error& Error::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_rpc_2eproto();
-  return *default_instance_;
+  protobuf_InitDefaults_rpc_2eproto();
+  return *internal_default_instance();
 }
 
-Error* Error::default_instance_ = NULL;
+::google::protobuf::internal::ExplicitlyConstructed<Error> Error_default_instance_;
 
 Error* Error::New(::google::protobuf::Arena* arena) const {
   Error* n = new Error;
@@ -1759,6 +1956,7 @@ Error* Error::New(::google::protobuf::Arena* arena) const {
 }
 
 void Error::Clear() {
+// @@protoc_insertion_point(message_clear_start:com.mycelius.message.Error)
   if (_has_bits_[0 / 32] & 15u) {
     code_ = 0;
     if (has_message()) {
@@ -1771,7 +1969,7 @@ void Error::Clear() {
       data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     }
   }
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  _has_bits_.Clear();
   if (_internal_metadata_.have_unknown_fields()) {
     mutable_unknown_fields()->Clear();
   }
@@ -1779,7 +1977,7 @@ void Error::Clear() {
 
 bool Error::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Error)
   for (;;) {
@@ -1790,10 +1988,10 @@ bool Error::MergePartialFromCodedStream(
       // required int32 code = 1;
       case 1: {
         if (tag == 8) {
+          set_has_code();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &code_)));
-          set_has_code();
         } else {
           goto handle_unusual;
         }
@@ -1911,8 +2109,9 @@ void Error::SerializeWithCachedSizes(
   // @@protoc_insertion_point(serialize_end:com.mycelius.message.Error)
 }
 
-::google::protobuf::uint8* Error::SerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::google::protobuf::uint8* Error::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:com.mycelius.message.Error)
   // required int32 code = 1;
   if (has_code()) {
@@ -1956,8 +2155,9 @@ void Error::SerializeWithCachedSizes(
   return target;
 }
 
-int Error::RequiredFieldsByteSizeFallback() const {
-  int total_size = 0;
+size_t Error::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:com.mycelius.message.Error)
+  size_t total_size = 0;
 
   if (has_code()) {
     // required int32 code = 1;
@@ -1982,8 +2182,9 @@ int Error::RequiredFieldsByteSizeFallback() const {
 
   return total_size;
 }
-int Error::ByteSize() const {
-  int total_size = 0;
+size_t Error::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:com.mycelius.message.Error)
+  size_t total_size = 0;
 
   if (((_has_bits_[0] & 0x00000007) ^ 0x00000007) == 0) {  // All required fields are present.
     // required int32 code = 1;
@@ -2016,26 +2217,39 @@ int Error::ByteSize() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         unknown_fields());
   }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = total_size;
+  _cached_size_ = cached_size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
   return total_size;
 }
 
 void Error::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:com.mycelius.message.Error)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  const Error* source = 
+  const Error* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const Error>(
           &from);
   if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:com.mycelius.message.Error)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-    MergeFrom(*source);
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:com.mycelius.message.Error)
+    UnsafeMergeFrom(*source);
   }
 }
 
 void Error::MergeFrom(const Error& from) {
-  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+// @@protoc_insertion_point(class_specific_merge_from_start:com.mycelius.message.Error)
+  if (GOOGLE_PREDICT_TRUE(&from != this)) {
+    UnsafeMergeFrom(from);
+  } else {
+    MergeFromFail(__LINE__);
+  }
+}
+
+void Error::UnsafeMergeFrom(const Error& from) {
+  GOOGLE_DCHECK(&from != this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_code()) {
       set_code(from.code());
@@ -2054,20 +2268,23 @@ void Error::MergeFrom(const Error& from) {
     }
   }
   if (from._internal_metadata_.have_unknown_fields()) {
-    mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+    ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
+      from.unknown_fields(), &_internal_metadata_);
   }
 }
 
 void Error::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:com.mycelius.message.Error)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Error::CopyFrom(const Error& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:com.mycelius.message.Error)
   if (&from == this) return;
   Clear();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
 }
 
 bool Error::IsInitialized() const {
@@ -2115,11 +2332,11 @@ void Error::clear_code() {
   code_ = 0;
   clear_has_code();
 }
- ::google::protobuf::int32 Error::code() const {
+::google::protobuf::int32 Error::code() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Error.code)
   return code_;
 }
- void Error::set_code(::google::protobuf::int32 value) {
+void Error::set_code(::google::protobuf::int32 value) {
   set_has_code();
   code_ = value;
   // @@protoc_insertion_point(field_set:com.mycelius.message.Error.code)
@@ -2139,36 +2356,37 @@ void Error::clear_message() {
   message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_message();
 }
- const ::std::string& Error::message() const {
+const ::std::string& Error::message() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Error.message)
   return message_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Error::set_message(const ::std::string& value) {
+void Error::set_message(const ::std::string& value) {
   set_has_message();
   message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:com.mycelius.message.Error.message)
 }
- void Error::set_message(const char* value) {
+void Error::set_message(const char* value) {
   set_has_message();
   message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:com.mycelius.message.Error.message)
 }
- void Error::set_message(const char* value, size_t size) {
+void Error::set_message(const char* value, size_t size) {
   set_has_message();
   message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Error.message)
 }
- ::std::string* Error::mutable_message() {
+::std::string* Error::mutable_message() {
   set_has_message();
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Error.message)
   return message_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* Error::release_message() {
+::std::string* Error::release_message() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Error.message)
   clear_has_message();
   return message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Error::set_allocated_message(::std::string* message) {
+void Error::set_allocated_message(::std::string* message) {
   if (message != NULL) {
     set_has_message();
   } else {
@@ -2192,36 +2410,37 @@ void Error::clear_id() {
   id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_id();
 }
- const ::std::string& Error::id() const {
+const ::std::string& Error::id() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Error.id)
   return id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Error::set_id(const ::std::string& value) {
+void Error::set_id(const ::std::string& value) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:com.mycelius.message.Error.id)
 }
- void Error::set_id(const char* value) {
+void Error::set_id(const char* value) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:com.mycelius.message.Error.id)
 }
- void Error::set_id(const char* value, size_t size) {
+void Error::set_id(const char* value, size_t size) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Error.id)
 }
- ::std::string* Error::mutable_id() {
+::std::string* Error::mutable_id() {
   set_has_id();
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Error.id)
   return id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* Error::release_id() {
+::std::string* Error::release_id() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Error.id)
   clear_has_id();
   return id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Error::set_allocated_id(::std::string* id) {
+void Error::set_allocated_id(::std::string* id) {
   if (id != NULL) {
     set_has_id();
   } else {
@@ -2245,36 +2464,37 @@ void Error::clear_data() {
   data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_data();
 }
- const ::std::string& Error::data() const {
+const ::std::string& Error::data() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Error.data)
   return data_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Error::set_data(const ::std::string& value) {
+void Error::set_data(const ::std::string& value) {
   set_has_data();
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:com.mycelius.message.Error.data)
 }
- void Error::set_data(const char* value) {
+void Error::set_data(const char* value) {
   set_has_data();
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:com.mycelius.message.Error.data)
 }
- void Error::set_data(const void* value, size_t size) {
+void Error::set_data(const void* value, size_t size) {
   set_has_data();
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Error.data)
 }
- ::std::string* Error::mutable_data() {
+::std::string* Error::mutable_data() {
   set_has_data();
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Error.data)
   return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* Error::release_data() {
+::std::string* Error::release_data() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Error.data)
   clear_has_data();
   return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Error::set_allocated_data(::std::string* data) {
+void Error::set_allocated_data(::std::string* data) {
   if (data != NULL) {
     set_has_data();
   } else {
@@ -2284,18 +2504,22 @@ void Error::clear_data() {
   // @@protoc_insertion_point(field_set_allocated:com.mycelius.message.Error.data)
 }
 
+inline const Error* Error::internal_default_instance() {
+  return &Error_default_instance_.get();
+}
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // ===================================================================
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Event::kCodeFieldNumber;
 const int Event::kNameFieldNumber;
 const int Event::kEvtDataFieldNumber;
-#endif  // !_MSC_VER
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Event::Event()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (this != internal_default_instance()) protobuf_InitDefaults_rpc_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Event)
 }
@@ -2307,16 +2531,14 @@ Event::Event(const Event& from)
   : ::google::protobuf::Message(),
     _internal_metadata_(NULL) {
   SharedCtor();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:com.mycelius.message.Event)
 }
 
 void Event::SharedCtor() {
-  ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
-  code_ = 0;
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  code_ = 0;
 }
 
 Event::~Event() {
@@ -2326,8 +2548,6 @@ Event::~Event() {
 
 void Event::SharedDtor() {
   name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != default_instance_) {
-  }
 }
 
 void Event::SetCachedSize(int size) const {
@@ -2341,11 +2561,11 @@ const ::google::protobuf::Descriptor* Event::descriptor() {
 }
 
 const Event& Event::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_rpc_2eproto();
-  return *default_instance_;
+  protobuf_InitDefaults_rpc_2eproto();
+  return *internal_default_instance();
 }
 
-Event* Event::default_instance_ = NULL;
+::google::protobuf::internal::ExplicitlyConstructed<Event> Event_default_instance_;
 
 Event* Event::New(::google::protobuf::Arena* arena) const {
   Event* n = new Event;
@@ -2356,6 +2576,7 @@ Event* Event::New(::google::protobuf::Arena* arena) const {
 }
 
 void Event::Clear() {
+// @@protoc_insertion_point(message_clear_start:com.mycelius.message.Event)
   if (_has_bits_[0 / 32] & 3u) {
     code_ = 0;
     if (has_name()) {
@@ -2363,7 +2584,7 @@ void Event::Clear() {
     }
   }
   evtdata_.Clear();
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  _has_bits_.Clear();
   if (_internal_metadata_.have_unknown_fields()) {
     mutable_unknown_fields()->Clear();
   }
@@ -2371,7 +2592,7 @@ void Event::Clear() {
 
 bool Event::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Event)
   for (;;) {
@@ -2382,10 +2603,10 @@ bool Event::MergePartialFromCodedStream(
       // required int32 code = 1;
       case 1: {
         if (tag == 8) {
+          set_has_code();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &code_)));
-          set_has_code();
         } else {
           goto handle_unusual;
         }
@@ -2480,8 +2701,9 @@ void Event::SerializeWithCachedSizes(
   // @@protoc_insertion_point(serialize_end:com.mycelius.message.Event)
 }
 
-::google::protobuf::uint8* Event::SerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::google::protobuf::uint8* Event::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:com.mycelius.message.Event)
   // required int32 code = 1;
   if (has_code()) {
@@ -2502,8 +2724,8 @@ void Event::SerializeWithCachedSizes(
   // repeated .com.mycelius.message.Data evtData = 3;
   for (unsigned int i = 0, n = this->evtdata_size(); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        3, this->evtdata(i), target);
+      InternalWriteMessageNoVirtualToArray(
+        3, this->evtdata(i), false, target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2514,8 +2736,9 @@ void Event::SerializeWithCachedSizes(
   return target;
 }
 
-int Event::RequiredFieldsByteSizeFallback() const {
-  int total_size = 0;
+size_t Event::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:com.mycelius.message.Event)
+  size_t total_size = 0;
 
   if (has_code()) {
     // required int32 code = 1;
@@ -2533,8 +2756,9 @@ int Event::RequiredFieldsByteSizeFallback() const {
 
   return total_size;
 }
-int Event::ByteSize() const {
-  int total_size = 0;
+size_t Event::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:com.mycelius.message.Event)
+  size_t total_size = 0;
 
   if (((_has_bits_[0] & 0x00000003) ^ 0x00000003) == 0) {  // All required fields are present.
     // required int32 code = 1;
@@ -2551,11 +2775,14 @@ int Event::ByteSize() const {
     total_size += RequiredFieldsByteSizeFallback();
   }
   // repeated .com.mycelius.message.Data evtData = 3;
-  total_size += 1 * this->evtdata_size();
-  for (int i = 0; i < this->evtdata_size(); i++) {
-    total_size +=
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->evtdata(i));
+  {
+    unsigned int count = this->evtdata_size();
+    total_size += 1UL * count;
+    for (unsigned int i = 0; i < count; i++) {
+      total_size +=
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->evtdata(i));
+    }
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2563,26 +2790,39 @@ int Event::ByteSize() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         unknown_fields());
   }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = total_size;
+  _cached_size_ = cached_size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
   return total_size;
 }
 
 void Event::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:com.mycelius.message.Event)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  const Event* source = 
+  const Event* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const Event>(
           &from);
   if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:com.mycelius.message.Event)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-    MergeFrom(*source);
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:com.mycelius.message.Event)
+    UnsafeMergeFrom(*source);
   }
 }
 
 void Event::MergeFrom(const Event& from) {
-  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+// @@protoc_insertion_point(class_specific_merge_from_start:com.mycelius.message.Event)
+  if (GOOGLE_PREDICT_TRUE(&from != this)) {
+    UnsafeMergeFrom(from);
+  } else {
+    MergeFromFail(__LINE__);
+  }
+}
+
+void Event::UnsafeMergeFrom(const Event& from) {
+  GOOGLE_DCHECK(&from != this);
   evtdata_.MergeFrom(from.evtdata_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_code()) {
@@ -2594,20 +2834,23 @@ void Event::MergeFrom(const Event& from) {
     }
   }
   if (from._internal_metadata_.have_unknown_fields()) {
-    mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+    ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
+      from.unknown_fields(), &_internal_metadata_);
   }
 }
 
 void Event::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:com.mycelius.message.Event)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Event::CopyFrom(const Event& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:com.mycelius.message.Event)
   if (&from == this) return;
   Clear();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
 }
 
 bool Event::IsInitialized() const {
@@ -2655,11 +2898,11 @@ void Event::clear_code() {
   code_ = 0;
   clear_has_code();
 }
- ::google::protobuf::int32 Event::code() const {
+::google::protobuf::int32 Event::code() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Event.code)
   return code_;
 }
- void Event::set_code(::google::protobuf::int32 value) {
+void Event::set_code(::google::protobuf::int32 value) {
   set_has_code();
   code_ = value;
   // @@protoc_insertion_point(field_set:com.mycelius.message.Event.code)
@@ -2679,36 +2922,37 @@ void Event::clear_name() {
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_name();
 }
- const ::std::string& Event::name() const {
+const ::std::string& Event::name() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Event.name)
   return name_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Event::set_name(const ::std::string& value) {
+void Event::set_name(const ::std::string& value) {
   set_has_name();
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:com.mycelius.message.Event.name)
 }
- void Event::set_name(const char* value) {
+void Event::set_name(const char* value) {
   set_has_name();
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:com.mycelius.message.Event.name)
 }
- void Event::set_name(const char* value, size_t size) {
+void Event::set_name(const char* value, size_t size) {
   set_has_name();
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Event.name)
 }
- ::std::string* Event::mutable_name() {
+::std::string* Event::mutable_name() {
   set_has_name();
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Event.name)
   return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* Event::release_name() {
+::std::string* Event::release_name() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Event.name)
   clear_has_name();
   return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Event::set_allocated_name(::std::string* name) {
+void Event::set_allocated_name(::std::string* name) {
   if (name != NULL) {
     set_has_name();
   } else {
@@ -2725,29 +2969,32 @@ int Event::evtdata_size() const {
 void Event::clear_evtdata() {
   evtdata_.Clear();
 }
- const ::com::mycelius::message::Data& Event::evtdata(int index) const {
+const ::com::mycelius::message::Data& Event::evtdata(int index) const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Event.evtData)
   return evtdata_.Get(index);
 }
- ::com::mycelius::message::Data* Event::mutable_evtdata(int index) {
+::com::mycelius::message::Data* Event::mutable_evtdata(int index) {
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Event.evtData)
   return evtdata_.Mutable(index);
 }
- ::com::mycelius::message::Data* Event::add_evtdata() {
+::com::mycelius::message::Data* Event::add_evtdata() {
   // @@protoc_insertion_point(field_add:com.mycelius.message.Event.evtData)
   return evtdata_.Add();
 }
- const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >&
-Event::evtdata() const {
-  // @@protoc_insertion_point(field_list:com.mycelius.message.Event.evtData)
-  return evtdata_;
-}
- ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >*
+::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >*
 Event::mutable_evtdata() {
   // @@protoc_insertion_point(field_mutable_list:com.mycelius.message.Event.evtData)
   return &evtdata_;
 }
+const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >&
+Event::evtdata() const {
+  // @@protoc_insertion_point(field_list:com.mycelius.message.Event.evtData)
+  return evtdata_;
+}
 
+inline const Event* Event::internal_default_instance() {
+  return &Event_default_instance_.get();
+}
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // ===================================================================
@@ -2757,7 +3004,7 @@ const ::google::protobuf::EnumDescriptor* Message_MessageType_descriptor() {
   return Message_MessageType_descriptor_;
 }
 bool Message_MessageType_IsValid(int value) {
-  switch(value) {
+  switch (value) {
     case 0:
     case 1:
     case 2:
@@ -2769,7 +3016,7 @@ bool Message_MessageType_IsValid(int value) {
   }
 }
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
 const Message_MessageType Message::REQUEST;
 const Message_MessageType Message::RESPONSE;
 const Message_MessageType Message::ERROR;
@@ -2778,8 +3025,8 @@ const Message_MessageType Message::TRANSFER;
 const Message_MessageType Message::MessageType_MIN;
 const Message_MessageType Message::MessageType_MAX;
 const int Message::MessageType_ARRAYSIZE;
-#endif  // _MSC_VER
-#ifndef _MSC_VER
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Message::kTypeFieldNumber;
 const int Message::kIndexFieldNumber;
 const int Message::kTotalFieldNumber;
@@ -2789,42 +3036,45 @@ const int Message::kErrFieldNumber;
 const int Message::kEvtFieldNumber;
 const int Message::kDataFieldNumber;
 const int Message::kIdFieldNumber;
-#endif  // !_MSC_VER
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Message::Message()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (this != internal_default_instance()) protobuf_InitDefaults_rpc_2eproto();
   SharedCtor();
   // @@protoc_insertion_point(constructor:com.mycelius.message.Message)
 }
 
 void Message::InitAsDefaultInstance() {
-  rqst_ = const_cast< ::com::mycelius::message::Request*>(&::com::mycelius::message::Request::default_instance());
-  rsp_ = const_cast< ::com::mycelius::message::Response*>(&::com::mycelius::message::Response::default_instance());
-  err_ = const_cast< ::com::mycelius::message::Error*>(&::com::mycelius::message::Error::default_instance());
-  evt_ = const_cast< ::com::mycelius::message::Event*>(&::com::mycelius::message::Event::default_instance());
+  rqst_ = const_cast< ::com::mycelius::message::Request*>(
+      ::com::mycelius::message::Request::internal_default_instance());
+  rsp_ = const_cast< ::com::mycelius::message::Response*>(
+      ::com::mycelius::message::Response::internal_default_instance());
+  err_ = const_cast< ::com::mycelius::message::Error*>(
+      ::com::mycelius::message::Error::internal_default_instance());
+  evt_ = const_cast< ::com::mycelius::message::Event*>(
+      ::com::mycelius::message::Event::internal_default_instance());
 }
 
 Message::Message(const Message& from)
   : ::google::protobuf::Message(),
     _internal_metadata_(NULL) {
   SharedCtor();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:com.mycelius.message.Message)
 }
 
 void Message::SharedCtor() {
-  ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
-  type_ = 2;
-  index_ = 0;
-  total_ = 0;
+  data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   rqst_ = NULL;
   rsp_ = NULL;
   err_ = NULL;
   evt_ = NULL;
-  data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  ::memset(&index_, 0, reinterpret_cast<char*>(&total_) -
+    reinterpret_cast<char*>(&index_) + sizeof(total_));
+  type_ = 2;
 }
 
 Message::~Message() {
@@ -2835,7 +3085,7 @@ Message::~Message() {
 void Message::SharedDtor() {
   data_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != default_instance_) {
+  if (this != &Message_default_instance_.get()) {
     delete rqst_;
     delete rsp_;
     delete err_;
@@ -2854,11 +3104,11 @@ const ::google::protobuf::Descriptor* Message::descriptor() {
 }
 
 const Message& Message::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_rpc_2eproto();
-  return *default_instance_;
+  protobuf_InitDefaults_rpc_2eproto();
+  return *internal_default_instance();
 }
 
-Message* Message::default_instance_ = NULL;
+::google::protobuf::internal::ExplicitlyConstructed<Message> Message_default_instance_;
 
 Message* Message::New(::google::protobuf::Arena* arena) const {
   Message* n = new Message;
@@ -2869,10 +3119,26 @@ Message* Message::New(::google::protobuf::Arena* arena) const {
 }
 
 void Message::Clear() {
+// @@protoc_insertion_point(message_clear_start:com.mycelius.message.Message)
+#if defined(__clang__)
+#define ZR_HELPER_(f) \
+  _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
+  __builtin_offsetof(Message, f) \
+  _Pragma("clang diagnostic pop")
+#else
+#define ZR_HELPER_(f) reinterpret_cast<char*>(\
+  &reinterpret_cast<Message*>(16)->f)
+#endif
+
+#define ZR_(first, last) do {\
+  ::memset(&(first), 0,\
+           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
+} while (0)
+
   if (_has_bits_[0 / 32] & 255u) {
+    ZR_(index_, total_);
     type_ = 2;
-    index_ = 0;
-    total_ = 0;
     if (has_rqst()) {
       if (rqst_ != NULL) rqst_->::com::mycelius::message::Request::Clear();
     }
@@ -2892,7 +3158,11 @@ void Message::Clear() {
   if (has_id()) {
     id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+
+#undef ZR_HELPER_
+#undef ZR_
+
+  _has_bits_.Clear();
   if (_internal_metadata_.have_unknown_fields()) {
     mutable_unknown_fields()->Clear();
   }
@@ -2900,7 +3170,7 @@ void Message::Clear() {
 
 bool Message::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:com.mycelius.message.Message)
   for (;;) {
@@ -2927,14 +3197,14 @@ bool Message::MergePartialFromCodedStream(
         break;
       }
 
-      // required int32 index = 2;
+      // required sint32 index = 2;
       case 2: {
         if (tag == 16) {
          parse_index:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &index_)));
           set_has_index();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_SINT32>(
+                 input, &index_)));
         } else {
           goto handle_unusual;
         }
@@ -2946,10 +3216,10 @@ bool Message::MergePartialFromCodedStream(
       case 3: {
         if (tag == 24) {
          parse_total:
+          set_has_total();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &total_)));
-          set_has_total();
         } else {
           goto handle_unusual;
         }
@@ -3070,9 +3340,9 @@ void Message::SerializeWithCachedSizes(
       1, this->type(), output);
   }
 
-  // required int32 index = 2;
+  // required sint32 index = 2;
   if (has_index()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->index(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteSInt32(2, this->index(), output);
   }
 
   // required int32 total = 3;
@@ -3127,8 +3397,9 @@ void Message::SerializeWithCachedSizes(
   // @@protoc_insertion_point(serialize_end:com.mycelius.message.Message)
 }
 
-::google::protobuf::uint8* Message::SerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::google::protobuf::uint8* Message::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:com.mycelius.message.Message)
   // required .com.mycelius.message.Message.MessageType type = 1 [default = ERROR];
   if (has_type()) {
@@ -3136,9 +3407,9 @@ void Message::SerializeWithCachedSizes(
       1, this->type(), target);
   }
 
-  // required int32 index = 2;
+  // required sint32 index = 2;
   if (has_index()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->index(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteSInt32ToArray(2, this->index(), target);
   }
 
   // required int32 total = 3;
@@ -3149,29 +3420,29 @@ void Message::SerializeWithCachedSizes(
   // optional .com.mycelius.message.Request rqst = 4;
   if (has_rqst()) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        4, *this->rqst_, target);
+      InternalWriteMessageNoVirtualToArray(
+        4, *this->rqst_, false, target);
   }
 
   // optional .com.mycelius.message.Response rsp = 5;
   if (has_rsp()) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        5, *this->rsp_, target);
+      InternalWriteMessageNoVirtualToArray(
+        5, *this->rsp_, false, target);
   }
 
   // optional .com.mycelius.message.Error err = 6;
   if (has_err()) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        6, *this->err_, target);
+      InternalWriteMessageNoVirtualToArray(
+        6, *this->err_, false, target);
   }
 
   // optional .com.mycelius.message.Event evt = 7;
   if (has_evt()) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        7, *this->evt_, target);
+      InternalWriteMessageNoVirtualToArray(
+        7, *this->evt_, false, target);
   }
 
   // optional bytes data = 8;
@@ -3200,8 +3471,9 @@ void Message::SerializeWithCachedSizes(
   return target;
 }
 
-int Message::RequiredFieldsByteSizeFallback() const {
-  int total_size = 0;
+size_t Message::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:com.mycelius.message.Message)
+  size_t total_size = 0;
 
   if (has_type()) {
     // required .com.mycelius.message.Message.MessageType type = 1 [default = ERROR];
@@ -3210,9 +3482,9 @@ int Message::RequiredFieldsByteSizeFallback() const {
   }
 
   if (has_index()) {
-    // required int32 index = 2;
+    // required sint32 index = 2;
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
+      ::google::protobuf::internal::WireFormatLite::SInt32Size(
         this->index());
   }
 
@@ -3225,17 +3497,18 @@ int Message::RequiredFieldsByteSizeFallback() const {
 
   return total_size;
 }
-int Message::ByteSize() const {
-  int total_size = 0;
+size_t Message::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:com.mycelius.message.Message)
+  size_t total_size = 0;
 
   if (((_has_bits_[0] & 0x00000007) ^ 0x00000007) == 0) {  // All required fields are present.
     // required .com.mycelius.message.Message.MessageType type = 1 [default = ERROR];
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
 
-    // required int32 index = 2;
+    // required sint32 index = 2;
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
+      ::google::protobuf::internal::WireFormatLite::SInt32Size(
         this->index());
 
     // required int32 total = 3;
@@ -3295,26 +3568,39 @@ int Message::ByteSize() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         unknown_fields());
   }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = total_size;
+  _cached_size_ = cached_size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
   return total_size;
 }
 
 void Message::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:com.mycelius.message.Message)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  const Message* source = 
+  const Message* source =
       ::google::protobuf::internal::DynamicCastToGenerated<const Message>(
           &from);
   if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:com.mycelius.message.Message)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-    MergeFrom(*source);
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:com.mycelius.message.Message)
+    UnsafeMergeFrom(*source);
   }
 }
 
 void Message::MergeFrom(const Message& from) {
-  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+// @@protoc_insertion_point(class_specific_merge_from_start:com.mycelius.message.Message)
+  if (GOOGLE_PREDICT_TRUE(&from != this)) {
+    UnsafeMergeFrom(from);
+  } else {
+    MergeFromFail(__LINE__);
+  }
+}
+
+void Message::UnsafeMergeFrom(const Message& from) {
+  GOOGLE_DCHECK(&from != this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_type()) {
       set_type(from.type());
@@ -3349,20 +3635,23 @@ void Message::MergeFrom(const Message& from) {
     }
   }
   if (from._internal_metadata_.have_unknown_fields()) {
-    mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+    ::google::protobuf::UnknownFieldSet::MergeToInternalMetdata(
+      from.unknown_fields(), &_internal_metadata_);
   }
 }
 
 void Message::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:com.mycelius.message.Message)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Message::CopyFrom(const Message& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:com.mycelius.message.Message)
   if (&from == this) return;
   Clear();
-  MergeFrom(from);
+  UnsafeMergeFrom(from);
 }
 
 bool Message::IsInitialized() const {
@@ -3427,18 +3716,18 @@ void Message::clear_type() {
   type_ = 2;
   clear_has_type();
 }
- ::com::mycelius::message::Message_MessageType Message::type() const {
+::com::mycelius::message::Message_MessageType Message::type() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Message.type)
   return static_cast< ::com::mycelius::message::Message_MessageType >(type_);
 }
- void Message::set_type(::com::mycelius::message::Message_MessageType value) {
+void Message::set_type(::com::mycelius::message::Message_MessageType value) {
   assert(::com::mycelius::message::Message_MessageType_IsValid(value));
   set_has_type();
   type_ = value;
   // @@protoc_insertion_point(field_set:com.mycelius.message.Message.type)
 }
 
-// required int32 index = 2;
+// required sint32 index = 2;
 bool Message::has_index() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
@@ -3452,11 +3741,11 @@ void Message::clear_index() {
   index_ = 0;
   clear_has_index();
 }
- ::google::protobuf::int32 Message::index() const {
+::google::protobuf::int32 Message::index() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Message.index)
   return index_;
 }
- void Message::set_index(::google::protobuf::int32 value) {
+void Message::set_index(::google::protobuf::int32 value) {
   set_has_index();
   index_ = value;
   // @@protoc_insertion_point(field_set:com.mycelius.message.Message.index)
@@ -3476,11 +3765,11 @@ void Message::clear_total() {
   total_ = 0;
   clear_has_total();
 }
- ::google::protobuf::int32 Message::total() const {
+::google::protobuf::int32 Message::total() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Message.total)
   return total_;
 }
- void Message::set_total(::google::protobuf::int32 value) {
+void Message::set_total(::google::protobuf::int32 value) {
   set_has_total();
   total_ = value;
   // @@protoc_insertion_point(field_set:com.mycelius.message.Message.total)
@@ -3500,11 +3789,12 @@ void Message::clear_rqst() {
   if (rqst_ != NULL) rqst_->::com::mycelius::message::Request::Clear();
   clear_has_rqst();
 }
- const ::com::mycelius::message::Request& Message::rqst() const {
+const ::com::mycelius::message::Request& Message::rqst() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Message.rqst)
-  return rqst_ != NULL ? *rqst_ : *default_instance_->rqst_;
+  return rqst_ != NULL ? *rqst_
+                         : *::com::mycelius::message::Request::internal_default_instance();
 }
- ::com::mycelius::message::Request* Message::mutable_rqst() {
+::com::mycelius::message::Request* Message::mutable_rqst() {
   set_has_rqst();
   if (rqst_ == NULL) {
     rqst_ = new ::com::mycelius::message::Request;
@@ -3512,13 +3802,14 @@ void Message::clear_rqst() {
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Message.rqst)
   return rqst_;
 }
- ::com::mycelius::message::Request* Message::release_rqst() {
+::com::mycelius::message::Request* Message::release_rqst() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Message.rqst)
   clear_has_rqst();
   ::com::mycelius::message::Request* temp = rqst_;
   rqst_ = NULL;
   return temp;
 }
- void Message::set_allocated_rqst(::com::mycelius::message::Request* rqst) {
+void Message::set_allocated_rqst(::com::mycelius::message::Request* rqst) {
   delete rqst_;
   rqst_ = rqst;
   if (rqst) {
@@ -3543,11 +3834,12 @@ void Message::clear_rsp() {
   if (rsp_ != NULL) rsp_->::com::mycelius::message::Response::Clear();
   clear_has_rsp();
 }
- const ::com::mycelius::message::Response& Message::rsp() const {
+const ::com::mycelius::message::Response& Message::rsp() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Message.rsp)
-  return rsp_ != NULL ? *rsp_ : *default_instance_->rsp_;
+  return rsp_ != NULL ? *rsp_
+                         : *::com::mycelius::message::Response::internal_default_instance();
 }
- ::com::mycelius::message::Response* Message::mutable_rsp() {
+::com::mycelius::message::Response* Message::mutable_rsp() {
   set_has_rsp();
   if (rsp_ == NULL) {
     rsp_ = new ::com::mycelius::message::Response;
@@ -3555,13 +3847,14 @@ void Message::clear_rsp() {
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Message.rsp)
   return rsp_;
 }
- ::com::mycelius::message::Response* Message::release_rsp() {
+::com::mycelius::message::Response* Message::release_rsp() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Message.rsp)
   clear_has_rsp();
   ::com::mycelius::message::Response* temp = rsp_;
   rsp_ = NULL;
   return temp;
 }
- void Message::set_allocated_rsp(::com::mycelius::message::Response* rsp) {
+void Message::set_allocated_rsp(::com::mycelius::message::Response* rsp) {
   delete rsp_;
   rsp_ = rsp;
   if (rsp) {
@@ -3586,11 +3879,12 @@ void Message::clear_err() {
   if (err_ != NULL) err_->::com::mycelius::message::Error::Clear();
   clear_has_err();
 }
- const ::com::mycelius::message::Error& Message::err() const {
+const ::com::mycelius::message::Error& Message::err() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Message.err)
-  return err_ != NULL ? *err_ : *default_instance_->err_;
+  return err_ != NULL ? *err_
+                         : *::com::mycelius::message::Error::internal_default_instance();
 }
- ::com::mycelius::message::Error* Message::mutable_err() {
+::com::mycelius::message::Error* Message::mutable_err() {
   set_has_err();
   if (err_ == NULL) {
     err_ = new ::com::mycelius::message::Error;
@@ -3598,13 +3892,14 @@ void Message::clear_err() {
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Message.err)
   return err_;
 }
- ::com::mycelius::message::Error* Message::release_err() {
+::com::mycelius::message::Error* Message::release_err() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Message.err)
   clear_has_err();
   ::com::mycelius::message::Error* temp = err_;
   err_ = NULL;
   return temp;
 }
- void Message::set_allocated_err(::com::mycelius::message::Error* err) {
+void Message::set_allocated_err(::com::mycelius::message::Error* err) {
   delete err_;
   err_ = err;
   if (err) {
@@ -3629,11 +3924,12 @@ void Message::clear_evt() {
   if (evt_ != NULL) evt_->::com::mycelius::message::Event::Clear();
   clear_has_evt();
 }
- const ::com::mycelius::message::Event& Message::evt() const {
+const ::com::mycelius::message::Event& Message::evt() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Message.evt)
-  return evt_ != NULL ? *evt_ : *default_instance_->evt_;
+  return evt_ != NULL ? *evt_
+                         : *::com::mycelius::message::Event::internal_default_instance();
 }
- ::com::mycelius::message::Event* Message::mutable_evt() {
+::com::mycelius::message::Event* Message::mutable_evt() {
   set_has_evt();
   if (evt_ == NULL) {
     evt_ = new ::com::mycelius::message::Event;
@@ -3641,13 +3937,14 @@ void Message::clear_evt() {
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Message.evt)
   return evt_;
 }
- ::com::mycelius::message::Event* Message::release_evt() {
+::com::mycelius::message::Event* Message::release_evt() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Message.evt)
   clear_has_evt();
   ::com::mycelius::message::Event* temp = evt_;
   evt_ = NULL;
   return temp;
 }
- void Message::set_allocated_evt(::com::mycelius::message::Event* evt) {
+void Message::set_allocated_evt(::com::mycelius::message::Event* evt) {
   delete evt_;
   evt_ = evt;
   if (evt) {
@@ -3672,36 +3969,37 @@ void Message::clear_data() {
   data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_data();
 }
- const ::std::string& Message::data() const {
+const ::std::string& Message::data() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Message.data)
   return data_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Message::set_data(const ::std::string& value) {
+void Message::set_data(const ::std::string& value) {
   set_has_data();
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:com.mycelius.message.Message.data)
 }
- void Message::set_data(const char* value) {
+void Message::set_data(const char* value) {
   set_has_data();
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:com.mycelius.message.Message.data)
 }
- void Message::set_data(const void* value, size_t size) {
+void Message::set_data(const void* value, size_t size) {
   set_has_data();
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Message.data)
 }
- ::std::string* Message::mutable_data() {
+::std::string* Message::mutable_data() {
   set_has_data();
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Message.data)
   return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* Message::release_data() {
+::std::string* Message::release_data() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Message.data)
   clear_has_data();
   return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Message::set_allocated_data(::std::string* data) {
+void Message::set_allocated_data(::std::string* data) {
   if (data != NULL) {
     set_has_data();
   } else {
@@ -3725,36 +4023,37 @@ void Message::clear_id() {
   id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_id();
 }
- const ::std::string& Message::id() const {
+const ::std::string& Message::id() const {
   // @@protoc_insertion_point(field_get:com.mycelius.message.Message.id)
   return id_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Message::set_id(const ::std::string& value) {
+void Message::set_id(const ::std::string& value) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:com.mycelius.message.Message.id)
 }
- void Message::set_id(const char* value) {
+void Message::set_id(const char* value) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:com.mycelius.message.Message.id)
 }
- void Message::set_id(const char* value, size_t size) {
+void Message::set_id(const char* value, size_t size) {
   set_has_id();
   id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:com.mycelius.message.Message.id)
 }
- ::std::string* Message::mutable_id() {
+::std::string* Message::mutable_id() {
   set_has_id();
   // @@protoc_insertion_point(field_mutable:com.mycelius.message.Message.id)
   return id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- ::std::string* Message::release_id() {
+::std::string* Message::release_id() {
+  // @@protoc_insertion_point(field_release:com.mycelius.message.Message.id)
   clear_has_id();
   return id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
- void Message::set_allocated_id(::std::string* id) {
+void Message::set_allocated_id(::std::string* id) {
   if (id != NULL) {
     set_has_id();
   } else {
@@ -3764,6 +4063,9 @@ void Message::clear_id() {
   // @@protoc_insertion_point(field_set_allocated:com.mycelius.message.Message.id)
 }
 
+inline const Message* Message::internal_default_instance() {
+  return &Message_default_instance_.get();
+}
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // @@protoc_insertion_point(namespace_scope)

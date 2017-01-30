@@ -9,7 +9,7 @@ CONFIG         += plugin
 QT             += widgets
 INCLUDEPATH    +=
 TARGET          = sayhelloplugin
-DESTDIR         = ../plugins
+DESTDIR         = ../WebApp/Cargo/bin/plugins
 CONFIG += c++11
 
 HEADERS += \

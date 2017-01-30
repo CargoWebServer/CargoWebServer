@@ -25,17 +25,13 @@
   *@constructor
  * @extends EventManager
  */
-var FileManager = function (id) {
+var FileManager = function () {
 
     if (server == undefined) {
         return
     }
 
-    if (id == undefined) {
-        id = randomUUID()
-    }
-
-    EventManager.call(this, id, FileEvent)
+    EventManager.call(this, FileEvent)
 
     return this
 }

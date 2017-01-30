@@ -7,6 +7,8 @@
 #include <QMetaObject>
 #include <QMetaMethod>
 #include <QVariantList>
+#include <QJsonArray>
+#include <QJsonDocument>
 
 QVariant CallMethod(QObject* object, QMetaMethod metaMethod, QVariantList args)
 {
@@ -14,7 +16,7 @@ QVariant CallMethod(QObject* object, QMetaMethod metaMethod, QVariantList args)
     QVariantList converted;
 
     // We need enough arguments to perform the conversion.
-    QList<QByteArray> methodTypes = metaMethod.parameterTypes();
+   QList<QByteArray> methodTypes = metaMethod.parameterTypes();
     if (methodTypes.size() < args.size()) {
         qDebug() << "Insufficient arguments to call" << metaMethod.name();
         return QVariant();
@@ -27,7 +29,8 @@ QVariant CallMethod(QObject* object, QMetaMethod metaMethod, QVariantList args)
         QByteArray argTypeName = arg.typeName();
 
         QVariant::Type methodType = QVariant::nameToType(methodTypeName);
-        QVariant copy = QVariant(arg);
+
+        QVariant copy = QVariant::fromValue(arg);
 
         // If the types are not the same, attempt a conversion. If it
         // fails, we cannot proceed.
@@ -126,23 +129,36 @@ void Action::run()
     // run the command here...
     // http://doc.qt.io/qt-5/qmetaobject.html
     QVariantList list;
-    QString prototype = QString::fromStdString(this->name.toStdString());
 
-    prototype += "(";
-    // no more than 10 paremeter are allow...!!!
-    for(int i=0; i < this->params.size(); i++){
-        list.append(this->params[i]->value);
-        prototype += this->params[i]->typeName;
-        if(i < this->params.size() - 1 && this->params.size() > 1){
-            prototype += ",";
+    // Here I will recreate the action prototype from it list of parameter...
+    QString prototype;
+
+    if(this->name == "ExecuteJsFunction") {
+        prototype = "ExecuteJsFunction(QVariantList)";
+        // Append the function parameters here...
+        QVariantList arg;
+        for(int i=0; i < this->params.size(); i++){
+            arg.append(this->params[i]->value);
         }
+        list.push_back(arg);
+    }else{
+        prototype = this->name;
+        prototype += "(";
+        // no more than 10 paremeter are allow...!!!
+        for(int i=0; i < this->params.size(); i++){
+            list.append(this->params[i]->value);
+            prototype += this->params[i]->typeName;
+            if(i < this->params.size() - 1 && this->params.size() > 1){
+                prototype += ",";
+            }
+        }
+        prototype += ")";
     }
-    prototype += ")";
 
     // Test object here...
-    QObject* obj = ServiceContainer::getInstance()->getObjectByTypeName("totot");
+    QObject* obj = ServiceContainer::getInstance();
 
-    // Retreive the object method here...
+    // Retreive the object function.
     int index = obj->metaObject()->indexOfSlot(prototype.toStdString().c_str());
     QMetaMethod metaMethod = obj->metaObject()->method(index);
     QVariant retVal = CallMethod(obj, metaMethod, list);
@@ -157,25 +173,43 @@ void Action::run()
     com::mycelius::message::Response*  rsp = new com::mycelius::message::Response();
     rsp->set_id(this->id.toStdString());
 
-
     // So here I will create the response and send it back to the caller...
     if(retVal.isValid()){
         com::mycelius::message::Data* d = rsp->add_results();;
         d->set_name("result");
-        if(retVal.canConvert(QMetaType::QString)){
-            // The type is a string...
-            qDebug() << "The result is a string";
-            d->set_type(::com::mycelius::message::Data_DataType_STRING);
-            d->set_databytes(retVal.toString().toStdString());
-        }else if(retVal.canConvert(QMetaType::Int)){
+        if(retVal.type() == QMetaType::QStringList){
+            // The type is a string list...
+            qDebug() << "The result is a string list";
+            d->set_type(::com::mycelius::message::Data_DataType_JSON_STR);
+            QJsonDocument doc;
+            doc.setArray(::QJsonArray::fromStringList(retVal.toStringList()));
+
+            // So here I will
+            d->set_databytes(doc.toJson().toStdString());
+        }else if(retVal.type() == QMetaType::QVariantList){
+            // The type is a string list...
+            qDebug() << "The result is a variant list";
+            d->set_type(::com::mycelius::message::Data_DataType_JSON_STR);
+            QJsonDocument doc;
+            doc.setArray(::QJsonArray::fromVariantList(retVal.toList()));
+
+            // So here I will
+            d->set_databytes(doc.toJson().toStdString());
+
+        } else if(retVal.type() == QMetaType::Int){
             // The type is a integer...
             qDebug() << "The result is an integer";
             d->set_type(::com::mycelius::message::Data_DataType_INTEGER);
             d->set_databytes(retVal.toString().toStdString());
-        }else if(retVal.canConvert(QMetaType::Double)){
+        }else if(retVal.type() == QMetaType::Double){
             // The type is a float...
             qDebug() << "The result is a double";
             d->set_type(::com::mycelius::message::Data_DataType_DOUBLE);
+            d->set_databytes(retVal.toString().toStdString());
+        }else if(retVal.canConvert(QMetaType::QString)){
+            // The type is a string...
+            qDebug() << "The result is a string";
+            d->set_type(::com::mycelius::message::Data_DataType_STRING);
             d->set_databytes(retVal.toString().toStdString());
         }
     }else{

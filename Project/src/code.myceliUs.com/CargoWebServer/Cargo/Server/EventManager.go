@@ -13,7 +13,7 @@ import (
 
 const (
 	AccountEvent                   = "AccountEvent"
-	AccountRegisterSucessEvent     = 0
+	AccountRegisterSuccessEvent    = 0
 	AccountConfirmationSucessEvent = 1
 	SessionEvent                   = "SessionEvent"
 	LoginEvent                     = 4
@@ -35,8 +35,6 @@ const (
 	NewFileEvent                   = 17
 	DeleteFileEvent                = 18
 	UpdateFileEvent                = 19
-	OpenFileEvent                  = 20
-	CloseFileEvent                 = 21
 	TableEvent                     = "TableEvent"
 	DeleteRowEvent                 = 22
 	NewRowEvent                    = 23
@@ -45,6 +43,8 @@ const (
 	NewRoleEvent                   = 25
 	DeleteRoleEvent                = 26
 	UpdateRoleEvent                = 27
+	ProjectEvent                   = "ProjectEvent"
+	EmailEvent                     = "EmailEvent"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,6 +83,10 @@ func newEventManager() *EventManager {
  */
 func (this *EventManager) Initialize() {
 	this.m_eventDataMap = make(map[*Event]string, 0)
+}
+
+func (this *EventManager) GetId() string {
+	return "EventManager"
 }
 
 func (this *EventManager) Start() {

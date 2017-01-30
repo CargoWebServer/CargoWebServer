@@ -9,8 +9,8 @@ var languageInfo = {
 /**
  * This function is the entry point of the application...
  */
- function main() {
-    eventTests()
+function main() {
+    // eventTests()
     // Append filter to receive all session event message
     // on the sessionEvent channel.
     //securityTests()
@@ -36,7 +36,7 @@ var languageInfo = {
          undefined
      )
     */
-     
+
 
     // utilityTests()
     //serverTests()
@@ -51,15 +51,15 @@ var languageInfo = {
 
     //entityTests()
 
-    //testDynamicEntity()
+    testDynamicEntity()
 
-    // entityDump("item_1", "Test.Item")
+     entityDump("item_1", "Test.Item")
 
     //entitiesDump("COLLADASchema.COLLADA")
 
     //entitiesDump("XPDMXML.ProcessStructureType")
     //entitiesDump("DT3_informations.Workpoint")
-    
+
     //testEntityQuery()
 
     //TestWebRtc2()
@@ -68,7 +68,7 @@ var languageInfo = {
     // TestUploadFile()
 
     // Test get bmpn defintion instance...
-    /*
+  /*
     server.entityManager.getEntityPrototypes("Test",
         // Success callback.
         function (result, caller) {
@@ -115,8 +115,48 @@ var languageInfo = {
 
         }, {})
     */
+   // testServiceContainer()
 }
 
+function testServiceContainer() {
+    // Let us open a connection to a server... the service container.
+    var service = new Server("localhost", "127.0.0.1", 9494)
+    service.conn = initConnection("ws://" + service.ipv4 + ":" + service.port.toString(),
+        function () {
+            return function () {
+                console.log("Service is open!")
+                
+                // Now run a script...
+                function TestSayHelloPlugin(to){
+                    var msg = SayHello.sayHelloTo(to)
+                    return msg
+                }
+              
+                var params = []
+                params.push(new RpcData({ "name": "rootPath", "type": 2, "dataBytes": utf8_to_b64("Mr. Kavalec!!!") }))
+
+                // Call it on the server.
+                service.executeJsFunction(
+                    TestSayHelloPlugin.toString(), // The function to execute remotely on server
+                    params, // The parameters to pass to that function
+                    function (index, total, caller) { // The progress callback
+                        // Nothing special to do here.
+                    },
+                    function (result, caller) {
+                        console.log(result[0])
+
+                    },
+                    function (errMsg, caller) {
+
+                    }, // Error callback
+                    {} // The caller
+                )
+            }
+        } (service),
+        function () {
+            console.log("Service is close!")
+        })
+}
 
 function testEntityQuery() {
     //{"TypeName":"CargoEntities.Log","Fields":["uuid"],"Indexs":["M_id=defaultErrorLogger"],"Query":""}
@@ -282,7 +322,7 @@ function TestWebRtc1() {
                 }
             } (videoPanel),
             function (err) { }
-            );
+        );
     } else {
         alert("Sorry, your browser does not support getUserMedia.");
     }
@@ -292,8 +332,8 @@ function TestWebRtc1() {
 function TestWebRtc2() {
     var panel = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "display: table" })
     panel.appendElement({ "tag": "div", "style": "display:table-row" }).down().appendElement({ "tag": "video", "id": "video", autoplay: "", "style": "diplay: table-cell" })
-    .appendElement({ "tag": "canvas", "id": "canvas", "style": "diplay: table-cell, min-width: 640px;" }).up()
-    .appendElement({ "tag": "div", "style": "display:table-row; text-align: center;" }).down().appendElement({ "tag": "button", "id": "button", "style": "display: table-cell;", "innerHtml": "Selfy!" })
+        .appendElement({ "tag": "canvas", "id": "canvas", "style": "diplay: table-cell, min-width: 640px;" }).up()
+        .appendElement({ "tag": "div", "style": "display:table-row; text-align: center;" }).down().appendElement({ "tag": "button", "id": "button", "style": "display: table-cell;", "innerHtml": "Selfy!" })
 
     var video = panel.getChildById("video")
     var canvas = panel.getChildById("canvas")
@@ -313,9 +353,9 @@ function TestWebRtc2() {
                 streaming = true
             }
         } (video, canvas),
-        function (error) {
-            console.log("Raised an error when capturing:", error);
-        });
+            function (error) {
+                console.log("Raised an error when capturing:", error);
+            });
 
         button.element.addEventListener('click',
             function (canvas, video) {
