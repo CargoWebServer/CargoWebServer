@@ -2,12 +2,11 @@ package Server
 
 import (
 	"encoding/json"
+	"strings"
 
 	"code.google.com/p/go-uuid/uuid"
 	"code.myceliUs.com/CargoWebServer/Cargo/Config/CargoConfig"
 	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
-	//	"log"
-	"strings"
 )
 
 /** Entity Prototype creation **/
@@ -16,11 +15,12 @@ func (this *EntityManager) Create_CargoConfig_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "CargoConfig.Configuration"
 	configurationEntityProto.IsAbstract = true
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "CargoConfig.SmtpConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "CargoConfig.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "CargoConfig.LdapConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "CargoConfig.ServiceConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "CargoConfig.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "CargoConfig.ServerConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "CargoConfig.SmtpConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "CargoConfig.DataStoreConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "uuid")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "uuid")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -1930,6 +1930,582 @@ func (this *CargoConfig_LdapConfigurationEntity) AppendReference(reference Entit
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+//              			ServiceConfiguration
+////////////////////////////////////////////////////////////////////////////////
+/** local type **/
+type CargoConfig_ServiceConfigurationEntity struct {
+	/** not the object id, except for the definition **/
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	referenced     []EntityRef
+	object         *CargoConfig.ServiceConfiguration
+}
+
+/** Constructor function **/
+func (this *EntityManager) NewCargoConfigServiceConfigurationEntity(objectId string, object interface{}) *CargoConfig_ServiceConfigurationEntity {
+	var uuidStr string
+	if len(objectId) > 0 {
+		if Utility.IsValidEntityReferenceName(objectId) {
+			uuidStr = objectId
+		} else {
+			uuidStr = CargoConfigServiceConfigurationExists(objectId)
+		}
+	}
+	if object != nil {
+		object.(*CargoConfig.ServiceConfiguration).TYPENAME = "CargoConfig.ServiceConfiguration"
+	}
+	if len(uuidStr) > 0 {
+		if object != nil {
+			object.(*CargoConfig.ServiceConfiguration).UUID = uuidStr
+		}
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
+				this.setObjectValues(val, object)
+
+			}
+			return val.(*CargoConfig_ServiceConfigurationEntity)
+		}
+	} else {
+		uuidStr = "CargoConfig.ServiceConfiguration%" + uuid.NewRandom().String()
+	}
+	entity := new(CargoConfig_ServiceConfigurationEntity)
+	if object == nil {
+		entity.object = new(CargoConfig.ServiceConfiguration)
+		entity.SetNeedSave(true)
+	} else {
+		entity.object = object.(*CargoConfig.ServiceConfiguration)
+		entity.SetNeedSave(true)
+	}
+	entity.object.TYPENAME = "CargoConfig.ServiceConfiguration"
+
+	entity.object.UUID = uuidStr
+	entity.SetInit(false)
+	entity.uuid = uuidStr
+	this.insert(entity)
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoConfig.ServiceConfiguration", "CargoConfig")
+	entity.prototype = prototype
+	return entity
+}
+
+/** Entity functions **/
+func (this *CargoConfig_ServiceConfigurationEntity) GetTypeName() string {
+	return "CargoConfig.ServiceConfiguration"
+}
+func (this *CargoConfig_ServiceConfigurationEntity) GetUuid() string {
+	return this.uuid
+}
+func (this *CargoConfig_ServiceConfigurationEntity) GetParentPtr() Entity {
+	return this.parentPtr
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) AppendReferenced(name string, owner Entity) {
+	if owner.GetUuid() == this.GetUuid() {
+		return
+	}
+	var ref EntityRef
+	ref.Name = name
+	ref.OwnerUuid = owner.GetUuid()
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
+		}
+	}
+	this.referenced = append(this.referenced, ref)
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) GetReferenced() []EntityRef {
+	return this.referenced
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) RemoveReferenced(name string, owner Entity) {
+	var referenced []EntityRef
+	referenced = make([]EntityRef, 0)
+	for i := 0; i < len(this.referenced); i++ {
+		ref := this.referenced[i]
+		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
+			referenced = append(referenced, ref)
+		}
+	}
+	// Set the reference.
+	this.referenced = referenced
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) RemoveReference(name string, reference Entity) {
+	refsUuid := make([]string, 0)
+	refsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid != reference.GetUuid() {
+			refsPtr = append(refsPtr, reference)
+			refsUuid = append(refsUuid, reference.GetUuid())
+		}
+	}
+	// Set the new array...
+	this.SetReferencesUuid(refsUuid)
+	this.SetReferencesPtr(refsPtr)
+
+	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
+	params := make([]interface{}, 1)
+	params[0] = reference.GetObject()
+	Utility.CallMethod(this.GetObject(), removeMethode, params)
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) GetChildsPtr() []Entity {
+	return this.childsPtr
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) SetChildsPtr(childsPtr []Entity) {
+	this.childsPtr = childsPtr
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) GetChildsUuid() []string {
+	return this.childsUuid
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) SetChildsUuid(childsUuid []string) {
+	this.childsUuid = childsUuid
+}
+
+/**
+ * Remove a chidl uuid form the list of child in an entity.
+ */
+func (this *CargoConfig_ServiceConfigurationEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
+	params := make([]interface{}, 1)
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
+			params[0] = this.GetChildsPtr()[i].GetObject()
+		}
+	}
+	this.childsPtr = childsPtr
+
+	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
+	Utility.CallMethod(this.GetObject(), removeMethode, params)
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) GetReferencesUuid() []string {
+	return this.referencesUuid
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) SetReferencesUuid(refsUuid []string) {
+	this.referencesUuid = refsUuid
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) GetReferencesPtr() []Entity {
+	return this.referencesPtr
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) SetReferencesPtr(refsPtr []Entity) {
+	this.referencesPtr = refsPtr
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) GetObject() interface{} {
+	return this.object
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) NeedSave() bool {
+	return this.object.NeedSave
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) SetNeedSave(needSave bool) {
+	this.object.NeedSave = needSave
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) IsInit() bool {
+	return this.object.IsInit
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) SetInit(isInit bool) {
+	this.object.IsInit = isInit
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) GetChecksum() string {
+	objectStr, _ := json.Marshal(this.object)
+	return Utility.GetMD5Hash(string(objectStr))
+}
+
+func (this *CargoConfig_ServiceConfigurationEntity) Exist() bool {
+	var query EntityQuery
+	query.TypeName = "CargoConfig.ServiceConfiguration"
+	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Fields = append(query.Fields, "uuid")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(CargoConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return false
+	}
+	return len(results[0][0].(string)) > 0
+
+}
+
+/**
+* Return the entity prototype.
+ */
+func (this *CargoConfig_ServiceConfigurationEntity) GetPrototype() *EntityPrototype {
+	return this.prototype
+}
+
+/** Entity Prototype creation **/
+func (this *EntityManager) Create_CargoConfig_ServiceConfigurationEntityPrototype() {
+
+	var serviceConfigurationEntityProto EntityPrototype
+	serviceConfigurationEntityProto.TypeName = "CargoConfig.ServiceConfiguration"
+	serviceConfigurationEntityProto.SuperTypeNames = append(serviceConfigurationEntityProto.SuperTypeNames, "CargoConfig.Configuration")
+	serviceConfigurationEntityProto.Ids = append(serviceConfigurationEntityProto.Ids, "uuid")
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "uuid")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 0)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
+	serviceConfigurationEntityProto.Indexs = append(serviceConfigurationEntityProto.Indexs, "parentUuid")
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "parentUuid")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 1)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
+
+	/** members of Configuration **/
+	serviceConfigurationEntityProto.Ids = append(serviceConfigurationEntityProto.Ids, "M_id")
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 2)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_id")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.ID")
+
+	/** members of ServiceConfiguration **/
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 3)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_hostName")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 4)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_ipv4")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 5)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_port")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.int")
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 6)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_user")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 7)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_pwd")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 8)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_start")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.bool")
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "childsUuid")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "[]xs.string")
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 9)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
+
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "referenced")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "[]EntityRef")
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 10)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
+
+	store := GetServer().GetDataManager().getDataStore(CargoConfigDB).(*KeyValueDataStore)
+	store.SetEntityPrototype(&serviceConfigurationEntityProto)
+
+}
+
+/** Create **/
+func (this *CargoConfig_ServiceConfigurationEntity) SaveEntity() {
+	if this.object.NeedSave == false {
+		return
+	}
+
+	this.SetNeedSave(false)
+	this.SetInit(true)
+	this.object.UUID = this.uuid
+	this.object.TYPENAME = "CargoConfig.ServiceConfiguration"
+
+	var query EntityQuery
+	query.TypeName = "CargoConfig.ServiceConfiguration"
+
+	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "parentUuid")
+
+	/** members of Configuration **/
+	query.Fields = append(query.Fields, "M_id")
+
+	/** members of ServiceConfiguration **/
+	query.Fields = append(query.Fields, "M_hostName")
+	query.Fields = append(query.Fields, "M_ipv4")
+	query.Fields = append(query.Fields, "M_port")
+	query.Fields = append(query.Fields, "M_user")
+	query.Fields = append(query.Fields, "M_pwd")
+	query.Fields = append(query.Fields, "M_start")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	var ServiceConfigurationInfo []interface{}
+
+	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.GetUuid())
+	if this.parentPtr != nil {
+		ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.parentPtr.GetUuid())
+	} else {
+		ServiceConfigurationInfo = append(ServiceConfigurationInfo, "")
+	}
+
+	/** members of Configuration **/
+	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_id)
+
+	/** members of ServiceConfiguration **/
+	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_hostName)
+	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_ipv4)
+	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_port)
+	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_user)
+	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_pwd)
+	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_start)
+	childsUuidStr, _ := json.Marshal(this.childsUuid)
+	ServiceConfigurationInfo = append(ServiceConfigurationInfo, string(childsUuidStr))
+	referencedStr, _ := json.Marshal(this.referenced)
+	ServiceConfigurationInfo = append(ServiceConfigurationInfo, string(referencedStr))
+	eventData := make([]*MessageData, 1)
+	msgData := new(MessageData)
+	msgData.Name = "entity"
+	msgData.Value = this.GetObject()
+	eventData[0] = msgData
+	var err error
+	var evt *Event
+	if this.Exist() == true {
+		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
+		var params []interface{}
+		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		queryStr, _ := json.Marshal(query)
+		err = GetServer().GetDataManager().updateData(CargoConfigDB, string(queryStr), ServiceConfigurationInfo, params)
+	} else {
+		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
+		queryStr, _ := json.Marshal(query)
+		_, err = GetServer().GetDataManager().createData(CargoConfigDB, string(queryStr), ServiceConfigurationInfo)
+	}
+	if err == nil {
+		GetServer().GetEntityManager().insert(this)
+		GetServer().GetEntityManager().setReferences(this)
+		GetServer().GetEventManager().BroadcastEvent(evt)
+	}
+}
+
+/** Read **/
+func (this *CargoConfig_ServiceConfigurationEntity) InitEntity(id string) error {
+	if this.object.IsInit == true {
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		if err == nil {
+			// Return the already initialyse entity.
+			this = entity.(*CargoConfig_ServiceConfigurationEntity)
+			return nil
+		}
+		// I must reinit the entity if the entity manager dosent have it.
+		this.object.IsInit = false
+	}
+	this.uuid = id
+
+	// Set the reference on the map
+	var query EntityQuery
+	query.TypeName = "CargoConfig.ServiceConfiguration"
+
+	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "parentUuid")
+
+	/** members of Configuration **/
+	query.Fields = append(query.Fields, "M_id")
+
+	/** members of ServiceConfiguration **/
+	query.Fields = append(query.Fields, "M_hostName")
+	query.Fields = append(query.Fields, "M_ipv4")
+	query.Fields = append(query.Fields, "M_port")
+	query.Fields = append(query.Fields, "M_user")
+	query.Fields = append(query.Fields, "M_pwd")
+	query.Fields = append(query.Fields, "M_start")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	var results [][]interface{}
+	var err error
+	queryStr, _ := json.Marshal(query)
+
+	results, err = GetServer().GetDataManager().readData(CargoConfigDB, string(queryStr), fieldsType, params)
+	if err != nil {
+		return err
+	}
+	// Initialisation of information of ServiceConfiguration...
+	if len(results) > 0 {
+
+		/** initialyzation of the entity object **/
+		this.object = new(CargoConfig.ServiceConfiguration)
+		this.object.UUID = this.uuid
+		this.object.TYPENAME = "CargoConfig.ServiceConfiguration"
+
+		this.parentUuid = results[0][1].(string)
+
+		/** members of Configuration **/
+
+		/** id **/
+		if results[0][2] != nil {
+			this.object.M_id = results[0][2].(string)
+		}
+
+		/** members of ServiceConfiguration **/
+
+		/** hostName **/
+		if results[0][3] != nil {
+			this.object.M_hostName = results[0][3].(string)
+		}
+
+		/** ipv4 **/
+		if results[0][4] != nil {
+			this.object.M_ipv4 = results[0][4].(string)
+		}
+
+		/** port **/
+		if results[0][5] != nil {
+			this.object.M_port = results[0][5].(int)
+		}
+
+		/** user **/
+		if results[0][6] != nil {
+			this.object.M_user = results[0][6].(string)
+		}
+
+		/** pwd **/
+		if results[0][7] != nil {
+			this.object.M_pwd = results[0][7].(string)
+		}
+
+		/** start **/
+		if results[0][8] != nil {
+			this.object.M_start = results[0][8].(bool)
+		}
+		childsUuidStr := results[0][9].(string)
+		this.childsUuid = make([]string, 0)
+		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+		if err != nil {
+			return err
+		}
+
+		referencedStr := results[0][10].(string)
+		this.referenced = make([]EntityRef, 0)
+		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+		if err != nil {
+			return err
+		}
+	}
+
+	// set need save to false.
+	this.SetNeedSave(false)
+	// set init done.
+	this.SetInit(true)
+	// Init the references...
+	GetServer().GetEntityManager().InitEntity(this)
+	return nil
+}
+
+/** instantiate a new entity from an existing object. **/
+func (this *EntityManager) NewCargoConfigServiceConfigurationEntityFromObject(object *CargoConfig.ServiceConfiguration) *CargoConfig_ServiceConfigurationEntity {
+	return this.NewCargoConfigServiceConfigurationEntity(object.UUID, object)
+}
+
+/** Delete **/
+func (this *CargoConfig_ServiceConfigurationEntity) DeleteEntity() {
+	GetServer().GetEntityManager().deleteEntity(this)
+}
+
+/** Exists **/
+func CargoConfigServiceConfigurationExists(val string) string {
+	var query EntityQuery
+	query.TypeName = "CargoConfig.ServiceConfiguration"
+	query.Indexs = append(query.Indexs, "M_id="+val)
+	query.Fields = append(query.Fields, "uuid")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(CargoConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return ""
+	}
+	return results[0][0].(string)
+}
+
+/** Append child entity into parent entity. **/
+func (this *CargoConfig_ServiceConfigurationEntity) AppendChild(attributeName string, child Entity) error {
+
+	// Append child if is not there...
+	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
+		this.childsUuid = append(this.childsUuid, child.GetUuid())
+		this.childsPtr = append(this.childsPtr, child)
+	} else {
+		childsPtr := make([]Entity, 0)
+		for i := 0; i < len(this.childsPtr); i++ {
+			if this.childsPtr[i].GetUuid() != child.GetUuid() {
+				childsPtr = append(childsPtr, this.childsPtr[i])
+			}
+		}
+		childsPtr = append(childsPtr, child)
+		this.SetChildsPtr(childsPtr)
+	}
+	// Set this as parent in the child
+	child.SetParentPtr(this)
+
+	params := make([]interface{}, 1)
+	params[0] = child.GetObject()
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
+	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
+	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
+	if invalidMethod != nil {
+		return invalidMethod.(error)
+	}
+	return nil
+}
+
+/** Append reference entity into parent entity. **/
+func (this *CargoConfig_ServiceConfigurationEntity) AppendReference(reference Entity) {
+
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 //              			ApplicationConfiguration
 ////////////////////////////////////////////////////////////////////////////////
 /** local type **/
@@ -2748,50 +3324,54 @@ func (this *EntityManager) Create_CargoConfig_ServerConfigurationEntityPrototype
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 5)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_port")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_serverPort")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.int")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 6)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_applicationsPath")
-	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_servicePort")
+	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.int")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 7)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_dataPath")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_applicationsPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 8)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_scriptsPath")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_dataPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 9)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_definitionsPath")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_scriptsPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 10)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_schemasPath")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_definitionsPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 11)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_tmpPath")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_schemasPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 12)
+	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_tmpPath")
+	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 13)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_binPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 
 	/** associations of ServerConfiguration **/
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 13)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 14)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_parentPtr")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "CargoConfig.Configurations:Ref")
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "childsUuid")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "[]xs.string")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 14)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 15)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "referenced")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "[]EntityRef")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 15)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 16)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(CargoConfigDB).(*KeyValueDataStore)
@@ -2822,7 +3402,8 @@ func (this *CargoConfig_ServerConfigurationEntity) SaveEntity() {
 	/** members of ServerConfiguration **/
 	query.Fields = append(query.Fields, "M_hostName")
 	query.Fields = append(query.Fields, "M_ipv4")
-	query.Fields = append(query.Fields, "M_port")
+	query.Fields = append(query.Fields, "M_serverPort")
+	query.Fields = append(query.Fields, "M_servicePort")
 	query.Fields = append(query.Fields, "M_applicationsPath")
 	query.Fields = append(query.Fields, "M_dataPath")
 	query.Fields = append(query.Fields, "M_scriptsPath")
@@ -2851,7 +3432,8 @@ func (this *CargoConfig_ServerConfigurationEntity) SaveEntity() {
 	/** members of ServerConfiguration **/
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_hostName)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_ipv4)
-	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_port)
+	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_serverPort)
+	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_servicePort)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_applicationsPath)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_dataPath)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_scriptsPath)
@@ -2920,7 +3502,8 @@ func (this *CargoConfig_ServerConfigurationEntity) InitEntity(id string) error {
 	/** members of ServerConfiguration **/
 	query.Fields = append(query.Fields, "M_hostName")
 	query.Fields = append(query.Fields, "M_ipv4")
-	query.Fields = append(query.Fields, "M_port")
+	query.Fields = append(query.Fields, "M_serverPort")
+	query.Fields = append(query.Fields, "M_servicePort")
 	query.Fields = append(query.Fields, "M_applicationsPath")
 	query.Fields = append(query.Fields, "M_dataPath")
 	query.Fields = append(query.Fields, "M_scriptsPath")
@@ -2975,51 +3558,56 @@ func (this *CargoConfig_ServerConfigurationEntity) InitEntity(id string) error {
 			this.object.M_ipv4 = results[0][4].(string)
 		}
 
-		/** port **/
+		/** serverPort **/
 		if results[0][5] != nil {
-			this.object.M_port = results[0][5].(int)
+			this.object.M_serverPort = results[0][5].(int)
+		}
+
+		/** servicePort **/
+		if results[0][6] != nil {
+			this.object.M_servicePort = results[0][6].(int)
 		}
 
 		/** applicationsPath **/
-		if results[0][6] != nil {
-			this.object.M_applicationsPath = results[0][6].(string)
+		if results[0][7] != nil {
+			this.object.M_applicationsPath = results[0][7].(string)
 		}
 
 		/** dataPath **/
-		if results[0][7] != nil {
-			this.object.M_dataPath = results[0][7].(string)
+		if results[0][8] != nil {
+			this.object.M_dataPath = results[0][8].(string)
 		}
 
 		/** scriptsPath **/
-		if results[0][8] != nil {
-			this.object.M_scriptsPath = results[0][8].(string)
+		if results[0][9] != nil {
+			this.object.M_scriptsPath = results[0][9].(string)
 		}
 
 		/** definitionsPath **/
-		if results[0][9] != nil {
-			this.object.M_definitionsPath = results[0][9].(string)
+		if results[0][10] != nil {
+			this.object.M_definitionsPath = results[0][10].(string)
 		}
 
 		/** schemasPath **/
-		if results[0][10] != nil {
-			this.object.M_schemasPath = results[0][10].(string)
+		if results[0][11] != nil {
+			this.object.M_schemasPath = results[0][11].(string)
 		}
 
 		/** tmpPath **/
-		if results[0][11] != nil {
-			this.object.M_tmpPath = results[0][11].(string)
+		if results[0][12] != nil {
+			this.object.M_tmpPath = results[0][12].(string)
 		}
 
 		/** binPath **/
-		if results[0][12] != nil {
-			this.object.M_binPath = results[0][12].(string)
+		if results[0][13] != nil {
+			this.object.M_binPath = results[0][13].(string)
 		}
 
 		/** associations of ServerConfiguration **/
 
 		/** parentPtr **/
-		if results[0][13] != nil {
-			id := results[0][13].(string)
+		if results[0][14] != nil {
+			id := results[0][14].(string)
 			if len(id) > 0 {
 				refTypeName := "CargoConfig.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -3027,14 +3615,14 @@ func (this *CargoConfig_ServerConfigurationEntity) InitEntity(id string) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][14].(string)
+		childsUuidStr := results[0][15].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 		if err != nil {
 			return err
 		}
 
-		referencedStr := results[0][15].(string)
+		referencedStr := results[0][16].(string)
 		this.referenced = make([]EntityRef, 0)
 		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 		if err != nil {
@@ -3875,6 +4463,7 @@ func (this *EntityManager) RegisterCargoConfigObjects() {
 	Utility.RegisterType((*CargoConfig.SmtpConfiguration)(nil))
 	Utility.RegisterType((*CargoConfig.DataStoreConfiguration)(nil))
 	Utility.RegisterType((*CargoConfig.LdapConfiguration)(nil))
+	Utility.RegisterType((*CargoConfig.ServiceConfiguration)(nil))
 	Utility.RegisterType((*CargoConfig.ApplicationConfiguration)(nil))
 	Utility.RegisterType((*CargoConfig.ServerConfiguration)(nil))
 	Utility.RegisterType((*CargoConfig.Configurations)(nil))
@@ -3886,6 +4475,7 @@ func (this *EntityManager) CreateCargoConfigPrototypes() {
 	this.Create_CargoConfig_SmtpConfigurationEntityPrototype()
 	this.Create_CargoConfig_DataStoreConfigurationEntityPrototype()
 	this.Create_CargoConfig_LdapConfigurationEntityPrototype()
+	this.Create_CargoConfig_ServiceConfigurationEntityPrototype()
 	this.Create_CargoConfig_ApplicationConfigurationEntityPrototype()
 	this.Create_CargoConfig_ServerConfigurationEntityPrototype()
 	this.Create_CargoConfig_ConfigurationsEntityPrototype()

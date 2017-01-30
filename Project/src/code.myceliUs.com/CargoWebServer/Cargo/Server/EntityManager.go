@@ -101,6 +101,10 @@ func (this *EntityManager) Initialize() {
 
 }
 
+func (this *EntityManager) GetId() string {
+	return "EntityManager"
+}
+
 func (this *EntityManager) Start() {
 	log.Println("--> Start EntityManager")
 }

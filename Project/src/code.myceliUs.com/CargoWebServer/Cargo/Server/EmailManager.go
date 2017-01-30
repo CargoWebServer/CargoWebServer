@@ -71,6 +71,10 @@ func (this *EmailManager) Initialize() {
 	}
 }
 
+func (this *EmailManager) GetId() string {
+	return "EmailManager"
+}
+
 func (this *EmailManager) Start() {
 	log.Println("--> Start EmailManager")
 }

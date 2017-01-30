@@ -241,17 +241,8 @@ Message.prototype.send = function () {
     var bytes = new Uint8Array(this.getRpcMessageData())
 
     // Control the size of the message.
-    if ((this.total == 1 && this.index == -1) || (this.total > 1 && this.index > -1)) {
+    if ((this.total == 1 && this.index == -1) || (this.total > 1 && this.index > -1)) {           
         this.conn.send(bytes);
-        /*setTimeout(function(msg){
-            return function(){
-                if(pendingMessage[msg.id] != undefined){
-                    //alert("lost in space!")
-                    msg.send()
-                    console.log("msg---> ", msg.id)
-                }
-            }
-        }(this), 100)*/
     } else if (this.total > 1) {
         // Bytes will contain the message to send to the server,
         // because it can't be send in one pass I will get it's bytes and

@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_SayHello_t {
-    QByteArrayData data[4];
-    char stringdata0[29];
+    QByteArrayData data[1];
+    char stringdata0[9];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -32,13 +32,10 @@ struct qt_meta_stringdata_SayHello_t {
     )
 static const qt_meta_stringdata_SayHello_t qt_meta_stringdata_SayHello = {
     {
-QT_MOC_LITERAL(0, 0, 8), // "SayHello"
-QT_MOC_LITERAL(1, 9, 10), // "sayHelloTo"
-QT_MOC_LITERAL(2, 20, 0), // ""
-QT_MOC_LITERAL(3, 21, 7) // "message"
+QT_MOC_LITERAL(0, 0, 8) // "SayHello"
 
     },
-    "SayHello\0sayHelloTo\0\0message"
+    "SayHello"
 };
 #undef QT_MOC_LITERAL
 
@@ -48,33 +45,22 @@ static const uint qt_meta_data_SayHello[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       1,   14, // methods
+       0,    0, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        0,       // signalCount
 
- // slots: name, argc, parameters, tag, flags
-       1,    1,   19,    2, 0x0a /* Public */,
-
- // slots: parameters
-    QMetaType::QString, QMetaType::QString,    3,
-
        0        // eod
 };
 
 void SayHello::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
-    if (_c == QMetaObject::InvokeMetaMethod) {
-        SayHello *_t = static_cast<SayHello *>(_o);
-        Q_UNUSED(_t)
-        switch (_id) {
-        case 0: { QString _r = _t->sayHelloTo((*reinterpret_cast< const QString(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = _r; }  break;
-        default: ;
-        }
-    }
+    Q_UNUSED(_o);
+    Q_UNUSED(_id);
+    Q_UNUSED(_c);
+    Q_UNUSED(_a);
 }
 
 const QMetaObject SayHello::staticMetaObject = {
@@ -105,15 +91,6 @@ int SayHello::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     _id = QObject::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
-    if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 1)
-            qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
-    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 1)
-            *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 1;
-    }
     return _id;
 }
 

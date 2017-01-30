@@ -26,17 +26,13 @@
  * @constructor
  * @extends EventManager
  */
-var SecurityManager = function (id) {
+var SecurityManager = function () {
 
     if (server == undefined) {
         return
     }
 
-    if (id == undefined) {
-        id = randomUUID()
-    }
-
-    EventManager.call(this, id, SecurityEvent)
+    EventManager.call(this, SecurityEvent)
 
     return this
 }

@@ -32,90 +32,71 @@ void writelen(QAbstractSocket *soc,uint32_t len){
 
 int Session::MAX_MESSAGE_SIZE = 17739;
 
-Session::Session(qintptr ID, QObject *parent) :
+Session::Session(QWebSocket* socket, QObject *parent) :
     QThread(parent)
 {
-    this->socketDescriptor = ID;
-}
-
-void Session::run()
-{
-    // thread starts here
-    qDebug() << " Thread started";
-    socket = new QTcpSocket();
-
-    // set the ID
-    if(!socket->setSocketDescriptor(this->socketDescriptor))
-    {
-        // something's wrong, we just emit a signal
-        emit error(socket->error());
-        return;
-    }
+    this->socket = socket;
 
     // connect socket and signal
     // note - Qt::DirectConnection is used because it's multithreaded
     //        This makes the slot to be invoked immediately, when the signal is emitted.
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
-    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-
-    // We'll have multiple clients, we want to know which is which
-    qDebug() << socketDescriptor << " Client connected";
+    connect(this->socket, &QWebSocket::binaryMessageReceived, this, &Session::processBinaryMessage, Qt::DirectConnection);
+    connect(this->socket, &QWebSocket::disconnected, this, &Session::disconnected);
 
     // Move the socket to the main thread so it will be accessible
     // from inside the slot...
-    socket->setParent(NULL);
-    socket->moveToThread(QCoreApplication::instance()->thread());
+    this->socket->setParent(NULL);
+    this->socket->moveToThread(QCoreApplication::instance()->thread());
+}
 
+Session::~Session(){
+    disconnect(this->socket, &QWebSocket::binaryMessageReceived, this, &Session::processBinaryMessage);
+    disconnect(this->socket, &QWebSocket::disconnected, this, &Session::disconnected);
+    qDebug() << "session is now closed!";
+}
+
+void Session::run()
+{
     // make this thread a loop,
     // thread will stay alive so that signal/slot to function properly
     // not dropped out in the middle when thread dies
     exec();
 }
 
-void Session::readyRead()
+void Session::processBinaryMessage(QByteArray data)
 {
     // get the information
-    while(this->socket->bytesAvailable())
-    {
-        QByteArray buffer;
-
-        int dataSize;
-        this->socket->read((char*)&dataSize, sizeof(int));
-        buffer = this->socket->read(dataSize);
-        while(buffer.size() < dataSize ) // only part of the message has been received
-        {
-            this->socket->waitForReadyRead(); // alternatively, store the buffer and wait for the next readyRead()
-            buffer.append(this->socket->read(dataSize - buffer.size())); // append the remaining bytes of the message
-        }
-        com::mycelius::message::Message msg;
-        msg.ParseFromArray(buffer, buffer.size());
-        this->processIncommingMessage(msg);
-    }
-
+    com::mycelius::message::Message msg;
+    msg.ParseFromArray(data, data.size());
+    this->processIncommingMessage(msg);
 }
 
 void Session::processIncommingMessage(com::mycelius::message::Message& msg){
+
     // Now i will determine if the message is a request, a response or an event...
     if(msg.type() == com::mycelius::message::Message_MessageType_ERROR){
         // The message is an error
     }else if(msg.type() == com::mycelius::message::Message_MessageType_REQUEST){
         // Now I will call process message from the store.
-        Action* action = new Action(QString::fromStdString(msg.rqst().id()), QString::fromStdString(msg.rqst().method()));
+        QString methodName = QString::fromStdString(msg.rqst().method());
+        Action* action = new Action(QString::fromStdString(msg.rqst().id()), methodName);
 
         // Now I will append the parameters...
         const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >& params = msg.rqst().params();
+
         for(::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >::const_iterator it = params.cbegin();
             it != params.cend(); it++){
+
             ::com::mycelius::message::Data param = *it;
             QVariant var;
+
             if(param.type() == ::com::mycelius::message::Data_DataType_DOUBLE){
 
             }else if(param.type() == ::com::mycelius::message::Data_DataType_INTEGER){
 
             }else if(param.type() == ::com::mycelius::message::Data_DataType_STRING){
                 var = QVariant(param.databytes().c_str());
-
-                //qDebug() << "Type name:" << var.typeName() << " value:" << var;
+                qDebug() << "Type name:" << var.typeName() << " value:" << var;
                 action->appendParam(QString::fromStdString(param.name()), var, "QString");
 
             }else if(param.type() == ::com::mycelius::message::Data_DataType_BYTES){
@@ -194,9 +175,8 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
 }
 
 void Session::sendMessage(com::mycelius::message::Message *msg){
-    writelen(this->socket,msg->ByteSize());
-    this->socket->write(serializeToByteArray(msg));
-    this->socket->waitForBytesWritten();
+    // Send messsage back.
+    this->socket->sendBinaryMessage(serializeToByteArray(msg));
 }
 
 void Session::completeProcessMessageData(com::mycelius::message::Message * msg){
@@ -266,7 +246,6 @@ void Session::processPendingMessage(QString messageId){
 
 void Session::disconnected()
 {
-    qDebug() << socketDescriptor << " Disconnected";
     socket->deleteLater();
-    exit(0);
+    this->exit(0);
 }

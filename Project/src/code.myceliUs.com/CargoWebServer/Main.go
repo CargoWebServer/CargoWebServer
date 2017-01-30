@@ -14,7 +14,7 @@ func main() {
 
 	// Handle application path...
 	root := Server.GetServer().GetConfigurationManager().GetApplicationDirectoryPath()
-	port := Server.GetServer().GetConfigurationManager().GetPort()
+	port := Server.GetServer().GetConfigurationManager().GetServerPort()
 	log.Println("Start serve files from ", root)
 
 	// Start the web socket handler
@@ -26,6 +26,9 @@ func main() {
 	// The file upload handler.
 	http.HandleFunc("/uploads", Server.FileUploadHandler)
 
+	// stop the server...
+	defer Server.GetServer().Stop()
+
 	// Start the server...
 	Server.GetServer().Start()
 	log.Println("Port:", port)
@@ -34,4 +37,5 @@ func main() {
 	if err != nil {
 		panic("ListenAndServe: " + err.Error())
 	}
+
 }

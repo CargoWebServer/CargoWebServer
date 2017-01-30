@@ -99,9 +99,13 @@ ProjectView.prototype.initFilesView = function (parent, dir, level) {
                         evt.stopPropagation()
                         // - Manage the file in order that all user have the same file view.
                         server.fileManager.openFile(file.M_id,
+                            // Progress callback.
+                            function (index, totatl, caller) {
+                                
+                            },
                             // Success callback
                             function (result, caller) {
-
+                                
                             },
                             // Error callback
                             function (errMsg, caller) {

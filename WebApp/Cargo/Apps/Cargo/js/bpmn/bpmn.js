@@ -1,13 +1,10 @@
-var WorkflowManager = function (id) {
+var WorkflowManager = function () {
 
     if (server == undefined) {
         return
     }
-    if (id == undefined) {
-        id = randomUUID()
-    }
 
-    EventManager.call(this, id, BpmnEvent)
+    EventManager.call(this, BpmnEvent)
 
     /*
      * The list of all bpmn element.

@@ -2,14 +2,13 @@ package Server
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
-	"github.com/skratchdot/open-golang/open"
+	//"github.com/skratchdot/open-golang/open"
 )
 
 var (
@@ -26,13 +25,11 @@ type Server struct {
 	messageProcessor *MessageProcessor
 
 	// That map contain list of other server on the network.
+	// Use by services manager as example.
 	peers map[string]connection
 
 	// The address information.
 	addressInfo *Utility.IPInfo
-
-	// The list of services...
-	services []ServiceInfo
 }
 
 /**
@@ -45,8 +42,6 @@ func newServer() *Server {
 	// Network...
 	server.hub = NewHub()
 	server.messageProcessor = newMessageProcessor()
-
-	server.services = make([]ServiceInfo, 0)
 
 	// Initialyse with the default configuration.
 	server.initialize()
@@ -64,7 +59,7 @@ func newServer() *Server {
 	if err == nil {
 		adminAccount := adminAccountEntity.GetObject().(*CargoEntities.Account)
 		if adminAccount.GetPassword() == "adminadmin" {
-			open.Run("http://127.0.0.1:9393/Bridge")
+			//open.Run("http://127.0.0.1:9393/Bridge")
 		}
 	}
 
@@ -82,45 +77,29 @@ func (this *Server) initialize() {
 
 	// Initialyse managers...
 	this.GetCacheManager().Initialize()
+
 	// Must be start before other service initialization.
 	this.GetCacheManager().Start()
-
 	this.GetEventManager().Initialize()
 
 	// Basic services...
 	this.GetConfigurationManager().Initialize()
+
+	// Those service are not manage by the service manager.
 	this.GetDataManager().Initialize()
 	this.GetEntityManager().Initialize()
 	this.GetSessionManager().Initialize()
 	this.GetAccountManager().Initialize()
 	this.GetSecurityManager().Initialize()
 
+	// The other services are initialyse by the service manager.
+	this.GetServiceManager().Initialize()
+
 	// The map of loggers.
 	this.loggers = make(map[string]*Logger)
 	// The default error logger...
 	logger := NewLogger("defaultErrorLogger")
 	this.loggers["defaultErrorLogger"] = logger
-
-	root := this.GetConfigurationManager().GetApplicationDirectoryPath()
-	servicesInfo_, err := ioutil.ReadFile(root + "/services.json")
-	if err != nil {
-		log.Println("--> no services configuration was found!")
-	} else {
-		json.Unmarshal(servicesInfo_, &this.services)
-	}
-
-	// Optional services Initialysation...
-	for i := 0; i < len(this.services); i++ {
-		// First of all I will retreive the service object...
-		params := make([]interface{}, 0)
-		service, err := Utility.CallMethod(this, "Get"+this.services[i].Name, params)
-		if err != nil {
-			log.Println("--> service whit name ", this.services[i].Name, " dosen't exist!")
-		} else {
-			service.(Service).Initialize()
-		}
-	}
-
 }
 
 /**
@@ -197,21 +176,7 @@ func (this *Server) Start() {
 	this.GetSessionManager().Start()
 	this.GetAccountManager().Start()
 	this.GetSecurityManager().Start()
-
-	// Optional services Initialisation...
-	for i := 0; i < len(this.services); i++ {
-		// First of all I will retreive the service object...
-		params := make([]interface{}, 0)
-		service, err := Utility.CallMethod(this, "Get"+this.services[i].Name, params)
-		if err != nil {
-			log.Println("--> service whit name ", this.services[i].Name, " dosen't exist!")
-		} else {
-			if this.services[i].Start {
-				service.(Service).Start()
-			}
-		}
-	}
-
+	this.GetServiceManager().Start()
 }
 
 /**
@@ -231,18 +196,7 @@ func (this *Server) Stop() {
 	this.GetAccountManager().Stop()
 	this.GetSecurityManager().Stop()
 	this.GetCacheManager().Stop()
-
-	// stop optional services...
-	for i := 0; i < len(this.services); i++ {
-		// First of all I will retreive the service object...
-		params := make([]interface{}, 0)
-		service, err := Utility.CallMethod(this, "Get"+this.services[i].Name, params)
-		if err != nil {
-			log.Println("--> service whit name ", this.services[i].Name, " dosen't exist!")
-		} else {
-			service.(Service).Stop()
-		}
-	}
+	this.GetServiceManager().Stop()
 
 	log.Println("Bye Bye :-)")
 

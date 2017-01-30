@@ -26,7 +26,7 @@
  * @constructor
  * @extends EventManager
  */
-var SessionManager = function (id) {
+var SessionManager = function () {
 
     // Keeps a list of user's' sessions localy.
     this.sessions = {}
@@ -40,11 +40,7 @@ var SessionManager = function (id) {
         return
     }
 
-    if (id == undefined) {
-        id = randomUUID()
-    }
-
-    EventManager.call(this, id, SessionEvent)
+    EventManager.call(this, SessionEvent)
 
     return this
 }

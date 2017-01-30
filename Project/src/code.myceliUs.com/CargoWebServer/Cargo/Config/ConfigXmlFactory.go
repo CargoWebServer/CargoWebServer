@@ -90,50 +90,11 @@ func (this *ConfigXmlFactory)SerializeXml(outputPath string, toSerialize *CargoC
 	return nil
 }
 
-/** inititialisation of ServerConfiguration **/
-func (this *ConfigXmlFactory) InitServerConfiguration(xmlElement *CargoConfig.XsdServerConfiguration,object *CargoConfig.ServerConfiguration){
-	log.Println("Initialize ServerConfiguration")
-
-	/** ServerConfiguration **/
-	object.M_id= xmlElement.M_id
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-
-	/** Configuration **/
-	object.M_ipv4= xmlElement.M_ipv4
-
-	/** Configuration **/
-	object.M_hostName= xmlElement.M_hostName
-
-	/** Configuration **/
-	object.M_port= xmlElement.M_port
-
-	/** Configuration **/
-	object.M_applicationsPath= xmlElement.M_applicationsPath
-
-	/** Configuration **/
-	object.M_dataPath= xmlElement.M_dataPath
-
-	/** Configuration **/
-	object.M_scriptsPath= xmlElement.M_scriptsPath
-
-	/** Configuration **/
-	object.M_definitionsPath= xmlElement.M_definitionsPath
-
-	/** Configuration **/
-	object.M_schemasPath= xmlElement.M_schemasPath
-
-	/** Configuration **/
-	object.M_tmpPath= xmlElement.M_tmpPath
-
-	/** Configuration **/
-	object.M_binPath= xmlElement.M_binPath
-}
-
 /** inititialisation of ApplicationConfiguration **/
 func (this *ConfigXmlFactory) InitApplicationConfiguration(xmlElement *CargoConfig.XsdApplicationConfiguration,object *CargoConfig.ApplicationConfiguration){
 	log.Println("Initialize ApplicationConfiguration")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoConfig.ApplicationConfiguration%" + Utility.RandomUUID()	}
 
 	/** ApplicationConfiguration **/
 	object.M_id= xmlElement.M_id
@@ -148,6 +109,8 @@ func (this *ConfigXmlFactory) InitApplicationConfiguration(xmlElement *CargoConf
 /** inititialisation of SmtpConfiguration **/
 func (this *ConfigXmlFactory) InitSmtpConfiguration(xmlElement *CargoConfig.XsdSmtpConfiguration,object *CargoConfig.SmtpConfiguration){
 	log.Println("Initialize SmtpConfiguration")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoConfig.SmtpConfiguration%" + Utility.RandomUUID()	}
 
 	/** SmtpConfiguration **/
 	object.M_id= xmlElement.M_id
@@ -174,6 +137,8 @@ func (this *ConfigXmlFactory) InitSmtpConfiguration(xmlElement *CargoConfig.XsdS
 /** inititialisation of LdapConfiguration **/
 func (this *ConfigXmlFactory) InitLdapConfiguration(xmlElement *CargoConfig.XsdLdapConfiguration,object *CargoConfig.LdapConfiguration){
 	log.Println("Initialize LdapConfiguration")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoConfig.LdapConfiguration%" + Utility.RandomUUID()	}
 
 	/** LdapConfiguration **/
 	object.M_id= xmlElement.M_id
@@ -206,6 +171,8 @@ func (this *ConfigXmlFactory) InitLdapConfiguration(xmlElement *CargoConfig.XsdL
 /** inititialisation of DataStoreConfiguration **/
 func (this *ConfigXmlFactory) InitDataStoreConfiguration(xmlElement *CargoConfig.XsdDataStoreConfiguration,object *CargoConfig.DataStoreConfiguration){
 	log.Println("Initialize DataStoreConfiguration")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoConfig.DataStoreConfiguration%" + Utility.RandomUUID()	}
 
 	/** DataStoreConfiguration **/
 	object.M_id= xmlElement.M_id
@@ -248,6 +215,8 @@ func (this *ConfigXmlFactory) InitDataStoreConfiguration(xmlElement *CargoConfig
 /** inititialisation of Configurations **/
 func (this *ConfigXmlFactory) InitConfigurations(xmlElement *CargoConfig.XsdConfigurations,object *CargoConfig.Configurations){
 	log.Println("Initialize Configurations")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoConfig.Configurations%" + Utility.RandomUUID()	}
 
 	/** Init serverConfiguration **/
 	if object.M_serverConfig== nil{
@@ -308,6 +277,80 @@ func (this *ConfigXmlFactory) InitConfigurations(xmlElement *CargoConfig.XsdConf
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
+}
+
+/** inititialisation of ServerConfiguration **/
+func (this *ConfigXmlFactory) InitServerConfiguration(xmlElement *CargoConfig.XsdServerConfiguration,object *CargoConfig.ServerConfiguration){
+	log.Println("Initialize ServerConfiguration")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoConfig.ServerConfiguration%" + Utility.RandomUUID()	}
+
+	/** ServerConfiguration **/
+	object.M_id= xmlElement.M_id
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+
+	/** Configuration **/
+	object.M_ipv4= xmlElement.M_ipv4
+
+	/** Configuration **/
+	object.M_hostName= xmlElement.M_hostName
+
+	/** Configuration **/
+	object.M_serverPort= xmlElement.M_serverPort
+
+	/** Configuration **/
+	object.M_servicePort= xmlElement.M_servicePort
+
+	/** Configuration **/
+	object.M_applicationsPath= xmlElement.M_applicationsPath
+
+	/** Configuration **/
+	object.M_dataPath= xmlElement.M_dataPath
+
+	/** Configuration **/
+	object.M_scriptsPath= xmlElement.M_scriptsPath
+
+	/** Configuration **/
+	object.M_definitionsPath= xmlElement.M_definitionsPath
+
+	/** Configuration **/
+	object.M_schemasPath= xmlElement.M_schemasPath
+
+	/** Configuration **/
+	object.M_tmpPath= xmlElement.M_tmpPath
+
+	/** Configuration **/
+	object.M_binPath= xmlElement.M_binPath
+}
+
+/** serialysation of SmtpConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeSmtpConfiguration(xmlElement *CargoConfig.XsdSmtpConfiguration,object *CargoConfig.SmtpConfiguration){
+	if xmlElement == nil{
+		return
+	}
+
+	/** SmtpConfiguration **/
+	xmlElement.M_id= object.M_id
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+
+	/** Configuration **/
+	xmlElement.M_hostName= object.M_hostName
+
+	/** Configuration **/
+	xmlElement.M_ipv4= object.M_ipv4
+
+	/** Configuration **/
+	xmlElement.M_port= object.M_port
+
+	/** Configuration **/
+	xmlElement.M_user= object.M_user
+
+	/** Configuration **/
+	xmlElement.M_pwd= object.M_pwd
 }
 
 /** serialysation of LdapConfiguration **/
@@ -477,7 +520,10 @@ func (this *ConfigXmlFactory) SerialyzeServerConfiguration(xmlElement *CargoConf
 	xmlElement.M_hostName= object.M_hostName
 
 	/** Configuration **/
-	xmlElement.M_port= object.M_port
+	xmlElement.M_serverPort= object.M_serverPort
+
+	/** Configuration **/
+	xmlElement.M_servicePort= object.M_servicePort
 
 	/** Configuration **/
 	xmlElement.M_applicationsPath= object.M_applicationsPath
@@ -515,32 +561,4 @@ func (this *ConfigXmlFactory) SerialyzeApplicationConfiguration(xmlElement *Carg
 
 	/** Configuration **/
 	xmlElement.M_indexPage= object.M_indexPage
-}
-
-/** serialysation of SmtpConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeSmtpConfiguration(xmlElement *CargoConfig.XsdSmtpConfiguration,object *CargoConfig.SmtpConfiguration){
-	if xmlElement == nil{
-		return
-	}
-
-	/** SmtpConfiguration **/
-	xmlElement.M_id= object.M_id
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-
-	/** Configuration **/
-	xmlElement.M_hostName= object.M_hostName
-
-	/** Configuration **/
-	xmlElement.M_ipv4= object.M_ipv4
-
-	/** Configuration **/
-	xmlElement.M_port= object.M_port
-
-	/** Configuration **/
-	xmlElement.M_user= object.M_user
-
-	/** Configuration **/
-	xmlElement.M_pwd= object.M_pwd
 }

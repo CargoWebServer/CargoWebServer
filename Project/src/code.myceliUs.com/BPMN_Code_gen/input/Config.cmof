@@ -89,6 +89,27 @@
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
 	</ownedMember>
+	
+		<ownedMember xmi:type="cmof:Class" xmi:id="ServiceConfiguration" name="ServiceConfiguration" superClass="Configuration">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hostName" name="hostName">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="ipv4" name="ipv4">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="port" name="port">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="user" name="user">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="pwd" name="pwd">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="start" name="start">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
+      </ownedAttribute>
+	</ownedMember>
 
 	<ownedMember xmi:type="cmof:Class" xmi:id="ApplicationConfiguration" name="ApplicationConfiguration" superClass="Configuration">
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="indexPage" name="indexPage">
@@ -103,7 +124,10 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="ipv4" name="ipv4">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="port" name="port">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="serverPort" name="serverPort">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="servicePort" name="servicePort">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
       </ownedAttribute>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="applicationsPath" name="applicationsPath">

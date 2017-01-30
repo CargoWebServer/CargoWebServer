@@ -43,9 +43,11 @@ func (this *AccountManager) Initialize() {
 	if len(adminUuid) == 0 {
 		// Create the account in memory.
 		account := new(CargoEntities.Account)
+		account.UUID = "CargoEntities.Account%" + Utility.RandomUUID()
 		account.M_id = "admin"
 		account.M_password = "adminadmin"
 		account.M_name = "admin"
+		account.NeedSave = true
 		account.M_email = ""
 
 		// Append the newly create account into the cargo entities
@@ -53,6 +55,7 @@ func (this *AccountManager) Initialize() {
 		account.SetEntitiesPtr(entities)
 		// Save the account
 		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+		log.Println("------> admin account was create: ", account)
 	}
 
 	// Create the guest account if it doesn't exist
@@ -60,18 +63,24 @@ func (this *AccountManager) Initialize() {
 	if len(guestUuid) == 0 {
 		// Create the account in memory.
 		account := new(CargoEntities.Account)
+		account.UUID = "CargoEntities.Account%" + Utility.RandomUUID()
 		account.M_id = "guest"
 		account.M_password = ""
 		account.M_name = "guest"
 		account.M_email = ""
-		account.UUID = "CargoEntities.Account%" + Utility.RandomUUID()
+		account.NeedSave = true
 
 		// Append the newly create account into the cargo entities
 		entities.SetEntities(account)
 		account.SetEntitiesPtr(entities)
 		// Save the account
 		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+		log.Println("------> guest account was create: ", account)
 	}
+}
+
+func (this *AccountManager) GetId() string {
+	return "AccountManager"
 }
 
 func (this *AccountManager) Start() {
@@ -103,6 +112,7 @@ func (this *AccountManager) Register(name string, password string, email string,
 		account.M_password = password
 		account.M_name = name
 		account.M_email = email
+		account.NeedSave = true
 
 		// Append the newly create account into the cargo entities
 		entities := GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities)

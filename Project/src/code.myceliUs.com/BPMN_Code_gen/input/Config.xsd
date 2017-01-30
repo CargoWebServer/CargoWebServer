@@ -30,7 +30,8 @@
 			<xsd:extension base="tConfiguration"> 
 				<xsd:attribute name="ipv4" type="xsd:string" />
 				<xsd:attribute name="hostName" type="xsd:string" />
-				<xsd:attribute name="port" type="xsd:integer" />
+				<xsd:attribute name="serverPort" type="xsd:integer" />
+				<xsd:attribute name="servicePort" type="xsd:integer" />
 				<xsd:attribute name="applicationsPath" type="xsd:string" />
 				<xsd:attribute name="dataPath" type="xsd:string" />
 				<xsd:attribute name="scriptsPath" type="xsd:string" />
@@ -94,6 +95,20 @@
 		</xsd:complexContent> 
 	</xsd:complexType>
 
+	<xsd:element name="serviceConfiguration" type="tServiceConfiguration" substitutionGroup="configuration"/>
+	<xsd:complexType name="tServiceConfiguration" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tConfiguration"> 
+				<xsd:attribute name="hostName" type="xsd:string" />
+				<xsd:attribute name="ipv4" type="xsd:string" />
+				<xsd:attribute name="port" type="xsd:integer" />
+				<xsd:attribute name="user" type="xsd:string" />
+				<xsd:attribute name="pwd" type="xsd:string" />
+				<xsd:attribute name="start" type="xsd:bool" />
+			</xsd:extension> 
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
 	<xsd:element name="configurations" type="tConfigurations"/>
 	<xsd:complexType name="tConfigurations">
 		<xsd:sequence>

@@ -46,6 +46,10 @@ func (this *WorkflowManager) Initialize() {
 	GetServer().GetEntityManager().getEntitiesByType("BPMN20.Definitions", "", "BPMN20")
 }
 
+func (this *WorkflowManager) GetId() string {
+	return "WorkflowManager"
+}
+
 /**
  * Start the service.
  */
@@ -334,6 +338,7 @@ func (this *WorkflowManager) GetDefinitionsById(id string, messageId string, ses
  * as message data or signal data...
  */
 func (this *WorkflowManager) StartProcess(processUUID string, startEventData interface{}, startEventDefinitionData interface{}, messageId string, sessionId string) {
+	log.Println("-------> start process: ", processUUID)
 	trigger := new(BPMS_Runtime.Trigger)
 	trigger.UUID = "BPMS_Runtime.Trigger%" + Utility.RandomUUID()
 	trigger.M_processUUID = processUUID

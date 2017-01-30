@@ -89,7 +89,8 @@ func (this *ConfigurationManager) Initialize() {
 		this.m_activeConfigurations.M_serverConfig.NeedSave = true
 
 		this.m_activeConfigurations.M_serverConfig.M_id = "CARGO_DEFAULT_SERVER"
-		this.m_activeConfigurations.M_serverConfig.M_port = 9393
+		this.m_activeConfigurations.M_serverConfig.M_serverPort = 9393
+		this.m_activeConfigurations.M_serverConfig.M_servicePort = 9494
 		this.m_activeConfigurations.M_serverConfig.M_hostName = "localhost"
 		this.m_activeConfigurations.M_serverConfig.M_ipv4 = "127.0.0.1"
 
@@ -105,6 +106,10 @@ func (this *ConfigurationManager) Initialize() {
 		this.m_activeConfigurations.NeedSave = true
 		this.m_configurationEntity.SaveEntity()
 	}
+}
+
+func (this *ConfigurationManager) GetId() string {
+	return "ConfigurationManager"
 }
 
 func (this *ConfigurationManager) Start() {
@@ -183,12 +188,92 @@ func (this *ConfigurationManager) GetIpv4() string {
 	return this.m_activeConfigurations.M_serverConfig.M_ipv4
 }
 
-func (this *ConfigurationManager) GetPort() int {
+/**
+ * Cargo server port.
+ **/
+func (this *ConfigurationManager) GetServerPort() int {
 	// Default port...
 	if this.m_activeConfigurations == nil {
 		return 9393
 	}
-	return this.m_activeConfigurations.M_serverConfig.M_port
+	return this.m_activeConfigurations.M_serverConfig.M_serverPort
+}
+
+/**
+ * Cargo service container port.
+ */
+func (this *ConfigurationManager) GetServicePort() int {
+	// Default port...
+	if this.m_activeConfigurations == nil {
+		return 9494
+	}
+	return this.m_activeConfigurations.M_serverConfig.M_servicePort
+}
+
+/**
+ * Return the list of local services configurations.
+ */
+func (this *ConfigurationManager) GetLocalServiceConfigurations() []CargoConfig.ServiceConfiguration {
+	services := make([]CargoConfig.ServiceConfiguration, 7)
+
+	// Each service that can be start and stop as needed...
+	var emailManager CargoConfig.ServiceConfiguration
+	emailManager.M_id = "EmailManager"
+	emailManager.M_ipv4 = "127.0.0.1"
+	emailManager.M_start = true
+	emailManager.M_port = 9393
+	emailManager.M_hostName = "localhost"
+	services[0] = emailManager
+
+	var schemaManager CargoConfig.ServiceConfiguration
+	schemaManager.M_id = "SchemaManager"
+	schemaManager.M_ipv4 = "127.0.0.1"
+	schemaManager.M_start = true
+	schemaManager.M_port = 9393
+	schemaManager.M_hostName = "localhost"
+	services[1] = schemaManager
+
+	var ldapManager CargoConfig.ServiceConfiguration
+	ldapManager.M_id = "LdapManager"
+	ldapManager.M_ipv4 = "127.0.0.1"
+	ldapManager.M_start = true
+	ldapManager.M_port = 9393
+	ldapManager.M_hostName = "localhost"
+	services[2] = ldapManager
+
+	var projectManager CargoConfig.ServiceConfiguration
+	projectManager.M_id = "ProjectManager"
+	projectManager.M_ipv4 = "127.0.0.1"
+	projectManager.M_start = true
+	projectManager.M_port = 9393
+	projectManager.M_hostName = "localhost"
+	services[3] = projectManager
+
+	var fileManager CargoConfig.ServiceConfiguration
+	fileManager.M_id = "FileManager"
+	fileManager.M_ipv4 = "127.0.0.1"
+	fileManager.M_start = true
+	fileManager.M_port = 9393
+	fileManager.M_hostName = "localhost"
+	services[4] = fileManager
+
+	var workflowManager CargoConfig.ServiceConfiguration
+	workflowManager.M_id = "WorkflowManager"
+	workflowManager.M_ipv4 = "127.0.0.1"
+	workflowManager.M_start = true
+	workflowManager.M_port = 9393
+	workflowManager.M_hostName = "localhost"
+	services[5] = workflowManager
+
+	var workflowProcessor CargoConfig.ServiceConfiguration
+	workflowProcessor.M_id = "WorkflowProcessor"
+	workflowProcessor.M_ipv4 = "127.0.0.1"
+	workflowProcessor.M_start = true
+	workflowProcessor.M_port = 9393
+	workflowProcessor.M_hostName = "localhost"
+	services[6] = workflowProcessor
+
+	return services
 }
 
 func (this *ConfigurationManager) GetDefaultDataStoreConfigurations() []CargoConfig.DataStoreConfiguration {
@@ -282,6 +367,25 @@ func (this *ConfigurationManager) GetSmtpConfigurations() []CargoConfig.SmtpConf
 	for i := 0; i < len(entities); i++ {
 		smtpConfiguration := entities[i].GetObject().(*CargoConfig.SmtpConfiguration)
 		configurations = append(configurations, *smtpConfiguration)
+	}
+
+	return configurations
+}
+
+/**
+ * Tha function retreive the services configuration.
+ */
+func (this *ConfigurationManager) GetServiceConfigurations() []CargoConfig.ServiceConfiguration {
+	var configurations []CargoConfig.ServiceConfiguration
+
+	entities, err := GetServer().GetEntityManager().getEntitiesByType("CargoConfig.ServiceConfiguration", "", "CargoConfig")
+	if err != nil {
+		return configurations
+	}
+
+	for i := 0; i < len(entities); i++ {
+		serviceConfiguration := entities[i].GetObject().(*CargoConfig.ServiceConfiguration)
+		configurations = append(configurations, *serviceConfiguration)
 	}
 
 	return configurations

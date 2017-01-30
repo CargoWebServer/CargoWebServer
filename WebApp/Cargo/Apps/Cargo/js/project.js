@@ -25,16 +25,13 @@
  * @constructor
  * @extends EventManager
  */
-var ProjectManager = function (id) {
+var ProjectManager = function () {
 
     if (server == undefined) {
         return
     }
-    if (id == undefined) {
-        id = randomUUID()
-    }
 
-    EventManager.call(this, id, ProjectEvent)
+    EventManager.call(this,ProjectEvent)
 
     /**
      * @property {object} entityPrototypes Keep track of prototypes in use.

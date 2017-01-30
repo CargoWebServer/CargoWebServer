@@ -4,35 +4,37 @@
 #include <QThreadPool>
 #include <QPluginLoader>
 #include <QDebug>
+#include <QCoreApplication>
+#include <QtScript/QtScript>
 
 // Does variable will be set from the Cargo server.
-const QString ServiceContainer::defaultApplicationName = "ServiceContainer";
-const QString ServiceContainer::defaultOrganizationName = "com.myceliUs";
-const unsigned int ServiceContainer::defaultPort = 1234;
-
 ServiceContainer* ServiceContainer::instance = 0;
 
 ServiceContainer *ServiceContainer::getInstance()
 {
     if(ServiceContainer::instance == 0){
-        ServiceContainer::instance = new ServiceContainer();
+        ServiceContainer::instance = new ServiceContainer(QStringLiteral("serviceContainer"), QWebSocketServer::NonSecureMode);
     }
-    return instance;
+
+    // Connect new connction.
+    connect(ServiceContainer::instance, &QWebSocketServer::newConnection, ServiceContainer::instance, &ServiceContainer::onNewConnection);
+
+    // end of services.
+    connect(ServiceContainer::instance, &QWebSocketServer::closed, ServiceContainer::instance, &ServiceContainer::closed);
+
+    return ServiceContainer::instance;
 }
 
-ServiceContainer::ServiceContainer(QObject* parent) :
-    QTcpServer(parent),
-    port(ServiceContainer::defaultPort)
+ServiceContainer::ServiceContainer(const QString &serverName, SslMode secureMode, QObject *parent) :
+    QWebSocketServer(serverName,secureMode, parent)
 {
-  // load the server settings.
-  this->loadSettings();
-
-  // load the plugins ojects.
-  this->loadPluginObjects();
+    // load the server plugins.
+    this->loadPluginObjects();
 }
 
 ServiceContainer::~ServiceContainer(){
-   delete this->settings;
+    // close the connections.
+    this->close();
 }
 
 void ServiceContainer::startServer()
@@ -48,51 +50,25 @@ void ServiceContainer::startServer()
 }
 
 // This function is called by QTcpServer when a new connection is available.
-void ServiceContainer::incomingConnection(qintptr socketDescriptor){
+void ServiceContainer::onNewConnection(){
+
     // We have a new connection
-    qDebug() << socketDescriptor << " Connecting...";
+    QWebSocket *socket = this->nextPendingConnection();
+    if(socket != NULL){
+        // Every new session will be run in a newly created thread
+        Session *session = new Session(socket, this);
 
-    // Every new session will be run in a newly created thread
-    Session *session = new Session(socketDescriptor, this);
+        // connect signal/slot
+        // once a thread is not needed, it will be beleted later
+        connect(session, SIGNAL(finished()), session, SLOT(deleteLater()));
 
-    // connect signal/slot
-    // once a thread is not needed, it will be beleted later
-    connect(session, SIGNAL(finished()), session, SLOT(deleteLater()));
-
-    // Start the session...
-    session->start();
-}
-
-
-void ServiceContainer::saveSettings(){
-
-}
-
-void ServiceContainer::loadSettings(){
-    // Here I will initialyse the application settings...
-    this->settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, organizationName, applicationName);
-
-    if (!settings->contains("port")){
-        this->settings->setValue("port", QVariant(ServiceContainer::defaultPort));
-    }else{
-        this->port = this->settings->value("port").toInt();
-    }
-
-    if (!settings->contains("applicationName")){
-        this->settings->setValue("applicationName", QVariant(ServiceContainer::defaultApplicationName));
-    }else{
-        this->applicationName = this->settings->value("applicationName").toString();
-    }
-
-    if (!settings->contains("organizationName")){
-        this->settings->setValue("organizationName", QVariant(ServiceContainer::defaultOrganizationName));
-    }else{
-        this->organizationName = this->settings->value("organizationName").toString();
+        // Start the session...
+        session->start();
     }
 }
 
-void ServiceContainer::setApplicationPath(QString path){
-    this->applicationPath = path;
+void  ServiceContainer::setPort(quint16 port) {
+    this->port = port;
 }
 
 QObject* ServiceContainer::getObjectByTypeName(QString typeName){
@@ -100,7 +76,8 @@ QObject* ServiceContainer::getObjectByTypeName(QString typeName){
 }
 
 void ServiceContainer::loadPluginObjects(){
-    QDir pluginsDir(this->applicationPath);
+
+    QDir pluginsDir(QCoreApplication::applicationDirPath());
 
 #if defined(Q_OS_WIN)
     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
@@ -122,4 +99,35 @@ void ServiceContainer::loadPluginObjects(){
             qDebug() << "Load object: " << plugin->metaObject()->className();
         }
     }
+}
+
+QString ServiceContainer::Ping(){
+    return "pong";
+}
+
+QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
+    // first of all i will create a new engine...
+    QScriptEngine engine;
+
+    // Now I will put the plugin objects in the engine context.
+    for(int i=0; i < this->objects.keys().length(); i++){
+        QScriptValue objectValue = engine.newQObject(this->objects.value(this->objects.keys()[i]));
+        engine.globalObject().setProperty(this->objects.keys()[i], objectValue);
+    }
+
+    // I will now evaluate the script function...
+    QScriptValue object = engine.evaluate("({toEvaluate:" + params[0].toString() + "})");
+    QScriptValue toEvaluate = object.property("toEvaluate");
+
+    QScriptValueList params_;
+    // Now I will set the function parameters...
+    for(int i= 1; i < params.length(); i++){
+        params_.append(engine.newVariant(params.at(i)));
+    }
+
+    QScriptValue result = toEvaluate.call(object, params_);
+    QVariantList results;
+    results.push_back(result.toVariant());
+
+    return results;
 }

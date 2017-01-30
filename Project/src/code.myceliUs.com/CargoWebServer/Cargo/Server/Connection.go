@@ -2,6 +2,7 @@ package Server
 
 import (
 	"encoding/binary"
+	"errors"
 	"log"
 	"net"
 	"strconv"
@@ -61,6 +62,9 @@ type tcpSocketConnection struct {
 
 	// The channel uuid...
 	m_uuid string
+
+	// The number of connection try before give up...
+	m_try int
 }
 
 func NewTcpSocketConnection() *tcpSocketConnection {
@@ -68,6 +72,7 @@ func NewTcpSocketConnection() *tcpSocketConnection {
 
 	// The connection is close at start...
 	conn.m_isOpen = false
+	conn.m_try = 0
 
 	// init members...
 	conn.send = make(chan []byte /*, connection_channel_size*/)
@@ -98,8 +103,18 @@ func (c *tcpSocketConnection) Open(host string, port int) (err error) {
 		log.Println("Connection with host ", host, " on port ", strconv.Itoa(port), " fail!!!")
 		return err
 	}
-	log.Println("Connection with host ", host, " on port ", strconv.Itoa(port), " is open")
-	c.m_isOpen = true
+
+	if c.m_socket == nil && c.m_try < 10 {
+		time.Sleep(100 * time.Millisecond)
+		c.Open(host, port)
+		c.m_try += 1
+	} else if c.m_try == 10 {
+		return errors.New("fail to connect with " + host + ":" + strconv.Itoa(port))
+	} else {
+		log.Println("Connection with host ", host, " on port ", strconv.Itoa(port), " is open")
+		c.m_isOpen = true
+	}
+
 	return nil
 }
 

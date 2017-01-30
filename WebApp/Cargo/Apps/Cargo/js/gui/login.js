@@ -34,7 +34,7 @@ var LoginPage = function (loginCallback) {
 		"tag": "div",
 		"class": "login_page",
 		"style": "width: 100%; height: 100%; padding-top: 0px; overflow:hidden;",
-		"id":"loginPage",
+		"id": "loginPage",
 		"draggable": "false"
 	})
 
@@ -143,13 +143,17 @@ var LoginPage = function (loginCallback) {
 			/* Here I will call the login... **/
 			if (password.length > 0 && userName.length > 0) {
 				server.sessionManager.login(userName, password, function (result, caller) {
-					caller.loginCallback(result)
-					var rememberMe = localStorage.getItem('_remember_me_')
-					if (rememberMe != undefined) {
-						// In that case I will put the session info in the 
-						var loginInfo = { "userName": caller.userName, "password": caller.password }
-						// local storage...
-						localStorage.setItem('_remember_me_', JSON.stringify(loginInfo))
+					if (caller.loginCallback != undefined) {
+						caller.loginCallback(result)
+						// call once...
+						caller.loginCallback = undefined
+						var rememberMe = localStorage.getItem('_remember_me_')
+						if (rememberMe != undefined) {
+							// In that case I will put the session info in the 
+							var loginInfo = { "userName": caller.userName, "password": caller.password }
+							// local storage...
+							localStorage.setItem('_remember_me_', JSON.stringify(loginInfo))
+						}
 					}
 				},
 					function (error, caller) {

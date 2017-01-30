@@ -22,7 +22,8 @@ type ServerConfiguration struct{
 	/** members of ServerConfiguration **/
 	M_hostName string
 	M_ipv4 string
-	M_port int
+	M_serverPort int
+	M_servicePort int
 	M_applicationsPath string
 	M_dataPath string
 	M_scriptsPath string
@@ -47,7 +48,8 @@ type XsdServerConfiguration struct {
 
 	M_ipv4	string	`xml:"ipv4,attr"`
 	M_hostName	string	`xml:"hostName,attr"`
-	M_port	int	`xml:"port,attr"`
+	M_serverPort	int	`xml:"serverPort,attr"`
+	M_servicePort	int	`xml:"servicePort,attr"`
 	M_applicationsPath	string	`xml:"applicationsPath,attr"`
 	M_dataPath	string	`xml:"dataPath,attr"`
 	M_scriptsPath	string	`xml:"scriptsPath,attr"`
@@ -101,18 +103,31 @@ func (this *ServerConfiguration) SetIpv4(ref interface{}){
 
 /** Remove reference Ipv4 **/
 
-/** Port **/
-func (this *ServerConfiguration) GetPort() int{
-	return this.M_port
+/** ServerPort **/
+func (this *ServerConfiguration) GetServerPort() int{
+	return this.M_serverPort
 }
 
-/** Init reference Port **/
-func (this *ServerConfiguration) SetPort(ref interface{}){
+/** Init reference ServerPort **/
+func (this *ServerConfiguration) SetServerPort(ref interface{}){
 	this.NeedSave = true
-	this.M_port = ref.(int)
+	this.M_serverPort = ref.(int)
 }
 
-/** Remove reference Port **/
+/** Remove reference ServerPort **/
+
+/** ServicePort **/
+func (this *ServerConfiguration) GetServicePort() int{
+	return this.M_servicePort
+}
+
+/** Init reference ServicePort **/
+func (this *ServerConfiguration) SetServicePort(ref interface{}){
+	this.NeedSave = true
+	this.M_servicePort = ref.(int)
+}
+
+/** Remove reference ServicePort **/
 
 /** ApplicationsPath **/
 func (this *ServerConfiguration) GetApplicationsPath() string{

@@ -449,7 +449,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 			// Here I will execute the successCallback if some is define.
 			if rqst.successCallback != nil {
 				// Call the successCallback.
-				rqst.successCallback(m)
+				rqst.successCallback(m, rqst.caller)
 			}
 		}
 

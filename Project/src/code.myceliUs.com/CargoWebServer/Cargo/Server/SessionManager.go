@@ -83,6 +83,10 @@ func (this *SessionManager) Initialize() {
 
 }
 
+func (this *SessionManager) GetId() string {
+	return "SessionManager"
+}
+
 func (this *SessionManager) Start() {
 	log.Println("--> Start SessionManager")
 }
