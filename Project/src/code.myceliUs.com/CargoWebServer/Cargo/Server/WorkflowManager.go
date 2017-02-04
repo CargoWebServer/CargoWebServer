@@ -339,6 +339,7 @@ func (this *WorkflowManager) GetDefinitionsById(id string, messageId string, ses
  */
 func (this *WorkflowManager) StartProcess(processUUID string, startEventData interface{}, startEventDefinitionData interface{}, messageId string, sessionId string) {
 	log.Println("-------> start process: ", processUUID)
+
 	trigger := new(BPMS_Runtime.Trigger)
 	trigger.UUID = "BPMS_Runtime.Trigger%" + Utility.RandomUUID()
 	trigger.M_processUUID = processUUID

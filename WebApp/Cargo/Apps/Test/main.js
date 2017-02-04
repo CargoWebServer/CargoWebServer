@@ -51,9 +51,9 @@ function main() {
 
     //entityTests()
 
-    testDynamicEntity()
+   // testDynamicEntity()
 
-     entityDump("item_1", "Test.Item")
+   //  entityDump("item_1", "Test.Item")
 
     //entitiesDump("COLLADASchema.COLLADA")
 
@@ -68,7 +68,7 @@ function main() {
     // TestUploadFile()
 
     // Test get bmpn defintion instance...
-  /*
+  
     server.entityManager.getEntityPrototypes("Test",
         // Success callback.
         function (result, caller) {
@@ -114,8 +114,8 @@ function main() {
         function () {
 
         }, {})
-    */
-   // testServiceContainer()
+    
+     testServiceContainer()
 }
 
 function testServiceContainer() {

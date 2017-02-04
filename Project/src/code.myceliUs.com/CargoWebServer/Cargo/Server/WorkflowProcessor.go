@@ -218,6 +218,10 @@ func (this *WorkflowProcessor) processTrigger(trigger *BPMS_Runtime.Trigger) *Ca
 
 		// Set the process instances...
 		definitionsInstance.SetProcessInstances(processInstance)
+		processInstance.SetParentPtr(definitionsInstance)
+
+		// Create empty itemaware elements in the process instance.
+		this.createItemAwareElementInstances(processInstance)
 
 		// Now I will create the start event...
 		startEventInstance := this.createInstance(startEvent, processInstance, nil, trigger.GetDataRef(), trigger.M_sessionId)
@@ -367,6 +371,9 @@ func (this *WorkflowProcessor) executeActivityInstance(instance BPMS_Runtime.Ins
 	// Get the activity object.
 	activity := activityEntity.GetObject()
 
+	processEntity, _ := GetServer().GetEntityManager().getEntityByUuid(instance.(*BPMS_Runtime.ActivityInstance).GetProcessInstancePtr().GetBpmnElementId())
+	definitions := processEntity.GetObject().(*BPMN20.Process).GetDefinitionsPtr()
+
 	switch v := activity.(type) {
 	case *BPMN20.AdHocSubProcess:
 
@@ -379,73 +386,26 @@ func (this *WorkflowProcessor) executeActivityInstance(instance BPMS_Runtime.Ins
 	case *BPMN20.ManualTask:
 
 	case *BPMN20.ScriptTask:
-		instances := make(map[string]interface{}, 0)
+		if activity.(*BPMN20.ScriptTask).GetScript() != nil {
+			activity.(*BPMN20.ScriptTask).GetScript()
+			// List the variable put in the vm...
+			instances := make(map[string]*BPMS_Runtime.ItemAwareElementInstance)
+			this.appendItemAwareElementInstance(instance, instances)
 
-		// Set the list of data store to be used...
-		dataStores := make([]string, 0)
+			var definitionInstances []BPMS_Runtime.Instance
+			// append defintion instance item aware... (DataStore)
+			definitionInstances, _ = GetServer().GetWorkflowManager().getInstances(definitions.UUID, "BPMS_Runtime.DefinitionsInstance")
+			for i := 0; i < len(definitionInstances); i++ {
+				this.appendItemAwareElementInstance(definitionInstances[i], instances)
+			}
 
-		processEntity, _ := GetServer().GetEntityManager().getEntityByUuid(instance.(*BPMS_Runtime.ActivityInstance).GetProcessInstancePtr().GetBpmnElementId())
-		definitions := processEntity.GetObject().(*BPMN20.Process).GetDefinitionsPtr()
+			script := "function run(){\n" + activity.(*BPMN20.ScriptTask).GetScript().GetScript() + "\n}"
+			instances, err := this.runScript(definitions, script, "run", instances, sessionId)
 
-		// I will get the list of stores...
-		for i := 0; i < len(definitions.GetRootElement()); i++ {
-			if reflect.TypeOf(definitions.GetRootElement()[i]).String() == "*BPMN20.DataStore" {
-				dataStore := definitions.GetRootElement()[i].(*BPMN20.DataStore)
-				if !Utility.Contains(dataStores, dataStore.GetName()) {
-					dataStores = append(dataStores, dataStore.GetName())
-				}
+			if err != nil {
+				return NewError(Utility.FileLine(), ACTION_EXECUTE_ERROR, SERVER_ERROR_CODE, err)
 			}
 		}
-
-		// List the variable put in the vm...
-		data := make([]string, 0)
-		itemawareElementMap := make(map[string]*BPMS_Runtime.ItemAwareElementInstance)
-
-		// I will set all of it's itemawere element in the vm context...
-		for i := 0; i < len(instance.GetData()); i++ {
-			itemawareElement := instance.GetData()[i]
-			itemawareElementMap[itemawareElement.M_id] = itemawareElement
-			data = append(data, itemawareElement.M_id)
-			var err error
-			var isCollection bool
-			var objects []interface{}
-
-			objects, isCollection, err = this.getItemawareElementData(itemawareElement)
-
-			if err == nil {
-				if isCollection {
-					instances[itemawareElement.M_id] = objects
-				} else {
-					if len(objects) > 0 {
-						instances[itemawareElement.M_id] = objects[0]
-					} else {
-						instances[itemawareElement.M_id] = nil
-					}
-				}
-			}
-		}
-
-		script := "function run(){\n" + activity.(*BPMN20.ScriptTask).GetScript().GetScript() + "\n}"
-		_, vm, err := this.runScript(dataStores, script, "run", instances, sessionId)
-
-		// Empty the map...
-		instance.(*BPMS_Runtime.ActivityInstance).M_data = make([]*BPMS_Runtime.ItemAwareElementInstance, 0)
-
-		// Set back the data values into the itemawareElement
-		for i := 0; i < len(data); i++ {
-			result, _ := vm.Get(data[i])
-			itemawareElement := itemawareElementMap[data[i]]
-			this.setItemawareElementData(itemawareElement, &result)
-			instance.(*BPMS_Runtime.ActivityInstance).M_data = append(instance.(*BPMS_Runtime.ActivityInstance).M_data, itemawareElement)
-		}
-
-		// Set state to completing...
-		if err != nil {
-			instance.(*BPMS_Runtime.ActivityInstance).M_lifecycleState = BPMS_Runtime.LifecycleState_Failed
-		} else {
-			instance.(*BPMS_Runtime.ActivityInstance).M_lifecycleState = BPMS_Runtime.LifecycleState_Completed
-		}
-
 		return nil
 	case *BPMN20.UserTask:
 
@@ -461,45 +421,83 @@ func (this *WorkflowProcessor) executeActivityInstance(instance BPMS_Runtime.Ins
 /**
  * That function is use to evaluate a given script.
  */
-func (this *WorkflowProcessor) runScript(dataStores []string, functionStr string, functionName string, instances map[string]interface{}, sessionId string) (result otto.Value, vm *otto.Otto, err error) {
+func (this *WorkflowProcessor) runScript(definitions *BPMN20.Definitions, functionStr string, functionName string, instances map[string]*BPMS_Runtime.ItemAwareElementInstance, sessionId string) (map[string]*BPMS_Runtime.ItemAwareElementInstance, error) {
+	var err error
 
 	// Remove the xml tag here...
 	functionStr = strings.Replace(functionStr, "<![CDATA[", "", -1)
 	functionStr = strings.Replace(functionStr, "]]>", "", -1)
 
 	// Set the instance on the context...
-	vm = JS.GetJsRuntimeManager().GetVm(sessionId).Copy()
+	vm := JS.GetJsRuntimeManager().GetVm(sessionId).Copy()
 	vm.Set("sessionId", sessionId)
 
 	// Set the server pointer and their services...
 	vm.Set("server", GetServer())
 
-	// initialyse datastore types...
-	for i := 0; i < len(dataStores); i++ {
-		this.initDatastore(dataStores[i], vm)
+	// I will get the list of stores...
+	for i := 0; i < len(definitions.GetRootElement()); i++ {
+		if reflect.TypeOf(definitions.GetRootElement()[i]).String() == "*BPMN20.DataStore" {
+			dataStore := definitions.GetRootElement()[i].(*BPMN20.DataStore)
+			this.initDatastore(dataStore.GetName(), vm)
+		}
 	}
 
+	// Here I will set instance data on the vm context...
 	for k, v := range instances {
-		log.Println("set variable ", k, " with value ", v)
-		vm.Set(k, v)
-	}
+		objects, isCollection, err := this.getItemawareElementData(v)
+		if err == nil {
+			if isCollection {
+				// set an empty array
+				object, _ := vm.Object(k + "=[]")
 
-	log.Println("---> code: ", functionStr)
+				// push the value in it.
+				for i := 0; i < len(objects); i++ {
+					object.Call("push", objects[i])
+				}
+
+			} else {
+				if len(objects) > 0 {
+					vm.Set(k, objects[0])
+				} else {
+					vm.Set(k, nil)
+				}
+			}
+		} else {
+			log.Println("----->462 data error: ", err.Error())
+		}
+	}
 
 	// Set the function string
-	result, err = vm.Run(functionStr)
+	_, err = vm.Run(functionStr)
 	if err != nil {
 		log.Println("Error in code of ", functionName)
-		return
+		return instances, err
 	}
 
-	result, err = vm.Run(functionName + "();")
+	// Call the function.
+	_, err = vm.Run(functionName + "();")
 	if err != nil {
 		log.Println("Error in code of ", functionName)
-		return
+		return instances, err
 	}
 
-	return
+	// Here all was correctly runing, I will get back the items data and set
+	// back to the item objects.
+	for k, v := range instances {
+		data, _ := vm.Get(k)
+		if v != nil {
+			if !data.IsUndefined() {
+				this.setItemawareElementData(v, &data)
+				// set back the instance.
+				instances[v.M_id] = v
+			}
+		} else {
+			log.Println("---> value assiciated with ", k, " is null!!!")
+		}
+	}
+
+	return instances, err
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -568,7 +566,11 @@ func (this *WorkflowProcessor) createActivityInstance(activity BPMN20.Activity, 
 	// I will copy the data reference into the start event...
 	for i := 0; i < len(items); i++ {
 		instance.SetDataRef(items[i])
+		items[i].SetParentPtr(instance)
 	}
+
+	// Create missing itemware elements in the instance.
+	this.createItemAwareElementInstances(instance)
 
 	switch v := activity.(type) {
 	case *BPMN20.AdHocSubProcess:
@@ -622,7 +624,11 @@ func (this *WorkflowProcessor) createEventInstance(event BPMN20.Event, processIn
 	// I will copy the data reference into the start event...
 	for i := 0; i < len(items); i++ {
 		instance.SetDataRef(items[i])
+		items[i].SetParentPtr(instance)
 	}
+
+	// Create missing itemware elements in the instance.
+	this.createItemAwareElementInstances(instance)
 
 	// Select the good event type...
 	switch v := event.(type) {
@@ -700,13 +706,16 @@ func (this *WorkflowProcessor) saveInstance(instance BPMS_Runtime.Instance) {
 
 	switch v := instance.(type) {
 	case *BPMS_Runtime.ActivityInstance:
-		entity = GetServer().GetEntityManager().NewBPMS_RuntimeActivityInstanceEntityFromObject(v)
+		v.GetProcessInstancePtr().SetFlowNodeInstances(instance)
+		entity = GetServer().GetEntityManager().NewBPMS_RuntimeProcessInstanceEntityFromObject(v.GetProcessInstancePtr())
 	case *BPMS_Runtime.ProcessInstance:
 		entity = GetServer().GetEntityManager().NewBPMS_RuntimeProcessInstanceEntityFromObject(v)
 	case *BPMS_Runtime.EventInstance:
-		entity = GetServer().GetEntityManager().NewBPMS_RuntimeEventInstanceEntityFromObject(v)
+		v.GetProcessInstancePtr().SetFlowNodeInstances(instance)
+		entity = GetServer().GetEntityManager().NewBPMS_RuntimeProcessInstanceEntityFromObject(v.GetProcessInstancePtr())
 	case *BPMS_Runtime.GatewayInstance:
-		entity = GetServer().GetEntityManager().NewBPMS_RuntimeGatewayInstanceEntityFromObject(v)
+		v.GetProcessInstancePtr().SetFlowNodeInstances(instance)
+		entity = GetServer().GetEntityManager().NewBPMS_RuntimeProcessInstanceEntityFromObject(v.GetProcessInstancePtr())
 	}
 
 	if entity != nil {
@@ -773,6 +782,7 @@ func (this *WorkflowProcessor) activateInstance(instance BPMS_Runtime.FlowNodeIn
 
 	instance.SetLifecycleState(BPMS_Runtime.LifecycleState_Active)
 	this.saveInstance(instance.(BPMS_Runtime.Instance))
+
 	return nil
 }
 
@@ -902,13 +912,9 @@ func (this *WorkflowProcessor) stillActive(processInstance *BPMS_Runtime.Process
 func (this *WorkflowProcessor) initDatastore(storeId string, vm *otto.Otto) {
 
 	// Create the data store if he not already exist...
-	log.Println("-------> initialyse ", storeId)
 	dataStore_ := GetServer().GetDataManager().getDataStore(storeId)
 	if dataStore_ == nil {
-		log.Println("-------> create the data store ", storeId)
 		dataStore_, _ = GetServer().GetDataManager().createDataStore(storeId, CargoConfig.DataStoreType_KEY_VALUE_STORE, CargoConfig.DataStoreVendor_MYCELIUS)
-	} else {
-		log.Println("-------> data store ", storeId, " was found!")
 	}
 
 	// So here I will get the prototypes from the store...
@@ -918,13 +924,150 @@ func (this *WorkflowProcessor) initDatastore(storeId string, vm *otto.Otto) {
 			// Generate the constructor code.
 			constructorSrc := prototypes[i].generateConstructor()
 			_, err = vm.Run(constructorSrc)
-
 			if err != nil {
 				log.Println("878 ----> ", err)
 			}
 		}
 	}
+}
 
+func (this *WorkflowProcessor) appendItemAwareElementInstance(instance BPMS_Runtime.Instance, instances map[string]*BPMS_Runtime.ItemAwareElementInstance) {
+	// Initialisation of the data instances.
+	for i := 0; i < len(instance.GetDataRef()); i++ {
+		instances[instance.GetDataRef()[i].M_id] = instance.GetDataRef()[i]
+	}
+
+	// Ref
+	for i := 0; i < len(instance.GetData()); i++ {
+		instances[instance.GetData()[i].M_id] = instance.GetData()[i]
+	}
+}
+
+func (this *WorkflowProcessor) getItemAwareElementId(ref BPMN20.ItemAwareElement) string {
+
+	var id string
+
+	if reflect.TypeOf(ref).String() == "*BPMN20.DataObjectReference" {
+		id = ref.(*BPMN20.DataObjectReference).GetDataObjectRef().GetId()
+	} else if reflect.TypeOf(ref).String() == "*BPMN20.DataStoreReference" {
+		id = ref.(*BPMN20.DataStoreReference).GetDataStoreRef().GetId()
+	} else {
+		id = ref.(BPMN20.BaseElement).GetId()
+	}
+
+	return id
+}
+
+func (this *WorkflowProcessor) containItemAwareElementInstance(id string, instance BPMS_Runtime.Instance) bool {
+	for i := 0; i < len(instance.GetData()); i++ {
+		if instance.GetData()[i].M_id == id {
+			return true
+		}
+	}
+	for i := 0; i < len(instance.GetDataRef()); i++ {
+		if instance.GetDataRef()[i].M_id == id {
+			return true
+		}
+	}
+	return false
+}
+
+/**
+ * Create instance if there are not already existing.
+ */
+func (this *WorkflowProcessor) createItemAwareElementInstances(instance BPMS_Runtime.Instance) {
+
+	bpmnElementEntity, err := GetServer().GetEntityManager().getEntityByUuid(instance.GetBpmnElementId())
+	if err == nil {
+		var itemAwareElements []BPMN20.ItemAwareElement
+		bpmnElement := bpmnElementEntity.GetObject()
+
+		// So here I will get data element from different type.
+		switch v := bpmnElement.(type) {
+		case *BPMN20.Definitions:
+			definitions := v
+			for i := 0; i < len(definitions.GetRootElement()); i++ {
+				switch v := definitions.GetRootElement()[i].(type) {
+				case *BPMN20.DataStore:
+					itemAwareElements = append(itemAwareElements, v)
+				}
+			}
+		case *BPMN20.Process:
+			process := v
+			// The property...
+			for i := 0; i < len(process.GetProperty()); i++ {
+				itemAwareElements = append(itemAwareElements, process.GetProperty()[i])
+			}
+
+			// The io specification.
+			for i := 0; i < len(process.GetIoSpecification().GetDataOutput()); i++ {
+				itemAwareElements = append(itemAwareElements, process.GetIoSpecification().GetDataOutput()[i])
+			}
+
+			for i := 0; i < len(process.GetIoSpecification().GetDataInput()); i++ {
+				itemAwareElements = append(itemAwareElements, process.GetIoSpecification().GetDataInput()[i])
+			}
+
+			for i := 0; i < len(process.GetFlowElement()); i++ {
+				switch v := process.GetFlowElement()[i].(type) {
+				case *BPMN20.DataObject:
+					itemAwareElements = append(itemAwareElements, v)
+				}
+			}
+
+		case BPMN20.Activity:
+			activity := v
+			// The property...
+			for i := 0; i < len(activity.GetProperty()); i++ {
+				itemAwareElements = append(itemAwareElements, activity.GetProperty()[i])
+			}
+
+			// The io specification.
+			for i := 0; i < len(activity.GetIoSpecification().GetDataOutput()); i++ {
+				itemAwareElements = append(itemAwareElements, activity.GetIoSpecification().GetDataOutput()[i])
+			}
+
+			for i := 0; i < len(activity.GetIoSpecification().GetDataInput()); i++ {
+				itemAwareElements = append(itemAwareElements, activity.GetIoSpecification().GetDataInput()[i])
+			}
+		case BPMN20.Event:
+			event := v
+			// The property...
+			for i := 0; i < len(event.GetProperty()); i++ {
+				itemAwareElements = append(itemAwareElements, event.GetProperty()[i])
+			}
+
+			switch v := bpmnElement.(type) {
+			case BPMN20.CatchEvent:
+				catchEvent := v
+				for i := 0; i < len(catchEvent.GetDataOutput()); i++ {
+					itemAwareElements = append(itemAwareElements, catchEvent.GetDataOutput()[i])
+				}
+			case BPMN20.ThrowEvent:
+				throwEvent := v
+				for i := 0; i < len(throwEvent.GetDataInput()); i++ {
+					itemAwareElements = append(itemAwareElements, throwEvent.GetDataInput()[i])
+				}
+			}
+		}
+
+		for i := 0; i < len(itemAwareElements); i++ {
+			ref := itemAwareElements[i]
+			if !this.containItemAwareElementInstance(ref.(BPMN20.BaseElement).GetId(), instance) {
+				// Create new source element in case it not exist...
+				itemawareElement := new(BPMS_Runtime.ItemAwareElementInstance)
+				itemawareElement.UUID = "BPMS_Runtime.ItemAwareElementInstance%" + Utility.RandomUUID()
+				itemawareElement.M_bpmnElementId = ref.(BPMN20.BaseElement).GetUUID()
+				itemawareElement.M_id = ref.(BPMN20.BaseElement).GetId()
+				itemawareElement.NeedSave = true
+				itemawareElement.SetParentPtr(instance)
+				instance.SetData(itemawareElement)
+				instance.SetData(itemawareElement)
+				// save the instance.
+				this.saveInstance(instance)
+			}
+		}
+	}
 }
 
 /**
@@ -934,34 +1077,31 @@ func (this *WorkflowProcessor) initDatastore(storeId string, vm *otto.Otto) {
  * dataAssociations contain the list of dataAssociations to set.
  */
 func (this *WorkflowProcessor) setDataAssocication(source BPMS_Runtime.Instance, target BPMS_Runtime.Instance, dataAssociations []BPMN20.DataAssociation, sessionId string) {
-
 	// Index the item aware in a map to access it by theire id's
-	srcItemawareElementMap := make(map[string]*BPMS_Runtime.ItemAwareElementInstance, 0)
-	trgItemawareElementMap := make(map[string]*BPMS_Runtime.ItemAwareElementInstance, 0)
+	instances := make(map[string]*BPMS_Runtime.ItemAwareElementInstance, 0)
 
-	// The source...
-	for i := 0; i < len(source.GetDataRef()); i++ {
-		log.Println("src item data: ", source.GetDataRef()[i].M_id)
-		srcItemawareElementMap[source.GetDataRef()[i].M_id] = source.GetDataRef()[i]
+	// I will found the definition from the source.
+	var definitions *BPMN20.Definitions
+	switch v := source.(type) {
+	case BPMS_Runtime.FlowNodeInstance:
+		processEntity, _ := GetServer().GetEntityManager().getEntityByUuid(v.GetProcessInstancePtr().GetBpmnElementId())
+		definitions = processEntity.GetObject().(*BPMN20.Process).GetDefinitionsPtr()
+	case *BPMS_Runtime.ProcessInstance:
+		processEntity, _ := GetServer().GetEntityManager().getEntityByUuid(v.GetBpmnElementId())
+		definitions = processEntity.GetObject().(*BPMN20.Process).GetDefinitionsPtr()
 	}
-	// Ref
-	for i := 0; i < len(source.GetData()); i++ {
-		log.Println("src item data ref: ", source.GetData()[i].M_id)
-		srcItemawareElementMap[source.GetData()[i].M_id] = source.GetData()[i]
-	}
+	var err error
+	var definitionInstances []BPMS_Runtime.Instance
 
-	// The target
-	for i := 0; i < len(target.GetDataRef()); i++ {
-		log.Println("trg item data: ", target.GetDataRef()[i].M_id)
-		trgItemawareElementMap[target.GetDataRef()[i].M_id] = target.GetDataRef()[i]
-	}
-	// Ref
-	for i := 0; i < len(target.GetData()); i++ {
-		log.Println("trg item data ref: ", target.GetData()[i].M_id)
-		trgItemawareElementMap[target.GetData()[i].M_id] = target.GetData()[i]
+	// append defintion instance item aware... (DataStore)
+	definitionInstances, _ = GetServer().GetWorkflowManager().getInstances(definitions.UUID, "BPMS_Runtime.DefinitionsInstance")
+	for i := 0; i < len(definitionInstances); i++ {
+		this.appendItemAwareElementInstance(definitionInstances[i], instances)
 	}
 
-	var dataStores []string
+	// Apppend the source and the target
+	this.appendItemAwareElementInstance(source, instances)
+	this.appendItemAwareElementInstance(target, instances)
 
 	// Set the data from the source instance to the
 	// target instance.
@@ -969,183 +1109,70 @@ func (this *WorkflowProcessor) setDataAssocication(source BPMS_Runtime.Instance,
 		dataAssociation := dataAssociations[i]
 		sourceRefs := dataAssociation.GetSourceRef()
 		targetRef := dataAssociation.GetTargetRef()
+		targetId := this.getItemAwareElementId(targetRef)
 
 		// Get transtformamtion if there one.
 		transformation := dataAssociation.GetTransformation()
 
 		// Get assignement (to, from)
 		assignments := dataAssociation.GetAssignment()
+		trgItemawareElement := instances[targetId]
 
-		// The target id...
-		var targetId string
-		var tagetBpmnElementId string
-		if reflect.TypeOf(targetRef).String() == "*BPMN20.DataObjectReference" {
-			targetId = targetRef.(*BPMN20.DataObjectReference).GetDataObjectRef().GetId()
-			tagetBpmnElementId = targetRef.(*BPMN20.DataObjectReference).GetDataObjectRef().GetUUID()
-		} else if reflect.TypeOf(targetRef).String() == "*BPMN20.DataStoreReference" {
-			targetId = targetRef.(*BPMN20.DataStoreReference).GetDataStoreRef().GetId()
-			tagetBpmnElementId = targetRef.(*BPMN20.DataStoreReference).GetDataStoreRef().GetUUID()
-			storeId := targetRef.(*BPMN20.DataStoreReference).GetDataStoreRef().GetName()
-			if !Utility.Contains(dataStores, storeId) {
-				dataStores = append(dataStores, storeId)
-			}
-
-		} else {
-			targetId = targetRef.(BPMN20.BaseElement).GetId()
-			tagetBpmnElementId = targetRef.(BPMN20.BaseElement).GetUUID()
-		}
-
-		trgItemawareElement := trgItemawareElementMap[targetId]
-		if trgItemawareElement == nil {
-			if trgItemawareElement == nil {
-				trgItemawareElement = new(BPMS_Runtime.ItemAwareElementInstance)
-				trgItemawareElement.UUID = "BPMS_Runtime.ItemAwareElementInstance%" + Utility.RandomUUID()
-				trgItemawareElement.M_bpmnElementId = tagetBpmnElementId
-				trgItemawareElement.M_id = targetId
-				trgItemawareElementMap[targetId] = trgItemawareElement
-				target.SetData(trgItemawareElement)
-			}
-		}
-
-		// The from assignements evaluations...
-		for k := 0; k < len(assignments); k++ {
-			assignment := assignments[k]
+		// The 'from' assignements evaluations...
+		for j := 0; j < len(assignments); j++ {
+			assignment := assignments[j]
 			if assignment.GetFrom() != nil {
 				from := assignment.GetFrom()
-				instances := make(map[string]interface{}, 0)
-				instances[targetId] = nil
-
 				// In that case no value are contain in the item aware
 				// element...
-				script := "function setFrom(){\n" + from.GetOther().(string) + "\n}"
-				targetRefData, vm, err := this.runScript(dataStores, script, "setFrom", instances, sessionId)
-
-				// In case of a null value...
-				if targetRefData.IsNull() {
-					targetRefData, err = vm.Get(targetId)
-				}
-
-				if err != nil {
-					// TODO log error here.
-					log.Println("--> script error ", err)
-				} else {
-					// Dependending of the data type of targetData I will
-					this.setItemawareElementData(trgItemawareElement, &targetRefData)
-				}
-			}
-		}
-
-		// Here I will iterate over the list of sources.
-		for j := 0; j < len(sourceRefs); j++ {
-			sourceRef := sourceRefs[j]
-			var sourceId string
-			if reflect.TypeOf(sourceRef).String() == "*BPMN20.DataObjectReference" {
-				sourceId = sourceRef.(*BPMN20.DataObjectReference).GetDataObjectRef().GetId()
-			} else if reflect.TypeOf(sourceRef).String() == "*BPMN20.DataStoreReference" {
-				sourceId = sourceRef.(*BPMN20.DataStoreReference).GetDataStoreRef().GetId()
-				storeId := sourceRef.(*BPMN20.DataStoreReference).GetDataStoreRef().GetName()
-				if !Utility.Contains(dataStores, storeId) {
-					dataStores = append(dataStores)
-				}
-			} else {
-				sourceId = sourceRef.(BPMN20.BaseElement).GetId()
-			}
-
-			srcItemawareElement := srcItemawareElementMap[sourceId]
-			if srcItemawareElement != nil {
-
-				// Apply a transformation over data.
-				if transformation != nil {
-					instances := make(map[string]interface{}, 0)
-					// The value display in the javasript side are the value of the M_data...
-					var err error
-					var isCollection bool
-					var objects []interface{}
-
-					objects, isCollection, err = this.getItemawareElementData(srcItemawareElement)
-					if err == nil {
-						if isCollection {
-							instances[srcItemawareElement.M_id] = objects
-						} else {
-							if len(objects) > 0 {
-								instances[srcItemawareElement.M_id] = objects[0]
-							} else {
-								instances[srcItemawareElement.M_id] = nil
-							}
-						}
-					} else {
-						log.Println("----->956 data error: ", err.Error())
-					}
-
-					script := "function transform(){\n" + transformation.GetOther().(string) + "\n}"
-					var targetRefData otto.Value
-					targetRefData, _, err = this.runScript(dataStores, script, "transform", instances, sessionId)
-
+				if len(from.GetOther().(string)) > 0 {
+					script := "function setFrom(){\n" + from.GetOther().(string) + "\n}"
+					instances, err = this.runScript(definitions, script, "setFrom", instances, sessionId)
 					if err != nil {
 						// TODO log error here.
-						log.Println("--------> script error ", err)
-					} else {
-						// Dependending of the data type of targetData I will
-						this.setItemawareElementData(trgItemawareElement, &targetRefData)
+						log.Println("--> 992 script error ", err)
 					}
-				} else {
-					// Set the data directly...
-					trgItemawareElement.SetData(srcItemawareElement.M_data)
 				}
-			} else {
-				log.Println("==========================================> nil nil ", sourceId)
 			}
 		}
 
-		// The to assignements evaluations...
-		for k := 0; k < len(assignments); k++ {
-			assignment := assignments[k]
-			if assignment.GetTo() != nil {
+		// Here I will iterate over the list of sources, create it itemaware
+		// elements if there's not exist and apply transformation on it.
+		for j := 0; j < len(sourceRefs); j++ {
+			sourceRef := sourceRefs[j]
+			sourceId := this.getItemAwareElementId(sourceRef)
+			srcItemawareElement := instances[sourceId]
 
-				to := assignment.GetTo()
-				instances := make(map[string]interface{}, 0)
-				var err error
-				var isCollection bool
-				var objects []interface{}
-				objects, isCollection, err = this.getItemawareElementData(trgItemawareElement)
-
-				for j := 0; j < len(sourceRefs); j++ {
-					sourceRef := sourceRefs[j]
-					var sourceId string
-					if reflect.TypeOf(sourceRef).String() == "*BPMN20.DataObjectReference" {
-						sourceId = sourceRef.(*BPMN20.DataObjectReference).GetDataObjectRef().GetId()
-					} else if reflect.TypeOf(sourceRef).String() == "*BPMN20.DataStoreReference" {
-						sourceId = sourceRef.(*BPMN20.DataStoreReference).GetDataStoreRef().GetId()
-						storeId := sourceRef.(*BPMN20.DataStoreReference).GetDataStoreRef().GetName()
-						if !Utility.Contains(dataStores, storeId) {
-							dataStores = append(dataStores)
-						}
-					} else {
-						sourceId = sourceRef.(BPMN20.BaseElement).GetId()
-					}
-
-					// I use the sourceId with the target value because of transformation...
-					if err == nil {
-						if isCollection {
-							instances[sourceId] = objects
-						} else {
-							if len(objects) > 0 {
-								instances[sourceId] = objects[0]
-							} else {
-								instances[sourceId] = nil
-							}
-						}
-					} else {
-						log.Println("----->998 data error: ", err.Error())
+			//  The 'transformation' evaluations...
+			if transformation != nil {
+				// The value display in the javasript side are the value of the M_data...
+				if len(transformation.GetOther().(string)) > 0 {
+					script := "function transform(){\n" + transformation.GetOther().(string) + "\n}"
+					instances, err = this.runScript(definitions, script, "transform", instances, sessionId)
+					if err != nil {
+						// TODO log error here.
+						log.Println("--> script error 1025 ", err)
 					}
 				}
+			} else {
+				// Set the data directly...
+				trgItemawareElement.SetData(srcItemawareElement.M_data)
+			}
+		}
 
+		// The 'to' assignements evaluations...
+		for j := 0; j < len(assignments); j++ {
+			assignment := assignments[j]
+			if assignment.GetTo() != nil {
+				to := assignment.GetTo()
 				// In that case no value are contain in the item aware
 				// element...
-				script := "function setTo(){\n" + to.GetOther().(string) + "\n}"
-				_, _, err = this.runScript(dataStores, script, "setTo", instances, sessionId)
-				if err != nil {
-					log.Println("----->1006 data error: ", err.Error())
+				if len(to.GetOther().(string)) > 0 {
+					script := "function setTo(){\n" + to.GetOther().(string) + "\n}"
+					instances, err = this.runScript(definitions, script, "setTo", instances, sessionId)
+					if err != nil {
+						log.Println("----->1047 data error: ", err.Error())
+					}
 				}
 			}
 		}
@@ -1160,15 +1187,23 @@ func (this *WorkflowProcessor) setItemawareElementData(instance *BPMS_Runtime.It
 
 	bpmnElementEntity, _ := GetServer().GetEntityManager().getEntityByUuid(instance.M_bpmnElementId)
 	itemAwareElement := bpmnElementEntity.GetObject().(BPMN20.ItemAwareElement)
+	//itemawareElementData, _, _ := this.getItemawareElementData(instance)
+
+	// get general information.
 	typeName, isCollection := this.getItemawareElementItemDefinitionType(itemAwareElement)
 
 	if strings.HasPrefix(typeName, "xsd:") == true {
 		// Here I have a base type
 		if isCollection == true {
-			// In case of a collection.
-			val, err := json.Marshal(data)
+			object, err := data.Export()
 			if err == nil {
-				strVal = string(val)
+				objectStr, err := json.Marshal(object)
+				if err == nil {
+					strVal = string(objectStr)
+				} else {
+					return err
+				}
+
 			} else {
 				return err
 			}
@@ -1218,6 +1253,10 @@ func (this *WorkflowProcessor) setItemawareElementData(instance *BPMS_Runtime.It
 	// Set back the value here.
 	instance.SetData([]byte(b64.StdEncoding.EncodeToString([]byte(strVal))))
 
+	// Save it new value.
+	instance.GetParentPtr().SetData(instance) // create or update the data.
+	this.saveInstance(instance.GetParentPtr())
+
 	return nil
 }
 
@@ -1248,13 +1287,25 @@ func (this *WorkflowProcessor) getItemawareElementData(itemawareElement *BPMS_Ru
 	if strings.HasPrefix(typeName, "xsd:") {
 		// Here I have a base type
 		if isCollection {
+			dataStr := strings.TrimSpace(string(data))
 			// In case of a collection.
-			err := json.Unmarshal(data, &objects)
+			if len(dataStr) == 0 {
+				// empty array...
+				return objects, true, nil
+			}
+
+			if !strings.HasPrefix(dataStr, "[") && !strings.HasSuffix(dataStr, "[") {
+				dataStr = "[" + dataStr + "]"
+			}
+
+			// Unmarshal the data values.
+			err := json.Unmarshal([]byte(dataStr), &objects)
 			if err == nil {
 				return objects, true, nil
 			} else {
 				return nil, true, err
 			}
+
 		} else {
 			// Here I got a json structure...
 			if typeName == "xsd:boolean" {
@@ -1351,6 +1402,8 @@ func (this *WorkflowProcessor) getDefinitionInstance(definitionsId string, bpmnD
 		definitionsInstance = definitionsInstanceEntity.GetObject().(*BPMS_Runtime.DefinitionsInstance)
 		definitionsInstance.M_id = definitionsId
 		definitionsInstance.M_bpmnElementId = bpmnDefinitionsId
+		// Create dataStore object.
+		this.createItemAwareElementInstances(definitionsInstance)
 	} else {
 		definitionsInstance = definitionsInstanceEntity.GetObject().(*BPMS_Runtime.DefinitionsInstance)
 	}
@@ -1423,7 +1476,6 @@ func (this *WorkflowProcessor) getNextProcessInstanceNumber() int {
 
 	// The next number...
 	number += 1
-
 	return number
 }
 
@@ -1451,6 +1503,9 @@ func (this *WorkflowProcessor) getItemawareElementItemDefinitionType(itemawareEl
 	} else if reflect.TypeOf(itemawareElement).String() == "*BPMN20.DataObject" {
 		typeName = itemawareElement.(*BPMN20.DataObject).M_itemSubjectRef
 		isCollection = itemawareElement.(*BPMN20.DataObject).M_isCollection
+	} else if reflect.TypeOf(itemawareElement).String() == "*BPMN20.DataStore" {
+		typeName = itemawareElement.(*BPMN20.DataStore).M_itemSubjectRef
+		isCollection = true
 	}
 
 	return typeName, isCollection

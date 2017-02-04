@@ -773,6 +773,14 @@ TableCell.prototype.formatValue = function (value) {
 	// In case of generic value I will try to determine the type of the entity... 
 	if (fieldType == "xs.[]uint8") {
 		if (isString(value)) {
+			try {
+				value = JSON.parse(value);
+			} catch (e) {
+				/** Nothing here */
+			}
+		}
+
+		if (isString(value)) {
 			fieldType = "xs.string"
 		} else {
 			if (isArray(value)) {

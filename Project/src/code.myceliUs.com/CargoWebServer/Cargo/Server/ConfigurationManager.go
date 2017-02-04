@@ -236,7 +236,7 @@ func (this *ConfigurationManager) GetLocalServiceConfigurations() []CargoConfig.
 	var ldapManager CargoConfig.ServiceConfiguration
 	ldapManager.M_id = "LdapManager"
 	ldapManager.M_ipv4 = "127.0.0.1"
-	ldapManager.M_start = true
+	ldapManager.M_start = false
 	ldapManager.M_port = 9393
 	ldapManager.M_hostName = "localhost"
 	services[2] = ldapManager
@@ -244,7 +244,7 @@ func (this *ConfigurationManager) GetLocalServiceConfigurations() []CargoConfig.
 	var projectManager CargoConfig.ServiceConfiguration
 	projectManager.M_id = "ProjectManager"
 	projectManager.M_ipv4 = "127.0.0.1"
-	projectManager.M_start = true
+	projectManager.M_start = false
 	projectManager.M_port = 9393
 	projectManager.M_hostName = "localhost"
 	services[3] = projectManager
@@ -252,7 +252,7 @@ func (this *ConfigurationManager) GetLocalServiceConfigurations() []CargoConfig.
 	var fileManager CargoConfig.ServiceConfiguration
 	fileManager.M_id = "FileManager"
 	fileManager.M_ipv4 = "127.0.0.1"
-	fileManager.M_start = true
+	fileManager.M_start = false
 	fileManager.M_port = 9393
 	fileManager.M_hostName = "localhost"
 	services[4] = fileManager
