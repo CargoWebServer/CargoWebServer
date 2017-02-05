@@ -194,6 +194,7 @@ void Action::run()
             doc.setArray(::QJsonArray::fromVariantList(retVal.toList()));
 
             // So here I will
+            qDebug()<<doc.toJson();
             d->set_databytes(doc.toJson().toStdString());
 
         } else if(retVal.type() == QMetaType::Int){

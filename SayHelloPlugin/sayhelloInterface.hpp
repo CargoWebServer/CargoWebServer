@@ -5,6 +5,9 @@ class SayHelloInterface
 {
 public:
     virtual ~SayHelloInterface() {}
+
+public slots:
+    // Slot are callable from JS
     virtual QString sayHelloTo(const QString &message) = 0;
 };
 

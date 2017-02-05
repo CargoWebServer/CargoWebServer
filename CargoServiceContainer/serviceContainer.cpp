@@ -122,6 +122,7 @@ QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
     QScriptValueList params_;
     // Now I will set the function parameters...
     for(int i= 1; i < params.length(); i++){
+        qDebug() << params.at(i);
         params_.append(engine.newVariant(params.at(i)));
     }
 

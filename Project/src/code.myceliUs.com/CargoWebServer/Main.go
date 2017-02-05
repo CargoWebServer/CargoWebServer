@@ -7,7 +7,6 @@ import (
 
 	"code.google.com/p/go.net/websocket"
 	"code.myceliUs.com/CargoWebServer/Cargo/Server"
-	//	"github.com/pkg/profile"
 )
 
 func main() {
@@ -15,6 +14,7 @@ func main() {
 	// Handle application path...
 	root := Server.GetServer().GetConfigurationManager().GetApplicationDirectoryPath()
 	port := Server.GetServer().GetConfigurationManager().GetServerPort()
+
 	log.Println("Start serve files from ", root)
 
 	// Start the web socket handler

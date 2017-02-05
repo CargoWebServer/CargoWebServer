@@ -2,8 +2,6 @@ package Server
 
 import (
 	"encoding/xml"
-	// "log"
-	// "strings"
 )
 
 /**
