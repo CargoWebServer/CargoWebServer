@@ -107,10 +107,12 @@ func WriteClassFile(outputPath, packName string, className string, classCode str
 	goPath := os.Getenv("GOPATH")
 
 	path := goPath + "/src/" + outputPath + packName
-	path = strings.Replace(path, "/", "\\", -1)
-	if !strings.HasSuffix(path, "\\") {
-		path += "\\"
+	path = strings.Replace(path, "/", string(os.PathSeparator), -1)
+	path = strings.Replace(path, "\\", string(os.PathSeparator), -1)
+	if !strings.HasSuffix(path, string(os.PathSeparator)) {
+		path += string(os.PathSeparator)
 	}
+
 	if !Utility.Exists(path) {
 		os.MkdirAll(path, 0777)
 	}
@@ -180,7 +182,8 @@ func generate(inputPath string, packName string, xmlRootElementName string) {
 	outputPath = "code.myceliUs.com/CargoWebServer/Cargo/Entities/"
 
 	path := inputPath + "\\" + packName
-	path = strings.Replace(path, "/", "\\", -1)
+	path = strings.Replace(path, "/", string(os.PathSeparator), -1)
+	path = strings.Replace(path, "\\", string(os.PathSeparator), -1)
 
 	loadCMOF(path + ".cmof")
 	loadXSD(path + ".xsd")

@@ -92,8 +92,16 @@ func (this *Parameter) SetParametersPtr(ref interface{}){
 		this.M_parametersPtr = ref.(string)
 	}else{
 		this.m_parametersPtr = ref.(*Parameter)
-		this.M_parametersPtr = ref.(*Parameter).GetName()
+		this.M_parametersPtr = ref.(*Parameter).GetUUID()
 	}
 }
 
 /** Remove reference Parameters **/
+func (this *Parameter) RemoveParametersPtr(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*Parameter)
+	if toDelete.GetUUID() == this.m_parametersPtr.GetUUID() {
+		this.m_parametersPtr = nil
+		this.M_parametersPtr = ""
+	}
+}

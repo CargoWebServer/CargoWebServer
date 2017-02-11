@@ -63,7 +63,7 @@ func (this *Action) SetParameters(ref interface{}){
 	isExist := false
 	var parameterss []*Parameter
 	for i:=0; i<len(this.M_parameters); i++ {
-		if this.M_parameters[i].GetName() != ref.(*Parameter).GetName() {
+		if this.M_parameters[i].GetUUID() != ref.(*Parameter).GetUUID() {
 			parameterss = append(parameterss, this.M_parameters[i])
 		} else {
 			isExist = true
@@ -77,6 +77,17 @@ func (this *Action) SetParameters(ref interface{}){
 }
 
 /** Remove reference Parameters **/
+func (this *Action) RemoveParameters(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*Parameter)
+	parameters_ := make([]*Parameter, 0)
+	for i := 0; i < len(this.M_parameters); i++ {
+		if toDelete.GetUUID() != this.M_parameters[i].GetUUID() {
+			parameters_ = append(parameters_, this.M_parameters[i])
+		}
+	}
+	this.M_parameters = parameters_
+}
 
 /** Results **/
 func (this *Action) GetResults() []*Parameter{
@@ -89,7 +100,7 @@ func (this *Action) SetResults(ref interface{}){
 	isExist := false
 	var resultss []*Parameter
 	for i:=0; i<len(this.M_results); i++ {
-		if this.M_results[i].GetName() != ref.(*Parameter).GetName() {
+		if this.M_results[i].GetUUID() != ref.(*Parameter).GetUUID() {
 			resultss = append(resultss, this.M_results[i])
 		} else {
 			isExist = true
@@ -103,6 +114,17 @@ func (this *Action) SetResults(ref interface{}){
 }
 
 /** Remove reference Results **/
+func (this *Action) RemoveResults(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*Parameter)
+	results_ := make([]*Parameter, 0)
+	for i := 0; i < len(this.M_results); i++ {
+		if toDelete.GetUUID() != this.M_results[i].GetUUID() {
+			results_ = append(results_, this.M_results[i])
+		}
+	}
+	this.M_results = results_
+}
 
 /** Entities **/
 func (this *Action) GetEntitiesPtr() *Entities{

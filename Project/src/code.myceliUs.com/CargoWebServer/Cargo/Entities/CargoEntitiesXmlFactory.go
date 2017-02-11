@@ -89,6 +89,111 @@ func (this *CargoEntitiesXmlFactory)SerializeXml(outputPath string, toSerialize 
 	return nil
 }
 
+/** inititialisation of Account **/
+func (this *CargoEntitiesXmlFactory) InitAccount(xmlElement *CargoEntities.XsdAccount,object *CargoEntities.Account){
+	log.Println("Initialize Account")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoEntities.Account%" + Utility.RandomUUID()	}
+
+	/** Account **/
+	object.M_id= xmlElement.M_id
+
+	/** Init ref userRef **/
+	if len(object.M_id) == 0 {
+		this.m_references[object.UUID] = object
+	}
+	if _, ok:= this.m_object[object.M_id]; !ok {
+		this.m_object[object.M_id]=make(map[string][]string)
+	}
+	if xmlElement.M_userRef !=nil {
+		if _, ok:= this.m_object[object.M_id]["userRef"]; !ok {
+			this.m_object[object.M_id]["userRef"]=make([]string,0)
+		}
+		this.m_object[object.M_id]["userRef"] = append(this.m_object[object.M_id]["userRef"], *xmlElement.M_userRef)
+	}
+
+
+	/** Init ref rolesRef **/
+	if len(object.M_id) == 0 {
+		this.m_references[object.UUID] = object
+	}
+	if _, ok:= this.m_object[object.M_id]; !ok {
+		this.m_object[object.M_id]=make(map[string][]string)
+	}
+	for i:=0; i < len(xmlElement.M_rolesRef); i++ {
+		if _, ok:= this.m_object[object.M_id]["rolesRef"]; !ok {
+			this.m_object[object.M_id]["rolesRef"]=make([]string,0)
+		}
+		this.m_object[object.M_id]["rolesRef"] = append(this.m_object[object.M_id]["rolesRef"], xmlElement.M_rolesRef[i])
+	}
+
+
+	/** Init permission **/
+	object.M_permissions= make([]*CargoEntities.Permission,0)
+	for i:=0;i<len(xmlElement.M_permissions); i++{
+		val:=new(CargoEntities.Permission)
+		this.InitPermission(xmlElement.M_permissions[i],val)
+		object.M_permissions= append(object.M_permissions, val)
+
+		/** association initialisation **/
+		val.SetAccountPtr(object)
+	}
+
+	/** Init session **/
+	object.M_sessions= make([]*CargoEntities.Session,0)
+	for i:=0;i<len(xmlElement.M_sessions); i++{
+		val:=new(CargoEntities.Session)
+		this.InitSession(xmlElement.M_sessions[i],val)
+		object.M_sessions= append(object.M_sessions, val)
+
+		/** association initialisation **/
+		val.SetAccountPtr(object)
+	}
+
+	/** Entity **/
+	object.M_name= xmlElement.M_name
+
+	/** Entity **/
+	object.M_password= xmlElement.M_password
+
+	/** Entity **/
+	object.M_email= xmlElement.M_email
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** inititialisation of Group **/
+func (this *CargoEntitiesXmlFactory) InitGroup(xmlElement *CargoEntities.XsdGroup,object *CargoEntities.Group){
+	log.Println("Initialize Group")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoEntities.Group%" + Utility.RandomUUID()	}
+
+	/** Group **/
+	object.M_id= xmlElement.M_id
+
+	/** Init ref membersRef **/
+	if len(object.M_id) == 0 {
+		this.m_references[object.UUID] = object
+	}
+	if _, ok:= this.m_object[object.M_id]; !ok {
+		this.m_object[object.M_id]=make(map[string][]string)
+	}
+	for i:=0; i < len(xmlElement.M_membersRef); i++ {
+		if _, ok:= this.m_object[object.M_id]["membersRef"]; !ok {
+			this.m_object[object.M_id]["membersRef"]=make([]string,0)
+		}
+		this.m_object[object.M_id]["membersRef"] = append(this.m_object[object.M_id]["membersRef"], xmlElement.M_membersRef[i])
+	}
+
+
+	/** Entity **/
+	object.M_name= xmlElement.M_name
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
 /** inititialisation of File **/
 func (this *CargoEntitiesXmlFactory) InitFile(xmlElement *CargoEntities.XsdFile,object *CargoEntities.File){
 	log.Println("Initialize File")
@@ -148,36 +253,34 @@ func (this *CargoEntitiesXmlFactory) InitFile(xmlElement *CargoEntities.XsdFile,
 	}
 }
 
-/** inititialisation of Log **/
-func (this *CargoEntitiesXmlFactory) InitLog(xmlElement *CargoEntities.XsdLog,object *CargoEntities.Log){
-	log.Println("Initialize Log")
+/** inititialisation of Project **/
+func (this *CargoEntitiesXmlFactory) InitProject(xmlElement *CargoEntities.XsdProject,object *CargoEntities.Project){
+	log.Println("Initialize Project")
 	if len(object.UUID) == 0 {
-		object.UUID = "CargoEntities.Log%" + Utility.RandomUUID()	}
+		object.UUID = "CargoEntities.Project%" + Utility.RandomUUID()	}
 
-	/** Init logEntry **/
-	object.M_entries= make([]*CargoEntities.LogEntry,0)
-	for i:=0;i<len(xmlElement.M_entries); i++{
-		val:=new(CargoEntities.LogEntry)
-		this.InitLogEntry(xmlElement.M_entries[i],val)
-		object.M_entries= append(object.M_entries, val)
+	/** Project **/
+	object.M_id= xmlElement.M_id
 
-		/** association initialisation **/
+	/** Init ref filesRef **/
+	if len(object.M_id) == 0 {
+		this.m_references[object.UUID] = object
 	}
+	if _, ok:= this.m_object[object.M_id]; !ok {
+		this.m_object[object.M_id]=make(map[string][]string)
+	}
+	for i:=0; i < len(xmlElement.M_filesRef); i++ {
+		if _, ok:= this.m_object[object.M_id]["filesRef"]; !ok {
+			this.m_object[object.M_id]["filesRef"]=make([]string,0)
+		}
+		this.m_object[object.M_id]["filesRef"] = append(this.m_object[object.M_id]["filesRef"], xmlElement.M_filesRef[i])
+	}
+
+
+	/** Entity **/
+	object.M_name= xmlElement.M_name
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
-	}
-}
-
-/** inititialisation of Action **/
-func (this *CargoEntitiesXmlFactory) InitAction(xmlElement *CargoEntities.XsdAction,object *CargoEntities.Action){
-	log.Println("Initialize Action")
-	if len(object.UUID) == 0 {
-		object.UUID = "CargoEntities.Action%" + Utility.RandomUUID()	}
-
-	/** Action **/
-	object.M_name= xmlElement.M_name
-	if len(object.M_name) > 0 {
-		this.m_references[object.M_name] = object
 	}
 }
 
@@ -303,6 +406,105 @@ func (this *CargoEntitiesXmlFactory) InitEntities(xmlElement *CargoEntities.XsdE
 	}
 }
 
+/** inititialisation of Session **/
+func (this *CargoEntitiesXmlFactory) InitSession(xmlElement *CargoEntities.XsdSession,object *CargoEntities.Session){
+	log.Println("Initialize Session")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoEntities.Session%" + Utility.RandomUUID()	}
+
+	/** Init ref computerRef **/
+	if len(object.M_id) == 0 {
+		this.m_references[object.UUID] = object
+	}
+	if _, ok:= this.m_object[object.M_id]; !ok {
+		this.m_object[object.M_id]=make(map[string][]string)
+	}
+	if xmlElement.M_computerRef !=nil {
+		if _, ok:= this.m_object[object.M_id]["computerRef"]; !ok {
+			this.m_object[object.M_id]["computerRef"]=make([]string,0)
+		}
+		this.m_object[object.M_id]["computerRef"] = append(this.m_object[object.M_id]["computerRef"], *xmlElement.M_computerRef)
+	}
+
+
+	/** Session **/
+	object.M_id= xmlElement.M_id
+
+	/** SessionState **/
+	if xmlElement.M_sessionState=="##Online"{
+		object.M_sessionState=CargoEntities.SessionState_Online
+	} else if xmlElement.M_sessionState=="##Away"{
+		object.M_sessionState=CargoEntities.SessionState_Away
+	} else if xmlElement.M_sessionState=="##Offline"{
+		object.M_sessionState=CargoEntities.SessionState_Offline
+	} else{
+		object.M_sessionState=CargoEntities.SessionState_Online
+ 	}
+
+	/** Session **/
+	object.M_startTime= xmlElement.M_startTime
+
+	/** Session **/
+	object.M_endTime= xmlElement.M_endTime
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** inititialisation of LogEntry **/
+func (this *CargoEntitiesXmlFactory) InitLogEntry(xmlElement *CargoEntities.XsdLogEntry,object *CargoEntities.LogEntry){
+	log.Println("Initialize LogEntry")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoEntities.LogEntry%" + Utility.RandomUUID()	}
+
+	/** Init ref entityRef **/
+	if len(object.M_id) == 0 {
+		this.m_references[object.UUID] = object
+	}
+	if _, ok:= this.m_object[object.M_id]; !ok {
+		this.m_object[object.M_id]=make(map[string][]string)
+	}
+	if len(xmlElement.M_entityRef) > 0 {
+		if _, ok:= this.m_object[object.M_id]["entityRef"]; !ok {
+			this.m_object[object.M_id]["entityRef"]=make([]string,0)
+		}
+		this.m_object[object.M_id]["entityRef"] = append(this.m_object[object.M_id]["entityRef"], xmlElement.M_entityRef)
+	}
+
+
+	/** LogEntry **/
+	object.M_creationTime= xmlElement.M_creationTime
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** inititialisation of Action **/
+func (this *CargoEntitiesXmlFactory) InitAction(xmlElement *CargoEntities.XsdAction,object *CargoEntities.Action){
+	log.Println("Initialize Action")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoEntities.Action%" + Utility.RandomUUID()	}
+
+	/** Action **/
+	object.M_name= xmlElement.M_name
+	if len(object.M_name) > 0 {
+		this.m_references[object.M_name] = object
+	}
+}
+
+/** inititialisation of Role **/
+func (this *CargoEntitiesXmlFactory) InitRole(xmlElement *CargoEntities.XsdRole,object *CargoEntities.Role){
+	log.Println("Initialize Role")
+	if len(object.UUID) == 0 {
+		object.UUID = "CargoEntities.Role%" + Utility.RandomUUID()	}
+
+	/** Role **/
+	object.M_id= xmlElement.M_id
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
 /** inititialisation of User **/
 func (this *CargoEntitiesXmlFactory) InitUser(xmlElement *CargoEntities.XsdUser,object *CargoEntities.User){
 	log.Println("Initialize User")
@@ -314,8 +516,7 @@ func (this *CargoEntitiesXmlFactory) InitUser(xmlElement *CargoEntities.XsdUser,
 
 	/** Init ref memberOfRef **/
 	if len(object.M_id) == 0 {
-		object.M_id=Utility.RandomUUID()
-		this.m_references[object.M_id] = object
+		this.m_references[object.UUID] = object
 	}
 	if _, ok:= this.m_object[object.M_id]; !ok {
 		this.m_object[object.M_id]=make(map[string][]string)
@@ -347,36 +548,26 @@ func (this *CargoEntitiesXmlFactory) InitUser(xmlElement *CargoEntities.XsdUser,
 	}
 }
 
-/** inititialisation of Group **/
-func (this *CargoEntitiesXmlFactory) InitGroup(xmlElement *CargoEntities.XsdGroup,object *CargoEntities.Group){
-	log.Println("Initialize Group")
+/** inititialisation of Permission **/
+func (this *CargoEntitiesXmlFactory) InitPermission(xmlElement *CargoEntities.XsdPermission,object *CargoEntities.Permission){
+	log.Println("Initialize Permission")
 	if len(object.UUID) == 0 {
-		object.UUID = "CargoEntities.Group%" + Utility.RandomUUID()	}
+		object.UUID = "CargoEntities.Permission%" + Utility.RandomUUID()	}
 
-	/** Group **/
-	object.M_id= xmlElement.M_id
+	/** Permission **/
+	object.M_pattern= xmlElement.M_pattern
 
-	/** Init ref membersRef **/
-	if len(object.M_id) == 0 {
-		object.M_id=Utility.RandomUUID()
-		this.m_references[object.M_id] = object
+	/** PermissionType **/
+	if xmlElement.M_type=="##Create"{
+		object.M_type=CargoEntities.PermissionType_Create
+	} else if xmlElement.M_type=="##Read"{
+		object.M_type=CargoEntities.PermissionType_Read
+	} else if xmlElement.M_type=="##Update"{
+		object.M_type=CargoEntities.PermissionType_Update
+	} else if xmlElement.M_type=="##Delete"{
+		object.M_type=CargoEntities.PermissionType_Delete
 	}
-	if _, ok:= this.m_object[object.M_id]; !ok {
-		this.m_object[object.M_id]=make(map[string][]string)
-	}
-	for i:=0; i < len(xmlElement.M_membersRef); i++ {
-		if _, ok:= this.m_object[object.M_id]["membersRef"]; !ok {
-			this.m_object[object.M_id]["membersRef"]=make([]string,0)
-		}
-		this.m_object[object.M_id]["membersRef"] = append(this.m_object[object.M_id]["membersRef"], xmlElement.M_membersRef[i])
-	}
-
-
-	/** Entity **/
-	object.M_name= xmlElement.M_name
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
+	this.m_references[object.UUID] = object
 }
 
 /** inititialisation of Computer **/
@@ -432,186 +623,21 @@ func (this *CargoEntitiesXmlFactory) InitComputer(xmlElement *CargoEntities.XsdC
 	}
 }
 
-/** inititialisation of Project **/
-func (this *CargoEntitiesXmlFactory) InitProject(xmlElement *CargoEntities.XsdProject,object *CargoEntities.Project){
-	log.Println("Initialize Project")
+/** inititialisation of Log **/
+func (this *CargoEntitiesXmlFactory) InitLog(xmlElement *CargoEntities.XsdLog,object *CargoEntities.Log){
+	log.Println("Initialize Log")
 	if len(object.UUID) == 0 {
-		object.UUID = "CargoEntities.Project%" + Utility.RandomUUID()	}
+		object.UUID = "CargoEntities.Log%" + Utility.RandomUUID()	}
 
-	/** Project **/
-	object.M_id= xmlElement.M_id
-
-	/** Init ref filesRef **/
-	if len(object.M_id) == 0 {
-		object.M_id=Utility.RandomUUID()
-		this.m_references[object.M_id] = object
-	}
-	if _, ok:= this.m_object[object.M_id]; !ok {
-		this.m_object[object.M_id]=make(map[string][]string)
-	}
-	for i:=0; i < len(xmlElement.M_filesRef); i++ {
-		if _, ok:= this.m_object[object.M_id]["filesRef"]; !ok {
-			this.m_object[object.M_id]["filesRef"]=make([]string,0)
-		}
-		this.m_object[object.M_id]["filesRef"] = append(this.m_object[object.M_id]["filesRef"], xmlElement.M_filesRef[i])
-	}
-
-
-	/** Entity **/
-	object.M_name= xmlElement.M_name
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** inititialisation of Account **/
-func (this *CargoEntitiesXmlFactory) InitAccount(xmlElement *CargoEntities.XsdAccount,object *CargoEntities.Account){
-	log.Println("Initialize Account")
-	if len(object.UUID) == 0 {
-		object.UUID = "CargoEntities.Account%" + Utility.RandomUUID()	}
-
-	/** Account **/
-	object.M_id= xmlElement.M_id
-
-	/** Init ref userRef **/
-	if len(object.M_id) == 0 {
-		object.M_id=Utility.RandomUUID()
-		this.m_references[object.M_id] = object
-	}
-	if _, ok:= this.m_object[object.M_id]; !ok {
-		this.m_object[object.M_id]=make(map[string][]string)
-	}
-	if xmlElement.M_userRef !=nil {
-		if _, ok:= this.m_object[object.M_id]["userRef"]; !ok {
-			this.m_object[object.M_id]["userRef"]=make([]string,0)
-		}
-		this.m_object[object.M_id]["userRef"] = append(this.m_object[object.M_id]["userRef"], *xmlElement.M_userRef)
-	}
-
-
-	/** Init ref rolesRef **/
-	if len(object.M_id) == 0 {
-		object.M_id=Utility.RandomUUID()
-		this.m_references[object.M_id] = object
-	}
-	if _, ok:= this.m_object[object.M_id]; !ok {
-		this.m_object[object.M_id]=make(map[string][]string)
-	}
-	for i:=0; i < len(xmlElement.M_rolesRef); i++ {
-		if _, ok:= this.m_object[object.M_id]["rolesRef"]; !ok {
-			this.m_object[object.M_id]["rolesRef"]=make([]string,0)
-		}
-		this.m_object[object.M_id]["rolesRef"] = append(this.m_object[object.M_id]["rolesRef"], xmlElement.M_rolesRef[i])
-	}
-
-
-	/** Init session **/
-	object.M_sessions= make([]*CargoEntities.Session,0)
-	for i:=0;i<len(xmlElement.M_sessions); i++{
-		val:=new(CargoEntities.Session)
-		this.InitSession(xmlElement.M_sessions[i],val)
-		object.M_sessions= append(object.M_sessions, val)
+	/** Init logEntry **/
+	object.M_entries= make([]*CargoEntities.LogEntry,0)
+	for i:=0;i<len(xmlElement.M_entries); i++{
+		val:=new(CargoEntities.LogEntry)
+		this.InitLogEntry(xmlElement.M_entries[i],val)
+		object.M_entries= append(object.M_entries, val)
 
 		/** association initialisation **/
-		val.SetAccountPtr(object)
 	}
-
-	/** Entity **/
-	object.M_name= xmlElement.M_name
-
-	/** Entity **/
-	object.M_password= xmlElement.M_password
-
-	/** Entity **/
-	object.M_email= xmlElement.M_email
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** inititialisation of Session **/
-func (this *CargoEntitiesXmlFactory) InitSession(xmlElement *CargoEntities.XsdSession,object *CargoEntities.Session){
-	log.Println("Initialize Session")
-	if len(object.UUID) == 0 {
-		object.UUID = "CargoEntities.Session%" + Utility.RandomUUID()	}
-
-	/** Init ref computerRef **/
-	if len(object.M_id) == 0 {
-		object.M_id=Utility.RandomUUID()
-		this.m_references[object.M_id] = object
-	}
-	if _, ok:= this.m_object[object.M_id]; !ok {
-		this.m_object[object.M_id]=make(map[string][]string)
-	}
-	if xmlElement.M_computerRef !=nil {
-		if _, ok:= this.m_object[object.M_id]["computerRef"]; !ok {
-			this.m_object[object.M_id]["computerRef"]=make([]string,0)
-		}
-		this.m_object[object.M_id]["computerRef"] = append(this.m_object[object.M_id]["computerRef"], *xmlElement.M_computerRef)
-	}
-
-
-	/** Session **/
-	object.M_id= xmlElement.M_id
-
-	/** SessionState **/
-	if xmlElement.M_sessionState=="##Online"{
-		object.M_sessionState=CargoEntities.SessionState_Online
-	} else if xmlElement.M_sessionState=="##Away"{
-		object.M_sessionState=CargoEntities.SessionState_Away
-	} else if xmlElement.M_sessionState=="##Offline"{
-		object.M_sessionState=CargoEntities.SessionState_Offline
-	} else{
-		object.M_sessionState=CargoEntities.SessionState_Online
- 	}
-
-	/** Session **/
-	object.M_startTime= xmlElement.M_startTime
-
-	/** Session **/
-	object.M_endTime= xmlElement.M_endTime
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** inititialisation of LogEntry **/
-func (this *CargoEntitiesXmlFactory) InitLogEntry(xmlElement *CargoEntities.XsdLogEntry,object *CargoEntities.LogEntry){
-	log.Println("Initialize LogEntry")
-	if len(object.UUID) == 0 {
-		object.UUID = "CargoEntities.LogEntry%" + Utility.RandomUUID()	}
-
-	/** Init ref entityRef **/
-	if len(object.M_id) == 0 {
-		object.M_id=Utility.RandomUUID()
-		this.m_references[object.M_id] = object
-	}
-	if _, ok:= this.m_object[object.M_id]; !ok {
-		this.m_object[object.M_id]=make(map[string][]string)
-	}
-	if len(xmlElement.M_entityRef) > 0 {
-		if _, ok:= this.m_object[object.M_id]["entityRef"]; !ok {
-			this.m_object[object.M_id]["entityRef"]=make([]string,0)
-		}
-		this.m_object[object.M_id]["entityRef"] = append(this.m_object[object.M_id]["entityRef"], xmlElement.M_entityRef)
-	}
-
-
-	/** LogEntry **/
-	object.M_creationTime= xmlElement.M_creationTime
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** inititialisation of Role **/
-func (this *CargoEntitiesXmlFactory) InitRole(xmlElement *CargoEntities.XsdRole,object *CargoEntities.Role){
-	log.Println("Initialize Role")
-	if len(object.UUID) == 0 {
-		object.UUID = "CargoEntities.Role%" + Utility.RandomUUID()	}
-
-	/** Role **/
-	object.M_id= xmlElement.M_id
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -633,6 +659,17 @@ func (this *CargoEntitiesXmlFactory) SerialyzeAccount(xmlElement *CargoEntities.
 	/** Serialyze ref rolesRef **/
 		xmlElement.M_rolesRef= object.M_rolesRef
 
+
+	/** Serialyze Permission **/
+	if len(object.M_permissions) > 0 {
+		xmlElement.M_permissions= make([]*CargoEntities.XsdPermission,0)
+	}
+
+	/** Now I will save the value of permissions **/
+	for i:=0; i<len(object.M_permissions);i++{
+		xmlElement.M_permissions=append(xmlElement.M_permissions,new(CargoEntities.XsdPermission))
+		this.SerialyzePermission(xmlElement.M_permissions[i],object.M_permissions[i])
+	}
 
 	/** Serialyze Session **/
 	if len(object.M_sessions) > 0 {
@@ -661,6 +698,100 @@ func (this *CargoEntitiesXmlFactory) SerialyzeAccount(xmlElement *CargoEntities.
 
 	/** Entity **/
 	xmlElement.M_email= object.M_email
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of Session **/
+func (this *CargoEntitiesXmlFactory) SerialyzeSession(xmlElement *CargoEntities.XsdSession,object *CargoEntities.Session){
+	if xmlElement == nil{
+		return
+	}
+
+	/** Serialyze ref computerRef **/
+	xmlElement.M_computerRef=&object.M_computerRef
+
+
+	/** Session **/
+	xmlElement.M_id= object.M_id
+
+	/** SessionState **/
+	if object.M_sessionState==CargoEntities.SessionState_Online{
+		xmlElement.M_sessionState="##Online"
+	} else if object.M_sessionState==CargoEntities.SessionState_Away{
+		xmlElement.M_sessionState="##Away"
+	} else if object.M_sessionState==CargoEntities.SessionState_Offline{
+		xmlElement.M_sessionState="##Offline"
+	} else{
+		xmlElement.M_sessionState="##Online"
+ 	}
+
+	/** Session **/
+	xmlElement.M_startTime= object.M_startTime
+
+	/** Session **/
+	xmlElement.M_endTime= object.M_endTime
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of File **/
+func (this *CargoEntitiesXmlFactory) SerialyzeFile(xmlElement *CargoEntities.XsdFile,object *CargoEntities.File){
+	if xmlElement == nil{
+		return
+	}
+
+	/** File **/
+	xmlElement.M_id= object.M_id
+
+	/** Serialyze File **/
+	if len(object.M_files) > 0 {
+		xmlElement.M_files= make([]*CargoEntities.XsdFile,0)
+	}
+
+	/** Now I will save the value of files **/
+	for i:=0; i<len(object.M_files);i++{
+		xmlElement.M_files=append(xmlElement.M_files,new(CargoEntities.XsdFile))
+		this.SerialyzeFile(xmlElement.M_files[i],object.M_files[i])
+	}
+
+	/** Entity **/
+	xmlElement.M_name= object.M_name
+
+	/** Entity **/
+	xmlElement.M_path= object.M_path
+
+	/** Entity **/
+	xmlElement.M_size= object.M_size
+
+	/** Entity **/
+	xmlElement.M_modeTime= object.M_modeTime
+
+	/** Entity **/
+	xmlElement.M_isDir= object.M_isDir
+
+	/** Entity **/
+	xmlElement.M_checksum= object.M_checksum
+
+	/** Entity **/
+	xmlElement.M_data= object.M_data
+
+	/** Entity **/
+	xmlElement.M_thumbnail= object.M_thumbnail
+
+	/** Entity **/
+	xmlElement.M_mime= object.M_mime
+
+	/** FileType **/
+	if object.M_fileType==CargoEntities.FileType_DbFile{
+		xmlElement.M_fileType="##dbFile"
+	} else if object.M_fileType==CargoEntities.FileType_DiskFile{
+		xmlElement.M_fileType="##diskFile"
+	} else{
+		xmlElement.M_fileType="##dbFile"
+ 	}
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -714,38 +845,6 @@ func (this *CargoEntitiesXmlFactory) SerialyzeComputer(xmlElement *CargoEntities
 
 	/** Entity **/
 	xmlElement.M_ipv4= object.M_ipv4
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of User **/
-func (this *CargoEntitiesXmlFactory) SerialyzeUser(xmlElement *CargoEntities.XsdUser,object *CargoEntities.User){
-	if xmlElement == nil{
-		return
-	}
-
-	/** User **/
-	xmlElement.M_id= object.M_id
-
-	/** Serialyze ref memberOfRef **/
-		xmlElement.M_memberOfRef= object.M_memberOfRef
-
-
-	/** Entity **/
-	xmlElement.M_firstName= object.M_firstName
-
-	/** Entity **/
-	xmlElement.M_lastName= object.M_lastName
-
-	/** Entity **/
-	xmlElement.M_middle= object.M_middle
-
-	/** Entity **/
-	xmlElement.M_email= object.M_email
-
-	/** Entity **/
-	xmlElement.M_phone= object.M_phone
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -889,84 +988,26 @@ func (this *CargoEntitiesXmlFactory) SerialyzeEntities(xmlElement *CargoEntities
 	}
 }
 
-/** serialysation of File **/
-func (this *CargoEntitiesXmlFactory) SerialyzeFile(xmlElement *CargoEntities.XsdFile,object *CargoEntities.File){
+/** serialysation of Permission **/
+func (this *CargoEntitiesXmlFactory) SerialyzePermission(xmlElement *CargoEntities.XsdPermission,object *CargoEntities.Permission){
 	if xmlElement == nil{
 		return
 	}
 
-	/** File **/
-	xmlElement.M_id= object.M_id
+	/** Permission **/
+	xmlElement.M_pattern= object.M_pattern
 
-	/** Serialyze File **/
-	if len(object.M_files) > 0 {
-		xmlElement.M_files= make([]*CargoEntities.XsdFile,0)
+	/** PermissionType **/
+	if object.M_type==CargoEntities.PermissionType_Create{
+		xmlElement.M_type="##Create"
+	} else if object.M_type==CargoEntities.PermissionType_Read{
+		xmlElement.M_type="##Read"
+	} else if object.M_type==CargoEntities.PermissionType_Update{
+		xmlElement.M_type="##Update"
+	} else if object.M_type==CargoEntities.PermissionType_Delete{
+		xmlElement.M_type="##Delete"
 	}
-
-	/** Now I will save the value of files **/
-	for i:=0; i<len(object.M_files);i++{
-		xmlElement.M_files=append(xmlElement.M_files,new(CargoEntities.XsdFile))
-		this.SerialyzeFile(xmlElement.M_files[i],object.M_files[i])
-	}
-
-	/** Entity **/
-	xmlElement.M_name= object.M_name
-
-	/** Entity **/
-	xmlElement.M_path= object.M_path
-
-	/** Entity **/
-	xmlElement.M_size= object.M_size
-
-	/** Entity **/
-	xmlElement.M_modeTime= object.M_modeTime
-
-	/** Entity **/
-	xmlElement.M_isDir= object.M_isDir
-
-	/** Entity **/
-	xmlElement.M_checksum= object.M_checksum
-
-	/** Entity **/
-	xmlElement.M_data= object.M_data
-
-	/** Entity **/
-	xmlElement.M_thumbnail= object.M_thumbnail
-
-	/** Entity **/
-	xmlElement.M_mime= object.M_mime
-
-	/** FileType **/
-	if object.M_fileType==CargoEntities.FileType_DbFile{
-		xmlElement.M_fileType="##dbFile"
-	} else if object.M_fileType==CargoEntities.FileType_DiskFile{
-		xmlElement.M_fileType="##diskFile"
-	} else{
-		xmlElement.M_fileType="##dbFile"
- 	}
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of Project **/
-func (this *CargoEntitiesXmlFactory) SerialyzeProject(xmlElement *CargoEntities.XsdProject,object *CargoEntities.Project){
-	if xmlElement == nil{
-		return
-	}
-
-	/** Project **/
-	xmlElement.M_id= object.M_id
-
-	/** Serialyze ref filesRef **/
-		xmlElement.M_filesRef= object.M_filesRef
-
-
-	/** Entity **/
-	xmlElement.M_name= object.M_name
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
+	this.m_references[object.UUID] = object
 }
 
 /** serialysation of LogEntry **/
@@ -999,35 +1040,53 @@ func (this *CargoEntitiesXmlFactory) SerialyzeRole(xmlElement *CargoEntities.Xsd
 	}
 }
 
-/** serialysation of Session **/
-func (this *CargoEntitiesXmlFactory) SerialyzeSession(xmlElement *CargoEntities.XsdSession,object *CargoEntities.Session){
+/** serialysation of Project **/
+func (this *CargoEntitiesXmlFactory) SerialyzeProject(xmlElement *CargoEntities.XsdProject,object *CargoEntities.Project){
 	if xmlElement == nil{
 		return
 	}
 
-	/** Serialyze ref computerRef **/
-	xmlElement.M_computerRef=&object.M_computerRef
-
-
-	/** Session **/
+	/** Project **/
 	xmlElement.M_id= object.M_id
 
-	/** SessionState **/
-	if object.M_sessionState==CargoEntities.SessionState_Online{
-		xmlElement.M_sessionState="##Online"
-	} else if object.M_sessionState==CargoEntities.SessionState_Away{
-		xmlElement.M_sessionState="##Away"
-	} else if object.M_sessionState==CargoEntities.SessionState_Offline{
-		xmlElement.M_sessionState="##Offline"
-	} else{
-		xmlElement.M_sessionState="##Online"
- 	}
+	/** Serialyze ref filesRef **/
+		xmlElement.M_filesRef= object.M_filesRef
 
-	/** Session **/
-	xmlElement.M_startTime= object.M_startTime
 
-	/** Session **/
-	xmlElement.M_endTime= object.M_endTime
+	/** Entity **/
+	xmlElement.M_name= object.M_name
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of User **/
+func (this *CargoEntitiesXmlFactory) SerialyzeUser(xmlElement *CargoEntities.XsdUser,object *CargoEntities.User){
+	if xmlElement == nil{
+		return
+	}
+
+	/** User **/
+	xmlElement.M_id= object.M_id
+
+	/** Serialyze ref memberOfRef **/
+		xmlElement.M_memberOfRef= object.M_memberOfRef
+
+
+	/** Entity **/
+	xmlElement.M_firstName= object.M_firstName
+
+	/** Entity **/
+	xmlElement.M_lastName= object.M_lastName
+
+	/** Entity **/
+	xmlElement.M_middle= object.M_middle
+
+	/** Entity **/
+	xmlElement.M_email= object.M_email
+
+	/** Entity **/
+	xmlElement.M_phone= object.M_phone
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}

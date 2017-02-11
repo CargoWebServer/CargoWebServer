@@ -110,12 +110,27 @@ func (this *Role) SetActions(ref interface{}){
 		}
 		this.M_actions = append(this.M_actions, ref.(string))
 	}else{
+		this.RemoveActions(ref)
 		this.m_actions = append(this.m_actions, ref.(*Action))
 		this.M_actions = append(this.M_actions, ref.(*Action).GetUUID())
 	}
 }
 
 /** Remove reference Actions **/
+func (this *Role) RemoveActions(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*Action)
+	actions_ := make([]*Action, 0)
+	actionsUuid := make([]string, 0)
+	for i := 0; i < len(this.m_actions); i++ {
+		if toDelete.GetUUID() != this.m_actions[i].GetUUID() {
+			actions_ = append(actions_, this.m_actions[i])
+			actionsUuid = append(actionsUuid, this.M_actions[i])
+		}
+	}
+	this.m_actions = actions_
+	this.M_actions = actionsUuid
+}
 
 /** Entities **/
 func (this *Role) GetEntitiesPtr() *Entities{

@@ -560,31 +560,23 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				refSetter += "		}\n"
 				refSetter += "		this.M_" + attribute.Name + ref + " = append(this.M_" + attribute.Name + ref + ", ref.(string))\n"
 				refSetter += "	}else{\n"
+
 				if (isRef || attribute.IsComposite == "true") && classesMap[typeName_] != nil {
-					if hasId(classesMap[typeName_]) {
-						refSetter += "		this.Remove" + methodName + ref + "(ref)\n"
-					}
+					refSetter += "		this.Remove" + methodName + ref + "(ref)\n"
 				}
+
 				refSetter += "		this.m_" + attribute.Name + ref + " = append(this.m_" + attribute.Name + ref + ", ref.(" + typeName + "))\n"
 				if classesMap[cast] != nil {
 					isInterfaceCast := Utility.Contains(abstractClassLst, cast) || Utility.Contains(superClassesLst, cast)
-					if hasId(classesMap[cast]) {
-						if elementPackName != packName {
-							cast = elementPackName + "." + cast
-						}
-						if isPointer && !isInterfaceCast {
-							cast = "*" + cast
-						}
-						refSetter += "		this.M_" + attribute.Name + ref + " = append(this.M_" + attribute.Name + ref + ", ref.(" + cast + ").GetUUID())\n"
-					} else if hasName(classesMap[cast]) {
-						if elementPackName != packName {
-							cast = elementPackName + "." + cast
-						}
-						if isPointer && !isInterfaceCast {
-							cast = "*" + cast
-						}
-						refSetter += "		this.M_" + attribute.Name + ref + " = append(this.M_" + attribute.Name + ref + ", ref.(" + cast + ").GetUUID())\n"
+
+					if elementPackName != packName {
+						cast = elementPackName + "." + cast
 					}
+					if isPointer && !isInterfaceCast {
+						cast = "*" + cast
+					}
+					refSetter += "		this.M_" + attribute.Name + ref + " = append(this.M_" + attribute.Name + ref + ", ref.(" + cast + ").GetUUID())\n"
+
 				}
 				refSetter += "	}\n"
 			} else {
@@ -601,44 +593,18 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					if classesMap[cast] != nil {
 						isInterfaceCast := Utility.Contains(abstractClassLst, cast) || Utility.Contains(superClassesLst, cast)
 
-						if hasId(classesMap[cast]) {
-							if elementPackName != packName {
-								cast = elementPackName + "." + cast
-							}
-
-							if isPointer && !isInterfaceCast {
-								cast = "*" + cast
-							}
-							if isInterface {
-								refSetter += "		if this.M_" + attribute.Name + "[i].(" + cast + ").GetUUID() != ref.(" + cast + ").GetUUID() {\n"
-							} else {
-								refSetter += "		if this.M_" + attribute.Name + "[i].GetUUID() != ref.(" + cast + ").GetUUID() {\n"
-							}
-						} else if hasName(classesMap[cast]) {
-							if elementPackName != packName {
-								cast = elementPackName + "." + cast
-							}
-							if isPointer && !isInterfaceCast {
-								cast = "*" + cast
-							}
-							if isInterface {
-								refSetter += "		if this.M_" + attribute.Name + "[i].(" + cast + ").GetName() != ref.(" + cast + ").GetName() {\n"
-							} else {
-								refSetter += "		if this.M_" + attribute.Name + "[i].GetName() != ref.(" + cast + ").GetName() {\n"
-							}
-						} else {
-							if elementPackName != packName {
-								cast = elementPackName + "." + cast
-							}
-							if isPointer && !isInterfaceCast {
-								cast = "*" + cast
-							}
-							if isInterface {
-								refSetter += "		if this.M_" + attribute.Name + "[i].(" + cast + ").GetUUID() != ref.(" + cast + ").GetUUID() {\n"
-							} else {
-								refSetter += "		if this.M_" + attribute.Name + "[i].GetUUID() != ref.(" + cast + ").GetUUID() {\n"
-							}
+						if elementPackName != packName {
+							cast = elementPackName + "." + cast
 						}
+						if isPointer && !isInterfaceCast {
+							cast = "*" + cast
+						}
+						if isInterface {
+							refSetter += "		if this.M_" + attribute.Name + "[i].(" + cast + ").GetUUID() != ref.(" + cast + ").GetUUID() {\n"
+						} else {
+							refSetter += "		if this.M_" + attribute.Name + "[i].GetUUID() != ref.(" + cast + ").GetUUID() {\n"
+						}
+
 					} else {
 						log.Println("------------> class not found! ", cast)
 					}
@@ -667,23 +633,13 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				refSetter += "		this.m_" + attribute.Name + ref + " = ref.(" + typeName + ")\n"
 				if classesMap[cast] != nil {
 					isInterfaceCast := Utility.Contains(abstractClassLst, cast) || Utility.Contains(superClassesLst, cast)
-					if hasId(classesMap[cast]) {
-						if elementPackName != packName {
-							cast = elementPackName + "." + cast
-						}
-						if isPointer && !isInterfaceCast {
-							cast = "*" + cast
-						}
-						refSetter += "		this.M_" + attribute.Name + ref + " = ref.(" + cast + ").GetUUID()\n"
-					} else if hasName(classesMap[cast]) {
-						if elementPackName != packName {
-							cast = elementPackName + "." + cast
-						}
-						if isPointer && !isInterfaceCast {
-							cast = "*" + cast
-						}
-						refSetter += "		this.M_" + attribute.Name + ref + " = ref.(" + cast + ").GetName()\n"
+					if elementPackName != packName {
+						cast = elementPackName + "." + cast
 					}
+					if isPointer && !isInterfaceCast {
+						cast = "*" + cast
+					}
+					refSetter += "		this.M_" + attribute.Name + ref + " = ref.(" + cast + ").GetUUID()\n"
 				}
 
 				refSetter += "	}\n"
@@ -700,88 +656,87 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 		methodStr += "\n/** Remove reference " + methodName + " **/\n"
 		refRemover := ""
 		if (isRef || attribute.IsComposite == "true") && classesMap[typeName_] != nil {
-			if hasId(classesMap[typeName_]) {
 
-				refRemover += "func (this *" + ownerName + ") Remove" + methodName + ref + "(ref interface{}){\n"
-				// Here the reference is an array...
-				refRemover += "	this.NeedSave = true\n"
-				var isInterfaceCast bool
-				if strings.Contains(cast, ".") {
-					isInterfaceCast = Utility.Contains(abstractClassLst, strings.Split(cast, ".")[1]) || Utility.Contains(superClassesLst, strings.Split(cast, ".")[1])
+			refRemover += "func (this *" + ownerName + ") Remove" + methodName + ref + "(ref interface{}){\n"
+			// Here the reference is an array...
+			refRemover += "	this.NeedSave = true\n"
+			var isInterfaceCast bool
+			if strings.Contains(cast, ".") {
+				isInterfaceCast = Utility.Contains(abstractClassLst, strings.Split(cast, ".")[1]) || Utility.Contains(superClassesLst, strings.Split(cast, ".")[1])
+			} else {
+				isInterfaceCast = Utility.Contains(abstractClassLst, cast) || Utility.Contains(superClassesLst, cast)
+			}
+
+			if isPointer && !isInterfaceCast && !strings.HasPrefix(cast, "*") {
+				cast = "*" + cast
+			}
+			refRemover += "	toDelete := ref.(" + cast + ")\n"
+
+			if attribute.Upper == "*" {
+
+				if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
+					refRemover += "	" + attribute.Name + ref + "_ := make([]" + getClassPackName(typeName_, packName) + typeName_ + ", 0)\n"
 				} else {
-					isInterfaceCast = Utility.Contains(abstractClassLst, cast) || Utility.Contains(superClassesLst, cast)
+					refRemover += "	" + attribute.Name + ref + "_ := make([]*" + getClassPackName(typeName_, packName) + typeName_ + ", 0)\n"
 				}
 
-				if isPointer && !isInterfaceCast && !strings.HasPrefix(cast, "*") {
-					cast = "*" + cast
-				}
-				refRemover += "	toDelete := ref.(" + cast + ")\n"
-
-				if attribute.Upper == "*" {
+				if len(attribute.IsComposite) > 0 {
+					refRemover += "	for i := 0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
 
 					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-						refRemover += "	" + attribute.Name + ref + "_ := make([]" + getClassPackName(typeName_, packName) + typeName_ + ", 0)\n"
+						refRemover += "		if toDelete.GetUUID() != this.M_" + attribute.Name + ref + "[i].(" + cast + ").GetUUID() {\n"
 					} else {
-						refRemover += "	" + attribute.Name + ref + "_ := make([]*" + getClassPackName(typeName_, packName) + typeName_ + ", 0)\n"
+						refRemover += "		if toDelete.GetUUID() != this.M_" + attribute.Name + ref + "[i].GetUUID() {\n"
 					}
-
-					if len(attribute.IsComposite) > 0 {
-						refRemover += "	for i := 0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
-
-						if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-							refRemover += "		if toDelete.GetUUID() != this.M_" + attribute.Name + ref + "[i].(" + cast + ").GetUUID() {\n"
-						} else {
-							refRemover += "		if toDelete.GetUUID() != this.M_" + attribute.Name + ref + "[i].GetUUID() {\n"
-						}
-						refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.M_" + attribute.Name + ref + "[i])\n"
-						refRemover += "		}\n"
-						refRemover += "	}\n"
-
-						refRemover += "	this.M_" + attribute.Name + ref + " = " + attribute.Name + ref + "_\n"
-					} else {
-						refRemover += "	" + attribute.Name + ref + "Uuid := make([]string, 0)\n"
-
-						refRemover += "	for i := 0; i < len(this.m_" + attribute.Name + ref + "); i++ {\n"
-						if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-							refRemover += "		if toDelete.GetUUID() != this.m_" + attribute.Name + ref + "[i].(" + cast + ").GetUUID() {\n"
-						} else {
-							refRemover += "		if toDelete.GetUUID() != this.m_" + attribute.Name + ref + "[i].GetUUID() {\n"
-						}
-
-						refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.m_" + attribute.Name + ref + "[i])\n"
-						refRemover += "			" + attribute.Name + ref + "Uuid = append(" + attribute.Name + ref + "Uuid, this.M_" + attribute.Name + ref + "[i])\n"
-						refRemover += "		}\n"
-						refRemover += "	}\n"
-
-						refRemover += "	this.m_" + attribute.Name + ref + " = " + attribute.Name + ref + "_\n"
-						refRemover += "	this.M_" + attribute.Name + ref + " = " + attribute.Name + ref + "Uuid\n"
-					}
-
-				} else {
-
-					if len(attribute.IsComposite) > 0 {
-						// The attribute is not an array...
-						if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-							refRemover += "	if toDelete.GetUUID() == this.M_" + attribute.Name + ref + ".(" + cast + ").GetUUID() {\n"
-						} else {
-							refRemover += "	if toDelete.GetUUID() == this.M_" + attribute.Name + ref + ".GetUUID() {\n"
-						}
-						refRemover += "		this.M_" + attribute.Name + ref + " = nil\n"
-					} else {
-						// The attribute is not an array...
-						if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-							refRemover += "	if toDelete.GetUUID() == this.m_" + attribute.Name + ref + ".(" + cast + ").GetUUID() {\n"
-						} else {
-							refRemover += "	if toDelete.GetUUID() == this.m_" + attribute.Name + ref + ".GetUUID() {\n"
-						}
-						refRemover += "		this.m_" + attribute.Name + ref + " = nil\n"
-						refRemover += "		this.M_" + attribute.Name + ref + " = \"\"\n"
-					}
+					refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.M_" + attribute.Name + ref + "[i])\n"
+					refRemover += "		}\n"
 					refRemover += "	}\n"
+
+					refRemover += "	this.M_" + attribute.Name + ref + " = " + attribute.Name + ref + "_\n"
+				} else {
+					refRemover += "	" + attribute.Name + ref + "Uuid := make([]string, 0)\n"
+
+					refRemover += "	for i := 0; i < len(this.m_" + attribute.Name + ref + "); i++ {\n"
+					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
+						refRemover += "		if toDelete.GetUUID() != this.m_" + attribute.Name + ref + "[i].(" + cast + ").GetUUID() {\n"
+					} else {
+						refRemover += "		if toDelete.GetUUID() != this.m_" + attribute.Name + ref + "[i].GetUUID() {\n"
+					}
+
+					refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.m_" + attribute.Name + ref + "[i])\n"
+					refRemover += "			" + attribute.Name + ref + "Uuid = append(" + attribute.Name + ref + "Uuid, this.M_" + attribute.Name + ref + "[i])\n"
+					refRemover += "		}\n"
+					refRemover += "	}\n"
+
+					refRemover += "	this.m_" + attribute.Name + ref + " = " + attribute.Name + ref + "_\n"
+					refRemover += "	this.M_" + attribute.Name + ref + " = " + attribute.Name + ref + "Uuid\n"
 				}
-				refRemover += "}\n"
-				methodStr += refRemover
+
+			} else {
+
+				if len(attribute.IsComposite) > 0 {
+					// The attribute is not an array...
+					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
+						refRemover += "	if toDelete.GetUUID() == this.M_" + attribute.Name + ref + ".(" + cast + ").GetUUID() {\n"
+					} else {
+						refRemover += "	if toDelete.GetUUID() == this.M_" + attribute.Name + ref + ".GetUUID() {\n"
+					}
+					refRemover += "		this.M_" + attribute.Name + ref + " = nil\n"
+				} else {
+					// The attribute is not an array...
+					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
+						refRemover += "	if toDelete.GetUUID() == this.m_" + attribute.Name + ref + ".(" + cast + ").GetUUID() {\n"
+					} else {
+						refRemover += "	if toDelete.GetUUID() == this.m_" + attribute.Name + ref + ".GetUUID() {\n"
+					}
+					refRemover += "		this.m_" + attribute.Name + ref + " = nil\n"
+					refRemover += "		this.M_" + attribute.Name + ref + " = \"\"\n"
+				}
+				refRemover += "	}\n"
 			}
+			refRemover += "}\n"
+			methodStr += refRemover
+
 		} else {
 			//log.Println("-----------> no remover for ", attribute.Name)
 		}

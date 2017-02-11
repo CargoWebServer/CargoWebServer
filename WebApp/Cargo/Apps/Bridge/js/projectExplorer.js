@@ -18,7 +18,7 @@ var ProjectExplorer = function (parent) {
         },
         // error callback
         function (errorMsg, caller) {
-            console.log(errMsg)
+
         }, this)
 
     return this

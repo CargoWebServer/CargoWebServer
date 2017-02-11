@@ -24,6 +24,7 @@ type Account struct{
 	M_password string
 	M_email string
 	M_sessions []*Session
+	M_permissions []*Permission
 	M_messages []Message
 	m_userRef *User
 	/** If the ref is a string and not an object **/
@@ -48,6 +49,7 @@ type XsdAccount struct {
 
 	M_userRef	*string	`xml:"userRef"`
 	M_rolesRef	[]string	`xml:"rolesRef"`
+	M_permissions	[]*XsdPermission	`xml:"permissions,omitempty"`
 	M_sessions	[]*XsdSession	`xml:"sessions,omitempty"`
 
 	M_name	string	`xml:"name,attr"`
@@ -147,6 +149,43 @@ func (this *Account) RemoveSessions(ref interface{}){
 		}
 	}
 	this.M_sessions = sessions_
+}
+
+/** Permissions **/
+func (this *Account) GetPermissions() []*Permission{
+	return this.M_permissions
+}
+
+/** Init reference Permissions **/
+func (this *Account) SetPermissions(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var permissionss []*Permission
+	for i:=0; i<len(this.M_permissions); i++ {
+		if this.M_permissions[i].GetUUID() != ref.(*Permission).GetUUID() {
+			permissionss = append(permissionss, this.M_permissions[i])
+		} else {
+			isExist = true
+			permissionss = append(permissionss, ref.(*Permission))
+		}
+	}
+	if !isExist {
+		permissionss = append(permissionss, ref.(*Permission))
+	}
+	this.M_permissions = permissionss
+}
+
+/** Remove reference Permissions **/
+func (this *Account) RemovePermissions(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*Permission)
+	permissions_ := make([]*Permission, 0)
+	for i := 0; i < len(this.M_permissions); i++ {
+		if toDelete.GetUUID() != this.M_permissions[i].GetUUID() {
+			permissions_ = append(permissions_, this.M_permissions[i])
+		}
+	}
+	this.M_permissions = permissions_
 }
 
 /** Messages **/

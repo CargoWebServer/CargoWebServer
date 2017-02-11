@@ -406,7 +406,7 @@ func generateGoXmlFactoryElementContent(elementType string, baseElementType stri
 				elementParserFunctionContentStr += "	}\n"
 			} else {
 				// Set element ref by type
-				elementParserFunctionContentStr += "	this.m_references[\"" + member.Name + "\"] = object\n"
+				elementParserFunctionContentStr += "	this.m_references[object.UUID] = object\n"
 			}
 		}
 
@@ -817,8 +817,7 @@ func generateGoXmlFactoryElementRef(attributeName string, attributeType string, 
 		if isInitialisation {
 			bpmnElementStr = "	/** Init bpmnElement **/\n"
 			bpmnElementStr += "	if len(object.M_id) == 0{\n"
-			bpmnElementStr += " 	object.M_id=Utility.RandomUUID()\n"
-			bpmnElementStr += "		this.m_references[object.M_id] = object\n"
+			bpmnElementStr += "		this.m_references[object.UUID] = object\n"
 			bpmnElementStr += "	}\n"
 			bpmnElementStr += "	if len(xmlElement.M_bpmnElement)>0{\n"
 			bpmnElementStr += "		if _, ok:= this.m_object[object.M_id]; !ok {\n"
@@ -858,8 +857,7 @@ func generateGoXmlFactoryElementRef(attributeName string, attributeType string, 
 
 		attributeInitialisationStr += "\n	/** Init ref " + attributeName + " **/\n"
 		attributeInitialisationStr += "	if len(" + mapMemberId + ") == 0 {\n"
-		attributeInitialisationStr += "		" + mapMemberId + "=Utility.RandomUUID()\n"
-		attributeInitialisationStr += "		this.m_references[object.M_id] = object\n"
+		attributeInitialisationStr += "		this.m_references[object.UUID] = object\n"
 
 		attributeInitialisationStr += "	}\n"
 		attributeInitialisationStr += "	if _, ok:= this.m_object[" + mapMemberId + "]; !ok {\n"

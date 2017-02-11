@@ -174,7 +174,7 @@ func (this *Entities) SetActions(ref interface{}){
 	isExist := false
 	var actionss []*Action
 	for i:=0; i<len(this.M_actions); i++ {
-		if this.M_actions[i].GetName() != ref.(*Action).GetName() {
+		if this.M_actions[i].GetUUID() != ref.(*Action).GetUUID() {
 			actionss = append(actionss, this.M_actions[i])
 		} else {
 			isExist = true
@@ -188,3 +188,14 @@ func (this *Entities) SetActions(ref interface{}){
 }
 
 /** Remove reference Actions **/
+func (this *Entities) RemoveActions(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*Action)
+	actions_ := make([]*Action, 0)
+	for i := 0; i < len(this.M_actions); i++ {
+		if toDelete.GetUUID() != this.M_actions[i].GetUUID() {
+			actions_ = append(actions_, this.M_actions[i])
+		}
+	}
+	this.M_actions = actions_
+}

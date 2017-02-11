@@ -1437,12 +1437,25 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 	var entity Entity
 	var errObj *CargoEntities.Error
 
+	// validate the action.
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return // exit here.
+	}
+
 	entity, errObj = this.getEntityByUuid(uuid)
 	if errObj != nil {
 		entity, errObj = this.getDynamicEntityByUuid(uuid)
 	}
 
 	if entity != nil {
+		// validate over the entity
+		errObj = GetServer().GetSecurityManager().hasPermission(sessionId, CargoEntities.PermissionType_Delete, entity)
+		if errObj != nil {
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return // exit here.
+		}
 
 		// Suppress the enitity...
 		entity.DeleteEntity()
