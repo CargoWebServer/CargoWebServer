@@ -353,9 +353,9 @@ EventHandler.prototype.broadcastEventData = function (evtNumber, evtName, eventD
 
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "evtNumber", "type": 1, "dataBytes": utf8_to_b64(evtNumber) }))
-    params.push(new RpcData({ "name": "channelId", "type": 2, "dataBytes": utf8_to_b64(evtName) }))
-    params.push(new RpcData({ "name": "eventDatas", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(eventDatas)) }))
+    params.push(createRpcData(evtNumber, "INTEGER", "evtNumber"))
+    params.push(createRpcData(channelId, "STRING", "channelId"))
+    params.push(createRpcData(eventDatas, "JSON_STR", "eventDatas"))
 
     // Call it on the server.
     server.executeJsFunction(

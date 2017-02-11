@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/Utility"
 )
 
 type Hub struct {

@@ -182,9 +182,9 @@ EntityManager.prototype.getObjectsByType = function (typeName, storeId, queryStr
 
             // Create the list of parameters.
             var params = []
-            params.push(new RpcData({ "name": "typeName", "type": 2, "dataBytes": utf8_to_b64(typeName) }))
-            params.push(new RpcData({ "name": "queryStr", "type": 2, "dataBytes": utf8_to_b64(queryStr) }))
-            params.push(new RpcData({ "name": "storeId", "type": 2, "dataBytes": utf8_to_b64(storeId) }))
+            params.push(createRpcData(typeName, "STRING", "typeName"))
+            params.push(createRpcData(queryStr, "STRING", "queryStr"))
+            params.push(createRpcData(storeId, "STRING", "storeId"))
 
             // Call it on the server.
             server.executeJsFunction(
@@ -266,7 +266,7 @@ EntityManager.prototype.getEntityLnks = function (uuid, progressCallback, succes
 
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "uuid", "type": 2, "dataBytes": utf8_to_b64(uuid) }))
+    params.push(createRpcData(uuid, "STRING", "uuid"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -335,7 +335,7 @@ EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, error
             var caller = caller.caller
 
             var params = []
-            params.push(new RpcData({ "name": "uuid", "type": 2, "dataBytes": utf8_to_b64(uuid) }))
+            params.push(createRpcData(uuid, "STRING", "uuid"))
 
             // Call it on the server.
             server.executeJsFunction(
@@ -420,9 +420,9 @@ EntityManager.prototype.getEntityById = function (typeName, id, successCallback,
             var caller = caller.caller
 
             var params = []
-            params.push(new RpcData({ "name": "typeName", "type": 2, "dataBytes": utf8_to_b64(typeName) }))
-            params.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(id) }))
-
+            params.push(createRpcData(typeName, "STRING", "typeName"))
+            params.push(createRpcData(id, "STRING", "id"))
+            
             // Call it on the server.
             server.executeJsFunction(
                 GetEntityById.toString(), // The function to execute remotely on server
@@ -490,11 +490,11 @@ EntityManager.prototype.createEntity = function (parentUuid, attributeName, type
 
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "parentUuid", "type": 2, "dataBytes": utf8_to_b64(parentUuid) }))
-    params.push(new RpcData({ "name": "attributeName", "type": 2, "dataBytes": utf8_to_b64(attributeName) }))
-    params.push(new RpcData({ "name": "typeName", "type": 2, "dataBytes": utf8_to_b64(typeName) }))
-    params.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(id) }))
-    params.push(new RpcData({ "name": "entity", "type": 4, "dataBytes": utf8_to_b64(entity.stringify()) }))
+    params.push(createRpcData(parentUuid, "STRING", "parentUuid"))
+    params.push(createRpcData(attributeName, "STRING", "attributeName"))
+    params.push(createRpcData(typeName, "STRING", "typeName"))
+    params.push(createRpcData(id, "STRING", "id"))
+    params.push(createRpcData(entity, "JSON_STR", "entity"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -541,7 +541,7 @@ EntityManager.prototype.removeEntity = function (uuid, successCallback, errorCal
 
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(uuid) }))
+    params.push(createRpcData(uuid, "STRING", "uuid"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -582,8 +582,9 @@ EntityManager.prototype.saveEntity = function (entity, successCallback, errorCal
     // server is the client side singleton.
     entity.NeedSave = true
     var params = []
-    params.push(new RpcData({ "name": "entity", "type": 4, "dataBytes": utf8_to_b64(entity.stringify()) }))
-    params.push(new RpcData({ "name": "typeName", "type": 2, "dataBytes": utf8_to_b64(entity.TYPENAME) }))
+    params.push(createRpcData(entity, "JSON_STR", "entity"))
+    params.push(createRpcData(entity.TYPENAME, "STRING", "typeName"))
+
     var functionStr = SaveEntity.toString()
 
     // Call it on the server.
@@ -636,8 +637,8 @@ EntityManager.prototype.createEntityPrototype = function (storeId, prototype, su
 
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "storeId", "type": 2, "dataBytes": utf8_to_b64(storeId) }))
-    params.push(new RpcData({ "name": "typeName", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(prototype)) }))
+    params.push(createRpcData(storeId, "STRING", "storeId"))
+    params.push(createRpcData(prototype, "JSON_STR", "prototype"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -694,8 +695,8 @@ EntityManager.prototype.getEntityPrototype = function (typeName, storeId, succes
 
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "typeName", "type": 2, "dataBytes": utf8_to_b64(typeName) }))
-    params.push(new RpcData({ "name": "storeId", "type": 2, "dataBytes": utf8_to_b64(storeId) }))
+    params.push(createRpcData(typeName, "STRING", "typeName"))
+    params.push(createRpcData(storeId, "STRING", "storeId"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -745,7 +746,7 @@ EntityManager.prototype.getEntityPrototypes = function (storeId, successCallback
 
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "storeId", "type": 2, "dataBytes": utf8_to_b64(storeId) }))
+    params.push(createRpcData(storeId, "STRING", "storeId"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -799,7 +800,7 @@ EntityManager.prototype.getDerivedEntityPrototypes = function (typeName, success
 
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "typeName", "type": 2, "dataBytes": utf8_to_b64(typeName) }))
+    params.push(createRpcData(typeName, "STRING", "typeName"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -1393,8 +1394,7 @@ function setRef(owner, property, refValue, isArray) {
  * Set object, that function call setObjectValues in this path so it's recursive.
  */
 function setSubObject(parent, property, values, isArray) {
-
-
+    
     if (values.TYPENAME == undefined || values.UUID.length == 0) {
         return parent
     }

@@ -24,7 +24,11 @@ server.languageManager.appendLanguageInfo(languageInfo)
  * The login page.
  */
 
-var LoginPage = function (loginCallback) {
+var LoginPage = function (loginCallback, serverId) {
+	this.serverId = serverId
+	if (this.serverId == undefined) {
+		this.serverId = "" // empty string
+	}
 
 	this.id = "loginPage"
 	this.loginCallback = loginCallback
@@ -137,12 +141,13 @@ var LoginPage = function (loginCallback) {
 	this.loginButton.element.onclick = function (usernameInput, passwordInput, loginCallback, loginPage) {
 		return function () {
 			/* get the value **/
-			userName = usernameInput.element.value
-			password = passwordInput.element.value
+			var userName = usernameInput.element.value
+			var password = passwordInput.element.value
+			var serverId = loginPage.serverId
 
 			/* Here I will call the login... **/
 			if (password.length > 0 && userName.length > 0) {
-				server.sessionManager.login(userName, password, function (result, caller) {
+				server.sessionManager.login(userName, password, serverId, function (result, caller) {
 					if (caller.loginCallback != undefined) {
 						caller.loginCallback(result)
 						// call once...
@@ -209,7 +214,7 @@ var LoginPage = function (loginCallback) {
 		// Here I will retreive the session info create an event and send it to the server.
 		var loginInfo = JSON.parse(localStorage.getItem("_remember_me_"))
 
-		server.sessionManager.login(loginInfo.userName, loginInfo.password,
+		server.sessionManager.login(loginInfo.userName, loginInfo.password, serverId,
 			// Success Callback
 			function (result, caller) {
 				caller.loginCallback(result)

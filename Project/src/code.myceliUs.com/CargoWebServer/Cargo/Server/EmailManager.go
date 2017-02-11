@@ -4,9 +4,9 @@ import (
 	"errors"
 	"log"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Config/CargoConfig"
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/Utility"
 
 	pop3 "github.com/bytbox/go-pop3"
 	gomail "gopkg.in/gomail.v1"
@@ -15,7 +15,8 @@ import (
 type EmailManager struct {
 
 	// info about connection on smtp server...
-	m_infos map[string]CargoConfig.SmtpConfiguration
+	m_infos  map[string]Config.SmtpConfiguration
+	m_config *Config.ServiceConfiguration
 }
 
 var emailManager *EmailManager
@@ -58,29 +59,43 @@ func newEmailManager() *EmailManager {
 	return emailManager
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Do intialysation stuff here.
  */
-func (this *EmailManager) Initialize() {
-	this.m_infos = make(map[string]CargoConfig.SmtpConfiguration, 0)
+func (this *EmailManager) initialize() {
+
+	log.Println("--> Initialize EmailManager")
+	// Create the default configurations
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+
+	this.m_infos = make(map[string]Config.SmtpConfiguration, 0)
 	smtpConfigurations := GetServer().GetConfigurationManager().GetSmtpConfigurations()
 
 	// Smtp server configuration...
 	for i := 0; i < len(smtpConfigurations); i++ {
 		this.m_infos[smtpConfigurations[i].M_id] = smtpConfigurations[i]
 	}
+
 }
 
-func (this *EmailManager) GetId() string {
+func (this *EmailManager) getId() string {
 	return "EmailManager"
 }
 
-func (this *EmailManager) Start() {
+func (this *EmailManager) start() {
 	log.Println("--> Start EmailManager")
 }
 
-func (this *EmailManager) Stop() {
+func (this *EmailManager) stop() {
 	log.Println("--> Stop EmailManager")
+}
+
+func (this *EmailManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
 }
 
 /**

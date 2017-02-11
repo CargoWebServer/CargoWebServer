@@ -69,8 +69,8 @@ function CreateDir(dirName, dirPath) {
  */
 FileManager.prototype.createDir = function (dirName, dirPath, successCallback, progressCallback, errorCallback, caller) {
     var params = []
-    params.push(new RpcData({ "name": "filename", "type": 2, "dataBytes": utf8_to_b64(dirName.toString()) }))
-    params.push(new RpcData({ "name": "filepath", "type": 2, "dataBytes": utf8_to_b64(dirPath) }))
+    params.push(createRpcData(dirName, "STRING", "dirName"))
+    params.push(createRpcData(dirPath, "STRING", "dirPath"))
 
     server.executeJsFunction(
         CreateDir.toString(), // The function to execute remotely on server
@@ -119,11 +119,12 @@ function CreateFile(filename, filepath, thumbnailMaxHeight, thumbnailMaxWidth, d
 FileManager.prototype.createFile = function (filename, filepath, filedata, thumbnailMaxHeight, thumbnailMaxWidth, dbFile, successCallback, progressCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "filename", "type": 2, "dataBytes": utf8_to_b64(filename) }))
-    params.push(new RpcData({ "name": "filepath", "type": 2, "dataBytes": utf8_to_b64(filepath) }))
-    params.push(new RpcData({ "name": "thumbnailMaxHeight", "type": 1, "dataBytes": utf8_to_b64(thumbnailMaxHeight) }))
-    params.push(new RpcData({ "name": "thumbnailMaxWidth", "type": 1, "dataBytes": utf8_to_b64(thumbnailMaxWidth) }))
-    params.push(new RpcData({ "name": "dbFile", "type": 5, "dataBytes": utf8_to_b64(dbFile) }))
+    // The file data (filedata) will be upload with the http protocol...
+    params.push(createRpcData(filename, "STRING", "filename"))
+    params.push(createRpcData(filepath, "STRING", "filepath"))
+    params.push(createRpcData(thumbnailMaxHeight, "INTEGER", "thumbnailMaxHeight"))
+    params.push(createRpcData(thumbnailMaxWidth, "INTEGER", "thumbnailMaxWidth"))
+    params.push(createRpcData(dbFile, "BOOLEAN", "dbFile"))
 
     // Here I will create a new data form...
     var formData = new FormData()
@@ -229,8 +230,6 @@ FileManager.prototype.downloadFile = function (path, fileName, mimeType, progres
     } (progressCallback, caller)
 
     xhr.send();
-
-
 }
 
 /**
@@ -243,7 +242,7 @@ FileManager.prototype.downloadFile = function (path, fileName, mimeType, progres
 FileManager.prototype.getFileByPath = function (path, progressCallback, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "path", "type": 2, "dataBytes": utf8_to_b64(path) }))
+    params.push(createRpcData(path, "STRING", "path"))
 
     server.executeJsFunction(
         GetFileByPath.toString(), // The function to execute remotely on server
@@ -289,7 +288,8 @@ function OpenFile(fileId) {
 FileManager.prototype.openFile = function (fileId, progressCallback, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "fileId", "type": 2, "dataBytes": utf8_to_b64(fileId) }))
+    params.push(createRpcData(fileId, "STRING", "fileId"))
+
     server.executeJsFunction(
         OpenFile.toString(), // The function to execute remotely on server
         params, // The parameters to pass to that function
@@ -336,7 +336,7 @@ function GetMimeTypeByExtension(fileExtension) {
 FileManager.prototype.getMimeTypeByExtension = function (fileExtension, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "fileExtension", "type": 2, "dataBytes": utf8_to_b64(fileExtension) }))
+    params.push(createRpcData(fileExtension, "STRING", "fileExtension"))
 
     server.executeJsFunction(
         GetMimeTypeByExtension.toString(), // The function to execute remotely on server
@@ -379,8 +379,8 @@ function IsFileExist(fileName, filePath) {
 FileManager.prototype.isFileExist = function (fileName, filePath, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "fileExtension", "type": 2, "dataBytes": utf8_to_b64(fileName) }))
-    params.push(new RpcData({ "name": "fileExtension", "type": 2, "dataBytes": utf8_to_b64(filePath) }))
+    params.push(createRpcData(filename, "STRING", "filename"))
+    params.push(createRpcData(filepath, "STRING", "filepath"))
 
     server.executeJsFunction(
         IsFileExist.toString(), // The function to execute remotely on server
@@ -422,7 +422,7 @@ function DeleteFile(uuid) {
 FileManager.prototype.deleteFile = function (uuid, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "uuid", "type": 2, "dataBytes": utf8_to_b64(uuid) }))
+    params.push(createRpcData(uuid, "STRING", "uuid"))
 
     server.executeJsFunction(
         DeleteFile.toString(), // The function to execute remotely on server

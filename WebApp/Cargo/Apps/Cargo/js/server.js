@@ -130,7 +130,7 @@ var Server = function (hostName, ipv4, port) {
  */
 Server.prototype.executeJsFunction = function (functionSrc, functionParams, progressCallback, successCallback, errorCallback, caller) {
     var params = []
-    params.push(new RpcData({ "name": "functionSrc", "type": 2, "dataBytes": utf8_to_b64(functionSrc) }))
+    params.push(createRpcData(functionSrc, "STRING", "functionSrc"))
 
     for (var i = 0; i < functionParams.length; i++) {
         params.push(functionParams[i])
@@ -281,7 +281,7 @@ Server.prototype.setSessionId = function () {
                 // The session listener.
                 //server.entityManager.getEntityPrototypes("BPMN20", function(result, caller){
                 //server.entityManager.getEntityPrototypes("BPMS_Runtime", function(result, caller){
-                server.entityManager.getEntityPrototypes("CargoConfig", function (result, caller) {
+                server.entityManager.getEntityPrototypes("Config", function (result, caller) {
                     server.entityManager.getEntityPrototypes("CargoEntities", function (result, caller) {
                         main()
                     }, function () {/* Error callback */ }, null)
@@ -322,7 +322,7 @@ Server.prototype.setRootPath = function (rootPath, successCallback, errorCallbac
 
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "rootPath", "type": 2, "dataBytes": utf8_to_b64(rootPath) }))
+    params.push(createRpcData(rootPath, "STRING", "rootPath"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -360,8 +360,8 @@ Server.prototype.connect = function (host, port, successCallback, errorCallback,
 
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "host", "type": 2, "dataBytes": utf8_to_b64(host) }))
-    params.push(new RpcData({ "name": "port", "type": 1, "dataBytes": utf8_to_b64(port) }))
+    params.push(createRpcData(host, "STRING", "host"))
+    params.push(createRpcData(port, "INTEGER", "port"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -399,9 +399,9 @@ Server.prototype.disconnect = function (host, port, successCallback, errorCallba
 
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "host", "type": 2, "dataBytes": utf8_to_b64(host) }))
-    params.push(new RpcData({ "name": "port", "type": 1, "dataBytes": utf8_to_b64(port) }))
-
+    params.push(createRpcData(host, "STRING", "host"))
+    params.push(createRpcData(port, "INTEGER", "port"))
+    
     // Call it on the server.
     server.executeJsFunction(
         Disconnect.toString(), // The function to execute remotely on server

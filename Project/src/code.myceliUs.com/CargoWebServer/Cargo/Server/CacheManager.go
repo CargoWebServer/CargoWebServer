@@ -1,7 +1,8 @@
 package Server
 
 import (
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/Utility"
 
 	"log"
 
@@ -61,6 +62,9 @@ type CacheManager struct {
 
 	// Ticker to ping the connection...
 	ticker *time.Ticker
+
+	// The cofiguration object.
+	m_config *Config.ServiceConfiguration
 }
 
 var cacheManager *CacheManager
@@ -76,14 +80,25 @@ func (this *Server) GetCacheManager() *CacheManager {
  * The cacheManager manages the memory and the lifetime of entities.
  */
 func newCacheManager() *CacheManager {
+
 	cacheManager := new(CacheManager)
+
 	return cacheManager
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Intilialization of the cacheManager
  */
-func (this *CacheManager) Initialize() {
+func (this *CacheManager) initialize() {
+
+	log.Println("--> Initialize CacheManager")
+
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+
 	this.entitiesMap = make(map[string]Entity, 0)
 	this.sessionIdsMap = make(map[string][]string, 0)
 
@@ -102,7 +117,7 @@ func (this *CacheManager) Initialize() {
 	this.abortedByEnvironment = make(chan bool)
 }
 
-func (this *CacheManager) Start() {
+func (this *CacheManager) start() {
 	log.Println("--> Start CacheManager")
 	go this.run()
 
@@ -115,14 +130,18 @@ func (this *CacheManager) Start() {
 	}(this.ticker)
 }
 
-func (this *CacheManager) GetId() string {
+func (this *CacheManager) getId() string {
 	return "CacheManager"
 }
 
-func (this *CacheManager) Stop() {
+func (this *CacheManager) stop() {
 	log.Println("--> Stop CacheManager")
 	// Free the cache
 	this.abortedByEnvironment <- true
+}
+
+func (this *CacheManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
 }
 
 /**

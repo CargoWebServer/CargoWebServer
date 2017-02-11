@@ -14,11 +14,11 @@ import (
 	"sync"
 	"time"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Config/CargoConfig"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/ast"
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/lexer"
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/parser"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/Utility"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/util"
 	"github.com/xrash/smetrics"
@@ -86,7 +86,7 @@ type KeyValueDataStore struct {
 	sync.RWMutex
 }
 
-func NewKeyValueDataStore(info CargoConfig.DataStoreConfiguration) (store *KeyValueDataStore, err error) {
+func NewKeyValueDataStore(info *Config.DataStoreConfiguration) (store *KeyValueDataStore, err error) {
 	store = new(KeyValueDataStore)
 	store.m_id = info.M_id
 

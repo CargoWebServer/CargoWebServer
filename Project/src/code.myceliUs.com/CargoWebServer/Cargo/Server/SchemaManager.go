@@ -10,9 +10,10 @@ import (
 	"strconv"
 	"strings"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Config/CargoConfig"
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/Utility"
+	"code.myceliUs.com/XML_Schemas"
 	"github.com/kokardy/saxlike"
 )
 
@@ -20,23 +21,24 @@ import (
 // The schemas manager.
 ////////////////////////////////////////////////////////////////////////////////
 type SchemaManager struct {
+	m_config *Config.ServiceConfiguration
 
 	// Map of schema
-	schemas map[string]*XSD_Schema
+	schemas map[string]*XML_Schemas.XSD_Schema
 
 	// To get the schema id for a given element...
 	elementSchema map[string]string
 
 	// Map of attributes...
-	globalAttributes     map[string]*XSD_Attribute
-	globalAnyAttributes  map[string]*XSD_AnyAttribute
-	globalAttributeGroup map[string]*XSD_AttributeGroup
+	globalAttributes     map[string]*XML_Schemas.XSD_Attribute
+	globalAnyAttributes  map[string]*XML_Schemas.XSD_AnyAttribute
+	globalAttributeGroup map[string]*XML_Schemas.XSD_AttributeGroup
 
 	// Map of compositor object...
-	globalSimpleTypes  map[string]*XSD_SimpleType
-	globalComplexTypes map[string]*XSD_ComplexType
-	globalGroups       map[string]*XSD_Group
-	globalElements     map[string]*XSD_Element
+	globalSimpleTypes  map[string]*XML_Schemas.XSD_SimpleType
+	globalComplexTypes map[string]*XML_Schemas.XSD_ComplexType
+	globalGroups       map[string]*XML_Schemas.XSD_Group
+	globalElements     map[string]*XML_Schemas.XSD_Element
 
 	// Map of xsd primitives...
 	xsdPrimitiveTypesMap map[string]string
@@ -55,17 +57,18 @@ func (this *Server) GetSchemaManager() *SchemaManager {
 }
 
 func newSchemaManager() *SchemaManager {
+
 	schemaManager := new(SchemaManager)
 
 	// Creation of maps...
-	schemaManager.schemas = make(map[string]*XSD_Schema)
-	schemaManager.globalAttributes = make(map[string]*XSD_Attribute)
-	schemaManager.globalAnyAttributes = make(map[string]*XSD_AnyAttribute)
-	schemaManager.globalAttributeGroup = make(map[string]*XSD_AttributeGroup)
-	schemaManager.globalSimpleTypes = make(map[string]*XSD_SimpleType)
-	schemaManager.globalComplexTypes = make(map[string]*XSD_ComplexType)
-	schemaManager.globalGroups = make(map[string]*XSD_Group)
-	schemaManager.globalElements = make(map[string]*XSD_Element)
+	schemaManager.schemas = make(map[string]*XML_Schemas.XSD_Schema)
+	schemaManager.globalAttributes = make(map[string]*XML_Schemas.XSD_Attribute)
+	schemaManager.globalAnyAttributes = make(map[string]*XML_Schemas.XSD_AnyAttribute)
+	schemaManager.globalAttributeGroup = make(map[string]*XML_Schemas.XSD_AttributeGroup)
+	schemaManager.globalSimpleTypes = make(map[string]*XML_Schemas.XSD_SimpleType)
+	schemaManager.globalComplexTypes = make(map[string]*XML_Schemas.XSD_ComplexType)
+	schemaManager.globalGroups = make(map[string]*XML_Schemas.XSD_Group)
+	schemaManager.globalElements = make(map[string]*XML_Schemas.XSD_Element)
 	schemaManager.elementSchema = make(map[string]string)
 
 	// Set the primitive type...
@@ -84,7 +87,14 @@ func newSchemaManager() *SchemaManager {
 	return schemaManager
 }
 
-func (this *SchemaManager) Initialize() {
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
+
+func (this *SchemaManager) initialize() {
+
+	log.Println("--> Initialize SchemaManager")
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
 
 	// Here I will initialyse the schema found in the schema directory.
 	// Those schema must be xml schema...
@@ -93,8 +103,8 @@ func (this *SchemaManager) Initialize() {
 		if strings.HasSuffix(strings.ToUpper(f.Name()), ".XSD") == true {
 
 			schemasXsdPath := GetServer().GetConfigurationManager().GetSchemasPath() + "/" + f.Name()
-			var schema *XSD_Schema
-			schema = new(XSD_Schema)
+			var schema *XML_Schemas.XSD_Schema
+			schema = new(XML_Schemas.XSD_Schema)
 			file, err := os.Open(schemasXsdPath)
 			defer file.Close()
 			if err = xml.NewDecoder(file).Decode(schema); err != nil {
@@ -131,7 +141,7 @@ func (this *SchemaManager) Initialize() {
 		if store == nil {
 			// I will create the new store here...
 			var errObj *CargoEntities.Error
-			store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, CargoConfig.DataStoreType_KEY_VALUE_STORE, CargoConfig.DataStoreVendor_MYCELIUS)
+			store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
 			if errObj != nil {
 				log.Println("-----------> ", errObj)
 			}
@@ -172,16 +182,20 @@ func (this *SchemaManager) Initialize() {
 	}
 }
 
-func (this *SchemaManager) GetId() string {
+func (this *SchemaManager) getId() string {
 	return "SchemaManager"
 }
 
-func (this *SchemaManager) Start() {
+func (this *SchemaManager) start() {
 	log.Println("--> Start SchemaManager")
 }
 
-func (this *SchemaManager) Stop() {
+func (this *SchemaManager) stop() {
 	log.Println("--> Stop SchemaManager")
+}
+
+func (this *SchemaManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
 }
 
 /**
@@ -238,7 +252,7 @@ func (this *SchemaManager) setSuperTypeField(prototype *EntityPrototype) {
 /**
  * Generate an entity prototype from given schema...
  */
-func (this *SchemaManager) parseSchema(schema *XSD_Schema) {
+func (this *SchemaManager) parseSchema(schema *XML_Schemas.XSD_Schema) {
 
 	// The annotation...
 	for i := 0; i < len(schema.Annotations); i++ {
@@ -250,7 +264,7 @@ func (this *SchemaManager) parseSchema(schema *XSD_Schema) {
 	// Now the includes files...
 	for i := 0; i < len(schema.Includes); i++ {
 		schemasXsdPath := GetServer().GetConfigurationManager().GetSchemasPath() + "/" + schema.Includes[i].SchemaLocation
-		schema_ := new(XSD_Schema)
+		schema_ := new(XML_Schemas.XSD_Schema)
 		file, err := os.Open(schemasXsdPath)
 		defer file.Close()
 		if err = xml.NewDecoder(file).Decode(schema_); err != nil {
@@ -316,7 +330,7 @@ func (this *SchemaManager) parseSchema(schema *XSD_Schema) {
 /**
  * Parse Attribute Group
  */
-func (this *SchemaManager) parseAttributeGroups(group *XSD_AttributeGroup, schema *XSD_Schema, isGlobal bool) {
+func (this *SchemaManager) parseAttributeGroups(group *XML_Schemas.XSD_AttributeGroup, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
 	id := schema.Id + "." + group.Name
 	if isGlobal {
 		this.globalAttributeGroup[id] = group
@@ -326,7 +340,7 @@ func (this *SchemaManager) parseAttributeGroups(group *XSD_AttributeGroup, schem
 /**
  * Parse Any Attribute
  */
-func (this *SchemaManager) parseAnyAttribute(any *XSD_AnyAttribute, schema *XSD_Schema, isGlobal bool) {
+func (this *SchemaManager) parseAnyAttribute(any *XML_Schemas.XSD_AnyAttribute, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
 	id := schema.Id + "." + any.Name
 	if isGlobal {
 		this.globalAnyAttributes[id] = any
@@ -336,7 +350,7 @@ func (this *SchemaManager) parseAnyAttribute(any *XSD_AnyAttribute, schema *XSD_
 /**
  * Parse Attribute
  */
-func (this *SchemaManager) parseAttribute(attribute *XSD_Attribute, schema *XSD_Schema, isGlobal bool) {
+func (this *SchemaManager) parseAttribute(attribute *XML_Schemas.XSD_Attribute, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
 	id := schema.Id + "." + attribute.Name
 	if isGlobal {
 		this.globalAttributes[id] = attribute
@@ -347,7 +361,7 @@ func (this *SchemaManager) parseAttribute(attribute *XSD_Attribute, schema *XSD_
 // Compositor elements...
 // Those element generate prototypes...
 ////////////////////////////////////////////////////////////////////////////////
-func (this *SchemaManager) parseAnnotation(annotation XSD_Annotation) string {
+func (this *SchemaManager) parseAnnotation(annotation XML_Schemas.XSD_Annotation) string {
 	annotationStr := ""
 	return annotationStr
 }
@@ -355,21 +369,21 @@ func (this *SchemaManager) parseAnnotation(annotation XSD_Annotation) string {
 /**
  * Parse Element
  */
-func (this *SchemaManager) parseElement(element *XSD_Element, schema *XSD_Schema, isGlobal bool) {
+func (this *SchemaManager) parseElement(element *XML_Schemas.XSD_Element, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
 	id := schema.Id + "." + element.Name
 	if isGlobal {
 		this.globalElements[id] = element
 	}
 
 	// Keep the schema information here...
-	element.schemaId = schema.Id
+	element.SchemaId = schema.Id
 	this.elementSchema[element.Name] = schema.Id
 }
 
 /**
  * Parse SimpleType
  */
-func (this *SchemaManager) parseSimpleType(simpleType *XSD_SimpleType, schema *XSD_Schema, isGlobal bool) {
+func (this *SchemaManager) parseSimpleType(simpleType *XML_Schemas.XSD_SimpleType, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
 	id := schema.Id + "." + simpleType.Name
 	if isGlobal {
 		this.globalSimpleTypes[id] = simpleType
@@ -379,7 +393,7 @@ func (this *SchemaManager) parseSimpleType(simpleType *XSD_SimpleType, schema *X
 /**
  * Parse ComplexType
  */
-func (this *SchemaManager) parseComplexType(complexType *XSD_ComplexType, schema *XSD_Schema, isGlobal bool) {
+func (this *SchemaManager) parseComplexType(complexType *XML_Schemas.XSD_ComplexType, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
 
 	id := schema.Id + "." + complexType.Name
 	if isGlobal {
@@ -391,7 +405,7 @@ func (this *SchemaManager) parseComplexType(complexType *XSD_ComplexType, schema
 /**
  * Parse Group
  */
-func (this *SchemaManager) parseGroup(group *XSD_Group, schema *XSD_Schema, isGlobal bool) {
+func (this *SchemaManager) parseGroup(group *XML_Schemas.XSD_Group, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
 	var groupId string
 
 	if len(group.Id) > 0 {
@@ -409,7 +423,7 @@ func (this *SchemaManager) parseGroup(group *XSD_Group, schema *XSD_Schema, isGl
 /**
  * Now the prototypes generation
  */
-func (this *SchemaManager) genereatePrototype(schema *XSD_Schema) {
+func (this *SchemaManager) genereatePrototype(schema *XML_Schemas.XSD_Schema) {
 	//Global simple type...
 	for k, s := range this.globalSimpleTypes {
 		if strings.HasPrefix(k, schema.Id) {
@@ -441,10 +455,10 @@ func (this *SchemaManager) genereatePrototype(schema *XSD_Schema) {
 
 }
 
-func (this *SchemaManager) createPrototypeElement(schema *XSD_Schema, element *XSD_Element) *EntityPrototype {
+func (this *SchemaManager) createPrototypeElement(schema *XML_Schemas.XSD_Schema, element *XML_Schemas.XSD_Element) *EntityPrototype {
 
-	var simpleType *XSD_SimpleType
-	var complexType *XSD_ComplexType
+	var simpleType *XML_Schemas.XSD_SimpleType
+	var complexType *XML_Schemas.XSD_ComplexType
 
 	if len(element.Type) > 0 {
 		// Here the content is define outside of the element...
@@ -508,7 +522,7 @@ func (this *SchemaManager) createPrototypeElement(schema *XSD_Schema, element *X
 /**
  * Create simple type prototype...
  */
-func (this *SchemaManager) createPrototypeSimpleType(schema *XSD_Schema, simpleType *XSD_SimpleType) *EntityPrototype {
+func (this *SchemaManager) createPrototypeSimpleType(schema *XML_Schemas.XSD_Schema, simpleType *XML_Schemas.XSD_SimpleType) *EntityPrototype {
 	// The new prototype to append to parent...
 	prototype := NewEntityPrototype()
 
@@ -550,7 +564,7 @@ func (this *SchemaManager) createPrototypeSimpleType(schema *XSD_Schema, simpleT
 /**
  * Create complex type prototype...
  */
-func (this *SchemaManager) createPrototypeComplexType(schema *XSD_Schema, complexType *XSD_ComplexType) *EntityPrototype {
+func (this *SchemaManager) createPrototypeComplexType(schema *XML_Schemas.XSD_Schema, complexType *XML_Schemas.XSD_ComplexType) *EntityPrototype {
 	prototype := NewEntityPrototype()
 
 	if complexType.IsAbstract {
@@ -623,7 +637,7 @@ func (this *SchemaManager) createPrototypeComplexType(schema *XSD_Schema, comple
  * Append attribute to the prototype...
  * TODO connect the default value when fixed is true...
  */
-func (this *SchemaManager) appendPrototypeAttribute(schema *XSD_Schema, prototype *EntityPrototype, attribute *XSD_Attribute) {
+func (this *SchemaManager) appendPrototypeAttribute(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, attribute *XML_Schemas.XSD_Attribute) {
 
 	// I will get the attribute from it reference...
 	if len(attribute.Ref) > 0 {
@@ -635,7 +649,7 @@ func (this *SchemaManager) appendPrototypeAttribute(schema *XSD_Schema, prototyp
 		return
 	}
 
-	var simpleType *XSD_SimpleType
+	var simpleType *XML_Schemas.XSD_SimpleType
 	if len(attribute.Type) > 0 {
 		simpleType = this.globalSimpleTypes[schema.Id+"."+attribute.Type]
 		if simpleType == nil {
@@ -699,21 +713,21 @@ func (this *SchemaManager) appendPrototypeAttribute(schema *XSD_Schema, prototyp
 /**
  * Append wildcard to replace any element.
  */
-func (this *SchemaManager) appendPrototypeAny(schema *XSD_Schema, parent *EntityPrototype, any *XSD_Any) {
+func (this *SchemaManager) appendPrototypeAny(schema *XML_Schemas.XSD_Schema, parent *EntityPrototype, any *XML_Schemas.XSD_Any) {
 	// TODO read anything here...
 }
 
 /**
  * Append any attribute to the prototype...
  */
-func (this *SchemaManager) appendPrototypeAnyAttribute(schema *XSD_Schema, parent *EntityPrototype, anyAttribute *XSD_AnyAttribute) {
+func (this *SchemaManager) appendPrototypeAnyAttribute(schema *XML_Schemas.XSD_Schema, parent *EntityPrototype, anyAttribute *XML_Schemas.XSD_AnyAttribute) {
 	// TODO read any attributes...
 }
 
 /**
  * Append attribute group to the prototype...
  */
-func (this *SchemaManager) appendPrototypeAttributeGroup(schema *XSD_Schema, parent *EntityPrototype, groupAttribute *XSD_AttributeGroup) {
+func (this *SchemaManager) appendPrototypeAttributeGroup(schema *XML_Schemas.XSD_Schema, parent *EntityPrototype, groupAttribute *XML_Schemas.XSD_AttributeGroup) {
 	// If is global...
 	if _, ok := this.globalAttributeGroup[schema.Id+"."+groupAttribute.Name]; ok {
 		for i := 0; i < len(groupAttribute.AnyAttributes); i++ {
@@ -747,7 +761,7 @@ func (this *SchemaManager) setLastPrototypeFieldCardinality(prototype *EntityPro
 /**
  *  append element to prototype...
  */
-func (this *SchemaManager) appendPrototypeElement(schema *XSD_Schema, prototype *EntityPrototype, element *XSD_Element, minOccurs string, maxOccurs string) {
+func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, element *XML_Schemas.XSD_Element, minOccurs string, maxOccurs string) {
 
 	// Here the element to append is not by reference, so
 	// it can be a subtype...
@@ -818,8 +832,8 @@ func (this *SchemaManager) appendPrototypeElement(schema *XSD_Schema, prototype 
 	}
 
 	// Here it's an element with local scope...
-	var simpleType *XSD_SimpleType
-	var complexType *XSD_ComplexType
+	var simpleType *XML_Schemas.XSD_SimpleType
+	var complexType *XML_Schemas.XSD_ComplexType
 	if len(element.Type) > 0 {
 		// Here the content is define outside of the element...
 		if val, ok := this.globalComplexTypes[schema.Id+"."+element.Type]; ok {
@@ -908,7 +922,7 @@ func (this *SchemaManager) appendPrototypeElement(schema *XSD_Schema, prototype 
 /**
  *  Append group...
  */
-func (this *SchemaManager) appendPrototypeGroup(schema *XSD_Schema, prototype *EntityPrototype, group *XSD_Group, minOccurs string, maxOccurs string) *EntityPrototype {
+func (this *SchemaManager) appendPrototypeGroup(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, group *XML_Schemas.XSD_Group, minOccurs string, maxOccurs string) *EntityPrototype {
 
 	if len(group.Ref) > 0 {
 		minOccurs := group.MinOccurs
@@ -942,7 +956,7 @@ func (this *SchemaManager) appendPrototypeGroup(schema *XSD_Schema, prototype *E
 /**
  *  Append the content of a sequence to a prototype...
  */
-func (this *SchemaManager) appendPrototypeSequence(schema *XSD_Schema, prototype *EntityPrototype, sequence *XSD_Sequence, minOccurs string, maxOccurs string) {
+func (this *SchemaManager) appendPrototypeSequence(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, sequence *XML_Schemas.XSD_Sequence, minOccurs string, maxOccurs string) {
 
 	// The sequence inner element
 	for i := 0; i < len(sequence.Elements); i++ {
@@ -984,7 +998,7 @@ func (this *SchemaManager) appendPrototypeSequence(schema *XSD_Schema, prototype
 /**
  * Append Field.
  */
-func (this *SchemaManager) appendPrototypeField(schema *XSD_Schema, prototype *EntityPrototype, field *XSD_Field) {
+func (this *SchemaManager) appendPrototypeField(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, field *XML_Schemas.XSD_Field) {
 
 	// This is kind of attribute that contain a xpath string...
 	if !Utility.Contains(prototype.Fields, "M_"+field.Id) {
@@ -1000,14 +1014,14 @@ func (this *SchemaManager) appendPrototypeField(schema *XSD_Schema, prototype *E
 /**
  * Append selector.
  */
-func (this *SchemaManager) appendPrototypeSelector(schema *XSD_Schema, parent *EntityPrototype, selector *XSD_Selector) {
+func (this *SchemaManager) appendPrototypeSelector(schema *XML_Schemas.XSD_Schema, parent *EntityPrototype, selector *XML_Schemas.XSD_Selector) {
 
 }
 
 /**
  * Append unique element.
  */
-func (this *SchemaManager) appendPrototypeUnique(schema *XSD_Schema, prototype *EntityPrototype, unique *XSD_Unique) {
+func (this *SchemaManager) appendPrototypeUnique(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, unique *XML_Schemas.XSD_Unique) {
 	this.appendPrototypeSelector(schema, prototype, &unique.Selector)
 
 	for i := 0; i < len(unique.Fields); i++ {
@@ -1018,7 +1032,7 @@ func (this *SchemaManager) appendPrototypeUnique(schema *XSD_Schema, prototype *
 /**
  * Append unique element.
  */
-func (this *SchemaManager) appendPrototypeList(schema *XSD_Schema, prototype *EntityPrototype, lst *XSD_List) {
+func (this *SchemaManager) appendPrototypeList(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, lst *XML_Schemas.XSD_List) {
 	if lst.SimpleType != nil {
 		// Create a list of simple type element.
 		p := this.createPrototypeSimpleType(schema, lst.SimpleType)
@@ -1051,7 +1065,7 @@ func (this *SchemaManager) appendPrototypeList(schema *XSD_Schema, prototype *En
 /**
  * Append key ref element
  */
-func (this *SchemaManager) appendPrototypeKeyRef(schema *XSD_Schema, parent *EntityPrototype, keyRef *XSD_KeyRef) {
+func (this *SchemaManager) appendPrototypeKeyRef(schema *XML_Schemas.XSD_Schema, parent *EntityPrototype, keyRef *XML_Schemas.XSD_KeyRef) {
 	this.appendPrototypeSelector(schema, parent, &keyRef.Selector)
 
 	for i := 0; i < len(keyRef.Fields); i++ {
@@ -1062,7 +1076,7 @@ func (this *SchemaManager) appendPrototypeKeyRef(schema *XSD_Schema, parent *Ent
 /**
  * Append key element
  */
-func (this *SchemaManager) appendPrototypeKey(schema *XSD_Schema, parent *EntityPrototype, key *XSD_Key) {
+func (this *SchemaManager) appendPrototypeKey(schema *XML_Schemas.XSD_Schema, parent *EntityPrototype, key *XML_Schemas.XSD_Key) {
 
 	this.appendPrototypeSelector(schema, parent, &key.Selector)
 
@@ -1074,7 +1088,7 @@ func (this *SchemaManager) appendPrototypeKey(schema *XSD_Schema, parent *Entity
 /**
  *  Append the content of a choice to a prototype...
  */
-func (this *SchemaManager) appendPrototypeChoice(schema *XSD_Schema, prototype *EntityPrototype, choice *XSD_Choice, minOccurs string, maxOccurs string) {
+func (this *SchemaManager) appendPrototypeChoice(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, choice *XML_Schemas.XSD_Choice, minOccurs string, maxOccurs string) {
 	// Append Any...
 	for i := 0; i < len(choice.Anys); i++ {
 		this.appendPrototypeAny(schema, prototype, &choice.Anys[i])
@@ -1110,7 +1124,7 @@ func (this *SchemaManager) appendPrototypeChoice(schema *XSD_Schema, prototype *
 /**
  *  Append the content of a all to a prototype...
  */
-func (this *SchemaManager) appendPrototypeAll(schema *XSD_Schema, prototype *EntityPrototype, all *XSD_All, minOccurs string, maxOccurs string) {
+func (this *SchemaManager) appendPrototypeAll(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, all *XML_Schemas.XSD_All, minOccurs string, maxOccurs string) {
 	// here I will append the list of all element...
 	for i := 0; i < len(all.Elements); i++ {
 		// Append Element from all to the prototype...
@@ -1123,7 +1137,7 @@ func (this *SchemaManager) appendPrototypeAll(schema *XSD_Schema, prototype *Ent
 /**
  * Append union... The content can be one of simple type...
  */
-func (this *SchemaManager) appendPrototypeUnion(schema *XSD_Schema, prototype *EntityPrototype, union *XSD_Union) {
+func (this *SchemaManager) appendPrototypeUnion(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, union *XML_Schemas.XSD_Union) {
 	// here I will append the union of element...
 	for i := 0; i < len(union.SimpleType); i++ {
 		this.createPrototypeSimpleType(schema, &union.SimpleType[i])
@@ -1150,7 +1164,7 @@ func (this *SchemaManager) appendPrototypeSuperBaseType(superTypeName string, pr
 /**
  * Append new prototype Extention.
  */
-func (this *SchemaManager) appendPrototypeExtention(schema *XSD_Schema, prototype *EntityPrototype, extension *XSD_Extension, complexContent *XSD_ComplexContent, simpleContent *XSD_SimpleContent) {
+func (this *SchemaManager) appendPrototypeExtention(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, extension *XML_Schemas.XSD_Extension, complexContent *XML_Schemas.XSD_ComplexContent, simpleContent *XML_Schemas.XSD_SimpleContent) {
 	if complexContent != nil {
 		if len(extension.Base) > 0 {
 			// So here I will find the base type content...
@@ -1212,7 +1226,7 @@ func (this *SchemaManager) appendPrototypeExtention(schema *XSD_Schema, prototyp
 /**
  * Append new restriction to the prototype...
  */
-func (this *SchemaManager) appendPrototypeRestriction(schema *XSD_Schema, prototype *EntityPrototype, restriction *XSD_Restriction, simpleType *XSD_SimpleType, complexContent *XSD_ComplexContent, simpleContent *XSD_SimpleContent) {
+func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Schema, prototype *EntityPrototype, restriction *XML_Schemas.XSD_Restriction, simpleType *XML_Schemas.XSD_SimpleType, complexContent *XML_Schemas.XSD_ComplexContent, simpleContent *XML_Schemas.XSD_SimpleContent) {
 
 	if len(restriction.Base) > 0 {
 		// The base type name...
@@ -1411,7 +1425,7 @@ func (this *SchemaManager) getFieldType(typeName string, fieldName string) strin
 type XmlDocumentHandler struct {
 
 	/** The schema to use to interpret the data. **/
-	schemaId string
+	SchemaId string
 
 	/** Keep entities reference here... **/
 	references map[string]*DynamicEntity
@@ -1429,7 +1443,7 @@ type XmlDocumentHandler struct {
 /**
  * Init the content of the entity from the content of the element.
  */
-func (this *XmlDocumentHandler) InitElement(entity *DynamicEntity, element *XSD_Element) {
+func (this *XmlDocumentHandler) InitElement(entity *DynamicEntity, element *XML_Schemas.XSD_Element) {
 
 }
 
@@ -1462,7 +1476,6 @@ func (this *XmlDocumentHandler) StartDocument() {
 
 /**
  * Remove xs object and keep only there values...
- * Hint there is where some indexation about xs values can be done.
  */
 func compactObject(object map[string]interface{}) {
 	for key, value := range object {
@@ -1504,7 +1517,7 @@ func (this *XmlDocumentHandler) EndDocument() {
 		object := this.globalObjects[i]
 		compactObject(object)
 		object["NeedSave"] = true
-		entity, errObj := GetServer().GetEntityManager().NewDynamicEntity(object)
+		entity, errObj := GetServer().GetEntityManager().newDynamicEntity(object)
 		if errObj == nil {
 			entity.SaveEntity()
 
@@ -1640,22 +1653,22 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 	var object map[string]interface{}
 
 	// Get the element schema...
-	if schemaId, ok := GetServer().GetSchemaManager().elementSchema[elementNameLocal]; ok {
-		this.schemaId = schemaId
+	if SchemaId, ok := GetServer().GetSchemaManager().elementSchema[elementNameLocal]; ok {
+		this.SchemaId = SchemaId
 	}
 
-	// If the schemaId is not already set I will try to get it
+	// If the SchemaId is not already set I will try to get it
 	// from the list of attribute of the element
-	if len(this.schemaId) == 0 {
+	if len(this.SchemaId) == 0 {
 		for i := 0; i < len(attributes); i++ {
 			attr := attributes[i]
 			if attr.Name.Local == "xmlns" {
-				this.schemaId = attr.Value[strings.LastIndex(attr.Value, "/")+1:]
+				this.SchemaId = attr.Value[strings.LastIndex(attr.Value, "/")+1:]
 			}
 		}
 	}
 
-	if len(this.schemaId) > 0 {
+	if len(this.SchemaId) > 0 {
 		// Get the parent of this object...
 		lastObject := this.getLastObject()
 		if lastObject != nil {
@@ -1675,8 +1688,8 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 			} else {
 				// The element is not found with it name in the prototype...
 				// so I will try to get it from the global scope...
-				var element *XSD_Element
-				if val, ok := GetServer().GetSchemaManager().globalElements[this.schemaId+"."+elementNameLocal]; ok {
+				var element *XML_Schemas.XSD_Element
+				if val, ok := GetServer().GetSchemaManager().globalElements[this.SchemaId+"."+elementNameLocal]; ok {
 					element = val
 					// The element can be name with it superType name in case of abstract type...
 					if len(element.SubstitutionGroup) > 0 {
@@ -1687,9 +1700,9 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 							fieldType = strings.Replace(fieldType, ":Ref", "", -1)
 							object = make(map[string]interface{})
 							if len(element.Type) > 0 {
-								object["TYPENAME"] = this.schemaId + "." + element.Type
+								object["TYPENAME"] = this.SchemaId + "." + element.Type
 							} else {
-								object["TYPENAME"] = this.schemaId + "." + element.Name
+								object["TYPENAME"] = this.SchemaId + "." + element.Name
 							}
 
 							object["UUID"] = object["TYPENAME"].(string) + "%" + Utility.RandomUUID()
@@ -1707,17 +1720,17 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 			}
 		} else {
 			// Try to get element from global element here.
-			var element *XSD_Element
-			if val, ok := GetServer().GetSchemaManager().globalElements[this.schemaId+"."+elementNameLocal]; ok {
+			var element *XML_Schemas.XSD_Element
+			if val, ok := GetServer().GetSchemaManager().globalElements[this.SchemaId+"."+elementNameLocal]; ok {
 				element = val
 			}
 			object = make(map[string]interface{})
 			// Here the object is in the global scope so the element must no]
 			// be nil
 			if len(element.Type) > 0 {
-				object["TYPENAME"] = this.schemaId + "." + element.Type
+				object["TYPENAME"] = this.SchemaId + "." + element.Type
 			} else {
-				object["TYPENAME"] = this.schemaId + "." + elementNameLocal
+				object["TYPENAME"] = this.SchemaId + "." + elementNameLocal
 			}
 			object["UUID"] = object["TYPENAME"].(string) + "%" + Utility.RandomUUID()
 			object["NeedSave"] = true

@@ -48,7 +48,7 @@ function ImportXmlBpmnDefinitions(content) {
 WorkflowManager.prototype.importXmlBpmnDefinitions = function (content, successCallback, errorCallback, caller) {
     // server is the client side singleton...
     var params = []
-    params[0] = new RpcData({ "name": "content", "type": 2, "dataBytes": utf8_to_b64(content) })
+    params.push(createRpcData(content, "STRING", "content"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -115,8 +115,8 @@ function GetDefinitionsById(id) {
 WorkflowManager.prototype.getDefinitionsById = function (id, successCallback, errorCallback, caller) {
     // server is the client side singleton...
     var params = []
-    params[0] = new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(id) })
-
+    params.push(createRpcData(id, "STRING", "id"))
+    
     // Call it on the server.
     server.executeJsFunction(
         GetDefinitionsById.toString(), // The function to execute remotely on server
@@ -141,7 +141,6 @@ WorkflowManager.prototype.getDefinitionsById = function (id, successCallback, er
 function initDefinitions(definitions) {
 
     for (var i = 0; i < definitions.M_BPMNDiagram.length; i++) {
-
         // Here I will use function insted of reference, so there will no circulare ref at serialysation time...
         definitions.M_BPMNDiagram[i].getParentDefinitions = function (definitions) {
             return function () {
@@ -244,8 +243,8 @@ function GetDefinitionInstances(definitionsId) {
 WorkflowManager.prototype.getDefinitionInstances = function (definitions, successCallback, errorCallback, caller) {
     // server is the client side singleton...
     var params = []
-    params[0] = new RpcData({ "name": "definitionsId", "type": 2, "dataBytes": utf8_to_b64(definitions.UUID) })
-
+    params.push(createRpcData(definitions.UUID, "STRING", "definitionsUUID"))
+    
     // Call it on the server.
     server.executeJsFunction(
         GetDefinitionInstances.toString(), // The function to execute remotely on server
@@ -317,8 +316,8 @@ WorkflowManager.prototype.newItemAwareElementInstance = function (bpmnElementId,
 
     // server is the client side singleton...
     var params = []
-    params[0] = new RpcData({ "name": "bpmnElementId", "type": 2, "dataBytes": utf8_to_b64(bpmnElementId) })
-    params[1] = new RpcData({ "name": "data", "type": 3, "dataBytes": utf8_to_b64(data)})
+    params.push(createRpcData(bpmnElementId, "STRING", "bpmnElementId"))
+    params.push(createRpcData(data, "BYTES", "data"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -352,9 +351,9 @@ WorkflowManager.prototype.startProcess = function (processUUID, eventData, event
 
     // server is the client side singleton...
     var params = []
-    params[0] = new RpcData({ "name": "processId", "type": 2, "dataBytes": utf8_to_b64(processUUID) })
-    params[1] = new RpcData({ "name": "data", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(eventData)) })
-    params[2] = new RpcData({ "name": "data", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(eventDefinitionData)) })
+    params.push(createRpcData(processUUID, "STRING", "processUUID"))
+    params.push(createRpcData(eventData, "JSON_STR", "params"))
+    params.push(createRpcData(eventDefinitionData, "JSON_STR", "params"))
 
     // Call it on the server.
     server.executeJsFunction(

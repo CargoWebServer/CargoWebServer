@@ -209,25 +209,25 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.serverSettingDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display: none;" })
     this.serverSettingContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Server Configuration" }).appendElement({ "tag": "i", "class": "fa fa-server" })
     setSelectAction(this.serverSettingContext, this.serverSettingDiv)
-    this.serverConfiguration = new ConfigurationPanel(this.serverSettingDiv, "Server configuration", "CargoConfig.ServerConfiguration", "serverConfig")
+    this.serverConfiguration = new ConfigurationPanel(this.serverSettingDiv, "Server configuration", "Config.ServerConfiguration", "serverConfig")
 
     // The database context...
     this.datasourceSettingDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display: none;" })
     this.datasourceSettingContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Data stores configuration" }).appendElement({ "tag": "i", "class": "fa fa-database" })
     setSelectAction(this.datasourceSettingContext, this.datasourceSettingDiv)
-    this.dataConfiguration = new ConfigurationPanel(this.datasourceSettingDiv, "Data configuration", "CargoConfig.DataStoreConfiguration", "dataStoreConfigs")
+    this.dataConfiguration = new ConfigurationPanel(this.datasourceSettingDiv, "Data configuration", "Config.DataStoreConfiguration", "dataStoreConfigs")
 
     // The user and group setting / ldap.
     this.userGroupSettingDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display:none;" })
     this.userGroupSettingContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "LDAP configuration" }).appendElement({ "tag": "i", "class": "fa fa-users" })
     setSelectAction(this.userGroupSettingContext, this.userGroupSettingDiv)
-    this.ldapConfiguration = new ConfigurationPanel(this.userGroupSettingDiv, "LDAP configuration", "CargoConfig.LdapConfiguration", "ldapConfigs")
+    this.ldapConfiguration = new ConfigurationPanel(this.userGroupSettingDiv, "LDAP configuration", "Config.LdapConfiguration", "ldapConfigs")
 
     // The mail server config.
     this.mailServerSettingDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display:none;" })
     this.mailServerSettingContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "SMTP configuration" }).appendElement({ "tag": "i", "class": "fa fa-envelope-o" })
     setSelectAction(this.mailServerSettingContext, this.mailServerSettingDiv)
-    this.smtpConfiguration = new ConfigurationPanel(this.mailServerSettingDiv, "Email server configuration", "CargoConfig.SmtpConfiguration", "smtpConfigs")
+    this.smtpConfiguration = new ConfigurationPanel(this.mailServerSettingDiv, "Email server configuration", "Config.SmtpConfiguration", "smtpConfigs")
 
     // The bpmn explorer...
     this.bpmnDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display:none;" })
@@ -240,7 +240,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.propertiesView = new PropertiesView(this.propertiesDiv)
 
     // I will set the configuration of the panel...
-    server.entityManager.getObjectsByType("CargoConfig.Configurations", "CargoConfig", "",
+    server.entityManager.getObjectsByType("Config.Configurations", "Config", "",
         /** Progress callback */
         function () {
 

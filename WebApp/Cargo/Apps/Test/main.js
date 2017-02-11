@@ -50,13 +50,14 @@ function main() {
     //dataTests()
 
     //entityTests()
+/*
+    testDynamicEntity()
 
-   // testDynamicEntity()
-
-   //  entityDump("item_1", "Test.Item")
-
+    entityDump("item_1", "Test.Item")
+*/
     //entitiesDump("COLLADASchema.COLLADA")
-
+//entitiesDump("CargoEntities.Action")
+entityDump( "CARGO_ENTITIES", "CargoEntities.Entities")
     //entitiesDump("XPDMXML.ProcessStructureType")
     //entitiesDump("DT3_informations.Workpoint")
 
@@ -68,14 +69,14 @@ function main() {
     // TestUploadFile()
 
     // Test get bmpn defintion instance...
-  
-    server.entityManager.getEntityPrototypes("Test",
+
+    /*server.entityManager.getEntityPrototypes("Test",
         // Success callback.
         function (result, caller) {
             server.entityManager.getEntityPrototypes("BPMN20",
                 // Success callback.
                 function (result, caller) {
-                    server.entityManager.getEntityPrototypes("BPMS_Runtime",
+                    server.entityManager.getEntityPrototypes("BPMS",
                         // Success callback.
                         function (result, caller) {
                             server.entityManager.getEntityById("BPMN20.Definitions", "_1484846640138",
@@ -116,6 +117,7 @@ function main() {
         }, {})
     
      testServiceContainer()
+  */
 }
 
 function testServiceContainer() {

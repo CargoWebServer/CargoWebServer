@@ -896,30 +896,44 @@ function getContrastYIQ(hexcolor) {
  * @param variable The variable to create as RpcData
  * @param {string} variableType The type of the variable. Can be: DOUBLE, INTEGER, STRING, BYTES, JSON_STR, BOOLEAN
  * @param {string} variableName The name of the variable to create as RpcData. This parameter is optional
+ * @param {string} typeName This is the name on the server side that must be use to interprest the data.
  * @returns {RpcData} The created RpcData or undefined if variableType was invalid
  */
 
-function createRpcData(variable, variableType, variableName) {
+function createRpcData(variable, variableType, variableName, typeName) {
     if (variableName == undefined) {
         variableName = "varName"
     }
     if (variableType == "DOUBLE") {
-        variableType = 0
+        variableType = Data_DOUBLE
+        typeName = "double"
     } else if (variableType == "INTEGER") {
-        variableType = 1
+        variableType = Data_INTEGER
+        typeName = "int"
     } else if (variableType == "STRING") {
-        variableType = 2
+        variableType = Data_STRING
+        typeName = "string"
     } else if (variableType == "BYTES") {
-        variableType = 3
+        variableType = Data_BYTES
+        typeName = "[]unit8"
     } else if (variableType == "JSON_STR") {
-        variableType = 4
+        variableType = Data_JSON_STR
+        if (variable.stringify != undefined) {
+            variableType = Data_JSON_STR
+            typeName = variable.TYPENAME
+            variable = variable.stringify()
+        }else{
+            variable = JSON.stringify(variable)
+        }
     } else if (variableType == "BOOLEAN") {
-        variableType = 5
+        variableType = Data_BOOLEAN
+        typeName = "bool"
     } else {
         return undefined
     }
-
-    return new RpcData({ "name": variableName, "type": variableType, "dataBytes": utf8_to_b64(variable) });
+    
+    // Now I will create the rpc data.
+    return new RpcData({ "name": variableName, "type": variableType, "dataBytes": utf8_to_b64(variable), "typeName": typeName});
 }
 
 

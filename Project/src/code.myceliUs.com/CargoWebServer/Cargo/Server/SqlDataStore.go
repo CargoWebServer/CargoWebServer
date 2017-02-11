@@ -10,7 +10,7 @@ import (
 	"time"
 
 	_ "code.google.com/p/odbc"
-	"code.myceliUs.com/CargoWebServer/Cargo/Config/CargoConfig"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -23,7 +23,7 @@ type SqlDataStore struct {
 	m_id string
 
 	/** The name of the drivers use **/
-	m_vendor CargoConfig.DataStoreVendor
+	m_vendor Config.DataStoreVendor
 
 	/** The store port **/
 	m_port int
@@ -44,7 +44,7 @@ type SqlDataStore struct {
 	m_db *sql.DB
 }
 
-func NewSqlDataStore(info CargoConfig.DataStoreConfiguration) (*SqlDataStore, error) {
+func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error) {
 
 	// The store...
 	store := new(SqlDataStore)
@@ -69,7 +69,7 @@ func (this *SqlDataStore) Connect() error {
 	var err error
 	var connectionString string
 	var driver string
-	if this.m_vendor == CargoConfig.DataStoreVendor_MSSQL {
+	if this.m_vendor == Config.DataStoreVendor_MSSQL {
 		/** Connect to Microsoft Sql server here... **/
 		// So I will create the connection string from info...
 		connectionString += "server=" + this.m_host + ";"
@@ -81,7 +81,7 @@ func (this *SqlDataStore) Connect() error {
 		//connectionString += "encrypt=false;"
 		driver = "mssql"
 
-	} else if this.m_vendor == CargoConfig.DataStoreVendor_MYSQL {
+	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
 		/** Connect to oracle MySql server here... **/
 		connectionString += this.m_user + ":"
 		connectionString += this.m_password + "@tcp("
@@ -90,7 +90,7 @@ func (this *SqlDataStore) Connect() error {
 		//connectionString += "encrypt=false;"
 		driver = "mysql"
 
-	} else if this.m_vendor == CargoConfig.DataStoreVendor_ODBC {
+	} else if this.m_vendor == Config.DataStoreVendor_ODBC {
 		/** Connect with ODBC here... **/
 		if runtime.GOOS == "windows" {
 			connectionString += "driver=sql server;"
@@ -150,9 +150,9 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
 	tableName := strings.TrimSpace(query[startIndex:endIndex])
 
 	var colKeyQuery string
-	if this.m_vendor == CargoConfig.DataStoreVendor_MSSQL || this.m_vendor == CargoConfig.DataStoreVendor_MYSQL {
+	if this.m_vendor == Config.DataStoreVendor_MSSQL || this.m_vendor == Config.DataStoreVendor_MYSQL {
 		colKeyQuery = "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE (TABLE_SCHEMA = '" + this.GetId() + "') AND (TABLE_NAME = ?) AND (COLUMN_KEY = 'PRI')"
-	} else if this.m_vendor == CargoConfig.DataStoreVendor_ODBC {
+	} else if this.m_vendor == Config.DataStoreVendor_ODBC {
 		colKeyQuery = "SELECT COLUMN_NAME FROM " + this.GetId() + ".INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_NAME LIKE ? AND CONSTRAINT_NAME LIKE 'PK%'"
 	}
 
@@ -167,7 +167,7 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
 		if colKey, ok := results[0][0].(string); ok {
 			// Now the second query...
 			var lastIndexQuery string
-			if this.m_vendor == CargoConfig.DataStoreVendor_MYSQL {
+			if this.m_vendor == Config.DataStoreVendor_MYSQL {
 				lastIndexQuery = "SELECT " + colKey + " FROM " + tableName + " ORDER BY " + colKey + " DESC LIMIT 1"
 			} else {
 				lastIndexQuery = "SELECT TOP 1 " + colKey + " FROM " + tableName + " ORDER BY " + colKey + " DESC"

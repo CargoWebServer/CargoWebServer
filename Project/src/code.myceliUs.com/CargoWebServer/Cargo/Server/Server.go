@@ -6,8 +6,8 @@ import (
 	"os"
 	"strconv"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/Utility"
 	//"github.com/skratchdot/open-golang/open"
 )
 
@@ -72,28 +72,41 @@ func newServer() *Server {
  */
 func (this *Server) initialize() {
 
-	// Contain the reference to other server on the network.
+	// Contain the reference to other services on the network.
 	this.peers = make(map[string]connection)
 
-	// Initialyse managers...
-	this.GetCacheManager().Initialize()
+	// Must be call first.
+	this.GetConfigurationManager()
+	this.GetServiceManager()
 
-	// Must be start before other service initialization.
-	this.GetCacheManager().Start()
-	this.GetEventManager().Initialize()
+	// Start the cache manager.
+	this.GetCacheManager().initialize()
+	this.GetCacheManager().start()
 
-	// Basic services...
-	this.GetConfigurationManager().Initialize()
+	// The basic services.
+	this.GetServiceManager().registerService(this.GetEventManager())
+	this.GetServiceManager().registerService(this.GetConfigurationManager())
 
 	// Those service are not manage by the service manager.
-	this.GetDataManager().Initialize()
-	this.GetEntityManager().Initialize()
-	this.GetSessionManager().Initialize()
-	this.GetAccountManager().Initialize()
-	this.GetSecurityManager().Initialize()
+	this.GetServiceManager().registerService(this.GetDataManager())
+	this.GetServiceManager().registerService(this.GetEntityManager())
+	this.GetServiceManager().registerService(this.GetSessionManager())
+	this.GetServiceManager().registerService(this.GetAccountManager())
+	this.GetServiceManager().registerService(this.GetSecurityManager())
+
+	// call other service in order to register theire configuration.
+	this.GetServiceManager().registerService(this.GetLdapManager())
+	this.GetServiceManager().registerService(this.GetFileManager())
+	this.GetServiceManager().registerService(this.GetEmailManager())
+	this.GetServiceManager().registerService(this.GetProjectManager())
+	this.GetServiceManager().registerService(this.GetSchemaManager())
+
+	// BPMN stuff
+	this.GetServiceManager().registerService(this.GetWorkflowManager())
+	this.GetServiceManager().registerService(this.GetWorkflowProcessor())
 
 	// The other services are initialyse by the service manager.
-	this.GetServiceManager().Initialize()
+	this.GetServiceManager().initialize()
 
 	// The map of loggers.
 	this.loggers = make(map[string]*Logger)
@@ -167,16 +180,19 @@ func (this *Server) Start() {
 	server.startMessageProcessor()
 	server.startHub()
 
-	this.GetEventManager().Start()
+	/*this.GetEventManager().start()
 
 	// Starting basic services...
-	this.GetConfigurationManager().Start()
-	this.GetDataManager().Start()
-	this.GetEntityManager().Start()
-	this.GetSessionManager().Start()
-	this.GetAccountManager().Start()
-	this.GetSecurityManager().Start()
-	this.GetServiceManager().Start()
+	this.GetConfigurationManager().start()
+	this.GetDataManager().start()
+	this.GetEntityManager().start()
+	this.GetSessionManager().start()
+	this.GetAccountManager().start()
+	this.GetSecurityManager().start()*/
+
+	// the service manager will start previous service depending of there
+	// configurations.
+	this.GetServiceManager().start()
 }
 
 /**
@@ -188,15 +204,8 @@ func (this *Server) Stop() {
 	server.messageProcessor.abortedByEnvironment <- true
 	server.hub.abortedByEnvironment <- true
 
-	// Stoping service...
-	this.GetConfigurationManager().Stop()
-	this.GetDataManager().Stop()
-	this.GetEntityManager().Stop()
-	this.GetSessionManager().Stop()
-	this.GetAccountManager().Stop()
-	this.GetSecurityManager().Stop()
-	this.GetCacheManager().Stop()
-	this.GetServiceManager().Stop()
+	// must be call last
+	this.GetServiceManager().stop()
 
 	log.Println("Bye Bye :-)")
 

@@ -89,7 +89,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
                             contentView.deleteCallback = function (entity) {
                                 // Here I will remove the folder if the entity is 
                                 // a database...
-                                if (entity.TYPENAME == "CargoConfig.DataStoreConfiguration") {
+                                if (entity.TYPENAME == "Config.DataStoreConfiguration") {
                                     // also remove the data store.
                                     server.dataManager.deleteDataStore(entity.M_id)
                                 }
@@ -183,7 +183,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                                 contentView.deleteCallback = function (entity) {
                                     // Here I will remove the folder if the entity is 
                                     // a database...
-                                    if (entity.TYPENAME == "CargoConfig.DataStoreConfiguration") {
+                                    if (entity.TYPENAME == "Config.DataStoreConfiguration") {
                                         // also remove the data store.
                                         server.dataManager.deleteDataStore(entity.M_id,
                                             // success callback

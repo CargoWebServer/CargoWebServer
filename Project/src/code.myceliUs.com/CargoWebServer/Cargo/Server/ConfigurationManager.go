@@ -6,8 +6,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Config/CargoConfig"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
+)
+
+const (
+	// The configuration db
+	ConfigDB = "Config"
 )
 
 /**
@@ -16,15 +21,23 @@ import (
  * used by applications served.
  */
 type ConfigurationManager struct {
+	// The service configuration.
+	m_config *Config.ServiceConfiguration
 
 	// This is the root of the server.
 	m_filePath string
 
 	// the active configurations...
-	m_activeConfigurations *CargoConfig.Configurations
+	m_activeConfigurations *Config.Configurations
 
 	// the configuration entity...
-	m_configurationEntity *CargoConfig_ConfigurationsEntity
+	m_configurationEntity *Config_ConfigurationsEntity
+
+	// The list of service configurations...
+	m_servicesConfiguration []*Config.ServiceConfiguration
+
+	// The list of data configurations...
+	m_datastoreConfiguration []*Config.DataStoreConfiguration
 }
 
 var configurationManager *ConfigurationManager
@@ -43,8 +56,6 @@ func newConfigurationManager() *ConfigurationManager {
 	// The variable CARGOROOT must be set at first...
 	cargoRoot := os.Getenv("CARGOROOT")
 
-	log.Println("root dir is: ", cargoRoot)
-
 	// Now I will load the configurations...
 	// Development...
 	dir, err := filepath.Abs(cargoRoot)
@@ -62,22 +73,53 @@ func newConfigurationManager() *ConfigurationManager {
 	configurationManager.m_filePath = dir + "WebApp/Cargo"
 	JS.NewJsRuntimeManager(configurationManager.m_filePath + "/Script")
 
+	// The list of registered services config
+	configurationManager.m_servicesConfiguration = make([]*Config.ServiceConfiguration, 0)
+
+	// The list of default datastore.
+	configurationManager.m_datastoreConfiguration = make([]*Config.DataStoreConfiguration, 0)
+
+	// Configuration db itself.
+	cargoConfigDB := new(Config.DataStoreConfiguration)
+	cargoConfigDB.M_id = ConfigDB
+	cargoConfigDB.M_dataStoreVendor = Config.DataStoreVendor_MYCELIUS
+	cargoConfigDB.M_dataStoreType = Config.DataStoreType_KEY_VALUE_STORE
+	cargoConfigDB.NeedSave = true
+	configurationManager.appendDefaultDataStoreConfiguration(cargoConfigDB)
+
+	// The cargo entities store config
+	cargoEntitiesDB := new(Config.DataStoreConfiguration)
+	cargoEntitiesDB.M_id = CargoEntitiesDB
+	cargoEntitiesDB.M_dataStoreVendor = Config.DataStoreVendor_MYCELIUS
+	cargoEntitiesDB.M_dataStoreType = Config.DataStoreType_KEY_VALUE_STORE
+	cargoEntitiesDB.NeedSave = true
+	configurationManager.appendDefaultDataStoreConfiguration(cargoEntitiesDB)
+
+	// Create the default configurations
+	configurationManager.m_config = configurationManager.getServiceConfiguration(configurationManager.getId())
+
 	return configurationManager
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Do intialysation stuff here.
  */
-func (this *ConfigurationManager) Initialize() {
+func (this *ConfigurationManager) initialize() {
+	log.Println("--> initialyze ConfigurationManager")
+
 	// So here if there is no configuration...
-	cargoConfigsUuid := CargoConfigConfigurationsExists("CARGO_CONFIGURATIONS")
-	if len(cargoConfigsUuid) > 0 {
-		this.m_configurationEntity = GetServer().GetEntityManager().NewCargoConfigConfigurationsEntity(cargoConfigsUuid, nil)
-		this.m_configurationEntity.InitEntity(cargoConfigsUuid)
-		this.m_activeConfigurations = this.m_configurationEntity.GetObject().(*CargoConfig.Configurations)
+	configsUuid := ConfigConfigurationsExists("CARGO_CONFIGURATIONS")
+	if len(configsUuid) > 0 {
+		this.m_configurationEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity(configsUuid, nil)
+		this.m_configurationEntity.InitEntity(configsUuid)
+		this.m_activeConfigurations = this.m_configurationEntity.GetObject().(*Config.Configurations)
 	} else {
-		this.m_configurationEntity = GetServer().GetEntityManager().NewCargoConfigConfigurationsEntity(cargoConfigsUuid, nil)
-		this.m_activeConfigurations = this.m_configurationEntity.GetObject().(*CargoConfig.Configurations)
+		this.m_configurationEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity(configsUuid, nil)
+		this.m_activeConfigurations = this.m_configurationEntity.GetObject().(*Config.Configurations)
 		this.m_activeConfigurations.M_id = "CARGO_CONFIGURATIONS"
 		this.m_activeConfigurations.M_name = "Default"
 		this.m_activeConfigurations.M_version = "1.0"
@@ -85,7 +127,7 @@ func (this *ConfigurationManager) Initialize() {
 
 		// Now the default server configuration...
 		// Sever default values...
-		this.m_activeConfigurations.M_serverConfig = new(CargoConfig.ServerConfiguration)
+		this.m_activeConfigurations.M_serverConfig = new(Config.ServerConfiguration)
 		this.m_activeConfigurations.M_serverConfig.NeedSave = true
 
 		this.m_activeConfigurations.M_serverConfig.M_id = "CARGO_DEFAULT_SERVER"
@@ -106,18 +148,23 @@ func (this *ConfigurationManager) Initialize() {
 		this.m_activeConfigurations.NeedSave = true
 		this.m_configurationEntity.SaveEntity()
 	}
+
 }
 
-func (this *ConfigurationManager) GetId() string {
+func (this *ConfigurationManager) getId() string {
 	return "ConfigurationManager"
 }
 
-func (this *ConfigurationManager) Start() {
+func (this *ConfigurationManager) start() {
 	log.Println("--> Start ConfigurationManager")
 }
 
-func (this *ConfigurationManager) Stop() {
+func (this *ConfigurationManager) stop() {
 	log.Println("--> Stop ConfigurationManager")
+}
+
+func (this *ConfigurationManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
 }
 
 /**
@@ -211,124 +258,66 @@ func (this *ConfigurationManager) GetServicePort() int {
 }
 
 /**
+ * Append configuration to the list.
+ */
+func (this *ConfigurationManager) getServiceConfiguration(id string) (config *Config.ServiceConfiguration) {
+
+	// Create the default service configurations
+	config = new(Config.ServiceConfiguration)
+	config.M_id = id
+	config.M_ipv4 = this.GetIpv4()
+	config.M_start = true
+	config.M_port = this.GetServerPort()
+	config.M_hostName = this.GetHostName()
+
+	// TODO append the configuration to the db only if none already exist.
+	this.m_servicesConfiguration = append(this.m_servicesConfiguration, config)
+
+	return
+}
+
+/**
  * Return the list of local services configurations.
  */
-func (this *ConfigurationManager) GetLocalServiceConfigurations() []CargoConfig.ServiceConfiguration {
-	services := make([]CargoConfig.ServiceConfiguration, 7)
-
-	// Each service that can be start and stop as needed...
-	var emailManager CargoConfig.ServiceConfiguration
-	emailManager.M_id = "EmailManager"
-	emailManager.M_ipv4 = "127.0.0.1"
-	emailManager.M_start = true
-	emailManager.M_port = 9393
-	emailManager.M_hostName = "localhost"
-	services[0] = emailManager
-
-	var schemaManager CargoConfig.ServiceConfiguration
-	schemaManager.M_id = "SchemaManager"
-	schemaManager.M_ipv4 = "127.0.0.1"
-	schemaManager.M_start = true
-	schemaManager.M_port = 9393
-	schemaManager.M_hostName = "localhost"
-	services[1] = schemaManager
-
-	var ldapManager CargoConfig.ServiceConfiguration
-	ldapManager.M_id = "LdapManager"
-	ldapManager.M_ipv4 = "127.0.0.1"
-	ldapManager.M_start = false
-	ldapManager.M_port = 9393
-	ldapManager.M_hostName = "localhost"
-	services[2] = ldapManager
-
-	var projectManager CargoConfig.ServiceConfiguration
-	projectManager.M_id = "ProjectManager"
-	projectManager.M_ipv4 = "127.0.0.1"
-	projectManager.M_start = false
-	projectManager.M_port = 9393
-	projectManager.M_hostName = "localhost"
-	services[3] = projectManager
-
-	var fileManager CargoConfig.ServiceConfiguration
-	fileManager.M_id = "FileManager"
-	fileManager.M_ipv4 = "127.0.0.1"
-	fileManager.M_start = false
-	fileManager.M_port = 9393
-	fileManager.M_hostName = "localhost"
-	services[4] = fileManager
-
-	var workflowManager CargoConfig.ServiceConfiguration
-	workflowManager.M_id = "WorkflowManager"
-	workflowManager.M_ipv4 = "127.0.0.1"
-	workflowManager.M_start = true
-	workflowManager.M_port = 9393
-	workflowManager.M_hostName = "localhost"
-	services[5] = workflowManager
-
-	var workflowProcessor CargoConfig.ServiceConfiguration
-	workflowProcessor.M_id = "WorkflowProcessor"
-	workflowProcessor.M_ipv4 = "127.0.0.1"
-	workflowProcessor.M_start = true
-	workflowProcessor.M_port = 9393
-	workflowProcessor.M_hostName = "localhost"
-	services[6] = workflowProcessor
-
-	return services
+func (this *ConfigurationManager) getLocalServiceConfigurations() []*Config.ServiceConfiguration {
+	// TODO get configuration from the db...
+	return this.m_servicesConfiguration
 }
 
-func (this *ConfigurationManager) GetDefaultDataStoreConfigurations() []CargoConfig.DataStoreConfiguration {
-
-	stores := make([]CargoConfig.DataStoreConfiguration, 4)
-
-	// Various persistent entities, account, user, group, file etc...
-	var cargoEntitiesDB CargoConfig.DataStoreConfiguration
-	cargoEntitiesDB.M_id = CargoEntitiesDB
-	cargoEntitiesDB.M_dataStoreVendor = CargoConfig.DataStoreVendor_MYCELIUS
-	cargoEntitiesDB.M_dataStoreType = CargoConfig.DataStoreType_KEY_VALUE_STORE
-	cargoEntitiesDB.NeedSave = true
-	stores[0] = cargoEntitiesDB
-
-	// Configuration entities.
-	var cargoConfigDB CargoConfig.DataStoreConfiguration
-	cargoConfigDB.M_id = CargoConfigDB
-	cargoConfigDB.M_dataStoreVendor = CargoConfig.DataStoreVendor_MYCELIUS
-	cargoConfigDB.M_dataStoreType = CargoConfig.DataStoreType_KEY_VALUE_STORE
-	cargoConfigDB.NeedSave = true
-	stores[1] = cargoConfigDB
-
-	// The BPMN 2.0 entities
-	var bpmn20DB CargoConfig.DataStoreConfiguration
-	bpmn20DB.M_id = BPMN20DB
-	bpmn20DB.M_dataStoreVendor = CargoConfig.DataStoreVendor_MYCELIUS
-	bpmn20DB.M_dataStoreType = CargoConfig.DataStoreType_KEY_VALUE_STORE
-	bpmn20DB.NeedSave = true
-	stores[2] = bpmn20DB
-
-	// The workflow manager runtime entities
-	var bpmnRuntimeDB CargoConfig.DataStoreConfiguration
-	bpmnRuntimeDB.M_id = BPMS_RuntimeDB
-	bpmnRuntimeDB.M_dataStoreVendor = CargoConfig.DataStoreVendor_MYCELIUS
-	bpmnRuntimeDB.M_dataStoreType = CargoConfig.DataStoreType_KEY_VALUE_STORE
-	bpmnRuntimeDB.NeedSave = true
-	stores[3] = bpmnRuntimeDB
-
-	return stores
+/**
+ * Return the list of default store configurations.
+ */
+func (this *ConfigurationManager) appendDefaultDataStoreConfiguration(config *Config.DataStoreConfiguration) {
+	this.m_datastoreConfiguration = append(this.m_datastoreConfiguration, config)
 }
+
+/**
+ * Return the list of default datastore configurations.
+ */
+func (this *ConfigurationManager) getDefaultDataStoreConfigurations() []*Config.DataStoreConfiguration {
+	return this.m_datastoreConfiguration
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// API
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Tha function retreive the store data configuration.
  */
-func (this *ConfigurationManager) GetDataStoreConfigurations() []CargoConfig.DataStoreConfiguration {
-	var configurations []CargoConfig.DataStoreConfiguration
+func (this *ConfigurationManager) GetDataStoreConfigurations() []*Config.DataStoreConfiguration {
 
-	entities, err := GetServer().GetEntityManager().getEntitiesByType("CargoConfig.DataStoreConfiguration", "", "CargoConfig")
+	// The store configurations.
+	configurations := make([]*Config.DataStoreConfiguration, 0)
+
+	entities, err := GetServer().GetEntityManager().getEntitiesByType("Config.DataStoreConfiguration", "", "Config")
 	if err != nil {
 		return configurations
 	}
 
 	for i := 0; i < len(entities); i++ {
-		storeConfiguration := entities[i].GetObject().(*CargoConfig.DataStoreConfiguration)
-		configurations = append(configurations, *storeConfiguration)
+		storeConfiguration := entities[i].GetObject().(*Config.DataStoreConfiguration)
+		configurations = append(configurations, storeConfiguration)
 	}
 
 	return configurations
@@ -337,16 +326,16 @@ func (this *ConfigurationManager) GetDataStoreConfigurations() []CargoConfig.Dat
 /**
  * Tha function retreive the ldap configuration.
  */
-func (this *ConfigurationManager) GetLdapConfigurations() []CargoConfig.LdapConfiguration {
-	var configurations []CargoConfig.LdapConfiguration
+func (this *ConfigurationManager) GetLdapConfigurations() []Config.LdapConfiguration {
+	var configurations []Config.LdapConfiguration
 
-	entities, err := GetServer().GetEntityManager().getEntitiesByType("CargoConfig.LdapConfiguration", "", "CargoConfig")
+	entities, err := GetServer().GetEntityManager().getEntitiesByType("Config.LdapConfiguration", "", "Config")
 	if err != nil {
 		return configurations
 	}
 
 	for i := 0; i < len(entities); i++ {
-		ldapConfiguration := entities[i].GetObject().(*CargoConfig.LdapConfiguration)
+		ldapConfiguration := entities[i].GetObject().(*Config.LdapConfiguration)
 		configurations = append(configurations, *ldapConfiguration)
 	}
 
@@ -356,16 +345,16 @@ func (this *ConfigurationManager) GetLdapConfigurations() []CargoConfig.LdapConf
 /**
  * Tha function retreive the smtp configuration.
  */
-func (this *ConfigurationManager) GetSmtpConfigurations() []CargoConfig.SmtpConfiguration {
-	var configurations []CargoConfig.SmtpConfiguration
+func (this *ConfigurationManager) GetSmtpConfigurations() []Config.SmtpConfiguration {
+	var configurations []Config.SmtpConfiguration
 
-	entities, err := GetServer().GetEntityManager().getEntitiesByType("CargoConfig.SmtpConfiguration", "", "CargoConfig")
+	entities, err := GetServer().GetEntityManager().getEntitiesByType("Config.SmtpConfiguration", "", "Config")
 	if err != nil {
 		return configurations
 	}
 
 	for i := 0; i < len(entities); i++ {
-		smtpConfiguration := entities[i].GetObject().(*CargoConfig.SmtpConfiguration)
+		smtpConfiguration := entities[i].GetObject().(*Config.SmtpConfiguration)
 		configurations = append(configurations, *smtpConfiguration)
 	}
 
@@ -375,17 +364,33 @@ func (this *ConfigurationManager) GetSmtpConfigurations() []CargoConfig.SmtpConf
 /**
  * Tha function retreive the services configuration.
  */
-func (this *ConfigurationManager) GetServiceConfigurations() []CargoConfig.ServiceConfiguration {
-	var configurations []CargoConfig.ServiceConfiguration
+func (this *ConfigurationManager) GetServiceConfigurations() []*Config.ServiceConfiguration {
 
-	entities, err := GetServer().GetEntityManager().getEntitiesByType("CargoConfig.ServiceConfiguration", "", "CargoConfig")
+	configurations := this.getLocalServiceConfigurations()
+
+	entities, err := GetServer().GetEntityManager().getEntitiesByType("Config.ServiceConfiguration", "", "Config")
 	if err != nil {
 		return configurations
 	}
 
 	for i := 0; i < len(entities); i++ {
-		serviceConfiguration := entities[i].GetObject().(*CargoConfig.ServiceConfiguration)
-		configurations = append(configurations, *serviceConfiguration)
+		serviceConfiguration := entities[i].GetObject().(*Config.ServiceConfiguration)
+		isExist := false
+		for j := 0; j < len(configurations); j++ {
+			if serviceConfiguration.M_id == configurations[j].M_id {
+				configurations[j] = serviceConfiguration
+				if serviceConfiguration.M_ipv4 == "127.0.0.1" && this.GetServerPort() != 9393 {
+					serviceConfiguration.M_port = this.GetServerPort()
+				}
+				isExist = true
+				break
+			}
+		}
+
+		// append it if not exist.
+		if !isExist {
+			configurations = append(configurations, serviceConfiguration)
+		}
 	}
 
 	return configurations

@@ -83,11 +83,11 @@ function Read(connectionId, query, fields, params) {
 DataManager.prototype.read = function (connectionId, query, fields, params, successCallback, progressCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params_ = []
-    params_.push(new RpcData({ "name": "connectionId", "type": 2, "dataBytes": utf8_to_b64(connectionId) }))
-    params_.push(new RpcData({ "name": "query", "type": 2, "dataBytes": utf8_to_b64(query) }))
-    params_.push(new RpcData({ "name": "fields", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(fields)), "typeName": "[]string"}))
-    params_.push(new RpcData({ "name": "params", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(params)), "typeName": "[]interface{}" }))
-
+    params_.push(createRpcData(connectionId, "STRING", "connectionId"))
+    params_.push(createRpcData(query, "STRING", "query"))
+    params_.push(createRpcData(fields, "JSON_STR", "fields", "[]interface{}"))
+    params_.push(createRpcData(params, "JSON_STR", "params", "[]interface{}"))
+    
     // Call it on the server.
     server.executeJsFunction(
         Read.toString(), // The function to execute remotely on server
@@ -133,14 +133,14 @@ function Create(connectionId, query, values) {
 DataManager.prototype.create = function (connectionId, query, values, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params_ = []
-    params_.push(new RpcData({ "name": "connectionId", "type": 2, "dataBytes": utf8_to_b64(connectionId) }))
-    params_.push(new RpcData({ "name": "query", "type": 2, "dataBytes": utf8_to_b64(query) }))
-    params_.push(new RpcData({ "name": "values", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(values)), "typeName": "[]interface{}" }))
+    params.push(createRpcData(connectionId, "STRING", "connectionId"))
+    params.push(createRpcData(query, "STRING", "query"))
+    params.push(createRpcData(values, "JSON_STR", "values", "[]interface{}"))
 
     // Call it on the server.
     server.executeJsFunction(
         Create.toString(), // The function to execute remotely on server
-        params_, // The parameters to pass to that function
+        params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
         },
@@ -181,10 +181,10 @@ function Update(connectionId, query, fields, params) {
 DataManager.prototype.update = function (connectionId, query, fields, params, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params_ = []
-    params_.push(new RpcData({ "name": "connectionId", "type": 2, "dataBytes": utf8_to_b64(connectionId) }))
-    params_.push(new RpcData({ "name": "query", "type": 2, "dataBytes": utf8_to_b64(query) }))
-    params_.push(new RpcData({ "name": "fields", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(fields)), "typeName": "[]interface{}" }))
-    params_.push(new RpcData({ "name": "params", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(params)), "typeName": "[]interface{}" }))
+    params_.push(createRpcData(connectionId, "STRING", "connectionId"))
+    params_.push(createRpcData(query, "STRING", "query"))
+    params_.push(createRpcData(fields, "JSON_STR", "fields", "[]interface{}"))
+    params_.push(createRpcData(params, "JSON_STR", "params", "[]interface{}"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -229,14 +229,14 @@ function Delete(connectionId, query, params) {
 DataManager.prototype.delete = function (connectionId, query, params, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params_ = []
-    params_.push(new RpcData({ "name": "connectionId", "type": 2, "dataBytes": utf8_to_b64(connectionId) }))
-    params_.push(new RpcData({ "name": "query", "type": 2, "dataBytes": utf8_to_b64(query) }))
-    params_.push(new RpcData({ "name": "params", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(params)), "typeName": "[]interface{}" }))
+    params.push(createRpcData(connectionId, "STRING", "connectionId"))
+    params.push(createRpcData(query, "STRING", "query"))
+    params.push(createRpcData(params, "JSON_STR", "params", "[]interface{}"))
 
     // Call it on the server.
     server.executeJsFunction(
         Delete.toString(), // The function to execute remotely on server
-        params_, // The parameters to pass to that function
+        params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
         },
@@ -318,7 +318,6 @@ function DeleteDataStore(storeId) {
  */
 DataManager.prototype.deleteDataStore = function (storeId, successCallback, errorCallback, caller) {
     var params = []
-
     params.push(createRpcData(storeId, "STRING", "storeId"))
 
     // Call it on the server.
@@ -360,13 +359,13 @@ function Ping_(connectionId) {
  */
 DataManager.prototype.ping = function (connectionId, successCallback, errorCallback, caller) {
     // server is the client side singleton.
-    var params_ = []
-    params_.push(new RpcData({ "name": "connectionId", "type": 2, "dataBytes": utf8_to_b64(connectionId) }))
+    var params = []
+    params.push(createRpcData(connectionId, "STRING", "connectionId"))
 
     // Call it on the server.
     server.executeJsFunction(
         Ping_.toString(), // The function to execute remotely on server
-        params_, // The parameters to pass to that function
+        params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
         },

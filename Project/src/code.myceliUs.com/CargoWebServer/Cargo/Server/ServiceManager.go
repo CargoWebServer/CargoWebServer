@@ -3,17 +3,22 @@ package Server
 import (
 	"log"
 	"os/exec"
+	"reflect"
 	"runtime"
+	"strconv"
+	"strings"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Config/CargoConfig"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/Utility"
 )
 
 type ServiceManager struct {
 
 	// info about connection on smtp server...
 	m_services            map[string]Service
-	m_servicesConfigs     map[string]CargoConfig.ServiceConfiguration
+	m_servicesLst         []Service
+	m_config              *Config.ServiceConfiguration
 	m_serviceContainerCmd *exec.Cmd
 }
 
@@ -32,60 +37,44 @@ func (this *Server) GetServiceManager() *ServiceManager {
 func newServiceManager() *ServiceManager {
 
 	serviceManager := new(ServiceManager)
-
 	// Here I will initialyse the optional services...
 	serviceManager.m_services = make(map[string]Service)
-	serviceManager.m_servicesConfigs = make(map[string]CargoConfig.ServiceConfiguration)
-
-	// The list of optional services.
-	serviceConfigurations := GetServer().GetConfigurationManager().GetLocalServiceConfigurations()
-
-	// Also ge the other services...
-	serviceConfigurations = append(serviceConfigurations, GetServer().GetConfigurationManager().GetServiceConfigurations()...)
-
-	// Now I will inialyse the services.
-	for i := 0; i < len(serviceConfigurations); i++ {
-		serviceConfiguration := serviceConfigurations[i]
-		// First of all I will retreive the service object...
-		params := make([]interface{}, 0)
-		service, err := Utility.CallMethod(GetServer(), "Get"+serviceConfiguration.M_id, params)
-
-		// In case of local service...
-		if serviceConfiguration.M_ipv4 == "127.0.0.1" {
-			if err != nil {
-				log.Println("--> service whit name ", serviceConfiguration.M_id, " dosen't exist!")
-			} else {
-				serviceManager.m_servicesConfigs[serviceConfiguration.M_id] = serviceConfiguration
-				serviceManager.m_services[serviceConfiguration.M_id] = service.(Service)
-			}
-		} else {
-			// I case of distant services...
-			log.Println("--> try to connect to service with name ", serviceConfiguration.M_id, " at adresse ", serviceConfiguration.GetIpv4())
-			// So here I will create the connection...
-		}
-	}
+	serviceManager.m_servicesLst = make([]Service, 0) // Keep the order of intialisation.
 
 	return serviceManager
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Do intialysation stuff here.
  */
-func (this *ServiceManager) Initialize() {
+func (this *ServiceManager) initialize() {
 	// Here I will start the c++ service container...
 	log.Println("--> Initialize ServiceManager")
-	for _, service := range this.m_services {
-		service.Initialize()
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+
+	for i := 0; i < len(this.m_servicesLst); i++ {
+		// Initialyse the service.
+		this.m_servicesLst[i].initialize()
 	}
 }
 
-func (this *ServiceManager) GetId() string {
+func (this *ServiceManager) getId() string {
 	return "ServiceManager"
 }
 
-func (this *ServiceManager) Start() {
+func (this *ServiceManager) start() {
 
 	log.Println("--> Start ServiceManager")
+	// I will create new action if there one's...
+	for i := 0; i < len(this.m_servicesLst); i++ {
+		// register the action inside the service.
+		this.registerActions(this.m_servicesLst[i])
+	}
+
 	// The first step will be to start the service manager.
 	serviceContainerPath := GetServer().GetConfigurationManager().GetBinPath() + "/CargoServiceContainer"
 	if runtime.GOOS == "windows" {
@@ -105,19 +94,98 @@ func (this *ServiceManager) Start() {
 
 	for _, service := range this.m_services {
 		// Get the service configuration information.
-		serviceConfiguration := this.m_servicesConfigs[service.GetId()]
-		if serviceConfiguration.M_start == true {
-			service.Start()
+		if service.getConfig().M_start == true {
+			service.start()
 		}
 	}
 }
 
-func (this *ServiceManager) Stop() {
+func (this *ServiceManager) stop() {
 	log.Println("--> Stop ServiceManager")
 	for _, service := range this.m_services {
-		service.Stop()
+		service.stop()
 	}
 
 	// Stop the process...
 	serviceManager.m_serviceContainerCmd.Process.Kill()
+}
+
+func (this *ServiceManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
+}
+
+/**
+ * Register a new service.
+ */
+func (this *ServiceManager) registerService(service Service) {
+	log.Println("--------> register service ", service.getId())
+	this.m_services[service.getId()] = service
+	this.m_servicesLst = append(this.m_servicesLst, service)
+}
+
+/**
+ * That function use reflection to create the actions information contain in a
+ * given service. The information will be use by role.
+ */
+func (this *ServiceManager) registerActions(service Service) {
+
+	// I will use the reflection to reteive method inside the service
+	serviceType := reflect.TypeOf(service)
+
+	// Now I will print it list of function.
+	for i := 0; i < serviceType.NumMethod(); i++ {
+		// I will try to find if the action was register
+		method := serviceType.Method(i)
+		methodName := strings.Replace(serviceType.String(), "*", "", -1) + "." + method.Name
+		metodUuid := CargoEntitiesActionExists(methodName)
+
+		if len(metodUuid) == 0 && !(strings.HasPrefix(method.Name, "New") && (strings.HasSuffix(method.Name, "Entity") || strings.HasSuffix(method.Name, "EntityFromObject"))) {
+
+			action := new(CargoEntities.Action)
+			action.UUID = "CargoEntities.Action%" + Utility.RandomUUID()
+			action.TYPENAME = "CargoEntities.Action"
+			action.SetName(methodName)
+
+			// The input
+			for j := 0; j < method.Type.NumIn(); j++ {
+				in := method.Type.In(j)
+				// The first paramters is the object itself.
+				if j > 0 {
+					parameter := new(CargoEntities.Parameter)
+					parameter.UUID = "CargoEntities.Parameter%" + Utility.RandomUUID()
+					parameter.TYPENAME = "CargoEntities.Parameter"
+					parameter.SetType(in.String())
+					parameter.SetName("p" + strconv.Itoa(j-1))
+					if strings.HasPrefix(in.String(), "[]") {
+						parameter.SetIsArray(true)
+					} else {
+						parameter.SetIsArray(false)
+					}
+					action.SetParameters(parameter)
+				}
+			}
+
+			// The output
+			for j := 0; j < method.Type.NumOut(); j++ {
+				out := method.Type.Out(j)
+				parameter := new(CargoEntities.Parameter)
+				parameter.UUID = "CargoEntities.Parameter%" + Utility.RandomUUID()
+				parameter.TYPENAME = "CargoEntities.Parameter"
+				parameter.SetType(out.String())
+				parameter.SetName("r" + strconv.Itoa(j))
+				if strings.HasPrefix(out.String(), "[]") {
+					parameter.SetIsArray(true)
+				} else {
+					parameter.SetIsArray(false)
+				}
+				action.SetResults(parameter)
+			}
+
+			// apend it to the entities action.
+			action.SetEntitiesPtr(GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities))
+			GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetActions(action)
+			log.Println("--> create action ", action.GetName())
+		}
+	}
+	GetServer().GetEntityManager().getCargoEntities().SaveEntity()
 }

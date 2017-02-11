@@ -17,10 +17,11 @@ import (
 	"os"
 	"strings"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"github.com/nfnt/resize"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/Utility"
 	"github.com/polds/imgbase64"
 )
 
@@ -42,6 +43,7 @@ type FileManager struct {
 	// This represent the root path of the server...
 	root        string
 	mimeTypeMap map[string]*MimeType
+	m_config    *Config.ServiceConfiguration
 }
 
 var fileManager *FileManager
@@ -57,6 +59,7 @@ func (this *Server) GetFileManager() *FileManager {
  * Create a new file manager...
  */
 func newFileManager() *FileManager {
+
 	fileManager := new(FileManager)
 
 	// Set the root to the application root path...
@@ -66,15 +69,22 @@ func newFileManager() *FileManager {
 	return fileManager
 }
 
-func (this *FileManager) Initialize() {
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
 
+func (this *FileManager) initialize() {
+	// register service avalaible action here.
+	log.Println("--> initialyze ConfigurationManager")
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	this.m_config.M_start = false
 }
 
-func (this *FileManager) GetId() string {
+func (this *FileManager) getId() string {
 	return "FileManager"
 }
 
-func (this *FileManager) Start() {
+func (this *FileManager) start() {
 	log.Println("--> Start FileManager")
 	// Now I will synchronize files...
 	rootDir := this.synchronize(this.root)
@@ -82,8 +92,12 @@ func (this *FileManager) Start() {
 	rootEntity.SaveEntity()
 }
 
-func (this *FileManager) Stop() {
+func (this *FileManager) stop() {
 	log.Println("--> Stop FileManager")
+}
+
+func (this *FileManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
 }
 
 /**

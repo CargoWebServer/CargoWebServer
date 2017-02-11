@@ -4,10 +4,10 @@ import (
 	"errors"
 
 	"log"
-	"reflect"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/Utility"
 )
 
 /**
@@ -16,6 +16,7 @@ import (
 type SecurityManager struct {
 	adminRole *CargoEntities.Role
 	guestRole *CargoEntities.Role
+	m_config  *Config.ServiceConfiguration
 }
 
 var securityManager *SecurityManager
@@ -28,15 +29,21 @@ func (this *Server) GetSecurityManager() *SecurityManager {
 }
 
 func newSecurityManager() *SecurityManager {
-
 	securityManager := new(SecurityManager)
 	return securityManager
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Initialize security related information.
  */
-func (this *SecurityManager) Initialize() *CargoEntities.Error {
+func (this *SecurityManager) initialize() {
+
+	log.Println("--> Initialize SessionManager")
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
 
 	// Create the admin role if it doesn't exist
 	adminRoleUuid := CargoEntitiesRoleExists("adminRole")
@@ -46,13 +53,13 @@ func (this *SecurityManager) Initialize() *CargoEntities.Error {
 
 		adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "admin")
 		if errObj != nil {
-			return errObj
+			return
 		}
 		adminAccount := adminAccountEntity.GetObject().(*CargoEntities.Account)
 
 		// Create adminRole
 		this.adminRole, _ = this.createRole("adminRole")
-		this.adminRole.SetAccountsRef(adminAccount)
+		this.adminRole.SetAccounts(adminAccount)
 
 		//adminAccountEntity.SaveEntity()
 		adminAccount.SetRolesRef(this.adminRole)
@@ -69,13 +76,13 @@ func (this *SecurityManager) Initialize() *CargoEntities.Error {
 
 		guestAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "guest")
 		if errObj != nil {
-			return errObj
+			return
 		}
 		guestAccount := guestAccountEntity.GetObject().(*CargoEntities.Account)
 
 		// Create guestRole
 		this.guestRole, _ = this.createRole("guestRole")
-		this.guestRole.SetAccountsRef(guestAccount)
+		this.guestRole.SetAccounts(guestAccount)
 
 		// Setting guestRole to guest account
 		cargoEntities.GetObject().(*CargoEntities.Entities).SetRoles(this.guestRole)
@@ -85,19 +92,22 @@ func (this *SecurityManager) Initialize() *CargoEntities.Error {
 		cargoEntities.SaveEntity()
 	}
 
-	return nil
 }
 
-func (this *SecurityManager) GetId() string {
+func (this *SecurityManager) getId() string {
 	return "SecurityManager"
 }
 
-func (this *SecurityManager) Start() {
+func (this *SecurityManager) start() {
 	log.Println("--> Start SecurityManager")
 }
 
-func (this *SecurityManager) Stop() {
+func (this *SecurityManager) stop() {
 	log.Println("--> Stop SecurityManager")
+}
+
+func (this *SecurityManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
 }
 
 /**
@@ -163,7 +173,7 @@ func (this *SecurityManager) appendAccount(roleId string, accountId string) *Car
 			if err == nil {
 				account := accountEntity.GetObject().(*CargoEntities.Account)
 				// Set the account to the role
-				role.SetAccountsRef(account)
+				role.SetAccounts(account)
 				account.SetRolesRef(role)
 
 				roleEntity.SaveEntity()
@@ -199,8 +209,8 @@ func (this *SecurityManager) hasAccount(roleId string, accountId string) bool {
 		roleEntity, err := GetServer().GetEntityManager().getEntityByUuid(roleUuid)
 		if err == nil {
 			role := roleEntity.GetObject().(*CargoEntities.Role)
-			for i := 0; i < len(role.M_accountsRef); i++ {
-				if role.M_accountsRef[i] == accountId {
+			for i := 0; i < len(role.M_accounts); i++ {
+				if role.M_accounts[i] == accountId {
 					return true
 				}
 			}
@@ -229,7 +239,7 @@ func (this *SecurityManager) removeAccount(roleId string, accountId string) *Car
 			if err == nil {
 				account := accountEntity.GetObject().(*CargoEntities.Account)
 				// Remove the account from the role
-				role.RemoveAccountsRef(account)
+				role.RemoveAccounts(account)
 				roleEntity.SaveEntity()
 
 				account.RemoveRolesRef(role)
@@ -264,118 +274,16 @@ func (this *SecurityManager) deleteRole(id string) *CargoEntities.Error {
 	}
 
 	// Remove the role from all accounts that have this role
-	accountsRef := roleEntity.GetObject().(*CargoEntities.Role).GetAccountsRef()
-	for i := 0; i < len(accountsRef); i++ {
-		accountsRef[i].RemoveRolesRef(roleEntity.GetObject())
-		accountEntityRef := GetServer().GetEntityManager().NewCargoEntitiesAccountEntityFromObject(accountsRef[i])
-		accountEntityRef.SaveEntity()
+	accounts := roleEntity.GetObject().(*CargoEntities.Role).GetAccounts()
+	for i := 0; i < len(accounts); i++ {
+		accounts[i].RemoveRolesRef(roleEntity.GetObject())
+		accountEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntityFromObject(accounts[i])
+		accountEntity.SaveEntity()
 	}
 
 	roleEntity.DeleteEntity()
 
 	return nil
-}
-
-/**
- * Set a restriction with a given role (by id) to an action.
- */
-func (this *SecurityManager) setRestrictionRole(roleId string, action *CargoEntities.Action) *CargoEntities.Error {
-
-	roleUuid := CargoEntitiesRoleExists(roleId)
-	// Get the role uuid, return error if it doesn't exist
-	roleEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(roleUuid)
-	if errObj != nil {
-		// Create the error message
-		cargoError := NewError(Utility.FileLine(), ROLE_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The role id '"+roleId+"' does not correspond to an existing role entity."))
-		return cargoError
-	}
-
-	// Find all the restrictions and verify if one exists for the action
-	restrictions, _ := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Restriction", "", "CargoEntities")
-
-	for i := 0; i < len(restrictions); i++ {
-		if restrictions[i].GetObject().(*CargoEntities.Restriction).GetActionRef().GetUUID() == action.GetUUID() {
-			restrictions[i].GetObject().(*CargoEntities.Restriction).SetRolesRef(roleEntity.GetObject())
-			return nil
-		}
-	}
-
-	// The restriction on the role for the action doesn't already exist
-
-	var restrictionEntity *CargoEntities_RestrictionEntity
-	restrictionEntity = GetServer().GetEntityManager().NewCargoEntitiesRestrictionEntity("", nil)
-	restriction := restrictionEntity.GetObject().(*CargoEntities.Restriction)
-	restriction.SetActionRef(action)
-	restriction.SetRolesRef(roleEntity.GetObject())
-
-	// Save the information.
-	cargoEntities := server.GetEntityManager().getCargoEntities()
-	cargoEntities.GetObject().(*CargoEntities.Entities).SetRestrictions(restriction)
-	cargoEntities.SaveEntity()
-
-	return nil
-}
-
-/**
- * Remove a role (by Id) from the restriction associated to an action
- */
-func (this *SecurityManager) removeRestrictionRole(roleId string, action *CargoEntities.Action) *CargoEntities.Error {
-
-	roleUuid := CargoEntitiesRoleExists(roleId)
-	// Get the role entity, return error if it doesn't exist
-	roleEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(roleUuid)
-	if errObj != nil {
-		// Create the error message
-		cargoError := NewError(Utility.FileLine(), ROLE_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The role id '"+roleId+"' does not correspond to an existing role entity."))
-		return cargoError
-	}
-
-	// Find all the restrictions and verify if one exists for the action
-	restrictions, _ := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Restriction", "", "CargoEntities")
-
-	for i := 0; i < len(restrictions); i++ {
-		if restrictions[i].GetObject().(*CargoEntities.Restriction).GetActionRef().GetUUID() == action.GetUUID() {
-			restrictions[i].GetObject().(*CargoEntities.Restriction).RemoveRolesRef(roleEntity.GetObject())
-			return nil
-		}
-	}
-
-	cargoError := NewError(Utility.FileLine(), RESTRICTION_ACTION_ROLE_ERROR, SERVER_ERROR_CODE, errors.New("There is no restriction for the role '"+roleId+"' on the action '"+action.GetName()+"'."))
-	return cargoError
-
-}
-
-/**
- * Verify if a role has a restriction for a given action
- */
-func (this *SecurityManager) roleHasRestrictionForAction(roleId string, action *CargoEntities.Action) (bool, *CargoEntities.Error) {
-
-	// Get the role uuid, return error if it doesn't exist
-	roleUuid := CargoEntitiesRoleExists(roleId)
-	if len(roleUuid) == 0 {
-		// Create the error message
-		cargoError := NewError(Utility.FileLine(), ROLE_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The role id '"+roleId+"' does not correspond to an existing role entity."))
-		return false, cargoError
-	}
-
-	// Find all the restrictions and verify if one exists for the action
-	restrictions, _ := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Restriction", "", "CargoEntities")
-
-	for i := 0; i < len(restrictions); i++ {
-		if restrictions[i].GetObject().(*CargoEntities.Restriction).GetActionRef().GetUUID() == action.GetUUID() {
-
-			// Verify if the resriction on the action for the role exists
-
-			for j := 0; j < len(restrictions[i].GetObject().(*CargoEntities.Restriction).GetRolesRef()); j++ {
-				if restrictions[i].GetObject().(*CargoEntities.Restriction).GetRolesRef()[j].GetId() == roleId {
-					return true, nil
-
-				}
-			}
-		}
-	}
-	return false, nil
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -441,107 +349,4 @@ func (this *SecurityManager) RemoveAccount(roleId string, accountId string, mess
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}
-}
-
-/**
- * Set a restriction with a given role (by id) to an action.
- */
-func (this *SecurityManager) SetRestrictionRole(roleId string, action interface{}, messageId string, sessionId string) {
-
-	if reflect.TypeOf(action).String() != "*CargoEntities.Action" {
-		cargoError := NewError(Utility.FileLine(), PARAMETER_TYPE_ERROR, SERVER_ERROR_CODE, errors.New("Expected '*CargoEntities.Action' but got '"+reflect.TypeOf(action).String()+"' instead."))
-		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-		return
-	}
-
-	errObj := this.setRestrictionRole(roleId, action.(*CargoEntities.Action))
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-	}
-}
-
-/**
- * Remove a role (by Id) from the restriction associated to an action
- */
-func (this *SecurityManager) RemoveRestrictionRole(roleId string, action interface{}, messageId string, sessionId string) {
-
-	if reflect.TypeOf(action).String() != "*CargoEntities.Action" {
-		cargoError := NewError(Utility.FileLine(), PARAMETER_TYPE_ERROR, SERVER_ERROR_CODE, errors.New("Expected '*CargoEntities.Action' but got '"+reflect.TypeOf(action).String()+"' instead."))
-		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-		return
-	}
-
-	errObj := this.removeRestrictionRole(roleId, action.(*CargoEntities.Action))
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-	}
-}
-
-/**
- * Verify if a role has a restriction for a given action
- */
-func (this *SecurityManager) RoleHasRestrictionForAction(roleId string, action interface{}, messageId string, sessionId string) bool {
-
-	if reflect.TypeOf(action).String() != "*CargoEntities.Action" {
-		cargoError := NewError(Utility.FileLine(), PARAMETER_TYPE_ERROR, SERVER_ERROR_CODE, errors.New("Expected '*CargoEntities.Action' but got '"+reflect.TypeOf(action).String()+"' instead."))
-		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-		return false
-	}
-
-	result, errObj := this.roleHasRestrictionForAction(roleId, action.(*CargoEntities.Action))
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-	}
-	return result
-}
-
-/*
-* Validate the restriction for an action
- */
-func validateRestriction(actionId string, sessionId string) *CargoEntities.Error {
-
-	actionUuid := CargoEntitiesActionExists(actionId)
-	var action *CargoEntities.Action
-	if len(actionUuid) == 0 {
-		// create the action
-		actionEntity := GetServer().GetEntityManager().NewCargoEntitiesActionEntity(actionId, nil)
-		action = actionEntity.GetObject().(*CargoEntities.Action)
-		action.SetId(actionId)
-		cargoEntities := server.GetEntityManager().getCargoEntities()
-		cargoEntities.GetObject().(*CargoEntities.Entities).SetEntities(action)
-		cargoEntities.SaveEntity()
-
-		return nil
-	}
-
-	actionEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(actionUuid)
-	action = actionEntity.GetObject().(*CargoEntities.Action)
-	if errObj != nil {
-		return errObj
-	}
-
-	// get the account for the given session
-	activeSessionEntity := GetServer().GetSessionManager().GetActiveSessionById(sessionId)
-
-	if activeSessionEntity == nil {
-		return nil
-	}
-
-	accountPtr := activeSessionEntity.GetAccountPtr()
-	if accountPtr == nil {
-		return nil
-	}
-
-	// get the roles for the account
-	roles := accountPtr.GetRolesRef()
-
-	// verify if role has restriction for action
-	for i := 0; i < len(roles); i++ {
-		roleHasRestrictionForAction, _ := GetServer().GetSecurityManager().roleHasRestrictionForAction(roles[i].GetId(), action)
-		if roleHasRestrictionForAction {
-			return NewError(Utility.FileLine(), PERMISSION_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("There is a restriction on the action '"+actionId+"' with the role '"+roles[i].GetId()+"' for the account '"+accountPtr.GetId()+"'."))
-		}
-	}
-
-	return nil
 }

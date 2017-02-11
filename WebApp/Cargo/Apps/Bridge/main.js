@@ -38,7 +38,7 @@ function main() {
                                                 function () {
 
                                                     // now the prototypes...
-                                                    server.entityManager.getEntityPrototypes("BPMS_Runtime",
+                                                    server.entityManager.getEntityPrototypes("BPMS",
                                                         function () {
                                                             var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
 
@@ -53,7 +53,9 @@ function main() {
                                                                 return function (sessionsInfo) {
                                                                     homePage.init(mainLayout, sessionsInfo)
                                                                 }
-                                                            } (mainLayout, homePage))
+                                                            } (mainLayout, homePage),
+                                                                "safranLdap" // Put the ldap sever id here
+                                                            )
                                                             // the main page...
                                                             mainPage = new MainPage(mainLayout, loginPage)
                                                         },

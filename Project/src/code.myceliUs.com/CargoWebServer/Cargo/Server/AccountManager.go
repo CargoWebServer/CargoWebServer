@@ -6,14 +6,16 @@ import (
 	"log"
 	"strings"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/Utility"
 )
 
 /**
  * This class implements functionalities to manage accounts
  */
 type AccountManager struct {
+	m_config *Config.ServiceConfiguration
 }
 
 var accountManager *AccountManager
@@ -33,10 +35,17 @@ func (this *Server) GetAccountManager() *AccountManager {
 	return accountManager
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Do initialization stuff here.
  */
-func (this *AccountManager) Initialize() {
+func (this *AccountManager) initialize() {
+
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+
 	entities := GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities)
 	// Create the admin account if it doesn't exist
 	adminUuid := CargoEntitiesAccountExists("admin")
@@ -77,24 +86,33 @@ func (this *AccountManager) Initialize() {
 		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
 		log.Println("------> guest account was create: ", account)
 	}
+
 }
 
-func (this *AccountManager) GetId() string {
+func (this *AccountManager) getId() string {
 	return "AccountManager"
 }
 
-func (this *AccountManager) Start() {
+func (this *AccountManager) start() {
 	log.Println("--> Start AccountManager")
 }
 
-func (this *AccountManager) Stop() {
+func (this *AccountManager) stop() {
 	log.Println("--> Stop AccountManager")
 }
 
+func (this *AccountManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// API
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Function used to register an new account on the server.
- * @name of the new accout
- * @password the password
+ * @name of the new account
+ * @password the account password
  * @email the email address
  * @messageId the id of the message at the root of the action.
  * @sessionId the id of the session at the root of the action.
@@ -156,7 +174,7 @@ func (this *AccountManager) GetAccountById(name string, messageId string, sessio
 }
 
 /**
-* Retreive a user with a given id
+ * Retreive a user with a given id
  */
 func (this *AccountManager) GetUserById(id string, messageId string, sessionId string) *CargoEntities.User {
 

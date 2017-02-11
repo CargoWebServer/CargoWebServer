@@ -1,8 +1,7 @@
-//+build BPMN
 package Server
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DI_DiagramElementEntityPrototype() {
+func (this *EntityManager) create_DI_DiagramElementEntityPrototype() {
 
 	var diagramElementEntityProto EntityPrototype
 	diagramElementEntityProto.TypeName = "DI.DiagramElement"
@@ -78,7 +77,7 @@ func (this *EntityManager) Create_DI_DiagramElementEntityPrototype() {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DI_NodeEntityPrototype() {
+func (this *EntityManager) create_DI_NodeEntityPrototype() {
 
 	var nodeEntityProto EntityPrototype
 	nodeEntityProto.TypeName = "DI.Node"
@@ -157,7 +156,7 @@ func (this *EntityManager) Create_DI_NodeEntityPrototype() {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DI_EdgeEntityPrototype() {
+func (this *EntityManager) create_DI_EdgeEntityPrototype() {
 
 	var edgeEntityProto EntityPrototype
 	edgeEntityProto.TypeName = "DI.Edge"
@@ -214,7 +213,7 @@ func (this *EntityManager) Create_DI_EdgeEntityPrototype() {
 	edgeEntityProto.FieldsOrder = append(edgeEntityProto.FieldsOrder, 10)
 	edgeEntityProto.FieldsVisibility = append(edgeEntityProto.FieldsVisibility, true)
 	edgeEntityProto.Fields = append(edgeEntityProto.Fields, "M_waypoint")
-	edgeEntityProto.FieldsType = append(edgeEntityProto.FieldsType, "[]DI.Point")
+	edgeEntityProto.FieldsType = append(edgeEntityProto.FieldsType, "[]DI.DC.Point")
 
 	/** associations of Edge **/
 	edgeEntityProto.FieldsOrder = append(edgeEntityProto.FieldsOrder, 11)
@@ -245,7 +244,7 @@ func (this *EntityManager) Create_DI_EdgeEntityPrototype() {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DI_DiagramEntityPrototype() {
+func (this *EntityManager) create_DI_DiagramEntityPrototype() {
 
 	var diagramEntityProto EntityPrototype
 	diagramEntityProto.TypeName = "DI.Diagram"
@@ -304,7 +303,7 @@ func (this *EntityManager) Create_DI_DiagramEntityPrototype() {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DI_ShapeEntityPrototype() {
+func (this *EntityManager) create_DI_ShapeEntityPrototype() {
 
 	var shapeEntityProto EntityPrototype
 	shapeEntityProto.TypeName = "DI.Shape"
@@ -357,7 +356,7 @@ func (this *EntityManager) Create_DI_ShapeEntityPrototype() {
 	shapeEntityProto.FieldsOrder = append(shapeEntityProto.FieldsOrder, 8)
 	shapeEntityProto.FieldsVisibility = append(shapeEntityProto.FieldsVisibility, true)
 	shapeEntityProto.Fields = append(shapeEntityProto.Fields, "M_Bounds")
-	shapeEntityProto.FieldsType = append(shapeEntityProto.FieldsType, "DI.Bounds")
+	shapeEntityProto.FieldsType = append(shapeEntityProto.FieldsType, "DI.DC.Bounds")
 
 	/** associations of Shape **/
 	shapeEntityProto.FieldsOrder = append(shapeEntityProto.FieldsOrder, 9)
@@ -388,7 +387,7 @@ func (this *EntityManager) Create_DI_ShapeEntityPrototype() {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DI_PlaneEntityPrototype() {
+func (this *EntityManager) create_DI_PlaneEntityPrototype() {
 
 	var planeEntityProto EntityPrototype
 	planeEntityProto.TypeName = "DI.Plane"
@@ -472,7 +471,7 @@ func (this *EntityManager) Create_DI_PlaneEntityPrototype() {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DI_LabeledEdgeEntityPrototype() {
+func (this *EntityManager) create_DI_LabeledEdgeEntityPrototype() {
 
 	var labeledEdgeEntityProto EntityPrototype
 	labeledEdgeEntityProto.TypeName = "DI.LabeledEdge"
@@ -530,7 +529,7 @@ func (this *EntityManager) Create_DI_LabeledEdgeEntityPrototype() {
 	labeledEdgeEntityProto.FieldsOrder = append(labeledEdgeEntityProto.FieldsOrder, 10)
 	labeledEdgeEntityProto.FieldsVisibility = append(labeledEdgeEntityProto.FieldsVisibility, true)
 	labeledEdgeEntityProto.Fields = append(labeledEdgeEntityProto.Fields, "M_waypoint")
-	labeledEdgeEntityProto.FieldsType = append(labeledEdgeEntityProto.FieldsType, "[]DI.Point")
+	labeledEdgeEntityProto.FieldsType = append(labeledEdgeEntityProto.FieldsType, "[]DI.DC.Point")
 
 	/** members of LabeledEdge **/
 	labeledEdgeEntityProto.FieldsOrder = append(labeledEdgeEntityProto.FieldsOrder, 11)
@@ -567,7 +566,7 @@ func (this *EntityManager) Create_DI_LabeledEdgeEntityPrototype() {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DI_LabeledShapeEntityPrototype() {
+func (this *EntityManager) create_DI_LabeledShapeEntityPrototype() {
 
 	var labeledShapeEntityProto EntityPrototype
 	labeledShapeEntityProto.TypeName = "DI.LabeledShape"
@@ -621,7 +620,7 @@ func (this *EntityManager) Create_DI_LabeledShapeEntityPrototype() {
 	labeledShapeEntityProto.FieldsOrder = append(labeledShapeEntityProto.FieldsOrder, 8)
 	labeledShapeEntityProto.FieldsVisibility = append(labeledShapeEntityProto.FieldsVisibility, true)
 	labeledShapeEntityProto.Fields = append(labeledShapeEntityProto.Fields, "M_Bounds")
-	labeledShapeEntityProto.FieldsType = append(labeledShapeEntityProto.FieldsType, "DI.Bounds")
+	labeledShapeEntityProto.FieldsType = append(labeledShapeEntityProto.FieldsType, "DI.DC.Bounds")
 
 	/** members of LabeledShape **/
 	labeledShapeEntityProto.FieldsOrder = append(labeledShapeEntityProto.FieldsOrder, 9)
@@ -658,7 +657,7 @@ func (this *EntityManager) Create_DI_LabeledShapeEntityPrototype() {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DI_LabelEntityPrototype() {
+func (this *EntityManager) create_DI_LabelEntityPrototype() {
 
 	var labelEntityProto EntityPrototype
 	labelEntityProto.TypeName = "DI.Label"
@@ -711,7 +710,7 @@ func (this *EntityManager) Create_DI_LabelEntityPrototype() {
 	labelEntityProto.FieldsOrder = append(labelEntityProto.FieldsOrder, 8)
 	labelEntityProto.FieldsVisibility = append(labelEntityProto.FieldsVisibility, true)
 	labelEntityProto.Fields = append(labelEntityProto.Fields, "M_Bounds")
-	labelEntityProto.FieldsType = append(labelEntityProto.FieldsType, "DI.Bounds")
+	labelEntityProto.FieldsType = append(labelEntityProto.FieldsType, "DI.DC.Bounds")
 
 	/** associations of Label **/
 	labelEntityProto.FieldsOrder = append(labelEntityProto.FieldsOrder, 9)
@@ -750,7 +749,7 @@ func (this *EntityManager) Create_DI_LabelEntityPrototype() {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DI_StyleEntityPrototype() {
+func (this *EntityManager) create_DI_StyleEntityPrototype() {
 
 	var styleEntityProto EntityPrototype
 	styleEntityProto.TypeName = "DI.Style"
@@ -799,19 +798,19 @@ func (this *EntityManager) Create_DI_StyleEntityPrototype() {
 }
 
 /** Register the entity to the dynamic typing system. **/
-func (this *EntityManager) RegisterDIObjects() {
+func (this *EntityManager) registerDIObjects() {
 }
 
 /** Create entity prototypes contain in a package **/
-func (this *EntityManager) CreateDIPrototypes() {
-	this.Create_DI_DiagramElementEntityPrototype()
-	this.Create_DI_NodeEntityPrototype()
-	this.Create_DI_EdgeEntityPrototype()
-	this.Create_DI_DiagramEntityPrototype()
-	this.Create_DI_ShapeEntityPrototype()
-	this.Create_DI_PlaneEntityPrototype()
-	this.Create_DI_LabeledEdgeEntityPrototype()
-	this.Create_DI_LabeledShapeEntityPrototype()
-	this.Create_DI_LabelEntityPrototype()
-	this.Create_DI_StyleEntityPrototype()
+func (this *EntityManager) createDIPrototypes() {
+	this.create_DI_DiagramElementEntityPrototype()
+	this.create_DI_NodeEntityPrototype()
+	this.create_DI_EdgeEntityPrototype()
+	this.create_DI_DiagramEntityPrototype()
+	this.create_DI_ShapeEntityPrototype()
+	this.create_DI_PlaneEntityPrototype()
+	this.create_DI_LabeledEdgeEntityPrototype()
+	this.create_DI_LabeledShapeEntityPrototype()
+	this.create_DI_LabelEntityPrototype()
+	this.create_DI_StyleEntityPrototype()
 }

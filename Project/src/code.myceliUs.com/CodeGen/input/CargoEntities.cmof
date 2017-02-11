@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:cmof="http://schema.omg.org/spec/MOF/2.0/cmof.xml" xmi:version="2.1">
+<cmof:Package xmi:id="_0" name="CargoEntities" uri="http://www.omg.org/spec/BPMN/20100524/MODEL-XMI">
+<ownedMember xmi:type="cmof:Class" xmi:id="Entity" name="Entity" isAbstract="true">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Entity-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Parameter" name="Parameter">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Parameter-name" name="name">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Parameter-type" name="type">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Parameter-isArray" name="isArray">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
+    </ownedAttribute>
+</ownedMember>
+<ownedMember xmi:type="cmof:Association" xmi:id="A_parameter_action" name="A_parameter_action" visibility="private" memberEnd="Action-parameter A_parameter_action-action">
+    <ownedEnd xmi:type="cmof:Property" xmi:id="A_parameter_action-action" name="parameters" _type="Parameter" lower="0" owningAssociation="A_parameter_action" association="A_parameter_action"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Association" xmi:id="A_results_action" name="A_results_action" visibility="private" memberEnd="Action-parameter A_results_action-action">
+    <ownedEnd xmi:type="cmof:Property" xmi:id="A_results_action-action" name="results" _type="Parameter" lower="0" upper="*" owningAssociation="A_results_action" association="A_results_action"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Action" name="Action">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Action-name" name="name">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+	<ownedAttribute xmi:type="cmof:Property" xmi:id="Action-parameters" name="parameters" _type="Parameter" lower="0" upper="*" isComposite="true" association="A_parameter_action"/>
+	<ownedAttribute xmi:type="cmof:Property" xmi:id="Action-results" name="results" _type="Parameter" lower="0" upper="*" isComposite="true" association="A_result_action"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Error" name="Error" superClass="Entity Message">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Error-errorPath" name="errorPath">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Error-code" name="code">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Error-accountRef" name="accountRef" visibility="public" _type="Account" upper="1" lower="0"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="LogEntry" name="LogEntry" superClass="Entity">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Message-creationTime" name="creationTime">
+        <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="LogEntry-entityRef" name="entityRef" _type="Entity" lower="1" upper="1"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Association" xmi:id="A_log_logEntry" name="A_log_logEntry" visibility="private" memberEnd="Log-entity A_log_logEntry-logEntry">
+    <ownedEnd xmi:type="cmof:Property" xmi:id="A_log_logEntry-logEntry" name="logger" _type="Log" lower="0" owningAssociation="A_log_logEntry" association="A_log_logEntry"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Log" name="Log" superClass="Entity">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Log-logEntry" name="entries" _type="LogEntry" lower="0" upper="*" isComposite="true" association="A_log_logEntry"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Project" name="Project" superClass="Entity">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Project-name" name="name">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Project-filesRef" name="filesRef" _type="File" lower="0" upper="*"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Message" name="Message" isAbstract="true" superClass="Entity">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Message-body" name="body">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Notification" name="Notification" superClass="Entity Message">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Notification-fromRef" name="fromRef" visibility="public" _type="Account" upper="1" lower="0"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Notification-toRef" name="toRef" visibility="public" _type="Account" upper="1" lower="0"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Notification-type" name="type">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Notification-code" name="code">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+    </ownedAttribute>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="TextMessage" name="TextMessage" superClass="Entity Message">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Message-creationTime" name="creationTime">
+        <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="TextMessage-fromRef" name="fromRef" visibility="public" _type="Account" upper="1" lower="0"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="TextMessage-toRef" name="toRef" visibility="public" _type="Account" upper="1" lower="0"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Notification-title" name="title">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+</ownedMember>
+<ownedMember xmi:type="cmof:Enumeration" xmi:id="SessionState" name="SessionState">
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="SessionState-Online" name="Online" classifier="SessionState" enumeration="SessionState"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="SessionState-Away" name="Away" classifier="SessionState" enumeration="SessionState"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="SessionState-Offline" name="Offline" classifier="SessionState" enumeration="SessionState"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Session" name="Session">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Session-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Session-startTime" name="startTime">
+        <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Session-endTime" name="endTime">
+        <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Session-statusTime" name="statusTime">
+        <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Session-sessionState" name="sessionState" _type="SessionState"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Session-computer" name="computerRef" _type="Computer" lower="0"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Role" name="Role">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Role-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Role-accounts" name="accounts" visibility="public" _type="Account" lower="0" upper="*"/>
+	<ownedAttribute xmi:type="cmof:Property" xmi:id="Role-actions" name="actions" visibility="public" _type="Action" lower="0" upper="*" />
+</ownedMember>
+<ownedMember xmi:type="cmof:Association" xmi:id="A_session_account" name="A_session_account" visibility="private" memberEnd="Entities-entity A_session_account-account">
+    <ownedEnd xmi:type="cmof:Property" xmi:id="A_session_account-account" name="account" _type="Account" lower="0" owningAssociation="A_session_account" association="A_session_account"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Account" name="Account" superClass="Entity">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-name" name="name">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-password" name="password">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-email" name="email">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-sessions" name="sessions" visibility="public" _type="Session" upper="*" lower="0" isComposite="true" association="A_session_account"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-messages" name="messages" visibility="public" _type="Message" upper="*" lower="0" isComposite="true"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-userRef" name="userRef" _type="User" lower="0" upper="1"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-rolesRef" name="rolesRef" _type="Role" lower="0" upper="*"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Enumeration" xmi:id="OsType" name="OsType">
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="OsType-unknown" name="unknown" classifier="OsType" enumeration="OsType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="OsType-Linux" name="Linux" classifier="OsType" enumeration="OsType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="OsType-Windows7" name="Windows7" classifier="OsType" enumeration="OsType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="OsType-Windows8" name="Windows8" classifier="OsType" enumeration="OsType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="OsType-Windows10" name="Windows10" classifier="OsType" enumeration="OsType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="OsType-OSX" name="OSX" classifier="OsType" enumeration="OsType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="OsType-IOS" name="IOS" classifier="OsType" enumeration="OsType"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Enumeration" xmi:id="PlatformType" name="PlatformType">
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="PlatformType-unknown" name="unknown" classifier="PlatformType" enumeration="PlatformType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="PlatformType-Tablet" name="Tablet" classifier="PlatformType" enumeration="PlatformType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="PlatformType-Phone" name="Phone" classifier="PlatformType" enumeration="PlatformType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="PlatformType-Desktop" name="Desktop" classifier="PlatformType" enumeration="PlatformType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="PlatformType-Laptop" name="Laptop" classifier="PlatformType" enumeration="PlatformType"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Computer" name="Computer" superClass="Entity">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Computer-name" name="name">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Computer-ipv4" name="ipv4">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Computer-osType" name="osType" _type="OsType"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Computer-platformType" name="platformType" _type="PlatformType"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Association" xmi:id="A_file_file" name="A_file_file" visibility="private" memberEnd="File-entity A_file_file-file">
+    <ownedEnd xmi:type="cmof:Property" xmi:id="A_file_file-file" name="parentDir" _type="File" lower="0" owningAssociation="A_file_file" association="A_file_file"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Enumeration" xmi:id="FileType" name="FileType">
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FileType-dbFile" name="dbFile" classifier="FileType" enumeration="FileType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FileType-diskFile" name="diskFile" classifier="FileType" enumeration="FileType"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="File" name="File" superClass="Entity">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="File-name" name="name">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="File-path" name="path">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="File-size" name="size">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="File-modTime" name="modeTime">
+        <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="File-isDir" name="isDir">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="File-checksum" name="checksum">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="File-data" name="data">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="File-thumbnail" name="thumbnail">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="File-mime" name="mime">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="File-files" name="files" _type="File" isComposite="true" lower="0" upper="*" association="A_file_file"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="File-fileType" name="fileType" _type="FileType"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="User" name="User" superClass="Entity">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="User-firstName" name="firstName">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="User-lastName" name="lastName">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="User-middle" name="middle">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="User-phone" name="phone">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="User-email" name="email">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="User-group" name="memberOfRef" _type="Group" lower="0" upper="*"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="User-accounts" name="accounts" _type="Account" lower="0" upper="*"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Group" name="Group" superClass="Entity">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Group-name" name="name">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Group-user" name="membersRef" _type="User" lower="0" upper="*"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Association" xmi:id="A_entity_entities" name="A_entity_entities" visibility="private" memberEnd="Entities-entity A_entity_entities-entities">
+    <ownedEnd xmi:type="cmof:Property" xmi:id="A_entity_entities-entities" name="entities" _type="Entities" lower="0" owningAssociation="A_entity_entities" association="A_entity_entities"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Association" xmi:id="A_role_entities" name="A_role_entities" visibility="private" memberEnd="Entities-role A_role_entities-entities">
+    <ownedEnd xmi:type="cmof:Property" xmi:id="A_role_entities-entities" name="entities" _type="Entities" lower="0" owningAssociation="A_role_entities" association="A_role_entities"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Association" xmi:id="A_action_entities" name="A_action_entities" visibility="private" memberEnd="Entities-action A_action_entities-entities">
+    <ownedEnd xmi:type="cmof:Property" xmi:id="A_action_entities-entities" name="entities" _type="Entities" lower="0" owningAssociation="A_action_entities" association="A_action_entities"/>
+</ownedMember>
+<ownedMember xmi:type="cmof:Class" xmi:id="Entities" name="Entities">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Entities-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Entities-name" name="name" visibility="public">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Entities-version" name="version" visibility="public">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Entities-entity" name="entities" _type="Entity" lower="0" upper="*" isComposite="true" association="A_entity_entities"/>
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Entities-role" name="roles" _type="Role" lower="0" upper="*" isComposite="true" association="A_role_entities"/>
+	<ownedAttribute xmi:type="cmof:Property" xmi:id="Entities-action" name="actions" _type="Action" lower="0" upper="*" isComposite="true" association="A_action_entities"/>
+</ownedMember>
+</cmof:Package>
+</xmi:XMI>
+

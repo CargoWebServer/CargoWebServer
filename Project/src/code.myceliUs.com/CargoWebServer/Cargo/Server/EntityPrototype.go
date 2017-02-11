@@ -3,7 +3,7 @@ package Server
 import "fmt"
 import "strings"
 import "log"
-import "code.myceliUs.com/CargoWebServer/Cargo/Utility"
+import "code.myceliUs.com/Utility"
 
 /**
  * Restrictions for Datatypes

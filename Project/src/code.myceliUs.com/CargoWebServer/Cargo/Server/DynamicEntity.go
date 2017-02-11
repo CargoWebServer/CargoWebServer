@@ -10,10 +10,9 @@ import (
 	"sync"
 
 	"code.google.com/p/go-uuid/uuid"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/Utility"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
-	//"github.com/pkg/profile"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 )
 
 var (
@@ -43,7 +42,7 @@ type DynamicEntity struct {
 	referenced     []EntityRef
 	prototype      *EntityPrototype
 
-	/** object It will be a map here... **/
+	/** object will be a map... **/
 	object map[string]interface{}
 
 	/**
@@ -78,7 +77,7 @@ func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error)
 /**
  * Create a new dynamic entity...
  */
-func (this *EntityManager) NewDynamicEntity(values map[string]interface{}) (*DynamicEntity, *CargoEntities.Error) {
+func (this *EntityManager) newDynamicEntity(values map[string]interface{}) (*DynamicEntity, *CargoEntities.Error) {
 	this.Lock()
 	defer this.Unlock()
 
@@ -375,7 +374,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 
 												if err != nil {
 													// In that case I will try with dynamic entity.
-													dynamicEntity, errObj := GetServer().GetEntityManager().NewDynamicEntity(values)
+													dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(values)
 													if errObj == nil {
 														// initialise the sub entity.
 														err := dynamicEntity.initEntity(uuids[i], path+"|"+this.GetUuid())
@@ -436,7 +435,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 
 										if err != nil {
 											// In that case I will try with dynamic entity.
-											dynamicEntity, errObj := GetServer().GetEntityManager().NewDynamicEntity(values)
+											dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(values)
 											if errObj == nil {
 												// initialise the sub entity.
 												err := dynamicEntity.initEntity(uuid, path+"|"+this.GetUuid())
@@ -651,7 +650,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 								if err != nil {
 									// In that case I will try with dynamic entity.
 									// I will create the sub value...
-									subEntity, errObj := GetServer().GetEntityManager().NewDynamicEntity(subValues)
+									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(subValues)
 									if errObj == nil {
 										subEntity.AppendReferenced(fieldName, this)
 										this.AppendChild(fieldName, subEntity)
@@ -693,7 +692,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 									if err != nil {
 										// In that case I will try with dynamic entity.
 										// I will create the sub value...
-										subEntity, errObj := GetServer().GetEntityManager().NewDynamicEntity(subValues)
+										subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(subValues)
 										if errObj == nil {
 											subEntity.AppendReferenced(fieldName, this)
 											this.AppendChild(fieldName, subEntity)
@@ -791,7 +790,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 								if err != nil {
 									// In that case I will try with dynamic entity.
 									// I will create the sub value...
-									subEntity, errObj := GetServer().GetEntityManager().NewDynamicEntity(subValues)
+									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(subValues)
 									if errObj == nil {
 										subEntity.AppendReferenced(fieldName, this)
 										this.AppendChild(fieldName, subEntity)
@@ -1472,7 +1471,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 									subEntity.(*DynamicEntity).SetObjectValues(subValues)
 								} else {
 									var errObj *CargoEntities.Error
-									subEntity, errObj = GetServer().GetEntityManager().NewDynamicEntity(subValues)
+									subEntity, errObj = GetServer().GetEntityManager().newDynamicEntity(subValues)
 									if errObj == nil {
 										this.object[k] = subEntity.GetObject()
 									}
@@ -1494,7 +1493,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 												subEntity.(*DynamicEntity).SetObjectValues(subValues)
 											} else {
 												var errObj *CargoEntities.Error
-												subEntity, errObj = GetServer().GetEntityManager().NewDynamicEntity(subValues)
+												subEntity, errObj = GetServer().GetEntityManager().newDynamicEntity(subValues)
 												if errObj == nil {
 													this.object[k].([]map[string]interface{})[i] = subEntity.GetObject().(map[string]interface{})
 												}
@@ -1519,7 +1518,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 														subEntity.(*DynamicEntity).SetObjectValues(subValues)
 													} else {
 														var errObj *CargoEntities.Error
-														subEntity, errObj = GetServer().GetEntityManager().NewDynamicEntity(subValues)
+														subEntity, errObj = GetServer().GetEntityManager().newDynamicEntity(subValues)
 														if errObj == nil {
 															this.object[k].([]interface{})[i] = subEntity.GetObject()
 														}

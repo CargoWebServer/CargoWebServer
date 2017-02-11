@@ -28,6 +28,55 @@
  */
 MAX_MSG_SIZE = 17740;
 
+/**
+ *  @constant {int}  Double data type identifier.
+ */
+Data_DOUBLE = 0
+/**
+ *  @constant {int}  Interger data type identifier.
+ */
+Data_INTEGER = 1
+/**
+ *  @constant {int}  String data type identifier.
+ */
+Data_STRING = 2
+/**
+ *  @constant {int}  Bytes data type identifier.
+ */
+Data_BYTES = 3
+/**
+ *  @constant {int}  Struct (JSON) data type identifier.
+ */
+Data_JSON_STR = 4
+/**
+ *  @constant {int}  Boolean data type identifier.
+ */
+Data_BOOLEAN = 5
+
+/**
+ *  @constant {int}  Request message type identifier.
+ */
+Msg_REQUEST = 0;
+
+/**
+ *  @constant {int}  Response message type identifier.
+ */
+Msg_RESPONSE = 1;
+
+/**
+ *  @constant {int}  Error message type identifier.
+ */
+Msg_ERROR = 2;
+
+/**
+ *  @constant {int}  Event message type identifier.
+ */
+Msg_EVENT = 3;
+
+/**
+ *  @constant {int}  Transfert message type identifier.
+ */
+Msg_TRANSFER = 4;
 
 // Contain the pending request waiting to be ask back.
 var pendingRequest = {};
@@ -176,7 +225,7 @@ var Message = function (id, conn, progressCallback, successCallback, errorCallba
 
 // Must be implement by child's.
 Message.prototype.getRpcMessageData = function () {
-    var msg = new RpcMessage({ "id": this.id, "type": 4, "index": this.index, "total": this.total, "data": utf8_to_b64(this.data) });
+    var msg = new RpcMessage({ "id": this.id, "type": Msg_TRANSFER, "index": this.index, "total": this.total, "data": utf8_to_b64(this.data) });
     return msg.toArrayBuffer();
 }
 
@@ -196,32 +245,32 @@ function _arrayBufferToBase64(uarr) {
  * @param {bytes} The binary data sent by the server.
  */
 Message.prototype.parseData = function (data) {
-    if (data.type == 0) {
+    if (data.type == Data_DOUBLE) {
         var begin = data.dataBytes.offset;
         var end = data.dataBytes.limit;
         var val = new Float64Array(data.dataBytes.buffer.slice(begin, end))[0];
         return val
-    } else if (data.type == 1) {
+    } else if (data.type == Data_INTEGER) {
         var begin = data.dataBytes.offset;
         var end = data.dataBytes.limit;
         var val = new Int32Array(data.dataBytes.buffer.slice(begin, end))[0];
         return val
-    } else if (data.type == 2) {
+    } else if (data.type == Data_STRING) {
         var begin = data.dataBytes.offset;
         var end = data.dataBytes.limit;
         var str = new StringView(data.dataBytes.view.subarray(begin, end)).toString();
         return str;
-    } else if (data.type == 3) {
+    } else if (data.type == Data_BYTES) {
         var begin = this.data.dataBytes.offset;
         var end = this.data.dataBytes.length;
         var bytes = this.data.dataBytes.view.subarray(begin, end)
         return bytes
-    } else if (data.type == 4) {
+    } else if (data.type == Data_JSON_STR) {
         var begin = data.dataBytes.offset;
         var end = data.dataBytes.limit;
         var str = new StringView(data.dataBytes.view.subarray(begin, end)).toString();
         return JSON.parse(str);
-    } else if (data.type == 5) {
+    } else if (data.type == Data_BOOLEAN) {
         var begin = data.dataBytes.offset;
         var end = data.dataBytes.limit;
         var str = new StringView(data[i].dataBytes.view.subarray(begin, end)).toString();
@@ -241,7 +290,7 @@ Message.prototype.send = function () {
     var bytes = new Uint8Array(this.getRpcMessageData())
 
     // Control the size of the message.
-    if ((this.total == 1 && this.index == -1) || (this.total > 1 && this.index > -1)) {           
+    if ((this.total == 1 && this.index == -1) || (this.total > 1 && this.index > -1)) {
         this.conn.send(bytes);
     } else if (this.total > 1) {
         // Bytes will contain the message to send to the server,
@@ -355,7 +404,7 @@ Request.prototype.getRpcMessageData = function () {
     var rqst = new RpcRequest({ "id": this.id, "method": this.method, "params": this.params });
 
     // Calculate the total number of message here.
-    var msg = new RpcMessage({ "id": this.id, "type": 0, "rqst": rqst, "index": 1, "total": 1 });
+    var msg = new RpcMessage({ "id": this.id, "type": Msg_REQUEST, "rqst": rqst, "index": 1, "total": 1 });
 
     var bytes = msg.toArrayBuffer();
     msg.total = Math.ceil(bytes.byteLength / MAX_MSG_SIZE)
@@ -454,7 +503,7 @@ Response.prototype.constructor = Response;
  */
 Response.prototype.getRpcMessageData = function () {
     var resp = new RpcResponse({ "id": this.id, "results": this.results });
-    var msg = new RpcMessage({ "id": this.id, "type": 1, "rsp": resp, "index": -1, "total": 1 });
+    var msg = new RpcMessage({ "id": this.id, "type": Msg_RESPONSE, "rsp": resp, "index": -1, "total": 1 });
     var bytes = msg.toArrayBuffer();
     msg.total = Math.ceil(bytes.byteLength / MAX_MSG_SIZE)
     this.total = msg.total
@@ -507,7 +556,7 @@ EventMsg.prototype.constructor = EventMsg;
 // Create the data to be sent over the network
 EventMsg.prototype.getRpcMessageData = function () {
     var evt = new RpcEvent({ "code": this.code, "name": this.name, "evtData": this.data });
-    var msg = new RpcMessage({ "type": 3, "evt": evt, "index": -1, "total": 1 });
+    var msg = new RpcMessage({ "type": Msg_EVENT, "evt": evt, "index": -1, "total": 1 });
     var bytes = msg.toArrayBuffer();
     msg.total = Math.ceil(bytes.byteLength / MAX_MSG_SIZE)
     this.total = msg.total
@@ -553,7 +602,7 @@ ErrorMsg.prototype.constructor = ErrorMsg;
 // Create the data to be sent over the network
 ErrorMsg.prototype.getRpcMessageData = function () {
     var err = new RpcError({ "code": this.code, "message": this.message, "data": this.data });
-    var msg = new RpcMessage({ "type": 2, "err": err, "index": 1, "total": 1 });
+    var msg = new RpcMessage({ "type": Msg_ERROR, "err": err, "index": 1, "total": 1 });
     var bytes = msg.toArrayBuffer();
     msg.total = Math.ceil(bytes.byteLength / MAX_MSG_SIZE)
     this.total = msg.total

@@ -68,9 +68,9 @@ SessionManager.prototype.RegisterListener = function () {
 /*
  * Sever side code.
  */
-function Login(name, password) {
+function Login(name, password, serverId) {
     var newSession = null
-    newSession = server.GetSessionManager().Login(name, password, messageId, sessionId)
+    newSession = server.GetSessionManager().Login(name, password, serverId, messageId, sessionId)
     return newSession
 }
 
@@ -83,10 +83,11 @@ function Login(name, password) {
  * @param {function} errorCallback The function to execute in case of error.
  * @param {object} caller A place to store object from the request context and get it back from the response context.
  */
-SessionManager.prototype.login = function (name, password, successCallback, errorCallback, caller) {
+SessionManager.prototype.login = function (name, password, serverId, successCallback, errorCallback, caller) {
     var params = []
-    params.push(new RpcData({ "name": "name", "type": 2, "dataBytes": utf8_to_b64(name) }))
-    params.push(new RpcData({ "name": "password", "type": 2, "dataBytes": utf8_to_b64(password) }))
+    params.push(createRpcData(name, "STRING", "name"))
+    params.push(createRpcData(password, "STRING", "password"))
+    params.push(createRpcData(serverId, "STRING", "serverId"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -194,7 +195,7 @@ function GetActiveSessionByAccountId(accountId) {
 SessionManager.prototype.getActiveSessionByAccountId = function (accountId, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "accountId", "type": 2, "dataBytes": utf8_to_b64(accountId) }))
+    params.push(createRpcData(accountId, "STRING", "accountId"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -236,7 +237,7 @@ function UpdateSessionState(state) {
 SessionManager.prototype.updateSessionState = function (state, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "state", "type": 1, "dataBytes": utf8_to_b64(state) }))
+    params.push(createRpcData(state, "INTEGER", "state"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -282,7 +283,8 @@ function Logout(toCloseId) {
 SessionManager.prototype.logout = function (sessionId, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "name", "type": 2, "dataBytes": utf8_to_b64(sessionId) }))
+    params.push(createRpcData(sessionId, "STRING", "sessionId"))
+
     // Call it on the server.
     server.executeJsFunction(
         Logout.toString(), // The function to execute remotely on server

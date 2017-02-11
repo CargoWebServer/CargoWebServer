@@ -2,12 +2,12 @@
 package Server
 
 import (
-	//	"log"
+	//"log"
 	"reflect"
 	"strconv"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/Utility"
 )
 
 /**
@@ -23,6 +23,12 @@ type Action struct {
 
 	/** The parameters **/
 	Params []interface{}
+
+	/** The parameters type name **/
+	ParamTypeNames []string
+
+	/** The parameters name **/
+	ParamNames []string
 }
 
 /**
@@ -33,6 +39,8 @@ func newAction(name string, msg *message) *Action {
 	a.Name = name
 	a.msg = msg
 	a.Params = make([]interface{}, 0, 0)
+	a.ParamTypeNames = make([]string, 0, 0)
+	a.ParamNames = make([]string, 0, 0)
 	return a
 }
 
@@ -54,6 +62,12 @@ func (self *Action) execute() {
 
 	// Remove the message from the pending message.
 	GetServer().GetProcessor().removePendingRequest(self.msg)
+
+	/**
+	log.Println(self.Name)
+	log.Println(self.ParamNames)
+	log.Println(self.ParamTypeNames)
+	*/
 
 	// That function use reflection to retreive the
 	// method to call on a given object.
@@ -132,6 +146,9 @@ func (self *Action) GetSessionId() string {
 ////////////////////////////////////////////////////////////////////////////////
 //					Script execution releated Actions...
 ////////////////////////////////////////////////////////////////////////////////
+/**
+ * That function is the most important function of the framework. It use
+ */
 func (self *Action) ExecuteJsFunction(funtionStr string, funtionParams ...interface{}) (results []interface{}, jsError error) {
 
 	// Call the function on the Js runtime.

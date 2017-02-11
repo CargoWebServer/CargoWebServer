@@ -1,5 +1,3 @@
-// +build BPMN
-
 package Server
 
 import (
@@ -11,19 +9,50 @@ import (
 	"reflect"
 
 	"code.google.com/p/go-uuid/uuid"
-	"code.myceliUs.com/CargoWebServer/Cargo/BPMS"
-	"code.myceliUs.com/CargoWebServer/Cargo/BPMS/BPMN20"
-	"code.myceliUs.com/CargoWebServer/Cargo/BPMS/BPMS_Runtime"
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/BPMN20"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/BPMS"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/Utility"
+)
+
+const (
+	// Datastore names...
+	BPMN20DB = "BPMN20"
+	BPMNDIDB = "BPMN20"
+	DCDB     = "BPMN20"
+	DIDB     = "BPMN20"
 )
 
 type WorkflowManager struct {
+	m_config *Config.ServiceConfiguration
 }
 
 func newWorkflowManager() *WorkflowManager {
 	// The workflow manger...
 	workflowManager := new(WorkflowManager)
+
+	// The BPMN 2.0 entities
+	bpmn20DB := new(Config.DataStoreConfiguration)
+	bpmn20DB.M_id = BPMN20DB
+	bpmn20DB.M_dataStoreVendor = Config.DataStoreVendor_MYCELIUS
+	bpmn20DB.M_dataStoreType = Config.DataStoreType_KEY_VALUE_STORE
+	bpmn20DB.NeedSave = true
+	GetServer().GetConfigurationManager().appendDefaultDataStoreConfiguration(bpmn20DB)
+	GetServer().GetDataManager().appendDefaultDataStore(bpmn20DB)
+
+	// Create prototypes...
+	GetServer().GetEntityManager().createBPMN20Prototypes()
+	GetServer().GetEntityManager().createBPMNDIPrototypes()
+	GetServer().GetEntityManager().createDCPrototypes()
+	GetServer().GetEntityManager().createDIPrototypes()
+
+	// Register objects...
+	GetServer().GetEntityManager().registerBPMNDIObjects()
+	GetServer().GetEntityManager().registerDCObjects()
+	GetServer().GetEntityManager().registerDIObjects()
+	GetServer().GetEntityManager().registerBPMN20Objects()
 
 	return workflowManager
 }
@@ -37,29 +66,41 @@ func (this *Server) GetWorkflowManager() *WorkflowManager {
 	return workflowManager
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Do intialysation stuff here.
  */
-func (this *WorkflowManager) Initialize() {
+func (this *WorkflowManager) initialize() {
+	log.Println("--> Initialize WorkflowManager")
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+
 	// Here i will load the list of all definition into the
 	// entity mananager entity map.
 	GetServer().GetEntityManager().getEntitiesByType("BPMN20.Definitions", "", "BPMN20")
+
 }
 
-func (this *WorkflowManager) GetId() string {
+func (this *WorkflowManager) getId() string {
 	return "WorkflowManager"
 }
 
 /**
  * Start the service.
  */
-func (this *WorkflowManager) Start() {
+func (this *WorkflowManager) start() {
 	log.Println("--> Start WorkflowManager")
 }
 
-func (this *WorkflowManager) Stop() {
+func (this *WorkflowManager) stop() {
 	log.Println("--> Stop WorkflowManager")
 
+}
+
+func (this *WorkflowManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +202,7 @@ func (this *WorkflowManager) getProcess() []*BPMN20.Process {
 /**
  * That function return the list of instance for a given bpmn element id.
  */
-func (this *WorkflowManager) getInstances(bpmnElementId string, typeName string) ([]BPMS_Runtime.Instance, *CargoEntities.Error) {
+func (this *WorkflowManager) getInstances(bpmnElementId string, typeName string) ([]BPMS.Instance, *CargoEntities.Error) {
 
 	// Now I will get all defintions names...
 	var intancesQuery EntityQuery
@@ -174,9 +215,9 @@ func (this *WorkflowManager) getInstances(bpmnElementId string, typeName string)
 	query, _ := json.Marshal(intancesQuery)
 
 	// The array of instance...
-	var instances []BPMS_Runtime.Instance
+	var instances []BPMS.Instance
 
-	values, err := GetServer().GetDataManager().readData(BPMS_RuntimeDB, string(query), filedsType, params)
+	values, err := GetServer().GetDataManager().readData(BPMSDB, string(query), filedsType, params)
 	if err == nil {
 		for i := 0; i < len(values); i++ {
 			uuid := values[i][0].(string)
@@ -187,7 +228,7 @@ func (this *WorkflowManager) getInstances(bpmnElementId string, typeName string)
 				return instances, err
 			}
 			// Append to the list...
-			instances = append(instances, instance.GetObject().(BPMS_Runtime.Instance))
+			instances = append(instances, instance.GetObject().(BPMS.Instance))
 		}
 	} else {
 		return instances, NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No instance was found with id "+bpmnElementId+" and type name"+typeName))
@@ -212,7 +253,7 @@ func (this *WorkflowManager) loadXmlBpmnDefinitions(messageId string, sessionId 
 	for _, f := range files {
 		log.Println("Load file ", dump+"/"+f.Name())
 		definition := new(BPMN20.Definitions)
-		xmlFactory := new(BPMS.BPMSXmlFactory)
+		xmlFactory := new(Entities.BPMN_XmlFactory)
 		err := xmlFactory.InitXml(dump+"/"+f.Name(), definition)
 		if err != nil {
 
@@ -233,7 +274,7 @@ func (this *WorkflowManager) loadXmlBpmnDefinitions(messageId string, sessionId 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Public API
+// API
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -241,7 +282,7 @@ func (this *WorkflowManager) loadXmlBpmnDefinitions(messageId string, sessionId 
  */
 func (this *WorkflowManager) ImportXmlBpmnDefinitions(content string, messageId string, sessionId string) {
 	definitions := new(BPMN20.Definitions)
-	xmlFactory := new(BPMS.BPMSXmlFactory)
+	xmlFactory := new(Entities.BPMN_XmlFactory)
 
 	// Here I will create a temporary file
 	tmp := GetServer().GetConfigurationManager().GetTmpPath()
@@ -340,18 +381,18 @@ func (this *WorkflowManager) GetDefinitionsById(id string, messageId string, ses
 func (this *WorkflowManager) StartProcess(processUUID string, startEventData interface{}, startEventDefinitionData interface{}, messageId string, sessionId string) {
 	log.Println("-------> start process: ", processUUID)
 
-	trigger := new(BPMS_Runtime.Trigger)
-	trigger.UUID = "BPMS_Runtime.Trigger%" + Utility.RandomUUID()
+	trigger := new(BPMS.Trigger)
+	trigger.UUID = "BPMS.Trigger%" + Utility.RandomUUID()
 	trigger.M_processUUID = processUUID
 
 	// The event data...
-	if reflect.TypeOf(startEventData).String() == "[]*BPMS_Runtime.ItemAwareElementInstance" {
-		for i := 0; i < len(startEventData.([]*BPMS_Runtime.ItemAwareElementInstance)); i++ {
-			trigger.SetDataRef(startEventData.([]*BPMS_Runtime.ItemAwareElementInstance)[i])
+	if reflect.TypeOf(startEventData).String() == "[]*BPMS.ItemAwareElementInstance" {
+		for i := 0; i < len(startEventData.([]*BPMS.ItemAwareElementInstance)); i++ {
+			trigger.SetDataRef(startEventData.([]*BPMS.ItemAwareElementInstance)[i])
 		}
 	}
 
-	trigger.M_eventTriggerType = BPMS_Runtime.EventTriggerType_Start
+	trigger.M_eventTriggerType = BPMS.EventTriggerType_Start
 
 	trigger.M_sessionId = sessionId
 
@@ -363,16 +404,16 @@ func (this *WorkflowManager) StartProcess(processUUID string, startEventData int
 /**
  * That function return the list of instance for a given bpmn element id.
  */
-func (this *WorkflowManager) GetDefinitionInstances(id string, messageId string, sessionId string) []*BPMS_Runtime.DefinitionsInstance {
-	instances, err := this.getInstances(id, "BPMS_Runtime.DefinitionsInstance")
+func (this *WorkflowManager) GetDefinitionInstances(id string, messageId string, sessionId string) []*BPMS.DefinitionsInstance {
+	instances, err := this.getInstances(id, "BPMS.DefinitionsInstance")
 	if err != nil {
 		log.Println("--------> Definitions", id, "not found!!!")
 		GetServer().reportErrorMessage(messageId, sessionId, err)
 	}
 
-	definitionInstances := make([]*BPMS_Runtime.DefinitionsInstance, len(instances))
+	definitionInstances := make([]*BPMS.DefinitionsInstance, len(instances))
 	for i := 0; i < len(instances); i++ {
-		definitionInstances[i] = instances[i].(*BPMS_Runtime.DefinitionsInstance)
+		definitionInstances[i] = instances[i].(*BPMS.DefinitionsInstance)
 	}
 
 	return definitionInstances

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/token"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/Utility"
 )
 
 type (

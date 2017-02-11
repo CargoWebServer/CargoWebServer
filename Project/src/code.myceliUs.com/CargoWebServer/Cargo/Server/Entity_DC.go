@@ -1,14 +1,11 @@
-//+build BPMN
 package Server
 
 import (
 	"encoding/json"
-
-	"code.google.com/p/go-uuid/uuid"
-	"code.myceliUs.com/CargoWebServer/Cargo/BPMS/DC"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
-	//	"log"
 	"strings"
+
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/DC"
+	"code.myceliUs.com/Utility"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,7 +51,7 @@ func (this *EntityManager) NewDCFontEntity(objectId string, object interface{}) 
 			return val.(*DC_FontEntity)
 		}
 	} else {
-		uuidStr = "DC.Font%" + uuid.NewRandom().String()
+		uuidStr = "DC.Font%" + Utility.RandomUUID()
 	}
 	entity := new(DC_FontEntity)
 	if object == nil {
@@ -250,7 +247,7 @@ func (this *DC_FontEntity) GetPrototype() *EntityPrototype {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DC_FontEntityPrototype() {
+func (this *EntityManager) create_DC_FontEntityPrototype() {
 
 	var fontEntityProto EntityPrototype
 	fontEntityProto.TypeName = "DC.Font"
@@ -606,7 +603,7 @@ func (this *EntityManager) NewDCPointEntity(objectId string, object interface{})
 			return val.(*DC_PointEntity)
 		}
 	} else {
-		uuidStr = "DC.Point%" + uuid.NewRandom().String()
+		uuidStr = "DC.Point%" + Utility.RandomUUID()
 	}
 	entity := new(DC_PointEntity)
 	if object == nil {
@@ -802,7 +799,7 @@ func (this *DC_PointEntity) GetPrototype() *EntityPrototype {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DC_PointEntityPrototype() {
+func (this *EntityManager) create_DC_PointEntityPrototype() {
 
 	var pointEntityProto EntityPrototype
 	pointEntityProto.TypeName = "DC.Point"
@@ -1122,7 +1119,7 @@ func (this *EntityManager) NewDCBoundsEntity(objectId string, object interface{}
 			return val.(*DC_BoundsEntity)
 		}
 	} else {
-		uuidStr = "DC.Bounds%" + uuid.NewRandom().String()
+		uuidStr = "DC.Bounds%" + Utility.RandomUUID()
 	}
 	entity := new(DC_BoundsEntity)
 	if object == nil {
@@ -1318,7 +1315,7 @@ func (this *DC_BoundsEntity) GetPrototype() *EntityPrototype {
 }
 
 /** Entity Prototype creation **/
-func (this *EntityManager) Create_DC_BoundsEntityPrototype() {
+func (this *EntityManager) create_DC_BoundsEntityPrototype() {
 
 	var boundsEntityProto EntityPrototype
 	boundsEntityProto.TypeName = "DC.Bounds"
@@ -1620,15 +1617,15 @@ func (this *DC_BoundsEntity) AppendReference(reference Entity) {
 }
 
 /** Register the entity to the dynamic typing system. **/
-func (this *EntityManager) RegisterDCObjects() {
+func (this *EntityManager) registerDCObjects() {
 	Utility.RegisterType((*DC.Font)(nil))
 	Utility.RegisterType((*DC.Point)(nil))
 	Utility.RegisterType((*DC.Bounds)(nil))
 }
 
 /** Create entity prototypes contain in a package **/
-func (this *EntityManager) CreateDCPrototypes() {
-	this.Create_DC_FontEntityPrototype()
-	this.Create_DC_PointEntityPrototype()
-	this.Create_DC_BoundsEntityPrototype()
+func (this *EntityManager) createDCPrototypes() {
+	this.create_DC_FontEntityPrototype()
+	this.create_DC_PointEntityPrototype()
+	this.create_DC_BoundsEntityPrototype()
 }

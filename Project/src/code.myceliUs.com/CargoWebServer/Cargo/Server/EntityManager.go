@@ -9,9 +9,9 @@ import (
 	"strings"
 	"sync"
 
-	//"code.myceliUs.com/CargoWebServer/Cargo/Config/CargoConfig"
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/Utility"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,90 +30,8 @@ type EntityRef struct {
 ////////////////////////////////////////////////////////////////////////////////
 //						Entity Manager
 ////////////////////////////////////////////////////////////////////////////////
-
-var entityManager *EntityManager
-
-func (this *Server) GetEntityManager() *EntityManager {
-	if entityManager == nil {
-		entityManager = newEntityManager()
-	}
-	return entityManager
-}
-
-func newEntityManager() *EntityManager {
-
-	entityManager = new(EntityManager)
-
-	// Create prototypes...
-	// Workflow manager.
-	entityManager.CreateBPMNDIPrototypes()
-	entityManager.CreateDCPrototypes()
-	entityManager.CreateDIPrototypes()
-	entityManager.CreateBPMN20Prototypes()
-	entityManager.CreateBPMS_RuntimePrototypes()
-
-	// Entity manager.
-	entityManager.CreateCargoConfigPrototypes()
-	entityManager.CreateCargoEntitiesPrototypes()
-
-	// Register objects...
-	entityManager.RegisterBPMNDIObjects()
-	entityManager.RegisterDCObjects()
-	entityManager.RegisterDIObjects()
-	entityManager.RegisterBPMN20Objects()
-	entityManager.RegisterBPMS_RuntimeObjects()
-	entityManager.RegisterCargoConfigObjects()
-	entityManager.RegisterCargoEntitiesObjects()
-
-	// Entity prototype is a dynamic type.
-	Utility.RegisterType((*EntityPrototype)(nil))
-	Utility.RegisterType((*Restriction)(nil))
-	Utility.RegisterType((*DynamicEntity)(nil))
-	Utility.RegisterType((*MessageData)(nil))
-
-	// References
-	entityManager.referenced = make(map[string][]EntityRef, 0)
-	entityManager.reference = make(map[string][]EntityRef, 0)
-
-	return entityManager
-}
-
-/**
- * Initialization.
- */
-func (this *EntityManager) Initialize() {
-
-	gob.Register(map[string]interface{}{})
-	gob.Register([]interface{}{})
-
-	cargoEntitiesUuid := CargoEntitiesEntitiesExists("CARGO_ENTITIES")
-	if len(cargoEntitiesUuid) > 0 {
-		this.cargoEntities = this.NewCargoEntitiesEntitiesEntity(cargoEntitiesUuid, nil)
-		this.cargoEntities.InitEntity(cargoEntitiesUuid)
-	} else {
-		this.cargoEntities = this.NewCargoEntitiesEntitiesEntity("CARGO_ENTITIES", nil)
-		this.cargoEntities.object.M_id = "CARGO_ENTITIES"
-		this.cargoEntities.object.M_name = "Cargo entities"
-		this.cargoEntities.object.M_version = "1.0"
-		this.cargoEntities.object.NeedSave = true
-		this.cargoEntities.SaveEntity()
-	}
-
-}
-
-func (this *EntityManager) GetId() string {
-	return "EntityManager"
-}
-
-func (this *EntityManager) Start() {
-	log.Println("--> Start EntityManager")
-}
-
-func (this *EntityManager) Stop() {
-	log.Println("--> Stop EntityManager")
-}
-
 type EntityManager struct {
+	m_config *Config.ServiceConfiguration
 
 	/**
 	 * ref -> entity
@@ -134,6 +52,85 @@ type EntityManager struct {
 	* Lock referenced and references map.
 	 */
 	sync.Mutex
+}
+
+var entityManager *EntityManager
+
+func (this *Server) GetEntityManager() *EntityManager {
+	if entityManager == nil {
+		entityManager = newEntityManager()
+	}
+	return entityManager
+}
+
+func newEntityManager() *EntityManager {
+
+	entityManager = new(EntityManager)
+
+	// Create prototypes for config objects and entities objects...
+	entityManager.createConfigPrototypes()
+	entityManager.createCargoEntitiesPrototypes()
+	entityManager.registerConfigObjects()
+	entityManager.registerCargoEntitiesObjects()
+
+	// Entity prototype is a dynamic type.
+	Utility.RegisterType((*EntityPrototype)(nil))
+	Utility.RegisterType((*Restriction)(nil))
+	Utility.RegisterType((*DynamicEntity)(nil))
+	Utility.RegisterType((*MessageData)(nil))
+
+	// References
+	entityManager.referenced = make(map[string][]EntityRef, 0)
+	entityManager.reference = make(map[string][]EntityRef, 0)
+
+	return entityManager
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Initialization.
+ */
+func (this *EntityManager) initialize() {
+	log.Println("--> Initialize EntityManager")
+
+	// Create the default configurations
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+
+	gob.Register(map[string]interface{}{})
+	gob.Register([]interface{}{})
+
+	cargoEntitiesUuid := CargoEntitiesEntitiesExists("CARGO_ENTITIES")
+	if len(cargoEntitiesUuid) > 0 {
+		this.cargoEntities = this.NewCargoEntitiesEntitiesEntity(cargoEntitiesUuid, nil)
+		this.cargoEntities.InitEntity(cargoEntitiesUuid)
+	} else {
+		this.cargoEntities = this.NewCargoEntitiesEntitiesEntity("CARGO_ENTITIES", nil)
+		this.cargoEntities.object.M_id = "CARGO_ENTITIES"
+		this.cargoEntities.object.M_name = "Cargo entities"
+		this.cargoEntities.object.M_version = "1.0"
+		this.cargoEntities.object.NeedSave = true
+		this.cargoEntities.SaveEntity()
+	}
+
+}
+
+func (this *EntityManager) getId() string {
+	return "EntityManager"
+}
+
+func (this *EntityManager) start() {
+	log.Println("--> Start EntityManager")
+}
+
+func (this *EntityManager) stop() {
+	log.Println("--> Stop EntityManager")
+}
+
+func (this *EntityManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
 }
 
 /**
@@ -621,10 +618,14 @@ func (this *EntityManager) getEntityById(typeName string, id string) (Entity, *C
 
 	// Retreive the entity uuid.
 	storeId := typeName[:strings.Index(typeName, ".")]
+
+	// In case of bpmn usage...
 	if storeId == "DC" {
-		storeId = "BPMN20"
+		storeId = DCDB
+	} else if storeId == "DI" {
+		storeId = DIDB
 	} else if storeId == "BPMNDI" {
-		storeId = "BPMN20"
+		storeId = BPMNDIDB
 	}
 
 	// If the store is not found I will return an error.
@@ -860,6 +861,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	result, err := Utility.CallMethod(this, funcName, params)
 
 	if err != nil {
+		log.Println("---------> fail to call ", funcName)
 		// Try with dynamic entity instead.
 		entity, errObj := this.getDynamicEntityByUuid(uuid)
 		if errObj != nil {
@@ -890,7 +892,7 @@ func (this *EntityManager) getDynamicEntityByUuid(uuid string) (Entity, *CargoEn
 	values["TYPENAME"] = strings.Split(uuid, "%")[0]
 	values["UUID"] = uuid
 
-	entity, errObj := this.NewDynamicEntity(values)
+	entity, errObj := this.newDynamicEntity(values)
 
 	if errObj != nil {
 		return nil, errObj
@@ -1194,7 +1196,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		if reflect.TypeOf(values).String() == "map[string]interface {}" {
 			values.(map[string]interface{})["parentUuid"] = parentUuid
 			var errObj *CargoEntities.Error
-			entity, errObj = this.NewDynamicEntity(values.(map[string]interface{}))
+			entity, errObj = this.newDynamicEntity(values.(map[string]interface{}))
 			if errObj != nil {
 				GetServer().reportErrorMessage(messageId, sessionId, errObj)
 				return nil
@@ -1410,7 +1412,7 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 	if err != nil {
 		// I will try with dynamic entity insted...
 		var errObj *CargoEntities.Error
-		entity, errObj = this.NewDynamicEntity(values.(map[string]interface{}))
+		entity, errObj = this.newDynamicEntity(values.(map[string]interface{}))
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return nil

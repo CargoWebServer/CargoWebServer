@@ -7,7 +7,7 @@ package Server
 import (
 	"log"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 )
 
 func NewError(errorPath string, errorId string, errorCode int, err error) *CargoEntities.Error {

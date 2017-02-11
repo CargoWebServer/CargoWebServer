@@ -7,8 +7,10 @@ import (
 	"regexp"
 	"sync"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+
+	"code.myceliUs.com/Utility"
 )
 
 const (
@@ -51,6 +53,8 @@ const (
 // The event manager
 ////////////////////////////////////////////////////////////////////////////////
 type EventManager struct {
+	m_config *Config.ServiceConfiguration
+
 	// The map of avalaible event channels...
 	m_channels     map[string]*EventChannel
 	m_eventDataMap map[*Event]string
@@ -72,28 +76,41 @@ func (this *Server) GetEventManager() *EventManager {
  * A singleton that manage the event channels...
  */
 func newEventManager() *EventManager {
+
 	eventManager := new(EventManager)
 	eventManager.m_channels = make(map[string]*EventChannel, 0)
-
 	return eventManager
 }
+
+func (this *EventManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Do intialysation stuff here.
  */
-func (this *EventManager) Initialize() {
+func (this *EventManager) initialize() {
+	log.Println("--> Initialize EventManager")
+
+	// Create the default configurations
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+
 	this.m_eventDataMap = make(map[*Event]string, 0)
 }
 
-func (this *EventManager) GetId() string {
+func (this *EventManager) getId() string {
 	return "EventManager"
 }
 
-func (this *EventManager) Start() {
+func (this *EventManager) start() {
 	log.Println("--> Start EventManager")
 }
 
-func (this *EventManager) Stop() {
+func (this *EventManager) stop() {
 	log.Println("--> Stop EventManager")
 }
 
@@ -114,70 +131,6 @@ func (this *EventManager) getEventData(evt *Event) string {
 	this.Lock()
 	defer this.Unlock()
 	return this.m_eventDataMap[evt]
-}
-
-/**
- * Event to broadcast on the channel...
- */
-func (this *EventManager) BroadcastEvent(evt *Event) {
-	// Broadcast event over listener over the channel.
-	this.Lock()
-	defer this.Unlock()
-
-	channel := this.m_channels[evt.GetName()]
-	if channel != nil {
-		channel.broadcastEvent(evt)
-	}
-	delete(this.m_eventDataMap, evt)
-}
-
-/**
- * Send event to specific account.
- */
-func (this *EventManager) BroadcastEventTo(evt *Event, to *CargoEntities.Account) {
-	this.Lock()
-	defer this.Unlock()
-	// Broadcast event over listener over the channel.
-	channel := this.m_channels[evt.GetName()]
-	if channel != nil {
-		channel.broadcastEventTo(evt, to)
-	}
-}
-
-/**
- * Add and remove channel from the handler.
- */
-func (this *EventManager) AddEventListener(listener *EventListener) {
-	this.Lock()
-	defer this.Unlock()
-	// Create the channel if is not exist
-	channel := this.m_channels[listener.getEventName()]
-
-	if this.m_channels[listener.getEventName()] == nil {
-		channel = new(EventChannel)
-		channel.m_eventName = listener.getEventName()
-		channel.m_listeners = make(map[string]*EventListener, 0)
-		this.m_channels[channel.m_eventName] = channel
-	}
-
-	// append the listener
-	channel.m_listeners[listener.getId()] = listener
-}
-
-/**
- * Remove specific listener from a channel.
- */
-func (this *EventManager) RemoveEventListener(id string, name string) {
-	this.Lock()
-	defer this.Unlock()
-	// Remove the listener
-	listener := this.m_channels[name].m_listeners[id]
-	this.m_channels[name].removeEventListener(listener)
-
-	// if the channel is empty remove the channel...
-	if len(this.m_channels) == 0 {
-		delete(this.m_channels, name)
-	}
 }
 
 /**
@@ -367,6 +320,71 @@ func (this *EventChannel) removeEventListener(listener *EventListener) {
 //////////////////////////////////////////////////////////////////////////////////
 // API Event manager
 //////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Event to broadcast on the channel...
+ */
+func (this *EventManager) BroadcastEvent(evt *Event) {
+	// Broadcast event over listener over the channel.
+	this.Lock()
+	defer this.Unlock()
+
+	channel := this.m_channels[evt.GetName()]
+	if channel != nil {
+		channel.broadcastEvent(evt)
+	}
+	delete(this.m_eventDataMap, evt)
+}
+
+/**
+ * Send event to specific account.
+ */
+func (this *EventManager) BroadcastEventTo(evt *Event, to *CargoEntities.Account) {
+	this.Lock()
+	defer this.Unlock()
+	// Broadcast event over listener over the channel.
+	channel := this.m_channels[evt.GetName()]
+	if channel != nil {
+		channel.broadcastEventTo(evt, to)
+	}
+}
+
+/**
+ * Add and remove channel from the handler.
+ */
+func (this *EventManager) AddEventListener(listener *EventListener) {
+	this.Lock()
+	defer this.Unlock()
+	// Create the channel if is not exist
+	channel := this.m_channels[listener.getEventName()]
+
+	if this.m_channels[listener.getEventName()] == nil {
+		channel = new(EventChannel)
+		channel.m_eventName = listener.getEventName()
+		channel.m_listeners = make(map[string]*EventListener, 0)
+		this.m_channels[channel.m_eventName] = channel
+	}
+
+	// append the listener
+	channel.m_listeners[listener.getId()] = listener
+}
+
+/**
+ * Remove specific listener from a channel.
+ */
+func (this *EventManager) RemoveEventListener(id string, name string) {
+	this.Lock()
+	defer this.Unlock()
+	// Remove the listener
+	listener := this.m_channels[name].m_listeners[id]
+	this.m_channels[name].removeEventListener(listener)
+
+	// if the channel is empty remove the channel...
+	if len(this.m_channels) == 0 {
+		delete(this.m_channels, name)
+	}
+}
+
 /**
  * Broadcast the event data over the network. The envent datas must be
  * an array of Message Data.

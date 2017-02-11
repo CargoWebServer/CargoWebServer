@@ -8,16 +8,17 @@ import (
 	"os"
 	"strings"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/Utility"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Config/CargoConfig"
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	LDAP "github.com/mavricknz/ldap"
 )
 
 type LdapManager struct {
 	// Contain the list of avalable ldap servers...
-	m_configsInfo map[string]CargoConfig.LdapConfiguration
+	m_configsInfo map[string]Config.LdapConfiguration
+	m_config      *Config.ServiceConfiguration
 }
 
 var ldapManager *LdapManager
@@ -30,26 +31,32 @@ func (this *Server) GetLdapManager() *LdapManager {
 }
 
 func newLdapManager() *LdapManager {
-
 	ldapManager := new(LdapManager)
-	ldapManager.m_configsInfo = make(map[string]CargoConfig.LdapConfiguration)
-
+	ldapManager.m_configsInfo = make(map[string]Config.LdapConfiguration)
 	return ldapManager
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * That function is use to synchronize the information of a ldap server
  * with a given id.
  */
-func (this *LdapManager) Initialize() {
-
+func (this *LdapManager) initialize() {
+	// register service avalaible action here.
+	log.Println("--> initialyze LdapManager")
+	// Create the default configurations
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	this.m_config.M_start = false
 }
 
-func (this *LdapManager) GetId() string {
+func (this *LdapManager) getId() string {
 	return "LdapManager"
 }
 
-func (this *LdapManager) Start() {
+func (this *LdapManager) start() {
 	log.Println("--> Start LdapManager")
 	ldapConfigurations := GetServer().GetConfigurationManager().GetLdapConfigurations()
 
@@ -81,9 +88,81 @@ func (this *LdapManager) Start() {
 	}
 }
 
-func (this *LdapManager) Stop() {
+func (this *LdapManager) stop() {
 	log.Println("--> Stop LdapManager")
 }
+
+func (this *LdapManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
+}
+
+/**
+ * Get the list of group for a user...
+ */
+func (this *LdapManager) getLdapUserMemberOf(id string, userId string) ([]string, error) {
+
+	var base_dn string = "OU=MON,OU=CA,DC=UD6,DC=UF6"
+
+	var filter string = "(&(objectClass=group)(objectcategory=Group)(member=" + userId + "))"
+	var attributes []string = []string{"sAMAccountName"}
+	results, err := this.Search(id, "", "", base_dn, filter, attributes)
+	var memberOf []string
+	if err != nil {
+		log.Println("error, fail to search the groups information for user on ldap...")
+		return memberOf, err
+	}
+
+	// Here I will print the information...
+	for i := 0; i < len(results); i++ {
+		// Here I will get the user in the group...
+		row := results[i]
+		for j := 0; j < len(row); j++ {
+			// Print the result...
+			groupName := row[j].(string)
+			// Save user from ldap directory to the database...
+			if len(groupName) > 0 {
+				memberOf = append(memberOf, groupName)
+			}
+		}
+	}
+	return memberOf, nil
+}
+
+func (this *LdapManager) getLdapGroupMembers(id string, groupId string) ([]string, error) {
+	var base_dn string = "OU=MON,OU=CA,DC=UD6,DC=UF6"
+
+	var filter string = "(&(objectClass=user)(objectcategory=Person)(memberOf=" + groupId + "))"
+	var attributes []string = []string{"sAMAccountName"}
+	results, err := this.Search(id, "", "", base_dn, filter, attributes)
+	var members []string
+
+	if err != nil {
+		log.Println("error, fail to search the members information for group on ldap...")
+		return members, err
+	}
+
+	// Here I will print the information...
+	for i := 0; i < len(results); i++ {
+		// Here I will get the user in the group...
+		row := results[i]
+		for j := 0; j < len(row); j++ {
+			// Print the result...
+
+			if attributes[j] == "sAMAccountName" {
+				userId := row[j].(string)
+				//if strings.HasPrefix(userId, "mm") == true || strings.HasPrefix(userId, "mtmx") == true || strings.HasPrefix(userId, "mrmfct") == true {
+				// Save user from ldap directory to the database...
+				members = append(members, userId)
+				//}
+			}
+		}
+	}
+	return members, nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// API
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Connect to a ldap server...
@@ -178,7 +257,6 @@ func (this *LdapManager) Authenticate(id string, login string, psswd string) boo
 
 	// Test get some user...
 	var attributes []string = []string{"sAMAccountName"}
-	//log.Println("authenticate account ", name, " login ", login)
 	_, err := this.Search(id, login, psswd, ldapConfigInfo.M_searchBase, filter, attributes)
 	if err != nil {
 		return false
@@ -288,38 +366,6 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 }
 
 /**
- * Get the list of group for a user...
- */
-func (this *LdapManager) getLdapUserMemberOf(id string, userId string) ([]string, error) {
-
-	var base_dn string = "OU=MON,OU=CA,DC=UD6,DC=UF6"
-
-	var filter string = "(&(objectClass=group)(objectcategory=Group)(member=" + userId + "))"
-	var attributes []string = []string{"sAMAccountName"}
-	results, err := this.Search(id, "", "", base_dn, filter, attributes)
-	var memberOf []string
-	if err != nil {
-		log.Println("error, fail to search the groups information for user on ldap...")
-		return memberOf, err
-	}
-
-	// Here I will print the information...
-	for i := 0; i < len(results); i++ {
-		// Here I will get the user in the group...
-		row := results[i]
-		for j := 0; j < len(row); j++ {
-			// Print the result...
-			groupName := row[j].(string)
-			// Save user from ldap directory to the database...
-			if len(groupName) > 0 {
-				memberOf = append(memberOf, groupName)
-			}
-		}
-	}
-	return memberOf, nil
-}
-
-/**
  * That function return the list of all user's register in the database.
  */
 func (this *LdapManager) GetAllUsers() ([]*CargoEntities.User, *CargoEntities.Error) {
@@ -409,38 +455,6 @@ func (this *LdapManager) SynchronizeGroups(id string) error {
 	// Call save on Entities...
 	GetServer().GetEntityManager().getCargoEntities().SaveEntity()
 	return nil
-}
-
-func (this *LdapManager) getLdapGroupMembers(id string, groupId string) ([]string, error) {
-	var base_dn string = "OU=MON,OU=CA,DC=UD6,DC=UF6"
-
-	var filter string = "(&(objectClass=user)(objectcategory=Person)(memberOf=" + groupId + "))"
-	var attributes []string = []string{"sAMAccountName"}
-	results, err := this.Search(id, "", "", base_dn, filter, attributes)
-	var members []string
-
-	if err != nil {
-		log.Println("error, fail to search the members information for group on ldap...")
-		return members, err
-	}
-
-	// Here I will print the information...
-	for i := 0; i < len(results); i++ {
-		// Here I will get the user in the group...
-		row := results[i]
-		for j := 0; j < len(row); j++ {
-			// Print the result...
-
-			if attributes[j] == "sAMAccountName" {
-				userId := row[j].(string)
-				//if strings.HasPrefix(userId, "mm") == true || strings.HasPrefix(userId, "mtmx") == true || strings.HasPrefix(userId, "mrmfct") == true {
-				// Save user from ldap directory to the database...
-				members = append(members, userId)
-				//}
-			}
-		}
-	}
-	return members, nil
 }
 
 /**

@@ -9,7 +9,7 @@ import (
 
 	"sync"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/Utility"
 )
 
 /**
@@ -246,6 +246,9 @@ func (this *MessageProcessor) createPendingMessages(m *message) {
 	this.processPendingMessage(id)
 }
 
+/**
+ * Determine if a message is pending or not.
+ */
 func (this *MessageProcessor) isPending(id string) bool {
 	this.Lock()
 	defer this.Unlock()
@@ -348,6 +351,11 @@ func (this *MessageProcessor) processIncomming(m *message) {
 
 		// Now the parameters.
 		for _, param := range msg.GetRqst().GetParams() {
+
+			// Set the parameter type and name
+			a.ParamTypeNames = append(a.ParamTypeNames, param.GetTypeName())
+			a.ParamNames = append(a.ParamNames, param.GetName())
+
 			if param.GetType() == Data_DOUBLE {
 				val, err := strconv.ParseFloat(string(param.GetDataBytes()), 64)
 				if err != nil {

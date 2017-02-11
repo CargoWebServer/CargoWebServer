@@ -131,14 +131,14 @@ function SendEmail(serverId, from_, to, cc, title, msg, attachs, bodyType) {
 EmailManager.prototype.sendEmail = function (serverId, from_, to, cc, title, msg, attachs, bodyType, progressCallback, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
-    params.push(new RpcData({ "name": "serverId", "type": 2, "dataBytes": utf8_to_b64(serverId) }))
-    params.push(new RpcData({ "name": "from", "type": 2, "dataBytes": utf8_to_b64(from_) }))
-    params.push(new RpcData({ "name": "to", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(to)) })) // Know as a string.
-    params.push(new RpcData({ "name": "cc", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(cc)), "typeName": "Server.CarbonCopy" }))
-    params.push(new RpcData({ "name": "title", "type": 2, "dataBytes": utf8_to_b64(title) }))
-    params.push(new RpcData({ "name": "msg", "type": 2, "dataBytes": utf8_to_b64(msg) }))
-    params.push(new RpcData({ "name": "attachs", "type": 4, "dataBytes": utf8_to_b64(JSON.stringify(attachs)), "typeName": "Server.Attachment" }))
-    params.push(new RpcData({ "name": "bodyType", "type": 2, "dataBytes": utf8_to_b64(bodyType) }))
+    params.push(createRpcData(serverId, "STRING", "serverId"))
+    params.push(createRpcData(from_, "STRING", "from"))
+    params.push(createRpcData(to, "STRING", "to"))
+    params.push(createRpcData(cc, "JSON_STR", "cc", "Server.CarbonCopy"))
+    params.push(createRpcData(title, "STRING", "title"))
+    params.push(createRpcData(msg, "STRING", "msg"))
+    params.push(createRpcData(attachs, "JSON_STR", "attachs", "Server.Attachment"))
+    params.push(createRpcData(bodyType, "STRING", "bodyType"))
 
     // Call it on the server.
     server.executeJsFunction(

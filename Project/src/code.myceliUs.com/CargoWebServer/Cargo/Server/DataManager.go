@@ -6,31 +6,14 @@ import (
 	"os"
 	"sync"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Config/CargoConfig"
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/Utility"
 )
 
-////////////////////////////////////////////////////////////////////////////////
-//              			Store id's
-////////////////////////////////////////////////////////////////////////////////
 const (
-	// Use to store computer, group and user info
-
-	// The bpmn informations...
-	BPMN20DB = "BPMN20"
-	BPMNDIDB = "BPMN20"
-	DCDB     = "BPMN20"
-	DIDB     = "BPMN20"
-
-	// The runtime database...
-	BPMS_RuntimeDB = "BPMS_Runtime"
-
 	// The persistence db
 	CargoEntitiesDB = "CargoEntities"
-
-	// The configuration db
-	CargoConfigDB = "CargoConfig"
 )
 
 /**
@@ -40,6 +23,8 @@ const (
 type DataManager struct {
 	/** This contain connection to know dataStore **/
 	m_dataStores map[string]DataStore
+	m_config     *Config.ServiceConfiguration
+
 	/**
 	 * Use to protected the entitiesMap access...
 	 */
@@ -65,14 +50,10 @@ func newDataManager() *DataManager {
 	dataManager.m_dataStores = make(map[string]DataStore)
 
 	/** Now I will initialyse data store one by one... **/
-	defaultStoreConfigurations := GetServer().GetConfigurationManager().GetDefaultDataStoreConfigurations()
+	defaultStoreConfigurations := GetServer().GetConfigurationManager().getDefaultDataStoreConfigurations()
 
 	for i := 0; i < len(defaultStoreConfigurations); i++ {
-		store, err := NewDataStore(defaultStoreConfigurations[i])
-		if err != nil {
-			log.Fatal(err)
-		}
-		dataManager.m_dataStores[store.GetId()] = store
+		dataManager.appendDefaultDataStore(defaultStoreConfigurations[i])
 	}
 
 	/** Return the data manager pointer... **/
@@ -80,9 +61,16 @@ func newDataManager() *DataManager {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//                   		DataManager function
+// Service functions
 ////////////////////////////////////////////////////////////////////////////////
-func (this *DataManager) Initialize() {
+
+func (this *DataManager) initialize() {
+
+	log.Println("--> Initialize DataManager")
+
+	// Create the default configurations
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+
 	// Here I will get the datastore configuration...
 	storeConfigurations := GetServer().GetConfigurationManager().GetDataStoreConfigurations()
 
@@ -94,24 +82,37 @@ func (this *DataManager) Initialize() {
 
 		this.m_dataStores[store.GetId()] = store
 	}
+	log.Println("--> initialyze DataManager")
 }
 
-func (this *DataManager) GetId() string {
+func (this *DataManager) getId() string {
 	return "DataManager"
 }
 
-func (this *DataManager) Start() {
+func (this *DataManager) start() {
 	log.Println("--> Start DataManager")
 }
 
-func (this *DataManager) Stop() {
+func (this *DataManager) stop() {
 	log.Println("--> Stop DataManager")
 	this.close()
+}
+
+func (this *DataManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // private function
 ////////////////////////////////////////////////////////////////////////////////
+
+func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfiguration) {
+	store, err := NewDataStore(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	this.m_dataStores[store.GetId()] = store
+}
 
 /**
  * Access a store with here given name...
@@ -199,7 +200,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 	return
 }
 
-func (this *DataManager) createDataStore(storeId string, storeType CargoConfig.DataStoreType, storeVendor CargoConfig.DataStoreVendor) (DataStore, *CargoEntities.Error) {
+func (this *DataManager) createDataStore(storeId string, storeType Config.DataStoreType, storeVendor Config.DataStoreVendor) (DataStore, *CargoEntities.Error) {
 
 	if !Utility.IsValidVariableName(storeId) {
 		cargoError := NewError(Utility.FileLine(), INVALID_VARIABLE_NAME_ERROR, SERVER_ERROR_CODE, errors.New("The storeId '"+storeId+"' is not valid."))
@@ -212,7 +213,7 @@ func (this *DataManager) createDataStore(storeId string, storeType CargoConfig.D
 	}
 
 	// Create the new store here.
-	var storeConfig CargoConfig.DataStoreConfiguration
+	storeConfig := new(Config.DataStoreConfiguration)
 	storeConfig.M_id = storeId
 	storeConfig.M_dataStoreVendor = storeVendor
 	storeConfig.M_dataStoreType = storeType
@@ -222,7 +223,7 @@ func (this *DataManager) createDataStore(storeId string, storeType CargoConfig.D
 	store, err := NewDataStore(storeConfig)
 	if err == nil {
 		// Append the new dataStore configuration.
-		GetServer().GetConfigurationManager().m_activeConfigurations.SetDataStoreConfigs(&storeConfig)
+		GetServer().GetConfigurationManager().m_activeConfigurations.SetDataStoreConfigs(storeConfig)
 		// Save it.
 		GetServer().GetConfigurationManager().m_configurationEntity.SaveEntity()
 		this.Lock()
@@ -250,7 +251,7 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 	}
 
 	// Delete the dataStore configuration
-	dataStoreConfigurationUuid := CargoConfigDataStoreConfigurationExists(storeId)
+	dataStoreConfigurationUuid := ConfigDataStoreConfigurationExists(storeId)
 	dataStoreConfigurationEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(dataStoreConfigurationUuid)
 
 	// In case of the configuration is not already deleted...
@@ -287,7 +288,7 @@ func (this *DataManager) close() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// public function
+// API
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * Execute a query that read information from the store and
@@ -361,7 +362,7 @@ func (this *DataManager) Delete(storeName string, query string, params []interfa
  */
 func (this *DataManager) CreateDataStore(storeId string, storeType int64, storeVendor int64, messageId string, sessionId string) {
 
-	_, errObj := this.createDataStore(storeId, CargoConfig.DataStoreType(storeType), CargoConfig.DataStoreVendor(storeVendor))
+	_, errObj := this.createDataStore(storeId, Config.DataStoreType(storeType), Config.DataStoreVendor(storeVendor))
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}
@@ -386,12 +387,12 @@ func (this *DataManager) DeleteDataStore(storeId string, messageId string, sessi
  * This is the factory function that create the correct store depending
  * of he's information.
  */
-func NewDataStore(info CargoConfig.DataStoreConfiguration) (DataStore, error) {
+func NewDataStore(info *Config.DataStoreConfiguration) (DataStore, error) {
 	var err error
-	if info.M_dataStoreType == CargoConfig.DataStoreType_SQL_STORE {
+	if info.M_dataStoreType == Config.DataStoreType_SQL_STORE {
 		dataStore, err := NewSqlDataStore(info)
 		return dataStore, err
-	} else if info.M_dataStoreType == CargoConfig.DataStoreType_KEY_VALUE_STORE {
+	} else if info.M_dataStoreType == Config.DataStoreType_KEY_VALUE_STORE {
 		dataStore, err := NewKeyValueDataStore(info)
 		return dataStore, err
 	}

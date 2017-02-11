@@ -92,9 +92,9 @@ function registerAccount(name, password, email) {
  */
 AccountManager.prototype.register = function (name, password, email, successCallback, errorCallback, caller) {
     var params = []
-    params.push(new RpcData({ "name": "name", "type": 2, "dataBytes": utf8_to_b64(name) }))
-    params.push(new RpcData({ "name": "password", "type": 2, "dataBytes": utf8_to_b64(password) }))
-    params.push(new RpcData({ "name": "email", "type": 2, "dataBytes": utf8_to_b64(email) }))
+    params.push(createRpcData(name, "STRING", "name"))
+    params.push(createRpcData(password, "STRING", "password"))
+    params.push(createRpcData(email, "STRING", "email"))
 
     // Call it on the server.
     server.executeJsFunction(
@@ -145,13 +145,13 @@ function GetAccountById(id) {
  */
 AccountManager.prototype.getAccountById = function (id, successCallback, errorCallback, caller) {
 
-    var params_ = []
-    params_.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(id) }))
+    var params = []
+    params.push(createRpcData(id, "STRING", "id"))
 
     // Call it on the server.
     server.executeJsFunction(
         GetAccountById.toString(), // The function to execute remotely on server
-        params_, // The parameters to pass to that function
+        params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
         },
@@ -196,13 +196,13 @@ function GetUserById(id) {
  */
 AccountManager.prototype.getUserById = function (id, successCallback, errorCallback, caller) {
 
-    var params_ = []
-    params_.push(new RpcData({ "name": "id", "type": 2, "dataBytes": utf8_to_b64(id) }))
+    var params = []
+    params.push(createRpcData(id, "STRING", "id"))
 
     // Call it on the server.
     server.executeJsFunction(
         GetUserById.toString(), // The function to execute remotely on server
-        params_, // The parameters to pass to that function
+        params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
         },

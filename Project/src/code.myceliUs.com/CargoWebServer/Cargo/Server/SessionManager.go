@@ -6,9 +6,10 @@ import (
 	"sort"
 	"time"
 
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
-	"code.myceliUs.com/CargoWebServer/Cargo/Persistence/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Utility"
+	"code.myceliUs.com/Utility"
 )
 
 /**
@@ -32,6 +33,8 @@ func (s Sessions) Less(i, j int) bool {
 }
 
 type SessionManager struct {
+	m_config *Config.ServiceConfiguration
+
 	activeSessions map[string]*CargoEntities.Session
 
 	sessionToCloseChannel chan struct {
@@ -57,16 +60,21 @@ func (this *Server) GetSessionManager() *SessionManager {
  * This function creates and return the session manager...
  */
 func newSessionManager() *SessionManager {
-
 	sessionManager := new(SessionManager)
-
 	return sessionManager
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Service functions
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Do initialization stuff here.
  */
-func (this *SessionManager) Initialize() {
+func (this *SessionManager) initialize() {
+
+	log.Println("--> Initialize SessionManager")
+	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
 
 	this.activeSessions = make(map[string]*CargoEntities.Session, 0)
 	this.sessionToCloseChannel = make(chan struct {
@@ -83,16 +91,20 @@ func (this *SessionManager) Initialize() {
 
 }
 
-func (this *SessionManager) GetId() string {
+func (this *SessionManager) getId() string {
 	return "SessionManager"
 }
 
-func (this *SessionManager) Start() {
+func (this *SessionManager) start() {
 	log.Println("--> Start SessionManager")
 }
 
-func (this *SessionManager) Stop() {
+func (this *SessionManager) stop() {
 	log.Println("--> Stop SessionManager")
+}
+
+func (this *SessionManager) getConfig() *Config.ServiceConfiguration {
+	return this.m_config
 }
 
 /**
@@ -223,66 +235,13 @@ func (this *SessionManager) getActiveSessionByAccountId(accountId string) Sessio
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Public functions
+// API
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Return the list of all active sessions on the server.
+ * Authenticate a user with a given account name and password on a given ldap server.
  */
-func (this *SessionManager) GetActiveSessions() []*CargoEntities.Session {
-	activeSessions := new(struct {
-		activeSessionsChan chan []*CargoEntities.Session
-	})
-
-	activeSessions.activeSessionsChan = make(chan []*CargoEntities.Session)
-
-	this.activeSessionsChannel <- *activeSessions
-
-	return <-activeSessions.activeSessionsChan
-}
-
-/**
- * This function returns the session with a given id, if the session is active.
- */
-func (this *SessionManager) GetActiveSessionById(sessionId string) *CargoEntities.Session {
-
-	activeSessions := this.GetActiveSessions()
-
-	for i := 0; i < len(activeSessions); i++ {
-		if activeSessions[i].GetId() == sessionId {
-			return activeSessions[i]
-		}
-	}
-	return nil
-}
-
-/**
- * Returns the list of sessions for a given accout.
- */
-func (this *SessionManager) GetActiveSessionByAccountId(accountId string) Sessions {
-	var sessions Sessions
-	for _, session := range this.GetActiveSessions() {
-		if session.M_accountPtr == accountId {
-			sessions = append(sessions, session)
-		}
-	}
-	sort.Sort(sessions)
-	return sessions
-}
-
-/**
- * Use LDAP to authenticate the user... It does not log the user in a new session...
- * TODO
- */
-func (this *SessionManager) Authenticate(userId string, psswd string) bool {
-	isAuthenticate := true //utility.GetLdapManager().TestConnectWithUser("SafranLdap", user.Login, psswd)
-	return isAuthenticate
-}
-
-/**
- * Log the user in
- */
-func (this *SessionManager) Login(accountName string, psswd string, messageId string, sessionId string) *CargoEntities.Session {
+func (this *SessionManager) Login(accountName string, psswd string, serverId string, messageId string, sessionId string) *CargoEntities.Session {
 
 	var session *CargoEntities.Session
 	accountUuid := CargoEntitiesAccountExists(accountName)
@@ -300,9 +259,8 @@ func (this *SessionManager) Login(accountName string, psswd string, messageId st
 		account := accountEntity.GetObject().(*CargoEntities.Account)
 
 		// Verify if the password it correct
-		// TODO make it non generic, not based on the SafranLdap
-		if _, ok := GetServer().GetLdapManager().m_configsInfo["SafranLdap"]; ok {
-			if GetServer().GetLdapManager().Authenticate("SafranLdap", account.M_id, psswd) == false {
+		if _, ok := GetServer().GetLdapManager().m_configsInfo[serverId]; ok {
+			if GetServer().GetLdapManager().Authenticate(serverId, account.M_id, psswd) == false {
 				if account.M_password != psswd {
 
 					// Create the error message
@@ -409,6 +367,50 @@ func (this *SessionManager) Logout(toCloseId string, messageId string, sessionId
 		cargoError := NewError(Utility.FileLine(), SESSION_ID_NOT_ACTIVE, SERVER_ERROR_CODE, errors.New("The session with the id '"+sessionId+"' is not active"))
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 	}
+}
+
+/**
+ * Return the list of all active sessions on the server.
+ */
+func (this *SessionManager) GetActiveSessions() []*CargoEntities.Session {
+	activeSessions := new(struct {
+		activeSessionsChan chan []*CargoEntities.Session
+	})
+
+	activeSessions.activeSessionsChan = make(chan []*CargoEntities.Session)
+
+	this.activeSessionsChannel <- *activeSessions
+
+	return <-activeSessions.activeSessionsChan
+}
+
+/**
+ * This function returns the session with a given id, if the session is active.
+ */
+func (this *SessionManager) GetActiveSessionById(sessionId string) *CargoEntities.Session {
+
+	activeSessions := this.GetActiveSessions()
+
+	for i := 0; i < len(activeSessions); i++ {
+		if activeSessions[i].GetId() == sessionId {
+			return activeSessions[i]
+		}
+	}
+	return nil
+}
+
+/**
+ * Returns the list of sessions for a given accout.
+ */
+func (this *SessionManager) GetActiveSessionByAccountId(accountId string) Sessions {
+	var sessions Sessions
+	for _, session := range this.GetActiveSessions() {
+		if session.M_accountPtr == accountId {
+			sessions = append(sessions, session)
+		}
+	}
+	sort.Sort(sessions)
+	return sessions
 }
 
 /**
