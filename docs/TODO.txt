@@ -7,3 +7,8 @@
 		- network
 -> Tutorials sidebar scroll avec la page
 
+-> Getting Started
+	-Comment installer, configurer, expliquer les fichiers, la configuration, etc.
+	-Comment créer un projet (hello world)
+	-Télécharger le projet hello world: complet A à Z (comme angular)
+	-Bridge
