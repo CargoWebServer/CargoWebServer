@@ -22,7 +22,9 @@ DataExplorer.prototype.initDataSchema = function (storeConfig) {
 
     // So here I will get the list of all prototype from a give store and
     // create it's relavite information.
-    if (storeConfig.M_dataStoreType == 2) {
+    if (storeConfig.M_dataStoreType == 0) {
+        // Sql data store.
+    }else if (storeConfig.M_dataStoreType == 1) {
         // Entity data store.
         server.entityManager.getEntityPrototypes(storeId,
             // success callback.
@@ -34,9 +36,7 @@ DataExplorer.prototype.initDataSchema = function (storeConfig) {
 
             },
             this)
-    } else if (storeConfig.M_dataStoreType == 0) {
-        // Sql data store.
-    }
+    } 
 
     this.schemas[storeId] = storeId
 }
