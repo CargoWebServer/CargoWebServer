@@ -1,3 +1,5 @@
+// +build Config
+
 package Config
 
 import(
@@ -27,6 +29,11 @@ type ServiceConfiguration struct{
 	M_pwd string
 	M_start bool
 
+
+	/** Associations **/
+	m_parentPtr *Configurations
+	/** If the ref is a string and not an object **/
+	M_parentPtr string
 }
 
 /** Xml parser for ServiceConfiguration **/
@@ -41,7 +48,7 @@ type XsdServiceConfiguration struct {
 	M_port	int	`xml:"port,attr"`
 	M_user	string	`xml:"user,attr"`
 	M_pwd	string	`xml:"pwd,attr"`
-	M_start	string	`xml:"start,attr"`
+	M_start	bool	`xml:"start,attr"`
 
 }
 /** UUID **/
@@ -139,3 +146,29 @@ func (this *ServiceConfiguration) SetStart(ref interface{}){
 }
 
 /** Remove reference Start **/
+
+/** Parent **/
+func (this *ServiceConfiguration) GetParentPtr() *Configurations{
+	return this.m_parentPtr
+}
+
+/** Init reference Parent **/
+func (this *ServiceConfiguration) SetParentPtr(ref interface{}){
+	this.NeedSave = true
+	if _, ok := ref.(string); ok {
+		this.M_parentPtr = ref.(string)
+	}else{
+		this.m_parentPtr = ref.(*Configurations)
+		this.M_parentPtr = ref.(*Configurations).GetUUID()
+	}
+}
+
+/** Remove reference Parent **/
+func (this *ServiceConfiguration) RemoveParentPtr(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*Configurations)
+	if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+		this.m_parentPtr = nil
+		this.M_parentPtr = ""
+	}
+}

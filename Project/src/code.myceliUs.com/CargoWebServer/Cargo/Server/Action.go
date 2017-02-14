@@ -63,12 +63,6 @@ func (self *Action) execute() {
 	// Remove the message from the pending message.
 	GetServer().GetProcessor().removePendingRequest(self.msg)
 
-	/**
-	log.Println(self.Name)
-	log.Println(self.ParamNames)
-	log.Println(self.ParamTypeNames)
-	*/
-
 	// That function use reflection to retreive the
 	// method to call on a given object.
 	x, errMsg := Utility.CallMethod(*self, self.Name, self.Params)

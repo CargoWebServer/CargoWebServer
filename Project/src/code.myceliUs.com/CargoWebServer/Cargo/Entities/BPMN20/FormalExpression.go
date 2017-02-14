@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 import (
@@ -38,7 +40,10 @@ type FormalExpression struct {
 	/** Associations **/
 	m_complexGatewayPtr *ComplexGateway
 	/** If the ref is a string and not an object **/
-	M_complexGatewayPtr             string
+	M_complexGatewayPtr       string
+	m_timerEventDefinitionPtr *TimerEventDefinition
+	/** If the ref is a string and not an object **/
+	M_timerEventDefinitionPtr       string
 	m_conditionalEventDefinitionPtr *ConditionalEventDefinition
 	/** If the ref is a string and not an object **/
 	M_conditionalEventDefinitionPtr string
@@ -77,10 +82,7 @@ type FormalExpression struct {
 	M_outgoingPtr []string
 	m_incomingPtr []*Association
 	/** If the ref is a string and not an object **/
-	M_incomingPtr             []string
-	m_timerEventDefinitionPtr *TimerEventDefinition
-	/** If the ref is a string and not an object **/
-	M_timerEventDefinitionPtr     string
+	M_incomingPtr                 []string
 	m_resourceParameterBindingPtr *ResourceParameterBinding
 	/** If the ref is a string and not an object **/
 	M_resourceParameterBindingPtr     string
@@ -105,6 +107,34 @@ type XsdFormalExpression struct {
 }
 
 /** Alias Xsd parser **/
+
+type XsdActivationCondition struct {
+	XMLName xml.Name `xml:"activationCondition"`
+	/** BaseElement **/
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	M_other             string                `xml:",innerxml"`
+
+	/** Expression **/
+
+	M_language           string `xml:"language,attr"`
+	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
+}
+
+type XsdConditionExpression struct {
+	XMLName xml.Name `xml:"conditionExpression"`
+	/** BaseElement **/
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	M_other             string                `xml:",innerxml"`
+
+	/** Expression **/
+
+	M_language           string `xml:"language,attr"`
+	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
+}
 
 type XsdTransformation struct {
 	XMLName xml.Name `xml:"transformation"`
@@ -134,8 +164,50 @@ type XsdDataPath struct {
 	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
 }
 
-type XsdActivationCondition struct {
-	XMLName xml.Name `xml:"activationCondition"`
+type XsdCondition struct {
+	XMLName xml.Name `xml:"condition"`
+	/** BaseElement **/
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	M_other             string                `xml:",innerxml"`
+
+	/** Expression **/
+
+	M_language           string `xml:"language,attr"`
+	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
+}
+
+type XsdTimeDate struct {
+	XMLName xml.Name `xml:"timeDate"`
+	/** BaseElement **/
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	M_other             string                `xml:",innerxml"`
+
+	/** Expression **/
+
+	M_language           string `xml:"language,attr"`
+	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
+}
+
+type XsdMessagePath struct {
+	XMLName xml.Name `xml:"messagePath"`
+	/** BaseElement **/
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	M_other             string                `xml:",innerxml"`
+
+	/** Expression **/
+
+	M_language           string `xml:"language,attr"`
+	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
+}
+
+type XsdTimeDuration struct {
+	XMLName xml.Name `xml:"timeDuration"`
 	/** BaseElement **/
 	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
 	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
@@ -176,50 +248,8 @@ type XsdTo struct {
 	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
 }
 
-type XsdConditionExpression struct {
-	XMLName xml.Name `xml:"conditionExpression"`
-	/** BaseElement **/
-	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
-	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
-	M_id                string                `xml:"id,attr"`
-	M_other             string                `xml:",innerxml"`
-
-	/** Expression **/
-
-	M_language           string `xml:"language,attr"`
-	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
-}
-
 type XsdLoopCardinality struct {
 	XMLName xml.Name `xml:"loopCardinality"`
-	/** BaseElement **/
-	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
-	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
-	M_id                string                `xml:"id,attr"`
-	M_other             string                `xml:",innerxml"`
-
-	/** Expression **/
-
-	M_language           string `xml:"language,attr"`
-	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
-}
-
-type XsdLoopCondition struct {
-	XMLName xml.Name `xml:"loopCondition"`
-	/** BaseElement **/
-	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
-	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
-	M_id                string                `xml:"id,attr"`
-	M_other             string                `xml:",innerxml"`
-
-	/** Expression **/
-
-	M_language           string `xml:"language,attr"`
-	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
-}
-
-type XsdCondition struct {
-	XMLName xml.Name `xml:"condition"`
 	/** BaseElement **/
 	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
 	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
@@ -246,8 +276,22 @@ type XsdCompletionCondition struct {
 	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
 }
 
-type XsdMessagePath struct {
-	XMLName xml.Name `xml:"messagePath"`
+type XsdLoopCondition struct {
+	XMLName xml.Name `xml:"loopCondition"`
+	/** BaseElement **/
+	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
+	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
+	M_id                string                `xml:"id,attr"`
+	M_other             string                `xml:",innerxml"`
+
+	/** Expression **/
+
+	M_language           string `xml:"language,attr"`
+	M_evaluatesToTypeRef string `xml:"evaluatesToTypeRef,attr"`
+}
+
+type XsdTimeCycle struct {
+	XMLName xml.Name `xml:"timeCycle"`
 	/** BaseElement **/
 	M_documentation     []*XsdDocumentation   `xml:"documentation,omitempty"`
 	M_extensionElements *XsdExtensionElements `xml:"extensionElements,omitempty"`
@@ -307,6 +351,13 @@ func (this *FormalExpression) SetExtensionElements(ref interface{}) {
 }
 
 /** Remove reference ExtensionElements **/
+func (this *FormalExpression) RemoveExtensionElements(ref interface{}) {
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionElements)
+	if toDelete.GetUUID() == this.M_extensionElements.GetUUID() {
+		this.M_extensionElements = nil
+	}
+}
 
 /** ExtensionDefinitions **/
 func (this *FormalExpression) GetExtensionDefinitions() []*ExtensionDefinition {
@@ -319,7 +370,7 @@ func (this *FormalExpression) SetExtensionDefinitions(ref interface{}) {
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
 	for i := 0; i < len(this.M_extensionDefinitions); i++ {
-		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
+		if this.M_extensionDefinitions[i].GetUUID() != ref.(*ExtensionDefinition).GetUUID() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
 			isExist = true
@@ -333,6 +384,17 @@ func (this *FormalExpression) SetExtensionDefinitions(ref interface{}) {
 }
 
 /** Remove reference ExtensionDefinitions **/
+func (this *FormalExpression) RemoveExtensionDefinitions(ref interface{}) {
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionDefinition)
+	extensionDefinitions_ := make([]*ExtensionDefinition, 0)
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
+		if toDelete.GetUUID() != this.M_extensionDefinitions[i].GetUUID() {
+			extensionDefinitions_ = append(extensionDefinitions_, this.M_extensionDefinitions[i])
+		}
+	}
+	this.M_extensionDefinitions = extensionDefinitions_
+}
 
 /** ExtensionValues **/
 func (this *FormalExpression) GetExtensionValues() []*ExtensionAttributeValue {
@@ -359,6 +421,17 @@ func (this *FormalExpression) SetExtensionValues(ref interface{}) {
 }
 
 /** Remove reference ExtensionValues **/
+func (this *FormalExpression) RemoveExtensionValues(ref interface{}) {
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionAttributeValue)
+	extensionValues_ := make([]*ExtensionAttributeValue, 0)
+	for i := 0; i < len(this.M_extensionValues); i++ {
+		if toDelete.GetUUID() != this.M_extensionValues[i].GetUUID() {
+			extensionValues_ = append(extensionValues_, this.M_extensionValues[i])
+		}
+	}
+	this.M_extensionValues = extensionValues_
+}
 
 /** Documentation **/
 func (this *FormalExpression) GetDocumentation() []*Documentation {
@@ -459,6 +532,32 @@ func (this *FormalExpression) RemoveComplexGatewayPtr(ref interface{}) {
 	if toDelete.GetUUID() == this.m_complexGatewayPtr.GetUUID() {
 		this.m_complexGatewayPtr = nil
 		this.M_complexGatewayPtr = ""
+	}
+}
+
+/** TimerEventDefinition **/
+func (this *FormalExpression) GetTimerEventDefinitionPtr() *TimerEventDefinition {
+	return this.m_timerEventDefinitionPtr
+}
+
+/** Init reference TimerEventDefinition **/
+func (this *FormalExpression) SetTimerEventDefinitionPtr(ref interface{}) {
+	this.NeedSave = true
+	if _, ok := ref.(string); ok {
+		this.M_timerEventDefinitionPtr = ref.(string)
+	} else {
+		this.m_timerEventDefinitionPtr = ref.(*TimerEventDefinition)
+		this.M_timerEventDefinitionPtr = ref.(BaseElement).GetUUID()
+	}
+}
+
+/** Remove reference TimerEventDefinition **/
+func (this *FormalExpression) RemoveTimerEventDefinitionPtr(ref interface{}) {
+	this.NeedSave = true
+	toDelete := ref.(BaseElement)
+	if toDelete.GetUUID() == this.m_timerEventDefinitionPtr.GetUUID() {
+		this.m_timerEventDefinitionPtr = nil
+		this.M_timerEventDefinitionPtr = ""
 	}
 }
 
@@ -834,32 +933,6 @@ func (this *FormalExpression) RemoveIncomingPtr(ref interface{}) {
 	}
 	this.m_incomingPtr = incomingPtr_
 	this.M_incomingPtr = incomingPtrUuid
-}
-
-/** TimerEventDefinition **/
-func (this *FormalExpression) GetTimerEventDefinitionPtr() *TimerEventDefinition {
-	return this.m_timerEventDefinitionPtr
-}
-
-/** Init reference TimerEventDefinition **/
-func (this *FormalExpression) SetTimerEventDefinitionPtr(ref interface{}) {
-	this.NeedSave = true
-	if _, ok := ref.(string); ok {
-		this.M_timerEventDefinitionPtr = ref.(string)
-	} else {
-		this.m_timerEventDefinitionPtr = ref.(*TimerEventDefinition)
-		this.M_timerEventDefinitionPtr = ref.(BaseElement).GetUUID()
-	}
-}
-
-/** Remove reference TimerEventDefinition **/
-func (this *FormalExpression) RemoveTimerEventDefinitionPtr(ref interface{}) {
-	this.NeedSave = true
-	toDelete := ref.(BaseElement)
-	if toDelete.GetUUID() == this.m_timerEventDefinitionPtr.GetUUID() {
-		this.m_timerEventDefinitionPtr = nil
-		this.M_timerEventDefinitionPtr = ""
-	}
 }
 
 /** ResourceParameterBinding **/

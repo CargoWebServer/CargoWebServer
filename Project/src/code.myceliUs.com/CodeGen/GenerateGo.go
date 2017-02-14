@@ -499,7 +499,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 	}
 
 	// If the method is a boolean and is name beging with is...
-	if strings.HasPrefix(methodName, "Is") && typeName == "bool" {
+	if strings.HasPrefix(methodName, "Is") && (typeName == "bool" || typeName == "boolean") {
 		getter += methodName + "() "
 		if attribute.Upper == "*" {
 			getter += "[]"
@@ -741,8 +741,12 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 			//log.Println("-----------> no remover for ", attribute.Name)
 		}
 	} else {
+
 		methodStr = "	/** " + methodName + " **/\n	" + getter + "\n"
-		if len(setter) > 0 {
+
+		// Now if the property is public i will also generate it's setter.
+		if attribute.Visibility == "public" {
+			setter += "Set" + methodName + ref + "(interface{}) "
 			methodStr += "	" + setter + "\n"
 		}
 	}

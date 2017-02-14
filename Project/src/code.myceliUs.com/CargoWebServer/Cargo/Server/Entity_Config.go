@@ -1,3 +1,5 @@
+// +build Config
+
 package Server
 
 import (
@@ -14,12 +16,12 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "uuid")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "uuid")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -2214,15 +2216,21 @@ func (this *EntityManager) create_Config_ServiceConfigurationEntityPrototype() {
 	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 8)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_start")
-	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.bool")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.boolean")
+
+	/** associations of ServiceConfiguration **/
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 9)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_parentPtr")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "childsUuid")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "[]xs.string")
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 9)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 10)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
 
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "referenced")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "[]EntityRef")
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 10)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 11)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
@@ -2258,6 +2266,9 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_pwd")
 	query.Fields = append(query.Fields, "M_start")
 
+	/** associations of ServiceConfiguration **/
+	query.Fields = append(query.Fields, "M_parentPtr")
+
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
 	var ServiceConfigurationInfo []interface{}
@@ -2279,6 +2290,11 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_user)
 	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_pwd)
 	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_start)
+
+	/** associations of ServiceConfiguration **/
+
+	/** Save parent type Configurations **/
+	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_parentPtr)
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	ServiceConfigurationInfo = append(ServiceConfigurationInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -2339,6 +2355,9 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string) error {
 	query.Fields = append(query.Fields, "M_user")
 	query.Fields = append(query.Fields, "M_pwd")
 	query.Fields = append(query.Fields, "M_start")
+
+	/** associations of ServiceConfiguration **/
+	query.Fields = append(query.Fields, "M_parentPtr")
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
@@ -2402,14 +2421,27 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string) error {
 		if results[0][8] != nil {
 			this.object.M_start = results[0][8].(bool)
 		}
-		childsUuidStr := results[0][9].(string)
+
+		/** associations of ServiceConfiguration **/
+
+		/** parentPtr **/
+		if results[0][9] != nil {
+			id := results[0][9].(string)
+			if len(id) > 0 {
+				refTypeName := "Config.Configurations"
+				id_ := refTypeName + "$$" + id
+				this.object.M_parentPtr = id
+				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
+			}
+		}
+		childsUuidStr := results[0][10].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 		if err != nil {
 			return err
 		}
 
-		referencedStr := results[0][10].(string)
+		referencedStr := results[0][11].(string)
 		this.referenced = make([]EntityRef, 0)
 		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 		if err != nil {
@@ -3994,28 +4026,32 @@ func (this *EntityManager) create_Config_ConfigurationsEntityPrototype() {
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "Config.ServerConfiguration")
 	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 7)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
+	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_serviceConfigs")
+	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.ServiceConfiguration")
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 8)
+	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_dataStoreConfigs")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.DataStoreConfiguration")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 8)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 9)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_smtpConfigs")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.SmtpConfiguration")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 9)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 10)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_ldapConfigs")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.LdapConfiguration")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 10)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 11)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_applicationConfigs")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.ApplicationConfiguration")
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "childsUuid")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]xs.string")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 11)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 12)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, false)
 
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "referenced")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]EntityRef")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 12)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 13)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
@@ -4046,6 +4082,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_version")
 	query.Fields = append(query.Fields, "M_filePath")
 	query.Fields = append(query.Fields, "M_serverConfig")
+	query.Fields = append(query.Fields, "M_serviceConfigs")
 	query.Fields = append(query.Fields, "M_dataStoreConfigs")
 	query.Fields = append(query.Fields, "M_smtpConfigs")
 	query.Fields = append(query.Fields, "M_ldapConfigs")
@@ -4080,6 +4117,20 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	} else {
 		ConfigurationsInfo = append(ConfigurationsInfo, "")
 	}
+
+	/** Save serviceConfigs type ServiceConfiguration **/
+	serviceConfigsIds := make([]string, 0)
+	for i := 0; i < len(this.object.M_serviceConfigs); i++ {
+		serviceConfigsEntity := GetServer().GetEntityManager().NewConfigServiceConfigurationEntity(this.object.M_serviceConfigs[i].UUID, this.object.M_serviceConfigs[i])
+		serviceConfigsIds = append(serviceConfigsIds, serviceConfigsEntity.uuid)
+		serviceConfigsEntity.AppendReferenced("serviceConfigs", this)
+		this.AppendChild("serviceConfigs", serviceConfigsEntity)
+		if serviceConfigsEntity.NeedSave() {
+			serviceConfigsEntity.SaveEntity()
+		}
+	}
+	serviceConfigsStr, _ := json.Marshal(serviceConfigsIds)
+	ConfigurationsInfo = append(ConfigurationsInfo, string(serviceConfigsStr))
 
 	/** Save dataStoreConfigs type DataStoreConfiguration **/
 	dataStoreConfigsIds := make([]string, 0)
@@ -4192,6 +4243,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 	query.Fields = append(query.Fields, "M_version")
 	query.Fields = append(query.Fields, "M_filePath")
 	query.Fields = append(query.Fields, "M_serverConfig")
+	query.Fields = append(query.Fields, "M_serviceConfigs")
 	query.Fields = append(query.Fields, "M_dataStoreConfigs")
 	query.Fields = append(query.Fields, "M_smtpConfigs")
 	query.Fields = append(query.Fields, "M_ldapConfigs")
@@ -4260,9 +4312,33 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 			}
 		}
 
-		/** dataStoreConfigs **/
+		/** serviceConfigs **/
 		if results[0][7] != nil {
 			uuidsStr := results[0][7].(string)
+			uuids := make([]string, 0)
+			err := json.Unmarshal([]byte(uuidsStr), &uuids)
+			if err != nil {
+				return err
+			}
+			for i := 0; i < len(uuids); i++ {
+				if len(uuids[i]) > 0 {
+					var serviceConfigsEntity *Config_ServiceConfigurationEntity
+					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+						serviceConfigsEntity = instance.(*Config_ServiceConfigurationEntity)
+					} else {
+						serviceConfigsEntity = GetServer().GetEntityManager().NewConfigServiceConfigurationEntity(uuids[i], nil)
+						serviceConfigsEntity.InitEntity(uuids[i])
+						GetServer().GetEntityManager().insert(serviceConfigsEntity)
+					}
+					serviceConfigsEntity.AppendReferenced("serviceConfigs", this)
+					this.AppendChild("serviceConfigs", serviceConfigsEntity)
+				}
+			}
+		}
+
+		/** dataStoreConfigs **/
+		if results[0][8] != nil {
+			uuidsStr := results[0][8].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -4285,8 +4361,8 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 		}
 
 		/** smtpConfigs **/
-		if results[0][8] != nil {
-			uuidsStr := results[0][8].(string)
+		if results[0][9] != nil {
+			uuidsStr := results[0][9].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -4309,8 +4385,8 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 		}
 
 		/** ldapConfigs **/
-		if results[0][9] != nil {
-			uuidsStr := results[0][9].(string)
+		if results[0][10] != nil {
+			uuidsStr := results[0][10].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -4333,8 +4409,8 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 		}
 
 		/** applicationConfigs **/
-		if results[0][10] != nil {
-			uuidsStr := results[0][10].(string)
+		if results[0][11] != nil {
+			uuidsStr := results[0][11].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -4355,14 +4431,14 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 				}
 			}
 		}
-		childsUuidStr := results[0][11].(string)
+		childsUuidStr := results[0][12].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 		if err != nil {
 			return err
 		}
 
-		referencedStr := results[0][12].(string)
+		referencedStr := results[0][13].(string)
 		this.referenced = make([]EntityRef, 0)
 		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 		if err != nil {

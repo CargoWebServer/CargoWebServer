@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 type ExtensionDefinition struct{
@@ -53,7 +55,7 @@ func (this *ExtensionDefinition) SetExtensionAttributeDefinition(ref interface{}
 	isExist := false
 	var extensionAttributeDefinitions []*ExtensionAttributeDefinition
 	for i:=0; i<len(this.M_extensionAttributeDefinition); i++ {
-		if this.M_extensionAttributeDefinition[i].GetName() != ref.(*ExtensionAttributeDefinition).GetName() {
+		if this.M_extensionAttributeDefinition[i].GetUUID() != ref.(*ExtensionAttributeDefinition).GetUUID() {
 			extensionAttributeDefinitions = append(extensionAttributeDefinitions, this.M_extensionAttributeDefinition[i])
 		} else {
 			isExist = true
@@ -67,6 +69,17 @@ func (this *ExtensionDefinition) SetExtensionAttributeDefinition(ref interface{}
 }
 
 /** Remove reference ExtensionAttributeDefinition **/
+func (this *ExtensionDefinition) RemoveExtensionAttributeDefinition(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionAttributeDefinition)
+	extensionAttributeDefinition_ := make([]*ExtensionAttributeDefinition, 0)
+	for i := 0; i < len(this.M_extensionAttributeDefinition); i++ {
+		if toDelete.GetUUID() != this.M_extensionAttributeDefinition[i].GetUUID() {
+			extensionAttributeDefinition_ = append(extensionAttributeDefinition_, this.M_extensionAttributeDefinition[i])
+		}
+	}
+	this.M_extensionAttributeDefinition = extensionAttributeDefinition_
+}
 
 /** BaseElement **/
 func (this *ExtensionDefinition) GetBaseElementPtr() []BaseElement{
@@ -118,7 +131,16 @@ func (this *ExtensionDefinition) SetExtensionPtr(ref interface{}){
 		this.M_extensionPtr = ref.(string)
 	}else{
 		this.m_extensionPtr = ref.(*Extension)
+		this.M_extensionPtr = ref.(*Extension).GetUUID()
 	}
 }
 
 /** Remove reference Extension **/
+func (this *ExtensionDefinition) RemoveExtensionPtr(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*Extension)
+	if toDelete.GetUUID() == this.m_extensionPtr.GetUUID() {
+		this.m_extensionPtr = nil
+		this.M_extensionPtr = ""
+	}
+}

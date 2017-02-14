@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 type ExtensionAttributeDefinition struct{
@@ -81,11 +83,19 @@ func (this *ExtensionAttributeDefinition) SetExtensionDefinition(ref interface{}
 		this.M_extensionDefinition = ref.(string)
 	}else{
 		this.m_extensionDefinition = ref.(*ExtensionDefinition)
-		this.M_extensionDefinition = ref.(*ExtensionDefinition).GetName()
+		this.M_extensionDefinition = ref.(*ExtensionDefinition).GetUUID()
 	}
 }
 
 /** Remove reference ExtensionDefinition **/
+func (this *ExtensionAttributeDefinition) RemoveExtensionDefinition(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionDefinition)
+	if toDelete.GetUUID() == this.m_extensionDefinition.GetUUID() {
+		this.m_extensionDefinition = nil
+		this.M_extensionDefinition = ""
+	}
+}
 
 /** ExtensionAttributeValue **/
 func (this *ExtensionAttributeDefinition) GetExtensionAttributeValuePtr() []*ExtensionAttributeValue{
@@ -103,8 +113,24 @@ func (this *ExtensionAttributeDefinition) SetExtensionAttributeValuePtr(ref inte
 		}
 		this.M_extensionAttributeValuePtr = append(this.M_extensionAttributeValuePtr, ref.(string))
 	}else{
+		this.RemoveExtensionAttributeValuePtr(ref)
 		this.m_extensionAttributeValuePtr = append(this.m_extensionAttributeValuePtr, ref.(*ExtensionAttributeValue))
+		this.M_extensionAttributeValuePtr = append(this.M_extensionAttributeValuePtr, ref.(*ExtensionAttributeValue).GetUUID())
 	}
 }
 
 /** Remove reference ExtensionAttributeValue **/
+func (this *ExtensionAttributeDefinition) RemoveExtensionAttributeValuePtr(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionAttributeValue)
+	extensionAttributeValuePtr_ := make([]*ExtensionAttributeValue, 0)
+	extensionAttributeValuePtrUuid := make([]string, 0)
+	for i := 0; i < len(this.m_extensionAttributeValuePtr); i++ {
+		if toDelete.GetUUID() != this.m_extensionAttributeValuePtr[i].GetUUID() {
+			extensionAttributeValuePtr_ = append(extensionAttributeValuePtr_, this.m_extensionAttributeValuePtr[i])
+			extensionAttributeValuePtrUuid = append(extensionAttributeValuePtrUuid, this.M_extensionAttributeValuePtr[i])
+		}
+	}
+	this.m_extensionAttributeValuePtr = extensionAttributeValuePtr_
+	this.M_extensionAttributeValuePtr = extensionAttributeValuePtrUuid
+}

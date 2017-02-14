@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 import(
@@ -33,9 +35,9 @@ type TimerEventDefinition struct{
 	/** No members **/
 
 	/** members of TimerEventDefinition **/
-	M_timeDate Expression
-	M_timeCycle Expression
-	M_timeDuration Expression
+	M_timeDate *FormalExpression
+	M_timeCycle *FormalExpression
+	M_timeDuration *FormalExpression
 
 
 	/** Associations **/
@@ -78,12 +80,9 @@ type XsdTimerEventDefinition struct {
 	/** EventDefinition **/
 
 
-	M_timeDate_0	*XsdFormalExpression	`xml:"formalExpression,omitempty"`
-	M_timeDate_1	*XsdExpression	`xml:"timeDate,omitempty"`
-	M_timeDuration_0	*XsdFormalExpression	`xml:"formalExpression,omitempty"`
-	M_timeDuration_1	*XsdExpression	`xml:"timeDuration,omitempty"`
-	M_timeCycle_0	*XsdFormalExpression	`xml:"formalExpression,omitempty"`
-	M_timeCycle_1	*XsdExpression	`xml:"timeCycle,omitempty"`
+	M_timeDate	*XsdTimeDate	`xml:"timeDate,omitempty"`
+	M_timeDuration	*XsdTimeDuration	`xml:"timeDuration,omitempty"`
+	M_timeCycle	*XsdTimeCycle	`xml:"timeCycle,omitempty"`
 
 }
 /** UUID **/
@@ -133,6 +132,13 @@ func (this *TimerEventDefinition) SetExtensionElements(ref interface{}){
 }
 
 /** Remove reference ExtensionElements **/
+func (this *TimerEventDefinition) RemoveExtensionElements(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionElements)
+	if toDelete.GetUUID() == this.M_extensionElements.GetUUID() {
+		this.M_extensionElements = nil
+	}
+}
 
 /** ExtensionDefinitions **/
 func (this *TimerEventDefinition) GetExtensionDefinitions() []*ExtensionDefinition{
@@ -145,7 +151,7 @@ func (this *TimerEventDefinition) SetExtensionDefinitions(ref interface{}){
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
 	for i:=0; i<len(this.M_extensionDefinitions); i++ {
-		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
+		if this.M_extensionDefinitions[i].GetUUID() != ref.(*ExtensionDefinition).GetUUID() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
 			isExist = true
@@ -159,6 +165,17 @@ func (this *TimerEventDefinition) SetExtensionDefinitions(ref interface{}){
 }
 
 /** Remove reference ExtensionDefinitions **/
+func (this *TimerEventDefinition) RemoveExtensionDefinitions(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionDefinition)
+	extensionDefinitions_ := make([]*ExtensionDefinition, 0)
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
+		if toDelete.GetUUID() != this.M_extensionDefinitions[i].GetUUID() {
+			extensionDefinitions_ = append(extensionDefinitions_, this.M_extensionDefinitions[i])
+		}
+	}
+	this.M_extensionDefinitions = extensionDefinitions_
+}
 
 /** ExtensionValues **/
 func (this *TimerEventDefinition) GetExtensionValues() []*ExtensionAttributeValue{
@@ -185,6 +202,17 @@ func (this *TimerEventDefinition) SetExtensionValues(ref interface{}){
 }
 
 /** Remove reference ExtensionValues **/
+func (this *TimerEventDefinition) RemoveExtensionValues(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionAttributeValue)
+	extensionValues_ := make([]*ExtensionAttributeValue, 0)
+	for i := 0; i < len(this.M_extensionValues); i++ {
+		if toDelete.GetUUID() != this.M_extensionValues[i].GetUUID() {
+			extensionValues_ = append(extensionValues_, this.M_extensionValues[i])
+		}
+	}
+	this.M_extensionValues = extensionValues_
+}
 
 /** Documentation **/
 func (this *TimerEventDefinition) GetDocumentation() []*Documentation{
@@ -224,61 +252,61 @@ func (this *TimerEventDefinition) RemoveDocumentation(ref interface{}){
 }
 
 /** TimeDate **/
-func (this *TimerEventDefinition) GetTimeDate() Expression{
+func (this *TimerEventDefinition) GetTimeDate() *FormalExpression{
 	return this.M_timeDate
 }
 
 /** Init reference TimeDate **/
 func (this *TimerEventDefinition) SetTimeDate(ref interface{}){
 	this.NeedSave = true
-	this.M_timeDate = ref.(Expression)
+	this.M_timeDate = ref.(*FormalExpression)
 }
 
 /** Remove reference TimeDate **/
 func (this *TimerEventDefinition) RemoveTimeDate(ref interface{}){
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
-	if toDelete.GetUUID() == this.M_timeDate.(BaseElement).GetUUID() {
+	if toDelete.GetUUID() == this.M_timeDate.GetUUID() {
 		this.M_timeDate = nil
 	}
 }
 
 /** TimeCycle **/
-func (this *TimerEventDefinition) GetTimeCycle() Expression{
+func (this *TimerEventDefinition) GetTimeCycle() *FormalExpression{
 	return this.M_timeCycle
 }
 
 /** Init reference TimeCycle **/
 func (this *TimerEventDefinition) SetTimeCycle(ref interface{}){
 	this.NeedSave = true
-	this.M_timeCycle = ref.(Expression)
+	this.M_timeCycle = ref.(*FormalExpression)
 }
 
 /** Remove reference TimeCycle **/
 func (this *TimerEventDefinition) RemoveTimeCycle(ref interface{}){
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
-	if toDelete.GetUUID() == this.M_timeCycle.(BaseElement).GetUUID() {
+	if toDelete.GetUUID() == this.M_timeCycle.GetUUID() {
 		this.M_timeCycle = nil
 	}
 }
 
 /** TimeDuration **/
-func (this *TimerEventDefinition) GetTimeDuration() Expression{
+func (this *TimerEventDefinition) GetTimeDuration() *FormalExpression{
 	return this.M_timeDuration
 }
 
 /** Init reference TimeDuration **/
 func (this *TimerEventDefinition) SetTimeDuration(ref interface{}){
 	this.NeedSave = true
-	this.M_timeDuration = ref.(Expression)
+	this.M_timeDuration = ref.(*FormalExpression)
 }
 
 /** Remove reference TimeDuration **/
 func (this *TimerEventDefinition) RemoveTimeDuration(ref interface{}){
 	this.NeedSave = true
 	toDelete := ref.(BaseElement)
-	if toDelete.GetUUID() == this.M_timeDuration.(BaseElement).GetUUID() {
+	if toDelete.GetUUID() == this.M_timeDuration.GetUUID() {
 		this.M_timeDuration = nil
 	}
 }

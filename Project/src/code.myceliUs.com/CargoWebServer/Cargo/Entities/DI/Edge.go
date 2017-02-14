@@ -1,3 +1,5 @@
+// +build DI
+
 package DI
 
 import(
@@ -12,11 +14,14 @@ type Edge interface{
 
 	/** Source **/
 	GetSource() DiagramElement
+	SetSource(interface{}) 
 
 	/** Target **/
 	GetTarget() DiagramElement
+	SetTarget(interface{}) 
 
 	/** Waypoint **/
 	GetWaypoint() []*DC.Point
+	SetWaypoint(interface{}) 
 
 }

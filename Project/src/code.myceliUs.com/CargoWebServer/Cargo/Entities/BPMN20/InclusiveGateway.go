@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 import(
@@ -145,6 +147,13 @@ func (this *InclusiveGateway) SetExtensionElements(ref interface{}){
 }
 
 /** Remove reference ExtensionElements **/
+func (this *InclusiveGateway) RemoveExtensionElements(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionElements)
+	if toDelete.GetUUID() == this.M_extensionElements.GetUUID() {
+		this.M_extensionElements = nil
+	}
+}
 
 /** ExtensionDefinitions **/
 func (this *InclusiveGateway) GetExtensionDefinitions() []*ExtensionDefinition{
@@ -157,7 +166,7 @@ func (this *InclusiveGateway) SetExtensionDefinitions(ref interface{}){
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
 	for i:=0; i<len(this.M_extensionDefinitions); i++ {
-		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
+		if this.M_extensionDefinitions[i].GetUUID() != ref.(*ExtensionDefinition).GetUUID() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
 			isExist = true
@@ -171,6 +180,17 @@ func (this *InclusiveGateway) SetExtensionDefinitions(ref interface{}){
 }
 
 /** Remove reference ExtensionDefinitions **/
+func (this *InclusiveGateway) RemoveExtensionDefinitions(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionDefinition)
+	extensionDefinitions_ := make([]*ExtensionDefinition, 0)
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
+		if toDelete.GetUUID() != this.M_extensionDefinitions[i].GetUUID() {
+			extensionDefinitions_ = append(extensionDefinitions_, this.M_extensionDefinitions[i])
+		}
+	}
+	this.M_extensionDefinitions = extensionDefinitions_
+}
 
 /** ExtensionValues **/
 func (this *InclusiveGateway) GetExtensionValues() []*ExtensionAttributeValue{
@@ -197,6 +217,17 @@ func (this *InclusiveGateway) SetExtensionValues(ref interface{}){
 }
 
 /** Remove reference ExtensionValues **/
+func (this *InclusiveGateway) RemoveExtensionValues(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionAttributeValue)
+	extensionValues_ := make([]*ExtensionAttributeValue, 0)
+	for i := 0; i < len(this.M_extensionValues); i++ {
+		if toDelete.GetUUID() != this.M_extensionValues[i].GetUUID() {
+			extensionValues_ = append(extensionValues_, this.M_extensionValues[i])
+		}
+	}
+	this.M_extensionValues = extensionValues_
+}
 
 /** Documentation **/
 func (this *InclusiveGateway) GetDocumentation() []*Documentation{

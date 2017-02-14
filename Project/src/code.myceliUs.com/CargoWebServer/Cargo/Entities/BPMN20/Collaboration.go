@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 type Collaboration interface{
@@ -29,17 +31,21 @@ type Collaboration interface{
 
 	/** Participant **/
 	GetParticipant() []*Participant
+	SetParticipant(interface{}) 
 
 	/** MessageFlow **/
 	GetMessageFlow() []*MessageFlow
+	SetMessageFlow(interface{}) 
 
 	/** CorrelationKey **/
 	GetCorrelationKey() []*CorrelationKey
 
 	/** ConversationNode **/
 	GetConversationNode() []ConversationNode
+	SetConversationNode(interface{}) 
 
 	/** ConversationLink **/
 	GetConversationLink() []*ConversationLink
+	SetConversationLink(interface{}) 
 
 }

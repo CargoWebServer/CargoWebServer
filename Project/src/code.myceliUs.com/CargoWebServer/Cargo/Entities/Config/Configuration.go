@@ -1,3 +1,5 @@
+// +build Config
+
 package Config
 
 type Configuration interface{

@@ -116,7 +116,7 @@ WorkflowManager.prototype.getDefinitionsById = function (id, successCallback, er
     // server is the client side singleton...
     var params = []
     params.push(createRpcData(id, "STRING", "id"))
-    
+
     // Call it on the server.
     server.executeJsFunction(
         GetDefinitionsById.toString(), // The function to execute remotely on server
@@ -244,7 +244,7 @@ WorkflowManager.prototype.getDefinitionInstances = function (definitions, succes
     // server is the client side singleton...
     var params = []
     params.push(createRpcData(definitions.UUID, "STRING", "definitionsUUID"))
-    
+
     // Call it on the server.
     server.executeJsFunction(
         GetDefinitionInstances.toString(), // The function to execute remotely on server
@@ -338,7 +338,7 @@ WorkflowManager.prototype.newItemAwareElementInstance = function (bpmnElementId,
     )
 }
 
-/*
+/**
  * Start a new process instance.
  */
 function StartProcess(processUUID, eventData, eventDefinitionData) {
@@ -374,4 +374,90 @@ WorkflowManager.prototype.startProcess = function (processUUID, eventData, event
     )
 }
 
+/*
+ * Serve side code
+ */
+function GetActiveProcessInstances(bpmnElementId) {
+    server.GetWorkflowProcessor().GetActiveProcessInstances(bpmnElementId, messageId, sessionId)
+}
 
+/**
+ * Get the list of active process instances for a bpmn process with given uuid.
+ */
+WorkflowManager.prototype.getActiveProcessInstances = function (uuid, successCallback, errorCallback, caller) {
+
+    // server is the client side singleton...
+    var params = []
+    params.push(createRpcData(uuid, "STRING", "uuid"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        GetActiveProcessInstances.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            var entities = []
+            if (result[0] != undefined) {
+                for (var i = 0; i < result[0].length; i++) {
+                    var entity = eval("new " + result[0][i].TYPENAME + "(caller.prototype)")
+                    entity.initCallback = function (entities, count, caller) {
+                        return function (entity) {
+                            entities.push(entity)
+                            server.entityManager.setEntity(entity)
+                            if (count == entities.length) {
+                                caller.successCallback(entities, caller.caller)
+                            }
+                        }
+                    } (entities, result[0].length, caller)
+                    entity.init(result[0][i])
+                }
+            }
+            if (result[0] == null) {
+                caller.successCallback(entities, caller.caller)
+            }
+        },
+        function (errMsg) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Serve side code
+ */
+function ActivateActivityInstance(instanceUuid) {
+    server.GetWorkflowProcessor().ActivateActivityInstance(instanceUuid, messageId, sessionId)
+}
+
+/**
+ * Run an activity with a given uuid.
+ */
+WorkflowManager.prototype.activateActivityInstance = function (uuid, successCallback, errorCallback, caller) {
+
+    // server is the client side singleton...
+    var params = []
+    params.push(createRpcData(uuid, "STRING", "uuid"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        ActivateActivityInstance.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            // Nothing to do here.
+        },
+        function (errMsg) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}

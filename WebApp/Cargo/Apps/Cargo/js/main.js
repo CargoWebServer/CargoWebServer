@@ -41,6 +41,9 @@ var server = new Server("localhost", "127.0.0.1", 9393)
  */
 var main = null
 
+// If the bpmn service is use..
+var BPMS = false
+
 /*
  * Append load function to the windows load event listener.
  */
@@ -55,7 +58,6 @@ function load() {
             // Create the listener
             server.accountManager = new AccountManager()
             server.sessionManager = new SessionManager()
-            server.workflowManager = new WorkflowManager()
             server.errorManager = new ErrorManager()
             server.fileManager = new FileManager()
             server.entityManager = new EntityManager()
@@ -67,13 +69,16 @@ function load() {
             // Register the listener to the server.
             server.accountManager.RegisterListener()
             server.sessionManager.RegisterListener()
-            server.workflowManager.RegisterListener()
             server.fileManager.RegisterListener()
             server.entityManager.RegisterListener()
             server.dataManager.RegisterListener()
             server.emailManager.RegisterListener()
             server.projectManager.RegisterListener()
             //server.securityManager.RegisterListener()
+            if (BPMS) {
+                server.workflowManager = new WorkflowManager()
+                server.workflowManager.RegisterListener()
+            }
 
         },  // onOpen callback
         function () { // onClose callback

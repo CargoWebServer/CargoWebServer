@@ -279,16 +279,11 @@ Server.prototype.setSessionId = function () {
                 // Go to the main entry point
                 // Append the listener for the entity.
                 // The session listener.
-                //server.entityManager.getEntityPrototypes("BPMN20", function(result, caller){
-                //server.entityManager.getEntityPrototypes("BPMS_Runtime", function(result, caller){
                 server.entityManager.getEntityPrototypes("Config", function (result, caller) {
                     server.entityManager.getEntityPrototypes("CargoEntities", function (result, caller) {
                         main()
                     }, function () {/* Error callback */ }, null)
                 }, function () {/* Error callback */ }, null)
-                // }, function(){/* Error callback */}, null)
-                // }, function(){/* Error callback */}, null)
-
             } else {
                 // I will show the project manager page.
                 // TODOO error 404

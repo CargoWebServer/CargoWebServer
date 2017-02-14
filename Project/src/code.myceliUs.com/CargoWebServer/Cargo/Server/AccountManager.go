@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 )
 
@@ -15,7 +14,6 @@ import (
  * This class implements functionalities to manage accounts
  */
 type AccountManager struct {
-	m_config *Config.ServiceConfiguration
 }
 
 var accountManager *AccountManager
@@ -44,7 +42,7 @@ func (this *Server) GetAccountManager() *AccountManager {
  */
 func (this *AccountManager) initialize() {
 
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	entities := GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities)
 	// Create the admin account if it doesn't exist
@@ -64,7 +62,6 @@ func (this *AccountManager) initialize() {
 		account.SetEntitiesPtr(entities)
 		// Save the account
 		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
-		log.Println("------> admin account was create: ", account)
 	}
 
 	// Create the guest account if it doesn't exist
@@ -99,10 +96,6 @@ func (this *AccountManager) start() {
 
 func (this *AccountManager) stop() {
 	log.Println("--> Stop AccountManager")
-}
-
-func (this *AccountManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 ////////////////////////////////////////////////////////////////////////////////

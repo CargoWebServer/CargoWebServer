@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 import(
@@ -144,6 +146,13 @@ func (this *ItemDefinition) SetExtensionElements(ref interface{}){
 }
 
 /** Remove reference ExtensionElements **/
+func (this *ItemDefinition) RemoveExtensionElements(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionElements)
+	if toDelete.GetUUID() == this.M_extensionElements.GetUUID() {
+		this.M_extensionElements = nil
+	}
+}
 
 /** ExtensionDefinitions **/
 func (this *ItemDefinition) GetExtensionDefinitions() []*ExtensionDefinition{
@@ -156,7 +165,7 @@ func (this *ItemDefinition) SetExtensionDefinitions(ref interface{}){
 	isExist := false
 	var extensionDefinitionss []*ExtensionDefinition
 	for i:=0; i<len(this.M_extensionDefinitions); i++ {
-		if this.M_extensionDefinitions[i].GetName() != ref.(*ExtensionDefinition).GetName() {
+		if this.M_extensionDefinitions[i].GetUUID() != ref.(*ExtensionDefinition).GetUUID() {
 			extensionDefinitionss = append(extensionDefinitionss, this.M_extensionDefinitions[i])
 		} else {
 			isExist = true
@@ -170,6 +179,17 @@ func (this *ItemDefinition) SetExtensionDefinitions(ref interface{}){
 }
 
 /** Remove reference ExtensionDefinitions **/
+func (this *ItemDefinition) RemoveExtensionDefinitions(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionDefinition)
+	extensionDefinitions_ := make([]*ExtensionDefinition, 0)
+	for i := 0; i < len(this.M_extensionDefinitions); i++ {
+		if toDelete.GetUUID() != this.M_extensionDefinitions[i].GetUUID() {
+			extensionDefinitions_ = append(extensionDefinitions_, this.M_extensionDefinitions[i])
+		}
+	}
+	this.M_extensionDefinitions = extensionDefinitions_
+}
 
 /** ExtensionValues **/
 func (this *ItemDefinition) GetExtensionValues() []*ExtensionAttributeValue{
@@ -196,6 +216,17 @@ func (this *ItemDefinition) SetExtensionValues(ref interface{}){
 }
 
 /** Remove reference ExtensionValues **/
+func (this *ItemDefinition) RemoveExtensionValues(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionAttributeValue)
+	extensionValues_ := make([]*ExtensionAttributeValue, 0)
+	for i := 0; i < len(this.M_extensionValues); i++ {
+		if toDelete.GetUUID() != this.M_extensionValues[i].GetUUID() {
+			extensionValues_ = append(extensionValues_, this.M_extensionValues[i])
+		}
+	}
+	this.M_extensionValues = extensionValues_
+}
 
 /** Documentation **/
 func (this *ItemDefinition) GetDocumentation() []*Documentation{
@@ -289,10 +320,19 @@ func (this *ItemDefinition) SetImport(ref interface{}){
 		this.M_import = ref.(string)
 	}else{
 		this.m_import = ref.(*Import)
+		this.M_import = ref.(*Import).GetUUID()
 	}
 }
 
 /** Remove reference Import **/
+func (this *ItemDefinition) RemoveImport(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*Import)
+	if toDelete.GetUUID() == this.m_import.GetUUID() {
+		this.m_import = nil
+		this.M_import = ""
+	}
+}
 
 /** Escalation **/
 func (this *ItemDefinition) GetEscalationPtr() []*Escalation{

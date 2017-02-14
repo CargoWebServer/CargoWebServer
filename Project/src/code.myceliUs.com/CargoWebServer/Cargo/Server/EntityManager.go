@@ -10,7 +10,6 @@ import (
 	"sync"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 )
 
@@ -31,7 +30,6 @@ type EntityRef struct {
 //						Entity Manager
 ////////////////////////////////////////////////////////////////////////////////
 type EntityManager struct {
-	m_config *Config.ServiceConfiguration
 
 	/**
 	 * ref -> entity
@@ -97,7 +95,7 @@ func (this *EntityManager) initialize() {
 	log.Println("--> Initialize EntityManager")
 
 	// Create the default configurations
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	gob.Register(map[string]interface{}{})
 	gob.Register([]interface{}{})
@@ -127,10 +125,6 @@ func (this *EntityManager) start() {
 
 func (this *EntityManager) stop() {
 	log.Println("--> Stop EntityManager")
-}
-
-func (this *EntityManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 /**
@@ -608,24 +602,12 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 /**
  * Return an entity with for a given type and id
  */
-func (this *EntityManager) getEntityById(typeName string, id string) (Entity, *CargoEntities.Error) {
+func (this *EntityManager) getEntityById(storeId string, typeName string, id string) (Entity, *CargoEntities.Error) {
 	// Verify that typeName is valid
 	// interface{} is an exception...
 	if !Utility.IsValidPackageName(typeName) && !strings.HasSuffix(typeName, "interface{}") {
 		cargoError := NewError(Utility.FileLine(), INVALID_PACKAGE_NAME_ERROR, SERVER_ERROR_CODE, errors.New("Type name '"+typeName+"' is not valid."))
 		return nil, cargoError
-	}
-
-	// Retreive the entity uuid.
-	storeId := typeName[:strings.Index(typeName, ".")]
-
-	// In case of bpmn usage...
-	if storeId == "DC" {
-		storeId = DCDB
-	} else if storeId == "DI" {
-		storeId = DIDB
-	} else if storeId == "BPMNDI" {
-		storeId = BPMNDIDB
 	}
 
 	// If the store is not found I will return an error.
@@ -1065,7 +1047,8 @@ func (this *EntityManager) InitEntity(entity Entity) {
 					refTarget, errObj = this.getEntityByUuid(refUUID)
 				} else if len(refUUID) > 0 {
 					// Here we have an id not a uuid...
-					refTarget, errObj = this.getEntityById(typeName, refUUID)
+					storeId := typeName[:strings.Index(typeName, ".")]
+					refTarget, errObj = this.getEntityById(storeId, typeName, refUUID)
 				}
 				// The set methode name...
 				if errObj == nil && refTarget != nil {
@@ -1382,9 +1365,9 @@ func (this *EntityManager) GetObjectByUuid(uuid string, messageId string, sessio
 /**
  * Return the underlying object, mostly use by the client side to get object..
  */
-func (this *EntityManager) GetObjectById(typeName string, id string, messageId string, sessionId string) interface{} {
+func (this *EntityManager) GetObjectById(storeId string, typeName string, id string, messageId string, sessionId string) interface{} {
 
-	entity, errObj := this.getEntityById(typeName, id)
+	entity, errObj := this.getEntityById(storeId, typeName, id)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil

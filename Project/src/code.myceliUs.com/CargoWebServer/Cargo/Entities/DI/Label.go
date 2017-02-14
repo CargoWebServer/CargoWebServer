@@ -1,3 +1,5 @@
+// +build DI
+
 package DI
 
 import(
@@ -12,5 +14,6 @@ type Label interface{
 
 	/** Bounds **/
 	GetBounds() *DC.Bounds
+	SetBounds(interface{}) 
 
 }

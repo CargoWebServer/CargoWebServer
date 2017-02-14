@@ -21,7 +21,6 @@ import (
 // The schemas manager.
 ////////////////////////////////////////////////////////////////////////////////
 type SchemaManager struct {
-	m_config *Config.ServiceConfiguration
 
 	// Map of schema
 	schemas map[string]*XML_Schemas.XSD_Schema
@@ -94,7 +93,7 @@ func newSchemaManager() *SchemaManager {
 func (this *SchemaManager) initialize() {
 
 	log.Println("--> Initialize SchemaManager")
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	// Here I will initialyse the schema found in the schema directory.
 	// Those schema must be xml schema...
@@ -192,10 +191,6 @@ func (this *SchemaManager) start() {
 
 func (this *SchemaManager) stop() {
 	log.Println("--> Stop SchemaManager")
-}
-
-func (this *SchemaManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 /**

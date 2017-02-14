@@ -1,63 +1,66 @@
+// +build BPMNDI
+
 package Server
-import(
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/BPMNDI"
+
+import (
 	"encoding/json"
-	"code.myceliUs.com/Utility"
 	"log"
 	"strings"
-)
 
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/BPMNDI"
+	"code.myceliUs.com/Utility"
+)
 
 ////////////////////////////////////////////////////////////////////////////////
 //              			BPMNDiagram
 ////////////////////////////////////////////////////////////////////////////////
 /** local type **/
-type BPMNDI_BPMNDiagramEntity struct{
+type BPMNDI_BPMNDiagramEntity struct {
 	/** not the object id, except for the definition **/
-	uuid string
-	parentPtr 			Entity
-	parentUuid 			string
-	childsPtr  			[]Entity
-	childsUuid  		[]string
-	referencesUuid  	[]string
-	referencesPtr  	    []Entity
-	prototype      		*EntityPrototype
-	referenced  		[]EntityRef
-	object *BPMNDI.BPMNDiagram
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	referenced     []EntityRef
+	object         *BPMNDI.BPMNDiagram
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewBPMNDIBPMNDiagramEntity(objectId string, object interface{}) *BPMNDI_BPMNDiagramEntity{
+func (this *EntityManager) NewBPMNDIBPMNDiagramEntity(objectId string, object interface{}) *BPMNDI_BPMNDiagramEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
-		if Utility.IsValidEntityReferenceName(objectId){
+		if Utility.IsValidEntityReferenceName(objectId) {
 			uuidStr = objectId
-		}else{
-			uuidStr  = BPMNDIBPMNDiagramExists(objectId)
+		} else {
+			uuidStr = BPMNDIBPMNDiagramExists(objectId)
 		}
 	}
-	if object != nil{
+	if object != nil {
 		object.(*BPMNDI.BPMNDiagram).TYPENAME = "BPMNDI.BPMNDiagram"
 	}
 	if len(uuidStr) > 0 {
-		if object != nil{
+		if object != nil {
 			object.(*BPMNDI.BPMNDiagram).UUID = uuidStr
 		}
-		if val, ok := this.contain(uuidStr);ok {
-			if object != nil{
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
 				this.setObjectValues(val, object)
 
 			}
 			return val.(*BPMNDI_BPMNDiagramEntity)
 		}
-	}else{
+	} else {
 		uuidStr = "BPMNDI.BPMNDiagram%" + Utility.RandomUUID()
 	}
 	entity := new(BPMNDI_BPMNDiagramEntity)
-	if object == nil{
+	if object == nil {
 		entity.object = new(BPMNDI.BPMNDiagram)
 		entity.SetNeedSave(true)
-	}else{
+	} else {
 		entity.object = object.(*BPMNDI.BPMNDiagram)
 		entity.SetNeedSave(true)
 	}
@@ -67,48 +70,48 @@ func (this *EntityManager) NewBPMNDIBPMNDiagramEntity(objectId string, object in
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNDiagram","BPMN20")
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNDiagram", "BPMN20")
 	entity.prototype = prototype
 	return entity
 }
 
 /** Entity functions **/
-func(this *BPMNDI_BPMNDiagramEntity) GetTypeName()string{
+func (this *BPMNDI_BPMNDiagramEntity) GetTypeName() string {
 	return "BPMNDI.BPMNDiagram"
 }
-func(this *BPMNDI_BPMNDiagramEntity) GetUuid()string{
+func (this *BPMNDI_BPMNDiagramEntity) GetUuid() string {
 	return this.uuid
 }
-func(this *BPMNDI_BPMNDiagramEntity) GetParentPtr()Entity{
+func (this *BPMNDI_BPMNDiagramEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) SetParentPtr(parentPtr Entity){
-	this.parentPtr=parentPtr
+func (this *BPMNDI_BPMNDiagramEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) AppendReferenced(name string, owner Entity){
+func (this *BPMNDI_BPMNDiagramEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
 	}
 	var ref EntityRef
 	ref.Name = name
 	ref.OwnerUuid = owner.GetUuid()
-	for i:=0; i<len(this.referenced); i++ {
-		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid { 
-			return;
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
 		}
 	}
 	this.referenced = append(this.referenced, ref)
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) GetReferenced() []EntityRef{
+func (this *BPMNDI_BPMNDiagramEntity) GetReferenced() []EntityRef {
 	return this.referenced
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) RemoveReferenced(name string, owner Entity) {
+func (this *BPMNDI_BPMNDiagramEntity) RemoveReferenced(name string, owner Entity) {
 	var referenced []EntityRef
-	referenced = make([]EntityRef,0)
+	referenced = make([]EntityRef, 0)
 	for i := 0; i < len(this.referenced); i++ {
 		ref := this.referenced[i]
 		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
@@ -119,7 +122,7 @@ func(this *BPMNDI_BPMNDiagramEntity) RemoveReferenced(name string, owner Entity)
 	this.referenced = referenced
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) RemoveReference(name string, reference Entity){
+func (this *BPMNDI_BPMNDiagramEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
 	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
@@ -139,96 +142,96 @@ func(this *BPMNDI_BPMNDiagramEntity) RemoveReference(name string, reference Enti
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) GetChildsPtr() []Entity{
+func (this *BPMNDI_BPMNDiagramEntity) GetChildsPtr() []Entity {
 	return this.childsPtr
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) SetChildsPtr(childsPtr[]Entity){
+func (this *BPMNDI_BPMNDiagramEntity) SetChildsPtr(childsPtr []Entity) {
 	this.childsPtr = childsPtr
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) GetChildsUuid() []string{
+func (this *BPMNDI_BPMNDiagramEntity) GetChildsUuid() []string {
 	return this.childsUuid
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) SetChildsUuid(childsUuid[]string){
+func (this *BPMNDI_BPMNDiagramEntity) SetChildsUuid(childsUuid []string) {
 	this.childsUuid = childsUuid
 }
 
 /**
  * Remove a chidl uuid form the list of child in an entity.
  */
-func(this *BPMNDI_BPMNDiagramEntity) RemoveChild(name string, uuid string) {
- 	childsUuid := make([]string, 0)
- 	for i := 0; i < len(this.GetChildsUuid()); i++ {
- 		if this.GetChildsUuid()[i] != uuid {
- 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
- 		}
- 	}
- 
- 	this.childsUuid = childsUuid
+func (this *BPMNDI_BPMNDiagramEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
 	params := make([]interface{}, 1)
- 	childsPtr := make([]Entity, 0)
- 	for i := 0; i < len(this.GetChildsPtr()); i++ {
- 		if this.GetChildsPtr()[i].GetUuid() != uuid {
- 			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
- 		}else{
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
 			params[0] = this.GetChildsPtr()[i].GetObject()
- 		}
- 	}
- 	this.childsPtr = childsPtr
+		}
+	}
+	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
- }
+}
 
-func(this *BPMNDI_BPMNDiagramEntity) GetReferencesUuid() []string{
+func (this *BPMNDI_BPMNDiagramEntity) GetReferencesUuid() []string {
 	return this.referencesUuid
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) SetReferencesUuid(refsUuid[]string){
+func (this *BPMNDI_BPMNDiagramEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) GetReferencesPtr() []Entity{
+func (this *BPMNDI_BPMNDiagramEntity) GetReferencesPtr() []Entity {
 	return this.referencesPtr
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) SetReferencesPtr(refsPtr[]Entity){
+func (this *BPMNDI_BPMNDiagramEntity) SetReferencesPtr(refsPtr []Entity) {
 	this.referencesPtr = refsPtr
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) GetObject() interface{}{
+func (this *BPMNDI_BPMNDiagramEntity) GetObject() interface{} {
 	return this.object
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) NeedSave() bool{
+func (this *BPMNDI_BPMNDiagramEntity) NeedSave() bool {
 	return this.object.NeedSave
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) SetNeedSave(needSave bool) {
+func (this *BPMNDI_BPMNDiagramEntity) SetNeedSave(needSave bool) {
 	this.object.NeedSave = needSave
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) IsInit() bool{
+func (this *BPMNDI_BPMNDiagramEntity) IsInit() bool {
 	return this.object.IsInit
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) SetInit(isInit bool) {
+func (this *BPMNDI_BPMNDiagramEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) GetChecksum() string{
+func (this *BPMNDI_BPMNDiagramEntity) GetChecksum() string {
 	objectStr, _ := json.Marshal(this.object)
-	return  Utility.GetMD5Hash(string(objectStr))
+	return Utility.GetMD5Hash(string(objectStr))
 }
 
-func(this *BPMNDI_BPMNDiagramEntity) Exist() bool{
+func (this *BPMNDI_BPMNDiagramEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "BPMNDI.BPMNDiagram"
 	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -241,72 +244,73 @@ func(this *BPMNDI_BPMNDiagramEntity) Exist() bool{
 
 /**
 * Return the entity prototype.
-*/
-func(this *BPMNDI_BPMNDiagramEntity) GetPrototype() *EntityPrototype {
+ */
+func (this *BPMNDI_BPMNDiagramEntity) GetPrototype() *EntityPrototype {
 	return this.prototype
 }
+
 /** Entity Prototype creation **/
 func (this *EntityManager) create_BPMNDI_BPMNDiagramEntityPrototype() {
 
 	var bPMNDiagramEntityProto EntityPrototype
 	bPMNDiagramEntityProto.TypeName = "BPMNDI.BPMNDiagram"
 	bPMNDiagramEntityProto.SuperTypeNames = append(bPMNDiagramEntityProto.SuperTypeNames, "DI.Diagram")
-	bPMNDiagramEntityProto.Ids = append(bPMNDiagramEntityProto.Ids,"uuid")
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"uuid")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"xs.string")
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,0)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,false)
-	bPMNDiagramEntityProto.Indexs = append(bPMNDiagramEntityProto.Indexs,"parentUuid")
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"parentUuid")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"xs.string")
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,1)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,false)
+	bPMNDiagramEntityProto.Ids = append(bPMNDiagramEntityProto.Ids, "uuid")
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "uuid")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "xs.string")
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 0)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, false)
+	bPMNDiagramEntityProto.Indexs = append(bPMNDiagramEntityProto.Indexs, "parentUuid")
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "parentUuid")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "xs.string")
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 1)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, false)
 
 	/** members of Diagram **/
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,2)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,true)
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"M_rootElement")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"BPMNDI.DI.DiagramElement")
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,3)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,true)
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"M_name")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"xs.string")
-	bPMNDiagramEntityProto.Ids = append(bPMNDiagramEntityProto.Ids,"M_id")
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,4)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,true)
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"M_id")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"xs.ID")
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,5)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,true)
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"M_documentation")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"xs.string")
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,6)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,true)
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"M_resolution")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"xs.float64")
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,7)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,true)
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"M_ownedStyle")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"[]BPMNDI.DI.Style")
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 2)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, true)
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "M_rootElement")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "BPMNDI.DI.DiagramElement")
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 3)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, true)
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "M_name")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "xs.string")
+	bPMNDiagramEntityProto.Ids = append(bPMNDiagramEntityProto.Ids, "M_id")
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 4)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, true)
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "M_id")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "xs.ID")
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 5)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, true)
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "M_documentation")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "xs.string")
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 6)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, true)
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "M_resolution")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "xs.float64")
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 7)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, true)
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "M_ownedStyle")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "[]BPMNDI.DI.Style")
 
 	/** members of BPMNDiagram **/
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,8)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,true)
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"M_BPMNPlane")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"BPMNDI.BPMNPlane")
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,9)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,true)
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"M_BPMNLabelStyle")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"[]BPMNDI.BPMNLabelStyle")
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"childsUuid")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"[]xs.string")
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,10)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,false)
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 8)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, true)
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "M_BPMNPlane")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "BPMNDI.BPMNPlane")
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 9)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, true)
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "M_BPMNLabelStyle")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "[]BPMNDI.BPMNLabelStyle")
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "childsUuid")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "[]xs.string")
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 10)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, false)
 
-	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields,"referenced")
-	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType,"[]EntityRef")
-	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder,11)
-	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility,false)
+	bPMNDiagramEntityProto.Fields = append(bPMNDiagramEntityProto.Fields, "referenced")
+	bPMNDiagramEntityProto.FieldsType = append(bPMNDiagramEntityProto.FieldsType, "[]EntityRef")
+	bPMNDiagramEntityProto.FieldsOrder = append(bPMNDiagramEntityProto.FieldsOrder, 11)
+	bPMNDiagramEntityProto.FieldsVisibility = append(bPMNDiagramEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(BPMNDIDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&bPMNDiagramEntityProto)
@@ -349,7 +353,7 @@ func (this *BPMNDI_BPMNDiagramEntity) SaveEntity() {
 	BPMNDiagramInfo = append(BPMNDiagramInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		BPMNDiagramInfo = append(BPMNDiagramInfo, this.parentPtr.GetUuid())
-	}else{
+	} else {
 		BPMNDiagramInfo = append(BPMNDiagramInfo, "")
 	}
 
@@ -359,39 +363,39 @@ func (this *BPMNDI_BPMNDiagramEntity) SaveEntity() {
 	if this.object.M_rootElement != nil {
 		switch v := this.object.M_rootElement.(type) {
 		case *BPMNDI.BPMNShape:
-			rootElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
+			rootElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
 			BPMNDiagramInfo = append(BPMNDiagramInfo, rootElementEntity.uuid)
-		    rootElementEntity.AppendReferenced("rootElement", this)
-			this.AppendChild("rootElement",rootElementEntity)
+			rootElementEntity.AppendReferenced("rootElement", this)
+			this.AppendChild("rootElement", rootElementEntity)
 			if rootElementEntity.NeedSave() {
 				rootElementEntity.SaveEntity()
 			}
 		case *BPMNDI.BPMNPlane:
-			rootElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
+			rootElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
 			BPMNDiagramInfo = append(BPMNDiagramInfo, rootElementEntity.uuid)
-		    rootElementEntity.AppendReferenced("rootElement", this)
-			this.AppendChild("rootElement",rootElementEntity)
+			rootElementEntity.AppendReferenced("rootElement", this)
+			this.AppendChild("rootElement", rootElementEntity)
 			if rootElementEntity.NeedSave() {
 				rootElementEntity.SaveEntity()
 			}
 		case *BPMNDI.BPMNLabel:
-			rootElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
+			rootElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
 			BPMNDiagramInfo = append(BPMNDiagramInfo, rootElementEntity.uuid)
-		    rootElementEntity.AppendReferenced("rootElement", this)
-			this.AppendChild("rootElement",rootElementEntity)
+			rootElementEntity.AppendReferenced("rootElement", this)
+			this.AppendChild("rootElement", rootElementEntity)
 			if rootElementEntity.NeedSave() {
 				rootElementEntity.SaveEntity()
 			}
 		case *BPMNDI.BPMNEdge:
-			rootElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
+			rootElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
 			BPMNDiagramInfo = append(BPMNDiagramInfo, rootElementEntity.uuid)
-		    rootElementEntity.AppendReferenced("rootElement", this)
-			this.AppendChild("rootElement",rootElementEntity)
+			rootElementEntity.AppendReferenced("rootElement", this)
+			this.AppendChild("rootElement", rootElementEntity)
 			if rootElementEntity.NeedSave() {
 				rootElementEntity.SaveEntity()
 			}
-			}
-	}else{
+		}
+	} else {
 		BPMNDiagramInfo = append(BPMNDiagramInfo, "")
 	}
 	BPMNDiagramInfo = append(BPMNDiagramInfo, this.object.M_name)
@@ -400,17 +404,17 @@ func (this *BPMNDI_BPMNDiagramEntity) SaveEntity() {
 	BPMNDiagramInfo = append(BPMNDiagramInfo, this.object.M_resolution)
 
 	/** Save ownedStyle type Style **/
-	ownedStyleIds := make([]string,0)
+	ownedStyleIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_ownedStyle); i++ {
 		switch v := this.object.M_ownedStyle[i].(type) {
 		case *BPMNDI.BPMNLabelStyle:
-		ownedStyleEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelStyleEntity(v.UUID, v)
-		ownedStyleIds=append(ownedStyleIds,ownedStyleEntity.uuid)
-		ownedStyleEntity.AppendReferenced("ownedStyle", this)
-		this.AppendChild("ownedStyle",ownedStyleEntity)
-		if ownedStyleEntity.NeedSave() {
-			ownedStyleEntity.SaveEntity()
-		}
+			ownedStyleEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelStyleEntity(v.UUID, v)
+			ownedStyleIds = append(ownedStyleIds, ownedStyleEntity.uuid)
+			ownedStyleEntity.AppendReferenced("ownedStyle", this)
+			this.AppendChild("ownedStyle", ownedStyleEntity)
+			if ownedStyleEntity.NeedSave() {
+				ownedStyleEntity.SaveEntity()
+			}
 		}
 	}
 	ownedStyleStr, _ := json.Marshal(ownedStyleIds)
@@ -420,24 +424,24 @@ func (this *BPMNDI_BPMNDiagramEntity) SaveEntity() {
 
 	/** Save BPMNPlane type BPMNPlane **/
 	if this.object.M_BPMNPlane != nil {
-		BPMNPlaneEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(this.object.M_BPMNPlane.UUID, this.object.M_BPMNPlane)
+		BPMNPlaneEntity := GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(this.object.M_BPMNPlane.UUID, this.object.M_BPMNPlane)
 		BPMNDiagramInfo = append(BPMNDiagramInfo, BPMNPlaneEntity.uuid)
 		BPMNPlaneEntity.AppendReferenced("BPMNPlane", this)
-		this.AppendChild("BPMNPlane",BPMNPlaneEntity)
+		this.AppendChild("BPMNPlane", BPMNPlaneEntity)
 		if BPMNPlaneEntity.NeedSave() {
 			BPMNPlaneEntity.SaveEntity()
 		}
-	}else{
+	} else {
 		BPMNDiagramInfo = append(BPMNDiagramInfo, "")
 	}
 
 	/** Save BPMNLabelStyle type BPMNLabelStyle **/
-	BPMNLabelStyleIds := make([]string,0)
+	BPMNLabelStyleIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_BPMNLabelStyle); i++ {
-		BPMNLabelStyleEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelStyleEntity(this.object.M_BPMNLabelStyle[i].UUID,this.object.M_BPMNLabelStyle[i])
-		BPMNLabelStyleIds=append(BPMNLabelStyleIds,BPMNLabelStyleEntity.uuid)
+		BPMNLabelStyleEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelStyleEntity(this.object.M_BPMNLabelStyle[i].UUID, this.object.M_BPMNLabelStyle[i])
+		BPMNLabelStyleIds = append(BPMNLabelStyleIds, BPMNLabelStyleEntity.uuid)
 		BPMNLabelStyleEntity.AppendReferenced("BPMNLabelStyle", this)
-		this.AppendChild("BPMNLabelStyle",BPMNLabelStyleEntity)
+		this.AppendChild("BPMNLabelStyle", BPMNLabelStyleEntity)
 		if BPMNLabelStyleEntity.NeedSave() {
 			BPMNLabelStyleEntity.SaveEntity()
 		}
@@ -464,7 +468,7 @@ func (this *BPMNDI_BPMNDiagramEntity) SaveEntity() {
 	} else {
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 		queryStr, _ := json.Marshal(query)
-		_, err =  GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNDiagramInfo)
+		_, err = GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNDiagramInfo)
 	}
 	if err == nil {
 		GetServer().GetEntityManager().insert(this)
@@ -474,7 +478,7 @@ func (this *BPMNDI_BPMNDiagramEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *BPMNDI_BPMNDiagramEntity) InitEntity(id string) error{
+func (this *BPMNDI_BPMNDiagramEntity) InitEntity(id string) error {
 	if this.object.IsInit == true {
 		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
 		if err == nil {
@@ -523,7 +527,7 @@ func (this *BPMNDI_BPMNDiagramEntity) InitEntity(id string) error{
 	// Initialisation of information of BPMNDiagram...
 	if len(results) > 0 {
 
-	/** initialyzation of the entity object **/
+		/** initialyzation of the entity object **/
 		this.object = new(BPMNDI.BPMNDiagram)
 		this.object.UUID = this.uuid
 		this.object.TYPENAME = "BPMNDI.BPMNDiagram"
@@ -533,163 +537,163 @@ func (this *BPMNDI_BPMNDiagramEntity) InitEntity(id string) error{
 		/** members of Diagram **/
 
 		/** rootElement **/
- 		if results[0][2] != nil{
-			uuid :=results[0][2].(string)
+		if results[0][2] != nil {
+			uuid := results[0][2].(string)
 			if len(uuid) > 0 {
 				typeName := uuid[0:strings.Index(uuid, "%")]
-				if err!=nil{
+				if err != nil {
 					log.Println("type ", typeName, " not found!")
 					return err
 				}
-			if typeName == "BPMNDI.BPMNPlane"{
-				if len(uuid) > 0 {
-					var rootElementEntity *BPMNDI_BPMNPlaneEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						rootElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
-					}else{
-						rootElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuid, nil)
-						rootElementEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(rootElementEntity)
+				if typeName == "BPMNDI.BPMNShape" {
+					if len(uuid) > 0 {
+						var rootElementEntity *BPMNDI_BPMNShapeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							rootElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
+						} else {
+							rootElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuid, nil)
+							rootElementEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(rootElementEntity)
+						}
+						rootElementEntity.AppendReferenced("rootElement", this)
+						this.AppendChild("rootElement", rootElementEntity)
 					}
-					rootElementEntity.AppendReferenced("rootElement", this)
-					this.AppendChild("rootElement",rootElementEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNLabel"{
-				if len(uuid) > 0 {
-					var rootElementEntity *BPMNDI_BPMNLabelEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						rootElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
-					}else{
-						rootElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuid, nil)
-						rootElementEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(rootElementEntity)
+				} else if typeName == "BPMNDI.BPMNPlane" {
+					if len(uuid) > 0 {
+						var rootElementEntity *BPMNDI_BPMNPlaneEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							rootElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
+						} else {
+							rootElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuid, nil)
+							rootElementEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(rootElementEntity)
+						}
+						rootElementEntity.AppendReferenced("rootElement", this)
+						this.AppendChild("rootElement", rootElementEntity)
 					}
-					rootElementEntity.AppendReferenced("rootElement", this)
-					this.AppendChild("rootElement",rootElementEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNShape"{
-				if len(uuid) > 0 {
-					var rootElementEntity *BPMNDI_BPMNShapeEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						rootElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
-					}else{
-						rootElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuid, nil)
-						rootElementEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(rootElementEntity)
+				} else if typeName == "BPMNDI.BPMNLabel" {
+					if len(uuid) > 0 {
+						var rootElementEntity *BPMNDI_BPMNLabelEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							rootElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
+						} else {
+							rootElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuid, nil)
+							rootElementEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(rootElementEntity)
+						}
+						rootElementEntity.AppendReferenced("rootElement", this)
+						this.AppendChild("rootElement", rootElementEntity)
 					}
-					rootElementEntity.AppendReferenced("rootElement", this)
-					this.AppendChild("rootElement",rootElementEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNEdge"{
-				if len(uuid) > 0 {
-					var rootElementEntity *BPMNDI_BPMNEdgeEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						rootElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
-					}else{
-						rootElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuid, nil)
-						rootElementEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(rootElementEntity)
+				} else if typeName == "BPMNDI.BPMNEdge" {
+					if len(uuid) > 0 {
+						var rootElementEntity *BPMNDI_BPMNEdgeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							rootElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
+						} else {
+							rootElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuid, nil)
+							rootElementEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(rootElementEntity)
+						}
+						rootElementEntity.AppendReferenced("rootElement", this)
+						this.AppendChild("rootElement", rootElementEntity)
 					}
-					rootElementEntity.AppendReferenced("rootElement", this)
-					this.AppendChild("rootElement",rootElementEntity)
 				}
 			}
-			}
- 		}
+		}
 
 		/** name **/
- 		if results[0][3] != nil{
- 			this.object.M_name=results[0][3].(string)
- 		}
+		if results[0][3] != nil {
+			this.object.M_name = results[0][3].(string)
+		}
 
 		/** id **/
- 		if results[0][4] != nil{
- 			this.object.M_id=results[0][4].(string)
- 		}
+		if results[0][4] != nil {
+			this.object.M_id = results[0][4].(string)
+		}
 
 		/** documentation **/
- 		if results[0][5] != nil{
- 			this.object.M_documentation=results[0][5].(string)
- 		}
+		if results[0][5] != nil {
+			this.object.M_documentation = results[0][5].(string)
+		}
 
 		/** resolution **/
- 		if results[0][6] != nil{
- 			this.object.M_resolution=results[0][6].(float64)
- 		}
+		if results[0][6] != nil {
+			this.object.M_resolution = results[0][6].(float64)
+		}
 
 		/** ownedStyle **/
- 		if results[0][7] != nil{
-			uuidsStr :=results[0][7].(string)
-			uuids :=make([]string,0)
+		if results[0][7] != nil {
+			uuidsStr := results[0][7].(string)
+			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(uuids); i++{
-			typeName := uuids[i][0:strings.Index(uuids[i], "%")]
-			if err!=nil{
-				log.Println("type ", typeName, " not found!")
-				return err
-			}
-				if typeName == "BPMNDI.BPMNLabelStyle"{
-						if len(uuids[i]) > 0 {
-							var ownedStyleEntity *BPMNDI_BPMNLabelStyleEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedStyleEntity = instance.(*BPMNDI_BPMNLabelStyleEntity)
-							}else{
-								ownedStyleEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelStyleEntity(uuids[i], nil)
-								ownedStyleEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedStyleEntity)
-							}
-							ownedStyleEntity.AppendReferenced("ownedStyle", this)
-							this.AppendChild("ownedStyle",ownedStyleEntity)
-						}
+			for i := 0; i < len(uuids); i++ {
+				typeName := uuids[i][0:strings.Index(uuids[i], "%")]
+				if err != nil {
+					log.Println("type ", typeName, " not found!")
+					return err
 				}
- 			}
- 		}
+				if typeName == "BPMNDI.BPMNLabelStyle" {
+					if len(uuids[i]) > 0 {
+						var ownedStyleEntity *BPMNDI_BPMNLabelStyleEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedStyleEntity = instance.(*BPMNDI_BPMNLabelStyleEntity)
+						} else {
+							ownedStyleEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelStyleEntity(uuids[i], nil)
+							ownedStyleEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedStyleEntity)
+						}
+						ownedStyleEntity.AppendReferenced("ownedStyle", this)
+						this.AppendChild("ownedStyle", ownedStyleEntity)
+					}
+				}
+			}
+		}
 
 		/** members of BPMNDiagram **/
 
 		/** BPMNPlane **/
- 		if results[0][8] != nil{
-			uuid :=results[0][8].(string)
+		if results[0][8] != nil {
+			uuid := results[0][8].(string)
 			if len(uuid) > 0 {
 				var BPMNPlaneEntity *BPMNDI_BPMNPlaneEntity
 				if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
 					BPMNPlaneEntity = instance.(*BPMNDI_BPMNPlaneEntity)
-				}else{
+				} else {
 					BPMNPlaneEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuid, nil)
 					BPMNPlaneEntity.InitEntity(uuid)
-					GetServer().GetEntityManager().insert( BPMNPlaneEntity)
+					GetServer().GetEntityManager().insert(BPMNPlaneEntity)
 				}
 				BPMNPlaneEntity.AppendReferenced("BPMNPlane", this)
-				this.AppendChild("BPMNPlane",BPMNPlaneEntity)
+				this.AppendChild("BPMNPlane", BPMNPlaneEntity)
 			}
- 		}
+		}
 
 		/** BPMNLabelStyle **/
- 		if results[0][9] != nil{
-			uuidsStr :=results[0][9].(string)
-			uuids :=make([]string,0)
+		if results[0][9] != nil {
+			uuidsStr := results[0][9].(string)
+			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(uuids); i++{
+			for i := 0; i < len(uuids); i++ {
 				if len(uuids[i]) > 0 {
 					var BPMNLabelStyleEntity *BPMNDI_BPMNLabelStyleEntity
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						BPMNLabelStyleEntity = instance.(*BPMNDI_BPMNLabelStyleEntity)
-					}else{
+					} else {
 						BPMNLabelStyleEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelStyleEntity(uuids[i], nil)
 						BPMNLabelStyleEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(BPMNLabelStyleEntity)
 					}
 					BPMNLabelStyleEntity.AppendReferenced("BPMNLabelStyle", this)
-					this.AppendChild("BPMNLabelStyle",BPMNLabelStyleEntity)
+					this.AppendChild("BPMNLabelStyle", BPMNLabelStyleEntity)
 				}
- 			}
- 		}
+			}
+		}
 		childsUuidStr := results[0][10].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -716,7 +720,7 @@ func (this *BPMNDI_BPMNDiagramEntity) InitEntity(id string) error{
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewBPMNDIBPMNDiagramEntityFromObject(object *BPMNDI.BPMNDiagram) *BPMNDI_BPMNDiagramEntity {
-	 return this.NewBPMNDIBPMNDiagramEntity(object.UUID, object)
+	return this.NewBPMNDIBPMNDiagramEntity(object.UUID, object)
 }
 
 /** Delete **/
@@ -730,7 +734,7 @@ func BPMNDIBPMNDiagramExists(val string) string {
 	query.TypeName = "BPMNDI.BPMNDiagram"
 	query.Indexs = append(query.Indexs, "M_id="+val)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -762,7 +766,7 @@ func (this *BPMNDI_BPMNDiagramEntity) AppendChild(attributeName string, child En
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
-	attributeName = strings.Replace(attributeName,"M_", "", -1)
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
 	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
 	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
 	if invalidMethod != nil {
@@ -770,77 +774,78 @@ func (this *BPMNDI_BPMNDiagramEntity) AppendChild(attributeName string, child En
 	}
 	return nil
 }
+
 /** Append reference entity into parent entity. **/
 func (this *BPMNDI_BPMNDiagramEntity) AppendReference(reference Entity) {
 
-	 // Here i will append the reference uuid
-	 index := -1
-	 for i := 0; i < len(this.referencesUuid); i++ {
-	 	refUuid := this.referencesUuid[i]
-	 	if refUuid == reference.GetUuid() {
-	 		index = i
-	 		break
-	 	}
-	 }
-	 if index == -1 {
-	 	this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-	 	this.referencesPtr = append(this.referencesPtr, reference)
-	 }else{
-	 	// The reference must be update in that case.
-	 	this.referencesPtr[index]  = reference
-	 }
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //              			BPMNPlane
 ////////////////////////////////////////////////////////////////////////////////
 /** local type **/
-type BPMNDI_BPMNPlaneEntity struct{
+type BPMNDI_BPMNPlaneEntity struct {
 	/** not the object id, except for the definition **/
-	uuid string
-	parentPtr 			Entity
-	parentUuid 			string
-	childsPtr  			[]Entity
-	childsUuid  		[]string
-	referencesUuid  	[]string
-	referencesPtr  	    []Entity
-	prototype      		*EntityPrototype
-	referenced  		[]EntityRef
-	object *BPMNDI.BPMNPlane
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	referenced     []EntityRef
+	object         *BPMNDI.BPMNPlane
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewBPMNDIBPMNPlaneEntity(objectId string, object interface{}) *BPMNDI_BPMNPlaneEntity{
+func (this *EntityManager) NewBPMNDIBPMNPlaneEntity(objectId string, object interface{}) *BPMNDI_BPMNPlaneEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
-		if Utility.IsValidEntityReferenceName(objectId){
+		if Utility.IsValidEntityReferenceName(objectId) {
 			uuidStr = objectId
-		}else{
-			uuidStr  = BPMNDIBPMNPlaneExists(objectId)
+		} else {
+			uuidStr = BPMNDIBPMNPlaneExists(objectId)
 		}
 	}
-	if object != nil{
+	if object != nil {
 		object.(*BPMNDI.BPMNPlane).TYPENAME = "BPMNDI.BPMNPlane"
 	}
 	if len(uuidStr) > 0 {
-		if object != nil{
+		if object != nil {
 			object.(*BPMNDI.BPMNPlane).UUID = uuidStr
 		}
-		if val, ok := this.contain(uuidStr);ok {
-			if object != nil{
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
 				this.setObjectValues(val, object)
 
 			}
 			return val.(*BPMNDI_BPMNPlaneEntity)
 		}
-	}else{
+	} else {
 		uuidStr = "BPMNDI.BPMNPlane%" + Utility.RandomUUID()
 	}
 	entity := new(BPMNDI_BPMNPlaneEntity)
-	if object == nil{
+	if object == nil {
 		entity.object = new(BPMNDI.BPMNPlane)
 		entity.SetNeedSave(true)
-	}else{
+	} else {
 		entity.object = object.(*BPMNDI.BPMNPlane)
 		entity.SetNeedSave(true)
 	}
@@ -850,48 +855,48 @@ func (this *EntityManager) NewBPMNDIBPMNPlaneEntity(objectId string, object inte
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNPlane","BPMN20")
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNPlane", "BPMN20")
 	entity.prototype = prototype
 	return entity
 }
 
 /** Entity functions **/
-func(this *BPMNDI_BPMNPlaneEntity) GetTypeName()string{
+func (this *BPMNDI_BPMNPlaneEntity) GetTypeName() string {
 	return "BPMNDI.BPMNPlane"
 }
-func(this *BPMNDI_BPMNPlaneEntity) GetUuid()string{
+func (this *BPMNDI_BPMNPlaneEntity) GetUuid() string {
 	return this.uuid
 }
-func(this *BPMNDI_BPMNPlaneEntity) GetParentPtr()Entity{
+func (this *BPMNDI_BPMNPlaneEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) SetParentPtr(parentPtr Entity){
-	this.parentPtr=parentPtr
+func (this *BPMNDI_BPMNPlaneEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) AppendReferenced(name string, owner Entity){
+func (this *BPMNDI_BPMNPlaneEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
 	}
 	var ref EntityRef
 	ref.Name = name
 	ref.OwnerUuid = owner.GetUuid()
-	for i:=0; i<len(this.referenced); i++ {
-		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid { 
-			return;
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
 		}
 	}
 	this.referenced = append(this.referenced, ref)
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) GetReferenced() []EntityRef{
+func (this *BPMNDI_BPMNPlaneEntity) GetReferenced() []EntityRef {
 	return this.referenced
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) RemoveReferenced(name string, owner Entity) {
+func (this *BPMNDI_BPMNPlaneEntity) RemoveReferenced(name string, owner Entity) {
 	var referenced []EntityRef
-	referenced = make([]EntityRef,0)
+	referenced = make([]EntityRef, 0)
 	for i := 0; i < len(this.referenced); i++ {
 		ref := this.referenced[i]
 		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
@@ -902,7 +907,7 @@ func(this *BPMNDI_BPMNPlaneEntity) RemoveReferenced(name string, owner Entity) {
 	this.referenced = referenced
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) RemoveReference(name string, reference Entity){
+func (this *BPMNDI_BPMNPlaneEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
 	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
@@ -922,96 +927,96 @@ func(this *BPMNDI_BPMNPlaneEntity) RemoveReference(name string, reference Entity
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) GetChildsPtr() []Entity{
+func (this *BPMNDI_BPMNPlaneEntity) GetChildsPtr() []Entity {
 	return this.childsPtr
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) SetChildsPtr(childsPtr[]Entity){
+func (this *BPMNDI_BPMNPlaneEntity) SetChildsPtr(childsPtr []Entity) {
 	this.childsPtr = childsPtr
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) GetChildsUuid() []string{
+func (this *BPMNDI_BPMNPlaneEntity) GetChildsUuid() []string {
 	return this.childsUuid
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) SetChildsUuid(childsUuid[]string){
+func (this *BPMNDI_BPMNPlaneEntity) SetChildsUuid(childsUuid []string) {
 	this.childsUuid = childsUuid
 }
 
 /**
  * Remove a chidl uuid form the list of child in an entity.
  */
-func(this *BPMNDI_BPMNPlaneEntity) RemoveChild(name string, uuid string) {
- 	childsUuid := make([]string, 0)
- 	for i := 0; i < len(this.GetChildsUuid()); i++ {
- 		if this.GetChildsUuid()[i] != uuid {
- 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
- 		}
- 	}
- 
- 	this.childsUuid = childsUuid
+func (this *BPMNDI_BPMNPlaneEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
 	params := make([]interface{}, 1)
- 	childsPtr := make([]Entity, 0)
- 	for i := 0; i < len(this.GetChildsPtr()); i++ {
- 		if this.GetChildsPtr()[i].GetUuid() != uuid {
- 			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
- 		}else{
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
 			params[0] = this.GetChildsPtr()[i].GetObject()
- 		}
- 	}
- 	this.childsPtr = childsPtr
+		}
+	}
+	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
- }
+}
 
-func(this *BPMNDI_BPMNPlaneEntity) GetReferencesUuid() []string{
+func (this *BPMNDI_BPMNPlaneEntity) GetReferencesUuid() []string {
 	return this.referencesUuid
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) SetReferencesUuid(refsUuid[]string){
+func (this *BPMNDI_BPMNPlaneEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) GetReferencesPtr() []Entity{
+func (this *BPMNDI_BPMNPlaneEntity) GetReferencesPtr() []Entity {
 	return this.referencesPtr
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) SetReferencesPtr(refsPtr[]Entity){
+func (this *BPMNDI_BPMNPlaneEntity) SetReferencesPtr(refsPtr []Entity) {
 	this.referencesPtr = refsPtr
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) GetObject() interface{}{
+func (this *BPMNDI_BPMNPlaneEntity) GetObject() interface{} {
 	return this.object
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) NeedSave() bool{
+func (this *BPMNDI_BPMNPlaneEntity) NeedSave() bool {
 	return this.object.NeedSave
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) SetNeedSave(needSave bool) {
+func (this *BPMNDI_BPMNPlaneEntity) SetNeedSave(needSave bool) {
 	this.object.NeedSave = needSave
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) IsInit() bool{
+func (this *BPMNDI_BPMNPlaneEntity) IsInit() bool {
 	return this.object.IsInit
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) SetInit(isInit bool) {
+func (this *BPMNDI_BPMNPlaneEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) GetChecksum() string{
+func (this *BPMNDI_BPMNPlaneEntity) GetChecksum() string {
 	objectStr, _ := json.Marshal(this.object)
-	return  Utility.GetMD5Hash(string(objectStr))
+	return Utility.GetMD5Hash(string(objectStr))
 }
 
-func(this *BPMNDI_BPMNPlaneEntity) Exist() bool{
+func (this *BPMNDI_BPMNPlaneEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "BPMNDI.BPMNPlane"
 	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -1024,10 +1029,11 @@ func(this *BPMNDI_BPMNPlaneEntity) Exist() bool{
 
 /**
 * Return the entity prototype.
-*/
-func(this *BPMNDI_BPMNPlaneEntity) GetPrototype() *EntityPrototype {
+ */
+func (this *BPMNDI_BPMNPlaneEntity) GetPrototype() *EntityPrototype {
 	return this.prototype
 }
+
 /** Entity Prototype creation **/
 func (this *EntityManager) create_BPMNDI_BPMNPlaneEntityPrototype() {
 
@@ -1036,85 +1042,85 @@ func (this *EntityManager) create_BPMNDI_BPMNPlaneEntityPrototype() {
 	bPMNPlaneEntityProto.SuperTypeNames = append(bPMNPlaneEntityProto.SuperTypeNames, "DI.DiagramElement")
 	bPMNPlaneEntityProto.SuperTypeNames = append(bPMNPlaneEntityProto.SuperTypeNames, "DI.Node")
 	bPMNPlaneEntityProto.SuperTypeNames = append(bPMNPlaneEntityProto.SuperTypeNames, "DI.Plane")
-	bPMNPlaneEntityProto.Ids = append(bPMNPlaneEntityProto.Ids,"uuid")
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"uuid")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"xs.string")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,0)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,false)
-	bPMNPlaneEntityProto.Indexs = append(bPMNPlaneEntityProto.Indexs,"parentUuid")
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"parentUuid")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"xs.string")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,1)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,false)
+	bPMNPlaneEntityProto.Ids = append(bPMNPlaneEntityProto.Ids, "uuid")
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "uuid")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "xs.string")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 0)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, false)
+	bPMNPlaneEntityProto.Indexs = append(bPMNPlaneEntityProto.Indexs, "parentUuid")
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "parentUuid")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "xs.string")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 1)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, false)
 
 	/** members of DiagramElement **/
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,2)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,true)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_owningDiagram")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"BPMNDI.DI.Diagram:Ref")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,3)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,true)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_owningElement")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"BPMNDI.DI.DiagramElement:Ref")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,4)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,true)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_modelElement")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"xs.interface{}:Ref")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,5)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,true)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_style")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"BPMNDI.DI.Style:Ref")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,6)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,true)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_ownedElement")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"[]BPMNDI.DI.DiagramElement")
-	bPMNPlaneEntityProto.Ids = append(bPMNPlaneEntityProto.Ids,"M_id")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,7)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,true)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_id")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"xs.ID")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 2)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, true)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_owningDiagram")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "BPMNDI.DI.Diagram:Ref")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 3)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, true)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_owningElement")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "BPMNDI.DI.DiagramElement:Ref")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 4)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, true)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_modelElement")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "xs.interface{}:Ref")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 5)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, true)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_style")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "BPMNDI.DI.Style:Ref")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 6)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, true)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_ownedElement")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "[]BPMNDI.DI.DiagramElement")
+	bPMNPlaneEntityProto.Ids = append(bPMNPlaneEntityProto.Ids, "M_id")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 7)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, true)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_id")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "xs.ID")
 
 	/** members of Node **/
 	/** No members **/
 
 	/** members of Plane **/
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,8)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,true)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_DiagramElement")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"[]BPMNDI.DI.DiagramElement")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 8)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, true)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_DiagramElement")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "[]BPMNDI.DI.DiagramElement")
 
 	/** members of BPMNPlane **/
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,9)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,true)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_bpmnElement")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"xs.interface{}:Ref")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 9)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, true)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_bpmnElement")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "xs.interface{}:Ref")
 
 	/** associations of BPMNPlane **/
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,10)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,false)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_diagramPtr")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"BPMNDI.BPMNDiagram:Ref")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,11)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,false)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_sourceEdgePtr")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"[]BPMNDI.DI.Edge:Ref")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,12)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,false)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_targetEdgePtr")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"[]BPMNDI.DI.Edge:Ref")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,13)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,false)
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"M_planePtr")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"BPMNDI.DI.Plane:Ref")
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"childsUuid")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"[]xs.string")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,14)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,false)
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 10)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, false)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_diagramPtr")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "BPMNDI.BPMNDiagram:Ref")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 11)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, false)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_sourceEdgePtr")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "[]BPMNDI.DI.Edge:Ref")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 12)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, false)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_targetEdgePtr")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "[]BPMNDI.DI.Edge:Ref")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 13)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, false)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "M_planePtr")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "BPMNDI.DI.Plane:Ref")
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "childsUuid")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "[]xs.string")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 14)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, false)
 
-	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields,"referenced")
-	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType,"[]EntityRef")
-	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder,15)
-	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility,false)
+	bPMNPlaneEntityProto.Fields = append(bPMNPlaneEntityProto.Fields, "referenced")
+	bPMNPlaneEntityProto.FieldsType = append(bPMNPlaneEntityProto.FieldsType, "[]EntityRef")
+	bPMNPlaneEntityProto.FieldsOrder = append(bPMNPlaneEntityProto.FieldsOrder, 15)
+	bPMNPlaneEntityProto.FieldsVisibility = append(bPMNPlaneEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(BPMNDIDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&bPMNPlaneEntityProto)
@@ -1155,7 +1161,7 @@ func (this *BPMNDI_BPMNPlaneEntity) SaveEntity() {
 	/** members of BPMNPlane **/
 	query.Fields = append(query.Fields, "M_bpmnElement")
 
-		/** associations of BPMNPlane **/
+	/** associations of BPMNPlane **/
 	query.Fields = append(query.Fields, "M_diagramPtr")
 	query.Fields = append(query.Fields, "M_sourceEdgePtr")
 	query.Fields = append(query.Fields, "M_targetEdgePtr")
@@ -1168,58 +1174,58 @@ func (this *BPMNDI_BPMNPlaneEntity) SaveEntity() {
 	BPMNPlaneInfo = append(BPMNPlaneInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		BPMNPlaneInfo = append(BPMNPlaneInfo, this.parentPtr.GetUuid())
-	}else{
+	} else {
 		BPMNPlaneInfo = append(BPMNPlaneInfo, "")
 	}
 
 	/** members of DiagramElement **/
 
 	/** Save owningDiagram type Diagram **/
-		BPMNPlaneInfo = append(BPMNPlaneInfo,this.object.M_owningDiagram)
+	BPMNPlaneInfo = append(BPMNPlaneInfo, this.object.M_owningDiagram)
 
 	/** Save owningElement type DiagramElement **/
-		BPMNPlaneInfo = append(BPMNPlaneInfo,this.object.M_owningElement)
+	BPMNPlaneInfo = append(BPMNPlaneInfo, this.object.M_owningElement)
 	BPMNPlaneInfo = append(BPMNPlaneInfo, this.object.M_modelElement)
 
 	/** Save style type Style **/
-		BPMNPlaneInfo = append(BPMNPlaneInfo,this.object.M_style)
+	BPMNPlaneInfo = append(BPMNPlaneInfo, this.object.M_style)
 
 	/** Save ownedElement type DiagramElement **/
-	ownedElementIds := make([]string,0)
+	ownedElementIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_ownedElement); i++ {
 		switch v := this.object.M_ownedElement[i].(type) {
-		case *BPMNDI.BPMNLabel:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
 		case *BPMNDI.BPMNShape:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
 		case *BPMNDI.BPMNPlane:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
+		case *BPMNDI.BPMNLabel:
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
 		case *BPMNDI.BPMNEdge:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
 		}
 	}
 	ownedElementStr, _ := json.Marshal(ownedElementIds)
@@ -1232,41 +1238,41 @@ func (this *BPMNDI_BPMNPlaneEntity) SaveEntity() {
 	/** members of Plane **/
 
 	/** Save DiagramElement type DiagramElement **/
-	DiagramElementIds := make([]string,0)
+	DiagramElementIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_DiagramElement); i++ {
 		switch v := this.object.M_DiagramElement[i].(type) {
 		case *BPMNDI.BPMNShape:
-		DiagramElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
-		DiagramElementIds=append(DiagramElementIds,DiagramElementEntity.uuid)
-		DiagramElementEntity.AppendReferenced("DiagramElement", this)
-		this.AppendChild("DiagramElement",DiagramElementEntity)
-		if DiagramElementEntity.NeedSave() {
-			DiagramElementEntity.SaveEntity()
-		}
+			DiagramElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
+			DiagramElementIds = append(DiagramElementIds, DiagramElementEntity.uuid)
+			DiagramElementEntity.AppendReferenced("DiagramElement", this)
+			this.AppendChild("DiagramElement", DiagramElementEntity)
+			if DiagramElementEntity.NeedSave() {
+				DiagramElementEntity.SaveEntity()
+			}
 		case *BPMNDI.BPMNPlane:
-		DiagramElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
-		DiagramElementIds=append(DiagramElementIds,DiagramElementEntity.uuid)
-		DiagramElementEntity.AppendReferenced("DiagramElement", this)
-		this.AppendChild("DiagramElement",DiagramElementEntity)
-		if DiagramElementEntity.NeedSave() {
-			DiagramElementEntity.SaveEntity()
-		}
+			DiagramElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
+			DiagramElementIds = append(DiagramElementIds, DiagramElementEntity.uuid)
+			DiagramElementEntity.AppendReferenced("DiagramElement", this)
+			this.AppendChild("DiagramElement", DiagramElementEntity)
+			if DiagramElementEntity.NeedSave() {
+				DiagramElementEntity.SaveEntity()
+			}
 		case *BPMNDI.BPMNLabel:
-		DiagramElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
-		DiagramElementIds=append(DiagramElementIds,DiagramElementEntity.uuid)
-		DiagramElementEntity.AppendReferenced("DiagramElement", this)
-		this.AppendChild("DiagramElement",DiagramElementEntity)
-		if DiagramElementEntity.NeedSave() {
-			DiagramElementEntity.SaveEntity()
-		}
+			DiagramElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
+			DiagramElementIds = append(DiagramElementIds, DiagramElementEntity.uuid)
+			DiagramElementEntity.AppendReferenced("DiagramElement", this)
+			this.AppendChild("DiagramElement", DiagramElementEntity)
+			if DiagramElementEntity.NeedSave() {
+				DiagramElementEntity.SaveEntity()
+			}
 		case *BPMNDI.BPMNEdge:
-		DiagramElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
-		DiagramElementIds=append(DiagramElementIds,DiagramElementEntity.uuid)
-		DiagramElementEntity.AppendReferenced("DiagramElement", this)
-		this.AppendChild("DiagramElement",DiagramElementEntity)
-		if DiagramElementEntity.NeedSave() {
-			DiagramElementEntity.SaveEntity()
-		}
+			DiagramElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
+			DiagramElementIds = append(DiagramElementIds, DiagramElementEntity.uuid)
+			DiagramElementEntity.AppendReferenced("DiagramElement", this)
+			this.AppendChild("DiagramElement", DiagramElementEntity)
+			if DiagramElementEntity.NeedSave() {
+				DiagramElementEntity.SaveEntity()
+			}
 		}
 	}
 	DiagramElementStr, _ := json.Marshal(DiagramElementIds)
@@ -1278,7 +1284,7 @@ func (this *BPMNDI_BPMNPlaneEntity) SaveEntity() {
 	/** associations of BPMNPlane **/
 
 	/** Save diagram type BPMNDiagram **/
-		BPMNPlaneInfo = append(BPMNPlaneInfo,this.object.M_diagramPtr)
+	BPMNPlaneInfo = append(BPMNPlaneInfo, this.object.M_diagramPtr)
 
 	/** Save sourceEdge type Edge **/
 	sourceEdgePtrStr, _ := json.Marshal(this.object.M_sourceEdgePtr)
@@ -1289,7 +1295,7 @@ func (this *BPMNDI_BPMNPlaneEntity) SaveEntity() {
 	BPMNPlaneInfo = append(BPMNPlaneInfo, string(targetEdgePtrStr))
 
 	/** Save plane type Plane **/
-		BPMNPlaneInfo = append(BPMNPlaneInfo,this.object.M_planePtr)
+	BPMNPlaneInfo = append(BPMNPlaneInfo, this.object.M_planePtr)
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	BPMNPlaneInfo = append(BPMNPlaneInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -1310,7 +1316,7 @@ func (this *BPMNDI_BPMNPlaneEntity) SaveEntity() {
 	} else {
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 		queryStr, _ := json.Marshal(query)
-		_, err =  GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNPlaneInfo)
+		_, err = GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNPlaneInfo)
 	}
 	if err == nil {
 		GetServer().GetEntityManager().insert(this)
@@ -1320,7 +1326,7 @@ func (this *BPMNDI_BPMNPlaneEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *BPMNDI_BPMNPlaneEntity) InitEntity(id string) error{
+func (this *BPMNDI_BPMNPlaneEntity) InitEntity(id string) error {
 	if this.object.IsInit == true {
 		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
 		if err == nil {
@@ -1357,7 +1363,7 @@ func (this *BPMNDI_BPMNPlaneEntity) InitEntity(id string) error{
 	/** members of BPMNPlane **/
 	query.Fields = append(query.Fields, "M_bpmnElement")
 
-		/** associations of BPMNPlane **/
+	/** associations of BPMNPlane **/
 	query.Fields = append(query.Fields, "M_diagramPtr")
 	query.Fields = append(query.Fields, "M_sourceEdgePtr")
 	query.Fields = append(query.Fields, "M_targetEdgePtr")
@@ -1380,7 +1386,7 @@ func (this *BPMNDI_BPMNPlaneEntity) InitEntity(id string) error{
 	// Initialisation of information of BPMNPlane...
 	if len(results) > 0 {
 
-	/** initialyzation of the entity object **/
+		/** initialyzation of the entity object **/
 		this.object = new(BPMNDI.BPMNPlane)
 		this.object.UUID = this.uuid
 		this.object.TYPENAME = "BPMNDI.BPMNPlane"
@@ -1390,123 +1396,123 @@ func (this *BPMNDI_BPMNPlaneEntity) InitEntity(id string) error{
 		/** members of DiagramElement **/
 
 		/** owningDiagram **/
- 		if results[0][2] != nil{
-			id :=results[0][2].(string)
+		if results[0][2] != nil {
+			id := results[0][2].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Diagram"
-				id_:= refTypeName + "$$" + id
-				this.object.M_owningDiagram= id
-				GetServer().GetEntityManager().appendReference("owningDiagram",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Diagram"
+				id_ := refTypeName + "$$" + id
+				this.object.M_owningDiagram = id
+				GetServer().GetEntityManager().appendReference("owningDiagram", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** owningElement **/
- 		if results[0][3] != nil{
-			id :=results[0][3].(string)
+		if results[0][3] != nil {
+			id := results[0][3].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.DiagramElement"
-				id_:= refTypeName + "$$" + id
-				this.object.M_owningElement= id
-				GetServer().GetEntityManager().appendReference("owningElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.DiagramElement"
+				id_ := refTypeName + "$$" + id
+				this.object.M_owningElement = id
+				GetServer().GetEntityManager().appendReference("owningElement", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** modelElement **/
- 		if results[0][4] != nil{
-			id :=results[0][4].(string)
+		if results[0][4] != nil {
+			id := results[0][4].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.interface{}"
-				id_:= refTypeName + "$$" + id
-				this.object.M_modelElement= id
-				GetServer().GetEntityManager().appendReference("modelElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.interface{}"
+				id_ := refTypeName + "$$" + id
+				this.object.M_modelElement = id
+				GetServer().GetEntityManager().appendReference("modelElement", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** style **/
- 		if results[0][5] != nil{
-			id :=results[0][5].(string)
+		if results[0][5] != nil {
+			id := results[0][5].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Style"
-				id_:= refTypeName + "$$" + id
-				this.object.M_style= id
-				GetServer().GetEntityManager().appendReference("style",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Style"
+				id_ := refTypeName + "$$" + id
+				this.object.M_style = id
+				GetServer().GetEntityManager().appendReference("style", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** ownedElement **/
- 		if results[0][6] != nil{
-			uuidsStr :=results[0][6].(string)
-			uuids :=make([]string,0)
+		if results[0][6] != nil {
+			uuidsStr := results[0][6].(string)
+			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(uuids); i++{
-			typeName := uuids[i][0:strings.Index(uuids[i], "%")]
-			if err!=nil{
-				log.Println("type ", typeName, " not found!")
-				return err
-			}
-				if typeName == "BPMNDI.BPMNEdge"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNEdgeEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNShape"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNShapeEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNPlane"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNPlaneEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNLabel"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNLabelEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
+			for i := 0; i < len(uuids); i++ {
+				typeName := uuids[i][0:strings.Index(uuids[i], "%")]
+				if err != nil {
+					log.Println("type ", typeName, " not found!")
+					return err
 				}
- 			}
- 		}
+				if typeName == "BPMNDI.BPMNShape" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNShapeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNPlane" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNPlaneEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNLabel" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNLabelEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNEdge" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNEdgeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				}
+			}
+		}
 
 		/** id **/
- 		if results[0][7] != nil{
- 			this.object.M_id=results[0][7].(string)
- 		}
+		if results[0][7] != nil {
+			this.object.M_id = results[0][7].(string)
+		}
 
 		/** members of Node **/
 		/** No members **/
@@ -1514,148 +1520,148 @@ func (this *BPMNDI_BPMNPlaneEntity) InitEntity(id string) error{
 		/** members of Plane **/
 
 		/** DiagramElement **/
- 		if results[0][8] != nil{
-			uuidsStr :=results[0][8].(string)
-			uuids :=make([]string,0)
+		if results[0][8] != nil {
+			uuidsStr := results[0][8].(string)
+			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(uuids); i++{
-			typeName := uuids[i][0:strings.Index(uuids[i], "%")]
-			if err!=nil{
-				log.Println("type ", typeName, " not found!")
-				return err
-			}
-				if typeName == "BPMNDI.BPMNEdge"{
-						if len(uuids[i]) > 0 {
-							var DiagramElementEntity *BPMNDI_BPMNEdgeEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								DiagramElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
-							}else{
-								DiagramElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuids[i], nil)
-								DiagramElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(DiagramElementEntity)
-							}
-							DiagramElementEntity.AppendReferenced("DiagramElement", this)
-							this.AppendChild("DiagramElement",DiagramElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNShape"{
-						if len(uuids[i]) > 0 {
-							var DiagramElementEntity *BPMNDI_BPMNShapeEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								DiagramElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
-							}else{
-								DiagramElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuids[i], nil)
-								DiagramElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(DiagramElementEntity)
-							}
-							DiagramElementEntity.AppendReferenced("DiagramElement", this)
-							this.AppendChild("DiagramElement",DiagramElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNPlane"{
-						if len(uuids[i]) > 0 {
-							var DiagramElementEntity *BPMNDI_BPMNPlaneEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								DiagramElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
-							}else{
-								DiagramElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuids[i], nil)
-								DiagramElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(DiagramElementEntity)
-							}
-							DiagramElementEntity.AppendReferenced("DiagramElement", this)
-							this.AppendChild("DiagramElement",DiagramElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNLabel"{
-						if len(uuids[i]) > 0 {
-							var DiagramElementEntity *BPMNDI_BPMNLabelEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								DiagramElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
-							}else{
-								DiagramElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
-								DiagramElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(DiagramElementEntity)
-							}
-							DiagramElementEntity.AppendReferenced("DiagramElement", this)
-							this.AppendChild("DiagramElement",DiagramElementEntity)
-						}
+			for i := 0; i < len(uuids); i++ {
+				typeName := uuids[i][0:strings.Index(uuids[i], "%")]
+				if err != nil {
+					log.Println("type ", typeName, " not found!")
+					return err
 				}
- 			}
- 		}
+				if typeName == "BPMNDI.BPMNShape" {
+					if len(uuids[i]) > 0 {
+						var DiagramElementEntity *BPMNDI_BPMNShapeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							DiagramElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
+						} else {
+							DiagramElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuids[i], nil)
+							DiagramElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(DiagramElementEntity)
+						}
+						DiagramElementEntity.AppendReferenced("DiagramElement", this)
+						this.AppendChild("DiagramElement", DiagramElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNPlane" {
+					if len(uuids[i]) > 0 {
+						var DiagramElementEntity *BPMNDI_BPMNPlaneEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							DiagramElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
+						} else {
+							DiagramElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuids[i], nil)
+							DiagramElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(DiagramElementEntity)
+						}
+						DiagramElementEntity.AppendReferenced("DiagramElement", this)
+						this.AppendChild("DiagramElement", DiagramElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNLabel" {
+					if len(uuids[i]) > 0 {
+						var DiagramElementEntity *BPMNDI_BPMNLabelEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							DiagramElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
+						} else {
+							DiagramElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
+							DiagramElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(DiagramElementEntity)
+						}
+						DiagramElementEntity.AppendReferenced("DiagramElement", this)
+						this.AppendChild("DiagramElement", DiagramElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNEdge" {
+					if len(uuids[i]) > 0 {
+						var DiagramElementEntity *BPMNDI_BPMNEdgeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							DiagramElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
+						} else {
+							DiagramElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuids[i], nil)
+							DiagramElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(DiagramElementEntity)
+						}
+						DiagramElementEntity.AppendReferenced("DiagramElement", this)
+						this.AppendChild("DiagramElement", DiagramElementEntity)
+					}
+				}
+			}
+		}
 
 		/** members of BPMNPlane **/
 
 		/** bpmnElement **/
- 		if results[0][9] != nil{
-			id :=results[0][9].(string)
+		if results[0][9] != nil {
+			id := results[0][9].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.interface{}"
-				id_:= refTypeName + "$$" + id
-				this.object.M_bpmnElement= id
-				GetServer().GetEntityManager().appendReference("bpmnElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.interface{}"
+				id_ := refTypeName + "$$" + id
+				this.object.M_bpmnElement = id
+				GetServer().GetEntityManager().appendReference("bpmnElement", this.object.UUID, id_)
 				this.object.M_bpmnElement = id
 			}
- 		}
+		}
 
 		/** associations of BPMNPlane **/
 
 		/** diagramPtr **/
- 		if results[0][10] != nil{
-			id :=results[0][10].(string)
+		if results[0][10] != nil {
+			id := results[0][10].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.BPMNDiagram"
-				id_:= refTypeName + "$$" + id
-				this.object.M_diagramPtr= id
-				GetServer().GetEntityManager().appendReference("diagramPtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.BPMNDiagram"
+				id_ := refTypeName + "$$" + id
+				this.object.M_diagramPtr = id
+				GetServer().GetEntityManager().appendReference("diagramPtr", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** sourceEdgePtr **/
- 		if results[0][11] != nil{
-			idsStr :=results[0][11].(string)
-			ids :=make([]string,0)
+		if results[0][11] != nil {
+			idsStr := results[0][11].(string)
+			ids := make([]string, 0)
 			err := json.Unmarshal([]byte(idsStr), &ids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(ids); i++{
+			for i := 0; i < len(ids); i++ {
 				if len(ids[i]) > 0 {
-					refTypeName:="BPMNDI.Edge"
-					id_:= refTypeName + "$$" + ids[i]
-					this.object.M_sourceEdgePtr = append(this.object.M_sourceEdgePtr,ids[i])
-					GetServer().GetEntityManager().appendReference("sourceEdgePtr",this.object.UUID, id_)
+					refTypeName := "BPMNDI.Edge"
+					id_ := refTypeName + "$$" + ids[i]
+					this.object.M_sourceEdgePtr = append(this.object.M_sourceEdgePtr, ids[i])
+					GetServer().GetEntityManager().appendReference("sourceEdgePtr", this.object.UUID, id_)
 				}
 			}
- 		}
+		}
 
 		/** targetEdgePtr **/
- 		if results[0][12] != nil{
-			idsStr :=results[0][12].(string)
-			ids :=make([]string,0)
+		if results[0][12] != nil {
+			idsStr := results[0][12].(string)
+			ids := make([]string, 0)
 			err := json.Unmarshal([]byte(idsStr), &ids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(ids); i++{
+			for i := 0; i < len(ids); i++ {
 				if len(ids[i]) > 0 {
-					refTypeName:="BPMNDI.Edge"
-					id_:= refTypeName + "$$" + ids[i]
-					this.object.M_targetEdgePtr = append(this.object.M_targetEdgePtr,ids[i])
-					GetServer().GetEntityManager().appendReference("targetEdgePtr",this.object.UUID, id_)
+					refTypeName := "BPMNDI.Edge"
+					id_ := refTypeName + "$$" + ids[i]
+					this.object.M_targetEdgePtr = append(this.object.M_targetEdgePtr, ids[i])
+					GetServer().GetEntityManager().appendReference("targetEdgePtr", this.object.UUID, id_)
 				}
 			}
- 		}
+		}
 
 		/** planePtr **/
- 		if results[0][13] != nil{
-			id :=results[0][13].(string)
+		if results[0][13] != nil {
+			id := results[0][13].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Plane"
-				id_:= refTypeName + "$$" + id
-				this.object.M_planePtr= id
-				GetServer().GetEntityManager().appendReference("planePtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Plane"
+				id_ := refTypeName + "$$" + id
+				this.object.M_planePtr = id
+				GetServer().GetEntityManager().appendReference("planePtr", this.object.UUID, id_)
 			}
- 		}
+		}
 		childsUuidStr := results[0][14].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -1682,7 +1688,7 @@ func (this *BPMNDI_BPMNPlaneEntity) InitEntity(id string) error{
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewBPMNDIBPMNPlaneEntityFromObject(object *BPMNDI.BPMNPlane) *BPMNDI_BPMNPlaneEntity {
-	 return this.NewBPMNDIBPMNPlaneEntity(object.UUID, object)
+	return this.NewBPMNDIBPMNPlaneEntity(object.UUID, object)
 }
 
 /** Delete **/
@@ -1696,7 +1702,7 @@ func BPMNDIBPMNPlaneExists(val string) string {
 	query.TypeName = "BPMNDI.BPMNPlane"
 	query.Indexs = append(query.Indexs, "M_id="+val)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -1728,7 +1734,7 @@ func (this *BPMNDI_BPMNPlaneEntity) AppendChild(attributeName string, child Enti
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
-	attributeName = strings.Replace(attributeName,"M_", "", -1)
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
 	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
 	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
 	if invalidMethod != nil {
@@ -1736,77 +1742,78 @@ func (this *BPMNDI_BPMNPlaneEntity) AppendChild(attributeName string, child Enti
 	}
 	return nil
 }
+
 /** Append reference entity into parent entity. **/
 func (this *BPMNDI_BPMNPlaneEntity) AppendReference(reference Entity) {
 
-	 // Here i will append the reference uuid
-	 index := -1
-	 for i := 0; i < len(this.referencesUuid); i++ {
-	 	refUuid := this.referencesUuid[i]
-	 	if refUuid == reference.GetUuid() {
-	 		index = i
-	 		break
-	 	}
-	 }
-	 if index == -1 {
-	 	this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-	 	this.referencesPtr = append(this.referencesPtr, reference)
-	 }else{
-	 	// The reference must be update in that case.
-	 	this.referencesPtr[index]  = reference
-	 }
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //              			BPMNShape
 ////////////////////////////////////////////////////////////////////////////////
 /** local type **/
-type BPMNDI_BPMNShapeEntity struct{
+type BPMNDI_BPMNShapeEntity struct {
 	/** not the object id, except for the definition **/
-	uuid string
-	parentPtr 			Entity
-	parentUuid 			string
-	childsPtr  			[]Entity
-	childsUuid  		[]string
-	referencesUuid  	[]string
-	referencesPtr  	    []Entity
-	prototype      		*EntityPrototype
-	referenced  		[]EntityRef
-	object *BPMNDI.BPMNShape
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	referenced     []EntityRef
+	object         *BPMNDI.BPMNShape
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewBPMNDIBPMNShapeEntity(objectId string, object interface{}) *BPMNDI_BPMNShapeEntity{
+func (this *EntityManager) NewBPMNDIBPMNShapeEntity(objectId string, object interface{}) *BPMNDI_BPMNShapeEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
-		if Utility.IsValidEntityReferenceName(objectId){
+		if Utility.IsValidEntityReferenceName(objectId) {
 			uuidStr = objectId
-		}else{
-			uuidStr  = BPMNDIBPMNShapeExists(objectId)
+		} else {
+			uuidStr = BPMNDIBPMNShapeExists(objectId)
 		}
 	}
-	if object != nil{
+	if object != nil {
 		object.(*BPMNDI.BPMNShape).TYPENAME = "BPMNDI.BPMNShape"
 	}
 	if len(uuidStr) > 0 {
-		if object != nil{
+		if object != nil {
 			object.(*BPMNDI.BPMNShape).UUID = uuidStr
 		}
-		if val, ok := this.contain(uuidStr);ok {
-			if object != nil{
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
 				this.setObjectValues(val, object)
 
 			}
 			return val.(*BPMNDI_BPMNShapeEntity)
 		}
-	}else{
+	} else {
 		uuidStr = "BPMNDI.BPMNShape%" + Utility.RandomUUID()
 	}
 	entity := new(BPMNDI_BPMNShapeEntity)
-	if object == nil{
+	if object == nil {
 		entity.object = new(BPMNDI.BPMNShape)
 		entity.SetNeedSave(true)
-	}else{
+	} else {
 		entity.object = object.(*BPMNDI.BPMNShape)
 		entity.SetNeedSave(true)
 	}
@@ -1816,48 +1823,48 @@ func (this *EntityManager) NewBPMNDIBPMNShapeEntity(objectId string, object inte
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNShape","BPMN20")
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNShape", "BPMN20")
 	entity.prototype = prototype
 	return entity
 }
 
 /** Entity functions **/
-func(this *BPMNDI_BPMNShapeEntity) GetTypeName()string{
+func (this *BPMNDI_BPMNShapeEntity) GetTypeName() string {
 	return "BPMNDI.BPMNShape"
 }
-func(this *BPMNDI_BPMNShapeEntity) GetUuid()string{
+func (this *BPMNDI_BPMNShapeEntity) GetUuid() string {
 	return this.uuid
 }
-func(this *BPMNDI_BPMNShapeEntity) GetParentPtr()Entity{
+func (this *BPMNDI_BPMNShapeEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
-func(this *BPMNDI_BPMNShapeEntity) SetParentPtr(parentPtr Entity){
-	this.parentPtr=parentPtr
+func (this *BPMNDI_BPMNShapeEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
 }
 
-func(this *BPMNDI_BPMNShapeEntity) AppendReferenced(name string, owner Entity){
+func (this *BPMNDI_BPMNShapeEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
 	}
 	var ref EntityRef
 	ref.Name = name
 	ref.OwnerUuid = owner.GetUuid()
-	for i:=0; i<len(this.referenced); i++ {
-		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid { 
-			return;
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
 		}
 	}
 	this.referenced = append(this.referenced, ref)
 }
 
-func(this *BPMNDI_BPMNShapeEntity) GetReferenced() []EntityRef{
+func (this *BPMNDI_BPMNShapeEntity) GetReferenced() []EntityRef {
 	return this.referenced
 }
 
-func(this *BPMNDI_BPMNShapeEntity) RemoveReferenced(name string, owner Entity) {
+func (this *BPMNDI_BPMNShapeEntity) RemoveReferenced(name string, owner Entity) {
 	var referenced []EntityRef
-	referenced = make([]EntityRef,0)
+	referenced = make([]EntityRef, 0)
 	for i := 0; i < len(this.referenced); i++ {
 		ref := this.referenced[i]
 		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
@@ -1868,7 +1875,7 @@ func(this *BPMNDI_BPMNShapeEntity) RemoveReferenced(name string, owner Entity) {
 	this.referenced = referenced
 }
 
-func(this *BPMNDI_BPMNShapeEntity) RemoveReference(name string, reference Entity){
+func (this *BPMNDI_BPMNShapeEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
 	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
@@ -1888,96 +1895,96 @@ func(this *BPMNDI_BPMNShapeEntity) RemoveReference(name string, reference Entity
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
 }
 
-func(this *BPMNDI_BPMNShapeEntity) GetChildsPtr() []Entity{
+func (this *BPMNDI_BPMNShapeEntity) GetChildsPtr() []Entity {
 	return this.childsPtr
 }
 
-func(this *BPMNDI_BPMNShapeEntity) SetChildsPtr(childsPtr[]Entity){
+func (this *BPMNDI_BPMNShapeEntity) SetChildsPtr(childsPtr []Entity) {
 	this.childsPtr = childsPtr
 }
 
-func(this *BPMNDI_BPMNShapeEntity) GetChildsUuid() []string{
+func (this *BPMNDI_BPMNShapeEntity) GetChildsUuid() []string {
 	return this.childsUuid
 }
 
-func(this *BPMNDI_BPMNShapeEntity) SetChildsUuid(childsUuid[]string){
+func (this *BPMNDI_BPMNShapeEntity) SetChildsUuid(childsUuid []string) {
 	this.childsUuid = childsUuid
 }
 
 /**
  * Remove a chidl uuid form the list of child in an entity.
  */
-func(this *BPMNDI_BPMNShapeEntity) RemoveChild(name string, uuid string) {
- 	childsUuid := make([]string, 0)
- 	for i := 0; i < len(this.GetChildsUuid()); i++ {
- 		if this.GetChildsUuid()[i] != uuid {
- 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
- 		}
- 	}
- 
- 	this.childsUuid = childsUuid
+func (this *BPMNDI_BPMNShapeEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
 	params := make([]interface{}, 1)
- 	childsPtr := make([]Entity, 0)
- 	for i := 0; i < len(this.GetChildsPtr()); i++ {
- 		if this.GetChildsPtr()[i].GetUuid() != uuid {
- 			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
- 		}else{
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
 			params[0] = this.GetChildsPtr()[i].GetObject()
- 		}
- 	}
- 	this.childsPtr = childsPtr
+		}
+	}
+	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
- }
+}
 
-func(this *BPMNDI_BPMNShapeEntity) GetReferencesUuid() []string{
+func (this *BPMNDI_BPMNShapeEntity) GetReferencesUuid() []string {
 	return this.referencesUuid
 }
 
-func(this *BPMNDI_BPMNShapeEntity) SetReferencesUuid(refsUuid[]string){
+func (this *BPMNDI_BPMNShapeEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
 }
 
-func(this *BPMNDI_BPMNShapeEntity) GetReferencesPtr() []Entity{
+func (this *BPMNDI_BPMNShapeEntity) GetReferencesPtr() []Entity {
 	return this.referencesPtr
 }
 
-func(this *BPMNDI_BPMNShapeEntity) SetReferencesPtr(refsPtr[]Entity){
+func (this *BPMNDI_BPMNShapeEntity) SetReferencesPtr(refsPtr []Entity) {
 	this.referencesPtr = refsPtr
 }
 
-func(this *BPMNDI_BPMNShapeEntity) GetObject() interface{}{
+func (this *BPMNDI_BPMNShapeEntity) GetObject() interface{} {
 	return this.object
 }
 
-func(this *BPMNDI_BPMNShapeEntity) NeedSave() bool{
+func (this *BPMNDI_BPMNShapeEntity) NeedSave() bool {
 	return this.object.NeedSave
 }
 
-func(this *BPMNDI_BPMNShapeEntity) SetNeedSave(needSave bool) {
+func (this *BPMNDI_BPMNShapeEntity) SetNeedSave(needSave bool) {
 	this.object.NeedSave = needSave
 }
 
-func(this *BPMNDI_BPMNShapeEntity) IsInit() bool{
+func (this *BPMNDI_BPMNShapeEntity) IsInit() bool {
 	return this.object.IsInit
 }
 
-func(this *BPMNDI_BPMNShapeEntity) SetInit(isInit bool) {
+func (this *BPMNDI_BPMNShapeEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
 }
 
-func(this *BPMNDI_BPMNShapeEntity) GetChecksum() string{
+func (this *BPMNDI_BPMNShapeEntity) GetChecksum() string {
 	objectStr, _ := json.Marshal(this.object)
-	return  Utility.GetMD5Hash(string(objectStr))
+	return Utility.GetMD5Hash(string(objectStr))
 }
 
-func(this *BPMNDI_BPMNShapeEntity) Exist() bool{
+func (this *BPMNDI_BPMNShapeEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "BPMNDI.BPMNShape"
 	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -1990,10 +1997,11 @@ func(this *BPMNDI_BPMNShapeEntity) Exist() bool{
 
 /**
 * Return the entity prototype.
-*/
-func(this *BPMNDI_BPMNShapeEntity) GetPrototype() *EntityPrototype {
+ */
+func (this *BPMNDI_BPMNShapeEntity) GetPrototype() *EntityPrototype {
 	return this.prototype
 }
+
 /** Entity Prototype creation **/
 func (this *EntityManager) create_BPMNDI_BPMNShapeEntityPrototype() {
 
@@ -2003,119 +2011,119 @@ func (this *EntityManager) create_BPMNDI_BPMNShapeEntityPrototype() {
 	bPMNShapeEntityProto.SuperTypeNames = append(bPMNShapeEntityProto.SuperTypeNames, "DI.Node")
 	bPMNShapeEntityProto.SuperTypeNames = append(bPMNShapeEntityProto.SuperTypeNames, "DI.Shape")
 	bPMNShapeEntityProto.SuperTypeNames = append(bPMNShapeEntityProto.SuperTypeNames, "DI.LabeledShape")
-	bPMNShapeEntityProto.Ids = append(bPMNShapeEntityProto.Ids,"uuid")
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"uuid")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"xs.string")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,0)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,false)
-	bPMNShapeEntityProto.Indexs = append(bPMNShapeEntityProto.Indexs,"parentUuid")
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"parentUuid")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"xs.string")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,1)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,false)
+	bPMNShapeEntityProto.Ids = append(bPMNShapeEntityProto.Ids, "uuid")
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "uuid")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "xs.string")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 0)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, false)
+	bPMNShapeEntityProto.Indexs = append(bPMNShapeEntityProto.Indexs, "parentUuid")
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "parentUuid")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "xs.string")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 1)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, false)
 
 	/** members of DiagramElement **/
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,2)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_owningDiagram")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"BPMNDI.DI.Diagram:Ref")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,3)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_owningElement")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"BPMNDI.DI.DiagramElement:Ref")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,4)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_modelElement")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"xs.interface{}:Ref")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,5)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_style")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"BPMNDI.DI.Style:Ref")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,6)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_ownedElement")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"[]BPMNDI.DI.DiagramElement")
-	bPMNShapeEntityProto.Ids = append(bPMNShapeEntityProto.Ids,"M_id")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,7)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_id")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"xs.ID")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 2)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_owningDiagram")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "BPMNDI.DI.Diagram:Ref")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 3)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_owningElement")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "BPMNDI.DI.DiagramElement:Ref")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 4)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_modelElement")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "xs.interface{}:Ref")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 5)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_style")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "BPMNDI.DI.Style:Ref")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 6)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_ownedElement")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "[]BPMNDI.DI.DiagramElement")
+	bPMNShapeEntityProto.Ids = append(bPMNShapeEntityProto.Ids, "M_id")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 7)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_id")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "xs.ID")
 
 	/** members of Node **/
 	/** No members **/
 
 	/** members of Shape **/
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,8)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_Bounds")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"BPMNDI.DC.Bounds")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 8)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_Bounds")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "BPMNDI.DC.Bounds")
 
 	/** members of LabeledShape **/
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,9)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_ownedLabel")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"[]BPMNDI.DI.Label")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 9)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_ownedLabel")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "[]BPMNDI.DI.Label")
 
 	/** members of BPMNShape **/
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,10)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_bpmnElement")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"xs.interface{}:Ref")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,11)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_isHorizontal")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"xs.bool")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,12)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_isExpanded")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"xs.bool")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,13)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_isMarkerVisible")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"xs.bool")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,14)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_BPMNLabel")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"BPMNDI.BPMNLabel")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,15)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_isMessageVisible")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"xs.bool")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,16)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_participantBandKind")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"enum:ParticipantBandKind_Top_initiating:ParticipantBandKind_Middle_initiating:ParticipantBandKind_Bottom_initiating:ParticipantBandKind_Top_non_initiating:ParticipantBandKind_Middle_non_initiating:ParticipantBandKind_Bottom_non_initiating")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,17)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,true)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_choreographyActivityShape")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"BPMNDI.BPMNShape:Ref")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 10)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_bpmnElement")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "xs.interface{}:Ref")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 11)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_isHorizontal")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "xs.boolean")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 12)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_isExpanded")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "xs.boolean")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 13)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_isMarkerVisible")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "xs.boolean")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 14)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_BPMNLabel")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "BPMNDI.BPMNLabel")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 15)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_isMessageVisible")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "xs.boolean")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 16)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_participantBandKind")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "enum:ParticipantBandKind_Top_initiating:ParticipantBandKind_Middle_initiating:ParticipantBandKind_Bottom_initiating:ParticipantBandKind_Top_non_initiating:ParticipantBandKind_Middle_non_initiating:ParticipantBandKind_Bottom_non_initiating")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 17)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, true)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_choreographyActivityShape")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "BPMNDI.BPMNShape:Ref")
 
 	/** associations of BPMNShape **/
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,18)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,false)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_participantBandShapePtr")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"BPMNDI.BPMNShape:Ref")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,19)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,false)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_sourceEdgePtr")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"[]BPMNDI.DI.Edge:Ref")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,20)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,false)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_targetEdgePtr")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"[]BPMNDI.DI.Edge:Ref")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,21)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,false)
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"M_planePtr")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"BPMNDI.DI.Plane:Ref")
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"childsUuid")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"[]xs.string")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,22)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,false)
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 18)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, false)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_participantBandShapePtr")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "BPMNDI.BPMNShape:Ref")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 19)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, false)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_sourceEdgePtr")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "[]BPMNDI.DI.Edge:Ref")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 20)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, false)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_targetEdgePtr")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "[]BPMNDI.DI.Edge:Ref")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 21)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, false)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "M_planePtr")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "BPMNDI.DI.Plane:Ref")
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "childsUuid")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "[]xs.string")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 22)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, false)
 
-	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields,"referenced")
-	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType,"[]EntityRef")
-	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder,23)
-	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility,false)
+	bPMNShapeEntityProto.Fields = append(bPMNShapeEntityProto.Fields, "referenced")
+	bPMNShapeEntityProto.FieldsType = append(bPMNShapeEntityProto.FieldsType, "[]EntityRef")
+	bPMNShapeEntityProto.FieldsOrder = append(bPMNShapeEntityProto.FieldsOrder, 23)
+	bPMNShapeEntityProto.FieldsVisibility = append(bPMNShapeEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(BPMNDIDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&bPMNShapeEntityProto)
@@ -2166,7 +2174,7 @@ func (this *BPMNDI_BPMNShapeEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_participantBandKind")
 	query.Fields = append(query.Fields, "M_choreographyActivityShape")
 
-		/** associations of BPMNShape **/
+	/** associations of BPMNShape **/
 	query.Fields = append(query.Fields, "M_participantBandShapePtr")
 	query.Fields = append(query.Fields, "M_sourceEdgePtr")
 	query.Fields = append(query.Fields, "M_targetEdgePtr")
@@ -2179,58 +2187,58 @@ func (this *BPMNDI_BPMNShapeEntity) SaveEntity() {
 	BPMNShapeInfo = append(BPMNShapeInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		BPMNShapeInfo = append(BPMNShapeInfo, this.parentPtr.GetUuid())
-	}else{
+	} else {
 		BPMNShapeInfo = append(BPMNShapeInfo, "")
 	}
 
 	/** members of DiagramElement **/
 
 	/** Save owningDiagram type Diagram **/
-		BPMNShapeInfo = append(BPMNShapeInfo,this.object.M_owningDiagram)
+	BPMNShapeInfo = append(BPMNShapeInfo, this.object.M_owningDiagram)
 
 	/** Save owningElement type DiagramElement **/
-		BPMNShapeInfo = append(BPMNShapeInfo,this.object.M_owningElement)
+	BPMNShapeInfo = append(BPMNShapeInfo, this.object.M_owningElement)
 	BPMNShapeInfo = append(BPMNShapeInfo, this.object.M_modelElement)
 
 	/** Save style type Style **/
-		BPMNShapeInfo = append(BPMNShapeInfo,this.object.M_style)
+	BPMNShapeInfo = append(BPMNShapeInfo, this.object.M_style)
 
 	/** Save ownedElement type DiagramElement **/
-	ownedElementIds := make([]string,0)
+	ownedElementIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_ownedElement); i++ {
 		switch v := this.object.M_ownedElement[i].(type) {
-		case *BPMNDI.BPMNShape:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
-		case *BPMNDI.BPMNPlane:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
 		case *BPMNDI.BPMNLabel:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
+		case *BPMNDI.BPMNShape:
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
+		case *BPMNDI.BPMNPlane:
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
 		case *BPMNDI.BPMNEdge:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
 		}
 	}
 	ownedElementStr, _ := json.Marshal(ownedElementIds)
@@ -2244,31 +2252,31 @@ func (this *BPMNDI_BPMNShapeEntity) SaveEntity() {
 
 	/** Save Bounds type Bounds **/
 	if this.object.M_Bounds != nil {
-		BoundsEntity:= GetServer().GetEntityManager().NewDCBoundsEntity(this.object.M_Bounds.UUID, this.object.M_Bounds)
+		BoundsEntity := GetServer().GetEntityManager().NewDCBoundsEntity(this.object.M_Bounds.UUID, this.object.M_Bounds)
 		BPMNShapeInfo = append(BPMNShapeInfo, BoundsEntity.uuid)
 		BoundsEntity.AppendReferenced("Bounds", this)
-		this.AppendChild("Bounds",BoundsEntity)
+		this.AppendChild("Bounds", BoundsEntity)
 		if BoundsEntity.NeedSave() {
 			BoundsEntity.SaveEntity()
 		}
-	}else{
+	} else {
 		BPMNShapeInfo = append(BPMNShapeInfo, "")
 	}
 
 	/** members of LabeledShape **/
 
 	/** Save ownedLabel type Label **/
-	ownedLabelIds := make([]string,0)
+	ownedLabelIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_ownedLabel); i++ {
 		switch v := this.object.M_ownedLabel[i].(type) {
 		case *BPMNDI.BPMNLabel:
-		ownedLabelEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
-		ownedLabelIds=append(ownedLabelIds,ownedLabelEntity.uuid)
-		ownedLabelEntity.AppendReferenced("ownedLabel", this)
-		this.AppendChild("ownedLabel",ownedLabelEntity)
-		if ownedLabelEntity.NeedSave() {
-			ownedLabelEntity.SaveEntity()
-		}
+			ownedLabelEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
+			ownedLabelIds = append(ownedLabelIds, ownedLabelEntity.uuid)
+			ownedLabelEntity.AppendReferenced("ownedLabel", this)
+			this.AppendChild("ownedLabel", ownedLabelEntity)
+			if ownedLabelEntity.NeedSave() {
+				ownedLabelEntity.SaveEntity()
+			}
 		}
 	}
 	ownedLabelStr, _ := json.Marshal(ownedLabelIds)
@@ -2282,42 +2290,42 @@ func (this *BPMNDI_BPMNShapeEntity) SaveEntity() {
 
 	/** Save BPMNLabel type BPMNLabel **/
 	if this.object.M_BPMNLabel != nil {
-		BPMNLabelEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(this.object.M_BPMNLabel.UUID, this.object.M_BPMNLabel)
+		BPMNLabelEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(this.object.M_BPMNLabel.UUID, this.object.M_BPMNLabel)
 		BPMNShapeInfo = append(BPMNShapeInfo, BPMNLabelEntity.uuid)
 		BPMNLabelEntity.AppendReferenced("BPMNLabel", this)
-		this.AppendChild("BPMNLabel",BPMNLabelEntity)
+		this.AppendChild("BPMNLabel", BPMNLabelEntity)
 		if BPMNLabelEntity.NeedSave() {
 			BPMNLabelEntity.SaveEntity()
 		}
-	}else{
+	} else {
 		BPMNShapeInfo = append(BPMNShapeInfo, "")
 	}
 	BPMNShapeInfo = append(BPMNShapeInfo, this.object.M_isMessageVisible)
 
 	/** Save participantBandKind type ParticipantBandKind **/
-	if this.object.M_participantBandKind==BPMNDI.ParticipantBandKind_Top_initiating{
+	if this.object.M_participantBandKind == BPMNDI.ParticipantBandKind_Top_initiating {
 		BPMNShapeInfo = append(BPMNShapeInfo, 0)
-	} else if this.object.M_participantBandKind==BPMNDI.ParticipantBandKind_Middle_initiating{
+	} else if this.object.M_participantBandKind == BPMNDI.ParticipantBandKind_Middle_initiating {
 		BPMNShapeInfo = append(BPMNShapeInfo, 1)
-	} else if this.object.M_participantBandKind==BPMNDI.ParticipantBandKind_Bottom_initiating{
+	} else if this.object.M_participantBandKind == BPMNDI.ParticipantBandKind_Bottom_initiating {
 		BPMNShapeInfo = append(BPMNShapeInfo, 2)
-	} else if this.object.M_participantBandKind==BPMNDI.ParticipantBandKind_Top_non_initiating{
+	} else if this.object.M_participantBandKind == BPMNDI.ParticipantBandKind_Top_non_initiating {
 		BPMNShapeInfo = append(BPMNShapeInfo, 3)
-	} else if this.object.M_participantBandKind==BPMNDI.ParticipantBandKind_Middle_non_initiating{
+	} else if this.object.M_participantBandKind == BPMNDI.ParticipantBandKind_Middle_non_initiating {
 		BPMNShapeInfo = append(BPMNShapeInfo, 4)
-	} else if this.object.M_participantBandKind==BPMNDI.ParticipantBandKind_Bottom_non_initiating{
+	} else if this.object.M_participantBandKind == BPMNDI.ParticipantBandKind_Bottom_non_initiating {
 		BPMNShapeInfo = append(BPMNShapeInfo, 5)
-	}else{
+	} else {
 		BPMNShapeInfo = append(BPMNShapeInfo, 0)
 	}
 
 	/** Save choreographyActivityShape type BPMNShape **/
-		BPMNShapeInfo = append(BPMNShapeInfo,this.object.M_choreographyActivityShape)
+	BPMNShapeInfo = append(BPMNShapeInfo, this.object.M_choreographyActivityShape)
 
 	/** associations of BPMNShape **/
 
 	/** Save participantBandShape type BPMNShape **/
-		BPMNShapeInfo = append(BPMNShapeInfo,this.object.M_participantBandShapePtr)
+	BPMNShapeInfo = append(BPMNShapeInfo, this.object.M_participantBandShapePtr)
 
 	/** Save sourceEdge type Edge **/
 	sourceEdgePtrStr, _ := json.Marshal(this.object.M_sourceEdgePtr)
@@ -2328,7 +2336,7 @@ func (this *BPMNDI_BPMNShapeEntity) SaveEntity() {
 	BPMNShapeInfo = append(BPMNShapeInfo, string(targetEdgePtrStr))
 
 	/** Save plane type Plane **/
-		BPMNShapeInfo = append(BPMNShapeInfo,this.object.M_planePtr)
+	BPMNShapeInfo = append(BPMNShapeInfo, this.object.M_planePtr)
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	BPMNShapeInfo = append(BPMNShapeInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -2349,7 +2357,7 @@ func (this *BPMNDI_BPMNShapeEntity) SaveEntity() {
 	} else {
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 		queryStr, _ := json.Marshal(query)
-		_, err =  GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNShapeInfo)
+		_, err = GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNShapeInfo)
 	}
 	if err == nil {
 		GetServer().GetEntityManager().insert(this)
@@ -2359,7 +2367,7 @@ func (this *BPMNDI_BPMNShapeEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *BPMNDI_BPMNShapeEntity) InitEntity(id string) error{
+func (this *BPMNDI_BPMNShapeEntity) InitEntity(id string) error {
 	if this.object.IsInit == true {
 		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
 		if err == nil {
@@ -2406,7 +2414,7 @@ func (this *BPMNDI_BPMNShapeEntity) InitEntity(id string) error{
 	query.Fields = append(query.Fields, "M_participantBandKind")
 	query.Fields = append(query.Fields, "M_choreographyActivityShape")
 
-		/** associations of BPMNShape **/
+	/** associations of BPMNShape **/
 	query.Fields = append(query.Fields, "M_participantBandShapePtr")
 	query.Fields = append(query.Fields, "M_sourceEdgePtr")
 	query.Fields = append(query.Fields, "M_targetEdgePtr")
@@ -2429,7 +2437,7 @@ func (this *BPMNDI_BPMNShapeEntity) InitEntity(id string) error{
 	// Initialisation of information of BPMNShape...
 	if len(results) > 0 {
 
-	/** initialyzation of the entity object **/
+		/** initialyzation of the entity object **/
 		this.object = new(BPMNDI.BPMNShape)
 		this.object.UUID = this.uuid
 		this.object.TYPENAME = "BPMNDI.BPMNShape"
@@ -2439,123 +2447,123 @@ func (this *BPMNDI_BPMNShapeEntity) InitEntity(id string) error{
 		/** members of DiagramElement **/
 
 		/** owningDiagram **/
- 		if results[0][2] != nil{
-			id :=results[0][2].(string)
+		if results[0][2] != nil {
+			id := results[0][2].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Diagram"
-				id_:= refTypeName + "$$" + id
-				this.object.M_owningDiagram= id
-				GetServer().GetEntityManager().appendReference("owningDiagram",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Diagram"
+				id_ := refTypeName + "$$" + id
+				this.object.M_owningDiagram = id
+				GetServer().GetEntityManager().appendReference("owningDiagram", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** owningElement **/
- 		if results[0][3] != nil{
-			id :=results[0][3].(string)
+		if results[0][3] != nil {
+			id := results[0][3].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.DiagramElement"
-				id_:= refTypeName + "$$" + id
-				this.object.M_owningElement= id
-				GetServer().GetEntityManager().appendReference("owningElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.DiagramElement"
+				id_ := refTypeName + "$$" + id
+				this.object.M_owningElement = id
+				GetServer().GetEntityManager().appendReference("owningElement", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** modelElement **/
- 		if results[0][4] != nil{
-			id :=results[0][4].(string)
+		if results[0][4] != nil {
+			id := results[0][4].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.interface{}"
-				id_:= refTypeName + "$$" + id
-				this.object.M_modelElement= id
-				GetServer().GetEntityManager().appendReference("modelElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.interface{}"
+				id_ := refTypeName + "$$" + id
+				this.object.M_modelElement = id
+				GetServer().GetEntityManager().appendReference("modelElement", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** style **/
- 		if results[0][5] != nil{
-			id :=results[0][5].(string)
+		if results[0][5] != nil {
+			id := results[0][5].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Style"
-				id_:= refTypeName + "$$" + id
-				this.object.M_style= id
-				GetServer().GetEntityManager().appendReference("style",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Style"
+				id_ := refTypeName + "$$" + id
+				this.object.M_style = id
+				GetServer().GetEntityManager().appendReference("style", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** ownedElement **/
- 		if results[0][6] != nil{
-			uuidsStr :=results[0][6].(string)
-			uuids :=make([]string,0)
+		if results[0][6] != nil {
+			uuidsStr := results[0][6].(string)
+			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(uuids); i++{
-			typeName := uuids[i][0:strings.Index(uuids[i], "%")]
-			if err!=nil{
-				log.Println("type ", typeName, " not found!")
-				return err
-			}
-				if typeName == "BPMNDI.BPMNShape"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNShapeEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNPlane"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNPlaneEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNLabel"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNLabelEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNEdge"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNEdgeEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
+			for i := 0; i < len(uuids); i++ {
+				typeName := uuids[i][0:strings.Index(uuids[i], "%")]
+				if err != nil {
+					log.Println("type ", typeName, " not found!")
+					return err
 				}
- 			}
- 		}
+				if typeName == "BPMNDI.BPMNShape" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNShapeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNPlane" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNPlaneEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNLabel" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNLabelEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNEdge" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNEdgeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				}
+			}
+		}
 
 		/** id **/
- 		if results[0][7] != nil{
- 			this.object.M_id=results[0][7].(string)
- 		}
+		if results[0][7] != nil {
+			this.object.M_id = results[0][7].(string)
+		}
 
 		/** members of Node **/
 		/** No members **/
@@ -2563,194 +2571,194 @@ func (this *BPMNDI_BPMNShapeEntity) InitEntity(id string) error{
 		/** members of Shape **/
 
 		/** Bounds **/
- 		if results[0][8] != nil{
-			uuid :=results[0][8].(string)
+		if results[0][8] != nil {
+			uuid := results[0][8].(string)
 			if len(uuid) > 0 {
 				var BoundsEntity *DC_BoundsEntity
 				if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
 					BoundsEntity = instance.(*DC_BoundsEntity)
-				}else{
+				} else {
 					BoundsEntity = GetServer().GetEntityManager().NewDCBoundsEntity(uuid, nil)
 					BoundsEntity.InitEntity(uuid)
-					GetServer().GetEntityManager().insert( BoundsEntity)
+					GetServer().GetEntityManager().insert(BoundsEntity)
 				}
 				BoundsEntity.AppendReferenced("Bounds", this)
-				this.AppendChild("Bounds",BoundsEntity)
+				this.AppendChild("Bounds", BoundsEntity)
 			}
- 		}
+		}
 
 		/** members of LabeledShape **/
 
 		/** ownedLabel **/
- 		if results[0][9] != nil{
-			uuidsStr :=results[0][9].(string)
-			uuids :=make([]string,0)
+		if results[0][9] != nil {
+			uuidsStr := results[0][9].(string)
+			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(uuids); i++{
-			typeName := uuids[i][0:strings.Index(uuids[i], "%")]
-			if err!=nil{
-				log.Println("type ", typeName, " not found!")
-				return err
-			}
-				if typeName == "BPMNDI.BPMNLabel"{
-						if len(uuids[i]) > 0 {
-							var ownedLabelEntity *BPMNDI_BPMNLabelEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedLabelEntity = instance.(*BPMNDI_BPMNLabelEntity)
-							}else{
-								ownedLabelEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
-								ownedLabelEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedLabelEntity)
-							}
-							ownedLabelEntity.AppendReferenced("ownedLabel", this)
-							this.AppendChild("ownedLabel",ownedLabelEntity)
-						}
+			for i := 0; i < len(uuids); i++ {
+				typeName := uuids[i][0:strings.Index(uuids[i], "%")]
+				if err != nil {
+					log.Println("type ", typeName, " not found!")
+					return err
 				}
- 			}
- 		}
+				if typeName == "BPMNDI.BPMNLabel" {
+					if len(uuids[i]) > 0 {
+						var ownedLabelEntity *BPMNDI_BPMNLabelEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedLabelEntity = instance.(*BPMNDI_BPMNLabelEntity)
+						} else {
+							ownedLabelEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
+							ownedLabelEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedLabelEntity)
+						}
+						ownedLabelEntity.AppendReferenced("ownedLabel", this)
+						this.AppendChild("ownedLabel", ownedLabelEntity)
+					}
+				}
+			}
+		}
 
 		/** members of BPMNShape **/
 
 		/** bpmnElement **/
- 		if results[0][10] != nil{
-			id :=results[0][10].(string)
+		if results[0][10] != nil {
+			id := results[0][10].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.interface{}"
-				id_:= refTypeName + "$$" + id
-				this.object.M_bpmnElement= id
-				GetServer().GetEntityManager().appendReference("bpmnElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.interface{}"
+				id_ := refTypeName + "$$" + id
+				this.object.M_bpmnElement = id
+				GetServer().GetEntityManager().appendReference("bpmnElement", this.object.UUID, id_)
 				this.object.M_bpmnElement = id
 			}
- 		}
+		}
 
 		/** isHorizontal **/
- 		if results[0][11] != nil{
- 			this.object.M_isHorizontal=results[0][11].(bool)
- 		}
+		if results[0][11] != nil {
+			this.object.M_isHorizontal = results[0][11].(bool)
+		}
 
 		/** isExpanded **/
- 		if results[0][12] != nil{
- 			this.object.M_isExpanded=results[0][12].(bool)
- 		}
+		if results[0][12] != nil {
+			this.object.M_isExpanded = results[0][12].(bool)
+		}
 
 		/** isMarkerVisible **/
- 		if results[0][13] != nil{
- 			this.object.M_isMarkerVisible=results[0][13].(bool)
- 		}
+		if results[0][13] != nil {
+			this.object.M_isMarkerVisible = results[0][13].(bool)
+		}
 
 		/** BPMNLabel **/
- 		if results[0][14] != nil{
-			uuid :=results[0][14].(string)
+		if results[0][14] != nil {
+			uuid := results[0][14].(string)
 			if len(uuid) > 0 {
 				var BPMNLabelEntity *BPMNDI_BPMNLabelEntity
 				if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
 					BPMNLabelEntity = instance.(*BPMNDI_BPMNLabelEntity)
-				}else{
+				} else {
 					BPMNLabelEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuid, nil)
 					BPMNLabelEntity.InitEntity(uuid)
-					GetServer().GetEntityManager().insert( BPMNLabelEntity)
+					GetServer().GetEntityManager().insert(BPMNLabelEntity)
 				}
 				BPMNLabelEntity.AppendReferenced("BPMNLabel", this)
-				this.AppendChild("BPMNLabel",BPMNLabelEntity)
+				this.AppendChild("BPMNLabel", BPMNLabelEntity)
 			}
- 		}
+		}
 
 		/** isMessageVisible **/
- 		if results[0][15] != nil{
- 			this.object.M_isMessageVisible=results[0][15].(bool)
- 		}
+		if results[0][15] != nil {
+			this.object.M_isMessageVisible = results[0][15].(bool)
+		}
 
 		/** participantBandKind **/
- 		if results[0][16] != nil{
- 			enumIndex := results[0][16].(int)
-			if enumIndex == 0{
- 				this.object.M_participantBandKind=BPMNDI.ParticipantBandKind_Top_initiating
-			} else if enumIndex == 1{
- 				this.object.M_participantBandKind=BPMNDI.ParticipantBandKind_Middle_initiating
-			} else if enumIndex == 2{
- 				this.object.M_participantBandKind=BPMNDI.ParticipantBandKind_Bottom_initiating
-			} else if enumIndex == 3{
- 				this.object.M_participantBandKind=BPMNDI.ParticipantBandKind_Top_non_initiating
-			} else if enumIndex == 4{
- 				this.object.M_participantBandKind=BPMNDI.ParticipantBandKind_Middle_non_initiating
-			} else if enumIndex == 5{
- 				this.object.M_participantBandKind=BPMNDI.ParticipantBandKind_Bottom_non_initiating
- 			}
- 		}
+		if results[0][16] != nil {
+			enumIndex := results[0][16].(int)
+			if enumIndex == 0 {
+				this.object.M_participantBandKind = BPMNDI.ParticipantBandKind_Top_initiating
+			} else if enumIndex == 1 {
+				this.object.M_participantBandKind = BPMNDI.ParticipantBandKind_Middle_initiating
+			} else if enumIndex == 2 {
+				this.object.M_participantBandKind = BPMNDI.ParticipantBandKind_Bottom_initiating
+			} else if enumIndex == 3 {
+				this.object.M_participantBandKind = BPMNDI.ParticipantBandKind_Top_non_initiating
+			} else if enumIndex == 4 {
+				this.object.M_participantBandKind = BPMNDI.ParticipantBandKind_Middle_non_initiating
+			} else if enumIndex == 5 {
+				this.object.M_participantBandKind = BPMNDI.ParticipantBandKind_Bottom_non_initiating
+			}
+		}
 
 		/** choreographyActivityShape **/
- 		if results[0][17] != nil{
-			id :=results[0][17].(string)
+		if results[0][17] != nil {
+			id := results[0][17].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.BPMNShape"
-				id_:= refTypeName + "$$" + id
-				this.object.M_choreographyActivityShape= id
-				GetServer().GetEntityManager().appendReference("choreographyActivityShape",this.object.UUID, id_)
+				refTypeName := "BPMNDI.BPMNShape"
+				id_ := refTypeName + "$$" + id
+				this.object.M_choreographyActivityShape = id
+				GetServer().GetEntityManager().appendReference("choreographyActivityShape", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** associations of BPMNShape **/
 
 		/** participantBandShapePtr **/
- 		if results[0][18] != nil{
-			id :=results[0][18].(string)
+		if results[0][18] != nil {
+			id := results[0][18].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.BPMNShape"
-				id_:= refTypeName + "$$" + id
-				this.object.M_participantBandShapePtr= id
-				GetServer().GetEntityManager().appendReference("participantBandShapePtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.BPMNShape"
+				id_ := refTypeName + "$$" + id
+				this.object.M_participantBandShapePtr = id
+				GetServer().GetEntityManager().appendReference("participantBandShapePtr", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** sourceEdgePtr **/
- 		if results[0][19] != nil{
-			idsStr :=results[0][19].(string)
-			ids :=make([]string,0)
+		if results[0][19] != nil {
+			idsStr := results[0][19].(string)
+			ids := make([]string, 0)
 			err := json.Unmarshal([]byte(idsStr), &ids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(ids); i++{
+			for i := 0; i < len(ids); i++ {
 				if len(ids[i]) > 0 {
-					refTypeName:="BPMNDI.Edge"
-					id_:= refTypeName + "$$" + ids[i]
-					this.object.M_sourceEdgePtr = append(this.object.M_sourceEdgePtr,ids[i])
-					GetServer().GetEntityManager().appendReference("sourceEdgePtr",this.object.UUID, id_)
+					refTypeName := "BPMNDI.Edge"
+					id_ := refTypeName + "$$" + ids[i]
+					this.object.M_sourceEdgePtr = append(this.object.M_sourceEdgePtr, ids[i])
+					GetServer().GetEntityManager().appendReference("sourceEdgePtr", this.object.UUID, id_)
 				}
 			}
- 		}
+		}
 
 		/** targetEdgePtr **/
- 		if results[0][20] != nil{
-			idsStr :=results[0][20].(string)
-			ids :=make([]string,0)
+		if results[0][20] != nil {
+			idsStr := results[0][20].(string)
+			ids := make([]string, 0)
 			err := json.Unmarshal([]byte(idsStr), &ids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(ids); i++{
+			for i := 0; i < len(ids); i++ {
 				if len(ids[i]) > 0 {
-					refTypeName:="BPMNDI.Edge"
-					id_:= refTypeName + "$$" + ids[i]
-					this.object.M_targetEdgePtr = append(this.object.M_targetEdgePtr,ids[i])
-					GetServer().GetEntityManager().appendReference("targetEdgePtr",this.object.UUID, id_)
+					refTypeName := "BPMNDI.Edge"
+					id_ := refTypeName + "$$" + ids[i]
+					this.object.M_targetEdgePtr = append(this.object.M_targetEdgePtr, ids[i])
+					GetServer().GetEntityManager().appendReference("targetEdgePtr", this.object.UUID, id_)
 				}
 			}
- 		}
+		}
 
 		/** planePtr **/
- 		if results[0][21] != nil{
-			id :=results[0][21].(string)
+		if results[0][21] != nil {
+			id := results[0][21].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Plane"
-				id_:= refTypeName + "$$" + id
-				this.object.M_planePtr= id
-				GetServer().GetEntityManager().appendReference("planePtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Plane"
+				id_ := refTypeName + "$$" + id
+				this.object.M_planePtr = id
+				GetServer().GetEntityManager().appendReference("planePtr", this.object.UUID, id_)
 			}
- 		}
+		}
 		childsUuidStr := results[0][22].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -2777,7 +2785,7 @@ func (this *BPMNDI_BPMNShapeEntity) InitEntity(id string) error{
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewBPMNDIBPMNShapeEntityFromObject(object *BPMNDI.BPMNShape) *BPMNDI_BPMNShapeEntity {
-	 return this.NewBPMNDIBPMNShapeEntity(object.UUID, object)
+	return this.NewBPMNDIBPMNShapeEntity(object.UUID, object)
 }
 
 /** Delete **/
@@ -2791,7 +2799,7 @@ func BPMNDIBPMNShapeExists(val string) string {
 	query.TypeName = "BPMNDI.BPMNShape"
 	query.Indexs = append(query.Indexs, "M_id="+val)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -2823,7 +2831,7 @@ func (this *BPMNDI_BPMNShapeEntity) AppendChild(attributeName string, child Enti
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
-	attributeName = strings.Replace(attributeName,"M_", "", -1)
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
 	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
 	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
 	if invalidMethod != nil {
@@ -2831,77 +2839,78 @@ func (this *BPMNDI_BPMNShapeEntity) AppendChild(attributeName string, child Enti
 	}
 	return nil
 }
+
 /** Append reference entity into parent entity. **/
 func (this *BPMNDI_BPMNShapeEntity) AppendReference(reference Entity) {
 
-	 // Here i will append the reference uuid
-	 index := -1
-	 for i := 0; i < len(this.referencesUuid); i++ {
-	 	refUuid := this.referencesUuid[i]
-	 	if refUuid == reference.GetUuid() {
-	 		index = i
-	 		break
-	 	}
-	 }
-	 if index == -1 {
-	 	this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-	 	this.referencesPtr = append(this.referencesPtr, reference)
-	 }else{
-	 	// The reference must be update in that case.
-	 	this.referencesPtr[index]  = reference
-	 }
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //              			BPMNEdge
 ////////////////////////////////////////////////////////////////////////////////
 /** local type **/
-type BPMNDI_BPMNEdgeEntity struct{
+type BPMNDI_BPMNEdgeEntity struct {
 	/** not the object id, except for the definition **/
-	uuid string
-	parentPtr 			Entity
-	parentUuid 			string
-	childsPtr  			[]Entity
-	childsUuid  		[]string
-	referencesUuid  	[]string
-	referencesPtr  	    []Entity
-	prototype      		*EntityPrototype
-	referenced  		[]EntityRef
-	object *BPMNDI.BPMNEdge
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	referenced     []EntityRef
+	object         *BPMNDI.BPMNEdge
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewBPMNDIBPMNEdgeEntity(objectId string, object interface{}) *BPMNDI_BPMNEdgeEntity{
+func (this *EntityManager) NewBPMNDIBPMNEdgeEntity(objectId string, object interface{}) *BPMNDI_BPMNEdgeEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
-		if Utility.IsValidEntityReferenceName(objectId){
+		if Utility.IsValidEntityReferenceName(objectId) {
 			uuidStr = objectId
-		}else{
-			uuidStr  = BPMNDIBPMNEdgeExists(objectId)
+		} else {
+			uuidStr = BPMNDIBPMNEdgeExists(objectId)
 		}
 	}
-	if object != nil{
+	if object != nil {
 		object.(*BPMNDI.BPMNEdge).TYPENAME = "BPMNDI.BPMNEdge"
 	}
 	if len(uuidStr) > 0 {
-		if object != nil{
+		if object != nil {
 			object.(*BPMNDI.BPMNEdge).UUID = uuidStr
 		}
-		if val, ok := this.contain(uuidStr);ok {
-			if object != nil{
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
 				this.setObjectValues(val, object)
 
 			}
 			return val.(*BPMNDI_BPMNEdgeEntity)
 		}
-	}else{
+	} else {
 		uuidStr = "BPMNDI.BPMNEdge%" + Utility.RandomUUID()
 	}
 	entity := new(BPMNDI_BPMNEdgeEntity)
-	if object == nil{
+	if object == nil {
 		entity.object = new(BPMNDI.BPMNEdge)
 		entity.SetNeedSave(true)
-	}else{
+	} else {
 		entity.object = object.(*BPMNDI.BPMNEdge)
 		entity.SetNeedSave(true)
 	}
@@ -2911,48 +2920,48 @@ func (this *EntityManager) NewBPMNDIBPMNEdgeEntity(objectId string, object inter
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNEdge","BPMN20")
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNEdge", "BPMN20")
 	entity.prototype = prototype
 	return entity
 }
 
 /** Entity functions **/
-func(this *BPMNDI_BPMNEdgeEntity) GetTypeName()string{
+func (this *BPMNDI_BPMNEdgeEntity) GetTypeName() string {
 	return "BPMNDI.BPMNEdge"
 }
-func(this *BPMNDI_BPMNEdgeEntity) GetUuid()string{
+func (this *BPMNDI_BPMNEdgeEntity) GetUuid() string {
 	return this.uuid
 }
-func(this *BPMNDI_BPMNEdgeEntity) GetParentPtr()Entity{
+func (this *BPMNDI_BPMNEdgeEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) SetParentPtr(parentPtr Entity){
-	this.parentPtr=parentPtr
+func (this *BPMNDI_BPMNEdgeEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) AppendReferenced(name string, owner Entity){
+func (this *BPMNDI_BPMNEdgeEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
 	}
 	var ref EntityRef
 	ref.Name = name
 	ref.OwnerUuid = owner.GetUuid()
-	for i:=0; i<len(this.referenced); i++ {
-		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid { 
-			return;
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
 		}
 	}
 	this.referenced = append(this.referenced, ref)
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) GetReferenced() []EntityRef{
+func (this *BPMNDI_BPMNEdgeEntity) GetReferenced() []EntityRef {
 	return this.referenced
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) RemoveReferenced(name string, owner Entity) {
+func (this *BPMNDI_BPMNEdgeEntity) RemoveReferenced(name string, owner Entity) {
 	var referenced []EntityRef
-	referenced = make([]EntityRef,0)
+	referenced = make([]EntityRef, 0)
 	for i := 0; i < len(this.referenced); i++ {
 		ref := this.referenced[i]
 		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
@@ -2963,7 +2972,7 @@ func(this *BPMNDI_BPMNEdgeEntity) RemoveReferenced(name string, owner Entity) {
 	this.referenced = referenced
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) RemoveReference(name string, reference Entity){
+func (this *BPMNDI_BPMNEdgeEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
 	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
@@ -2983,96 +2992,96 @@ func(this *BPMNDI_BPMNEdgeEntity) RemoveReference(name string, reference Entity)
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) GetChildsPtr() []Entity{
+func (this *BPMNDI_BPMNEdgeEntity) GetChildsPtr() []Entity {
 	return this.childsPtr
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) SetChildsPtr(childsPtr[]Entity){
+func (this *BPMNDI_BPMNEdgeEntity) SetChildsPtr(childsPtr []Entity) {
 	this.childsPtr = childsPtr
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) GetChildsUuid() []string{
+func (this *BPMNDI_BPMNEdgeEntity) GetChildsUuid() []string {
 	return this.childsUuid
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) SetChildsUuid(childsUuid[]string){
+func (this *BPMNDI_BPMNEdgeEntity) SetChildsUuid(childsUuid []string) {
 	this.childsUuid = childsUuid
 }
 
 /**
  * Remove a chidl uuid form the list of child in an entity.
  */
-func(this *BPMNDI_BPMNEdgeEntity) RemoveChild(name string, uuid string) {
- 	childsUuid := make([]string, 0)
- 	for i := 0; i < len(this.GetChildsUuid()); i++ {
- 		if this.GetChildsUuid()[i] != uuid {
- 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
- 		}
- 	}
- 
- 	this.childsUuid = childsUuid
+func (this *BPMNDI_BPMNEdgeEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
 	params := make([]interface{}, 1)
- 	childsPtr := make([]Entity, 0)
- 	for i := 0; i < len(this.GetChildsPtr()); i++ {
- 		if this.GetChildsPtr()[i].GetUuid() != uuid {
- 			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
- 		}else{
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
 			params[0] = this.GetChildsPtr()[i].GetObject()
- 		}
- 	}
- 	this.childsPtr = childsPtr
+		}
+	}
+	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
- }
+}
 
-func(this *BPMNDI_BPMNEdgeEntity) GetReferencesUuid() []string{
+func (this *BPMNDI_BPMNEdgeEntity) GetReferencesUuid() []string {
 	return this.referencesUuid
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) SetReferencesUuid(refsUuid[]string){
+func (this *BPMNDI_BPMNEdgeEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) GetReferencesPtr() []Entity{
+func (this *BPMNDI_BPMNEdgeEntity) GetReferencesPtr() []Entity {
 	return this.referencesPtr
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) SetReferencesPtr(refsPtr[]Entity){
+func (this *BPMNDI_BPMNEdgeEntity) SetReferencesPtr(refsPtr []Entity) {
 	this.referencesPtr = refsPtr
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) GetObject() interface{}{
+func (this *BPMNDI_BPMNEdgeEntity) GetObject() interface{} {
 	return this.object
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) NeedSave() bool{
+func (this *BPMNDI_BPMNEdgeEntity) NeedSave() bool {
 	return this.object.NeedSave
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) SetNeedSave(needSave bool) {
+func (this *BPMNDI_BPMNEdgeEntity) SetNeedSave(needSave bool) {
 	this.object.NeedSave = needSave
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) IsInit() bool{
+func (this *BPMNDI_BPMNEdgeEntity) IsInit() bool {
 	return this.object.IsInit
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) SetInit(isInit bool) {
+func (this *BPMNDI_BPMNEdgeEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) GetChecksum() string{
+func (this *BPMNDI_BPMNEdgeEntity) GetChecksum() string {
 	objectStr, _ := json.Marshal(this.object)
-	return  Utility.GetMD5Hash(string(objectStr))
+	return Utility.GetMD5Hash(string(objectStr))
 }
 
-func(this *BPMNDI_BPMNEdgeEntity) Exist() bool{
+func (this *BPMNDI_BPMNEdgeEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "BPMNDI.BPMNEdge"
 	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -3085,10 +3094,11 @@ func(this *BPMNDI_BPMNEdgeEntity) Exist() bool{
 
 /**
 * Return the entity prototype.
-*/
-func(this *BPMNDI_BPMNEdgeEntity) GetPrototype() *EntityPrototype {
+ */
+func (this *BPMNDI_BPMNEdgeEntity) GetPrototype() *EntityPrototype {
 	return this.prototype
 }
+
 /** Entity Prototype creation **/
 func (this *EntityManager) create_BPMNDI_BPMNEdgeEntityPrototype() {
 
@@ -3097,108 +3107,108 @@ func (this *EntityManager) create_BPMNDI_BPMNEdgeEntityPrototype() {
 	bPMNEdgeEntityProto.SuperTypeNames = append(bPMNEdgeEntityProto.SuperTypeNames, "DI.DiagramElement")
 	bPMNEdgeEntityProto.SuperTypeNames = append(bPMNEdgeEntityProto.SuperTypeNames, "DI.Edge")
 	bPMNEdgeEntityProto.SuperTypeNames = append(bPMNEdgeEntityProto.SuperTypeNames, "DI.LabeledEdge")
-	bPMNEdgeEntityProto.Ids = append(bPMNEdgeEntityProto.Ids,"uuid")
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"uuid")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"xs.string")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,0)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,false)
-	bPMNEdgeEntityProto.Indexs = append(bPMNEdgeEntityProto.Indexs,"parentUuid")
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"parentUuid")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"xs.string")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,1)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,false)
+	bPMNEdgeEntityProto.Ids = append(bPMNEdgeEntityProto.Ids, "uuid")
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "uuid")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "xs.string")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 0)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, false)
+	bPMNEdgeEntityProto.Indexs = append(bPMNEdgeEntityProto.Indexs, "parentUuid")
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "parentUuid")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "xs.string")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 1)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, false)
 
 	/** members of DiagramElement **/
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,2)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_owningDiagram")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"BPMNDI.DI.Diagram:Ref")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,3)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_owningElement")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"BPMNDI.DI.DiagramElement:Ref")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,4)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_modelElement")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"xs.interface{}:Ref")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,5)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_style")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"BPMNDI.DI.Style:Ref")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,6)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_ownedElement")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"[]BPMNDI.DI.DiagramElement")
-	bPMNEdgeEntityProto.Ids = append(bPMNEdgeEntityProto.Ids,"M_id")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,7)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_id")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"xs.ID")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 2)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_owningDiagram")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "BPMNDI.DI.Diagram:Ref")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 3)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_owningElement")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "BPMNDI.DI.DiagramElement:Ref")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 4)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_modelElement")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "xs.interface{}:Ref")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 5)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_style")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "BPMNDI.DI.Style:Ref")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 6)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_ownedElement")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "[]BPMNDI.DI.DiagramElement")
+	bPMNEdgeEntityProto.Ids = append(bPMNEdgeEntityProto.Ids, "M_id")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 7)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_id")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "xs.ID")
 
 	/** members of Edge **/
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,8)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_source")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"BPMNDI.DI.DiagramElement")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,9)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_target")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"BPMNDI.DI.DiagramElement")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,10)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_waypoint")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"[]BPMNDI.DC.Point")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 8)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_source")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "BPMNDI.DI.DiagramElement")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 9)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_target")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "BPMNDI.DI.DiagramElement")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 10)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_waypoint")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "[]BPMNDI.DC.Point")
 
 	/** members of LabeledEdge **/
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,11)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_ownedLabel")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"[]BPMNDI.DI.Label")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 11)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_ownedLabel")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "[]BPMNDI.DI.Label")
 
 	/** members of BPMNEdge **/
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,12)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_BPMNLabel")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"BPMNDI.BPMNLabel")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,13)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_bpmnElement")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"xs.interface{}:Ref")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,14)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_sourceElement")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"BPMNDI.DI.DiagramElement")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,15)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_targetElement")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"BPMNDI.DI.DiagramElement:Ref")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,16)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,true)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_messageVisibleKind")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"enum:MessageVisibleKind_Initiating:MessageVisibleKind_Non_initiating")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 12)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_BPMNLabel")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "BPMNDI.BPMNLabel")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 13)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_bpmnElement")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "xs.interface{}:Ref")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 14)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_sourceElement")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "BPMNDI.DI.DiagramElement")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 15)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_targetElement")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "BPMNDI.DI.DiagramElement:Ref")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 16)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, true)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_messageVisibleKind")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "enum:MessageVisibleKind_Initiating:MessageVisibleKind_Non_initiating")
 
 	/** associations of BPMNEdge **/
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,17)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,false)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_sourceEdgePtr")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"[]BPMNDI.DI.Edge:Ref")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,18)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,false)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_targetEdgePtr")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"[]BPMNDI.DI.Edge:Ref")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,19)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,false)
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"M_planePtr")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"BPMNDI.DI.Plane:Ref")
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"childsUuid")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"[]xs.string")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,20)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,false)
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 17)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, false)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_sourceEdgePtr")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "[]BPMNDI.DI.Edge:Ref")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 18)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, false)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_targetEdgePtr")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "[]BPMNDI.DI.Edge:Ref")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 19)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, false)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "M_planePtr")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "BPMNDI.DI.Plane:Ref")
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "childsUuid")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "[]xs.string")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 20)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, false)
 
-	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields,"referenced")
-	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType,"[]EntityRef")
-	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder,21)
-	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility,false)
+	bPMNEdgeEntityProto.Fields = append(bPMNEdgeEntityProto.Fields, "referenced")
+	bPMNEdgeEntityProto.FieldsType = append(bPMNEdgeEntityProto.FieldsType, "[]EntityRef")
+	bPMNEdgeEntityProto.FieldsOrder = append(bPMNEdgeEntityProto.FieldsOrder, 21)
+	bPMNEdgeEntityProto.FieldsVisibility = append(bPMNEdgeEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(BPMNDIDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&bPMNEdgeEntityProto)
@@ -3245,7 +3255,7 @@ func (this *BPMNDI_BPMNEdgeEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_targetElement")
 	query.Fields = append(query.Fields, "M_messageVisibleKind")
 
-		/** associations of BPMNEdge **/
+	/** associations of BPMNEdge **/
 	query.Fields = append(query.Fields, "M_sourceEdgePtr")
 	query.Fields = append(query.Fields, "M_targetEdgePtr")
 	query.Fields = append(query.Fields, "M_planePtr")
@@ -3257,58 +3267,58 @@ func (this *BPMNDI_BPMNEdgeEntity) SaveEntity() {
 	BPMNEdgeInfo = append(BPMNEdgeInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		BPMNEdgeInfo = append(BPMNEdgeInfo, this.parentPtr.GetUuid())
-	}else{
+	} else {
 		BPMNEdgeInfo = append(BPMNEdgeInfo, "")
 	}
 
 	/** members of DiagramElement **/
 
 	/** Save owningDiagram type Diagram **/
-		BPMNEdgeInfo = append(BPMNEdgeInfo,this.object.M_owningDiagram)
+	BPMNEdgeInfo = append(BPMNEdgeInfo, this.object.M_owningDiagram)
 
 	/** Save owningElement type DiagramElement **/
-		BPMNEdgeInfo = append(BPMNEdgeInfo,this.object.M_owningElement)
+	BPMNEdgeInfo = append(BPMNEdgeInfo, this.object.M_owningElement)
 	BPMNEdgeInfo = append(BPMNEdgeInfo, this.object.M_modelElement)
 
 	/** Save style type Style **/
-		BPMNEdgeInfo = append(BPMNEdgeInfo,this.object.M_style)
+	BPMNEdgeInfo = append(BPMNEdgeInfo, this.object.M_style)
 
 	/** Save ownedElement type DiagramElement **/
-	ownedElementIds := make([]string,0)
+	ownedElementIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_ownedElement); i++ {
 		switch v := this.object.M_ownedElement[i].(type) {
 		case *BPMNDI.BPMNPlane:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
 		case *BPMNDI.BPMNLabel:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
 		case *BPMNDI.BPMNShape:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
 		case *BPMNDI.BPMNEdge:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
 		}
 	}
 	ownedElementStr, _ := json.Marshal(ownedElementIds)
@@ -3321,89 +3331,89 @@ func (this *BPMNDI_BPMNEdgeEntity) SaveEntity() {
 	if this.object.M_source != nil {
 		switch v := this.object.M_source.(type) {
 		case *BPMNDI.BPMNShape:
-			sourceEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
+			sourceEntity := GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
 			BPMNEdgeInfo = append(BPMNEdgeInfo, sourceEntity.uuid)
-		    sourceEntity.AppendReferenced("source", this)
-			this.AppendChild("source",sourceEntity)
+			sourceEntity.AppendReferenced("source", this)
+			this.AppendChild("source", sourceEntity)
 			if sourceEntity.NeedSave() {
 				sourceEntity.SaveEntity()
 			}
 		case *BPMNDI.BPMNPlane:
-			sourceEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
+			sourceEntity := GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
 			BPMNEdgeInfo = append(BPMNEdgeInfo, sourceEntity.uuid)
-		    sourceEntity.AppendReferenced("source", this)
-			this.AppendChild("source",sourceEntity)
+			sourceEntity.AppendReferenced("source", this)
+			this.AppendChild("source", sourceEntity)
 			if sourceEntity.NeedSave() {
 				sourceEntity.SaveEntity()
 			}
 		case *BPMNDI.BPMNLabel:
-			sourceEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
+			sourceEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
 			BPMNEdgeInfo = append(BPMNEdgeInfo, sourceEntity.uuid)
-		    sourceEntity.AppendReferenced("source", this)
-			this.AppendChild("source",sourceEntity)
+			sourceEntity.AppendReferenced("source", this)
+			this.AppendChild("source", sourceEntity)
 			if sourceEntity.NeedSave() {
 				sourceEntity.SaveEntity()
 			}
 		case *BPMNDI.BPMNEdge:
-			sourceEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
+			sourceEntity := GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
 			BPMNEdgeInfo = append(BPMNEdgeInfo, sourceEntity.uuid)
-		    sourceEntity.AppendReferenced("source", this)
-			this.AppendChild("source",sourceEntity)
+			sourceEntity.AppendReferenced("source", this)
+			this.AppendChild("source", sourceEntity)
 			if sourceEntity.NeedSave() {
 				sourceEntity.SaveEntity()
 			}
-			}
-	}else{
+		}
+	} else {
 		BPMNEdgeInfo = append(BPMNEdgeInfo, "")
 	}
 
 	/** Save target type DiagramElement **/
 	if this.object.M_target != nil {
 		switch v := this.object.M_target.(type) {
-		case *BPMNDI.BPMNLabel:
-			targetEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
-			BPMNEdgeInfo = append(BPMNEdgeInfo, targetEntity.uuid)
-		    targetEntity.AppendReferenced("target", this)
-			this.AppendChild("target",targetEntity)
-			if targetEntity.NeedSave() {
-				targetEntity.SaveEntity()
-			}
 		case *BPMNDI.BPMNShape:
-			targetEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
+			targetEntity := GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
 			BPMNEdgeInfo = append(BPMNEdgeInfo, targetEntity.uuid)
-		    targetEntity.AppendReferenced("target", this)
-			this.AppendChild("target",targetEntity)
+			targetEntity.AppendReferenced("target", this)
+			this.AppendChild("target", targetEntity)
 			if targetEntity.NeedSave() {
 				targetEntity.SaveEntity()
 			}
 		case *BPMNDI.BPMNPlane:
-			targetEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
+			targetEntity := GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
 			BPMNEdgeInfo = append(BPMNEdgeInfo, targetEntity.uuid)
-		    targetEntity.AppendReferenced("target", this)
-			this.AppendChild("target",targetEntity)
+			targetEntity.AppendReferenced("target", this)
+			this.AppendChild("target", targetEntity)
+			if targetEntity.NeedSave() {
+				targetEntity.SaveEntity()
+			}
+		case *BPMNDI.BPMNLabel:
+			targetEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
+			BPMNEdgeInfo = append(BPMNEdgeInfo, targetEntity.uuid)
+			targetEntity.AppendReferenced("target", this)
+			this.AppendChild("target", targetEntity)
 			if targetEntity.NeedSave() {
 				targetEntity.SaveEntity()
 			}
 		case *BPMNDI.BPMNEdge:
-			targetEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
+			targetEntity := GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
 			BPMNEdgeInfo = append(BPMNEdgeInfo, targetEntity.uuid)
-		    targetEntity.AppendReferenced("target", this)
-			this.AppendChild("target",targetEntity)
+			targetEntity.AppendReferenced("target", this)
+			this.AppendChild("target", targetEntity)
 			if targetEntity.NeedSave() {
 				targetEntity.SaveEntity()
 			}
-			}
-	}else{
+		}
+	} else {
 		BPMNEdgeInfo = append(BPMNEdgeInfo, "")
 	}
 
 	/** Save waypoint type Point **/
-	waypointIds := make([]string,0)
+	waypointIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_waypoint); i++ {
-		waypointEntity:= GetServer().GetEntityManager().NewDCPointEntity(this.object.M_waypoint[i].UUID,this.object.M_waypoint[i])
-		waypointIds=append(waypointIds,waypointEntity.uuid)
+		waypointEntity := GetServer().GetEntityManager().NewDCPointEntity(this.object.M_waypoint[i].UUID, this.object.M_waypoint[i])
+		waypointIds = append(waypointIds, waypointEntity.uuid)
 		waypointEntity.AppendReferenced("waypoint", this)
-		this.AppendChild("waypoint",waypointEntity)
+		this.AppendChild("waypoint", waypointEntity)
 		if waypointEntity.NeedSave() {
 			waypointEntity.SaveEntity()
 		}
@@ -3414,17 +3424,17 @@ func (this *BPMNDI_BPMNEdgeEntity) SaveEntity() {
 	/** members of LabeledEdge **/
 
 	/** Save ownedLabel type Label **/
-	ownedLabelIds := make([]string,0)
+	ownedLabelIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_ownedLabel); i++ {
 		switch v := this.object.M_ownedLabel[i].(type) {
 		case *BPMNDI.BPMNLabel:
-		ownedLabelEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
-		ownedLabelIds=append(ownedLabelIds,ownedLabelEntity.uuid)
-		ownedLabelEntity.AppendReferenced("ownedLabel", this)
-		this.AppendChild("ownedLabel",ownedLabelEntity)
-		if ownedLabelEntity.NeedSave() {
-			ownedLabelEntity.SaveEntity()
-		}
+			ownedLabelEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
+			ownedLabelIds = append(ownedLabelIds, ownedLabelEntity.uuid)
+			ownedLabelEntity.AppendReferenced("ownedLabel", this)
+			this.AppendChild("ownedLabel", ownedLabelEntity)
+			if ownedLabelEntity.NeedSave() {
+				ownedLabelEntity.SaveEntity()
+			}
 		}
 	}
 	ownedLabelStr, _ := json.Marshal(ownedLabelIds)
@@ -3434,14 +3444,14 @@ func (this *BPMNDI_BPMNEdgeEntity) SaveEntity() {
 
 	/** Save BPMNLabel type BPMNLabel **/
 	if this.object.M_BPMNLabel != nil {
-		BPMNLabelEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(this.object.M_BPMNLabel.UUID, this.object.M_BPMNLabel)
+		BPMNLabelEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(this.object.M_BPMNLabel.UUID, this.object.M_BPMNLabel)
 		BPMNEdgeInfo = append(BPMNEdgeInfo, BPMNLabelEntity.uuid)
 		BPMNLabelEntity.AppendReferenced("BPMNLabel", this)
-		this.AppendChild("BPMNLabel",BPMNLabelEntity)
+		this.AppendChild("BPMNLabel", BPMNLabelEntity)
 		if BPMNLabelEntity.NeedSave() {
 			BPMNLabelEntity.SaveEntity()
 		}
-	}else{
+	} else {
 		BPMNEdgeInfo = append(BPMNEdgeInfo, "")
 	}
 	BPMNEdgeInfo = append(BPMNEdgeInfo, this.object.M_bpmnElement)
@@ -3450,51 +3460,51 @@ func (this *BPMNDI_BPMNEdgeEntity) SaveEntity() {
 	if this.object.M_sourceElement != nil {
 		switch v := this.object.M_sourceElement.(type) {
 		case *BPMNDI.BPMNShape:
-			sourceElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
+			sourceElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
 			BPMNEdgeInfo = append(BPMNEdgeInfo, sourceElementEntity.uuid)
-		    sourceElementEntity.AppendReferenced("sourceElement", this)
-			this.AppendChild("sourceElement",sourceElementEntity)
+			sourceElementEntity.AppendReferenced("sourceElement", this)
+			this.AppendChild("sourceElement", sourceElementEntity)
 			if sourceElementEntity.NeedSave() {
 				sourceElementEntity.SaveEntity()
 			}
 		case *BPMNDI.BPMNPlane:
-			sourceElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
+			sourceElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
 			BPMNEdgeInfo = append(BPMNEdgeInfo, sourceElementEntity.uuid)
-		    sourceElementEntity.AppendReferenced("sourceElement", this)
-			this.AppendChild("sourceElement",sourceElementEntity)
+			sourceElementEntity.AppendReferenced("sourceElement", this)
+			this.AppendChild("sourceElement", sourceElementEntity)
 			if sourceElementEntity.NeedSave() {
 				sourceElementEntity.SaveEntity()
 			}
 		case *BPMNDI.BPMNLabel:
-			sourceElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
+			sourceElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
 			BPMNEdgeInfo = append(BPMNEdgeInfo, sourceElementEntity.uuid)
-		    sourceElementEntity.AppendReferenced("sourceElement", this)
-			this.AppendChild("sourceElement",sourceElementEntity)
+			sourceElementEntity.AppendReferenced("sourceElement", this)
+			this.AppendChild("sourceElement", sourceElementEntity)
 			if sourceElementEntity.NeedSave() {
 				sourceElementEntity.SaveEntity()
 			}
 		case *BPMNDI.BPMNEdge:
-			sourceElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
+			sourceElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
 			BPMNEdgeInfo = append(BPMNEdgeInfo, sourceElementEntity.uuid)
-		    sourceElementEntity.AppendReferenced("sourceElement", this)
-			this.AppendChild("sourceElement",sourceElementEntity)
+			sourceElementEntity.AppendReferenced("sourceElement", this)
+			this.AppendChild("sourceElement", sourceElementEntity)
 			if sourceElementEntity.NeedSave() {
 				sourceElementEntity.SaveEntity()
 			}
-			}
-	}else{
+		}
+	} else {
 		BPMNEdgeInfo = append(BPMNEdgeInfo, "")
 	}
 
 	/** Save targetElement type DiagramElement **/
-		BPMNEdgeInfo = append(BPMNEdgeInfo,this.object.M_targetElement)
+	BPMNEdgeInfo = append(BPMNEdgeInfo, this.object.M_targetElement)
 
 	/** Save messageVisibleKind type MessageVisibleKind **/
-	if this.object.M_messageVisibleKind==BPMNDI.MessageVisibleKind_Initiating{
+	if this.object.M_messageVisibleKind == BPMNDI.MessageVisibleKind_Initiating {
 		BPMNEdgeInfo = append(BPMNEdgeInfo, 0)
-	} else if this.object.M_messageVisibleKind==BPMNDI.MessageVisibleKind_Non_initiating{
+	} else if this.object.M_messageVisibleKind == BPMNDI.MessageVisibleKind_Non_initiating {
 		BPMNEdgeInfo = append(BPMNEdgeInfo, 1)
-	}else{
+	} else {
 		BPMNEdgeInfo = append(BPMNEdgeInfo, 0)
 	}
 
@@ -3509,7 +3519,7 @@ func (this *BPMNDI_BPMNEdgeEntity) SaveEntity() {
 	BPMNEdgeInfo = append(BPMNEdgeInfo, string(targetEdgePtrStr))
 
 	/** Save plane type Plane **/
-		BPMNEdgeInfo = append(BPMNEdgeInfo,this.object.M_planePtr)
+	BPMNEdgeInfo = append(BPMNEdgeInfo, this.object.M_planePtr)
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	BPMNEdgeInfo = append(BPMNEdgeInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -3530,7 +3540,7 @@ func (this *BPMNDI_BPMNEdgeEntity) SaveEntity() {
 	} else {
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 		queryStr, _ := json.Marshal(query)
-		_, err =  GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNEdgeInfo)
+		_, err = GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNEdgeInfo)
 	}
 	if err == nil {
 		GetServer().GetEntityManager().insert(this)
@@ -3540,7 +3550,7 @@ func (this *BPMNDI_BPMNEdgeEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *BPMNDI_BPMNEdgeEntity) InitEntity(id string) error{
+func (this *BPMNDI_BPMNEdgeEntity) InitEntity(id string) error {
 	if this.object.IsInit == true {
 		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
 		if err == nil {
@@ -3583,7 +3593,7 @@ func (this *BPMNDI_BPMNEdgeEntity) InitEntity(id string) error{
 	query.Fields = append(query.Fields, "M_targetElement")
 	query.Fields = append(query.Fields, "M_messageVisibleKind")
 
-		/** associations of BPMNEdge **/
+	/** associations of BPMNEdge **/
 	query.Fields = append(query.Fields, "M_sourceEdgePtr")
 	query.Fields = append(query.Fields, "M_targetEdgePtr")
 	query.Fields = append(query.Fields, "M_planePtr")
@@ -3605,7 +3615,7 @@ func (this *BPMNDI_BPMNEdgeEntity) InitEntity(id string) error{
 	// Initialisation of information of BPMNEdge...
 	if len(results) > 0 {
 
-	/** initialyzation of the entity object **/
+		/** initialyzation of the entity object **/
 		this.object = new(BPMNDI.BPMNEdge)
 		this.object.UUID = this.uuid
 		this.object.TYPENAME = "BPMNDI.BPMNEdge"
@@ -3615,478 +3625,478 @@ func (this *BPMNDI_BPMNEdgeEntity) InitEntity(id string) error{
 		/** members of DiagramElement **/
 
 		/** owningDiagram **/
- 		if results[0][2] != nil{
-			id :=results[0][2].(string)
+		if results[0][2] != nil {
+			id := results[0][2].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Diagram"
-				id_:= refTypeName + "$$" + id
-				this.object.M_owningDiagram= id
-				GetServer().GetEntityManager().appendReference("owningDiagram",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Diagram"
+				id_ := refTypeName + "$$" + id
+				this.object.M_owningDiagram = id
+				GetServer().GetEntityManager().appendReference("owningDiagram", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** owningElement **/
- 		if results[0][3] != nil{
-			id :=results[0][3].(string)
+		if results[0][3] != nil {
+			id := results[0][3].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.DiagramElement"
-				id_:= refTypeName + "$$" + id
-				this.object.M_owningElement= id
-				GetServer().GetEntityManager().appendReference("owningElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.DiagramElement"
+				id_ := refTypeName + "$$" + id
+				this.object.M_owningElement = id
+				GetServer().GetEntityManager().appendReference("owningElement", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** modelElement **/
- 		if results[0][4] != nil{
-			id :=results[0][4].(string)
+		if results[0][4] != nil {
+			id := results[0][4].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.interface{}"
-				id_:= refTypeName + "$$" + id
-				this.object.M_modelElement= id
-				GetServer().GetEntityManager().appendReference("modelElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.interface{}"
+				id_ := refTypeName + "$$" + id
+				this.object.M_modelElement = id
+				GetServer().GetEntityManager().appendReference("modelElement", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** style **/
- 		if results[0][5] != nil{
-			id :=results[0][5].(string)
+		if results[0][5] != nil {
+			id := results[0][5].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Style"
-				id_:= refTypeName + "$$" + id
-				this.object.M_style= id
-				GetServer().GetEntityManager().appendReference("style",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Style"
+				id_ := refTypeName + "$$" + id
+				this.object.M_style = id
+				GetServer().GetEntityManager().appendReference("style", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** ownedElement **/
- 		if results[0][6] != nil{
-			uuidsStr :=results[0][6].(string)
-			uuids :=make([]string,0)
+		if results[0][6] != nil {
+			uuidsStr := results[0][6].(string)
+			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(uuids); i++{
-			typeName := uuids[i][0:strings.Index(uuids[i], "%")]
-			if err!=nil{
-				log.Println("type ", typeName, " not found!")
-				return err
-			}
-				if typeName == "BPMNDI.BPMNPlane"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNPlaneEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNLabel"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNLabelEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNShape"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNShapeEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNEdge"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNEdgeEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
+			for i := 0; i < len(uuids); i++ {
+				typeName := uuids[i][0:strings.Index(uuids[i], "%")]
+				if err != nil {
+					log.Println("type ", typeName, " not found!")
+					return err
 				}
- 			}
- 		}
+				if typeName == "BPMNDI.BPMNShape" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNShapeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNPlane" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNPlaneEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNLabel" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNLabelEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNEdge" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNEdgeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				}
+			}
+		}
 
 		/** id **/
- 		if results[0][7] != nil{
- 			this.object.M_id=results[0][7].(string)
- 		}
+		if results[0][7] != nil {
+			this.object.M_id = results[0][7].(string)
+		}
 
 		/** members of Edge **/
 
 		/** source **/
- 		if results[0][8] != nil{
-			uuid :=results[0][8].(string)
+		if results[0][8] != nil {
+			uuid := results[0][8].(string)
 			if len(uuid) > 0 {
 				typeName := uuid[0:strings.Index(uuid, "%")]
-				if err!=nil{
+				if err != nil {
 					log.Println("type ", typeName, " not found!")
 					return err
 				}
-			if typeName == "BPMNDI.BPMNShape"{
-				if len(uuid) > 0 {
-					var sourceEntity *BPMNDI_BPMNShapeEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						sourceEntity = instance.(*BPMNDI_BPMNShapeEntity)
-					}else{
-						sourceEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuid, nil)
-						sourceEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(sourceEntity)
+				if typeName == "BPMNDI.BPMNShape" {
+					if len(uuid) > 0 {
+						var sourceEntity *BPMNDI_BPMNShapeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							sourceEntity = instance.(*BPMNDI_BPMNShapeEntity)
+						} else {
+							sourceEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuid, nil)
+							sourceEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(sourceEntity)
+						}
+						sourceEntity.AppendReferenced("source", this)
+						this.AppendChild("source", sourceEntity)
 					}
-					sourceEntity.AppendReferenced("source", this)
-					this.AppendChild("source",sourceEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNPlane"{
-				if len(uuid) > 0 {
-					var sourceEntity *BPMNDI_BPMNPlaneEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						sourceEntity = instance.(*BPMNDI_BPMNPlaneEntity)
-					}else{
-						sourceEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuid, nil)
-						sourceEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(sourceEntity)
+				} else if typeName == "BPMNDI.BPMNPlane" {
+					if len(uuid) > 0 {
+						var sourceEntity *BPMNDI_BPMNPlaneEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							sourceEntity = instance.(*BPMNDI_BPMNPlaneEntity)
+						} else {
+							sourceEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuid, nil)
+							sourceEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(sourceEntity)
+						}
+						sourceEntity.AppendReferenced("source", this)
+						this.AppendChild("source", sourceEntity)
 					}
-					sourceEntity.AppendReferenced("source", this)
-					this.AppendChild("source",sourceEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNLabel"{
-				if len(uuid) > 0 {
-					var sourceEntity *BPMNDI_BPMNLabelEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						sourceEntity = instance.(*BPMNDI_BPMNLabelEntity)
-					}else{
-						sourceEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuid, nil)
-						sourceEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(sourceEntity)
+				} else if typeName == "BPMNDI.BPMNLabel" {
+					if len(uuid) > 0 {
+						var sourceEntity *BPMNDI_BPMNLabelEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							sourceEntity = instance.(*BPMNDI_BPMNLabelEntity)
+						} else {
+							sourceEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuid, nil)
+							sourceEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(sourceEntity)
+						}
+						sourceEntity.AppendReferenced("source", this)
+						this.AppendChild("source", sourceEntity)
 					}
-					sourceEntity.AppendReferenced("source", this)
-					this.AppendChild("source",sourceEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNEdge"{
-				if len(uuid) > 0 {
-					var sourceEntity *BPMNDI_BPMNEdgeEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						sourceEntity = instance.(*BPMNDI_BPMNEdgeEntity)
-					}else{
-						sourceEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuid, nil)
-						sourceEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(sourceEntity)
+				} else if typeName == "BPMNDI.BPMNEdge" {
+					if len(uuid) > 0 {
+						var sourceEntity *BPMNDI_BPMNEdgeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							sourceEntity = instance.(*BPMNDI_BPMNEdgeEntity)
+						} else {
+							sourceEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuid, nil)
+							sourceEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(sourceEntity)
+						}
+						sourceEntity.AppendReferenced("source", this)
+						this.AppendChild("source", sourceEntity)
 					}
-					sourceEntity.AppendReferenced("source", this)
-					this.AppendChild("source",sourceEntity)
 				}
 			}
-			}
- 		}
+		}
 
 		/** target **/
- 		if results[0][9] != nil{
-			uuid :=results[0][9].(string)
+		if results[0][9] != nil {
+			uuid := results[0][9].(string)
 			if len(uuid) > 0 {
 				typeName := uuid[0:strings.Index(uuid, "%")]
-				if err!=nil{
+				if err != nil {
 					log.Println("type ", typeName, " not found!")
 					return err
 				}
-			if typeName == "BPMNDI.BPMNShape"{
-				if len(uuid) > 0 {
-					var targetEntity *BPMNDI_BPMNShapeEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						targetEntity = instance.(*BPMNDI_BPMNShapeEntity)
-					}else{
-						targetEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuid, nil)
-						targetEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(targetEntity)
+				if typeName == "BPMNDI.BPMNShape" {
+					if len(uuid) > 0 {
+						var targetEntity *BPMNDI_BPMNShapeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							targetEntity = instance.(*BPMNDI_BPMNShapeEntity)
+						} else {
+							targetEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuid, nil)
+							targetEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(targetEntity)
+						}
+						targetEntity.AppendReferenced("target", this)
+						this.AppendChild("target", targetEntity)
 					}
-					targetEntity.AppendReferenced("target", this)
-					this.AppendChild("target",targetEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNPlane"{
-				if len(uuid) > 0 {
-					var targetEntity *BPMNDI_BPMNPlaneEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						targetEntity = instance.(*BPMNDI_BPMNPlaneEntity)
-					}else{
-						targetEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuid, nil)
-						targetEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(targetEntity)
+				} else if typeName == "BPMNDI.BPMNPlane" {
+					if len(uuid) > 0 {
+						var targetEntity *BPMNDI_BPMNPlaneEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							targetEntity = instance.(*BPMNDI_BPMNPlaneEntity)
+						} else {
+							targetEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuid, nil)
+							targetEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(targetEntity)
+						}
+						targetEntity.AppendReferenced("target", this)
+						this.AppendChild("target", targetEntity)
 					}
-					targetEntity.AppendReferenced("target", this)
-					this.AppendChild("target",targetEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNLabel"{
-				if len(uuid) > 0 {
-					var targetEntity *BPMNDI_BPMNLabelEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						targetEntity = instance.(*BPMNDI_BPMNLabelEntity)
-					}else{
-						targetEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuid, nil)
-						targetEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(targetEntity)
+				} else if typeName == "BPMNDI.BPMNLabel" {
+					if len(uuid) > 0 {
+						var targetEntity *BPMNDI_BPMNLabelEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							targetEntity = instance.(*BPMNDI_BPMNLabelEntity)
+						} else {
+							targetEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuid, nil)
+							targetEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(targetEntity)
+						}
+						targetEntity.AppendReferenced("target", this)
+						this.AppendChild("target", targetEntity)
 					}
-					targetEntity.AppendReferenced("target", this)
-					this.AppendChild("target",targetEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNEdge"{
-				if len(uuid) > 0 {
-					var targetEntity *BPMNDI_BPMNEdgeEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						targetEntity = instance.(*BPMNDI_BPMNEdgeEntity)
-					}else{
-						targetEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuid, nil)
-						targetEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(targetEntity)
+				} else if typeName == "BPMNDI.BPMNEdge" {
+					if len(uuid) > 0 {
+						var targetEntity *BPMNDI_BPMNEdgeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							targetEntity = instance.(*BPMNDI_BPMNEdgeEntity)
+						} else {
+							targetEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuid, nil)
+							targetEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(targetEntity)
+						}
+						targetEntity.AppendReferenced("target", this)
+						this.AppendChild("target", targetEntity)
 					}
-					targetEntity.AppendReferenced("target", this)
-					this.AppendChild("target",targetEntity)
 				}
 			}
-			}
- 		}
+		}
 
 		/** waypoint **/
- 		if results[0][10] != nil{
-			uuidsStr :=results[0][10].(string)
-			uuids :=make([]string,0)
+		if results[0][10] != nil {
+			uuidsStr := results[0][10].(string)
+			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(uuids); i++{
+			for i := 0; i < len(uuids); i++ {
 				if len(uuids[i]) > 0 {
 					var waypointEntity *DC_PointEntity
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						waypointEntity = instance.(*DC_PointEntity)
-					}else{
+					} else {
 						waypointEntity = GetServer().GetEntityManager().NewDCPointEntity(uuids[i], nil)
 						waypointEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(waypointEntity)
 					}
 					waypointEntity.AppendReferenced("waypoint", this)
-					this.AppendChild("waypoint",waypointEntity)
+					this.AppendChild("waypoint", waypointEntity)
 				}
- 			}
- 		}
+			}
+		}
 
 		/** members of LabeledEdge **/
 
 		/** ownedLabel **/
- 		if results[0][11] != nil{
-			uuidsStr :=results[0][11].(string)
-			uuids :=make([]string,0)
+		if results[0][11] != nil {
+			uuidsStr := results[0][11].(string)
+			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(uuids); i++{
-			typeName := uuids[i][0:strings.Index(uuids[i], "%")]
-			if err!=nil{
-				log.Println("type ", typeName, " not found!")
-				return err
-			}
-				if typeName == "BPMNDI.BPMNLabel"{
-						if len(uuids[i]) > 0 {
-							var ownedLabelEntity *BPMNDI_BPMNLabelEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedLabelEntity = instance.(*BPMNDI_BPMNLabelEntity)
-							}else{
-								ownedLabelEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
-								ownedLabelEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedLabelEntity)
-							}
-							ownedLabelEntity.AppendReferenced("ownedLabel", this)
-							this.AppendChild("ownedLabel",ownedLabelEntity)
-						}
+			for i := 0; i < len(uuids); i++ {
+				typeName := uuids[i][0:strings.Index(uuids[i], "%")]
+				if err != nil {
+					log.Println("type ", typeName, " not found!")
+					return err
 				}
- 			}
- 		}
+				if typeName == "BPMNDI.BPMNLabel" {
+					if len(uuids[i]) > 0 {
+						var ownedLabelEntity *BPMNDI_BPMNLabelEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedLabelEntity = instance.(*BPMNDI_BPMNLabelEntity)
+						} else {
+							ownedLabelEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
+							ownedLabelEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedLabelEntity)
+						}
+						ownedLabelEntity.AppendReferenced("ownedLabel", this)
+						this.AppendChild("ownedLabel", ownedLabelEntity)
+					}
+				}
+			}
+		}
 
 		/** members of BPMNEdge **/
 
 		/** BPMNLabel **/
- 		if results[0][12] != nil{
-			uuid :=results[0][12].(string)
+		if results[0][12] != nil {
+			uuid := results[0][12].(string)
 			if len(uuid) > 0 {
 				var BPMNLabelEntity *BPMNDI_BPMNLabelEntity
 				if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
 					BPMNLabelEntity = instance.(*BPMNDI_BPMNLabelEntity)
-				}else{
+				} else {
 					BPMNLabelEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuid, nil)
 					BPMNLabelEntity.InitEntity(uuid)
-					GetServer().GetEntityManager().insert( BPMNLabelEntity)
+					GetServer().GetEntityManager().insert(BPMNLabelEntity)
 				}
 				BPMNLabelEntity.AppendReferenced("BPMNLabel", this)
-				this.AppendChild("BPMNLabel",BPMNLabelEntity)
+				this.AppendChild("BPMNLabel", BPMNLabelEntity)
 			}
- 		}
+		}
 
 		/** bpmnElement **/
- 		if results[0][13] != nil{
-			id :=results[0][13].(string)
+		if results[0][13] != nil {
+			id := results[0][13].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.interface{}"
-				id_:= refTypeName + "$$" + id
-				this.object.M_bpmnElement= id
-				GetServer().GetEntityManager().appendReference("bpmnElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.interface{}"
+				id_ := refTypeName + "$$" + id
+				this.object.M_bpmnElement = id
+				GetServer().GetEntityManager().appendReference("bpmnElement", this.object.UUID, id_)
 				this.object.M_bpmnElement = id
 			}
- 		}
+		}
 
 		/** sourceElement **/
- 		if results[0][14] != nil{
-			uuid :=results[0][14].(string)
+		if results[0][14] != nil {
+			uuid := results[0][14].(string)
 			if len(uuid) > 0 {
 				typeName := uuid[0:strings.Index(uuid, "%")]
-				if err!=nil{
+				if err != nil {
 					log.Println("type ", typeName, " not found!")
 					return err
 				}
-			if typeName == "BPMNDI.BPMNShape"{
-				if len(uuid) > 0 {
-					var sourceElementEntity *BPMNDI_BPMNShapeEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						sourceElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
-					}else{
-						sourceElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuid, nil)
-						sourceElementEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(sourceElementEntity)
+				if typeName == "BPMNDI.BPMNLabel" {
+					if len(uuid) > 0 {
+						var sourceElementEntity *BPMNDI_BPMNLabelEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							sourceElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
+						} else {
+							sourceElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuid, nil)
+							sourceElementEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(sourceElementEntity)
+						}
+						sourceElementEntity.AppendReferenced("sourceElement", this)
+						this.AppendChild("sourceElement", sourceElementEntity)
 					}
-					sourceElementEntity.AppendReferenced("sourceElement", this)
-					this.AppendChild("sourceElement",sourceElementEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNPlane"{
-				if len(uuid) > 0 {
-					var sourceElementEntity *BPMNDI_BPMNPlaneEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						sourceElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
-					}else{
-						sourceElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuid, nil)
-						sourceElementEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(sourceElementEntity)
+				} else if typeName == "BPMNDI.BPMNShape" {
+					if len(uuid) > 0 {
+						var sourceElementEntity *BPMNDI_BPMNShapeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							sourceElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
+						} else {
+							sourceElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuid, nil)
+							sourceElementEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(sourceElementEntity)
+						}
+						sourceElementEntity.AppendReferenced("sourceElement", this)
+						this.AppendChild("sourceElement", sourceElementEntity)
 					}
-					sourceElementEntity.AppendReferenced("sourceElement", this)
-					this.AppendChild("sourceElement",sourceElementEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNLabel"{
-				if len(uuid) > 0 {
-					var sourceElementEntity *BPMNDI_BPMNLabelEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						sourceElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
-					}else{
-						sourceElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuid, nil)
-						sourceElementEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(sourceElementEntity)
+				} else if typeName == "BPMNDI.BPMNPlane" {
+					if len(uuid) > 0 {
+						var sourceElementEntity *BPMNDI_BPMNPlaneEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							sourceElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
+						} else {
+							sourceElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuid, nil)
+							sourceElementEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(sourceElementEntity)
+						}
+						sourceElementEntity.AppendReferenced("sourceElement", this)
+						this.AppendChild("sourceElement", sourceElementEntity)
 					}
-					sourceElementEntity.AppendReferenced("sourceElement", this)
-					this.AppendChild("sourceElement",sourceElementEntity)
-				}
-			} else if typeName == "BPMNDI.BPMNEdge"{
-				if len(uuid) > 0 {
-					var sourceElementEntity *BPMNDI_BPMNEdgeEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
-						sourceElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
-					}else{
-						sourceElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuid, nil)
-						sourceElementEntity.InitEntity(uuid)
-						GetServer().GetEntityManager().insert(sourceElementEntity)
+				} else if typeName == "BPMNDI.BPMNEdge" {
+					if len(uuid) > 0 {
+						var sourceElementEntity *BPMNDI_BPMNEdgeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
+							sourceElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
+						} else {
+							sourceElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuid, nil)
+							sourceElementEntity.InitEntity(uuid)
+							GetServer().GetEntityManager().insert(sourceElementEntity)
+						}
+						sourceElementEntity.AppendReferenced("sourceElement", this)
+						this.AppendChild("sourceElement", sourceElementEntity)
 					}
-					sourceElementEntity.AppendReferenced("sourceElement", this)
-					this.AppendChild("sourceElement",sourceElementEntity)
 				}
 			}
-			}
- 		}
+		}
 
 		/** targetElement **/
- 		if results[0][15] != nil{
-			id :=results[0][15].(string)
+		if results[0][15] != nil {
+			id := results[0][15].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.DiagramElement"
-				id_:= refTypeName + "$$" + id
-				this.object.M_targetElement= id
-				GetServer().GetEntityManager().appendReference("targetElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.DiagramElement"
+				id_ := refTypeName + "$$" + id
+				this.object.M_targetElement = id
+				GetServer().GetEntityManager().appendReference("targetElement", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** messageVisibleKind **/
- 		if results[0][16] != nil{
- 			enumIndex := results[0][16].(int)
-			if enumIndex == 0{
- 				this.object.M_messageVisibleKind=BPMNDI.MessageVisibleKind_Initiating
-			} else if enumIndex == 1{
- 				this.object.M_messageVisibleKind=BPMNDI.MessageVisibleKind_Non_initiating
- 			}
- 		}
+		if results[0][16] != nil {
+			enumIndex := results[0][16].(int)
+			if enumIndex == 0 {
+				this.object.M_messageVisibleKind = BPMNDI.MessageVisibleKind_Initiating
+			} else if enumIndex == 1 {
+				this.object.M_messageVisibleKind = BPMNDI.MessageVisibleKind_Non_initiating
+			}
+		}
 
 		/** associations of BPMNEdge **/
 
 		/** sourceEdgePtr **/
- 		if results[0][17] != nil{
-			idsStr :=results[0][17].(string)
-			ids :=make([]string,0)
+		if results[0][17] != nil {
+			idsStr := results[0][17].(string)
+			ids := make([]string, 0)
 			err := json.Unmarshal([]byte(idsStr), &ids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(ids); i++{
+			for i := 0; i < len(ids); i++ {
 				if len(ids[i]) > 0 {
-					refTypeName:="BPMNDI.Edge"
-					id_:= refTypeName + "$$" + ids[i]
-					this.object.M_sourceEdgePtr = append(this.object.M_sourceEdgePtr,ids[i])
-					GetServer().GetEntityManager().appendReference("sourceEdgePtr",this.object.UUID, id_)
+					refTypeName := "BPMNDI.Edge"
+					id_ := refTypeName + "$$" + ids[i]
+					this.object.M_sourceEdgePtr = append(this.object.M_sourceEdgePtr, ids[i])
+					GetServer().GetEntityManager().appendReference("sourceEdgePtr", this.object.UUID, id_)
 				}
 			}
- 		}
+		}
 
 		/** targetEdgePtr **/
- 		if results[0][18] != nil{
-			idsStr :=results[0][18].(string)
-			ids :=make([]string,0)
+		if results[0][18] != nil {
+			idsStr := results[0][18].(string)
+			ids := make([]string, 0)
 			err := json.Unmarshal([]byte(idsStr), &ids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(ids); i++{
+			for i := 0; i < len(ids); i++ {
 				if len(ids[i]) > 0 {
-					refTypeName:="BPMNDI.Edge"
-					id_:= refTypeName + "$$" + ids[i]
-					this.object.M_targetEdgePtr = append(this.object.M_targetEdgePtr,ids[i])
-					GetServer().GetEntityManager().appendReference("targetEdgePtr",this.object.UUID, id_)
+					refTypeName := "BPMNDI.Edge"
+					id_ := refTypeName + "$$" + ids[i]
+					this.object.M_targetEdgePtr = append(this.object.M_targetEdgePtr, ids[i])
+					GetServer().GetEntityManager().appendReference("targetEdgePtr", this.object.UUID, id_)
 				}
 			}
- 		}
+		}
 
 		/** planePtr **/
- 		if results[0][19] != nil{
-			id :=results[0][19].(string)
+		if results[0][19] != nil {
+			id := results[0][19].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Plane"
-				id_:= refTypeName + "$$" + id
-				this.object.M_planePtr= id
-				GetServer().GetEntityManager().appendReference("planePtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Plane"
+				id_ := refTypeName + "$$" + id
+				this.object.M_planePtr = id
+				GetServer().GetEntityManager().appendReference("planePtr", this.object.UUID, id_)
 			}
- 		}
+		}
 		childsUuidStr := results[0][20].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -4113,7 +4123,7 @@ func (this *BPMNDI_BPMNEdgeEntity) InitEntity(id string) error{
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewBPMNDIBPMNEdgeEntityFromObject(object *BPMNDI.BPMNEdge) *BPMNDI_BPMNEdgeEntity {
-	 return this.NewBPMNDIBPMNEdgeEntity(object.UUID, object)
+	return this.NewBPMNDIBPMNEdgeEntity(object.UUID, object)
 }
 
 /** Delete **/
@@ -4127,7 +4137,7 @@ func BPMNDIBPMNEdgeExists(val string) string {
 	query.TypeName = "BPMNDI.BPMNEdge"
 	query.Indexs = append(query.Indexs, "M_id="+val)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -4159,7 +4169,7 @@ func (this *BPMNDI_BPMNEdgeEntity) AppendChild(attributeName string, child Entit
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
-	attributeName = strings.Replace(attributeName,"M_", "", -1)
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
 	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
 	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
 	if invalidMethod != nil {
@@ -4167,77 +4177,78 @@ func (this *BPMNDI_BPMNEdgeEntity) AppendChild(attributeName string, child Entit
 	}
 	return nil
 }
+
 /** Append reference entity into parent entity. **/
 func (this *BPMNDI_BPMNEdgeEntity) AppendReference(reference Entity) {
 
-	 // Here i will append the reference uuid
-	 index := -1
-	 for i := 0; i < len(this.referencesUuid); i++ {
-	 	refUuid := this.referencesUuid[i]
-	 	if refUuid == reference.GetUuid() {
-	 		index = i
-	 		break
-	 	}
-	 }
-	 if index == -1 {
-	 	this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-	 	this.referencesPtr = append(this.referencesPtr, reference)
-	 }else{
-	 	// The reference must be update in that case.
-	 	this.referencesPtr[index]  = reference
-	 }
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //              			BPMNLabel
 ////////////////////////////////////////////////////////////////////////////////
 /** local type **/
-type BPMNDI_BPMNLabelEntity struct{
+type BPMNDI_BPMNLabelEntity struct {
 	/** not the object id, except for the definition **/
-	uuid string
-	parentPtr 			Entity
-	parentUuid 			string
-	childsPtr  			[]Entity
-	childsUuid  		[]string
-	referencesUuid  	[]string
-	referencesPtr  	    []Entity
-	prototype      		*EntityPrototype
-	referenced  		[]EntityRef
-	object *BPMNDI.BPMNLabel
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	referenced     []EntityRef
+	object         *BPMNDI.BPMNLabel
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewBPMNDIBPMNLabelEntity(objectId string, object interface{}) *BPMNDI_BPMNLabelEntity{
+func (this *EntityManager) NewBPMNDIBPMNLabelEntity(objectId string, object interface{}) *BPMNDI_BPMNLabelEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
-		if Utility.IsValidEntityReferenceName(objectId){
+		if Utility.IsValidEntityReferenceName(objectId) {
 			uuidStr = objectId
-		}else{
-			uuidStr  = BPMNDIBPMNLabelExists(objectId)
+		} else {
+			uuidStr = BPMNDIBPMNLabelExists(objectId)
 		}
 	}
-	if object != nil{
+	if object != nil {
 		object.(*BPMNDI.BPMNLabel).TYPENAME = "BPMNDI.BPMNLabel"
 	}
 	if len(uuidStr) > 0 {
-		if object != nil{
+		if object != nil {
 			object.(*BPMNDI.BPMNLabel).UUID = uuidStr
 		}
-		if val, ok := this.contain(uuidStr);ok {
-			if object != nil{
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
 				this.setObjectValues(val, object)
 
 			}
 			return val.(*BPMNDI_BPMNLabelEntity)
 		}
-	}else{
+	} else {
 		uuidStr = "BPMNDI.BPMNLabel%" + Utility.RandomUUID()
 	}
 	entity := new(BPMNDI_BPMNLabelEntity)
-	if object == nil{
+	if object == nil {
 		entity.object = new(BPMNDI.BPMNLabel)
 		entity.SetNeedSave(true)
-	}else{
+	} else {
 		entity.object = object.(*BPMNDI.BPMNLabel)
 		entity.SetNeedSave(true)
 	}
@@ -4247,48 +4258,48 @@ func (this *EntityManager) NewBPMNDIBPMNLabelEntity(objectId string, object inte
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNLabel","BPMN20")
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNLabel", "BPMN20")
 	entity.prototype = prototype
 	return entity
 }
 
 /** Entity functions **/
-func(this *BPMNDI_BPMNLabelEntity) GetTypeName()string{
+func (this *BPMNDI_BPMNLabelEntity) GetTypeName() string {
 	return "BPMNDI.BPMNLabel"
 }
-func(this *BPMNDI_BPMNLabelEntity) GetUuid()string{
+func (this *BPMNDI_BPMNLabelEntity) GetUuid() string {
 	return this.uuid
 }
-func(this *BPMNDI_BPMNLabelEntity) GetParentPtr()Entity{
+func (this *BPMNDI_BPMNLabelEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
-func(this *BPMNDI_BPMNLabelEntity) SetParentPtr(parentPtr Entity){
-	this.parentPtr=parentPtr
+func (this *BPMNDI_BPMNLabelEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
 }
 
-func(this *BPMNDI_BPMNLabelEntity) AppendReferenced(name string, owner Entity){
+func (this *BPMNDI_BPMNLabelEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
 	}
 	var ref EntityRef
 	ref.Name = name
 	ref.OwnerUuid = owner.GetUuid()
-	for i:=0; i<len(this.referenced); i++ {
-		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid { 
-			return;
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
 		}
 	}
 	this.referenced = append(this.referenced, ref)
 }
 
-func(this *BPMNDI_BPMNLabelEntity) GetReferenced() []EntityRef{
+func (this *BPMNDI_BPMNLabelEntity) GetReferenced() []EntityRef {
 	return this.referenced
 }
 
-func(this *BPMNDI_BPMNLabelEntity) RemoveReferenced(name string, owner Entity) {
+func (this *BPMNDI_BPMNLabelEntity) RemoveReferenced(name string, owner Entity) {
 	var referenced []EntityRef
-	referenced = make([]EntityRef,0)
+	referenced = make([]EntityRef, 0)
 	for i := 0; i < len(this.referenced); i++ {
 		ref := this.referenced[i]
 		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
@@ -4299,7 +4310,7 @@ func(this *BPMNDI_BPMNLabelEntity) RemoveReferenced(name string, owner Entity) {
 	this.referenced = referenced
 }
 
-func(this *BPMNDI_BPMNLabelEntity) RemoveReference(name string, reference Entity){
+func (this *BPMNDI_BPMNLabelEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
 	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
@@ -4319,96 +4330,96 @@ func(this *BPMNDI_BPMNLabelEntity) RemoveReference(name string, reference Entity
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
 }
 
-func(this *BPMNDI_BPMNLabelEntity) GetChildsPtr() []Entity{
+func (this *BPMNDI_BPMNLabelEntity) GetChildsPtr() []Entity {
 	return this.childsPtr
 }
 
-func(this *BPMNDI_BPMNLabelEntity) SetChildsPtr(childsPtr[]Entity){
+func (this *BPMNDI_BPMNLabelEntity) SetChildsPtr(childsPtr []Entity) {
 	this.childsPtr = childsPtr
 }
 
-func(this *BPMNDI_BPMNLabelEntity) GetChildsUuid() []string{
+func (this *BPMNDI_BPMNLabelEntity) GetChildsUuid() []string {
 	return this.childsUuid
 }
 
-func(this *BPMNDI_BPMNLabelEntity) SetChildsUuid(childsUuid[]string){
+func (this *BPMNDI_BPMNLabelEntity) SetChildsUuid(childsUuid []string) {
 	this.childsUuid = childsUuid
 }
 
 /**
  * Remove a chidl uuid form the list of child in an entity.
  */
-func(this *BPMNDI_BPMNLabelEntity) RemoveChild(name string, uuid string) {
- 	childsUuid := make([]string, 0)
- 	for i := 0; i < len(this.GetChildsUuid()); i++ {
- 		if this.GetChildsUuid()[i] != uuid {
- 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
- 		}
- 	}
- 
- 	this.childsUuid = childsUuid
+func (this *BPMNDI_BPMNLabelEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
 	params := make([]interface{}, 1)
- 	childsPtr := make([]Entity, 0)
- 	for i := 0; i < len(this.GetChildsPtr()); i++ {
- 		if this.GetChildsPtr()[i].GetUuid() != uuid {
- 			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
- 		}else{
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
 			params[0] = this.GetChildsPtr()[i].GetObject()
- 		}
- 	}
- 	this.childsPtr = childsPtr
+		}
+	}
+	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
- }
+}
 
-func(this *BPMNDI_BPMNLabelEntity) GetReferencesUuid() []string{
+func (this *BPMNDI_BPMNLabelEntity) GetReferencesUuid() []string {
 	return this.referencesUuid
 }
 
-func(this *BPMNDI_BPMNLabelEntity) SetReferencesUuid(refsUuid[]string){
+func (this *BPMNDI_BPMNLabelEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
 }
 
-func(this *BPMNDI_BPMNLabelEntity) GetReferencesPtr() []Entity{
+func (this *BPMNDI_BPMNLabelEntity) GetReferencesPtr() []Entity {
 	return this.referencesPtr
 }
 
-func(this *BPMNDI_BPMNLabelEntity) SetReferencesPtr(refsPtr[]Entity){
+func (this *BPMNDI_BPMNLabelEntity) SetReferencesPtr(refsPtr []Entity) {
 	this.referencesPtr = refsPtr
 }
 
-func(this *BPMNDI_BPMNLabelEntity) GetObject() interface{}{
+func (this *BPMNDI_BPMNLabelEntity) GetObject() interface{} {
 	return this.object
 }
 
-func(this *BPMNDI_BPMNLabelEntity) NeedSave() bool{
+func (this *BPMNDI_BPMNLabelEntity) NeedSave() bool {
 	return this.object.NeedSave
 }
 
-func(this *BPMNDI_BPMNLabelEntity) SetNeedSave(needSave bool) {
+func (this *BPMNDI_BPMNLabelEntity) SetNeedSave(needSave bool) {
 	this.object.NeedSave = needSave
 }
 
-func(this *BPMNDI_BPMNLabelEntity) IsInit() bool{
+func (this *BPMNDI_BPMNLabelEntity) IsInit() bool {
 	return this.object.IsInit
 }
 
-func(this *BPMNDI_BPMNLabelEntity) SetInit(isInit bool) {
+func (this *BPMNDI_BPMNLabelEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
 }
 
-func(this *BPMNDI_BPMNLabelEntity) GetChecksum() string{
+func (this *BPMNDI_BPMNLabelEntity) GetChecksum() string {
 	objectStr, _ := json.Marshal(this.object)
-	return  Utility.GetMD5Hash(string(objectStr))
+	return Utility.GetMD5Hash(string(objectStr))
 }
 
-func(this *BPMNDI_BPMNLabelEntity) Exist() bool{
+func (this *BPMNDI_BPMNLabelEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "BPMNDI.BPMNLabel"
 	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -4421,10 +4432,11 @@ func(this *BPMNDI_BPMNLabelEntity) Exist() bool{
 
 /**
 * Return the entity prototype.
-*/
-func(this *BPMNDI_BPMNLabelEntity) GetPrototype() *EntityPrototype {
+ */
+func (this *BPMNDI_BPMNLabelEntity) GetPrototype() *EntityPrototype {
 	return this.prototype
 }
+
 /** Entity Prototype creation **/
 func (this *EntityManager) create_BPMNDI_BPMNLabelEntityPrototype() {
 
@@ -4433,97 +4445,97 @@ func (this *EntityManager) create_BPMNDI_BPMNLabelEntityPrototype() {
 	bPMNLabelEntityProto.SuperTypeNames = append(bPMNLabelEntityProto.SuperTypeNames, "DI.DiagramElement")
 	bPMNLabelEntityProto.SuperTypeNames = append(bPMNLabelEntityProto.SuperTypeNames, "DI.Node")
 	bPMNLabelEntityProto.SuperTypeNames = append(bPMNLabelEntityProto.SuperTypeNames, "DI.Label")
-	bPMNLabelEntityProto.Ids = append(bPMNLabelEntityProto.Ids,"uuid")
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"uuid")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"xs.string")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,0)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,false)
-	bPMNLabelEntityProto.Indexs = append(bPMNLabelEntityProto.Indexs,"parentUuid")
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"parentUuid")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"xs.string")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,1)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,false)
+	bPMNLabelEntityProto.Ids = append(bPMNLabelEntityProto.Ids, "uuid")
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "uuid")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "xs.string")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 0)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, false)
+	bPMNLabelEntityProto.Indexs = append(bPMNLabelEntityProto.Indexs, "parentUuid")
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "parentUuid")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "xs.string")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 1)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, false)
 
 	/** members of DiagramElement **/
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,2)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,true)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_owningDiagram")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"BPMNDI.DI.Diagram:Ref")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,3)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,true)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_owningElement")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"BPMNDI.DI.DiagramElement:Ref")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,4)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,true)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_modelElement")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"xs.interface{}:Ref")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,5)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,true)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_style")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"BPMNDI.DI.Style:Ref")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,6)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,true)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_ownedElement")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"[]BPMNDI.DI.DiagramElement")
-	bPMNLabelEntityProto.Ids = append(bPMNLabelEntityProto.Ids,"M_id")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,7)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,true)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_id")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"xs.ID")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 2)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, true)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_owningDiagram")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "BPMNDI.DI.Diagram:Ref")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 3)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, true)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_owningElement")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "BPMNDI.DI.DiagramElement:Ref")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 4)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, true)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_modelElement")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "xs.interface{}:Ref")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 5)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, true)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_style")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "BPMNDI.DI.Style:Ref")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 6)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, true)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_ownedElement")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "[]BPMNDI.DI.DiagramElement")
+	bPMNLabelEntityProto.Ids = append(bPMNLabelEntityProto.Ids, "M_id")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 7)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, true)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_id")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "xs.ID")
 
 	/** members of Node **/
 	/** No members **/
 
 	/** members of Label **/
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,8)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,true)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_Bounds")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"BPMNDI.DC.Bounds")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 8)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, true)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_Bounds")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "BPMNDI.DC.Bounds")
 
 	/** members of BPMNLabel **/
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,9)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,true)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_labelStyle")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"BPMNDI.BPMNLabelStyle:Ref")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 9)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, true)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_labelStyle")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "BPMNDI.BPMNLabelStyle:Ref")
 
 	/** associations of BPMNLabel **/
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,10)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,false)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_shapePtr")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"BPMNDI.BPMNShape:Ref")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,11)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,false)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_edgePtr")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"BPMNDI.BPMNEdge:Ref")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,12)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,false)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_sourceEdgePtr")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"[]BPMNDI.DI.Edge:Ref")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,13)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,false)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_targetEdgePtr")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"[]BPMNDI.DI.Edge:Ref")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,14)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,false)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_planePtr")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"BPMNDI.DI.Plane:Ref")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,15)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,false)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_owningEdgePtr")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"BPMNDI.DI.LabeledEdge:Ref")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,16)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,false)
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"M_owningShapePtr")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"BPMNDI.DI.LabeledShape:Ref")
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"childsUuid")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"[]xs.string")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,17)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,false)
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 10)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, false)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_shapePtr")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "BPMNDI.BPMNShape:Ref")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 11)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, false)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_edgePtr")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "BPMNDI.BPMNEdge:Ref")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 12)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, false)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_sourceEdgePtr")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "[]BPMNDI.DI.Edge:Ref")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 13)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, false)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_targetEdgePtr")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "[]BPMNDI.DI.Edge:Ref")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 14)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, false)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_planePtr")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "BPMNDI.DI.Plane:Ref")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 15)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, false)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_owningEdgePtr")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "BPMNDI.DI.LabeledEdge:Ref")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 16)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, false)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "M_owningShapePtr")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "BPMNDI.DI.LabeledShape:Ref")
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "childsUuid")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "[]xs.string")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 17)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, false)
 
-	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields,"referenced")
-	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType,"[]EntityRef")
-	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder,18)
-	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility,false)
+	bPMNLabelEntityProto.Fields = append(bPMNLabelEntityProto.Fields, "referenced")
+	bPMNLabelEntityProto.FieldsType = append(bPMNLabelEntityProto.FieldsType, "[]EntityRef")
+	bPMNLabelEntityProto.FieldsOrder = append(bPMNLabelEntityProto.FieldsOrder, 18)
+	bPMNLabelEntityProto.FieldsVisibility = append(bPMNLabelEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(BPMNDIDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&bPMNLabelEntityProto)
@@ -4564,7 +4576,7 @@ func (this *BPMNDI_BPMNLabelEntity) SaveEntity() {
 	/** members of BPMNLabel **/
 	query.Fields = append(query.Fields, "M_labelStyle")
 
-		/** associations of BPMNLabel **/
+	/** associations of BPMNLabel **/
 	query.Fields = append(query.Fields, "M_shapePtr")
 	query.Fields = append(query.Fields, "M_edgePtr")
 	query.Fields = append(query.Fields, "M_sourceEdgePtr")
@@ -4580,58 +4592,58 @@ func (this *BPMNDI_BPMNLabelEntity) SaveEntity() {
 	BPMNLabelInfo = append(BPMNLabelInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		BPMNLabelInfo = append(BPMNLabelInfo, this.parentPtr.GetUuid())
-	}else{
+	} else {
 		BPMNLabelInfo = append(BPMNLabelInfo, "")
 	}
 
 	/** members of DiagramElement **/
 
 	/** Save owningDiagram type Diagram **/
-		BPMNLabelInfo = append(BPMNLabelInfo,this.object.M_owningDiagram)
+	BPMNLabelInfo = append(BPMNLabelInfo, this.object.M_owningDiagram)
 
 	/** Save owningElement type DiagramElement **/
-		BPMNLabelInfo = append(BPMNLabelInfo,this.object.M_owningElement)
+	BPMNLabelInfo = append(BPMNLabelInfo, this.object.M_owningElement)
 	BPMNLabelInfo = append(BPMNLabelInfo, this.object.M_modelElement)
 
 	/** Save style type Style **/
-		BPMNLabelInfo = append(BPMNLabelInfo,this.object.M_style)
+	BPMNLabelInfo = append(BPMNLabelInfo, this.object.M_style)
 
 	/** Save ownedElement type DiagramElement **/
-	ownedElementIds := make([]string,0)
+	ownedElementIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_ownedElement); i++ {
 		switch v := this.object.M_ownedElement[i].(type) {
-		case *BPMNDI.BPMNPlane:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
-		case *BPMNDI.BPMNLabel:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
 		case *BPMNDI.BPMNShape:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
+		case *BPMNDI.BPMNPlane:
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
+		case *BPMNDI.BPMNLabel:
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
 		case *BPMNDI.BPMNEdge:
-		ownedElementEntity:= GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
-		ownedElementIds=append(ownedElementIds,ownedElementEntity.uuid)
-		ownedElementEntity.AppendReferenced("ownedElement", this)
-		this.AppendChild("ownedElement",ownedElementEntity)
-		if ownedElementEntity.NeedSave() {
-			ownedElementEntity.SaveEntity()
-		}
+			ownedElementEntity := GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(v.UUID, v)
+			ownedElementIds = append(ownedElementIds, ownedElementEntity.uuid)
+			ownedElementEntity.AppendReferenced("ownedElement", this)
+			this.AppendChild("ownedElement", ownedElementEntity)
+			if ownedElementEntity.NeedSave() {
+				ownedElementEntity.SaveEntity()
+			}
 		}
 	}
 	ownedElementStr, _ := json.Marshal(ownedElementIds)
@@ -4645,29 +4657,29 @@ func (this *BPMNDI_BPMNLabelEntity) SaveEntity() {
 
 	/** Save Bounds type Bounds **/
 	if this.object.M_Bounds != nil {
-		BoundsEntity:= GetServer().GetEntityManager().NewDCBoundsEntity(this.object.M_Bounds.UUID, this.object.M_Bounds)
+		BoundsEntity := GetServer().GetEntityManager().NewDCBoundsEntity(this.object.M_Bounds.UUID, this.object.M_Bounds)
 		BPMNLabelInfo = append(BPMNLabelInfo, BoundsEntity.uuid)
 		BoundsEntity.AppendReferenced("Bounds", this)
-		this.AppendChild("Bounds",BoundsEntity)
+		this.AppendChild("Bounds", BoundsEntity)
 		if BoundsEntity.NeedSave() {
 			BoundsEntity.SaveEntity()
 		}
-	}else{
+	} else {
 		BPMNLabelInfo = append(BPMNLabelInfo, "")
 	}
 
 	/** members of BPMNLabel **/
 
 	/** Save labelStyle type BPMNLabelStyle **/
-		BPMNLabelInfo = append(BPMNLabelInfo,this.object.M_labelStyle)
+	BPMNLabelInfo = append(BPMNLabelInfo, this.object.M_labelStyle)
 
 	/** associations of BPMNLabel **/
 
 	/** Save shape type BPMNShape **/
-		BPMNLabelInfo = append(BPMNLabelInfo,this.object.M_shapePtr)
+	BPMNLabelInfo = append(BPMNLabelInfo, this.object.M_shapePtr)
 
 	/** Save edge type BPMNEdge **/
-		BPMNLabelInfo = append(BPMNLabelInfo,this.object.M_edgePtr)
+	BPMNLabelInfo = append(BPMNLabelInfo, this.object.M_edgePtr)
 
 	/** Save sourceEdge type Edge **/
 	sourceEdgePtrStr, _ := json.Marshal(this.object.M_sourceEdgePtr)
@@ -4678,13 +4690,13 @@ func (this *BPMNDI_BPMNLabelEntity) SaveEntity() {
 	BPMNLabelInfo = append(BPMNLabelInfo, string(targetEdgePtrStr))
 
 	/** Save plane type Plane **/
-		BPMNLabelInfo = append(BPMNLabelInfo,this.object.M_planePtr)
+	BPMNLabelInfo = append(BPMNLabelInfo, this.object.M_planePtr)
 
 	/** Save owningEdge type LabeledEdge **/
-		BPMNLabelInfo = append(BPMNLabelInfo,this.object.M_owningEdgePtr)
+	BPMNLabelInfo = append(BPMNLabelInfo, this.object.M_owningEdgePtr)
 
 	/** Save owningShape type LabeledShape **/
-		BPMNLabelInfo = append(BPMNLabelInfo,this.object.M_owningShapePtr)
+	BPMNLabelInfo = append(BPMNLabelInfo, this.object.M_owningShapePtr)
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	BPMNLabelInfo = append(BPMNLabelInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -4705,7 +4717,7 @@ func (this *BPMNDI_BPMNLabelEntity) SaveEntity() {
 	} else {
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 		queryStr, _ := json.Marshal(query)
-		_, err =  GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNLabelInfo)
+		_, err = GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNLabelInfo)
 	}
 	if err == nil {
 		GetServer().GetEntityManager().insert(this)
@@ -4715,7 +4727,7 @@ func (this *BPMNDI_BPMNLabelEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *BPMNDI_BPMNLabelEntity) InitEntity(id string) error{
+func (this *BPMNDI_BPMNLabelEntity) InitEntity(id string) error {
 	if this.object.IsInit == true {
 		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
 		if err == nil {
@@ -4752,7 +4764,7 @@ func (this *BPMNDI_BPMNLabelEntity) InitEntity(id string) error{
 	/** members of BPMNLabel **/
 	query.Fields = append(query.Fields, "M_labelStyle")
 
-		/** associations of BPMNLabel **/
+	/** associations of BPMNLabel **/
 	query.Fields = append(query.Fields, "M_shapePtr")
 	query.Fields = append(query.Fields, "M_edgePtr")
 	query.Fields = append(query.Fields, "M_sourceEdgePtr")
@@ -4778,7 +4790,7 @@ func (this *BPMNDI_BPMNLabelEntity) InitEntity(id string) error{
 	// Initialisation of information of BPMNLabel...
 	if len(results) > 0 {
 
-	/** initialyzation of the entity object **/
+		/** initialyzation of the entity object **/
 		this.object = new(BPMNDI.BPMNLabel)
 		this.object.UUID = this.uuid
 		this.object.TYPENAME = "BPMNDI.BPMNLabel"
@@ -4788,123 +4800,123 @@ func (this *BPMNDI_BPMNLabelEntity) InitEntity(id string) error{
 		/** members of DiagramElement **/
 
 		/** owningDiagram **/
- 		if results[0][2] != nil{
-			id :=results[0][2].(string)
+		if results[0][2] != nil {
+			id := results[0][2].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Diagram"
-				id_:= refTypeName + "$$" + id
-				this.object.M_owningDiagram= id
-				GetServer().GetEntityManager().appendReference("owningDiagram",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Diagram"
+				id_ := refTypeName + "$$" + id
+				this.object.M_owningDiagram = id
+				GetServer().GetEntityManager().appendReference("owningDiagram", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** owningElement **/
- 		if results[0][3] != nil{
-			id :=results[0][3].(string)
+		if results[0][3] != nil {
+			id := results[0][3].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.DiagramElement"
-				id_:= refTypeName + "$$" + id
-				this.object.M_owningElement= id
-				GetServer().GetEntityManager().appendReference("owningElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.DiagramElement"
+				id_ := refTypeName + "$$" + id
+				this.object.M_owningElement = id
+				GetServer().GetEntityManager().appendReference("owningElement", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** modelElement **/
- 		if results[0][4] != nil{
-			id :=results[0][4].(string)
+		if results[0][4] != nil {
+			id := results[0][4].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.interface{}"
-				id_:= refTypeName + "$$" + id
-				this.object.M_modelElement= id
-				GetServer().GetEntityManager().appendReference("modelElement",this.object.UUID, id_)
+				refTypeName := "BPMNDI.interface{}"
+				id_ := refTypeName + "$$" + id
+				this.object.M_modelElement = id
+				GetServer().GetEntityManager().appendReference("modelElement", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** style **/
- 		if results[0][5] != nil{
-			id :=results[0][5].(string)
+		if results[0][5] != nil {
+			id := results[0][5].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Style"
-				id_:= refTypeName + "$$" + id
-				this.object.M_style= id
-				GetServer().GetEntityManager().appendReference("style",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Style"
+				id_ := refTypeName + "$$" + id
+				this.object.M_style = id
+				GetServer().GetEntityManager().appendReference("style", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** ownedElement **/
- 		if results[0][6] != nil{
-			uuidsStr :=results[0][6].(string)
-			uuids :=make([]string,0)
+		if results[0][6] != nil {
+			uuidsStr := results[0][6].(string)
+			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(uuids); i++{
-			typeName := uuids[i][0:strings.Index(uuids[i], "%")]
-			if err!=nil{
-				log.Println("type ", typeName, " not found!")
-				return err
-			}
-				if typeName == "BPMNDI.BPMNEdge"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNEdgeEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNPlane"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNPlaneEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNLabel"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNLabelEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
-				} else if typeName == "BPMNDI.BPMNShape"{
-						if len(uuids[i]) > 0 {
-							var ownedElementEntity *BPMNDI_BPMNShapeEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								ownedElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
-							}else{
-								ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuids[i], nil)
-								ownedElementEntity.InitEntity(uuids[i])
-								GetServer().GetEntityManager().insert(ownedElementEntity)
-							}
-							ownedElementEntity.AppendReferenced("ownedElement", this)
-							this.AppendChild("ownedElement",ownedElementEntity)
-						}
+			for i := 0; i < len(uuids); i++ {
+				typeName := uuids[i][0:strings.Index(uuids[i], "%")]
+				if err != nil {
+					log.Println("type ", typeName, " not found!")
+					return err
 				}
- 			}
- 		}
+				if typeName == "BPMNDI.BPMNShape" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNShapeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNShapeEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNShapeEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNPlane" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNPlaneEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNPlaneEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNPlaneEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNLabel" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNLabelEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNLabelEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNLabelEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				} else if typeName == "BPMNDI.BPMNEdge" {
+					if len(uuids[i]) > 0 {
+						var ownedElementEntity *BPMNDI_BPMNEdgeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ownedElementEntity = instance.(*BPMNDI_BPMNEdgeEntity)
+						} else {
+							ownedElementEntity = GetServer().GetEntityManager().NewBPMNDIBPMNEdgeEntity(uuids[i], nil)
+							ownedElementEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(ownedElementEntity)
+						}
+						ownedElementEntity.AppendReferenced("ownedElement", this)
+						this.AppendChild("ownedElement", ownedElementEntity)
+					}
+				}
+			}
+		}
 
 		/** id **/
- 		if results[0][7] != nil{
- 			this.object.M_id=results[0][7].(string)
- 		}
+		if results[0][7] != nil {
+			this.object.M_id = results[0][7].(string)
+		}
 
 		/** members of Node **/
 		/** No members **/
@@ -4912,127 +4924,127 @@ func (this *BPMNDI_BPMNLabelEntity) InitEntity(id string) error{
 		/** members of Label **/
 
 		/** Bounds **/
- 		if results[0][8] != nil{
-			uuid :=results[0][8].(string)
+		if results[0][8] != nil {
+			uuid := results[0][8].(string)
 			if len(uuid) > 0 {
 				var BoundsEntity *DC_BoundsEntity
 				if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
 					BoundsEntity = instance.(*DC_BoundsEntity)
-				}else{
+				} else {
 					BoundsEntity = GetServer().GetEntityManager().NewDCBoundsEntity(uuid, nil)
 					BoundsEntity.InitEntity(uuid)
-					GetServer().GetEntityManager().insert( BoundsEntity)
+					GetServer().GetEntityManager().insert(BoundsEntity)
 				}
 				BoundsEntity.AppendReferenced("Bounds", this)
-				this.AppendChild("Bounds",BoundsEntity)
+				this.AppendChild("Bounds", BoundsEntity)
 			}
- 		}
+		}
 
 		/** members of BPMNLabel **/
 
 		/** labelStyle **/
- 		if results[0][9] != nil{
-			id :=results[0][9].(string)
+		if results[0][9] != nil {
+			id := results[0][9].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.BPMNLabelStyle"
-				id_:= refTypeName + "$$" + id
-				this.object.M_labelStyle= id
-				GetServer().GetEntityManager().appendReference("labelStyle",this.object.UUID, id_)
+				refTypeName := "BPMNDI.BPMNLabelStyle"
+				id_ := refTypeName + "$$" + id
+				this.object.M_labelStyle = id
+				GetServer().GetEntityManager().appendReference("labelStyle", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** associations of BPMNLabel **/
 
 		/** shapePtr **/
- 		if results[0][10] != nil{
-			id :=results[0][10].(string)
+		if results[0][10] != nil {
+			id := results[0][10].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.BPMNShape"
-				id_:= refTypeName + "$$" + id
-				this.object.M_shapePtr= id
-				GetServer().GetEntityManager().appendReference("shapePtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.BPMNShape"
+				id_ := refTypeName + "$$" + id
+				this.object.M_shapePtr = id
+				GetServer().GetEntityManager().appendReference("shapePtr", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** edgePtr **/
- 		if results[0][11] != nil{
-			id :=results[0][11].(string)
+		if results[0][11] != nil {
+			id := results[0][11].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.BPMNEdge"
-				id_:= refTypeName + "$$" + id
-				this.object.M_edgePtr= id
-				GetServer().GetEntityManager().appendReference("edgePtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.BPMNEdge"
+				id_ := refTypeName + "$$" + id
+				this.object.M_edgePtr = id
+				GetServer().GetEntityManager().appendReference("edgePtr", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** sourceEdgePtr **/
- 		if results[0][12] != nil{
-			idsStr :=results[0][12].(string)
-			ids :=make([]string,0)
+		if results[0][12] != nil {
+			idsStr := results[0][12].(string)
+			ids := make([]string, 0)
 			err := json.Unmarshal([]byte(idsStr), &ids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(ids); i++{
+			for i := 0; i < len(ids); i++ {
 				if len(ids[i]) > 0 {
-					refTypeName:="BPMNDI.Edge"
-					id_:= refTypeName + "$$" + ids[i]
-					this.object.M_sourceEdgePtr = append(this.object.M_sourceEdgePtr,ids[i])
-					GetServer().GetEntityManager().appendReference("sourceEdgePtr",this.object.UUID, id_)
+					refTypeName := "BPMNDI.Edge"
+					id_ := refTypeName + "$$" + ids[i]
+					this.object.M_sourceEdgePtr = append(this.object.M_sourceEdgePtr, ids[i])
+					GetServer().GetEntityManager().appendReference("sourceEdgePtr", this.object.UUID, id_)
 				}
 			}
- 		}
+		}
 
 		/** targetEdgePtr **/
- 		if results[0][13] != nil{
-			idsStr :=results[0][13].(string)
-			ids :=make([]string,0)
+		if results[0][13] != nil {
+			idsStr := results[0][13].(string)
+			ids := make([]string, 0)
 			err := json.Unmarshal([]byte(idsStr), &ids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(ids); i++{
+			for i := 0; i < len(ids); i++ {
 				if len(ids[i]) > 0 {
-					refTypeName:="BPMNDI.Edge"
-					id_:= refTypeName + "$$" + ids[i]
-					this.object.M_targetEdgePtr = append(this.object.M_targetEdgePtr,ids[i])
-					GetServer().GetEntityManager().appendReference("targetEdgePtr",this.object.UUID, id_)
+					refTypeName := "BPMNDI.Edge"
+					id_ := refTypeName + "$$" + ids[i]
+					this.object.M_targetEdgePtr = append(this.object.M_targetEdgePtr, ids[i])
+					GetServer().GetEntityManager().appendReference("targetEdgePtr", this.object.UUID, id_)
 				}
 			}
- 		}
+		}
 
 		/** planePtr **/
- 		if results[0][14] != nil{
-			id :=results[0][14].(string)
+		if results[0][14] != nil {
+			id := results[0][14].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Plane"
-				id_:= refTypeName + "$$" + id
-				this.object.M_planePtr= id
-				GetServer().GetEntityManager().appendReference("planePtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Plane"
+				id_ := refTypeName + "$$" + id
+				this.object.M_planePtr = id
+				GetServer().GetEntityManager().appendReference("planePtr", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** owningEdgePtr **/
- 		if results[0][15] != nil{
-			id :=results[0][15].(string)
+		if results[0][15] != nil {
+			id := results[0][15].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.LabeledEdge"
-				id_:= refTypeName + "$$" + id
-				this.object.M_owningEdgePtr= id
-				GetServer().GetEntityManager().appendReference("owningEdgePtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.LabeledEdge"
+				id_ := refTypeName + "$$" + id
+				this.object.M_owningEdgePtr = id
+				GetServer().GetEntityManager().appendReference("owningEdgePtr", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** owningShapePtr **/
- 		if results[0][16] != nil{
-			id :=results[0][16].(string)
+		if results[0][16] != nil {
+			id := results[0][16].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.LabeledShape"
-				id_:= refTypeName + "$$" + id
-				this.object.M_owningShapePtr= id
-				GetServer().GetEntityManager().appendReference("owningShapePtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.LabeledShape"
+				id_ := refTypeName + "$$" + id
+				this.object.M_owningShapePtr = id
+				GetServer().GetEntityManager().appendReference("owningShapePtr", this.object.UUID, id_)
 			}
- 		}
+		}
 		childsUuidStr := results[0][17].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -5059,7 +5071,7 @@ func (this *BPMNDI_BPMNLabelEntity) InitEntity(id string) error{
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewBPMNDIBPMNLabelEntityFromObject(object *BPMNDI.BPMNLabel) *BPMNDI_BPMNLabelEntity {
-	 return this.NewBPMNDIBPMNLabelEntity(object.UUID, object)
+	return this.NewBPMNDIBPMNLabelEntity(object.UUID, object)
 }
 
 /** Delete **/
@@ -5073,7 +5085,7 @@ func BPMNDIBPMNLabelExists(val string) string {
 	query.TypeName = "BPMNDI.BPMNLabel"
 	query.Indexs = append(query.Indexs, "M_id="+val)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -5105,7 +5117,7 @@ func (this *BPMNDI_BPMNLabelEntity) AppendChild(attributeName string, child Enti
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
-	attributeName = strings.Replace(attributeName,"M_", "", -1)
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
 	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
 	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
 	if invalidMethod != nil {
@@ -5113,77 +5125,78 @@ func (this *BPMNDI_BPMNLabelEntity) AppendChild(attributeName string, child Enti
 	}
 	return nil
 }
+
 /** Append reference entity into parent entity. **/
 func (this *BPMNDI_BPMNLabelEntity) AppendReference(reference Entity) {
 
-	 // Here i will append the reference uuid
-	 index := -1
-	 for i := 0; i < len(this.referencesUuid); i++ {
-	 	refUuid := this.referencesUuid[i]
-	 	if refUuid == reference.GetUuid() {
-	 		index = i
-	 		break
-	 	}
-	 }
-	 if index == -1 {
-	 	this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-	 	this.referencesPtr = append(this.referencesPtr, reference)
-	 }else{
-	 	// The reference must be update in that case.
-	 	this.referencesPtr[index]  = reference
-	 }
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //              			BPMNLabelStyle
 ////////////////////////////////////////////////////////////////////////////////
 /** local type **/
-type BPMNDI_BPMNLabelStyleEntity struct{
+type BPMNDI_BPMNLabelStyleEntity struct {
 	/** not the object id, except for the definition **/
-	uuid string
-	parentPtr 			Entity
-	parentUuid 			string
-	childsPtr  			[]Entity
-	childsUuid  		[]string
-	referencesUuid  	[]string
-	referencesPtr  	    []Entity
-	prototype      		*EntityPrototype
-	referenced  		[]EntityRef
-	object *BPMNDI.BPMNLabelStyle
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	referenced     []EntityRef
+	object         *BPMNDI.BPMNLabelStyle
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewBPMNDIBPMNLabelStyleEntity(objectId string, object interface{}) *BPMNDI_BPMNLabelStyleEntity{
+func (this *EntityManager) NewBPMNDIBPMNLabelStyleEntity(objectId string, object interface{}) *BPMNDI_BPMNLabelStyleEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
-		if Utility.IsValidEntityReferenceName(objectId){
+		if Utility.IsValidEntityReferenceName(objectId) {
 			uuidStr = objectId
-		}else{
-			uuidStr  = BPMNDIBPMNLabelStyleExists(objectId)
+		} else {
+			uuidStr = BPMNDIBPMNLabelStyleExists(objectId)
 		}
 	}
-	if object != nil{
+	if object != nil {
 		object.(*BPMNDI.BPMNLabelStyle).TYPENAME = "BPMNDI.BPMNLabelStyle"
 	}
 	if len(uuidStr) > 0 {
-		if object != nil{
+		if object != nil {
 			object.(*BPMNDI.BPMNLabelStyle).UUID = uuidStr
 		}
-		if val, ok := this.contain(uuidStr);ok {
-			if object != nil{
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
 				this.setObjectValues(val, object)
 
 			}
 			return val.(*BPMNDI_BPMNLabelStyleEntity)
 		}
-	}else{
+	} else {
 		uuidStr = "BPMNDI.BPMNLabelStyle%" + Utility.RandomUUID()
 	}
 	entity := new(BPMNDI_BPMNLabelStyleEntity)
-	if object == nil{
+	if object == nil {
 		entity.object = new(BPMNDI.BPMNLabelStyle)
 		entity.SetNeedSave(true)
-	}else{
+	} else {
 		entity.object = object.(*BPMNDI.BPMNLabelStyle)
 		entity.SetNeedSave(true)
 	}
@@ -5193,48 +5206,48 @@ func (this *EntityManager) NewBPMNDIBPMNLabelStyleEntity(objectId string, object
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNLabelStyle","BPMN20")
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("BPMNDI.BPMNLabelStyle", "BPMN20")
 	entity.prototype = prototype
 	return entity
 }
 
 /** Entity functions **/
-func(this *BPMNDI_BPMNLabelStyleEntity) GetTypeName()string{
+func (this *BPMNDI_BPMNLabelStyleEntity) GetTypeName() string {
 	return "BPMNDI.BPMNLabelStyle"
 }
-func(this *BPMNDI_BPMNLabelStyleEntity) GetUuid()string{
+func (this *BPMNDI_BPMNLabelStyleEntity) GetUuid() string {
 	return this.uuid
 }
-func(this *BPMNDI_BPMNLabelStyleEntity) GetParentPtr()Entity{
+func (this *BPMNDI_BPMNLabelStyleEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) SetParentPtr(parentPtr Entity){
-	this.parentPtr=parentPtr
+func (this *BPMNDI_BPMNLabelStyleEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) AppendReferenced(name string, owner Entity){
+func (this *BPMNDI_BPMNLabelStyleEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
 	}
 	var ref EntityRef
 	ref.Name = name
 	ref.OwnerUuid = owner.GetUuid()
-	for i:=0; i<len(this.referenced); i++ {
-		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid { 
-			return;
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
 		}
 	}
 	this.referenced = append(this.referenced, ref)
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) GetReferenced() []EntityRef{
+func (this *BPMNDI_BPMNLabelStyleEntity) GetReferenced() []EntityRef {
 	return this.referenced
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) RemoveReferenced(name string, owner Entity) {
+func (this *BPMNDI_BPMNLabelStyleEntity) RemoveReferenced(name string, owner Entity) {
 	var referenced []EntityRef
-	referenced = make([]EntityRef,0)
+	referenced = make([]EntityRef, 0)
 	for i := 0; i < len(this.referenced); i++ {
 		ref := this.referenced[i]
 		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
@@ -5245,7 +5258,7 @@ func(this *BPMNDI_BPMNLabelStyleEntity) RemoveReferenced(name string, owner Enti
 	this.referenced = referenced
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) RemoveReference(name string, reference Entity){
+func (this *BPMNDI_BPMNLabelStyleEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
 	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
@@ -5265,96 +5278,96 @@ func(this *BPMNDI_BPMNLabelStyleEntity) RemoveReference(name string, reference E
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) GetChildsPtr() []Entity{
+func (this *BPMNDI_BPMNLabelStyleEntity) GetChildsPtr() []Entity {
 	return this.childsPtr
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) SetChildsPtr(childsPtr[]Entity){
+func (this *BPMNDI_BPMNLabelStyleEntity) SetChildsPtr(childsPtr []Entity) {
 	this.childsPtr = childsPtr
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) GetChildsUuid() []string{
+func (this *BPMNDI_BPMNLabelStyleEntity) GetChildsUuid() []string {
 	return this.childsUuid
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) SetChildsUuid(childsUuid[]string){
+func (this *BPMNDI_BPMNLabelStyleEntity) SetChildsUuid(childsUuid []string) {
 	this.childsUuid = childsUuid
 }
 
 /**
  * Remove a chidl uuid form the list of child in an entity.
  */
-func(this *BPMNDI_BPMNLabelStyleEntity) RemoveChild(name string, uuid string) {
- 	childsUuid := make([]string, 0)
- 	for i := 0; i < len(this.GetChildsUuid()); i++ {
- 		if this.GetChildsUuid()[i] != uuid {
- 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
- 		}
- 	}
- 
- 	this.childsUuid = childsUuid
+func (this *BPMNDI_BPMNLabelStyleEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
 	params := make([]interface{}, 1)
- 	childsPtr := make([]Entity, 0)
- 	for i := 0; i < len(this.GetChildsPtr()); i++ {
- 		if this.GetChildsPtr()[i].GetUuid() != uuid {
- 			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
- 		}else{
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
 			params[0] = this.GetChildsPtr()[i].GetObject()
- 		}
- 	}
- 	this.childsPtr = childsPtr
+		}
+	}
+	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
- }
+}
 
-func(this *BPMNDI_BPMNLabelStyleEntity) GetReferencesUuid() []string{
+func (this *BPMNDI_BPMNLabelStyleEntity) GetReferencesUuid() []string {
 	return this.referencesUuid
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) SetReferencesUuid(refsUuid[]string){
+func (this *BPMNDI_BPMNLabelStyleEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) GetReferencesPtr() []Entity{
+func (this *BPMNDI_BPMNLabelStyleEntity) GetReferencesPtr() []Entity {
 	return this.referencesPtr
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) SetReferencesPtr(refsPtr[]Entity){
+func (this *BPMNDI_BPMNLabelStyleEntity) SetReferencesPtr(refsPtr []Entity) {
 	this.referencesPtr = refsPtr
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) GetObject() interface{}{
+func (this *BPMNDI_BPMNLabelStyleEntity) GetObject() interface{} {
 	return this.object
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) NeedSave() bool{
+func (this *BPMNDI_BPMNLabelStyleEntity) NeedSave() bool {
 	return this.object.NeedSave
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) SetNeedSave(needSave bool) {
+func (this *BPMNDI_BPMNLabelStyleEntity) SetNeedSave(needSave bool) {
 	this.object.NeedSave = needSave
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) IsInit() bool{
+func (this *BPMNDI_BPMNLabelStyleEntity) IsInit() bool {
 	return this.object.IsInit
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) SetInit(isInit bool) {
+func (this *BPMNDI_BPMNLabelStyleEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) GetChecksum() string{
+func (this *BPMNDI_BPMNLabelStyleEntity) GetChecksum() string {
 	objectStr, _ := json.Marshal(this.object)
-	return  Utility.GetMD5Hash(string(objectStr))
+	return Utility.GetMD5Hash(string(objectStr))
 }
 
-func(this *BPMNDI_BPMNLabelStyleEntity) Exist() bool{
+func (this *BPMNDI_BPMNLabelStyleEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "BPMNDI.BPMNLabelStyle"
 	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -5367,66 +5380,67 @@ func(this *BPMNDI_BPMNLabelStyleEntity) Exist() bool{
 
 /**
 * Return the entity prototype.
-*/
-func(this *BPMNDI_BPMNLabelStyleEntity) GetPrototype() *EntityPrototype {
+ */
+func (this *BPMNDI_BPMNLabelStyleEntity) GetPrototype() *EntityPrototype {
 	return this.prototype
 }
+
 /** Entity Prototype creation **/
 func (this *EntityManager) create_BPMNDI_BPMNLabelStyleEntityPrototype() {
 
 	var bPMNLabelStyleEntityProto EntityPrototype
 	bPMNLabelStyleEntityProto.TypeName = "BPMNDI.BPMNLabelStyle"
 	bPMNLabelStyleEntityProto.SuperTypeNames = append(bPMNLabelStyleEntityProto.SuperTypeNames, "DI.Style")
-	bPMNLabelStyleEntityProto.Ids = append(bPMNLabelStyleEntityProto.Ids,"uuid")
-	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields,"uuid")
-	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType,"xs.string")
-	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder,0)
-	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility,false)
-	bPMNLabelStyleEntityProto.Indexs = append(bPMNLabelStyleEntityProto.Indexs,"parentUuid")
-	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields,"parentUuid")
-	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType,"xs.string")
-	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder,1)
-	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility,false)
+	bPMNLabelStyleEntityProto.Ids = append(bPMNLabelStyleEntityProto.Ids, "uuid")
+	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields, "uuid")
+	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType, "xs.string")
+	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder, 0)
+	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility, false)
+	bPMNLabelStyleEntityProto.Indexs = append(bPMNLabelStyleEntityProto.Indexs, "parentUuid")
+	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields, "parentUuid")
+	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType, "xs.string")
+	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder, 1)
+	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility, false)
 
 	/** members of Style **/
-	bPMNLabelStyleEntityProto.Ids = append(bPMNLabelStyleEntityProto.Ids,"M_id")
-	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder,2)
-	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility,true)
-	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields,"M_id")
-	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType,"xs.ID")
+	bPMNLabelStyleEntityProto.Ids = append(bPMNLabelStyleEntityProto.Ids, "M_id")
+	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder, 2)
+	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility, true)
+	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields, "M_id")
+	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType, "xs.ID")
 
 	/** members of BPMNLabelStyle **/
-	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder,3)
-	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility,true)
-	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields,"M_Font")
-	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType,"BPMNDI.DC.Font")
+	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder, 3)
+	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility, true)
+	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields, "M_Font")
+	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType, "BPMNDI.DC.Font")
 
 	/** associations of BPMNLabelStyle **/
-	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder,4)
-	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility,false)
-	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields,"M_diagramPtr")
-	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType,"BPMNDI.BPMNDiagram:Ref")
-	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder,5)
-	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility,false)
-	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields,"M_labelPtr")
-	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType,"[]BPMNDI.BPMNLabel:Ref")
-	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder,6)
-	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility,false)
-	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields,"M_diagramElementPtr")
-	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType,"[]BPMNDI.DI.DiagramElement:Ref")
-	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder,7)
-	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility,false)
-	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields,"M_owningDiagramPtr")
-	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType,"BPMNDI.DI.Diagram:Ref")
-	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields,"childsUuid")
-	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType,"[]xs.string")
-	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder,8)
-	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility,false)
+	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder, 4)
+	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility, false)
+	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields, "M_diagramPtr")
+	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType, "BPMNDI.BPMNDiagram:Ref")
+	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder, 5)
+	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility, false)
+	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields, "M_labelPtr")
+	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType, "[]BPMNDI.BPMNLabel:Ref")
+	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder, 6)
+	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility, false)
+	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields, "M_diagramElementPtr")
+	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType, "[]BPMNDI.DI.DiagramElement:Ref")
+	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder, 7)
+	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility, false)
+	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields, "M_owningDiagramPtr")
+	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType, "BPMNDI.DI.Diagram:Ref")
+	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields, "childsUuid")
+	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType, "[]xs.string")
+	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder, 8)
+	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility, false)
 
-	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields,"referenced")
-	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType,"[]EntityRef")
-	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder,9)
-	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility,false)
+	bPMNLabelStyleEntityProto.Fields = append(bPMNLabelStyleEntityProto.Fields, "referenced")
+	bPMNLabelStyleEntityProto.FieldsType = append(bPMNLabelStyleEntityProto.FieldsType, "[]EntityRef")
+	bPMNLabelStyleEntityProto.FieldsOrder = append(bPMNLabelStyleEntityProto.FieldsOrder, 9)
+	bPMNLabelStyleEntityProto.FieldsVisibility = append(bPMNLabelStyleEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(BPMNDIDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&bPMNLabelStyleEntityProto)
@@ -5456,7 +5470,7 @@ func (this *BPMNDI_BPMNLabelStyleEntity) SaveEntity() {
 	/** members of BPMNLabelStyle **/
 	query.Fields = append(query.Fields, "M_Font")
 
-		/** associations of BPMNLabelStyle **/
+	/** associations of BPMNLabelStyle **/
 	query.Fields = append(query.Fields, "M_diagramPtr")
 	query.Fields = append(query.Fields, "M_labelPtr")
 	query.Fields = append(query.Fields, "M_diagramElementPtr")
@@ -5469,7 +5483,7 @@ func (this *BPMNDI_BPMNLabelStyleEntity) SaveEntity() {
 	BPMNLabelStyleInfo = append(BPMNLabelStyleInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		BPMNLabelStyleInfo = append(BPMNLabelStyleInfo, this.parentPtr.GetUuid())
-	}else{
+	} else {
 		BPMNLabelStyleInfo = append(BPMNLabelStyleInfo, "")
 	}
 
@@ -5480,21 +5494,21 @@ func (this *BPMNDI_BPMNLabelStyleEntity) SaveEntity() {
 
 	/** Save Font type Font **/
 	if this.object.M_Font != nil {
-		FontEntity:= GetServer().GetEntityManager().NewDCFontEntity(this.object.M_Font.UUID, this.object.M_Font)
+		FontEntity := GetServer().GetEntityManager().NewDCFontEntity(this.object.M_Font.UUID, this.object.M_Font)
 		BPMNLabelStyleInfo = append(BPMNLabelStyleInfo, FontEntity.uuid)
 		FontEntity.AppendReferenced("Font", this)
-		this.AppendChild("Font",FontEntity)
+		this.AppendChild("Font", FontEntity)
 		if FontEntity.NeedSave() {
 			FontEntity.SaveEntity()
 		}
-	}else{
+	} else {
 		BPMNLabelStyleInfo = append(BPMNLabelStyleInfo, "")
 	}
 
 	/** associations of BPMNLabelStyle **/
 
 	/** Save diagram type BPMNDiagram **/
-		BPMNLabelStyleInfo = append(BPMNLabelStyleInfo,this.object.M_diagramPtr)
+	BPMNLabelStyleInfo = append(BPMNLabelStyleInfo, this.object.M_diagramPtr)
 
 	/** Save label type BPMNLabel **/
 	labelPtrStr, _ := json.Marshal(this.object.M_labelPtr)
@@ -5505,7 +5519,7 @@ func (this *BPMNDI_BPMNLabelStyleEntity) SaveEntity() {
 	BPMNLabelStyleInfo = append(BPMNLabelStyleInfo, string(diagramElementPtrStr))
 
 	/** Save owningDiagram type Diagram **/
-		BPMNLabelStyleInfo = append(BPMNLabelStyleInfo,this.object.M_owningDiagramPtr)
+	BPMNLabelStyleInfo = append(BPMNLabelStyleInfo, this.object.M_owningDiagramPtr)
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	BPMNLabelStyleInfo = append(BPMNLabelStyleInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -5526,7 +5540,7 @@ func (this *BPMNDI_BPMNLabelStyleEntity) SaveEntity() {
 	} else {
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 		queryStr, _ := json.Marshal(query)
-		_, err =  GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNLabelStyleInfo)
+		_, err = GetServer().GetDataManager().createData(BPMNDIDB, string(queryStr), BPMNLabelStyleInfo)
 	}
 	if err == nil {
 		GetServer().GetEntityManager().insert(this)
@@ -5536,7 +5550,7 @@ func (this *BPMNDI_BPMNLabelStyleEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *BPMNDI_BPMNLabelStyleEntity) InitEntity(id string) error{
+func (this *BPMNDI_BPMNLabelStyleEntity) InitEntity(id string) error {
 	if this.object.IsInit == true {
 		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
 		if err == nil {
@@ -5562,7 +5576,7 @@ func (this *BPMNDI_BPMNLabelStyleEntity) InitEntity(id string) error{
 	/** members of BPMNLabelStyle **/
 	query.Fields = append(query.Fields, "M_Font")
 
-		/** associations of BPMNLabelStyle **/
+	/** associations of BPMNLabelStyle **/
 	query.Fields = append(query.Fields, "M_diagramPtr")
 	query.Fields = append(query.Fields, "M_labelPtr")
 	query.Fields = append(query.Fields, "M_diagramElementPtr")
@@ -5585,7 +5599,7 @@ func (this *BPMNDI_BPMNLabelStyleEntity) InitEntity(id string) error{
 	// Initialisation of information of BPMNLabelStyle...
 	if len(results) > 0 {
 
-	/** initialyzation of the entity object **/
+		/** initialyzation of the entity object **/
 		this.object = new(BPMNDI.BPMNLabelStyle)
 		this.object.UUID = this.uuid
 		this.object.TYPENAME = "BPMNDI.BPMNLabelStyle"
@@ -5595,88 +5609,88 @@ func (this *BPMNDI_BPMNLabelStyleEntity) InitEntity(id string) error{
 		/** members of Style **/
 
 		/** id **/
- 		if results[0][2] != nil{
- 			this.object.M_id=results[0][2].(string)
- 		}
+		if results[0][2] != nil {
+			this.object.M_id = results[0][2].(string)
+		}
 
 		/** members of BPMNLabelStyle **/
 
 		/** Font **/
- 		if results[0][3] != nil{
-			uuid :=results[0][3].(string)
+		if results[0][3] != nil {
+			uuid := results[0][3].(string)
 			if len(uuid) > 0 {
 				var FontEntity *DC_FontEntity
 				if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
 					FontEntity = instance.(*DC_FontEntity)
-				}else{
+				} else {
 					FontEntity = GetServer().GetEntityManager().NewDCFontEntity(uuid, nil)
 					FontEntity.InitEntity(uuid)
-					GetServer().GetEntityManager().insert( FontEntity)
+					GetServer().GetEntityManager().insert(FontEntity)
 				}
 				FontEntity.AppendReferenced("Font", this)
-				this.AppendChild("Font",FontEntity)
+				this.AppendChild("Font", FontEntity)
 			}
- 		}
+		}
 
 		/** associations of BPMNLabelStyle **/
 
 		/** diagramPtr **/
- 		if results[0][4] != nil{
-			id :=results[0][4].(string)
+		if results[0][4] != nil {
+			id := results[0][4].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.BPMNDiagram"
-				id_:= refTypeName + "$$" + id
-				this.object.M_diagramPtr= id
-				GetServer().GetEntityManager().appendReference("diagramPtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.BPMNDiagram"
+				id_ := refTypeName + "$$" + id
+				this.object.M_diagramPtr = id
+				GetServer().GetEntityManager().appendReference("diagramPtr", this.object.UUID, id_)
 			}
- 		}
+		}
 
 		/** labelPtr **/
- 		if results[0][5] != nil{
-			idsStr :=results[0][5].(string)
-			ids :=make([]string,0)
+		if results[0][5] != nil {
+			idsStr := results[0][5].(string)
+			ids := make([]string, 0)
 			err := json.Unmarshal([]byte(idsStr), &ids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(ids); i++{
+			for i := 0; i < len(ids); i++ {
 				if len(ids[i]) > 0 {
-					refTypeName:="BPMNDI.BPMNLabel"
-					id_:= refTypeName + "$$" + ids[i]
-					this.object.M_labelPtr = append(this.object.M_labelPtr,ids[i])
-					GetServer().GetEntityManager().appendReference("labelPtr",this.object.UUID, id_)
+					refTypeName := "BPMNDI.BPMNLabel"
+					id_ := refTypeName + "$$" + ids[i]
+					this.object.M_labelPtr = append(this.object.M_labelPtr, ids[i])
+					GetServer().GetEntityManager().appendReference("labelPtr", this.object.UUID, id_)
 				}
 			}
- 		}
+		}
 
 		/** diagramElementPtr **/
- 		if results[0][6] != nil{
-			idsStr :=results[0][6].(string)
-			ids :=make([]string,0)
+		if results[0][6] != nil {
+			idsStr := results[0][6].(string)
+			ids := make([]string, 0)
 			err := json.Unmarshal([]byte(idsStr), &ids)
 			if err != nil {
 				return err
 			}
-			for i:=0; i<len(ids); i++{
+			for i := 0; i < len(ids); i++ {
 				if len(ids[i]) > 0 {
-					refTypeName:="BPMNDI.DiagramElement"
-					id_:= refTypeName + "$$" + ids[i]
-					this.object.M_diagramElementPtr = append(this.object.M_diagramElementPtr,ids[i])
-					GetServer().GetEntityManager().appendReference("diagramElementPtr",this.object.UUID, id_)
+					refTypeName := "BPMNDI.DiagramElement"
+					id_ := refTypeName + "$$" + ids[i]
+					this.object.M_diagramElementPtr = append(this.object.M_diagramElementPtr, ids[i])
+					GetServer().GetEntityManager().appendReference("diagramElementPtr", this.object.UUID, id_)
 				}
 			}
- 		}
+		}
 
 		/** owningDiagramPtr **/
- 		if results[0][7] != nil{
-			id :=results[0][7].(string)
+		if results[0][7] != nil {
+			id := results[0][7].(string)
 			if len(id) > 0 {
-				refTypeName:="BPMNDI.Diagram"
-				id_:= refTypeName + "$$" + id
-				this.object.M_owningDiagramPtr= id
-				GetServer().GetEntityManager().appendReference("owningDiagramPtr",this.object.UUID, id_)
+				refTypeName := "BPMNDI.Diagram"
+				id_ := refTypeName + "$$" + id
+				this.object.M_owningDiagramPtr = id
+				GetServer().GetEntityManager().appendReference("owningDiagramPtr", this.object.UUID, id_)
 			}
- 		}
+		}
 		childsUuidStr := results[0][8].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -5703,7 +5717,7 @@ func (this *BPMNDI_BPMNLabelStyleEntity) InitEntity(id string) error{
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewBPMNDIBPMNLabelStyleEntityFromObject(object *BPMNDI.BPMNLabelStyle) *BPMNDI_BPMNLabelStyleEntity {
-	 return this.NewBPMNDIBPMNLabelStyleEntity(object.UUID, object)
+	return this.NewBPMNDIBPMNLabelStyleEntity(object.UUID, object)
 }
 
 /** Delete **/
@@ -5717,7 +5731,7 @@ func BPMNDIBPMNLabelStyleExists(val string) string {
 	query.TypeName = "BPMNDI.BPMNLabelStyle"
 	query.Indexs = append(query.Indexs, "M_id="+val)
 	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface {} // not use...
+	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(BPMNDIDB, string(queryStr), fieldsType, params)
@@ -5749,7 +5763,7 @@ func (this *BPMNDI_BPMNLabelStyleEntity) AppendChild(attributeName string, child
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
-	attributeName = strings.Replace(attributeName,"M_", "", -1)
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
 	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
 	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
 	if invalidMethod != nil {
@@ -5757,28 +5771,30 @@ func (this *BPMNDI_BPMNLabelStyleEntity) AppendChild(attributeName string, child
 	}
 	return nil
 }
+
 /** Append reference entity into parent entity. **/
 func (this *BPMNDI_BPMNLabelStyleEntity) AppendReference(reference Entity) {
 
-	 // Here i will append the reference uuid
-	 index := -1
-	 for i := 0; i < len(this.referencesUuid); i++ {
-	 	refUuid := this.referencesUuid[i]
-	 	if refUuid == reference.GetUuid() {
-	 		index = i
-	 		break
-	 	}
-	 }
-	 if index == -1 {
-	 	this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-	 	this.referencesPtr = append(this.referencesPtr, reference)
-	 }else{
-	 	// The reference must be update in that case.
-	 	this.referencesPtr[index]  = reference
-	 }
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
 }
+
 /** Register the entity to the dynamic typing system. **/
-func (this *EntityManager) registerBPMNDIObjects(){
+func (this *EntityManager) registerBPMNDIObjects() {
 	Utility.RegisterType((*BPMNDI.BPMNDiagram)(nil))
 	Utility.RegisterType((*BPMNDI.BPMNPlane)(nil))
 	Utility.RegisterType((*BPMNDI.BPMNShape)(nil))
@@ -5788,12 +5804,11 @@ func (this *EntityManager) registerBPMNDIObjects(){
 }
 
 /** Create entity prototypes contain in a package **/
-func (this *EntityManager) createBPMNDIPrototypes(){
-	this.create_BPMNDI_BPMNDiagramEntityPrototype() 
-	this.create_BPMNDI_BPMNPlaneEntityPrototype() 
-	this.create_BPMNDI_BPMNShapeEntityPrototype() 
-	this.create_BPMNDI_BPMNEdgeEntityPrototype() 
-	this.create_BPMNDI_BPMNLabelEntityPrototype() 
-	this.create_BPMNDI_BPMNLabelStyleEntityPrototype() 
+func (this *EntityManager) createBPMNDIPrototypes() {
+	this.create_BPMNDI_BPMNDiagramEntityPrototype()
+	this.create_BPMNDI_BPMNPlaneEntityPrototype()
+	this.create_BPMNDI_BPMNShapeEntityPrototype()
+	this.create_BPMNDI_BPMNEdgeEntityPrototype()
+	this.create_BPMNDI_BPMNLabelEntityPrototype()
+	this.create_BPMNDI_BPMNLabelStyleEntityPrototype()
 }
-

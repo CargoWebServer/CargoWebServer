@@ -1,3 +1,5 @@
+// +build BPMNDI
+
 package BPMNDI
 
 import(
@@ -80,6 +82,13 @@ func (this *BPMNLabelStyle) SetFont(ref interface{}){
 }
 
 /** Remove reference Font **/
+func (this *BPMNLabelStyle) RemoveFont(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*DC.Font)
+	if toDelete.GetUUID() == this.M_Font.GetUUID() {
+		this.M_Font = nil
+	}
+}
 
 /** Diagram **/
 func (this *BPMNLabelStyle) GetDiagramPtr() *BPMNDiagram{

@@ -1,3 +1,5 @@
+// +build BPMS
+
 package BPMS
 
 import(
@@ -43,6 +45,7 @@ type ActivityInstance struct{
 	M_multiInstanceBehaviorType MultiInstanceBehaviorType
 	M_loopCharacteristicType LoopCharacteristicType
 	M_tokenCount int
+	M_ressources []*RessourceInstance
 
 
 	/** Associations **/
@@ -397,6 +400,43 @@ func (this *ActivityInstance) SetTokenCount(ref interface{}){
 }
 
 /** Remove reference TokenCount **/
+
+/** Ressources **/
+func (this *ActivityInstance) GetRessources() []*RessourceInstance{
+	return this.M_ressources
+}
+
+/** Init reference Ressources **/
+func (this *ActivityInstance) SetRessources(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var ressourcess []*RessourceInstance
+	for i:=0; i<len(this.M_ressources); i++ {
+		if this.M_ressources[i].GetUUID() != ref.(*RessourceInstance).GetUUID() {
+			ressourcess = append(ressourcess, this.M_ressources[i])
+		} else {
+			isExist = true
+			ressourcess = append(ressourcess, ref.(*RessourceInstance))
+		}
+	}
+	if !isExist {
+		ressourcess = append(ressourcess, ref.(*RessourceInstance))
+	}
+	this.M_ressources = ressourcess
+}
+
+/** Remove reference Ressources **/
+func (this *ActivityInstance) RemoveRessources(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*RessourceInstance)
+	ressources_ := make([]*RessourceInstance, 0)
+	for i := 0; i < len(this.M_ressources); i++ {
+		if toDelete.GetUUID() != this.M_ressources[i].GetUUID() {
+			ressources_ = append(ressources_, this.M_ressources[i])
+		}
+	}
+	this.M_ressources = ressources_
+}
 
 /** SubprocessInstance **/
 func (this *ActivityInstance) GetSubprocessInstancePtr() *SubprocessInstance{

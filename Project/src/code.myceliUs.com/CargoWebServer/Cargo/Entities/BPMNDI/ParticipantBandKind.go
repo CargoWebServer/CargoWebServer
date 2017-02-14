@@ -1,3 +1,5 @@
+// +build BPMNDI
+
 package BPMNDI
 
 type ParticipantBandKind int

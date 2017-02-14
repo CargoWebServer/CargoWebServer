@@ -18,7 +18,6 @@ import (
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"github.com/nfnt/resize"
 
 	"code.myceliUs.com/Utility"
@@ -43,7 +42,6 @@ type FileManager struct {
 	// This represent the root path of the server...
 	root        string
 	mimeTypeMap map[string]*MimeType
-	m_config    *Config.ServiceConfiguration
 }
 
 var fileManager *FileManager
@@ -76,8 +74,8 @@ func newFileManager() *FileManager {
 func (this *FileManager) initialize() {
 	// register service avalaible action here.
 	log.Println("--> initialyze ConfigurationManager")
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
-	this.m_config.M_start = false
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+
 }
 
 func (this *FileManager) getId() string {
@@ -94,10 +92,6 @@ func (this *FileManager) start() {
 
 func (this *FileManager) stop() {
 	log.Println("--> Stop FileManager")
-}
-
-func (this *FileManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 /**
@@ -500,7 +494,7 @@ func (this *FileManager) createFile(filename string, filepath string, filedata [
  * Return a file with a given uuid, or id.
  */
 func (this *FileManager) getFileById(id string) (*CargoEntities.File, *CargoEntities.Error) {
-	fileEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.File", id)
+	fileEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", id)
 	if errObj == nil {
 		// Initialize it's content.
 		fileEntity.InitEntity(fileEntity.GetUuid())

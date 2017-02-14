@@ -404,9 +404,9 @@
       <ownedAttribute xmi:type="cmof:Property" xmi:id="CompensateEventDefinition-activityRef" name="activityRef" _type="Activity" lower="0" association="A_activityRef_compensateEventDefinition"/>
     </ownedMember>
     <ownedMember xmi:type="cmof:Class" xmi:id="TimerEventDefinition" name="TimerEventDefinition" superClass="EventDefinition">
-      <ownedAttribute xmi:type="cmof:Property" xmi:id="TimerEventDefinition-timeDate" name="timeDate" _type="Expression" lower="0" isComposite="true" association="A_timeDate_timerEventDefinition"/>
-      <ownedAttribute xmi:type="cmof:Property" xmi:id="TimerEventDefinition-timeCycle" name="timeCycle" _type="Expression" lower="0" isComposite="true" association="A_timeCycle_timerEventDefinition"/>
-      <ownedAttribute xmi:type="cmof:Property" xmi:id="TimerEventDefinition-timeDuration" name="timeDuration" visibility="public" _type="Expression" lower="0" isComposite="true" association="A_timeDuration_timerEventDefinition"/>
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="TimerEventDefinition-timeDate" name="timeDate" _type="FormalExpression" lower="0" isComposite="true" association="A_timeDate_timerEventDefinition"/>
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="TimerEventDefinition-timeCycle" name="timeCycle" _type="FormalExpression" lower="0" isComposite="true" association="A_timeCycle_timerEventDefinition"/>
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="TimerEventDefinition-timeDuration" name="timeDuration" visibility="public" _type="FormalExpression" lower="0" isComposite="true" association="A_timeDuration_timerEventDefinition"/>
     </ownedMember>
     <ownedMember xmi:type="cmof:Class" xmi:id="LinkEventDefinition" name="LinkEventDefinition" superClass="EventDefinition">
       <ownedAttribute xmi:type="cmof:Property" xmi:id="LinkEventDefinition-name" name="name">

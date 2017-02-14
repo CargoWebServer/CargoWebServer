@@ -1,6 +1,8 @@
+// +build BPMS
+
 package BPMS
 
-type Instance interface {
+type Instance interface{
 	/** Method of Instance **/
 
 	/** UUID **/
@@ -17,13 +19,14 @@ type Instance interface {
 
 	/** DataRef **/
 	GetDataRef() []*ItemAwareElementInstance
-	SetDataRef(interface{})
+	SetDataRef(interface{}) 
 
 	/** Data **/
 	GetData() []*ItemAwareElementInstance
-	SetData(interface{})
+	SetData(interface{}) 
 
 	/** LogInfoRef **/
 	GetLogInfoRef() []*LogInfo
-	SetLogInfoRef(interface{})
+	SetLogInfoRef(interface{}) 
+
 }

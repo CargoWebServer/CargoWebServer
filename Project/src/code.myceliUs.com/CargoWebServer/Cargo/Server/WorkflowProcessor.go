@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package Server
 
 import (
@@ -45,9 +47,6 @@ type ColorTag struct {
 }
 
 type WorkflowProcessor struct {
-
-	// The service configuration
-	m_config *Config.ServiceConfiguration
 
 	// The workflow manage stop when that variable
 	// is set to true.
@@ -110,7 +109,7 @@ func newWorkflowProcessor() *WorkflowProcessor {
 func (this *WorkflowProcessor) initialize() {
 
 	log.Println("--> Initialize WorkflowProcessor")
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	// The runtime data...
 	runtimeUUID := BPMSRuntimesExists("runtime")
@@ -171,10 +170,6 @@ func (this *WorkflowProcessor) start() {
 func (this *WorkflowProcessor) stop() {
 	log.Println("--> Stop WorkflowProcessor")
 
-}
-
-func (this *WorkflowProcessor) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 // Start processing the workflow...
@@ -331,9 +326,11 @@ func (this *WorkflowProcessor) workflowTransition(flowNode BPMS.FlowNodeInstance
 		if flowNode.GetLifecycleState() == BPMS.LifecycleState_Active {
 			// Here I will process the active instances...
 			if reflect.TypeOf(flowNode).String() == "*BPMS.ActivityInstance" {
-				err := this.executeActivityInstance(flowNode.(*BPMS.ActivityInstance), "")
-				if err == nil {
-					flowNode.SetLifecycleState(BPMS.LifecycleState_Completing)
+				if strings.HasPrefix(flowNode.(*BPMS.ActivityInstance).M_bpmnElementId, "BPMN20.UserTask%") {
+					err := this.executeActivityInstance(flowNode.(*BPMS.ActivityInstance), "")
+					if err == nil {
+						flowNode.SetLifecycleState(BPMS.LifecycleState_Completing)
+					}
 				}
 			} else if reflect.TypeOf(flowNode).String() == "*BPMS.EventInstance" {
 				if reflect.TypeOf(bpmnElementEntity.GetObject()).String() == "*BPMN20.EndEvent" {
@@ -438,6 +435,7 @@ func (this *WorkflowProcessor) executeActivityInstance(instance BPMS.Instance, s
 		}
 		return nil
 	case *BPMN20.UserTask:
+		log.Println("----------> user task ", v.GetUUID())
 
 	case *BPMN20.Task_impl:
 
@@ -445,7 +443,7 @@ func (this *WorkflowProcessor) executeActivityInstance(instance BPMS.Instance, s
 		log.Println("-------> Unknow activity type ", v)
 	}
 
-	return NewError(Utility.FileLine(), ACTION_EXECUTE_ERROR, SERVER_ERROR_CODE, errors.New("No action was found!"))
+	return nil
 }
 
 /**
@@ -761,10 +759,12 @@ func (this *WorkflowProcessor) activateInstance(instance BPMS.FlowNodeInstance, 
 		return errors.New("The input flow node instance must have life cycle state at Ready")
 	}
 
+	isUserTask := false
+
 	// Initialisation of the data input.
 	switch v := instance.(type) {
 	case *BPMS.ActivityInstance:
-
+		isUserTask = strings.HasPrefix(v.M_bpmnElementId, "BPMN20.UserTask")
 		bpmnElement, _ := GetServer().GetEntityManager().getEntityByUuid(v.M_bpmnElementId)
 		activity := bpmnElement.GetObject().(BPMN20.Activity)
 
@@ -810,7 +810,11 @@ func (this *WorkflowProcessor) activateInstance(instance BPMS.FlowNodeInstance, 
 
 	}
 
-	instance.SetLifecycleState(BPMS.LifecycleState_Active)
+	// User task stay at ready state.
+	if !isUserTask {
+		instance.SetLifecycleState(BPMS.LifecycleState_Active)
+	}
+
 	this.saveInstance(instance.(BPMS.Instance))
 
 	return nil
@@ -1030,12 +1034,14 @@ func (this *WorkflowProcessor) createItemAwareElementInstances(instance BPMS.Ins
 			}
 
 			// The io specification.
-			for i := 0; i < len(process.GetIoSpecification().GetDataOutput()); i++ {
-				itemAwareElements = append(itemAwareElements, process.GetIoSpecification().GetDataOutput()[i])
-			}
+			if process.GetIoSpecification() != nil {
+				for i := 0; i < len(process.GetIoSpecification().GetDataOutput()); i++ {
+					itemAwareElements = append(itemAwareElements, process.GetIoSpecification().GetDataOutput()[i])
+				}
 
-			for i := 0; i < len(process.GetIoSpecification().GetDataInput()); i++ {
-				itemAwareElements = append(itemAwareElements, process.GetIoSpecification().GetDataInput()[i])
+				for i := 0; i < len(process.GetIoSpecification().GetDataInput()); i++ {
+					itemAwareElements = append(itemAwareElements, process.GetIoSpecification().GetDataInput()[i])
+				}
 			}
 
 			for i := 0; i < len(process.GetFlowElement()); i++ {
@@ -1053,12 +1059,14 @@ func (this *WorkflowProcessor) createItemAwareElementInstances(instance BPMS.Ins
 			}
 
 			// The io specification.
-			for i := 0; i < len(activity.GetIoSpecification().GetDataOutput()); i++ {
-				itemAwareElements = append(itemAwareElements, activity.GetIoSpecification().GetDataOutput()[i])
-			}
+			if activity.GetIoSpecification() != nil {
+				for i := 0; i < len(activity.GetIoSpecification().GetDataOutput()); i++ {
+					itemAwareElements = append(itemAwareElements, activity.GetIoSpecification().GetDataOutput()[i])
+				}
 
-			for i := 0; i < len(activity.GetIoSpecification().GetDataInput()); i++ {
-				itemAwareElements = append(itemAwareElements, activity.GetIoSpecification().GetDataInput()[i])
+				for i := 0; i < len(activity.GetIoSpecification().GetDataInput()); i++ {
+					itemAwareElements = append(itemAwareElements, activity.GetIoSpecification().GetDataInput()[i])
+				}
 			}
 		case BPMN20.Event:
 			event := v
@@ -1414,6 +1422,17 @@ func (this *WorkflowProcessor) getItemawareElementData(itemawareElement *BPMS.It
 	return objects, isCollection, nil
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// Ressource evaluation function.
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Evaluate ressource of an instance, instance must be subProcess or activity.
+ */
+func (this *WorkflowProcessor) evaluateRessources(instance BPMS.Instance) {
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Getter/setter
 ////////////////////////////////////////////////////////////////////////////////
@@ -1630,4 +1649,39 @@ func (this *WorkflowProcessor) NewItemAwareElementInstance(bpmnElementId string,
 	}
 
 	return instance
+}
+
+/**
+ * Return the list of active process instances for a given bpmn process.
+ */
+func (this *WorkflowProcessor) GetActiveProcessInstances(bpmnElementId string, messageId string, sessionId string) []*BPMS.ProcessInstance {
+
+	processEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(bpmnElementId)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
+	instances := this.getActiveProcessInstances(processEntity.GetObject().(*BPMN20.Process))
+	log.Println("--------> get active instances: ", instances)
+	return instances
+}
+
+/**
+ * Execute an activity instance with a given uuid.
+ */
+func (this *WorkflowProcessor) ActivateActivityInstance(uuid string, messageId string, sessionId string) {
+	log.Println("----------> execute activity ", uuid)
+	entity, errObj := GetServer().GetEntityManager().getEntityByUuid(uuid)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
+	// I will get the instance and activate it...
+	instance := entity.GetObject().(*BPMS.ActivityInstance)
+
+	// Activate the user task.
+	instance.SetLifecycleState(BPMS.LifecycleState_Active)
+	this.saveInstance(instance)
 }

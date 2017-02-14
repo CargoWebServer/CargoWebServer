@@ -5,7 +5,6 @@ package Server
 
 import (
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 	//"bytes"
 	//"encoding/xml"
@@ -17,7 +16,6 @@ import (
 type ProjectManager struct {
 	activeProjects map[string]*CargoEntities.Project
 	root           string
-	m_config       *Config.ServiceConfiguration
 }
 
 var projectManager *ProjectManager
@@ -49,8 +47,8 @@ func newProjectManager() *ProjectManager {
 func (this *ProjectManager) initialize() {
 	// register service avalaible action here.
 	log.Println("--> Initialize ProjectManager")
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
-	this.m_config.M_start = false
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+
 }
 
 func (this *ProjectManager) getId() string {
@@ -66,10 +64,6 @@ func (this *ProjectManager) start() {
 
 func (this *ProjectManager) stop() {
 	log.Println("--> Stop ProjectManager")
-}
-
-func (this *ProjectManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 /**
@@ -118,7 +112,7 @@ func (this *ProjectManager) synchronizeProject(project *CargoEntities.Project, p
 	fileId := Utility.CreateSha1Key([]byte("/" + project.GetId()))
 
 	// I will keep reference to the project directory only...
-	file, err := GetServer().GetEntityManager().getEntityById("CargoEntities.File", fileId) // get the first file level only...
+	file, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", fileId) // get the first file level only...
 	if err == nil {
 		project.SetFilesRef(file.GetObject().(*CargoEntities.File))
 	} else {

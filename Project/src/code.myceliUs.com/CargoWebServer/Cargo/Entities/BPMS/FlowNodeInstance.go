@@ -1,3 +1,5 @@
+// +build BPMS
+
 package BPMS
 
 type FlowNodeInstance interface {
@@ -22,6 +24,6 @@ type FlowNodeInstance interface {
 	GetOutputRef() []*ConnectingObject
 	SetOutputRef(interface{})
 
-	/** The parent process **/
+	/** Process instance ptr **/
 	GetProcessInstancePtr() *ProcessInstance
 }

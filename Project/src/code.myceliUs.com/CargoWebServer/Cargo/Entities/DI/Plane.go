@@ -1,3 +1,5 @@
+// +build DI
+
 package DI
 
 type Plane interface{
@@ -8,5 +10,6 @@ type Plane interface{
 
 	/** DiagramElement **/
 	GetDiagramElement() []DiagramElement
+	SetDiagramElement(interface{}) 
 
 }

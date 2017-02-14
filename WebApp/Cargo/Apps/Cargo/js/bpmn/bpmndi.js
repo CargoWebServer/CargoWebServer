@@ -82,6 +82,8 @@ SvgDiagram.prototype.init = function () {
 			}
 		} (diagramElement)
 	}
+
+	this.instanceListView = new InstanceListView(this.parent, this)
 }
 
 /*

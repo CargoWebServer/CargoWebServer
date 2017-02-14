@@ -1,3 +1,5 @@
+// +build DI
+
 package DI
 
 type Node interface{

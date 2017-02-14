@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"code.myceliUs.com/Utility"
 )
@@ -33,8 +32,6 @@ func (s Sessions) Less(i, j int) bool {
 }
 
 type SessionManager struct {
-	m_config *Config.ServiceConfiguration
-
 	activeSessions map[string]*CargoEntities.Session
 
 	sessionToCloseChannel chan struct {
@@ -74,7 +71,7 @@ func newSessionManager() *SessionManager {
 func (this *SessionManager) initialize() {
 
 	log.Println("--> Initialize SessionManager")
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	this.activeSessions = make(map[string]*CargoEntities.Session, 0)
 	this.sessionToCloseChannel = make(chan struct {
@@ -101,10 +98,6 @@ func (this *SessionManager) start() {
 
 func (this *SessionManager) stop() {
 	log.Println("--> Stop SessionManager")
-}
-
-func (this *SessionManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 /**

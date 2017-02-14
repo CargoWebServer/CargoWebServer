@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 )
 
@@ -18,7 +17,6 @@ type ServiceManager struct {
 	// info about connection on smtp server...
 	m_services            map[string]Service
 	m_servicesLst         []Service
-	m_config              *Config.ServiceConfiguration
 	m_serviceContainerCmd *exec.Cmd
 }
 
@@ -54,7 +52,7 @@ func newServiceManager() *ServiceManager {
 func (this *ServiceManager) initialize() {
 	// Here I will start the c++ service container...
 	log.Println("--> Initialize ServiceManager")
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	for i := 0; i < len(this.m_servicesLst); i++ {
 		// Initialyse the service.
@@ -92,10 +90,14 @@ func (this *ServiceManager) start() {
 		log.Println("---> fail to start the service container!")
 	}*/
 
-	for _, service := range this.m_services {
+	for i := 0; i < len(this.m_servicesLst); i++ {
 		// Get the service configuration information.
-		if service.getConfig().M_start == true {
-			service.start()
+		config := GetServer().GetConfigurationManager().getServiceConfigurationById(this.m_servicesLst[i].getId())
+		if config != nil {
+			if config.M_start == true {
+				this.m_servicesLst[i].start()
+			}
+
 		}
 	}
 }
@@ -108,10 +110,6 @@ func (this *ServiceManager) stop() {
 
 	// Stop the process...
 	serviceManager.m_serviceContainerCmd.Process.Kill()
-}
-
-func (this *ServiceManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 /**

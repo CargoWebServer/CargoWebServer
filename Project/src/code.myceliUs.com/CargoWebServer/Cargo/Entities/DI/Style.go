@@ -1,3 +1,5 @@
+// +build DI
+
 package DI
 
 type Style interface{
@@ -8,5 +10,6 @@ type Style interface{
 
 	/** Id **/
 	GetId() string
+	SetId(interface{}) 
 
 }

@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package Server
 
 import (
@@ -26,7 +28,6 @@ const (
 )
 
 type WorkflowManager struct {
-	m_config *Config.ServiceConfiguration
 }
 
 func newWorkflowManager() *WorkflowManager {
@@ -75,7 +76,7 @@ func (this *Server) GetWorkflowManager() *WorkflowManager {
  */
 func (this *WorkflowManager) initialize() {
 	log.Println("--> Initialize WorkflowManager")
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	// Here i will load the list of all definition into the
 	// entity mananager entity map.
@@ -97,10 +98,6 @@ func (this *WorkflowManager) start() {
 func (this *WorkflowManager) stop() {
 	log.Println("--> Stop WorkflowManager")
 
-}
-
-func (this *WorkflowManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 ////////////////////////////////////////////////////////////////////////////////

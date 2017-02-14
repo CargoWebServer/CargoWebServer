@@ -56,6 +56,7 @@ var HomePage = function () {
 
     /** The configurations... */
     this.serverConfiguration = null
+    this.servicesConfiguration = null
     this.dataConfiguration = null
     this.ldapConfiguration = null
     this.smtpConfiguration = null
@@ -186,9 +187,15 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                 var buttons = document.getElementsByClassName("navigation_btn")
                 for (var i = 0; i < buttons.length; i++) {
                     buttons[i].firstChild.className = buttons[i].firstChild.className.replace(" active", "")
+                    if (buttons[i].firstChild.id == "workflowImg") {
+                        buttons[i].firstChild.src = "img/workflow.svg"
+                    }
                 }
 
                 this.firstChild.className += " active"
+                if (this.firstChild.id == "workflowImg") {
+                    this.firstChild.src = "img/workflow_blue.svg"
+                }
             }
         } (div, leftDiv)
     }
@@ -200,16 +207,44 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.projectContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Projects" }).appendElement({ "tag": "i", "class": "fa fa-files-o active" })
     setSelectAction(this.projectContext, this.projectDiv)
 
-    // The search context...
-    this.searchDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": " left:50px; display:none;" })
-    this.searchContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Search" }).appendElement({ "tag": "i", "class": "fa fa-search" })
-    setSelectAction(this.searchContext, this.searchDiv)
+    if (BPMS) {
+        // The bpmn explorer...
+        this.bpmnDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display:none;" })
+        this.bpmnContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Workflow Manager" })
+            .appendElement({ "tag": "img", "id": "workflowImg", "src": "img/workflow.svg" })
+
+        var workflowImg = this.bpmnContext.getChildById("workflowImg")
+        workflowImg.element.onmouseover = function () {
+            if (this.className.indexOf("active") == -1) {
+                this.src = "img/workflow_hover.svg"
+            }
+        }
+
+        workflowImg.element.onmouseleave = function () {
+            if (this.className.indexOf("active") == -1) {
+                this.src = "img/workflow.svg"
+            }
+        }
+        setSelectAction(this.bpmnContext, this.bpmnDiv)
+        this.bpmnExplorer = new BpmnExplorer(this.bpmnDiv)
+    }
 
     // The server context...
     this.serverSettingDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display: none;" })
-    this.serverSettingContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Server Configuration" }).appendElement({ "tag": "i", "class": "fa fa-server" })
+    this.serverSettingContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Server Configuration" }).appendElement({ "tag": "i", "class": "fa fa-ship" })
     setSelectAction(this.serverSettingContext, this.serverSettingDiv)
     this.serverConfiguration = new ConfigurationPanel(this.serverSettingDiv, "Server configuration", "Config.ServerConfiguration", "serverConfig")
+
+    // The security context...
+    this.securityDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": " left:50px; display:none;" })
+    this.securityContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "security" }).appendElement({ "tag": "i", "class": "fa fa-shield" })
+    setSelectAction(this.securityContext, this.securityDiv)
+
+    // The services context...
+    this.servicesSettingDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display: none;" })
+    this.serviceSettingContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Services Configuration" }).appendElement({ "tag": "i", "class": "fa fa-server" })
+    setSelectAction(this.serviceSettingContext, this.servicesSettingDiv)
+    this.servicesConfiguration = new ConfigurationPanel(this.servicesSettingDiv, "Services configuration", "Config.ServiceConfiguration", "serviceConfigs")
 
     // The database context...
     this.datasourceSettingDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display: none;" })
@@ -229,12 +264,6 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     setSelectAction(this.mailServerSettingContext, this.mailServerSettingDiv)
     this.smtpConfiguration = new ConfigurationPanel(this.mailServerSettingDiv, "Email server configuration", "Config.SmtpConfiguration", "smtpConfigs")
 
-    // The bpmn explorer...
-    this.bpmnDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display:none;" })
-    this.bpmnContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Workflow Manager" }).appendElement({ "tag": "i", "class": "fa fa-tasks" })
-    setSelectAction(this.bpmnContext, this.bpmnDiv)
-    this.bpmnExplorer = new BpmnExplorer(this.bpmnDiv)
-
     // That area will contain different object properties.
     this.propertiesDiv = new Element(rightDiv, { "tag": "div", "class": "properties_div" })
     this.propertiesView = new PropertiesView(this.propertiesDiv)
@@ -248,6 +277,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
         /** Progress callback */
         function (results, caller) {
             caller.serverConfiguration.setConfigurations(results)
+            caller.servicesConfiguration.setConfigurations(results)
             caller.ldapConfiguration.setConfigurations(results)
             caller.smtpConfiguration.setConfigurations(results)
             caller.dataConfiguration.setConfigurations(results)

@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 type ExtensionAttributeValue struct{
@@ -79,11 +81,19 @@ func (this *ExtensionAttributeValue) SetExtensionAttributeDefinition(ref interfa
 		this.M_extensionAttributeDefinition = ref.(string)
 	}else{
 		this.m_extensionAttributeDefinition = ref.(*ExtensionAttributeDefinition)
-		this.M_extensionAttributeDefinition = ref.(*ExtensionAttributeDefinition).GetName()
+		this.M_extensionAttributeDefinition = ref.(*ExtensionAttributeDefinition).GetUUID()
 	}
 }
 
 /** Remove reference ExtensionAttributeDefinition **/
+func (this *ExtensionAttributeValue) RemoveExtensionAttributeDefinition(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionAttributeDefinition)
+	if toDelete.GetUUID() == this.m_extensionAttributeDefinition.GetUUID() {
+		this.m_extensionAttributeDefinition = nil
+		this.M_extensionAttributeDefinition = ""
+	}
+}
 
 /** BaseElement **/
 func (this *ExtensionAttributeValue) GetBaseElementPtr() BaseElement{

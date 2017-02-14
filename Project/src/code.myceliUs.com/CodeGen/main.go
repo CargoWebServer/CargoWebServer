@@ -18,6 +18,22 @@ func main() {
 	generate(dir+"/input", "Config", "configurations")
 	generate(dir+"/input", "CargoEntities", "entities")
 
+	// Now the runtime.
+	initMaps()
+
+	// set the output to
+	loadXSD("input/BPMS.xsd")
+
+	// Now the cmof shcmea...
+	loadCMOF("input/BPMS.cmof")
+
+	generateCode("BPMS")
+
+	// xml roots element...
+	generateGoXmlFactory("runtimes", "Entities", outputPath, "BPMS_")
+
+	generateEntity("BPMS")
+
 	// Bpmn stuff
 	initMaps()
 
@@ -48,19 +64,4 @@ func main() {
 	generateEntity("BPMNDI")
 	generateEntity("BPMN20")
 
-	// Now the runtime.
-	initMaps()
-
-	// set the output to
-	loadXSD("input/BPMS.xsd")
-
-	// Now the cmof shcmea...
-	loadCMOF("input/BPMS.cmof")
-
-	generateCode("BPMS")
-
-	// xml roots element...
-	generateGoXmlFactory("runtimes", "Entities", outputPath, "BPMS_")
-
-	generateEntity("BPMS")
 }

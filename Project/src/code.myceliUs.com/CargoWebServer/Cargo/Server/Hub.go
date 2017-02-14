@@ -73,8 +73,9 @@ func (this *Hub) run() {
 		select {
 		case c := <-this.register:
 			this.connections[c.GetUuid()] = c
-			// Set a new js server object...
+			// initialyse js interpreter for the new connection.
 			vm := JS.GetJsRuntimeManager().GetVm(c.GetUuid())
+			// put server object in it context.
 			vm.Set("server", GetServer())
 		case c := <-this.unregister:
 			delete(this.connections, c.GetUuid())

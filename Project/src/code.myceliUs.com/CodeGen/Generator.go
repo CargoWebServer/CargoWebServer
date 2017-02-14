@@ -106,6 +106,7 @@ var (
 func WriteClassFile(outputPath, packName string, className string, classCode string) {
 	goPath := os.Getenv("GOPATH")
 
+	classCode = "// +build " + packName + "\n\n" + classCode
 	path := goPath + "/src/" + outputPath + packName
 	path = strings.Replace(path, "/", string(os.PathSeparator), -1)
 	path = strings.Replace(path, "\\", string(os.PathSeparator), -1)

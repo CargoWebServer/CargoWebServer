@@ -1,9 +1,5 @@
 package Server
 
-import (
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
-)
-
 /**
  * A service is a class that can be use to extend the server functionality.
  */
@@ -28,9 +24,4 @@ type Service interface {
 	 * Stoping the service.
 	 */
 	stop()
-
-	/**
-	 * Get the service configurations
-	 */
-	getConfig() *Config.ServiceConfiguration
 }

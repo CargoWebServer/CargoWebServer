@@ -1,3 +1,5 @@
+// +build DI
+
 package DI
 
 type LabeledShape interface{
@@ -8,5 +10,6 @@ type LabeledShape interface{
 
 	/** OwnedLabel **/
 	GetOwnedLabel() []Label
+	SetOwnedLabel(interface{}) 
 
 }

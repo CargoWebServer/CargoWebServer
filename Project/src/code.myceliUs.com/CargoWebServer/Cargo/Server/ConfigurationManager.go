@@ -96,7 +96,7 @@ func newConfigurationManager() *ConfigurationManager {
 	configurationManager.appendDefaultDataStoreConfiguration(cargoEntitiesDB)
 
 	// Create the default configurations
-	configurationManager.m_config = configurationManager.getServiceConfiguration(configurationManager.getId())
+	configurationManager.setServiceConfiguration(configurationManager.getId())
 
 	return configurationManager
 }
@@ -157,6 +157,18 @@ func (this *ConfigurationManager) getId() string {
 
 func (this *ConfigurationManager) start() {
 	log.Println("--> Start ConfigurationManager")
+
+	// Set services configurations...
+	for i := 0; i < len(this.m_servicesConfiguration); i++ {
+		serviceUuid := ConfigServiceConfigurationExists(this.m_servicesConfiguration[i].GetId())
+		log.Println("===============> ", serviceUuid)
+		if len(serviceUuid) == 0 {
+			// Set the new config...
+			this.m_activeConfigurations.SetServiceConfigs(this.m_servicesConfiguration[i])
+			this.m_configurationEntity.SaveEntity()
+		}
+	}
+
 }
 
 func (this *ConfigurationManager) stop() {
@@ -260,28 +272,18 @@ func (this *ConfigurationManager) GetServicePort() int {
 /**
  * Append configuration to the list.
  */
-func (this *ConfigurationManager) getServiceConfiguration(id string) (config *Config.ServiceConfiguration) {
+func (this *ConfigurationManager) setServiceConfiguration(id string) {
 
 	// Create the default service configurations
-	config = new(Config.ServiceConfiguration)
+	config := new(Config.ServiceConfiguration)
 	config.M_id = id
 	config.M_ipv4 = this.GetIpv4()
 	config.M_start = true
 	config.M_port = this.GetServerPort()
 	config.M_hostName = this.GetHostName()
-
-	// TODO append the configuration to the db only if none already exist.
 	this.m_servicesConfiguration = append(this.m_servicesConfiguration, config)
-
+	log.Println("-------------------------> config", config)
 	return
-}
-
-/**
- * Return the list of local services configurations.
- */
-func (this *ConfigurationManager) getLocalServiceConfigurations() []*Config.ServiceConfiguration {
-	// TODO get configuration from the db...
-	return this.m_servicesConfiguration
 }
 
 /**
@@ -296,6 +298,26 @@ func (this *ConfigurationManager) appendDefaultDataStoreConfiguration(config *Co
  */
 func (this *ConfigurationManager) getDefaultDataStoreConfigurations() []*Config.DataStoreConfiguration {
 	return this.m_datastoreConfiguration
+}
+
+/**
+ * Get the configuration of a given service.
+ */
+func (this *ConfigurationManager) getServiceConfigurationById(id string) *Config.ServiceConfiguration {
+
+	for i := 0; i < len(this.m_activeConfigurations.GetServiceConfigs()); i++ {
+		if this.m_activeConfigurations.GetServiceConfigs()[i].GetId() == id {
+			return this.m_activeConfigurations.GetServiceConfigs()[i]
+		}
+	}
+
+	// Here I will get a look in the list...
+	for i := 0; i < len(this.m_servicesConfiguration); i++ {
+		if this.m_servicesConfiguration[i].GetId() == id {
+			return this.m_servicesConfiguration[i]
+		}
+	}
+	return nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -356,41 +378,6 @@ func (this *ConfigurationManager) GetSmtpConfigurations() []Config.SmtpConfigura
 	for i := 0; i < len(entities); i++ {
 		smtpConfiguration := entities[i].GetObject().(*Config.SmtpConfiguration)
 		configurations = append(configurations, *smtpConfiguration)
-	}
-
-	return configurations
-}
-
-/**
- * Tha function retreive the services configuration.
- */
-func (this *ConfigurationManager) GetServiceConfigurations() []*Config.ServiceConfiguration {
-
-	configurations := this.getLocalServiceConfigurations()
-
-	entities, err := GetServer().GetEntityManager().getEntitiesByType("Config.ServiceConfiguration", "", "Config")
-	if err != nil {
-		return configurations
-	}
-
-	for i := 0; i < len(entities); i++ {
-		serviceConfiguration := entities[i].GetObject().(*Config.ServiceConfiguration)
-		isExist := false
-		for j := 0; j < len(configurations); j++ {
-			if serviceConfiguration.M_id == configurations[j].M_id {
-				configurations[j] = serviceConfiguration
-				if serviceConfiguration.M_ipv4 == "127.0.0.1" && this.GetServerPort() != 9393 {
-					serviceConfiguration.M_port = this.GetServerPort()
-				}
-				isExist = true
-				break
-			}
-		}
-
-		// append it if not exist.
-		if !isExist {
-			configurations = append(configurations, serviceConfiguration)
-		}
 	}
 
 	return configurations

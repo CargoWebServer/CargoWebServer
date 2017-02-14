@@ -15,8 +15,7 @@ import (
 type EmailManager struct {
 
 	// info about connection on smtp server...
-	m_infos  map[string]Config.SmtpConfiguration
-	m_config *Config.ServiceConfiguration
+	m_infos map[string]Config.SmtpConfiguration
 }
 
 var emailManager *EmailManager
@@ -70,7 +69,7 @@ func (this *EmailManager) initialize() {
 
 	log.Println("--> Initialize EmailManager")
 	// Create the default configurations
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	this.m_infos = make(map[string]Config.SmtpConfiguration, 0)
 	smtpConfigurations := GetServer().GetConfigurationManager().GetSmtpConfigurations()
@@ -92,10 +91,6 @@ func (this *EmailManager) start() {
 
 func (this *EmailManager) stop() {
 	log.Println("--> Stop EmailManager")
-}
-
-func (this *EmailManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 /**

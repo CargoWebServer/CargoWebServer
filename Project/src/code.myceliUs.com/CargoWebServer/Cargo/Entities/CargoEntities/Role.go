@@ -1,3 +1,5 @@
+// +build CargoEntities
+
 package CargoEntities
 
 import(

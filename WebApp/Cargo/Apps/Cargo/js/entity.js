@@ -379,9 +379,9 @@ EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, error
 /*
  * Server side script
  */
-function GetEntityById(typeName, id) {
+function GetEntityById(storeId, typeName, id) {
     var entity = null
-    entity = server.GetEntityManager().GetObjectById(typeName, id, messageId, sessionId)
+    entity = server.GetEntityManager().GetObjectById(storeId, typeName, id, messageId, sessionId)
     return entity
 }
 
@@ -394,13 +394,8 @@ function GetEntityById(typeName, id) {
  * @param {object} caller A place to store object from the request context and get it back from the response context.
  * @param {parent} the parent object reference.
  */
-EntityManager.prototype.getEntityById = function (typeName, id, successCallback, errorCallback, caller, parent) {
-    // Little fix...
-    var storeId = typeName.split(".")[0]
-    if (storeId == "BPMNDI" || storeId == "DC" || storeId == "DI") {
-        storeId = "BPMN20"
-    }
-
+EntityManager.prototype.getEntityById = function (storeId, typeName, id, successCallback, errorCallback, caller, parent) {
+    
     if (server.entityManager.entities[typeName + "_" + id] != undefined) {
         successCallback(server.entityManager.entities[typeName + "_" + id], caller)
         return // break it here.
@@ -412,6 +407,7 @@ EntityManager.prototype.getEntityById = function (typeName, id, successCallback,
         function (result, caller) {
 
             // Set the parameters.
+            var storeId = caller.storeId
             var typeName = caller.typeName
             var id = caller.id
             var successCallback = caller.successCallback
@@ -420,6 +416,7 @@ EntityManager.prototype.getEntityById = function (typeName, id, successCallback,
             var caller = caller.caller
 
             var params = []
+            params.push(createRpcData(storeId, "STRING", "storeId"))
             params.push(createRpcData(typeName, "STRING", "typeName"))
             params.push(createRpcData(id, "STRING", "id"))
             
@@ -463,7 +460,7 @@ EntityManager.prototype.getEntityById = function (typeName, id, successCallback,
             console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller)
-        }, { "typeName": typeName, "id": id, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback })
+        }, { "storeId":storeId, "typeName": typeName, "id": id, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback })
 }
 
 /*

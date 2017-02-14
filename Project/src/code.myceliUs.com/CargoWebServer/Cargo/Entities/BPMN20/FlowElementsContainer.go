@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 type FlowElementsContainer interface{
@@ -11,5 +13,6 @@ type FlowElementsContainer interface{
 
 	/** LaneSet **/
 	GetLaneSet() []*LaneSet
+	SetLaneSet(interface{}) 
 
 }

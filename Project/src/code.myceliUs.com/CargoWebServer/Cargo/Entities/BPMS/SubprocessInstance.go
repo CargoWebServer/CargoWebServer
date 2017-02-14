@@ -1,3 +1,5 @@
+// +build BPMS
+
 package BPMS
 
 import(
@@ -42,6 +44,7 @@ type SubprocessInstance struct{
 	M_SubprocessType SubprocessType
 	M_flowNodeInstances []FlowNodeInstance
 	M_connectingObjects []*ConnectingObject
+	M_ressources []*RessourceInstance
 
 
 	/** Associations **/
@@ -74,6 +77,7 @@ type XsdSubprocessInstance struct {
 	M_flowNodeInstances_3	[]*XsdEventInstance	`xml:"eventInstance,omitempty"`
 
 	M_connectingObjects	[]*XsdConnectingObject	`xml:"connectingObjects,omitempty"`
+	M_ressources	[]*XsdRessourceInstance	`xml:"ressources,omitempty"`
 	M_SubprocessType	string	`xml:"SubprocessType,attr"`
 
 }
@@ -434,6 +438,43 @@ func (this *SubprocessInstance) RemoveConnectingObjects(ref interface{}){
 		}
 	}
 	this.M_connectingObjects = connectingObjects_
+}
+
+/** Ressources **/
+func (this *SubprocessInstance) GetRessources() []*RessourceInstance{
+	return this.M_ressources
+}
+
+/** Init reference Ressources **/
+func (this *SubprocessInstance) SetRessources(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var ressourcess []*RessourceInstance
+	for i:=0; i<len(this.M_ressources); i++ {
+		if this.M_ressources[i].GetUUID() != ref.(*RessourceInstance).GetUUID() {
+			ressourcess = append(ressourcess, this.M_ressources[i])
+		} else {
+			isExist = true
+			ressourcess = append(ressourcess, ref.(*RessourceInstance))
+		}
+	}
+	if !isExist {
+		ressourcess = append(ressourcess, ref.(*RessourceInstance))
+	}
+	this.M_ressources = ressourcess
+}
+
+/** Remove reference Ressources **/
+func (this *SubprocessInstance) RemoveRessources(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*RessourceInstance)
+	ressources_ := make([]*RessourceInstance, 0)
+	for i := 0; i < len(this.M_ressources); i++ {
+		if toDelete.GetUUID() != this.M_ressources[i].GetUUID() {
+			ressources_ = append(ressources_, this.M_ressources[i])
+		}
+	}
+	this.M_ressources = ressources_
 }
 
 /** SubprocessInstance **/

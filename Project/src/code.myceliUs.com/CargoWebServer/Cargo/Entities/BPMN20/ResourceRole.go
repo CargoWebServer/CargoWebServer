@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 type ResourceRole interface{
@@ -17,5 +19,6 @@ type ResourceRole interface{
 
 	/** Name **/
 	GetName() string
+	SetName(interface{}) 
 
 }

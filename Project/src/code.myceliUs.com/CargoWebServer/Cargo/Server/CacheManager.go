@@ -1,7 +1,6 @@
 package Server
 
 import (
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 
 	"log"
@@ -62,9 +61,6 @@ type CacheManager struct {
 
 	// Ticker to ping the connection...
 	ticker *time.Ticker
-
-	// The cofiguration object.
-	m_config *Config.ServiceConfiguration
 }
 
 var cacheManager *CacheManager
@@ -97,7 +93,7 @@ func (this *CacheManager) initialize() {
 
 	log.Println("--> Initialize CacheManager")
 
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	this.entitiesMap = make(map[string]Entity, 0)
 	this.sessionIdsMap = make(map[string][]string, 0)
@@ -138,10 +134,6 @@ func (this *CacheManager) stop() {
 	log.Println("--> Stop CacheManager")
 	// Free the cache
 	this.abortedByEnvironment <- true
-}
-
-func (this *CacheManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 /**

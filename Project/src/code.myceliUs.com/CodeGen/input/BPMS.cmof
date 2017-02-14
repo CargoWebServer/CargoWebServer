@@ -58,7 +58,6 @@
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FlowNodeType-IntermediateThrowEvent" name="IntermediateThrowEvent" classifier="FlowNodeType" enumeration="FlowNodeType"/>
 	</ownedMember>
 
-	
 	<ownedMember xmi:type="cmof:Class" xmi:id="FlowNodeInstance" name="FlowNodeInstance" superClass="Instance" isAbstract="true">
 		<ownedAttribute xmi:type="cmof:Property" visibility="public" xmi:id="FlowNodeInstance-flowNodeType" name="flowNodeType" _type="FlowNodeType"/>
 		<ownedAttribute xmi:type="cmof:Property" visibility="public" xmi:id="FlowNodeInstance-lifecycleState" name="lifecycleState" _type="LifecycleState"/>
@@ -80,6 +79,10 @@
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="ActivityType-CallActivity" name="CallActivity" classifier="ActivityType" enumeration="ActivityType"/>
 	</ownedMember>
 	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_ActivityInstance_RessourceInstance" name="A_ActivityInstance_RessourceInstance" visibility="private" memberEnd="ActivityInstance-RessourceInstance A_ActivityInstance_RessourceInstance-RessourceInstance">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_ActivityInstance_RessourceInstance-parent" name="parent" _type="Instance" lower="0" owningAssociation="A_ActivityInstance_RessourceInstance" association="A_ActivityInstance_RessourceInstance"/>
+    </ownedMember>
+	
 	<ownedMember xmi:type="cmof:Class" xmi:id="ActivityInstance" name="ActivityInstance" superClass="Instance FlowNodeInstance">
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="ActivityInstance-ActivityType" name="activityType" _type="ActivityType"/>
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="ActivityInstance-multiInstanceBehaviorType" name="multiInstanceBehaviorType" _type="MultiInstanceBehaviorType"/>
@@ -87,6 +90,7 @@
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="ActivityInstance-tokenCount" name="tokenCount">
         	<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
      	</ownedAttribute>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="ActivityInstance-ressources" name="ressources" _type="RessourceInstance" lower="0"  upper="*" isComposite="true" association="A_ActivityInstance_RessourceInstance"/>
 	</ownedMember>
 	
 	<ownedMember xmi:type="cmof:Enumeration" xmi:id="SubprocessType" name="SubprocessType">
@@ -104,10 +108,15 @@
       <ownedEnd xmi:type="cmof:Property" xmi:id="A_connectingObject_Subprocess-Subprocess" name="SubprocessInstance" _type="SubprocessInstance" lower="0" owningAssociation="A_connectingObject_Subprocess" association="A_connectingObject_Subprocess"/>
     </ownedMember>
 	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_SubProcessInstance_RessourceInstance" name="A_SubProcessInstance_RessourceInstance" visibility="private" memberEnd="SubProcessInstance-RessourceInstance A_SubProcessInstance_RessourceInstance-RessourceInstance">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_SubProcessInstance_RessourceInstance-parent" name="parent" _type="Instance" lower="0" owningAssociation="A_SubProcessInstance_RessourceInstance" association="A_SubProcessInstance_RessourceInstance"/>
+    </ownedMember>
+	
 	<ownedMember xmi:type="cmof:Class" xmi:id="SubprocessInstance" name="SubprocessInstance" superClass="Instance FlowNodeInstance">
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="SubprocessInstance-SubprocessType" name="SubprocessType" _type="SubprocessType"/>
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="SubprocessInstance-flowNodes" name="flowNodeInstances" _type="FlowNodeInstance" lower="0"  upper="*" isComposite="true" association="A_flowNode_Subprocess"/>
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="SubprocessInstance-connectingObjects" name="connectingObjects" _type="ConnectingObject" lower="0"  upper="*" isComposite="true" association="A_connectingObject_Subprocess"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="SubprocessInstance-ressources" name="ressources" _type="RessourceInstance" lower="0"  upper="*" isComposite="true" association="A_SubProcessInstance_RessourceInstance"/>
 	</ownedMember>
 	
 	<ownedMember xmi:type="cmof:Enumeration" xmi:id="GatewayType" name="GatewayType">
@@ -154,7 +163,7 @@
 	<ownedMember xmi:type="cmof:Association" xmi:id="A_connectingObject_Process" name="A_connectingObject_Process" visibility="private" memberEnd="Process-ConnectingObject A_connectingObject_Process-Process">
       <ownedEnd xmi:type="cmof:Property" xmi:id="A_connectingObject_Process-process" name="processInstance" _type="ProcessInstance" lower="0" owningAssociation="A_connectingObject_Process" association="A_connectingObject_Process"/>
     </ownedMember>
-	
+
 	<ownedMember xmi:type="cmof:Class" xmi:id="ProcessInstance" name="ProcessInstance" superClass="Instance">
 	    <ownedAttribute xmi:type="cmof:Property" xmi:id="ProcessInstance-number" name="number">
         	<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
@@ -168,8 +177,6 @@
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="ProcessInstance-flowNodeInstances" name="flowNodeInstances" _type="FlowNodeInstance" lower="0"  upper="*" isComposite="true" association="A_flowNode_Process"/>
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="ProcessInstance-connectingObjects" name="connectingObjects" _type="ConnectingObject" lower="0"  upper="*" isComposite="true" association="A_connectingObject_Process"/>
 	</ownedMember>
-	
-	
 	
 	<ownedMember xmi:type="cmof:Enumeration" xmi:id="EventDefinitionType" name="EventDefinitionType">
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventDefinitionType-MessageEventDefinition" name="MessageEventDefinition" classifier="EventDefinitionType" enumeration="EventDefinitionType"/>
@@ -235,7 +242,7 @@
 	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="EventTriggerType-Start" name="Start" classifier="EventTriggerType" enumeration="EventTriggerType"/>
 	</ownedMember>
 	
-	
+	<!-- Item aware Element -->
 	<ownedMember xmi:type="cmof:Class" xmi:id="ItemAwareElementInstance" name="ItemAwareElementInstance">
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="Instance-id" name="id">
 	    	<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
@@ -248,6 +255,29 @@
 		</ownedAttribute>
 	</ownedMember>
 
+	<!-- Ressource instance Element -->
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_RessourceParameterInstance_ItemAwareElementInstance" name="A_RessourceParameterInstance_ItemAwareElementInstance" visibility="private" memberEnd="RessourceParameterInstance-ItemAwareElementInstance A_RessourceParameterInstance_ItemAwareElementInstance-ItemAwareElementInstance">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_RessourceParameterInstance_ItemAwareElementInstance-parent" name="parent" _type="RessourceParameterInstance" lower="0" owningAssociation="A_RessourceParameterInstance_ItemAwareElementInstance" association="A_RessourceParameterInstance_ItemAwareElementInstance"/>
+    </ownedMember>
+	<ownedMember xmi:type="cmof:Class" xmi:id="RessourceParameterInstance" name="RessourceParameterInstance" isAbstract="false">
+      	<ownedAttribute xmi:type="cmof:Property" xmi:id="RessourceParameterInstance-bpmnElementId" name="bpmnElementId">
+        	<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      	</ownedAttribute>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="RessourceParameterInstance-data" visibility="public" name="data" _type="ItemAwareElementInstance" lower="0"  upper="1" isComposite="true" association="A_RessourceParameterInstance_ItemAwareElementInstance"/>
+	</ownedMember>
+
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_RessourceInstance_RessourceParameterInstance" name="A_RessourceInstance_RessourceParameterInstance" visibility="private" memberEnd="RessourceInstance-RessourceParameterInstance A_RessourceInstance_RessourceParameterInstance-RessourceParameterInstance">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_RessourceInstance_RessourceParameterInstance-parent" name="parent" _type="RessourceInstance" lower="0" owningAssociation="A_RessourceInstance_RessourceParameterInstance" association="A_RessourceInstance_RessourceParameterInstance"/>
+    </ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="RessourceInstance" name="RessourceInstance" isAbstract="false">
+      	<ownedAttribute xmi:type="cmof:Property" xmi:id="RessourceInstance-bpmnElementId" name="bpmnElementId">
+        	<type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      	</ownedAttribute>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="RessourceInstance-parameters" visibility="public" name="parameters" _type="RessourceParameterInstance" lower="0"  upper="*" isComposite="true" association="A_RessourceInstance_RessourceParameterInstance"/>
+	</ownedMember>
+
+	<!-- Event data -->
 	<ownedMember xmi:type="cmof:Class" xmi:id="EventData" name="EventData" isAbstract="false">
       <ownedAttribute xmi:type="cmof:Property" xmi:id="EventData-id" name="id">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
@@ -259,7 +289,6 @@
 	<!-- SignalInstance -->
 	
 	<!-- Expression -->
-	
 	
 	<ownedMember xmi:type="cmof:Association" xmi:id="A_eventData_Triger" name="A_eventData_Triger" visibility="private" memberEnd="Trigger-EventData A_eventData_Triger-Trigger">
       <ownedEnd xmi:type="cmof:Property" xmi:id="A_eventData_Triger-EventData" name="trigger" _type="Trigger" lower="0" owningAssociation="A_eventData_Triger" association="A_eventData_Triger"/>

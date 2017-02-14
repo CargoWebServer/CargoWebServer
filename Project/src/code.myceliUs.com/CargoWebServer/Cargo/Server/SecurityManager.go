@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 )
 
@@ -16,7 +15,6 @@ import (
 type SecurityManager struct {
 	adminRole *CargoEntities.Role
 	guestRole *CargoEntities.Role
-	m_config  *Config.ServiceConfiguration
 }
 
 var securityManager *SecurityManager
@@ -43,7 +41,7 @@ func newSecurityManager() *SecurityManager {
 func (this *SecurityManager) initialize() {
 
 	log.Println("--> Initialize SessionManager")
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	// Create the admin role if it doesn't exist
 	adminRoleUuid := CargoEntitiesRoleExists("adminRole")
@@ -51,7 +49,7 @@ func (this *SecurityManager) initialize() {
 
 	if len(adminRoleUuid) == 0 {
 
-		adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "admin")
+		adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", "admin")
 		if errObj != nil {
 			return
 		}
@@ -74,7 +72,7 @@ func (this *SecurityManager) initialize() {
 	guestRoleUuid := CargoEntitiesRoleExists("guestRole")
 	if len(guestRoleUuid) == 0 {
 
-		guestAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "guest")
+		guestAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", "guest")
 		if errObj != nil {
 			return
 		}
@@ -104,10 +102,6 @@ func (this *SecurityManager) start() {
 
 func (this *SecurityManager) stop() {
 	log.Println("--> Stop SecurityManager")
-}
-
-func (this *SecurityManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -408,6 +402,7 @@ func (this *SecurityManager) canExecuteAction(sessionId string, actionName strin
 	actionName = strings.Replace(actionName, ")", "", -1)
 
 	session := GetServer().GetSessionManager().activeSessions[sessionId]
+
 	var account *CargoEntities.Account
 	if session != nil {
 		account = session.GetAccountPtr()
@@ -440,6 +435,7 @@ func (this *SecurityManager) canExecuteAction(sessionId string, actionName strin
  */
 func (this *SecurityManager) hasPermission(sessionId string, permissionType CargoEntities.PermissionType, entity Entity) *CargoEntities.Error {
 	session := GetServer().GetSessionManager().activeSessions[sessionId]
+
 	var account *CargoEntities.Account
 	if session != nil {
 		account = session.GetAccountPtr()

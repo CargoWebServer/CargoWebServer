@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 type SubProcess interface{
@@ -11,5 +13,6 @@ type SubProcess interface{
 
 	/** Artifact **/
 	GetArtifact() []Artifact
+	SetArtifact(interface{}) 
 
 }

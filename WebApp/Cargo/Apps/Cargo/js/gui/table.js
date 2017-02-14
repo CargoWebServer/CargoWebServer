@@ -869,7 +869,7 @@ TableCell.prototype.formatValue = function (value) {
 			}
 
 			content = new Element(this.valueDiv, { "tag": "div", "style": "display: table-row;", "id": field + "_content" })
-			var newLnkButton = content.appendElement({ "tag": "div", "class": "new_row_button row_button", "id": fieldType + "_plus_btn" }).down()
+			var newLnkButton = content.appendElement({ "tag": "div", "class": "new_row_button row_button", "id": field + "_plus_btn" }).down()
 			newLnkButton.appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
 
 			// A generic table.
@@ -1076,7 +1076,7 @@ TableCell.prototype.formatValue = function (value) {
 				}
 
 				content = new Element(this.valueDiv, { "tag": "div", "style": "display: table-row;", "id": field + "_content" })
-				var newLnkButton = content.appendElement({ "tag": "div", "class": "new_row_button row_button", "id": fieldType + "_plus_btn" }).down()
+				var newLnkButton = content.appendElement({ "tag": "div", "class": "new_row_button row_button", "id": field + "_plus_btn" }).down()
 				newLnkButton.appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
 				var itemPrototype = server.entityManager.entityPrototypes[fieldType.replace("[]", "")]
 
@@ -1085,15 +1085,14 @@ TableCell.prototype.formatValue = function (value) {
 					var itemsTableModel = new EntityTableModel(itemPrototype)
 					var itemTable = new Table(randomUUID(), content)
 
+					// Keep the table reference in the entity.
+					entity[field + "_table"] = itemTable
+
 					itemTable.setModel(itemsTableModel, function (itemsTable, values, field) {
 						return function () {
 							for (var i = 0; i < values.length; i++) {
 								if (values[i].UUID != undefined) {
 									values[i].parentLnk = field
-
-									// keep the reference in the parent entity panel.
-									server.entityManager.entities[values[i].parentUuid].panel = itemsTable
-
 									itemsTable.appendRow(values[i], values[i].UUID)
 								} else {
 									itemsTable.model.fields[0] = fieldType
@@ -1111,11 +1110,19 @@ TableCell.prototype.formatValue = function (value) {
 						item.UUID = fieldType + "%" + randomUUID()
 						item.TYPENAME = fieldType
 
+						// I will push the item
+						if (entity[field] == undefined) {
+							entity[field] = []
+						}
+
+						entity[field].push(item)
+
 						// Set the parent uuid.
 						item.parentUuid = entity.UUID
 						item.parentLnk = field
+
 						if (itemTable == undefined) {
-							itemTable = entity.panel
+							itemTable = entity[field + "_table"]
 						}
 						if (itemTable == undefined) {
 							var itemTable = new Table(randomUUID(), content)
@@ -1281,6 +1288,16 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 
 	// I will get the cell editor related to this column...
 	var editor = this.row.table.cellEditors[this.index]
+	
+	// One editor at time.
+	if (editor != undefined) {
+		if (editor.element.parentNode != undefined) {
+			editor.element.parentNode.removeChild(editor.element)
+		}
+		delete this.row.table.cellEditors[this.index]
+		editor = null
+	}
+
 	var prototype = this.row.table.model.proto
 	var entity = null
 
@@ -1425,19 +1442,23 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 		var onblur = function (self, editor, onblur) {
 			// If the value change...
 			return function () {
+				var value
 				if (this.type == "checkbox") {
-					this.value = this.checked
+					value = this.checked
+				} else {
+					value = this.value
 				}
-				if (this.value != value) {
+
+				if (self.value != value) {
 
 					if (editor.entity != undefined) {
 						if (editor.entity.M_valueOf != undefined) {
-							editor.entity.M_valueOf = this.value
+							editor.entity.M_valueOf = value
 							editor.entity.NeedSave = true
 						}
 						self.setValue(editor.entity)
 					} else {
-						self.setValue(this.value)
+						self.setValue(value)
 					}
 
 				}

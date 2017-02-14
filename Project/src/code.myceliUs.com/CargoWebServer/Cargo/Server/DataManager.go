@@ -23,7 +23,6 @@ const (
 type DataManager struct {
 	/** This contain connection to know dataStore **/
 	m_dataStores map[string]DataStore
-	m_config     *Config.ServiceConfiguration
 
 	/**
 	 * Use to protected the entitiesMap access...
@@ -69,7 +68,7 @@ func (this *DataManager) initialize() {
 	log.Println("--> Initialize DataManager")
 
 	// Create the default configurations
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	// Here I will get the datastore configuration...
 	storeConfigurations := GetServer().GetConfigurationManager().GetDataStoreConfigurations()
@@ -96,10 +95,6 @@ func (this *DataManager) start() {
 func (this *DataManager) stop() {
 	log.Println("--> Stop DataManager")
 	this.close()
-}
-
-func (this *DataManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,3 +1,5 @@
+// +build DC
+
 package Server
 
 import (
@@ -274,19 +276,19 @@ func (this *EntityManager) create_DC_FontEntityPrototype() {
 	fontEntityProto.FieldsOrder = append(fontEntityProto.FieldsOrder, 4)
 	fontEntityProto.FieldsVisibility = append(fontEntityProto.FieldsVisibility, true)
 	fontEntityProto.Fields = append(fontEntityProto.Fields, "M_isBold")
-	fontEntityProto.FieldsType = append(fontEntityProto.FieldsType, "xs.bool")
+	fontEntityProto.FieldsType = append(fontEntityProto.FieldsType, "xs.boolean")
 	fontEntityProto.FieldsOrder = append(fontEntityProto.FieldsOrder, 5)
 	fontEntityProto.FieldsVisibility = append(fontEntityProto.FieldsVisibility, true)
 	fontEntityProto.Fields = append(fontEntityProto.Fields, "M_isItalic")
-	fontEntityProto.FieldsType = append(fontEntityProto.FieldsType, "xs.bool")
+	fontEntityProto.FieldsType = append(fontEntityProto.FieldsType, "xs.boolean")
 	fontEntityProto.FieldsOrder = append(fontEntityProto.FieldsOrder, 6)
 	fontEntityProto.FieldsVisibility = append(fontEntityProto.FieldsVisibility, true)
 	fontEntityProto.Fields = append(fontEntityProto.Fields, "M_isUnderline")
-	fontEntityProto.FieldsType = append(fontEntityProto.FieldsType, "xs.bool")
+	fontEntityProto.FieldsType = append(fontEntityProto.FieldsType, "xs.boolean")
 	fontEntityProto.FieldsOrder = append(fontEntityProto.FieldsOrder, 7)
 	fontEntityProto.FieldsVisibility = append(fontEntityProto.FieldsVisibility, true)
 	fontEntityProto.Fields = append(fontEntityProto.Fields, "M_isStrikeThrough")
-	fontEntityProto.FieldsType = append(fontEntityProto.FieldsType, "xs.bool")
+	fontEntityProto.FieldsType = append(fontEntityProto.FieldsType, "xs.boolean")
 	fontEntityProto.Fields = append(fontEntityProto.Fields, "childsUuid")
 	fontEntityProto.FieldsType = append(fontEntityProto.FieldsType, "[]xs.string")
 	fontEntityProto.FieldsOrder = append(fontEntityProto.FieldsOrder, 8)

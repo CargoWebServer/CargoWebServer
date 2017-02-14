@@ -104,7 +104,7 @@
 				<xsd:attribute name="port" type="xsd:integer" />
 				<xsd:attribute name="user" type="xsd:string" />
 				<xsd:attribute name="pwd" type="xsd:string" />
-				<xsd:attribute name="start" type="xsd:bool" />
+				<xsd:attribute name="start" type="xsd:boolean" />
 			</xsd:extension> 
 		</xsd:complexContent> 
 	</xsd:complexType>
@@ -117,6 +117,7 @@
 			<xsd:element name="smtpConfigs" type="tSmtpConfiguration" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="ldapConfigs" type="tLdapConfiguration" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="dataStoreConfigs" type="tDataStoreConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="serviceConfigs" type="tServiceConfiguration" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:attribute name="name" type="xsd:string"/>

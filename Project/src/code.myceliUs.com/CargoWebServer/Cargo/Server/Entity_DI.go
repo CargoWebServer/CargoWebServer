@@ -1,3 +1,5 @@
+// +build DI
+
 package Server
 
 /** Entity Prototype creation **/

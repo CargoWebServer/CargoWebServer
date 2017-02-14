@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 type ChoreographyActivity interface{
@@ -14,8 +16,10 @@ type ChoreographyActivity interface{
 
 	/** CorrelationKey **/
 	GetCorrelationKey() []*CorrelationKey
+	SetCorrelationKey(interface{}) 
 
 	/** LoopType **/
 	GetLoopType() ChoreographyLoopType
+	SetLoopType(interface{}) 
 
 }

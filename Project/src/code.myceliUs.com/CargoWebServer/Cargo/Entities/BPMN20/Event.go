@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 type Event interface{
@@ -8,5 +10,6 @@ type Event interface{
 
 	/** Property **/
 	GetProperty() []*Property
+	SetProperty(interface{}) 
 
 }

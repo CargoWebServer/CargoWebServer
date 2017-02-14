@@ -65,6 +65,9 @@ func loadSchema(schema *XML_Schemas.XSD_Schema) {
 	aliasElementType["messagePath"] = "FormalExpression"
 	aliasElementType["dataPath"] = "FormalExpression"
 	aliasElementType["condition"] = "FormalExpression"
+	aliasElementType["timeDate"] = "FormalExpression"
+	aliasElementType["timeDuration"] = "FormalExpression"
+	aliasElementType["timeCycle"] = "FormalExpression"
 
 	// ImplicitThrowEvent...
 	aliasElementType["event"] = "ImplicitThrowEvent"

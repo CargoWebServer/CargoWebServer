@@ -1,3 +1,5 @@
+// +build BPMN20
+
 package BPMN20
 
 import(
@@ -103,6 +105,13 @@ func (this *Extension) SetExtensionDefinition(ref interface{}){
 }
 
 /** Remove reference ExtensionDefinition **/
+func (this *Extension) RemoveExtensionDefinition(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*ExtensionDefinition)
+	if toDelete.GetUUID() == this.M_extensionDefinition.GetUUID() {
+		this.M_extensionDefinition = nil
+	}
+}
 
 /** Definitions **/
 func (this *Extension) GetDefinitionsPtr() *Definitions{

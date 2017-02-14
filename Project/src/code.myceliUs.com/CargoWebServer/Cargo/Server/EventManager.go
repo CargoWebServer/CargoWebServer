@@ -8,8 +8,6 @@ import (
 	"sync"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
-
 	"code.myceliUs.com/Utility"
 )
 
@@ -53,7 +51,6 @@ const (
 // The event manager
 ////////////////////////////////////////////////////////////////////////////////
 type EventManager struct {
-	m_config *Config.ServiceConfiguration
 
 	// The map of avalaible event channels...
 	m_channels     map[string]*EventChannel
@@ -82,10 +79,6 @@ func newEventManager() *EventManager {
 	return eventManager
 }
 
-func (this *EventManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Service functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,9 +88,7 @@ func (this *EventManager) getConfig() *Config.ServiceConfiguration {
  */
 func (this *EventManager) initialize() {
 	log.Println("--> Initialize EventManager")
-
-	// Create the default configurations
-	this.m_config = GetServer().GetConfigurationManager().getServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	this.m_eventDataMap = make(map[*Event]string, 0)
 }

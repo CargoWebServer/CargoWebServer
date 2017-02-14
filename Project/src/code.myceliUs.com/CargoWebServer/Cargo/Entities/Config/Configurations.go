@@ -1,3 +1,5 @@
+// +build Config
+
 package Config
 
 import(
@@ -22,6 +24,7 @@ type Configurations struct{
 	M_version string
 	M_filePath string
 	M_serverConfig *ServerConfiguration
+	M_serviceConfigs []*ServiceConfiguration
 	M_dataStoreConfigs []*DataStoreConfiguration
 	M_smtpConfigs []*SmtpConfiguration
 	M_ldapConfigs []*LdapConfiguration
@@ -37,6 +40,7 @@ type XsdConfigurations struct {
 	M_smtpConfigs	[]*XsdSmtpConfiguration	`xml:"smtpConfigs,omitempty"`
 	M_ldapConfigs	[]*XsdLdapConfiguration	`xml:"ldapConfigs,omitempty"`
 	M_dataStoreConfigs	[]*XsdDataStoreConfiguration	`xml:"dataStoreConfigs,omitempty"`
+	M_serviceConfigs	[]*XsdServiceConfiguration	`xml:"serviceConfigs,omitempty"`
 	M_id	string	`xml:"id,attr"`
 	M_name	string	`xml:"name,attr"`
 	M_version	string	`xml:"version,attr"`
@@ -117,6 +121,43 @@ func (this *Configurations) RemoveServerConfig(ref interface{}){
 	if toDelete.GetUUID() == this.M_serverConfig.GetUUID() {
 		this.M_serverConfig = nil
 	}
+}
+
+/** ServiceConfigs **/
+func (this *Configurations) GetServiceConfigs() []*ServiceConfiguration{
+	return this.M_serviceConfigs
+}
+
+/** Init reference ServiceConfigs **/
+func (this *Configurations) SetServiceConfigs(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var serviceConfigss []*ServiceConfiguration
+	for i:=0; i<len(this.M_serviceConfigs); i++ {
+		if this.M_serviceConfigs[i].GetUUID() != ref.(Configuration).GetUUID() {
+			serviceConfigss = append(serviceConfigss, this.M_serviceConfigs[i])
+		} else {
+			isExist = true
+			serviceConfigss = append(serviceConfigss, ref.(*ServiceConfiguration))
+		}
+	}
+	if !isExist {
+		serviceConfigss = append(serviceConfigss, ref.(*ServiceConfiguration))
+	}
+	this.M_serviceConfigs = serviceConfigss
+}
+
+/** Remove reference ServiceConfigs **/
+func (this *Configurations) RemoveServiceConfigs(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(Configuration)
+	serviceConfigs_ := make([]*ServiceConfiguration, 0)
+	for i := 0; i < len(this.M_serviceConfigs); i++ {
+		if toDelete.GetUUID() != this.M_serviceConfigs[i].GetUUID() {
+			serviceConfigs_ = append(serviceConfigs_, this.M_serviceConfigs[i])
+		}
+	}
+	this.M_serviceConfigs = serviceConfigs_
 }
 
 /** DataStoreConfigs **/

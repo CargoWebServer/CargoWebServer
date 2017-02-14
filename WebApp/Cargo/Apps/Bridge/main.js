@@ -8,6 +8,27 @@ var applicationName = document.getElementsByTagName("title")[0].text
 var mainPage = null
 var catalog = null
 
+function init() {
+    var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
+
+    // The body element....
+    var mainLayout = new Element(bodyElement, { "tag": "div", "style": "position: absolute; top:0px; left:0px; right:0px; bottom: 0px;" });
+
+    // The page to display when the user is logged in
+    homePage = new HomePage(mainLayout)
+
+    // The login page...
+    var loginPage = new LoginPage(function (mainLayout, homePage) {
+        return function (sessionsInfo) {
+            homePage.init(mainLayout, sessionsInfo)
+        }
+    } (mainLayout, homePage),
+        "safranLdap" // Put the ldap sever id here
+    )
+    // the main page...
+    mainPage = new MainPage(mainLayout, loginPage)
+}
+
 /**
  * This function is the entry point of the application...
  */
@@ -36,35 +57,16 @@ function main() {
                                                 "CargoEntities.",
                                                 "SecurityEvent",
                                                 function () {
-
                                                     // now the prototypes...
                                                     server.entityManager.getEntityPrototypes("BPMS",
                                                         function () {
-                                                            var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
-
-                                                            // The body element....
-                                                            var mainLayout = new Element(bodyElement, { "tag": "div", "style": "position: absolute; top:0px; left:0px; right:0px; bottom: 0px;" });
-
-                                                            // The page to display when the user is logged in
-                                                            homePage = new HomePage(mainLayout)
-
-                                                            // The login page...
-                                                            var loginPage = new LoginPage(function (mainLayout, homePage) {
-                                                                return function (sessionsInfo) {
-                                                                    homePage.init(mainLayout, sessionsInfo)
-                                                                }
-                                                            } (mainLayout, homePage),
-                                                                "safranLdap" // Put the ldap sever id here
-                                                            )
-                                                            // the main page...
-                                                            mainPage = new MainPage(mainLayout, loginPage)
+                                                            init()
                                                         },
                                                         // error callback
                                                         function () {
-
+                                                            // without bpmn
+                                                            init()
                                                         }, {})
-
-
                                                 },
                                                 function () { },
                                                 undefined

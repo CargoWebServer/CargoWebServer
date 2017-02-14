@@ -1,3 +1,5 @@
+// +build BPMS
+
 package BPMS
 
 type LoopCharacteristicType int
