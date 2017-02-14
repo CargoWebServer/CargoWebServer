@@ -17,7 +17,7 @@ func main() {
 	// Generate the module inside input...
 	generate(dir+"/input", "Config", "configurations")
 	generate(dir+"/input", "CargoEntities", "entities")
-
+/*
 	// Now the runtime.
 	initMaps()
 
@@ -63,5 +63,5 @@ func main() {
 	generateEntity("DI")
 	generateEntity("BPMNDI")
 	generateEntity("BPMN20")
-
+*/
 }
