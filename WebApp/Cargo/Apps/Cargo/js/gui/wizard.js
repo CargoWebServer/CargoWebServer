@@ -104,7 +104,7 @@ var Wizard = function (id, title) {
 
             // Set the keyframe inner text.
             var keyframe = "100% { left:" + offset + "px;}"
-            wizard.pagesDiv.animate(keyframe, "wizard_next_page_animation", 1,
+            wizard.pagesDiv.animate(keyframe, 1,
                 function (pageDiv, offset) {
                     return function () {
                         pageDiv.element.style.left = offset + "px"

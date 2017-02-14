@@ -41,9 +41,6 @@ var server = new Server("localhost", "127.0.0.1", 9393)
  */
 var main = null
 
-// If the bpmn service is use..
-var BPMS = false
-
 /*
  * Append load function to the windows load event listener.
  */
@@ -75,10 +72,6 @@ function load() {
             server.emailManager.RegisterListener()
             server.projectManager.RegisterListener()
             //server.securityManager.RegisterListener()
-            if (BPMS) {
-                server.workflowManager = new WorkflowManager()
-                server.workflowManager.RegisterListener()
-            }
 
         },  // onOpen callback
         function () { // onClose callback

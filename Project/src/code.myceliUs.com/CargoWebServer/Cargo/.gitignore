@@ -7,8 +7,8 @@
 /Entities/BPMS_XmlFactory.go
 /Server/WorkflowManager.go
 /Server/WorkflowProcessor.go
-/Entities/Entity_BPMN20.go
-/Entities/Entity_BPMS.go
-/Entities/Entity_BPMDI.go
-/Entities/Entity_DI.go
-/Entities/Entity_DC.go
+/Server/Entity_BPMN20.go
+/Server/Entity_BPMS.go
+/Server/Entity_BPMDI.go
+/Server/Entity_DI.go
+/Server/Entity_DC.go

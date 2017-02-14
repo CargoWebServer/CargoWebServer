@@ -1,0 +1,6 @@
+
+.data_explorer{
+    display: table-cell;
+    height: 100%;
+    overflow-y: auto;
+}

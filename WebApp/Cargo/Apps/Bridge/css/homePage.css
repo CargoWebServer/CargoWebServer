@@ -12,10 +12,14 @@
 
 .navigation_div{
 	position: absolute;
+	display: table;
+	height: 100%;
 	top: 0px;
 	bottom: 0px;
 	left: 0px;
 	right: 0px;
+	padding: 2px;
+	min-width: 375px;
 }
 
 .properties_div{
@@ -40,22 +44,18 @@
 /** */
 #rightDiv{
 	position: relative;
-	width: 300px;
+	width: 100%;
 	height: 100%;
 	background-color: white; 
 	border-top: 1px solid grey;
+	overflow-x: auto;
 }
 
-#middleDiv{
-	width: 100%;
-	height: 100%;
-	border-top: 1px solid grey;
-}
 
 .header{
 	background-color: white;
 	display: table-row;
-	height: 90px;
+	height: 60px;
 	width: 100%;
 }
 
@@ -81,13 +81,14 @@
 
 .menu_div div{
 	display: table-cell;
-	height: 60px;
+	height: 30px;
 }
 
 .workspace_div{
 	width: 100%;
 	height: 100%;
 	position: relative;
+	background-color: lightgray;
 }
 
 .contextSelector div {

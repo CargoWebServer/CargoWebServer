@@ -129,7 +129,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
 ConfigurationPanel.prototype.setConfigurations = function (configurations) {
 
     // So here I will create the configuration selector...
-    this.header = this.panel.appendElement({ "tag": "div", "style": "display: table; margin-top: 2px; margin-bottom: 4px;" }).down()
+    this.header = this.panel.appendElement({ "tag": "div", "style": "display: table; margin-top: 2px; margin-bottom: 4px; width: 100%;" }).down()
     this.configurationSelect = this.header.appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;", "innerHtml": "Configurations" })
         .appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;" }).down()
         .appendElement({ "tag": "select", "style": "margin-left: 5px;" }).down()
@@ -150,7 +150,6 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
             if (content == undefined) {
                 content = []
             }
-
             // The new configuration button.
             this.header.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" })
 
@@ -172,7 +171,6 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
             // Here the configuration panel contain more than one panel...
             for (var j = 0; j < content.length; j++) {
                 if (content[j] != undefined) {
-
                     var contentView = new EntityPanel(configurationContent, content[j].TYPENAME,
                         function (content, title) {
                             return function (contentView) {
@@ -198,26 +196,29 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                                 }
                             }
                         } (content[j], this.title))
-
+                    if (content[j].TYPENAME == "Config.DataStoreConfiguration") {
+                        // So here I will set the schema view for the releated store.
+                        homepage.dataExplorer.initDataSchema(content[j])
+                    }
                     // Here I will append the connection button...
                     contentView.connectBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell; color: lightgrey;" }).down()
                     contentView.connectBtn.appendElement({ "tag": "i", "class": "fa fa-plug" })
 
                     // Now If the connection is activated...
-                    contentView.connectBtn.element.onclick = function(contentView){
-                        return function(){
+                    contentView.connectBtn.element.onclick = function (contentView) {
+                        return function () {
                             // Here I will try to open or close the connection...
                             server.dataManager.ping(contentView.entity.M_id,
-                            function(result, caller){
-                                // Here the data store can be reach so I will try to connect.
+                                function (result, caller) {
+                                    // Here the data store can be reach so I will try to connect.
 
-                            }, 
-                            function(errMsg, caller){
-                                // Here There is an error...
-                                
-                            }, contentView)
+                                },
+                                function (errMsg, caller) {
+                                    // Here There is an error...
+
+                                }, contentView)
                         }
-                    }(contentView)
+                    } (contentView)
 
                     if (j != 0) {
                         contentView.panel.element.style.display = "none"
@@ -238,6 +239,11 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         }
                         configurationPanel.currentIndex++
                         configurationPanel.contentViews[configurationPanel.currentIndex].panel.element.style.display = ""
+                        
+                        if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
+                             homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
+                        }
+
                         if (configurationPanel.currentIndex == configurationPanel.contentViews.length - 1) {
                             configurationPanel.nextConfigBtn.element.className = "entities_header_btn"
                             configurationPanel.nextConfigBtn.element.style.color = "lightgrey"
@@ -270,6 +276,11 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         }
                         configurationPanel.currentIndex--
                         configurationPanel.contentViews[configurationPanel.currentIndex].panel.element.style.display = ""
+                        
+                        if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
+                           homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
+                        }
+
                         if (configurationPanel.currentIndex == 0) {
                             configurationPanel.previousConfigBtn.element.className = "entities_header_btn"
                             configurationPanel.previousConfigBtn.element.style.color = "lightgrey"

@@ -45,6 +45,9 @@ var HomePage = function () {
     /** The project explorer */
     this.projectExplorer = null
 
+    /** Use to display the content of data store. */
+    this.dataExplorer = null
+
     /** The file navigation  */
     this.fileNavigator = null
 
@@ -85,14 +88,14 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     // The menu grid who will contain the menu panel...
     this.headerDiv = this.panel.appendElement({ "tag": "div", "class": "header" }).down()
 
-    var menuRow = this.headerDiv.appendElement({ "tag": "div", "style": "width:100%; height: 60px; display: table-row" }).down()
+    var menuRow = this.headerDiv.appendElement({ "tag": "div", "style": "width:100%; height: 30px; display: table-row" }).down()
 
     // This is where the menu grid will be put...
     this.menuContentDiv = menuRow.appendElement({ "tag": "div", "style": "width:100%; display: table-cell;" }).down()
         .appendElement({ "tag": "div", "style": "width:100%; display: table; height: 0px;" }).down()
 
     // Now I will create the session panel...
-    this.sessionPanel = new SessionPanel(menuRow.appendElement({ "tag": "div", "style": "width:100%; display: table-cell; height:60px" }).down(), sessionInfo)
+    this.sessionPanel = new SessionPanel(menuRow.appendElement({ "tag": "div", "style": "width:100%; display: table-cell; height:30px" }).down(), sessionInfo)
 
     // The menu
     var newFileOrProjectMenuItem = new MenuItem("newFileOrProjectMenuItem", "New File or Project...", {}, 1,
@@ -119,24 +122,19 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     this.fileNavigator = new FileNavigator(this.workingFilesDiv)
 
-    // Now the left, middle and right div...
+    // Now the left and right div...
     var splitArea1 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-cell; position: relative;" }).down()
     var leftDiv = new Element(splitArea1, { "tag": "div", "id": "leftDiv", "style": "" })
     var splitter1 = this.mainArea.appendElement({ "tag": "div", "class": "splitter vertical", "id": "splitter1" }).down()
 
     var splitArea2 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%; height:100%" }).down()
-    var middleDiv = new Element(splitArea2, { "tag": "div", "id": "middleDiv" })
-    var splitter2 = this.mainArea.appendElement({ "tag": "div", "class": "splitter vertical", "id": "splitter2" }).down()
-
-    var splitArea3 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-cell; height:100%" }).down()
-    var rightDiv = new Element(splitArea3, { "tag": "div", "id": "rightDiv" })
+    var rightDiv = new Element(splitArea2, { "tag": "div", "id": "rightDiv" })
 
     // Init the splitter action.
     initSplitter(splitter1, leftDiv)
-    initSplitter(splitter2, rightDiv)
 
     // The workspace area
-    this.workspaceDiv = new Element(middleDiv, { "tag": "div", "class": "workspace_div" })
+    this.workspaceDiv = new Element(rightDiv, { "tag": "div", "class": "workspace_div" })
 
     // The code editor...
     this.codeEditor = new CodeEditor(this.workspaceDiv)
@@ -207,7 +205,8 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.projectContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Projects" }).appendElement({ "tag": "i", "class": "fa fa-files-o active" })
     setSelectAction(this.projectContext, this.projectDiv)
 
-    if (BPMS) {
+    // Workflow manager service interface here.
+    if (server.workflowManager != null) {
         // The bpmn explorer...
         this.bpmnDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display:none;" })
         this.bpmnContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Workflow Manager" })
@@ -251,6 +250,9 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.datasourceSettingContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Data stores configuration" }).appendElement({ "tag": "i", "class": "fa fa-database" })
     setSelectAction(this.datasourceSettingContext, this.datasourceSettingDiv)
     this.dataConfiguration = new ConfigurationPanel(this.datasourceSettingDiv, "Data configuration", "Config.DataStoreConfiguration", "dataStoreConfigs")
+    
+    // So here I will append panel to display more information about data inside the store. **/
+    this.dataExplorer = new DataExplorer(this.datasourceSettingDiv)
 
     // The user and group setting / ldap.
     this.userGroupSettingDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display:none;" })
@@ -265,8 +267,8 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.smtpConfiguration = new ConfigurationPanel(this.mailServerSettingDiv, "Email server configuration", "Config.SmtpConfiguration", "smtpConfigs")
 
     // That area will contain different object properties.
-    this.propertiesDiv = new Element(rightDiv, { "tag": "div", "class": "properties_div" })
-    this.propertiesView = new PropertiesView(this.propertiesDiv)
+    /* this.propertiesDiv = new Element(rightDiv, { "tag": "div", "class": "properties_div" })
+     this.propertiesView = new PropertiesView(this.propertiesDiv)*/
 
     // I will set the configuration of the panel...
     server.entityManager.getObjectsByType("Config.Configurations", "Config", "",
@@ -294,5 +296,4 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 HomePage.prototype.createNewProject = function () {
     // So here I will create the new wizard...
     var wiz = new ProjectWizard()
-
 }

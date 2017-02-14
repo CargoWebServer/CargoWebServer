@@ -1,9 +1,9 @@
 /** The server configuration **/
 .severConfiguration{
-    width: calc(100%-1px);
     color: #657383;
     padding: 2px;
     font-size: 12pt;
+    display: table-row;
 }
 
 .severConfiguration select {

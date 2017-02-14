@@ -40,6 +40,10 @@ $("#frontEndNextTutorialLink").click(function() {
 main()
 
 function main() {
+	// TODO delete auto clicks
+	$('#li-tutorials').click()
+	$('#tutorialsLink-AsynchronousProgramming').click()
+
 
 	// Element example
 	var containerElement = new Element(

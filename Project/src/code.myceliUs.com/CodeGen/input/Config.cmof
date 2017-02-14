@@ -5,11 +5,10 @@
 	<!-- The data store type... -->
 	<ownedMember xmi:type="cmof:Enumeration" xmi:id="DataStoreType" name="DataStoreType">
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreType-SQL_STORE" name="SQL_STORE" classifier="DataStoreType" enumeration="DataStoreType"/>
-      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreType-MEMORY_STORE" name="MEMORY_STORE" classifier="DataStoreType" enumeration="DataStoreType"/>
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreType-KEY_VALUE_STORE" name="KEY_VALUE_STORE" classifier="DataStoreType" enumeration="DataStoreType"/>
-	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreType-GRAPH_STORE" name="GRAPH_STORE" classifier="DataStoreType" enumeration="DataStoreType"/>
 	</ownedMember>
 	
+
 	<!-- The data store product id... -->
 	<ownedMember xmi:type="cmof:Enumeration" xmi:id="DataStoreVendor" name="DataStoreVendor">
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-MYCELIUS" name="MYCELIUS" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
