@@ -8,13 +8,13 @@
 /Project/src/gopkg.in/
 /Project/src/sourcegraph.com/
 
-/WebApp/Cargo/bin/
-/WebApp/Cargo/Data/
-/WebApp/Cargo/Definitions/
-/WebApp/Cargo/icons/
-/WebApp/Cargo/Schemas/
-/WebApp/Cargo/Scripts/
-/WebApp/Cargo/tmp/
+/WebApp/Cargo/bin/*
+/WebApp/Cargo/Data/*
+/WebApp/Cargo/Definitions/*
+/WebApp/Cargo/icons/*
+/WebApp/Cargo/Schemas/*
+/WebApp/Cargo/Scripts/*
+/WebApp/Cargo/tmp/*
 
 /WebApp/Cargo/Apps/BrisOutil/
 /WebApp/Cargo/Apps/Catalog/
