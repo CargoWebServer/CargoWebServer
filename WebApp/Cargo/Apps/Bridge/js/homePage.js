@@ -123,15 +123,15 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.fileNavigator = new FileNavigator(this.workingFilesDiv)
 
     // Now the left and right div...
-    var splitArea1 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-cell; position: relative;" }).down()
+    var splitArea1 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-cell; position: relative; height:100%" }).down()
     var leftDiv = new Element(splitArea1, { "tag": "div", "id": "leftDiv", "style": "" })
     var splitter1 = this.mainArea.appendElement({ "tag": "div", "class": "splitter vertical", "id": "splitter1" }).down()
 
-    var splitArea2 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%; height:100%" }).down()
+    var splitArea2 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-cell; position: relative; width: 100%; height:100%" }).down()
     var rightDiv = new Element(splitArea2, { "tag": "div", "id": "rightDiv" })
 
     // Init the splitter action.
-    initSplitter(splitter1, leftDiv)
+    initSplitter(splitter1, leftDiv, 50)
 
     // The workspace area
     this.workspaceDiv = new Element(rightDiv, { "tag": "div", "class": "workspace_div" })
@@ -150,13 +150,11 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                 // navigation panel.
                 if (this.firstChild.className.indexOf("active") > -1) {
                     if (leftDiv.element.style.width == "50px") {
-                        leftDiv.element.style.overflowY = "auto"
                         var keyframe = "100% { width:431px;}"
                         leftDiv.animate(keyframe, .5,
                             function (leftDiv) {
                                 return function () {
                                     leftDiv.element.style.width = "431px"
-                                    leftDiv.element.style.overflowY = "auto"
                                 }
                             } (leftDiv))
                     } else {
@@ -288,6 +286,8 @@ HomePage.prototype.init = function (parent, sessionInfo) {
         function (errMsg, caller) {
 
         }, this)
+
+    
 }
 
 /**

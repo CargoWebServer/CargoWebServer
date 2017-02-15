@@ -1,25 +1,13 @@
 
 /** **/
-#leftDiv{
-	width: 350px;
-	height: 100%;
-	position: relative;
-	overflow-x: hidden;
-	overflow-y: auto;
-	background-color: white; 
-	border-top: 1px solid grey;
-}
-
 .navigation_div{
 	position: absolute;
-	display: table;
-	height: 100%;
 	top: 0px;
 	bottom: 0px;
 	left: 0px;
 	right: 0px;
-	padding: 2px;
-	min-width: 375px;
+	min-width: 50px;
+  	height: 100%;
 }
 
 .properties_div{
@@ -41,6 +29,7 @@
 	transition: all .2s ease;
 }
 
+
 /** */
 #rightDiv{
 	position: relative;
@@ -51,6 +40,16 @@
 	overflow-x: auto;
 }
 
+/** **/
+#leftDiv{
+	position: relative;
+	width: 450px;
+	height: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
+	background-color: white; 
+	border-top: 1px solid grey;
+}
 
 .header{
 	background-color: white;

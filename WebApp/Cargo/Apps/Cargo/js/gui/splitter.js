@@ -2,9 +2,12 @@
 /**
  * Set splitter action...
  */
-function initSplitter(splitter, area) {
+function initSplitter(splitter, area, min) {
+	if (min == undefined) {
+		min = 0;
+	}
+	var moveSplitter = function (splitter, area, min) {
 
-	var moveSplitter = function (splitter, area) {
 		return function (e) {
 			var isVertical = splitter.element.className.indexOf("vertical") > -1
 			if (isVertical) {
@@ -12,7 +15,9 @@ function initSplitter(splitter, area) {
 				var offset = e.clientX - splitter.element.offsetLeft
 				var w = area.element.offsetWidth
 				if (isAtLeft) {
-					w = area.element.offsetWidth + offset
+					if (w > min) {
+						w = area.element.offsetWidth + offset
+					}
 				} else {
 					w = area.element.offsetWidth - offset
 				}
@@ -29,14 +34,14 @@ function initSplitter(splitter, area) {
 				area.element.style.height = h + "px"
 			}
 		}
-	} (splitter, area)
+	} (splitter, area, min)
 
 	function mouseUp() {
 		window.removeEventListener('mousemove', moveSplitter);
 		window.removeEventListener('mouseup', mouseUp);
 	}
 
-    splitter.element.onmousedown = function () {
+	splitter.element.onmousedown = function () {
 		window.addEventListener('mousemove', moveSplitter);
 		window.addEventListener('mouseup', mouseUp);
 	}
