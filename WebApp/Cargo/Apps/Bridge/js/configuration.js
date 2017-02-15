@@ -239,9 +239,9 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         }
                         configurationPanel.currentIndex++
                         configurationPanel.contentViews[configurationPanel.currentIndex].panel.element.style.display = ""
-                        
+
                         if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
-                             homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
+                            homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
                         }
 
                         if (configurationPanel.currentIndex == configurationPanel.contentViews.length - 1) {
@@ -276,9 +276,9 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         }
                         configurationPanel.currentIndex--
                         configurationPanel.contentViews[configurationPanel.currentIndex].panel.element.style.display = ""
-                        
+
                         if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
-                           homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
+                            homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
                         }
 
                         if (configurationPanel.currentIndex == 0) {

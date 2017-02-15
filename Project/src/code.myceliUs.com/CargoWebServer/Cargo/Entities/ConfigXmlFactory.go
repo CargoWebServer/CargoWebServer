@@ -355,6 +355,9 @@ func (this *ConfigXmlFactory) InitServerConfiguration(xmlElement *Config.XsdServ
 
 	/** Configuration **/
 	object.M_binPath = xmlElement.M_binPath
+
+	/** Configuration **/
+	object.M_queriesPath = xmlElement.M_queriesPath
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -372,6 +375,115 @@ func (this *ConfigXmlFactory) InitApplicationConfiguration(xmlElement *Config.Xs
 
 	/** Configuration **/
 	object.M_indexPage = xmlElement.M_indexPage
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of LdapConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeLdapConfiguration(xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** LdapConfiguration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_hostName = object.M_hostName
+
+	/** Configuration **/
+	xmlElement.M_ipv4 = object.M_ipv4
+
+	/** Configuration **/
+	xmlElement.M_port = object.M_port
+
+	/** Configuration **/
+	xmlElement.M_user = object.M_user
+
+	/** Configuration **/
+	xmlElement.M_pwd = object.M_pwd
+
+	/** Configuration **/
+	xmlElement.M_domain = object.M_domain
+
+	/** Configuration **/
+	xmlElement.M_searchBase = object.M_searchBase
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of DataStoreConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeDataStoreConfiguration(xmlElement *Config.XsdDataStoreConfiguration, object *Config.DataStoreConfiguration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** DataStoreConfiguration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_hostName = object.M_hostName
+
+	/** Configuration **/
+	xmlElement.M_ipv4 = object.M_ipv4
+
+	/** Configuration **/
+	xmlElement.M_port = object.M_port
+
+	/** Configuration **/
+	xmlElement.M_user = object.M_user
+
+	/** Configuration **/
+	xmlElement.M_pwd = object.M_pwd
+
+	/** DataStoreType **/
+	if object.M_dataStoreType == Config.DataStoreType_SQL_STORE {
+		xmlElement.M_dataStoreType = "##SQL_STORE"
+	} else if object.M_dataStoreType == Config.DataStoreType_KEY_VALUE_STORE {
+		xmlElement.M_dataStoreType = "##KEY_VALUE_STORE"
+	}
+
+	/** DataStoreVendor **/
+	if object.M_dataStoreVendor == Config.DataStoreVendor_MYCELIUS {
+		xmlElement.M_dataStoreVendor = "##MYCELIUS"
+	} else if object.M_dataStoreVendor == Config.DataStoreVendor_MYSQL {
+		xmlElement.M_dataStoreVendor = "##MYSQL"
+	} else if object.M_dataStoreVendor == Config.DataStoreVendor_MSSQL {
+		xmlElement.M_dataStoreVendor = "##MSSQL"
+	}
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of ServiceConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** ServiceConfiguration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_hostName = object.M_hostName
+
+	/** Configuration **/
+	xmlElement.M_ipv4 = object.M_ipv4
+
+	/** Configuration **/
+	xmlElement.M_port = object.M_port
+
+	/** Configuration **/
+	xmlElement.M_user = object.M_user
+
+	/** Configuration **/
+	xmlElement.M_pwd = object.M_pwd
+
+	/** Configuration **/
+	xmlElement.M_start = object.M_start
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -499,6 +611,9 @@ func (this *ConfigXmlFactory) SerialyzeServerConfiguration(xmlElement *Config.Xs
 
 	/** Configuration **/
 	xmlElement.M_binPath = object.M_binPath
+
+	/** Configuration **/
+	xmlElement.M_queriesPath = object.M_queriesPath
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -543,115 +658,6 @@ func (this *ConfigXmlFactory) SerialyzeSmtpConfiguration(xmlElement *Config.XsdS
 
 	/** Configuration **/
 	xmlElement.M_pwd = object.M_pwd
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of LdapConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeLdapConfiguration(xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** LdapConfiguration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_hostName = object.M_hostName
-
-	/** Configuration **/
-	xmlElement.M_ipv4 = object.M_ipv4
-
-	/** Configuration **/
-	xmlElement.M_port = object.M_port
-
-	/** Configuration **/
-	xmlElement.M_user = object.M_user
-
-	/** Configuration **/
-	xmlElement.M_pwd = object.M_pwd
-
-	/** Configuration **/
-	xmlElement.M_domain = object.M_domain
-
-	/** Configuration **/
-	xmlElement.M_searchBase = object.M_searchBase
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of DataStoreConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeDataStoreConfiguration(xmlElement *Config.XsdDataStoreConfiguration, object *Config.DataStoreConfiguration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** DataStoreConfiguration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_hostName = object.M_hostName
-
-	/** Configuration **/
-	xmlElement.M_ipv4 = object.M_ipv4
-
-	/** Configuration **/
-	xmlElement.M_port = object.M_port
-
-	/** Configuration **/
-	xmlElement.M_user = object.M_user
-
-	/** Configuration **/
-	xmlElement.M_pwd = object.M_pwd
-
-	/** DataStoreType **/
-	if object.M_dataStoreType == Config.DataStoreType_SQL_STORE {
-		xmlElement.M_dataStoreType = "##SQL_STORE"
-	} else if object.M_dataStoreType == Config.DataStoreType_KEY_VALUE_STORE {
-		xmlElement.M_dataStoreType = "##KEY_VALUE_STORE"
-	}
-
-	/** DataStoreVendor **/
-	if object.M_dataStoreVendor == Config.DataStoreVendor_MYCELIUS {
-		xmlElement.M_dataStoreVendor = "##MYCELIUS"
-	} else if object.M_dataStoreVendor == Config.DataStoreVendor_MYSQL {
-		xmlElement.M_dataStoreVendor = "##MYSQL"
-	} else if object.M_dataStoreVendor == Config.DataStoreVendor_MSSQL {
-		xmlElement.M_dataStoreVendor = "##MSSQL"
-	}
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of ServiceConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** ServiceConfiguration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_hostName = object.M_hostName
-
-	/** Configuration **/
-	xmlElement.M_ipv4 = object.M_ipv4
-
-	/** Configuration **/
-	xmlElement.M_port = object.M_port
-
-	/** Configuration **/
-	xmlElement.M_user = object.M_user
-
-	/** Configuration **/
-	xmlElement.M_pwd = object.M_pwd
-
-	/** Configuration **/
-	xmlElement.M_start = object.M_start
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}

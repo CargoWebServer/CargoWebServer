@@ -18,6 +18,7 @@ var DataExplorer = function (parent) {
 
     // That contain the map of data aready loaded.
     this.shemasView = {}
+    this.prototypesView = {}
     this.configs = {}
 
     return this
@@ -25,16 +26,25 @@ var DataExplorer = function (parent) {
 
 DataExplorer.prototype.resize = function () {
     var height = this.parent.element.offsetHeight - this.parent.element.firstChild.offsetHeight;
-    this.panel.element.style.height = height - 2 + "px"
+    this.panel.element.style.height = height - 10 + "px"
 }
 
 /**
  * Display the data schema of a given data store.
  */
 DataExplorer.prototype.initDataSchema = function (storeConfig) {
-    //this.panel.element.innerHTML = this.schemas[storeId]
+    // init one time.
+    if (this.configs[storeConfig.M_id] != undefined) {
+        return
+    }
+
     this.configs[storeConfig.M_id] = storeConfig
     this.shemasView[storeConfig.M_id] = new Element(this.panel, { "tag": "div", "class": "shemas_view" })
+
+    // Only display the first panel at first.
+    if (Object.keys(this.shemasView).length > 1) {
+        this.shemasView[storeConfig.M_id].element.style.display = "none"
+    }
 
     // So here I will get the list of all prototype from a give store and
     // create it's relavite information.
@@ -63,7 +73,9 @@ DataExplorer.prototype.generatePrototypesView = function (storeId, prototypes) {
     // Here I will create the prototype views...
     for (var i = 0; i < prototypes.length; i++) {
         // Here I will append the prototype name...
-        new PrototypeTreeView(this.shemasView[storeId], prototypes[i])
+        if (this.prototypesView[prototypes[i].TypeName] == undefined) {
+            this.prototypesView[prototypes[i].TypeName] = new PrototypeTreeView(this.shemasView[storeId], prototypes[i])
+        }
     }
 }
 
@@ -84,11 +96,93 @@ DataExplorer.prototype.setDataSchema = function (storeId) {
 }
 
 /**
- * 
+ * That view is use to display prototype structures
  */
 var PrototypeTreeView = function (parent, prototype) {
     this.parent = parent
     this.panel = new Element(parent, { "tag": "div", "class": "data_prototype_tree_view" })
-    this.panel.appendElement({ "tag": "div", "innerHtml": prototype.TypeName })
+    this.fieldsView = {}
+    
+    // The type name without the schemas name.
+    var typeName = prototype.TypeName.substring(prototype.TypeName.indexOf(".") + 1) //.split(".")[1]
+
+    // Display the type name and the expand shrink button.
+    var header = this.panel.appendElement({ "tag": "div", "class": "data_prototype_tree_view" }).down().appendElement({ "tag": "div", "class": "data_prototype_tree_view_header" }).down()
+    header.appendElement()
+
+    /** The expand button */
+    this.expandBtn = header.appendElement({ "tag": "i", "class": "fa fa-caret-right", "style": "display:inline;" }).down()
+
+    /** The shrink button */
+    this.shrinkBtn = header.appendElement({ "tag": "i", "class": "fa fa-caret-down", "style": "display:none;" }).down()
+    header.appendElement({ "tag": "span", "innerHtml": typeName }).down()
+
+    this.fieldsPanel = this.panel.appendElement({ "tag": "div", "class": "data_prototype_tree_view_fields" }).down()
+
+    // The code for display field of a given type.
+    this.expandBtn.element.onclick = function(view){
+        return function(){
+            view.fieldsPanel.element.style.display = "table"
+            this.style.display = "none"
+            view.shrinkBtn.element.style.display = ""
+        }
+    }(this)
+
+    this.shrinkBtn.element.onclick = function(view){
+        return function(){
+            view.fieldsPanel.element.style.display = ""
+            this.style.display = "none"
+            view.expandBtn.element.style.display = ""
+        }
+    }(this)
+
+    // Now the fields.
+    for (var i = 0; i < prototype.Fields.length; i++) {
+        if (prototype.Fields[i].startsWith("M_")) {
+
+            this.fieldsView[prototype.Fields[i]] = new PrototypeTreeViewField(this.fieldsPanel, prototype, prototype.Fields[i], prototype.FieldsType[i], prototype.FieldsVisibility[i], prototype.FieldsNillable[i])
+        }
+    }
+
     return this
+}
+
+/**
+ * The view of a given field...
+ */
+var PrototypeTreeViewField = function (parent, prototype, fieldName, fieldType, isVisible, isNillable) {
+    // if is an id...
+    var isKey = contains(prototype.Ids, fieldName)
+    var isIndex = contains(prototype.Indexs, fieldName)
+
+    // Not display the M_
+    fieldName = fieldName.replace("M_", "")
+
+    // The parent prototype.
+    this.prototype = prototype
+
+    // The parent panel.
+    this.parent = parent
+
+    // Create the new panel.
+    this.panel = new Element(parent, { "tag": "div", "class": "data_prototype_tree_view_field" })
+
+    var visibilityClass = ""
+    if(isVisible){
+        visibilityClass = "field_visibility visible"
+    }
+
+    var className = ""
+    if(isKey){
+        className = "field_id"
+    }else if(isIndex){
+        className = "field_index"
+    }
+
+    // append the the field name.
+    this.panel.appendElement({ "tag": "i", "title":"visibility", "class": "fa fa-lightbulb-o " + visibilityClass }).appendElement({ "tag": "span", "innerHtml": fieldName, "class": className }).down()
+
+    // Now the typename 
+    this.panel.appendElement({ "tag": "span", "innerHtml": fieldType}).down()
+
 }

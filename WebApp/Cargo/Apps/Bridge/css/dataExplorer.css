@@ -2,11 +2,26 @@
 .data_explorer{
     border-top: 1px solid grey;
     position: relative;
-    overflow: auto;
     width: 100%;
+    padding: 5px;
+
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;   /* Chrome/Safari/Opera */
+    -khtml-user-select: none;    /* Konqueror */
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;       /* Internet Explorer/Edge */
+    user-select: none;           /* Non-prefixed version, currently
+                                 not supported by any browser */
+
+    /** color font **/
+    color: #657383;
+    font-size: 10pt;
+    transition: all .2s ease;
+
 }
 
 .shemas_view {
+    overflow: auto;
     position: absolute;
     top:0px;
     bottom: 0px;
@@ -15,5 +30,57 @@
 }
 
 .data_prototype_tree_view{
-   
+    display: table;
+    border-collapse:collapse;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+.data_prototype_tree_view_header{
+    display: table-row;
+    font-size: 12pt;
+}
+
+.data_prototype_tree_view_header span, i{
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.data_prototype_tree_view_header i:hover{
+    cursor: pointer;
+}
+
+.data_prototype_tree_view_fields{
+    display: none;
+    border-collapse:collapse;
+    margin-top: 1px;
+    margin-left: 20px;
+    margin-bottom: 1px;
+}
+
+.data_prototype_tree_view_field{
+    display: table-row;
+}
+
+.data_prototype_tree_view_field span, i{
+   display: table-cell;
+   padding: 2px 2px 2px 4px;
+}
+
+.field_id{
+    color: #428bca;
+    font-weight: bold;
+}
+
+.field_index{
+    color: green;
+    font-weight: bold;
+}
+
+.field_visibility{
+    color: lightgray;
+}
+
+.field_visibility.visible{
+    color:  #428bca;
 }

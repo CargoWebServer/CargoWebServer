@@ -8,6 +8,7 @@
 	right: 0px;
 	min-width: 50px;
   	height: 100%;
+	overflow: hidden;
 }
 
 .properties_div{

@@ -138,12 +138,23 @@ func (this *ConfigurationManager) initialize() {
 
 		// Server folders...
 		this.m_activeConfigurations.M_serverConfig.M_applicationsPath = "/Apps"
+		os.MkdirAll(this.GetApplicationDirectoryPath(), 0777)
 		this.m_activeConfigurations.M_serverConfig.M_dataPath = "/Data"
+		os.MkdirAll(this.GetDataPath(), 0777)
 		this.m_activeConfigurations.M_serverConfig.M_definitionsPath = "/Definitions"
+		os.MkdirAll(this.GetDefinitionsPath(), 0777)
 		this.m_activeConfigurations.M_serverConfig.M_scriptsPath = "/Script"
+		os.MkdirAll(this.GetScriptPath(), 0777)
 		this.m_activeConfigurations.M_serverConfig.M_schemasPath = "/Schemas"
+		os.MkdirAll(this.GetSchemasPath(), 0777)
 		this.m_activeConfigurations.M_serverConfig.M_tmpPath = "/tmp"
+		os.MkdirAll(this.GetTmpPath(), 0777)
 		this.m_activeConfigurations.M_serverConfig.M_binPath = "/bin"
+		os.MkdirAll(this.GetBinPath(), 0777)
+
+		// Where queries are store by default...
+		this.m_activeConfigurations.M_serverConfig.M_queriesPath = this.m_activeConfigurations.M_serverConfig.M_applicationsPath + "/queries"
+		os.MkdirAll(this.GetQueriesPath(), 0777)
 
 		this.m_activeConfigurations.NeedSave = true
 		this.m_configurationEntity.SaveEntity()
@@ -161,10 +172,19 @@ func (this *ConfigurationManager) start() {
 	// Set services configurations...
 	for i := 0; i < len(this.m_servicesConfiguration); i++ {
 		serviceUuid := ConfigServiceConfigurationExists(this.m_servicesConfiguration[i].GetId())
-		log.Println("===============> ", serviceUuid)
 		if len(serviceUuid) == 0 {
 			// Set the new config...
 			this.m_activeConfigurations.SetServiceConfigs(this.m_servicesConfiguration[i])
+			this.m_configurationEntity.SaveEntity()
+		}
+	}
+
+	// Set datastores configuration.
+	for i := 0; i < len(this.m_datastoreConfiguration); i++ {
+		storeUuid := ConfigDataStoreConfigurationExists(this.m_datastoreConfiguration[i].GetId())
+		if len(storeUuid) == 0 {
+			// Set the new config...
+			this.m_activeConfigurations.SetDataStoreConfigs(this.m_datastoreConfiguration[i])
 			this.m_configurationEntity.SaveEntity()
 		}
 	}
@@ -231,6 +251,13 @@ func (this *ConfigurationManager) GetBinPath() string {
 	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_binPath
 }
 
+func (this *ConfigurationManager) GetQueriesPath() string {
+	if this.m_activeConfigurations == nil {
+		return this.m_filePath + "/queries"
+	}
+	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_queriesPath
+}
+
 func (this *ConfigurationManager) GetHostName() string {
 	if this.m_activeConfigurations == nil {
 		return "localhost"
@@ -282,7 +309,6 @@ func (this *ConfigurationManager) setServiceConfiguration(id string) {
 	config.M_port = this.GetServerPort()
 	config.M_hostName = this.GetHostName()
 	this.m_servicesConfiguration = append(this.m_servicesConfiguration, config)
-	log.Println("-------------------------> config", config)
 	return
 }
 

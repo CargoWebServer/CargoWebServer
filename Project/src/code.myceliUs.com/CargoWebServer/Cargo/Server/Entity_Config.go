@@ -3382,20 +3382,24 @@ func (this *EntityManager) create_Config_ServerConfigurationEntityPrototype() {
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_binPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 14)
+	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_queriesPath")
+	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 
 	/** associations of ServerConfiguration **/
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 14)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 15)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_parentPtr")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "childsUuid")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "[]xs.string")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 15)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 16)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "referenced")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "[]EntityRef")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 16)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 17)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
@@ -3435,6 +3439,7 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_schemasPath")
 	query.Fields = append(query.Fields, "M_tmpPath")
 	query.Fields = append(query.Fields, "M_binPath")
+	query.Fields = append(query.Fields, "M_queriesPath")
 
 	/** associations of ServerConfiguration **/
 	query.Fields = append(query.Fields, "M_parentPtr")
@@ -3465,6 +3470,7 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_schemasPath)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_tmpPath)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_binPath)
+	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_queriesPath)
 
 	/** associations of ServerConfiguration **/
 
@@ -3535,6 +3541,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string) error {
 	query.Fields = append(query.Fields, "M_schemasPath")
 	query.Fields = append(query.Fields, "M_tmpPath")
 	query.Fields = append(query.Fields, "M_binPath")
+	query.Fields = append(query.Fields, "M_queriesPath")
 
 	/** associations of ServerConfiguration **/
 	query.Fields = append(query.Fields, "M_parentPtr")
@@ -3627,11 +3634,16 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string) error {
 			this.object.M_binPath = results[0][13].(string)
 		}
 
+		/** queriesPath **/
+		if results[0][14] != nil {
+			this.object.M_queriesPath = results[0][14].(string)
+		}
+
 		/** associations of ServerConfiguration **/
 
 		/** parentPtr **/
-		if results[0][14] != nil {
-			id := results[0][14].(string)
+		if results[0][15] != nil {
+			id := results[0][15].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -3639,14 +3651,14 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][15].(string)
+		childsUuidStr := results[0][16].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 		if err != nil {
 			return err
 		}
 
-		referencedStr := results[0][16].(string)
+		referencedStr := results[0][17].(string)
 		this.referenced = make([]EntityRef, 0)
 		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 		if err != nil {

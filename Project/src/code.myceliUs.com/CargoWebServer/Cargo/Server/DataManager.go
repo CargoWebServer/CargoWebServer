@@ -74,12 +74,14 @@ func (this *DataManager) initialize() {
 	storeConfigurations := GetServer().GetConfigurationManager().GetDataStoreConfigurations()
 
 	for i := 0; i < len(storeConfigurations); i++ {
-		store, err := NewDataStore(storeConfigurations[i])
-		if err != nil {
-			log.Fatal(err)
-		}
+		if this.m_dataStores[storeConfigurations[i].GetId()] == nil {
+			store, err := NewDataStore(storeConfigurations[i])
+			if err != nil {
+				log.Fatal(err)
+			}
 
-		this.m_dataStores[store.GetId()] = store
+			this.m_dataStores[store.GetId()] = store
+		}
 	}
 	log.Println("--> initialyze DataManager")
 }

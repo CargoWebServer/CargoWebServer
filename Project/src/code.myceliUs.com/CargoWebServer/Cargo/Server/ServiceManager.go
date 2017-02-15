@@ -109,7 +109,9 @@ func (this *ServiceManager) stop() {
 	}
 
 	// Stop the process...
-	serviceManager.m_serviceContainerCmd.Process.Kill()
+	if serviceManager.m_serviceContainerCmd != nil {
+		serviceManager.m_serviceContainerCmd.Process.Kill()
+	}
 }
 
 /**

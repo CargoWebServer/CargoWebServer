@@ -22,6 +22,7 @@ var FileNavigator = function (parent) {
     // Show the next file.
     this.setNextFileBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-right fileNavigationBtn" })
 
+
     // Here I will attach the file navigator to file event.
     // Open 
     server.fileManager.attach(this, OpenEntityEvent, function (evt, fileNavigator) {

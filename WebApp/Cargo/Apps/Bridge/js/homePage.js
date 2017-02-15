@@ -88,6 +88,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     // The menu grid who will contain the menu panel...
     this.headerDiv = this.panel.appendElement({ "tag": "div", "class": "header" }).down()
 
+    /////////////////////////////////// Menu section ///////////////////////////////////
     var menuRow = this.headerDiv.appendElement({ "tag": "div", "style": "width:100%; height: 30px; display: table-row" }).down()
 
     // This is where the menu grid will be put...
@@ -97,15 +98,65 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     // Now I will create the session panel...
     this.sessionPanel = new SessionPanel(menuRow.appendElement({ "tag": "div", "style": "width:100%; display: table-cell; height:30px" }).down(), sessionInfo)
 
-    // The menu
-    var newFileOrProjectMenuItem = new MenuItem("newFileOrProjectMenuItem", "New File or Project...", {}, 1,
+    var newQueryMenuItem = new MenuItem("new_query_menu_item", "New Query", {}, 1, function () {
+        // So here I will create a new query file.
+        server.fileManager.getFileByPath("/queries",
+            // Progress...
+            function () {
+
+            },
+            // Success
+            function (results, caller) {
+                console.log(results)
+                // query file will have a name like q1, q2... qx by default...
+                var lastIndex = 0
+                for (var i = 0; i < results.M_files.length; i++) {
+                    var f = results.M_files[i]
+                    if (f.M_name.match(/q[0-9]+/)) {
+                        if (parseInt(f.M_name.replace("q", "").replace(".js", "")) > lastIndex) {
+                            lastIndex = parseInt((f.M_name).replace("q", "").replace(".js", ""))
+                        }
+                    }
+                }
+                lastIndex++
+
+                // Here I will create an empty text file.
+                var f = new File(["/** Wrote your query here **/\n"], "q" + lastIndex + ".js", {type: "text/plain", lastModified: new Date(0)})
+
+                // Now I will create the new file...
+                server.fileManager.createFile("q" + lastIndex + ".js", "/queries", f, 256, 256, false,
+                    // Success callback.
+                    function (result, caller) {
+                        // Here is the new file...
+                        console.log(result)
+                    },
+                    // Progress callback
+                    function () {
+
+                    },
+                    // Error callback.
+                    function () {
+
+                    }, caller)
+            },
+            // Error
+            function () {
+
+            }, {})
+    }, "fa fa-file-o")
+
+    var newProjectMenuItem = new MenuItem("new_project_menu_item", "New Project...", {}, 1,
         function (homepage) {
             return function () {
                 homepage.createNewProject()
             }
         } (this), "fa fa-files-o")
-    var openFileOrProjectMenuItem = new MenuItem("openFileOrProjectMenuItem", "Close server", {}, 1, function () { server.stop() }, "fa fa-folder-open-o")
-    var fileMenuItem = new MenuItem("file_menu", "File", { "newFileOrProjectMenuItem": newFileOrProjectMenuItem, "openFileOrProjectMenuItem": openFileOrProjectMenuItem }, 0)
+
+    var newMenuItem = new MenuItem("new_menu_item", "New", { "new_query_menu_item": newQueryMenuItem, "new_project_menu_item": newProjectMenuItem }, 1)
+
+    var closeServerItem = new MenuItem("close_server_menu_item", "Close server", {}, 1, function () { server.stop() }, "fa fa-power-off")
+
+    var fileMenuItem = new MenuItem("file_menu", "File", { "new_menu_item": newMenuItem, "close_server_menu_item": closeServerItem }, 0)
 
     var editMenuItem = new MenuItem("edit_menu", "Edit", {}, 0)
 
@@ -192,6 +243,9 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                 if (this.firstChild.id == "workflowImg") {
                     this.firstChild.src = "img/workflow_blue.svg"
                 }
+
+                homepage.dataExplorer.resize()
+
             }
         } (div, leftDiv)
     }
@@ -248,7 +302,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.datasourceSettingContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Data stores configuration" }).appendElement({ "tag": "i", "class": "fa fa-database" })
     setSelectAction(this.datasourceSettingContext, this.datasourceSettingDiv)
     this.dataConfiguration = new ConfigurationPanel(this.datasourceSettingDiv, "Data configuration", "Config.DataStoreConfiguration", "dataStoreConfigs")
-    
+
     // So here I will append panel to display more information about data inside the store. **/
     this.dataExplorer = new DataExplorer(this.datasourceSettingDiv)
 
@@ -287,7 +341,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
         }, this)
 
-    
+
 }
 
 /**

@@ -123,7 +123,7 @@ var Wizard = function (id, title) {
             }
             var offset = wizard.pagesDiv.element.offsetLeft + wizard.currentPage.width
             var keyframe = "100% { left:" + offset + "px;}"
-            wizard.pagesDiv.animate(keyframe, "wizard_next_page_animation", 1,
+            wizard.pagesDiv.animate(keyframe,  1,
                 function (pageDiv, offset) {
                     return function () {
                         pageDiv.element.style.left = offset + "px"
@@ -205,7 +205,7 @@ Wizard.prototype.setPage = function (index) {
             var offset = -1 * page.index * page.width
             var keyframe = "100% { left:" + offset + "px;}"
             wizard.setPage(page.index)
-            wizard.pagesDiv.animate(keyframe, "wizard_next_page_animation", 1,
+            wizard.pagesDiv.animate(keyframe,1,
                 function (pageDiv, offset) {
                     return function () {
                         pageDiv.element.style.left = offset + "px"

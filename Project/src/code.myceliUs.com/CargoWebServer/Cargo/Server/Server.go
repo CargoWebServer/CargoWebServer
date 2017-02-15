@@ -102,8 +102,8 @@ func (this *Server) initialize() {
 	this.GetServiceManager().registerService(this.GetSchemaManager())
 
 	// BPMN stuff
-	//this.GetServiceManager().registerService(this.GetWorkflowManager())
-	//this.GetServiceManager().registerService(this.GetWorkflowProcessor())
+	this.GetServiceManager().registerService(this.GetWorkflowManager())
+	this.GetServiceManager().registerService(this.GetWorkflowProcessor())
 
 	// The other services are initialyse by the service manager.
 	this.GetServiceManager().initialize()
@@ -179,16 +179,6 @@ func (this *Server) Start() {
 	// Start the server...
 	server.startMessageProcessor()
 	server.startHub()
-
-	/*this.GetEventManager().start()
-
-	// Starting basic services...
-	this.GetConfigurationManager().start()
-	this.GetDataManager().start()
-	this.GetEntityManager().start()
-	this.GetSessionManager().start()
-	this.GetAccountManager().start()
-	this.GetSecurityManager().start()*/
 
 	// the service manager will start previous service depending of there
 	// configurations.
