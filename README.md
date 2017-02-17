@@ -11,7 +11,8 @@ Cargo was created with Service Oriented Achitecture (SOA) in mind. The basics se
 - Security service: management by roles and permissions of actions and access respectively.
 - Other service: LDAP, SMTP.
 
-Cargo made use of the google protocol buffer to 
+Extensibility and modularity are key concepts in the design of Cargo. You can create your own service, all you have to do is implementing the Serive interface in Go. You can also use the service container and create a plugin in C++.
 
+Cargo made use of the websocket/tcp scoket to communicate with client's. To do so it has it own protocol. The protocol is written with help of google protobuffer, and are similiar to JSON/RPC. 
 
 www.cargowebserver.com
