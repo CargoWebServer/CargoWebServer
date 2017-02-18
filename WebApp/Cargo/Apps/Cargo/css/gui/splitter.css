@@ -7,8 +7,6 @@
 }
 
 .splitter {
-    width: 5px;
-    height: 100%;
     background-color: white;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none;   /* Chrome/Safari/Opera */
@@ -23,6 +21,8 @@
 .splitter.vertical{
     border-left: 1px solid grey;
     border-right: 1px solid grey;
+    width: 5px;
+    height: 100%;
 }
 
 .splitter.vertical:active {
@@ -32,6 +32,8 @@
 .splitter.horizontal{
     border-top: 1px solid grey;
     border-bottom: 1px solid grey;
+    width: 100%;
+    height: 5px;
 }
 
 .splitter.horizontal:active {

@@ -376,6 +376,59 @@ func (this *DataManager) DeleteDataStore(storeId string, messageId string, sessi
 	}
 }
 
+/**
+ * Create a new xsd datastore from a given xsd file content.
+ */
+func (this *DataManager) ImportXsdSchema(name string, content string, messageId string, sessionId string) {
+
+	// Here I will create a temporary file
+	schemaPath := GetServer().GetConfigurationManager().GetSchemasPath()
+	f, err := os.Create(schemaPath + "/" + name)
+
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+
+	f.WriteString(content)
+	f.Close()
+
+	// Import the file.
+	errObj := GetServer().GetSchemaManager().importSchema(f.Name())
+
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+}
+
+/**
+ * Import the content of an xml file into a dataStore.
+ */
+func (this *DataManager) ImportXmlData(content string, messageId string, sessionId string) {
+	var err error
+	// Here I will create a temporary file
+	tmp := GetServer().GetConfigurationManager().GetTmpPath()
+	f, err := os.Create(tmp + "/" + Utility.RandomUUID())
+
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_NOT_FOUND_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+
+	f.WriteString(content)
+	f.Close()
+
+	// Remove the file when done.
+	defer os.Remove(f.Name())
+
+	// Import the file.
+	err = GetServer().GetSchemaManager().importXmlFile(f.Name())
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //                              DataStore
 ////////////////////////////////////////////////////////////////////////////////

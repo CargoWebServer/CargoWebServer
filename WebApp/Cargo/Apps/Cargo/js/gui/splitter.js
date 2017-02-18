@@ -6,13 +6,15 @@ function initSplitter(splitter, area, min) {
 	if (min == undefined) {
 		min = 0;
 	}
+	
 	var moveSplitter = function (splitter, area, min) {
-
 		return function (e) {
 			var isVertical = splitter.element.className.indexOf("vertical") > -1
 			if (isVertical) {
-				var isAtLeft = splitter.element.offsetLeft >= area.element.offsetLeft
-				var offset = e.clientX - splitter.element.offsetLeft
+				var splitterLeft = getCoords(splitter.element).left
+				var areaLeft = getCoords(area.element).left
+				var isAtLeft = splitterLeft >= areaLeft
+				var offset = e.clientX - splitterLeft
 				var w = area.element.offsetWidth
 				if (isAtLeft) {
 					if (w > min) {
@@ -23,8 +25,10 @@ function initSplitter(splitter, area, min) {
 				}
 				area.element.style.width = w + "px"
 			} else {
-				var isAtTop = splitter.element.offsetTop >= area.element.offseTop
-				var offset = e.clientY - splitter.element.offsetTop
+				var splitterTop = getCoords(splitter.element).top
+				var areaTop = getCoords(area.element).top
+				var isAtTop = splitterTop >= areaTop
+				var offset = e.clientY - splitterTop
 				var h = area.element.offsetHeight
 				if (isAtTop) {
 					h = area.element.offsetHeight + offset

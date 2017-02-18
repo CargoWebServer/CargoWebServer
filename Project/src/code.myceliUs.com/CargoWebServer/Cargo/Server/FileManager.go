@@ -780,14 +780,15 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 		return nil
 	}
 
+	// remove the tmp file if it file path is not empty... otherwise the
+	// file will bee remove latter.
+	defer os.Remove(tmpPath)
+
 	file, errObj := this.createFile(filename, filepath, filedata, sessionId, int(thumbnailMaxHeight), int(thumbnailMaxWidth), dbFile)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-
-	// remove the tmp file.
-	os.Remove(tmpPath)
 
 	return file
 }

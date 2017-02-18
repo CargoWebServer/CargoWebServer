@@ -1148,39 +1148,6 @@ Object.defineProperty(Array.prototype, "stackoverflow_filterValue", {
     }
 });
 
-/**
- * Return the global postion of a given element.
- * @param target An html element.
- * @returns The rectangle coordinates (top, left, bottom, right) with their respective values.
- */
-function localToGlobal(target) {
-
-    var width = target.offsetWidth
-    var height = target.offsetHeight
-
-    var gleft = 0
-    var gtop = 0
-    var rect = {}
-
-    var moonwalk = function (parent) {
-        if (!parent) {
-            gleft += parent.offsetLeft;
-            gtop += parent.offsetTop;
-            moonwalk(parent.offsetParent);
-        } else {
-            return rect = {
-                top: target.offsetTop + gtop,
-                left: target.offsetLeft + gleft,
-                bottom: (target.offsetTop + gtop) + height,
-                right: (target.offsetLeft + gleft) + width
-            };
-        }
-    };
-    moonwalk(target.offsetParent);
-
-    return rect;
-}
-
 /** 
  * Return the time since a given time, it format 
  * the result in a human readable form.

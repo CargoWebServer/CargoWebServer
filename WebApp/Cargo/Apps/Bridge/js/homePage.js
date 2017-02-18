@@ -98,7 +98,8 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     // Now I will create the session panel...
     this.sessionPanel = new SessionPanel(menuRow.appendElement({ "tag": "div", "style": "width:100%; display: table-cell; height:30px" }).down(), sessionInfo)
 
-    var newQueryMenuItem = new MenuItem("new_query_menu_item", "New Query", {}, 1, function () {
+    // That funtion create a new file with a query in it.
+    function createQuery(extension) {
         // So here I will create a new query file.
         server.fileManager.getFileByPath("/queries",
             // Progress...
@@ -107,24 +108,24 @@ HomePage.prototype.init = function (parent, sessionInfo) {
             },
             // Success
             function (results, caller) {
-                console.log(results)
+                var extension = caller.extension
                 // query file will have a name like q1, q2... qx by default...
                 var lastIndex = 0
                 for (var i = 0; i < results.M_files.length; i++) {
                     var f = results.M_files[i]
                     if (f.M_name.match(/q[0-9]+/)) {
-                        if (parseInt(f.M_name.replace("q", "").replace(".js", "")) > lastIndex) {
-                            lastIndex = parseInt((f.M_name).replace("q", "").replace(".js", ""))
+                        if (parseInt(f.M_name.replace("q", "").replace(extension, "")) > lastIndex) {
+                            lastIndex = parseInt((f.M_name).replace("q", "").replace(extension, ""))
                         }
                     }
                 }
                 lastIndex++
 
                 // Here I will create an empty text file.
-                var f = new File(["/** Wrote your query here **/\n"], "q" + lastIndex + ".js", {type: "text/plain", lastModified: new Date(0)})
+                var f = new File(["/** Wrote your query here **/\n"], "q" + lastIndex + extension, { type: "text/plain", lastModified: new Date(0) })
 
                 // Now I will create the new file...
-                server.fileManager.createFile("q" + lastIndex + ".js", "/queries", f, 256, 256, false,
+                server.fileManager.createFile("q" + lastIndex + extension, "/queries", f, 256, 256, false,
                     // Success callback.
                     function (result, caller) {
                         // Here is the new file...
@@ -142,8 +143,21 @@ HomePage.prototype.init = function (parent, sessionInfo) {
             // Error
             function () {
 
-            }, {})
-    }, "fa fa-file-o")
+            }, { extension })
+    }
+
+    // Create a new Entity Query File.
+
+
+    // Entity Query Language File.
+    var newEqlQueryMenuItem = new MenuItem("new_eql_query_menu_item", "EQL Query", {}, 1, function (extension) {
+        return function () { createQuery(extension) }
+    } (".eql"), "fa fa-file-o")
+
+    // Structured Query Language Query Language File.
+    var newSqlQueryMenuItem = new MenuItem("new_sql_query_menu_item", "SQL Query", {}, 1, function (extension) {
+        return function () { createQuery(extension) }
+    } (".sql"), "fa fa-file-o")
 
     var newProjectMenuItem = new MenuItem("new_project_menu_item", "New Project...", {}, 1,
         function (homepage) {
@@ -152,26 +166,87 @@ HomePage.prototype.init = function (parent, sessionInfo) {
             }
         } (this), "fa fa-files-o")
 
-    var newMenuItem = new MenuItem("new_menu_item", "New", { "new_query_menu_item": newQueryMenuItem, "new_project_menu_item": newProjectMenuItem }, 1)
+    // The new menu in the file menu
+    var newFileMenuItem = new MenuItem("new_file_menu_item", "New", { "new_project_menu_item": newProjectMenuItem }, 1)
+
+    // Now the import data menu
+    var importXsdSchemaMenuItem = new MenuItem("import_xsd_menu_item", "XSD schema", {}, 2, function (parent) {
+        return function () {
+            var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".xsd, .XSD, .Xsd", "multiple": "", "style": "display: none;" }).down()
+            fileExplorer.element.onchange = function (bpmnExplorer) {
+                return function (evt) {
+                    var files = evt.target.files; // FileList object
+                    for (var i = 0, f; f = files[i]; i++) {
+                        //server.dataManager.importXsdSchema(f)
+                        var reader = new FileReader();
+                        /** I will read the file content... */
+                        reader.onload = function(file){
+                            return function (e) {
+                                // Now I will load the content of the file.
+                                server.dataManager.importXsdSchema(file.name, e.target.result)
+                        }}(f);
+                        reader.readAsText(f);
+                    }
+                }
+            } (this)
+            // Display the file explorer...
+            fileExplorer.element.click()
+        }
+    } (parent), "fa fa-file-o")
+
+    var importXmlDataMenuItem = new MenuItem("import_xml_menu_item", "XML data", {}, 2, function (parent) {
+        return function () {
+            var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".xml, .XML, .dae, .DAE", "multiple": "", "style": "display: none;" }).down()
+            fileExplorer.element.onchange = function (bpmnExplorer) {
+                return function (evt) {
+                    var files = evt.target.files; // FileList object
+                    for (var i = 0, f; f = files[i]; i++) {
+                        //server.dataManager.importXsdSchema(f)
+                        var reader = new FileReader();
+                        /** I will read the file content... */
+                        reader.onload = function (e) {
+                                var text = e.target.result
+                                // Now I will load the content of the file.
+                                server.dataManager.importXmlData(text,
+                                    function (result, caller) {
+                                        /** Nothing todo the the action will be in the event listener. */
+                                    },
+                                    function (errMsg, caller) {
+
+                                    }, {})
+                            };
+                        reader.readAsText(f);
+                    }
+                }
+            } (this)
+            // Display the file explorer...
+            fileExplorer.element.click()
+        }
+    } (parent), "fa fa-file-o")
+
+    var importDataMenuItem = new MenuItem("import_data_menu_item", "Import", { "import_xsd_menu_item": importXsdSchemaMenuItem, "import_xml_menu_item": importXmlDataMenuItem }, 1)
+
+    // The new menu in the data Menu
+    var newDataMenuItem = new MenuItem("new_data_menu_item", "New", { "new_eql_query_menu_item": newEqlQueryMenuItem, "new_sql_query_menu_item": newSqlQueryMenuItem }, 1)
 
     var closeServerItem = new MenuItem("close_server_menu_item", "Close server", {}, 1, function () { server.stop() }, "fa fa-power-off")
 
-    var fileMenuItem = new MenuItem("file_menu", "File", { "new_menu_item": newMenuItem, "close_server_menu_item": closeServerItem }, 0)
+    var fileMenuItem = new MenuItem("file_menu", "File", { "new_file_menu_item": newFileMenuItem, "close_server_menu_item": closeServerItem }, 0)
 
     var editMenuItem = new MenuItem("edit_menu", "Edit", {}, 0)
 
+    var dataMenuItem = new MenuItem("data_menu", "Data", { "import_data_menu_item": importDataMenuItem, "new_data_menu_item": newDataMenuItem }, 0)
+
     // The main menu will be display in the body element, so nothing will be over it.
-    this.mainMenu = new VerticalMenu(new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; top:2px;" }), [fileMenuItem, editMenuItem])
+    this.mainMenu = new VerticalMenu(new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; top:2px;" }), [fileMenuItem, dataMenuItem, editMenuItem])
 
     /////////////////////////////////// workspace section  ///////////////////////////////////
     this.mainArea = this.panel.appendElement({ "tag": "div", "style": "display: table; width:100%; height:100%" }).down()
 
-    // The working file grid...
-    this.workingFilesDiv = this.headerDiv.appendElement({ "tag": "div", "id": "workingFilesDiv", "style": "width:100%; height: 30px; display: table;" }).down()
+    // The toolbar file grid...
+    this.toolbarDiv = this.headerDiv.appendElement({ "tag": "div", "id": "toolbarDiv"}).down()
         .appendElement({ "tag": "div", "style": "width:100%; display: inline; position: relative" }).down()
-    //.appendElement({ "tag": "div", "style": "position: absolute; top:0px; left:0px; bottom:0px; right: 0px;" }).down()
-
-    this.fileNavigator = new FileNavigator(this.workingFilesDiv)
+    this.toolBar = new Toolbar(this.toolbarDiv)
 
     // Now the left and right div...
     var splitArea1 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-cell; position: relative; height:100%" }).down()
@@ -186,7 +261,11 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     // The workspace area
     this.workspaceDiv = new Element(rightDiv, { "tag": "div", "class": "workspace_div" })
-
+    
+    // The working file grid...
+    this.workingFilesDiv = this.workspaceDiv.appendElement({ "tag": "div", "id": "workingFilesDiv"}).down()
+        .appendElement({ "tag": "div", "style": "width:100%; display: inline; position: relative" }).down()
+    this.fileNavigator = new FileNavigator(this.workingFilesDiv)
     // The code editor...
     this.codeEditor = new CodeEditor(this.workspaceDiv)
 

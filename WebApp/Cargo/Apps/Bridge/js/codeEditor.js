@@ -11,6 +11,9 @@ var CodeEditor = function (parent) {
     // The open files...
     this.files = {}
 
+    // The toolbar associated whit the editor.
+    this.toolbars = {}
+
     // The current file.
     this.activeFile = null
 
@@ -30,7 +33,7 @@ var CodeEditor = function (parent) {
                     codeEditor.appendFile(file)
                 }
             }
-        }else if (evt.dataMap["bpmnDiagramInfo"] != undefined) {
+        } else if (evt.dataMap["bpmnDiagramInfo"] != undefined) {
             var diagram = server.entityManager.entities[evt.dataMap["bpmnDiagramInfo"].UUID]
             if (diagram != undefined) {
                 codeEditor.appendBpmnDiagram(diagram)
@@ -59,7 +62,6 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
 
     var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": diagram.M_id + "_editor" }).down()
 
-    // Here I will create the new diagram...
     this.diagram = new SvgDiagram(filePanel, diagram)
     this.diagram.init()
     this.diagram.drawDiagramElements()
@@ -111,9 +113,6 @@ CodeEditor.prototype.appendFile = function (file) {
         fileMode = "ace/mode/json"
     }
 
-    if (fileMode.length == 0) {
-        return
-    }
 
     // Here I will set the file
     if (this.files[file.M_id] != undefined) {
@@ -125,11 +124,43 @@ CodeEditor.prototype.appendFile = function (file) {
     // Here the new file tab must be created.
     this.files[file.M_id] = file
 
+    // Here I will create the file toolbar...
+    var fileToolbar = new Element(null, { "tag": "div", "class": "toolbar" })
+    var saveBtn = fileToolbar.appendElement({"tag":"div"}).down()
+    saveBtn.appendElement({"tag":"i", "class":"fa-floppy-o"})
+
+    // Keep the track of the reference.
+    this.toolbars[file.M_id] = fileToolbar
+
+    //var deleteBtn = fileToolbar.appendElement({"tag":"div"}).down()
+
+    if (fileMode.length == 0) {
+        if (file.M_name.endsWith(".eql") || file.M_name.endsWith(".sql")) {
+            // Here I will create a query editor insted of ace editor.
+            var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_editor" }).down()
+
+            // The query editor.
+            var queryEditor = new QueryEditor(filePanel, file, function () {
+                return function (queryEditor) {
+                    // Now I will create the toolbar for execute a query.
+                    var queryToolbar = new Element({ "tag": "div", "class": "toolbar" })
+                   
+                }
+            }(this))
+            
+            // Init the query editor.
+            queryEditor.init()
+
+            this.filesPanel[file.M_id] = filePanel
+            this.setActiveFile(file.M_id)
+        }
+        return
+    }
+
+
     // Now I will create the file editor.
     var filePanel = this.panel.appendElement({ "tag": "xmp", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
     var editor = ace.edit(file.M_id + "_editor");
-    // TODO connect the ace configuration panel with the Brigde configuration panel.
-    // editor.setTheme("ace/theme/monokai");
 
     editor.getSession().setMode(fileMode);
 
@@ -140,13 +171,18 @@ CodeEditor.prototype.appendFile = function (file) {
 
 CodeEditor.prototype.removeFile = function (fileId) {
     if (this.filesPanel[fileId] != undefined) {
+        // remove the element from the panel.
         this.panel.removeElement(this.filesPanel[fileId])
+
         delete this.filesPanel[fileId]
         delete this.files[fileId]
+
         if (this.activeFile != undefined) {
             if (this.activeFile.M_id == fileId) {
                 this.activeFile = null
             }
+        }else{
+            
         }
     }
 }

@@ -85,7 +85,7 @@ ProjectView.prototype.initFilesView = function (parent, dir, level) {
             } else {
                 // Here I will append the file...
                 var fileDiv = parent.appendElement({ "tag": "div", "style": "display: table-row; width: 100%" }).down()
-                    .appendElement({ "tag": "div", "class": "project_file" }).down()
+                    .appendElement({ "tag": "div", "class": "project_file", "style":"display: none;" }).down()
 
                 // Set the file title
                 fileDiv.appendElement({ "tag": "div", "innerHtml": file.M_name, "style": "display:inline;" })

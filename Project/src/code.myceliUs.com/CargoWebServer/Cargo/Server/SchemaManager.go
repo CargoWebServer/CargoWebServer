@@ -100,7 +100,6 @@ func (this *SchemaManager) initialize() {
 	schemasDir, _ := ioutil.ReadDir(GetServer().GetConfigurationManager().GetSchemasPath())
 	for _, f := range schemasDir {
 		if strings.HasSuffix(strings.ToUpper(f.Name()), ".XSD") == true {
-
 			schemasXsdPath := GetServer().GetConfigurationManager().GetSchemasPath() + "/" + f.Name()
 			var schema *XML_Schemas.XSD_Schema
 			schema = new(XML_Schemas.XSD_Schema)
@@ -191,6 +190,69 @@ func (this *SchemaManager) start() {
 
 func (this *SchemaManager) stop() {
 	log.Println("--> Stop SchemaManager")
+}
+
+/**
+ * Import a new schema whit a given file path.
+ */
+func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Error {
+
+	var schema *XML_Schemas.XSD_Schema
+	schema = new(XML_Schemas.XSD_Schema)
+	file, err := os.Open(schemasXsdPath)
+	defer file.Close()
+	if err = xml.NewDecoder(file).Decode(schema); err != nil {
+		cargoError := NewError(Utility.FileLine(), FILE_OPEN_ERROR, SERVER_ERROR_CODE, err)
+		return cargoError
+	} else {
+		// if the schema does not exist I will get the existing schema...
+		if len(schema.TargetNamespace) != 0 {
+			schema.Id = schema.TargetNamespace[strings.LastIndex(schema.TargetNamespace, "/")+1:]
+			//log.Println("--> Load file: ", schemasXsdPath)
+			this.schemas[schema.Id] = schema
+
+			// Read and populate maps of element, complex type etc...
+			this.parseSchema(schema)
+		}
+	}
+
+	// Set the schema id with the store id values...
+	store := GetServer().GetDataManager().getDataStore(schema.Id)
+	if store == nil {
+		// I will create the new store here...
+		var errObj *CargoEntities.Error
+		store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
+		if errObj != nil {
+			return errObj
+		}
+	}
+
+	if schema.TargetNamespace != "http://www.w3.org/2001/XMLSchema/xs" {
+		this.genereatePrototype(schema)
+	}
+
+	// Before i create the prototy I will expand supertypes,
+	// that mean I will copy fields of super type into the
+	// prototype itself...
+	for _, prototype := range this.prototypes {
+		// Set the super type fields...
+		this.setSuperTypeField(prototype)
+	}
+
+	// Save entity prototypes...
+	for _, prototype := range this.prototypes {
+		// Set the field order.
+		for i := 0; i < len(prototype.Fields); i++ {
+			prototype.FieldsOrder = append(prototype.FieldsOrder, i)
+		}
+		// Here i will save the prototype...
+		prototype.Create()
+
+		// Print the list of prototypes...
+		//prototype.Print()
+	}
+
+	return nil
 }
 
 /**
@@ -447,7 +509,6 @@ func (this *SchemaManager) genereatePrototype(schema *XML_Schemas.XSD_Schema) {
 			this.createPrototypeElement(schema, e)
 		}
 	}
-
 }
 
 func (this *SchemaManager) createPrototypeElement(schema *XML_Schemas.XSD_Schema, element *XML_Schemas.XSD_Element) *EntityPrototype {
@@ -1893,13 +1954,19 @@ func (this *XmlDocumentHandler) Directive(xml.Directive) {
  * The xml file to read must be place in the schema directory. Everything else
  * than xsd extension will be read as xml file.
  */
-func (this *SchemaManager) importXmlFile(filePath string) {
+func (this *SchemaManager) importXmlFile(filePath string) error {
 	source, err := ioutil.ReadFile(filePath)
 	if err == nil {
 		r := bytes.NewReader([]byte(source))
 		handler := NewXmlDocumentHandler()
 		parser := saxlike.NewParser(r, handler)
 		parser.Parse()
-
+	} else {
+		return err
 	}
+	return nil
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Api
+////////////////////////////////////////////////////////////////////////////////

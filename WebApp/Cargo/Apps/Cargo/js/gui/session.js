@@ -337,19 +337,23 @@ var SessionInfoPanel = function (parent, sessionInfo, accountInfo, displayStateM
 		}
 
 		// Here I will create the list of available state here...
-		this.sessionStateMenu = this.sessionState.appendElement({ "tag": "div", "class": "session_state_menu", "style": "display:none;" }).down()
-		var sessionMenuIsShow = false
-		this.sessionState.element.onclick = function (sessionPanel, isShow) {
+		this.sessionStateMenu = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "session_state_menu" })
+		this.sessionStateMenu.element.onclick = function () {
+			this.style.display = "none"
+		}
+
+		this.sessionState.element.onclick = function (sessionPanel) {
 			return function () {
-				if (!isShow) {
+				if (sessionPanel.sessionStateMenu.element.style.display != "block") {
 					sessionPanel.sessionStateMenu.element.style.display = "block"
+					var sessionStateMenuCoord = getCoords(this)
+					sessionPanel.sessionStateMenu.element.style.top = sessionStateMenuCoord.top + this.offsetHeight + "px"
+					sessionPanel.sessionStateMenu.element.style.left = sessionStateMenuCoord.left + "px"
 				} else {
 					sessionPanel.sessionStateMenu.element.style.display = "none"
 				}
-
-				isShow = !isShow
 			}
-		} (this, sessionMenuIsShow)
+		} (this)
 
 		// The session states...
 		this.sessionStateOnline = this.sessionStateMenu.appendElement({ "tag": "div", "class": "state_select", "style": "display:none;" }).down()

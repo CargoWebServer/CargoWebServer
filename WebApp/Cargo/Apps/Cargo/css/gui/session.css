@@ -2,14 +2,13 @@
 #logout_btn{
 	display: block;
 	border-radius: 1px;
-	padding: 10px;
+	margin: 1px;
+	padding: 5px 0px 5px 0px;
 	color: #646464;
 	cursor: pointer;
 	transition: all .2s ease;
 	border: 1px solid transparent;
-	width: 100%;
 	text-align: center;
-	vertical-align: middle;
 	font-size: 10pt;
 }
 
@@ -29,6 +28,7 @@
 	height: 100%;
 	text-align: center;
 	position: relative;
+	z-index: 10;
 }
 
 .styled-select select {
@@ -101,11 +101,10 @@
 
 /** The panel that contain menu **/
 .session_display_panel {
-	min-width: 180px;
-	min-height: 50px;
-	max-height: 300px;
+	min-width: 200px;
 	overflow-y: auto;
 	font-size: 10pt;
+	overflow: hidden;
 	font-family: Arial, Helvetica, sans-serif;
 	padding: 1px;
 	position: absolute;
@@ -117,11 +116,13 @@
 	-webkit-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
 	-moz-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
 	box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+	z-index: 10;
 }
 
 .active_session {
 	display: table;
 	padding: 10px;
+	width: 100%;
 }
 
 .active_session div{
@@ -147,9 +148,11 @@
 	padding-top: 2px;
 	padding-bottom: 2px;
 	background-color: white;
-	z-index: 10;
+	z-index: 11;
 	transition: all .2s ease;
 	-webkit-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
 	-moz-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
 	box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+	border-right: 1px solid lightslategray;
+	border-bottom: 1px solid lightslategray;
 }

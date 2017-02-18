@@ -26,13 +26,17 @@ var FileNavigator = function (parent) {
     // Here I will attach the file navigator to file event.
     // Open 
     server.fileManager.attach(this, OpenEntityEvent, function (evt, fileNavigator) {
+        var file
         if (evt.dataMap["fileInfo"] != undefined) {
-            var file = server.entityManager.entities[evt.dataMap["fileInfo"].UUID]
-            if (file != undefined) {
-                if (file.M_data != undefined && file.M_data != "") {
-                    // Here thats mean the file was open
-                    fileNavigator.appendFile(file)
-                }
+            file = server.entityManager.entities[evt.dataMap["fileInfo"].UUID]
+        } else if (evt.dataMap["bpmnDiagramInfo"] != undefined) {
+            file = server.entityManager.entities[evt.dataMap["bpmnDiagramInfo"].UUID]
+        }
+
+        if (file != undefined) {
+            if (file.M_id != undefined) {
+                // Here thats mean the file was open
+                fileNavigator.appendFile(file)
             }
         }
     })
@@ -92,7 +96,9 @@ FileNavigator.prototype.appendFile = function (file) {
     // now the onclick event...
     this.tabs[file.M_id].element.onclick = function (file, fileNavigator) {
         return function () {
-            fileNavigator.setActiveTab(file.M_id)
+            if (fileNavigator.files[file.M_id] != undefined) {
+                fileNavigator.setActiveTab(file.M_id)
+            }
         }
     } (file, this)
 }
@@ -112,16 +118,26 @@ FileNavigator.prototype.setActiveTab = function (fileId) {
     // I will generate the event so other panel will set the current file... 
     if (this.files[fileId] != undefined) {
         // local event.
-        var evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": this.activeFile } }
+        var evt
+        if (this.activeFile.TYPENAME == "BPMNDI.BPMNDiagram") {
+            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "bpmnDiagramInfo": this.activeFile } }
+        } else {
+            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": this.activeFile } }
+        }
         server.eventHandler.BroadcastEvent(evt)
     }
-
 }
 
 /**
  * That function will remove existing file from the file navigator.
  */
 FileNavigator.prototype.removeFile = function (fileId) {
+    var index
+    for (index = 0; index < Object.keys(this.files).length; index++) {
+        if (Object.keys(this.files)[index] == fileId) {
+            break
+        }
+    }
     var file = this.files[fileId]
     delete this.files[fileId]
     var tab = this.tabs[fileId]
@@ -129,8 +145,18 @@ FileNavigator.prototype.removeFile = function (fileId) {
     this.panel.removeElement(tab)
     if (this.activeFile != null) {
         if (this.activeFile.M_id == fileId) {
-            this.activeFile = null
+            //this.activeFile = null
+            // Now I will set the active file
+            if (Object.keys(this.files).length == 0) {
+                this.activeFile = null
+            } else if (index >= Object.keys(this.files).length) {
+                this.setActiveTab(Object.keys(this.files)[Object.keys(this.files).length - 1])
+            } else {
+                this.setActiveTab(Object.keys(this.files)[index])
+            }
         }
     }
-    // TODO ash the user to save the file if there is change...
+
+
+    // TODO ask the user to save the file if there is change...
 }

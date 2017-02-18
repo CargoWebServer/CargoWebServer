@@ -163,10 +163,6 @@ function GetObjectsByType(typeName, queryStr, storeId) {
  */
 EntityManager.prototype.getObjectsByType = function (typeName, storeId, queryStr, progressCallback, successCallback, errorCallback, caller) {
 
-    if (storeId == "BPMNDI" || storeId == "DC" || storeId == "DI") {
-        storeId = "BPMN20"
-    }
-
     // First of all i will get the entity prototype.
     server.entityManager.getEntityPrototype(typeName, storeId,
         // The success callback.

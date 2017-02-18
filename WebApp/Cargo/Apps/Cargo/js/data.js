@@ -87,7 +87,7 @@ DataManager.prototype.read = function (connectionId, query, fields, params, succ
     params_.push(createRpcData(query, "STRING", "query"))
     params_.push(createRpcData(fields, "JSON_STR", "fields", "[]interface{}"))
     params_.push(createRpcData(params, "JSON_STR", "params", "[]interface{}"))
-    
+
     // Call it on the server.
     server.executeJsFunction(
         Read.toString(), // The function to execute remotely on server
@@ -380,6 +380,73 @@ DataManager.prototype.ping = function (connectionId, successCallback, errorCallb
             caller.errorCallback(errMsg, caller.caller)
             // dispatch the message.
             server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/**
+ * Create a new datastore from a given file.
+ */
+function ImportXsdSchema(fileName, fileContent) {
+    err = server.GetDataManager().ImportXsdSchema(fileName, fileContent, messageId, sessionId)
+    return err
+}
+
+DataManager.prototype.importXsdSchema = function (fileName, fileContent, successCallback, errorCallback, caller) {
+    // First of all I will upload the file in the tmp directory.
+    // server is the client side singleton...
+    var params = []
+    params.push(createRpcData(fileName, "STRING", "fileName"))
+    params.push(createRpcData(fileContent, "STRING", "fileContent"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        ImportXsdSchema.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            // Nothing todo here.
+        },
+        function (errMsg, caller) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/**
+ * Import data that correspond to a given xsd schema.
+ */
+function ImportXmlData(content) {
+    err = server.GetDataManager().ImportXmlData(content, messageId, sessionId)
+    return err
+}
+
+DataManager.prototype.importXmlData = function (content, successCallback, errorCallback, caller) {
+    // First of all I will upload the file in the tmp directory.
+    // server is the client side singleton...
+    var params = []
+    params.push(createRpcData(content, "STRING", "content"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        ImportXmlData.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            // Nothing todo here.
+        },
+        function (errMsg, caller) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )

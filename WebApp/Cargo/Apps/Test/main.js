@@ -51,11 +51,11 @@ function main() {
 
     //entityTests()
 
-    testDynamicEntity()
+    //testDynamicEntity()
 
-    entityDump("item_1", "Test.Item")
+    //entityDump("item_1", "Test.Item")
 
-    //entitiesDump("COLLADASchema.COLLADA")
+    entitiesDump("COLLADASchema.COLLADA")
 //entitiesDump("CargoEntities.Action")
     //entityDump( "CARGO_ENTITIES", "CargoEntities.Entities")
     //entitiesDump("XPDMXML.ProcessStructureType")
