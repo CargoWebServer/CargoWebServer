@@ -156,7 +156,7 @@ func (this *EmailManager) ReceiveMailFunc(address string, user string, pass stri
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	} else {
-		err = client.Auth("dave.courtois60@gmail.com", "400zm89a")
+		err = client.Auth(user, pass)
 		if err != nil {
 			log.Fatalf("Error: %v\n", err)
 		} else {
