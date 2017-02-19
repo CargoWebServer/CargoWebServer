@@ -936,9 +936,6 @@ function createRpcData(variable, variableType, variableName, typeName) {
     return new RpcData({ "name": variableName, "type": variableType, "dataBytes": utf8_to_b64(variable), "typeName": typeName});
 }
 
-
-
-
 /**
  * Evaluate if an array contain a given element.
  * @param arr The target array.

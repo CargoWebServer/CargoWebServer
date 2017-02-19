@@ -1,5 +1,5 @@
 /**
- * The file navigator is use to display open project files.
+ * The file navigator is use to display open project files..
  */
 var FileNavigator = function (parent) {
     this.parent = parent
@@ -8,20 +8,44 @@ var FileNavigator = function (parent) {
     // Keep the list of open files.
     this.files = {}
 
+    // Keep list of files that need save.
+    this.toSaves = {}
+
     // The tabs that contain the file names...
     this.tabs = {}
 
     this.activeFile = null
 
+    // The save all button.
+    this.saveAllBtn = this.panel.appendElement({ "tag": "i", "title": "save all", "class": "fa fa-save-all fileNavigationBtn", "style": "display:none; font-size: 12pt;" }).down()
+    this.saveAllBtn.element.onclick = function (fileNavigator) {
+        return function () {
+            for (var fileId in fileNavigator.toSaves) {
+                fileNavigator.saveFile(fileId)
+            }
+        }
+    } (this)
+
+    this.saveBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-floppy-o fileNavigationBtn", "style": "display:none" }).down()
+
+    // Now I will save the file...
+    this.saveBtn.element.onclick = function (fileNavigator) {
+        return function () {
+            if (fileNavigator.toSaves[fileNavigator.activeFile.M_id]) {
+                // The file need to be save here...
+                fileNavigator.saveFile(fileNavigator.activeFile.M_id)
+            }
+        }
+    } (this)
+
     // Show the list of file that dosent fit in the file explorer...
-    this.showHiddenFilesBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-down fileNavigationBtn" })
+    this.showHiddenFilesBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-down fileNavigationBtn" }).down()
 
     // The show the previous file.
-    this.setPreviousFileBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-left fileNavigationBtn" })
+    this.setPreviousFileBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-left fileNavigationBtn" }).down()
 
     // Show the next file.
-    this.setNextFileBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-right fileNavigationBtn" })
-
+    this.setNextFileBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-right fileNavigationBtn" }).down()
 
     // Here I will attach the file navigator to file event.
     // Open 
@@ -40,6 +64,30 @@ var FileNavigator = function (parent) {
             }
         }
     })
+    
+    server.fileManager.attach(this, UpdateFileEvent, function (evt, codeEditor) {
+        if (evt.dataMap["fileInfo"] != undefined) {
+            var fileId = evt.dataMap["fileInfo"].M_id
+            codeEditor.saveBtn.element.title = ""
+            codeEditor.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn"
+
+            var tab = codeEditor.tabs[fileId]
+            tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
+
+            // Remove from the save map
+            delete codeEditor.toSaves[fileId]
+
+            // Now the file save button...
+            if (Object.keys(codeEditor.toSaves).length <= 1) {
+                codeEditor.saveAllBtn.element.style.display = "none"
+            }
+
+            if (Object.keys(codeEditor.toSaves).length == 0) {
+                codeEditor.saveBtn.element.style.display = "none"
+                codeEditor.saveBtn.element.title = ""
+            }
+        }
+    })
 
     // Attach the file close event.
     server.fileManager.attach(this, CloseEntityEvent, function (evt, fileNavigator) {
@@ -49,6 +97,36 @@ var FileNavigator = function (parent) {
         }
     })
 
+    // The change file event.
+    server.fileManager.attach(this, ChangeFileEvent, function (evt, fileNavigator) {
+        if (evt.dataMap["fileId"] != undefined) {
+            // The file has already change.
+            var fileId = evt.dataMap["fileId"]
+            if (fileNavigator.toSaves[fileId] != undefined) {
+                return
+            }
+
+            // put in the list to save.
+            fileNavigator.toSaves[fileId] = fileNavigator.files[fileId].M_name
+
+            // Display the save button.
+            fileNavigator.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn active"
+            fileNavigator.saveBtn.element.style.display = ""
+            fileNavigator.saveBtn.element.title = "save " + fileNavigator.toSaves[fileId]
+
+            // I will put an asterist before the name.
+            var tab = fileNavigator.tabs[fileId]
+            tab.getChildById("fileNameDiv").element.innerHTML = "* " + fileNavigator.toSaves[fileId]
+
+            // Display the save all option in case of multiple file changes.
+            if (Object.keys(fileNavigator.toSaves).length > 1) {
+                if (fileNavigator.saveAllBtn.element.style.display != "") {
+                    fileNavigator.saveAllBtn.element.className = "fa fa-save-all fileNavigationBtn active"
+                    fileNavigator.saveAllBtn.element.style.display = ""
+                }
+            }
+        }
+    })
 
     return this;
 }
@@ -77,7 +155,7 @@ FileNavigator.prototype.appendFile = function (file) {
 
     this.tabs[file.M_id] = this.panel.appendElement({ "tag": "div", "class": "file_tab" }).down()
     this.tabs[file.M_id].appendElement({ "tag": "div", "style": "display: table; height: 100%; width:100%;" }).down()
-        .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": file.M_name })
+        .appendElement({ "tag": "div", "id": "fileNameDiv", "style": "display: table-cell;", "innerHtml": file.M_name })
         .appendElement({ "tag": "i", "id": file.id + "_file_tab_close_btn", "class": "fa fa-times file_tab_close_btn" })
 
     var fileCloseBtn = this.tabs[file.M_id].getChildById(file.id + "_file_tab_close_btn")
@@ -113,6 +191,7 @@ FileNavigator.prototype.setActiveTab = function (fileId) {
         // Set the tab active...
         this.tabs[fileId].element.className += " active"
         this.activeFile = this.files[fileId]
+        this.panel.element.style.display = "block"
     }
 
     // I will generate the event so other panel will set the current file... 
@@ -125,6 +204,14 @@ FileNavigator.prototype.setActiveTab = function (fileId) {
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": this.activeFile } }
         }
         server.eventHandler.BroadcastEvent(evt)
+
+        if (this.toSaves[fileId] != undefined) {
+            this.saveBtn.element.title = "save " + this.files[fileId].M_name
+            this.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn active"
+        } else {
+            this.saveBtn.element.title = ""
+            this.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn"
+        }
     }
 }
 
@@ -149,6 +236,7 @@ FileNavigator.prototype.removeFile = function (fileId) {
             // Now I will set the active file
             if (Object.keys(this.files).length == 0) {
                 this.activeFile = null
+                this.panel.element.style.display = "none"
             } else if (index >= Object.keys(this.files).length) {
                 this.setActiveTab(Object.keys(this.files)[Object.keys(this.files).length - 1])
             } else {
@@ -157,6 +245,40 @@ FileNavigator.prototype.removeFile = function (fileId) {
         }
     }
 
+    delete this.toSaves[fileId]
 
+    // Now the file save button...
+    if (Object.keys(this.toSaves).length <= 1) {
+        this.saveAllBtn.element.style.display = "none"
+    }
+    if (Object.keys(this.toSaves).length == 0) {
+        this.saveBtn.element.style.display = "none"
+        this.saveBtn.element.title = ""
+    }
     // TODO ask the user to save the file if there is change...
+}
+
+/**
+ * Save a file with a given id.
+ */
+FileNavigator.prototype.saveFile = function (fileId) {
+
+    // Now I will save the file.
+    var file = server.entityManager.entities["CargoEntities.File_" + fileId]
+    var f = new File([decode64(file.M_data)], file.M_name, { type: "text/plain", lastModified: new Date(0) })
+
+    server.fileManager.createFile(file.M_name, file.M_path, f, 256, 256, false,
+        // Success callback
+        function (result, caller) {
+
+        },
+        // Progress callback
+        function (index, total, caller) {
+        },
+        // Error callback
+        function (errMsg, caller) {
+
+        },
+        this)
+
 }

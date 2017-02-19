@@ -1,7 +1,6 @@
 /**
  * The project wizard.
  */
-
 var ProjectWizard = function(){
 
     Wizard.call(this, "project_wizard", "New Project", 400, 400)

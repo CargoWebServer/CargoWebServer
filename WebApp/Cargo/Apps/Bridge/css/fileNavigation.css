@@ -10,6 +10,7 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
+    display: none;
 }
 
 .fileNavigationBtn{
@@ -33,6 +34,7 @@
 
 .fileNavigationBtn.active:hover{
     cursor: pointer;
+    color:  #428bca;
 }
 
 .file_tab{
@@ -75,4 +77,18 @@
 .file_tab_close_btn:hover{
     color:  #657383;
     cursor: pointer;
+}
+
+.fa-save-all:before{
+    content: "\f0c7";
+    position:relative;
+    top: -4px;
+    left: -4px;
+}
+.fa-save-all:after {
+    content: "\f0c7";
+    position:absolute;
+    left: 10px;
+    top: 10px;
+    background-color:white;
 }

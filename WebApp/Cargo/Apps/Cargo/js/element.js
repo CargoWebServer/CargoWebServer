@@ -20,7 +20,7 @@
 * @version 1.0
 */
 
-/*
+/**
 * Creates a child element for a given parent.
 * @param parent The parent of the child element.
 * @param node The child element node.

@@ -1,9 +1,4 @@
 /**
- * The properitie manager is a simple listener to manage event...
- */
-
-
-/**
  * The propertie view contain the code to display propertie
  * of an entity to the end user.
  */

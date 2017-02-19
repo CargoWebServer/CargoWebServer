@@ -2,7 +2,6 @@
  * The query editor is use to edit query in EQL and SQL language.
  * It also contain a table to display it results.
  */
-
 var QueryEditor = function (parent, file, initCallback) {
 
     this.initCallback = initCallback
@@ -39,12 +38,20 @@ var QueryEditor = function (parent, file, initCallback) {
     // Init the splitter action.
     initSplitter(queryEditorSplitor, this.editQueryPanel)
 
-    var filePanel = this.editQueryPanel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "query_editor", "innerHtml": decode64(file.M_data) }).down()
-    var editor = ace.edit(file.M_id + "query_editor");
+    var filePanel = this.editQueryPanel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
+    var editor = ace.edit(file.M_id + "_editor");
 
     // In case of sql query..
     if (this.isSql) {
         editor.getSession().setMode("ace/mode/sql");
+        editor.getSession().on('change', function (fileId, fileUUID, editor) {
+            return function () {
+                var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileId } }
+                var file = server.entityManager.entities[fileUUID]
+                file.M_data = encode64(editor.getSession().getValue())
+                server.eventHandler.BroadcastEvent(evt)
+            }
+        } (file.M_id, file.UUID, editor));
     } else if (this.isEql) {
         // TODO implement the syntax highlight for EQL...
     }

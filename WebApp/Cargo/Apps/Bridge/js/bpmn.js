@@ -65,7 +65,6 @@ var BpmnExplorer = function (parent) {
                         bpmnExplorer)
                 }
             } (caller)
-
             // Read the blob as a text file...
             reader.readAsText(blob);
         },
@@ -82,9 +81,8 @@ var BpmnExplorer = function (parent) {
             }
         }
     } (this))
-
     return this
-}
+} 
 
 /**
  * Append a new definitions...

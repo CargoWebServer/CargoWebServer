@@ -12,7 +12,8 @@
 
 /** Toolbar button **/
 .toolbar div{
-    display: inline-block;
+    color: lightgray;
+    display: table-cell;
     height: 30px;
     width: 30px;
 }

@@ -1,8 +1,10 @@
 /**
- * The code editor.
+ * The code editor..
  * TODO create the split functionnality
- * TODO create the multiuser access for a single file...
+ * TODO create the multiuser access for a single file.
+ * Test...
  */
+ 
 var CodeEditor = function (parent) {
 
     // The panel...
@@ -17,13 +19,20 @@ var CodeEditor = function (parent) {
     // The current file.
     this.activeFile = null
 
+    // The editor
+    this.editors = {}
+
     // The map of file panels.
     this.filesPanel = {}
 
     // TODO create the new file event and the delete file event here...
+    this.quiet = false
+
+    // Here I will create the file toolbar...
+    this.fileToolbar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar" })
 
     // Here I will attach the file navigator to file event.
-    // Open 
+    // Open
     server.fileManager.attach(this, OpenEntityEvent, function (evt, codeEditor) {
         if (evt.dataMap["fileInfo"] != undefined) {
             var file = server.entityManager.entities[evt.dataMap["fileInfo"].UUID]
@@ -48,6 +57,24 @@ var CodeEditor = function (parent) {
         }
     })
 
+    // Attach the file update event.
+    server.fileManager.attach(this, UpdateFileEvent, function (evt, codeEditor) {
+        if (evt.dataMap["fileInfo"] != undefined) {
+            var file = evt.dataMap["fileInfo"]
+            var editor = codeEditor.editors[file.M_id + "_editor"]
+            if (editor != undefined) {
+                // Supend the change event propagation
+                codeEditor.quiet = true
+                var position = editor.getCursorPosition()
+                editor.setValue(decode64(file.M_data), -1)
+                editor.clearSelection()
+                editor.scrollToLine(position.row + 1, true, true, function () { });
+                editor.gotoLine(position.row + 1, position.column)
+                // Resume the chage event propagation.
+                codeEditor.quiet = false
+            }
+        }
+    })
     return this
 }
 
@@ -67,9 +94,7 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
     this.diagram.drawDiagramElements()
 
     this.files[diagram.M_id] = diagram
-
     this.filesPanel[diagram.M_id] = filePanel
-
     this.setActiveFile(diagram.M_id)
 
     // Now the resize element...
@@ -95,7 +120,6 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
             canvas.initWorkspace()
         }
     } (this.diagram.canvas))
-
 
     this.diagram.canvas.initWorkspace()
 }
@@ -124,14 +148,6 @@ CodeEditor.prototype.appendFile = function (file) {
     // Here the new file tab must be created.
     this.files[file.M_id] = file
 
-    // Here I will create the file toolbar...
-    var fileToolbar = new Element(null, { "tag": "div", "class": "toolbar" })
-    var saveBtn = fileToolbar.appendElement({"tag":"div"}).down()
-    saveBtn.appendElement({"tag":"i", "class":"fa-floppy-o"})
-
-    // Keep the track of the reference.
-    this.toolbars[file.M_id] = fileToolbar
-
     //var deleteBtn = fileToolbar.appendElement({"tag":"div"}).down()
 
     if (fileMode.length == 0) {
@@ -144,10 +160,10 @@ CodeEditor.prototype.appendFile = function (file) {
                 return function (queryEditor) {
                     // Now I will create the toolbar for execute a query.
                     var queryToolbar = new Element({ "tag": "div", "class": "toolbar" })
-                   
+
                 }
-            }(this))
-            
+            } (this))
+
             // Init the query editor.
             queryEditor.init()
 
@@ -161,11 +177,23 @@ CodeEditor.prototype.appendFile = function (file) {
     // Now I will create the file editor.
     var filePanel = this.panel.appendElement({ "tag": "xmp", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
     var editor = ace.edit(file.M_id + "_editor");
-
     editor.getSession().setMode(fileMode);
+    this.editors[file.M_id + "_editor"] = editor
+
+    // In case of file update...
+    editor.getSession().on('change', function (fileId, fileUUID, codeEditor) {
+        return function () {
+            if (!codeEditor.quiet) {
+                var editor = codeEditor.editors[fileId + "_editor"]
+                var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileId } }
+                var file = server.entityManager.entities[fileUUID]
+                file.M_data = encode64(editor.getSession().getValue())
+                server.eventHandler.BroadcastEvent(evt)
+            }
+        }
+    } (file.M_id, file.UUID, this));
 
     this.filesPanel[file.M_id] = filePanel
-
     this.setActiveFile(file.M_id)
 }
 
@@ -173,16 +201,14 @@ CodeEditor.prototype.removeFile = function (fileId) {
     if (this.filesPanel[fileId] != undefined) {
         // remove the element from the panel.
         this.panel.removeElement(this.filesPanel[fileId])
-
         delete this.filesPanel[fileId]
         delete this.files[fileId]
+        delete this.editors[fileId + "_editor"]
 
         if (this.activeFile != undefined) {
             if (this.activeFile.M_id == fileId) {
                 this.activeFile = null
             }
-        }else{
-            
         }
     }
 }

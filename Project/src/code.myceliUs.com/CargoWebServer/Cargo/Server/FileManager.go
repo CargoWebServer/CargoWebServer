@@ -319,6 +319,9 @@ func (this *FileManager) createFile(filename string, filepath string, filedata [
 	var checksum string
 	var parentDirPath string
 
+	// Use to determine if the file already exist or not.
+	isNew := true
+
 	// The parent is the root.
 	if len(filepath) == 0 {
 		parentDirPath = "CARGOROOT"
@@ -337,17 +340,20 @@ func (this *FileManager) createFile(filename string, filepath string, filedata [
 
 		// The user wants to save the data into a physical file.
 		fileId = Utility.CreateSha1Key([]byte(filepath + "/" + filename))
-
 		log.Println("-----------> ", filepath+"/"+filename)
 
 		fileUuid := CargoEntitiesFileExists(fileId)
 		if len(fileUuid) > 0 {
-			// Create the error message
-			cargoError := NewError(Utility.FileLine(), FILE_ALREADY_EXISTS_ERROR, SERVER_ERROR_CODE, errors.New("The file '"+fileId+"' already exists. "))
-			return nil, cargoError
+			isNew = false
+			entity, cargoError := GetServer().GetEntityManager().getEntityByUuid(fileUuid)
+			if cargoError != nil {
+				return nil, cargoError
+			}
+			fileEntity = entity.(*CargoEntities_FileEntity)
+		} else {
+			fileEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(fileId, nil)
 		}
 
-		fileEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(fileId, nil)
 		file = fileEntity.GetObject().(*CargoEntities.File)
 		file.SetFileType(CargoEntities.FileType_DiskFile)
 		f_, err := ioutil.TempFile("", "_create_file_")
@@ -480,10 +486,19 @@ func (this *FileManager) createFile(filename string, filepath string, filedata [
 
 		fileInfo := new(MessageData)
 		fileInfo.Name = "fileInfo"
+		if !isNew {
+			file.SetData(base64.StdEncoding.EncodeToString(filedata))
+		}
 		fileInfo.Value = file
 		eventData[0] = fileInfo
-
-		evt, _ := NewEvent(NewFileEvent, FileEvent, eventData)
+		var evt *Event
+		if isNew {
+			// New file create
+			evt, _ = NewEvent(NewFileEvent, FileEvent, eventData)
+		} else {
+			// Existing file was update
+			evt, _ = NewEvent(UpdateFileEvent, FileEvent, eventData)
+		}
 		GetServer().GetEventManager().BroadcastEvent(evt)
 	}
 

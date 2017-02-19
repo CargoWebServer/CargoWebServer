@@ -245,9 +245,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     // The toolbar file grid...
     this.toolbarDiv = this.headerDiv.appendElement({ "tag": "div", "id": "toolbarDiv"}).down()
-        .appendElement({ "tag": "div", "style": "width:100%; display: inline; position: relative" }).down()
-    this.toolBar = new Toolbar(this.toolbarDiv)
-
+    
     // Now the left and right div...
     var splitArea1 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-cell; position: relative; height:100%" }).down()
     var leftDiv = new Element(splitArea1, { "tag": "div", "id": "leftDiv", "style": "" })

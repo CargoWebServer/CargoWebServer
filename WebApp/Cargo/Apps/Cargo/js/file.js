@@ -149,7 +149,6 @@ FileManager.prototype.createFile = function (filename, filepath, filedata, thumb
                             caller.progressCallback(index, total, caller.caller)
                         },
                         function (result, caller) {
-                            console.log(result)
                             caller.successCallback(result[0], caller.caller)
                         },
                         function (errMsg, caller) {
