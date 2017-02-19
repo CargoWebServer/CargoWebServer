@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"code.google.com/p/go.net/websocket"
 	"code.myceliUs.com/CargoWebServer/Cargo/Server"
+	"golang.org/x/net/websocket"
 )
 
 func main() {

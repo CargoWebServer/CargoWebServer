@@ -48,8 +48,6 @@
 /WebApp/Cargo/Data/*
 /WebApp/Cargo/Definitions/*
 /WebApp/Cargo/icons/*
-/WebApp/Cargo/Schemas/*
-!/WebApp/Cargo/Schemas/xs.xsd
 /WebApp/Cargo/Scripts/*
 /WebApp/Cargo/tmp/*
 /WebApp/Cargo/queries/*
@@ -73,7 +71,6 @@
 /WebApp/Cargo/Apps/BrisOutil/
 /WebApp/Cargo/Apps/Catalog/
 /WebApp/Cargo/Apps/Dt3/
-/WebApp/Cargo/Apps/lib/
 /WebApp/Cargo/Apps/QrqcSupervision/
 
 /build

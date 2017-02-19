@@ -9,8 +9,8 @@ import (
 	"strings"
 	"sync"
 
-	"code.google.com/p/go-uuid/uuid"
 	"code.myceliUs.com/Utility"
+	"github.com/pborman/uuid"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 )

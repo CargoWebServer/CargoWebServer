@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"code.google.com/p/go-uuid/uuid"
-	"code.google.com/p/go.net/websocket"
+	"github.com/pborman/uuid"
+	"golang.org/x/net/websocket"
 )
 
 /**

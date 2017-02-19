@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	_ "code.google.com/p/odbc"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	_ "github.com/alexbrainman/odbc"
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
 )

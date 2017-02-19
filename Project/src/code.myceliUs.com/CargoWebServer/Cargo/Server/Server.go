@@ -102,8 +102,8 @@ func (this *Server) initialize() {
 	this.GetServiceManager().registerService(this.GetSchemaManager())
 
 	// BPMN stuff
-	this.GetServiceManager().registerService(this.GetWorkflowManager())
-	this.GetServiceManager().registerService(this.GetWorkflowProcessor())
+	//this.GetServiceManager().registerService(this.GetWorkflowManager())
+	//this.GetServiceManager().registerService(this.GetWorkflowProcessor())
 
 	// The other services are initialyse by the service manager.
 	this.GetServiceManager().initialize()
