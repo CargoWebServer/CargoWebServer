@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @COPYRIGHT DASSAULT SYSTEMES 2010. All rights reserved. -->
+<xs:schema id="xs" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.w3.org/2001/XMLSchema/xs" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+
+<!-- The level zero. -->
+<xs:simpleType name="anySimpleType" id="anySimpleType">
+</xs:simpleType>
+
+<!-- URI (Uniform Resource Identifier). -->
+<xs:simpleType name="anyURI" id="anyURI">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Binary content coded as "base64". -->
+<xs:simpleType name="base64Binary" id="base64Binary">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Boolean (true or false). -->
+<xs:simpleType name="boolean" id="boolean">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Signed value of 8 bits.  -->
+<xs:simpleType name="byte" id="byte">
+<xs:restriction base="xs:short">
+<xs:minInclusive value="-128"/>
+<xs:maxInclusive value="127"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Gregorian calendar date. -->
+<xs:simpleType name="date" id="date">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Instant of time (Gregorian calendar). -->
+<xs:simpleType name="dateTime" id="dateTime">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Decimal numbers. -->
+<xs:simpleType name="decimal" id="decimal">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- IEEE 64 bit floating point. -->
+<xs:simpleType name="double" id="double">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Time durations.. ISO 8601 -->
+<xs:simpleType name="duration" id="duration">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!--  -->
+<xs:simpleType name="ENTITIES" id="ENTITIES">
+<xs:restriction>
+<xs:simpleType>
+<xs:list>
+<xs:simpleType>
+<xs:restriction base="xs:ENTITY"/>
+</xs:simpleType>
+</xs:list>
+</xs:simpleType>
+<xs:minLength value="1"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!--  -->
+<xs:simpleType name="ENTITY" id="ENTITY">
+<xs:restriction base="xs:NCName"/>
+</xs:simpleType>
+
+<!-- IEEE 32 bit floating point -->
+<xs:simpleType name="float" id="float">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Recurring period of time: monthly day. -->
+<xs:simpleType name="gDay" id="gDay">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Recurring period of time: yearly month. -->
+<xs:simpleType name="gMonth" id="gMonth">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Recurring period of time: yearly day. -->
+<xs:simpleType name="gMonthDay" id="gMonthDay">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Period of one year. -->
+<xs:simpleType name="gYear" id="gYear">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Period of one month. -->
+<xs:simpleType name="gYearMonth" id="gYearMonth">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Binary contents coded in hexadecimal. -->
+<xs:simpleType name="hexBinary" id="hexBinary">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!--  Definition of unique identifiers. -->
+<xs:simpleType name="ID" id="ID">
+<xs:restriction base="xs:NCName"/>
+</xs:simpleType>
+
+<!-- Definition of references to unique identifiers. -->
+<xs:simpleType name="IDREF" id="IDREF">
+<xs:restriction base="xs:NCName"/>
+</xs:simpleType>
+
+<!-- Definition of lists of references to unique identifiers -->
+<xs:simpleType name="IDREFS" id="IDREFS">
+<xs:restriction>
+<xs:simpleType>
+<xs:list>
+<xs:simpleType>
+<xs:restriction base="xs:IDREF"/>
+</xs:simpleType>
+</xs:list>
+</xs:simpleType>
+<xs:minLength value="1"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- 32 bit signed integers. -->
+<xs:simpleType name="int" id="int">
+<xs:restriction base="xs:long">
+<xs:minInclusive value="-2147483648"/>
+<xs:maxInclusive value="2147483647"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- signed integers. -->
+<xs:simpleType name="integer" id="integer">
+<xs:restriction base="xs:decimal">
+<xs:fractionDigits value="0" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- RFC 1766 language codes. -->
+<xs:simpleType name="language" id="language">
+<xs:restriction base="xs:token">
+<xs:pattern value="([a-zA-Z]{2}|[iI]-[a-zA-Z]+|[xX]-[a-zA-Z]{1,8})(-[a-zA-Z]{1,8})*"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- 64 bit signed integers.  -->
+<xs:simpleType name="long" id="long">
+<xs:restriction base="xs:integer">
+<xs:minInclusive value="-9223372036854775808"/>
+<xs:maxInclusive value="9223372036854775807"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- XML 1.O names. -->
+<xs:simpleType name="Name" id="Name">
+<xs:restriction base="xs:token">
+<xs:pattern value="\i\c*"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Unqualified names. -->
+<xs:simpleType name="NCName" id="NCName">
+<xs:restriction base="xs:Name">
+<xs:pattern value="[\i-[:]][\c-[:]]*"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Strictly negative integers of arbitrary length. -->
+<xs:simpleType name="negativeInteger" id="negativeInteger">
+<xs:restriction base="xs:nonPositiveInteger">
+<xs:maxInclusive value="-1"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- XML 1.0 name token (NMTOKEN). -->
+<xs:simpleType name="NMTOKEN" id="NMTOKEN">
+<xs:restriction base="xs:token">
+<xs:pattern value="\c+"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- List of XML 1.0 name token (NMTOKEN). -->
+<xs:simpleType name="NMTOKENS" id="NMTOKENS">
+<xs:restriction>
+<xs:simpleType>
+<xs:list>
+<xs:simpleType>
+<xs:restriction base="xs:NMTOKEN"/>
+</xs:simpleType>
+</xs:list>
+</xs:simpleType>
+<xs:minLength value="1"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Integers of arbitrary length positive or equal to zero. -->
+<xs:simpleType name="nonNegativeInteger" id="nonNegativeInteger">
+<xs:restriction base="xs:integer">
+<xs:minInclusive value="0"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Integers of arbitrary length negative or equal to zero. -->
+<xs:simpleType name="nonPositiveInteger" id="nonPositiveInteger">
+<xs:restriction base="xs:integer">
+<xs:maxInclusive value="0"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Whitespace-replaced strings. -->
+<xs:simpleType name="normalizedString" id="normalizedString">
+<xs:restriction base="xs:string">
+<xs:whiteSpace value="replace"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Emulation of the XML 1.0 feature. -->
+<xs:simpleType name="NOTATION" id="NOTATION">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Strictly positive integers of arbitrary length. -->
+<xs:simpleType name="positiveInteger" id="positiveInteger">
+<xs:restriction base="xs:nonNegativeInteger">
+<xs:minInclusive value="1"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Namespaces in XML qualified names. -->
+<xs:simpleType name="QName" id="QName">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- 32 bit signed integers. -->
+<xs:simpleType name="short" id="short">
+<xs:restriction base="xs:int">
+<xs:minInclusive value="-32768"/>
+<xs:maxInclusive value="32767"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Any string. -->
+<xs:simpleType name="string" id="string">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="preserve"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Point in time recurring each day. -->
+<xs:simpleType name="time" id="time">
+<xs:restriction base="xs:anySimpleType">
+<xs:whiteSpace value="collapse" fixed="true"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!--  Whitespace-replaced and collapsed strings. -->
+<xs:simpleType name="token" id="token">
+<xs:restriction base="xs:normalizedString">
+<xs:whiteSpace value="collapse"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!--  Unsigned value of 8 bits. -->
+<xs:simpleType name="unsignedByte" id="unsignedBtype">
+<xs:restriction base="xs:unsignedShort">
+<xs:maxInclusive value="255"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Unsigned value of 32 bits.  -->
+<xs:simpleType name="unsignedInt" id="unsignedInt">
+<xs:restriction base="xs:unsignedLong">
+<xs:maxInclusive value="4294967295"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Unsigned value of 64 bits. -->
+<xs:simpleType name="unsignedLong" id="unsignedLong">
+<xs:restriction base="xs:nonNegativeInteger">
+<xs:maxInclusive value="18446744073709551615"/>
+</xs:restriction>
+</xs:simpleType>
+
+<!-- Unsigned integer of 16 bits.  -->
+<xs:simpleType name="unsignedShort" id="unsignedShort">
+<xs:restriction base="xs:unsignedInt">
+<xs:maxInclusive value="65535"/>
+</xs:restriction>
+</xs:simpleType>
+
+</xs:schema>
