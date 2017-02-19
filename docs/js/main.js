@@ -18,6 +18,10 @@ $('#a-cargo').click(function(e) {
 	hidePages(this.id)
 });
 
+$('#li-gettingStarted').click(function(e) {
+	hidePages("page-gettingStarted")
+});
+
 function hidePages(exceptId){
 	$('.pageRow').addClass('hidden')
 	$('#page-' + exceptId.split('-')[1]).removeClass('hidden')

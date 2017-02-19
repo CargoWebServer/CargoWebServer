@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
 	<meta http-equiv="x-ua-compatible" content="IE=edge">
 	<meta charset="UTF-8">
@@ -16,12 +17,13 @@
 
 <body>
 	<div class="container-fluid">
-		
+
 		<div class="row">
 			<nav class="navbar navbar-default">
 				<div class="container-fluid">
 					<div class="navbar-header">
-						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+							aria-expanded="false">
 							<span class="sr-only">Toggle navigation</span>
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
@@ -43,16 +45,18 @@
 						<ul class="nav navbar-nav navbar-right">
 							<li id="li-about"><a href="#">About</a></li>
 						</ul>
-					</div><!-- /.navbar-collapse -->
-				</div><!-- /.container-fluid -->
+					</div>
+					<!-- /.navbar-collapse -->
+				</div>
+				<!-- /.container-fluid -->
 			</nav>
 		</div>
 
 		<div class="row pageRow" id="page-cargo">
-			<div class="row"> 
+			<div class="row">
 				<div class="col-xs-12 text-center" id="cargo-intro-container">
 					<div class="col-xs-12">
-						<img src="img/wheel.svg" id="cargo-intro-wheel"/>
+						<img src="img/wheel.svg" id="cargo-intro-wheel" />
 					</div>
 					<div class="col-sm-6 col-sm-offset-3 text-center">
 						<h2>Cargo is a complete web application framework. It's fast, easy and lightweight.<br><br></h2>
@@ -76,7 +80,7 @@
 					<span class="glyphicon glyphicon-road"></span>
 					<h2>Smooth learning curve</h2>
 					<p>
-						Code everything in one language: javascript. 
+						Code everything in one language: javascript.
 					</p>
 				</div>
 				<div class="col-md-3">
@@ -90,28 +94,99 @@
 	</div>
 	<div class="row hidden pageRow" id="page-gettingStarted">
 		<div class="col-lg-12">
-
+			<div class="col-sm-2" role="complementary">
+				<nav class="bs-docs-sidebar affix-top">
+					<ul class="nav bs-docs-sidenav">
+						<li "guidAssumptionsLink-frontEnd" class="assumptions-link">
+							<a href="#guideAssumptionDiv">1 Guide Assumptions</a>
+						</li>
+						<li "gettingCargoLink-frontEnd" class="gettingCargo-link">
+							<a href="#gettingCargoDiv">2 Getting Cargo</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+			<div class="col-sm-10" role="main">
+				<div class="row" id="">
+					<div class="col-xs-12">
+						<div class="jumbotron">
+							<div class="container">
+								<h2>Getting Started with Cargo</h2>
+								<p>This guide covers getting up and running with Cargo</br>
+									After reading this guide you will know:
+									<ul>
+										<li>
+											How to install and configure your Cargo application server.
+										</li>
+										<li>
+											The general structure of a Cargo application.
+										</li>
+										<li>
+											How to invoke action on your server from javascript client.
+										</li>
+										<li>
+											How to create a simple application that make use of basic part of the framework.
+										</li>
+									</ul>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="row" id="guideAssumptionDiv">
+						<div class="col-xs-12">
+							<h2>1 Guide Assumptions</h2>
+							<p>
+								This guide was written for beginners who want to get started with written Cargo application from scratch. I does not assume
+								that you have any prior experience with Cargo. However, to get most out of it, you need to have some knowledge of
+								HTML, CSS, JavaScript, better you master those tool and better your application will be. Because Cargo was witten
+								with Go and has no external dependencies, there nothing more than Cargo itself to intall, so let's do it.
+							</p>
+						</div>
+					</div>
+					<div class="row" id="gettingCargoDiv">
+						<div class="col-xs-12">
+							<h2>2 Getting Cargo</h2>
+							<p>
+								As I say Cargo was written in Go, but that dosen't means that you have to know Go for use Cargo. We think Go is a wonderfull
+								language for backend programming, it's fast, concurrent, elegant and intuitive, and well apdated to modern computer architecture.
+								For enthusiasm who want to know more about backend programming and want to create additonnal services in Cargo, you must know that Cargo
+								is open source, so you are welcome to be part of the team. With simplicity in mind, Cargo use Javasript for client side programming.
+								Being the default script language and supported by all 'serious' browser, JavaScript is de facto web programming language, and it's
+								at lest, the one you must know in order to create application in Cargo. So let assume you are confortable with JavaScript and 
+								get Cargo. 
+							</p>
+							<p>
+								For linux user's there is the link </br>
+								<a>Cargo v1.0 linux 64bit </a>
+							</p>
+							<p>
+								For windows user's there is the link </br>
+								<a>Cargo v1.0 windows 64bit </a>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 	<div class="row hidden pageRow" id="page-tutorials">
 		<div class="col-sm-2" role="complementary">
-			
-			<nav class="bs-docs-sidebar affix-top tutorialsSideBar">	
+			<nav class="bs-docs-sidebar affix-top tutorialsSideBar">
 				<h3 id="tutorialsLink-intro" class="tutorials-link tutorialsHeader">Tutorials</h3>
 				<ul class="nav bs-docs-sidenav">
-					<li id="tutorialsLink-frontEnd" class="tutorials-link"> 
-						<a href="#">Front End</a> 
+					<li id="tutorialsLink-frontEnd" class="tutorials-link">
+						<a href="#">Front End</a>
 					</li>
-					<li id="tutorialsLink-AsynchronousProgramming" class="tutorials-link"> 
-						<a href="#">Asynchronous Programming</a> 
+					<li id="tutorialsLink-AsynchronousProgramming" class="tutorials-link">
+						<a href="#">Asynchronous Programming</a>
 					</li>
-					<li id="tutorialsLink-events" class="tutorials-link"> 
-						<a href="#">Events</a> 
+					<li id="tutorialsLink-events" class="tutorials-link">
+						<a href="#">Events</a>
 					</li>
-					<li id="tutorialsLink-serverSide" class="tutorials-link"> 
-						<a href="#">Server-side</a> 
+					<li id="tutorialsLink-serverSide" class="tutorials-link">
+						<a href="#">Server-side</a>
 					</li>
-				</ul>		
+				</ul>
 			</nav>
 		</div>
 		<div class="col-sm-10" role="main">
@@ -120,7 +195,8 @@
 					<div class="jumbotron">
 						<div class="container">
 							<p>Creating a web application is made easy with cargo.</p>
-							<p>These tutorials will go through all the components of the framework to make you a web development pro as soon as possible. If it hasn't been done, we suggest starting with the 'Getting Started' page.</p>
+							<p>These tutorials will go through all the components of the framework to make you a web development pro as soon as possible.
+								If it hasn't been done, we suggest starting with the 'Getting Started' page.</p>
 						</div>
 					</div>
 				</div>
@@ -130,11 +206,16 @@
 					<h2> Front End </h2>
 					<h3> Element </h3>
 					<p>
-						The 'Element' class included in the Cargo javascript framework offers a basic Html element wrapper class to help you create client side graphical interfaces. It gives you the ability to create and manipulate html elements within your javascript files rather than in the traditionnal html and css files. All the functionnalities related to this class can be found within the file 'element.js'. 
+						The 'Element' class included in the Cargo javascript framework offers a basic Html element wrapper class to help you create
+						client side graphical interfaces. It gives you the ability to create and manipulate html elements within your javascript
+						files rather than in the traditionnal html and css files. All the functionnalities related to this class can be found
+						within the file 'element.js'.
 					</p>
 					<p>
-						You do not need to use the 'Element' class or any of it's related functionnalities 
-						to develop a web application using the Cargo framework. It can be used in conjunction with other javascript libraries such as Jquery and Bootstrap. If you are an experienced front-end web application developper and already have techniques which you are familiar with, feel free to skip to the <a href="#" id="frontEndNextTutorialLink"> next tutorial</a>.
+						You do not need to use the 'Element' class or any of it's related functionnalities to develop a web application using the
+						Cargo framework. It can be used in conjunction with other javascript libraries such as Jquery and Bootstrap. If you
+						are an experienced front-end web application developper and already have techniques which you are familiar with, feel
+						free to skip to the <a href="#" id="frontEndNextTutorialLink"> next tutorial</a>.
 					</p>
 
 					<h4> Element essential functions </h4>
@@ -143,7 +224,7 @@
 						Element constructor
 					</button>
 					<div class="collapse" id="collapseElementConstructor">
-						<p> 
+						<p>
 							To create a new element, simply call it's constructor function.
 						</p>
 						<pre><code class="javascript">var myElement = new Element(parent, params, callback, appendFront)</code></pre>
@@ -159,8 +240,8 @@
 						.appendElement()
 					</button>
 					<div class="collapse" id="collapseAppendElement">
-						<p> 
-							This function is used to append a child element to an existing element. 
+						<p>
+							This function is used to append a child element to an existing element.
 						</p>
 						<pre><code class="javascript">myElement.appendElement(childElement)</code></pre>
 						<ul>
@@ -172,8 +253,8 @@
 						.removeElement()
 					</button>
 					<div class="collapse" id="collapseRemoveElement">
-						<p> 
-							This function is used to remove a child element from an existing element. 
+						<p>
+							This function is used to remove a child element from an existing element.
 						</p>
 						<pre><code class="javascript">myElement.removeElement(childElement)</code></pre>
 						<ul>
@@ -185,8 +266,8 @@
 						.getChildById()
 					</button>
 					<div class="collapse" id="collapseGetChildById">
-						<p> 
-							This function is used to find a child recursively inside the element's childs hierarchy. 
+						<p>
+							This function is used to find a child recursively inside the element's childs hierarchy.
 						</p>
 						<pre><code class="javascript">myElement.getChildById("childElementId")</code></pre>
 						<ul>
@@ -198,7 +279,7 @@
 						.down()
 					</button>
 					<div class="collapse" id="collapseDown">
-						<p> 
+						<p>
 							This function is used to navigate downwards in the Element hierarchy. It returns the last child of the element.
 						</p>
 						<pre><code class="javascript">myElement.down()</code></pre>
@@ -208,7 +289,7 @@
 						.up()
 					</button>
 					<div class="collapse" id="collapseUp">
-						<p> 
+						<p>
 							This function is used to navigate upwards in the Element hierarchy. It returns the immediate parent of the element.
 						</p>
 						<pre><code class="javascript">myElement.up()</code></pre>
@@ -234,23 +315,31 @@
 				<div class="col-xs-12">
 					<h2> Asynchronous programming </h2>
 					<p>
-						Asynchronous programming means that your web application can execute multiple segments of code simultaneously. To do so, Cargo uses 'callbacks'. A callback is a function that can be passed as an argument in another function. Cargo has three types of callbacks.
+						Asynchronous programming means that your web application can execute multiple segments of code simultaneously. To do so,
+						Cargo uses 'callbacks'. A callback is a function that can be passed as an argument in another function. Cargo has three
+						types of callbacks.
 					</p>
 					<ul>
-						<li> Progress callbacks: executed during the progress of the function. (For example used as feedback when transfering a file through the network).</li>
+						<li> Progress callbacks: executed during the progress of the function. (For example used as feedback when transfering a
+							file through the network).</li>
 						<li> Success callbacks: executed when the function has succeded.</li>
 						<li> Error callbacks: executed when the function fails.</li>
 					</ul>
 					<p>
-						Callbacks are in most cases optional parameters, meaning that if you can pass an empty function (<code>function(){}</code>) or <code>undefined</code> as a callback.
+						Callbacks are in most cases optional parameters, meaning that if you can pass an empty function (<code>function(){}</code>)
+						or <code>undefined</code> as a callback.
 					</p>
 					<p>
-						Some functions have a parameter named 'caller'. The caller is a JSON in which you can store object from the request context and get it back from the response context. This means you can place a variable in the 'caller', pass it as a parameter to the function, modify it in the callback functions, and retrieve it afterwards.
+						Some functions have a parameter named 'caller'. The caller is a JSON in which you can store object from the request context
+						and get it back from the response context. This means you can place a variable in the 'caller', pass it as a parameter
+						to the function, modify it in the callback functions, and retrieve it afterwards.
 					</p>
 					<h4> Example </h4>
 					<p>Session manager's login function</p>
 					<pre><code class="javascript">var user = {<br>&#09;"userName" : "myUserName",<br>&#09;"password" : "password01"<br>};<br><br>server.sessionManager.login(<br>&#09;/* name */<br>&#09;user.userName,<br>&#09;/* password */<br>&#09;user.password,<br>&#09;/* Success Callback */<br>&#09;function (result, caller){<br>&#09;&#09;console.log(caller.userName + " logged in.");<br>&#09;},<br>&#09;/* Error Callback */<br>&#09;function (err, caller) {<br>&#09;&#09;console.log("Login error ", err);<br>&#09;},<br>&#09;/* caller */<br>&#09;{ "user": user}<br>);</code></pre>
-					<p>Note that the 'login' function has a success callback, an error callback and a caller but it does not have a progress callback.</p>
+					<p>Note that the 'login' function has a success callback, an error callback and a caller but it does not have a progress
+						callback.
+					</p>
 				</div>
 			</div>
 			<div class="row tutorialsRow" id="tutorialsSection-events">
@@ -258,7 +347,8 @@
 					<h2> Events </h2>
 					<h3> Event Manager </h3>
 					<h3> Local events </h3>
-					Local events will be accessible only from within the running application, meaning that other applications on the network will not be able to respond to those events.
+					Local events will be accessible only from within the running application, meaning that other applications on the network
+					will not be able to respond to those events.
 					<h4> Example </h4>
 					<h3> Network events </h3>
 					Network events are available to all other applications connected to the server.
@@ -285,15 +375,15 @@
 			<a href="#">About</a>
 		</div>
 	</div>
-</div>
-<!-- Libs -->
-<script src="lib/jquery/js/jquery-3.1.1.min.js"></script>
-<script src="lib/bootstrap/js/bootstrap.min.js"></script>
-<script src="lib/highlight/highlight.pack.js"></script>
-<script src="lib/cargo/element.js"></script>
-<script src="lib/cargo/utility.js"></script>
+	</div>
+	<!-- Libs -->
+	<script src="lib/jquery/js/jquery-3.1.1.min.js"></script>
+	<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+	<script src="lib/highlight/highlight.pack.js"></script>
+	<script src="lib/cargo/element.js"></script>
+	<script src="lib/cargo/utility.js"></script>
 
-<script src="js/main.js"></script>
+	<script src="js/main.js"></script>
 </body>
 
 </html>
