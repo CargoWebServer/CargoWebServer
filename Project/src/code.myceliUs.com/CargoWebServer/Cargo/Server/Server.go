@@ -59,7 +59,7 @@ func newServer() *Server {
 	if err == nil {
 		adminAccount := adminAccountEntity.GetObject().(*CargoEntities.Account)
 		if adminAccount.GetPassword() == "adminadmin" {
-			//open.Run("http://127.0.0.1:9393/Bridge")
+			//open.Run("http://127.0.0.1:9393")
 		}
 	}
 

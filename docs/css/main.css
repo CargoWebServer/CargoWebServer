@@ -22,6 +22,10 @@ h5{
 	padding: 20px;
 }
 
+#gettingCargoDiv i{
+	font-size: 18pt;
+}
+
 .tutorialsHeader{
 	padding-left:10px;
 	cursor: pointer;
@@ -41,6 +45,9 @@ h5{
 	padding-top: 20px;
 }
 
+.fa-windows{
+	color: #1BA1E2;
+}
 
 /* MARKETING
 -------------------------------------------------- */
