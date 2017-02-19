@@ -44,27 +44,13 @@
 /Project/src/code.myceliUs.com/CargoWebServer/Cargo/Server/Entity_DI.go
 /Project/src/code.myceliUs.com/CargoWebServer/Cargo/Server/Entity_DC.go
 
-/WebApp/Cargo/bin/*
-/WebApp/Cargo/Data/*
-/WebApp/Cargo/Definitions/*
-/WebApp/Cargo/icons/*
-/WebApp/Cargo/Scripts/*
-/WebApp/Cargo/tmp/*
-/WebApp/Cargo/queries/*
-
-/WebApp/Cargo/Apps/BrisOutil/
-/WebApp/Cargo/Apps/Catalog/
-/WebApp/Cargo/Apps/Dt3/
-/WebApp/Cargo/Apps/QrqcSupervision/
-
-/build
-
-/WebApp/Cargo/bin/*
-/WebApp/Cargo/Data/*
-/WebApp/Cargo/Definitions/*
-/WebApp/Cargo/icons/*
-/WebApp/Cargo/Scripts/*
-/WebApp/Cargo/tmp/*
+/WebApp/Cargo/bin/
+/WebApp/Cargo/Data/
+/WebApp/Cargo/Definitions/
+/WebApp/Cargo/icons/
+/WebApp/Cargo/Scripts/
+/WebApp/Cargo/tmp/
+/WebApp/Cargo/queries/
 
 /WebApp/Cargo/Apps/BrisOutil/
 /WebApp/Cargo/Apps/Catalog/
