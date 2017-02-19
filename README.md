@@ -15,4 +15,51 @@ Extensibility and modularity are key concepts in the design of Cargo. You can cr
 
 Cargo uses the websocket/tcp scoket to communicate with client's. To do so it has it own protocol written with google protobuffer, and similiar to [JSON/RPC](https://github.com/CargoWebServer/CargoWebServer/blob/master/WebApp/Cargo/Apps/Cargo/proto/rpc.proto). The Server Object Model (SOM) was created to simplify the interaction with the sever. Similar to the document object model (DOM) which gives access to the browser, the server object model SOM gives you access to a server. All you have to do is create the server object and invoke actions on it. With the help of callbacks and events, communication with the SOM is easy and intuive.
 
+Now To compile the project on your computer you must have a Go environement configure properly configure.
+
+The Go source code of Cargo are in the directory 
+CargoWebServer(master depending if you clone the project or not)
+  * Project (That must be part of your GOPATH)
+  * Project/src (Go source code)
+  * Project/src/code.myceliUs.com (Cargo source code)
+  
+  You must get those dependencies,
+  
+- go get github.com/pborman/uuid
+- go get golang.org/x/net/websocket
+- go get github.com/alexbrainman/odbc
+- go get github.com/denisenkom/go-mssqldb
+- go get github.com/go-sql-driver/mysql
+- go get github.com/golang/protobuf/proto
+- go get github.com/kokardy/saxlike
+- go get github.com/mavricknz/ldap
+- go get github.com/nfnt/resize
+- go get github.com/polds/imgbase64
+- go get github.com/robertkrimen/otto
+- go get github.com/syndtr/goleveldb/leveldb
+- go get github.com/xrash/smetrics
+- go get golang.org/x/text/runes
+- go get gopkg.in/gomail.v1
+- go get github.com/bytbox/go-pop3
+
+Now to build Cago from the top level dir
+
+cd CargoWebServer/Project/src/code.myceliUs.com/CargoWebServer
+
+you must see the file Main.go it that directory, now call
+
+go build -i -tags "Config CargoEntities"
+
+The output file must CargoWebServer in linux and CargoWebServer.exe in windows.
+
+Now to run Cargo you must move CargoWebServer(.exe) at the top level dir, or create a new directory and put inside it:
+
+- CargoWebServer/WebApp
+- CargoWebServer/CargoWebServer(.exe)
+
+Now you can start the command CargoWebServer(.exe) et voîlà!
+
+type 127.0.0.1:9393 to go to the root of your newly install server.
+
+For more info go to our website.
 www.cargowebserver.com
