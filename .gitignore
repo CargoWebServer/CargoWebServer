@@ -8,14 +8,6 @@
 /Project/src/gopkg.in/
 /Project/src/sourcegraph.com/*.exe
 
-/Project/bin/
-/Project/pkg/
-/Project/src/code.google.com/
-/Project/src/github.com/
-/Project/src/golang.org/
-/Project/src/gopkg.in/
-/Project/src/sourcegraph.com/
-
 /Project/src/code.myceliUs.com/CodeGen/CodeGen
 /Project/src/code.myceliUs.com/CodeGen/input/BPMN20.cmof
 /Project/src/code.myceliUs.com/CodeGen/input/BPMN20.xsd
@@ -56,5 +48,6 @@
 /WebApp/Cargo/Apps/Catalog/
 /WebApp/Cargo/Apps/Dt3/
 /WebApp/Cargo/Apps/QrqcSupervision/
+
 
 /build
