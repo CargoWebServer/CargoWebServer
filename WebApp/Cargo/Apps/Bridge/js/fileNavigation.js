@@ -51,14 +51,14 @@ var FileNavigator = function (parent) {
     // Open 
     server.fileManager.attach(this, OpenEntityEvent, function (evt, fileNavigator) {
         var file
-        if (evt.dataMap["fileInfo"] != undefined) {
+        if (evt.dataMap.fileInfo !== undefined) {
             file = server.entityManager.entities[evt.dataMap["fileInfo"].UUID]
-        } else if (evt.dataMap["bpmnDiagramInfo"] != undefined) {
+        } else if (evt.dataMap.bpmnDiagramInfo !== undefined) {
             file = server.entityManager.entities[evt.dataMap["bpmnDiagramInfo"].UUID]
         }
 
-        if (file != undefined) {
-            if (file.M_id != undefined) {
+        if (file !== undefined) {
+            if (file.M_id !== undefined) {
                 // Here thats mean the file was open
                 fileNavigator.appendFile(file)
             }
@@ -66,7 +66,7 @@ var FileNavigator = function (parent) {
     })
     
     server.fileManager.attach(this, UpdateFileEvent, function (evt, codeEditor) {
-        if (evt.dataMap["fileInfo"] != undefined) {
+        if (evt.dataMap.fileInfo !== undefined) {
             var fileId = evt.dataMap["fileInfo"].M_id
             codeEditor.saveBtn.element.title = ""
             codeEditor.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn"
@@ -82,7 +82,7 @@ var FileNavigator = function (parent) {
                 codeEditor.saveAllBtn.element.style.display = "none"
             }
 
-            if (Object.keys(codeEditor.toSaves).length == 0) {
+            if (Object.keys(codeEditor.toSaves).length === 0) {
                 codeEditor.saveBtn.element.style.display = "none"
                 codeEditor.saveBtn.element.title = ""
             }
@@ -91,7 +91,7 @@ var FileNavigator = function (parent) {
 
     // Attach the file close event.
     server.fileManager.attach(this, CloseEntityEvent, function (evt, fileNavigator) {
-        if (evt.dataMap["fileId"] != undefined) {
+        if (evt.dataMap.fileId !== undefined) {
             // Remove the file.
             fileNavigator.removeFile(evt.dataMap["fileId"])
         }
@@ -99,10 +99,10 @@ var FileNavigator = function (parent) {
 
     // The change file event.
     server.fileManager.attach(this, ChangeFileEvent, function (evt, fileNavigator) {
-        if (evt.dataMap["fileId"] != undefined) {
+        if (evt.dataMap.fileId !== undefined) {
             // The file has already change.
             var fileId = evt.dataMap["fileId"]
-            if (fileNavigator.toSaves[fileId] != undefined) {
+            if (fileNavigator.toSaves[fileId] !== undefined) {
                 return
             }
 

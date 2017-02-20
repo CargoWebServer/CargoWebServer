@@ -96,13 +96,29 @@ DataExplorer.prototype.setDataSchema = function (storeId) {
 }
 
 /**
+ * Display the data schema of a given data store.
+ */
+DataExplorer.prototype.removeDataSchema = function (storeId) {
+
+    // here I will calculate the height...
+    for (var id in this.shemasView) {
+        this.shemasView[id].element.style.display = "none"
+        if (this.shemasView[id] == storeId) {
+            this.shemasView[storeId].element.parentNode.removeChild(this.shemasView[storeId].element)
+            delete this.shemasView[storeId]
+        }
+    }
+
+}
+
+/**
  * That view is use to display prototype structures
  */
 var PrototypeTreeView = function (parent, prototype) {
     this.parent = parent
     this.panel = new Element(parent, { "tag": "div", "class": "data_prototype_tree_view" })
     this.fieldsView = {}
-    
+
     // The type name without the schemas name.
     var typeName = prototype.TypeName.substring(prototype.TypeName.indexOf(".") + 1) //.split(".")[1]
 
@@ -120,21 +136,21 @@ var PrototypeTreeView = function (parent, prototype) {
     this.fieldsPanel = this.panel.appendElement({ "tag": "div", "class": "data_prototype_tree_view_fields" }).down()
 
     // The code for display field of a given type.
-    this.expandBtn.element.onclick = function(view){
-        return function(){
+    this.expandBtn.element.onclick = function (view) {
+        return function () {
             view.fieldsPanel.element.style.display = "table"
             this.style.display = "none"
             view.shrinkBtn.element.style.display = ""
         }
-    }(this)
+    } (this)
 
-    this.shrinkBtn.element.onclick = function(view){
-        return function(){
+    this.shrinkBtn.element.onclick = function (view) {
+        return function () {
             view.fieldsPanel.element.style.display = ""
             this.style.display = "none"
             view.expandBtn.element.style.display = ""
         }
-    }(this)
+    } (this)
 
     // Now the fields.
     for (var i = 0; i < prototype.Fields.length; i++) {
@@ -168,21 +184,21 @@ var PrototypeTreeViewField = function (parent, prototype, fieldName, fieldType, 
     this.panel = new Element(parent, { "tag": "div", "class": "data_prototype_tree_view_field" })
 
     var visibilityClass = ""
-    if(isVisible){
+    if (isVisible) {
         visibilityClass = "field_visibility visible"
     }
 
     var className = ""
-    if(isKey){
+    if (isKey) {
         className = "field_id"
-    }else if(isIndex){
+    } else if (isIndex) {
         className = "field_index"
     }
 
     // append the the field name.
-    this.panel.appendElement({ "tag": "i", "title":"visibility", "class": "fa fa-lightbulb-o " + visibilityClass }).appendElement({ "tag": "span", "innerHtml": fieldName, "class": className }).down()
+    this.panel.appendElement({ "tag": "i", "title": "visibility", "class": "fa fa-lightbulb-o " + visibilityClass }).appendElement({ "tag": "span", "innerHtml": fieldName, "class": className }).down()
 
     // Now the typename 
-    this.panel.appendElement({ "tag": "span", "innerHtml": fieldType}).down()
+    this.panel.appendElement({ "tag": "span", "innerHtml": fieldType }).down()
 
 }

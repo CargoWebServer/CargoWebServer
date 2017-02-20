@@ -138,18 +138,18 @@ function setValidator(msg, control, validator, delay) {
         this.style.border = ""
     });
 
-    var validationCall = function (validator, control, errorDiv) {
+    var validationCall = function (validator, control, errorDiv, msgDiv) {
         return function () {
             if (!display) {
                 return
             }
 
-            setTimeout(function (validator, errorDiv, control, delay) {
+            setTimeout(function (validator,msgDiv,errorDiv, control, delay) {
                 return function () {
-                    if (validator() == false) {
+                    if (validator(msgDiv) == false) {
                         // The validor widow...
                         errorDiv.element.style.display = "block"
-                        errorDiv.element.style.top = (-1 * (control.element.clientHeight + errorDiv.element.clientHeight)) + "px"
+                        errorDiv.element.style.top = (-1 * (control.element.clientHeight + errorDiv.element.clientHeight - 4)) + "px"
                         errorDiv.element.style.left = control.element.offsetLeft + "px"
 
                         // I will remove the red border if the user change the text..
@@ -167,16 +167,15 @@ function setValidator(msg, control, validator, delay) {
                                 errorDiv.element.style.top = "0px"
                                 errorDiv.element.style.left = "0px"
                                 control.element.value = ""
-                                control.element.focus()
                                 control.element.style.border = "1px solid red"
                                 display = false
                             }
                         } (errorDiv, control), delay)
                     }
                 }
-            } (validator, errorDiv, control, delay), 200); // 200 ms wait before validating...
+            } (validator,msgDiv, errorDiv, control, delay), 200); // 200 ms wait before validating...
         }
-    } (validator, control, errorDiv)
+    } (validator, control, errorDiv, msgDiv)
 
     control.element.addEventListener("blur", validationCall)
 
@@ -187,4 +186,6 @@ function setValidator(msg, control, validator, delay) {
     control.element.addEventListener("change", function () {
         display = true
     })
+
+    return this
 }

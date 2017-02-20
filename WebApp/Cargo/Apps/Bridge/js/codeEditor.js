@@ -4,7 +4,7 @@
  * TODO create the multiuser access for a single file.
  * Test...
  */
- 
+
 var CodeEditor = function (parent) {
 
     // The panel...
@@ -220,6 +220,8 @@ CodeEditor.prototype.setActiveFile = function (fileId) {
     for (var id in this.filesPanel) {
         this.filesPanel[id].element.style.display = "none"
     }
-    this.filesPanel[fileId].element.style.display = ""
+    if (this.filesPanel[fileId] !== undefined) {
+        this.filesPanel[fileId].element.style.display = ""
+    }
     this.activeFile = this.files[fileId]
 }

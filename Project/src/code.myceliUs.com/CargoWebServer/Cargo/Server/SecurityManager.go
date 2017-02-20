@@ -513,10 +513,10 @@ func (this *SecurityManager) appendPermission(accountId string, permissionType C
 /**
  * Create a new Role with a given id.
  */
-func (this *SecurityManager) CreateRole(id string, messageId string, sessionUuid string) interface{} {
+func (this *SecurityManager) CreateRole(id string, messageId string, sessionId string) interface{} {
 	role, errObj := this.createRole(id)
 	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionUuid, errObj)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
 	return role
@@ -525,10 +525,10 @@ func (this *SecurityManager) CreateRole(id string, messageId string, sessionUuid
 /**
  * Retreive a role with a given id.
  */
-func (this *SecurityManager) GetRole(id string, messageId string, sessionUuid string) interface{} {
+func (this *SecurityManager) GetRole(id string, messageId string, sessionId string) interface{} {
 	role, errObj := this.getRole(id)
 	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionUuid, errObj)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
 	return role
@@ -537,36 +537,60 @@ func (this *SecurityManager) GetRole(id string, messageId string, sessionUuid st
 /**
  * Delete a role with a given id.
  */
-func (this *SecurityManager) DeleteRole(id string, messageId string, sessionUuid string) {
+func (this *SecurityManager) DeleteRole(id string, messageId string, sessionId string) {
 	errObj := this.deleteRole(id)
 	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionUuid, errObj)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}
 }
 
 /**
  * Return true if a role has an account.
  */
-func (this *SecurityManager) HasAccount(roleId string, accountId string, messageId string, sessionUuid string) bool {
+func (this *SecurityManager) HasAccount(roleId string, accountId string, messageId string, sessionId string) bool {
 	return this.hasAccount(roleId, accountId)
 }
 
 /**
  * Append a new account to a given role. Do nothing if the account is already in the role
  */
-func (this *SecurityManager) AppendAccount(roleId string, accountId string, messageId string, sessionUuid string) {
+func (this *SecurityManager) AppendAccount(roleId string, accountId string, messageId string, sessionId string) {
 	errObj := this.appendAccount(roleId, accountId)
 	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionUuid, errObj)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}
 }
 
 /**
  * Remove an account from a given role.
  */
-func (this *SecurityManager) RemoveAccount(roleId string, accountId string, messageId string, sessionUuid string) {
+func (this *SecurityManager) RemoveAccount(roleId string, accountId string, messageId string, sessionId string) {
 	errObj := this.removeAccount(roleId, accountId)
 	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionUuid, errObj)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}
+}
+
+/**
+ * Change the admin password.
+ */
+func (this *SecurityManager) ChangeAdminPassword(pwd string, newPwd string, messageId string, sessionId string) {
+
+	adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", "admin")
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+
+	// If the actual password dosent match the password.
+	account := adminAccountEntity.GetObject().(*CargoEntities.Account)
+	if account.GetPassword() != pwd {
+		errObj = NewError(Utility.FileLine(), PERMISSION_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("Wrong password!"))
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+
+	// Now I will set the new password.
+	account.SetPassword(newPwd)
+
+	// I will save the entity.
+	adminAccountEntity.SaveEntity()
 }

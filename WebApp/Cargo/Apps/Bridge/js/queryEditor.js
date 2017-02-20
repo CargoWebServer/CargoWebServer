@@ -38,8 +38,8 @@ var QueryEditor = function (parent, file, initCallback) {
     // Init the splitter action.
     initSplitter(queryEditorSplitor, this.editQueryPanel)
 
-    var filePanel = this.editQueryPanel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
-    var editor = ace.edit(file.M_id + "_editor");
+    var filePanel = this.editQueryPanel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_query_editor", "innerHtml": decode64(file.M_data) }).down()
+    var editor = ace.edit(file.M_id + "_query_editor");
 
     // In case of sql query..
     if (this.isSql) {

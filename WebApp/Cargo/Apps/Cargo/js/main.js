@@ -71,7 +71,7 @@ function load() {
             server.dataManager.RegisterListener()
             server.emailManager.RegisterListener()
             server.projectManager.RegisterListener()
-            //server.securityManager.RegisterListener()
+            server.securityManager.RegisterListener()
 
         },  // onOpen callback
         function () { // onClose callback

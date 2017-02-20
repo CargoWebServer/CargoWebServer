@@ -36,12 +36,10 @@
 .diagramDiv{
     display:table; 
     width: 100%;
-    padding: 2px 2px 2px 10px;
 }
 
 .diagramLnk{
     width:100%; 
-    padding-left: 10px;
 }
 
 .diagramLnk:hover{

@@ -321,3 +321,43 @@ SecurityManager.prototype.removeAccount = function (roleId, accountId, successCa
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
 }
+
+/*
+ * Sever side code.
+ */
+function ChangeAdminPassword(pwd, newPwd) {
+    server.GetSecurityManager().ChangeAdminPassword(pwd, newPwd, messageId, sessionId)
+}
+
+/**
+ * Change the current password for the admin account.
+ * @param {string} pwd The current password
+ * @param {string} newPwd The new password
+ */
+SecurityManager.prototype.changeAdminPassword = function (pwd, newPwd, successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = []
+    params.push(createRpcData(pwd, "STRING", "pwd"))
+    params.push(createRpcData(newPwd, "STRING", "newPwd"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        ChangeAdminPassword.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            caller.successCallback(result, caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback.
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}

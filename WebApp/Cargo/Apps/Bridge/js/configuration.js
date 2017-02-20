@@ -61,8 +61,12 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
                 for (var i = 0; i < configurationPanel.contentViews.length; i++) {
                     if (configurationPanel.contentViews[i].entity.UUID == evt.dataMap["entity"].UUID) {
                         // append the the view to the content.
+                        var entity = configurationPanel.contentViews[i].entity
                         var view = configurationPanel.contentViews.splice(i, 1)[0]
                         view.panel.element.style.display = "none"
+                        if (entity.TYPENAME == "Config.DataStoreConfiguration") {
+                            homepage.dataExplorer.removeDataSchema(entity.M_id)
+                        }
                     }
                 }
 
@@ -192,6 +196,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                                             function () {
 
                                             }, this)
+
                                     }
                                 }
                             }
@@ -335,8 +340,111 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                     } (content, this.title))
                 contentView.deleteBtn.element.style.display = "none"
 
+                // If the content is server configuration I will also append the change admin password option.
+                if (content.TYPENAME == "Config.ServerConfiguration") {
+
+                    // That pannel will be use to change admin password.
+                    configurationContent.appendElement({ "tag": "div", "style": "display:table; border-top: 1px solid grey; padding: 5px 0px 5px 2px; width: 100%;" }).down()
+                        .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;", "innerHtml": "Change admin password" }).up()
+                        .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;" }).down()
+                        .appendElement({ "tag": "div", "id": "adminPasswordChange" }).down()
+                        .appendElement({ "tag": "div", "style": "display:table-row; width:100%;" }).down()
+                        .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+                        .appendElement({ "tag": "span", "innerHtml": "current password:" }).up()
+                        .appendElement({ "tag": "div", "style": "display: table-cell; position: relative;" }).down()
+                        .appendElement({ "tag": "input", "type": "password", "style": "width: 100%;", "id": "currentPwd" }).up().up()
+                        .appendElement({ "tag": "div", "style": "display:table-row; width:100%;" }).down()
+                        .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+                        .appendElement({ "tag": "span", "type": "password", "innerHtml": "new password:" }).up()
+                        .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+                        .appendElement({ "tag": "input", "type": "password", "style": "width: 100%;", "id": "newPwd" }).up().up()
+                        .appendElement({ "tag": "div", "style": "display:table-row; width:100%;" }).down()
+                        .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+                        .appendElement({ "tag": "span", "innerHtml": "confirm password:" }).up()
+                        .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+                        .appendElement({ "tag": "input", "type": "password", "style": "width: 100%;", "id": "confirmPwd" }).up().up().up().up()
+                        .appendElement({ "tag": "div", "style": "display:table; width: 100%;" }).down()
+                        .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;" }).down()
+                        .appendElement({ "tag": "div", "style": "display: table-cell; width:100%;" })
+                        .appendElement({ "tag": "div", "id": "changeAdminPwdBtn", "style": "display: table-cell; with: 50px", "innerHtml": "ok" })
+
+                    var currentPwd = configurationContent.getChildById("currentPwd")
+                    var newPwd = configurationContent.getChildById("newPwd")
+                    var confirmPwd = configurationContent.getChildById("confirmPwd")
+                    var changeAdminPwdBtn = configurationContent.getChildById("changeAdminPwdBtn")
+
+                    // Validation here.
+
+                    // So here I will use a decorator to display message to the input...
+                    // The first parameter is the message to use by default...
+                    setValidator("", currentPwd, function (currentPwd) {
+                        return function (msgDiv) {
+                            if (currentPwd.element.value.length == 0) {
+                                msgDiv.element.innerHTML = "The password must contain a value!"
+                                currentPwd.element.focus()
+                                return false
+                            }
+                        }
+                    } (currentPwd), 3000)
+
+                    setValidator("", newPwd, function (newPwd) {
+                        return function (msgDiv) {
+                            if (currentPwd.element.value.length == 0) {
+                                msgDiv.element.innerHTML = "The password must contain a value!"
+                                newPwd.element.focus()
+                                return false
+                            }
+                        }
+                    } (newPwd), 3000)
+
+                    setValidator("", confirmPwd, function (newPwd) {
+                        return function (msgDiv) {
+                            if (confirmPwd.element.value.length == 0) {
+                                msgDiv.element.innerHTML = "The password must contain a value!"
+                                confirmPwd.element.focus()
+                                return false
+                            }
+                        }
+                    } (confirmPwd), 3000)
+
+                    setValidator("", confirmPwd, function (newPwd, confirmPwd) {
+                        return function (msgDiv) {
+                            if (confirmPwd.element.value != newPwd.element.value) {
+                                msgDiv.element.innerHTML = "The tow values enter for password does not match!"
+                                newPwd.element.focus()
+                                newPwd.element.style.border = "1px solid red"
+                                newPwd.element.value = ""
+                                confirmPwd.element.value = ""
+                                newPwd.element.onkeydown = function (newPwd, confirmPwd) {
+                                    return function () {
+                                        newPwd.element.style.border = ""
+                                        confirmPwd.element.style.border = ""
+                                    }
+                                } (newPwd, confirmPwd)
+                                return false
+                            }
+                        }
+                    } (newPwd, confirmPwd), 3000)
+
+                    changeAdminPwdBtn.element.onclick = function (currentPwd, newPwd, confirmPwd) {
+                        return function () {
+                            if (confirmPwd.element.value == newPwd.element.value) {
+                                // Now I will set the new admin password.
+                                server.securityManager.changeAdminPassword(currentPwd.element.value, newPwd.element.value,
+                                    // success callback
+                                    function (results, caller) {
+
+                                    },
+                                    // error callback
+                                    function (errMsg, caller) {
+
+                                    }, {})
+                            }
+                        }
+                    } (currentPwd, newPwd, confirmPwd)
+                }
+
             }
         }
-
     }
 }
