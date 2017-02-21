@@ -95,6 +95,14 @@ DataExplorer.prototype.setDataSchema = function (storeId) {
     }
 }
 
+DataExplorer.prototype.hidePanels = function (storeId) {
+
+    // here I will calculate the height...
+    for (var id in this.shemasView) {
+        this.shemasView[id].element.style.display = "none"
+    }
+}
+
 /**
  * Display the data schema of a given data store.
  */

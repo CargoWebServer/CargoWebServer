@@ -385,6 +385,90 @@ DataManager.prototype.ping = function (connectionId, successCallback, errorCallb
     )
 }
 
+/*
+ * Server side code.
+ */
+function Connect_(connectionId) {
+    // No value are return.
+    server.GetDataManager().Connect(connectionId, messageId, sessionId)
+}
+
+/**
+ * Open a new connection with the datastore.
+ * @param {string} connectionId The data server connection (configuration) id
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+DataManager.prototype.connect = function (connectionId, successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = []
+    params.push(createRpcData(connectionId, "STRING", "connectionId"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        Connect_.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            caller.successCallback(result, caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback.
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Server side code.
+ */
+function Close_(connectionId) {
+    // No value are return.
+    server.GetDataManager().Close(connectionId, messageId, sessionId)
+}
+
+/**
+ * Close the connection to the datastore with a given id.
+ * @param {string} connectionId The data server connection (configuration) id
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+DataManager.prototype.close = function (connectionId, successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = []
+    params.push(createRpcData(connectionId, "STRING", "connectionId"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        Close_.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            caller.successCallback(result, caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback.
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
 /**
  * Create a new datastore from a given file.
  */

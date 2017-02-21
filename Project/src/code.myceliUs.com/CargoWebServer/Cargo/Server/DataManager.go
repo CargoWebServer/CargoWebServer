@@ -117,11 +117,7 @@ func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfigur
 func (this *DataManager) getDataStore(name string) DataStore {
 	this.Lock()
 	defer this.Unlock()
-
 	store := this.m_dataStores[name]
-	if store == nil {
-		log.Println("Store with name ", name, " is not configure!!!")
-	}
 	return store
 }
 
@@ -208,13 +204,19 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ALREADY_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The storeId '"+storeId+"' already exists."))
 		return nil, cargoError
 	}
+	var storeConfig *Config.DataStoreConfiguration
+	storeConfigEntity, err_ := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", storeId)
 
 	// Create the new store here.
-	storeConfig := new(Config.DataStoreConfiguration)
-	storeConfig.M_id = storeId
-	storeConfig.M_dataStoreVendor = storeVendor
-	storeConfig.M_dataStoreType = storeType
-	storeConfig.NeedSave = true
+	if err_ != nil {
+		storeConfig = new(Config.DataStoreConfiguration)
+		storeConfig.M_id = storeId
+		storeConfig.M_dataStoreVendor = storeVendor
+		storeConfig.M_dataStoreType = storeType
+		storeConfig.NeedSave = true
+	} else {
+		storeConfig = storeConfigEntity.GetObject().(*Config.DataStoreConfiguration)
+	}
 
 	// Create the store here.
 	store, err := NewDataStore(storeConfig)
@@ -225,6 +227,7 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 		GetServer().GetConfigurationManager().m_configurationEntity.SaveEntity()
 		this.Lock()
 		this.m_dataStores[storeId] = store
+		log.Println("----------> ", storeId, this.m_dataStores[storeId])
 		this.Unlock()
 	} else {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Failed to create dataStore with id '"+storeId+"' and with error '"+err.Error()+"'."))
@@ -302,6 +305,38 @@ func (this *DataManager) Ping(storeName string, messageId string, sessionId stri
 
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Fail to ping the data store "+err.Error()+"'."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+}
+
+func (this *DataManager) Connect(storeName string, messageId string, sessionId string) {
+	store := this.getDataStore(storeName)
+	if store == nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("The datastore '"+storeName+"' does not exist."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+	err := store.Connect()
+
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Fail to open the data store connection "+err.Error()+"'."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+}
+
+func (this *DataManager) Close(storeName string, messageId string, sessionId string) {
+	store := this.getDataStore(storeName)
+	if store == nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("The datastore '"+storeName+"' does not exist."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+	err := store.Close()
+
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Fail to close the data store connection "+err.Error()+"'."))
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return
 	}
@@ -438,6 +473,7 @@ func (this *DataManager) ImportXmlData(content string, messageId string, session
  * of he's information.
  */
 func NewDataStore(info *Config.DataStoreConfiguration) (DataStore, error) {
+	log.Println("-------> info: ", info)
 	var err error
 	if info.M_dataStoreType == Config.DataStoreType_SQL_STORE {
 		dataStore, err := NewSqlDataStore(info)

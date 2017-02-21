@@ -113,6 +113,9 @@ var EntityPanel = function (parent, typeName, initCallback, parentEntityPanel, r
 	// the delete callback will be call after success
 	this.deleteCallback = null
 
+	// Keep track of the init callback.
+	this.initCallback = initCallback
+
 	// Finish the intialysation...
 	this.init(server.entityManager.entityPrototypes[typeName], initCallback)
 
@@ -151,7 +154,6 @@ EntityPanel.prototype.init = function (proto, initCallback) {
 	// Call after the initialisation....
 	if (initCallback != undefined) {
 		initCallback(this)
-		initCallback = null
 	}
 }
 
@@ -298,6 +300,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 			newInput.element.style.display = "none"
 		}
 	}
+	this.saveBtn.element.id = entity.UUID + "_save_btn"
 	this.saveBtn.element.style.display = ""
 	this.deleteBtn.element.style.display = "table-cell"
 }
@@ -309,6 +312,9 @@ EntityPanel.prototype.clear = function () {
 	this.panel.innerHtml = ""
 	this.entity = null
 	this.init(this.proto)
+	if(this.initCallback != undefined){
+		this.initCallback(this)
+	}
 	this.maximizeBtn.element.click()
 	this.saveBtn.element.style.display = ""
 	this.deleteBtn.element.style.display = "none"
@@ -360,17 +366,20 @@ EntityPanel.prototype.initHeader = function () {
 	this.saveBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled" }).down()
 	this.saveBtn.appendElement({ "tag": "i", "class": "fa fa-save" })
 
-	this.saveBtn.element.onclick = function (entityPanel) {
+	this.saveBtn.element.addEventListener("click", function (entityPanel) {
 		return function () {
 			this.style.display = "none"
 			// Here I will save the entity...
 			entityPanel.entity.NeedSave = true
 			if (entityPanel.entity != null) {
+				entityPanel.saveBtn.element.id = entityPanel.entity.UUID + "_save_btn"
 				if (entityPanel.entity.exist == false) {
 					server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.parentLnk, entityPanel.entity.TYPENAME, entityPanel.entity.UUID, entityPanel.entity,
 						// Success callback
 						function (entity, entityPanel) {
-							//entityPanel.setEntity(entity)
+							if (entityPanel.saveCallback != undefined) {
+								entityPanel.saveCallback(entity)
+							}
 						},
 						// Error callback.
 						function (result, caller) {
@@ -380,7 +389,9 @@ EntityPanel.prototype.initHeader = function () {
 					server.entityManager.saveEntity(entityPanel.entity,
 						// Success callback
 						function (entity, entityPanel) {
-
+							if (entityPanel.saveCallback != undefined) {
+								entityPanel.saveCallback(entity)
+							}
 						},
 						// Error callback.
 						function () {
@@ -390,7 +401,7 @@ EntityPanel.prototype.initHeader = function () {
 
 			}
 		}
-	} (this)
+	} (this))
 
 	// The remove button.
 	this.deleteBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: none;" }).down()
@@ -558,7 +569,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 	// The entity div.
 	var entityDiv = parent.appendElement({ "tag": "div", "class": "entity" }).down()
 	var id = this.proto.TypeName + "_" + field
-	
+
 
 	// In case of a generic value....
 	if (fieldType == "xs.[]uint8") {
@@ -1152,7 +1163,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 
 			// Here I will remove the default control and replace it by a div where the reference will be placed.
 			control.element.parentNode.removeChild(control.element)
-			control = control.parentElement.appendElement({"tag":"div"}).down()
+			control = control.parentElement.appendElement({ "tag": "div" }).down()
 		}
 	}
 

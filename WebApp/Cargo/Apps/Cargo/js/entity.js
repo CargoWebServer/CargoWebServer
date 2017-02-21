@@ -1115,6 +1115,7 @@ function removeObjectValue(object, field, value) {
         var fieldType = prototype.FieldsType[index]
         var isArray = fieldType.startsWith("[]")
         var isRef = fieldType.endsWith(":Ref")
+
         if (isArray) {
             // Here the entity is an array.
             for (var i = 0; i < object[field].length; i++) {
@@ -1677,7 +1678,9 @@ EntityPrototype.prototype.generateConstructor = function () {
                 constructorSrc += " = new Date()\n"
             } else if (this.FieldsType[i] == "xs.boolean") {
                 constructorSrc += " = false\n"
-            } else {
+            } else if (this.FieldsType[i].startsWith("enum:")){
+                constructorSrc += " = 1\n"
+            }  else {
                 // Object here.
                 constructorSrc += " = undefined\n"
             }

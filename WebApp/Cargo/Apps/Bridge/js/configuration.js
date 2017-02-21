@@ -67,6 +67,8 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
                         if (entity.TYPENAME == "Config.DataStoreConfiguration") {
                             homepage.dataExplorer.removeDataSchema(entity.M_id)
                         }
+
+
                     }
                 }
 
@@ -82,47 +84,21 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
     server.entityManager.attach(this, NewEntityEvent, function (evt, configurationPanel) {
         if (evt.dataMap["entity"] != undefined) {
             if (evt.dataMap["entity"].TYPENAME == configurationPanel.typeName) {
+                // Hide the currently displayed view.
+                for (var i = 0; i < configurationPanel.contentViews.length; i++) {
+                    configurationPanel.contentViews[i].panel.element.style.display = "none"
+                }
+                homepage.dataExplorer.hidePanels()
+
                 var entity = server.entityManager.entities[evt.dataMap["entity"].UUID]
                 var configurationContent = configurationPanel.panel.getChildById("configurationContent")
-                var contentView = new EntityPanel(configurationContent, entity.TYPENAME,
-                    function (entity, configurationPanel) {
-                        return function (contentView) {
-                            // Always set the value after the panel was initialysed.
-                            contentView.setEntity(entity)
-                            contentView.setTitle(configurationPanel.title)
-                            contentView.deleteCallback = function (entity) {
-                                // Here I will remove the folder if the entity is 
-                                // a database...
-                                if (entity.TYPENAME == "Config.DataStoreConfiguration") {
-                                    // also remove the data store.
-                                    server.dataManager.deleteDataStore(entity.M_id)
-                                }
-                            }
 
-                            configurationPanel.contentViews.push(contentView)
+                // Set the new configuration.
+                var contentView = configurationPanel.setConfiguration(configurationContent, entity)
+                var idField = contentView.getFieldControl("M_id")
 
-                            for (var i = 0; i < configurationPanel.contentViews.length; i++) {
-                                configurationPanel.contentViews[i].panel.element.style.display = "none"
-                            }
-
-                            configurationPanel.currentIndex = configurationPanel.contentViews.length - 1
-                            contentView.panel.element.style.display = ""
-
-                            configurationPanel.nextConfigBtn.element.className = "entities_header_btn"
-                            configurationPanel.nextConfigBtn.element.style.color = "lightgrey"
-
-                            if (configurationPanel.currentIndex == 1) {
-                                configurationPanel.previousConfigBtn.element.className = "entities_header_btn"
-                                configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
-                            } else {
-                                configurationPanel.previousConfigBtn.element.className = "entities_header_btn enabled"
-                                configurationPanel.previousConfigBtn.element.style.color = ""
-                            }
-
-                            var idField = contentView.getFieldControl("M_id")
-                            idField.element.focus()
-                        }
-                    } (entity, configurationPanel))
+                // Set focus to the id field.
+                idField.element.focus()
             }
         }
     })
@@ -130,219 +106,104 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
     return this
 }
 
-ConfigurationPanel.prototype.setConfigurations = function (configurations) {
+/**
+ * Append a new configuration to the configuration panel.
+ */
+ConfigurationPanel.prototype.setConfiguration = function (configurationContent, content) {
+    var contentView = new EntityPanel(configurationContent, content.TYPENAME,
+        function (content, title) {
+            return function (contentView) {
+                // Always set the value after the panel was initialysed.
+                contentView.setEntity(content)
+                contentView.setTitle(title)
+                contentView.hideNavigationButtons()
 
-    // So here I will create the configuration selector...
-    this.header = this.panel.appendElement({ "tag": "div", "style": "display: table; margin-top: 2px; margin-bottom: 4px; width: 100%;" }).down()
-    this.configurationSelect = this.header.appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;", "innerHtml": "Configurations" })
-        .appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;" }).down()
-        .appendElement({ "tag": "select", "style": "margin-left: 5px;" }).down()
-
-    for (var i = 0; i < configurations.length; i++) {
-        var configuration = configurations[i]
-        this.configurationSelect.appendElement({ "tag": "option", "value": configuration.M_id, "innerHtml": configuration.M_name })
-
-        var configurationContent = this.panel.appendElement({ "tag": "div", "id": "configurationContent", "style": "display: table;" }).down()
-        var content = configuration["M_" + this.propertyName]
-        var prototype = server.entityManager.entityPrototypes[configuration.TYPENAME]
-        var fieldType = prototype.FieldsType[prototype.getFieldIndex("M_" + this.propertyName)]
-
-        // In case of multiple configurations element..
-        if (fieldType.startsWith("[]")) {
-
-            // Set an empty array if none exist.
-            if (content == undefined) {
-                content = []
-            }
-            // The new configuration button.
-            this.header.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" })
-
-            this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;color: #657383;" }).down()
-            this.newConfigElementBtn.appendElement({ "tag": "i", "class": "fa fa-plus", "style": "" })
-
-            // I will append the navigation button i that case...
-            this.previousConfigBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell; color:lightgrey;" }).down()
-            this.previousConfigBtn.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-left" })
-
-            this.nextConfigBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell; color:lightgrey;" }).down()
-            this.nextConfigBtn.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-right" })
-
-            if (content.length > 1) {
-                this.nextConfigBtn.element.className += " enabled"
-                this.nextConfigBtn.element.style.color = "#657383"
-            }
-
-            // Here the configuration panel contain more than one panel...
-            for (var j = 0; j < content.length; j++) {
-                if (content[j] != undefined) {
-                    var contentView = new EntityPanel(configurationContent, content[j].TYPENAME,
-                        function (content, title) {
-                            return function (contentView) {
-                                // Always set the value after the panel was initialysed.
-                                contentView.setEntity(content)
-                                contentView.setTitle(title)
-                                contentView.hideNavigationButtons()
-                                contentView.deleteCallback = function (entity) {
-                                    // Here I will remove the folder if the entity is 
-                                    // a database...
-                                    if (entity.TYPENAME == "Config.DataStoreConfiguration") {
-                                        // also remove the data store.
-                                        server.dataManager.deleteDataStore(entity.M_id,
-                                            // success callback
-                                            function () {
-
-                                            },
-                                            // error callback.
-                                            function () {
-
-                                            }, this)
-
-                                    }
-                                }
-                            }
-                        } (content[j], this.title))
-                    if (content[j].TYPENAME == "Config.DataStoreConfiguration") {
-                        // So here I will set the schema view for the releated store.
-                        homepage.dataExplorer.initDataSchema(content[j])
+                contentView.saveCallback = function (entity) {
+                    // So here I will create the new dataStore.
+                    if (entity.TYPENAME == "Config.DataStoreConfiguration") {
+                        server.dataManager.createDataStore(entity.M_id, entity.M_dataStoreType, entity.M_dataStoreVendor,
+                            // Success callback
+                            function (success, caller) {
+                            },
+                            // Error callback
+                            function (errObj, caller) {
+                            }, {})
                     }
+                }
+
+                contentView.deleteCallback = function (entity) {
+                    // Here I will remove the folder if the entity is 
+                    // a database...
+                    if (entity.TYPENAME == "Config.DataStoreConfiguration") {
+                        // also remove the data store.
+                        server.dataManager.deleteDataStore(entity.M_id,
+                            // success callback
+                            function () {
+
+                            },
+                            // error callback.
+                            function () {
+
+                            }, this)
+
+                    }
+                }
+                if (content.TYPENAME == "Config.DataStoreConfiguration") {
+                    // So here I will set the schema view for the releated store.
+                    homepage.dataExplorer.initDataSchema(content)
+
                     // Here I will append the connection button...
                     contentView.connectBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell; color: lightgrey;" }).down()
                     contentView.connectBtn.appendElement({ "tag": "i", "class": "fa fa-plug" })
 
                     // Now If the connection is activated...
-                    contentView.connectBtn.element.onclick = function (contentView) {
+                    contentView.connectBtn.element.onclick = function (connectionId) {
                         return function () {
+
                             // Here I will try to open or close the connection...
-                            server.dataManager.ping(contentView.entity.M_id,
-                                function (result, caller) {
-                                    // Here the data store can be reach so I will try to connect.
+                            if (this.status == "connected") {
+                                server.dataManager.close(connectionId,
+                                    function (result, caller) {
+                                        // Here the data store can be reach so I will try to connect.
+                                        caller.style.color = "lightgrey"
+                                        caller.status = "disconnected"
+                                    },
+                                    function (errMsg, caller) {
+                                        // Fail to disconnect
 
-                                },
-                                function (errMsg, caller) {
-                                    // Here There is an error...
+                                    }, this)
+                            } else if (this.status == "disconnected") {
+                                server.dataManager.connect(connectionId,
+                                    function (result, caller) {
+                                        // Here the data store can be reach so I will try to connect.
+                                        caller.style.color = "#4CAF50"
+                                        caller.status = "connected"
+                                    },
+                                    function (errMsg, caller) {
+                                        // fail to connect...
+                                        caller.style.color = "#8B0000"
+                                        caller.status = "error"
+                                    }, this)
+                            }
 
-                                }, contentView)
                         }
-                    } (contentView)
+                    } (contentView.entity.M_id)
 
-                    if (j != 0) {
-                        contentView.panel.element.style.display = "none"
-                    }
-
-                    // keep the index.
-                    this.contentViews.push(contentView)
-                }
-            }
-
-            // The next configuration button.
-            this.nextConfigBtn.element.onclick = function (configurationPanel) {
-                return function () {
-                    // Here I will display the next element
-                    if (configurationPanel.currentIndex < configurationPanel.contentViews.length - 1) {
-                        for (var i = 0; i < configurationPanel.contentViews.length; i++) {
-                            configurationPanel.contentViews[i].panel.element.style.display = "none"
-                        }
-                        configurationPanel.currentIndex++
-                        configurationPanel.contentViews[configurationPanel.currentIndex].panel.element.style.display = ""
-
-                        if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
-                            homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
-                        }
-
-                        if (configurationPanel.currentIndex == configurationPanel.contentViews.length - 1) {
-                            configurationPanel.nextConfigBtn.element.className = "entities_header_btn"
-                            configurationPanel.nextConfigBtn.element.style.color = "lightgrey"
-                        } else {
-                            configurationPanel.nextConfigBtn.element.className = "entities_header_btn enabled"
-                            configurationPanel.nextConfigBtn.element.style.color = "#657383"
-                        }
-
-                        configurationPanel.previousConfigBtn.element.className = "entities_header_btn enabled"
-                        configurationPanel.previousConfigBtn.element.style.color = "#657383"
-                    }
-                    if (configurationPanel.contentViews.length <= 1) {
-                        // disable the next button
-                        configurationPanel.nextConfigBtn.element.className = "entities_header_btn"
-                        configurationPanel.nextConfigBtn.element.style.color = "lightgrey"
-                        // disable the previous button.
-                        configurationPanel.previousConfigBtn.element.className = "entities_header_btn"
-                        configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
-                    }
-
-                }
-            } (this)
-
-            // The previous configuration button.
-            this.previousConfigBtn.element.onclick = function (configurationPanel) {
-                return function () {
-                    if (configurationPanel.currentIndex > 0) {
-                        for (var i = 0; i < configurationPanel.contentViews.length; i++) {
-                            configurationPanel.contentViews[i].panel.element.style.display = "none"
-                        }
-                        configurationPanel.currentIndex--
-                        configurationPanel.contentViews[configurationPanel.currentIndex].panel.element.style.display = ""
-
-                        if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
-                            homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
-                        }
-
-                        if (configurationPanel.currentIndex == 0) {
-                            configurationPanel.previousConfigBtn.element.className = "entities_header_btn"
-                            configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
-                        } else {
-                            configurationPanel.previousConfigBtn.element.className = "entities_header_btn enabled"
-                            configurationPanel.previousConfigBtn.element.style.color = "#657383"
-                        }
-                        configurationPanel.nextConfigBtn.element.className = "entities_header_btn enabled"
-                        configurationPanel.nextConfigBtn.element.style.color = "#657383"
-                    }
-                    if (configurationPanel.contentViews.length <= 1) {
-                        // disable the next button
-                        configurationPanel.nextConfigBtn.element.className = "entities_header_btn"
-                        configurationPanel.nextConfigBtn.element.style.color = "lightgrey"
-                        // disable the previous button.
-                        configurationPanel.previousConfigBtn.element.className = "entities_header_btn"
-                        configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
-                    }
-                }
-            } (this)
-
-            // Now the append configuration button.
-            this.newConfigElementBtn.element.onclick = function (configurationPanel, configurationContent, configuration) {
-                return function () {
-                    // Here I will create a new entity...
-                    var entity = eval("new " + configurationPanel.typeName + "()")
-                    entity.UUID = configurationPanel.typeName + "%" + randomUUID()
-                    entity.M_id = "New " + configurationPanel.typeName.split(".")[1]
-
-                    server.entityManager.setEntity(entity)
-
-                    server.entityManager.createEntity(configuration.UUID, "M_" + configurationPanel.propertyName, configurationPanel.typeName, entity.M_id, entity,
+                    // Set the connection status
+                    server.dataManager.ping(contentView.entity.M_id,
                         function (result, caller) {
-                            /** The interface update is made by the new entity event handler... */
+                            // Here the data store can be reach so I will try to connect.
+                            caller.style.color = "#4CAF50"
+                            caller.status = "connected"
                         },
-                        function (errMsg) {
+                        function (errMsg, caller) {
+                            // Here There is an error...
+                            caller.style.color = "#8B0000"
+                            caller.status = "error"
+                        }, contentView.connectBtn.element)
 
-                        }, configurationPanel)
-                }
-            } (this, configurationContent, configuration)
-
-        } else {
-            if (content != undefined) {
-                var contentView = new EntityPanel(configurationContent, content.TYPENAME,
-                    function (content, title) {
-                        return function (contentView) {
-                            // Always set the value after the panel was initialysed.
-                            contentView.setEntity(content)
-                            contentView.setTitle(title)
-                            contentView.hideNavigationButtons()
-                        }
-                    } (content, this.title))
-                contentView.deleteBtn.element.style.display = "none"
-
-                // If the content is server configuration I will also append the change admin password option.
-                if (content.TYPENAME == "Config.ServerConfiguration") {
-
+                } else if (content.TYPENAME == "Config.ServerConfiguration") {
+                    // If the content is server configuration I will also append the change admin password option.
                     // That pannel will be use to change admin password.
                     configurationContent.appendElement({ "tag": "div", "style": "display:table; border-top: 1px solid grey; padding: 5px 0px 5px 2px; width: 100%;" }).down()
                         .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;", "innerHtml": "Change admin password" }).up()
@@ -444,6 +305,167 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                     } (currentPwd, newPwd, confirmPwd)
                 }
 
+            }
+
+        } (content, this.title))
+
+    // keep the index.
+    this.contentViews.push(contentView)
+    return contentView
+}
+
+/**
+ * Set the configuration panel itself.
+ */
+ConfigurationPanel.prototype.setConfigurations = function (configurations) {
+
+    // So here I will create the configuration selector...
+    this.header = this.panel.appendElement({ "tag": "div", "style": "display: table; margin-top: 2px; margin-bottom: 4px; width: 100%;" }).down()
+    this.configurationSelect = this.header.appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;", "innerHtml": "Configurations" })
+        .appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;" }).down()
+        .appendElement({ "tag": "select", "style": "margin-left: 5px;" }).down()
+
+    for (var i = 0; i < configurations.length; i++) {
+        var configuration = configurations[i]
+        this.configurationSelect.appendElement({ "tag": "option", "value": configuration.M_id, "innerHtml": configuration.M_name })
+
+        var configurationContent = this.panel.appendElement({ "tag": "div", "id": "configurationContent", "style": "display: table;" }).down()
+        var content = configuration["M_" + this.propertyName]
+        var prototype = server.entityManager.entityPrototypes[configuration.TYPENAME]
+        var fieldType = prototype.FieldsType[prototype.getFieldIndex("M_" + this.propertyName)]
+
+        // In case of multiple configurations element..
+        if (fieldType.startsWith("[]")) {
+
+            // Set an empty array if none exist.
+            if (content == undefined) {
+                content = []
+            }
+
+            // The new configuration button.
+            this.header.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" })
+
+            this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;color: #657383;" }).down()
+            this.newConfigElementBtn.appendElement({ "tag": "i", "class": "fa fa-plus", "style": "" })
+
+            // I will append the navigation button i that case...
+            this.previousConfigBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell; color:lightgrey;" }).down()
+            this.previousConfigBtn.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-left" })
+
+            this.nextConfigBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell; color:lightgrey;" }).down()
+            this.nextConfigBtn.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-right" })
+
+            if (content.length > 1) {
+                this.nextConfigBtn.element.className += " enabled"
+                this.nextConfigBtn.element.style.color = "#657383"
+            }
+
+            // Here the configuration panel contain more than one panel...
+            for (var j = 0; j < content.length; j++) {
+                if (content[j] != undefined) {
+                    this.setConfiguration(configurationContent, content[j])
+                    if (j != 0) {
+                        this.contentViews[j].panel.element.style.display = "none"
+                    }
+                }
+            }
+
+            // The next configuration button.
+            this.nextConfigBtn.element.onclick = function (configurationPanel) {
+                return function () {
+                    // Here I will display the next element
+                    if (configurationPanel.currentIndex < configurationPanel.contentViews.length - 1) {
+                        for (var i = 0; i < configurationPanel.contentViews.length; i++) {
+                            configurationPanel.contentViews[i].panel.element.style.display = "none"
+                        }
+                        configurationPanel.currentIndex++
+                        configurationPanel.contentViews[configurationPanel.currentIndex].panel.element.style.display = ""
+
+                        if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
+                            homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
+                        }
+
+                        if (configurationPanel.currentIndex == configurationPanel.contentViews.length - 1) {
+                            configurationPanel.nextConfigBtn.element.className = "entities_header_btn"
+                            configurationPanel.nextConfigBtn.element.style.color = "lightgrey"
+                        } else {
+                            configurationPanel.nextConfigBtn.element.className = "entities_header_btn enabled"
+                            configurationPanel.nextConfigBtn.element.style.color = "#657383"
+                        }
+
+                        configurationPanel.previousConfigBtn.element.className = "entities_header_btn enabled"
+                        configurationPanel.previousConfigBtn.element.style.color = "#657383"
+                    }
+                    if (configurationPanel.contentViews.length <= 1) {
+                        // disable the next button
+                        configurationPanel.nextConfigBtn.element.className = "entities_header_btn"
+                        configurationPanel.nextConfigBtn.element.style.color = "lightgrey"
+                        // disable the previous button.
+                        configurationPanel.previousConfigBtn.element.className = "entities_header_btn"
+                        configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
+                    }
+
+                }
+            } (this)
+
+            // The previous configuration button.
+            this.previousConfigBtn.element.onclick = function (configurationPanel) {
+                return function () {
+                    if (configurationPanel.currentIndex > 0) {
+                        for (var i = 0; i < configurationPanel.contentViews.length; i++) {
+                            configurationPanel.contentViews[i].panel.element.style.display = "none"
+                        }
+                        configurationPanel.currentIndex--
+                        configurationPanel.contentViews[configurationPanel.currentIndex].panel.element.style.display = ""
+
+                        if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
+                            homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
+                        }
+
+                        if (configurationPanel.currentIndex == 0) {
+                            configurationPanel.previousConfigBtn.element.className = "entities_header_btn"
+                            configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
+                        } else {
+                            configurationPanel.previousConfigBtn.element.className = "entities_header_btn enabled"
+                            configurationPanel.previousConfigBtn.element.style.color = "#657383"
+                        }
+                        configurationPanel.nextConfigBtn.element.className = "entities_header_btn enabled"
+                        configurationPanel.nextConfigBtn.element.style.color = "#657383"
+                    }
+                    if (configurationPanel.contentViews.length <= 1) {
+                        // disable the next button
+                        configurationPanel.nextConfigBtn.element.className = "entities_header_btn"
+                        configurationPanel.nextConfigBtn.element.style.color = "lightgrey"
+                        // disable the previous button.
+                        configurationPanel.previousConfigBtn.element.className = "entities_header_btn"
+                        configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
+                    }
+                }
+            } (this)
+
+            // Now the append configuration button.
+            this.newConfigElementBtn.element.onclick = function (configurationPanel, configurationContent, configuration) {
+                return function () {
+                    // Here I will create a new entity...
+                    var entity = eval("new " + configurationPanel.typeName + "()")
+                    entity.UUID = configurationPanel.typeName + "%" + randomUUID()
+                    entity.M_id = "New " + configurationPanel.typeName.split(".")[1]
+
+                    server.entityManager.setEntity(entity)
+
+                    server.entityManager.createEntity(configuration.UUID, "M_" + configurationPanel.propertyName, configurationPanel.typeName, entity.M_id, entity,
+                        function (result, caller) {
+                            /** The interface update is made by the new entity event handler... */
+                        },
+                        function (errMsg) {
+
+                        }, configurationPanel)
+                }
+            } (this, configurationContent, configuration)
+
+        } else {
+            if (content != undefined) {
+                this.setConfiguration(configurationContent, content)
             }
         }
     }
