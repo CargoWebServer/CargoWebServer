@@ -40,8 +40,8 @@ $("#frontEndNextTutorialLink").click(function () {
 	}, 500);
 });
 
-$("#DowloadBtnDiv").click(function () {
-	var lnk = this.children[1].childNodes[0]
+$("#dowloadBtn").click(function () {
+	var lnk = this
 	var OSName = "Unknown OS";
 	if (navigator.appVersion.indexOf("Win") != -1) OSName = "Windows";
 	else if (navigator.appVersion.indexOf("Mac") != -1) OSName = "MacOS";
@@ -56,6 +56,10 @@ $("#DowloadBtnDiv").click(function () {
 
 	lnk.click()
 });
+
+$('#getStarted-btn').click(function(){
+	$('#li-gettingStarted').click()
+})
 
 // main
 main()
