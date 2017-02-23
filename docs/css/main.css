@@ -20,8 +20,8 @@ h5{
 #cargo-intro-wheel{
 	max-height: 250px;
 	padding: 20px;
-	-moz-animation:50s rotateRight infinite linear; 
-	-webkit-animation:50s rotateRight infinite linear; 
+	-moz-animation:75s rotateRight infinite linear; 
+	-webkit-animation:75s rotateRight infinite linear; 
 }
 
 @-moz-keyframes rotateRight{
