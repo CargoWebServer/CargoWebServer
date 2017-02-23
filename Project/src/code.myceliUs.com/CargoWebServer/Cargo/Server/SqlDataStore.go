@@ -2,6 +2,7 @@ package Server
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"reflect"
 	"runtime"
@@ -229,6 +230,7 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 	rows, err := this.m_db.Query(query, params...)
 	if err != nil {
 		log.Println("---> sql read query error:", err)
+		log.Println("query: ", query)
 		return nil, err
 	}
 
@@ -339,6 +341,7 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 	err = rows.Err()
 	if err != nil {
 		log.Println("---> sql error:", err)
+		log.Println("quey: ", query)
 		return nil, err
 	}
 	return results, nil
@@ -395,6 +398,8 @@ func (this *SqlDataStore) Update(query string, fields []interface{}, params []in
 			id.Value = params[0].(float32)
 		} else if reflect.TypeOf(params[0]).String() == "float64" {
 			id.Value = params[0].(float64)
+		} else {
+			log.Println("----> unknow type: ", reflect.TypeOf(params[0]).String())
 		}
 
 		eventData[1] = id
@@ -456,6 +461,8 @@ func (this *SqlDataStore) Delete(query string, params []interface{}) (err error)
 				id.Value = params[i].(float32)
 			} else if reflect.TypeOf(params[i]).String() == "float64" {
 				id.Value = params[i].(float64)
+			} else {
+				log.Println("----> unknow type: ", reflect.TypeOf(params[i]).String())
 			}
 			eventData = append(eventData, id)
 		}
@@ -471,7 +478,232 @@ func (this *SqlDataStore) Delete(query string, params []interface{}) (err error)
  * Close the backend store.
  */
 func (this *SqlDataStore) Close() error {
-	// TODO Close all connection...
+	return this.m_db.Close()
+}
 
-	return nil
+/**
+ * Return the prototypes for all accessible table of a database.
+ */
+func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
+	var prototypes []*EntityPrototype
+	// Try to ping the sql server.
+	err := this.Ping()
+	if err != nil {
+		err = this.Connect()
+		if err != nil {
+			return prototypes, err
+		}
+	}
+
+	// So here I will get the list of table name that will be prototypes...
+	query := "SELECT sobjects.name "
+	query += "FROM sysobjects sobjects "
+	query += "WHERE sobjects.xtype = 'U'"
+
+	fieldsType := make([]interface{}, 1)
+	fieldsType[0] = "string"
+
+	var params []interface{}
+
+	// Read the
+	values, err := this.Read(query, fieldsType, params)
+	if err != nil {
+		return prototypes, err
+	}
+	for i := 0; i < len(values); i++ {
+		prototype, err := this.GetEntityPrototype(values[i][0].(string))
+		if err != nil {
+			return prototypes, err
+		}
+		prototypes = append(prototypes, prototype)
+	}
+
+	return prototypes, nil
+}
+
+/**
+ * Return the prototype of a given table.
+ */
+func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error) {
+
+	var prototype *EntityPrototype
+	err := this.Ping()
+	if err != nil {
+		err = this.Connect()
+		if err != nil {
+			return prototype, err
+		}
+	}
+
+	// Retreive the schema id.
+	var schemaId string
+	schemaId, err = this.getSchemaId(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// If the data store is not found.
+	store := GetServer().GetDataManager().m_dataStores["sql_info"]
+	if store == nil {
+		store, _ = GetServer().GetDataManager().createDataStore("sql_info", Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
+	} else {
+		prototype, err = store.GetEntityPrototype(schemaId + "." + id)
+		if err == nil {
+			return prototype, nil
+		}
+	}
+
+	// Initialyse the prototype.
+	prototype = NewEntityPrototype()
+	prototype.TypeName = schemaId + "." + id
+
+	// Now I will retreive the list of field of the table.
+	query := "SELECT "
+	query += "c.name 'Column Name',"
+	query += "t.Name 'Data type',"
+	query += "c.max_length 'Max Length',"
+	query += "c.precision ,"
+	query += "c.scale ,"
+	query += "c.is_nullable,"
+	query += "ISNULL(i.is_primary_key, 0) 'Primary Key' "
+	query += "FROM "
+	query += "sys.columns c "
+	query += "INNER JOIN "
+	query += "sys.types t ON c.user_type_id = t.user_type_id "
+	query += "LEFT OUTER JOIN "
+	query += "sys.index_columns ic ON ic.object_id = c.object_id AND ic.column_id = c.column_id "
+	query += "LEFT OUTER JOIN  "
+	query += "sys.indexes i ON ic.object_id = i.object_id AND ic.index_id = i.index_id "
+	query += "WHERE "
+	query += "c.object_id = OBJECT_ID('" + id + "')"
+
+	fieldsType := make([]interface{}, 7)
+	fieldsType[0] = "string"
+	fieldsType[1] = "string"
+	fieldsType[2] = "int"
+	fieldsType[3] = "int"
+	fieldsType[4] = "int"
+	fieldsType[5] = "bit"
+	fieldsType[6] = "bit"
+
+	var params []interface{}
+
+	// Read the
+	values, err := this.Read(query, fieldsType, params)
+	if err != nil {
+		return prototype, err
+	}
+
+	for i := 0; i < len(values); i++ {
+		fieldName := values[i][0].(string)
+		fieldName = strings.Replace(fieldName, "'", "''", -1)
+		fieldTypeName := values[i][1].(string)
+		fieldType, _ := this.getSqlTypePrototype(fieldTypeName)
+		// If the field can be null
+		isNilAble := values[i][5].(bool)
+		// if the field is a key
+		isId := values[i][6].(bool)
+		// So here I will create new field...
+		if fieldType != nil {
+			prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
+			refName, refType, err := this.getTypeNameRef(id, fieldName)
+			if err == nil {
+				// So here the attribute is a ref...
+				prototype.Fields = append(prototype.Fields, "M_"+refName)
+				prototype.FieldsType = append(prototype.FieldsType, refType)
+			} else {
+				prototype.Fields = append(prototype.Fields, "M_"+fieldName)
+				prototype.FieldsType = append(prototype.FieldsType, fieldType.TypeName)
+				if isId {
+					prototype.Ids = append(prototype.Ids, "M_"+fieldName)
+				}
+			}
+			if isNilAble {
+				prototype.FieldsNillable = append(prototype.FieldsNillable, true)
+			} else {
+				prototype.FieldsNillable = append(prototype.FieldsNillable, false)
+			}
+			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+
+		}
+	}
+
+	err = store.(*KeyValueDataStore).SetEntityPrototype(prototype)
+	if err == nil {
+		log.Println("---> create ", prototype.TypeName, " prototype.")
+	}
+	return prototype, err
+}
+
+func (this *SqlDataStore) getSchemaId(name string) (string, error) {
+	query := "SELECT SCHEMA_NAME(schema_id)"
+	query += "AS SchemaTable "
+	query += "FROM sys.tables "
+	query += "WHERE  sys.tables.name = '" + name + "'"
+
+	fieldsType := make([]interface{}, 1)
+	fieldsType[0] = "string"
+	var params []interface{}
+
+	// Read the
+	values, err := this.Read(query, fieldsType, params)
+	if err != nil {
+		return "", err
+	}
+	if len(values) > 0 {
+		return this.m_id + "." + values[0][0].(string), nil
+	}
+
+	return "", errors.New("No schema found for table " + name)
+
+}
+
+func (this *SqlDataStore) getTypeNameRef(tableName string, fieldName string) (string, string, error) {
+	fieldName = strings.Replace(fieldName, "'", "''", -1)
+
+	query := "SELECT "
+	query += "  OBJECT_NAME (f.referenced_object_id) AS ReferenceTableName, "
+	query += "  f.name AS ForeignKey "
+	query += "FROM "
+	query += "  sys.foreign_keys AS f "
+	query += "  INNER JOIN sys.foreign_key_columns AS fc ON f.OBJECT_ID = fc.constraint_object_id "
+	query += "  INNER JOIN sys.objects AS o ON o.OBJECT_ID = fc.referenced_object_id "
+	query += "WHERE "
+	query += "    OBJECT_NAME(f.parent_object_id) = '" + tableName + "' and COL_NAME(fc.parent_object_id,fc.parent_column_id) = '" + fieldName + "'"
+
+	fieldsType := make([]interface{}, 2)
+	fieldsType[0] = "string"
+	fieldsType[1] = "string"
+	var params []interface{}
+
+	// Read the
+	values, err := this.Read(query, fieldsType, params)
+	if err != nil {
+		return "", "", err
+	}
+
+	if len(values) > 0 {
+		if len(values[0]) == 2 {
+			refName := values[0][1].(string)
+			refTypeName := values[0][0].(string)
+
+			refSchema, err := this.getSchemaId(refTypeName)
+			if err != nil {
+				log.Println(query)
+				return "", "", err
+			}
+			return refName, refSchema + "." + refTypeName + ":Ref", nil
+		}
+	}
+
+	return "", "", errors.New("No reference found for attribute " + tableName + "." + fieldName)
+}
+
+/**
+ * Get the mapping of a given sql type.
+ */
+func (this *SqlDataStore) getSqlTypePrototype(typeName string) (*EntityPrototype, error) {
+	prototype, err := GetServer().GetEntityManager().getEntityPrototype("sqltypes."+typeName, "sqltypes")
+	return prototype, err
 }

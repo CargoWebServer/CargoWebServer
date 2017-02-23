@@ -32,7 +32,7 @@ DataExplorer.prototype.resize = function () {
 /**
  * Display the data schema of a given data store.
  */
-DataExplorer.prototype.initDataSchema = function (storeConfig) {
+DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
     // init one time.
     if (this.configs[storeConfig.M_id] != undefined) {
         return
@@ -49,19 +49,38 @@ DataExplorer.prototype.initDataSchema = function (storeConfig) {
     // So here I will get the list of all prototype from a give store and
     // create it's relavite information.
     if (storeConfig.M_dataStoreType == 1) {
-        // Sql data store.
-    } else if (storeConfig.M_dataStoreType == 2) {
-        // Entity data store.
-        server.entityManager.getEntityPrototypes(storeConfig.M_id,
+        // Sql data store,
+        // prototype for sql dataStore are in the 
+        server.entityManager.getEntityPrototypes("sql_info." + storeConfig.M_id,
             // success callback.
             function (results, caller) {
-                caller.dataExplorer.generatePrototypesView(caller.storeId, results)
+                for (var i = 0; i < results.length; i++) {
+                    caller.dataExplorer.generatePrototypesView(caller.storeId, results)
+                }
+                if(caller.initCallback != undefined){
+                    caller.initCallback()
+                }
             },
             // error callback.
             function (errMsg, caller) {
 
             },
-            { "dataExplorer": this, "storeId": storeConfig.M_id })
+            { "dataExplorer": this, "storeId": storeConfig.M_id, "initCallback":initCallback })
+
+    } else if (storeConfig.M_dataStoreType == 2) {
+        // Entity data store.
+        if (storeConfig.M_id != "sql_info") {
+            server.entityManager.getEntityPrototypes(storeConfig.M_id,
+                // success callback.
+                function (results, caller) {
+                    caller.dataExplorer.generatePrototypesView(caller.storeId, results)
+                },
+                // error callback.
+                function (errMsg, caller) {
+
+                },
+                { "dataExplorer": this, "storeId": storeConfig.M_id })
+        }
     }
 }
 
@@ -95,11 +114,38 @@ DataExplorer.prototype.setDataSchema = function (storeId) {
     }
 }
 
+/**
+ * Hide all schema panels
+ */
 DataExplorer.prototype.hidePanels = function (storeId) {
 
     // here I will calculate the height...
     for (var id in this.shemasView) {
         this.shemasView[id].element.style.display = "none"
+    }
+}
+
+/**
+ * Hide a given store panel
+ */
+DataExplorer.prototype.hidePanel = function (storeId) {
+    // here I will calculate the height...
+    this.shemasView[storeId].element.style.display = "none"
+}
+
+/**
+ * Show a given data panel.
+ */
+DataExplorer.prototype.showPanel = function (storeId) {
+    if(this.shemasView[storeId]!= undefined){
+        this.shemasView[storeId].element.style.display = ""
+    }else{
+        // I will get the list of prototypes and 
+       this.initDataSchema(storeId, function(dataExplorer, storeId){
+           return function(){
+               dataExplorer.setDataSchema(storeId)
+           }
+       }(this, storeId))
     }
 }
 

@@ -7,13 +7,36 @@
 
 /** Toolbar **/
 .toolbar{
+    display: table;
+}
+
+.toolbar select{
+    color: #657383;
     display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    border: 1px solid transparent;
+    height: 30px;
+}
+
+.toolbar select:hover{
+    border: 1px solid lightgrey;
 }
 
 /** Toolbar button **/
-.toolbar div{
-    color: lightgray;
-    display: table-cell;
-    height: 30px;
+.toolbarButton{
     width: 30px;
+    height: 30px;
+    display: table-cell;
+    border: 1px solid transparent;
+    vertical-align: middle;
+    text-align: center;
+    color: lightgrey;
+    font-size: 12pt;
+}
+
+.toolbarButton:hover{
+    border: 1px solid lightgrey;
+    cursor: pointer;
+    color: #428bca;;
 }

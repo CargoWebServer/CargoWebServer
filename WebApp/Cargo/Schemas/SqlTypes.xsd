@@ -1,0 +1,204 @@
+<xsd:schema id="SqlTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.microsoft.com/sqlserver/2004/sqltypes" attributeFormDefault="qualified" xmlns:sqltypes="http://schemas.microsoft.com/sqlserver/2004/sqltypes" version="1.2">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">&#xd;&#xa;XML Schema describing the base types to which SQL Server types are being mapped. For more information, please consult the documentation.&#xd;&#xa;&#xd;&#xa;(c) 2008, Microsoft Corporation&#xd;&#xa;&#xd;&#xa;The following schema for Microsoft SQL Server is presented in XML format and is for informational purposes only. Microsoft Corporation ("Microsoft") may have trademarks, copyrights, or other intellectual property rights covering subject matter in the schema.&#xd;&#xa;&#xd;&#xa;Microsoft does not make any representation or warranty regarding the schema or any product or item developed based on the schema. The schema is provided to you on an AS IS basis.  Microsoft disclaims all express, implied and statutory warranties, including but not limited to the implied warranties of merchantability, fitness for a particular purpose, and freedom from infringement. Without limiting the generality of the foregoing, Microsoft does not make any warranty of any kind that any item developed based on the schema, or any portion of the schema, will not infringe any copyright, patent, trade secret, or other intellectual property right of any person or entity in any country. It is your responsibility to seek licenses for such intellectual property rights where appropriate.&#xd;&#xa;&#xd;&#xa;MICROSOFT SHALL NOT BE LIABLE FOR ANY DAMAGES OF ANY KIND ARISING OUT OF OR IN CONNECTION WITH THE USE OF THE SCHEMA, INCLUDING WITHOUT LIMITATION, ANY DIRECT, INDIRECT, INCIDENTAL, CONSEQUENTIAL (INCLUDING ANY LOST PROFITS), PUNITIVE OR SPECIAL DAMAGES, WHETHER OR NOT MICROSOFT HAS BEEN ADVISED OF SUCH DAMAGES.&#xd;&#xa;</xsd:documentation>
+  </xsd:annotation>
+  <!-- Global types and attributes that can be used for schema annotations. -->
+  <xsd:simpleType name="sqlDbTypeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="BigInt" />
+      <xsd:enumeration value="Binary" />
+      <xsd:enumeration value="Bit" />
+      <xsd:enumeration value="Char" />
+      <xsd:enumeration value="Date" />
+      <xsd:enumeration value="DateTime" />
+      <xsd:enumeration value="DateTimeOffset" />
+      <xsd:enumeration value="DateTime2" />
+      <xsd:enumeration value="Decimal" />
+      <xsd:enumeration value="Float" />
+      <xsd:enumeration value="Image" />
+      <xsd:enumeration value="Int" />
+      <xsd:enumeration value="Money" />
+      <xsd:enumeration value="NChar" />
+      <xsd:enumeration value="NText" />
+      <!-- The sqlDbTypeEnum aligns with the .Net System.Data.SqlDbType enum and does not provide an entry for Numeric (which is mapped to Decimal). -->
+      <xsd:enumeration value="NVarChar" />
+      <xsd:enumeration value="Real" />
+      <xsd:enumeration value="SmallDateTime" />
+      <xsd:enumeration value="SmallInt" />
+      <xsd:enumeration value="SmallMoney" />
+      <xsd:enumeration value="Structured" />
+      <xsd:enumeration value="Text" />
+      <xsd:enumeration value="Time" />
+      <xsd:enumeration value="Timestamp" />
+      <xsd:enumeration value="TinyInt" />
+      <xsd:enumeration value="Udt" />
+      <xsd:enumeration value="UniqueIdentifier" />
+      <xsd:enumeration value="VarBinary" />
+      <xsd:enumeration value="VarChar" />
+      <xsd:enumeration value="Variant" />
+      <xsd:enumeration value="Xml" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="sqlCompareOptionsEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Default" />
+      <xsd:enumeration value="None" />
+      <xsd:enumeration value="IgnoreCase" />
+      <xsd:enumeration value="IgnoreNonSpace" />
+      <xsd:enumeration value="IgnoreKanaType" />
+      <xsd:enumeration value="IgnoreWidth" />
+      <xsd:enumeration value="BinarySort" />
+      <xsd:enumeration value="BinarySort2" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="sqlCompareOptionsList">
+    <xsd:list itemType="sqltypes:sqlCompareOptionsEnum" />
+  </xsd:simpleType>
+  <xsd:attribute default="NVarChar" name="sqlDbType" type="sqltypes:sqlDbTypeEnum"/>
+  <xsd:attribute name="clrTypeName" type="xsd:string"/>
+  <xsd:attribute default="1" name="maxLength" type="xsd:long"/>
+  <xsd:attribute default="-1" name="localeId" type="xsd:int"/>
+  <xsd:attribute default="Default" name="sqlCompareOptions" type="sqltypes:sqlCompareOptionsList"/>
+  <xsd:attribute default="0" name="sqlCollationVersion" type="xsd:int"/>
+  <xsd:attribute default="0" name="sqlSortId" type="xsd:int"/>
+  <xsd:attribute default="0" name="scale" type="xsd:unsignedByte"/>
+  <xsd:attribute default="18" name="precision" type="xsd:unsignedByte"/>
+  <xsd:attribute name="xmlSchemaCollection" type="xsd:string"/>
+  <xsd:attribute name="sqlTypeAlias" type="xsd:string"/>
+  <xsd:attribute default="false" name="supplementaryCharacters" type="xsd:boolean"/>
+  <!-- Global types that describe the base SQL types. -->
+  <xsd:simpleType name="char">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="nchar">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="varchar">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="nvarchar">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="text">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="ntext">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="varbinary">
+    <xsd:restriction base="xsd:base64Binary"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="binary">
+    <xsd:restriction base="xsd:base64Binary"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="image">
+    <xsd:restriction base="xsd:base64Binary"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="timestamp">
+    <xsd:restriction base="xsd:base64Binary">
+      <xsd:maxLength value="8"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="timestampNumeric">
+  <!-- The timestampNumeric type supports a legacy format of timestamp. -->
+    <xsd:restriction base="xsd:long"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="decimal">
+    <xsd:restriction base="xsd:decimal"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="numeric">
+    <xsd:restriction base="xsd:decimal"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="bigint">
+    <xsd:restriction base="xsd:long" />
+  </xsd:simpleType>
+  <xsd:simpleType name="int">
+    <xsd:restriction base="xsd:int"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="smallint">
+    <xsd:restriction base="xsd:short"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="tinyint">
+    <xsd:restriction base="xsd:unsignedByte"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="bit">
+    <xsd:restriction base="xsd:boolean"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="float">
+    <xsd:restriction base="xsd:double"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="real">
+    <xsd:restriction base="xsd:float"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="datetime">
+    <xsd:restriction base="xsd:dateTime">
+      <xsd:pattern value="((000[1-9])|(00[1-9][0-9])|(0[1-9][0-9]{2})|([1-9][0-9]{3}))-((0[1-9])|(1[012]))-((0[1-9])|([12][0-9])|(3[01]))T(([01][0-9])|(2[0-3]))(:[0-5][0-9]){2}(\.[0-9]{2}[037])?"/>
+      <xsd:maxInclusive value="9999-12-31T23:59:59.997"/>
+      <xsd:minInclusive value="1753-01-01T00:00:00.000"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="smalldatetime">
+    <xsd:restriction base="xsd:dateTime">
+      <xsd:pattern value="((000[1-9])|(00[1-9][0-9])|(0[1-9][0-9]{2})|([1-9][0-9]{3}))-((0[1-9])|(1[012]))-((0[1-9])|([12][0-9])|(3[01]))T(([01][0-9])|(2[0-3]))(:[0-5][0-9])(:00)"/>
+      <xsd:maxInclusive value="2079-06-06T23:59:00"/>
+      <xsd:minInclusive value="1900-01-01T00:00:00"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="date">
+    <xsd:restriction base="xsd:date">
+      <xsd:pattern value="((000[1-9])|(00[1-9][0-9])|(0[1-9][0-9]{2})|([1-9][0-9]{3}))-((0[1-9])|(1[012]))-((0[1-9])|([12][0-9])|(3[01]))"/>
+      <xsd:maxInclusive value="9999-12-31"/>
+      <xsd:minInclusive value="0001-01-01"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="time">
+    <xsd:restriction base="xsd:time">
+      <xsd:pattern value="(([01][0-9])|(2[0-3]))(:[0-5][0-9]){2}(\.[0-9]+)?"/>
+      <xsd:minInclusive value="00:00:00"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="datetime2">
+    <xsd:restriction base="xsd:dateTime">
+      <xsd:pattern value="((000[1-9])|(00[1-9][0-9])|(0[1-9][0-9]{2})|([1-9][0-9]{3}))-((0[1-9])|(1[012]))-((0[1-9])|([12][0-9])|(3[01]))T(([01][0-9])|(2[0-3]))(:[0-5][0-9]){2}(\.[0-9]+)?"/>
+      <xsd:minInclusive value="0001-01-01T00:00:00"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="datetimeoffset">
+    <xsd:restriction base="xsd:dateTime">
+      <xsd:pattern value="((000[1-9])|(00[1-9][0-9])|(0[1-9][0-9]{2})|([1-9][0-9]{3}))-((0[1-9])|(1[012]))-((0[1-9])|([12][0-9])|(3[01]))T(([01][0-9])|(2[0-3]))(:[0-5][0-9]){2}(\.[0-9]+)?(([+-]((((0[0-9])|(1[0-3]))(:[0-5][0-9]))|14:00))|Z)"/>
+      <xsd:minInclusive value="0001-01-01T00:00:00Z"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="money">
+    <xsd:restriction base="xsd:decimal">
+      <xsd:totalDigits value="19"/>
+      <xsd:fractionDigits value="4"/>
+      <xsd:maxInclusive value="922337203685477.5807"/>
+      <xsd:minInclusive value="-922337203685477.5808"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="smallmoney">
+    <xsd:restriction base="xsd:decimal">
+      <xsd:totalDigits value="10"/>
+      <xsd:fractionDigits value="4"/>
+      <xsd:maxInclusive value="214748.3647"/>
+      <xsd:minInclusive value="-214748.3648"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="uniqueidentifier">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})|(\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\})"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!-- sql_variant directly maps to xsd:anyType -->
+  <xsd:complexType name="xml" mixed="true">
+    <xsd:sequence>
+      <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="skip" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <!-- the following type is for FOR XML binary URL results only -->
+  <xsd:simpleType name="dbobject">
+    <xsd:restriction base="xsd:anyURI" />
+  </xsd:simpleType>
+</xsd:schema>
+

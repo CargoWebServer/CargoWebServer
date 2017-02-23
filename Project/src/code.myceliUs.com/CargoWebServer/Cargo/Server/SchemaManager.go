@@ -1582,7 +1582,6 @@ func (this *XmlDocumentHandler) EndDocument() {
 }
 
 func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, typeName string, name string, value string, isArray bool) interface{} {
-
 	// Set the object value...
 	if typeName == "xs.boolean" {
 		if value == "true" {

@@ -68,11 +68,14 @@ var HomePage = function () {
     this.propertiesDiv = null
     this.propertiesView = null
 
-    // Set the global variable...
-    homepage = this
-
     // The main menu.
     this.mainMenu = null
+
+    // The toolbar div
+    this.toolbarDiv = null
+
+    // Set the global variable...
+    homepage = this
 
     return this
 }
@@ -90,7 +93,10 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     /////////////////////////////////// Menu section ///////////////////////////////////
     var menuRow = this.headerDiv.appendElement({ "tag": "div", "style": "width:100%; height: 30px; display: table-row" }).down()
-
+   
+    // The toolbar file grid...
+    this.toolbarDiv = this.headerDiv.appendElement({ "tag": "div", "id": "toolbarDiv"}).down()
+    
     // This is where the menu grid will be put...
     this.menuContentDiv = menuRow.appendElement({ "tag": "div", "style": "width:100%; display: table-cell;" }).down()
         .appendElement({ "tag": "div", "style": "width:100%; display: table; height: 0px;" }).down()
@@ -243,9 +249,6 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     /////////////////////////////////// workspace section  ///////////////////////////////////
     this.mainArea = this.panel.appendElement({ "tag": "div", "style": "display: table; width:100%; height:100%" }).down()
 
-    // The toolbar file grid...
-    this.toolbarDiv = this.headerDiv.appendElement({ "tag": "div", "id": "toolbarDiv"}).down()
-    
     // Now the left and right div...
     var splitArea1 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-cell; position: relative; height:100%" }).down()
     var leftDiv = new Element(splitArea1, { "tag": "div", "id": "leftDiv", "style": "" })

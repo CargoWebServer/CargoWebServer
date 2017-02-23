@@ -681,11 +681,6 @@ EntityManager.prototype.getEntityPrototype = function (typeName, storeId, succes
         return
     }
 
-    // little trick here, i use the same db for bpmn elements.
-    if (storeId == "BPMNDI" || storeId == "DC" || storeId == "DI") {
-        storeId = "BPMN20"
-    }
-
     // server is the client side singleton.
     var params = []
     params.push(createRpcData(typeName, "STRING", "typeName"))
@@ -731,11 +726,6 @@ function GetEntityPrototypes(storeId) {
  * @param {object} caller A place to store object from the request context and get it back from the response context.
  */
 EntityManager.prototype.getEntityPrototypes = function (storeId, successCallback, errorCallback, caller) {
-
-    // little trick here, i use the same db for bpmn elements.
-    if (storeId == "BPMNDI" || storeId == "DC" || storeId == "DI") {
-        storeId = "BPMN20"
-    }
 
     // server is the client side singleton.
     var params = []
@@ -1043,9 +1033,6 @@ EntityPrototype.prototype.init = function (object) {
 
     // Generate the class code.
     this.generateConstructor()
-
-    // The init function.
-    this.generateInit()
 }
 
 /**
@@ -1626,27 +1613,23 @@ function setObjectValues(object, values) {
 }
 
 /**
- * Generate the initialization function.
- */
-EntityPrototype.prototype.generateInit = function () {
-    // Now the initialization from object value.
-    initFunction = this.PackageName + "." + this.ClassName + ".prototype.init = function(object){\n"
-    // First of all i will set reference in the result.
-    initFunction += "   this.TYPENAME = object.TYPENAME\n"
-    initFunction += "   this.UUID = object.UUID\n"
-    initFunction += "   this.IsInit = false\n"
-    initFunction += "   setObjectValues(this, object)\n"
-    initFunction += "}\n"
-    eval(initFunction)
-}
-
-/**
  * This function generate the js class base on the entity prototype.
  */
 EntityPrototype.prototype.generateConstructor = function () {
+    var constructorSrc = this.PackageName + " = function(){\n"
+    var constructorSrc = this.PackageName +" || {};\n"
+
+    var packageName = this.PackageName
+    var classNames = this.ClassName.split(".")
+
+    for(var i=0; i < classNames.length-1; i++){
+        packageName += "." + classNames[i]
+        constructorSrc +=  packageName + " = " + packageName + " || {};\n"
+    }
+
     // I will create the object constructor from the information
     // of the fields.
-    var constructorSrc = this.PackageName + "." + this.ClassName + " = function(){\n"
+    constructorSrc +=  this.PackageName + "." + this.ClassName + " = function(){\n"
 
     // Common properties share by all entity.
     constructorSrc += " this.__class__ = \"" + this.PackageName + "." + this.ClassName + "\"\n"
@@ -1662,9 +1645,19 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += " this.initCallback = undefined\n"
     constructorSrc += " this.panel = null\n"
 
+    // Remove space accent '' from the field name
+    function normalizeFieldName(fieldName){
+        // TODO make distinctive..
+        fieldName = fieldName.replaceAll(" ", "_")
+        fieldName = fieldName.replaceAll("'", "")
+        return fieldName
+    }
+
     // Fields.
     for (var i = 0; i < this.Fields.length; i++) {
-        constructorSrc += " this." + this.Fields[i]
+
+        constructorSrc += " this." + normalizeFieldName(this.Fields[i])
+
         if (this.FieldsType[i].startsWith("[]")) {
             constructorSrc += " = undefined\n"
         } else {
@@ -1704,8 +1697,8 @@ EntityPrototype.prototype.generateConstructor = function () {
     for (var i = 0; i < this.Fields.length; i++) {
         if (!this.FieldsType[i].startsWith("xs.") && !this.FieldsType[i].startsWith("[]xs.")) {
             // So its not a basic type.
-            constructorSrc += " this.set" + this.Fields[i].replace("M_", "").capitalizeFirstLetter() + " = function(value){\n"
-            constructorSrc += "     appendObjectValue(this,\"" + this.Fields[i] + "\", value)\n"
+            constructorSrc += " this.set" + normalizeFieldName(this.Fields[i]).replace("M_", "").capitalizeFirstLetter() + " = function(value){\n"
+            constructorSrc += "     appendObjectValue(this,\"" + normalizeFieldName(this.Fields[i]) + "\", value)\n"
             constructorSrc += " }\n"
         }
     }
@@ -1714,8 +1707,8 @@ EntityPrototype.prototype.generateConstructor = function () {
     for (var i = 0; i < this.Fields.length; i++) {
         if (!this.FieldsType[i].startsWith("xs.") && !this.FieldsType[i].startsWith("[]xs.")) {
             // So its not a basic type.
-            constructorSrc += " this.remove" + this.Fields[i].replace("M_", "").capitalizeFirstLetter() + " = function(value){\n"
-            constructorSrc += "     removeObjectValue(this,\"" + this.Fields[i] + "\", value)\n"
+            constructorSrc += " this.remove" + normalizeFieldName(this.Fields[i]).replace("M_", "").capitalizeFirstLetter() + " = function(value){\n"
+            constructorSrc += "     removeObjectValue(this,\"" + normalizeFieldName(this.Fields[i]) + "\", value)\n"
             constructorSrc += " }\n"
         }
     }
@@ -1733,10 +1726,20 @@ EntityPrototype.prototype.generateConstructor = function () {
     }
 
     // Keep the reference on the entity prototype.
+    // The class level.
     constructorSrc += " return this\n"
-    constructorSrc += "}\n"
+    constructorSrc += "}\n\n"
+
+    constructorSrc +=  this.PackageName + "." + this.ClassName + ".prototype.init = function(object){\n"
+    // First of all i will set reference in the result.
+    constructorSrc += "   this.TYPENAME = object.TYPENAME\n"
+    constructorSrc += "   this.UUID = object.UUID\n"
+    constructorSrc += "   this.IsInit = false\n"
+    constructorSrc += "   setObjectValues(this, object)\n"
+    constructorSrc += "}\n\n"
 
     // Set the function.
+    //console.log(constructorSrc)
     eval(constructorSrc)
 
 }

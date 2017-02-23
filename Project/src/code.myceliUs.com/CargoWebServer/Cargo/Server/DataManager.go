@@ -81,6 +81,9 @@ func (this *DataManager) initialize() {
 			}
 
 			this.m_dataStores[store.GetId()] = store
+
+			// Call get entity prototype once to initialyse entity prototypes.
+			store.GetEntityPrototypes()
 		}
 	}
 	log.Println("--> initialyze DataManager")
@@ -227,12 +230,14 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 		GetServer().GetConfigurationManager().m_configurationEntity.SaveEntity()
 		this.Lock()
 		this.m_dataStores[storeId] = store
-		log.Println("----------> ", storeId, this.m_dataStores[storeId])
 		this.Unlock()
 	} else {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Failed to create dataStore with id '"+storeId+"' and with error '"+err.Error()+"'."))
 		return nil, cargoError
 	}
+
+	// I will get it entity prototypes.
+	store.GetEntityPrototypes()
 
 	return store, nil
 }
@@ -527,4 +532,14 @@ type DataStore interface {
 	 * Open the data store connection.
 	 */
 	Connect() error
+
+	/**
+	 * Return the list of all entity prototypes from a dataStore
+	 */
+	GetEntityPrototypes() ([]*EntityPrototype, error)
+
+	/**
+	 * Return the prototype of a given type.
+	 */
+	GetEntityPrototype(id string) (*EntityPrototype, error)
 }

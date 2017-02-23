@@ -13,7 +13,7 @@ var CodeEditor = function (parent) {
     // The open files...
     this.files = {}
 
-    // The toolbar associated whit the editor.
+    // The toolbars associated whit each editor.
     this.toolbars = {}
 
     // The current file.
@@ -29,10 +29,10 @@ var CodeEditor = function (parent) {
     this.quiet = false
 
     // Here I will create the file toolbar...
-    this.fileToolbar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar" })
+    //this.fileToolbar = new Element(null, { "tag": "div", "class": "toolbar" })
 
     // Here I will attach the file navigator to file event.
-    // Open
+    // Open.
     server.fileManager.attach(this, OpenEntityEvent, function (evt, codeEditor) {
         if (evt.dataMap["fileInfo"] != undefined) {
             var file = server.entityManager.entities[evt.dataMap["fileInfo"].UUID]
@@ -52,8 +52,14 @@ var CodeEditor = function (parent) {
 
     // Attach the file close event.
     server.fileManager.attach(this, CloseEntityEvent, function (evt, codeEditor) {
-        if (evt.dataMap["fileId"] != undefined) {
-            codeEditor.removeFile(evt.dataMap["fileId"])
+        var fileId = evt.dataMap["fileId"] 
+        if (fileId != undefined) {
+            codeEditor.removeFile(fileId)
+            for (var i = 0; i < codeEditor.toolbars[fileId].length; i++) {
+                var toolbar = codeEditor.toolbars[fileId][i]
+                homepage.toolbarDiv.removeElement(toolbar)
+            }
+            codeEditor.toolbars[fileId] = []
         }
     })
 
@@ -103,7 +109,6 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
             if (workspace.lastChild == undefined) {
                 return
             }
-
             if (workspace.lastChild.lastChild != undefined) {
                 for (var childId in workspace.childs) {
                     var child = workspace.childs[childId]
@@ -156,13 +161,45 @@ CodeEditor.prototype.appendFile = function (file) {
             var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_editor" }).down()
 
             // The query editor.
-            var queryEditor = new QueryEditor(filePanel, file, function () {
+            var queryEditor = new QueryEditor(filePanel, file, function (codeEditor, fileId) {
                 return function (queryEditor) {
                     // Now I will create the toolbar for execute a query.
-                    var queryToolbar = new Element({ "tag": "div", "class": "toolbar" })
+                    // So here I will create the tool bar for the query editor.
+                    var queryToolBar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar", "id":randomUUID() })
 
+                    // The datasource selection.
+                    var dataSelect = queryToolBar.appendElement({"tag":"select"}).down()
+
+                    for(var configId in queryEditor.dataConfigs){
+                        dataSelect.appendElement({"tag":"option", "innerHtml":configId, "value":configId})
+                        if(queryEditor.activeDataConfig == undefined){
+                            queryEditor.setActiveDataConfig(configId)
+                        }
+                    }
+
+                    // Here I will set the current data source
+                    dataSelect.element.onchange = function(queryEditor){
+                        return function(){
+                            queryEditor.setActiveDataConfig(this.value)
+                        }
+                    }(queryEditor)
+
+                    // The query button.
+                    var playQueryBtn = queryToolBar.appendElement({ "tag": "div", "class": "toolbarButton" }).down()
+                     playQueryBtn.appendElement({ "tag": "i", "id": fileId + "_play_query_btn", "class": "fa fa-play" })
+
+                    playQueryBtn.element.onclick = function(queryEditor){
+                        return function(){
+                            // Here I will call the query.
+                            queryEditor.runQuery()
+                        }
+                    }(queryEditor)
+
+                    // I will append the list of dataStore that can be use to do query.
+                    codeEditor.toolbars[fileId] = []
+                    codeEditor.toolbars[fileId].push(queryToolBar)
                 }
-            } (this))
+            } (this, file.M_id))
 
             // Init the query editor.
             queryEditor.init()

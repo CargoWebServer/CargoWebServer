@@ -221,8 +221,8 @@ func (this *EntityPrototype) generateConstructor() string {
 	// create sub-namspace if there is some.
 	if len(values) > 2 {
 		for i := 1; i < len(values)-1; i++ {
-			packageName += values[i]
-			constructorSrc += "var " + packageName + " = " + packageName + "|| {};\n"
+			packageName += "." + values[i]
+			constructorSrc += packageName + " = " + packageName + "|| {};\n"
 		}
 	}
 

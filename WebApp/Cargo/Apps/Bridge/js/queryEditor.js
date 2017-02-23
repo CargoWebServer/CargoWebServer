@@ -17,7 +17,6 @@ var QueryEditor = function (parent, file, initCallback) {
     this.isEql = file.M_name.endsWith(".eql") || file.M_name.endsWith(".EQL")
 
     this.panel = parent.appendElement({ "tag": "div", "class": "query_editor" }).down()
-    this.tool
     this.mainArea = this.panel.appendElement({ "tag": "div", "style": "display: table; width:100%; height:100%" }).down()
 
     // So the panel will be divide in tow parts...
@@ -39,19 +38,19 @@ var QueryEditor = function (parent, file, initCallback) {
     initSplitter(queryEditorSplitor, this.editQueryPanel)
 
     var filePanel = this.editQueryPanel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_query_editor", "innerHtml": decode64(file.M_data) }).down()
-    var editor = ace.edit(file.M_id + "_query_editor");
+    this.editor = ace.edit(file.M_id + "_query_editor");
 
     // In case of sql query..
     if (this.isSql) {
-        editor.getSession().setMode("ace/mode/sql");
-        editor.getSession().on('change', function (fileId, fileUUID, editor) {
+        this.editor.getSession().setMode("ace/mode/sql");
+        this.editor.getSession().on('change', function (fileId, fileUUID, editor) {
             return function () {
                 var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileId } }
                 var file = server.entityManager.entities[fileUUID]
                 file.M_data = encode64(editor.getSession().getValue())
                 server.eventHandler.BroadcastEvent(evt)
             }
-        } (file.M_id, file.UUID, editor));
+        } (file.M_id, file.UUID, this.editor));
     } else if (this.isEql) {
         // TODO implement the syntax highlight for EQL...
     }
@@ -100,4 +99,19 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
 
     // Call the init callback.
     this.initCallback(this)
+}
+
+QueryEditor.prototype.setActiveDataConfig = function (configId) {
+    // Keep ref to the data configuration.
+    this.activeDataConfig = this.dataConfigs[configId]
+}
+
+
+QueryEditor.prototype.runQuery = function () {
+    // Keep ref to the data configuration.
+    if (this.isSql) {
+        // Here I will execute sql query...
+        var query = this.editor.getSession().getValue()
+        console.log(query)
+    }
 }

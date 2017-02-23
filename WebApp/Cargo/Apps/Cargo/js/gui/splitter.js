@@ -37,6 +37,8 @@ function initSplitter(splitter, area, min) {
 				}
 				area.element.style.height = h + "px"
 			}
+			window.dispatchEvent(new Event('resize'));
+
 		}
 	} (splitter, area, min)
 

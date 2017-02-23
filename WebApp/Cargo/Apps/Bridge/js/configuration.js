@@ -110,6 +110,19 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
  * Append a new configuration to the configuration panel.
  */
 ConfigurationPanel.prototype.setConfiguration = function (configurationContent, content) {
+    // If the view already exist
+    for (var i = 0; i < this.contentViews.length; i++) {
+        if (this.contentViews[i].entity.UUID == content.UUID) {
+            this.contentViews[i].setEntity(content)
+            if (this.contentViews[i].connectBtn != undefined) {
+                this.contentViews[i].connectBtn.status = "disconnected"
+                this.contentViews[i].connectBtn.element.click()
+            }
+            return this.contentViews[i]
+        }
+    }
+
+    // In that case I will create a new entity panel.
     var contentView = new EntityPanel(configurationContent, content.TYPENAME,
         function (content, title) {
             return function (contentView) {
@@ -118,18 +131,22 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                 contentView.setTitle(title)
                 contentView.hideNavigationButtons()
 
-                contentView.saveCallback = function (entity) {
-                    // So here I will create the new dataStore.
-                    if (entity.TYPENAME == "Config.DataStoreConfiguration") {
-                        server.dataManager.createDataStore(entity.M_id, entity.M_dataStoreType, entity.M_dataStoreVendor,
-                            // Success callback
-                            function (success, caller) {
-                            },
-                            // Error callback
-                            function (errObj, caller) {
-                            }, {})
+                contentView.saveCallback = function (contentView) {
+                    return function (entity) {
+                        // So here I will create the new dataStore.
+                        if (entity.TYPENAME == "Config.DataStoreConfiguration") {
+                            server.dataManager.createDataStore(entity.M_id, entity.M_dataStoreType, entity.M_dataStoreVendor,
+                                // Success callback
+                                function (success, caller) {
+                                    caller.connectBtn.element.status = "disconnected"
+                                    caller.connectBtn.element.click()
+                                },
+                                // Error callback
+                                function (errObj, caller) {
+                                }, contentView)
+                        }
                     }
-                }
+                } (contentView)
 
                 contentView.deleteCallback = function (entity) {
                     // Here I will remove the folder if the entity is 
@@ -157,37 +174,46 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     contentView.connectBtn.appendElement({ "tag": "i", "class": "fa fa-plug" })
 
                     // Now If the connection is activated...
-                    contentView.connectBtn.element.onclick = function (connectionId) {
+                    contentView.connectBtn.element.onclick = function (UUID) {
                         return function () {
+                            var entity = server.entityManager.entities[UUID]
 
+                            if (this.status == "error") {
+                                this.status = "disconnected"
+                            }
                             // Here I will try to open or close the connection...
                             if (this.status == "connected") {
-                                server.dataManager.close(connectionId,
+                                server.dataManager.close(entity.M_id,
                                     function (result, caller) {
                                         // Here the data store can be reach so I will try to connect.
-                                        caller.style.color = "lightgrey"
-                                        caller.status = "disconnected"
+                                        caller.connectBtn.style.color = "lightgrey"
+                                        caller.connectBtn.status = "disconnected"
+                                        homepage.dataExplorer.hidePanel(caller.entity.M_id)
                                     },
                                     function (errMsg, caller) {
                                         // Fail to disconnect
-
-                                    }, this)
+                                        caller.connectBtn.style.color = "#8B0000"
+                                        caller.connectBtn.status = "error"
+                                        homepage.dataExplorer.hidePanel(caller.entity.M_id)
+                                    }, { "connectBtn": this, "entity": entity })
                             } else if (this.status == "disconnected") {
-                                server.dataManager.connect(connectionId,
+                                server.dataManager.connect(entity.M_id,
                                     function (result, caller) {
                                         // Here the data store can be reach so I will try to connect.
-                                        caller.style.color = "#4CAF50"
-                                        caller.status = "connected"
+                                        caller.connectBtn.style.color = "#4CAF50"
+                                        caller.connectBtn.status = "connected"
+                                        homepage.dataExplorer.showPanel(caller.entity.M_id)
                                     },
                                     function (errMsg, caller) {
                                         // fail to connect...
-                                        caller.style.color = "#8B0000"
-                                        caller.status = "error"
-                                    }, this)
+                                        caller.connectBtn.style.color = "#8B0000"
+                                        caller.connectBtn.status = "error"
+                                        homepage.dataExplorer.hidePanel(caller.entity.M_id)
+                                    }, { "connectBtn": this, "entity": entity })
                             }
 
                         }
-                    } (contentView.entity.M_id)
+                    } (contentView.entity.UUID)
 
                     // Set the connection status
                     server.dataManager.ping(contentView.entity.M_id,

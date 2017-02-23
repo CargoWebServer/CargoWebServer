@@ -1104,14 +1104,25 @@ func (this *EntityManager) InitEntity(entity Entity) {
 /**
  * Return the list of entity prototype for a given package...
  */
-func (this *EntityManager) getEntityPrototypes(storeId string) ([]*EntityPrototype, error) {
+func (this *EntityManager) getEntityPrototypes(storeId string, schemaId string) ([]*EntityPrototype, error) {
 
 	if GetServer().GetDataManager().getDataStore(storeId) == nil {
 		return nil, errors.New("The dataStore with id '" + storeId + "' doesn't exist.")
 	}
+
 	dataStore := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
 	protos, err := dataStore.GetEntityPrototypes()
-	return protos, err
+	prototypes := make([]*EntityPrototype, 0)
+
+	if err == nil {
+		for i := 0; i < len(protos); i++ {
+			if strings.HasPrefix(protos[i].TypeName, schemaId) {
+				prototypes = append(prototypes, protos[i])
+			}
+		}
+	}
+
+	return prototypes, err
 }
 
 /**
@@ -1256,7 +1267,12 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
  * Return the list of entity prototype for a given package...
  */
 func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string, sessionId string) []*EntityPrototype {
-	protos, err := this.getEntityPrototypes(storeId)
+	var schemaId string
+	if strings.Index(storeId, ".") > 0 {
+		schemaId = storeId[strings.Index(storeId, ".")+1:]
+		storeId = storeId[0:strings.Index(storeId, ".")]
+	}
+	protos, err := this.getEntityPrototypes(storeId, schemaId)
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("There is no prototypes in store '"+storeId+"'."))
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
