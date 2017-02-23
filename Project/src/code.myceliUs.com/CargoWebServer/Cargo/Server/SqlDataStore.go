@@ -279,9 +279,16 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 					result = append(result, val)
 
 				} else if fieldsType[i] == "bit" {
-					val := fields[i].(bool)
-					result = append(result, val)
-
+					if reflect.TypeOf(fields[i]).Kind() == reflect.Bool {
+						val := fields[i].(bool)
+						result = append(result, val)
+					} else if reflect.TypeOf(fields[i]).String() == "[]uint8" {
+						if string(fields[i].([]uint8)) == "1" {
+							result = append(result, true)
+						} else {
+							result = append(result, false)
+						}
+					}
 				} else if fieldsType[i] == "real" || fieldsType[i] == "float" {
 
 					switch fields[i].(type) {
@@ -494,20 +501,26 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 			return prototypes, err
 		}
 	}
+	var query string
 
+	fieldsType := make([]interface{}, 0)
 	// So here I will get the list of table name that will be prototypes...
-	query := "SELECT sobjects.name "
-	query += "FROM sysobjects sobjects "
-	query += "WHERE sobjects.xtype = 'U'"
+	if this.m_vendor == Config.DataStoreVendor_ODBC {
+		query = "SELECT sobjects.name "
+		query += "FROM sysobjects sobjects "
+		query += "WHERE sobjects.xtype = 'U'"
 
-	fieldsType := make([]interface{}, 1)
-	fieldsType[0] = "string"
+	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
+		query = "SELECT table_name FROM information_schema.tables where table_schema='" + this.m_id + "'"
+	}
 
+	fieldsType = append(fieldsType, "string")
 	var params []interface{}
 
 	// Read the
 	values, err := this.Read(query, fieldsType, params)
 	if err != nil {
+
 		return prototypes, err
 	}
 	for i := 0; i < len(values); i++ {
@@ -537,8 +550,8 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 
 	// Retreive the schema id.
 	var schemaId string
-	schemaId, err = this.getSchemaId(id)
 
+	schemaId, err = this.getSchemaId(id)
 	if err != nil {
 		return nil, err
 	}
@@ -559,39 +572,45 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 	prototype.TypeName = schemaId + "." + id
 
 	// Now I will retreive the list of field of the table.
-	query := "SELECT "
-	query += "c.name 'Column Name',"
-	query += "t.Name 'Data type',"
-	query += "c.max_length 'Max Length',"
-	query += "c.precision ,"
-	query += "c.scale ,"
-	query += "c.is_nullable,"
-	query += "ISNULL(i.is_primary_key, 0) 'Primary Key' "
-	query += "FROM "
-	query += "sys.columns c "
-	query += "INNER JOIN "
-	query += "sys.types t ON c.user_type_id = t.user_type_id "
-	query += "LEFT OUTER JOIN "
-	query += "sys.index_columns ic ON ic.object_id = c.object_id AND ic.column_id = c.column_id "
-	query += "LEFT OUTER JOIN  "
-	query += "sys.indexes i ON ic.object_id = i.object_id AND ic.index_id = i.index_id "
-	query += "WHERE "
-	query += "c.object_id = OBJECT_ID('" + id + "')"
+	var query string
+	if this.m_vendor == Config.DataStoreVendor_ODBC {
+		query = "SELECT "
+		query += "c.name 'Column Name',"
+		query += "t.Name 'Data type',"
+		query += "c.is_nullable,"
+		query += "ISNULL(i.is_primary_key, 0) 'Primary Key' "
+		query += "FROM "
+		query += "sys.columns c "
+		query += "INNER JOIN "
+		query += "sys.types t ON c.user_type_id = t.user_type_id "
+		query += "LEFT OUTER JOIN "
+		query += "sys.index_columns ic ON ic.object_id = c.object_id AND ic.column_id = c.column_id "
+		query += "LEFT OUTER JOIN  "
+		query += "sys.indexes i ON ic.object_id = i.object_id AND ic.index_id = i.index_id "
+		query += "WHERE "
+		query += "c.object_id = OBJECT_ID('" + id + "')"
+	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
+		query = "SELECT "
+		query += "column_name,"
+		query += "data_type,"
+		query += "IS_NULLABLE = 'YES',"
+		query += "COLUMN_KEY = 'PRI' "
+		query += "FROM information_schema.columns "
+		query += "WHERE table_name='" + id + "';"
+	}
 
-	fieldsType := make([]interface{}, 7)
+	fieldsType := make([]interface{}, 4)
 	fieldsType[0] = "string"
 	fieldsType[1] = "string"
-	fieldsType[2] = "int"
-	fieldsType[3] = "int"
-	fieldsType[4] = "int"
-	fieldsType[5] = "bit"
-	fieldsType[6] = "bit"
+	fieldsType[2] = "bit"
+	fieldsType[3] = "bit"
 
 	var params []interface{}
 
 	// Read the
 	values, err := this.Read(query, fieldsType, params)
 	if err != nil {
+
 		return prototype, err
 	}
 
@@ -601,9 +620,9 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 		fieldTypeName := values[i][1].(string)
 		fieldType, _ := this.getSqlTypePrototype(fieldTypeName)
 		// If the field can be null
-		isNilAble := values[i][5].(bool)
+		isNilAble := values[i][2].(bool)
 		// if the field is a key
-		isId := values[i][6].(bool)
+		isId := values[i][3].(bool)
 		// So here I will create new field...
 		if fieldType != nil {
 			prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
@@ -612,13 +631,13 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 				// So here the attribute is a ref...
 				prototype.Fields = append(prototype.Fields, "M_"+refName)
 				prototype.FieldsType = append(prototype.FieldsType, refType)
-			} else {
-				prototype.Fields = append(prototype.Fields, "M_"+fieldName)
-				prototype.FieldsType = append(prototype.FieldsType, fieldType.TypeName)
-				if isId {
-					prototype.Ids = append(prototype.Ids, "M_"+fieldName)
-				}
 			}
+			prototype.Fields = append(prototype.Fields, "M_"+fieldName)
+			prototype.FieldsType = append(prototype.FieldsType, fieldType.TypeName)
+			if isId {
+				prototype.Ids = append(prototype.Ids, "M_"+fieldName)
+			}
+
 			if isNilAble {
 				prototype.FieldsNillable = append(prototype.FieldsNillable, true)
 			} else {
@@ -637,22 +656,29 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 }
 
 func (this *SqlDataStore) getSchemaId(name string) (string, error) {
-	query := "SELECT SCHEMA_NAME(schema_id)"
-	query += "AS SchemaTable "
-	query += "FROM sys.tables "
-	query += "WHERE  sys.tables.name = '" + name + "'"
 
-	fieldsType := make([]interface{}, 1)
-	fieldsType[0] = "string"
-	var params []interface{}
+	if this.m_vendor == Config.DataStoreVendor_ODBC {
+		var query string
 
-	// Read the
-	values, err := this.Read(query, fieldsType, params)
-	if err != nil {
-		return "", err
-	}
-	if len(values) > 0 {
-		return this.m_id + "." + values[0][0].(string), nil
+		query = "SELECT SCHEMA_NAME(schema_id)"
+		query += "AS SchemaTable "
+		query += "FROM sys.tables "
+		query += "WHERE  sys.tables.name = '" + name + "'"
+		fieldsType := make([]interface{}, 1)
+		fieldsType[0] = "string"
+		var params []interface{}
+
+		// Read the
+		values, err := this.Read(query, fieldsType, params)
+		if err != nil {
+			return "", err
+		}
+		if len(values) > 0 {
+			return this.m_id + "." + values[0][0].(string), nil
+		}
+	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
+		// with mysql the schema id is the id of the database.
+		return this.m_id, nil
 	}
 
 	return "", errors.New("No schema found for table " + name)
@@ -662,15 +688,25 @@ func (this *SqlDataStore) getSchemaId(name string) (string, error) {
 func (this *SqlDataStore) getTypeNameRef(tableName string, fieldName string) (string, string, error) {
 	fieldName = strings.Replace(fieldName, "'", "''", -1)
 
-	query := "SELECT "
-	query += "  OBJECT_NAME (f.referenced_object_id) AS ReferenceTableName, "
-	query += "  f.name AS ForeignKey "
-	query += "FROM "
-	query += "  sys.foreign_keys AS f "
-	query += "  INNER JOIN sys.foreign_key_columns AS fc ON f.OBJECT_ID = fc.constraint_object_id "
-	query += "  INNER JOIN sys.objects AS o ON o.OBJECT_ID = fc.referenced_object_id "
-	query += "WHERE "
-	query += "    OBJECT_NAME(f.parent_object_id) = '" + tableName + "' and COL_NAME(fc.parent_object_id,fc.parent_column_id) = '" + fieldName + "'"
+	var query string
+	if this.m_vendor == Config.DataStoreVendor_ODBC {
+		query = "SELECT "
+		query += "  OBJECT_NAME (f.referenced_object_id) AS ReferenceTableName, "
+		query += "  f.name AS ForeignKey "
+		query += "FROM "
+		query += "  sys.foreign_keys AS f "
+		query += "  INNER JOIN sys.foreign_key_columns AS fc ON f.OBJECT_ID = fc.constraint_object_id "
+		query += "  INNER JOIN sys.objects AS o ON o.OBJECT_ID = fc.referenced_object_id "
+		query += "WHERE "
+		query += "    OBJECT_NAME(f.parent_object_id) = '" + tableName + "' and COL_NAME(fc.parent_object_id,fc.parent_column_id) = '" + fieldName + "'"
+	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
+		query = "SELECT REFERENCED_TABLE_NAME,CONSTRAINT_NAME "
+		query += "FROM information_schema.KEY_COLUMN_USAGE "
+		query += "WHERE CONSTRAINT_SCHEMA = '" + this.m_id + "' "
+		query += "AND TABLE_NAME = '" + tableName + "' "
+		query += "AND REFERENCED_COLUMN_NAME = '" + fieldName + "' "
+		query += "AND REFERENCED_COLUMN_NAME IS NOT NULL"
+	}
 
 	fieldsType := make([]interface{}, 2)
 	fieldsType[0] = "string"

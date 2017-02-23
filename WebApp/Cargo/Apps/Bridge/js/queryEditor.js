@@ -112,6 +112,49 @@ QueryEditor.prototype.runQuery = function () {
     if (this.isSql) {
         // Here I will execute sql query...
         var query = this.editor.getSession().getValue()
-        console.log(query)
+		var ast = simpleSqlParser.sql2ast(query)
+        // in case of where
+        var params = []
+
+        // list of type.
+        var fields = []
+
+        // Here I will keep the list of prototype.
+        var prototypes = []
+
+        // Query type...
+        var type = "" // Can be CREATE, READ, UPDATE, DELETE
+
+        // Now I will parse 
+        if(ast.status == true){
+            // The list of prototypes...
+            for(var i= 0; i < ast.value.from.length; i++){
+                prototypes.push(ast.value.from[i].table)
+            }
+
+            // Here There is no syntax error...
+            for(var i= 0; i < ast.value.select.length; i++){
+                type = "READ"
+                fields.push(ast.value.select[i].column)
+            }
+        }
+
+        // Now I will retreive the prototypes from prototypes names and exectute the query...
+        for(var i=0; i <prototypes.length; i++){
+            var prototype = prototypes[i]
+            if(prototype.indexOf(".") != 0){
+                // In that case the prototype contain the schema id and table id.
+                server.entityManager.getEntityPrototype(prototype, "sql_info",
+                // success callback
+                function(result, caller){
+                    console.log(result)
+                },
+                // error callback
+                function(errObj, caller){
+
+                }, this)
+            }
+        }
+        console.log(ast)
     }
 }
