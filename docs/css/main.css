@@ -20,6 +20,18 @@ h5{
 #cargo-intro-wheel{
 	max-height: 250px;
 	padding: 20px;
+	-moz-animation:50s rotateRight infinite linear; 
+	-webkit-animation:50s rotateRight infinite linear; 
+}
+
+@-moz-keyframes rotateRight{
+	0%{ -moz-transform:rotate(0deg); -moz-transform-origin:50% 50%; }
+	100%{ -moz-transform:rotate(360deg); }
+}
+
+@-webkit-keyframes rotateRight{
+	0%{ -webkit-transform:rotate(0deg); -webkit-transform-origin:50% 50%; }
+	100%{ -webkit-transform:rotate(360deg); }
 }
 
 #gettingCargoDiv i{
@@ -73,6 +85,8 @@ h5{
 	color: #444;
 	margin-top: 20px;
 }
+
+
 
 
 
