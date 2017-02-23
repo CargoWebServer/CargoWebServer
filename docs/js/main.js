@@ -58,7 +58,7 @@ $("#dowloadBtn").click(function () {
 });
 
 $('#getStarted-btn').click(function(){
-	$('#li-gettingStarted').click()
+	hidePages("page-gettingStarted");
 })
 
 // main
