@@ -818,16 +818,19 @@ TableCell.prototype.formatValue = function (value) {
 	fieldType = fieldType.replace("[]", "")
 
 	// if its xs type... 
-	var isBaseType = fieldType.startsWith("xs.") || fieldType == "string" || fieldType == "int" || fieldType == "double" || fieldType == "date" || fieldType == "dateTime" || field == "M_valueOf" || field == "M_listOf"
+	var isBaseType = fieldType.startsWith("sqltypes.") || fieldType.startsWith("xs.") || fieldType == "string" || fieldType == "int" || fieldType == "double" || fieldType == "date" || fieldType == "dateTime" || field == "M_valueOf" || field == "M_listOf"
 	if (isBaseType) {
 		if (!isArray_) {
-			if (fieldType == "xs.dateTime" || fieldType == "dateTime" || fieldType == "date" || fieldType == "date") {
+			if (fieldType == "xs.dateTime" || fieldType == "dateTime" || fieldType == "xs.date" || fieldType == "date"
+				|| fieldType == "sqltypes.date" || fieldType == "sqltypes.datetime" || fieldType == "sqltypes.datetime2" || fieldType == "sqltypes.smalldatetime") {
 				value = formater.formatDate(value);
 				this.valueDiv.element.className = "xs_date"
-			} else if (fieldType == "xs.float" || fieldType == "xs.decimal" || fieldType == "xs.double" || fieldType == "double") {
+			} else if (fieldType == "xs.float" || fieldType == "xs.decimal" || fieldType == "xs.double" || fieldType == "double"
+				|| fieldType == "sqltypes.float" || fieldType == "sqltypes.decimal" || fieldType == "sqltypes.real") {
 				this.valueDiv.element.className = "xs_number"
 				value = formater.formatReal(value)
-			} else if (fieldType == "xs.string" || fieldType == "string" || fieldType == "xs.token" || fieldType == "xs.anyURI" || fieldType == "xs.anyURI" || fieldType == "xs.IDREF" || fieldType == "xs.QName" || fieldType == "xs.NOTATION" || fieldType == "xs.normalizedString" || fieldType == "xs.Name" || fieldType == "xs.language") {
+			} else if (fieldType == "xs.string" || fieldType == "string" || fieldType == "xs.token" || fieldType == "xs.anyURI" || fieldType == "xs.anyURI" || fieldType == "xs.IDREF" || fieldType == "xs.QName" || fieldType == "xs.NOTATION" || fieldType == "xs.normalizedString" || fieldType == "xs.Name" || fieldType == "xs.language"
+			|| fieldType == "sqltypes.char" || fieldType == "sqltypes.nchar" || fieldType == "sqltypes.ntext" || fieldType == "sqltypes.nvchar" || fieldType == "sqltypes.text" || fieldType == "sqltypes.varchar") {
 				this.valueDiv.element.className = "xs_string"
 				value = formater.formatString(value)
 			} else if (fieldType == "xs.NCName" || fieldType == "xs.ID") {
@@ -859,7 +862,8 @@ TableCell.prototype.formatValue = function (value) {
 					value = formater.formatString(value)
 				}
 
-			} else if (fieldType == "int" || fieldType == "xs.int" || fieldType == "xs.integer" || fieldType == "xs.long" || fieldType == "xs.unsignedInt" || fieldType == "xs.short" || fieldType == "xs.unsignedLong") {
+			} else if (fieldType == "int" || fieldType == "xs.int" || fieldType == "xs.integer" || fieldType == "xs.long" || fieldType == "xs.unsignedInt" || fieldType == "xs.short" || fieldType == "xs.unsignedLong"
+				|| fieldType == "sqltypes.int" || fieldType == "sqltypes.bigint" || fieldType == "sqltypes.smallint" || fieldType == "sqltypes.tinyint") {
 				this.valueDiv.element.className = "xs_number"
 			}
 		} else {
@@ -1288,7 +1292,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 
 	// I will get the cell editor related to this column...
 	var editor = this.row.table.cellEditors[this.index]
-	
+
 	// One editor at time.
 	if (editor != undefined) {
 		if (editor.element.parentNode != undefined) {

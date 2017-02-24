@@ -1,1 +1,7 @@
-SELECT first_name, last_name FROM employees.employees
+SELECT [id]
+      ,[first_name]
+      ,[last_name]
+      ,[email]
+      ,[is_active]
+      ,[is_aprobator]
+  FROM [dbo].[DT_EMPLOYES]

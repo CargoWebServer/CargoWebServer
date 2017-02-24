@@ -255,7 +255,7 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 		for i := 0; i < len(fields); i++ {
 			if fields[i] != nil {
 
-				if fieldsType[i] == "int" {
+				if strings.HasSuffix(fieldsType[i].(string), "int") {
 					var val int
 					switch fields[i].(type) {
 					case int:
@@ -278,7 +278,7 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 
 					result = append(result, val)
 
-				} else if fieldsType[i] == "bit" {
+				} else if strings.HasSuffix(fieldsType[i].(string), "bit") {
 					if reflect.TypeOf(fields[i]).Kind() == reflect.Bool {
 						val := fields[i].(bool)
 						result = append(result, val)
@@ -289,7 +289,7 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 							result = append(result, false)
 						}
 					}
-				} else if fieldsType[i] == "real" || fieldsType[i] == "float" {
+				} else if strings.HasSuffix(fieldsType[i].(string), "real") || strings.HasSuffix(fieldsType[i].(string), "float") {
 
 					switch fields[i].(type) {
 					case float32:
@@ -311,17 +311,17 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 						}
 					}
 
-				} else if fieldsType[i] == "bytes" {
+				} else if strings.HasSuffix(fieldsType[i].(string), "bytes") {
 					var val []byte
 					val = fields[i].([]byte)
 					result = append(result, val)
 
-				} else if fieldsType[i] == "date" {
+				} else if strings.HasSuffix(fieldsType[i].(string), "date") {
 					var val time.Time
 					val = fields[i].(time.Time)
 					result = append(result, val)
 
-				} else if fieldsType[i] == "string" {
+				} else if strings.HasSuffix(fieldsType[i].(string), "string") || strings.HasSuffix(fieldsType[i].(string), "varchar") {
 					var val string
 					switch fields[i].(type) {
 					case []uint8: // Bytes...
