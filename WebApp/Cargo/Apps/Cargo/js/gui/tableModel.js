@@ -57,6 +57,9 @@ TableModel.prototype.init = function (successCallback, progressCallback, errorCa
  *  @returns {int} The number of row of the model.
  */
 TableModel.prototype.getRowCount = function () {
+    if (this.values == undefined) {
+        this.values = []
+    }
     return this.values.length
 }
 
@@ -65,6 +68,9 @@ TableModel.prototype.getRowCount = function () {
  *  @returns The number of colunm display in the model.
  */
 TableModel.prototype.getColumnCount = function () {
+    if (this.titles == undefined) {
+        this.titles = []
+    }
     return this.titles.length
 }
 
@@ -231,10 +237,10 @@ EntityTableModel.prototype.removeRow = function (rowIndex) {
             server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
             var prototype = server.entityManager.entityPrototypes[entity.TYPENAME]
             var id = prototype.Ids[1] // 0 is the uuid...
-            if(id == undefined){
+            if (id == undefined) {
                 id = "uuid"
             }
-            
+
             var index = prototype.Indexs[1] // 0 is the uuid...
             var label = entity[index]
             if (label == undefined) {

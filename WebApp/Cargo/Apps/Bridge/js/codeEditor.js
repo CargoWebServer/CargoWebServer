@@ -163,41 +163,9 @@ CodeEditor.prototype.appendFile = function (file) {
             // The query editor.
             var queryEditor = new QueryEditor(filePanel, file, function (codeEditor, fileId) {
                 return function (queryEditor) {
-                    // Now I will create the toolbar for execute a query.
-                    // So here I will create the tool bar for the query editor.
-                    var queryToolBar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar", "id":randomUUID() })
-
-                    // The datasource selection.
-                    var dataSelect = queryToolBar.appendElement({"tag":"select"}).down()
-
-                    for(var configId in queryEditor.dataConfigs){
-                        dataSelect.appendElement({"tag":"option", "innerHtml":configId, "value":configId})
-                        if(queryEditor.activeDataConfig == undefined){
-                            queryEditor.setActiveDataConfig(configId)
-                        }
-                    }
-
-                    // Here I will set the current data source
-                    dataSelect.element.onchange = function(queryEditor){
-                        return function(){
-                            queryEditor.setActiveDataConfig(this.value)
-                        }
-                    }(queryEditor)
-
-                    // The query button.
-                    var playQueryBtn = queryToolBar.appendElement({ "tag": "div", "class": "toolbarButton" }).down()
-                     playQueryBtn.appendElement({ "tag": "i", "id": fileId + "_play_query_btn", "class": "fa fa-play" })
-
-                    playQueryBtn.element.onclick = function(queryEditor){
-                        return function(){
-                            // Here I will call the query.
-                            queryEditor.runQuery()
-                        }
-                    }(queryEditor)
-
                     // I will append the list of dataStore that can be use to do query.
                     codeEditor.toolbars[fileId] = []
-                    codeEditor.toolbars[fileId].push(queryToolBar)
+                    codeEditor.toolbars[fileId].push(queryEditor.queryToolBar)
                 }
             } (this, file.M_id))
 

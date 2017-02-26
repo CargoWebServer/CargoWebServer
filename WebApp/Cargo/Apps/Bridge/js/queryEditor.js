@@ -9,6 +9,11 @@ var QueryEditor = function (parent, file, initCallback) {
     this.file = file
     this.dataConfigs = {}
     this.activeDataConfig = null
+    this.queryToolBar = null
+    this.dataSelect = null
+
+    // Keep the number of row that can be displayed.
+    this.count = 0
 
     // Sql data source.
     this.isSql = file.M_name.endsWith(".sql") || file.M_name.endsWith(".SQL")
@@ -100,6 +105,37 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
         this.dataConfigs[configs[i].M_id] = configs[i]
     }
 
+    // So here I will create the tool bar for the query editor.
+    this.queryToolBar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar", "id": randomUUID() })
+
+    // The datasource selection.
+    this.dataSelect = this.queryToolBar.appendElement({ "tag": "select" }).down()
+
+    for (var configId in this.dataConfigs) {
+        this.dataSelect.appendElement({ "tag": "option", "innerHtml": configId, "value": configId })
+        if (this.activeDataConfig == undefined) {
+            this.setActiveDataConfig(configId)
+        }
+    }
+
+    // Here I will set the current data source
+    this.dataSelect.element.onchange = function (queryEditor) {
+        return function () {
+            queryEditor.setActiveDataConfig(this.value)
+        }
+    } (this)
+
+    // The query button.
+    var playQueryBtn = this.queryToolBar.appendElement({ "tag": "div", "class": "toolbarButton" }).down()
+    playQueryBtn.appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-play" })
+
+    playQueryBtn.element.onclick = function (queryEditor) {
+        return function () {
+            // Here I will call the query.
+            queryEditor.runQuery()
+        }
+    } (this)
+
     // Call the init callback.
     this.initCallback(this)
 }
@@ -160,9 +196,22 @@ QueryEditor.prototype.runQuery = function () {
             // Here There is no syntax error...
             for (var i = 0; i < ast.value.select.length; i++) {
                 type = "READ"
-                fields.push(ast.value.select[i].column)
+                fields.push(ast.value.select[i])
             }
         }
+
+        // The query can be formated...
+        var query_ = simpleSqlParser.ast2sql(ast)
+        if (query_.length > 0) {
+            if (query != query_) {
+                this.editor.getSession().setValue(query_)
+                query = query
+            }
+        }
+        //if(type == )
+        // Now I will create the count query
+        // ast.select = []
+
 
         // Now I will retreive the prototypes from prototypes names and exectute the query...
         for (var prototype in prototypes) {
@@ -186,33 +235,55 @@ QueryEditor.prototype.runQuery = function () {
                         var fields = []
                         for (var i = 0; i < caller.fields.length; i++) {
                             var field = caller.fields[i]
-                            var values = field.split(".")
-                            if (values.length == 1 && Object.keys(prototypes).length == 1) {
-                                // That's means there's only one table in use for the query.
-                                if(field != "*"){
-                                    var fieldType = result.FieldsType[result.getFieldIndex("M_" + field)]
-                                    fieldsType.push(fieldType)
-                                    fields.push(field)
-                                }else{
-                                    // In that case the user want all the value from the table.
-                                    for(var i=0; i < result.FieldsType.length; i++){
-                                        if(result.FieldsType[i].startsWith("sqltypes.")){
-                                            fieldsType.push(result.FieldsType[i])
-                                            fields.push(result.Fields[i])
+                            if (field.column != null) {
+                                var values = field.column.split(".")
+                                if (values.length == 1 && Object.keys(prototypes).length == 1) {
+                                    // That's means there's only one table in use for the query.
+                                    if (field.column != "*") {
+                                        var fieldType = result.FieldsType[result.getFieldIndex("M_" + field.column)]
+                                        fieldsType.push(fieldType)
+                                        if (field.alias != null) {
+                                            fields.push(field.alias)
+                                        } else {
+                                            fields.push(field.column)
+                                        }
+                                    } else {
+                                        // In that case the user want all the value from the table.
+                                        for (var i = 0; i < result.FieldsType.length; i++) {
+                                            if (result.FieldsType[i].startsWith("sqltypes.")) {
+                                                fieldsType.push(result.FieldsType[i])
+                                                fields.push(result.Fields[i])
+                                            }
                                         }
                                     }
+
+                                } else {
+                                    var tableId = values[0]
+                                    var fieldName = values[1]
                                 }
                             } else {
-                                var tableId = values[0]
-                                var fieldName = values[1]
+                                if (field.alias != null) {
+                                    fields.push(field.alias)
+                                }
+
+                                if(field.expression != null){
+                                    // The count expression...
+                                    if(field.expression.startsWith("COUNT(")){
+                                        fieldsType.push("sqltypes.int")
+                                    }
+                                }
                             }
                         }
-
-                        // Here I will execute the query...
-                        if (caller.type == "READ") {
-                            caller.queryEditor.setResult(caller.query, fields, fieldsType, [], caller.type)
-                        }
                     }
+
+                    // Here I will execute the query...
+                    if (caller.type == "READ") {
+                        // Here I will get the number of expected result before execute the final query...
+                        //var countQuery = "select count(*) as numRow from (" + caller.query + ") src";
+                        
+                        caller.queryEditor.setResult(caller.query, fields, fieldsType, [], caller.type)
+                    }
+
                 },
                 // error callback
                 function (errObj, caller) {
@@ -231,9 +302,8 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
     if (this.isSql) {
         if (type == "READ") {
             // Here I will create a sql table.
+            this.resultQueryPanel.removeAllChilds()
             var table = new Table(this.activeDataConfig.M_id, this.resultQueryPanel)
-
-            // Set the table model.
             var model = new SqlTableModel(this.activeDataConfig.M_id, query, fieldsType, [], fields)
 
             table.setModel(model, function (table, queryEditor) {
@@ -276,16 +346,16 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                     // Now the height of the panel...
                     table.rowGroup.element.style.height = queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight + "px"
 
-                    table.rowGroup.element.onscroll = function(header){
-                        return function(){
-                        var position = this.scrollTop;
-                        if(this.scrollTop > 0){
-                            header.className = "table_header scrolling"
-                        }else{
-                            header.className = "table_header"
+                    table.rowGroup.element.onscroll = function (header) {
+                        return function () {
+                            var position = this.scrollTop;
+                            if (this.scrollTop > 0) {
+                                header.className = "table_header scrolling"
+                            } else {
+                                header.className = "table_header"
+                            }
                         }
-                        }
-                    }(table.header.div.element)
+                    } (table.header.div.element)
 
                     // Now the resize event.
                     window.addEventListener('resize',

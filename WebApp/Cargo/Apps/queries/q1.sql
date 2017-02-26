@@ -1,7 +1,1 @@
-SELECT [id]
-      ,[first_name]
-      ,[last_name]
-      ,[email]
-      ,[is_active]
-      ,[is_aprobator]
-  FROM [dbo].[DT_EMPLOYES]
+SELECT first_name, last_name FROM employees.employees LIMIT 0, 50
