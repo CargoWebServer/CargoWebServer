@@ -1,1 +1,1 @@
-SELECT first_name, last_name FROM employees.employees LIMIT 0, 50
+SELECT first_name, last_name FROM employees.employees WHERE first_name like 'D%' LIMIT 0, 500

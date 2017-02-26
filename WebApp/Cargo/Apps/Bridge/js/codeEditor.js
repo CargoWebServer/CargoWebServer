@@ -2,7 +2,6 @@
  * The code editor..
  * TODO create the split functionnality
  * TODO create the multiuser access for a single file.
- * Test...
  */
 
 var CodeEditor = function (parent) {

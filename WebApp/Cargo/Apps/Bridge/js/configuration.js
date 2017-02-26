@@ -232,7 +232,8 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     // If the content is server configuration I will also append the change admin password option.
                     // That pannel will be use to change admin password.
                     configurationContent.appendElement({ "tag": "div", "style": "display:table; border-top: 1px solid grey; padding: 5px 0px 5px 2px; width: 100%;" }).down()
-                        .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;", "innerHtml": "Change admin password" }).up()
+                        .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;" }).down()
+                        .appendElement({ "tag": "div", "style": "display: table-cell; padding: 2px;color: white; background-color: #bbbbbb;", "innerHtml": "Change admin password"}).up()
                         .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;" }).down()
                         .appendElement({ "tag": "div", "id": "adminPasswordChange" }).down()
                         .appendElement({ "tag": "div", "style": "display:table-row; width:100%;" }).down()

@@ -234,7 +234,6 @@ Table.prototype.init = function () {
 			}
 			this.rows[i] = new TableRow(this, i, data)
 			this.rowsId[data[0]] = this.rows[i]
-			//this.appendRow(data, data[0])
 		}
 
 		/* The delete row event **/
@@ -830,7 +829,7 @@ TableCell.prototype.formatValue = function (value) {
 				this.valueDiv.element.className = "xs_number"
 				value = formater.formatReal(value)
 			} else if (fieldType == "xs.string" || fieldType == "string" || fieldType == "xs.token" || fieldType == "xs.anyURI" || fieldType == "xs.anyURI" || fieldType == "xs.IDREF" || fieldType == "xs.QName" || fieldType == "xs.NOTATION" || fieldType == "xs.normalizedString" || fieldType == "xs.Name" || fieldType == "xs.language"
-			|| fieldType == "sqltypes.char" || fieldType == "sqltypes.nchar" || fieldType == "sqltypes.ntext" || fieldType == "sqltypes.nvchar" || fieldType == "sqltypes.text" || fieldType == "sqltypes.varchar") {
+				|| fieldType == "sqltypes.char" || fieldType == "sqltypes.nchar" || fieldType == "sqltypes.ntext" || fieldType == "sqltypes.nvchar" || fieldType == "sqltypes.text" || fieldType == "sqltypes.varchar") {
 				this.valueDiv.element.className = "xs_string"
 				value = formater.formatString(value)
 			} else if (fieldType == "xs.NCName" || fieldType == "xs.ID") {

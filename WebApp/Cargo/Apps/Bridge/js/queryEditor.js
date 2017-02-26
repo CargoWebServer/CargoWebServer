@@ -12,8 +12,20 @@ var QueryEditor = function (parent, file, initCallback) {
     this.queryToolBar = null
     this.dataSelect = null
 
+    // result navigation.
+    this.moveFirstBtn = null
+    this.moveLeftBtn = null
+    this.nagivatorState = null
+    this.moveRightBtn = null
+    this.moveLastBtn = null
+
     // Keep the number of row that can be displayed.
-    this.count = 0
+    this.countRows = 0
+    this.maxRows = 5000 // Must be set in config.
+
+    // Those info came from the query itself.
+    this.fromRows = undefined
+    this.nbRows = 0
 
     // Sql data source.
     this.isSql = file.M_name.endsWith(".sql") || file.M_name.endsWith(".SQL")
@@ -109,7 +121,8 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
     this.queryToolBar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar", "id": randomUUID() })
 
     // The datasource selection.
-    this.dataSelect = this.queryToolBar.appendElement({ "tag": "select" }).down()
+    this.dataSelect = this.queryToolBar.appendElement({ "tag": "div", "style": "display: table-cell; height: 100%; vertical-align: middle;" }).down()
+        .appendElement({ "tag": "select" }).down()
 
     for (var configId in this.dataConfigs) {
         this.dataSelect.appendElement({ "tag": "option", "innerHtml": configId, "value": configId })
@@ -127,7 +140,7 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
 
     // The query button.
     var playQueryBtn = this.queryToolBar.appendElement({ "tag": "div", "class": "toolbarButton" }).down()
-    playQueryBtn.appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-play" })
+    playQueryBtn.appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-bolt" })
 
     playQueryBtn.element.onclick = function (queryEditor) {
         return function () {
@@ -136,8 +149,139 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
         }
     } (this)
 
+    // Now the pages navigation button to use in case of query that contain limits
+    this.queryToolBar.appendElement({ "tag": "div", "class": "toolbarButton", "id": "moveFirstBtn", "style": "display: none;" }).down()
+        .appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-angle-double-left" }).up()
+        .appendElement({ "tag": "div", "class": "toolbarButton", "id": "moveLeftBtn", "style": "display: none;" }).down()
+        .appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-angle-left" }).up()
+        .appendElement({ "tag": "div", "style": "display: none; vertical-align: middle; color: #657383; padding: 0px 10px 0px 10px;", "id": "nagivatorState" })
+        .appendElement({ "tag": "div", "class": "toolbarButton", "id": "moveRightBtn", "style": "display: none;" }).down()
+        .appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-angle-right " }).up()
+        .appendElement({ "tag": "div", "class": "toolbarButton", "id": "moveLastBtn", "style": "display: none;" }).down()
+        .appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-angle-double-right " })
+
+    // Now the action button
+    this.moveFirstBtn = this.queryToolBar.getChildById("moveFirstBtn")
+    this.moveLeftBtn = this.queryToolBar.getChildById("moveLeftBtn")
+    this.nagivatorState = this.queryToolBar.getChildById("nagivatorState")
+    this.moveRightBtn = this.queryToolBar.getChildById("moveRightBtn")
+    this.moveLastBtn = this.queryToolBar.getChildById("moveLastBtn")
+
+    // The move first button.
+    this.moveFirstBtn.element.onclick = function (queryEditor) {
+        return function () {
+            // So here I will set the from to the last...
+            queryEditor.fromRows = 0
+
+            var total = parseInt((queryEditor.countRows / queryEditor.nbRows) + .5)
+            queryEditor.nagivatorState.element.innerHTML = "0 | " + total
+            // Hide left buttons...
+            queryEditor.moveFirstBtn.element.style.display = "none"
+            queryEditor.moveLeftBtn.element.style.display = "none"
+
+            // display the right buttons
+            queryEditor.moveRightBtn.element.style.display = ""
+            queryEditor.moveLastBtn.element.style.display = ""
+
+            queryEditor.runQuery()
+        }
+    } (this)
+
+    // The move last button.
+    this.moveLastBtn.element.onclick = function (queryEditor) {
+        return function () {
+            // So here I will set the from to the last...
+            queryEditor.fromRows = parseInt((queryEditor.countRows / queryEditor.nbRows)) * queryEditor.nbRows
+            var total = parseInt((queryEditor.countRows / queryEditor.nbRows) + .5)
+            queryEditor.nagivatorState.element.innerHTML = total + " | " + total
+            // display right buttons...
+            queryEditor.moveFirstBtn.element.style.display = ""
+            queryEditor.moveLeftBtn.element.style.display = ""
+
+            // hide the right buttons
+            queryEditor.moveRightBtn.element.style.display = "none"
+            queryEditor.moveLastBtn.element.style.display = "none"
+
+            queryEditor.runQuery()
+        }
+    } (this)
+
+    // The move right button.
+    this.moveRightBtn.element.onclick = function (queryEditor) {
+        return function () {
+            // move to nb rows
+            queryEditor.fromRows += queryEditor.nbRows
+
+            var total = parseInt((queryEditor.countRows / queryEditor.nbRows) + .5)
+            var index = parseInt((queryEditor.fromRows / queryEditor.nbRows) + .5)
+
+            // Hide the button if the index is 
+            if (index == total) {
+                queryEditor.moveRightBtn.element.style.display = "none"
+                queryEditor.moveLastBtn.element.style.display = "none"
+            }
+
+            queryEditor.runQuery()
+        }
+    } (this)
+
+    // Move left.
+    this.moveLeftBtn.element.onclick = function (queryEditor) {
+        return function () {
+            // move to nb rows
+            queryEditor.fromRows -= queryEditor.nbRows
+
+            var total = parseInt((queryEditor.countRows / queryEditor.nbRows) + .5)
+            var index = parseInt((queryEditor.fromRows / queryEditor.nbRows) + .5)
+
+            // Hide the button if the index is 
+            if (index == 0) {
+                queryEditor.moveLeftBtn.element.style.display = "none"
+                queryEditor.moveLeftBtn.element.style.display = "none"
+            }
+
+            queryEditor.runQuery()
+        }
+    } (this)
+
     // Call the init callback.
     this.initCallback(this)
+}
+
+QueryEditor.prototype.setResultsNavigatorSate = function () {
+
+    if (this.countRows > this.nbRows) {
+        var total = parseInt((this.countRows / this.nbRows) + .5)
+        var index = this.fromRows / this.nbRows
+
+        if (this.fromRows == 0) {
+            this.moveFirstBtn.element.style.display = "none"
+            this.moveLeftBtn.element.style.display = "none"
+            this.moveRightBtn.element.style.display = ""
+            this.moveLastBtn.element.style.display = ""
+        } else if (index == total) {
+            this.moveRightBtn.element.style.display = "none"
+            this.moveLastBtn.element.style.display = "none"
+            this.moveFirstBtn.element.style.display = ""
+            this.moveLeftBtn.element.style.display = ""
+        } else {
+            this.moveFirstBtn.element.style.display = ""
+            this.moveLeftBtn.element.style.display = ""
+            this.moveRightBtn.element.style.display = ""
+            this.moveLastBtn.element.style.display = ""
+        }
+
+        this.nagivatorState.element.style.display = "table-cell"
+        this.nagivatorState.element.innerHTML = index + " | " + total
+
+    } else {
+        // In that case there no need for the navigation
+        this.moveFirstBtn.element.style.display = "none"
+        this.moveLeftBtn.element.style.display = "none"
+        this.nagivatorState.element.style.display = "none"
+        this.moveRightBtn.element.style.display = "none"
+        this.moveLastBtn.element.style.display = "none"
+    }
 }
 
 /**
@@ -146,6 +290,12 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
 QueryEditor.prototype.setActiveDataConfig = function (configId) {
     // Keep ref to the data configuration.
     this.activeDataConfig = this.dataConfigs[configId]
+    for (var i = 0; i < this.dataSelect.element.childNodes.length; i++) {
+        if (this.dataSelect.element.childNodes[i].value == this.activeDataConfig.M_id) {
+            this.dataSelect.element.selectedIndex = i
+            break
+        }
+    }
 }
 
 /**
@@ -181,7 +331,7 @@ QueryEditor.prototype.runQuery = function () {
                     // only schema will be keep.
                     for (var sourceId in this.dataConfigs) {
                         if (sourceId == values[0]) {
-                            this.activeDataConfig = this.dataConfigs[values[0]]
+                            this.setActiveDataConfig(values[0])
                             prototype = values[1]
                             break
                         }
@@ -200,18 +350,25 @@ QueryEditor.prototype.runQuery = function () {
             }
         }
 
+        // Set the row to start and the number of row to display from start.
+        if (ast.value.limit != null) {
+            if (this.fromRows != undefined) {
+                ast.value.limit.from = this.fromRows
+            } else {
+                this.fromRows = ast.value.limit.from
+            }
+
+            this.nbRows = ast.value.limit.nb
+        }
+
         // The query can be formated...
         var query_ = simpleSqlParser.ast2sql(ast)
         if (query_.length > 0) {
             if (query != query_) {
                 this.editor.getSession().setValue(query_)
-                query = query
+                query = query_
             }
         }
-        //if(type == )
-        // Now I will create the count query
-        // ast.select = []
-
 
         // Now I will retreive the prototypes from prototypes names and exectute the query...
         for (var prototype in prototypes) {
@@ -266,9 +423,9 @@ QueryEditor.prototype.runQuery = function () {
                                     fields.push(field.alias)
                                 }
 
-                                if(field.expression != null){
+                                if (field.expression != null) {
                                     // The count expression...
-                                    if(field.expression.startsWith("COUNT(")){
+                                    if (field.expression.startsWith("COUNT(")) {
                                         fieldsType.push("sqltypes.int")
                                     }
                                 }
@@ -276,12 +433,32 @@ QueryEditor.prototype.runQuery = function () {
                         }
                     }
 
+                    // The list of field types.
+                    caller.fieldsType = fieldsType
+                    caller.fields = fields
+
                     // Here I will execute the query...
                     if (caller.type == "READ") {
                         // Here I will get the number of expected result before execute the final query...
-                        //var countQuery = "select count(*) as numRow from (" + caller.query + ") src";
-                        
-                        caller.queryEditor.setResult(caller.query, fields, fieldsType, [], caller.type)
+                        var ast = simpleSqlParser.sql2ast(caller.query)
+                        ast.value.limit = null // remove the limits
+                        var query_ = simpleSqlParser.ast2sql(ast)
+                        var countQuery = "select count(*) as numRow from (" + query_ + ") src";
+                        server.dataManager.read(caller.queryEditor.activeDataConfig.M_id, countQuery, ["sqltypes.int"], [],
+                            // success callback
+                            function (result, caller) {
+                                caller.queryEditor.countRows = result[0][0]
+                                caller.queryEditor.setResult(caller.query, caller.fields, caller.fieldsType, [], caller.type)
+                            },
+                            // progress callback
+                            function (index, total, caller) {
+
+                            }
+                            , //error callback 
+                            function (errMsg, caller) {
+
+                            },
+                            caller)
                     }
 
                 },
@@ -305,6 +482,9 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
             this.resultQueryPanel.removeAllChilds()
             var table = new Table(this.activeDataConfig.M_id, this.resultQueryPanel)
             var model = new SqlTableModel(this.activeDataConfig.M_id, query, fieldsType, [], fields)
+
+            // Set the results navigator state.
+            this.setResultsNavigatorSate()
 
             table.setModel(model, function (table, queryEditor) {
                 return function () {
