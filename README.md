@@ -26,7 +26,6 @@ CargoWebServer(master depending if you clone the project or not)
   
   You must get the following dependencies:
 - go get github.com/pborman/uuid
-- go get golang.org/x/net/websocket
 - go get github.com/alexbrainman/odbc
 - go get github.com/denisenkom/go-mssqldb
 - go get github.com/go-sql-driver/mysql
@@ -38,9 +37,11 @@ CargoWebServer(master depending if you clone the project or not)
 - go get github.com/robertkrimen/otto
 - go get github.com/syndtr/goleveldb/leveldb
 - go get github.com/xrash/smetrics
-- go get golang.org/x/text/runes
-- go get gopkg.in/gomail.v1
 - go get github.com/bytbox/go-pop3
+- go get github.com/skratchdot/open-golang/open
+- go get gopkg.in/gomail.v1
+- go get golang.org/x/net/websocket
+- go get golang.org/x/text/runes
 
 ###Build
 To build Cago from the top level directory:
