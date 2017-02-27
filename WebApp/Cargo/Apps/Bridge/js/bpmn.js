@@ -1,5 +1,5 @@
 /**
- * The bpmn view...
+ * The bpmn view.
  */
 var BpmnExplorer = function (parent) {
     this.parent = parent

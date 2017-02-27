@@ -22,6 +22,7 @@ type SmtpConfiguration struct{
 	M_id string
 
 	/** members of SmtpConfiguration **/
+	M_textEncoding Encoding
 	M_hostName string
 	M_ipv4 string
 	M_port int
@@ -47,6 +48,7 @@ type XsdSmtpConfiguration struct {
 	M_port	int	`xml:"port,attr"`
 	M_user	string	`xml:"user,attr"`
 	M_pwd	string	`xml:"pwd,attr"`
+	M_textEncoding	string	`xml:"textEncoding,attr"`
 
 }
 /** UUID **/
@@ -66,6 +68,19 @@ func (this *SmtpConfiguration) SetId(ref interface{}){
 }
 
 /** Remove reference Id **/
+
+/** TextEncoding **/
+func (this *SmtpConfiguration) GetTextEncoding() Encoding{
+	return this.M_textEncoding
+}
+
+/** Init reference TextEncoding **/
+func (this *SmtpConfiguration) SetTextEncoding(ref interface{}){
+	this.NeedSave = true
+	this.M_textEncoding = ref.(Encoding)
+}
+
+/** Remove reference TextEncoding **/
 
 /** HostName **/
 func (this *SmtpConfiguration) GetHostName() string{

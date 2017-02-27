@@ -1,5 +1,8 @@
 package Server
 
+/**
+* TODO append the other encoding charset...
+ */
 import (
 	"database/sql"
 	"errors"
@@ -11,6 +14,8 @@ import (
 	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/Utility"
+
 	_ "github.com/alexbrainman/odbc"
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
@@ -25,6 +30,9 @@ type SqlDataStore struct {
 
 	/** The name of the drivers use **/
 	m_vendor Config.DataStoreVendor
+
+	/** The charset **/
+	m_textEncoding Config.Encoding
 
 	/** The store port **/
 	m_port int
@@ -57,6 +65,7 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 	store.m_user = info.M_user
 	store.m_password = info.M_pwd
 	store.m_port = info.M_port
+	store.m_textEncoding = info.M_textEncoding
 
 	// Connect the store...
 	err := store.Connect()
@@ -103,7 +112,36 @@ func (this *SqlDataStore) Connect() error {
 		connectionString += "uid=" + this.m_user + ";"
 		connectionString += "pwd=" + this.m_password + ";"
 		connectionString += "port=" + strconv.Itoa(this.m_port) + ";"
-		connectionString += "clientcharset=UTF-8;"
+
+		// The encoding
+		if this.m_textEncoding == Config.Encoding_UTF8 {
+			connectionString += "clientcharset=UTF-8;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_1 {
+			connectionString += "clientcharset=ISO8859_1;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1250 {
+			connectionString += "clientcharset=Windows1250;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1251 {
+			connectionString += "clientcharset=Windows1251;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1252 {
+			connectionString += "clientcharset=Windows1252;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1253 {
+			connectionString += "clientcharset=Windows1253;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1254 {
+			connectionString += "clientcharset=Windows1254;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1255 {
+			connectionString += "clientcharset=Windows1255;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1256 {
+			connectionString += "clientcharset=Windows1256;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1257 {
+			connectionString += "clientcharset=Windows1257;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1258 {
+			connectionString += "clientcharset=Windows1258;"
+		} else if this.m_textEncoding == Config.Encoding_KOI8R {
+			connectionString += "clientcharset=KOI8R;"
+		} else if this.m_textEncoding == Config.Encoding_KOI8U {
+			connectionString += "clientcharset=KOI8U;"
+		}
+
 		driver = "odbc"
 	}
 
@@ -250,11 +288,10 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 
 			return nil, err
 		}
-		result := make([]interface{}, 0, 0)
 
+		result := make([]interface{}, 0, 0)
 		for i := 0; i < len(fields); i++ {
 			if fields[i] != nil {
-
 				if strings.HasSuffix(fieldsType[i].(string), "int") {
 					var val int
 					switch fields[i].(type) {
@@ -316,12 +353,13 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 					val = fields[i].([]byte)
 					result = append(result, val)
 
-				} else if strings.HasSuffix(fieldsType[i].(string), "date") {
+				} else if strings.HasSuffix(fieldsType[i].(string), "date") || strings.HasSuffix(fieldsType[i].(string), "datetime") {
 					var val time.Time
 					val = fields[i].(time.Time)
 					result = append(result, val)
 
 				} else if strings.HasSuffix(fieldsType[i].(string), "string") || strings.HasSuffix(fieldsType[i].(string), "varchar") {
+
 					var val string
 					switch fields[i].(type) {
 					case []uint8: // Bytes...
@@ -334,10 +372,38 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 						}
 					}
 
+					// If values need decoding.
+					if this.m_textEncoding == Config.Encoding_ISO8859_1 {
+						val, _ = Utility.DecodeISO8859_1(val)
+					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1250 {
+						val, _ = Utility.DecodeWindows1250(val)
+					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1251 {
+						val, _ = Utility.DecodeWindows1251(val)
+					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1252 {
+						val, _ = Utility.DecodeWindows1252(val)
+					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1253 {
+						val, _ = Utility.DecodeWindows1253(val)
+					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1254 {
+						val, _ = Utility.DecodeWindows1254(val)
+					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1255 {
+						val, _ = Utility.DecodeWindows1255(val)
+					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1256 {
+						val, _ = Utility.DecodeWindows1256(val)
+					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1257 {
+						val, _ = Utility.DecodeWindows1257(val)
+					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1258 {
+						val, _ = Utility.DecodeWindows1258(val)
+					} else if this.m_textEncoding == Config.Encoding_KOI8R {
+						val, _ = Utility.DecodeKOI8R(val)
+					} else if this.m_textEncoding == Config.Encoding_KOI8U {
+						val, _ = Utility.DecodeKOI8U(val)
+					}
+
 					result = append(result, val)
 
 				} else {
-					log.Println("Type not found!!!")
+
+					log.Println("Type", fieldsType[i], "not found!!!")
 				}
 			} else {
 				result = append(result, nil)

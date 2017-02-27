@@ -749,6 +749,20 @@ function createItemLnk(entity, value, field, valueDiv) {
 }
 
 /**
+ * Return true if the field is a string
+ */
+function fieldIsString(fieldType){
+
+}
+
+/**
+ * Return true if the field is a 
+ */
+function fieldIsFloat(fieldType){
+
+}
+
+/**
  * Fromat the content of the cell in respect of the value.
  * @param {} value The value to display in the cell.
  */
@@ -761,7 +775,7 @@ TableCell.prototype.formatValue = function (value) {
 	}
 
 	// In case of a reference string...
-	if (fieldType == "xs.string") {
+	if (fieldType.endsWith("string")) {
 		if (isObjectReference(value)) {
 			// In that case I will create the link object to reach the 
 			// reference...
@@ -770,7 +784,7 @@ TableCell.prototype.formatValue = function (value) {
 	}
 
 	// In case of generic value I will try to determine the type of the entity... 
-	if (fieldType == "xs.[]uint8") {
+	if (fieldType.endsWith("[]uint8")) {
 		if (isString(value)) {
 			try {
 				value = JSON.parse(value);
@@ -1314,7 +1328,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 
 	// Here is the default editor if is undefined...
 	if (editor == null) {
-		if (type == "string" || type == "xs.string") {
+		if (type.endsWith("string")) {
 			// Here I will put a text area..
 			if (value.length > 50) {
 				editor = this.div.appendElement({ "tag": "textarea", "resize": "false" }).down()
@@ -1328,11 +1342,11 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 			if (value != undefined) {
 				editor.element.value = value
 			}
-		} else if (type == "date" || type == "xs.date" || type == "xs.dateTime") {
+		} else if (type.endsWith("date") || type.endsWith("dateTime")) {
 			editor = this.div.appendElement({ "tag": "input", "type": "datetime-local", "name": "date" }).down()
 			editor.element.value = moment(value).format('YYYY-MM-DDTHH:mm:ss');
 			editor.element.step = 7
-		} else if (type == "double" || type == "xs.float" || type == "xs.double" || type == "xs.float64") {
+		} else if (type.endsWith("double") || type.endsWith("float") || "xs.float64") {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "0.01" }).down()
 			editor.element.value = value
 		} else if (type == "xs.id") {
@@ -1341,7 +1355,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 		} else if (type == "xs.boolean") {
 			editor = this.div.appendElement({ "tag": "input", "type": "checkbox" }).down()
 			editor.element.checked = value
-		} else if (type == "int" || type == "xs.int" || type == "xs.integer" || type == "xs.unsignedLong") {
+		} else if (type.endsWith("int") || type == "xs.integer" || type == "xs.unsignedLong") {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "1" }).down()
 			editor.element.value = value
 		} else if (prototype != null) {
@@ -1811,11 +1825,11 @@ var ColumnFilter = function (index, table) {
 		return function () {
 			if (filter.filterPanelDiv.element.style.display != "block") {
 				filter.filterPanelDiv.element.style.display = "block"
-				var rect1 = localToGlobal(filter.filterPanelDiv.element)
+				/*var rect1 = localToGlobal(filter.filterPanelDiv.element)
 				var rect2 = localToGlobal(filter.table.div.element)
 				if (rect1.right > rect2.right) {
 					filter.filterPanelDiv.element.style.right = "0px"
-				}
+				}*/
 			} else {
 				filter.filterPanelDiv.element.style.display = "none"
 			}
@@ -1835,7 +1849,7 @@ ColumnFilter.prototype.getValues = function () {
 		// Get unique value...
 		var value = this.table.model.getValueAt(i, this.index)
 		var formater = this.table.columnFormater
-		if (this.type == "date") {
+		if (this.type.endsWith("date") || this.type.endsWith("datetime")) {
 			value = formater.formatDate(value, this.table.filterFormat);
 		} else if (this.type == "real" || this.type == "float") {
 			value = parseFloat(formater.formatReal(value))
@@ -1872,7 +1886,7 @@ ColumnFilter.prototype.initFilterPanel = function () {
 
 	// First of all I wil get the list of value...
 	var type = this.table.model.getColumnClass(this.index)
-	if (type != "date") {
+	if (!this.type.endsWith("datetime") && !this.type.endsWith("date")) {
 		var values = this.getValues()
 		// So here I will create the list of values with checkbox...
 		for (var i = 0; i < values.length; i++) {
@@ -2097,7 +2111,7 @@ ColumnFilter.prototype.filterValues = function () {
 		var row = this.table.rows[i]
 		var cellValue = this.table.model.getValueAt(i, this.index)
 		var isShow = false
-		if (this.type == "date") {
+		if (this.type.endsWith("date") || this.type.endsWith("datetime")) {
 			// Now filters are apply...
 			for (var filter in this.filters) {
 				var f = this.filters[filter]

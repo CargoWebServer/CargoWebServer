@@ -6,7 +6,7 @@ var languageInfo = {
 }
 
 server.languageManager.appendLanguageInfo(languageInfo)
-var homepage = null
+
 /**
  * When the user is logged in this is the page to display.
  */
@@ -74,7 +74,6 @@ var HomePage = function () {
     // The toolbar div
     this.toolbarDiv = null
 
-    // Set the global variable...
     homepage = this
 
     return this
@@ -93,10 +92,10 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     /////////////////////////////////// Menu section ///////////////////////////////////
     var menuRow = this.headerDiv.appendElement({ "tag": "div", "style": "width:100%; height: 30px; display: table-row" }).down()
-   
+
     // The toolbar file grid...
-    this.toolbarDiv = this.headerDiv.appendElement({ "tag": "div", "id": "toolbarDiv"}).down()
-    
+    this.toolbarDiv = this.headerDiv.appendElement({ "tag": "div", "id": "toolbarDiv" }).down()
+
     // This is where the menu grid will be put...
     this.menuContentDiv = menuRow.appendElement({ "tag": "div", "style": "width:100%; display: table-cell;" }).down()
         .appendElement({ "tag": "div", "style": "width:100%; display: table; height: 0px;" }).down()
@@ -128,7 +127,14 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                 lastIndex++
 
                 // Here I will create an empty text file.
-                var f = new File(["/** Wrote your query here **/\n"], "q" + lastIndex + extension, { type: "text/plain", lastModified: new Date(0) })
+                var f = null
+                try {
+                    var f = new File([""], "q" + lastIndex + extension, { type: "text/plain", lastModified: new Date(0) })
+                } catch (error) {
+                    f = new Blob([""], { type: "text/plain" });
+                    f.name = "test.txt"
+                    f.lastModifiedDate = new Date(0);
+                }
 
                 // Now I will create the new file...
                 server.fileManager.createFile("q" + lastIndex + extension, "/queries", f, 256, 256, false,
@@ -149,7 +155,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
             // Error
             function () {
 
-            }, { extension })
+            }, {"extension":extension})
     }
 
     // Create a new Entity Query File.
@@ -186,11 +192,12 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                         //server.dataManager.importXsdSchema(f)
                         var reader = new FileReader();
                         /** I will read the file content... */
-                        reader.onload = function(file){
+                        reader.onload = function (file) {
                             return function (e) {
                                 // Now I will load the content of the file.
                                 server.dataManager.importXsdSchema(file.name, e.target.result)
-                        }}(f);
+                            }
+                        } (f);
                         reader.readAsText(f);
                     }
                 }
@@ -211,16 +218,16 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                         var reader = new FileReader();
                         /** I will read the file content... */
                         reader.onload = function (e) {
-                                var text = e.target.result
-                                // Now I will load the content of the file.
-                                server.dataManager.importXmlData(text,
-                                    function (result, caller) {
-                                        /** Nothing todo the the action will be in the event listener. */
-                                    },
-                                    function (errMsg, caller) {
+                            var text = e.target.result
+                            // Now I will load the content of the file.
+                            server.dataManager.importXmlData(text,
+                                function (result, caller) {
+                                    /** Nothing todo the the action will be in the event listener. */
+                                },
+                                function (errMsg, caller) {
 
-                                    }, {})
-                            };
+                                }, {})
+                        };
                         reader.readAsText(f);
                     }
                 }
@@ -262,9 +269,9 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     // The workspace area
     this.workspaceDiv = new Element(rightDiv, { "tag": "div", "class": "workspace_div" })
-    
+
     // The working file grid...
-    this.workingFilesDiv = this.workspaceDiv.appendElement({ "tag": "div", "id": "workingFilesDiv"}).down()
+    this.workingFilesDiv = this.workspaceDiv.appendElement({ "tag": "div", "id": "workingFilesDiv" }).down()
         .appendElement({ "tag": "div", "style": "width:100%; display: inline; position: relative" }).down()
     this.fileNavigator = new FileNavigator(this.workingFilesDiv)
     // The code editor...

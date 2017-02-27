@@ -64,7 +64,7 @@ var FileNavigator = function (parent) {
             }
         }
     })
-    
+
     server.fileManager.attach(this, UpdateFileEvent, function (evt, codeEditor) {
         if (evt.dataMap.fileInfo !== undefined) {
             var fileId = evt.dataMap["fileInfo"].M_id
@@ -265,7 +265,16 @@ FileNavigator.prototype.saveFile = function (fileId) {
 
     // Now I will save the file.
     var file = server.entityManager.entities["CargoEntities.File_" + fileId]
-    var f = new File([decode64(file.M_data)], file.M_name, { type: "text/plain", lastModified: new Date(0) })
+    var data = [decode64(file.M_data)]
+    var f = null
+    
+    try {
+        f = new File(data, file.M_name, { type: "text/plain", lastModified: new Date(0) })
+    } catch (error) {
+        f = new Blob(data, { type: "text/plain" });
+        f.name = "test.txt"
+        f.lastModifiedDate = new Date(0);
+    }
 
     server.fileManager.createFile(file.M_name, file.M_path, f, 256, 256, false,
         // Success callback

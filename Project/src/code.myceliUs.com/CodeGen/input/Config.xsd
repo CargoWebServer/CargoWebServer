@@ -19,6 +19,24 @@
 		</xsd:restriction>
 	</xsd:simpleType>
 
+	<xsd:simpleType name="tEncoding">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="UTF8"/>
+			<xsd:enumeration value="WINDOWS_1250"/>
+			<xsd:enumeration value="WINDOWS_1251"/>
+			<xsd:enumeration value="WINDOWS_1252"/>
+			<xsd:enumeration value="WINDOWS_1253"/>
+			<xsd:enumeration value="WINDOWS_1254"/>
+			<xsd:enumeration value="WINDOWS_1255"/>
+			<xsd:enumeration value="WINDOWS_1256"/>
+			<xsd:enumeration value="WINDOWS_1257"/>
+			<xsd:enumeration value="WINDOWS_1258"/>
+			<xsd:enumeration value="ISO8859_1"/>
+			<xsd:enumeration value="KOI8R"/>
+			<xsd:enumeration value="KOI8U"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
 	<xsd:element name="configuration" type="tConfiguration"/>
 	<xsd:complexType name="tConfiguration" abstract="true">
 		<xsd:attribute name="id" type="xsd:ID"/>
@@ -62,6 +80,7 @@
 				<xsd:attribute name="port" type="xsd:integer" />
 				<xsd:attribute name="user" type="xsd:string" />
 				<xsd:attribute name="pwd" type="xsd:string" />
+				<xsd:attribute name="textEncoding" type="tEncoding" />
 			</xsd:extension> 
 		</xsd:complexContent> 
 	</xsd:complexType>
@@ -77,6 +96,7 @@
 				<xsd:attribute name="pwd" type="xsd:string" />
 				<xsd:attribute name="dataStoreType" type="tDataStoreType" />
 				<xsd:attribute name="dataStoreVendor" type="tDataStoreVendor" />
+				<xsd:attribute name="textEncoding" type="tEncoding" />
 			</xsd:extension> 
 		</xsd:complexContent> 
 	</xsd:complexType>

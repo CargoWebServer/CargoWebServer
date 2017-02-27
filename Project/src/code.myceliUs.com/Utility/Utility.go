@@ -23,6 +23,7 @@ import (
 	"unicode"
 
 	"github.com/pborman/uuid"
+	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -363,4 +364,222 @@ func ForeignIP(ip string) (*IPInfo, error) {
 		return nil, err
 	}
 	return &ipinfo, nil
+}
+
+// Various decoding function.
+
+// Windows1250
+func DecodeWindows1250(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.Windows1250.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// Windows1251
+func DecodeWindows1251(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.Windows1251.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// Windows1252
+func DecodeWindows1252(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.Windows1252.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// Windows1253
+func DecodeWindows1253(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.Windows1253.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// Windows1254
+func DecodeWindows1254(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.Windows1254.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// Windows1255
+func DecodeWindows1255(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.Windows1255.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// Windows1256
+func DecodeWindows1256(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.Windows1256.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// Windows1257
+func DecodeWindows1257(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.Windows1257.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// Windows1258
+func DecodeWindows1258(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.Windows1258.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_1
+func DecodeISO8859_1(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_1.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// KOI8R
+func DecodeKOI8R(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.KOI8R.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// KOI8U
+func DecodeKOI8U(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.KOI8U.NewDecoder()
+
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
 }

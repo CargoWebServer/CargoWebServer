@@ -26,6 +26,19 @@
 
 window.URL = window.URL || window.webkitURL;  // Take care of vendor prefixes.
 
+function fireResize(){
+    if (document.createEvent) { // W3C
+        var ev = document.createEvent('Event');
+        ev.initEvent('resize', true, true);
+        window.dispatchEvent(ev);
+    }
+    else { // IE
+        element=document.documentElement;
+        var event=document.createEventObject();
+        element.fireEvent("onresize",event);
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////////
 //  Validation functions helpers
 ////////////////////////////////////////////////////////////////////////////
@@ -1285,6 +1298,39 @@ function getCoords(elem) { // crossbrowser version
     var left = box.left + scrollLeft - clientLeft;
 
     return { top: Math.round(top), left: Math.round(left) };
+}
+
+/**
+ * Return the global postion of a given element.
+ * @param target An html element.
+ * @returns The rectangle coordinates (top, left, bottom, right) with their respective values.
+ */
+function localToGlobal(target) {
+
+    var width = target.offsetWidth
+    var height = target.offsetHeight
+
+    var gleft = 0
+    var gtop = 0
+    var rect = {}
+
+    var moonwalk = function (parent) {
+        if (!parent) {
+            gleft += parent.offsetLeft;
+            gtop += parent.offsetTop;
+            moonwalk(parent.offsetParent);
+        } else {
+            return rect = {
+                top: target.offsetTop + gtop,
+                left: target.offsetLeft + gleft,
+                bottom: (target.offsetTop + gtop) + height,
+                right: (target.offsetLeft + gleft) + width
+            };
+        }
+    };
+    moonwalk(target.offsetParent);
+
+    return rect;
 }
 
 /**

@@ -51,12 +51,14 @@ var CodeEditor = function (parent) {
 
     // Attach the file close event.
     server.fileManager.attach(this, CloseEntityEvent, function (evt, codeEditor) {
-        var fileId = evt.dataMap["fileId"] 
+        var fileId = evt.dataMap["fileId"]
         if (fileId != undefined) {
             codeEditor.removeFile(fileId)
-            for (var i = 0; i < codeEditor.toolbars[fileId].length; i++) {
-                var toolbar = codeEditor.toolbars[fileId][i]
-                homepage.toolbarDiv.removeElement(toolbar)
+            if (codeEditor.toolbars[fileId] != undefined) {
+                for (var i = 0; i < codeEditor.toolbars[fileId].length; i++) {
+                    var toolbar = codeEditor.toolbars[fileId][i]
+                    homepage.toolbarDiv.removeElement(toolbar)
+                }
             }
             codeEditor.toolbars[fileId] = []
         }
@@ -179,7 +181,7 @@ CodeEditor.prototype.appendFile = function (file) {
 
 
     // Now I will create the file editor.
-    var filePanel = this.panel.appendElement({ "tag": "xmp", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
+    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
     var editor = ace.edit(file.M_id + "_editor");
     editor.getSession().setMode(fileMode);
     this.editors[file.M_id + "_editor"] = editor

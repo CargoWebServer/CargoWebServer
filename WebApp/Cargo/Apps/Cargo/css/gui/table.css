@@ -75,7 +75,9 @@
 }
 
 .table_row {
-    display: table-row
+    display: table-row;
+    /*visibility: hidden;*/
+    /* display: none; */
 }
 
 

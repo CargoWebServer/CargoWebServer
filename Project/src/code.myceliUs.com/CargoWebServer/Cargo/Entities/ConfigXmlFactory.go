@@ -94,70 +94,6 @@ func (this *ConfigXmlFactory) SerializeXml(outputPath string, toSerialize *Confi
 	return nil
 }
 
-/** inititialisation of SmtpConfiguration **/
-func (this *ConfigXmlFactory) InitSmtpConfiguration(xmlElement *Config.XsdSmtpConfiguration, object *Config.SmtpConfiguration) {
-	log.Println("Initialize SmtpConfiguration")
-	if len(object.UUID) == 0 {
-		object.UUID = "Config.SmtpConfiguration%" + Utility.RandomUUID()
-	}
-
-	/** SmtpConfiguration **/
-	object.M_id = xmlElement.M_id
-
-	/** Configuration **/
-	object.M_hostName = xmlElement.M_hostName
-
-	/** Configuration **/
-	object.M_ipv4 = xmlElement.M_ipv4
-
-	/** Configuration **/
-	object.M_port = xmlElement.M_port
-
-	/** Configuration **/
-	object.M_user = xmlElement.M_user
-
-	/** Configuration **/
-	object.M_pwd = xmlElement.M_pwd
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** inititialisation of LdapConfiguration **/
-func (this *ConfigXmlFactory) InitLdapConfiguration(xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
-	log.Println("Initialize LdapConfiguration")
-	if len(object.UUID) == 0 {
-		object.UUID = "Config.LdapConfiguration%" + Utility.RandomUUID()
-	}
-
-	/** LdapConfiguration **/
-	object.M_id = xmlElement.M_id
-
-	/** Configuration **/
-	object.M_hostName = xmlElement.M_hostName
-
-	/** Configuration **/
-	object.M_ipv4 = xmlElement.M_ipv4
-
-	/** Configuration **/
-	object.M_port = xmlElement.M_port
-
-	/** Configuration **/
-	object.M_user = xmlElement.M_user
-
-	/** Configuration **/
-	object.M_pwd = xmlElement.M_pwd
-
-	/** Configuration **/
-	object.M_domain = xmlElement.M_domain
-
-	/** Configuration **/
-	object.M_searchBase = xmlElement.M_searchBase
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
 /** inititialisation of DataStoreConfiguration **/
 func (this *ConfigXmlFactory) InitDataStoreConfiguration(xmlElement *Config.XsdDataStoreConfiguration, object *Config.DataStoreConfiguration) {
 	log.Println("Initialize DataStoreConfiguration")
@@ -197,6 +133,35 @@ func (this *ConfigXmlFactory) InitDataStoreConfiguration(xmlElement *Config.XsdD
 		object.M_dataStoreVendor = Config.DataStoreVendor_MYSQL
 	} else if xmlElement.M_dataStoreVendor == "##MSSQL" {
 		object.M_dataStoreVendor = Config.DataStoreVendor_MSSQL
+	}
+
+	/** Encoding **/
+	if xmlElement.M_textEncoding == "##UTF8" {
+		object.M_textEncoding = Config.Encoding_UTF8
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1250" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1250
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1251" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1251
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1252" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1252
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1253" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1253
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1254" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1254
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1255" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1255
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1256" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1256
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1257" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1257
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1258" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1258
+	} else if xmlElement.M_textEncoding == "##ISO8859_1" {
+		object.M_textEncoding = Config.Encoding_ISO8859_1
+	} else if xmlElement.M_textEncoding == "##KOI8R" {
+		object.M_textEncoding = Config.Encoding_KOI8R
+	} else if xmlElement.M_textEncoding == "##KOI8U" {
+		object.M_textEncoding = Config.Encoding_KOI8U
 	}
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
@@ -380,110 +345,94 @@ func (this *ConfigXmlFactory) InitApplicationConfiguration(xmlElement *Config.Xs
 	}
 }
 
-/** serialysation of LdapConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeLdapConfiguration(xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
-	if xmlElement == nil {
-		return
+/** inititialisation of SmtpConfiguration **/
+func (this *ConfigXmlFactory) InitSmtpConfiguration(xmlElement *Config.XsdSmtpConfiguration, object *Config.SmtpConfiguration) {
+	log.Println("Initialize SmtpConfiguration")
+	if len(object.UUID) == 0 {
+		object.UUID = "Config.SmtpConfiguration%" + Utility.RandomUUID()
+	}
+
+	/** SmtpConfiguration **/
+	object.M_id = xmlElement.M_id
+
+	/** Configuration **/
+	object.M_hostName = xmlElement.M_hostName
+
+	/** Configuration **/
+	object.M_ipv4 = xmlElement.M_ipv4
+
+	/** Configuration **/
+	object.M_port = xmlElement.M_port
+
+	/** Configuration **/
+	object.M_user = xmlElement.M_user
+
+	/** Configuration **/
+	object.M_pwd = xmlElement.M_pwd
+
+	/** Encoding **/
+	if xmlElement.M_textEncoding == "##UTF8" {
+		object.M_textEncoding = Config.Encoding_UTF8
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1250" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1250
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1251" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1251
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1252" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1252
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1253" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1253
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1254" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1254
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1255" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1255
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1256" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1256
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1257" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1257
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1258" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1258
+	} else if xmlElement.M_textEncoding == "##ISO8859_1" {
+		object.M_textEncoding = Config.Encoding_ISO8859_1
+	} else if xmlElement.M_textEncoding == "##KOI8R" {
+		object.M_textEncoding = Config.Encoding_KOI8R
+	} else if xmlElement.M_textEncoding == "##KOI8U" {
+		object.M_textEncoding = Config.Encoding_KOI8U
+	}
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** inititialisation of LdapConfiguration **/
+func (this *ConfigXmlFactory) InitLdapConfiguration(xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
+	log.Println("Initialize LdapConfiguration")
+	if len(object.UUID) == 0 {
+		object.UUID = "Config.LdapConfiguration%" + Utility.RandomUUID()
 	}
 
 	/** LdapConfiguration **/
-	xmlElement.M_id = object.M_id
+	object.M_id = xmlElement.M_id
 
 	/** Configuration **/
-	xmlElement.M_hostName = object.M_hostName
+	object.M_hostName = xmlElement.M_hostName
 
 	/** Configuration **/
-	xmlElement.M_ipv4 = object.M_ipv4
+	object.M_ipv4 = xmlElement.M_ipv4
 
 	/** Configuration **/
-	xmlElement.M_port = object.M_port
+	object.M_port = xmlElement.M_port
 
 	/** Configuration **/
-	xmlElement.M_user = object.M_user
+	object.M_user = xmlElement.M_user
 
 	/** Configuration **/
-	xmlElement.M_pwd = object.M_pwd
+	object.M_pwd = xmlElement.M_pwd
 
 	/** Configuration **/
-	xmlElement.M_domain = object.M_domain
+	object.M_domain = xmlElement.M_domain
 
 	/** Configuration **/
-	xmlElement.M_searchBase = object.M_searchBase
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of DataStoreConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeDataStoreConfiguration(xmlElement *Config.XsdDataStoreConfiguration, object *Config.DataStoreConfiguration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** DataStoreConfiguration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_hostName = object.M_hostName
-
-	/** Configuration **/
-	xmlElement.M_ipv4 = object.M_ipv4
-
-	/** Configuration **/
-	xmlElement.M_port = object.M_port
-
-	/** Configuration **/
-	xmlElement.M_user = object.M_user
-
-	/** Configuration **/
-	xmlElement.M_pwd = object.M_pwd
-
-	/** DataStoreType **/
-	if object.M_dataStoreType == Config.DataStoreType_SQL_STORE {
-		xmlElement.M_dataStoreType = "##SQL_STORE"
-	} else if object.M_dataStoreType == Config.DataStoreType_KEY_VALUE_STORE {
-		xmlElement.M_dataStoreType = "##KEY_VALUE_STORE"
-	}
-
-	/** DataStoreVendor **/
-	if object.M_dataStoreVendor == Config.DataStoreVendor_MYCELIUS {
-		xmlElement.M_dataStoreVendor = "##MYCELIUS"
-	} else if object.M_dataStoreVendor == Config.DataStoreVendor_MYSQL {
-		xmlElement.M_dataStoreVendor = "##MYSQL"
-	} else if object.M_dataStoreVendor == Config.DataStoreVendor_MSSQL {
-		xmlElement.M_dataStoreVendor = "##MSSQL"
-	}
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of ServiceConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** ServiceConfiguration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_hostName = object.M_hostName
-
-	/** Configuration **/
-	xmlElement.M_ipv4 = object.M_ipv4
-
-	/** Configuration **/
-	xmlElement.M_port = object.M_port
-
-	/** Configuration **/
-	xmlElement.M_user = object.M_user
-
-	/** Configuration **/
-	xmlElement.M_pwd = object.M_pwd
-
-	/** Configuration **/
-	xmlElement.M_start = object.M_start
+	object.M_searchBase = xmlElement.M_searchBase
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -658,6 +607,173 @@ func (this *ConfigXmlFactory) SerialyzeSmtpConfiguration(xmlElement *Config.XsdS
 
 	/** Configuration **/
 	xmlElement.M_pwd = object.M_pwd
+
+	/** Encoding **/
+	if object.M_textEncoding == Config.Encoding_UTF8 {
+		xmlElement.M_textEncoding = "##UTF8"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1250 {
+		xmlElement.M_textEncoding = "##WINDOWS_1250"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1251 {
+		xmlElement.M_textEncoding = "##WINDOWS_1251"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1252 {
+		xmlElement.M_textEncoding = "##WINDOWS_1252"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1253 {
+		xmlElement.M_textEncoding = "##WINDOWS_1253"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1254 {
+		xmlElement.M_textEncoding = "##WINDOWS_1254"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1255 {
+		xmlElement.M_textEncoding = "##WINDOWS_1255"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1256 {
+		xmlElement.M_textEncoding = "##WINDOWS_1256"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1257 {
+		xmlElement.M_textEncoding = "##WINDOWS_1257"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1258 {
+		xmlElement.M_textEncoding = "##WINDOWS_1258"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_1 {
+		xmlElement.M_textEncoding = "##ISO8859_1"
+	} else if object.M_textEncoding == Config.Encoding_KOI8R {
+		xmlElement.M_textEncoding = "##KOI8R"
+	} else if object.M_textEncoding == Config.Encoding_KOI8U {
+		xmlElement.M_textEncoding = "##KOI8U"
+	}
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of LdapConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeLdapConfiguration(xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** LdapConfiguration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_hostName = object.M_hostName
+
+	/** Configuration **/
+	xmlElement.M_ipv4 = object.M_ipv4
+
+	/** Configuration **/
+	xmlElement.M_port = object.M_port
+
+	/** Configuration **/
+	xmlElement.M_user = object.M_user
+
+	/** Configuration **/
+	xmlElement.M_pwd = object.M_pwd
+
+	/** Configuration **/
+	xmlElement.M_domain = object.M_domain
+
+	/** Configuration **/
+	xmlElement.M_searchBase = object.M_searchBase
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of DataStoreConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeDataStoreConfiguration(xmlElement *Config.XsdDataStoreConfiguration, object *Config.DataStoreConfiguration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** DataStoreConfiguration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_hostName = object.M_hostName
+
+	/** Configuration **/
+	xmlElement.M_ipv4 = object.M_ipv4
+
+	/** Configuration **/
+	xmlElement.M_port = object.M_port
+
+	/** Configuration **/
+	xmlElement.M_user = object.M_user
+
+	/** Configuration **/
+	xmlElement.M_pwd = object.M_pwd
+
+	/** DataStoreType **/
+	if object.M_dataStoreType == Config.DataStoreType_SQL_STORE {
+		xmlElement.M_dataStoreType = "##SQL_STORE"
+	} else if object.M_dataStoreType == Config.DataStoreType_KEY_VALUE_STORE {
+		xmlElement.M_dataStoreType = "##KEY_VALUE_STORE"
+	}
+
+	/** DataStoreVendor **/
+	if object.M_dataStoreVendor == Config.DataStoreVendor_MYCELIUS {
+		xmlElement.M_dataStoreVendor = "##MYCELIUS"
+	} else if object.M_dataStoreVendor == Config.DataStoreVendor_MYSQL {
+		xmlElement.M_dataStoreVendor = "##MYSQL"
+	} else if object.M_dataStoreVendor == Config.DataStoreVendor_MSSQL {
+		xmlElement.M_dataStoreVendor = "##MSSQL"
+	}
+
+	/** Encoding **/
+	if object.M_textEncoding == Config.Encoding_UTF8 {
+		xmlElement.M_textEncoding = "##UTF8"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1250 {
+		xmlElement.M_textEncoding = "##WINDOWS_1250"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1251 {
+		xmlElement.M_textEncoding = "##WINDOWS_1251"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1252 {
+		xmlElement.M_textEncoding = "##WINDOWS_1252"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1253 {
+		xmlElement.M_textEncoding = "##WINDOWS_1253"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1254 {
+		xmlElement.M_textEncoding = "##WINDOWS_1254"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1255 {
+		xmlElement.M_textEncoding = "##WINDOWS_1255"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1256 {
+		xmlElement.M_textEncoding = "##WINDOWS_1256"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1257 {
+		xmlElement.M_textEncoding = "##WINDOWS_1257"
+	} else if object.M_textEncoding == Config.Encoding_WINDOWS_1258 {
+		xmlElement.M_textEncoding = "##WINDOWS_1258"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_1 {
+		xmlElement.M_textEncoding = "##ISO8859_1"
+	} else if object.M_textEncoding == Config.Encoding_KOI8R {
+		xmlElement.M_textEncoding = "##KOI8R"
+	} else if object.M_textEncoding == Config.Encoding_KOI8U {
+		xmlElement.M_textEncoding = "##KOI8U"
+	}
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of ServiceConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** ServiceConfiguration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_hostName = object.M_hostName
+
+	/** Configuration **/
+	xmlElement.M_ipv4 = object.M_ipv4
+
+	/** Configuration **/
+	xmlElement.M_port = object.M_port
+
+	/** Configuration **/
+	xmlElement.M_user = object.M_user
+
+	/** Configuration **/
+	xmlElement.M_pwd = object.M_pwd
+
+	/** Configuration **/
+	xmlElement.M_start = object.M_start
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}

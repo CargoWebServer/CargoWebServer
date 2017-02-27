@@ -249,38 +249,39 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
 }
 
 QueryEditor.prototype.setResultsNavigatorSate = function () {
+    if (this.nbRows > 0) {
+        if (this.countRows > this.nbRows) {
+            var total = parseInt((this.countRows / this.nbRows) + .5)
+            var index = this.fromRows / this.nbRows
 
-    if (this.countRows > this.nbRows) {
-        var total = parseInt((this.countRows / this.nbRows) + .5)
-        var index = this.fromRows / this.nbRows
+            if (this.fromRows == 0) {
+                this.moveFirstBtn.element.style.display = "none"
+                this.moveLeftBtn.element.style.display = "none"
+                this.moveRightBtn.element.style.display = ""
+                this.moveLastBtn.element.style.display = ""
+            } else if (index == total) {
+                this.moveRightBtn.element.style.display = "none"
+                this.moveLastBtn.element.style.display = "none"
+                this.moveFirstBtn.element.style.display = ""
+                this.moveLeftBtn.element.style.display = ""
+            } else {
+                this.moveFirstBtn.element.style.display = ""
+                this.moveLeftBtn.element.style.display = ""
+                this.moveRightBtn.element.style.display = ""
+                this.moveLastBtn.element.style.display = ""
+            }
 
-        if (this.fromRows == 0) {
+            this.nagivatorState.element.style.display = "table-cell"
+            this.nagivatorState.element.innerHTML = index + " | " + total
+
+        } else {
+            // In that case there no need for the navigation
             this.moveFirstBtn.element.style.display = "none"
             this.moveLeftBtn.element.style.display = "none"
-            this.moveRightBtn.element.style.display = ""
-            this.moveLastBtn.element.style.display = ""
-        } else if (index == total) {
+            this.nagivatorState.element.style.display = "none"
             this.moveRightBtn.element.style.display = "none"
             this.moveLastBtn.element.style.display = "none"
-            this.moveFirstBtn.element.style.display = ""
-            this.moveLeftBtn.element.style.display = ""
-        } else {
-            this.moveFirstBtn.element.style.display = ""
-            this.moveLeftBtn.element.style.display = ""
-            this.moveRightBtn.element.style.display = ""
-            this.moveLastBtn.element.style.display = ""
         }
-
-        this.nagivatorState.element.style.display = "table-cell"
-        this.nagivatorState.element.innerHTML = index + " | " + total
-
-    } else {
-        // In that case there no need for the navigation
-        this.moveFirstBtn.element.style.display = "none"
-        this.moveLeftBtn.element.style.display = "none"
-        this.nagivatorState.element.style.display = "none"
-        this.moveRightBtn.element.style.display = "none"
-        this.moveLastBtn.element.style.display = "none"
     }
 }
 
@@ -409,7 +410,7 @@ QueryEditor.prototype.runQuery = function () {
                                         for (var i = 0; i < result.FieldsType.length; i++) {
                                             if (result.FieldsType[i].startsWith("sqltypes.")) {
                                                 fieldsType.push(result.FieldsType[i])
-                                                fields.push(result.Fields[i])
+                                                fields.push(result.Fields[i].replace("M_", ""))
                                             }
                                         }
                                     }
@@ -524,8 +525,9 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                     table.rowGroup.element.style.top = table.header.div.element.offsetHeight + 2 + "px"
 
                     // Now the height of the panel...
-                    table.rowGroup.element.style.height = queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight + "px"
+                    table.rowGroup.element.style.height = queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight + 10 + "px"
 
+                    // Here the scrolling event.
                     table.rowGroup.element.onscroll = function (header) {
                         return function () {
                             var position = this.scrollTop;
@@ -541,7 +543,7 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                     window.addEventListener('resize',
                         function (queryEditor, table) {
                             return function () {
-                                table.rowGroup.element.style.height = queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight + "px"
+                                table.rowGroup.element.style.height = queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight + 10 + "px"
                             }
                         } (queryEditor, table), true);
                 }
