@@ -98,6 +98,60 @@ func (this *SqlDataStore) Connect() error {
 		connectionString += this.m_host + ":" + strconv.Itoa(this.m_port) + ")"
 		connectionString += "/" + this.m_id
 		//connectionString += "encrypt=false;"
+		// The encoding
+		if this.m_textEncoding == Config.Encoding_UTF8 {
+			connectionString += "CharSet=UTF-8;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_1 {
+			connectionString += "CharSet=ISO8859_1;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_2 {
+			connectionString += "CharSet=ISO8859_2;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_3 {
+			connectionString += "CharSet=ISO8859_3;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_4 {
+			connectionString += "CharSet=ISO8859_4;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_5 {
+			connectionString += "CharSet=ISO8859_5;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_6 {
+			connectionString += "CharSet=ISO8859_6;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_7 {
+			connectionString += "CharSet=ISO8859_7;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_8 {
+			connectionString += "CharSet=ISO8859_8;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_9 {
+			connectionString += "CharSet=ISO8859_9;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_10 {
+			connectionString += "CharSet=ISO8859_10;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_13 {
+			connectionString += "CharSet=ISO8859_13;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_14 {
+			connectionString += "CharSet=ISO8859_14;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_15 {
+			connectionString += "CharSet=ISO8859_15;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_16 {
+			connectionString += "CharSet=ISO8859_16;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1250 {
+			connectionString += "CharSet=Windows1250;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1251 {
+			connectionString += "CharSet=Windows1251;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1252 {
+			connectionString += "CharSet=Windows1252;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1253 {
+			connectionString += "CharSet=Windows1253;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1254 {
+			connectionString += "CharSet=Windows1254;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1255 {
+			connectionString += "CharSet=Windows1255;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1256 {
+			connectionString += "CharSet=Windows1256;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1257 {
+			connectionString += "CharSet=Windows1257;"
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1258 {
+			connectionString += "CharSet=Windows1258;"
+		} else if this.m_textEncoding == Config.Encoding_KOI8R {
+			connectionString += "CharSet=KOI8R;"
+		} else if this.m_textEncoding == Config.Encoding_KOI8U {
+			connectionString += "CharSet=KOI8U;"
+		}
 		driver = "mysql"
 
 	} else if this.m_vendor == Config.DataStoreVendor_ODBC {
@@ -118,6 +172,32 @@ func (this *SqlDataStore) Connect() error {
 			connectionString += "clientcharset=UTF-8;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_1 {
 			connectionString += "clientcharset=ISO8859_1;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_2 {
+			connectionString += "clientcharset=ISO8859_2;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_3 {
+			connectionString += "clientcharset=ISO8859_3;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_4 {
+			connectionString += "clientcharset=ISO8859_4;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_5 {
+			connectionString += "clientcharset=ISO8859_5;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_6 {
+			connectionString += "clientcharset=ISO8859_6;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_7 {
+			connectionString += "clientcharset=ISO8859_7;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_8 {
+			connectionString += "clientcharset=ISO8859_8;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_9 {
+			connectionString += "clientcharset=ISO8859_9;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_10 {
+			connectionString += "clientcharset=ISO8859_10;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_13 {
+			connectionString += "clientcharset=ISO8859_13;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_14 {
+			connectionString += "clientcharset=ISO8859_14;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_15 {
+			connectionString += "clientcharset=ISO8859_15;"
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_16 {
+			connectionString += "clientcharset=ISO8859_16;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1250 {
 			connectionString += "clientcharset=Windows1250;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1251 {
@@ -248,6 +328,176 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
 }
 
 /**
+ * Cast sql type into it go equivalent type.
+ */
+func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) interface{} {
+	/////////////////////////// Integer ////////////////////////////////
+	if strings.HasSuffix(sqlTypeName, "tinyint") {
+		return value.(int8)
+	}
+
+	if strings.HasSuffix(sqlTypeName, "smallint") {
+		return value.(int16)
+	}
+
+	if strings.HasSuffix(sqlTypeName, "int") {
+		return value.(int32)
+	}
+
+	if strings.HasSuffix(sqlTypeName, "bigint") || strings.HasSuffix(sqlTypeName, "timestampNumeric") {
+		return value.(int64)
+	}
+
+	/////////////////////////// Boolean ////////////////////////////////
+	if strings.HasSuffix(sqlTypeName, "bit") {
+		if reflect.TypeOf(value).Kind() == reflect.Bool {
+			return value.(bool)
+		} else if reflect.TypeOf(value).String() == "[]uint8" {
+			if string(value.([]uint8)) == "1" {
+				return true
+			} else {
+				return false
+			}
+		}
+	}
+
+	/////////////////////////// Numeric ////////////////////////////////
+	if strings.HasSuffix(sqlTypeName, "real") || strings.HasSuffix(sqlTypeName, "float") || strings.HasSuffix(sqlTypeName, "decimal") || strings.HasSuffix(sqlTypeName, "numeric") || strings.HasSuffix(sqlTypeName, "money") || strings.HasSuffix(sqlTypeName, "smallmoney") {
+		switch value.(type) {
+		case float32:
+			{
+				val := value.(float32)
+				return val
+			}
+		case float64:
+			{
+				val := value.(float64)
+				return val
+			}
+		case []uint8:
+			{
+				val, _ := strconv.ParseFloat(string(value.([]uint8)), 64)
+				return val
+			}
+		}
+	}
+
+	//////////////////////////// Date ////////////////////////////////
+	if strings.HasSuffix(sqlTypeName, "date") || strings.HasSuffix(sqlTypeName, "datetime") {
+		var val time.Time
+		val = value.(time.Time)
+		return val
+	}
+
+	/////////////////////////// string ////////////////////////////////
+	if strings.HasSuffix(sqlTypeName, "nchar") || strings.HasSuffix(sqlTypeName, "varchar") || strings.HasSuffix(sqlTypeName, "nvarchar") || strings.HasSuffix(sqlTypeName, "text") || strings.HasSuffix(sqlTypeName, "ntext") {
+		var val string
+
+		switch value.(type) {
+		case []uint8: // Bytes...
+			{
+				val = string(value.([]byte))
+			}
+		case string:
+			{
+				val = value.(string)
+			}
+		}
+
+		// If values need decoding.
+		if this.m_textEncoding == Config.Encoding_ISO8859_1 {
+			val, _ = Utility.DecodeISO8859_1(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_2 {
+			val, _ = Utility.DecodeISO8859_2(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_3 {
+			val, _ = Utility.DecodeISO8859_3(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_4 {
+			val, _ = Utility.DecodeISO8859_4(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_5 {
+			val, _ = Utility.DecodeISO8859_5(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_6 {
+			val, _ = Utility.DecodeISO8859_6(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_7 {
+			val, _ = Utility.DecodeISO8859_7(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_8 {
+			val, _ = Utility.DecodeISO8859_8(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_9 {
+			val, _ = Utility.DecodeISO8859_9(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_10 {
+			val, _ = Utility.DecodeISO8859_10(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_13 {
+			val, _ = Utility.DecodeISO8859_13(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_14 {
+			val, _ = Utility.DecodeISO8859_14(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_15 {
+			val, _ = Utility.DecodeISO8859_15(val)
+		} else if this.m_textEncoding == Config.Encoding_ISO8859_16 {
+			val, _ = Utility.DecodeISO8859_16(val)
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1250 {
+			val, _ = Utility.DecodeWindows1250(val)
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1251 {
+			val, _ = Utility.DecodeWindows1251(val)
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1252 {
+			val, _ = Utility.DecodeWindows1252(val)
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1253 {
+			val, _ = Utility.DecodeWindows1253(val)
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1254 {
+			val, _ = Utility.DecodeWindows1254(val)
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1255 {
+			val, _ = Utility.DecodeWindows1255(val)
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1256 {
+			val, _ = Utility.DecodeWindows1256(val)
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1257 {
+			val, _ = Utility.DecodeWindows1257(val)
+		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1258 {
+			val, _ = Utility.DecodeWindows1258(val)
+		} else if this.m_textEncoding == Config.Encoding_KOI8R {
+			val, _ = Utility.DecodeKOI8R(val)
+		} else if this.m_textEncoding == Config.Encoding_KOI8U {
+			val, _ = Utility.DecodeKOI8U(val)
+		}
+		return val
+	}
+
+	/////////////////////////// binary ////////////////////////////////
+	if strings.HasSuffix(sqlTypeName, "varbinary") || strings.HasSuffix(sqlTypeName, "binary") || strings.HasSuffix(sqlTypeName, "image") || strings.HasSuffix(sqlTypeName, "timestamp") {
+		var val string
+
+		switch value.(type) {
+		case []uint8: // Bytes...
+			{
+				val = string(value.([]byte))
+			}
+		case string:
+			{
+				val = value.(string)
+			}
+		}
+
+		// Must be a base 64 string.
+		return val
+	}
+
+	/////////////////////////// other values ////////////////////////////////
+	// uniqueidentifier, time
+	var val string
+	switch value.(type) {
+	case []uint8: // Bytes...
+		{
+			val = string(value.([]byte))
+		}
+	case string:
+		{
+			val = value.(string)
+		}
+	}
+
+	// Must be a base 64 string.
+	return val
+
+}
+
+/**
  * Read a query execute it and return the result as an array of interface...
  */
 func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []interface{}) ([][]interface{}, error) {
@@ -292,119 +542,8 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 		result := make([]interface{}, 0, 0)
 		for i := 0; i < len(fields); i++ {
 			if fields[i] != nil {
-				if strings.HasSuffix(fieldsType[i].(string), "int") {
-					var val int
-					switch fields[i].(type) {
-					case int:
-						{
-							val = fields[i].(int)
-						}
-					case int32:
-						{
-							val = int(fields[i].(int32))
-						}
-					case int64:
-						{
-							val = int(fields[i].(int64))
-						}
-					case []uint8:
-						{
-							val, _ = strconv.Atoi(string(fields[i].([]uint8)))
-						}
-					}
-
-					result = append(result, val)
-
-				} else if strings.HasSuffix(fieldsType[i].(string), "bit") {
-					if reflect.TypeOf(fields[i]).Kind() == reflect.Bool {
-						val := fields[i].(bool)
-						result = append(result, val)
-					} else if reflect.TypeOf(fields[i]).String() == "[]uint8" {
-						if string(fields[i].([]uint8)) == "1" {
-							result = append(result, true)
-						} else {
-							result = append(result, false)
-						}
-					}
-				} else if strings.HasSuffix(fieldsType[i].(string), "real") || strings.HasSuffix(fieldsType[i].(string), "float") {
-
-					switch fields[i].(type) {
-					case float32:
-						{
-							val := fields[i].(float32)
-							result = append(result, val)
-
-						}
-					case float64:
-						{
-							val := fields[i].(float64)
-							result = append(result, val)
-
-						}
-					case []uint8:
-						{
-							val, _ := strconv.ParseFloat(string(fields[i].([]uint8)), 64)
-							result = append(result, val)
-						}
-					}
-
-				} else if strings.HasSuffix(fieldsType[i].(string), "bytes") {
-					var val []byte
-					val = fields[i].([]byte)
-					result = append(result, val)
-
-				} else if strings.HasSuffix(fieldsType[i].(string), "date") || strings.HasSuffix(fieldsType[i].(string), "datetime") {
-					var val time.Time
-					val = fields[i].(time.Time)
-					result = append(result, val)
-
-				} else if strings.HasSuffix(fieldsType[i].(string), "string") || strings.HasSuffix(fieldsType[i].(string), "varchar") {
-
-					var val string
-					switch fields[i].(type) {
-					case []uint8: // Bytes...
-						{
-							val = string(fields[i].([]byte))
-						}
-					case string:
-						{
-							val = fields[i].(string)
-						}
-					}
-
-					// If values need decoding.
-					if this.m_textEncoding == Config.Encoding_ISO8859_1 {
-						val, _ = Utility.DecodeISO8859_1(val)
-					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1250 {
-						val, _ = Utility.DecodeWindows1250(val)
-					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1251 {
-						val, _ = Utility.DecodeWindows1251(val)
-					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1252 {
-						val, _ = Utility.DecodeWindows1252(val)
-					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1253 {
-						val, _ = Utility.DecodeWindows1253(val)
-					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1254 {
-						val, _ = Utility.DecodeWindows1254(val)
-					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1255 {
-						val, _ = Utility.DecodeWindows1255(val)
-					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1256 {
-						val, _ = Utility.DecodeWindows1256(val)
-					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1257 {
-						val, _ = Utility.DecodeWindows1257(val)
-					} else if this.m_textEncoding == Config.Encoding_WINDOWS_1258 {
-						val, _ = Utility.DecodeWindows1258(val)
-					} else if this.m_textEncoding == Config.Encoding_KOI8R {
-						val, _ = Utility.DecodeKOI8R(val)
-					} else if this.m_textEncoding == Config.Encoding_KOI8U {
-						val, _ = Utility.DecodeKOI8U(val)
-					}
-
-					result = append(result, val)
-
-				} else {
-
-					log.Println("Type", fieldsType[i], "not found!!!")
-				}
+				val := this.castSqlType(fieldsType[i].(string), fields[i])
+				result = append(result, val)
 			} else {
 				result = append(result, nil)
 			}
@@ -580,7 +719,7 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 		query = "SELECT table_name FROM information_schema.tables where table_schema='" + this.m_id + "'"
 	}
 
-	fieldsType = append(fieldsType, "string")
+	fieldsType = append(fieldsType, "nvarchar")
 	var params []interface{}
 
 	// Read the
@@ -666,8 +805,8 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 	}
 
 	fieldsType := make([]interface{}, 4)
-	fieldsType[0] = "string"
-	fieldsType[1] = "string"
+	fieldsType[0] = "nvarchar"
+	fieldsType[1] = "nvarchar"
 	fieldsType[2] = "bit"
 	fieldsType[3] = "bit"
 
@@ -731,7 +870,7 @@ func (this *SqlDataStore) getSchemaId(name string) (string, error) {
 		query += "FROM sys.tables "
 		query += "WHERE  sys.tables.name = '" + name + "'"
 		fieldsType := make([]interface{}, 1)
-		fieldsType[0] = "string"
+		fieldsType[0] = "nvarchar"
 		var params []interface{}
 
 		// Read the
@@ -740,7 +879,9 @@ func (this *SqlDataStore) getSchemaId(name string) (string, error) {
 			return "", err
 		}
 		if len(values) > 0 {
-			return this.m_id + "." + values[0][0].(string), nil
+			if values[0][0] != nil {
+				return this.m_id + "." + values[0][0].(string), nil
+			}
 		}
 	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
 		// with mysql the schema id is the id of the database.
@@ -775,8 +916,8 @@ func (this *SqlDataStore) getTypeNameRef(tableName string, fieldName string) (st
 	}
 
 	fieldsType := make([]interface{}, 2)
-	fieldsType[0] = "string"
-	fieldsType[1] = "string"
+	fieldsType[0] = "nvarchar"
+	fieldsType[1] = "nvarchar"
 	var params []interface{}
 
 	// Read the

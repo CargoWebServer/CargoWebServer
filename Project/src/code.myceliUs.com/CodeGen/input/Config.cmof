@@ -30,6 +30,19 @@
 	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-WINDOWS_1257" name="WINDOWS_1257" classifier="Encoding" enumeration="Encoding"/>
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-WINDOWS_1258" name="WINDOWS_1258" classifier="Encoding" enumeration="Encoding"/>
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_1" name="ISO8859_1" classifier="Encoding" enumeration="Encoding"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_2" name="ISO8859_2" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_3" name="ISO8859_3" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_4" name="ISO8859_4" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_5" name="ISO8859_5" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_6" name="ISO8859_6" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_7" name="ISO8859_7" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_8" name="ISO8859_8" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_9" name="ISO8859_9" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_10" name="ISO8859_10" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_13" name="ISO8859_13" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_14" name="ISO8859_14" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_15" name="ISO8859_15" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_16" name="ISO8859_16" classifier="Encoding" enumeration="Encoding"/>
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-KOI8R" name="KOI8R" classifier="Encoding" enumeration="Encoding"/>
 	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-KOI8U" name="KOI8U" classifier="Encoding" enumeration="Encoding"/>
 	</ownedMember>

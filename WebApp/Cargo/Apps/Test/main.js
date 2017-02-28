@@ -51,11 +51,11 @@ function main() {
 
     //entityTests()
 
-    testDynamicEntity()
+    //testDynamicEntity()
 
     entityDump("item_1", "Test.Item")
 
-   // entitiesDump("COLLADASchema.COLLADA")
+   //entitiesDump("COLLADASchema.COLLADA")
 //entitiesDump("CargoEntities.Action")
     //entityDump( "CARGO_ENTITIES", "CargoEntities.Entities")
     //entitiesDump("XPDMXML.ProcessStructureType")
@@ -217,7 +217,7 @@ function entityDump(id, typeName) {
     server.entityManager.getEntityPrototypes(typeName.split(".")[0],
         function (result, caller) {
             // Here I will initialyse the catalog...
-            server.entityManager.getEntityById(typeName, id,
+            server.entityManager.getEntityById(typeName.split(".")[0], typeName, id,
                 function (result) {
 
                     // Here I will overload the way to display the name in the interface.

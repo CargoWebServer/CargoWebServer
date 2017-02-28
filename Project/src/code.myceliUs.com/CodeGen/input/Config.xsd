@@ -32,6 +32,19 @@
 			<xsd:enumeration value="WINDOWS_1257"/>
 			<xsd:enumeration value="WINDOWS_1258"/>
 			<xsd:enumeration value="ISO8859_1"/>
+			<xsd:enumeration value="ISO8859_2"/>
+			<xsd:enumeration value="ISO8859_3"/>
+			<xsd:enumeration value="ISO8859_4"/>
+			<xsd:enumeration value="ISO8859_5"/>
+			<xsd:enumeration value="ISO8859_6"/>
+			<xsd:enumeration value="ISO8859_7"/>
+			<xsd:enumeration value="ISO8859_8"/>
+			<xsd:enumeration value="ISO8859_9"/>
+			<xsd:enumeration value="ISO8859_10"/>
+			<xsd:enumeration value="ISO8859_13"/>
+			<xsd:enumeration value="ISO8859_14"/>
+			<xsd:enumeration value="ISO8859_15"/>
+			<xsd:enumeration value="ISO8859_16"/>
 			<xsd:enumeration value="KOI8R"/>
 			<xsd:enumeration value="KOI8U"/>
 		</xsd:restriction>

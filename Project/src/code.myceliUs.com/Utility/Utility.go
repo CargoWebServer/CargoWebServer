@@ -36,11 +36,13 @@ const (
 		Because JavaScript is case sensitive, letters include the characters "A"
 		through "Z" (uppercase) and the characters "a" through "z" (lowercase).
 	*/
-	UUID_PATTERN          = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
-	VARIABLE_NAME_PATTERN = "^[a-zA-Z_$][a-zA-Z_$0-9]*$"
-	PACKAGE_NAME_PATTERN  = "^[a-zA-Z_$][a-zA-Z_$0-9]*(\\.[a-zA-Z_$][a-zA-Z_$0-9]*)+(\\.[a-zA-Z_$][a-zA-Z_$0-9]*)*$"
-	ENTITY_NAME_PATTERN   = "^[a-zA-Z_$][a-zA-Z_$0-9]*(\\.[a-zA-Z_$][a-zA-Z_$0-9]*)+(\\.[a-zA-Z_$][a-zA-Z_$0-9]*)*\\%[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
-	ISO_8601_DATE_PATTERN = `^(?P<year>-?(?:[1-9][0-9]*)?[0-9]{4})-(?P<month>1[0-2]|0[1-9])-(?P<day>3[01]|0[1-9]|[12][0-9])T(?P<hour>2[0-3]|[01][0-9]):(?P<minute>[0-5][0-9]):(?P<second>[0-5][0-9])(?P<ms>\.[0-9]+)?(?P<timezone>Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$`
+	UUID_PATTERN               = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+	VARIABLE_NAME_PATTERN      = "^[a-zA-Z_$][a-zA-Z_$0-9]*$"
+	PACKAGE_NAME_PATTERN       = "^[a-zA-Z_$][a-zA-Z_$0-9]*(\\.[a-zA-Z_$][a-zA-Z_$0-9]*)+(\\.[a-zA-Z_$][a-zA-Z_$0-9]*)*$"
+	ENTITY_NAME_PATTERN        = "^[a-zA-Z_$][a-zA-Z_$0-9]*(\\.[a-zA-Z_$][a-zA-Z_$0-9]*)+(\\.[a-zA-Z_$][a-zA-Z_$0-9]*)*\\%[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+	ISO_8601_TIME_PATTERN      = `^(?P<hour>2[0-3]|[01][0-9]):(?P<minute>[0-5][0-9]):(?P<second>[0-5][0-9])(?P<ms>\.[0-9]+)?(?P<timezone>Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$`
+	ISO_8601_DATE_PATTERN      = `^(?P<year>-?(?:[1-9][0-9]*)?[0-9]{4})-(?P<month>1[0-2]|0[1-9])-(?P<day>3[01]|0[1-9]|[12][0-9])$`
+	ISO_8601_DATE_TIME_PATTERN = `^(?P<year>-?(?:[1-9][0-9]*)?[0-9]{4})-(?P<month>1[0-2]|0[1-9])-(?P<day>3[01]|0[1-9]|[12][0-9])T(?P<hour>2[0-3]|[01][0-9]):(?P<minute>[0-5][0-9]):(?P<second>[0-5][0-9])(?P<ms>\.[0-9]+)?(?P<timezone>Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$`
 )
 
 /** Utility function **/
@@ -77,8 +79,60 @@ func StringToBytes(s string) []byte {
  * Parse and return a time object from a 8601 iso string, the time zone is
  * the UTC.
  */
+func MatchISO8601_Time(str string) *time.Time {
+	var exp = regexp.MustCompile(ISO_8601_TIME_PATTERN)
+	match := exp.FindStringSubmatch(str)
+	var hour, minute, second, miliSecond int
+	for i, name := range exp.SubexpNames() {
+		if i != 0 {
+			if name == "hour" {
+				val, _ := strconv.ParseInt(match[i], 10, 64)
+				hour = int(val)
+			} else if name == "minute" {
+				val, _ := strconv.ParseInt(match[i], 10, 64)
+				minute = int(val)
+			} else if name == "second" {
+				val, _ := strconv.ParseInt(match[i], 10, 64)
+				second = int(val)
+			} else if name == "ms" {
+				val, _ := strconv.ParseFloat(match[i], 64)
+				miliSecond = int(val * 1000)
+			}
+		}
+	}
+	// year/mounth/day all set to zero in that case.
+	t := time.Date(0, time.Month(0), 0, hour, minute, second, miliSecond, time.UTC)
+	return &t
+}
+
 func MatchISO8601_Date(str string) *time.Time {
 	var exp = regexp.MustCompile(ISO_8601_DATE_PATTERN)
+	match := exp.FindStringSubmatch(str)
+	var year, month, day int
+	for i, name := range exp.SubexpNames() {
+		if i != 0 {
+			if name == "year" {
+				val, _ := strconv.ParseInt(match[i], 10, 64)
+				year = int(val)
+			} else if name == "month" {
+				val, _ := strconv.ParseInt(match[i], 10, 64)
+				month = int(val)
+			} else if name == "day" {
+				val, _ := strconv.ParseInt(match[i], 10, 64)
+				day = int(val)
+			}
+		}
+	}
+	t := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+	return &t
+}
+
+/**
+ * Parse and return a time object from a 8601 iso string, the time zone is
+ * the UTC.
+ */
+func MatchISO8601_DateTime(str string) *time.Time {
+	var exp = regexp.MustCompile(ISO_8601_DATE_TIME_PATTERN)
 	match := exp.FindStringSubmatch(str)
 	var year, month, day, hour, minute, second, miliSecond int
 	for i, name := range exp.SubexpNames() {
@@ -535,7 +589,227 @@ func DecodeISO8859_1(val string) (string, error) {
 
 	b := []byte(val)
 	dec := charmap.ISO8859_1.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
 
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_2
+func DecodeISO8859_2(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_2.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_3
+func DecodeISO8859_3(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_3.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_4
+func DecodeISO8859_4(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_4.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_5
+func DecodeISO8859_5(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_5.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_6
+func DecodeISO8859_6(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_6.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_7
+func DecodeISO8859_7(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_7.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_8
+func DecodeISO8859_8(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_8.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_9
+func DecodeISO8859_9(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_9.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_10
+func DecodeISO8859_10(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_10.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_13
+func DecodeISO8859_13(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_13.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_14
+func DecodeISO8859_14(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_14.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_15
+func DecodeISO8859_15(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_15.NewDecoder()
+	// Take more space just in case some characters need
+	// more bytes in UTF-8 than in Win1256.
+	bUTF := make([]byte, len(b)*3)
+	n, _, err := dec.Transform(bUTF, b, false)
+	if err != nil {
+		return "", err
+	}
+
+	bUTF = bUTF[:n]
+	return string(bUTF), nil
+}
+
+// ISO8859_16
+func DecodeISO8859_16(val string) (string, error) {
+
+	b := []byte(val)
+	dec := charmap.ISO8859_16.NewDecoder()
 	// Take more space just in case some characters need
 	// more bytes in UTF-8 than in Win1256.
 	bUTF := make([]byte, len(b)*3)

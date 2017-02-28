@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
@@ -77,7 +78,6 @@ func newSchemaManager() *SchemaManager {
 	schemaManager.prototypes = make(map[string]*EntityPrototype)
 
 	// Basic primitive...
-	// Types here are type found in the
 	schemaManager.xsdPrimitiveTypesMap["NCName"] = "xs.string"
 	schemaManager.xsdPrimitiveTypesMap["uint"] = "xs.unsignedInt"
 	schemaManager.xsdPrimitiveTypesMap["bool"] = "xs.boolean"
@@ -1584,6 +1584,7 @@ func (this *XmlDocumentHandler) EndDocument() {
 func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, typeName string, name string, value string, isArray bool) interface{} {
 	// Set the object value...
 	if typeName == "xs.boolean" {
+		//////////////////////////// Boolean types ////////////////////////////
 		if value == "true" {
 			if isArray == true {
 				object[name] = append(object[name].([]interface{}), true)
@@ -1597,8 +1598,8 @@ func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, ty
 				object[name] = false
 			}
 		}
-	} else if typeName == "xs.byte" || typeName == "xs.int" || typeName == "xs.integer" || typeName == "xs.long" || typeName == "xs.nonPositiveInteger" || typeName == "xs.nonNegativeInteger" || typeName == "xs.positiveInteger" || typeName == "xs.short" {
-
+	} else if typeName == "xs.byte" || typeName == "xs.short" || typeName == "xs.int" || typeName == "xs.integer" || typeName == "xs.long" || typeName == "xs.positiveInteger" || typeName == "xs.nonPositiveInteger" || typeName == "xs.nonNegativeInteger" || typeName == "xs.negativeInteger" {
+		//////////////////////////// Integer types ////////////////////////////
 		if typeName == "xs.byte" {
 			i, err := strconv.ParseInt(value, 10, 8)
 			if err != nil {
@@ -1611,6 +1612,16 @@ func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, ty
 			}
 
 		} else if typeName == "xs.short" {
+			i, err := strconv.ParseInt(value, 10, 16)
+			if err != nil {
+				panic(err)
+			}
+			if isArray == true {
+				object[name] = append(object[name].([]interface{}), int32(i))
+			} else {
+				object[name] = int32(i)
+			}
+		} else if typeName == "xs.int" || typeName == "xs.integer" || typeName == "xs.positiveInteger" || typeName == "xs.nonPositiveInteger" || typeName == "xs.nonNegativeInteger" || typeName == "xs.negativeInteger" || typeName == "xs.timestampNumeric" {
 			i, err := strconv.ParseInt(value, 10, 32)
 			if err != nil {
 				panic(err)
@@ -1632,27 +1643,9 @@ func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, ty
 			}
 		}
 
-	} else if typeName == "xs.decimal" || typeName == "xs.double" || typeName == "xs.float" {
-		f, err := strconv.ParseFloat(value, 10)
-		if err != nil {
-			panic(err)
-		}
-		if typeName == "xs.float" {
-			if isArray == true {
-				object[name] = append(object[name].([]interface{}), float32(f))
-			} else {
-				object[name] = float32(f)
-			}
-		} else {
-			if isArray == true {
-				object[name] = append(object[name].([]interface{}), f)
-			} else {
-				object[name] = f
-			}
-		}
-	} else if typeName == "xs.unsignedBtype" || typeName == "xs.unsignedInt" || typeName == "xs.unsignedLong" || typeName == "xs.unsignedShort" {
-
-		if typeName == "xs.unsignedBtype" {
+	} else if typeName == "xs.unsignedByte" || typeName == "xs.unsignedShort" || typeName == "xs.unsignedInt" || typeName == "xs.unsignedLong" {
+		//////////////////////////// Unsigned types ////////////////////////////
+		if typeName == "xs.unsignedByte" {
 			i, err := strconv.ParseUint(value, 10, 8)
 			if err != nil {
 				panic(err)
@@ -1663,6 +1656,17 @@ func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, ty
 				object[name] = uint8(i)
 			}
 		} else if typeName == "xs.unsignedShort" {
+			i, err := strconv.ParseUint(value, 10, 16)
+			if err != nil {
+				panic(err)
+			}
+			if isArray == true {
+				object[name] = append(object[name].([]interface{}), uint32(i))
+			} else {
+				object[name] = uint32(i)
+			}
+		} else if typeName == "xs.unsignedInt" {
+
 			i, err := strconv.ParseUint(value, 10, 32)
 			if err != nil {
 				panic(err)
@@ -1683,7 +1687,57 @@ func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, ty
 				object[name] = uint64(i)
 			}
 		}
+	} else if typeName == "xs.decimal" || typeName == "xs.double" || typeName == "xs.float" || typeName == "xs.money" || typeName == "xs.smallmoney" {
+		//////////////////////////// Numeric types ////////////////////////////
+		if typeName == "xs.float" {
+			f, err := strconv.ParseFloat(value, 64)
+			if err != nil {
+				panic(err)
+			}
+			if isArray == true {
+				object[name] = append(object[name].([]interface{}), float64(f))
+			} else {
+				object[name] = float32(f)
+			}
+		} else {
+			f, err := strconv.ParseFloat(value, 32)
+			if err != nil {
+				panic(err)
+			}
+			if isArray == true {
+				object[name] = append(object[name].([]interface{}), f)
+			} else {
+				object[name] = f
+			}
+		}
+	} else if typeName == "xs.date" || typeName == "xs.datetime" || typeName == "xs.time" {
+		//////////////////////////// Time and date ////////////////////////////
+		if typeName == "xs.dateTime" {
+			dateTime := Utility.MatchISO8601_DateTime(value)
+
+			if isArray == true {
+				object[name] = append(object[name].([]interface{}), dateTime.UnixNano()/int64(time.Millisecond))
+			} else {
+				object[name] = dateTime
+			}
+		} else if typeName == "xs.time" {
+			time_ := Utility.MatchISO8601_Time(value)
+
+			if isArray == true {
+				object[name] = append(object[name].([]interface{}), time_.UnixNano()/int64(time.Millisecond))
+			} else {
+				object[name] = time_
+			}
+		} else if typeName == "xs.date" {
+			date := Utility.MatchISO8601_Date(value)
+			if isArray == true {
+				object[name] = append(object[name].([]interface{}), date.UnixNano()/int64(time.Millisecond))
+			} else {
+				object[name] = date
+			}
+		}
 	} else {
+		//////////////////////////// String types ////////////////////////////
 		if isArray == true {
 			object[name] = append(object[name].([]interface{}), value)
 		} else {

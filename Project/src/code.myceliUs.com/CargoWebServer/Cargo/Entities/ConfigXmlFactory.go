@@ -158,6 +158,32 @@ func (this *ConfigXmlFactory) InitDataStoreConfiguration(xmlElement *Config.XsdD
 		object.M_textEncoding = Config.Encoding_WINDOWS_1258
 	} else if xmlElement.M_textEncoding == "##ISO8859_1" {
 		object.M_textEncoding = Config.Encoding_ISO8859_1
+	} else if xmlElement.M_textEncoding == "##ISO8859_2" {
+		object.M_textEncoding = Config.Encoding_ISO8859_2
+	} else if xmlElement.M_textEncoding == "##ISO8859_3" {
+		object.M_textEncoding = Config.Encoding_ISO8859_3
+	} else if xmlElement.M_textEncoding == "##ISO8859_4" {
+		object.M_textEncoding = Config.Encoding_ISO8859_4
+	} else if xmlElement.M_textEncoding == "##ISO8859_5" {
+		object.M_textEncoding = Config.Encoding_ISO8859_5
+	} else if xmlElement.M_textEncoding == "##ISO8859_6" {
+		object.M_textEncoding = Config.Encoding_ISO8859_6
+	} else if xmlElement.M_textEncoding == "##ISO8859_7" {
+		object.M_textEncoding = Config.Encoding_ISO8859_7
+	} else if xmlElement.M_textEncoding == "##ISO8859_8" {
+		object.M_textEncoding = Config.Encoding_ISO8859_8
+	} else if xmlElement.M_textEncoding == "##ISO8859_9" {
+		object.M_textEncoding = Config.Encoding_ISO8859_9
+	} else if xmlElement.M_textEncoding == "##ISO8859_10" {
+		object.M_textEncoding = Config.Encoding_ISO8859_10
+	} else if xmlElement.M_textEncoding == "##ISO8859_13" {
+		object.M_textEncoding = Config.Encoding_ISO8859_13
+	} else if xmlElement.M_textEncoding == "##ISO8859_14" {
+		object.M_textEncoding = Config.Encoding_ISO8859_14
+	} else if xmlElement.M_textEncoding == "##ISO8859_15" {
+		object.M_textEncoding = Config.Encoding_ISO8859_15
+	} else if xmlElement.M_textEncoding == "##ISO8859_16" {
+		object.M_textEncoding = Config.Encoding_ISO8859_16
 	} else if xmlElement.M_textEncoding == "##KOI8R" {
 		object.M_textEncoding = Config.Encoding_KOI8R
 	} else if xmlElement.M_textEncoding == "##KOI8U" {
@@ -393,6 +419,32 @@ func (this *ConfigXmlFactory) InitSmtpConfiguration(xmlElement *Config.XsdSmtpCo
 		object.M_textEncoding = Config.Encoding_WINDOWS_1258
 	} else if xmlElement.M_textEncoding == "##ISO8859_1" {
 		object.M_textEncoding = Config.Encoding_ISO8859_1
+	} else if xmlElement.M_textEncoding == "##ISO8859_2" {
+		object.M_textEncoding = Config.Encoding_ISO8859_2
+	} else if xmlElement.M_textEncoding == "##ISO8859_3" {
+		object.M_textEncoding = Config.Encoding_ISO8859_3
+	} else if xmlElement.M_textEncoding == "##ISO8859_4" {
+		object.M_textEncoding = Config.Encoding_ISO8859_4
+	} else if xmlElement.M_textEncoding == "##ISO8859_5" {
+		object.M_textEncoding = Config.Encoding_ISO8859_5
+	} else if xmlElement.M_textEncoding == "##ISO8859_6" {
+		object.M_textEncoding = Config.Encoding_ISO8859_6
+	} else if xmlElement.M_textEncoding == "##ISO8859_7" {
+		object.M_textEncoding = Config.Encoding_ISO8859_7
+	} else if xmlElement.M_textEncoding == "##ISO8859_8" {
+		object.M_textEncoding = Config.Encoding_ISO8859_8
+	} else if xmlElement.M_textEncoding == "##ISO8859_9" {
+		object.M_textEncoding = Config.Encoding_ISO8859_9
+	} else if xmlElement.M_textEncoding == "##ISO8859_10" {
+		object.M_textEncoding = Config.Encoding_ISO8859_10
+	} else if xmlElement.M_textEncoding == "##ISO8859_13" {
+		object.M_textEncoding = Config.Encoding_ISO8859_13
+	} else if xmlElement.M_textEncoding == "##ISO8859_14" {
+		object.M_textEncoding = Config.Encoding_ISO8859_14
+	} else if xmlElement.M_textEncoding == "##ISO8859_15" {
+		object.M_textEncoding = Config.Encoding_ISO8859_15
+	} else if xmlElement.M_textEncoding == "##ISO8859_16" {
+		object.M_textEncoding = Config.Encoding_ISO8859_16
 	} else if xmlElement.M_textEncoding == "##KOI8R" {
 		object.M_textEncoding = Config.Encoding_KOI8R
 	} else if xmlElement.M_textEncoding == "##KOI8U" {
@@ -631,6 +683,32 @@ func (this *ConfigXmlFactory) SerialyzeSmtpConfiguration(xmlElement *Config.XsdS
 		xmlElement.M_textEncoding = "##WINDOWS_1258"
 	} else if object.M_textEncoding == Config.Encoding_ISO8859_1 {
 		xmlElement.M_textEncoding = "##ISO8859_1"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_2 {
+		xmlElement.M_textEncoding = "##ISO8859_2"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_3 {
+		xmlElement.M_textEncoding = "##ISO8859_3"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_4 {
+		xmlElement.M_textEncoding = "##ISO8859_4"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_5 {
+		xmlElement.M_textEncoding = "##ISO8859_5"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_6 {
+		xmlElement.M_textEncoding = "##ISO8859_6"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_7 {
+		xmlElement.M_textEncoding = "##ISO8859_7"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_8 {
+		xmlElement.M_textEncoding = "##ISO8859_8"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_9 {
+		xmlElement.M_textEncoding = "##ISO8859_9"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_10 {
+		xmlElement.M_textEncoding = "##ISO8859_10"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_13 {
+		xmlElement.M_textEncoding = "##ISO8859_13"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_14 {
+		xmlElement.M_textEncoding = "##ISO8859_14"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_15 {
+		xmlElement.M_textEncoding = "##ISO8859_15"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_16 {
+		xmlElement.M_textEncoding = "##ISO8859_16"
 	} else if object.M_textEncoding == Config.Encoding_KOI8R {
 		xmlElement.M_textEncoding = "##KOI8R"
 	} else if object.M_textEncoding == Config.Encoding_KOI8U {
@@ -738,6 +816,32 @@ func (this *ConfigXmlFactory) SerialyzeDataStoreConfiguration(xmlElement *Config
 		xmlElement.M_textEncoding = "##WINDOWS_1258"
 	} else if object.M_textEncoding == Config.Encoding_ISO8859_1 {
 		xmlElement.M_textEncoding = "##ISO8859_1"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_2 {
+		xmlElement.M_textEncoding = "##ISO8859_2"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_3 {
+		xmlElement.M_textEncoding = "##ISO8859_3"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_4 {
+		xmlElement.M_textEncoding = "##ISO8859_4"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_5 {
+		xmlElement.M_textEncoding = "##ISO8859_5"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_6 {
+		xmlElement.M_textEncoding = "##ISO8859_6"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_7 {
+		xmlElement.M_textEncoding = "##ISO8859_7"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_8 {
+		xmlElement.M_textEncoding = "##ISO8859_8"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_9 {
+		xmlElement.M_textEncoding = "##ISO8859_9"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_10 {
+		xmlElement.M_textEncoding = "##ISO8859_10"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_13 {
+		xmlElement.M_textEncoding = "##ISO8859_13"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_14 {
+		xmlElement.M_textEncoding = "##ISO8859_14"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_15 {
+		xmlElement.M_textEncoding = "##ISO8859_15"
+	} else if object.M_textEncoding == Config.Encoding_ISO8859_16 {
+		xmlElement.M_textEncoding = "##ISO8859_16"
 	} else if object.M_textEncoding == Config.Encoding_KOI8R {
 		xmlElement.M_textEncoding = "##KOI8R"
 	} else if object.M_textEncoding == Config.Encoding_KOI8U {

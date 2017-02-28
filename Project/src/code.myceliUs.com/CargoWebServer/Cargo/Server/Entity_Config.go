@@ -17,12 +17,12 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "uuid")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "uuid")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -321,7 +321,7 @@ func (this *EntityManager) create_Config_SmtpConfigurationEntityPrototype() {
 	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 3)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, true)
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "M_textEncoding")
-	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "enum:Encoding_UTF8:Encoding_WINDOWS_1250:Encoding_WINDOWS_1251:Encoding_WINDOWS_1252:Encoding_WINDOWS_1253:Encoding_WINDOWS_1254:Encoding_WINDOWS_1255:Encoding_WINDOWS_1256:Encoding_WINDOWS_1257:Encoding_WINDOWS_1258:Encoding_ISO8859_1:Encoding_KOI8R:Encoding_KOI8U")
+	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "enum:Encoding_UTF8:Encoding_WINDOWS_1250:Encoding_WINDOWS_1251:Encoding_WINDOWS_1252:Encoding_WINDOWS_1253:Encoding_WINDOWS_1254:Encoding_WINDOWS_1255:Encoding_WINDOWS_1256:Encoding_WINDOWS_1257:Encoding_WINDOWS_1258:Encoding_ISO8859_1:Encoding_ISO8859_2:Encoding_ISO8859_3:Encoding_ISO8859_4:Encoding_ISO8859_5:Encoding_ISO8859_6:Encoding_ISO8859_7:Encoding_ISO8859_8:Encoding_ISO8859_9:Encoding_ISO8859_10:Encoding_ISO8859_13:Encoding_ISO8859_14:Encoding_ISO8859_15:Encoding_ISO8859_16:Encoding_KOI8R:Encoding_KOI8U")
 	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 4)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, true)
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "M_hostName")
@@ -433,10 +433,36 @@ func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 9)
 	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_1 {
 		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 10)
-	} else if this.object.M_textEncoding == Config.Encoding_KOI8R {
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_2 {
 		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 11)
-	} else if this.object.M_textEncoding == Config.Encoding_KOI8U {
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_3 {
 		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 12)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_4 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 13)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_5 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 14)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_6 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 15)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_7 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 16)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_8 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 17)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_9 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 18)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_10 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 19)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_13 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 20)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_14 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 21)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_15 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 22)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_16 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 23)
+	} else if this.object.M_textEncoding == Config.Encoding_KOI8R {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 24)
+	} else if this.object.M_textEncoding == Config.Encoding_KOI8U {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 25)
 	} else {
 		SmtpConfigurationInfo = append(SmtpConfigurationInfo, 0)
 	}
@@ -573,8 +599,34 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string) error {
 			} else if enumIndex == 10 {
 				this.object.M_textEncoding = Config.Encoding_ISO8859_1
 			} else if enumIndex == 11 {
-				this.object.M_textEncoding = Config.Encoding_KOI8R
+				this.object.M_textEncoding = Config.Encoding_ISO8859_2
 			} else if enumIndex == 12 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_3
+			} else if enumIndex == 13 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_4
+			} else if enumIndex == 14 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_5
+			} else if enumIndex == 15 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_6
+			} else if enumIndex == 16 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_7
+			} else if enumIndex == 17 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_8
+			} else if enumIndex == 18 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_9
+			} else if enumIndex == 19 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_10
+			} else if enumIndex == 20 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_13
+			} else if enumIndex == 21 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_14
+			} else if enumIndex == 22 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_15
+			} else if enumIndex == 23 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_16
+			} else if enumIndex == 24 {
+				this.object.M_textEncoding = Config.Encoding_KOI8R
+			} else if enumIndex == 25 {
 				this.object.M_textEncoding = Config.Encoding_KOI8U
 			}
 		}
@@ -992,7 +1044,7 @@ func (this *EntityManager) create_Config_DataStoreConfigurationEntityPrototype()
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 5)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_textEncoding")
-	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "enum:Encoding_UTF8:Encoding_WINDOWS_1250:Encoding_WINDOWS_1251:Encoding_WINDOWS_1252:Encoding_WINDOWS_1253:Encoding_WINDOWS_1254:Encoding_WINDOWS_1255:Encoding_WINDOWS_1256:Encoding_WINDOWS_1257:Encoding_WINDOWS_1258:Encoding_ISO8859_1:Encoding_KOI8R:Encoding_KOI8U")
+	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "enum:Encoding_UTF8:Encoding_WINDOWS_1250:Encoding_WINDOWS_1251:Encoding_WINDOWS_1252:Encoding_WINDOWS_1253:Encoding_WINDOWS_1254:Encoding_WINDOWS_1255:Encoding_WINDOWS_1256:Encoding_WINDOWS_1257:Encoding_WINDOWS_1258:Encoding_ISO8859_1:Encoding_ISO8859_2:Encoding_ISO8859_3:Encoding_ISO8859_4:Encoding_ISO8859_5:Encoding_ISO8859_6:Encoding_ISO8859_7:Encoding_ISO8859_8:Encoding_ISO8859_9:Encoding_ISO8859_10:Encoding_ISO8859_13:Encoding_ISO8859_14:Encoding_ISO8859_15:Encoding_ISO8859_16:Encoding_KOI8R:Encoding_KOI8U")
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 6)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_hostName")
@@ -1130,10 +1182,36 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 9)
 	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_1 {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 10)
-	} else if this.object.M_textEncoding == Config.Encoding_KOI8R {
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_2 {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 11)
-	} else if this.object.M_textEncoding == Config.Encoding_KOI8U {
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_3 {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 12)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_4 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 13)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_5 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 14)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_6 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 15)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_7 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 16)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_8 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 17)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_9 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 18)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_10 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 19)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_13 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 20)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_14 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 21)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_15 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 22)
+	} else if this.object.M_textEncoding == Config.Encoding_ISO8859_16 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 23)
+	} else if this.object.M_textEncoding == Config.Encoding_KOI8R {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 24)
+	} else if this.object.M_textEncoding == Config.Encoding_KOI8U {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 25)
 	} else {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 0)
 	}
@@ -1298,8 +1376,34 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string) error {
 			} else if enumIndex == 10 {
 				this.object.M_textEncoding = Config.Encoding_ISO8859_1
 			} else if enumIndex == 11 {
-				this.object.M_textEncoding = Config.Encoding_KOI8R
+				this.object.M_textEncoding = Config.Encoding_ISO8859_2
 			} else if enumIndex == 12 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_3
+			} else if enumIndex == 13 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_4
+			} else if enumIndex == 14 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_5
+			} else if enumIndex == 15 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_6
+			} else if enumIndex == 16 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_7
+			} else if enumIndex == 17 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_8
+			} else if enumIndex == 18 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_9
+			} else if enumIndex == 19 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_10
+			} else if enumIndex == 20 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_13
+			} else if enumIndex == 21 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_14
+			} else if enumIndex == 22 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_15
+			} else if enumIndex == 23 {
+				this.object.M_textEncoding = Config.Encoding_ISO8859_16
+			} else if enumIndex == 24 {
+				this.object.M_textEncoding = Config.Encoding_KOI8R
+			} else if enumIndex == 25 {
 				this.object.M_textEncoding = Config.Encoding_KOI8U
 			}
 		}

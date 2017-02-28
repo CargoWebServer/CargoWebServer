@@ -15,6 +15,19 @@ const(
 	Encoding_WINDOWS_1257
 	Encoding_WINDOWS_1258
 	Encoding_ISO8859_1
+	Encoding_ISO8859_2
+	Encoding_ISO8859_3
+	Encoding_ISO8859_4
+	Encoding_ISO8859_5
+	Encoding_ISO8859_6
+	Encoding_ISO8859_7
+	Encoding_ISO8859_8
+	Encoding_ISO8859_9
+	Encoding_ISO8859_10
+	Encoding_ISO8859_13
+	Encoding_ISO8859_14
+	Encoding_ISO8859_15
+	Encoding_ISO8859_16
 	Encoding_KOI8R
 	Encoding_KOI8U
 )

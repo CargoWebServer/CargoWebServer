@@ -348,9 +348,9 @@ EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, error
                             caller.successCallback(entity, caller.caller)
                         }
                     } (caller)
-                    if(entity.IsInit == false){
+                    if (entity.IsInit == false) {
                         entity.init(result[0])
-                    }else{
+                    } else {
                         caller.successCallback(entity, caller.caller)
                     }
 
@@ -391,7 +391,7 @@ function GetEntityById(storeId, typeName, id) {
  * @param {parent} the parent object reference.
  */
 EntityManager.prototype.getEntityById = function (storeId, typeName, id, successCallback, errorCallback, caller, parent) {
-    
+
     if (server.entityManager.entities[typeName + "_" + id] != undefined) {
         successCallback(server.entityManager.entities[typeName + "_" + id], caller)
         return // break it here.
@@ -415,7 +415,7 @@ EntityManager.prototype.getEntityById = function (storeId, typeName, id, success
             params.push(createRpcData(storeId, "STRING", "storeId"))
             params.push(createRpcData(typeName, "STRING", "typeName"))
             params.push(createRpcData(id, "STRING", "id"))
-            
+
             // Call it on the server.
             server.executeJsFunction(
                 GetEntityById.toString(), // The function to execute remotely on server
@@ -456,7 +456,7 @@ EntityManager.prototype.getEntityById = function (storeId, typeName, id, success
             console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller)
-        }, { "storeId":storeId, "typeName": typeName, "id": id, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback })
+        }, { "storeId": storeId, "typeName": typeName, "id": id, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback })
 }
 
 /*
@@ -1375,7 +1375,7 @@ function setRef(owner, property, refValue, isArray) {
  * Set object, that function call setObjectValues in this path so it's recursive.
  */
 function setSubObject(parent, property, values, isArray) {
-    
+
     if (values.TYPENAME == undefined || values.UUID.length == 0) {
         return parent
     }
@@ -1532,7 +1532,7 @@ function setObjectValues(object, values) {
             if (values[property] != null) {
                 if (isBaseType) {
                     // String, int, double...
-                    if (propertyType == "xs.[]uint8") {
+                    if (propertyType == "xs.base64Binary") {
                         // In case of binairy object I will try to create object if information is given for it.
                         // TODO see why to decode is necessary here...
                         var strVal = decode64(decode64(values[property]))
@@ -1617,19 +1617,19 @@ function setObjectValues(object, values) {
  */
 EntityPrototype.prototype.generateConstructor = function () {
     var constructorSrc = this.PackageName + " = function(){\n"
-    var constructorSrc = this.PackageName +" || {};\n"
+    var constructorSrc = this.PackageName + " || {};\n"
 
     var packageName = this.PackageName
     var classNames = this.ClassName.split(".")
 
-    for(var i=0; i < classNames.length-1; i++){
+    for (var i = 0; i < classNames.length - 1; i++) {
         packageName += "." + classNames[i]
-        constructorSrc +=  packageName + " = " + packageName + " || {};\n"
+        constructorSrc += packageName + " = " + packageName + " || {};\n"
     }
 
     // I will create the object constructor from the information
     // of the fields.
-    constructorSrc +=  this.PackageName + "." + this.ClassName + " = function(){\n"
+    constructorSrc += this.PackageName + "." + this.ClassName + " = function(){\n"
 
     // Common properties share by all entity.
     constructorSrc += " this.__class__ = \"" + this.PackageName + "." + this.ClassName + "\"\n"
@@ -1646,7 +1646,7 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += " this.panel = null\n"
 
     // Remove space accent '' from the field name
-    function normalizeFieldName(fieldName){
+    function normalizeFieldName(fieldName) {
         // TODO make distinctive..
         fieldName = fieldName.replaceAll(" ", "_")
         fieldName = fieldName.replaceAll("'", "")
@@ -1661,19 +1661,19 @@ EntityPrototype.prototype.generateConstructor = function () {
         if (this.FieldsType[i].startsWith("[]")) {
             constructorSrc += " = undefined\n"
         } else {
-            if (this.FieldsType[i] == "xs.string" || this.FieldsType[i] == "xs.ID" || this.FieldsType[i] == "xs.NCName") {
+            if (isXsString(this.FieldsType[i]) || isXsRef(this.FieldsType[i]) || isXsId(this.FieldsType[i])) {
                 constructorSrc += " = \"\"\n"
-            } else if (this.FieldsType[i] == "xs.int" || this.FieldsType[i] == "xs.double") {
+            } else if (isXsInt(this.FieldsType[i])) {
                 constructorSrc += " = 0\n"
-            } else if (this.FieldsType[i] == "xs.float64" || this.FieldsType[i] == "xs.double") {
+            } else if (isXsNumeric(this.FieldsType[i])) {
                 constructorSrc += " = 0.0\n"
-            } else if (this.FieldsType[i] == "xs.date" || this.FieldsType[i] == "xs.dateTime") {
+            } else if (isXsDate(this.FieldsType[i])) {
                 constructorSrc += " = new Date()\n"
-            } else if (this.FieldsType[i] == "xs.boolean") {
+            } else if (isXsBoolean(this.FieldsType[i])) {
                 constructorSrc += " = false\n"
-            } else if (this.FieldsType[i].startsWith("enum:")){
+            } else if (this.FieldsType[i].startsWith("enum:")) {
                 constructorSrc += " = 1\n"
-            }  else {
+            } else {
                 // Object here.
                 constructorSrc += " = undefined\n"
             }
@@ -1683,7 +1683,20 @@ EntityPrototype.prototype.generateConstructor = function () {
     // Now the stringify function.
     constructorSrc += " this.stringify = function(){\n"
     constructorSrc += "       resetObjectValues(this)\n"
-    constructorSrc += "       var entityStr = JSON.stringify(this)\n"
+    constructorSrc += "       var cache = [];\n"
+    constructorSrc += "       var entityStr = JSON.stringify(this, function(key, value) {\n"
+    constructorSrc += "           if (typeof value === 'object' && value !== null) {\n"
+    constructorSrc += "               if (cache.indexOf(value) !== -1) {\n"
+    constructorSrc += "                   // Circular reference found, discard key\n"
+    constructorSrc += "                   return;\n"
+    constructorSrc += "               }\n"
+    constructorSrc += "               // Store value in our collection\n"
+    constructorSrc += "               cache.push(value);\n"
+    constructorSrc += "           }\n"
+    constructorSrc += "           return value;\n"
+    constructorSrc += "       });\n"
+    constructorSrc += "       cache = null; // Enable garbage collection\n"
+
     constructorSrc += "       setObjectValues(this)\n"
     constructorSrc += "       return entityStr\n"
     constructorSrc += "   }\n"
@@ -1730,7 +1743,7 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += " return this\n"
     constructorSrc += "}\n\n"
 
-    constructorSrc +=  this.PackageName + "." + this.ClassName + ".prototype.init = function(object){\n"
+    constructorSrc += this.PackageName + "." + this.ClassName + ".prototype.init = function(object){\n"
     // First of all i will set reference in the result.
     constructorSrc += "   this.TYPENAME = object.TYPENAME\n"
     constructorSrc += "   this.UUID = object.UUID\n"

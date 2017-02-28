@@ -51,6 +51,7 @@
     min-height: 16px;
 }
 
+/** XSD styles **/
 .xs_number {
     min-width: 75px;
     text-align: center;
@@ -72,6 +73,11 @@
 .xs_id {
     min-width: 75px;
     text-align: center;
+}
+
+.xs_ref{
+    color: darkblue;
+    text-decoration: underline;
 }
 
 .table_row {

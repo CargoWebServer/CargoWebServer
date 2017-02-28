@@ -26,16 +26,16 @@
 
 window.URL = window.URL || window.webkitURL;  // Take care of vendor prefixes.
 
-function fireResize(){
+function fireResize() {
     if (document.createEvent) { // W3C
         var ev = document.createEvent('Event');
         ev.initEvent('resize', true, true);
         window.dispatchEvent(ev);
     }
     else { // IE
-        element=document.documentElement;
-        var event=document.createEventObject();
-        element.fireEvent("onresize",event);
+        element = document.documentElement;
+        var event = document.createEventObject();
+        element.fireEvent("onresize", event);
     }
 };
 
@@ -74,7 +74,7 @@ function isString(o) {
 /**
  * Test if a given string is an object reference.
  */
-function isObjectReference(ref){
+function isObjectReference(ref) {
     return /^[a-zA-Z_$][a-zA-Z_$0-9]*(\.[a-zA-Z_$][a-zA-Z_$0-9]*)+(\.[a-zA-Z_$][a-zA-Z_$0-9]*)*\%[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(ref)
 }
 
@@ -138,6 +138,143 @@ function isArray(o) {
     }
 }
 
+//////////////////////////////////// XML/SQL type ////////////////////////////////////
+
+/**
+ * Dertermine if the value is a base type.
+ */
+function isXsBaseType(fieldType) {
+    return isXsId(fieldType) || isXsRef(fieldType) || isXsInt(fieldType) || isXsString(fieldType) || isXsBinary(fieldType) || isXsNumeric(fieldType) || isXsBoolean(fieldType) || isXsDate(fieldType) || isXsTime(fieldType) || isXsMoney(fieldType)
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere integer.
+ */
+function isXsInt(fieldType) {
+    if (fieldType.endsWith("byte") || fieldType.endsWith("int") || fieldType.endsWith("integer") || fieldType.endsWith("short")  // XML
+        || fieldType.endsWith("unsignedInt") || fieldType.endsWith("unsignedBtype") || fieldType.endsWith("unsignedShort") || fieldType.endsWith("unsignedLong")  // XML
+        || fieldType.endsWith("negativeInteger") || fieldType.endsWith("nonNegativeInteger") || fieldType.endsWith("nonPositiveInteger") || fieldType.endsWith("positiveInteger") // XML
+        || fieldType.endsWith("tinyint") || fieldType.endsWith("smallint") || fieldType.endsWith("bigint"))// SQL
+    {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere String.
+ */
+function isXsString(fieldType) {
+    if (fieldType.endsWith("string")
+        || fieldType.endsWith("Name") || fieldType.endsWith("QName") || fieldType.endsWith("NMTOKEN")  // XML
+        || fieldType.endsWith("gDay") || fieldType.endsWith("gMonth") || fieldType.endsWith("gMonthDay") || fieldType.endsWith("gYear") // XML
+        || fieldType.endsWith("gYearMonth") || fieldType.endsWith("token") || fieldType.endsWith("normalizedString") || fieldType.endsWith("hexBinary") // XML
+        || fieldType.endsWith("language") || fieldType.endsWith("NMTOKENS") || fieldType.endsWith("NOTATION")  // XML
+        || fieldType.endsWith("char") || fieldType.endsWith("nchar") || fieldType.endsWith("varchar") // SQL
+        || fieldType.endsWith("nvarchar") || fieldType.endsWith("text") || fieldType.endsWith("ntext") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere binary value.
+ */
+function isXsBinary(fieldType) {
+    if (fieldType.endsWith("base64Binary") // XML
+        || fieldType.endsWith("varbinary") || fieldType.endsWith("binary") // SQL
+        || fieldType.endsWith("image") || fieldType.endsWith("timestamp")  // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere numeric value.
+ */
+function isXsNumeric(fieldType) {
+    if (fieldType.endsWith("double") || fieldType.endsWith("decimal") || fieldType.endsWith("float") // XML
+        || fieldType.endsWith("numeric") || fieldType.endsWith("real") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere boolean value.
+ */
+function isXsBoolean(fieldType) {
+    if (fieldType.endsWith("boolean") // XML
+        || fieldType.endsWith("bit")  // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere date value.
+ */
+function isXsDate(fieldType) {
+    if (fieldType.endsWith("date") || fieldType.endsWith("dateTime") // XML
+        || fieldType.endsWith("datetime2") || fieldType.endsWith("smalldatetime") || fieldType.endsWith("datetimeoffset") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere time value.
+ */
+function isXsTime(fieldType) {
+    if (fieldType.endsWith("time") // XML
+        || fieldType.endsWith("timestampNumeric") || fieldType.endsWith("timestamp") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere money value.
+ */
+function isXsMoney(fieldType) {
+    if (
+        fieldType.endsWith("money") || fieldType.endsWith("smallmoney") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere id value.
+ */
+function isXsId(fieldType) {
+    if (
+        fieldType.endsWith("ID") || fieldType.endsWith("NCName") // XML
+        || fieldType.endsWith("uniqueidentifier") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere id value.
+ */
+function isXsRef(fieldType) {
+    if (
+        fieldType.endsWith("anyURI") || fieldType.endsWith("IDREF") // XML
+    ) {
+        return true
+    }
+    return false
+}
 ////////////////////////////////////////////////////////////////////////////
 //  Random functions helpers
 ////////////////////////////////////////////////////////////////////////////
@@ -465,7 +602,7 @@ function Uint8ToBase64(array) {
 
 var Base64 = {
     _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=%",
-    encode: function(input) {
+    encode: function (input) {
         var output = "";
         var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
         var i = 0;
@@ -497,7 +634,7 @@ var Base64 = {
     },
 
 
-    decode: function(input) {
+    decode: function (input) {
         var output = "";
         var chr1, chr2, chr3;
         var enc1, enc2, enc3, enc4;
@@ -533,7 +670,7 @@ var Base64 = {
 
     },
 
-    _utf8_encode: function(string) {
+    _utf8_encode: function (string) {
         string = string.replace(/\r\n/g, "\n");
         var utftext = "";
 
@@ -559,7 +696,7 @@ var Base64 = {
         return utftext;
     },
 
-    _utf8_decode: function(utftext) {
+    _utf8_decode: function (utftext) {
         var string = "";
         var i = 0;
         var c = c1 = c2 = 0;
@@ -588,7 +725,7 @@ var Base64 = {
 
         return string;
     }
-} 
+}
 
 /**
  * Encode iput content into base64 string
@@ -935,7 +1072,7 @@ function createRpcData(variable, variableType, variableName, typeName) {
             variableType = Data_JSON_STR
             typeName = variable.TYPENAME
             variable = variable.stringify()
-        }else{
+        } else {
             variable = JSON.stringify(variable)
         }
     } else if (variableType == "BOOLEAN") {
@@ -944,9 +1081,9 @@ function createRpcData(variable, variableType, variableName, typeName) {
     } else {
         return undefined
     }
-    
+
     // Now I will create the rpc data.
-    return new RpcData({ "name": variableName, "type": variableType, "dataBytes": utf8_to_b64(variable), "typeName": typeName});
+    return new RpcData({ "name": variableName, "type": variableType, "dataBytes": utf8_to_b64(variable), "typeName": typeName });
 }
 
 /**

@@ -543,6 +543,14 @@ func generateEntityAttribute(attribute *XML_Schemas.CMOF_OwnedAttribute, packNam
 			memberTypeName = "boolean"
 		}
 
+		if memberTypeName == "[]unit8" {
+			memberTypeName = "base64Binary"
+		}
+
+		if memberTypeName == "int64" {
+			memberTypeName = "long"
+		}
+
 		memberTypeName = "xs." + memberTypeName
 
 		if attribute.Upper == "*" {
