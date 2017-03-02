@@ -38,7 +38,7 @@ h5{
 	font-size: 18pt;
 }
 
-.tutorialsHeader{
+.sidebarHeader{
 	padding-left:10px;
 	cursor: pointer;
 }
@@ -53,12 +53,20 @@ h5{
 	height: 256px;
 }
 
-.tutorialsSectionIntro{
+.sectionIntro{
 	padding-top: 20px;
 }
 
 .fa-windows{
 	color: #1BA1E2;
+}
+
+.quickstartList > li{
+	padding-left: 25px;
+}
+
+.dividerBottom{
+	border-bottom: 3px solid #eee;
 }
 
 /* MARKETING
