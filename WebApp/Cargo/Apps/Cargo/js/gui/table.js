@@ -234,7 +234,6 @@ Table.prototype.init = function () {
 			}
 			this.rows[i] = new TableRow(this, i, data)
 			this.rowsId[data[0]] = this.rows[i]
-			//this.appendRow(data, data[0])
 		}
 
 		/* The delete row event **/
@@ -762,7 +761,7 @@ TableCell.prototype.formatValue = function (value) {
 	}
 
 	// In case of a reference string...
-	if (fieldType == "xs.string") {
+	if (fieldType.endsWith("string")) {
 		if (isObjectReference(value)) {
 			// In that case I will create the link object to reach the 
 			// reference...
@@ -770,8 +769,8 @@ TableCell.prototype.formatValue = function (value) {
 		}
 	}
 
-	// In case of generic value I will try to determine the type of the entity... 
-	if (fieldType == "xs.[]uint8") {
+	// Binary string here.
+	if (fieldType.endsWith("base64Binary")) {
 		if (isString(value)) {
 			try {
 				value = JSON.parse(value);
@@ -813,24 +812,19 @@ TableCell.prototype.formatValue = function (value) {
 	var formater = this.row.table.columnFormater
 	var isRef = fieldType.endsWith(":Ref")
 
-
-
 	fieldType = fieldType.replace("[]", "")
 
 	// if its xs type... 
-	var isBaseType = fieldType.startsWith("xs.") || fieldType == "string" || fieldType == "int" || fieldType == "double" || fieldType == "date" || fieldType == "dateTime" || field == "M_valueOf" || field == "M_listOf"
+	var isBaseType = isXsBaseType(fieldType) || field == "M_valueOf" || field == "M_listOf"
 	if (isBaseType) {
 		if (!isArray_) {
-			if (fieldType == "xs.dateTime" || fieldType == "dateTime" || fieldType == "date" || fieldType == "date") {
+			if (isXsDate(fieldType)) {
 				value = formater.formatDate(value);
 				this.valueDiv.element.className = "xs_date"
-			} else if (fieldType == "xs.float" || fieldType == "xs.decimal" || fieldType == "xs.double" || fieldType == "double") {
+			} else if (isXsNumeric(fieldType)) {
 				this.valueDiv.element.className = "xs_number"
 				value = formater.formatReal(value)
-			} else if (fieldType == "xs.string" || fieldType == "string" || fieldType == "xs.token" || fieldType == "xs.anyURI" || fieldType == "xs.anyURI" || fieldType == "xs.IDREF" || fieldType == "xs.QName" || fieldType == "xs.NOTATION" || fieldType == "xs.normalizedString" || fieldType == "xs.Name" || fieldType == "xs.language") {
-				this.valueDiv.element.className = "xs_string"
-				value = formater.formatString(value)
-			} else if (fieldType == "xs.NCName" || fieldType == "xs.ID") {
+			} else if (isXsId(fieldType)) {
 				// here I have an entity now I need to know if is an abstact entity or not.
 				var entity = server.entityManager.entities[this.row.table.model.entities[this.row.index].UUID]
 				if (entity == undefined) {
@@ -859,8 +853,16 @@ TableCell.prototype.formatValue = function (value) {
 					value = formater.formatString(value)
 				}
 
-			} else if (fieldType == "int" || fieldType == "xs.int" || fieldType == "xs.integer" || fieldType == "xs.long" || fieldType == "xs.unsignedInt" || fieldType == "xs.short" || fieldType == "xs.unsignedLong") {
+			} else if (isXsRef(fieldType)) {
+				// Here I will put a text area..
+				this.valueDiv.element.className = "xs_ref"
+			} else if (isXsInt(fieldType)) {
 				this.valueDiv.element.className = "xs_number"
+			} else if (isXsString(fieldType)) {
+				this.valueDiv.element.className = "xs_string"
+				value = formater.formatString(value)
+			}else{
+				value = formater.formatString(value)
 			}
 		} else {
 			var content = this.valueDiv.getChildById(field + "_content")
@@ -1288,7 +1290,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 
 	// I will get the cell editor related to this column...
 	var editor = this.row.table.cellEditors[this.index]
-	
+
 	// One editor at time.
 	if (editor != undefined) {
 		if (editor.element.parentNode != undefined) {
@@ -1311,7 +1313,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 
 	// Here is the default editor if is undefined...
 	if (editor == null) {
-		if (type == "string" || type == "xs.string") {
+		if (isXsString(type)) {
 			// Here I will put a text area..
 			if (value.length > 50) {
 				editor = this.div.appendElement({ "tag": "textarea", "resize": "false" }).down()
@@ -1319,26 +1321,27 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				editor = this.div.appendElement({ "tag": "input" }).down()
 			}
 			editor.element.value = value
-		} else if (type == "xs.NCName" || type == "xs.ID") {
+		} else if (isXsId(type)) {
 			// Here I will put a text area..
 			editor = this.div.appendElement({ "tag": "input" }).down()
 			if (value != undefined) {
 				editor.element.value = value
 			}
-		} else if (type == "date" || type == "xs.date" || type == "xs.dateTime") {
+		} else if (isXsRef(type)) {
+			// Here I will put a text area..
+			console.log("------> ref found!!!!")
+
+		} else if (isXsDate(type)) {
 			editor = this.div.appendElement({ "tag": "input", "type": "datetime-local", "name": "date" }).down()
 			editor.element.value = moment(value).format('YYYY-MM-DDTHH:mm:ss');
 			editor.element.step = 7
-		} else if (type == "double" || type == "xs.float" || type == "xs.double" || type == "xs.float64") {
+		} else if (isXsNumeric(type)) {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "0.01" }).down()
 			editor.element.value = value
-		} else if (type == "xs.id") {
-			editor = this.div.appendElement({ "tag": "input" }).down()
-			editor.element.value = value
-		} else if (type == "xs.boolean") {
+		} else if (isXsBoolean(type)) {
 			editor = this.div.appendElement({ "tag": "input", "type": "checkbox" }).down()
 			editor.element.checked = value
-		} else if (type == "int" || type == "xs.int" || type == "xs.integer" || type == "xs.unsignedLong") {
+		} else if (isXsInt(type)) {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "1" }).down()
 			editor.element.value = value
 		} else if (prototype != null) {
@@ -1808,11 +1811,11 @@ var ColumnFilter = function (index, table) {
 		return function () {
 			if (filter.filterPanelDiv.element.style.display != "block") {
 				filter.filterPanelDiv.element.style.display = "block"
-				var rect1 = localToGlobal(filter.filterPanelDiv.element)
+				/*var rect1 = localToGlobal(filter.filterPanelDiv.element)
 				var rect2 = localToGlobal(filter.table.div.element)
 				if (rect1.right > rect2.right) {
 					filter.filterPanelDiv.element.style.right = "0px"
-				}
+				}*/
 			} else {
 				filter.filterPanelDiv.element.style.display = "none"
 			}
@@ -1832,15 +1835,26 @@ ColumnFilter.prototype.getValues = function () {
 		// Get unique value...
 		var value = this.table.model.getValueAt(i, this.index)
 		var formater = this.table.columnFormater
-		if (this.type == "date") {
+		if (isXsDate(this.type)) {
 			value = formater.formatDate(value, this.table.filterFormat);
-		} else if (this.type == "real" || this.type == "float") {
+		} else if (isXsNumeric(this.type) || isXsMoney(this.type)) {
 			value = parseFloat(formater.formatReal(value))
-		} else if (this.type == "string") {
+		} else if (isXsString(this.type)) {
 			value = formater.formatString(value)
-		} else if (this.type == "int") {
+		} else if (isXsInt(this.type)) {
 			value = parseInt(value)
+		} else if (isXsBoolean(this.type)) {
+			if(value == "true"){
+				value = true
+			}else{
+				value = false
+			}
+		} else if (isXsBinary(this.type)){
+			console.log("Binary value found")
+		}else if (isXsTime(this.type)){
+			console.log("Time value found")
 		}
+
 		var j = 0
 		for (j = 0; j < values.length; j++) {
 			if (values[j] == value) {
@@ -1869,7 +1883,7 @@ ColumnFilter.prototype.initFilterPanel = function () {
 
 	// First of all I wil get the list of value...
 	var type = this.table.model.getColumnClass(this.index)
-	if (type != "date") {
+	if (!isXsDate(this.type)) {
 		var values = this.getValues()
 		// So here I will create the list of values with checkbox...
 		for (var i = 0; i < values.length; i++) {
@@ -2094,7 +2108,7 @@ ColumnFilter.prototype.filterValues = function () {
 		var row = this.table.rows[i]
 		var cellValue = this.table.model.getValueAt(i, this.index)
 		var isShow = false
-		if (this.type == "date") {
+		if (isXsDate(this.type)) {
 			// Now filters are apply...
 			for (var filter in this.filters) {
 				var f = this.filters[filter]

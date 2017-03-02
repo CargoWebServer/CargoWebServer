@@ -51,6 +51,7 @@
     min-height: 16px;
 }
 
+/** XSD styles **/
 .xs_number {
     min-width: 75px;
     text-align: center;
@@ -74,8 +75,15 @@
     text-align: center;
 }
 
+.xs_ref{
+    color: darkblue;
+    text-decoration: underline;
+}
+
 .table_row {
-    display: table-row
+    display: table-row;
+    /*visibility: hidden;*/
+    /* display: none; */
 }
 
 
@@ -170,10 +178,9 @@
 }
 
 .row_button{
-    padding: 4px;
     vertical-align: middle;
     display: inline; 
-    padding-left: 2px;
+    min-width: 16px;
 }
 
 .row_button i {
@@ -208,7 +215,6 @@
 
 .table_header_size_btn{
     text-align: right; 
-    padding: 2px;
     color: #bbb;
 }
 

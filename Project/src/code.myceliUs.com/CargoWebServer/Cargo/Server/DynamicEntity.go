@@ -283,32 +283,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 				// Array's...
 				if strings.HasPrefix(fieldType, "[]") {
 					if strings.HasPrefix(fieldType, "[]xs.") || fieldName == "M_listOf" {
-						var values interface{}
-						if fieldType == "[]xs.string" || fieldType == "[]xs.token" || fieldType == "[]xs.anyURI" || fieldType == "[]xs.anyURI" || fieldType == "[]xs.IDREF" || fieldType == "[]xs.QName" || fieldType == "[]xs.NOTATION" || fieldType == "[]xs.normalizedString" || fieldType == "[]xs.Name" || fieldType == "[]xs.NCName" || fieldType == "[]xs.ID" || fieldType == "[]xs.language" {
-							values = make([]string, 0)
-						} else if fieldType == "[]xs.int" || fieldType == "[]xs.integer" {
-							values = make([]int, 0)
-						} else if fieldType == "[]xs.long" {
-							values = make([]int64, 0)
-						} else if fieldType == "[]xs.boolean" {
-							values = make([]bool, 0)
-						} else if fieldType == "[]xs.double" {
-							values = make([]float64, 0)
-						} else if fieldType == "[]xs.float" || fieldType == "[]xs.decimal" {
-							values = make([]float32, 0)
-						} else if fieldType == "[]xs.time" || fieldType == "[]xs.gDay" || fieldType == "[]xs.gMonth" || fieldType == "[]xs.gMonthDay" || fieldType == "[]xs.gYear" || fieldType == "[]xs.gYearMonth" || fieldType == "[]xs.date" || fieldType == "[]xs.dateTime" {
-							values = make([]string, 0)
-						} else if fieldType == "[]xs.byte" {
-							values = make([]byte, 0)
-						} else if fieldType == "[]xs.unsignedInt" {
-							values = make([]uint, 0)
-						} else if fieldType == "[]xs.short" {
-							values = make([]uint8, 0)
-						} else if fieldType == "[]xs.unsignedLong" {
-							values = make([]uint64, 0)
-						} else if fieldType == "[]xs.unsignedByte" || fieldType == "[]xs.unsignedShort" {
-							values = make([]uint8, 0)
-						}
+						values := make([]interface{}, 0)
 						err := json.Unmarshal([]byte(results[0][i].(string)), &values)
 						if err != nil {
 							log.Println("fail to get value --------->", results[0][i].(string))
@@ -721,13 +696,44 @@ func (this *DynamicEntity) saveEntity(path string) {
 			} else {
 				// Not an array...
 				if strings.HasPrefix(fieldType, "xs.") || fieldName == "M_valueOf" {
-
 					// Little fix to convert float into int type as needed.
-					if fieldType == "xs.int" || fieldType == "xs.integer" || fieldType == "xs.long" || fieldType == "xs.unsignedInt" || fieldType == "xs.short" || fieldType == "xs.unsignedLong" {
+					if fieldType == "xs.byte" || fieldType == "xs.short" || fieldType == "xs.int" || fieldType == "xs.integer" || fieldType == "xs.long" || fieldType == "xs.unsignedInt" || fieldType == "xs.unsignedByte" || fieldType == "xs.unsignedShort" || fieldType == "xs.unsignedLong" {
 						if reflect.TypeOf(this.object[fieldName]).Kind() == reflect.Float32 {
-							this.object[fieldName] = int64(this.object[fieldName].(float32))
+							if fieldType == "xs.int" || fieldType == "xs.integer" {
+								this.object[fieldName] = int32(this.object[fieldName].(float32))
+							} else if fieldType == "xs.byte" {
+								this.object[fieldName] = int8(this.object[fieldName].(float32))
+							} else if fieldType == "xs.short" {
+								this.object[fieldName] = int16(this.object[fieldName].(float32))
+							} else if fieldType == "xs.unsignedByte" {
+								this.object[fieldName] = uint8(this.object[fieldName].(float32))
+							} else if fieldType == "xs.unsignedShort" {
+								this.object[fieldName] = uint16(this.object[fieldName].(float32))
+							} else if fieldType == "xs.unsignedInt" {
+								this.object[fieldName] = uint32(this.object[fieldName].(float32))
+							} else if fieldType == "xs.unsignedLong" {
+								this.object[fieldName] = uint64(this.object[fieldName].(float32))
+							} else {
+								this.object[fieldName] = int64(this.object[fieldName].(float32))
+							}
 						} else if reflect.TypeOf(this.object[fieldName]).Kind() == reflect.Float64 {
-							this.object[fieldName] = int64(this.object[fieldName].(float64))
+							if fieldType == "xs.int" || fieldType == "xs.integer" {
+								this.object[fieldName] = int32(this.object[fieldName].(float64))
+							} else if fieldType == "xs.byte" {
+								this.object[fieldName] = int8(this.object[fieldName].(float64))
+							} else if fieldType == "xs.short" {
+								this.object[fieldName] = int16(this.object[fieldName].(float64))
+							} else if fieldType == "xs.unsignedByte" {
+								this.object[fieldName] = uint8(this.object[fieldName].(float64))
+							} else if fieldType == "xs.unsignedShort" {
+								this.object[fieldName] = uint16(this.object[fieldName].(float64))
+							} else if fieldType == "xs.unsignedInt" {
+								this.object[fieldName] = uint32(this.object[fieldName].(float64))
+							} else if fieldType == "xs.unsignedLong" {
+								this.object[fieldName] = uint64(this.object[fieldName].(float64))
+							} else {
+								this.object[fieldName] = int64(this.object[fieldName].(float64))
+							}
 						}
 					}
 

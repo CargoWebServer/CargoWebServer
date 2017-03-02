@@ -237,7 +237,7 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 	}
 
 	// I will get it entity prototypes.
-	store.GetEntityPrototypes()
+	//	store.GetEntityPrototypes()
 
 	return store, nil
 }
@@ -478,7 +478,6 @@ func (this *DataManager) ImportXmlData(content string, messageId string, session
  * of he's information.
  */
 func NewDataStore(info *Config.DataStoreConfiguration) (DataStore, error) {
-	log.Println("-------> info: ", info)
 	var err error
 	if info.M_dataStoreType == Config.DataStoreType_SQL_STORE {
 		dataStore, err := NewSqlDataStore(info)

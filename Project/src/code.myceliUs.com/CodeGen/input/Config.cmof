@@ -18,6 +18,35 @@
 	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-KNOWLEDGEBASE" name="KNOWLEDGEBASE" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
 	</ownedMember>
 	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="Encoding" name="Encoding">
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-UTF8" name="UTF8" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-WINDOWS_1250" name="WINDOWS_1250" classifier="Encoding" enumeration="Encoding"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-WINDOWS_1251" name="WINDOWS_1251" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-WINDOWS_1252" name="WINDOWS_1252" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-WINDOWS_1253" name="WINDOWS_1253" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-WINDOWS_1254" name="WINDOWS_1254" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-WINDOWS_1255" name="WINDOWS_1255" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-WINDOWS_1256" name="WINDOWS_1256" classifier="Encoding" enumeration="Encoding"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-WINDOWS_1257" name="WINDOWS_1257" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-WINDOWS_1258" name="WINDOWS_1258" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_1" name="ISO8859_1" classifier="Encoding" enumeration="Encoding"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_2" name="ISO8859_2" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_3" name="ISO8859_3" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_4" name="ISO8859_4" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_5" name="ISO8859_5" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_6" name="ISO8859_6" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_7" name="ISO8859_7" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_8" name="ISO8859_8" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_9" name="ISO8859_9" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_10" name="ISO8859_10" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_13" name="ISO8859_13" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_14" name="ISO8859_14" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_15" name="ISO8859_15" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-ISO8859_16" name="ISO8859_16" classifier="Encoding" enumeration="Encoding"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-KOI8R" name="KOI8R" classifier="Encoding" enumeration="Encoding"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="Encoding-KOI8U" name="KOI8U" classifier="Encoding" enumeration="Encoding"/>
+	</ownedMember>
+	
 	<!-- Abstract configuration -->
 	<ownedMember xmi:type="cmof:Class" xmi:id="Configuration" name="Configuration" isAbstract="true">
       <ownedAttribute xmi:type="cmof:Property" xmi:id="Configuration-id" name="id">
@@ -26,6 +55,7 @@
 	</ownedMember>
 			
 	<ownedMember xmi:type="cmof:Class" xmi:id="SmtpConfiguration" name="SmtpConfiguration" superClass="Configuration">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="SmtpConfiguration-Encoding" name="textEncoding" _type="Encoding"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hostName" name="hostName">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
@@ -47,6 +77,7 @@
 
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="DataStoreConfiguration-DataStoreType" name="dataStoreType" _type="DataStoreType"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="DataStoreConfiguration-DataStoreVendor" name="dataStoreVendor" _type="DataStoreVendor"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="DataStoreConfiguration-Encoding" name="textEncoding" _type="Encoding"/>
 
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hostName" name="hostName">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>

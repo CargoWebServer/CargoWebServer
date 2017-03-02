@@ -9,6 +9,23 @@ var QueryEditor = function (parent, file, initCallback) {
     this.file = file
     this.dataConfigs = {}
     this.activeDataConfig = null
+    this.queryToolBar = null
+    this.dataSelect = null
+
+    // result navigation.
+    this.moveFirstBtn = null
+    this.moveLeftBtn = null
+    this.nagivatorState = null
+    this.moveRightBtn = null
+    this.moveLastBtn = null
+
+    // Keep the number of row that can be displayed.
+    this.countRows = 0
+    this.maxRows = 5000 // Must be set in config.
+
+    // Those info came from the query itself.
+    this.fromRows = undefined
+    this.nbRows = 0
 
     // Sql data source.
     this.isSql = file.M_name.endsWith(".sql") || file.M_name.endsWith(".SQL")
@@ -32,7 +49,7 @@ var QueryEditor = function (parent, file, initCallback) {
     // The result panel.
     var splitArea2 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-row; position: relative; width: 100%; height:100%;" }).down()
 
-    this.resultQueryPanel = new Element(splitArea2, { "tag": "div", "class": "result_query_panel" })
+    this.resultQueryPanel = new Element(splitArea2, { "tag": "div", "class": "result_query_panel", "style": "position: relative;" })
 
     // Init the splitter action.
     initSplitter(queryEditorSplitor, this.editQueryPanel)
@@ -58,6 +75,9 @@ var QueryEditor = function (parent, file, initCallback) {
     return this
 }
 
+/**
+ * Initialyse the query editor.
+ */
 QueryEditor.prototype.init = function () {
     // Now I will get the list of datastore from the server for the given type.
     server.entityManager.getObjectsByType("Config.DataStoreConfiguration", "Config", "",
@@ -97,22 +117,198 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
         this.dataConfigs[configs[i].M_id] = configs[i]
     }
 
+    // So here I will create the tool bar for the query editor.
+    this.queryToolBar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar", "id": randomUUID() })
+
+    // The datasource selection.
+    this.dataSelect = this.queryToolBar.appendElement({ "tag": "div", "style": "display: table-cell; height: 100%; vertical-align: middle;" }).down()
+        .appendElement({ "tag": "select" }).down()
+
+    for (var configId in this.dataConfigs) {
+        this.dataSelect.appendElement({ "tag": "option", "innerHtml": configId, "value": configId })
+        if (this.activeDataConfig == undefined) {
+            this.setActiveDataConfig(configId)
+        }
+    }
+
+    // Here I will set the current data source
+    this.dataSelect.element.onchange = function (queryEditor) {
+        return function () {
+            queryEditor.setActiveDataConfig(this.value)
+        }
+    } (this)
+
+    // The query button.
+    var playQueryBtn = this.queryToolBar.appendElement({ "tag": "div", "class": "toolbarButton" }).down()
+    playQueryBtn.appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-bolt" })
+
+    playQueryBtn.element.onclick = function (queryEditor) {
+        return function () {
+            // Here I will call the query.
+            queryEditor.runQuery()
+        }
+    } (this)
+
+    // Now the pages navigation button to use in case of query that contain limits
+    this.queryToolBar.appendElement({ "tag": "div", "class": "toolbarButton", "id": "moveFirstBtn", "style": "display: none;" }).down()
+        .appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-angle-double-left" }).up()
+        .appendElement({ "tag": "div", "class": "toolbarButton", "id": "moveLeftBtn", "style": "display: none;" }).down()
+        .appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-angle-left" }).up()
+        .appendElement({ "tag": "div", "style": "display: none; vertical-align: middle; color: #657383; padding: 0px 10px 0px 10px;", "id": "nagivatorState" })
+        .appendElement({ "tag": "div", "class": "toolbarButton", "id": "moveRightBtn", "style": "display: none;" }).down()
+        .appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-angle-right " }).up()
+        .appendElement({ "tag": "div", "class": "toolbarButton", "id": "moveLastBtn", "style": "display: none;" }).down()
+        .appendElement({ "tag": "i", "id": randomUUID() + "_play_query_btn", "class": "fa fa-angle-double-right " })
+
+    // Now the action button
+    this.moveFirstBtn = this.queryToolBar.getChildById("moveFirstBtn")
+    this.moveLeftBtn = this.queryToolBar.getChildById("moveLeftBtn")
+    this.nagivatorState = this.queryToolBar.getChildById("nagivatorState")
+    this.moveRightBtn = this.queryToolBar.getChildById("moveRightBtn")
+    this.moveLastBtn = this.queryToolBar.getChildById("moveLastBtn")
+
+    // The move first button.
+    this.moveFirstBtn.element.onclick = function (queryEditor) {
+        return function () {
+            // So here I will set the from to the last...
+            queryEditor.fromRows = 0
+
+            var total = parseInt((queryEditor.countRows / queryEditor.nbRows) + .5)
+            queryEditor.nagivatorState.element.innerHTML = "0 | " + total
+            // Hide left buttons...
+            queryEditor.moveFirstBtn.element.style.display = "none"
+            queryEditor.moveLeftBtn.element.style.display = "none"
+
+            // display the right buttons
+            queryEditor.moveRightBtn.element.style.display = ""
+            queryEditor.moveLastBtn.element.style.display = ""
+
+            queryEditor.runQuery()
+        }
+    } (this)
+
+    // The move last button.
+    this.moveLastBtn.element.onclick = function (queryEditor) {
+        return function () {
+            // So here I will set the from to the last...
+            queryEditor.fromRows = parseInt((queryEditor.countRows / queryEditor.nbRows)) * queryEditor.nbRows
+            var total = parseInt((queryEditor.countRows / queryEditor.nbRows) + .5)
+            queryEditor.nagivatorState.element.innerHTML = total + " | " + total
+            // display right buttons...
+            queryEditor.moveFirstBtn.element.style.display = ""
+            queryEditor.moveLeftBtn.element.style.display = ""
+
+            // hide the right buttons
+            queryEditor.moveRightBtn.element.style.display = "none"
+            queryEditor.moveLastBtn.element.style.display = "none"
+
+            queryEditor.runQuery()
+        }
+    } (this)
+
+    // The move right button.
+    this.moveRightBtn.element.onclick = function (queryEditor) {
+        return function () {
+            // move to nb rows
+            queryEditor.fromRows += queryEditor.nbRows
+
+            var total = parseInt((queryEditor.countRows / queryEditor.nbRows) + .5)
+            var index = parseInt((queryEditor.fromRows / queryEditor.nbRows) + .5)
+
+            // Hide the button if the index is 
+            if (index == total) {
+                queryEditor.moveRightBtn.element.style.display = "none"
+                queryEditor.moveLastBtn.element.style.display = "none"
+            }
+
+            queryEditor.runQuery()
+        }
+    } (this)
+
+    // Move left.
+    this.moveLeftBtn.element.onclick = function (queryEditor) {
+        return function () {
+            // move to nb rows
+            queryEditor.fromRows -= queryEditor.nbRows
+
+            var total = parseInt((queryEditor.countRows / queryEditor.nbRows) + .5)
+            var index = parseInt((queryEditor.fromRows / queryEditor.nbRows) + .5)
+
+            // Hide the button if the index is 
+            if (index == 0) {
+                queryEditor.moveLeftBtn.element.style.display = "none"
+                queryEditor.moveLeftBtn.element.style.display = "none"
+            }
+
+            queryEditor.runQuery()
+        }
+    } (this)
+
     // Call the init callback.
     this.initCallback(this)
 }
 
+QueryEditor.prototype.setResultsNavigatorSate = function () {
+    if (this.nbRows > 0) {
+        if (this.countRows > this.nbRows) {
+            var total = parseInt((this.countRows / this.nbRows) + .5)
+            var index = this.fromRows / this.nbRows
+
+            if (this.fromRows == 0) {
+                this.moveFirstBtn.element.style.display = "none"
+                this.moveLeftBtn.element.style.display = "none"
+                this.moveRightBtn.element.style.display = ""
+                this.moveLastBtn.element.style.display = ""
+            } else if (index == total) {
+                this.moveRightBtn.element.style.display = "none"
+                this.moveLastBtn.element.style.display = "none"
+                this.moveFirstBtn.element.style.display = ""
+                this.moveLeftBtn.element.style.display = ""
+            } else {
+                this.moveFirstBtn.element.style.display = ""
+                this.moveLeftBtn.element.style.display = ""
+                this.moveRightBtn.element.style.display = ""
+                this.moveLastBtn.element.style.display = ""
+            }
+
+            this.nagivatorState.element.style.display = "table-cell"
+            this.nagivatorState.element.innerHTML = index + " | " + total
+
+        } else {
+            // In that case there no need for the navigation
+            this.moveFirstBtn.element.style.display = "none"
+            this.moveLeftBtn.element.style.display = "none"
+            this.nagivatorState.element.style.display = "none"
+            this.moveRightBtn.element.style.display = "none"
+            this.moveLastBtn.element.style.display = "none"
+        }
+    }
+}
+
+/**
+ * Set the current database.
+ */
 QueryEditor.prototype.setActiveDataConfig = function (configId) {
     // Keep ref to the data configuration.
     this.activeDataConfig = this.dataConfigs[configId]
+    for (var i = 0; i < this.dataSelect.element.childNodes.length; i++) {
+        if (this.dataSelect.element.childNodes[i].value == this.activeDataConfig.M_id) {
+            this.dataSelect.element.selectedIndex = i
+            break
+        }
+    }
 }
 
-
+/**
+ * Run the query and set the result.
+ */
 QueryEditor.prototype.runQuery = function () {
     // Keep ref to the data configuration.
     if (this.isSql) {
         // Here I will execute sql query...
-        var query = this.editor.getSession().getValue()
-		var ast = simpleSqlParser.sql2ast(query)
+        var query = this.editor.getSession().getValue().replaceAll("[", "").replaceAll("]", "")
+
+        var ast = simpleSqlParser.sql2ast(query)
         // in case of where
         var params = []
 
@@ -120,41 +316,238 @@ QueryEditor.prototype.runQuery = function () {
         var fields = []
 
         // Here I will keep the list of prototype.
-        var prototypes = []
+        var prototypes = {}
 
         // Query type...
         var type = "" // Can be CREATE, READ, UPDATE, DELETE
 
         // Now I will parse 
-        if(ast.status == true){
+        if (ast.status == true) {
             // The list of prototypes...
-            for(var i= 0; i < ast.value.from.length; i++){
-                prototypes.push(ast.value.from[i].table)
+            for (var i = 0; i < ast.value.from.length; i++) {
+                var prototype = ast.value.from[i].table
+                var values = prototype.split(".")
+                if (values.length == 2) {
+                    // Tow value can be database_name.table_name or schema_name.table_name
+                    // only schema will be keep.
+                    for (var sourceId in this.dataConfigs) {
+                        if (sourceId == values[0]) {
+                            this.setActiveDataConfig(values[0])
+                            prototype = values[1]
+                            break
+                        }
+                    }
+                }
+
+                // the final prototype id will be database_name.(schema_name.)table_name schema is optional.
+                prototype = this.activeDataConfig.M_id + "." + prototype
+                prototypes[prototype] = prototype
             }
 
             // Here There is no syntax error...
-            for(var i= 0; i < ast.value.select.length; i++){
+            for (var i = 0; i < ast.value.select.length; i++) {
                 type = "READ"
-                fields.push(ast.value.select[i].column)
+                fields.push(ast.value.select[i])
+            }
+        }
+
+        // Set the row to start and the number of row to display from start.
+        if (ast.value.limit != null) {
+            if (this.fromRows != undefined) {
+                ast.value.limit.from = this.fromRows
+            } else {
+                this.fromRows = ast.value.limit.from
+            }
+
+            this.nbRows = ast.value.limit.nb
+        }
+
+        // The query can be formated...
+        var query_ = simpleSqlParser.ast2sql(ast)
+        if (query_.length > 0) {
+            if (query != query_) {
+                this.editor.getSession().setValue(query_)
+                query = query_
             }
         }
 
         // Now I will retreive the prototypes from prototypes names and exectute the query...
-        for(var i=0; i <prototypes.length; i++){
-            var prototype = prototypes[i]
-            if(prototype.indexOf(".") != 0){
-                // In that case the prototype contain the schema id and table id.
-                server.entityManager.getEntityPrototype(prototype, "sql_info",
+        for (var prototype in prototypes) {
+            // In that case the prototype contain the schema id and table id.
+            server.entityManager.getEntityPrototype(prototype, "sql_info",
                 // success callback
-                function(result, caller){
-                    console.log(result)
+                function (result, caller) {
+                    //console.log(result)
+                    var prototypes = caller.prototypes
+                    prototypes[result.TypeName] = result
+
+                    var done = true
+                    for (var prototype in prototypes) {
+                        if (isString(prototypes[prototype])) {
+                            done = false
+                        }
+                    }
+                    if (done) {
+                        // here I will get the list of field type.
+                        var fieldsType = []
+                        var fields = []
+                        for (var i = 0; i < caller.fields.length; i++) {
+                            var field = caller.fields[i]
+                            if (field.column != null) {
+                                var values = field.column.split(".")
+                                if (values.length == 1 && Object.keys(prototypes).length == 1) {
+                                    // That's means there's only one table in use for the query.
+                                    if (field.column != "*") {
+                                        var fieldType = result.FieldsType[result.getFieldIndex("M_" + field.column)]
+                                        fieldsType.push(fieldType)
+                                        if (field.alias != null) {
+                                            fields.push(field.alias)
+                                        } else {
+                                            fields.push(field.column)
+                                        }
+                                    } else {
+                                        // In that case the user want all the value from the table.
+                                        for (var i = 0; i < result.FieldsType.length; i++) {
+                                            if (result.FieldsType[i].startsWith("sqltypes.")) {
+                                                fieldsType.push(result.FieldsType[i])
+                                                fields.push(result.Fields[i].replace("M_", ""))
+                                            }
+                                        }
+                                    }
+
+                                } else {
+                                    var tableId = values[0]
+                                    var fieldName = values[1]
+                                }
+                            } else {
+                                if (field.alias != null) {
+                                    fields.push(field.alias)
+                                }
+
+                                if (field.expression != null) {
+                                    // The count expression...
+                                    if (field.expression.startsWith("COUNT(")) {
+                                        fieldsType.push("sqltypes.int")
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // The list of field types.
+                    caller.fieldsType = fieldsType
+                    caller.fields = fields
+
+                    // Here I will execute the query...
+                    if (caller.type == "READ") {
+                        // Here I will get the number of expected result before execute the final query...
+                        var ast = simpleSqlParser.sql2ast(caller.query)
+                        ast.value.limit = null // remove the limits
+                        var query_ = simpleSqlParser.ast2sql(ast)
+                        var countQuery = "select count(*) as numRow from (" + query_ + ") src";
+                        server.dataManager.read(caller.queryEditor.activeDataConfig.M_id, countQuery, ["sqltypes.int"], [],
+                            // success callback
+                            function (result, caller) {
+                                caller.queryEditor.countRows = result[0][0]
+                                caller.queryEditor.setResult(caller.query, caller.fields, caller.fieldsType, [], caller.type)
+                            },
+                            // progress callback
+                            function (index, total, caller) {
+
+                            }
+                            , //error callback 
+                            function (errMsg, caller) {
+
+                            },
+                            caller)
+                    }
+
                 },
                 // error callback
-                function(errObj, caller){
+                function (errObj, caller) {
 
-                }, this)
-            }
+                }, { "prototypes": prototypes, "type": type, "fields": fields, "query": query, "queryEditor": this })
+
         }
         console.log(ast)
+    }
+}
+
+/**
+ * Set the reuslt table.
+ */
+QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, type) {
+    if (this.isSql) {
+        if (type == "READ") {
+            // Here I will create a sql table.
+            this.resultQueryPanel.removeAllChilds()
+            var table = new Table(this.activeDataConfig.M_id, this.resultQueryPanel)
+            var model = new SqlTableModel(this.activeDataConfig.M_id, query, fieldsType, [], fields)
+
+            // Set the results navigator state.
+            this.setResultsNavigatorSate()
+
+            table.setModel(model, function (table, queryEditor) {
+                return function () {
+                    // init the table.
+                    table.init()
+                    table.header.maximizeBtn.element.click()
+
+                    // Because html table suck with the header position vs scroll 
+                    // I do some little hack to fix it without weird stuff like 
+                    // copy another header etc...
+                    var widths = []
+                    // Now I will wrote the code for the layout...
+                    for (var i = 0; i < table.header.cells.length; i++) {
+                        var w = table.header.cells[i].element.offsetWidth
+                        table.header.cells[i].element.style.width = w + "px"
+                        table.header.cells[i].element.style.minWidth = w + "px"
+                        widths.push(w)
+                    }
+
+                    // Now the table body...
+                    for (var i = 0; i < table.rows.length; i++) {
+                        for (var j = 0; j < table.rows[i].cells.length; j++) {
+                            var cell = table.rows[i].cells[j]
+                            cell.div.element.style.width = widths[j] + "px"
+                            cell.div.element.style.minWidth = widths[j] + "px"
+                        }
+                    }
+
+                    // The table header.
+                    table.header.div.element.style.position = "absolute"
+                    table.header.div.element.style.left = "2px"
+
+                    // Now the table body
+                    table.rowGroup.element.style.position = "absolute"
+                    table.rowGroup.element.style.overflowX = "hidden"
+                    table.rowGroup.element.style.overflowY = "auto"
+                    table.rowGroup.element.style.top = table.header.div.element.offsetHeight + 2 + "px"
+
+                    // Now the height of the panel...
+                    table.rowGroup.element.style.height = queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight + 10 + "px"
+
+                    // Here the scrolling event.
+                    table.rowGroup.element.onscroll = function (header) {
+                        return function () {
+                            var position = this.scrollTop;
+                            if (this.scrollTop > 0) {
+                                header.className = "table_header scrolling"
+                            } else {
+                                header.className = "table_header"
+                            }
+                        }
+                    } (table.header.div.element)
+
+                    // Now the resize event.
+                    window.addEventListener('resize',
+                        function (queryEditor, table) {
+                            return function () {
+                                table.rowGroup.element.style.height = queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight + 10 + "px"
+                            }
+                        } (queryEditor, table), true);
+                }
+            } (table, this))
+        }
     }
 }

@@ -67,7 +67,7 @@ var SessionPanel = function (parent, sessionInfo) {
 	this.setAccountInfo(sessionInfo.M_accountPtr)
 
 	// Set the user information.
-	if (sessionInfo.M_accountPtr.M_userRef != undefined) {
+	if (sessionInfo.M_accountPtr.M_userRef.length > 0){
 		// Set the user information if founded.
 		this.setUserInfo(sessionInfo.M_accountPtr.M_userRef)
 	} else {

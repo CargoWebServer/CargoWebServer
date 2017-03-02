@@ -10,6 +10,7 @@ var ChangeFileEvent = 100
 // Set the address here
 var mainPage = null
 var catalog = null
+var homePage = null
 
 function init() {
     var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
@@ -18,7 +19,7 @@ function init() {
     var mainLayout = new Element(bodyElement, { "tag": "div", "style": "position: absolute; top:0px; left:0px; right:0px; bottom: 0px;" });
 
     // The page to display when the user is logged in
-    homePage = new HomePage(mainLayout)
+    homePage = new HomePage()
 
     // The login page...
     var loginPage = new LoginPage(function (mainLayout, homePage) {

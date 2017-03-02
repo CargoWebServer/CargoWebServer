@@ -2,7 +2,6 @@
  * The code editor..
  * TODO create the split functionnality
  * TODO create the multiuser access for a single file.
- * Test...
  */
 
 var CodeEditor = function (parent) {
@@ -52,12 +51,14 @@ var CodeEditor = function (parent) {
 
     // Attach the file close event.
     server.fileManager.attach(this, CloseEntityEvent, function (evt, codeEditor) {
-        var fileId = evt.dataMap["fileId"] 
+        var fileId = evt.dataMap["fileId"]
         if (fileId != undefined) {
             codeEditor.removeFile(fileId)
-            for (var i = 0; i < codeEditor.toolbars[fileId].length; i++) {
-                var toolbar = codeEditor.toolbars[fileId][i]
-                homepage.toolbarDiv.removeElement(toolbar)
+            if (codeEditor.toolbars[fileId] != undefined) {
+                for (var i = 0; i < codeEditor.toolbars[fileId].length; i++) {
+                    var toolbar = codeEditor.toolbars[fileId][i]
+                    homepage.toolbarDiv.removeElement(toolbar)
+                }
             }
             codeEditor.toolbars[fileId] = []
         }
@@ -163,41 +164,9 @@ CodeEditor.prototype.appendFile = function (file) {
             // The query editor.
             var queryEditor = new QueryEditor(filePanel, file, function (codeEditor, fileId) {
                 return function (queryEditor) {
-                    // Now I will create the toolbar for execute a query.
-                    // So here I will create the tool bar for the query editor.
-                    var queryToolBar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar", "id":randomUUID() })
-
-                    // The datasource selection.
-                    var dataSelect = queryToolBar.appendElement({"tag":"select"}).down()
-
-                    for(var configId in queryEditor.dataConfigs){
-                        dataSelect.appendElement({"tag":"option", "innerHtml":configId, "value":configId})
-                        if(queryEditor.activeDataConfig == undefined){
-                            queryEditor.setActiveDataConfig(configId)
-                        }
-                    }
-
-                    // Here I will set the current data source
-                    dataSelect.element.onchange = function(queryEditor){
-                        return function(){
-                            queryEditor.setActiveDataConfig(this.value)
-                        }
-                    }(queryEditor)
-
-                    // The query button.
-                    var playQueryBtn = queryToolBar.appendElement({ "tag": "div", "class": "toolbarButton" }).down()
-                     playQueryBtn.appendElement({ "tag": "i", "id": fileId + "_play_query_btn", "class": "fa fa-play" })
-
-                    playQueryBtn.element.onclick = function(queryEditor){
-                        return function(){
-                            // Here I will call the query.
-                            queryEditor.runQuery()
-                        }
-                    }(queryEditor)
-
                     // I will append the list of dataStore that can be use to do query.
                     codeEditor.toolbars[fileId] = []
-                    codeEditor.toolbars[fileId].push(queryToolBar)
+                    codeEditor.toolbars[fileId].push(queryEditor.queryToolBar)
                 }
             } (this, file.M_id))
 
@@ -212,7 +181,7 @@ CodeEditor.prototype.appendFile = function (file) {
 
 
     // Now I will create the file editor.
-    var filePanel = this.panel.appendElement({ "tag": "xmp", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
+    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
     var editor = ace.edit(file.M_id + "_editor");
     editor.getSession().setMode(fileMode);
     this.editors[file.M_id + "_editor"] = editor

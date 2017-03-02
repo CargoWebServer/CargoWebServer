@@ -270,7 +270,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 
 			if (value != null && control != null && value != "") {
 				if (control.setFieldValue == undefined) {
-					if (fieldType == "xs.[]uint8") {
+					if (fieldType == "xs.base64Binary") {
 						this.setGenericFieldValue(control, field, value, entity.UUID)
 					} else {
 						this.setFieldValue(control, field, fieldType, value, entity.UUID)
@@ -312,7 +312,7 @@ EntityPanel.prototype.clear = function () {
 	this.panel.innerHtml = ""
 	this.entity = null
 	this.init(this.proto)
-	if(this.initCallback != undefined){
+	if (this.initCallback != undefined) {
 		this.initCallback(this)
 	}
 	this.maximizeBtn.element.click()
@@ -529,7 +529,17 @@ EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType
 			control = appendSelect(restrictions, id, valueDiv)
 		}
 	} else {
-		if (fieldType == "xs.string" || fieldType == "xs.NMTOKEN") {
+
+		if (isXsId(fieldType)) {
+			control = valueDiv.appendElement({ "tag": "input", "id": id }).down()
+		} else if (isXsRef(fieldType)) {
+			// Reference here... autocomplete...
+			control = valueDiv.appendElement({ "tag": "input", "id": id }).down()
+		} else if (isXsInt(fieldType)) {
+			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "1", "id": id }).down()
+		} else if (isXsDate(fieldType)) {
+			control = valueDiv.appendElement({ "tag": "input", "type": "date", "id": id }).down()
+		} else if (isXsString(fieldType)) {
 			if (field == "M_description") {
 				valueDiv.element.style.verticalAlign = "top"
 				control = valueDiv.appendElement({ "tag": "textarea", "id": id }).down()
@@ -539,20 +549,18 @@ EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType
 					control.element.type = "password"
 				}
 			}
-		} else if (fieldType == "xs.float64" || fieldType == "xs.double") {
-			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "0.01", "id": id }).down()
-		} else if (fieldType == "xs.date") {
-			control = valueDiv.appendElement({ "tag": "input", "type": "date", "id": id }).down()
-		} else if (fieldType == "xs.dateTime") {
-			control = valueDiv.appendElement({ "tag": "input", "type": "date", "id": id }).down()
-		} else if (fieldType == "xs.integer" || fieldType == "xs.int" || fieldType == "xs.unsignedLong") {
-			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "1", "id": id }).down()
-		} else if (fieldType == "xs.bool") {
+		} else if (isXsBinary(fieldType)) {
+
+		} else if (isXsBoolean(fieldType)) {
 			control = valueDiv.appendElement({ "tag": "input", "type": "checkbox", "id": id }).down()
-		} else if (fieldType == "xs.anyURI" || fieldType == "xs.NCName" || fieldType == "xs.ID") {
-			control = valueDiv.appendElement({ "tag": "input", "id": id }).down()
-		} else if (fieldType == "xs.boolean") {
-			control = valueDiv.appendElement({ "tag": "input", "id": id, "type": "checkbox" }).down()
+		} else if (isXsTime(fieldType)) {
+
+		} else if (isXsNumeric(fieldType)) {
+			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "0.01", "id": id }).down()
+		} else if (isXsMoney(fieldType)) {
+			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "0.01", "id": id }).down()
+		} else {
+
 		}
 	}
 	return control
@@ -572,7 +580,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 
 	// In case of a generic value....
-	if (fieldType == "xs.[]uint8") {
+	if (fieldType == "xs.base64Binary") {
 		this.controls[id] = parent
 		return
 	}
@@ -815,16 +823,16 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 					}
 
 					/** Here it's a string **/
-					if (fieldType == "xs.string" || fieldType == "xs.NMTOKEN" || fieldType == "xs.NCName" || fieldType == "xs.ID") {
+					if (isXsId(fieldType) || isXsString(fieldType || isXsRef(fieldType))) {
 						entity[attribute] = this.value
 						entity.NeedSave = true
-					} else if (fieldType == "xs.float64" || fieldType == "xs.float32" || fieldType == "xs.double") {
+					} else if (isXsNumeric(fieldType)) {
 						entity[attribute] = parseFloat(this.value)
 						entity.NeedSave = true
-					} else if (fieldType == "xs.integer" || fieldType == "xs.int") {
+					} else if (isXsInt(fieldType)) {
 						entity[attribute] = parseInt(this.value)
 						entity.NeedSave = true
-					} else if (fieldType == "xs.boolean") {
+					} else if (isXsBoolean(fieldType)) {
 						entity[attribute] = this.checked
 						entity.NeedSave = true
 					} else if (fieldType.startsWith("enum:")) {
@@ -1169,41 +1177,38 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 
 	this.maximizeBtn.element.click()
 	// Here I will see if the type is derived basetype...
-	if (fieldType.startsWith("enum:")) {
-		// Here the value is an enumeration...
-		control.element.selectedIndex = parseInt(value) - 1
-	} else if (fieldType == "xs.string" || fieldType == "interface{}" || fieldType == "xs.NMTOKEN" || fieldType == "xs.ID") {
-		control.element.value = value
-	} else if (fieldType == "xs.float64" || fieldType == "xs.float32" || fieldType == "xs.double") {
-		if (value != "") {
-			control.element.value = parseFloat(value)
-		} else {
-			control.element.value = ""
+	if (!fieldType.startsWith("[]")) {
+		if (fieldType.startsWith("enum:")) {
+			// Here the value is an enumeration...
+			control.element.selectedIndex = parseInt(value) - 1
+		} else if (isXsString(fieldType) || fieldType == "interface{}") {
+			control.element.value = value
+		} else if (isXsNumeric(fieldType)) {
+			if (value != "") {
+				control.element.value = parseFloat(value)
+			} else {
+				control.element.value = ""
+			}
+		} else if (isXsInt(fieldType)) {
+			if (value != "") {
+				control.element.value = parseInt(value)
+			} else {
+				control.element.value = ""
+			}
+		} else if (isXsBoolean(fieldType)) {
+			control.element.checked = value
+		} else if (isXsDate(fieldType)) {
+			if (value != "") {
+				control.element.value = moment(value).format('YYYY-MM-DD');
+			} else {
+				control.element.value = ""
+			}
+		} else if (isXsId(fieldType)) {
+			control.element.value = value
+		}else if (isXsRef(fieldType)) {
+			control.element.innerHTML = value.replace("#", "")
+			control.element.href = value
 		}
-	} else if (fieldType == "xs.int" || fieldType == "xs.integer" || fieldType == "xs.unsignedLong") {
-		if (value != "") {
-			control.element.value = parseInt(value)
-		} else {
-			control.element.value = ""
-		}
-	} else if (fieldType == "xs.boolean") {
-		control.element.checked = value
-	} else if (fieldType == "xs.date") {
-		if (value != "") {
-			control.element.value = moment(value).format('YYYY-MM-DD');
-		} else {
-			control.element.value = ""
-		}
-	} else if (fieldType == "xs.dateTime") {
-		if (value != "") {
-			control.element.value = moment(value).format('YYYY-MM-DD');
-		} else {
-			control.element.value = ""
-		}
-	} else if (fieldType == "xs.anyURI" || fieldType == "xs.NCName" || fieldType == "xs.ID") {
-		control.element.innerHTML = value.replace("#", "")
-		control.element.href = value
-
 	} else {
 		// Here the entity is a reference to a complex type...
 		var isRef = fieldType.endsWith(":Ref")
@@ -1246,7 +1251,6 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 				} else {
 					control.clear()
 				}
-
 			}
 		} else {
 			if (value != null) {
@@ -1332,11 +1336,13 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 				// or the first entity id.
 				for (var i = 0; i < results.length; i++) {
 					var result = results[i]
-					var titles = result.getTitles()
-					for (var j = 0; j < titles.length; j++) {
-						if (ids.indexOf(titles[j]) == -1) {
-							objMap[titles[j]] = result
-							lst.push(titles[j])
+					if (result.getTitles != undefined) {
+						var titles = result.getTitles()
+						for (var j = 0; j < titles.length; j++) {
+							if (ids.indexOf(titles[j]) == -1) {
+								objMap[titles[j]] = result
+								lst.push(titles[j])
+							}
 						}
 					}
 				}
