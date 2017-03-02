@@ -65,8 +65,12 @@ h5{
 	padding-left: 25px;
 }
 
-.dividerBottom{
+.dividerBottom-thick{
 	border-bottom: 3px solid #eee;
+}
+
+.dividerBottom-thin{
+	border-bottom: 1px solid #eee;
 }
 
 /* MARKETING
