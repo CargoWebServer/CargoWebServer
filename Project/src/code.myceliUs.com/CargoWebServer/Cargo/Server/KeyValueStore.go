@@ -390,7 +390,6 @@ func (this *KeyValueDataStore) getIndexationKeys(prototype *EntityPrototype, ent
 			index := prototype.getFieldIndex(prototype.Ids[i])
 			switch v := entity[index].(type) {
 			case string:
-
 				if strings.HasPrefix(v, "[") && strings.HasSuffix(v, "]") {
 					values := make([]string, 0)
 					err := json.Unmarshal([]byte(v), &values)
@@ -407,8 +406,20 @@ func (this *KeyValueDataStore) getIndexationKeys(prototype *EntityPrototype, ent
 							indexationKeys = append(indexationKeys, indexationKey)
 						}
 					}
-
 				}
+
+			case int8:
+				indexationKey = prototype.TypeName + ":" + prototype.Ids[i] + ":" + strconv.Itoa(int(v))
+				indexationKeys = append(indexationKeys, indexationKey)
+
+			case int16:
+				indexationKey = prototype.TypeName + ":" + prototype.Ids[i] + ":" + strconv.Itoa(int(v))
+				indexationKeys = append(indexationKeys, indexationKey)
+
+			case int32:
+				indexationKey = prototype.TypeName + ":" + prototype.Ids[i] + ":" + strconv.Itoa(int(v))
+				indexationKeys = append(indexationKeys, indexationKey)
+
 			case int64:
 				indexationKey = prototype.TypeName + ":" + prototype.Ids[i] + ":" + strconv.FormatInt(v, 10)
 				indexationKeys = append(indexationKeys, indexationKey)

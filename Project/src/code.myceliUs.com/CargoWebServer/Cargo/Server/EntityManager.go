@@ -617,7 +617,14 @@ func (this *EntityManager) getEntityById(storeId string, typeName string, id str
 		return nil, cargoError
 	}
 
+	// The entity information are in sql_info and not the given store id...
+	if reflect.TypeOf(GetServer().GetDataManager().getDataStore(storeId)).String() == "*Server.SqlDataStore" {
+		// I will try to found the prototype inside sql_info instead.
+		storeId = "sql_info"
+	}
+
 	prototype, err := this.getEntityPrototype(typeName, storeId)
+
 	var results [][]interface{}
 	if err == nil {
 		var query EntityQuery
@@ -844,14 +851,11 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	result, err := Utility.CallMethod(this, funcName, params)
 
 	if err != nil {
-		log.Println("---------> fail to call ", funcName)
 		// Try with dynamic entity instead.
 		entity, errObj := this.getDynamicEntityByUuid(uuid)
 		if errObj != nil {
-
 			return nil, errObj
 		}
-
 		return entity, nil
 	}
 
@@ -1124,7 +1128,12 @@ func (this *EntityManager) getEntityPrototypes(storeId string, schemaId string) 
 		return nil, errors.New("The dataStore with id '" + storeId + "' doesn't exist.")
 	}
 
-	dataStore := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
+	dataStore := GetServer().GetDataManager().getDataStore(storeId)
+	if reflect.TypeOf(dataStore).String() == "*Server.SqlDataStore" {
+		// I will try to found the prototype inside sql_info instead.
+		dataStore = GetServer().GetDataManager().getDataStore("sql_info")
+	}
+
 	protos, err := dataStore.GetEntityPrototypes()
 	prototypes := make([]*EntityPrototype, 0)
 
@@ -1145,7 +1154,6 @@ func (this *EntityManager) getEntityPrototypes(storeId string, schemaId string) 
 func (this *EntityManager) getEntityPrototype(typeName string, storeId string) (*EntityPrototype, error) {
 
 	if GetServer().GetDataManager().getDataStore(storeId) == nil {
-
 		return nil, errors.New("The dataStore with id '" + storeId + "' doesn't exist.")
 	}
 

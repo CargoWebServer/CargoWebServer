@@ -256,7 +256,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 
 		//init the child...
 		childsUuidStr := results[0][this.prototype.getFieldIndex("childsUuid")].(string)
-		this.childsUuid = make([]string, 0)
+
 		if len(childsUuidStr) > 0 {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
@@ -467,6 +467,8 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 		this.saveEntity("")
 	}
 
+	//log.Print("-----> ", this.GetObject())
+
 	return nil
 }
 
@@ -490,8 +492,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 	if !this.NeedSave() || strings.Index(path, this.GetUuid()) != -1 {
 		return
 	}
-
-	//log.Println("-----> ", path, "::", this.GetUuid())
 
 	// cut the recusion here.
 	this.SetNeedSave(false)
@@ -523,12 +523,12 @@ func (this *DynamicEntity) saveEntity(path string) {
 
 		// append the field in the query fields list.
 		query.Fields = append(query.Fields, fieldName)
-
+		//log.Println("--------> save ", fieldName, " whit value ", this.object[fieldName], " field type ", fieldType)
 		// Print the field name.
 		if this.object[fieldName] != nil {
 			// Array's
 			if strings.HasPrefix(fieldType, "[]") {
-				if strings.HasPrefix(fieldType, "[]xs.") || fieldName == "M_listOf" {
+				if strings.HasPrefix(fieldType, "[]xs.") || strings.HasPrefix(fieldType, "[]sqltypes.") || fieldName == "M_listOf" {
 
 					valuesStr, err := json.Marshal(this.object[fieldName])
 					if err != nil {
@@ -704,7 +704,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 				}
 			} else {
 				// Not an array...
-				if strings.HasPrefix(fieldType, "xs.") || fieldName == "M_valueOf" {
+				if strings.HasPrefix(fieldType, "xs.") || strings.HasPrefix(fieldType, "sqltypes.") || fieldName == "M_valueOf" {
 					// Little fix to convert float into int type as needed.
 					if fieldType == "xs.byte" || fieldType == "xs.short" || fieldType == "xs.int" || fieldType == "xs.integer" || fieldType == "xs.long" || fieldType == "xs.unsignedInt" || fieldType == "xs.unsignedByte" || fieldType == "xs.unsignedShort" || fieldType == "xs.unsignedLong" {
 						if reflect.TypeOf(this.object[fieldName]).Kind() == reflect.Float32 {
@@ -968,7 +968,6 @@ func (this *DynamicEntity) RemoveChild(name string, uuid string) {
 		delete(this.object, name)
 	}
 
-	//log.Println("Remove child: ", name, ":", uuid, ":", this.object)
 }
 
 /**
@@ -1091,7 +1090,6 @@ func (this *DynamicEntity) RemoveReference(name string, reference Entity) {
 		delete(this.object, name)
 	}
 
-	//log.Println("Remove reference: ", name, ":", reference.GetUuid(), ":", this.object)
 }
 
 /**
@@ -1114,11 +1112,12 @@ func (this *DynamicEntity) SetChildsPtr(childsPtr []Entity) {
 func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error {
 
 	// I will retreive the entity prototype retreive the attribute information.
-	typeName := this.uuid[0:strings.Index(this.uuid, "%")]
+	/*
+		typeName := this.uuid[0:strings.Index(this.uuid, "%")]
 
-	var query EntityQuery
-	query.TypeName = typeName
-
+		var query EntityQuery
+		query.TypeName = typeName
+	*/
 	// Here I will append the rest of the fields...
 
 	// Set or reset the child ptr.
@@ -1361,7 +1360,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 		fieldType := this.prototype.FieldsType[i]
 		isArray := strings.HasPrefix(fieldType, "[]")
 		isRef := strings.HasSuffix(fieldType, ":Ref")
-		isBaseType := strings.HasPrefix(fieldType, "[]xs.") || strings.HasPrefix(fieldType, "xs.")
+		isBaseType := strings.HasPrefix(fieldType, "[]xs.") || strings.HasPrefix(fieldType, "xs.") || strings.HasPrefix(fieldType, "sqltypes.") || strings.HasPrefix(fieldType, "[]sqltypes.")
 
 		// The goal here is to remove base value or reference if there is no
 		// more in the values.

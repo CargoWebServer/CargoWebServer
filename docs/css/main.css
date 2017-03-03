@@ -38,7 +38,7 @@ h5{
 	font-size: 18pt;
 }
 
-.sidebarHeader{
+.tutorialsHeader{
 	padding-left:10px;
 	cursor: pointer;
 }
@@ -53,7 +53,7 @@ h5{
 	height: 256px;
 }
 
-.sectionIntro{
+.tutorialsSectionIntro{
 	padding-top: 20px;
 }
 
@@ -61,24 +61,13 @@ h5{
 	color: #1BA1E2;
 }
 
-.quickstartList > li{
-	padding-left: 25px;
-}
-
-.dividerBottom-thick{
-	border-bottom: 3px solid #eee;
-}
-
-.dividerBottom-thin{
-	border-bottom: 1px solid #eee;
-}
-
 /* MARKETING
 -------------------------------------------------- */
 
 .marketing {
 	height: 300px;
-	padding-left: 15px;
+	padding-right: 150px;
+	padding-left: 150px;
 }
 
 .marketing .col-md-3 {

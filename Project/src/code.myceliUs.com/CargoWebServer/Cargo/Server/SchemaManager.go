@@ -165,7 +165,7 @@ func (this *SchemaManager) initialize() {
 			prototype.FieldsOrder = append(prototype.FieldsOrder, i)
 		}
 		// Here i will save the prototype...
-		prototype.Create()
+		prototype.Create("")
 
 		// Print the list of prototypes...
 		//prototype.Print()
@@ -246,7 +246,7 @@ func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Er
 			prototype.FieldsOrder = append(prototype.FieldsOrder, i)
 		}
 		// Here i will save the prototype...
-		prototype.Create()
+		prototype.Create("")
 
 		// Print the list of prototypes...
 		//prototype.Print()

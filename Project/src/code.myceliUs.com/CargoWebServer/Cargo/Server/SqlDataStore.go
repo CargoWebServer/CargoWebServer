@@ -834,27 +834,31 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 		isId := values[i][3].(bool)
 		// So here I will create new field...
 		if fieldType != nil {
-			prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
-			prototype.Fields = append(prototype.Fields, "M_"+fieldName)
-			prototype.FieldsType = append(prototype.FieldsType, fieldType.TypeName)
-			if isId {
-				prototype.Ids = append(prototype.Ids, "M_"+fieldName)
-			}
+			if !Utility.Contains(prototype.Fields, "M_"+fieldName) {
+				prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
+				prototype.Fields = append(prototype.Fields, "M_"+fieldName)
+				prototype.FieldsType = append(prototype.FieldsType, fieldType.TypeName)
+				prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, "")
 
-			if isNilAble {
-				prototype.FieldsNillable = append(prototype.FieldsNillable, true)
-			} else {
-				prototype.FieldsNillable = append(prototype.FieldsNillable, false)
-			}
-			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+				// Set as id.
+				if isId {
+					prototype.Ids = append(prototype.Ids, "M_"+fieldName)
+				}
 
+				if isNilAble {
+					prototype.FieldsNillable = append(prototype.FieldsNillable, true)
+				} else {
+					prototype.FieldsNillable = append(prototype.FieldsNillable, false)
+				}
+
+				prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+			}
 		}
 	}
 
-	err = store.(*KeyValueDataStore).SetEntityPrototype(prototype)
-	if err == nil {
-		log.Println("---> create ", prototype.TypeName, " prototype.")
-	}
+	// Create the new prototype in sql_info store.
+	prototype.Create("sql_info")
+
 	return prototype, err
 }
 
@@ -964,7 +968,6 @@ func (this *SqlDataStore) getTypeNameRef(tableName string, fieldName string) (st
 		if len(values[0]) == 2 {
 			refName := values[0][1].(string)
 			refTypeName := values[0][0].(string)
-
 			refSchema, err := this.getSchemaId(refTypeName)
 			if err != nil {
 				log.Println(query)
@@ -975,6 +978,127 @@ func (this *SqlDataStore) getTypeNameRef(tableName string, fieldName string) (st
 	}
 
 	return "", "", errors.New("No reference found for attribute " + tableName + "." + fieldName)
+}
+
+func appendField(prototype *EntityPrototype, fieldName string, fieldType string) {
+	if !Utility.Contains(prototype.Fields, fieldName) {
+
+		prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
+		prototype.FieldsNillable = append(prototype.FieldsVisibility, true)
+
+		fields := prototype.Fields
+		fieldsType := prototype.FieldsType
+		fieldsVisibility := prototype.FieldsVisibility
+		//fieldsDocumentation := prototype.FieldsDocumentation
+
+		// Set empty array...
+		prototype.Fields = make([]string, len(prototype.FieldsOrder))
+		prototype.FieldsType = make([]string, len(prototype.FieldsOrder))
+		prototype.FieldsVisibility = make([]bool, len(prototype.FieldsOrder))
+		prototype.FieldsDocumentation = make([]string, len(prototype.FieldsOrder))
+
+		for i := 0; i < len(fields)-2; i++ {
+			prototype.Fields[i] = fields[i]
+			prototype.FieldsType[i] = fieldsType[i]
+			prototype.FieldsVisibility[i] = fieldsVisibility[i]
+			//prototype.FieldsDocumentation[i] = fieldsDocumentation[i]
+		}
+
+		lastIndex := len(prototype.FieldsOrder) - 1
+		prototype.Fields[lastIndex-2] = fieldName
+		prototype.FieldsType[lastIndex-2] = fieldType
+		prototype.FieldsVisibility[lastIndex-2] = true
+		//prototype.FieldsDocumentation[lastIndex-2] = ""
+
+		// childsUuid
+		prototype.Fields[lastIndex-1] = fields[len(fields)-2]
+		prototype.FieldsType[lastIndex-1] = fieldsType[len(fields)-2]
+		prototype.FieldsVisibility[lastIndex-1] = fieldsVisibility[len(fields)-2]
+		//prototype.FieldsDocumentation[lastIndex-1] = fieldsDocumentation[len(fields)-2]
+
+		// referenced
+		prototype.Fields[lastIndex] = fields[len(fields)-1]
+		prototype.FieldsType[lastIndex] = fieldsType[len(fields)-1]
+		prototype.FieldsVisibility[lastIndex] = fieldsVisibility[len(fields)-1]
+		//prototype.FieldsDocumentation[lastIndex] = fieldsDocumentation[len(fields)-1]
+
+		// Save it back.
+		GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(prototype)
+	}
+}
+
+// Return true if the prototype is an associative one...
+func isAssociative(prototype *EntityPrototype) bool {
+
+	for j := 0; j < len(prototype.Fields); j++ {
+		if strings.HasPrefix(prototype.FieldsType[j], "sqltypes.") {
+			if strings.HasPrefix(prototype.Fields[j], "M_") {
+				if !Utility.Contains(prototype.Ids, prototype.Fields[j]) {
+					return false
+				}
+			}
+		}
+	}
+
+	return true
+}
+
+// For a given ref id it return, the schma name, the table name,
+// the table column name, the referenced_table name and the referenced column name.
+func (this *SqlDataStore) getRefInfos(refId string) ([]string, error) {
+
+	results := make([]string, 5)
+	var query string
+	if this.m_vendor == Config.DataStoreVendor_ODBC {
+		query = "SELECT "
+		query += "	tab1.name     AS [table],"
+		query += "	col1.name     AS [column],"
+		query += "	tab2.name     AS [referenced_table],"
+		query += "	col2.name     AS [referenced_column], "
+		query += "	sch.name      AS [schema_name] "
+		query += "FROM "
+		query += "	sys.foreign_key_columns fkc "
+		query += "INNER JOIN sys.objects obj "
+		query += "	ON obj.object_id = fkc.constraint_object_id "
+		query += "INNER JOIN sys.tables tab1 "
+		query += "	ON tab1.object_id = fkc.parent_object_id "
+		query += "INNER JOIN sys.schemas sch "
+		query += "	ON tab1.schema_id = sch.schema_id "
+		query += "INNER JOIN sys.columns col1 "
+		query += "	ON col1.column_id = parent_column_id AND col1.object_id = tab1.object_id "
+		query += "INNER JOIN sys.tables tab2 "
+		query += "	ON tab2.object_id = fkc.referenced_object_id "
+		query += "INNER JOIN sys.columns col2 "
+		query += "	ON col2.column_id = referenced_column_id "
+		query += "	AND col2.object_id =  tab2.object_id "
+		query += "WHERE obj.name ='" + refId + "'"
+	}
+
+	// TODO create the query for mySql here.
+
+	fieldsType := make([]interface{}, 5)
+	fieldsType[0] = "nvarchar"
+	fieldsType[1] = "nvarchar"
+	fieldsType[2] = "nvarchar"
+	fieldsType[3] = "nvarchar"
+	fieldsType[4] = "nvarchar"
+
+	var params []interface{}
+
+	// Read the
+	values, err := this.Read(query, fieldsType, params)
+	if err != nil {
+		return results, err
+	}
+
+	// Set the value inside the results.
+	results[0] = values[0][0].(string)
+	results[1] = values[0][1].(string)
+	results[2] = values[0][2].(string)
+	results[3] = values[0][3].(string)
+	results[4] = values[0][4].(string)
+
+	return results, nil
 }
 
 // Must be call after all protoypes are created.
@@ -1055,17 +1179,8 @@ func (this *SqlDataStore) setRefs() error {
 			isSrcFieldKey := Utility.Contains(src.Ids, "M_"+sourceFieldName)
 			isTrgFieldKey := Utility.Contains(trg.Ids, "M_"+targetFieldName)
 
-			isAssociative := true
-			for j := 0; j < len(src.Fields); j++ {
-				if strings.HasPrefix(src.Fields[j], "M_") {
-					if !Utility.Contains(src.Ids, src.Fields[j]) {
-						isAssociative = false
-					}
-				}
-			}
-
 			// I will append the field if is not already there.
-			if !isAssociative {
+			if !isAssociative(src) {
 				if !Utility.Contains(trg.Fields, "M_"+refName) {
 					// Now the rule to determine the cardinality.
 					fieldType := this.m_id + "." + schemasName + "." + sourceTableName
@@ -1079,15 +1194,7 @@ func (this *SqlDataStore) setRefs() error {
 						fieldType = "[]" + fieldType
 					}
 
-					// Set the target information.
-					trg.Fields = append(trg.Fields, "M_"+refName)
-					trg.FieldsOrder = append(trg.FieldsOrder, len(trg.FieldsOrder))
-					trg.FieldsType = append(trg.FieldsType, fieldType)
-					trg.FieldsNillable = append(trg.FieldsNillable, true)
-					trg.FieldsVisibility = append(trg.FieldsVisibility, true)
-					trg.FieldsDocumentation = append(trg.FieldsDocumentation, "")
-
-					GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(trg)
+					appendField(trg, "M_"+refName, fieldType)
 				}
 
 				// Now the sources.
@@ -1104,13 +1211,11 @@ func (this *SqlDataStore) setRefs() error {
 						fieldType = "[]" + fieldType
 					}
 
-					src.FieldsType = append(src.FieldsType, fieldType)
-					src.FieldsNillable = append(src.FieldsNillable, true)
-					src.FieldsVisibility = append(src.FieldsVisibility, true)
-					src.FieldsDocumentation = append(src.FieldsDocumentation, "")
-					GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(src)
+					appendField(src, "M_"+refName, fieldType)
+				} else {
+					return nil
 				}
-			} else if isAssociative {
+			} else {
 				associativeTables[src.TypeName] = src
 				associations[src.TypeName] = append(associations[src.TypeName], make([]interface{}, 2))
 				associations[src.TypeName][len(associations[src.TypeName])-1][0] = refName
@@ -1130,15 +1235,11 @@ func (this *SqlDataStore) setRefs() error {
 				if this.isRef(refName) {
 					fieldType = fieldType + ":Ref"
 				}
-
-				associativeTable.Fields = append(associativeTable.Fields, "M_"+refName)
-				associativeTable.FieldsOrder = append(associativeTable.FieldsOrder, len(associativeTable.Fields))
-				associativeTable.FieldsType = append(associativeTable.FieldsType, fieldType)
-				associativeTable.FieldsNillable = append(associativeTable.FieldsNillable, true)
-				associativeTable.FieldsVisibility = append(associativeTable.FieldsVisibility, true)
-				associativeTable.FieldsDocumentation = append(associativeTable.FieldsDocumentation, "")
-				GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(associativeTable)
+				if !isAssociative(trg) {
+					appendField(associativeTable, "M_"+refName, fieldType)
+				}
 			}
+
 			// Associative table must contain tow value.
 			for j := 0; j < len(associations_); j++ {
 				if j != i {
@@ -1146,25 +1247,11 @@ func (this *SqlDataStore) setRefs() error {
 					if err != nil {
 						return err
 					}
-
-					if !Utility.Contains(trg.Fields, "M_"+associations_[j][0].(string)) {
-
-						trg1.Fields = append(trg1.Fields, "M_"+refName)
-						trg1.FieldsOrder = append(trg1.FieldsOrder, len(trg1.FieldsOrder))
-						trg1.FieldsType = append(trg1.FieldsType, "[]"+trg.TypeName+":Ref")
-						trg1.FieldsNillable = append(trg1.FieldsNillable, true)
-						trg1.FieldsVisibility = append(trg1.FieldsVisibility, true)
-						trg1.FieldsDocumentation = append(trg1.FieldsDocumentation, "")
-						GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(trg1)
-
-						trg.Fields = append(trg.Fields, "M_"+associations_[j][0].(string))
-						trg.FieldsOrder = append(trg.FieldsOrder, len(trg.FieldsOrder))
-						trg.FieldsType = append(trg.FieldsType, "[]"+trg1.TypeName+":Ref")
-						trg.FieldsNillable = append(trg.FieldsNillable, true)
-						trg.FieldsVisibility = append(trg.FieldsVisibility, true)
-						trg.FieldsDocumentation = append(trg.FieldsDocumentation, "")
-						GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(trg)
-
+					if !isAssociative(trg) {
+						appendField(trg1, "M_"+refName, "[]"+trg.TypeName+":Ref")
+					}
+					if !isAssociative(trg1) {
+						appendField(trg, "M_"+associations_[j][0].(string), "[]"+trg1.TypeName+":Ref")
 					}
 				}
 			}
@@ -1217,75 +1304,160 @@ func (this *SqlDataStore) DeleteEntityPrototypes() error {
  */
 func (this *SqlDataStore) synchronize() error {
 	prototypes, err := this.GetEntityPrototypes()
+	// First of all I will sychronize create the enities information if it dosen't exist.
 	for i := 0; i < len(prototypes); i++ {
-		log.Println("--------> synchronize ", prototypes[i].TypeName)
-		if len(prototypes[i].Ids) > 1 {
-			query := "SELECT "
-			fieldsType := make([]interface{}, 0)
+		if !isAssociative(prototypes[i]) { // Associative table object are not needed...
+			log.Println("--------> synchronize ", prototypes[i].TypeName)
+			if len(prototypes[i].Ids) > 1 {
+				query := "SELECT "
+				fieldsType := make([]interface{}, 0)
+				for j := 0; j < len(prototypes[i].Ids); j++ {
+					if strings.HasPrefix(prototypes[i].Ids[j], "M_") {
+						query += strings.Replace(prototypes[i].Ids[j], "M_", "", -1)
+						fieldsType = append(fieldsType, prototypes[i].FieldsType[prototypes[i].getFieldIndex(prototypes[i].Ids[j])])
+						if j < len(prototypes[i].Ids)-1 {
+							query += " ,"
+						}
+					}
+				}
+				query += " FROM " + prototypes[i].TypeName
+				var params []interface{}
 
-			for j := 0; j < len(prototypes[i].Ids); j++ {
-				if strings.HasPrefix(prototypes[i].Ids[j], "M_") {
-					query += strings.Replace(prototypes[i].Ids[j], "M_", "", -1)
-					fieldsType = append(fieldsType, prototypes[i].FieldsType[prototypes[i].getFieldIndex(prototypes[i].Ids[j])])
-					if j < len(prototypes[i].Ids)-1 {
-						query += " ,"
+				// Execute the query...
+				values, err := this.Read(query, fieldsType, params)
+				if err != nil {
+					return err
+				}
+
+				// Now I will generate a unique key for the retreive information.
+				for j := 0; j < len(values); j++ {
+					keyInfo := prototypes[i].TypeName + ":"
+					for k := 0; k < len(values[j]); k++ {
+						if reflect.TypeOf(values[j][k]).Kind() == reflect.String {
+							keyInfo += values[j][k].(string)
+						} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int {
+							keyInfo += strconv.Itoa(values[j][k].(int))
+						} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int8 {
+							keyInfo += strconv.Itoa(int(values[j][k].(int8)))
+						} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int16 {
+							keyInfo += strconv.Itoa(int(values[j][k].(int16)))
+						} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int32 {
+							keyInfo += strconv.Itoa(int(values[j][k].(int32)))
+						} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int64 {
+							keyInfo += strconv.Itoa(int(values[j][k].(int64)))
+						}
+						// Append underscore for readability in case of problem...
+						if k < len(values[j])-1 {
+							keyInfo += "_"
+						}
+					}
+
+					// The uuid is in that case a MD5 value.
+					uuid := prototypes[i].TypeName + "%" + Utility.GenerateUUID(keyInfo)
+
+					// Now I will create the entity if it dosen't exist.
+					_, errObj := GetServer().GetEntityManager().getDynamicEntityByUuid(uuid)
+					if errObj != nil {
+						// Here I will create the Dynamic entity.
+						infos := make(map[string]interface{}, 0)
+						infos["TYPENAME"] = prototypes[i].TypeName
+						infos["UUID"] = uuid
+
+						// The 0 value is the uuid
+						for k := 1; k < len(prototypes[i].Ids); k++ {
+							id := prototypes[i].Ids[k]
+							infos[id] = values[j][k-1]
+						}
+
+						entity, errObj := GetServer().GetEntityManager().newDynamicEntity(infos)
+						if errObj == nil {
+							// Save the entity.
+							entity.SaveEntity()
+						}
 					}
 				}
 			}
-			query += " FROM " + prototypes[i].TypeName
-			var params []interface{}
+		}
+	}
 
-			// Execute the query...
-			values, err := this.Read(query, fieldsType, params)
-			if err != nil {
-				return err
-			}
+	// Now I will set the entity reliationships
+	for i := 0; i < len(prototypes); i++ {
+		if !isAssociative(prototypes[i]) { // Associative table object are not needed...
+			for j := 0; j < len(prototypes[i].FieldsType); j++ {
+				entities, errObj := GetServer().GetEntityManager().getEntitiesByType(prototypes[i].TypeName, "", "sql_info")
+				if errObj == nil {
+					if !strings.HasPrefix(prototypes[i].FieldsType[j], "sqltypes") && !strings.HasPrefix(prototypes[i].FieldsType[j], "[]sqltypes") && strings.HasPrefix(prototypes[i].Fields[j], "M_") {
+						fieldType := prototypes[i].FieldsType[j]
+						if strings.HasPrefix(fieldType, "[]") {
+							fieldType = strings.Replace(fieldType, "[]", "", -1)
+						}
+						for k := 0; k < len(entities); k++ {
+							entity := entities[k]
+							if !strings.HasSuffix(prototypes[i].FieldsType[j], ":Ref") {
+								// This is an aggregation releationship.
+								//log.Println("=------> set ", prototypes[i].Fields[j], ":", fieldType, "is Array", isArray)
+								refInfos, err := this.getRefInfos(prototypes[i].Fields[j][2:])
+								if err == nil {
+									id := entity.GetObject().(map[string]interface{})["M_"+refInfos[3]]
+									//log.Println("=------> ", "M_"+refInfos[3], ":", id, ":", entity.GetObject())
+									var strId string
+									if reflect.TypeOf(id).Kind() == reflect.String {
+										strId = "'" + id.(string) + "'"
+									} else if reflect.TypeOf(id).Kind() == reflect.Int {
+										strId = strconv.Itoa(id.(int))
+									} else if reflect.TypeOf(id).Kind() == reflect.Int8 {
+										strId = strconv.Itoa(int(id.(int8)))
+									} else if reflect.TypeOf(id).Kind() == reflect.Int16 {
+										strId = strconv.Itoa(int(id.(int16)))
+									} else if reflect.TypeOf(id).Kind() == reflect.Int32 {
+										strId = strconv.Itoa(int(id.(int32)))
+									} else if reflect.TypeOf(id).Kind() == reflect.Int64 {
+										strId = strconv.Itoa(int(id.(int64)))
+									}
 
-			// Now I will generate a unique key for the retreive information.
-			for j := 0; j < len(values); j++ {
-				keyInfo := prototypes[i].TypeName
-				for k := 0; k < len(values[j]); k++ {
-					if reflect.TypeOf(values[j][k]).Kind() == reflect.String {
-						keyInfo += values[j][k].(string)
-					} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int {
-						keyInfo += strconv.Itoa(values[j][k].(int))
-					} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int8 {
-						keyInfo += strconv.Itoa(int(values[j][k].(int8)))
-					} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int16 {
-						keyInfo += strconv.Itoa(int(values[j][k].(int16)))
-					} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int32 {
-						keyInfo += strconv.Itoa(int(values[j][k].(int32)))
-					} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int64 {
-						keyInfo += strconv.Itoa(int(values[j][k].(int64)))
+									query := "SELECT " + refInfos[3] + " FROM " + refInfos[0] + " WHERE " + refInfos[1] + "=" + strId
+									var params []interface{}
+									var fieldsType []interface{}
+									fieldsType = append(fieldsType, prototypes[i].FieldsType[prototypes[i].getFieldIndex("M_"+refInfos[3])])
+									// Execute the query...
+									values, err := this.Read(query, fieldsType, params)
+									if err == nil {
+										for n := 0; n < len(values); n++ {
+											childTypeName := this.m_id + "." + refInfos[4] + "." + refInfos[0]
+											var strId string
+											if reflect.TypeOf(values[n][0]).Kind() == reflect.String {
+												strId = values[n][0].(string)
+											} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int {
+												strId = strconv.Itoa(values[n][0].(int))
+											} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int8 {
+												strId = strconv.Itoa(int(values[n][0].(int8)))
+											} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int16 {
+												strId = strconv.Itoa(int(values[n][0].(int16)))
+											} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int32 {
+												strId = strconv.Itoa(int(values[n][0].(int32)))
+											} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int64 {
+												strId = strconv.Itoa(int(values[n][0].(int64)))
+											}
+
+											// Set the child uuid.
+											childUuid := childTypeName + "%" + Utility.GenerateUUID(childTypeName+":"+strId)
+											childEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(childUuid)
+											if errObj == nil {
+												log.Println("-------> child uuid ", childEntity.GetUuid(), " found!!!!")
+												entity.AppendChild(prototypes[i].Fields[j], childEntity)
+											} else {
+												log.Println("-------> child uuid ", childUuid, " not found!!!!")
+											}
+											// Save the entity
+											entity.SaveEntity()
+										}
+									}
+								}
+							} else {
+								// this is a composition relationship.
+							}
+						}
 					}
-					// Append underscore for readability in case of problem...
-					if k < len(values[j])-1 {
-						keyInfo += "_"
-					}
-				}
-
-				// The uuid is in that case a MD5 value.
-				uuid := prototypes[i].TypeName + "%" + Utility.GenerateUUID(keyInfo)
-
-				// Now I will create the entity if it dosen't exist.
-				_, errObj := GetServer().GetEntityManager().getDynamicEntityByUuid(uuid)
-				if errObj != nil {
-					// Here I will create the Dynamic entity.
-					infos := make(map[string]interface{}, 0)
-					infos["TYPENAME"] = prototypes[i].TypeName
-					infos["UUID"] = uuid
-					// The 0 value is the uuid
-					for k := 1; k < len(prototypes[i].Ids); k++ {
-						id := prototypes[i].Ids[k]
-						infos[id] = values[j][k-1]
-					}
-
-					/*entity, errObj := GetServer().GetEntityManager().newDynamicEntity(infos)
-					if errObj == nil {
-						// Save the entity.
-						entity.SaveEntity()
-					}*/
-
 				}
 			}
 		}

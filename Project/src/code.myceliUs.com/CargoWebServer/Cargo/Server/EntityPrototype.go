@@ -178,7 +178,7 @@ func (this *EntityPrototype) getFieldIndex(fieldName string) int {
 /**
  * Save the new entity prototype in the data store.
  */
-func (this *EntityPrototype) Create() {
+func (this *EntityPrototype) Create(storeId string) {
 
 	// Append the default fields at end...
 
@@ -198,7 +198,10 @@ func (this *EntityPrototype) Create() {
 		this.FieldsVisibility = append(this.FieldsVisibility, false)
 	}
 
-	storeId := this.TypeName[:strings.Index(this.TypeName, ".")]
+	if len(storeId) == 0 {
+		storeId = this.TypeName[:strings.Index(this.TypeName, ".")]
+	}
+
 	store := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
 	if store != nil {
 		err := store.SetEntityPrototype(this)
