@@ -34,6 +34,13 @@ $(".tutorials-link").click(function () {
 	}, 500);
 });
 
+// gettingStarted navigation
+$(".gettingStarted-link").click(function () {
+	$('html, body').animate({
+		scrollTop: $('#gettingStartedSection-' + this.id.split('-')[1]).offset().top
+	}, 500);
+});
+
 $("#frontEndNextTutorialLink").click(function () {
 	$('html, body').animate({
 		scrollTop: $('#tutorialsSection-AsynchronousProgramming').offset().top

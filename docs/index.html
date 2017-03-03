@@ -59,7 +59,7 @@
 						<img src="img/wheel.svg" id="cargo-intro-wheel" />
 					</div>
 					<div class="col-sm-6 col-sm-offset-3 text-center">
-						<h2>Cargo is an open-source, complete web application framework. It's fast, easy and lightweight.<br><br></h2>
+						<h2>Cargo is a free and open-source web application framework. It's fast, easy and lightweight.<br><br></h2>
 						<!-- <p><a id="dowloadBtn" class="btn btn-primary btn-lg" href="#" role="button">Download Cargo</a></p> -->
 						<p><a id="getStarted-btn" class="btn btn-primary btn-lg" href="#" role="button">Get started!</a></p>
 					</div>
@@ -68,8 +68,8 @@
 			<div class="row marketing">
 				<div class="col-md-3">
 					<span class="glyphicon glyphicon glyphicon-ok"></span>
-					<h2>Complete</h2>
-					<p>Front-end, server, database. All in one.</p>
+					<h2>All in one</h2>
+					<p>Front-end, server, database.</p>
 				</div>
 				<div class="col-md-3">
 					<span class="glyphicon glyphicon-play"></span>
@@ -86,98 +86,122 @@
 				<div class="col-md-3">
 					<span class="glyphicon glyphicon-flash"></span>
 					<h2>Lightweight, fast, non-blocking</h2>
-					<p>Golang server.</p>
+					<p>Golang back-end.</p>
 				</div>
 			</div>
 
 		</div>
 	</div>
 	<div class="row hidden pageRow" id="page-gettingStarted">
-		<div class="col-lg-12">
-			<div class="col-sm-2" role="complementary">
-				<nav class="bs-docs-sidebar affix-top">
-					<ul class="nav bs-docs-sidenav">
-						<li "guidAssumptionsLink-frontEnd" class="assumptions-link">
-							<a href="#guideAssumptionDiv">Prerequisites</a>
-						</li>
-						<li "gettingCargoLink-frontEnd" class="gettingCargo-link">
-							<a href="#gettingCargoDiv">Getting Cargo</a>
-						</li>
-						<li "installingCargoLink-frontEnd" class="installingCargo-link">
-							<a href="#gettingCargoDiv">Installation</a>
-						</li>
-					</ul>
-				</nav>
+		<div class="col-sm-2" role="complementary">
+			<nav class="bs-docs-sidebar affix-top">
+				<h3 id="gettingStarted-intro" class="gettingStarted-link sidebarHeader">Getting Started</h3>
+				<ul class="nav bs-docs-sidenav">
+					<li id="gettingStartedLink-Quickstart" class="gettingStarted-link dividerBottom-thin">
+						<a href="#">Quickstart</a>
+					</li>
+					<li id="gettingStartedLink-Prerequisites" class="gettingStarted-link">
+						<a href="#">Prerequisites</a>
+					</li>
+					<li id="gettingStartedLink-GettingCargo" class="gettingStarted-link">
+						<a href="#">Getting Cargo</a>
+					</li>
+					<li id="gettingStartedLink-Installation" class="gettingStarted-link">
+						<a href="#">Installation</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+		<div class="col-sm-10" role="main">
+			<div class="row sectionIntro" id="gettingStartedSection-intro">
+				<div class="col-xs-12">
+					<div class="jumbotron">
+						<div class="container">
+							<h2>Getting Started with Cargo</h2>
+							<ul>
+								<li>
+									How to install and configure your Cargo application server.
+								</li>
+								<li>
+									The general structure of a Cargo application.
+								</li>
+								<li>
+									How to invoke actions on your server from a javascript client.
+								</li>
+								<li>
+									How to create a simple application that uses basic parts of the framework.
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
 			</div>
-			<div class="col-sm-10" role="main">
-				<div class="row" id="">
-					<div class="col-xs-12">
-						<div class="jumbotron">
-							<div class="container">
-								<h2>Getting Started with Cargo</h2>
-								<p>After reading this guide you will know:
-									<ul>
-										<li>
-											How to install and configure your Cargo application server.
-										</li>
-										<li>
-											The general structure of a Cargo application.
-										</li>
-										<li>
-											How to invoke actions on your server from a javascript client.
-										</li>
-										<li>
-											How to create a simple application that uses basic parts of the framework.
-										</li>
-									</ul>
-								</p>
-							</div>
-						</div>
-					</div>
-					<div class="row" id="guideAssumptionDiv">
-						<div class="col-xs-12">
-							<h2>Prerequisites</h2>
-							<p>
-								To start developing web applications with Cargo, you will need some knowledge of HTML, CSS and JavaScript. Because the back-end
-								of Cargo was witten with Go, it and has no external dependencies so there nothing more than Cargo itself to install.
-								However, you will not need to know or use Go to build a web application with Cargo.
-							</p>
-						</div>
-					</div>
-					<div class="row" id="gettingCargoDiv">
-						<div class="col-xs-12">
-							<h2>Getting Cargo</h2>
-							<p>
-								<i class="fa fa-github"></i>
-								<a href='https://github.com/CargoWebServer/CargoWebServer'>Visit our Github page</a>
-							</p>
-							<p>
+			<div class="row dividerBottom-thick" id="gettingStartedSection-Quickstart">
+				<div class="col-xs-12">
+					<h2>Quickstart</h2>
+					<ul class="list-unstyled quickstartList">
+						<li>1. Download <li>
+						<ul class="list-unstyled quickstartList">
+							<li>
 								<i class="fa fa-linux"></i>
 								<a href="http://cargowebserver.com/distro/linux/64/CargoWebServer.tar.gz">Cargo v1.0 linux 64bit </a>
-							</p>
-							<p>
+							</li>
+							<li>
 								<i class="fa fa-windows"></i>
 								<a href="http://cargowebserver.com/distro/windows/64/CargoWebServer.zip">Cargo v1.0 windows 64bit </a>
-							</p>
-						</div>
-					</div>
-					<div class="row" id="installingCargoDiv">
-						<div class="col-xs-12">
-							<h2>Installing Cargo</h2>
-							<p>
-								Unzip the file where you want your sever to be and voîlà! you have a server ready to run.
-								</br>
-								To start the server simply call the command <code>./CargoWebServer</code> in linux, or <code>CargoWebServer.exe</code>								
-								in windows. Note that the server might take several minutes to load the first time.
-								</br>
-								When the indexation is done, Bridge will open. To login, in the user name input enter <kbd>admin</kbd> and in the password input enter
-								<kbd>adminadmin</kbd>.
-							</p>
-							<p>
-
-							</p>
-						</div>
-					</div>
+							</li>
+						</ul>
+						<li>2. Run<li>
+						<ul class="list-unstyled quickstartList">
+							<li>
+								<code>./CargoWebServer</code> in linux
+							</li>
+							<li>
+								<code>CargoWebServer.exe</code> in windows
+							</li>
+						</ul>
+					</ul>
+				</div>
+			</div>
+			<div class="row" id="gettingStartedSection-Prerequisites">
+				<div class="col-xs-12">
+					<h2>Prerequisites</h2>
+					<p>
+						To start developing web applications with Cargo, you will need some knowledge of HTML, CSS and JavaScript. Because the back-end
+						of Cargo was witten with Go, it has no external dependencies so there nothing more than Cargo itself to install.
+						However, you will not need to know or use Go to build a web application with Cargo.
+					</p>
+				</div>
+			</div>
+			<div class="row" id="gettingStartedSection-GettingCargo">
+				<div class="col-xs-12">
+					<h2>Getting Cargo</h2>
+					<p>
+						<i class="fa fa-github"></i>
+						<a href='https://github.com/CargoWebServer/CargoWebServer'>Visit our Github page</a>
+					</p>
+					<p>
+						<i class="fa fa-linux"></i>
+						<a href="http://cargowebserver.com/distro/linux/64/CargoWebServer.tar.gz">Cargo v1.0 linux 64bit </a>
+					</p>
+					<p>
+						<i class="fa fa-windows"></i>
+						<a href="http://cargowebserver.com/distro/windows/64/CargoWebServer.zip">Cargo v1.0 windows 64bit </a>
+					</p>
+				</div>
+			</div>
+			<div class="row" id="gettingStartedSection-Installation">
+				<div class="col-xs-12">
+					<h2>Installing Cargo</h2>
+					<p>
+						Unzip the file where you want your sever to be and voîlà! you have a server ready to run.
+						</br>
+						To start the server simply call the command <code>./CargoWebServer</code> in linux, or <code>CargoWebServer.exe</code>								
+						in windows. Note that the server might take several minutes to load the first time.
+						</br>
+						When the indexation is done, Bridge will open. To login, in the user name input enter <kbd>admin</kbd> and in the password input enter
+						<kbd>adminadmin</kbd>.
+					</p>
 				</div>
 			</div>
 		</div>
@@ -185,7 +209,7 @@
 	<div class="row hidden pageRow" id="page-tutorials">
 		<div class="col-sm-2" role="complementary">
 			<nav class="bs-docs-sidebar affix-top tutorialsSideBar">
-				<h3 id="tutorialsLink-intro" class="tutorials-link tutorialsHeader">Tutorials</h3>
+				<h3 id="tutorialsLink-intro" class="tutorials-link sidebarHeader">Tutorials</h3>
 				<ul class="nav bs-docs-sidenav">
 					<li id="tutorialsLink-frontEnd" class="tutorials-link">
 						<a href="#">Front End</a>
@@ -203,11 +227,10 @@
 			</nav>
 		</div>
 		<div class="col-sm-10" role="main">
-			<div class="row tutorialsRow tutorialsSectionIntro" id="tutorialsSection-intro">
+			<div class="row tutorialsRow sectionIntro" id="tutorialsSection-intro">
 				<div class="col-xs-12">
 					<div class="jumbotron">
 						<div class="container">
-							<p>Creating a web application is made easy with cargo.</p>
 							<p>These tutorials will go through all the components of the framework to make you a web development pro as soon as possible.
 								If it hasn't been done, we suggest starting with the 'Getting Started' page.</p>
 						</div>
