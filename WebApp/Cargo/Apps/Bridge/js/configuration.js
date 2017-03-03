@@ -1,6 +1,6 @@
 /**
  * The language mapping... control id/text
- * TODO add language as needed!
+ * TODO add language as needed!  
  */
 var languageInfo = {
     "en": {
@@ -88,6 +88,8 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
                 for (var i = 0; i < configurationPanel.contentViews.length; i++) {
                     configurationPanel.contentViews[i].panel.element.style.display = "none"
                 }
+
+                // Hide all data panel.
                 homepage.dataExplorer.hidePanels()
 
                 var entity = server.entityManager.entities[evt.dataMap["entity"].UUID]
@@ -138,8 +140,14 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                             server.dataManager.createDataStore(entity.M_id, entity.M_dataStoreType, entity.M_dataStoreVendor,
                                 // Success callback
                                 function (success, caller) {
-                                    caller.connectBtn.element.status = "disconnected"
-                                    caller.connectBtn.element.click()
+                                    // Init the schema informations.
+                                    homepage.dataExplorer.initDataSchema(caller.entity, function (contentView) {
+                                        return function () {
+                                            // display the schemas information here...
+                                            contentView.connectBtn.element.status = "disconnected"
+                                            contentView.connectBtn.element.click()
+                                        }
+                                    } (caller))
                                 },
                                 // Error callback
                                 function (errObj, caller) {
@@ -233,7 +241,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     // That pannel will be use to change admin password.
                     configurationContent.appendElement({ "tag": "div", "style": "display:table; border-top: 1px solid grey; padding: 5px 0px 5px 2px; width: 100%;" }).down()
                         .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;" }).down()
-                        .appendElement({ "tag": "div", "style": "display: table-cell; padding: 2px;color: white; background-color: #bbbbbb;", "innerHtml": "Change admin password"}).up()
+                        .appendElement({ "tag": "div", "style": "display: table-cell; padding: 2px;color: white; background-color: #bbbbbb;", "innerHtml": "Change admin password" }).up()
                         .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;" }).down()
                         .appendElement({ "tag": "div", "id": "adminPasswordChange" }).down()
                         .appendElement({ "tag": "div", "style": "display:table-row; width:100%;" }).down()

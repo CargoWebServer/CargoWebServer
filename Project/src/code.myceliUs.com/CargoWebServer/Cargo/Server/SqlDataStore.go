@@ -67,10 +67,7 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 	store.m_port = info.M_port
 	store.m_textEncoding = info.M_textEncoding
 
-	// Connect the store...
-	err := store.Connect()
-
-	return store, err
+	return store, nil
 }
 
 func (this *SqlDataStore) Connect() error {
@@ -98,59 +95,60 @@ func (this *SqlDataStore) Connect() error {
 		connectionString += this.m_host + ":" + strconv.Itoa(this.m_port) + ")"
 		connectionString += "/" + this.m_id
 		//connectionString += "encrypt=false;"
+		connectionString += "?"
 		// The encoding
 		if this.m_textEncoding == Config.Encoding_UTF8 {
-			connectionString += "CharSet=UTF-8;"
+			connectionString += "charset=utf8;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_1 {
-			connectionString += "CharSet=ISO8859_1;"
+			connectionString += "charset=ISO8859_1;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_2 {
-			connectionString += "CharSet=ISO8859_2;"
+			connectionString += "charset=ISO8859_2;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_3 {
-			connectionString += "CharSet=ISO8859_3;"
+			connectionString += "charset=ISO8859_3;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_4 {
-			connectionString += "CharSet=ISO8859_4;"
+			connectionString += "charset=ISO8859_4;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_5 {
-			connectionString += "CharSet=ISO8859_5;"
+			connectionString += "charset=ISO8859_5;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_6 {
-			connectionString += "CharSet=ISO8859_6;"
+			connectionString += "charset=ISO8859_6;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_7 {
-			connectionString += "CharSet=ISO8859_7;"
+			connectionString += "charset=ISO8859_7;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_8 {
-			connectionString += "CharSet=ISO8859_8;"
+			connectionString += "charset=ISO8859_8;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_9 {
-			connectionString += "CharSet=ISO8859_9;"
+			connectionString += "charset=ISO8859_9;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_10 {
-			connectionString += "CharSet=ISO8859_10;"
+			connectionString += "charset=ISO8859_10;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_13 {
-			connectionString += "CharSet=ISO8859_13;"
+			connectionString += "charset=ISO8859_13;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_14 {
-			connectionString += "CharSet=ISO8859_14;"
+			connectionString += "charset=ISO8859_14;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_15 {
-			connectionString += "CharSet=ISO8859_15;"
+			connectionString += "charset=ISO8859_15;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_16 {
-			connectionString += "CharSet=ISO8859_16;"
+			connectionString += "charset=ISO8859_16;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1250 {
-			connectionString += "CharSet=Windows1250;"
+			connectionString += "charset=Windows1250;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1251 {
-			connectionString += "CharSet=Windows1251;"
+			connectionString += "charset=Windows1251;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1252 {
-			connectionString += "CharSet=Windows1252;"
+			connectionString += "charset=Windows1252;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1253 {
-			connectionString += "CharSet=Windows1253;"
+			connectionString += "charset=Windows1253;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1254 {
-			connectionString += "CharSet=Windows1254;"
+			connectionString += "charset=Windows1254;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1255 {
-			connectionString += "CharSet=Windows1255;"
+			connectionString += "charset=Windows1255;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1256 {
-			connectionString += "CharSet=Windows1256;"
+			connectionString += "charset=Windows1256;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1257 {
-			connectionString += "CharSet=Windows1257;"
+			connectionString += "charset=Windows1257;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1258 {
-			connectionString += "CharSet=Windows1258;"
+			connectionString += "charset=Windows1258;"
 		} else if this.m_textEncoding == Config.Encoding_KOI8R {
-			connectionString += "CharSet=KOI8R;"
+			connectionString += "charset=KOI8R;"
 		} else if this.m_textEncoding == Config.Encoding_KOI8U {
-			connectionString += "CharSet=KOI8U;"
+			connectionString += "charset=KOI8U;"
 		}
 		driver = "mysql"
 
@@ -169,63 +167,66 @@ func (this *SqlDataStore) Connect() error {
 
 		// The encoding
 		if this.m_textEncoding == Config.Encoding_UTF8 {
-			connectionString += "clientcharset=UTF-8;"
+			connectionString += "charset=UTF8;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_1 {
-			connectionString += "clientcharset=ISO8859_1;"
+			connectionString += "charset=ISO8859_1;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_2 {
-			connectionString += "clientcharset=ISO8859_2;"
+			connectionString += "charset=ISO8859_2;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_3 {
-			connectionString += "clientcharset=ISO8859_3;"
+			connectionString += "charset=ISO8859_3;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_4 {
-			connectionString += "clientcharset=ISO8859_4;"
+			connectionString += "charset=ISO8859_4;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_5 {
-			connectionString += "clientcharset=ISO8859_5;"
+			connectionString += "charset=ISO8859_5;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_6 {
-			connectionString += "clientcharset=ISO8859_6;"
+			connectionString += "charset=ISO8859_6;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_7 {
-			connectionString += "clientcharset=ISO8859_7;"
+			connectionString += "charset=ISO8859_7;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_8 {
-			connectionString += "clientcharset=ISO8859_8;"
+			connectionString += "charset=ISO8859_8;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_9 {
-			connectionString += "clientcharset=ISO8859_9;"
+			connectionString += "charset=ISO8859_9;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_10 {
-			connectionString += "clientcharset=ISO8859_10;"
+			connectionString += "charset=ISO8859_10;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_13 {
-			connectionString += "clientcharset=ISO8859_13;"
+			connectionString += "charset=ISO8859_13;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_14 {
-			connectionString += "clientcharset=ISO8859_14;"
+			connectionString += "charset=ISO8859_14;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_15 {
-			connectionString += "clientcharset=ISO8859_15;"
+			connectionString += "charset=ISO8859_15;"
 		} else if this.m_textEncoding == Config.Encoding_ISO8859_16 {
-			connectionString += "clientcharset=ISO8859_16;"
+			connectionString += "charset=ISO8859_16;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1250 {
-			connectionString += "clientcharset=Windows1250;"
+			connectionString += "charset=Windows1250;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1251 {
-			connectionString += "clientcharset=Windows1251;"
+			connectionString += "charset=Windows1251;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1252 {
-			connectionString += "clientcharset=Windows1252;"
+			connectionString += "charset=Windows1252;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1253 {
-			connectionString += "clientcharset=Windows1253;"
+			connectionString += "charset=Windows1253;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1254 {
-			connectionString += "clientcharset=Windows1254;"
+			connectionString += "charset=Windows1254;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1255 {
-			connectionString += "clientcharset=Windows1255;"
+			connectionString += "charset=Windows1255;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1256 {
-			connectionString += "clientcharset=Windows1256;"
+			connectionString += "charset=Windows1256;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1257 {
-			connectionString += "clientcharset=Windows1257;"
+			connectionString += "charset=Windows1257;"
 		} else if this.m_textEncoding == Config.Encoding_WINDOWS_1258 {
-			connectionString += "clientcharset=Windows1258;"
+			connectionString += "charset=Windows1258;"
 		} else if this.m_textEncoding == Config.Encoding_KOI8R {
-			connectionString += "clientcharset=KOI8R;"
+			connectionString += "charset=KOI8R;"
 		} else if this.m_textEncoding == Config.Encoding_KOI8U {
-			connectionString += "clientcharset=KOI8U;"
+			connectionString += "charset=KOI8U;"
 		}
 
 		driver = "odbc"
 	}
 
 	this.m_db, err = sql.Open(driver, connectionString)
+
+	// Update sql_info information about the content of this store.
+	this.synchronize()
 
 	return err
 }
@@ -736,6 +737,9 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 		prototypes = append(prototypes, prototype)
 	}
 
+	// Complete the reference information.
+	this.setRefs()
+
 	return prototypes, nil
 }
 
@@ -831,12 +835,6 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 		// So here I will create new field...
 		if fieldType != nil {
 			prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
-			refName, refType, err := this.getTypeNameRef(id, fieldName)
-			if err == nil {
-				// So here the attribute is a ref...
-				prototype.Fields = append(prototype.Fields, "M_"+refName)
-				prototype.FieldsType = append(prototype.FieldsType, refType)
-			}
 			prototype.Fields = append(prototype.Fields, "M_"+fieldName)
 			prototype.FieldsType = append(prototype.FieldsType, fieldType.TypeName)
 			if isId {
@@ -858,6 +856,42 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 		log.Println("---> create ", prototype.TypeName, " prototype.")
 	}
 	return prototype, err
+}
+
+/**
+ * Determine if a relation is a reference or not.
+ */
+func (this *SqlDataStore) isRef(relationName string) bool {
+
+	if this.m_vendor == Config.DataStoreVendor_ODBC {
+		var query string
+		query = "SELECT delete_referential_action_desc "
+		query += "FROM sys.foreign_keys "
+		query += "WHERE  name = '" + relationName + "'"
+
+		fieldsType := make([]interface{}, 1)
+		fieldsType[0] = "nvarchar"
+		var params []interface{}
+
+		// Read the
+		values, err := this.Read(query, fieldsType, params)
+		if err != nil {
+			return true
+		}
+
+		if len(values) > 0 {
+			if values[0][0] != nil {
+				return values[0][0].(string) != "CASCADE"
+			}
+		}
+
+	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
+		// TODO implement it...
+		return true
+	}
+
+	return true
+
 }
 
 func (this *SqlDataStore) getSchemaId(name string) (string, error) {
@@ -943,10 +977,319 @@ func (this *SqlDataStore) getTypeNameRef(tableName string, fieldName string) (st
 	return "", "", errors.New("No reference found for attribute " + tableName + "." + fieldName)
 }
 
+// Must be call after all protoypes are created.
+// That function will complete references information.
+func (this *SqlDataStore) setRefs() error {
+	var query string
+	if this.m_vendor == Config.DataStoreVendor_ODBC {
+		query = "SELECT "
+		query += "	obj.name      AS FK_NAME,"
+		query += "	sch.name      AS [schema_name],"
+		query += "	tab1.name     AS [table],"
+		query += "	col1.name     AS [column],"
+		query += "	tab2.name     AS [referenced_table],"
+		query += "	col2.name     AS [referenced_column] "
+		query += "FROM "
+		query += "	sys.foreign_key_columns fkc "
+		query += "INNER JOIN sys.objects obj "
+		query += "	ON obj.object_id = fkc.constraint_object_id "
+		query += "INNER JOIN sys.tables tab1 "
+		query += "	ON tab1.object_id = fkc.parent_object_id "
+		query += "INNER JOIN sys.schemas sch "
+		query += "	ON tab1.schema_id = sch.schema_id "
+		query += "INNER JOIN sys.columns col1 "
+		query += "	ON col1.column_id = parent_column_id AND col1.object_id = tab1.object_id "
+		query += "INNER JOIN sys.tables tab2 "
+		query += "	ON tab2.object_id = fkc.referenced_object_id "
+		query += "INNER JOIN sys.columns col2 "
+		query += "	ON col2.column_id = referenced_column_id "
+		query += "	AND col2.object_id =  tab2.object_id; "
+	}
+
+	// TODO create the query for mySql here.
+	fieldsType := make([]interface{}, 6)
+	fieldsType[0] = "nvarchar"
+	fieldsType[1] = "nvarchar"
+	fieldsType[2] = "nvarchar"
+	fieldsType[3] = "nvarchar"
+	fieldsType[4] = "nvarchar"
+	fieldsType[5] = "nvarchar"
+
+	var params []interface{}
+
+	// Read the
+	values, err := this.Read(query, fieldsType, params)
+	if err != nil {
+		return err
+	}
+
+	// Keep assiative table in a map.
+	associativeTables := make(map[string]*EntityPrototype, 0)
+
+	// Keep association values temporary...
+	associations := make(map[string][][]interface{}, 0)
+
+	if len(values) > 0 {
+		for i := 0; i < len(values); i++ {
+			refName := values[i][0].(string)
+			schemasName := values[i][1].(string)
+
+			// Source
+			sourceTableName := values[i][2].(string)
+			sourceFieldName := values[i][3].(string)
+
+			// Target.
+			targetTableName := values[i][4].(string)
+			targetFieldName := values[i][5].(string)
+
+			src, err := GetServer().GetEntityManager().getEntityPrototype(this.m_id+"."+schemasName+"."+sourceTableName, "sql_info")
+			if err != nil {
+				return err
+			}
+
+			trg, err := GetServer().GetEntityManager().getEntityPrototype(this.m_id+"."+schemasName+"."+targetTableName, "sql_info")
+			if err != nil {
+				return err
+			}
+
+			isSrcFieldKey := Utility.Contains(src.Ids, "M_"+sourceFieldName)
+			isTrgFieldKey := Utility.Contains(trg.Ids, "M_"+targetFieldName)
+
+			isAssociative := true
+			for j := 0; j < len(src.Fields); j++ {
+				if strings.HasPrefix(src.Fields[j], "M_") {
+					if !Utility.Contains(src.Ids, src.Fields[j]) {
+						isAssociative = false
+					}
+				}
+			}
+
+			// I will append the field if is not already there.
+			if !isAssociative {
+				if !Utility.Contains(trg.Fields, "M_"+refName) {
+					// Now the rule to determine the cardinality.
+					fieldType := this.m_id + "." + schemasName + "." + sourceTableName
+
+					if this.isRef(refName) {
+						fieldType = fieldType + ":Ref"
+					}
+
+					if !(isSrcFieldKey && isTrgFieldKey) {
+						// one to one relationship in that case.
+						fieldType = "[]" + fieldType
+					}
+
+					// Set the target information.
+					trg.Fields = append(trg.Fields, "M_"+refName)
+					trg.FieldsOrder = append(trg.FieldsOrder, len(trg.FieldsOrder))
+					trg.FieldsType = append(trg.FieldsType, fieldType)
+					trg.FieldsNillable = append(trg.FieldsNillable, true)
+					trg.FieldsVisibility = append(trg.FieldsVisibility, true)
+					trg.FieldsDocumentation = append(trg.FieldsDocumentation, "")
+
+					GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(trg)
+				}
+
+				// Now the sources.
+				if !Utility.Contains(src.Fields, "M_"+refName) {
+					// Apppend the target in the source.
+					src.Fields = append(src.Fields, "M_"+refName)
+					src.FieldsOrder = append(src.FieldsOrder, len(src.Fields))
+
+					// Now the rule to determine the cardinality.
+					fieldType := this.m_id + "." + schemasName + "." + targetTableName + ":Ref"
+
+					if !isTrgFieldKey {
+						// one to one relationship in that case.
+						fieldType = "[]" + fieldType
+					}
+
+					src.FieldsType = append(src.FieldsType, fieldType)
+					src.FieldsNillable = append(src.FieldsNillable, true)
+					src.FieldsVisibility = append(src.FieldsVisibility, true)
+					src.FieldsDocumentation = append(src.FieldsDocumentation, "")
+					GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(src)
+				}
+			} else if isAssociative {
+				associativeTables[src.TypeName] = src
+				associations[src.TypeName] = append(associations[src.TypeName], make([]interface{}, 2))
+				associations[src.TypeName][len(associations[src.TypeName])-1][0] = refName
+				associations[src.TypeName][len(associations[src.TypeName])-1][1] = trg
+			}
+		}
+	}
+
+	// Now I will set the associations *Cross references
+	for _, associativeTable := range associativeTables {
+		associations_ := associations[associativeTable.TypeName]
+		for i := 0; i < len(associations_); i++ {
+			refName := associations_[i][0].(string)
+			trg, _ := GetServer().GetEntityManager().getEntityPrototype(associations_[i][1].(*EntityPrototype).TypeName, "sql_info")
+			if !Utility.Contains(associativeTable.Fields, "M_"+refName) {
+				fieldType := trg.TypeName
+				if this.isRef(refName) {
+					fieldType = fieldType + ":Ref"
+				}
+
+				associativeTable.Fields = append(associativeTable.Fields, "M_"+refName)
+				associativeTable.FieldsOrder = append(associativeTable.FieldsOrder, len(associativeTable.Fields))
+				associativeTable.FieldsType = append(associativeTable.FieldsType, fieldType)
+				associativeTable.FieldsNillable = append(associativeTable.FieldsNillable, true)
+				associativeTable.FieldsVisibility = append(associativeTable.FieldsVisibility, true)
+				associativeTable.FieldsDocumentation = append(associativeTable.FieldsDocumentation, "")
+				GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(associativeTable)
+			}
+			// Associative table must contain tow value.
+			for j := 0; j < len(associations_); j++ {
+				if j != i {
+					trg1, err := GetServer().GetEntityManager().getEntityPrototype(associations_[j][1].(*EntityPrototype).TypeName, "sql_info")
+					if err != nil {
+						return err
+					}
+
+					if !Utility.Contains(trg.Fields, "M_"+associations_[j][0].(string)) {
+
+						trg1.Fields = append(trg1.Fields, "M_"+refName)
+						trg1.FieldsOrder = append(trg1.FieldsOrder, len(trg1.FieldsOrder))
+						trg1.FieldsType = append(trg1.FieldsType, "[]"+trg.TypeName+":Ref")
+						trg1.FieldsNillable = append(trg1.FieldsNillable, true)
+						trg1.FieldsVisibility = append(trg1.FieldsVisibility, true)
+						trg1.FieldsDocumentation = append(trg1.FieldsDocumentation, "")
+						GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(trg1)
+
+						trg.Fields = append(trg.Fields, "M_"+associations_[j][0].(string))
+						trg.FieldsOrder = append(trg.FieldsOrder, len(trg.FieldsOrder))
+						trg.FieldsType = append(trg.FieldsType, "[]"+trg1.TypeName+":Ref")
+						trg.FieldsNillable = append(trg.FieldsNillable, true)
+						trg.FieldsVisibility = append(trg.FieldsVisibility, true)
+						trg.FieldsDocumentation = append(trg.FieldsDocumentation, "")
+						GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(trg)
+
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 /**
  * Get the mapping of a given sql type.
  */
 func (this *SqlDataStore) getSqlTypePrototype(typeName string) (*EntityPrototype, error) {
 	prototype, err := GetServer().GetEntityManager().getEntityPrototype("sqltypes."+typeName, "sqltypes")
 	return prototype, err
+}
+
+/**
+ * Remove a given entity prototype.
+ */
+func (this *SqlDataStore) DeleteEntityPrototype(id string) error {
+	store := GetServer().GetDataManager().getDataStore("sql_info")
+	if store != nil {
+		return store.DeleteEntityPrototype(id)
+	}
+	return errors.New("Store with id sql_info dosen't exist!")
+}
+
+/**
+ * Remove all prototypes.
+ */
+func (this *SqlDataStore) DeleteEntityPrototypes() error {
+	prototypes, err := this.GetEntityPrototypes()
+	if err != nil {
+		return err
+	}
+	for i := 0; i < len(prototypes); i++ {
+		err := this.DeleteEntityPrototype(prototypes[i].TypeName)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+/**
+ * synchronize the content of database with sql_info content. Only key's will be
+ * save, the other field will be retreive as needed via sql querie's.
+ */
+func (this *SqlDataStore) synchronize() error {
+	prototypes, err := this.GetEntityPrototypes()
+	for i := 0; i < len(prototypes); i++ {
+		log.Println("--------> synchronize ", prototypes[i].TypeName)
+		if len(prototypes[i].Ids) > 1 {
+			query := "SELECT "
+			fieldsType := make([]interface{}, 0)
+
+			for j := 0; j < len(prototypes[i].Ids); j++ {
+				if strings.HasPrefix(prototypes[i].Ids[j], "M_") {
+					query += strings.Replace(prototypes[i].Ids[j], "M_", "", -1)
+					fieldsType = append(fieldsType, prototypes[i].FieldsType[prototypes[i].getFieldIndex(prototypes[i].Ids[j])])
+					if j < len(prototypes[i].Ids)-1 {
+						query += " ,"
+					}
+				}
+			}
+			query += " FROM " + prototypes[i].TypeName
+			var params []interface{}
+
+			// Execute the query...
+			values, err := this.Read(query, fieldsType, params)
+			if err != nil {
+				return err
+			}
+
+			// Now I will generate a unique key for the retreive information.
+			for j := 0; j < len(values); j++ {
+				keyInfo := prototypes[i].TypeName
+				for k := 0; k < len(values[j]); k++ {
+					if reflect.TypeOf(values[j][k]).Kind() == reflect.String {
+						keyInfo += values[j][k].(string)
+					} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int {
+						keyInfo += strconv.Itoa(values[j][k].(int))
+					} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int8 {
+						keyInfo += strconv.Itoa(int(values[j][k].(int8)))
+					} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int16 {
+						keyInfo += strconv.Itoa(int(values[j][k].(int16)))
+					} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int32 {
+						keyInfo += strconv.Itoa(int(values[j][k].(int32)))
+					} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int64 {
+						keyInfo += strconv.Itoa(int(values[j][k].(int64)))
+					}
+					// Append underscore for readability in case of problem...
+					if k < len(values[j])-1 {
+						keyInfo += "_"
+					}
+				}
+
+				// The uuid is in that case a MD5 value.
+				uuid := prototypes[i].TypeName + "%" + Utility.GenerateUUID(keyInfo)
+
+				// Now I will create the entity if it dosen't exist.
+				_, errObj := GetServer().GetEntityManager().getDynamicEntityByUuid(uuid)
+				if errObj != nil {
+					// Here I will create the Dynamic entity.
+					infos := make(map[string]interface{}, 0)
+					infos["TYPENAME"] = prototypes[i].TypeName
+					infos["UUID"] = uuid
+					// The 0 value is the uuid
+					for k := 1; k < len(prototypes[i].Ids); k++ {
+						id := prototypes[i].Ids[k]
+						infos[id] = values[j][k-1]
+					}
+
+					/*entity, errObj := GetServer().GetEntityManager().newDynamicEntity(infos)
+					if errObj == nil {
+						// Save the entity.
+						entity.SaveEntity()
+					}*/
+
+				}
+			}
+		}
+	}
+
+	return err
 }

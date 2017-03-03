@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -987,7 +988,20 @@ func (this *EntityManager) saveReferenced(entity Entity) {
 				if reflect.TypeOf(entity.GetObject()).String() == "map[string]interface {}" {
 					// A dynamic entity here...
 					if entity.GetObject().(map[string]interface{})[id] != nil {
-						refId := entity.GetObject().(map[string]interface{})[id].(string)
+						var refId string
+						if reflect.TypeOf(entity.GetObject().(map[string]interface{})[id]).Kind() == reflect.String {
+							refId += entity.GetObject().(map[string]interface{})[id].(string)
+						} else if reflect.TypeOf(entity.GetObject().(map[string]interface{})[id]).Kind() == reflect.Int {
+							refId += strconv.Itoa(entity.GetObject().(map[string]interface{})[id].(int))
+						} else if reflect.TypeOf(entity.GetObject().(map[string]interface{})[id]).Kind() == reflect.Int8 {
+							refId += strconv.Itoa(int(entity.GetObject().(map[string]interface{})[id].(int8)))
+						} else if reflect.TypeOf(entity.GetObject().(map[string]interface{})[id]).Kind() == reflect.Int16 {
+							refId += strconv.Itoa(int(entity.GetObject().(map[string]interface{})[id].(int16)))
+						} else if reflect.TypeOf(entity.GetObject().(map[string]interface{})[id]).Kind() == reflect.Int32 {
+							refId += strconv.Itoa(int(entity.GetObject().(map[string]interface{})[id].(int32)))
+						} else if reflect.TypeOf(entity.GetObject().(map[string]interface{})[id]).Kind() == reflect.Int64 {
+							refId += strconv.Itoa(int(entity.GetObject().(map[string]interface{})[id].(int64)))
+						}
 						referenced = this.referenced[refId]
 					}
 				} else {
@@ -1134,8 +1148,15 @@ func (this *EntityManager) getEntityPrototype(typeName string, storeId string) (
 
 		return nil, errors.New("The dataStore with id '" + storeId + "' doesn't exist.")
 	}
-	dataStore := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
+
+	dataStore := GetServer().GetDataManager().getDataStore(storeId)
+	if reflect.TypeOf(dataStore).String() == "*Server.SqlDataStore" {
+		// I will try to found the prototype inside sql_info instead.
+		dataStore = GetServer().GetDataManager().getDataStore("sql_info")
+	}
+
 	proto, err := dataStore.GetEntityPrototype(typeName)
+
 	if err != nil {
 		err = errors.New("Prototype for entity '" + typeName + "' was not found.")
 	}

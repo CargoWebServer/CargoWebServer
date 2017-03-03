@@ -539,6 +539,8 @@ func generateEntityAttribute(attribute *XML_Schemas.CMOF_OwnedAttribute, packNam
 			// Set the type name as id.
 			memberTypeName = "ID"
 		}
+
+		// Name that must be change...
 		if memberTypeName == "bool" {
 			memberTypeName = "boolean"
 		}

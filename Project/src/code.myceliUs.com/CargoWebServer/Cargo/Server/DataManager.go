@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	//	"reflect"
 	"sync"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
@@ -82,6 +83,9 @@ func (this *DataManager) initialize() {
 
 			this.m_dataStores[store.GetId()] = store
 
+			// Open connection.
+			store.Connect()
+
 			// Call get entity prototype once to initialyse entity prototypes.
 			store.GetEntityPrototypes()
 		}
@@ -112,6 +116,7 @@ func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfigur
 		log.Fatal(err)
 	}
 	this.m_dataStores[store.GetId()] = store
+	store.Connect()
 }
 
 /**
@@ -134,7 +139,10 @@ func (this *DataManager) removeDataStore(name string) {
 	// Close the connection.
 	this.m_dataStores[name].Close()
 
-	// Delete the reference from the database.
+	// Remove data. Deadlock error.
+	// this.m_dataStores[name].DeleteEntityPrototypes()
+
+	// Delete the reference from the map.
 	delete(this.m_dataStores, name)
 }
 
@@ -148,10 +156,12 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 	if store == nil {
 		return nil, errors.New("The datastore '" + storeName + "' does not exist.")
 	}
+
 	data, err := store.Read(query, fieldsType, params)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
 	}
+
 	return data, err
 }
 
@@ -160,6 +170,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
  * value to insert in the DB.
  */
 func (this *DataManager) createData(storeName string, query string, d []interface{}) (lastId interface{}, err error) {
+
 	store := this.getDataStore(storeName)
 	if store == nil {
 		return nil, errors.New("Data store '" + storeName + " does not exist.")
@@ -237,7 +248,7 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 	}
 
 	// I will get it entity prototypes.
-	//	store.GetEntityPrototypes()
+	store.GetEntityPrototypes()
 
 	return store, nil
 }
@@ -541,4 +552,14 @@ type DataStore interface {
 	 * Return the prototype of a given type.
 	 */
 	GetEntityPrototype(id string) (*EntityPrototype, error)
+
+	/**
+	 * Remove a given entity prototype.
+	 */
+	DeleteEntityPrototype(id string) error
+
+	/**
+	 * Remove all prototypes.
+	 */
+	DeleteEntityPrototypes() error
 }

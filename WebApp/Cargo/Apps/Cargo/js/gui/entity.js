@@ -350,6 +350,7 @@ EntityPanel.prototype.initHeader = function () {
 			this.style.display = "none"
 			entitiesDiv.element.style.display = "table-row"
 			minimizeBtn.element.style.display = "table-cell"
+			fireResize()
 		}
 	} (this.entitiesDiv, this.minimizeBtn)
 
@@ -358,6 +359,7 @@ EntityPanel.prototype.initHeader = function () {
 			this.style.display = "none"
 			entitiesDiv.element.style.display = "none"
 			maximizeBtn.element.style.display = "table-cell"
+			fireResize()
 		}
 	} (this.entitiesDiv, this.maximizeBtn)
 	this.minimizeBtn.element.click()

@@ -142,7 +142,6 @@ func (this *KeyValueDataStore) deleteValue(key string) error {
 	this.Lock()
 	defer this.Unlock()
 	return this.m_db.Delete([]byte(key), nil)
-
 }
 
 /**
@@ -220,6 +219,71 @@ func (this *KeyValueDataStore) SetEntityPrototype(prototype *EntityPrototype) er
 		err = this.setValue([]byte("prototype:"+prototype.TypeName), m.Bytes())
 		if err != nil {
 			log.Println("Prototype encode:", err)
+			return err
+		}
+	}
+
+	return nil
+}
+
+/**
+ * Save an entity prototype.
+ */
+func (this *KeyValueDataStore) saveEntityPrototype(prototype *EntityPrototype) error {
+
+	// Save it only once...
+	_, err := this.GetEntityPrototype(prototype.TypeName)
+	if err == nil {
+		// I will serialyse the prototype.
+		m := new(bytes.Buffer)
+		enc := gob.NewEncoder(m)
+		err := enc.Encode(prototype)
+		err = this.setValue([]byte("prototype:"+prototype.TypeName), m.Bytes())
+		if err != nil {
+			log.Println("Prototype encode:", err)
+			return err
+		}
+	}
+	return nil
+}
+
+/**
+ * Remove an entity prototype and all it releated values.
+ */
+func (this *KeyValueDataStore) DeleteEntityPrototype(typeName string) error {
+
+	prototype, err := this.GetEntityPrototype(typeName)
+	// The prototype does not exist.
+	if err != nil {
+		return err
+	}
+
+	// I will delete all entity...
+	entities, _ := GetServer().GetEntityManager().getEntitiesByType(prototype.TypeName, "", this.m_id)
+	for i := 0; i < len(entities); i++ {
+		entity := entities[i]
+		// remove it...
+		entity.DeleteEntity()
+	}
+
+	// remove the prototype itself...
+	this.deleteValue("prototype:" + prototype.TypeName)
+
+	return nil
+}
+
+/**
+ * Remove all prototypes.
+ */
+func (this *KeyValueDataStore) DeleteEntityPrototypes() error {
+	prototypes, err := this.GetEntityPrototypes()
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < len(prototypes); i++ {
+		err := this.DeleteEntityPrototype(prototypes[i].TypeName)
+		if err != nil {
 			return err
 		}
 	}
@@ -1113,7 +1177,7 @@ func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, p
 					if len(query.Fields) > 0 && len(result) > 0 {
 						// Here I will insert the fields asked by
 						// the user...
-						for k := 0; k < len(query.Fields); k++ {
+						for k := 0; k < len(query.Fields) && k < len(result); k++ {
 							field := query.Fields[k]
 							index := prototype.getFieldIndex(field)
 							result_ = append(result_, result[index])

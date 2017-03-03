@@ -165,8 +165,14 @@ func MatchISO8601_DateTime(str string) *time.Time {
 	return &t
 }
 
+// Create a random uuid value.
 func RandomUUID() string {
 	return uuid.NewRandom().String()
+}
+
+// Create a MD5 hash value with UUID format.
+func GenerateUUID(val string) string {
+	return uuid.NewMD5(uuid.NameSpace_DNS, []byte(val)).String()
 }
 
 // Determine if a string is a UUID or not,

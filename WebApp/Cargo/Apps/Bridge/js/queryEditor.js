@@ -525,7 +525,7 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                     table.rowGroup.element.style.top = table.header.div.element.offsetHeight + 2 + "px"
 
                     // Now the height of the panel...
-                    table.rowGroup.element.style.height = queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight + 10 + "px"
+                    table.rowGroup.element.style.height = (queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight) -15 + "px"
 
                     // Here the scrolling event.
                     table.rowGroup.element.onscroll = function (header) {
@@ -543,7 +543,7 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                     window.addEventListener('resize',
                         function (queryEditor, table) {
                             return function () {
-                                table.rowGroup.element.style.height = queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight + 10 + "px"
+                                table.rowGroup.element.style.height = (queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight) -15 + "px"
                             }
                         } (queryEditor, table), true);
                 }

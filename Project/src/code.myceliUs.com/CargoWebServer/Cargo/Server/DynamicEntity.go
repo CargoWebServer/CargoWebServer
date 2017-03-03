@@ -69,7 +69,11 @@ func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error)
 	prototype, err := GetServer().GetEntityManager().getEntityPrototype(typeName, packageName)
 
 	if err != nil {
-		return nil, err
+		// Try to find the type in sql_info...
+		prototype, err = GetServer().GetEntityManager().getEntityPrototype(typeName, "sql_info") //sql_info contain information from the sql schema
+		if err != nil {
+			return nil, err
+		}
 	}
 	return prototype, nil
 }
@@ -228,8 +232,13 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 
+	storeId := packageName
+	if reflect.TypeOf(dataManager.getDataStore(storeId)).String() == "*Server.SqlDataStore" {
+		storeId = "sql_info" // Must save or update value from sql info instead.
+	}
+
 	queryStr, _ := json.Marshal(query)
-	results, err := GetServer().GetDataManager().readData(packageName, string(queryStr), fieldsType, params)
+	results, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
 	if err != nil {
 		log.Fatalln(Utility.FileLine(), "--> No object found for entity ", id, " ", err)
 		return err
@@ -857,9 +866,27 @@ func (this *DynamicEntity) saveEntity(path string) {
 	if len(this.prototype.Ids) > 1 {
 		id := this.prototype.Ids[1]
 		if this.object[id] != nil {
-			objectId := this.object[id].(string)
+			var objectId string
+			if reflect.TypeOf(this.object[id]).Kind() == reflect.String {
+				objectId = this.object[id].(string)
+			} else if reflect.TypeOf(this.object[id]).Kind() == reflect.Int {
+				objectId = strconv.Itoa(this.object[id].(int))
+			} else if reflect.TypeOf(this.object[id]).Kind() == reflect.Int8 {
+				objectId = strconv.Itoa(int(this.object[id].(int8)))
+			} else if reflect.TypeOf(this.object[id]).Kind() == reflect.Int16 {
+				objectId = strconv.Itoa(int(this.object[id].(int16)))
+			} else if reflect.TypeOf(this.object[id]).Kind() == reflect.Int32 {
+				objectId = strconv.Itoa(int(this.object[id].(int32)))
+			} else if reflect.TypeOf(this.object[id]).Kind() == reflect.Int64 {
+				objectId = strconv.Itoa(int(this.object[id].(int64)))
+			}
 			entityById[objectId] = this
 		}
+	}
+
+	storeId := this.GetPackageName()
+	if reflect.TypeOf(dataManager.getDataStore(storeId)).String() == "*Server.SqlDataStore" {
+		storeId = "sql_info" // Must save or update value from sql info instead.
 	}
 
 	if this.Exist() == true {
@@ -867,12 +894,12 @@ func (this *DynamicEntity) saveEntity(path string) {
 		var params []interface{}
 		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
 		queryStr, _ := json.Marshal(query)
-		err = GetServer().GetDataManager().updateData(this.GetPackageName(), string(queryStr), DynamicEntityInfo, params)
+		err = GetServer().GetDataManager().updateData(storeId, string(queryStr), DynamicEntityInfo, params)
 	} else {
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 		// Save the values for that entity.
 		queryStr, _ := json.Marshal(query)
-		_, err = GetServer().GetDataManager().createData(this.GetPackageName(), string(queryStr), DynamicEntityInfo)
+		_, err = GetServer().GetDataManager().createData(storeId, string(queryStr), DynamicEntityInfo)
 	}
 
 	if err == nil {
@@ -1644,7 +1671,11 @@ func (this *DynamicEntity) Exist() bool {
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
-	results, err := GetServer().GetDataManager().readData(this.GetPackageName(), string(queryStr), fieldsType, params)
+	storeId := this.GetPackageName()
+	if reflect.TypeOf(dataManager.getDataStore(storeId)).String() == "*Server.SqlDataStore" {
+		storeId = "sql_info" // Must save or update value from sql info instead.
+	}
+	results, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
 	if err != nil || len(results) == 0 {
 		return false
 	}

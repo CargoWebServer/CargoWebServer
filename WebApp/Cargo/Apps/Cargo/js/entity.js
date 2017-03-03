@@ -1696,7 +1696,6 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += "           return value;\n"
     constructorSrc += "       });\n"
     constructorSrc += "       cache = null; // Enable garbage collection\n"
-
     constructorSrc += "       setObjectValues(this)\n"
     constructorSrc += "       return entityStr\n"
     constructorSrc += "   }\n"
