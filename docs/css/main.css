@@ -103,3 +103,7 @@ h5{
 #generalFileStructure a{
 	text-decoration: none;
 }
+
+#generalFileStructureDiv span{
+	font-style: italic;
+}

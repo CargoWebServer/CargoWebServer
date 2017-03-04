@@ -175,7 +175,7 @@
 							</p>
 						</div>
 					</div>
-					<div class="row" id="installingCargoDiv">
+					<div class="row" id="generalFileStructureDiv">
 						<div class="col-xs-12">
 							<h2>File structure</h2>
 							<p>
@@ -189,12 +189,14 @@
 								<div>
 									<span>
 											<i class="fa fa-folder-open-o" aria-hidden="true"></i>
-											<a href="http:127.0.0.1:9393">WebApp</a>
+											WebApp
 											</span>
 									<div>
 										<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Cargo</span>
 										<div>
-											<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Apps</span>
+											<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>
+											<a href="http://127.0.0.1:9393">Apps</a>
+											</span>
 											<div>
 												<span><i class="fa fa-folder-o" aria-hidden="true"></i>Bridge</span></br>
 												<span><i class="fa fa-folder-o" aria-hidden="true"></i>lib</span></br>
@@ -245,13 +247,34 @@
 								</div>
 							</div>
 							<p>
-								In order to work properly, the <span style="font-style: italic;">WebApp</span> folder and the sever executable file should be at the same level. If you need to
-								separate those tow files, you must define a global variable with name CARGOROOT and make it point to the <span style="font-style: italic;">WebApp</span>  directory.
-								The application directory <span style="font-style: italic;">Apps</span> contain applications files. From the browser point of vue it's the root of your server file system.
-								With a running server, by clicking to the link <a href="http:127.0.0.1:9393">127.0.0.1:9393</a> you can see the content of <span style="font-style: italic;">Apps</span> folder.
-								The lib folder is the place to put external libraries used by all your applications.<span style="font-style: italic;"> E.g. underscore, jQuery, ...</span> 
-								The <span style="font-style: italic;">Cargo</span> folder contain the code used by all applications to interact with the server, we will see later wich file must be include by application.
-
+								In order to work properly, the
+								<span>WebApp</span> folder and the sever executable file should be at the same directory level. If you need to separate
+								these tow files, you must define a global variable named CARGOROOT and make it point to <span>WebApp</span> directory.
+								The application directory <span>Apps</span> contain applications files. From the browser point of view it's the root
+								of your server file system. With a running server, clicking the link "<a href="http://127.0.0.1:9393">Apps</span></a>"
+								display the <span>Apps</span> folder content.
+								</br>Here's a list of server directories description: </br>
+								<ul>
+									<li>
+										The <span>lib</span> folder is the place to put external libraries used by all your applications.
+										<span> E.g. underscore, jQuery, ...</span>
+									</li>
+									<li>
+										The <span>Cargo</span> folder contain the code used by all applications to interact with the server. We will see later
+										which files must be included by application.
+									</li>
+									<li>
+										The <span>Data</span> folder contain applications data. The <span>MimeTypeIcon</span> directory contain icon's named (mime type extension).png
+										</br>** Never delete files <span>colorName.csv</span> and <span>mimeType.csv</span>
+									</li>
+									<li>
+										The <span>Schemas</span> folder contain XML schemas used by applications. 
+										</br>** Never delete files <span>xs.xsd</span> and <span>SqlTypes.xsd</span>
+									</li>
+									<li>
+										The <span>Script</span> folder contain sever side JavaScript files.
+									</li>
+								</ul>
 							</p>
 						</div>
 					</div>
