@@ -180,63 +180,78 @@
 							<h2>File structure</h2>
 							<p>
 								Let's now explore the files we got in CargoWebServer directory.
-								<div id="generalFileStructure">
-
+							</p>
+							<div id="generalFileStructure">
+								<div>
+									<i class="fa fa-cog" aria-hidden="true"></i>
+									<a href="#" data-toggle="tooltip" title="Cargo executable file.">CargoWebServer(.exe)</a>
+								</div>
+								<div>
+									<span>
+											<i class="fa fa-folder-open-o" aria-hidden="true"></i>
+											<a href="http:127.0.0.1:9393">WebApp</a>
+											</span>
 									<div>
-										<i class="fa fa-cog" aria-hidden="true"></i>
-										<a href="#" data-toggle="tooltip" title="Cargo executable file.">CargoWebServer(.exe)</a>
-									</div>
-									<div>
-										<span>
-											<i class="fa fa-folder-open-o" aria-hidden="true"></i>WebApp</span>
+										<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Cargo</span>
 										<div>
-											<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Cargo</span>
+											<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Apps</span>
 											<div>
-												<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Apps</span>
+												<span><i class="fa fa-folder-o" aria-hidden="true"></i>Bridge</span></br>
+												<span><i class="fa fa-folder-o" aria-hidden="true"></i>lib</span></br>
+												<span><i class="fa fa-folder-o" aria-hidden="true"></i>Test</span></br>
+												<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Cargo</span>
 												<div>
-													<span><i class="fa fa-folder-o" aria-hidden="true"></i>Bridge</span></br>
-													<span><i class="fa fa-folder-o" aria-hidden="true"></i>lib</span></br>
-													<span><i class="fa fa-folder-o" aria-hidden="true"></i>Test</span></br>
-													<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Cargo</span>
+													<span><i class="fa fa-folder-o" aria-hidden="true"></i>css</span></br>
+													<span><i class="fa fa-folder-o" aria-hidden="true"></i>doc</span></br>
+													<span><i class="fa fa-folder-o" aria-hidden="true"></i>svg</span></br>
+													<span><i class="fa fa-folder-o" aria-hidden="true"></i>proto</span></br>
 													<div>
-														<span><i class="fa fa-folder-o" aria-hidden="true"></i>css</span></br>
-														<span><i class="fa fa-folder-o" aria-hidden="true"></i>doc</span></br>
-														<span><i class="fa fa-folder-o" aria-hidden="true"></i>proto</span></br>
-														<span><i class="fa fa-folder-o" aria-hidden="true"></i>svg</span></br>
-														<span><i class="fa fa-folder-o" aria-hidden="true"></i>js</span></br>
-														<div>
-															<span><i class="fa fa-folder-o" aria-hidden="true"></i>gui</span></br>
-															<span><i class="fa fa-file-code-o" aria-hidden="true"></i>
+														<span><i class="fa fa-file-code-o" aria-hidden="true"></i>
+															<a href="https://github.com/CargoWebServer/CargoWebServer/blob/master/WebApp/Cargo/Apps/Cargo/proto/rpc.proto" data-toggle="tooltip" title="Protocol definition">rpc.proto</a>
+															</span></br>
+													</div>
+													<span><i class="fa fa-folder-o" aria-hidden="true"></i>js</span></br>
+													<div>
+														<span><i class="fa fa-folder-o" aria-hidden="true"></i>gui</span></br>
+														<span><i class="fa fa-file-code-o" aria-hidden="true"></i>
 															<a href="https://github.com/CargoWebServer/CargoWebServer/tree/master/WebApp/Cargo/Apps/Cargo/js" data-toggle="tooltip" title="Javascript script files.">*.js</a>
 															</span></br>
-
-														</div>
 													</div>
 												</div>
-												<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Data</span></br>
-												<div>
-													<span><i class="fa fa-folder-o" aria-hidden="true"></i>MimeTypeIcon</span></br>
-													<span><i class="fa fa-file-text-o" aria-hidden="true"></i>
+											</div>
+											<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Data</span></br>
+											<div>
+												<span><i class="fa fa-folder-o" aria-hidden="true"></i>MimeTypeIcon</span></br>
+												<span><i class="fa fa-file-text-o" aria-hidden="true"></i>
 													<a href="https://github.com/CargoWebServer/CargoWebServer/blob/master/WebApp/Cargo/Data/colorName.csv" data-toggle="tooltip" title="Contain a list of colors with their name.">colorName.csv</a>
 													</span></br>
-													<span><i class="fa fa-file-text-o" aria-hidden="true"></i>
+												<span><i class="fa fa-file-text-o" aria-hidden="true"></i>
 													<a href="https://github.com/CargoWebServer/CargoWebServer/blob/master/WebApp/Cargo/Data/mimeType.csv" data-toggle="tooltip" title="Contain mime type informations.">mimeType.csv</a></span>
-												</div>
-												<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Schemas</span>
-												<div>
-													<span><i class="fa fa-file-text-o" aria-hidden="true"></i>
-													<a href="https://github.com/CargoWebServer/CargoWebServer/blob/master/WebApp/Cargo/Schemas/xs.xsd" data-toggle="tooltip" title="XML schema base types elements definition.">xs.xsd</a></span>
-													</span></br>
-													<span><i class="fa fa-file-text-o" aria-hidden="true"></i>
-													<a href="https://github.com/CargoWebServer/CargoWebServer/blob/master/WebApp/Cargo/Schemas/SqlTypes.xsd" data-toggle="tooltip" title="XML schema SQL types definition. ">SqlTypes.xsd</a></span>
-													</span>
-												</div>
-												<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Script</span>
-												<div></div>
 											</div>
+											<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Schemas</span>
+											<div>
+												<span><i class="fa fa-file-text-o" aria-hidden="true"></i>
+													<a href="https://github.com/CargoWebServer/CargoWebServer/blob/master/WebApp/Cargo/Schemas/xs.xsd" data-toggle="tooltip" title="XML schema base types elements definition.">xs.xsd</a></span>
+												</span>
+												</br>
+												<span><i class="fa fa-file-text-o" aria-hidden="true"></i>
+													<a href="https://github.com/CargoWebServer/CargoWebServer/blob/master/WebApp/Cargo/Schemas/SqlTypes.xsd" data-toggle="tooltip" title="XML schema SQL types definition. ">SqlTypes.xsd</a></span>
+												</span>
+											</div>
+											<span><i class="fa fa-folder-open-o" aria-hidden="true"></i>Script</span>
+											<div></div>
 										</div>
 									</div>
 								</div>
+							</div>
+							<p>
+								In order to work properly, the <span style="font-style: italic;">WebApp</span> folder and the sever executable file should be at the same level. If you need to
+								separate those tow files, you must define a global variable with name CARGOROOT and make it point to the <span style="font-style: italic;">WebApp</span>  directory.
+								The application directory <span style="font-style: italic;">Apps</span> contain applications files. From the browser point of vue it's the root of your server file system.
+								With a running server, by clicking to the link <a href="http:127.0.0.1:9393">127.0.0.1:9393</a> you can see the content of <span style="font-style: italic;">Apps</span> folder.
+								The lib folder is the place to put external libraries used by all your applications.<span style="font-style: italic;"> E.g. underscore, jQuery, ...</span> 
+								The <span style="font-style: italic;">Cargo</span> folder contain the code used by all applications to interact with the server, we will see later wich file must be include by application.
+
 							</p>
 						</div>
 					</div>

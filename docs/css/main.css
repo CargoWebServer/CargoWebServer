@@ -88,6 +88,10 @@ h5{
 
 
 
+#generalFileStructure{
+	padding: 5px;
+}
+
 #generalFileStructure div{
 	padding-left: 15px;
 }

@@ -226,7 +226,7 @@ func (this *SqlDataStore) Connect() error {
 	this.m_db, err = sql.Open(driver, connectionString)
 
 	// Update sql_info information about the content of this store.
-	this.synchronize()
+	//this.synchronize()
 
 	return err
 }
@@ -399,9 +399,16 @@ func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) int
 
 	//////////////////////////// Date ////////////////////////////////
 	if strings.HasSuffix(sqlTypeName, "date") || strings.HasSuffix(sqlTypeName, "datetime") {
-		var val time.Time
-		val = value.(time.Time)
-		return val
+		if reflect.TypeOf(value).String() == "time.Time" {
+			var val time.Time
+			val = value.(time.Time)
+			return val
+		} else if reflect.TypeOf(value).String() == "[]uint8" {
+			t, err := time.Parse(time.RFC3339Nano, string(value.([]uint8)))
+			if err == nil {
+				return t
+			}
+		}
 	}
 
 	/////////////////////////// string ////////////////////////////////
@@ -943,6 +950,7 @@ func (this *SqlDataStore) getSchemaId(name string) (string, error) {
 }
 
 func appendField(prototype *EntityPrototype, fieldName string, fieldType string) {
+
 	if !Utility.Contains(prototype.Fields, fieldName) {
 
 		prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
@@ -1078,6 +1086,7 @@ func (this *SqlDataStore) getRefInfos(refId string) ([]string, error) {
 // Must be call after all protoypes are created.
 // That function will complete references information.
 func (this *SqlDataStore) setRefs() error {
+
 	var query string
 	if this.m_vendor == Config.DataStoreVendor_ODBC {
 		query = "SELECT "
@@ -1131,6 +1140,7 @@ func (this *SqlDataStore) setRefs() error {
 	// Read the
 	values, err := this.Read(query, fieldsType, params)
 	if err != nil {
+		log.Println("------> error ", err)
 		return err
 	}
 
@@ -1143,7 +1153,10 @@ func (this *SqlDataStore) setRefs() error {
 	if len(values) > 0 {
 		for i := 0; i < len(values); i++ {
 			refName := values[i][0].(string)
-			schemasName := values[i][1].(string)
+			schemasName := values[i][1].(string) + "."
+			if this.m_vendor == Config.DataStoreVendor_MYSQL {
+				schemasName = ""
+			}
 
 			// Source
 			sourceTableName := values[i][2].(string)
@@ -1151,66 +1164,50 @@ func (this *SqlDataStore) setRefs() error {
 
 			// Target.
 			targetTableName := values[i][4].(string)
-			targetFieldName := values[i][5].(string)
+			//targetFieldName := values[i][5].(string)
 
-			src, err := GetServer().GetEntityManager().getEntityPrototype(this.m_id+"."+schemasName+"."+sourceTableName, "sql_info")
+			src, err := GetServer().GetEntityManager().getEntityPrototype(this.m_id+"."+schemasName+sourceTableName, "sql_info")
 			if err != nil {
+				log.Println("----------------> src not found: ", err)
 				return err
 			}
 
-			trg, err := GetServer().GetEntityManager().getEntityPrototype(this.m_id+"."+schemasName+"."+targetTableName, "sql_info")
+			trg, err := GetServer().GetEntityManager().getEntityPrototype(this.m_id+"."+schemasName+targetTableName, "sql_info")
 			if err != nil {
+				log.Println("----------------> trg not found: ", err)
 				return err
 			}
-
-			isSrcFieldKey := Utility.Contains(src.Ids, "M_"+sourceFieldName)
-			isTrgFieldKey := Utility.Contains(trg.Ids, "M_"+targetFieldName)
 
 			// I will append the field if is not already there.
 			if !isAssociative(src) {
 				if !Utility.Contains(trg.Fields, "M_"+refName) {
 					// Now the rule to determine the cardinality.
 					var fieldType string
-					if this.m_vendor == Config.DataStoreVendor_ODBC {
-						fieldType = this.m_id + "." + schemasName + "." + sourceTableName
-					} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
-						fieldType = this.m_id + "." + sourceTableName
-					}
+					fieldType = this.m_id + "." + schemasName + sourceTableName
 
 					if this.isRef(refName) {
 						fieldType = fieldType + ":Ref"
 					}
 
-					if !(isSrcFieldKey && isTrgFieldKey) {
+					if len(src.Ids) != len(trg.Ids) {
 						// one to one relationship in that case.
 						fieldType = "[]" + fieldType
 					}
-
 					appendField(trg, "M_"+refName, fieldType)
 				}
 
 				// Now the sources.
 				if !Utility.Contains(src.Fields, "M_"+refName) {
-					// Apppend the target in the source.
-					src.Fields = append(src.Fields, "M_"+refName)
-					src.FieldsOrder = append(src.FieldsOrder, len(src.Fields))
 
 					// Now the rule to determine the cardinality.
 					var fieldType string
-					if this.m_vendor == Config.DataStoreVendor_ODBC {
-						fieldType = this.m_id + "." + schemasName + "." + sourceTableName
-					} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
-						fieldType = this.m_id + "." + sourceTableName
-					}
+					fieldType = this.m_id + "." + schemasName + targetTableName + ":Ref"
 
-					if !isTrgFieldKey {
+					if !Utility.Contains(src.Ids, "M_"+sourceFieldName) {
 						// one to one relationship in that case.
 						fieldType = "[]" + fieldType
 					}
-
 					appendField(src, "M_"+refName, fieldType)
-				} else {
-					return nil
 				}
 			} else {
 				associativeTables[src.TypeName] = src
@@ -1262,6 +1259,10 @@ func (this *SqlDataStore) setRefs() error {
  * Get the mapping of a given sql type.
  */
 func (this *SqlDataStore) getSqlTypePrototype(typeName string) (*EntityPrototype, error) {
+	if typeName == "enum" {
+		// enum is not a basic sql type...
+		typeName = "varchar"
+	}
 	prototype, err := GetServer().GetEntityManager().getEntityPrototype("sqltypes."+typeName, "sqltypes")
 	return prototype, err
 }
@@ -1270,6 +1271,7 @@ func (this *SqlDataStore) getSqlTypePrototype(typeName string) (*EntityPrototype
  * Remove a given entity prototype.
  */
 func (this *SqlDataStore) DeleteEntityPrototype(id string) error {
+
 	store := GetServer().GetDataManager().getDataStore("sql_info")
 	if store != nil {
 		return store.DeleteEntityPrototype(id)
