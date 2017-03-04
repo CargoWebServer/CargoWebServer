@@ -367,6 +367,14 @@ func (this *KeyValueDataStore) getIndexationKeys(prototype *EntityPrototype, ent
 						}
 					}
 				}
+			case int:
+				indexationKey = prototype.TypeName + ":" + prototype.Indexs[i] + ":" + strconv.FormatInt(int64(v), 10)
+				indexationKeys = append(indexationKeys, indexationKey)
+
+			case int32:
+				indexationKey = prototype.TypeName + ":" + prototype.Indexs[i] + ":" + strconv.FormatInt(int64(v), 10)
+				indexationKeys = append(indexationKeys, indexationKey)
+
 			case int64:
 				indexationKey = prototype.TypeName + ":" + prototype.Indexs[i] + ":" + strconv.FormatInt(v, 10)
 				indexationKeys = append(indexationKeys, indexationKey)
@@ -380,7 +388,7 @@ func (this *KeyValueDataStore) getIndexationKeys(prototype *EntityPrototype, ent
 				indexationKeys = append(indexationKeys, indexationKey)
 
 			default:
-				log.Println("--------> value can not be use as indexation key ", v)
+				log.Println("--------> value can not be use as indexation key ", v, reflect.TypeOf(v).String())
 			}
 		}
 
@@ -416,6 +424,10 @@ func (this *KeyValueDataStore) getIndexationKeys(prototype *EntityPrototype, ent
 				indexationKey = prototype.TypeName + ":" + prototype.Ids[i] + ":" + strconv.Itoa(int(v))
 				indexationKeys = append(indexationKeys, indexationKey)
 
+			case int:
+				indexationKey = prototype.TypeName + ":" + prototype.Ids[i] + ":" + strconv.Itoa(int(v))
+				indexationKeys = append(indexationKeys, indexationKey)
+
 			case int32:
 				indexationKey = prototype.TypeName + ":" + prototype.Ids[i] + ":" + strconv.Itoa(int(v))
 				indexationKeys = append(indexationKeys, indexationKey)
@@ -433,7 +445,7 @@ func (this *KeyValueDataStore) getIndexationKeys(prototype *EntityPrototype, ent
 				indexationKeys = append(indexationKeys, indexationKey)
 
 			default:
-				log.Println("--------> value can not be use as indexation key ", v)
+				log.Println("--------> value can not be use as indexation key ", v, reflect.TypeOf(v).String())
 			}
 		}
 	}

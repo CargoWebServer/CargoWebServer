@@ -237,6 +237,11 @@ func (this *SqlDataStore) GetId() string {
 
 /** Open a new Connection with the data store **/
 func (this *SqlDataStore) Ping() (err error) {
+	if this.m_db == nil {
+		err = errors.New("No connection was found for datastore " + this.m_id)
+		return err
+	}
+
 	err = this.m_db.Ping()
 	return err
 }
@@ -332,21 +337,30 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
  * Cast sql type into it go equivalent type.
  */
 func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) interface{} {
+
 	/////////////////////////// Integer ////////////////////////////////
-	if strings.HasSuffix(sqlTypeName, "tinyint") {
-		return value.(int8)
-	}
+	if strings.HasSuffix(sqlTypeName, "tinyint") || strings.HasSuffix(sqlTypeName, "smallint") || strings.HasSuffix(sqlTypeName, "int") || strings.HasSuffix(sqlTypeName, "bigint") || strings.HasSuffix(sqlTypeName, "timestampNumeric") {
+		var val int
+		switch value.(type) {
+		case int:
+			{
+				val = value.(int)
+			}
+		case int32:
+			{
+				val = int(value.(int32))
+			}
+		case int64:
+			{
+				val = int(value.(int64))
+			}
+		case []uint8:
+			{
+				val, _ = strconv.Atoi(string(value.([]uint8)))
+			}
+		}
 
-	if strings.HasSuffix(sqlTypeName, "smallint") {
-		return value.(int16)
-	}
-
-	if strings.HasSuffix(sqlTypeName, "int") {
-		return value.(int32)
-	}
-
-	if strings.HasSuffix(sqlTypeName, "bigint") || strings.HasSuffix(sqlTypeName, "timestampNumeric") {
-		return value.(int64)
+		return val
 	}
 
 	/////////////////////////// Boolean ////////////////////////////////
@@ -866,34 +880,32 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
  * Determine if a relation is a reference or not.
  */
 func (this *SqlDataStore) isRef(relationName string) bool {
-
+	var query string
 	if this.m_vendor == Config.DataStoreVendor_ODBC {
-		var query string
 		query = "SELECT delete_referential_action_desc "
 		query += "FROM sys.foreign_keys "
 		query += "WHERE  name = '" + relationName + "'"
-
-		fieldsType := make([]interface{}, 1)
-		fieldsType[0] = "nvarchar"
-		var params []interface{}
-
-		// Read the
-		values, err := this.Read(query, fieldsType, params)
-		if err != nil {
-			return true
-		}
-
-		if len(values) > 0 {
-			if values[0][0] != nil {
-				return values[0][0].(string) != "CASCADE"
-			}
-		}
-
 	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
-		// TODO implement it...
+		query = "SELECT DELETE_RULE FROM "
+		query += "information_schema.REFERENTIAL_CONSTRAINTS "
+		query += "WHERE CONSTRAINT_NAME = '" + relationName + "'"
+	}
+
+	fieldsType := make([]interface{}, 1)
+	fieldsType[0] = "nvarchar"
+	var params []interface{}
+
+	// Read the
+	values, err := this.Read(query, fieldsType, params)
+	if err != nil {
 		return true
 	}
 
+	if len(values) > 0 {
+		if values[0][0] != nil {
+			return values[0][0].(string) != "CASCADE"
+		}
+	}
 	return true
 
 }
@@ -928,56 +940,6 @@ func (this *SqlDataStore) getSchemaId(name string) (string, error) {
 
 	return "", errors.New("No schema found for table " + name)
 
-}
-
-func (this *SqlDataStore) getTypeNameRef(tableName string, fieldName string) (string, string, error) {
-	fieldName = strings.Replace(fieldName, "'", "''", -1)
-
-	var query string
-	if this.m_vendor == Config.DataStoreVendor_ODBC {
-		query = "SELECT "
-		query += "  OBJECT_NAME (f.referenced_object_id) AS ReferenceTableName, "
-		query += "  f.name AS ForeignKey "
-		query += "FROM "
-		query += "  sys.foreign_keys AS f "
-		query += "  INNER JOIN sys.foreign_key_columns AS fc ON f.OBJECT_ID = fc.constraint_object_id "
-		query += "  INNER JOIN sys.objects AS o ON o.OBJECT_ID = fc.referenced_object_id "
-		query += "WHERE "
-		query += "    OBJECT_NAME(f.parent_object_id) = '" + tableName + "' and COL_NAME(fc.parent_object_id,fc.parent_column_id) = '" + fieldName + "'"
-	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
-		query = "SELECT REFERENCED_TABLE_NAME,CONSTRAINT_NAME "
-		query += "FROM information_schema.KEY_COLUMN_USAGE "
-		query += "WHERE CONSTRAINT_SCHEMA = '" + this.m_id + "' "
-		query += "AND TABLE_NAME = '" + tableName + "' "
-		query += "AND REFERENCED_COLUMN_NAME = '" + fieldName + "' "
-		query += "AND REFERENCED_COLUMN_NAME IS NOT NULL"
-	}
-
-	fieldsType := make([]interface{}, 2)
-	fieldsType[0] = "nvarchar"
-	fieldsType[1] = "nvarchar"
-	var params []interface{}
-
-	// Read the
-	values, err := this.Read(query, fieldsType, params)
-	if err != nil {
-		return "", "", err
-	}
-
-	if len(values) > 0 {
-		if len(values[0]) == 2 {
-			refName := values[0][1].(string)
-			refTypeName := values[0][0].(string)
-			refSchema, err := this.getSchemaId(refTypeName)
-			if err != nil {
-				log.Println(query)
-				return "", "", err
-			}
-			return refName, refSchema + "." + refTypeName + ":Ref", nil
-		}
-	}
-
-	return "", "", errors.New("No reference found for attribute " + tableName + "." + fieldName)
 }
 
 func appendField(prototype *EntityPrototype, fieldName string, fieldType string) {
@@ -1072,6 +1034,18 @@ func (this *SqlDataStore) getRefInfos(refId string) ([]string, error) {
 		query += "	ON col2.column_id = referenced_column_id "
 		query += "	AND col2.object_id =  tab2.object_id "
 		query += "WHERE obj.name ='" + refId + "'"
+	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
+		query = "select "
+		query += "	table_name, "
+		query += "	column_name, "
+		query += "	referenced_table_name, "
+		query += "	referenced_column_name, "
+		query += "	table_schema "
+		query += "from "
+		query += "	information_schema.key_column_usage "
+		query += "where "
+		query += "	referenced_table_name is not null "
+		query += "	and constraint_name = '" + refId + "'"
 	}
 
 	// TODO create the query for mySql here.
@@ -1128,6 +1102,19 @@ func (this *SqlDataStore) setRefs() error {
 		query += "INNER JOIN sys.columns col2 "
 		query += "	ON col2.column_id = referenced_column_id "
 		query += "	AND col2.object_id =  tab2.object_id; "
+	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
+		query = "select "
+		query += "	constraint_name,"
+		query += "	table_schema,"
+		query += "	table_name, "
+		query += "	column_name, "
+		query += "	referenced_table_name, "
+		query += "	referenced_column_name "
+		query += "from "
+		query += "	information_schema.key_column_usage "
+		query += "where "
+		query += "	referenced_table_name is not null "
+		query += "	and table_schema = '" + this.m_id + "'"
 	}
 
 	// TODO create the query for mySql here.
@@ -1183,7 +1170,12 @@ func (this *SqlDataStore) setRefs() error {
 			if !isAssociative(src) {
 				if !Utility.Contains(trg.Fields, "M_"+refName) {
 					// Now the rule to determine the cardinality.
-					fieldType := this.m_id + "." + schemasName + "." + sourceTableName
+					var fieldType string
+					if this.m_vendor == Config.DataStoreVendor_ODBC {
+						fieldType = this.m_id + "." + schemasName + "." + sourceTableName
+					} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
+						fieldType = this.m_id + "." + sourceTableName
+					}
 
 					if this.isRef(refName) {
 						fieldType = fieldType + ":Ref"
@@ -1204,7 +1196,12 @@ func (this *SqlDataStore) setRefs() error {
 					src.FieldsOrder = append(src.FieldsOrder, len(src.Fields))
 
 					// Now the rule to determine the cardinality.
-					fieldType := this.m_id + "." + schemasName + "." + targetTableName + ":Ref"
+					var fieldType string
+					if this.m_vendor == Config.DataStoreVendor_ODBC {
+						fieldType = this.m_id + "." + schemasName + "." + sourceTableName
+					} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
+						fieldType = this.m_id + "." + sourceTableName
+					}
 
 					if !isTrgFieldKey {
 						// one to one relationship in that case.
@@ -1321,6 +1318,8 @@ func (this *SqlDataStore) synchronize() error {
 					}
 				}
 				query += " FROM " + prototypes[i].TypeName
+
+				log.Println(query)
 				var params []interface{}
 
 				// Execute the query...
@@ -1328,9 +1327,10 @@ func (this *SqlDataStore) synchronize() error {
 				if err != nil {
 					return err
 				}
-
+				//log.Println("-------> results ", len(values))
 				// Now I will generate a unique key for the retreive information.
 				for j := 0; j < len(values); j++ {
+					log.Println(prototypes[i].TypeName, j, ":", len(values))
 					keyInfo := prototypes[i].TypeName + ":"
 					for k := 0; k < len(values[j]); k++ {
 						if reflect.TypeOf(values[j][k]).Kind() == reflect.String {
@@ -1353,6 +1353,7 @@ func (this *SqlDataStore) synchronize() error {
 					}
 
 					// The uuid is in that case a MD5 value.
+					//log.Println("---> ", keyInfo)
 					uuid := prototypes[i].TypeName + "%" + Utility.GenerateUUID(keyInfo)
 
 					// Now I will create the entity if it dosen't exist.
@@ -1423,7 +1424,14 @@ func (this *SqlDataStore) synchronize() error {
 									values, err := this.Read(query, fieldsType, params)
 									if err == nil {
 										for n := 0; n < len(values); n++ {
-											childTypeName := this.m_id + "." + refInfos[4] + "." + refInfos[0]
+
+											var childTypeName string
+											if this.m_vendor == Config.DataStoreVendor_ODBC {
+												childTypeName = this.m_id + "." + refInfos[4] + "." + refInfos[0]
+											} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
+												childTypeName = this.m_id + "." + refInfos[0]
+											}
+
 											var strId string
 											if reflect.TypeOf(values[n][0]).Kind() == reflect.String {
 												strId = values[n][0].(string)

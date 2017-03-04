@@ -5,7 +5,7 @@
 package Server
 
 import (
-	"log"
+	//	"log"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 )
@@ -36,7 +36,7 @@ func NewError(errorPath string, errorId string, errorCode int, err error) *Cargo
 		GetServer().GetDefaultErrorLogger().AppendLogEntry(errorObject)
 	*/
 
-	log.Println("ERROR: ", errorObject)
+	//log.Println("ERROR: ", errorObject)
 	return errorObject
 }
 

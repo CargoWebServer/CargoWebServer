@@ -247,9 +247,6 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 		return nil, cargoError
 	}
 
-	// I will get it entity prototypes.
-	store.GetEntityPrototypes()
-
 	return store, nil
 }
 
@@ -340,6 +337,10 @@ func (this *DataManager) Connect(storeName string, messageId string, sessionId s
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return
 	}
+
+	// I will get it entity prototypes.
+	store.GetEntityPrototypes()
+
 }
 
 func (this *DataManager) Close(storeName string, messageId string, sessionId string) {
