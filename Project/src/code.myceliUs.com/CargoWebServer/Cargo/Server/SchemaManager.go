@@ -192,6 +192,13 @@ func (this *SchemaManager) stop() {
 	log.Println("--> Stop SchemaManager")
 }
 
+func removeNs(id string) string {
+	if strings.Index(id, ":") > 0 {
+		return id[strings.Index(id, ":")+1:]
+	}
+	return id
+}
+
 /**
  * Import a new schema whit a given file path.
  */
@@ -388,7 +395,7 @@ func (this *SchemaManager) parseSchema(schema *XML_Schemas.XSD_Schema) {
  * Parse Attribute Group
  */
 func (this *SchemaManager) parseAttributeGroups(group *XML_Schemas.XSD_AttributeGroup, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
-	id := schema.Id + "." + group.Name
+	id := schema.Id + "." + removeNs(group.Name)
 	if isGlobal {
 		this.globalAttributeGroup[id] = group
 	}
@@ -398,7 +405,7 @@ func (this *SchemaManager) parseAttributeGroups(group *XML_Schemas.XSD_Attribute
  * Parse Any Attribute
  */
 func (this *SchemaManager) parseAnyAttribute(any *XML_Schemas.XSD_AnyAttribute, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
-	id := schema.Id + "." + any.Name
+	id := schema.Id + "." + removeNs(any.Name)
 	if isGlobal {
 		this.globalAnyAttributes[id] = any
 	}
@@ -408,7 +415,7 @@ func (this *SchemaManager) parseAnyAttribute(any *XML_Schemas.XSD_AnyAttribute, 
  * Parse Attribute
  */
 func (this *SchemaManager) parseAttribute(attribute *XML_Schemas.XSD_Attribute, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
-	id := schema.Id + "." + attribute.Name
+	id := schema.Id + "." + removeNs(attribute.Name)
 	if isGlobal {
 		this.globalAttributes[id] = attribute
 	}
@@ -427,7 +434,7 @@ func (this *SchemaManager) parseAnnotation(annotation XML_Schemas.XSD_Annotation
  * Parse Element
  */
 func (this *SchemaManager) parseElement(element *XML_Schemas.XSD_Element, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
-	id := schema.Id + "." + element.Name
+	id := schema.Id + "." + removeNs(element.Name)
 	if isGlobal {
 		this.globalElements[id] = element
 	}
@@ -441,7 +448,7 @@ func (this *SchemaManager) parseElement(element *XML_Schemas.XSD_Element, schema
  * Parse SimpleType
  */
 func (this *SchemaManager) parseSimpleType(simpleType *XML_Schemas.XSD_SimpleType, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
-	id := schema.Id + "." + simpleType.Name
+	id := schema.Id + "." + removeNs(simpleType.Name)
 	if isGlobal {
 		this.globalSimpleTypes[id] = simpleType
 	}
@@ -452,7 +459,7 @@ func (this *SchemaManager) parseSimpleType(simpleType *XML_Schemas.XSD_SimpleTyp
  */
 func (this *SchemaManager) parseComplexType(complexType *XML_Schemas.XSD_ComplexType, schema *XML_Schemas.XSD_Schema, isGlobal bool) {
 
-	id := schema.Id + "." + complexType.Name
+	id := schema.Id + "." + removeNs(complexType.Name)
 	if isGlobal {
 		// A globel complex type must have it one prototype
 		this.globalComplexTypes[id] = complexType
@@ -471,10 +478,12 @@ func (this *SchemaManager) parseGroup(group *XML_Schemas.XSD_Group, schema *XML_
 		groupId = group.Name
 	}
 
-	id := schema.Id + "." + groupId
+	id := schema.Id + "." + removeNs(groupId)
+
 	if isGlobal {
 		this.globalGroups[id] = group
 	}
+
 }
 
 /**
@@ -518,9 +527,9 @@ func (this *SchemaManager) createPrototypeElement(schema *XML_Schemas.XSD_Schema
 
 	if len(element.Type) > 0 {
 		// Here the content is define outside of the element...
-		if val, ok := this.globalComplexTypes[schema.Id+"."+element.Type]; ok {
+		if val, ok := this.globalComplexTypes[schema.Id+"."+removeNs(element.Type)]; ok {
 			complexType = val
-		} else if val, ok := this.globalSimpleTypes[schema.Id+"."+element.Type]; ok {
+		} else if val, ok := this.globalSimpleTypes[schema.Id+"."+removeNs(element.Type)]; ok {
 			simpleType = val
 		}
 	} else {
@@ -559,7 +568,7 @@ func (this *SchemaManager) createPrototypeElement(schema *XML_Schemas.XSD_Schema
 		if p, ok := this.prototypes[schema.Id+"."+element.SubstitutionGroup]; ok {
 			parent = p
 		} else {
-			if pe, ok := this.globalElements[schema.Id+"."+element.SubstitutionGroup]; ok {
+			if pe, ok := this.globalElements[schema.Id+"."+removeNs(element.SubstitutionGroup)]; ok {
 				parent = this.createPrototypeElement(schema, pe)
 			}
 		}
@@ -697,7 +706,7 @@ func (this *SchemaManager) appendPrototypeAttribute(schema *XML_Schemas.XSD_Sche
 
 	// I will get the attribute from it reference...
 	if len(attribute.Ref) > 0 {
-		attribute = this.globalAttributes[schema.Id+"."+attribute.Ref]
+		attribute = this.globalAttributes[schema.Id+"."+removeNs(attribute.Ref)]
 	}
 
 	if attribute == nil {
@@ -707,7 +716,7 @@ func (this *SchemaManager) appendPrototypeAttribute(schema *XML_Schemas.XSD_Sche
 
 	var simpleType *XML_Schemas.XSD_SimpleType
 	if len(attribute.Type) > 0 {
-		simpleType = this.globalSimpleTypes[schema.Id+"."+attribute.Type]
+		simpleType = this.globalSimpleTypes[schema.Id+"."+removeNs(attribute.Type)]
 		if simpleType == nil {
 			// if the name is nil, I will try to get it from the xs namespace...
 			primitiveName := attribute.Type[strings.Index(attribute.Type, ":")+1:]
@@ -785,7 +794,7 @@ func (this *SchemaManager) appendPrototypeAnyAttribute(schema *XML_Schemas.XSD_S
  */
 func (this *SchemaManager) appendPrototypeAttributeGroup(schema *XML_Schemas.XSD_Schema, parent *EntityPrototype, groupAttribute *XML_Schemas.XSD_AttributeGroup) {
 	// If is global...
-	if _, ok := this.globalAttributeGroup[schema.Id+"."+groupAttribute.Name]; ok {
+	if _, ok := this.globalAttributeGroup[schema.Id+"."+removeNs(groupAttribute.Name)]; ok {
 		for i := 0; i < len(groupAttribute.AnyAttributes); i++ {
 			this.appendPrototypeAnyAttribute(schema, parent, groupAttribute.AnyAttributes[i])
 		}
@@ -828,7 +837,7 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 		if p, ok := this.prototypes[schema.Id+"."+element.SubstitutionGroup]; ok {
 			parent = p
 		} else {
-			if pe, ok := this.globalElements[schema.Id+"."+element.SubstitutionGroup]; ok {
+			if pe, ok := this.globalElements[schema.Id+"."+removeNs(element.SubstitutionGroup)]; ok {
 				parent = this.createPrototypeElement(schema, pe)
 			}
 		}
@@ -842,7 +851,7 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 	// type.
 	if len(element.Ref) > 0 {
 		isRef := strings.HasSuffix(element.Type, "anyURI")
-		if val, ok := this.globalElements[schema.Id+"."+element.Ref]; ok {
+		if val, ok := this.globalElements[schema.Id+"."+removeNs(element.Ref)]; ok {
 			element = val
 
 			if p, ok := this.prototypes[schema.Id+"."+element.Name]; ok {
@@ -892,9 +901,9 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 	var complexType *XML_Schemas.XSD_ComplexType
 	if len(element.Type) > 0 {
 		// Here the content is define outside of the element...
-		if val, ok := this.globalComplexTypes[schema.Id+"."+element.Type]; ok {
+		if val, ok := this.globalComplexTypes[schema.Id+"."+removeNs(element.Type)]; ok {
 			complexType = val
-		} else if val, ok := this.globalSimpleTypes[schema.Id+"."+element.Type]; ok {
+		} else if val, ok := this.globalSimpleTypes[schema.Id+"."+removeNs(element.Type)]; ok {
 			simpleType = val
 		} else {
 			elementType := element.Type[strings.Index(element.Type, ":")+1:]
@@ -983,7 +992,8 @@ func (this *SchemaManager) appendPrototypeGroup(schema *XML_Schemas.XSD_Schema, 
 	if len(group.Ref) > 0 {
 		minOccurs := group.MinOccurs
 		maxOccurs := group.MaxOccurs
-		group = this.globalGroups[schema.Id+"."+group.Ref]
+		group = this.globalGroups[schema.Id+"."+removeNs(group.Ref)]
+
 		group.MaxOccurs = maxOccurs
 		group.MinOccurs = minOccurs
 	}
@@ -1224,11 +1234,11 @@ func (this *SchemaManager) appendPrototypeExtention(schema *XML_Schemas.XSD_Sche
 	if complexContent != nil {
 		if len(extension.Base) > 0 {
 			// So here I will find the base type content...
-			if val, ok := this.globalComplexTypes[schema.Id+"."+extension.Base]; ok {
+			if val, ok := this.globalComplexTypes[schema.Id+"."+removeNs(extension.Base)]; ok {
 				this.createPrototypeComplexType(schema, val)
 				this.appendPrototypeSuperBaseType(schema.Id+"."+val.Name, prototype)
 
-			} else if val, ok := this.globalSimpleTypes[schema.Id+"."+extension.Base]; ok {
+			} else if val, ok := this.globalSimpleTypes[schema.Id+"."+removeNs(extension.Base)]; ok {
 				this.createPrototypeSimpleType(schema, val)
 				this.appendPrototypeSuperBaseType(schema.Id+"."+val.Name, prototype)
 			}
@@ -1248,10 +1258,10 @@ func (this *SchemaManager) appendPrototypeExtention(schema *XML_Schemas.XSD_Sche
 		if len(extension.Base) > 0 {
 			// The base extention...
 
-			if val, ok := this.globalComplexTypes[schema.Id+"."+extension.Base]; ok {
+			if val, ok := this.globalComplexTypes[schema.Id+"."+removeNs(extension.Base)]; ok {
 				this.createPrototypeComplexType(schema, val)
 				this.appendPrototypeSuperBaseType(schema.Id+"."+extension.Base, prototype)
-			} else if val, ok := this.globalSimpleTypes[schema.Id+"."+extension.Base]; ok {
+			} else if val, ok := this.globalSimpleTypes[schema.Id+"."+removeNs(extension.Base)]; ok {
 				this.createPrototypeSimpleType(schema, val)
 				this.appendPrototypeSuperBaseType(schema.Id+"."+extension.Base, prototype)
 			} else {
@@ -1290,7 +1300,13 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 		// Now the facet that will limit the value that can be set as values...
 		if complexContent != nil || simpleContent != nil {
 			// Set the prototype SuperTypeName...
-			this.appendPrototypeSuperBaseType(schema.Id+"."+simpleType.Name, prototype)
+			if simpleType != nil {
+				this.appendPrototypeSuperBaseType(schema.Id+"."+simpleType.Name, prototype)
+			} else {
+				// Here the base type will be take from the restriction base.
+				this.appendPrototypeSuperBaseType(schema.Id+"."+restriction.Base, prototype)
+			}
+
 			// In the context of simple content
 			for i := 0; i < len(restriction.Attributes); i++ {
 				this.appendPrototypeAttribute(schema, prototype, &restriction.Attributes[i])
@@ -1313,6 +1329,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 				} else if restriction.Choice != nil {
 					this.appendPrototypeChoice(schema, prototype, restriction.Choice, restriction.Choice.MinOccurs, restriction.Choice.MaxOccurs)
 				} else if restriction.Group != nil {
+					log.Println("-----------> restriction", restriction)
 					this.appendPrototypeGroup(schema, prototype, restriction.Group, restriction.Group.MinOccurs, restriction.Group.MaxOccurs)
 				} else if restriction.Sequence != nil {
 					this.appendPrototypeSequence(schema, prototype, restriction.Sequence, restriction.Sequence.MinOccurs, restriction.Sequence.MaxOccurs)
@@ -1453,7 +1470,7 @@ func (this *SchemaManager) getFieldType(typeName string, fieldName string) strin
 		superType := prototype.SuperTypeNames[i]
 		if _, ok := this.prototypes[superType]; !ok {
 			// Here will try to find if a global element exist
-			if element, ok := this.globalElements[superType]; ok {
+			if element, ok := this.globalElements[removeNs(superType)]; ok {
 				if len(element.Type) > 0 {
 					superType = superType[0:strings.Index(superType, ".")+1] + element.Type
 				}

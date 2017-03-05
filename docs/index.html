@@ -14,12 +14,14 @@
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 
 	<script>
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-92967277-1', 'auto');
-	ga('send', 'pageview');
+		(function (i, s, o, g, r, a, m) {
+			i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+				(i[r].q = i[r].q || []).push(arguments)
+			}, i[r].l = 1 * new Date(); a = s.createElement(o),
+				m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+		})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+		ga('create', 'UA-92967277-1', 'auto');
+		ga('send', 'pageview');
 	</script>
 
 </head>
@@ -455,12 +457,9 @@ function main() {
     padding: 2px;
 }
 							</code>
-							</pre>
-							Dont worry if you can't understand all at once, the point here is to get a idea of what is Cargo.
-							As you see there is no trace of http, in fact there no trace of protocol at all, the only thing 
-							we know is the <span>server</span> object. Essentially we define a JavaScript function named <span>SayHello</span>
-							and ask the <span>server</span> to run it and return the result. The rest of the code was to create the
-							user interface.
+							</pre> Dont worry if you can't understand all at once, the point here is to get a idea of what is Cargo. As
+							you see there is no trace of http, in fact there no trace of protocol at all, the only thing we know is the <span>server</span>							object. Essentially we define a JavaScript function named <span>SayHello</span> and ask the <span>server</span> to
+							run it and return the result. The rest of the code was to create the user interface.
 						</div>
 					</div>
 				</div>
@@ -664,8 +663,66 @@ function main() {
 		</div>
 	</div>
 	<div class="row hidden pageRow" id="page-docs">
-		<div class="col-12">
-			<a href="#">Docs</a>
+		<div class="col-sm-2" role="complementary">
+			<nav class="bs-docs-sidebar affix-top">
+				<h3 id="documentationLink-intro" class="documentation-link">Documentation</h3>
+				<ul class="nav bs-docs-sidenav">
+					<li id="documentationLink-achitecture" class="documentation-link">
+						<a href="#">Introduction</a>
+					</li>
+					<li id="documentationLink-achitecture" class="documentation-link">
+						<a href="#">Architecture</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+		<div class="col-sm-10" role="main">
+			<div class="row tutorialsRow" id="tutorialsSection-frontEnd">
+				<div class="col-xs-12">
+					<h2>Introduction</h2>
+					<h4>Programming background</h4>
+					<p>
+						In order to take advantage of a framework it's important to know what's it's philosophy. There a lot of choice out there
+						and find the good tool that meet your needs can be confusing. Chosing a framework simply because it's the flavor of
+						the day whiout knowing to much about it it's a risky buisness. Extensibility, simplicity, efficiency, flexibility,
+						dependency are overused word's these day's and some of them ar mutually opposed. So let's put all of this in perspective
+						and find out if Cargo is the good tool for you.
+					</p>
+					<p>
+						First of all simplicity. What is simple for one can be complex for another... I came from object oriented programming. The
+						first programming language I learn was C++, and later Java. Far from being perfect, those languages have the advantage
+						to impose structure at there core. There goal is to protect the integrity of the system. In a language like JavaScript
+						structures are more a matter of desing, but trust me without structure, simplicity give place to complexity. OOP it's
+						a good starting point for using Cargo, but it's not the destination...
+					</p>
+					<p>
+						If is easy to switch from C++ to Java, thing became more complicated when you switch to JavaScript. Because JavaScript is
+						not a pure OOP, thinking purely in OOP result in ugly code. I like to thing OOP language as lego block and functional
+						language as playdough. My goal here is not to teach you JavaScript, but to encourage you to take advantage of the flexibility
+						of this language whiout lost all your good habit from OOP.
+					</p>
+					<p>
+						If you came from C++, Java, Objective-C or any other desktop application programming language I think you will enjoy working
+						with Cargo.
+					</p>
+					<h4>Philosophy</h4>
+					<p>
+						In tow words <span>non-intrusive</span>. Cargo does not impose you any rules. The role of Cargo is to give you access
+						to server functionalies via the server object. So simplicity here is achieve by making abstraction of the network or
+						any protocol. We also create some helper class to simplify the work with HTML and SVG element. Minimize dependencies
+						was also one of our goal in order to keep thing simple. You can use tool like jQuery, Bootstrap or Angular to create
+						your application. But those are not part of the framework. We will see later how to achieve extensibity whit Cargo.
+						More you know JavaScript and better you became with Cargo!-)
+					</p>
+				</div>
+				<div class="col-xs-12">
+					<h2>Achitecture</h2>
+					<h4>From DOM to SOM...</h4>
+					<p>
+					
+					</p>
+				</div>
+			</div>
 		</div>
 	</div>
 	<div class="row hidden pageRow" id="page-about">
