@@ -243,6 +243,9 @@ Element.prototype.appendElement = function (e) {
         }
     }
 
+    // try to set language text if the element is register.
+    server.languageManager.setElementText(e, e.id)
+    
     return this;
 };
 

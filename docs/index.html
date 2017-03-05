@@ -285,27 +285,173 @@
 							<p>
 								With Cargo up and runing on your computer, it's time to create our first application. The application will contain one input
 								box and one button. The user will enter a value in the input box and when it click on the button the server will
-								respond with a greeting composed from that value.
+								respond with a greeting composed from that value. You can get the code <a href="">here</a>.
 							</p>
 							<p>
 								First of all, we will create the directory inside the <span>Apps</span> folder. Let's name it <span>HelloCargo</span>.
 								Inside it we will create tow folders, one named <span>css</span> the other named <span>js</span>. I like to regroup
-								Javascript files in one folder and style sheets in other folder, but there's no rules about it. In the <span>HelloCargo</span>								
-								directory create a new file named <span>index.html</span>. Each application must have an <span>index</span> file
-								at it top level directory. The <span>index</span> file has tow part, the header and the body.</br> Let's get a look of
-								it:
+								Javascript files in one folder and style sheets in other folder, but there's no rules about it. In the <span>HelloCargo</span>								directory create a new file named <span>index.html</span>. Each application must have an <span>index</span> file
+								at it top level directory. The <span>index</span> file has tow part, the header and the body.</br> Let's get a look
+								of it:
 								<pre>
 								<code class="xml hljs">
-
 <span class="hljs-meta">&lt;!DOCTYPE html&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">head</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">"en"</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">http-equiv</span>=<span class="hljs-string">"x-ua-compatible"</span><span class="hljs-attr"> content</span>=<span class="hljs-string">"IE=edge"</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">"UTF-8"</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>HelloCargo<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">head</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">"en"</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">http-equiv</span>=<span class="hljs-string">"x-ua-compatible"</span><span class="hljs-attr"> content</span>=<span class="hljs-string">"IE=edge"</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">"UTF-8"</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>HelloCargo<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+		
+		<span class="hljs-comment">&lt;!-- css files --&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span><span class="hljs-attr"> type</span>=<span class="hljs-string">"text/css"</span><span class="hljs-attr"> href</span>=<span class="hljs-string">"/Cargo/css/main.css"</span>&gt;</span>	
+
+		<span class="hljs-comment">&lt;!-- js files --&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/lib/protobuf/bytebuffer.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/lib/protobuf/long.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/lib/protobuf/protobuf.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/lib/rollups/sha256.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/lib/stringview.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		
+		<span class="hljs-comment">&lt;!-- Base Server files --&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/utility.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/handlers.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/error.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/event.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/languageManager.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/server.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/security.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/main.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+		<span class="hljs-comment">&lt;!-- Listener --&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/session.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/account.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/file.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/entity.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/data.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/message.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/project.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+		<span class="hljs-comment">&lt;!-- GUI --&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/Cargo/js/element.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+		<span class="hljs-comment">&lt;!-- HelloCargo files --&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span><span class="hljs-attr"> type</span>=<span class="hljs-string">"text/css"</span><span class="hljs-attr"> href</span>=<span class="hljs-string">"css/main.css"</span>&gt;</span>	
+	<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+		<span class="hljs-comment">&lt;!-- HelloCargo script file --&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"js/main.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
 								</code>
-								</pre>
+								</pre> The first tow <span>meta</span> elements defines how the content of the application must be interpreted
+								by the browser. The title element must contain your application name. Other lines of the header contains various
+								stylesheets and script files to be imported. Those files are needed by all applications in order to work. In the
+								body element I import specif application files, in your case only the main file are import.
 							</p>
+							<p>
+								Every C++ or Java programmer know the main function. In those language it represent the entry point of all program. JavaScript
+								dosen't have a main function by itself. Cargo impose the use of a main function because before starting your application
+								a lot of work must be done, like opening a connection with the server, tranfering files, initializing data structures
+								to name a few. So let's get a look of the
+								<scan>main.js</scan> file.
+							</p>
+							<pre>
+							<code class="javascript">
+var applicationName = document.getElementsByTagName("title")[0].text
+
+var server = new Server("localhost", "127.0.0.1", 9393)
+
+var languageInfo = {
+    "en": {
+        "label": "What is your name?",
+        "btn": "greeting"
+    },
+    "fr": {
+        "label": "Quel est votre nom?",
+        "btn": "salutation"
+    }
+}
+
+// Depending of the language the correct text will be set.
+server.languageManager.appendLanguageInfo(languageInfo)
+
+/**
+ * Server side function
+ */
+function SayHello(to) {
+    return "Hello " + to + "!"
+}
+
+/**
+ * This function is the entry point of the application...
+ */
+function main() {
+    // Creation of the element.
+    var panel = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "id": "panel" })
+
+    // Now I will append the element label, input and button.
+    panel.appendElement({ "tag": "div", "style": "display: table-row" }).down()
+        .appendElement({ "tag": "span", "id": "label" })
+        .appendElement({ "tag": "input", "id": "input" }).up()
+        .appendElement({ "tag": "div", "style": "display: table-row" }).down()
+        .appendElement({ "tag": "button", "id": "btn" })
+        .appendElement({ "tag": "div", "style": "display: table-row" }).down()
+        .appendElement({ "tag": "span", "id": "greeting" })
+
+    // Now the action.
+    var btn = panel.getChildById("btn")
+    var greeting = panel.getChildById("greeting")
+    var input = panel.getChildById("input")
+
+    btn.element.onclick = function (greeting, input) {
+        return function () {
+            var params = []
+            params.push(createRpcData(input.element.value, "STRING", "id"))
+            // Call it on the server.
+            server.executeJsFunction(
+                SayHello.toString(), // The function to execute remotely on server
+                params, // The parameters to pass to that function
+                 // The progress callback
+                function (index, total, caller) {
+                    // Nothing to do here.
+                },
+                // The success callback
+                function (results, caller) {
+                    // Caller is the greething reference.
+                    caller.element.innerHTML = results[0]
+                },
+				// The error callback
+                function (errMsg, caller) {
+                    // display the message in the console.
+                    console.log(errMsg)
+                }, // Error callback
+                greeting // The caller
+            )
+        }
+    } (greeting, input)
+}
+							</code>
+							</pre>
+							<pre>
+							<code class="css hljs">
+#panel{
+    display: table;
+    margin: 10px;
+    border-spacing: 10px;
+    border-collapse: separate;
+}
+
+#panel span,button,input{
+    display: table-cell;
+    padding: 2px;
+}
+							</code>
+							</pre>
+							Dont worry if you can't understand all at once, the point here is to get a idea of what is Cargo.
+							As you see there is no trace of http, in fact there no trace of protocol at all, the only thing 
+							we know is the <span>server</span> object. Essentially we define a JavaScript function named <span>SayHello</span>
+							and ask the <span>server</span> to run it and return the result. The rest of the code was to create the
+							user interface.
 						</div>
 					</div>
 				</div>
