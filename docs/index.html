@@ -175,13 +175,13 @@
 							</p>
 						</div>
 					</div>
-					<div class="row" id="generalFileStructureDiv">
+					<div class="row" id="FileStructureDiv">
 						<div class="col-xs-12">
 							<h2>File structure</h2>
 							<p>
 								Let's now explore the files we got in CargoWebServer directory.
 							</p>
-							<div id="generalFileStructure">
+							<div class="fileStructure">
 								<div>
 									<i class="fa fa-cog" aria-hidden="true"></i>
 									<a href="#" data-toggle="tooltip" title="Cargo executable file.">CargoWebServer(.exe)</a>
@@ -260,21 +260,51 @@
 										<span> E.g. underscore, jQuery, ...</span>
 									</li>
 									<li>
-										The <span>Cargo</span> folder contain the code used by all applications to interact with the server. We will see later
-										which files must be included by application.
+										The <span>Cargo</span> folder contain the code used by all applications to interact with the server. We will see
+										later which files must be included by application.
 									</li>
 									<li>
-										The <span>Data</span> folder contain applications data. The <span>MimeTypeIcon</span> directory contain icon's named (mime type extension).png
+										The <span>Data</span> folder contain applications data. The <span>MimeTypeIcon</span> directory contain icon's
+										named (mime type extension).png
 										</br>** Never delete files <span>colorName.csv</span> and <span>mimeType.csv</span>
 									</li>
 									<li>
-										The <span>Schemas</span> folder contain XML schemas used by applications. 
+										The <span>Schemas</span> folder contain XML schemas used by applications.
 										</br>** Never delete files <span>xs.xsd</span> and <span>SqlTypes.xsd</span>
 									</li>
 									<li>
 										The <span>Script</span> folder contain sever side JavaScript files.
 									</li>
 								</ul>
+							</p>
+						</div>
+					</div>
+					<div class="row" id="HelloCargoDiv">
+						<div class="col-xs-12">
+							<h2>Hello Cargo!</h2>
+							<p>
+								With Cargo up and runing on your computer, it's time to create our first application. The application will contain one input
+								box and one button. The user will enter a value in the input box and when it click on the button the server will
+								respond with a greeting composed from that value.
+							</p>
+							<p>
+								First of all, we will create the directory inside the <span>Apps</span> folder. Let's name it <span>HelloCargo</span>.
+								Inside it we will create tow folders, one named <span>css</span> the other named <span>js</span>. I like to regroup
+								Javascript files in one folder and style sheets in other folder, but there's no rules about it. In the <span>HelloCargo</span>								
+								directory create a new file named <span>index.html</span>. Each application must have an <span>index</span> file
+								at it top level directory. The <span>index</span> file has tow part, the header and the body.</br> Let's get a look of
+								it:
+								<pre>
+								<code class="xml hljs">
+
+<span class="hljs-meta">&lt;!DOCTYPE html&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">"en"</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">http-equiv</span>=<span class="hljs-string">"x-ua-compatible"</span><span class="hljs-attr"> content</span>=<span class="hljs-string">"IE=edge"</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">"UTF-8"</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>HelloCargo<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+								</code>
+								</pre>
 							</p>
 						</div>
 					</div>

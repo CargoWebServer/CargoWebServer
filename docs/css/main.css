@@ -88,22 +88,28 @@ h5{
 
 
 
-#generalFileStructure{
+.fileStructure{
 	padding: 5px;
 }
 
-#generalFileStructure div{
+.fileStructure div{
 	padding-left: 15px;
 }
 
-#generalFileStructure i{
+.fileStructure i{
 	margin-right: 5px;
 }
 
-#generalFileStructure a{
+.fileStructure a{
 	text-decoration: none;
 }
 
-#generalFileStructureDiv span{
+.fileStructure span{
 	font-style: italic;
 }
+
+#FileStructureDiv, #HelloCargoDiv span{
+	font-style: italic;
+}
+
+#HelloCargoDiv xmp {white-space: pre-wrap }
