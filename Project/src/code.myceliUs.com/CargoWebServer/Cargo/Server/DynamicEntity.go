@@ -291,7 +291,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 				// Determine if the object is a reference.
 				// Array's...
 				if strings.HasPrefix(fieldType, "[]") {
-					if strings.HasPrefix(fieldType, "[]xs.") || fieldName == "M_listOf" {
+					if strings.HasPrefix(fieldType, "[]xs.") || strings.HasPrefix(fieldType, "[]sqltypes.") || fieldName == "M_listOf" {
 						values := make([]interface{}, 0)
 						err := json.Unmarshal([]byte(results[0][i].(string)), &values)
 						if err != nil {
@@ -385,7 +385,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 						}
 					}
 				} else {
-					if strings.HasPrefix(fieldType, "[]xs.") || fieldName == "M_valueOf" {
+					if strings.HasPrefix(fieldType, "xs.") || strings.HasPrefix(fieldType, "sqltypes.") || fieldName == "M_valueOf" {
 						this.object[fieldName] = results[0][i]
 					} else {
 						// Not an array here.
@@ -405,7 +405,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 										dynamicEntity.AppendReferenced(fieldName, this)
 										this.AppendChild(fieldName, dynamicEntity)
 									} else {
-										typeName := strings.Replace(strings.Replace(fieldType, ":Ref", "", -1), "[]", "", -1)
+										typeName := strings.Replace(fieldType, ":Ref", "", -1)
 										values := make(map[string]interface{}, 0)
 										values["UUID"] = uuid
 										values["TYPENAME"] = typeName
@@ -1110,15 +1110,6 @@ func (this *DynamicEntity) SetChildsPtr(childsPtr []Entity) {
  * Append a child...
  */
 func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error {
-
-	// I will retreive the entity prototype retreive the attribute information.
-	/*
-		typeName := this.uuid[0:strings.Index(this.uuid, "%")]
-
-		var query EntityQuery
-		query.TypeName = typeName
-	*/
-	// Here I will append the rest of the fields...
 
 	// Set or reset the child ptr.
 	child.SetParentPtr(this)

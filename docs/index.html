@@ -305,7 +305,7 @@
 								at it top level directory. The <span>index</span> file has tow part, the header and the body.</br> Let's get a look
 								of it:
 								<pre>
-								<code class="xml hljs">
+									<code class="xml hljs">
 <span class="hljs-meta">&lt;!DOCTYPE html&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
 	<span class="hljs-tag">&lt;<span class="hljs-name">head</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">"en"</span>&gt;</span>
@@ -354,10 +354,10 @@
 	<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
 								</code>
-								</pre> The first tow <span>meta</span> elements defines how the content of the application must be interpreted
-								by the browser. The title element must contain your application name. Other lines of the header contains various
-								stylesheets and script files to be imported. Those files are needed by all applications in order to work. In the
-								body element I import specif application files, in your case only the main file are import.
+								</pre> The first tow <span>meta</span> elements defines how the content of the application must be interpreted by
+								the browser. The title element must contain your application name. Other lines of the header contains various stylesheets
+								and script files to be imported. Those files are needed by all applications in order to work. In the body element
+								I import specif application files, in your case only the main file are import.
 							</p>
 							<p>
 								Every C++ or Java programmer know the main function. In those language it represent the entry point of all program. JavaScript
@@ -367,7 +367,7 @@
 								<scan>main.js</scan> file.
 							</p>
 							<pre>
-							<code class="javascript">
+								<code class="javascript">
 var applicationName = document.getElementsByTagName("title")[0].text
 
 var server = new Server("localhost", "127.0.0.1", 9393)
@@ -444,7 +444,7 @@ function main() {
 							</code>
 							</pre>
 							<pre>
-							<code class="css hljs">
+								<code class="css hljs">
 #panel{
     display: table;
     margin: 10px;
@@ -457,8 +457,8 @@ function main() {
     padding: 2px;
 }
 							</code>
-							</pre> Dont worry if you can't understand all at once, the point here is to get a idea of what is Cargo. As
-							you see there is no trace of http, in fact there no trace of protocol at all, the only thing we know is the <span>server</span>							object. Essentially we define a JavaScript function named <span>SayHello</span> and ask the <span>server</span> to
+							</pre> Dont worry if you can't understand all at once, the point here is to get a idea of what is Cargo. As you see
+							there is no trace of http, in fact there no trace of protocol at all, the only thing we know is the <span>server</span>							object. Essentially we define a JavaScript function named <span>SayHello</span> and ask the <span>server</span> to
 							run it and return the result. The rest of the code was to create the user interface.
 						</div>
 					</div>
@@ -682,51 +682,80 @@ function main() {
 					<h2>Introduction</h2>
 					<h4>Programming background</h4>
 					<p>
-						In order to take advantage of a framework it's important to know what it philosophy is. There a lot of choice out there
-						and find the good tool that meet your needs can be confusing. Chosing a framework simply because it's the flavor of
-						the day whiout knowing to much about it is a risky buisness. Extensibility, simplicity, efficiency, flexibility 
-						are overused word's these day's. So let's put all of this in perspective and find out if Cargo is the good tool for you.
+						In order to take advantage of a framework it's important to know what it philosophy is. There a lot of choice out there and
+						find the good tool that meet your needs can be confusing. Chosing a framework simply because it's the flavor of the
+						day whiout knowing to much about it is a risky buisness. Extensibility, simplicity, efficiency, flexibility are overused
+						word's these day's. So let's put all of this in perspective and find out if Cargo is the good tool for you.
 					</p>
 					<p>
-						First of all simplicity. I came from object oriented programming. The first programming language I learn was C++, and later Java. 
-						Far from being perfect, those languages have the advantage to impose structure at there core. There goal is to protect the integrity 
-						of the system. In a language like JavaScript structures are more a matter of desing, but trust me without structures, simplicity give 
-						place to complexity. OOP it's a good starting point for using Cargo, but it's not the destination...
+						First of all simplicity. My background is OOP the first programming language I learn was C++, and later
+						Java. Far from being perfect, those languages have the advantage to impose structure at there core. There goal is to
+						protect the integrity of the system. In a language like JavaScript structures are more a matter of desing, but trust
+						me without structures, simplicity give place to complexity. OOP it's a good starting point for using Cargo, but it's
+						not the destination...
 					</p>
 					<p>
-						If is easy to switch from C++ to Java, thing became more complicated when you switch to JavaScript. Because JavaScript is
+						If is easy to switch from C++ to Java, thing get more complicated when you switch to JavaScript. Because JavaScript is
 						not a pure OOP, thinking purely in OOP result in ugly code. I like to thing OOP language as lego block and functional
 						language as playdough. My goal here is not to teach you JavaScript, but to encourage you to take advantage of the flexibility
 						of this language without give up all good habit learn from OOP.
 					</p>
 					<p>
-						If you came from C++, Java, Objective-C or any other desktop application programming language you will enjoy working
-						with Cargo.
+						If you came from C++, Java, Objective-C or any other desktop application programming language you will enjoy working with
+						Cargo.
 					</p>
 					<h4>Philosophy</h4>
 					<p>
-						In tow words <span>non-intrusive</span>. Cargo dosen't impose you any rules. The role of Cargo is give you access
-						to server functionalies via the server object. Simplicity here is achieve by making abstraction of the network. 
-						We also create some helper class to simplify the use of HTML and SVG element. In order to keep thing simple, we keep external 
-						dependencies at mimimum. You can use tool like jQuery, Bootstrap or Angular but those libraries are not part of the framework.
-						We will see later how to achieve extensibity whit Cargo.
+						In tow words <span>non-intrusive</span>. Cargo dosen't impose you any rules. The role of Cargo is give you access to
+						server functionalies via the server object. Simplicity here is achieve by making abstraction of the network. We also
+						create some helper class to simplify the use of HTML and SVG element. In order to keep thing simple, we keep external
+						dependencies at mimimum. You can use tool like jQuery, Bootstrap or Angular but those libraries are not part of the
+						framework. We will see later how to achieve extensibity whit Cargo.
 					</p>
 				</div>
 				<div class="col-xs-12">
 					<h2>Achitecture</h2>
-					<h4>From DOM to SOM...</h4>
+					<h4>From desktop application to web application</h4>
 					<p>
-					Suppose you want to create a desktop application written in JavaScript. Because JavaScript is support in almost all browsers,
-					there's a good chance you make use of HTML and CSS to create the user interface. The document object model was created to 
-					link JavaScript with those other languages. With emergin of HTML5 more and more functionnalities becames available. It's now
-					possible to read multimedia content, working with local file, drawing shapes etc.
-					
-					// Draft... not easy...
-					Suppose your application need to access files from the server. Supposse your application need to access ressources like users, files, sessions, permissions... 
-					Starting from a javaScript desktop application, we now have a javaScript web application. But the focus 
-					is the same, it's a client application that make use of services. 
+						Application programming in Java, C++ or objective-C fowllow the same principles. Framework in these languages offer basicaly
+						the same kind of functionalities like database access, interface design tools, openGL api... They are composed of various libraries
+						that exetend functionalities of the language and facilitate the development of application. Swing in Java, Cacao in Objective-c, 
+						MFC and Qt in C++ are good example of desktop application framework. If we think HTML5 as a JavaScript framework we can see some similarities
+						with these frameworks. Each new functionnality added in HTML5 address a need of application programming. With all these
+						new functionalities we can now considere JavaScript/HTML5 as a desktop application framework.
 					</p>
-					
+					<p>
+						There's no formal definition of what is a <span>web</web> application. For the sake of clarity, let's define web application as 
+						distibuted application. The major difference between a desktop application and a web application is the model of execution. Desktop
+						application run on single computer, and distributed application on a network. In those applications, functionalities are access with use 
+						of libraries. The communication with the framework and the application are made via object instances or function call. Instead of libraries, 
+						distributed application made use of services, and call to function are made via RPC or reference to distributed object.
+					</p>
+					<p>
+						Services offer by Cargo are, objects persitence, sessions management, events management (channels, listener), ressource management (files, user, group, role, action...),
+						data access (SQL, Key/Value), authentication (LDAP). Because Cargo take care of all the burden of distributed aspects of your 
+						application, developping web application with it isn't more difficult than developping desktop application.
+					</p>
+					<h4>The big picture</h4>
+					<p>
+						Cargo simplify web application programming by exposing distant services as local objects. Just like you use <code>document</code> object to intereact with
+						HTML elements, you use <code>server</code> object to interact with the backend. The only difference is the communication model. Local object methods call are 
+						synchronous and distant object method call are asynchronous. To work around it and simplify the code, we made use of callback's functions. The 
+						three callbacks functions are, success, error and transfer. They represent the state of the action call on the backend. In backround, when a method on
+						server object is invoke, a request to the backend is send. The request is process by the backend and a response message is sent back to client. Depending of
+						the response type, the appropriate callback function is call.
+					</p>
+					<p>
+						Distributed system based from OOP made use of interface definition language IDL to describe component's application programming interface. With Cargo, in place of 
+						IDL, we made use of JavaScript. Because Cargo backend can interpret JavaScript and because all of it's functionalities are interface with JavaScript, you can ask Cargo to do
+						all you want. Following the the open closed principle, you can exetend the server functionalities from the client side without modifying it's code.
+					</p>
+					<h4>Event model</h4>
+					<p>
+						An event in Cargo is a simple data structure that contain a channel id {string}, a code number {int}, and a data map {string:json}. Event can be
+						create by application and can be broadcast locally or remotely. All event are create equal, so event from the server or application are threated the same
+						way. 
+					</p>
 				</div>
 			</div>
 		</div>

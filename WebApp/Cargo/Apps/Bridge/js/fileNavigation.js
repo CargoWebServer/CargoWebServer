@@ -164,7 +164,7 @@ FileNavigator.prototype.appendFile = function (file) {
             return function () {
                 // Send event localy...
                 var evt = { "code": CloseEntityEvent, "name": FileEvent, "dataMap": { "fileId": file.M_id } }
-                server.eventHandler.BroadcastEvent(evt)
+                server.eventHandler.broadcastLocalEvent(evt)
             }
         } (file)
     }
@@ -203,7 +203,7 @@ FileNavigator.prototype.setActiveTab = function (fileId) {
         } else {
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": this.activeFile } }
         }
-        server.eventHandler.BroadcastEvent(evt)
+        server.eventHandler.broadcastLocalEvent(evt)
 
         if (this.toSaves[fileId] != undefined) {
             this.saveBtn.element.title = "save " + this.files[fileId].M_name

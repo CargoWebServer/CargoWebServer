@@ -204,7 +204,7 @@ Server.prototype.handleMessage = function (conn, data) {
         // event
         //console.log("Event received.");
         var evt = new EventMsg(msg.evt.id, conn, msg.evt.name, msg.evt.code, msg.evt.evtData, null, null, null)
-        this.eventHandler.BroadcastEvent(evt)
+        this.eventHandler.broadcastLocalEvent(evt)
     }
     // This is a transfer message use whit chunk message.
     else if (msg.type === 4) {

@@ -709,18 +709,21 @@ func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, s
 		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Datastore '"+storeId+"' dosen't exist."))
 		return nil, cargoError
 	}
-
-	dataStore := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
+	var dataStore DataStore
+	dataStore = GetServer().GetDataManager().getDataStore(storeId)
+	if reflect.TypeOf(dataStore).String() == "*Server.SqlDataStore" {
+		dataStore = GetServer().GetDataManager().getDataStore("sql_info")
+	}
 
 	if len(queryStr) == 0 {
-		values, err := dataStore.getIndexation(typeName)
+		values, err := dataStore.(*KeyValueDataStore).getIndexation(typeName)
 		if err != nil {
 			return entities, NewError(Utility.FileLine(), DATASTORE_INDEXATION_ERROR, SERVER_ERROR_CODE, errors.New("No indexation for type '"+typeName+"'."))
 		}
 
 		for i := 0; i < len(values); i++ {
 			key := values[i].(string)
-			values_, err := dataStore.getValues(key)
+			values_, err := dataStore.(*KeyValueDataStore).getValues(key)
 			if err != nil {
 				return entities, NewError(Utility.FileLine(), DATASTORE_KEY_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("No value found for key '"+key+"'."))
 			}

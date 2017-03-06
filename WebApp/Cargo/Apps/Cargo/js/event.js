@@ -182,7 +182,7 @@ var EventChannel = function (id) {
 * @stability 1
 * @public true
 */
-EventChannel.prototype.BroadcastEvent = function (evt) {
+EventChannel.prototype.broadcastEvent = function (evt) {
     for (var l in this.listeners) {
         var listener = this.listeners[l]
         listener.onEvent(evt)
@@ -213,7 +213,7 @@ var EventHandler = function () {
 * @stability 1
 * @public true
 */
-EventHandler.prototype.AddEventManager = function (listener, callback) {
+EventHandler.prototype.addEventManager = function (listener, callback) {
     /* Add it to the local event listener **/
     if (this.channels[listener.channelId] == undefined) {
         this.channels[listener.channelId] = new EventChannel(listener.channelId)
@@ -248,7 +248,7 @@ EventHandler.prototype.AddEventManager = function (listener, callback) {
 * @param listener The listener to remove.
 * @param callback The function to call when an event happen.
 */
-EventHandler.prototype.RemoveEventManager = function (listener, callback) {
+EventHandler.prototype.removeEventManager = function (listener, callback) {
     /* Delete the local listener **/
     if (this.channels[listener.channelId] != undefined) {
         if (this.channels[listener.channelId].listeners[listener.id] != undefined) {
@@ -319,23 +319,23 @@ EventHandler.prototype.appendEventFilter = function (filter, channelId, successC
 /**
 * Broadcast an event localy over a given channel
 * var evt = {"code":OpenEntityEvent, "channelId":FileEvent, "dataMap":{"fileInfo": file}}
-* server.eventHandler.BroadcastEvent(evt)
+* server.eventHandler.broadcastLocalEvent(evt)
 * @param evt The event to broadcast locally
 * @stability 1
 * @public true
 */
-EventHandler.prototype.BroadcastEvent = function (evt) {
+EventHandler.prototype.broadcastLocalEvent = function (evt) {
     var channel = this.channels[evt.name]
     if (channel != undefined) {
 
-        channel.BroadcastEvent(evt)
+        channel.broadcastEvent(evt)
     }
 }
 
 /*
 * Server side script
 */
-function BroadcastEventData(evtNumber, eventName, eventDatas) {
+function BroadcastNetworkEvent(evtNumber, eventName, eventDatas) {
     // Call the method.
     server.GetEventManager().BroadcastEventData(evtNumber, eventName, eventDatas, messageId, sessionId)
 }
@@ -347,9 +347,9 @@ function BroadcastEventData(evtNumber, eventName, eventDatas) {
 * @param {MessageData} eventDatas An array of Message Data structures.
 * Here is an example To send a file open event over the network.
 * var entityInfo = {"TYPENAME":"Server.MessageData", "Name":"entityInfo", "Value":file.stringify()}
-* server.eventHandler.broadcastEventData(OpenEntityEvent, EntityEvent, [entityInfo], function(){}, function(){}, undefined) 
+* server.eventHandler.broadcastNetworkEvent(OpenEntityEvent, EntityEvent, [entityInfo], function(){}, function(){}, undefined) 
 */
-EventHandler.prototype.broadcastEventData = function (evtNumber, evtName, eventDatas, successCallback, errorCallback, caller) {
+EventHandler.prototype.broadcastNetworkEvent = function (evtNumber, evtName, eventDatas, successCallback, errorCallback, caller) {
 
     // server is the client side singleton.
     var params = []
@@ -359,7 +359,7 @@ EventHandler.prototype.broadcastEventData = function (evtNumber, evtName, eventD
 
     // Call it on the server.
     server.executeJsFunction(
-        BroadcastEventData.toString(), // The function to execute remotely on server
+        BroadcastNetworkEvent.toString(), // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

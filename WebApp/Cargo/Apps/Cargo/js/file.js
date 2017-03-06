@@ -42,7 +42,7 @@ FileManager.prototype.constructor = FileManager;
 
 FileManager.prototype.RegisterListener = function () {
     // Append to the event handler.
-    server.eventHandler.AddEventManager(this,
+    server.eventHandler.addEventManager(this,
         // callback
         function () {
             console.log("Listener registered!!!!")
@@ -302,7 +302,7 @@ FileManager.prototype.openFile = function (fileId, progressCallback, successCall
             server.entityManager.setEntity(file)
             caller.successCallback(file, caller.caller)
             var evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
-            server.eventHandler.BroadcastEvent(evt)
+            server.eventHandler.broadcastLocalEvent(evt)
         },
         function (errMsg, caller) {
             // display the message in the console.

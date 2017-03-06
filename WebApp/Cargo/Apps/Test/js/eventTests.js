@@ -83,7 +83,7 @@ function events_EventChannel_broadcastEvent_test() {
     var eventManagerEventsGroup = "TestEvent"
     var myEventManager_broadcastEvent = new EventManager(eventManagerEventsGroup)
 
-    server.eventHandler.AddEventManager(
+    server.eventHandler.addEventManager(
         myEventManager_broadcastEvent,
         function () {
             server.eventHandler.appendEventFilter(

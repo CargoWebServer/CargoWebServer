@@ -65,7 +65,7 @@ var QueryEditor = function (parent, file, initCallback) {
                 var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileId } }
                 var file = server.entityManager.entities[fileUUID]
                 file.M_data = encode64(editor.getSession().getValue())
-                server.eventHandler.BroadcastEvent(evt)
+                server.eventHandler.broadcastLocalEvent(evt)
             }
         } (file.M_id, file.UUID, this.editor));
     } else if (this.isEql) {

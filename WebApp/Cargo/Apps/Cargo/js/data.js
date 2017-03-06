@@ -52,7 +52,7 @@ DataManager.prototype.onEvent = function (evt) {
 
 DataManager.prototype.RegisterListener = function () {
     // Append to the event handler.
-    server.eventHandler.AddEventManager(this,
+    server.eventHandler.addEventManager(this,
         // callback
         function () {
             console.log("Listener registered!!!!")

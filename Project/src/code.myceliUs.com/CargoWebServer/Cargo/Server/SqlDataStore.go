@@ -219,14 +219,15 @@ func (this *SqlDataStore) Connect() error {
 		} else if this.m_textEncoding == Config.Encoding_KOI8U {
 			connectionString += "charset=KOI8U;"
 		}
-
 		driver = "odbc"
 	}
 
 	this.m_db, err = sql.Open(driver, connectionString)
 
 	// Update sql_info information about the content of this store.
-	//this.synchronize()
+	if err == nil {
+		this.synchronize()
+	}
 
 	return err
 }
@@ -1160,11 +1161,9 @@ func (this *SqlDataStore) setRefs() error {
 
 			// Source
 			sourceTableName := values[i][2].(string)
-			sourceFieldName := values[i][3].(string)
 
 			// Target.
 			targetTableName := values[i][4].(string)
-			//targetFieldName := values[i][5].(string)
 
 			src, err := GetServer().GetEntityManager().getEntityPrototype(this.m_id+"."+schemasName+sourceTableName, "sql_info")
 			if err != nil {
@@ -1178,8 +1177,27 @@ func (this *SqlDataStore) setRefs() error {
 				return err
 			}
 
+			// Test if source field and target field are id's
+			sourceField_isId := Utility.Contains(src.Ids, "M_"+values[i][3].(string))
+			targetField_isId := Utility.Contains(trg.Ids, "M_"+values[i][5].(string))
+
 			// I will append the field if is not already there.
 			if !isAssociative(src) {
+				// Now the sources.
+				if !Utility.Contains(src.Fields, "M_"+refName) {
+
+					// Now the rule to determine the cardinality.
+					var fieldType string
+					fieldType = this.m_id + "." + schemasName + targetTableName + ":Ref"
+
+					if !targetField_isId {
+						// one to one relationship in that case.
+						fieldType = "[]" + fieldType
+					}
+
+					appendField(src, "M_"+refName, fieldType)
+				}
+
 				if !Utility.Contains(trg.Fields, "M_"+refName) {
 					// Now the rule to determine the cardinality.
 					var fieldType string
@@ -1189,26 +1207,15 @@ func (this *SqlDataStore) setRefs() error {
 						fieldType = fieldType + ":Ref"
 					}
 
-					if len(src.Ids) != len(trg.Ids) {
+					if !sourceField_isId {
+
 						// one to one relationship in that case.
 						fieldType = "[]" + fieldType
 					}
+
 					appendField(trg, "M_"+refName, fieldType)
 				}
 
-				// Now the sources.
-				if !Utility.Contains(src.Fields, "M_"+refName) {
-
-					// Now the rule to determine the cardinality.
-					var fieldType string
-					fieldType = this.m_id + "." + schemasName + targetTableName + ":Ref"
-
-					if !Utility.Contains(src.Ids, "M_"+sourceFieldName) {
-						// one to one relationship in that case.
-						fieldType = "[]" + fieldType
-					}
-					appendField(src, "M_"+refName, fieldType)
-				}
 			} else {
 				associativeTables[src.TypeName] = src
 				associations[src.TypeName] = append(associations[src.TypeName], make([]interface{}, 2))
@@ -1320,8 +1327,6 @@ func (this *SqlDataStore) synchronize() error {
 					}
 				}
 				query += " FROM " + prototypes[i].TypeName
-
-				log.Println(query)
 				var params []interface{}
 
 				// Execute the query...
@@ -1329,7 +1334,7 @@ func (this *SqlDataStore) synchronize() error {
 				if err != nil {
 					return err
 				}
-				//log.Println("-------> results ", len(values))
+
 				// Now I will generate a unique key for the retreive information.
 				for j := 0; j < len(values); j++ {
 					log.Println(prototypes[i].TypeName, j, ":", len(values))
@@ -1383,6 +1388,9 @@ func (this *SqlDataStore) synchronize() error {
 		}
 	}
 
+	// Keep entities before save...
+	toSave := make([]Entity, 0)
+
 	// Now I will set the entity reliationships
 	for i := 0; i < len(prototypes); i++ {
 		if !isAssociative(prototypes[i]) { // Associative table object are not needed...
@@ -1398,11 +1406,9 @@ func (this *SqlDataStore) synchronize() error {
 							entity := entities[k]
 							if !strings.HasSuffix(prototypes[i].FieldsType[j], ":Ref") {
 								// This is an aggregation releationship.
-								//log.Println("=------> set ", prototypes[i].Fields[j], ":", fieldType, "is Array", isArray)
 								refInfos, err := this.getRefInfos(prototypes[i].Fields[j][2:])
 								if err == nil {
 									id := entity.GetObject().(map[string]interface{})["M_"+refInfos[3]]
-									//log.Println("=------> ", "M_"+refInfos[3], ":", id, ":", entity.GetObject())
 									var strId string
 									if reflect.TypeOf(id).Kind() == reflect.String {
 										strId = "'" + id.(string) + "'"
@@ -1426,7 +1432,6 @@ func (this *SqlDataStore) synchronize() error {
 									values, err := this.Read(query, fieldsType, params)
 									if err == nil {
 										for n := 0; n < len(values); n++ {
-
 											var childTypeName string
 											if this.m_vendor == Config.DataStoreVendor_ODBC {
 												childTypeName = this.m_id + "." + refInfos[4] + "." + refInfos[0]
@@ -1455,11 +1460,11 @@ func (this *SqlDataStore) synchronize() error {
 											if errObj == nil {
 												log.Println("-------> child uuid ", childEntity.GetUuid(), " found!!!!")
 												entity.AppendChild(prototypes[i].Fields[j], childEntity)
+												entity.SetNeedSave(true)
+												toSave = append(toSave, entity)
 											} else {
 												log.Println("-------> child uuid ", childUuid, " not found!!!!")
 											}
-											// Save the entity
-											entity.SaveEntity()
 										}
 									}
 								}
@@ -1473,5 +1478,10 @@ func (this *SqlDataStore) synchronize() error {
 		}
 	}
 
+	for i := 0; i < len(toSave); i++ {
+		toSave[i].SaveEntity()
+	}
+
+	log.Println("------------> end of sync!")
 	return err
 }

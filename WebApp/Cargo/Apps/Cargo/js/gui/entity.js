@@ -608,7 +608,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 	}
 
 	// If the value is simple string...
-	if (!isArray && (fieldType.startsWith("xs.") || fieldType.startsWith("enum:"))) {
+	if (!isArray && (fieldType.startsWith("sqltypes.") || fieldType.startsWith("xs.") || fieldType.startsWith("enum:"))) {
 		// in case of an enum
 		if (fieldType.startsWith("enum:")) {
 			var values = fieldType.replace("enum:", "").split(":")
@@ -648,7 +648,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 					tableModel.editable[1] = true
 
 					var baseType = fieldType
-					if (!baseType.startsWith('xs.')) {
+					if (!baseType.startsWith('xs.') && !baseType.startsWith('sqltypes.')) {
 						baseType = server.entityManager.getBaseTypeExtension(fieldType)
 					}
 

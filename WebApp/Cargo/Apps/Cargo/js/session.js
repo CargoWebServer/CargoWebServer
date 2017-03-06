@@ -57,7 +57,7 @@ SessionManager.prototype.onEvent = function (evt) {
 
 SessionManager.prototype.RegisterListener = function () {
     // Append to the event handler.
-    server.eventHandler.AddEventManager(this,
+    server.eventHandler.addEventManager(this,
         // callback
         function () {
             console.log("Session manager is registered")

@@ -91,7 +91,7 @@ EntityManager.prototype.onEvent = function (evt) {
 
 EntityManager.prototype.RegisterListener = function () {
     // Append to the event handler.
-    server.eventHandler.AddEventManager(this,
+    server.eventHandler.addEventManager(this,
         // callback
         function () {
             console.log("Entity manager is registered!")
@@ -1499,7 +1499,7 @@ function setObjectValues(object, values) {
         var field = prototype.Fields[i]
         if (field.startsWith("M_") || field.startsWith("[]M_")) {
             // Reset the objet fields.
-            if (!fieldType.startsWith("xs.") && !fieldType.startsWith("[]xs.")) {
+            if (!fieldType.startsWith("sqltypes.") && !fieldType.startsWith("[]sqltypes.") && !fieldType.startsWith("xs.") && !fieldType.startsWith("[]xs.")) {
                 if (fieldType.startsWith("[]")) {
                     object[field] = []
                 } else {
@@ -1507,9 +1507,9 @@ function setObjectValues(object, values) {
                 }
             } else {
                 // Reset the base type fields.
-                if (fieldType.startsWith("[]xs.")) {
+                if (fieldType.startsWith("[]xs.") || fieldType.startsWith("[]sqltypes.")) {
                     object[field] = []
-                } else if (fieldType.startsWith("xs.")) {
+                } else if (fieldType.startsWith("xs.") || fieldType.startsWith("sqltypes.")) {
                     object[field] = ""
                 }
             }
@@ -1527,7 +1527,7 @@ function setObjectValues(object, values) {
             var isRef = propertyType.endsWith(":Ref")
 
             // M_listOf, M_valueOf field or enumeration type contain plain value.
-            var isBaseType = propertyType.startsWith("[]xs.") || propertyType.startsWith("xs.") || property == "M_listOf" || property == "M_valueOf" || propertyType.startsWith("enum:")
+            var isBaseType = propertyType.startsWith("sqltypes.") && !propertyType.startsWith("[]sqltypes.") || propertyType.startsWith("[]xs.") || propertyType.startsWith("xs.") || property == "M_listOf" || property == "M_valueOf" || propertyType.startsWith("enum:")
 
             if (values[property] != null) {
                 if (isBaseType) {

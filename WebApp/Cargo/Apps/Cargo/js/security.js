@@ -49,7 +49,7 @@ SecurityManager.prototype.onEvent = function (evt) {
 
 SecurityManager.prototype.RegisterListener = function () {
     // Append to the event handler.
-    server.eventHandler.AddEventManager(this,
+    server.eventHandler.addEventManager(this,
         // callback
         function () {
             console.log("Security manager is registered")

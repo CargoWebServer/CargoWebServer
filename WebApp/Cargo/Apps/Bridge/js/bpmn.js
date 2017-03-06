@@ -131,7 +131,7 @@ BpmnExplorer.prototype.appendDefinitions = function (definitions) {
             return function () {
                 // Here I will create an open file event...
                 var evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "bpmnDiagramInfo": bpmnDiagram } }
-                server.eventHandler.BroadcastEvent(evt)
+                server.eventHandler.broadcastLocalEvent(evt)
             }
         } (definitions.M_BPMNDiagram[i])
     }
