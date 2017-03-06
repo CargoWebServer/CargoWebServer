@@ -682,49 +682,48 @@ function main() {
 					<h2>Introduction</h2>
 					<h4>Programming background</h4>
 					<p>
-						In order to take advantage of a framework it's important to know what's it philosophy is. There a lot of choice out there
+						In order to take advantage of a framework it's important to know what it philosophy is. There a lot of choice out there
 						and find the good tool that meet your needs can be confusing. Chosing a framework simply because it's the flavor of
-						the day whiout knowing to much about it it's a risky buisness. Extensibility, simplicity, efficiency, flexibility,
-						dependency are overused word's these day's and some of them ar mutually opposed. So let's put all of this in perspective
-						and find out if Cargo is the good tool for you.
+						the day whiout knowing to much about it is a risky buisness. Extensibility, simplicity, efficiency, flexibility 
+						are overused word's these day's. So let's put all of this in perspective and find out if Cargo is the good tool for you.
 					</p>
 					<p>
-						First of all simplicity. What is simple for one can be complex for another... I came from object oriented programming. The
-						first programming language I learn was C++, and later Java. Far from being perfect, those languages have the advantage
-						to impose structure at there core. There goal is to protect the integrity of the system. In a language like JavaScript
-						structures are more a matter of desing, but trust me without structure, simplicity give place to complexity. OOP it's
-						a good starting point for using Cargo, but it's not the destination...
+						First of all simplicity. I came from object oriented programming. The first programming language I learn was C++, and later Java. 
+						Far from being perfect, those languages have the advantage to impose structure at there core. There goal is to protect the integrity 
+						of the system. In a language like JavaScript structures are more a matter of desing, but trust me without structures, simplicity give 
+						place to complexity. OOP it's a good starting point for using Cargo, but it's not the destination...
 					</p>
 					<p>
 						If is easy to switch from C++ to Java, thing became more complicated when you switch to JavaScript. Because JavaScript is
 						not a pure OOP, thinking purely in OOP result in ugly code. I like to thing OOP language as lego block and functional
 						language as playdough. My goal here is not to teach you JavaScript, but to encourage you to take advantage of the flexibility
-						of this language whiout lost all your good habit from OOP.
+						of this language without give up all good habit learn from OOP.
 					</p>
 					<p>
-						If you came from C++, Java, Objective-C or any other desktop application programming language I think you will enjoy working
+						If you came from C++, Java, Objective-C or any other desktop application programming language you will enjoy working
 						with Cargo.
 					</p>
 					<h4>Philosophy</h4>
 					<p>
-						In tow words <span>non-intrusive</span>. Cargo does not impose you any rules. The role of Cargo is to give you access
-						to server functionalies via the server object. So simplicity here is achieve by making abstraction of the network or
-						any protocol. We also create some helper class to simplify the work with HTML and SVG element. Minimize dependencies
-						was also one of our goal in order to keep thing simple. You can use tool like jQuery, Bootstrap or Angular to create
-						your application. But those are not part of the framework. We will see later how to achieve extensibity whit Cargo.
-						More you know JavaScript and better you became with Cargo!-)
+						In tow words <span>non-intrusive</span>. Cargo dosen't impose you any rules. The role of Cargo is give you access
+						to server functionalies via the server object. Simplicity here is achieve by making abstraction of the network. 
+						We also create some helper class to simplify the use of HTML and SVG element. In order to keep thing simple, we keep external 
+						dependencies at mimimum. You can use tool like jQuery, Bootstrap or Angular but those libraries are not part of the framework.
+						We will see later how to achieve extensibity whit Cargo.
 					</p>
 				</div>
 				<div class="col-xs-12">
 					<h2>Achitecture</h2>
 					<h4>From DOM to SOM...</h4>
 					<p>
-					Imagine you want to create a desktop application only with the use of javaScript. It's possible, but wath will missing in that case? 
-					You will need a way to create a graphical user interface with controls. To do so there is the document object model, DOM. Maybe you
-					need open files, display multimedia content, HTML5 is there for that. Now you will probably need some way to access files shares on the network, 
-					maybe your program file itself. Maybe you will find usefull to manage ressources like users, files, sessions, permissions... Maybe you will need to save informations 
-					about those user, or get access to existing SQL database data. Maybe you need to reach user by email... What is missing to increase our application 
-					funcitonalities is exacly what SOM is. Starting from a javaScript desktop application, we now have a javaScript web application. But the focus 
+					Suppose you want to create a desktop application written in JavaScript. Because JavaScript is support in almost all browsers,
+					there's a good chance you make use of HTML and CSS to create the user interface. The document object model was created to 
+					link JavaScript with those other languages. With emergin of HTML5 more and more functionnalities becames available. It's now
+					possible to read multimedia content, working with local file, drawing shapes etc.
+					
+					// Draft... not easy...
+					Suppose your application need to access files from the server. Supposse your application need to access ressources like users, files, sessions, permissions... 
+					Starting from a javaScript desktop application, we now have a javaScript web application. But the focus 
 					is the same, it's a client application that make use of services. 
 					</p>
 					
