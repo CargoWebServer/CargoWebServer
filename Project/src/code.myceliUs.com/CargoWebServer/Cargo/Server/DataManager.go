@@ -83,11 +83,11 @@ func (this *DataManager) initialize() {
 
 			this.m_dataStores[store.GetId()] = store
 
-			// Open connection.
-			store.Connect()
-
 			// Call get entity prototype once to initialyse entity prototypes.
 			store.GetEntityPrototypes()
+
+			// Open connection.
+			store.Connect()
 		}
 	}
 	log.Println("--> initialyze DataManager")

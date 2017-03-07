@@ -23,7 +23,7 @@
 /**
  * The datamanager is use to get information from data source like SQL or Cargo object store.
   *@constructor
- * @extends EventManager
+ * @extends EventHub
  */
 var DataManager = function (id) {
 
@@ -35,29 +35,19 @@ var DataManager = function (id) {
         id = randomUUID()
     }
 
-    EventManager.call(this, id, TableEvent)
+    EventHub.call(this, id, TableEvent)
 
     return this
 }
 
-DataManager.prototype = new EventManager(null);
+DataManager.prototype = new EventHub(null);
 DataManager.prototype.constructor = DataManager;
 
 /*
  * Dispatch event.
  */
 DataManager.prototype.onEvent = function (evt) {
-    EventManager.prototype.onEvent.call(this, evt)
-}
-
-DataManager.prototype.RegisterListener = function () {
-    // Append to the event handler.
-    server.eventHandler.addEventManager(this,
-        // callback
-        function () {
-            console.log("Listener registered!!!!")
-        }
-    )
+    EventHub.prototype.onEvent.call(this, evt)
 }
 
 /*

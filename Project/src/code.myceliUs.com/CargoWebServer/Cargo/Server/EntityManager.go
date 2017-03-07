@@ -151,8 +151,10 @@ func (this *EntityManager) contain(uuid string) (Entity, bool) {
  * Otherwise replaces the entity in the map with this entity.
  */
 func (this *EntityManager) insert(entity Entity) {
-	// Set the cache...
-	server.GetCacheManager().setEntity(entity)
+	if entity.GetObject() != nil {
+		// Set the cache...
+		server.GetCacheManager().setEntity(entity)
+	}
 }
 
 /**
@@ -895,6 +897,7 @@ func (this *EntityManager) getDynamicEntityByUuid(uuid string) (Entity, *CargoEn
 		return nil, cargoError
 	}
 
+	log.Println("-------> 900", values)
 	// initialyse the entity.
 	entity.InitEntity(uuid)
 

@@ -91,7 +91,7 @@ func (this *EntityManager) newDynamicEntity(values map[string]interface{}) (*Dyn
 		if val, ok := this.contain(values["UUID"].(string)); ok {
 			if val != nil {
 				entity = val.(*DynamicEntity)
-				// Set it value as needed...
+
 				if Utility.GetChecksum(values) != entity.GetChecksum() {
 					entity.SetObjectValues(values)
 				} else {
@@ -156,28 +156,28 @@ func (this *EntityManager) newDynamicEntity(values map[string]interface{}) (*Dyn
  * Determine is an entity is initialyse or not.
  */
 func (this *DynamicEntity) IsInit() bool {
-	return this.object["IsInit"].(bool)
+	return this.GetObject().(map[string]interface{})["IsInit"].(bool)
 }
 
 /**
  * Set if an entity must be inityalyse.
  */
 func (this *DynamicEntity) SetInit(isInit bool) {
-	this.object["IsInit"] = isInit
+	this.GetObject().(map[string]interface{})["IsInit"] = isInit
 }
 
 /**
  * Test if an entity need to be save.
  */
 func (this *DynamicEntity) NeedSave() bool {
-	return this.object["NeedSave"].(bool)
+	return this.GetObject().(map[string]interface{})["NeedSave"].(bool)
 }
 
 /**
  * Set if an entity need to be save.
  */
 func (this *DynamicEntity) SetNeedSave(needSave bool) {
-	this.object["NeedSave"] = needSave
+	this.GetObject().(map[string]interface{})["NeedSave"] = needSave
 }
 
 /**
@@ -191,7 +191,6 @@ func (this *DynamicEntity) InitEntity(id string) error {
 	err := this.initEntity(id, "")
 	this.lock.Unlock(token)
 	//log.Println("After init:", toJsonStr(this.object))
-
 	return err
 }
 
@@ -467,8 +466,6 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 		this.saveEntity("")
 	}
 
-	//log.Print("-----> ", this.GetObject())
-
 	return nil
 }
 
@@ -523,9 +520,10 @@ func (this *DynamicEntity) saveEntity(path string) {
 
 		// append the field in the query fields list.
 		query.Fields = append(query.Fields, fieldName)
-		//log.Println("--------> save ", fieldName, " whit value ", this.object[fieldName], " field type ", fieldType)
+
 		// Print the field name.
 		if this.object[fieldName] != nil {
+			log.Println("--------> save ", fieldName, " whit value ", this.object[fieldName], " field type ", fieldType)
 			// Array's
 			if strings.HasPrefix(fieldType, "[]") {
 				if strings.HasPrefix(fieldType, "[]xs.") || strings.HasPrefix(fieldType, "[]sqltypes.") || fieldName == "M_listOf" {
@@ -1110,7 +1108,7 @@ func (this *DynamicEntity) SetChildsPtr(childsPtr []Entity) {
  * Append a child...
  */
 func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error {
-
+	//log.Println("--------> append child: ", this.uuid, ":", attributeName, child.GetUuid())
 	// Set or reset the child ptr.
 	child.SetParentPtr(this)
 
@@ -1316,6 +1314,10 @@ func (this *DynamicEntity) RemoveReferenced(name string, owner Entity) {
  * Return the object wrapped by this entity...
  */
 func (this *DynamicEntity) GetObject() interface{} {
+	log.Println("---------> ", this.object["UUID"])
+	token := Utility.NewToken()
+	this.lock.Lock(token)
+	defer this.lock.Unlock(token)
 	return this.object
 }
 
@@ -1323,16 +1325,18 @@ func (this *DynamicEntity) GetObject() interface{} {
  * Return the object wrapped by this entity...
  */
 func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
+	// Here I will clean up field inside the object that are not inside the new
+	// value.
+	token := Utility.NewToken()
+	this.lock.Lock(token)
+	defer this.Unlock()
 
 	// nothing to do if the pointer is nil...
 	if this == nil {
 		return
 	}
 
-	this.Lock()
-	defer this.Unlock()
 	entity, exist := GetServer().GetEntityManager().contain(this.GetUuid())
-
 	if !exist {
 		// If the map is not in the cache I can set the values directly.
 		this.object = values
@@ -1344,8 +1348,6 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 		this.object = entity.GetObject().(map[string]interface{})
 	}
 
-	// Here I will clean up field inside the object that are not inside the new
-	// value.
 	for i := 0; i < len(this.prototype.Fields); i++ {
 		field := this.prototype.Fields[i]
 		fieldType := this.prototype.FieldsType[i]
@@ -1651,9 +1653,10 @@ func (this *DynamicEntity) GetChecksum() string {
  */
 func (this *DynamicEntity) Exist() bool {
 	// if the 'this' pointer is not initialyse it means the entity was deleted.
-	if this == nil {
+	if this == nil || this.object["TYPENAME"] == nil {
 		return false
 	}
+
 	var query EntityQuery
 	query.TypeName = this.GetTypeName()
 	query.Indexs = append(query.Indexs, "uuid="+this.uuid)

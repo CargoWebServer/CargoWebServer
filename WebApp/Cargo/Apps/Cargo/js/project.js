@@ -23,7 +23,7 @@
 /**
  * The project manager is use to manage project.
  * @constructor
- * @extends EventManager
+ * @extends EventHub
  */
 var ProjectManager = function () {
 
@@ -31,7 +31,7 @@ var ProjectManager = function () {
         return
     }
 
-    EventManager.call(this,ProjectEvent)
+    EventHub.call(this,ProjectEvent)
 
     /**
      * @property {object} entityPrototypes Keep track of prototypes in use.
@@ -41,24 +41,14 @@ var ProjectManager = function () {
     return this
 }
 
-ProjectManager.prototype = new EventManager(null);
+ProjectManager.prototype = new EventHub(null);
 ProjectManager.prototype.constructor = ProjectManager;
 
 /*
  * Dispatch event.
  */
 ProjectManager.prototype.onEvent = function (evt) {
-    EventManager.prototype.onEvent.call(this, evt)
-}
-
-ProjectManager.prototype.RegisterListener = function () {
-    // Append to the event handler.
-    server.eventHandler.addEventManager(this,
-        // callback
-        function () {
-            console.log("Entity manager is registered!")
-        }
-    )
+    EventHub.prototype.onEvent.call(this, evt)
 }
 
 /**

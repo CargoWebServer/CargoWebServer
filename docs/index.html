@@ -714,7 +714,7 @@ function main() {
 					</p>
 				</div>
 				<div class="col-xs-12">
-					<h2>Achitecture</h2>
+					<h2>Architecture</h2>
 					<h4>From desktop application to web application</h4>
 					<p>
 						Application programming in Java, C++ or objective-C fowllow the same principles. Framework in these languages offer basicaly
@@ -750,11 +750,26 @@ function main() {
 						IDL, we made use of JavaScript. Because Cargo backend can interpret JavaScript and because all of it's functionalities are interface with JavaScript, you can ask Cargo to do
 						all you want. Following the the open closed principle, you can exetend the server functionalities from the client side without modifying it's code.
 					</p>
-					<h4>Event model</h4>
+					<h4>Event model, don't call us, we'll call you</h4>
 					<p>
-						An event in Cargo is a simple data structure that contain a channel id {string}, a code number {int}, and a data map {string:json}. Event can be
-						create by application and can be broadcast locally or remotely. All event are create equal, so event from the server or application are threated the same
-						way. 
+						Cargo event model are pretty simple and pretty usefull. The desing of the event system follow the publish-subscribe pattern principles. Event can be see as piece
+						of inforamtion travelling through channels. Each channel can carry one type of event and each event can travel throw one channel. Channel are dynamic, when a listener
+						register itself on an event channel, the channel is created, and inversely the channel is close when no more listeners use it. One of the key concept in Cargo event 
+						model is the <code>EventHub</code>. From the point of view of server, who play the role of publisher, the <code>EventHub</code> play the role of subscriber. But from the point 
+						of view of local object, who play the role of subscriber, it play the role of publisher. Just like event channels and events, <code>EventHub</code> are specialize in on type of event. 
+						Class derived from <code>EventHub</code> play the role of event controller in your application. Here we made use of a variation of the observer pattern. If an object want's
+						to be inform of a given event, it define an update function for that particular event and attach itself to the <code>EventHub</code> reponsable of that event.
+						Latter when the object has no more interest to receive event message, he simply detach itself from the <code>EventHub</code>. Because there can be a lot of event travelling the 
+						network, we create event filters. Event filters are <spab>regex<span> regular expression. By default channel are silent, in order to receive event you must register a regular expression (filter)
+						for a given event type. To get all event of a given type the regex * can be use. By using the event model in your application you decoupling classes and making your
+						code more robust and reusable.
+					</p>
+					<h4>Entity, something that exists as itself</h4>
+					<p>
+						JavaScript Object Notation JSON is the facto information model those days. Shinning by it's simplicity and it's versatility every structures can be serialyse with it.
+						But when you serialyse an instance of a class and instantiate back you end up with a json object and not the initial instance. That represent a problem when it's time
+						to make object persistent. Every data store need schema to represent the informations structures, XML and SQL has it. The goal able to represent informations structures from
+						SQL and XML without lost. 
 					</p>
 				</div>
 			</div>

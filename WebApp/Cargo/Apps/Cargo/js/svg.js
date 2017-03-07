@@ -23,7 +23,7 @@
 
 /**
  * A simple wrapper around SVG element.
- * @extends EventManager
+ * @extends EventHub
  * @param {Element} parent The parent of the svg element.
  * @param {string} id Identifier, must be unique in it context.
  * @param {string} className The syle sheet class name.

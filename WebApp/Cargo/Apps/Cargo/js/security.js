@@ -24,7 +24,7 @@
  * The security manager's role is to manipulate 
  * roles and permissions on entities
  * @constructor
- * @extends EventManager
+ * @extends EventHub
  */
 var SecurityManager = function () {
 
@@ -32,29 +32,19 @@ var SecurityManager = function () {
         return
     }
 
-    EventManager.call(this, SecurityEvent)
+    EventHub.call(this, SecurityEvent)
 
     return this
 }
 
-SecurityManager.prototype = new EventManager(null);
+SecurityManager.prototype = new EventHub(null);
 SecurityManager.prototype.constructor = SecurityManager;
 
 /*
  * Dispatch event.
  */
 SecurityManager.prototype.onEvent = function (evt) {
-    EventManager.prototype.onEvent.call(this, evt)
-}
-
-SecurityManager.prototype.RegisterListener = function () {
-    // Append to the event handler.
-    server.eventHandler.addEventManager(this,
-        // callback
-        function () {
-            console.log("Security manager is registered")
-        }
-    )
+    EventHub.prototype.onEvent.call(this, evt)
 }
 
 /*

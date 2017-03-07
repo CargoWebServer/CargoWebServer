@@ -17,7 +17,7 @@ function events_allTestsAsserted_Test() {
 function events_EventManager_constructor_test() {
     events_nbTests++
     var eventManagerEventsGroup = "TestEvent"
-    var myEventManager = new EventManager(eventManagerEventsGroup)
+    var myEventManager = new EventHub(eventManagerEventsGroup)
 
     QUnit.test("events_EventManager_constructor_test",
         function (assert) {
@@ -31,7 +31,7 @@ function events_EventManager_constructor_test() {
 function events_EventManager_attach_test() {
     events_nbTests++
     var eventManagerEventsGroup = "TestEvent"
-    var myEventManager_attach = new EventManager(eventManagerEventsGroup)
+    var myEventManager_attach = new EventHub(eventManagerEventsGroup)
     var myElement = new Element(
         document.getElementsByTagName("body")[0],
         { "tag": "div" })
@@ -81,7 +81,7 @@ function events_EventManager_detach_test() {
 function events_EventChannel_broadcastEvent_test() {
     events_nbTests++
     var eventManagerEventsGroup = "TestEvent"
-    var myEventManager_broadcastEvent = new EventManager(eventManagerEventsGroup)
+    var myEventManager_broadcastEvent = new EventHub(eventManagerEventsGroup)
 
     server.eventHandler.addEventManager(
         myEventManager_broadcastEvent,

@@ -57,14 +57,14 @@ ProjectEvent = "ProjectEvent"
 EmailEvent = "EmailEvent"
 
 /**
-* EventManager contructor
+* EventHub contructor
 * @constructor
 * @param {string} channelId The id of the channel of events to manage
-* @returns {EventManager}
+* @returns {EventHub}
 * @stability 2
 * @public true
 */
-var EventManager = function (channelId) {
+var EventHub = function (channelId) {
 
     this.id = randomUUID();
 
@@ -76,6 +76,19 @@ var EventManager = function (channelId) {
 }
 
 /**
+ * Register the hub as a listener to a given channel.
+ */
+EventHub.prototype.registerListener = function () {
+    // Append to the event handler
+    server.eventHandler.addEventListener(this,
+        // callback
+        function (listener) {
+            console.log("Listener" + listener.id + "was registered to the channel ", listener.channelId)
+        }
+    )
+}
+
+/**
 * Attach observer to a specific event.
 * @param obeserver The observer to attach.
 * @param eventId The event id.
@@ -83,7 +96,7 @@ var EventManager = function (channelId) {
 * @stability 1
 * @public true
 */
-EventManager.prototype.attach = function (observer, eventId, updateFct) {
+EventHub.prototype.attach = function (observer, eventId, updateFct) {
     observer.observable = this
 
     if (observer.id == undefined) {
@@ -121,7 +134,7 @@ EventManager.prototype.attach = function (observer, eventId, updateFct) {
 * @stability 1
 * @public true
 */
-EventManager.prototype.detach = function (observer, eventId) {
+EventHub.prototype.detach = function (observer, eventId) {
     if (observer.observable != null) {
         observer.observable = null
     }
@@ -141,7 +154,7 @@ EventManager.prototype.detach = function (observer, eventId) {
 * @stability 1
 * @public false
 */
-EventManager.prototype.onEvent = function (evt) {
+EventHub.prototype.onEvent = function (evt) {
     console.log("Event received: ", evt)
     var observers = this.observers[evt.code]
     if (observers != undefined) {
@@ -213,7 +226,7 @@ var EventHandler = function () {
 * @stability 1
 * @public true
 */
-EventHandler.prototype.addEventManager = function (listener, callback) {
+EventHandler.prototype.addEventListener = function (listener, callback) {
     /* Add it to the local event listener **/
     if (this.channels[listener.channelId] == undefined) {
         this.channels[listener.channelId] = new EventChannel(listener.channelId)
@@ -232,14 +245,14 @@ EventHandler.prototype.addEventManager = function (listener, callback) {
         // Progress callback
         function () { },
         // Success callback
-        function () {
+        function (result, listener) {
             // calling success call back function
-            callback();
+            callback(listener);
         },
         // Error callback.
         function () {
 
-        });
+        }, listener);
     rqst.send();
 }
 

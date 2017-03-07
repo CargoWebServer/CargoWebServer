@@ -23,7 +23,7 @@
 /**
  * The email manager can be use to send email or get acces to mailbox.
  * @constructor
- * @extends EventManager
+ * @extends EventHub
  */
 var EmailManager = function (id) {
 
@@ -34,12 +34,12 @@ var EmailManager = function (id) {
         id = randomUUID()
     }
 
-    EventManager.call(this, id, EmailEvent)
+    EventHub.call(this, id, EmailEvent)
 
     return this
 }
 
-EmailManager.prototype = new EventManager(null);
+EmailManager.prototype = new EventHub(null);
 EmailManager.prototype.constructor = EntityManager;
 
 /*
@@ -47,17 +47,7 @@ EmailManager.prototype.constructor = EntityManager;
  */
 EmailManager.prototype.onEvent = function (evt) {
 
-    EventManager.prototype.onEvent.call(this, evt)
-}
-
-EmailManager.prototype.RegisterListener = function () {
-    // Append to the event handler.
-    server.eventHandler.addEventManager(this,
-        // callback
-        function () {
-            console.log("Listener registered!!!!")
-        }
-    )
+    EventHub.prototype.onEvent.call(this, evt)
 }
 
 /**

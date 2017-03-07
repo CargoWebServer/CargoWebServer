@@ -23,7 +23,7 @@
 /**
  * The FileManager contain functionality to work with files.
   *@constructor
- * @extends EventManager
+ * @extends EventHub
  */
 var FileManager = function () {
 
@@ -31,24 +31,13 @@ var FileManager = function () {
         return
     }
 
-    EventManager.call(this, FileEvent)
+    EventHub.call(this, FileEvent)
 
     return this
 }
 
-FileManager.prototype = new EventManager(null);
+FileManager.prototype = new EventHub(null);
 FileManager.prototype.constructor = FileManager;
-
-
-FileManager.prototype.RegisterListener = function () {
-    // Append to the event handler.
-    server.eventHandler.addEventManager(this,
-        // callback
-        function () {
-            console.log("Listener registered!!!!")
-        }
-    )
-}
 
 /*
  * Sever side code.

@@ -64,14 +64,14 @@ function load() {
             server.securityManager = new SecurityManager()
 
             // Register the listener to the server.
-            server.accountManager.RegisterListener()
-            server.sessionManager.RegisterListener()
-            server.fileManager.RegisterListener()
-            server.entityManager.RegisterListener()
-            server.dataManager.RegisterListener()
-            server.emailManager.RegisterListener()
-            server.projectManager.RegisterListener()
-            server.securityManager.RegisterListener()
+            server.accountManager.registerListener()
+            server.sessionManager.registerListener()
+            server.fileManager.registerListener()
+            server.entityManager.registerListener()
+            server.dataManager.registerListener()
+            server.emailManager.registerListener()
+            server.projectManager.registerListener()
+            server.securityManager.registerListener()
 
         },  // onOpen callback
         function () { // onClose callback

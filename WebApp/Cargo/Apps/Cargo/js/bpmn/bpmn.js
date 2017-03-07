@@ -4,7 +4,7 @@ var WorkflowManager = function () {
         return
     }
 
-    EventManager.call(this, BpmnEvent)
+    EventHub.call(this, BpmnEvent)
 
     /*
      * The list of all bpmn element.
@@ -14,23 +14,13 @@ var WorkflowManager = function () {
     return this
 }
 
-WorkflowManager.prototype = new EventManager(null)
+WorkflowManager.prototype = new EventHub(null)
 WorkflowManager.prototype.constructor = WorkflowManager
-
-WorkflowManager.prototype.RegisterListener = function () {
-    // Append to the event handler...
-    server.eventHandler.addEventManager(this,
-        // callback
-        function () {
-            console.log("Listener registered!!!!")
-        }
-    )
-}
 
 /* The event handling **/
 WorkflowManager.prototype.onEvent = function (evt) {
 
-    EventManager.prototype.onEvent.call(this, evt)
+    EventHub.prototype.onEvent.call(this, evt)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

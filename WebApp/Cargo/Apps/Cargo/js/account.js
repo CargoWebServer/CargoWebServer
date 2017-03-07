@@ -24,7 +24,7 @@
 /**
  * The AccountManager is used to get information about user accounts.
   *@constructor
- * @extends EventManager
+ * @extends EventHub
  */
 var AccountManager = function () {
 
@@ -34,12 +34,12 @@ var AccountManager = function () {
         return
     }
 
-    EventManager.call(this, AccountEvent)
+    EventHub.call(this, AccountEvent)
 
     return this
 }
 
-AccountManager.prototype = new EventManager(null);
+AccountManager.prototype = new EventHub(null);
 AccountManager.prototype.constructor = AccountManager;
 
 /*
@@ -51,17 +51,7 @@ AccountManager.prototype.onEvent = function (evt) {
     } else if (evt.code == ContactInvitationReceivedsuccessEvent) {
         this.account = evt.dataMap["toInfo"][0]
     }
-    EventManager.prototype.onEvent.call(this, evt)
-}
-
-AccountManager.prototype.RegisterListener = function () {
-    // Append to the event handler
-    server.eventHandler.addEventManager(this,
-        // callback
-        function () {
-            console.log("Listener registered!!!!")
-        }
-    )
+    EventHub.prototype.onEvent.call(this, evt)
 }
 
 /**

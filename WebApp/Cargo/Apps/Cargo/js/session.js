@@ -24,7 +24,7 @@
  * The session manager regroups functionalities relatead to session such as
  * login, logout and users sessions informations.
  * @constructor
- * @extends EventManager
+ * @extends EventHub
  */
 var SessionManager = function () {
 
@@ -40,29 +40,19 @@ var SessionManager = function () {
         return
     }
 
-    EventManager.call(this, SessionEvent)
+    EventHub.call(this, SessionEvent)
 
     return this
 }
 
-SessionManager.prototype = new EventManager(null);
+SessionManager.prototype = new EventHub(null);
 SessionManager.prototype.constructor = SessionManager;
 
 /*
  * Dispatch event.
  */
 SessionManager.prototype.onEvent = function (evt) {
-    EventManager.prototype.onEvent.call(this, evt)
-}
-
-SessionManager.prototype.RegisterListener = function () {
-    // Append to the event handler.
-    server.eventHandler.addEventManager(this,
-        // callback
-        function () {
-            console.log("Session manager is registered")
-        }
-    )
+    EventHub.prototype.onEvent.call(this, evt)
 }
 
 /*

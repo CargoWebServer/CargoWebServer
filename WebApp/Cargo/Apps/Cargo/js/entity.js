@@ -24,7 +24,7 @@
 /**
  * The entity manager gives acces to ojects stored on the server.
  * @constructor
- * @extends EventManager
+ * @extends EventHub
  */
 var EntityManager = function () {
 
@@ -32,7 +32,7 @@ var EntityManager = function () {
         return
     }
 
-    EventManager.call(this, EntityEvent)
+    EventHub.call(this, EntityEvent)
 
     /**
      * @property {object} entityPrototypes Keeps track of prototypes in use.
@@ -51,7 +51,7 @@ var EntityManager = function () {
     return this
 }
 
-EntityManager.prototype = new EventManager(null);
+EntityManager.prototype = new EventHub(null);
 EntityManager.prototype.constructor = EntityManager;
 
 /*
@@ -64,7 +64,7 @@ EntityManager.prototype.onEvent = function (evt) {
             var entity = eval("new " + evt.dataMap["entity"].TYPENAME + "()")
             entity.initCallback = function (self, evt, entity) {
                 return function (entity) {
-                    EventManager.prototype.onEvent.call(self, evt)
+                    EventHub.prototype.onEvent.call(self, evt)
                 }
             } (this, evt, entity)
             entity.init(evt.dataMap["entity"])
@@ -74,7 +74,7 @@ EntityManager.prototype.onEvent = function (evt) {
             var entity = this.entities[evt.dataMap["entity"].UUID]
             entity.initCallback = function (self, evt, entity) {
                 return function (entity) {
-                    EventManager.prototype.onEvent.call(self, evt)
+                    EventHub.prototype.onEvent.call(self, evt)
                 }
             } (this, evt, entity)
             setObjectValues(entity, evt.dataMap["entity"])
@@ -84,19 +84,9 @@ EntityManager.prototype.onEvent = function (evt) {
         var entity = this.entities[evt.dataMap["entity"].UUID]
         if (entity != undefined) {
             this.resetEntity(entity)
-            EventManager.prototype.onEvent.call(this, evt)
+            EventHub.prototype.onEvent.call(this, evt)
         }
     }
-}
-
-EntityManager.prototype.RegisterListener = function () {
-    // Append to the event handler.
-    server.eventHandler.addEventManager(this,
-        // callback
-        function () {
-            console.log("Entity manager is registered!")
-        }
-    )
 }
 
 /*
