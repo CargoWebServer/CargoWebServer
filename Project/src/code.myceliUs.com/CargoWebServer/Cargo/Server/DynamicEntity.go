@@ -49,11 +49,6 @@ type DynamicEntity struct {
 	 * Use to protected the entitiesMap access...
 	 */
 	sync.RWMutex
-
-	/**
-	 * Mutex to use with recursion.
-	 */
-	lock Utility.Rmutex
 }
 
 func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error) {
@@ -82,8 +77,6 @@ func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error)
  * Create a new dynamic entity...
  */
 func (this *EntityManager) newDynamicEntity(values map[string]interface{}) (*DynamicEntity, *CargoEntities.Error) {
-	this.Lock()
-	defer this.Unlock()
 
 	var entity *DynamicEntity
 
@@ -92,7 +85,13 @@ func (this *EntityManager) newDynamicEntity(values map[string]interface{}) (*Dyn
 			if val != nil {
 				entity = val.(*DynamicEntity)
 
-				if Utility.GetChecksum(values) != entity.GetChecksum() {
+				// Calculate the checksum.
+				this.Lock()
+				sum0 := Utility.GetChecksum(values)
+				sum1 := entity.GetChecksum()
+				this.Unlock()
+
+				if sum0 != sum1 {
 					entity.SetObjectValues(values)
 				} else {
 					entity.SetNeedSave(false)
@@ -153,44 +152,65 @@ func (this *EntityManager) newDynamicEntity(values map[string]interface{}) (*Dyn
 }
 
 /**
+ * Thread safe function
+ */
+func (this *DynamicEntity) setValue(field string, value interface{}) {
+	this.Lock()
+	this.object[field] = value
+	this.Unlock()
+}
+
+/**
+ * Thread safe function
+ */
+func (this *DynamicEntity) getValue(field string) interface{} {
+	this.Lock()
+	defer this.Unlock()
+	return this.object[field]
+}
+
+/**
+ * Thread safe function
+ */
+func (this *DynamicEntity) deleteValue(field string) {
+	this.Lock()
+	delete(this.object, field)
+	this.Unlock()
+}
+
+/**
  * Determine is an entity is initialyse or not.
  */
 func (this *DynamicEntity) IsInit() bool {
-	return this.GetObject().(map[string]interface{})["IsInit"].(bool)
+	return this.getValue("IsInit").(bool)
 }
 
 /**
  * Set if an entity must be inityalyse.
  */
 func (this *DynamicEntity) SetInit(isInit bool) {
-	this.GetObject().(map[string]interface{})["IsInit"] = isInit
+	this.setValue("IsInit", isInit)
 }
 
 /**
  * Test if an entity need to be save.
  */
 func (this *DynamicEntity) NeedSave() bool {
-	return this.GetObject().(map[string]interface{})["NeedSave"].(bool)
+	return this.getValue("NeedSave").(bool)
 }
 
 /**
  * Set if an entity need to be save.
  */
 func (this *DynamicEntity) SetNeedSave(needSave bool) {
-	this.GetObject().(map[string]interface{})["NeedSave"] = needSave
+	this.setValue("NeedSave", needSave)
 }
 
 /**
  * Initialyse a entity with a given id.
  */
 func (this *DynamicEntity) InitEntity(id string) error {
-
-	token := Utility.NewToken()
-	this.lock.Lock(token)
-
 	err := this.initEntity(id, "")
-	this.lock.Unlock(token)
-	//log.Println("After init:", toJsonStr(this.object))
 	return err
 }
 
@@ -202,7 +222,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 	}
 
 	// If the value is already in the cache I have nothing todo...
-	if this.object["IsInit"].(bool) == true {
+	if this.IsInit() == true {
 		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
 		if err == nil {
 			// Return the already initialyse entity.
@@ -246,12 +266,12 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 	// Initialisation of information of Interface...
 	if len(results) > 0 {
 		// Set the common values...
-		this.object["UUID"] = results[0][0].(string)
-		this.object["TYPENAME"] = typeName // Set the typeName
+		this.setValue("UUID", results[0][0].(string))
+		this.setValue("TYPENAME", typeName) // Set the typeName
 
 		// Set the parent uuid...
 		this.parentUuid = results[0][1].(string)
-		this.object["parentUuid"] = this.parentUuid // Set the parent uuid.
+		this.setValue("parentUuid", this.parentUuid) // Set the parent uuid.
 
 		//init the child...
 		childsUuidStr := results[0][this.prototype.getFieldIndex("childsUuid")].(string)
@@ -296,7 +316,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 						if err != nil {
 							log.Println("fail to get value --------->", results[0][i].(string))
 						} else {
-							this.object[fieldName] = values
+							this.setValue(fieldName, values)
 						}
 					} else {
 						// If the field is a reference.
@@ -308,10 +328,10 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 
 							refTypeName := fieldType
 
-							this.object[fieldName] = referencesId
+							this.setValue(fieldName, referencesId)
 							for i := 0; i < len(referencesId); i++ {
 								id_ := refTypeName + "$$" + referencesId[i]
-								GetServer().GetEntityManager().appendReference(fieldName, this.object["UUID"].(string), id_)
+								GetServer().GetEntityManager().appendReference(fieldName, this.getValue("UUID").(string), id_)
 							}
 
 						} else {
@@ -334,7 +354,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 							if len(uuids) > 0 {
 								// Set an empty array here...
 								if Utility.IsValidEntityReferenceName(uuids[0]) {
-									this.object[fieldName] = make([]map[string]interface{}, 0)
+									this.setValue(fieldName, make([]map[string]interface{}, 0))
 									for i := 0; i < len(uuids); i++ {
 										if len(uuids[i]) > 0 {
 											if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
@@ -385,15 +405,15 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 					}
 				} else {
 					if strings.HasPrefix(fieldType, "xs.") || strings.HasPrefix(fieldType, "sqltypes.") || fieldName == "M_valueOf" {
-						this.object[fieldName] = results[0][i]
+						this.setValue(fieldName, results[0][i])
 					} else {
 						// Not an array here.
 						if this.isRef(fieldType, fieldName) {
 							// In that case the reference must be a simple string.
 							refTypeName := fieldType
 							id_ := refTypeName + "$$" + results[0][i].(string)
-							this.object[fieldName] = results[0][i].(string)
-							GetServer().GetEntityManager().appendReference(fieldName, this.object["UUID"].(string), id_)
+							this.setValue(fieldName, results[0][i].(string))
+							GetServer().GetEntityManager().appendReference(fieldName, this.getValue("UUID").(string), id_)
 						} else {
 							// Here I have an object...
 							if reflect.TypeOf(results[0][i]).String() == "string" {
@@ -439,17 +459,17 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 									}
 								} else {
 									// A plain string...
-									this.object[fieldName] = results[0][i]
+									this.setValue(fieldName, results[0][i])
 								}
 							} else {
 								// A base type other than strings... bool, float64, int64 etc...
-								this.object[fieldName] = results[0][i]
+								this.setValue(fieldName, results[0][i])
 							}
 						}
 					}
 				}
 			} else {
-				this.object[fieldName] = nil
+				this.setValue(fieldName, nil)
 			}
 		}
 	}
@@ -473,12 +493,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
  * Save entity
  */
 func (this *DynamicEntity) SaveEntity() {
-	token := Utility.NewToken()
-
-	this.lock.Lock(token)
 	this.saveEntity("")
-	this.lock.Unlock(token)
-
 	//log.Println("After save:", toJsonStr(this.object))
 
 }
@@ -506,7 +521,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	query.Fields = append(query.Fields, "parentUuid")
 	if len(this.parentUuid) > 0 {
 		DynamicEntityInfo = append(DynamicEntityInfo, this.parentUuid)
-		this.object["parentUuid"] = this.parentUuid
+		this.setValue("parentUuid", this.parentUuid)
 	} else {
 		DynamicEntityInfo = append(DynamicEntityInfo, "")
 	}
@@ -522,13 +537,13 @@ func (this *DynamicEntity) saveEntity(path string) {
 		query.Fields = append(query.Fields, fieldName)
 
 		// Print the field name.
-		if this.object[fieldName] != nil {
-			log.Println("--------> save ", fieldName, " whit value ", this.object[fieldName], " field type ", fieldType)
+		if this.getValue(fieldName) != nil {
+			log.Println("--------> save ", fieldName, " whit value ", this.getValue(fieldName), " field type ", fieldType)
 			// Array's
 			if strings.HasPrefix(fieldType, "[]") {
 				if strings.HasPrefix(fieldType, "[]xs.") || strings.HasPrefix(fieldType, "[]sqltypes.") || fieldName == "M_listOf" {
 
-					valuesStr, err := json.Marshal(this.object[fieldName])
+					valuesStr, err := json.Marshal(this.getValue(fieldName))
 					if err != nil {
 						DynamicEntityInfo = append(DynamicEntityInfo, "null")
 					} else {
@@ -542,11 +557,11 @@ func (this *DynamicEntity) saveEntity(path string) {
 						refUuids := make([]string, 0)
 						refIds := make([]string, 0)
 						// Value can be of type []interface {} or [] of string.
-						if reflect.TypeOf(this.object[fieldName]).String() == "[]interface {}" {
+						if reflect.TypeOf(this.getValue(fieldName)).String() == "[]interface {}" {
 							// An array of interface type.
-							for j := 0; j < len(this.object[fieldName].([]interface{})); j++ {
+							for j := 0; j < len(this.getValue(fieldName).([]interface{})); j++ {
 								// Append reference.
-								obj := this.object[fieldName].([]interface{})[j]
+								obj := this.getValue(fieldName).([]interface{})[j]
 								if obj != nil {
 									var refUuid string
 									// It can be an object or a string...
@@ -573,9 +588,9 @@ func (this *DynamicEntity) saveEntity(path string) {
 								}
 							}
 
-						} else if reflect.TypeOf(this.object[fieldName]).String() == "[]string" {
-							for j := 0; j < len(this.object[fieldName].([]string)); j++ {
-								refUuid := this.object[fieldName].([]string)[j]
+						} else if reflect.TypeOf(this.getValue(fieldName)).String() == "[]string" {
+							for j := 0; j < len(this.getValue(fieldName).([]string)); j++ {
+								refUuid := this.getValue(fieldName).([]string)[j]
 								if len(refUuid) > 0 {
 									if strings.HasPrefix(refUuid, "#") {
 										refUuid = refUuid[1:]
@@ -587,7 +602,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 								}
 							}
 						} else {
-							log.Println(Utility.FileLine(), "---> field no found!", fieldName, ":", fieldType, ":", reflect.TypeOf(this.object[fieldName]).String())
+							log.Println(Utility.FileLine(), "---> field no found!", fieldName, ":", fieldType, ":", reflect.TypeOf(this.getValue(fieldName)).String())
 						}
 
 						// Set the pending uuid references.
@@ -613,11 +628,11 @@ func (this *DynamicEntity) saveEntity(path string) {
 						DynamicEntityInfo = append(DynamicEntityInfo, string(refUuidsStr))
 					} else {
 						// In the case of object.
-						if reflect.TypeOf(this.object[fieldName]).String() == "[]map[string]interface {}" {
+						if reflect.TypeOf(this.getValue(fieldName)).String() == "[]map[string]interface {}" {
 							subEntityIds := make([]string, 0)
-							for j := 0; j < len(this.object[fieldName].([]map[string]interface{})); j++ {
+							for j := 0; j < len(this.getValue(fieldName).([]map[string]interface{})); j++ {
 								// I will get the values of the sub item...
-								subValues := this.object[fieldName].([]map[string]interface{})[j]
+								subValues := this.getValue(fieldName).([]map[string]interface{})[j]
 
 								typeName := strings.Replace(strings.Replace(fieldType, ":Ref", "", -1), "[]", "", -1)
 								uuid := subValues["UUID"].(string)
@@ -654,12 +669,12 @@ func (this *DynamicEntity) saveEntity(path string) {
 							subEntityIdsStr, _ := json.Marshal(subEntityIds)
 							DynamicEntityInfo = append(DynamicEntityInfo, string(subEntityIdsStr))
 
-						} else if reflect.TypeOf(this.object[fieldName]).String() == "[]interface {}" {
+						} else if reflect.TypeOf(this.getValue(fieldName)).String() == "[]interface {}" {
 							subEntityIds := make([]string, 0)
-							for j := 0; j < len(this.object[fieldName].([]interface{})); j++ {
-								if reflect.TypeOf(this.object[fieldName].([]interface{})[j]).String() == "map[string]interface {}" {
+							for j := 0; j < len(this.getValue(fieldName).([]interface{})); j++ {
+								if reflect.TypeOf(this.getValue(fieldName).([]interface{})[j]).String() == "map[string]interface {}" {
 									// I will get the values of the sub item...
-									subValues := this.object[fieldName].([]interface{})[j].(map[string]interface{})
+									subValues := this.getValue(fieldName).([]interface{})[j].(map[string]interface{})
 									// I will create the sub value...
 									typeName := strings.Replace(strings.Replace(fieldType, ":Ref", "", -1), "[]", "", -1)
 									uuid := subValues["UUID"].(string)
@@ -692,7 +707,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 										}
 									}
 								} else {
-									log.Println(Utility.FileLine(), "---> field no found!", fieldName, ":", fieldType, ":", reflect.TypeOf(this.object[fieldName].([]interface{})[j]).String())
+									log.Println(Utility.FileLine(), "---> field no found!", fieldName, ":", fieldType, ":", reflect.TypeOf(this.getValue(fieldName).([]interface{})[j]).String())
 								}
 							}
 							subEntityIdsStr, _ := json.Marshal(subEntityIds)
@@ -705,55 +720,71 @@ func (this *DynamicEntity) saveEntity(path string) {
 				if strings.HasPrefix(fieldType, "xs.") || strings.HasPrefix(fieldType, "sqltypes.") || fieldName == "M_valueOf" {
 					// Little fix to convert float into int type as needed.
 					if fieldType == "xs.byte" || fieldType == "xs.short" || fieldType == "xs.int" || fieldType == "xs.integer" || fieldType == "xs.long" || fieldType == "xs.unsignedInt" || fieldType == "xs.unsignedByte" || fieldType == "xs.unsignedShort" || fieldType == "xs.unsignedLong" {
-						if reflect.TypeOf(this.object[fieldName]).Kind() == reflect.Float32 {
+						if reflect.TypeOf(this.getValue(fieldName)).Kind() == reflect.Float32 {
 							if fieldType == "xs.int" || fieldType == "xs.integer" {
-								this.object[fieldName] = int32(this.object[fieldName].(float32))
+								val := int32(this.getValue(fieldName).(float32))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.byte" {
-								this.object[fieldName] = int8(this.object[fieldName].(float32))
+								val := int8(this.getValue(fieldName).(float32))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.short" {
-								this.object[fieldName] = int16(this.object[fieldName].(float32))
+								val := int16(this.getValue(fieldName).(float32))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.unsignedByte" {
-								this.object[fieldName] = uint8(this.object[fieldName].(float32))
+								val := uint8(this.getValue(fieldName).(float32))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.unsignedShort" {
-								this.object[fieldName] = uint16(this.object[fieldName].(float32))
+								val := uint16(this.getValue(fieldName).(float32))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.unsignedInt" {
-								this.object[fieldName] = uint32(this.object[fieldName].(float32))
+								val := uint32(this.getValue(fieldName).(float32))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.unsignedLong" {
-								this.object[fieldName] = uint64(this.object[fieldName].(float32))
+								val := uint64(this.getValue(fieldName).(float32))
+								this.setValue(fieldName, val)
 							} else {
-								this.object[fieldName] = int64(this.object[fieldName].(float32))
+								val := int64(this.getValue(fieldName).(float32))
+								this.setValue(fieldName, val)
 							}
-						} else if reflect.TypeOf(this.object[fieldName]).Kind() == reflect.Float64 {
+						} else if reflect.TypeOf(this.getValue(fieldName)).Kind() == reflect.Float64 {
 							if fieldType == "xs.int" || fieldType == "xs.integer" {
-								this.object[fieldName] = int32(this.object[fieldName].(float64))
+								val := int32(this.getValue(fieldName).(float64))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.byte" {
-								this.object[fieldName] = int8(this.object[fieldName].(float64))
+								val := int8(this.getValue(fieldName).(float64))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.short" {
-								this.object[fieldName] = int16(this.object[fieldName].(float64))
+								val := int16(this.getValue(fieldName).(float64))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.unsignedByte" {
-								this.object[fieldName] = uint8(this.object[fieldName].(float64))
+								val := uint8(this.getValue(fieldName).(float64))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.unsignedShort" {
-								this.object[fieldName] = uint16(this.object[fieldName].(float64))
+								val := uint16(this.getValue(fieldName).(float64))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.unsignedInt" {
-								this.object[fieldName] = uint32(this.object[fieldName].(float64))
+								val := uint32(this.getValue(fieldName).(float64))
+								this.setValue(fieldName, val)
 							} else if fieldType == "xs.unsignedLong" {
-								this.object[fieldName] = uint64(this.object[fieldName].(float64))
+								val := uint64(this.getValue(fieldName).(float64))
+								this.setValue(fieldName, val)
 							} else {
-								this.object[fieldName] = int64(this.object[fieldName].(float64))
+								val := int64(this.getValue(fieldName).(float64))
+								this.setValue(fieldName, val)
 							}
 						}
 					}
 
 					//log.Println(fieldType, this.object[fieldName], reflect.TypeOf(this.object[fieldName]))
-					DynamicEntityInfo = append(DynamicEntityInfo, this.object[fieldName])
+					DynamicEntityInfo = append(DynamicEntityInfo, this.getValue(fieldName))
 				} else {
 					if this.isRef(fieldType, fieldName) {
 						// Must be a string or an object...
 						var refId string
-						if reflect.TypeOf(this.object[fieldName]).String() == "string" {
-							refId = this.object[fieldName].(string)
-						} else if reflect.TypeOf(this.object[fieldName]).String() == "map[string]interface {}" {
-							refId = this.object[fieldName].(map[string]interface{})["UUID"].(string)
+						if reflect.TypeOf(this.getValue(fieldName)).String() == "string" {
+							refId = this.getValue(fieldName).(string)
+						} else if reflect.TypeOf(this.getValue(fieldName)).String() == "map[string]interface {}" {
+							refId = this.getValue(fieldName).(map[string]interface{})["UUID"].(string)
 						}
 
 						if len(refId) > 0 {
@@ -784,10 +815,10 @@ func (this *DynamicEntity) saveEntity(path string) {
 						}
 
 					} else {
-						if this.object[fieldName] != nil {
+						if this.getValue(fieldName) != nil {
 							// Only value with object map will be convert into ther given type...
-							if reflect.TypeOf(this.object[fieldName]).String() == "map[string]interface {}" {
-								subValues := this.object[fieldName].(map[string]interface{})
+							if reflect.TypeOf(this.getValue(fieldName)).String() == "map[string]interface {}" {
+								subValues := this.getValue(fieldName).(map[string]interface{})
 
 								// I will create the sub value...
 								typeName := strings.Replace(strings.Replace(fieldType, ":Ref", "", -1), "[]", "", -1)
@@ -854,7 +885,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
-	msgData.Value = this.object
+	msgData.Value = this.GetObject()
 	eventData[0] = msgData
 
 	var evt *Event
@@ -863,20 +894,20 @@ func (this *DynamicEntity) saveEntity(path string) {
 	// Now I will register the entity in the entityByIdMap if is not nil
 	if len(this.prototype.Ids) > 1 {
 		id := this.prototype.Ids[1]
-		if this.object[id] != nil {
+		if this.getValue(id) != nil {
 			var objectId string
-			if reflect.TypeOf(this.object[id]).Kind() == reflect.String {
-				objectId = this.object[id].(string)
-			} else if reflect.TypeOf(this.object[id]).Kind() == reflect.Int {
-				objectId = strconv.Itoa(this.object[id].(int))
-			} else if reflect.TypeOf(this.object[id]).Kind() == reflect.Int8 {
-				objectId = strconv.Itoa(int(this.object[id].(int8)))
-			} else if reflect.TypeOf(this.object[id]).Kind() == reflect.Int16 {
-				objectId = strconv.Itoa(int(this.object[id].(int16)))
-			} else if reflect.TypeOf(this.object[id]).Kind() == reflect.Int32 {
-				objectId = strconv.Itoa(int(this.object[id].(int32)))
-			} else if reflect.TypeOf(this.object[id]).Kind() == reflect.Int64 {
-				objectId = strconv.Itoa(int(this.object[id].(int64)))
+			if reflect.TypeOf(this.getValue(id)).Kind() == reflect.String {
+				objectId = this.getValue(id).(string)
+			} else if reflect.TypeOf(this.getValue(id)).Kind() == reflect.Int {
+				objectId = strconv.Itoa(this.getValue(id).(int))
+			} else if reflect.TypeOf(this.getValue(id)).Kind() == reflect.Int8 {
+				objectId = strconv.Itoa(int(this.getValue(id).(int8)))
+			} else if reflect.TypeOf(this.getValue(id)).Kind() == reflect.Int16 {
+				objectId = strconv.Itoa(int(this.getValue(id).(int16)))
+			} else if reflect.TypeOf(this.getValue(id)).Kind() == reflect.Int32 {
+				objectId = strconv.Itoa(int(this.getValue(id).(int32)))
+			} else if reflect.TypeOf(this.getValue(id)).Kind() == reflect.Int64 {
+				objectId = strconv.Itoa(int(this.getValue(id).(int64)))
 			}
 			entityById[objectId] = this
 		}
@@ -916,10 +947,7 @@ func (this *DynamicEntity) saveEntity(path string) {
  * Delete the entity
  */
 func (this *DynamicEntity) DeleteEntity() {
-	token := Utility.NewToken()
-	this.lock.Lock(token)
 	GetServer().GetEntityManager().deleteEntity(this)
-	this.lock.Unlock(token)
 }
 
 /**
@@ -948,22 +976,22 @@ func (this *DynamicEntity) RemoveChild(name string, uuid string) {
 	isArray := strings.HasPrefix(filedType, "[]")
 	if isArray {
 		childs := make([]map[string]interface{}, 0)
-		if reflect.TypeOf(this.object[name]).String() == "[]map[string]interface {}" {
-			for i := 0; i < len(this.object[name].([]map[string]interface{})); i++ {
-				if uuid != this.object[name].([]map[string]interface{})[i]["UUID"] {
-					childs = append(childs, this.object[name].([]map[string]interface{})[i])
+		if reflect.TypeOf(this.getValue(name)).String() == "[]map[string]interface {}" {
+			for i := 0; i < len(this.getValue(name).([]map[string]interface{})); i++ {
+				if uuid != this.getValue(name).([]map[string]interface{})[i]["UUID"] {
+					childs = append(childs, this.getValue(name).([]map[string]interface{})[i])
 				}
 			}
-		} else if reflect.TypeOf(this.object[name]).String() == "[]interface {}" {
-			for i := 0; i < len(this.object[name].([]interface{})); i++ {
-				if uuid != this.object[name].([]interface{})[i].(map[string]interface{})["UUID"] {
-					childs = append(childs, this.object[name].([]interface{})[i].(map[string]interface{}))
+		} else if reflect.TypeOf(this.getValue(name)).String() == "[]interface {}" {
+			for i := 0; i < len(this.getValue(name).([]interface{})); i++ {
+				if uuid != this.getValue(name).([]interface{})[i].(map[string]interface{})["UUID"] {
+					childs = append(childs, this.getValue(name).([]interface{})[i].(map[string]interface{}))
 				}
 			}
 		}
-		this.object[name] = childs
+		this.setValue(name, childs)
 	} else {
-		delete(this.object, name)
+		this.deleteValue(name)
 	}
 
 }
@@ -972,7 +1000,7 @@ func (this *DynamicEntity) RemoveChild(name string, uuid string) {
  * Return the type name of an entity
  */
 func (this *DynamicEntity) GetTypeName() string {
-	return this.object["TYPENAME"].(string)
+	return this.getValue("TYPENAME").(string)
 }
 
 /**
@@ -1078,14 +1106,14 @@ func (this *DynamicEntity) RemoveReference(name string, reference Entity) {
 	isArray := strings.HasPrefix(fieldType, "[]")
 	if isArray {
 		refs := make([]string, 0)
-		for i := 0; i < len(this.object[name].([]string)); i++ {
-			if reference.GetUuid() != this.object[name].([]string)[i] {
-				refs = append(refs, this.object[name].([]string)[i])
+		for i := 0; i < len(this.getValue(name).([]string)); i++ {
+			if reference.GetUuid() != this.getValue(name).([]string)[i] {
+				refs = append(refs, this.getValue(name).([]string)[i])
 			}
 		}
-		this.object[name] = refs
+		this.setValue(name, refs)
 	} else {
-		delete(this.object, name)
+		this.deleteValue(name)
 	}
 
 }
@@ -1118,23 +1146,24 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 		fieldTypeName := this.prototype.FieldsType[fieldTypeIndex]
 		if strings.HasPrefix(fieldTypeName, "[]") {
 			// if the array is nil...
-			if this.object[attributeName] == nil {
+			if this.getValue(attributeName) == nil {
 				if strings.HasSuffix(fieldTypeName, ":Ref") {
-					this.object[attributeName] = make([]string, 0)
+					this.setValue(attributeName, make([]string, 0))
 				} else {
-					this.object[attributeName] = make([]map[string]interface{}, 0)
+					this.setValue(attributeName, make([]map[string]interface{}, 0))
 				}
 			}
 			// In case of a reference.
-			if reflect.TypeOf(this.object[attributeName]).String() == "[]string" {
-				if !Utility.Contains(this.object[attributeName].([]string), child.GetUuid()) {
-					this.object[attributeName] = append(this.object[attributeName].([]string), child.GetUuid())
+			if reflect.TypeOf(this.getValue(attributeName)).String() == "[]string" {
+				if !Utility.Contains(this.getValue(attributeName).([]string), child.GetUuid()) {
+					values := this.getValue(attributeName).([]string)
+					this.setValue(attributeName, append(values, child.GetUuid()))
 				}
 
-			} else if reflect.TypeOf(this.object[attributeName]).String() == "[]map[string]interface {}" {
+			} else if reflect.TypeOf(this.getValue(attributeName)).String() == "[]map[string]interface {}" {
 				// In case of an object...
-				if this.object[attributeName] != nil {
-					objects := this.object[attributeName].([]map[string]interface{})
+				if this.getValue(attributeName) != nil {
+					objects := this.getValue(attributeName).([]map[string]interface{})
 					objects_ := make([]map[string]interface{}, 0)
 					isExist := false
 					for i := 0; i < len(objects); i++ {
@@ -1162,19 +1191,21 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 					}
 
 					// Set the array containing the new value.
-					this.object[attributeName] = objects_
+					this.setValue(attributeName, objects_)
 				} else {
-					this.object[attributeName] = make([]map[string]interface{}, 0)
+					this.setValue(attributeName, make([]map[string]interface{}, 0))
 					if reflect.TypeOf(child.GetObject()).String() == "map[string]interface {}" {
-						this.object[attributeName] = append(this.object[attributeName].([]map[string]interface{}), child.GetObject().(map[string]interface{}))
+						values := this.getValue(attributeName).([]map[string]interface{})
+						this.setValue(attributeName, append(values, child.GetObject().(map[string]interface{})))
 					} else {
 						object, _ := Utility.ToMap(child.GetObject())
-						this.object[attributeName] = append(this.object[attributeName].([]map[string]interface{}), object)
+						values := this.getValue(attributeName).([]map[string]interface{})
+						this.setValue(attributeName, append(values, object))
 					}
 				}
-			} else if reflect.TypeOf(this.object[attributeName]).String() == "[]interface {}" {
-				if this.object[attributeName] != nil {
-					objects := this.object[attributeName].([]interface{})
+			} else if reflect.TypeOf(this.getValue(attributeName)).String() == "[]interface {}" {
+				if this.getValue(attributeName) != nil {
+					objects := this.getValue(attributeName).([]interface{})
 					objects_ := make([]interface{}, 0)
 					isExist := false
 					for i := 0; i < len(objects); i++ {
@@ -1202,14 +1233,16 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 					}
 
 					// Set the array containing the new value.
-					this.object[attributeName] = objects_
+					this.setValue(attributeName, objects_)
 				} else {
-					this.object[attributeName] = make([]map[string]interface{}, 0)
+					this.setValue(attributeName, make([]map[string]interface{}, 0))
 					if reflect.TypeOf(child.GetObject()).String() == "map[string]interface {}" {
-						this.object[attributeName] = append(this.object[attributeName].([]map[string]interface{}), child.GetObject().(map[string]interface{}))
+						values := this.getValue(attributeName).([]map[string]interface{})
+						this.setValue(attributeName, append(values, child.GetObject().(map[string]interface{})))
 					} else {
 						object, _ := Utility.ToMap(child.GetObject())
-						this.object[attributeName] = append(this.object[attributeName].([]map[string]interface{}), object)
+						values := this.getValue(attributeName).([]map[string]interface{})
+						this.setValue(attributeName, append(values, object))
 					}
 				}
 			}
@@ -1217,10 +1250,10 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 		} else {
 			// Set or replace the value...
 			if reflect.TypeOf(child.GetObject()).String() == "map[string]interface {}" {
-				this.object[attributeName] = child.GetObject()
+				this.setValue(attributeName, child.GetObject())
 			} else {
 				object, _ := Utility.ToMap(child.GetObject())
-				this.object[attributeName] = object
+				this.setValue(attributeName, object)
 			}
 		}
 	}
@@ -1314,10 +1347,8 @@ func (this *DynamicEntity) RemoveReferenced(name string, owner Entity) {
  * Return the object wrapped by this entity...
  */
 func (this *DynamicEntity) GetObject() interface{} {
-	log.Println("---------> ", this.object["UUID"])
-	token := Utility.NewToken()
-	this.lock.Lock(token)
-	defer this.lock.Unlock(token)
+	this.Lock()
+	defer this.Unlock()
 	return this.object
 }
 
@@ -1325,11 +1356,9 @@ func (this *DynamicEntity) GetObject() interface{} {
  * Return the object wrapped by this entity...
  */
 func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
+
 	// Here I will clean up field inside the object that are not inside the new
 	// value.
-	token := Utility.NewToken()
-	this.lock.Lock(token)
-	defer this.Unlock()
 
 	// nothing to do if the pointer is nil...
 	if this == nil {
@@ -1339,13 +1368,22 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 	entity, exist := GetServer().GetEntityManager().contain(this.GetUuid())
 	if !exist {
 		// If the map is not in the cache I can set the values directly.
+		this.Lock()
 		this.object = values
+		this.Unlock()
 		this.SetNeedSave(true)
 		return
 	} else {
 		// here I will set the need save attribute.
-		entity.SetNeedSave(entity.GetChecksum() != Utility.GetChecksum(values))
-		this.object = entity.GetObject().(map[string]interface{})
+		this.Lock()
+		sum0 := Utility.GetChecksum(values)
+		sum1 := entity.GetChecksum()
+		this.Unlock()
+		entity.SetNeedSave(sum0 != sum1)
+		obj := entity.GetObject().(map[string]interface{})
+		this.Lock()
+		this.object = obj
+		this.Unlock()
 	}
 
 	for i := 0; i < len(this.prototype.Fields); i++ {
@@ -1357,12 +1395,12 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 
 		// The goal here is to remove base value or reference if there is no
 		// more in the values.
-		if this.object[field] != nil {
+		if this.getValue(field) != nil {
 			if strings.HasPrefix(field, "M_") {
 				// remove nil value
 				if isBaseType {
-					if this.object[field] != nil && values[field] == nil {
-						this.object = nil
+					if this.getValue(field) != nil && values[field] == nil {
+						this.setValue(field, nil)
 					}
 				} else if isRef {
 					v := values[field]
@@ -1389,10 +1427,10 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 						}
 
 						// Here I will remove deleted references.
-						if reflect.TypeOf(this.object[field]).String() == "[]string" {
-							for i := 0; i < len(this.object[field].([]string)); i++ {
-								if !Utility.Contains(v_, this.object[field].([]string)[i]) {
-									toRemove := this.object[field].([]string)[i]
+						if reflect.TypeOf(this.getValue(field)).String() == "[]string" {
+							for i := 0; i < len(this.getValue(field).([]string)); i++ {
+								if !Utility.Contains(v_, this.getValue(field).([]string)[i]) {
+									toRemove := this.getValue(field).([]string)[i]
 									ref, err := GetServer().GetEntityManager().getEntityByUuid(toRemove)
 									if err == nil {
 										this.RemoveReference(field, ref)
@@ -1414,21 +1452,21 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 						}
 
 						// Set the ref values...
-						this.object[field] = v_
+						this.setValue(field, v_)
 
 					} else {
 						var toRemove string
 
-						if v == nil && this.object[field] != nil {
-							toRemove = this.object[field].(string)
-						} else if v != nil && this.object[field] != nil {
-							if reflect.TypeOf(this.object[field]).String() == "map[string]interface {}" {
-								if v.(map[string]interface{})["UUID"] != this.object[field] {
-									toRemove = this.object[field].(string)
+						if v == nil && this.getValue(field) != nil {
+							toRemove = this.getValue(field).(string)
+						} else if v != nil && this.getValue(field) != nil {
+							if reflect.TypeOf(this.getValue(field)).String() == "map[string]interface {}" {
+								if v.(map[string]interface{})["UUID"] != this.getValue(field) {
+									toRemove = this.getValue(field).(string)
 								}
-							} else if reflect.TypeOf(this.object[field]).String() == "string" {
-								if v != this.object[field] {
-									toRemove = this.object[field].(string)
+							} else if reflect.TypeOf(this.getValue(field)).String() == "string" {
+								if v != this.getValue(field) {
+									toRemove = this.getValue(field).(string)
 								}
 							}
 						}
@@ -1455,10 +1493,10 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 									ref.AppendReferenced(field, this)
 									this.AppendReference(ref)
 								}
-								this.object[field] = refUuid
+								this.setValue(field, refUuid)
 							}
 						} else {
-							this.object[field] = nil
+							this.setValue(field, nil)
 						}
 					}
 				}
@@ -1470,7 +1508,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 	for k, v := range values {
 
 		if v == nil {
-			delete(this.object, k)
+			this.deleteValue(k)
 		} else {
 			// Only propertie with M_ will be set here.
 			fieldIndex := this.prototype.getFieldIndex(k)
@@ -1480,13 +1518,13 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 				isArray := strings.HasPrefix(fieldType, "[]")
 
 				if !isRef {
-					if this.object[k] == nil {
+					if this.getValue(k) == nil {
 						// simply set the value...
 						if v != nil {
-							this.object[k] = v
+							this.setValue(k, v)
 						}
 					} else {
-						if reflect.TypeOf(this.object[k]).String() == "map[string]interface {}" {
+						if reflect.TypeOf(this.getValue(k)).String() == "map[string]interface {}" {
 							subValues := v.(map[string]interface{})
 							if subValues["UUID"] != nil {
 								// Here I have another dynamic object...
@@ -1498,18 +1536,18 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 									var errObj *CargoEntities.Error
 									subEntity, errObj = GetServer().GetEntityManager().newDynamicEntity(subValues)
 									if errObj == nil {
-										this.object[k] = subEntity.GetObject()
+										this.setValue(k, subEntity.GetObject())
 									}
 								}
 							} else {
 								log.Println(Utility.FileLine(), " Map of interface without UUID found...!")
-								this.object[k] = v
+								this.setValue(k, v)
 							}
 						} else {
-							if this.object[k] != nil {
-								if reflect.TypeOf(this.object[k]).String() == "[]map[string]interface {}" {
-									for i := 0; i < len(this.object[k].([]map[string]interface{})); i++ {
-										subValues := this.object[k].([]map[string]interface{})[i]
+							if this.getValue(k) != nil {
+								if reflect.TypeOf(this.getValue(k)).String() == "[]map[string]interface {}" {
+									for i := 0; i < len(this.getValue(k).([]map[string]interface{})); i++ {
+										subValues := this.getValue(k).([]map[string]interface{})[i]
 										if subValues["UUID"] != nil {
 											// Here I have another dynamic object...
 											subEntity, exist := GetServer().GetEntityManager().contain(subValues["UUID"].(string))
@@ -1520,21 +1558,26 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 												var errObj *CargoEntities.Error
 												subEntity, errObj = GetServer().GetEntityManager().newDynamicEntity(subValues)
 												if errObj == nil {
-													this.object[k].([]map[string]interface{})[i] = subEntity.GetObject().(map[string]interface{})
+													obj := subEntity.GetObject().(map[string]interface{})
+													this.Lock()
+													this.object[k].([]map[string]interface{})[i] = obj
+													this.Unlock()
 												}
 											}
 										} else {
 											log.Println(Utility.FileLine(), " Map of interface without UUID found...!")
+											this.Lock()
 											this.object[k].([]map[string]interface{})[i] = v.(map[string]interface{})
+											this.Unlock()
 										}
 									}
-								} else if reflect.TypeOf(this.object[k]).String() == "[]interface {}" {
-									if len(this.object[k].([]interface{})) == 0 {
-										this.object[k] = v
+								} else if reflect.TypeOf(this.getValue(k)).String() == "[]interface {}" {
+									if len(this.getValue(k).([]interface{})) == 0 {
+										this.setValue(k, v)
 									} else {
-										if reflect.TypeOf(this.object[k].([]interface{})[0]).String() == "map[string]interface {}" {
-											for i := 0; i < len(this.object[k].([]interface{})); i++ {
-												subValues := this.object[k].([]interface{})[i].(map[string]interface{})
+										if reflect.TypeOf(this.getValue(k).([]interface{})[0]).String() == "map[string]interface {}" {
+											for i := 0; i < len(this.getValue(k).([]interface{})); i++ {
+												subValues := this.getValue(k).([]interface{})[i].(map[string]interface{})
 												if subValues["UUID"] != nil {
 													// Here I have another dynamic object...
 													subEntity, exist := GetServer().GetEntityManager().contain(subValues["UUID"].(string))
@@ -1545,52 +1588,66 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 														var errObj *CargoEntities.Error
 														subEntity, errObj = GetServer().GetEntityManager().newDynamicEntity(subValues)
 														if errObj == nil {
-															this.object[k].([]interface{})[i] = subEntity.GetObject()
+															obj := subEntity.GetObject()
+															this.Lock()
+															this.object[k].([]interface{})[i] = obj
+															this.Unlock()
 														}
 													}
 												} else {
 													log.Println(Utility.FileLine(), " Map of interface without UUID found...!")
+													this.Lock()
 													this.object[k].([]interface{})[i] = v
+													this.Unlock()
 												}
 											}
 										} else {
 											// Replace the array with the new value.
-											this.object[k] = v
+											this.setValue(k, v)
 										}
 									}
-								} else if reflect.TypeOf(this.object[k]).String() == "[]string" {
-									this.object[k] = v // Replace the array of string with the new value.
-								} else if this.object[k] != v {
-									if reflect.TypeOf(this.object[k]).Kind() == reflect.TypeOf(v).Kind() {
-										this.object[k] = v
+								} else if reflect.TypeOf(this.getValue(k)).String() == "[]string" {
+									this.setValue(k, v) // Replace the array of string with the new value.
+								} else if this.getValue(k) != v {
+									if reflect.TypeOf(this.getValue(k)).Kind() == reflect.TypeOf(v).Kind() {
+										this.setValue(k, v)
 									} else {
 										// Here I need to convert the v type...
-										if reflect.TypeOf(this.object[k]).Kind() == reflect.Float64 && reflect.TypeOf(v).Kind() == reflect.String {
-											this.object[k], _ = strconv.ParseFloat(v.(string), 64)
-										} else if reflect.TypeOf(this.object[k]).Kind() == reflect.Float32 && reflect.TypeOf(v).Kind() == reflect.String {
-											this.object[k], _ = strconv.ParseFloat(v.(string), 32)
-										} else if reflect.TypeOf(this.object[k]).Kind() == reflect.Int64 && reflect.TypeOf(v).Kind() == reflect.String {
-											this.object[k], _ = strconv.ParseInt(v.(string), 10, 64)
-										} else if reflect.TypeOf(this.object[k]).Kind() == reflect.Int8 && reflect.TypeOf(v).Kind() == reflect.String {
-											this.object[k], _ = strconv.ParseInt(v.(string), 10, 8)
-										} else if reflect.TypeOf(this.object[k]).Kind() == reflect.Int && reflect.TypeOf(v).Kind() == reflect.String {
-											this.object[k], _ = strconv.ParseInt(v.(string), 10, 64)
-										} else if reflect.TypeOf(this.object[k]).Kind() == reflect.Int32 && reflect.TypeOf(v).Kind() == reflect.String {
-											this.object[k], _ = strconv.ParseInt(v.(string), 10, 32)
-										} else if reflect.TypeOf(this.object[k]).Kind() == reflect.Int16 && reflect.TypeOf(v).Kind() == reflect.String {
-											this.object[k], _ = strconv.ParseInt(v.(string), 10, 16)
-										} else if reflect.TypeOf(this.object[k]).Kind() == reflect.Bool && reflect.TypeOf(v).Kind() == reflect.String {
-											this.object[k], _ = strconv.ParseBool(v.(string))
-										} else if reflect.TypeOf(this.object[k]).Kind() == reflect.Int64 && reflect.TypeOf(v).Kind() == reflect.Float64 {
+										if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Float64 && reflect.TypeOf(v).Kind() == reflect.String {
+											val, _ := strconv.ParseFloat(v.(string), 64)
+											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Float32 && reflect.TypeOf(v).Kind() == reflect.String {
+											val, _ := strconv.ParseFloat(v.(string), 32)
+											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Int64 && reflect.TypeOf(v).Kind() == reflect.String {
+											val, _ := strconv.ParseInt(v.(string), 10, 64)
+											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Int8 && reflect.TypeOf(v).Kind() == reflect.String {
+											val, _ := strconv.ParseInt(v.(string), 10, 8)
+											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Int && reflect.TypeOf(v).Kind() == reflect.String {
+											val, _ := strconv.ParseInt(v.(string), 10, 64)
+											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Int32 && reflect.TypeOf(v).Kind() == reflect.String {
+											val, _ := strconv.ParseInt(v.(string), 10, 32)
+											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Int16 && reflect.TypeOf(v).Kind() == reflect.String {
+											val, _ := strconv.ParseInt(v.(string), 10, 16)
+											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Bool && reflect.TypeOf(v).Kind() == reflect.String {
+											val, _ := strconv.ParseBool(v.(string))
+											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Int64 && reflect.TypeOf(v).Kind() == reflect.Float64 {
 											// the json parser transform all numerical value to float... that not what we want here...
-											this.object[k] = int64(v.(float64))
+											val := int64(v.(float64))
+											this.setValue(k, val)
 										}
 									}
 
 								}
 							} else {
 								// Append the new value here...
-								this.object[k] = v // Replace the array of string with the new value.
+								this.setValue(k, v) // Replace the array of string with the new value.
 							}
 						}
 					}
@@ -1598,30 +1655,33 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 					// Here I have a reference. I need to keep only the uuid
 					// in case of I receive the complete objet value.
 					if isArray {
-						if this.object[k] == nil {
-							this.object[k] = make([]string, 0)
+						if this.getValue(k) == nil {
+							this.setValue(k, make([]string, 0))
 						}
 						if reflect.TypeOf(v).String() == "[]map[string] interface{}" {
 							for i := 0; i < len(v.([]map[string]interface{})); i++ {
-								this.object[k] = append(this.object[k].([]string), v.(map[string]interface{})["UUID"].(string))
+								val := this.getValue(k).([]string)
+								this.setValue(k, append(val, v.(map[string]interface{})["UUID"].(string)))
 							}
 						} else if reflect.TypeOf(v).String() == "[]interface {}" {
 							for i := 0; i < len(v.([]interface{})); i++ {
 								if reflect.TypeOf(v.([]interface{})[i]).String() == "map[string] interface{}" {
-									this.object[k] = append(this.object[k].([]string), v.([]interface{})[i].(map[string]interface{})["UUID"].(string))
+									val := this.getValue(k).([]string)
+									this.setValue(k, append(val, v.([]interface{})[i].(map[string]interface{})["UUID"].(string)))
 								} else if reflect.TypeOf(v.([]interface{})[i]).String() == "string" {
-									this.object[k] = append(this.object[k].([]string), v.([]interface{})[i].(string))
+									val := this.getValue(k).([]string)
+									this.setValue(k, append(val, v.([]interface{})[i].(string)))
 								}
 							}
 						} else if reflect.TypeOf(v).String() == "[]string" {
 							// and array of string.
-							this.object[k] = v
+							this.setValue(k, v)
 						}
 					} else {
 						if reflect.TypeOf(v).String() == "map[string]interface {}" {
-							this.object[k] = v.(map[string]interface{})["UUID"]
+							this.setValue(k, v.(map[string]interface{})["UUID"])
 						} else if reflect.TypeOf(v).String() == "string" {
-							this.object[k] = v
+							this.setValue(k, v)
 						}
 					}
 				}
@@ -1653,7 +1713,7 @@ func (this *DynamicEntity) GetChecksum() string {
  */
 func (this *DynamicEntity) Exist() bool {
 	// if the 'this' pointer is not initialyse it means the entity was deleted.
-	if this == nil || this.object["TYPENAME"] == nil {
+	if this == nil {
 		return false
 	}
 

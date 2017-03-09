@@ -897,7 +897,6 @@ func (this *EntityManager) getDynamicEntityByUuid(uuid string) (Entity, *CargoEn
 		return nil, cargoError
 	}
 
-	log.Println("-------> 900", values)
 	// initialyse the entity.
 	entity.InitEntity(uuid)
 
@@ -1425,7 +1424,7 @@ func (this *EntityManager) GetObjectById(storeId string, typeName string, id str
 	}
 	// Associate the sessionId with the entityUuid in the cache
 	GetServer().GetCacheManager().register(entity.GetUuid(), sessionId)
-
+	log.Println(entity.GetObject())
 	return entity.GetObject()
 }
 

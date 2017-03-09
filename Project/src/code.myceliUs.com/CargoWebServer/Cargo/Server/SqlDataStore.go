@@ -224,10 +224,6 @@ func (this *SqlDataStore) Connect() error {
 
 	this.m_db, err = sql.Open(driver, connectionString)
 
-	if err == nil {
-		//this.synchronize()
-	}
-
 	return err
 }
 
@@ -760,6 +756,9 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 
 	// Complete the reference information.
 	this.setRefs()
+
+	// Synchronize actual data
+	//this.synchronize(prototypes)
 
 	return prototypes, nil
 }
@@ -1307,13 +1306,12 @@ func (this *SqlDataStore) DeleteEntityPrototypes() error {
  * synchronize the content of database with sql_info content. Only key's will be
  * save, the other field will be retreive as needed via sql querie's.
  */
-func (this *SqlDataStore) synchronize() error {
+func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 	// Keep entities before save...
 	toSave := make(map[string]Entity, 0)
 	entitiesByType := make(map[string][]Entity, 0)
 
-	prototypes, err := this.GetEntityPrototypes()
 	// First of all I will sychronize create the enities information if it dosen't exist.
 	for i := 0; i < len(prototypes); i++ {
 		if !isAssociative(prototypes[i]) { // Associative table object are not needed...
@@ -1467,9 +1465,12 @@ func (this *SqlDataStore) synchronize() error {
 										if toSave[childUuid] != nil {
 											childEntity = toSave[childUuid]
 										} else {
-											childEntity, _ := GetServer().GetEntityManager().getEntityByUuid(childUuid)
-											toSave[childUuid] = childEntity
+											childEntity, _ = GetServer().GetEntityManager().getEntityByUuid(childUuid)
 										}
+
+										// The parent will save the child...
+										delete(toSave, childUuid)
+
 										if childEntity != nil {
 											log.Println("-------> child uuid ", childEntity.GetUuid(), " found!!!!")
 											entity.AppendChild(prototypes[i].Fields[j], childEntity)
@@ -1492,10 +1493,8 @@ func (this *SqlDataStore) synchronize() error {
 	for uuid, entity := range toSave {
 		log.Println("----> entity ", uuid, " was save successfully!")
 		entity.SaveEntity()
-
-		//log.Println(entity.GetParentPtr())
 	}
 
 	log.Println("------------> end of sync!")
-	return err
+	return nil
 }

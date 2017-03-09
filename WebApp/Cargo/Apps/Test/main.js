@@ -54,7 +54,8 @@ function main() {
     //testDynamicEntity()
 
    // entityDump("item_1", "Test.Item")
-   entityDump("1", "dt_methode_development.dbo.DT_DTS")
+   //entityDump("1", "dt_methode_development.dbo.DT_DTS")
+   entityDump("4371", "dt_methode_development.dbo.DT_DOCUMENTS")
 // entityDump("1", "employees.employees")
     
    //entitiesDump("COLLADASchema.COLLADA")
