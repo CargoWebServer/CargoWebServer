@@ -729,7 +729,7 @@ function main() {
 						distibuted application. The major difference between a desktop application and a web application is the model of execution. Desktop
 						application run on single computer, and distributed application on a network. In those applications, functionalities are access with use 
 						of libraries. The communication with the framework and the application are made via object instances or function call. Instead of libraries, 
-						distributed application made use of services, and call to function are made via RPC or reference to distributed object.
+						distributed application made use of services, and call to function are made via RPC or distributed object reference.
 					</p>
 					<p>
 						Services offer by Cargo are, objects persitence, sessions management, events management (channels, listener), ressource management (files, user, group, role, action...),
@@ -750,7 +750,8 @@ function main() {
 						IDL, we made use of JavaScript. Because Cargo backend can interpret JavaScript and because all of it's functionalities are interface with JavaScript, you can ask Cargo to do
 						all you want. Following the the open closed principle, you can exetend the server functionalities from the client side without modifying it's code.
 					</p>
-					<h4>Event model, don't call us, we'll call you</h4>
+					<h4>Event model</h4>
+					<h5>don't call us, we'll call you</h5>
 					<p>
 						Cargo event model are pretty simple and pretty usefull. The design of the event system follow the publish-subscribe pattern principles. Event can be see as piece
 						of inforamtion travelling through channels. Each channel can carry one type of event and each event can travel throw one channel. Channel are dynamic, when a listener
@@ -764,7 +765,8 @@ function main() {
 						for a given event type. To get all event of a given type the regex * can be use. By using the event model in your application you decoupling classes and making your
 						code more robust and manageable.
 					</p>
-					<h4>Entity, something that exists as itself</h4>
+					<h4>Entity</h4>
+					<h5>something that exists as itself</h5>
 					<p>
 						JavaScript Object Notation JSON is the facto information model those days. Shinning by it's simplicity and it's versatility every structures can be serialysed with it.
 						But when you serialyse an instance of a class and instantiate it back you end up with a json object and not the initial instance. That represent a problem when it's time
@@ -799,7 +801,7 @@ function main() {
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="row hidden pageRow" id="page-about">
 		<div class="col-12">
 			<a href="#">About</a>
