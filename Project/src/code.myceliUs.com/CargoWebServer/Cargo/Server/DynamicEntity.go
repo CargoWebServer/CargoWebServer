@@ -49,6 +49,11 @@ type DynamicEntity struct {
 	 * Use to protected the entitiesMap access...
 	 */
 	sync.RWMutex
+
+	/**
+	 * Mutex to use with recursion.
+	 */
+	lock Utility.Rmutex
 }
 
 func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error) {
@@ -90,11 +95,15 @@ func (this *EntityManager) newDynamicEntity(values map[string]interface{}) (*Dyn
 				sum0 := Utility.GetChecksum(values)
 				sum1 := entity.GetChecksum()
 				this.Unlock()
-
 				if sum0 != sum1 {
 					entity.SetObjectValues(values)
 				} else {
-					entity.SetNeedSave(false)
+					// If the value dosent exist It need to be save...
+					if entity.Exist() == false {
+						entity.SetNeedSave(true)
+					} else {
+						entity.SetNeedSave(false)
+					}
 				}
 				return entity, nil
 			}
@@ -164,8 +173,8 @@ func (this *DynamicEntity) setValue(field string, value interface{}) {
  * Thread safe function
  */
 func (this *DynamicEntity) getValue(field string) interface{} {
-	this.Lock()
-	defer this.Unlock()
+	this.RLock()
+	defer this.RUnlock()
 	return this.object[field]
 }
 
@@ -210,7 +219,11 @@ func (this *DynamicEntity) SetNeedSave(needSave bool) {
  * Initialyse a entity with a given id.
  */
 func (this *DynamicEntity) InitEntity(id string) error {
+	token := Utility.NewToken()
+	this.lock.Lock(token)
 	err := this.initEntity(id, "")
+	this.lock.Unlock(token)
+
 	return err
 }
 
@@ -493,7 +506,10 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
  * Save entity
  */
 func (this *DynamicEntity) SaveEntity() {
+	token := Utility.NewToken()
+	this.lock.Lock(token)
 	this.saveEntity("")
+	this.lock.Unlock(token)
 	//log.Println("After save:", toJsonStr(this.object))
 
 }
@@ -538,11 +554,10 @@ func (this *DynamicEntity) saveEntity(path string) {
 
 		// Print the field name.
 		if this.getValue(fieldName) != nil {
-			log.Println("--------> save ", fieldName, " whit value ", this.getValue(fieldName), " field type ", fieldType)
+			//log.Println("--------> save ", fieldName, " whit value ", this.getValue(fieldName), " field type ", fieldType)
 			// Array's
 			if strings.HasPrefix(fieldType, "[]") {
 				if strings.HasPrefix(fieldType, "[]xs.") || strings.HasPrefix(fieldType, "[]sqltypes.") || fieldName == "M_listOf" {
-
 					valuesStr, err := json.Marshal(this.getValue(fieldName))
 					if err != nil {
 						DynamicEntityInfo = append(DynamicEntityInfo, "null")
@@ -632,10 +647,9 @@ func (this *DynamicEntity) saveEntity(path string) {
 							subEntityIds := make([]string, 0)
 							for j := 0; j < len(this.getValue(fieldName).([]map[string]interface{})); j++ {
 								// I will get the values of the sub item...
+								uuid := this.getValue(fieldName).([]map[string]interface{})[j]["UUID"].(string)
 								subValues := this.getValue(fieldName).([]map[string]interface{})[j]
-
-								typeName := strings.Replace(strings.Replace(fieldType, ":Ref", "", -1), "[]", "", -1)
-								uuid := subValues["UUID"].(string)
+								typeName := strings.Replace(fieldType, "[]", "", -1)
 
 								// I will try to create a static entity...
 								newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
@@ -1136,7 +1150,12 @@ func (this *DynamicEntity) SetChildsPtr(childsPtr []Entity) {
  * Append a child...
  */
 func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error {
-	//log.Println("--------> append child: ", this.uuid, ":", attributeName, child.GetUuid())
+
+	log.Println("--------> append child: ", this.uuid, ":", attributeName, child.GetUuid())
+	if Utility.Contains(this.childsUuid, child.GetUuid()) {
+
+	}
+
 	// Set or reset the child ptr.
 	child.SetParentPtr(this)
 
@@ -1284,6 +1303,7 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 			this.SetChildsPtr(childsPtr)
 		}
 	}
+
 	return nil
 }
 
@@ -1366,6 +1386,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 	}
 
 	entity, exist := GetServer().GetEntityManager().contain(this.GetUuid())
+
 	if !exist {
 		// If the map is not in the cache I can set the values directly.
 		this.Lock()
@@ -1705,6 +1726,8 @@ func (this *DynamicEntity) GetPrototype() *EntityPrototype {
  * Calculate a unique value for a given entity object value...
  */
 func (this *DynamicEntity) GetChecksum() string {
+	this.Lock()
+	defer this.Unlock()
 	return Utility.GetChecksum(this.object)
 }
 

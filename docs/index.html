@@ -28,7 +28,6 @@
 
 <body>
 	<div class="container-fluid">
-
 		<div class="row">
 			<nav class="navbar navbar-default">
 				<div class="container-fluid">
@@ -406,7 +405,7 @@ function main() {
         .appendElement({ "tag": "span", "id": "label" })
         .appendElement({ "tag": "input", "id": "input" }).up()
         .appendElement({ "tag": "div", "style": "display: table-row" }).down()
-        .appendElement({ "tag": "button", "id": "btn" })
+        .appendElement({ "tag": "button", "id": "btn" }).up()
         .appendElement({ "tag": "div", "style": "display: table-row" }).down()
         .appendElement({ "tag": "span", "id": "greeting" })
 
@@ -726,7 +725,7 @@ function main() {
 						new functionalities we can now considere JavaScript/HTML5 as a desktop application framework.
 					</p>
 					<p>
-						There's no formal definition of what is a <span>web</web> application. For the sake of clarity, let's define web application as 
+						There's no formal definition of what is a <span>web</span> application. For the sake of clarity, let's define web application as 
 						distibuted application. The major difference between a desktop application and a web application is the model of execution. Desktop
 						application run on single computer, and distributed application on a network. In those applications, functionalities are access with use 
 						of libraries. The communication with the framework and the application are made via object instances or function call. Instead of libraries, 
@@ -739,10 +738,10 @@ function main() {
 					</p>
 					<h4>The big picture</h4>
 					<p>
-						Cargo simplify web application programming by exposing distant services as local objects. Just like you use <code>document</code> object to intereact with
-						HTML elements, you use <code>server</code> object to interact with the backend. The only difference is the communication model. Local object methods call are 
+						Cargo simplify web application programming by exposing distant services as local objects. Just like you use <span>document</span> object to intereact with
+						HTML elements, you use <span>server</span> object to interact with the backend. The only difference is the communication model. Local object methods call are 
 						synchronous and distant object method call are asynchronous. To work around it and simplify the code, we made use of callback's functions. The 
-						three callbacks functions are, success, error and transfer. They represent the state of the action call on the backend. In backround, when a method on
+						three callbacks functions are, success, error and progress. They represent the state of the action call on the backend. In backround, when a method on
 						server object is invoke, a request to the backend is send. The request is process by the backend and a response message is sent back to client. Depending of
 						the response type, the appropriate callback function is call.
 					</p>
@@ -753,24 +752,48 @@ function main() {
 					</p>
 					<h4>Event model, don't call us, we'll call you</h4>
 					<p>
-						Cargo event model are pretty simple and pretty usefull. The desing of the event system follow the publish-subscribe pattern principles. Event can be see as piece
+						Cargo event model are pretty simple and pretty usefull. The design of the event system follow the publish-subscribe pattern principles. Event can be see as piece
 						of inforamtion travelling through channels. Each channel can carry one type of event and each event can travel throw one channel. Channel are dynamic, when a listener
 						register itself on an event channel, the channel is created, and inversely the channel is close when no more listeners use it. One of the key concept in Cargo event 
-						model is the <code>EventHub</code>. From the point of view of server, who play the role of publisher, the <code>EventHub</code> play the role of subscriber. But from the point 
-						of view of local object, who play the role of subscriber, it play the role of publisher. Just like event channels and events, <code>EventHub</code> are specialize in on type of event. 
+						model is the <span>EventHub</span>. From the point of view of server, who play the role of publisher, the <span>EventHub</span> play the role of subscriber. But from the point 
+						of view of local object, who play the role of subscriber, it play the role of publisher. Just like event channels and events, <span>EventHub</span> are specialize in on type of event. 
 						Class derived from <code>EventHub</code> play the role of event controller in your application. Here we made use of a variation of the observer pattern. If an object want's
-						to be inform of a given event, it define an update function for that particular event and attach itself to the <code>EventHub</code> reponsable of that event.
-						Latter when the object has no more interest to receive event message, he simply detach itself from the <code>EventHub</code>. Because there can be a lot of event travelling the 
-						network, we create event filters. Event filters are <spab>regex<span> regular expression. By default channel are silent, in order to receive event you must register a regular expression (filter)
+						to be inform of a given event, it define an update function for that particular event and attach itself to the <span>EventHub</span> reponsable of that event.
+						Latter when the object has no more interest to receive event message, he simply detach itself from the <span>EventHub</span>. Because there can be a lot of events travelling the 
+						network, we create event filters. Event filters are <span>regex</span> regular expression. By default channel are silent, in order to receive event you must register a regular expression (filter)
 						for a given event type. To get all event of a given type the regex * can be use. By using the event model in your application you decoupling classes and making your
-						code more robust and reusable.
+						code more robust and manageable.
 					</p>
 					<h4>Entity, something that exists as itself</h4>
 					<p>
-						JavaScript Object Notation JSON is the facto information model those days. Shinning by it's simplicity and it's versatility every structures can be serialyse with it.
-						But when you serialyse an instance of a class and instantiate back you end up with a json object and not the initial instance. That represent a problem when it's time
-						to make object persistent. Every data store need schema to represent the informations structures, XML and SQL has it. The goal able to represent informations structures from
-						SQL and XML without lost. 
+						JavaScript Object Notation JSON is the facto information model those days. Shinning by it's simplicity and it's versatility every structures can be serialysed with it.
+						But when you serialyse an instance of a class and instantiate it back you end up with a json object and not the initial instance. That represent a problem when it's time
+						to make object persistent. Data store need meta data in order to be able to manipulated his contained data. The concept of schema is use to define data structure inside the
+						data sotre and the relations between those structures. Query language also need meta data to be able work properly. To fullfill our need we create the entity prototype concept.
+						The entity prototype contain the additionals informations needed by application to persist class instance. The entity prototype was inspire by XML schema <span>XSD</span>, and 
+						he's fully compatible with it, he also with SQL schema.
+					</p>
+					<p>
+						Being the model part of your application, the entities are instances of JavaScript classes. By simply creating a data store connection in your configuration, or importing XSD schema, 
+						Cargo automatically do all the work for you. The mapping between the data source and the classes instances is done transparently. From the entity prototype, Cargo generate the 
+						classes definitions and use it to instantiate entities. Class definition are injected on the JavaScript runtime when you need it, and became accessible to your application. Because 
+						no source file are generated by the ORM there's no risk of divergence with the information model. By indexing property of your classes, you can latter retreived instances by making
+						entity query on it. Cargo has it own query language named entity query language EQL. Not only you can get access to exsiting data but you can define new one directly in JavaScript,
+						simple by creating a new entity prototype instance. 
+					</p>
+					<h4>Services</h4>
+					<p>
+						The <span>sever</span> object contain few functionalities by itself, it role is to give access to other services objects. IF CSS3/HTML5/JavaScript, in the context of the browser,
+						are suitable to create desktop application, they lack most of the required features needed by distributed applications. Remember, with Cargo the application code run on the client side. 
+						This way to do have the advantage of minimizing ressource usage on the server side. Aslo the connection model of Cargo is different of most web application framework, instead of using
+						http, it make use of it own protocol runing over the websocket. That connection model is best suited for service oriented architecture. In that model, the client and the server side
+						are well definied and independant of each other. Most of Cargo services are in fact interface to other external services like SQL DBMS, LDAP or SMTP server. Cargo give acces to those 
+						underlying services in a uniform manner. Because services configurations informations are keep in the server side their access are protected. I will tell more about each services
+						in the tutorials.
+					</p>
+					<h4>Securtity, With Great Power Comes Great Responsibility</h4>
+					<p>
+						Internally Cargo work with Entities. As exemple, File, Group, User, Role, Session and Action are entities. 
 					</p>
 				</div>
 			</div>

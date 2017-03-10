@@ -51,6 +51,9 @@ type SqlDataStore struct {
 
 	/** The underlying database **/
 	m_db *sql.DB
+
+	/** The list of associations **/
+	m_associations map[string]bool
 }
 
 func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error) {
@@ -66,6 +69,9 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 	store.m_password = info.M_pwd
 	store.m_port = info.M_port
 	store.m_textEncoding = info.M_textEncoding
+
+	// Keep the list of associations...
+	store.m_associations = make(map[string]bool, 0)
 
 	return store, nil
 }
@@ -997,26 +1003,38 @@ func appendField(prototype *EntityPrototype, fieldName string, fieldType string)
 }
 
 // Return true if the prototype is an associative one...
-func isAssociative(prototype *EntityPrototype) bool {
+func (this *SqlDataStore) isAssociative(prototype *EntityPrototype) bool {
+	// if the asscociation already exist.
+	if val, ok := this.m_associations[prototype.TypeName]; ok {
+		return val
+	}
 
 	for j := 0; j < len(prototype.Fields); j++ {
 		if strings.HasPrefix(prototype.FieldsType[j], "sqltypes.") {
 			if strings.HasPrefix(prototype.Fields[j], "M_") {
-				if !Utility.Contains(prototype.Ids, prototype.Fields[j]) {
-					return false
+				refInfos, _ := this.getRefInfos(prototype.Fields[j][2:])
+				if len(refInfos) == 0 {
+					if !Utility.Contains(prototype.Ids, prototype.Fields[j]) {
+						//log.Println("-----> ", prototype.TypeName, " is not associative")
+						this.m_associations[prototype.TypeName] = false
+						return false
+					}
 				}
 			}
 		}
 	}
 
+	this.m_associations[prototype.TypeName] = true
+	//log.Println("-----> ", prototype.TypeName, " is associative")
 	return true
 }
 
 // For a given ref id it return, the schma name, the table name,
 // the table column name, the referenced_table name and the referenced column name.
+// TODO handle multiple refs...
 func (this *SqlDataStore) getRefInfos(refId string) ([]string, error) {
 
-	results := make([]string, 5)
+	var results []string
 	var query string
 	if this.m_vendor == Config.DataStoreVendor_ODBC {
 		query = "SELECT "
@@ -1055,8 +1073,6 @@ func (this *SqlDataStore) getRefInfos(refId string) ([]string, error) {
 		query += "	and constraint_name = '" + refId + "'"
 	}
 
-	// TODO create the query for mySql here.
-
 	fieldsType := make([]interface{}, 5)
 	fieldsType[0] = "nvarchar"
 	fieldsType[1] = "nvarchar"
@@ -1069,16 +1085,21 @@ func (this *SqlDataStore) getRefInfos(refId string) ([]string, error) {
 	// Read the
 	values, err := this.Read(query, fieldsType, params)
 	if err != nil {
+		log.Println("=-------|> ", err)
+		log.Println(query)
 		return results, err
+	} else if len(values) > 0 {
+		if len(values[0]) == 5 {
+			results = make([]string, 5)
+			// Set the value inside the results.
+			results[0] = values[0][0].(string)
+			results[1] = values[0][1].(string)
+			results[2] = values[0][2].(string)
+			results[3] = values[0][3].(string)
+			results[4] = values[0][4].(string)
+		}
+		return results, nil
 	}
-
-	// Set the value inside the results.
-	results[0] = values[0][0].(string)
-	results[1] = values[0][1].(string)
-	results[2] = values[0][2].(string)
-	results[3] = values[0][3].(string)
-	results[4] = values[0][4].(string)
-
 	return results, nil
 }
 
@@ -1180,7 +1201,7 @@ func (this *SqlDataStore) setRefs() error {
 			targetField_isId := Utility.Contains(trg.Ids, "M_"+values[i][5].(string))
 
 			// I will append the field if is not already there.
-			if !isAssociative(src) {
+			if !this.isAssociative(src) {
 				// Now the sources.
 				if !Utility.Contains(src.Fields, "M_"+refName) {
 
@@ -1234,7 +1255,7 @@ func (this *SqlDataStore) setRefs() error {
 				if this.isRef(refName) {
 					fieldType = fieldType + ":Ref"
 				}
-				if !isAssociative(trg) {
+				if !this.isAssociative(trg) {
 					appendField(associativeTable, "M_"+refName, fieldType)
 				}
 			}
@@ -1246,10 +1267,10 @@ func (this *SqlDataStore) setRefs() error {
 					if err != nil {
 						return err
 					}
-					if !isAssociative(trg) {
+					if !this.isAssociative(trg) {
 						appendField(trg1, "M_"+refName, "[]"+trg.TypeName+":Ref")
 					}
-					if !isAssociative(trg1) {
+					if !this.isAssociative(trg1) {
 						appendField(trg, "M_"+associations_[j][0].(string), "[]"+trg1.TypeName+":Ref")
 					}
 				}
@@ -1314,21 +1335,21 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 	// First of all I will sychronize create the enities information if it dosen't exist.
 	for i := 0; i < len(prototypes); i++ {
-		if !isAssociative(prototypes[i]) { // Associative table object are not needed...
-			log.Println("--------> synchronize ", prototypes[i].TypeName)
-			if len(prototypes[i].Ids) > 1 {
+		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
+		if !this.isAssociative(prototype) { // Associative table object are not needed...
+			if len(prototype.Ids) > 1 {
 				query := "SELECT "
 				fieldsType := make([]interface{}, 0)
-				for j := 0; j < len(prototypes[i].Ids); j++ {
-					if strings.HasPrefix(prototypes[i].Ids[j], "M_") {
-						query += strings.Replace(prototypes[i].Ids[j], "M_", "", -1)
-						fieldsType = append(fieldsType, prototypes[i].FieldsType[prototypes[i].getFieldIndex(prototypes[i].Ids[j])])
-						if j < len(prototypes[i].Ids)-1 {
+				for j := 0; j < len(prototype.Ids); j++ {
+					if strings.HasPrefix(prototype.Ids[j], "M_") {
+						query += strings.Replace(prototype.Ids[j], "M_", "", -1)
+						fieldsType = append(fieldsType, prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[j])])
+						if j < len(prototype.Ids)-1 {
 							query += " ,"
 						}
 					}
 				}
-				query += " FROM " + prototypes[i].TypeName
+				query += " FROM " + prototype.TypeName
 				var params []interface{}
 
 				// Execute the query...
@@ -1339,8 +1360,8 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 				// Now I will generate a unique key for the retreive information.
 				for j := 0; j < len(values); j++ {
-					log.Println(prototypes[i].TypeName, j, ":", len(values))
-					keyInfo := prototypes[i].TypeName + ":"
+					//log.Println(prototype.TypeName, j, ":", len(values))
+					keyInfo := prototype.TypeName + ":"
 					for k := 0; k < len(values[j]); k++ {
 						if reflect.TypeOf(values[j][k]).Kind() == reflect.String {
 							keyInfo += values[j][k].(string)
@@ -1363,19 +1384,19 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 					// The uuid is in that case a MD5 value.
 					//log.Println("---> ", keyInfo)
-					uuid := prototypes[i].TypeName + "%" + Utility.GenerateUUID(keyInfo)
+					uuid := prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
 
 					// Now I will create the entity if it dosen't exist.
 					_, errObj := GetServer().GetEntityManager().getDynamicEntityByUuid(uuid)
 					if errObj != nil {
 						// Here I will create the Dynamic entity.
 						infos := make(map[string]interface{}, 0)
-						infos["TYPENAME"] = prototypes[i].TypeName
+						infos["TYPENAME"] = prototype.TypeName
 						infos["UUID"] = uuid
 
 						// The 0 value is the uuid
-						for k := 1; k < len(prototypes[i].Ids); k++ {
-							id := prototypes[i].Ids[k]
+						for k := 1; k < len(prototype.Ids); k++ {
+							id := prototype.Ids[k]
 							infos[id] = values[j][k-1]
 						}
 
@@ -1398,90 +1419,91 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 	// Now I will set the entity reliationships
 	for i := 0; i < len(prototypes); i++ {
-		if !isAssociative(prototypes[i]) { // Associative table object are not needed...
-			for j := 0; j < len(prototypes[i].FieldsType); j++ {
-				entities := entitiesByType[prototypes[i].TypeName]
+		if !this.isAssociative(prototypes[i]) { // Associative table object are not needed...
+			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
+			for j := 0; j < len(prototype.FieldsType); j++ {
+				entities := entitiesByType[prototype.TypeName]
 				for k := 0; k < len(entities); k++ {
 					entity := entities[k]
-					if !strings.HasPrefix(prototypes[i].FieldsType[j], "sqltypes") && !strings.HasPrefix(prototypes[i].FieldsType[j], "[]sqltypes") && strings.HasPrefix(prototypes[i].Fields[j], "M_") {
-						fieldType := prototypes[i].FieldsType[j]
-						if strings.HasPrefix(fieldType, "[]") {
-							fieldType = strings.Replace(fieldType, "[]", "", -1)
+					if !strings.HasPrefix(prototype.FieldsType[j], "sqltypes") && !strings.HasPrefix(prototype.FieldsType[j], "[]sqltypes") && strings.HasPrefix(prototype.Fields[j], "M_") {
+
+						// If the relation is aggregation or association.
+						isRef := strings.HasSuffix(prototype.FieldsType[j], ":Ref")
+						// This is an aggregation releationship.
+						refInfos, err := this.getRefInfos(prototype.Fields[j][2:])
+						var childTypeName string
+						if this.m_vendor == Config.DataStoreVendor_ODBC {
+							childTypeName = this.m_id + "." + refInfos[4] + "." + refInfos[0]
+						} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
+							childTypeName = this.m_id + "." + refInfos[0]
 						}
 
-						if !strings.HasSuffix(prototypes[i].FieldsType[j], ":Ref") {
-							// This is an aggregation releationship.
-							refInfos, err := this.getRefInfos(prototypes[i].Fields[j][2:])
+						if err == nil && !this.m_associations[childTypeName] {
+							id := entity.GetObject().(map[string]interface{})["M_"+refInfos[3]]
+							var strId string
+							if reflect.TypeOf(id).Kind() == reflect.String {
+								strId = "'" + id.(string) + "'"
+							} else if reflect.TypeOf(id).Kind() == reflect.Int {
+								strId = strconv.Itoa(id.(int))
+							} else if reflect.TypeOf(id).Kind() == reflect.Int8 {
+								strId = strconv.Itoa(int(id.(int8)))
+							} else if reflect.TypeOf(id).Kind() == reflect.Int16 {
+								strId = strconv.Itoa(int(id.(int16)))
+							} else if reflect.TypeOf(id).Kind() == reflect.Int32 {
+								strId = strconv.Itoa(int(id.(int32)))
+							} else if reflect.TypeOf(id).Kind() == reflect.Int64 {
+								strId = strconv.Itoa(int(id.(int64)))
+							}
+
+							query := "SELECT " + refInfos[3] + " FROM " + refInfos[0] + " WHERE " + refInfos[1] + "=" + strId
+							var params []interface{}
+							var fieldsType []interface{}
+							fieldsType = append(fieldsType, prototype.FieldsType[prototype.getFieldIndex("M_"+refInfos[3])])
+
+							// Execute the query...
+							values, err := this.Read(query, fieldsType, params)
 							if err == nil {
-								id := entity.GetObject().(map[string]interface{})["M_"+refInfos[3]]
-								var strId string
-								if reflect.TypeOf(id).Kind() == reflect.String {
-									strId = "'" + id.(string) + "'"
-								} else if reflect.TypeOf(id).Kind() == reflect.Int {
-									strId = strconv.Itoa(id.(int))
-								} else if reflect.TypeOf(id).Kind() == reflect.Int8 {
-									strId = strconv.Itoa(int(id.(int8)))
-								} else if reflect.TypeOf(id).Kind() == reflect.Int16 {
-									strId = strconv.Itoa(int(id.(int16)))
-								} else if reflect.TypeOf(id).Kind() == reflect.Int32 {
-									strId = strconv.Itoa(int(id.(int32)))
-								} else if reflect.TypeOf(id).Kind() == reflect.Int64 {
-									strId = strconv.Itoa(int(id.(int64)))
-								}
+								for n := 0; n < len(values); n++ {
+									var strId string
+									if reflect.TypeOf(values[n][0]).Kind() == reflect.String {
+										strId = values[n][0].(string)
+									} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int {
+										strId = strconv.Itoa(values[n][0].(int))
+									} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int8 {
+										strId = strconv.Itoa(int(values[n][0].(int8)))
+									} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int16 {
+										strId = strconv.Itoa(int(values[n][0].(int16)))
+									} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int32 {
+										strId = strconv.Itoa(int(values[n][0].(int32)))
+									} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int64 {
+										strId = strconv.Itoa(int(values[n][0].(int64)))
+									}
 
-								query := "SELECT " + refInfos[3] + " FROM " + refInfos[0] + " WHERE " + refInfos[1] + "=" + strId
-								var params []interface{}
-								var fieldsType []interface{}
-								fieldsType = append(fieldsType, prototypes[i].FieldsType[prototypes[i].getFieldIndex("M_"+refInfos[3])])
-								// Execute the query...
-								values, err := this.Read(query, fieldsType, params)
-								if err == nil {
-									for n := 0; n < len(values); n++ {
-										var childTypeName string
-										if this.m_vendor == Config.DataStoreVendor_ODBC {
-											childTypeName = this.m_id + "." + refInfos[4] + "." + refInfos[0]
-										} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
-											childTypeName = this.m_id + "." + refInfos[0]
-										}
+									// Set the child uuid.
+									childUuid := childTypeName + "%" + Utility.GenerateUUID(childTypeName+":"+strId)
+									var childEntity Entity
+									if toSave[childUuid] != nil {
+										childEntity = toSave[childUuid]
+									} else {
+										childEntity, _ = GetServer().GetEntityManager().getEntityByUuid(childUuid)
+									}
 
-										var strId string
-										if reflect.TypeOf(values[n][0]).Kind() == reflect.String {
-											strId = values[n][0].(string)
-										} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int {
-											strId = strconv.Itoa(values[n][0].(int))
-										} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int8 {
-											strId = strconv.Itoa(int(values[n][0].(int8)))
-										} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int16 {
-											strId = strconv.Itoa(int(values[n][0].(int16)))
-										} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int32 {
-											strId = strconv.Itoa(int(values[n][0].(int32)))
-										} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int64 {
-											strId = strconv.Itoa(int(values[n][0].(int64)))
-										}
-
-										// Set the child uuid.
-										childUuid := childTypeName + "%" + Utility.GenerateUUID(childTypeName+":"+strId)
-										var childEntity Entity
-										if toSave[childUuid] != nil {
-											childEntity = toSave[childUuid]
-										} else {
-											childEntity, _ = GetServer().GetEntityManager().getEntityByUuid(childUuid)
-										}
-
-										// The parent will save the child...
-										delete(toSave, childUuid)
-
-										if childEntity != nil {
+									if childEntity != nil {
+										if !isRef {
+											entity.AppendChild(prototype.Fields[j], childEntity)
+											// The parent will save the child...
+											delete(toSave, childUuid)
 											log.Println("-------> child uuid ", childEntity.GetUuid(), " found!!!!")
-											entity.AppendChild(prototypes[i].Fields[j], childEntity)
 										} else {
-											log.Println("-------> child uuid ", childUuid, " not found!!!!")
+											entity.AppendReference(childEntity)
+											log.Println("-------> ref uuid ", childEntity.GetUuid(), " found!!!!")
 										}
+									} else {
+										log.Println("-------> child uuid ", childUuid, " not found!!!!")
 									}
 								}
 							}
-						} else {
-							// this is a composition relationship.
+
 						}
 					}
 				}
