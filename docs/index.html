@@ -677,7 +677,7 @@ function main() {
 			</nav>
 		</div>
 		<div class="col-sm-10" role="main">
-			<div class="row tutorialsRow" id="tutorialsSection-frontEnd">
+			<div class="row documentationRow" id="documentationDiv">
 				<div class="col-xs-12">
 					<h2>Introduction</h2>
 					<h4>Programming background</h4>
@@ -758,7 +758,7 @@ function main() {
 						register itself on an event channel, the channel is created, and inversely the channel is close when no more listeners use it. One of the key concept in Cargo event 
 						model is the <span>EventHub</span>. From the point of view of server, who play the role of publisher, the <span>EventHub</span> play the role of subscriber. But from the point 
 						of view of local object, who play the role of subscriber, it play the role of publisher. Just like event channels and events, <span>EventHub</span> are specialize in on type of event. 
-						Class derived from <code>EventHub</code> play the role of event controller in your application. Here we made use of a variation of the observer pattern. If an object want's
+						Class derived from <span>EventHub</span> play the role of event controller in your application. Here we made use of a variation of the observer pattern. If an object want's
 						to be inform of a given event, it define an update function for that particular event and attach itself to the <span>EventHub</span> reponsable of that event.
 						Latter when the object has no more interest to receive event message, he simply detach itself from the <span>EventHub</span>. Because there can be a lot of events travelling the 
 						network, we create event filters. Event filters are <span>regex</span> regular expression. By default channel are silent, in order to receive event you must register a regular expression (filter)
