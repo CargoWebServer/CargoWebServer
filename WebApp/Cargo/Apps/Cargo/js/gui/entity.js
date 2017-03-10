@@ -1311,6 +1311,8 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 	input.element.style.cursor = "progress"
 	input.element.style.width = "auto"
 
+	// TODO use query instead of download all elements.
+/*
 	server.entityManager.getObjectsByType(typeName, typeName.split(".")[0], "",
 		// Progress...
 		function () {
@@ -1384,4 +1386,5 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 		function (errMsg, caller) {
 		},
 		{ "input": input, "field": field, "objMap": objMap, "values": this.values, "entityPanel": entityPanel, "onSelect": onSelect, "ids": ids })
+*/
 }

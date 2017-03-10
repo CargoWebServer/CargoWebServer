@@ -43,11 +43,6 @@ type EntityManager struct {
 	reference map[string][]EntityRef
 
 	/**
-	 * The root of all object...
-	 */
-	cargoEntities *CargoEntities_EntitiesEntity
-
-	/**
 	* Lock referenced and references map.
 	 */
 	sync.Mutex
@@ -101,19 +96,16 @@ func (this *EntityManager) initialize() {
 	gob.Register(map[string]interface{}{})
 	gob.Register([]interface{}{})
 
+	// I will create the cargo entities if it dosent already exist.
 	cargoEntitiesUuid := CargoEntitiesEntitiesExists("CARGO_ENTITIES")
-	if len(cargoEntitiesUuid) > 0 {
-		this.cargoEntities = this.NewCargoEntitiesEntitiesEntity(cargoEntitiesUuid, nil)
-		this.cargoEntities.InitEntity(cargoEntitiesUuid)
-	} else {
-		this.cargoEntities = this.NewCargoEntitiesEntitiesEntity("CARGO_ENTITIES", nil)
-		this.cargoEntities.object.M_id = "CARGO_ENTITIES"
-		this.cargoEntities.object.M_name = "Cargo entities"
-		this.cargoEntities.object.M_version = "1.0"
-		this.cargoEntities.object.NeedSave = true
-		this.cargoEntities.SaveEntity()
+	if len(cargoEntitiesUuid) == 0 {
+		cargoEntities := this.NewCargoEntitiesEntitiesEntity("CARGO_ENTITIES", nil)
+		cargoEntities.object.M_id = "CARGO_ENTITIES"
+		cargoEntities.object.M_name = "Cargo entities"
+		cargoEntities.object.M_version = "1.0"
+		cargoEntities.object.NeedSave = true
+		cargoEntities.SaveEntity()
 	}
-
 }
 
 func (this *EntityManager) getId() string {
@@ -132,9 +124,10 @@ func (this *EntityManager) stop() {
  * Cargo entities contains files, accounts, etc...
  */
 func (this *EntityManager) getCargoEntities() *CargoEntities_EntitiesEntity {
+	cargoEntitiesUuid := CargoEntitiesEntitiesExists("CARGO_ENTITIES")
+	cargoEntities, _ := this.getEntityByUuid(cargoEntitiesUuid)
 
-	return this.cargoEntities
-
+	return cargoEntities.(*CargoEntities_EntitiesEntity)
 }
 
 /**
@@ -1257,9 +1250,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		}
 	}
 
-	// Associate the sessionId with the entityUuid in the cache
-	GetServer().GetCacheManager().register(entity.(Entity).GetUuid(), sessionId)
-
 	// Return the object.
 	return entity.(Entity).GetObject()
 }
@@ -1361,9 +1351,6 @@ func (this *EntityManager) GetObjectsByType(typeName string, queryStr string, st
 			// Init the entity
 			entities[i].InitEntity(entities[i].GetUuid())
 
-			// Associate the sessionId with the entityUuid in the cache
-			GetServer().GetCacheManager().register(entities[i].GetUuid(), sessionId)
-
 			objects = append(objects, entities[i].GetObject())
 		}
 	}
@@ -1406,9 +1393,6 @@ func (this *EntityManager) GetObjectByUuid(uuid string, messageId string, sessio
 		}
 	}
 
-	// Associate the sessionId with the entityUuid in the cache
-	GetServer().GetCacheManager().register(entity.GetUuid(), sessionId)
-
 	return entity.GetObject()
 }
 
@@ -1422,8 +1406,7 @@ func (this *EntityManager) GetObjectById(storeId string, typeName string, id str
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-	// Associate the sessionId with the entityUuid in the cache
-	GetServer().GetCacheManager().register(entity.GetUuid(), sessionId)
+
 	log.Println(entity.GetObject())
 	return entity.GetObject()
 }
@@ -1454,9 +1437,6 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 
 	// Now I will save the entity.
 	entity.(Entity).SaveEntity()
-
-	// Associate the sessionId with the entityUuid in the cache
-	GetServer().GetCacheManager().register(entity.(Entity).GetUuid(), sessionId)
 
 	return entity.(Entity).GetObject()
 }

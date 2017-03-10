@@ -127,7 +127,6 @@ func (this *SessionManager) removeClosedSession() {
 		if GetServer().getConnectionById(sessionId) == nil {
 			// The session is closed
 			this.closeSession(sessions[i].GetObject().(*CargoEntities.Session))
-			GetServer().GetCacheManager().removeSession(sessionId)
 		}
 	}
 }
@@ -173,8 +172,6 @@ func (this *SessionManager) closeSession_(session *CargoEntities.Session) *Cargo
 	if connection != nil {
 		connection.Close()
 	}
-
-	GetServer().GetCacheManager().removeSession(session.GetId())
 
 	return nil
 }

@@ -5,6 +5,8 @@ package Server
 import (
 	"encoding/json"
 	//	"log"
+	"reflect"
+	"strconv"
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
@@ -4026,6 +4028,8 @@ func (this *EntityManager) NewConfigConfigurationsEntity(objectId string, object
 	if object != nil {
 		object.(*Config.Configurations).TYPENAME = "Config.Configurations"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.Configurations", "Config")
+
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*Config.Configurations).UUID = uuidStr
@@ -4038,8 +4042,40 @@ func (this *EntityManager) NewConfigConfigurationsEntity(objectId string, object
 			return val.(*Config_ConfigurationsEntity)
 		}
 	} else {
-		uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			keyInfo := prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				if reflect.TypeOf(value).Kind() == reflect.String {
+					keyInfo += value.(string)
+				} else if reflect.TypeOf(value).Kind() == reflect.Int {
+					keyInfo += strconv.Itoa(value.(int))
+				} else if reflect.TypeOf(value).Kind() == reflect.Int8 {
+					keyInfo += strconv.Itoa(int(value.(int8)))
+				} else if reflect.TypeOf(value).Kind() == reflect.Int16 {
+					keyInfo += strconv.Itoa(int(value.(int16)))
+				} else if reflect.TypeOf(value).Kind() == reflect.Int32 {
+					keyInfo += strconv.Itoa(int(value.(int32)))
+				} else if reflect.TypeOf(value).Kind() == reflect.Int64 {
+					keyInfo += strconv.Itoa(int(value.(int64)))
+				}
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
+
 	entity := new(Config_ConfigurationsEntity)
 	if object == nil {
 		entity.object = new(Config.Configurations)
@@ -4054,7 +4090,6 @@ func (this *EntityManager) NewConfigConfigurationsEntity(objectId string, object
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.Configurations", "Config")
 	entity.prototype = prototype
 	return entity
 }

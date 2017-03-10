@@ -23,6 +23,8 @@ func generateEntity(packageId string) {
 	imports = append(imports, "code.myceliUs.com/Utility")
 	imports = append(imports, "log")
 	imports = append(imports, "strings")
+	imports = append(imports, "reflect")
+	imports = append(imports, "strconv")
 
 	for i := 0; i < len(classes); i++ {
 		class := classesMap[classes[i]]
@@ -322,6 +324,7 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "	if object != nil{\n"
 	entityConstructorStr += "		object.(*" + packageId + "." + className + ").TYPENAME = \"" + packageId + "." + class.Name + "\"\n"
 	entityConstructorStr += "	}\n"
+	entityConstructorStr += "	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(\"" + packageId + "." + className + "\",\"" + packageId_ + "\")\n"
 	entityConstructorStr += "	if len(uuidStr) > 0 {\n"
 	entityConstructorStr += "		if object != nil{\n"
 	entityConstructorStr += "			object.(*" + packageId + "." + className + ").UUID = uuidStr\n"
@@ -333,7 +336,36 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "			return val.(*" + packageId + "_" + class.Name + "Entity)\n"
 	entityConstructorStr += "		}\n"
 	entityConstructorStr += "	}else{\n"
-	entityConstructorStr += "		uuidStr = \"" + packageId + "." + class.Name + "%\" + Utility.RandomUUID()\n"
+	entityConstructorStr += "		if len(prototype.Ids) == 1 {\n"
+	entityConstructorStr += "			// Here there is a new entity...\n"
+	entityConstructorStr += "			uuidStr = \"Config.Configurations%\" + Utility.RandomUUID()\n"
+	entityConstructorStr += "		} else {\n"
+	entityConstructorStr += "			keyInfo := prototype.TypeName + \":\"\n"
+	entityConstructorStr += "			for i := 1; i < len(prototype.Ids); i++ {\n"
+	entityConstructorStr += "				var getter = \"Get\" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]\n"
+	entityConstructorStr += "				params := make([]interface{}, 0)\n"
+	entityConstructorStr += "				value, _ := Utility.CallMethod(object, getter, params)\n"
+	entityConstructorStr += "				if reflect.TypeOf(value).Kind() == reflect.String {\n"
+	entityConstructorStr += "					keyInfo += value.(string)\n"
+	entityConstructorStr += "				} else if reflect.TypeOf(value).Kind() == reflect.Int {\n"
+	entityConstructorStr += "					keyInfo += strconv.Itoa(value.(int))\n"
+	entityConstructorStr += "				} else if reflect.TypeOf(value).Kind() == reflect.Int8 {\n"
+	entityConstructorStr += "					keyInfo += strconv.Itoa(int(value.(int8)))\n"
+	entityConstructorStr += "				} else if reflect.TypeOf(value).Kind() == reflect.Int16 {\n"
+	entityConstructorStr += "					keyInfo += strconv.Itoa(int(value.(int16)))\n"
+	entityConstructorStr += "				} else if reflect.TypeOf(value).Kind() == reflect.Int32 {\n"
+	entityConstructorStr += "					keyInfo += strconv.Itoa(int(value.(int32)))\n"
+	entityConstructorStr += "				} else if reflect.TypeOf(value).Kind() == reflect.Int64 {\n"
+	entityConstructorStr += "					keyInfo += strconv.Itoa(int(value.(int64)))\n"
+	entityConstructorStr += "				}\n"
+	entityConstructorStr += "				// Append underscore for readability in case of problem...\n"
+	entityConstructorStr += "				if i < len(prototype.Ids)-1 {\n"
+	entityConstructorStr += "					keyInfo += \"_\"\n"
+	entityConstructorStr += "				}\n"
+	entityConstructorStr += "			}\n\n"
+	entityConstructorStr += "			// The uuid is in that case a MD5 value.\n"
+	entityConstructorStr += "			uuidStr = prototype.TypeName + \"%\" + Utility.GenerateUUID(keyInfo)\n"
+	entityConstructorStr += "		}\n"
 	entityConstructorStr += "	}\n"
 	entityConstructorStr += "	entity := new(" + packageId + "_" + class.Name + "Entity)\n"
 	entityConstructorStr += "	if object == nil{\n"
@@ -358,7 +390,6 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 		className = strings.Replace(className, "_impl", "", -1)
 	}
 
-	entityConstructorStr += "	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(\"" + packageId + "." + className + "\",\"" + packageId_ + "\")\n"
 	entityConstructorStr += "	entity.prototype = prototype\n"
 
 	entityConstructorStr += "	return entity\n"

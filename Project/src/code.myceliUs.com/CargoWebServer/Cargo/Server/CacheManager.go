@@ -1,11 +1,7 @@
 package Server
 
 import (
-	"code.myceliUs.com/Utility"
-
 	"log"
-
-	"strings"
 	"time"
 )
 
@@ -15,6 +11,12 @@ type CacheManager struct {
 	 * This map will keep entities in memory.
 	 */
 	entitiesMap map[string]Entity
+
+	/**
+	 * Each entity has a lifetime of 30 second. If an entity is not use
+	 * inside that interval it will be flush from the cache.
+	 */
+	timersMap map[string]*time.Timer
 
 	/**
 	 * Channel used to append entity inside the entity map
@@ -32,35 +34,12 @@ type CacheManager struct {
 	}
 
 	/**
-	 * This map will contain the sessions using the entities
-	 */
-	sessionIdsMap map[string][]string
-
-	/**
-	 * The channel used to populate the sessionIdsMap
-	 */
-	sessionIdsChannel chan struct {
-		// The uuid of the entity
-		entityUuid string
-		// The sessionId
-		sessionId string
-	}
-
-	/**
 	 * The channel used to remove entities
 	 */
 	removeEntityChannel chan string
 
-	/**
-	 * The channel used to remove sessionIds
-	 */
-	removeSessionIdChannel chan string
-
 	// stop processing when that variable are set to true...
 	abortedByEnvironment chan bool
-
-	// Ticker to ping the connection...
-	ticker *time.Ticker
 }
 
 var cacheManager *CacheManager
@@ -78,9 +57,12 @@ func (this *Server) GetCacheManager() *CacheManager {
 func newCacheManager() *CacheManager {
 
 	cacheManager := new(CacheManager)
-
 	return cacheManager
 }
+
+var (
+	timeout = time.Duration(30)
+)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Service functions
@@ -92,11 +74,10 @@ func newCacheManager() *CacheManager {
 func (this *CacheManager) initialize() {
 
 	log.Println("--> Initialize CacheManager")
-
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	this.entitiesMap = make(map[string]Entity, 0)
-	this.sessionIdsMap = make(map[string][]string, 0)
+	this.timersMap = make(map[string]*time.Timer)
 
 	this.inputEntityChannel = make(chan Entity)
 	this.outputEntityChannel = make(chan struct {
@@ -104,26 +85,13 @@ func (this *CacheManager) initialize() {
 		entityOutputChannel chan Entity
 	})
 
-	this.sessionIdsChannel = make(chan struct {
-		entityUuid string
-		sessionId  string
-	})
 	this.removeEntityChannel = make(chan string)
-	this.removeSessionIdChannel = make(chan string)
 	this.abortedByEnvironment = make(chan bool)
 }
 
 func (this *CacheManager) start() {
 	log.Println("--> Start CacheManager")
 	go this.run()
-
-	this.ticker = time.NewTicker(time.Millisecond * 2000)
-
-	go func(ticker *time.Ticker) {
-		for _ = range ticker.C {
-			GetServer().GetCacheManager().flushCache()
-		}
-	}(this.ticker)
 }
 
 func (this *CacheManager) getId() string {
@@ -144,30 +112,34 @@ func (this *CacheManager) run() {
 		select {
 		case inputEntity := <-this.inputEntityChannel:
 			this.entitiesMap[inputEntity.GetUuid()] = inputEntity
+			if this.timersMap[inputEntity.GetUuid()] != nil {
+				// In that case I will reset the timer time to 30 sec...
+				this.timersMap[inputEntity.GetUuid()].Reset(time.Second * timeout)
+			} else {
+				this.timersMap[inputEntity.GetUuid()] = time.NewTimer(time.Second * timeout)
+			}
 
-		case sessionInfo := <-this.sessionIdsChannel:
-			this.appendEntitySessionId(this.entitiesMap[sessionInfo.entityUuid], sessionInfo.sessionId, "")
+			go func(timer *time.Timer, uuid string, removeChannel chan string) {
+
+				// Remove the entity from the cache.
+				<-timer.C
+				//log.Println("Timer expired for entity ", uuid)
+				removeChannel <- uuid
+
+			}(this.timersMap[inputEntity.GetUuid()], inputEntity.GetUuid(), this.removeEntityChannel)
 
 		case outputEntity := <-this.outputEntityChannel:
 			outputEntity_ := this.entitiesMap[outputEntity.entityUuid]
+			// Reset the timeout value here.
+			if this.timersMap[outputEntity.entityUuid] != nil {
+				this.timersMap[outputEntity.entityUuid].Reset(time.Second * timeout)
+			}
 			outputEntity.entityOutputChannel <- outputEntity_
 
-		case sessionId := <-this.removeSessionIdChannel:
-			for k, v := range this.sessionIdsMap {
-				sessionIds_ := make([]string, 0)
-				for i := 0; i < len(v); i++ {
-					if sessionId != v[i] {
-						sessionIds_ = append(sessionIds_, v[i])
-					}
-				}
-				this.sessionIdsMap[k] = sessionIds_
-			}
-
 		case entityUuidToRemove := <-this.removeEntityChannel:
-			// Delete the corresponding sessionId in the sessionIdsMap
-			delete(this.sessionIdsMap, entityUuidToRemove)
 			// The entity to remove.
 			delete(this.entitiesMap, entityUuidToRemove)
+			delete(this.timersMap, entityUuidToRemove)
 
 		case done := <-this.abortedByEnvironment:
 			if done {
@@ -178,9 +150,6 @@ func (this *CacheManager) run() {
 		//log.Println("Number of items in the cache ", len(this.entitiesMap))
 
 	}
-
-	// Stop the ticker.
-	this.ticker.Stop()
 }
 
 /**
@@ -218,66 +187,6 @@ func (this *CacheManager) contains(uuid string) (Entity, bool) {
  */
 func (this *CacheManager) removeEntity(uuid string) {
 	this.removeEntityChannel <- uuid
-}
-
-/**
- * Remove session from the cache
- */
-func (this *CacheManager) removeSession(sessionId string) {
-	this.removeSessionIdChannel <- sessionId
-}
-
-/**
- * Append a cacheEntityInfo to the map of cacheEntityInfoMap if it doesn't already exist, otherwise update it.
- * Must only be used locally
- */
-func (this *CacheManager) appendEntitySessionId(entity Entity, sessionId string, recursivePath string) {
-	if entity == nil {
-		return
-	}
-
-	if strings.Contains(recursivePath, entity.GetUuid()) {
-		return
-	}
-
-	recursivePath += (entity.GetUuid() + " ")
-
-	if _, ok := this.sessionIdsMap[entity.GetUuid()]; !ok {
-		// The entity is not already in the cache
-		this.sessionIdsMap[entity.GetUuid()] = make([]string, 0)
-	}
-
-	if Utility.Contains(this.sessionIdsMap[entity.GetUuid()], sessionId) == false && len(sessionId) > 0 {
-		this.sessionIdsMap[entity.GetUuid()] = append(this.sessionIdsMap[entity.GetUuid()], sessionId)
-	}
-
-	for i := 0; i < len(entity.GetChildsPtr()); i++ {
-		this.appendEntitySessionId(entity.GetChildsPtr()[i], sessionId, recursivePath)
-	}
-}
-
-/**
- * Remove unused entities from the cache
- * Must only be used locally
- */
-func (this *CacheManager) flushCache() {
-	for k, v := range this.sessionIdsMap {
-		if len(v) == 0 {
-			delete(this.entitiesMap, k)
-			delete(this.sessionIdsMap, k)
-		}
-	}
-}
-
-/**
- * Associate the sessionId with the entityUuid in the cache
- * Can be used from the outside of this class
- */
-func (this *CacheManager) register(entityUuid string, sessionId string) {
-	this.sessionIdsChannel <- struct {
-		entityUuid string
-		sessionId  string
-	}{entityUuid, sessionId}
 }
 
 /**
