@@ -68,7 +68,7 @@ var TutorialsPage = function (parent) {
         .appendElement({ "tag": "div", "class": "jumbotron" }).down()
         .appendElement({ "tag": "div", "class": "container" }).down()
         .appendElement({ "tag": "div", "class": "col-xs-2" }).down()
-        .appendElement({ "tag": "img", "src": "img/Lighthouse.svg", "style": "max-width: 145px;" }).up()
+        .appendElement({ "tag": "img", "src": "img/Lighthouse.svg", "style": "max-width: 100px;" }).up()
         .appendElement({ "tag": "div", "class": "col-xs-10" }).down()
         .appendElement({ "tag": "h2", "id": "tutorial-title" })
         .appendElement({ "tag": "p" }).down()
