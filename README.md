@@ -42,6 +42,7 @@ CargoWebServer(master depending if you clone the project or not)
 - go get gopkg.in/gomail.v1
 - go get golang.org/x/net/websocket
 - go get golang.org/x/text/runes
+- go get github.com/orcaman/concurrent-map
 
 ###Build
 To build Cago from the top level directory:
