@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- @COPYRIGHT DASSAULT SYSTEMES 2010. All rights reserved. -->
 <xs:schema id="xs" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.w3.org/2001/XMLSchema/xs" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
 
 <!-- The level zero. -->
