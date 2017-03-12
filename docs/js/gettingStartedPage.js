@@ -21,16 +21,16 @@ var GettingStartedPage = function (parent) {
             "how-to-intall-li": "How to install and configure your Cargo application server.",
             "general-structure-li": "The general structure of a Cargo application server.",
             "create-simple-app-li": "How to create a simple application that uses basic parts of the framework.",
-            "prerequisites-content": "To start developing web applications with Cargo, you will need some knowledge of HTML, CSS and JavaScript. Because the back-end"
+            "prerequisites-content": "To start developing web applications with Cargo, you will need some knowledge of HTML, CSS and JavaScript. Because the back-end "
             + "of Cargo was witten with Go, it and has no external dependencies so there nothing more than Cargo itself to install."
             + "However, you will not need to know or use Go to build a web application with Cargo.",
             "cargo-web-server-git-lnk": "Visit our Github page",
             "cargo-linux-64-download-lnk": "Cargo v1.0 linux 64bit",
             "cargo-windows-64-download-lnk": "Cargo v1.0 windows 64bit",
-            "installing-cargo-content": "Unzip the file where you want your sever to be and voîlà! You have a server ready to run."
-            + "</br>To start the server simply call the command <code>./CargoWebServer</code> in linux, or <code>CargoWebServer.exe</code>"
+            "installing-cargo-content": "Unzip the file where you want your sever to be and voîlà! You have a server ready to run. "
+            + "</br>To start the server simply call the command <code>./CargoWebServer</code> in linux, or <code>CargoWebServer.exe</code> "
             + "in windows. Note that the server might take several minutes to load the first time.</br>"
-            + "When the indexation is done, Bridge will open. To login, in the user name input enter <kbd>admin</kbd> and in the"
+            + "When the indexation is done, Bridge will open. To login, in the user name input enter <kbd>admin</kbd> and in the "
             + "password input enter <kbd>adminadmin</kbd>.",
             "files-struct-intro": "Let's now explore the files we got in <span>CargoWebServer</span> directory.",
             "files-structure-description": "In order to work properly, the <span>WebApp</span> folder and the sever executable file should be at the same directory level. If you need to separate "
@@ -40,31 +40,31 @@ var GettingStartedPage = function (parent) {
             + " display the <span>Apps</span> folder content.</br>Here's a list of server directories description: </br>",
             "lib-folder-desc-li": "The <span>lib</span> folder is the place to put external libraries used by all your applications."
             + "<span> E.g. underscore, jQuery, ...</span>",
-            "cargo-folder-desc-li": "The <span>Cargo</span> folder contain the code used by all applications to interact with the server. We will see"
+            "cargo-folder-desc-li": "The <span>Cargo</span> folder contain the code used by all applications to interact with the server. We will see "
             + "later which files must be included by application.",
-            "data-folder-desc-li": "The <span>Data</span> folder contain applications data. The <span>MimeTypeIcon</span> directory contain icon's"
+            "data-folder-desc-li": "The <span>Data</span> folder contain applications data. The <span>MimeTypeIcon</span> directory contain icon's "
             + "named (mime type extension).png </br>** Never delete files <span>colorName.csv</span> and <span>mimeType.csv</span>",
-            "schema-folder-desc-li": "The <span>Schemas</span> folder contain XML schemas used by applications."
-            + "</br>** Never delete files <span>xs.xsd</span> and <span>SqlTypes.xsd</span>",
-            "script-folder-desc-li": "The <span>Script</span> folder contain sever side JavaScript files.",
-            "hello-cargo-intro-p1": "With Cargo up and runing on your computer, it's time to create our first application. The application will contain one input"
-            + "box and one button. The user will enter a value in the input box and when it click on the button the server will"
-            + "respond with a greeting composed from that value. You can get the code <a href=\"http://cargowebserver.com/example/HelloCargo.zip\">here</a>"
-            + " or try it <a href=\"http://54.214.130.226:9393/HelloCargo/\">here</a>.",
-            "hello-cargo-intro-p2": "First of all, we will create the directory inside the <span>Apps</span> folder. Let's name it <span>HelloCargo</span>."
-            + "Inside it we will create tow folders, one named <span>css</span> the other named <span>js</span>. I like to regroup"
+            "schema-folder-desc-li": "The <span>Schemas</span> folder contain XML schemas used by applications. "
+            + "</br>** Never delete files <span>xs.xsd</span> and <span>SqlTypes.xsd</span> ",
+            "script-folder-desc-li": "The <span>Script</span> folder contain sever side JavaScript files. ",
+            "hello-cargo-intro-p1": "With Cargo up and runing on your computer, it's time to create our first application. The application will contain one input "
+            + "box and one button. The user will enter a value in the input box and when it click on the button the server will "
+            + "respond with a greeting composed from that value. You can get the code <a href=\"http://cargowebserver.com/example/HelloCargo.zip\">here</a> "
+            + " or try it <a href=\"http://54.214.130.226:9393/HelloCargo/\">here</a>. ",
+            "hello-cargo-intro-p2": "First of all, we will create the directory inside the <span>Apps</span> folder. Let's name it <span>HelloCargo</span>. "
+            + "Inside it we will create tow folders, one named <span>css</span> the other named <span>js</span>. I like to regroup "
             + "Javascript files in one folder and style sheets in other folder, but there's no rules about it. In the <span>HelloCargo</span> "
-            + "directory create a new file named <span>index.html</span>. Each application must have an <span>index</span> file"
-            + "at it top level directory. The <span>index</span> file has tow part, the header and the body.</br> Let's get a look of it:",
+            + "directory create a new file named <span>index.html</span>. Each application must have an <span>index</span> file "
+            + "at it top level directory. The <span>index</span> file has tow part, the header and the body.</br> Let's get a look of it: ",
             "index-html-desc-p": "The first tow <span>meta</span> elements defines how the content of the application must be interpreted by "
-            + "the browser. The title element must contain your application name. Other lines of the header contains various stylesheets"
+            + "the browser. The title element must contain your application name. Other lines of the header contains various stylesheets "
             + "and script files to be imported. Those files are needed by all applications in order to work. In the body element "
             + "I import specif application files, in your case only the main file are import.",
             "main-js-desc-p": "Every C++ or Java programmer know the main function. In those language it represent the entry point of all program. JavaScript dosen't have a main function by itself. Cargo impose the use of a main "
-            + "dosen't have a main function by itself. Cargo impose the use of a main function because before starting your application"
-            + "a lot of work must be done, like opening a connection with the server, tranfering files, initializing data structures"
+            + "dosen't have a main function by itself. Cargo impose the use of a main function because before starting your application "
+            + "a lot of work must be done, like opening a connection with the server, tranfering files, initializing data structures "
             + "to name a few. So let's get a look of the <scan>main.js</scan> file.",
-            "hello-cargo-conclusion-p" : "Dont worry if you can't understand all at once, the point here is to get a idea of what is Cargo. As you see"
+            "hello-cargo-conclusion-p" : "Dont worry if you can't understand all at once, the point here is to get a idea of what is Cargo. As you see "
             +"there is no trace of http, in fact there no trace of protocol at all, the only thing we know is the <span>server</span> "
             +"run it and return the result. The rest of the code was to create the user interface."
         },
