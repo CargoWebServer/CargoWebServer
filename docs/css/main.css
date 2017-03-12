@@ -61,23 +61,20 @@ h5{
 	color: #1BA1E2;
 }
 
-/* MARKETING
--------------------------------------------------- */
-
-.marketing {
+.feature {
 	height: 300px;
 	padding-right: 150px;
 	padding-left: 150px;
 }
 
-.marketing .col-md-3 {
+.feature .col-md-3 {
 	height: 100%;
 	text-align: center;
 	font-size: 16px;
 	transition: all .0s ease;
 }
 
-.marketing .col-md-3 .glyphicon {
+.feature .col-md-3 .glyphicon {
 	font-size: 60px;
 	background-color: #EAEAEA;
 	border-radius: 50%;
@@ -87,29 +84,24 @@ h5{
 }
 
 
-
-.fileStructure{
-	padding: 5px;
-}
-
-.fileStructure div{
+.fileStructure {
 	padding-left: 15px;
 }
 
-.fileStructure i{
-	margin-right: 5px;
+.fileStructure margin{
+	margin: 20px;
 }
 
 .fileStructure a{
 	text-decoration: none;
+	margin-left: 2px;
 }
 
 .fileStructure span{
-	font-style: italic;
+	margin-left: 2px;
 }
 
-#FileStructureDiv, #HelloCargoDiv, #documentationDiv span{
+
+.fileStructure, #FileStructureDiv, #HelloCargoDiv, #documentationDiv span{
 	font-style: italic;
 }
-
-#HelloCargoDiv xmp {white-space: pre-wrap }

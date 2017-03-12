@@ -12,6 +12,10 @@ import (
  */
 func CallMethod(i interface{}, methodName string, params []interface{}) (interface{}, interface{}) {
 
+	if i == nil {
+		return "", errors.New("Nil pointer!")
+	}
+
 	//log.Println("Call method ", methodName, " with params ", params)
 	var ptr reflect.Value
 	var value reflect.Value
