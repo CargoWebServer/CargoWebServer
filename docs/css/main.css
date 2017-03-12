@@ -2,8 +2,25 @@ body{
 	overflow-x: hidden;
 }
 
+h2{
+	font-size: 16pt;
+}
+
+h3{
+	font-size: 14pt;
+}
+
+
+h4{
+	font-size: 12pt;
+}
+
 h5{
-	font-size: 16px;
+	font-size: 10pt;
+}
+
+.jumbotron p {
+	font-size: 12pt;
 }
 
 .navbar {
@@ -34,13 +51,13 @@ h5{
 	100%{ -webkit-transform:rotate(360deg); }
 }
 
-#gettingCargoDiv i{
-	font-size: 18pt;
+#page-cargoDocumentation p span {
+	font-style: italic;
 }
 
-.tutorialsHeader{
-	padding-left:10px;
-	cursor: pointer;
+.tutorial-symbol-div img{
+	margin-right: 10px;
+	padding-bottom: 10px;
 }
 
 .pageRow{
@@ -83,7 +100,6 @@ h5{
 	margin-top: 20px;
 }
 
-
 .fileStructure {
 	padding-left: 15px;
 }
@@ -100,7 +116,6 @@ h5{
 .fileStructure span{
 	margin-left: 2px;
 }
-
 
 .fileStructure, #FileStructureDiv, #HelloCargoDiv, #documentationDiv span{
 	font-style: italic;

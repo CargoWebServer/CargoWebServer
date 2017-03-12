@@ -13,19 +13,19 @@ var DocumentationPage = function (parent) {
             + "find the good tool that meet your needs can be confusing. Chosing a framework simply because it's the flavor of the "
             + "day whiout knowing to much about it is a risky buisness. Extensibility, simplicity, efficiency, flexibility are overused "
             + "word's these day's. So let's put all of this in perspective and find out if Cargo is the good tool for you.",
-            "documentation-introduction-p2": "First of all simplicity. My background is OOP the first programming language I learn was C++, and later"
+            "documentation-introduction-p2": "First of all simplicity. My background is OOP the first programming language I learn was C++, and later "
             + "Java. Far from being perfect, those languages have the advantage to impose structure at there core. There goal is to "
             + "protect the integrity of the system. In a language like JavaScript structures are more a matter of desing, but trust "
-            + "me without structures, simplicity give place to complexity. OOP it's a good starting point for using Cargo, but it's"
+            + "me without structures, simplicity give place to complexity. OOP it's a good starting point for using Cargo, but it's "
             + "not the destination...",
-            "documentation-introduction-p3": "If is easy to switch from C++ to Java, thing get more complicated when you switch to JavaScript. Because JavaScript is"
+            "documentation-introduction-p3": "If is easy to switch from C++ to Java, thing get more complicated when you switch to JavaScript. Because JavaScript is "
             + "not a pure OOP, thinking purely in OOP result in ugly code. I like to thing OOP language as lego block and functional "
             + "language as playdough. My goal here is not to teach you JavaScript, but to encourage you to take advantage of the flexibility "
             + "of this language without give up all good habit learn from OOP.",
             "documentation-introduction-p4": "If you came from C++, Java, Objective-C or any other desktop application programming language you will enjoy working with Cargo.",
             "philosophy-intro-lnk": "Philosophy",
             "documentation-philosophy-title": "Philosophy",
-            "documentation-philosophy-desc": "In tow words <span>non-intrusive</span>. Cargo dosen't impose you any rules. The role of Cargo is give you access to"
+            "documentation-philosophy-desc": "In tow words <span>non-intrusive</span>. Cargo dosen't impose you any rules. The role of Cargo is give you access to "
             + "server functionalies via the server object. Simplicity here is achieve by making abstraction of the network. We also "
             + "create some helper class to simplify the use of HTML and SVG element. In order to keep thing simple, we keep external "
             + "dependencies at mimimum. You can use tool like jQuery, Bootstrap or Angular but those libraries are not part of the "
@@ -33,8 +33,8 @@ var DocumentationPage = function (parent) {
             "documentation-architecture-lnk": "Architecture",
             "documentation-architecture-title": "Architecture",
             "documentation-from-desk-to-web": "From desktop application to web application",
-            "documentation-architecture-p1": "Application programming in Java, C++ or objective-C fowllow the same principles. Framework in these languages offer basicaly"
-            + "the same kind of functionalities like database access, interface design tools, openGL api... They are composed of various libraries"
+            "documentation-architecture-p1": "Application programming in Java, C++ or objective-C fowllow the same principles. Framework in these languages offer basicaly "
+            + "the same kind of functionalities like database access, interface design tools, openGL api... They are composed of various libraries "
             + "that exetend functionalities of the language and facilitate the development of application. Swing in Java, Cacao in Objective-c,"
             + "MFC and Qt in C++ are good example of desktop application framework. If we think HTML5 as a JavaScript framework we can see some similarities "
             + "with these frameworks. Each new functionnality added in HTML5 address a need of application programming. With all these "
@@ -44,7 +44,7 @@ var DocumentationPage = function (parent) {
             + "application run on single computer, and distributed application on a network. In those applications, functionalities are access with use "
             + "of libraries. The communication with the framework and the application are made via object instances or function call. Instead of libraries, "
             + "distributed application made use of services, and call to function are made via RPC or distributed object reference.",
-            "documentation-architecture-p3": "Services offer by Cargo are, objects persitence, sessions management, events management (channels, listener), ressource management (files, user, group, role, action...),"
+            "documentation-architecture-p3": "Services offer by Cargo are, objects persitence, sessions management, events management (channels, listener), ressource management (files, user, group, role, action...), "
             + "data access (SQL, Key/Value), authentication (LDAP). Because Cargo take care of all the burden of distributed aspects of your "
             + "application, developping web application with it isn't more difficult than developping desktop application.",
             "documentation-big-picture": "The big picture",
@@ -75,7 +75,7 @@ var DocumentationPage = function (parent) {
             "documentation-entity-title": "Entity",
             "documentation-entity-lnk": "Entity",
             "documentation-entity-subtitle": "something that exists as itself",
-            "documentation-entity-p1": "JavaScript Object Notation JSON is the facto information model those days. Shinning by it's simplicity and it's versatility every structures can be serialysed with it."
+            "documentation-entity-p1": "JavaScript Object Notation JSON is the facto information model those days. Shinning by it's simplicity and it's versatility every structures can be serialysed with it. "
             + "But when you serialyse an instance of a class and instantiate it back you end up with a json object and not the initial instance. That represent a problem when it's time "
             + "to make object persistent. Data store need meta data in order to be able to manipulated his contained data. The concept of schema is use to define data structure inside the "
             + " data sotre and the relations between those structures. Query language also need meta data to be able work properly. To fullfill our need we create the entity prototype concept."
@@ -268,9 +268,9 @@ var DocumentationPage = function (parent) {
         .appendElement({ "tag": "p", "id": "documentation-entity-p2" })
         // Services
         .appendElement({ "tag": "h4", "id": "documentation-services-title" })
-        .appendElement({ "tag": "p", "id": "documentation-services-p1" })
+        .appendElement({ "tag": "p", "id": "documentation-services-p" })
         // Security
         .appendElement({ "tag": "h4", "id": "documentation-security-title" })
         .appendElement({ "tag": "h5", "id": "documentation-security-subtitle" })
-        .appendElement({ "tag": "p", "id": "documentation-security-p1" })
+        .appendElement({ "tag": "p", "id": "documentation-security-p" })
 }

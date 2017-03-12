@@ -33,7 +33,7 @@ var GettingStartedPage = function (parent) {
             + "When the indexation is done, Bridge will open. To login, in the user name input enter <kbd>admin</kbd> and in the"
             + "password input enter <kbd>adminadmin</kbd>.",
             "files-struct-intro": "Let's now explore the files we got in <span>CargoWebServer</span> directory.",
-            "files-structure-description": "In order to work properly, the <span>WebApp</span> folder and the sever executable file should be at the same directory level. If you need to separate"
+            "files-structure-description": "In order to work properly, the <span>WebApp</span> folder and the sever executable file should be at the same directory level. If you need to separate "
             + "these tow files, you must define a global variable named CARGOROOT and make it point to <span>WebApp</span> directory."
             + "The application directory <span>Apps</span> contain applications files. From the browser point of view it's the root "
             + "of your server file system. With a running server, clicking the link <a href=\"http://127.0.0.1:9393\">Apps</span></a>"
