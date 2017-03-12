@@ -16,12 +16,15 @@ var TutorialsPage = function (parent) {
             + "So don't Hesitate to communicate with us to share comment or idea at <a href=\"mailto:cargowebserver@gmail.com\">CargoWebServer@gmail.com</a>, your opinion is important to us.",
             "convention-tutorial-title": "Conventions",
             "convention-tutorial-content": "Let's me now explain to you the tutorials conventions. Because of the name Cargo, we made use of nautic symbols.",
-            "tutorial-lifesaver-desc": "The life saver symbol is use went we want to teach you good practices or usefull techniques.",
+            "tutorial-lifesaver-desc": "The life saver symbol is use when we want to teach you good practices or usefull techniques.",
             "tutorial-buoy-desc" :"The buoy symbol is use to warning you about common mistake or bad programming practices.",
             "tutorial-anchor-desc":"The anchor symbol are use for complementary explanation or discution that can be skip by hurry reader's.",
-            "blog-tutorial-title": "The first step, your own Blog!",
-            "blog-tutorial-content": "",
-            "blog-tutorial-lnk": "Blog tutorial"
+            "blog-tutorial-title": "The first step, your own <a href=\"https://en.wikipedia.org/wiki/Blog\">Blog</a>!",
+            "blog-tutorial-lnk": "Blog tutorial",
+            "blog-tutorial-content": "Cargo is a generic framework, with it, you can program almost every kind of web-application. There's a lot frameworks specialized in blog programming, "
+            + "and if your only intent is to created one, you should probably considere to get look at them. Because blog's made use of limited part of the framework, it reprensent "
+            + "a good starting point for teach you your first application with Cargo. With that tutorial we will learn the basics like how to work with entities and how to create dynamic "
+            +" html elements to diplay informations."
         },
         //francais
         "fr": {
