@@ -21,10 +21,10 @@ var TutorialsPage = function (parent) {
             "tutorial-anchor-desc":"The anchor symbol are use for complementary explanation or discution that can be skip by hurry reader's.",
             "blog-tutorial-title": "The first step, your own <a href=\"https://en.wikipedia.org/wiki/Blog\">Blog</a>!",
             "blog-tutorial-lnk": "Blog tutorial",
-            "blog-tutorial-content": "Cargo is a generic framework, with it, you can program almost every kind of web-application. There's a lot frameworks specialized in blog programming, "
-            + "and if your only intent is to created one, you should probably considere to get look at them. Because blog's made use of limited part of the framework, it reprensent "
-            + "a good starting point for teach you your first application with Cargo. With that tutorial we will learn the basics like how to work with entities and how to create dynamic "
-            +" html elements to diplay informations."
+            "blog-tutorial-content": "Cargo is a generic framework, with it, you can program almost every kind of web-applications. There's a lot of frameworks specialized in blog programming, "
+            + "if your only intent is to created one, you should probably considere to get look at them. Because blog's made use of limited number of number of features, it reprensent "
+            + "a good starting point for us to teach you the basics of web-applications programming. In that tutorial you will learn how to work with entities and how to create dynamic "
+            +" html elements to display pages content. So let's begin."
         },
         //francais
         "fr": {
