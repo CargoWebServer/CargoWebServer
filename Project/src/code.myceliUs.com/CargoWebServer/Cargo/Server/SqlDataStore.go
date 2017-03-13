@@ -764,7 +764,7 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 	this.setRefs()
 
 	// Synchronize actual data
-	//this.synchronize(prototypes)
+	this.synchronize(prototypes)
 
 	return prototypes, nil
 }
@@ -1425,6 +1425,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 				entities := entitiesByType[prototype.TypeName]
 				for k := 0; k < len(entities); k++ {
 					entity := entities[k]
+					log.Println("1428 ----> val ", k, "/", len(entities))
 					if !strings.HasPrefix(prototype.FieldsType[j], "sqltypes") && !strings.HasPrefix(prototype.FieldsType[j], "[]sqltypes") && strings.HasPrefix(prototype.Fields[j], "M_") {
 
 						// If the relation is aggregation or association.
@@ -1464,6 +1465,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 							values, err := this.Read(query, fieldsType, params)
 							if err == nil {
 								for n := 0; n < len(values); n++ {
+									log.Println("1468 val n ", n, "/", len(values))
 									var strId string
 									if reflect.TypeOf(values[n][0]).Kind() == reflect.String {
 										strId = values[n][0].(string)
@@ -1495,7 +1497,13 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 											delete(toSave, childUuid)
 											log.Println("-------> child uuid ", childEntity.GetUuid(), " found!!!!")
 										} else {
+											if !strings.HasPrefix(prototype.FieldsType[j], "[]") {
+												entity.(*DynamicEntity).setValue(prototype.Fields[j], childEntity)
+											} else {
+												entity.(*DynamicEntity).appendValue(prototype.Fields[j], childEntity)
+											}
 											entity.AppendReference(childEntity)
+											childEntity.AppendReferenced(prototype.Fields[j], entity)
 											log.Println("-------> ref uuid ", childEntity.GetUuid(), " found!!!!")
 										}
 									} else {

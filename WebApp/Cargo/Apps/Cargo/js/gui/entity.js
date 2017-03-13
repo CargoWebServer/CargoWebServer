@@ -375,7 +375,8 @@ EntityPanel.prototype.initHeader = function () {
 			entityPanel.entity.NeedSave = true
 			if (entityPanel.entity != null) {
 				entityPanel.saveBtn.element.id = entityPanel.entity.UUID + "_save_btn"
-				if (entityPanel.entity.exist == false) {
+				if (entityPanel.entity.exist == false && entityPanel.parentEntity != null) {
+					// The parent entity is know and the entity does not exist.
 					server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.parentLnk, entityPanel.entity.TYPENAME, entityPanel.entity.UUID, entityPanel.entity,
 						// Success callback
 						function (entity, entityPanel) {
@@ -388,6 +389,7 @@ EntityPanel.prototype.initHeader = function () {
 
 						}, entityPanel)
 				} else {
+					// Here the entity will be created of save...
 					server.entityManager.saveEntity(entityPanel.entity,
 						// Success callback
 						function (entity, entityPanel) {
@@ -442,7 +444,7 @@ EntityPanel.prototype.initHeader = function () {
 
 	// Set the title div, the type is the default title.
 	this.header.appendElement({ "tag": "div", "class": "entity_type" }).down()
-		.appendElement({ "tag": "div", "id": "title_div", "innerHtml": this.typeName })
+		.appendElement({ "tag": "div", "id": this.typeName, "innerHtml": this.typeName })
 
 	this.spacer = this.header.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" }).down()
 	this.moveUp = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell;" }).down()
@@ -502,7 +504,7 @@ EntityPanel.prototype.getFieldControl = function (fieldName) {
  * Set the title.
  */
 EntityPanel.prototype.setTitle = function (title) {
-	var titleDiv = this.panel.getChildById("title_div")
+	var titleDiv = this.panel.getChildById(this.typeName)
 	titleDiv.element.innerHTML = title
 }
 
@@ -589,7 +591,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 	// The entity label here...
 	var label = entityDiv.appendElement({ "tag": "div", id: this.proto.TypeName + "_" + field + "_lbl" }).down()
-	label.appendElement({ "tag": "span", "innerHtml": field.replace("M_", "") }).down()
+	label.appendElement({ "tag": "span", "innerHtml": field.replace("M_", ""), "id": field.replace("M_", "") }).down()
 
 	server.languageManager.setElementText(label, field)
 
@@ -741,7 +743,6 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						// In that case I will create a new entity
 						if (itemPrototype != undefined) {
 							var item = eval("new " + itemPrototype.TypeName + "()")
-							item.UUID = itemPrototype.TypeName + "%" + randomUUID()
 							item.TYPENAME = itemPrototype.TypeName
 
 							// Set the parent uuid.
@@ -816,9 +817,11 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						// Here I will create a new entity.
 						var entity = eval("new " + entityPanel.typeName)
 						// set basic values.
-						entity.UUID = entityPanel.typeName + "%" + randomUUID()
-						entity.parentUuid = entityPanel.parentEntity.UUID
-						entity.parentLnk = entityPanel.parentLnk
+						if (entityPanel.parentEntity != null) {
+							entity.parentUuid = entityPanel.parentEntity.UUID
+							entity.parentLnk = entityPanel.parentLnk
+						}
+
 					} else {
 						// Get the existing entity.
 						entity = entityPanel.entity
@@ -1207,7 +1210,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 			}
 		} else if (isXsId(fieldType)) {
 			control.element.value = value
-		}else if (isXsRef(fieldType)) {
+		} else if (isXsRef(fieldType)) {
 			control.element.innerHTML = value.replace("#", "")
 			control.element.href = value
 		}
@@ -1312,8 +1315,8 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 	input.element.style.width = "auto"
 
 	// TODO use query instead of download all elements.
-/*
-	server.entityManager.getObjectsByType(typeName, typeName.split(".")[0], "",
+
+	server.entityManager.getObjectsByType(typeName, typeName.substring(0, typeName.indexOf(".")), "",
 		// Progress...
 		function () {
 
@@ -1384,7 +1387,11 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 
 		},
 		function (errMsg, caller) {
+			// here there's no indexation... so what!
+			var input = caller.input
+			input.element.readOnly = false
+			input.element.style.cursor = "default"
 		},
 		{ "input": input, "field": field, "objMap": objMap, "values": this.values, "entityPanel": entityPanel, "onSelect": onSelect, "ids": ids })
-*/
+
 }

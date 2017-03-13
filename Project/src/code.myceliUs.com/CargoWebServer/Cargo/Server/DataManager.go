@@ -152,6 +152,10 @@ func (this *DataManager) removeDataStore(name string) {
  */
 func (this *DataManager) readData(storeName string, query string, fieldsType []interface{}, params []interface{}) ([][]interface{}, error) {
 
+	if storeName == "sql_info" {
+		log.Println("-----------> read data with fields: ", fieldsType, params)
+	}
+
 	store := this.getDataStore(storeName)
 	if store == nil {
 		return nil, errors.New("The datastore '" + storeName + "' does not exist.")
@@ -170,6 +174,11 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
  * value to insert in the DB.
  */
 func (this *DataManager) createData(storeName string, query string, d []interface{}) (lastId interface{}, err error) {
+	// If the store is sql_info in that case I will need to create the information
+	// in the sql data store.
+	if storeName == "sql_info" {
+		log.Println("-----------> need create data for values: ", d)
+	}
 
 	store := this.getDataStore(storeName)
 	if store == nil {
@@ -183,6 +192,10 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 }
 
 func (this *DataManager) deleteData(storeName string, query string, params []interface{}) (err error) {
+	if storeName == "sql_info" {
+		log.Println("-----------> need delete data with param: ", params)
+	}
+
 	store := this.getDataStore(storeName)
 	if store == nil {
 		return errors.New("Data store " + storeName + " does not exist.")
@@ -196,6 +209,11 @@ func (this *DataManager) deleteData(storeName string, query string, params []int
 }
 
 func (this *DataManager) updateData(storeName string, query string, fields []interface{}, params []interface{}) (err error) {
+
+	if storeName == "sql_info" {
+		log.Println("-----------> need update data with fields: ", fields, params)
+	}
+
 	store := this.getDataStore(storeName)
 	if store == nil {
 		return errors.New("Data store " + storeName + " does not exist.")

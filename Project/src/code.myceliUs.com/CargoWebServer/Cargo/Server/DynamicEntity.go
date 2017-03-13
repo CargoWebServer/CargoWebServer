@@ -220,8 +220,50 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
  * Append a new value.
  */
 func (this *DynamicEntity) appendValue(field string, value interface{}) {
-	log.Println("==----------> append value ", field, ":", value)
-	// TODO implement it...
+	values, exist := this.object.Get(field)
+
+	if !exist {
+		// Here no value aready exist.
+		if reflect.TypeOf(value).Kind() == reflect.String {
+			values = make([]string, 1)
+			values.([]string)[0] = value.(string)
+			this.object.Set(field, values)
+		} else if reflect.TypeOf(value).String() == "*Server.DynamicEntity" {
+			if strings.HasSuffix(this.prototype.FieldsType[this.prototype.getFieldIndex(field)], ":Ref") {
+				values = make([]string, 1)
+				values.([]string)[0] = value.(Entity).GetUuid()
+				this.object.Set(field, values)
+			} else {
+				this.AppendChild(field, value.(Entity))
+			}
+		} else {
+			// Other types.
+			values = make([]interface{}, 1)
+			values.([]interface{})[0] = value
+			this.object.Set(field, values)
+		}
+
+	} else {
+		// An array already exist in that case.
+		if reflect.TypeOf(value).Kind() == reflect.String {
+			values = append(values.([]string), value.(string))
+			this.object.Set(field, values)
+		} else if reflect.TypeOf(value).String() == "*Server.DynamicEntity" {
+			if strings.HasSuffix(this.prototype.FieldsType[this.prototype.getFieldIndex(field)], ":Ref") {
+				if !Utility.Contains(values.([]string), value.(Entity).GetUuid()) {
+					values = append(values.([]string), value.(Entity).GetUuid())
+					this.object.Set(field, values)
+				}
+			} else {
+				this.AppendChild(field, value.(Entity))
+			}
+		} else {
+			// Other types.
+			values = append(values.([]interface{}), value)
+			this.object.Set(field, values)
+		}
+	}
+
 }
 
 /**
@@ -257,13 +299,11 @@ func (this *DynamicEntity) SetNeedSave(needSave bool) {
  */
 func (this *DynamicEntity) InitEntity(id string) error {
 	err := this.initEntity(id, "")
-	log.Println("After init:", toJsonStr(this.object))
-
+	//log.Println("After init:", toJsonStr(this.object))
 	return err
 }
 
 func (this *DynamicEntity) initEntity(id string, path string) error {
-
 	// cut infinite recursion here.
 	if strings.Index(path, id) != -1 {
 		return nil
@@ -546,7 +586,6 @@ func (this *DynamicEntity) SaveEntity() {
 }
 
 func (this *DynamicEntity) saveEntity(path string) {
-
 	// Do not save if is nt necessary...
 	if !this.NeedSave() || strings.Index(path, this.GetUuid()) != -1 {
 		return

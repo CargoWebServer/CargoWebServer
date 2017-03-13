@@ -12,7 +12,7 @@ function attachAutoComplete(control, elementLst, autoComplete) {
     if (control.element.parentNode != undefined) {
         control.element.parentNode.style.position = "relative"
     }
-    
+
     // The value must be in the list...
     if (autoComplete == undefined) {
         autoComplete = true
@@ -27,10 +27,6 @@ function attachAutoComplete(control, elementLst, autoComplete) {
         return function (evt) {
 
             /* The div that contain items **/
-            /* var viewportOffset = control.element.parentNode.getBoundingClientRect();
-            var doc = document.documentElement;
-            var left = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
-            var top = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);*/
             var coord = getCoords(control.element)
             var minWidth = control.element.offsetWidth + "px"
             autocompleteDiv.element.style.minWidth = minWidth
@@ -42,14 +38,25 @@ function attachAutoComplete(control, elementLst, autoComplete) {
                 // Filter the values...
                 values = _.select(elementLst, function (val) {
                     return function (user) {
-                        return user.substring(0, val.length).toUpperCase() == val.toUpperCase()
+                        if (isString(user)) {
+                            return user.substring(0, val.length).toUpperCase() == val.toUpperCase()
+                        }else if(isInt(user)){
+                            return user.toString()
+                        }else if(isNumeric(user)){
+                            return user.toString()
+                        }
+                        return user
                     }
                 } (control.element.value))
 
                 if (values.length > 1 || (values.length >= 1 && !autoComplete)) {
                     // Append the element...
                     for (var i = 0; i < values.length; i++) {
-                        var elementDiv = autocompleteDiv.appendElement({ "tag": "div", "innerHtml": values[i], "style": "display: block;", "id": i }).down()
+                        var value = values[i]
+                        if(!isString(value)){
+                            value = value.toString()
+                        }
+                        var elementDiv = autocompleteDiv.appendElement({ "tag": "div", "innerHtml": value, "style": "display: block;", "id": i }).down()
                         // Here i will append the click event...
                         elementDiv.element.onclick = function (control, autocompleteDiv, value) {
                             return function () {
@@ -144,7 +151,7 @@ function setValidator(msg, control, validator, delay) {
                 return
             }
 
-            setTimeout(function (validator,msgDiv,errorDiv, control, delay) {
+            setTimeout(function (validator, msgDiv, errorDiv, control, delay) {
                 return function () {
                     if (validator(msgDiv) == false) {
                         // The validor widow...
@@ -173,7 +180,7 @@ function setValidator(msg, control, validator, delay) {
                         } (errorDiv, control), delay)
                     }
                 }
-            } (validator,msgDiv, errorDiv, control, delay), 200); // 200 ms wait before validating...
+            } (validator, msgDiv, errorDiv, control, delay), 200); // 200 ms wait before validating...
         }
     } (validator, control, errorDiv, msgDiv)
 

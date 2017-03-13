@@ -1482,6 +1482,35 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 }
 
 /**
+ * Take an array of id's in the same order as the entity prototype Id's and
+ * generate a dertermistic UUID from it.
+ */
+func (this *EntityManager) GenerateEntityUUID(typeName string, ids []interface{}, messageId string, sessionId string) string {
+	keyInfo := typeName + ":"
+	for i := 0; i < len(ids); i++ {
+		if reflect.TypeOf(ids[i]).Kind() == reflect.String {
+			keyInfo += ids[i].(string)
+		} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int {
+			keyInfo += strconv.Itoa(ids[i].(int))
+		} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int8 {
+			keyInfo += strconv.Itoa(int(ids[i].(int8)))
+		} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int16 {
+			keyInfo += strconv.Itoa(int(ids[i].(int16)))
+		} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int32 {
+			keyInfo += strconv.Itoa(int(ids[i].(int32)))
+		} else if reflect.TypeOf(ids[i]).Kind() == reflect.Int64 {
+			keyInfo += strconv.Itoa(int(ids[i].(int64)))
+		}
+		// Append underscore for readability in case of problem...
+		if i < len(ids)-1 {
+			keyInfo += "_"
+		}
+	}
+	// Return the uuid from the input information.
+	return Utility.GenerateUUID(keyInfo)
+}
+
+/**
  * Return the list of all link's for a given entity.
  */
 func (this *EntityManager) GetEntityLnks(uuid string, messageId string, sessionId string) []Entity {

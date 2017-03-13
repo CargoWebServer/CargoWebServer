@@ -102,22 +102,22 @@ var Element = function (parent, params, callback, appendFront) {
     /**
      * @property {function} callback The function to call after the initialization.
      */
-     this.callback = callback;
+    this.callback = callback;
 
     /**
      * @property {Element} parent The parent element, can be a plain HTML element or an Element.
      */
-     this.parentElement = parent;
+    this.parentElement = parent;
 
     /**
      * @property {string} id a uuid. If the params contain id, the param id will be used.
      */
-     this.id = randomUUID();
+    this.id = randomUUID();
 
     /**
      * @property {Element[]} childs The map of child elements indexed by their id.
      */
-     this.childs = {};
+    this.childs = {};
 
     // Keeping a reference of the lastChild. Used by the down function.
     this.lastChild = null;
@@ -209,6 +209,12 @@ var Element = function (parent, params, callback, appendFront) {
     if (this.callback != undefined) {
         this.callback(); // Calls the callback function
     }
+
+    // try to set language text if the element is register.
+    if (this.element.id.length > 0) {
+        server.languageManager.setElementText(this, this.element.id)
+    }
+    
     return this;
 };
 
@@ -220,10 +226,10 @@ var Element = function (parent, params, callback, appendFront) {
 * @stability 1
 */
 Element.prototype.appendElement = function (e) {
-    if(e == undefined){
+    if (e == undefined) {
         return
     }
-    
+
     if (e.element != undefined) {
         e.parentElement = this
         this.childs[e.id] = e
@@ -243,9 +249,6 @@ Element.prototype.appendElement = function (e) {
         }
     }
 
-    // try to set language text if the element is register.
-    server.languageManager.setElementText(e, e.id)
-    
     return this;
 };
 
@@ -322,9 +325,9 @@ Element.prototype.removeAllChilds = function () {
 */
 Element.prototype.init = function () {
     var keys = Object.keys(this.childs)
-    , i = 0
-    , len = keys.length
-    , child = null
+        , i = 0
+        , len = keys.length
+        , child = null
 
     for (; i < len; i++) {
         child = this.childs[keys[i]]
@@ -349,10 +352,10 @@ Element.prototype.init = function () {
 */
 Element.prototype.getChildById = function (id) {
     var keys = Object.keys(this.childs)
-    , i = 0
-    , len = keys.length
-    , found = null
-    , child = null
+        , i = 0
+        , len = keys.length
+        , found = null
+        , child = null
 
     for (i = 0; i < len; i++) {
         child = this.childs[keys[i]]

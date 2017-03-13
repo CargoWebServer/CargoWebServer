@@ -215,7 +215,6 @@ func (this *Server) Restart() {
 
 	// Start the server...
 	server.Start()
-
 }
 
 /**
