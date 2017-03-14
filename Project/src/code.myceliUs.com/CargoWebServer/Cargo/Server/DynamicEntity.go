@@ -125,20 +125,7 @@ func (this *EntityManager) newDynamicEntity(values map[string]interface{}) (*Dyn
 				} else {
 					keyInfo := prototype.TypeName + ":"
 					for i := 1; i < len(prototype.Ids); i++ {
-						value := values[prototype.Ids[i]]
-						if reflect.TypeOf(value).Kind() == reflect.String {
-							keyInfo += value.(string)
-						} else if reflect.TypeOf(value).Kind() == reflect.Int {
-							keyInfo += strconv.Itoa(value.(int))
-						} else if reflect.TypeOf(value).Kind() == reflect.Int8 {
-							keyInfo += strconv.Itoa(int(value.(int8)))
-						} else if reflect.TypeOf(value).Kind() == reflect.Int16 {
-							keyInfo += strconv.Itoa(int(value.(int16)))
-						} else if reflect.TypeOf(value).Kind() == reflect.Int32 {
-							keyInfo += strconv.Itoa(int(value.(int32)))
-						} else if reflect.TypeOf(value).Kind() == reflect.Int64 {
-							keyInfo += strconv.Itoa(int(value.(int64)))
-						}
+						keyInfo += Utility.ToString(values[prototype.Ids[i]])
 						// Append underscore for readability in case of problem...
 						if i < len(prototype.Ids)-1 {
 							keyInfo += "_"

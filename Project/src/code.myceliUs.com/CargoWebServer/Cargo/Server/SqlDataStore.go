@@ -305,7 +305,6 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
 			results, _ = GetServer().GetDataManager().readData(this.GetId(), lastIndexQuery, fieldType, params)
 			if len(results) > 0 {
 				lastId = int64(results[0][0].(int))
-
 			}
 		}
 	}
@@ -622,22 +621,7 @@ func (this *SqlDataStore) Update(query string, fields []interface{}, params []in
 
 		id := new(MessageData)
 		id.Name = "id"
-		if reflect.TypeOf(params[0]).String() == "string" {
-			id.Value = params[0].(string) // Be sure to convert to the good type here...
-		} else if reflect.TypeOf(params[0]).String() == "int" {
-			id.Value = params[0].(int)
-		} else if reflect.TypeOf(params[0]).String() == "int32" {
-			id.Value = params[0].(int32)
-		} else if reflect.TypeOf(params[0]).String() == "int64" {
-			id.Value = params[0].(int64)
-		} else if reflect.TypeOf(params[0]).String() == "float32" {
-			id.Value = params[0].(float32)
-		} else if reflect.TypeOf(params[0]).String() == "float64" {
-			id.Value = params[0].(float64)
-		} else {
-			log.Println("----> unknow type: ", reflect.TypeOf(params[0]).String())
-		}
-
+		id.Value = Utility.ToString(params[0])
 		eventData[1] = id
 		evt, _ := NewEvent(UpdateRowEvent, TableEvent, eventData)
 		GetServer().GetEventManager().BroadcastEvent(evt)
@@ -685,21 +669,7 @@ func (this *SqlDataStore) Delete(query string, params []interface{}) (err error)
 		for i := 0; i < len(params); i++ {
 			id := new(MessageData)
 			id.Name = "id_" + strconv.Itoa(i)
-			if reflect.TypeOf(params[i]).String() == "string" {
-				id.Value = params[i].(string) // Be sure to convert to the good type here...
-			} else if reflect.TypeOf(params[i]).String() == "int" {
-				id.Value = params[i].(int)
-			} else if reflect.TypeOf(params[i]).String() == "int32" {
-				id.Value = params[i].(int32)
-			} else if reflect.TypeOf(params[i]).String() == "int64" {
-				id.Value = params[i].(int64)
-			} else if reflect.TypeOf(params[i]).String() == "float32" {
-				id.Value = params[i].(float32)
-			} else if reflect.TypeOf(params[i]).String() == "float64" {
-				id.Value = params[i].(float64)
-			} else {
-				log.Println("----> unknow type: ", reflect.TypeOf(params[i]).String())
-			}
+			id.Value = Utility.ToString(params[i])
 			eventData = append(eventData, id)
 		}
 
@@ -1363,19 +1333,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 					//log.Println(prototype.TypeName, j, ":", len(values))
 					keyInfo := prototype.TypeName + ":"
 					for k := 0; k < len(values[j]); k++ {
-						if reflect.TypeOf(values[j][k]).Kind() == reflect.String {
-							keyInfo += values[j][k].(string)
-						} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int {
-							keyInfo += strconv.Itoa(values[j][k].(int))
-						} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int8 {
-							keyInfo += strconv.Itoa(int(values[j][k].(int8)))
-						} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int16 {
-							keyInfo += strconv.Itoa(int(values[j][k].(int16)))
-						} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int32 {
-							keyInfo += strconv.Itoa(int(values[j][k].(int32)))
-						} else if reflect.TypeOf(values[j][k]).Kind() == reflect.Int64 {
-							keyInfo += strconv.Itoa(int(values[j][k].(int64)))
-						}
+						keyInfo += Utility.ToString(values[j][k])
 						// Append underscore for readability in case of problem...
 						if k < len(values[j])-1 {
 							keyInfo += "_"
@@ -1441,22 +1399,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 						if err == nil && !this.m_associations[childTypeName] {
 							id := entity.GetObject().(map[string]interface{})["M_"+refInfos[3]]
-							var strId string
-							if reflect.TypeOf(id).Kind() == reflect.String {
-								strId = "'" + id.(string) + "'"
-							} else if reflect.TypeOf(id).Kind() == reflect.Int {
-								strId = strconv.Itoa(id.(int))
-							} else if reflect.TypeOf(id).Kind() == reflect.Int8 {
-								strId = strconv.Itoa(int(id.(int8)))
-							} else if reflect.TypeOf(id).Kind() == reflect.Int16 {
-								strId = strconv.Itoa(int(id.(int16)))
-							} else if reflect.TypeOf(id).Kind() == reflect.Int32 {
-								strId = strconv.Itoa(int(id.(int32)))
-							} else if reflect.TypeOf(id).Kind() == reflect.Int64 {
-								strId = strconv.Itoa(int(id.(int64)))
-							}
-
-							query := "SELECT " + refInfos[3] + " FROM " + refInfos[0] + " WHERE " + refInfos[1] + "=" + strId
+							query := "SELECT " + refInfos[3] + " FROM " + refInfos[0] + " WHERE " + refInfos[1] + "=" + Utility.ToString(id)
 							var params []interface{}
 							var fieldsType []interface{}
 							fieldsType = append(fieldsType, prototype.FieldsType[prototype.getFieldIndex("M_"+refInfos[3])])
@@ -1466,23 +1409,8 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 							if err == nil {
 								for n := 0; n < len(values); n++ {
 									log.Println("1468 val n ", n, "/", len(values))
-									var strId string
-									if reflect.TypeOf(values[n][0]).Kind() == reflect.String {
-										strId = values[n][0].(string)
-									} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int {
-										strId = strconv.Itoa(values[n][0].(int))
-									} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int8 {
-										strId = strconv.Itoa(int(values[n][0].(int8)))
-									} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int16 {
-										strId = strconv.Itoa(int(values[n][0].(int16)))
-									} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int32 {
-										strId = strconv.Itoa(int(values[n][0].(int32)))
-									} else if reflect.TypeOf(values[n][0]).Kind() == reflect.Int64 {
-										strId = strconv.Itoa(int(values[n][0].(int64)))
-									}
-
 									// Set the child uuid.
-									childUuid := childTypeName + "%" + Utility.GenerateUUID(childTypeName+":"+strId)
+									childUuid := childTypeName + "%" + Utility.GenerateUUID(childTypeName+":"+Utility.ToString(values[n][0]))
 									var childEntity Entity
 									if toSave[childUuid] != nil {
 										childEntity = toSave[childUuid]

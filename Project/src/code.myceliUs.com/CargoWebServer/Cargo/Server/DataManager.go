@@ -4,7 +4,8 @@ import (
 	"errors"
 	"log"
 	"os"
-	//	"reflect"
+	"reflect"
+	"strings"
 	"sync"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
@@ -152,10 +153,6 @@ func (this *DataManager) removeDataStore(name string) {
  */
 func (this *DataManager) readData(storeName string, query string, fieldsType []interface{}, params []interface{}) ([][]interface{}, error) {
 
-	if storeName == "sql_info" {
-		log.Println("-----------> read data with fields: ", fieldsType, params)
-	}
-
 	store := this.getDataStore(storeName)
 	if store == nil {
 		return nil, errors.New("The datastore '" + storeName + "' does not exist.")
@@ -164,6 +161,85 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 	data, err := store.Read(query, fieldsType, params)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
+	}
+
+	// In case of SQL data, the data we found will be use to get
+	// sql data in a second pass.
+	if storeName == "sql_info" && err == nil {
+		dataIndex := make([]int, 0)
+		// In that case the value will be read from sql.
+		for i := 0; i < len(data); i++ {
+			if len(data[i]) > 1 {
+				if reflect.TypeOf(data[i][0]).Kind() == reflect.String {
+					if Utility.IsValidEntityReferenceName(data[i][0].(string)) {
+						// So I will create the sql query to get it data back.
+						uuid := data[i][0].(string)
+						values := strings.Split(uuid[0:strings.Index(uuid, "%")], ".")
+						dataBaseName := values[0]
+						tableName := values[len(values)-1]
+						schemaId := ""
+						if len(values) == 3 {
+							schemaId = values[1]
+						}
+						prototype, err := GetServer().GetEntityManager().getEntityPrototype(uuid[0:strings.Index(uuid, "%")], "sql_info")
+						if err == nil {
+							// Now I will create the query.
+							var ids []interface{}
+							var fields []string
+							var fieldsType []interface{}
+							for j := 0; j < len(prototype.Fields); j++ {
+								fieldName := prototype.Fields[j]
+								fieldType := prototype.FieldsType[j]
+								// If the field is an id
+								if !strings.HasSuffix(fieldType, ":Ref") && strings.HasPrefix(fieldName, "M_") {
+									if Utility.Contains(prototype.Ids, fieldName) {
+										ids = append(ids, data[i][j]) // append the id
+									}
+									fields = append(fields, fieldName[2:])
+									fieldsType = append(fieldsType, fieldType)
+									dataIndex = append(dataIndex, j)
+								}
+							}
+
+							// Now I will recreate the sql query string.
+							query := "SELECT "
+							for j := 0; j < len(fields); j++ {
+								query += fields[j]
+								if j < len(fields)-1 {
+									query += ", "
+								}
+							}
+
+							// The from close.
+							query += " FROM " + dataBaseName
+							if len(schemaId) > 0 {
+								query += "." + schemaId
+							}
+							query += "." + tableName
+
+							if len(ids) > 0 {
+								query += " WHERE "
+								for j := 0; j < len(ids); j++ {
+									// The first ids in the list of ids are always the uuid so
+									// the index is j+1
+									query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=" + Utility.ToString(ids[j])
+								}
+							}
+
+							// Now I will get data from sql...
+							sqlData, err := this.readData(dataBaseName, query, fieldsType, params)
+							if err == nil {
+								// Now I will replace the data with the retreive values.
+								for j := 0; j < len(sqlData[0]); j++ {
+									// Set the value.
+									data[i][dataIndex[j]] = sqlData[0][j]
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	return data, err
@@ -176,10 +252,6 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 func (this *DataManager) createData(storeName string, query string, d []interface{}) (lastId interface{}, err error) {
 	// If the store is sql_info in that case I will need to create the information
 	// in the sql data store.
-	if storeName == "sql_info" {
-		log.Println("-----------> need create data for values: ", d)
-	}
-
 	store := this.getDataStore(storeName)
 	if store == nil {
 		return nil, errors.New("Data store '" + storeName + " does not exist.")
@@ -188,14 +260,73 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
 	}
+
+	// In the case of sql data I also need to save the information in the database.
+	if storeName == "sql_info" && len(d) > 0 {
+		if reflect.TypeOf(d[0]).Kind() == reflect.String {
+			uuid := d[0].(string)
+			values := strings.Split(uuid[0:strings.Index(uuid, "%")], ".")
+			dataBaseName := values[0]
+			tableName := values[len(values)-1]
+			schemaId := ""
+			if len(values) == 3 {
+				schemaId = values[1]
+			}
+			prototype, err := GetServer().GetEntityManager().getEntityPrototype(uuid[0:strings.Index(uuid, "%")], "sql_info")
+			if err == nil {
+				query := "INSERT INTO " + dataBaseName
+				if len(schemaId) > 0 {
+					query += "." + schemaId
+				}
+				data := make([]interface{}, 0)
+				fields := make([]string, 0)
+				fieldsType := make([]interface{}, 0)
+
+				query += "." + tableName + "("
+				values := "VALUES("
+				for i := 0; i < len(d); i++ {
+					if strings.HasPrefix(prototype.Fields[i], "M_") && !strings.HasSuffix(prototype.FieldsType[i], ":Ref") {
+						fields = append(fields, prototype.Fields[i])
+						fieldsType = append(fieldsType, prototype.FieldsType[i])
+
+						// In case of null value...
+						if reflect.TypeOf(d[i]).Kind() == reflect.String {
+							if d[i] == "null" {
+								// if the field is an id it must not be null
+								if Utility.Contains(prototype.Ids, prototype.Fields[i]) {
+									return -1, nil
+								}
+								d[i] = "NULL"
+							}
+						}
+						data = append(data, d[i])
+					}
+				}
+
+				for i := 0; i < len(fields); i++ {
+					values += "?"
+					query += fields[i][2:]
+					if i < len(fields)-1 {
+						values += ","
+						query += ","
+					}
+				}
+
+				// Set the values...
+				query += ")" + values + ")"
+
+				log.Println("----> ", query, fieldsType, data)
+				id, err := this.createData(dataBaseName, query, data)
+				if err == nil {
+					log.Println("--------> data insert sucessfully! ", id)
+				}
+			}
+		}
+	}
 	return
 }
 
 func (this *DataManager) deleteData(storeName string, query string, params []interface{}) (err error) {
-	if storeName == "sql_info" {
-		log.Println("-----------> need delete data with param: ", params)
-	}
-
 	store := this.getDataStore(storeName)
 	if store == nil {
 		return errors.New("Data store " + storeName + " does not exist.")
@@ -209,11 +340,6 @@ func (this *DataManager) deleteData(storeName string, query string, params []int
 }
 
 func (this *DataManager) updateData(storeName string, query string, fields []interface{}, params []interface{}) (err error) {
-
-	if storeName == "sql_info" {
-		log.Println("-----------> need update data with fields: ", fields, params)
-	}
-
 	store := this.getDataStore(storeName)
 	if store == nil {
 		return errors.New("Data store " + storeName + " does not exist.")

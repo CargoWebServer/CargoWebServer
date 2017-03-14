@@ -1808,7 +1808,6 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 				fieldType = strings.Replace(fieldType, ":Ref", "", -1)
 				object = make(map[string]interface{})
 				object["TYPENAME"] = fieldType
-				object["UUID"] = object["TYPENAME"].(string) + "%" + Utility.RandomUUID()
 				object["NeedSave"] = true
 				this.objects.Push(object)
 			} else {
@@ -1830,8 +1829,6 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 							} else {
 								object["TYPENAME"] = this.SchemaId + "." + element.Name
 							}
-
-							object["UUID"] = object["TYPENAME"].(string) + "%" + Utility.RandomUUID()
 							object["NeedSave"] = true
 							this.objects.Push(object)
 						} else {
@@ -1858,7 +1855,6 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 			} else {
 				object["TYPENAME"] = this.SchemaId + "." + elementNameLocal
 			}
-			object["UUID"] = object["TYPENAME"].(string) + "%" + Utility.RandomUUID()
 			object["NeedSave"] = true
 			this.objects.Push(object)
 			this.globalObjects = append(this.globalObjects, object)
@@ -1884,7 +1880,6 @@ func (this *XmlDocumentHandler) StartElement(e xml.StartElement) {
 					// value of field...
 					attrObject := make(map[string]interface{})
 					attrObject["TYPENAME"] = fieldType
-					attrObject["UUID"] = attrObject["TYPENAME"].(string) + "%" + Utility.RandomUUID()
 					attrObject["M_valueOf"] = attr.Value
 					attrObject["NeedSave"] = true
 					object[attrName] = attrObject

@@ -392,7 +392,7 @@ func (this *FileManager) createFile(filename string, filepath string, filedata [
 
 		// The file data will be saved in the database without physical file.
 		// The id will be a uuid.
-		fileId = Utility.RandomUUID()
+		fileId = Utility.GenerateUUID(Utility.CreateSha1Key([]byte(filepath + "/" + filename)))
 		file.SetFileType(CargoEntities.FileType_DbFile)
 		fileEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(fileId, nil)
 		file = fileEntity.GetObject().(*CargoEntities.File)

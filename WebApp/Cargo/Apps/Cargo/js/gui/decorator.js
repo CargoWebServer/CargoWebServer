@@ -40,12 +40,9 @@ function attachAutoComplete(control, elementLst, autoComplete) {
                     return function (user) {
                         if (isString(user)) {
                             return user.substring(0, val.length).toUpperCase() == val.toUpperCase()
-                        }else if(isInt(user)){
-                            return user.toString()
-                        }else if(isNumeric(user)){
-                            return user.toString()
+                        }else if(isInt(user) || isNumeric(user)){
+                             user.toString().substring(0, val.length).toUpperCase() == val.toUpperCase()
                         }
-                        return user
                     }
                 } (control.element.value))
 

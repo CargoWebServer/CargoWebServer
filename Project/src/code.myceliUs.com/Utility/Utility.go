@@ -19,6 +19,7 @@ import (
 	"time"
 	"unsafe"
 
+	"log"
 	"net/http"
 	"unicode"
 
@@ -862,4 +863,31 @@ func DecodeKOI8U(val string) (string, error) {
 
 	bUTF = bUTF[:n]
 	return string(bUTF), nil
+}
+
+/**
+ * Convert a numerical value to a string.
+ */
+func ToString(value interface{}) string {
+	var str string
+	if reflect.TypeOf(value).Kind() == reflect.String {
+		str += value.(string)
+	} else if reflect.TypeOf(value).Kind() == reflect.Int {
+		str += strconv.Itoa(value.(int))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int8 {
+		str += strconv.Itoa(int(value.(int8)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int16 {
+		str += strconv.Itoa(int(value.(int16)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int32 {
+		str += strconv.Itoa(int(value.(int32)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int64 {
+		str += strconv.Itoa(int(value.(int64)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
+		str += strconv.FormatFloat(float64(value.(float32)), 'f', -1, 32)
+	} else if reflect.TypeOf(value).Kind() == reflect.Float64 {
+		str += strconv.FormatFloat(value.(float64), 'f', -1, 64)
+	} else {
+		log.Panicln("Value with type:", reflect.TypeOf(value).String(), "cannot be convert to string")
+	}
+	return str
 }

@@ -197,7 +197,7 @@ func (this *Server) Stop() {
 	// must be call last
 	this.GetServiceManager().stop()
 
-	log.Println("Bye Bye :-)")
+	log.Panicln("Bye Bye :-)")
 
 	// Now stop the process.
 	os.Exit(0)
