@@ -470,6 +470,22 @@ function CreateEntity(parentUuid, attributeName, typeName, id, values) {
  * @param {object} caller A place to store object from the request context and get it back from the response context.
  */
 EntityManager.prototype.createEntity = function (parentUuid, attributeName, typeName, id, entity, successCallback, errorCallback, caller) {
+    
+    // Generate a deterministic uuid from entity id's
+    if (entity.UUID.length == 0) {
+        // Now I will generate the uuid...
+        var prototype = this.entityPrototypes[entity.TYPENAME]
+        var keyInfo = entity.TYPENAME + ":"
+        // index 0 contain the uuid key itself...
+        for (var i = 1; i < prototype.Ids.length; i++) {
+            keyInfo += entity[prototype.Ids[i]]
+            if (i < prototype.Ids.length - 1) {
+                keyInfo += "_"
+            }
+        }
+
+        entity.UUID = entity.uuid = entity.TYPENAME + "%" + generateUUID(keyInfo)
+    }
 
     // server is the client side singleton.
     var params = []
@@ -478,6 +494,7 @@ EntityManager.prototype.createEntity = function (parentUuid, attributeName, type
     params.push(createRpcData(typeName, "STRING", "typeName"))
     params.push(createRpcData(id, "STRING", "id"))
     params.push(createRpcData(entity, "JSON_STR", "entity"))
+
 
     // Call it on the server.
     server.executeJsFunction(
@@ -564,6 +581,21 @@ function SaveEntity(entity, typeName) {
 EntityManager.prototype.saveEntity = function (entity, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     entity.NeedSave = true
+    if (entity.UUID.length == 0) {
+        // Now I will generate the uuid...
+        var prototype = this.entityPrototypes[entity.TYPENAME]
+        var keyInfo = entity.TYPENAME + ":"
+        // index 0 contain the uuid key itself...
+        for (var i = 1; i < prototype.Ids.length; i++) {
+            keyInfo += entity[prototype.Ids[i]]
+            if (i < prototype.Ids.length - 1) {
+                keyInfo += "_"
+            }
+        }
+
+        entity.UUID = entity.uuid = entity.TYPENAME + "%" + generateUUID(keyInfo)
+    }
+
     var params = []
     params.push(createRpcData(entity, "JSON_STR", "entity"))
     params.push(createRpcData(entity.TYPENAME, "STRING", "typeName"))
@@ -1624,7 +1656,7 @@ EntityPrototype.prototype.generateConstructor = function () {
     // Common properties share by all entity.
     constructorSrc += " this.__class__ = \"" + this.PackageName + "." + this.ClassName + "\"\n"
     constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
-    constructorSrc += " this.UUID = this.TYPENAME + \"%\" + randomUUID()\n"
+    constructorSrc += " this.UUID = \"\"\n"
     constructorSrc += " this.uuid = this.UUID\n"
     constructorSrc += " this.parentUuid = \"\"\n"
     constructorSrc += " this.childsUuid = []\n"

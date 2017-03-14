@@ -1,6 +1,7 @@
 package Server
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
 	"os"
@@ -315,7 +316,6 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 				// Set the values...
 				query += ")" + values + ")"
 
-				log.Println("----> ", query, fieldsType, data)
 				id, err := this.createData(dataBaseName, query, data)
 				if err == nil {
 					log.Println("--------> data insert sucessfully! ", id)
@@ -328,14 +328,67 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 
 func (this *DataManager) deleteData(storeName string, query string, params []interface{}) (err error) {
 	store := this.getDataStore(storeName)
+
 	if store == nil {
 		return errors.New("Data store " + storeName + " does not exist.")
+	}
+
+	// Now if the entity has sql backend.
+	if storeName == "sql_info" {
+
+		var entityQuery *EntityQuery
+		err = json.Unmarshal([]byte(query), &entityQuery)
+		if err != nil {
+			return err
+		}
+
+		// Get the entity uuid to delete.
+		uuid := strings.Split(entityQuery.Indexs[0], "=")[1]
+
+		if Utility.IsValidEntityReferenceName(uuid) {
+
+			values := strings.Split(uuid[0:strings.Index(uuid, "%")], ".")
+			dataBaseName := values[0]
+			tableName := values[len(values)-1]
+			schemaId := ""
+			if len(values) == 3 {
+				schemaId = values[1]
+			}
+
+			prototype, err := GetServer().GetEntityManager().getEntityPrototype(entityQuery.TypeName, "sql_info")
+
+			ids := make([]interface{}, 0)
+			query := "DELETE FROM " + dataBaseName
+			if len(schemaId) > 0 {
+				query += "." + schemaId
+			}
+			query += "." + tableName + " WHERE "
+
+			if err == nil {
+				entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
+				for i := 0; i < len(prototype.Ids); i++ {
+					if strings.HasPrefix(prototype.Ids[i], "M_") {
+						ids = append(ids, entity.(*DynamicEntity).getValue(prototype.Ids[i]))
+						query += prototype.Ids[i][2:] + "=?"
+						if i < len(prototype.Ids)-1 {
+							query += " AND "
+						}
+					}
+				}
+			}
+			log.Println("-------------> ", query, ids)
+			err = this.deleteData(dataBaseName, query, ids)
+			if err == nil {
+				log.Println("-------------> entity ", uuid, "was deleted!")
+			}
+		}
 	}
 
 	err = store.Delete(query, params)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
 	}
+
 	return
 }
 
@@ -348,6 +401,81 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
 	}
+
+	// In case of entity with sql database backend.
+	if storeName == "sql_info" {
+		var entityQuery EntityQuery
+		err = json.Unmarshal([]byte(query), &entityQuery)
+		if err != nil {
+			return err
+		}
+
+		// Here I will use the entity query instead of the prototype.
+		if reflect.TypeOf(fields[0]).Kind() == reflect.String {
+			if Utility.IsValidEntityReferenceName(fields[0].(string)) {
+				// I will get information from it uuid.
+				uuid := fields[0].(string)
+				values := strings.Split(uuid[0:strings.Index(uuid, "%")], ".")
+				dataBaseName := values[0]
+				tableName := values[len(values)-1]
+				schemaId := ""
+				if len(values) == 3 {
+					schemaId = values[1]
+				}
+
+				fieldsName := make([]string, 0)
+				data := make([]interface{}, 0)
+				ids := make([]interface{}, 0)
+				idsFieldsName := make([]string, 0)
+				prototype, _ := GetServer().GetEntityManager().getEntityPrototype(entityQuery.TypeName, "sql_info")
+				for i := 0; i < len(entityQuery.Fields); i++ {
+					if strings.HasPrefix(entityQuery.Fields[i], "M_") {
+						fieldType := prototype.FieldsType[prototype.getFieldIndex(entityQuery.Fields[i])]
+						if !strings.HasSuffix(fieldType, ":Ref") {
+							if Utility.Contains(prototype.Ids, entityQuery.Fields[i]) {
+								ids = append(ids, fields[i])
+								idsFieldsName = append(idsFieldsName, entityQuery.Fields[i][2:])
+							} else {
+								fieldsName = append(fieldsName, entityQuery.Fields[i][2:])
+								data = append(data, fields[i])
+							}
+						}
+					}
+				}
+
+				// The sql query.
+				query := "UPDATE " + dataBaseName
+				if len(schemaId) > 0 {
+					query += "." + schemaId
+				}
+				query += "." + tableName + " SET "
+
+				for i := 0; i < len(fieldsName); i++ {
+					query += fieldsName[i] + "=?"
+					if i < len(fieldsName)-1 {
+						query += ", "
+					}
+				}
+
+				if len(ids) > 0 {
+					query += " WHERE "
+					for i := 0; i < len(ids); i++ {
+						query += idsFieldsName[i] + "=?"
+						if i < len(ids)-1 {
+							query += " AND "
+						}
+					}
+				}
+
+				// Update the entity.
+				err = this.updateData(dataBaseName, query, data, ids)
+				if err == nil {
+					log.Println("-------> updata succed!")
+				}
+			}
+		}
+	}
+
 	return
 }
 

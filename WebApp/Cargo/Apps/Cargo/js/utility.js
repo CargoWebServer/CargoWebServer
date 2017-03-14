@@ -319,6 +319,14 @@ function randomUUID() {
 }
 
 /**
+ * Deterministic value from a given value.
+ */
+function generateUUID(value){
+    uuid = new UUID(3, "ns:URL", value);
+    return uuid.toString()
+}
+
+/**
  * Create an integer value between a given range.
  * @param {int} min The inclusive minimumal value
  * @param {int} max The inclusive maximal value

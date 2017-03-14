@@ -2,11 +2,11 @@
 
 package CargoEntities
 
-import(
-"encoding/xml"
+import (
+	"encoding/xml"
 )
 
-type Account struct{
+type Account struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -16,25 +16,24 @@ type Account struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Entity **/
 	M_id string
 
 	/** members of Account **/
-	M_name string
-	M_password string
-	M_email string
-	M_sessions []*Session
+	M_name        string
+	M_password    string
+	M_email       string
+	M_sessions    []*Session
 	M_permissions []*Permission
-	M_messages []Message
-	m_userRef *User
+	M_messages    []Message
+	m_userRef     *User
 	/** If the ref is a string and not an object **/
-	M_userRef string
+	M_userRef  string
 	m_rolesRef []*Role
 	/** If the ref is a string and not an object **/
 	M_rolesRef []string
-
 
 	/** Associations **/
 	m_entitiesPtr *Entities
@@ -44,33 +43,32 @@ type Account struct{
 
 /** Xml parser for Account **/
 type XsdAccount struct {
-	XMLName xml.Name	`xml:"toRef"`
+	XMLName xml.Name `xml:"toRef"`
 	/** Entity **/
-	M_id	string	`xml:"id,attr"`
+	M_id string `xml:"id,attr"`
 
+	M_userRef     *string          `xml:"userRef"`
+	M_rolesRef    []string         `xml:"rolesRef"`
+	M_permissions []*XsdPermission `xml:"permissions,omitempty"`
+	M_sessions    []*XsdSession    `xml:"sessions,omitempty"`
 
-	M_userRef	*string	`xml:"userRef"`
-	M_rolesRef	[]string	`xml:"rolesRef"`
-	M_permissions	[]*XsdPermission	`xml:"permissions,omitempty"`
-	M_sessions	[]*XsdSession	`xml:"sessions,omitempty"`
-
-	M_name	string	`xml:"name,attr"`
-	M_password	string	`xml:"password,attr"`
-	M_email	string	`xml:"email,attr"`
-
+	M_name     string `xml:"name,attr"`
+	M_password string `xml:"password,attr"`
+	M_email    string `xml:"email,attr"`
 }
+
 /** UUID **/
-func (this *Account) GetUUID() string{
+func (this *Account) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *Account) GetId() string{
+func (this *Account) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *Account) SetId(ref interface{}){
+func (this *Account) SetId(ref interface{}) {
 	this.NeedSave = true
 	this.M_id = ref.(string)
 }
@@ -78,12 +76,12 @@ func (this *Account) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** Name **/
-func (this *Account) GetName() string{
+func (this *Account) GetName() string {
 	return this.M_name
 }
 
 /** Init reference Name **/
-func (this *Account) SetName(ref interface{}){
+func (this *Account) SetName(ref interface{}) {
 	this.NeedSave = true
 	this.M_name = ref.(string)
 }
@@ -91,12 +89,12 @@ func (this *Account) SetName(ref interface{}){
 /** Remove reference Name **/
 
 /** Password **/
-func (this *Account) GetPassword() string{
+func (this *Account) GetPassword() string {
 	return this.M_password
 }
 
 /** Init reference Password **/
-func (this *Account) SetPassword(ref interface{}){
+func (this *Account) SetPassword(ref interface{}) {
 	this.NeedSave = true
 	this.M_password = ref.(string)
 }
@@ -104,12 +102,12 @@ func (this *Account) SetPassword(ref interface{}){
 /** Remove reference Password **/
 
 /** Email **/
-func (this *Account) GetEmail() string{
+func (this *Account) GetEmail() string {
 	return this.M_email
 }
 
 /** Init reference Email **/
-func (this *Account) SetEmail(ref interface{}){
+func (this *Account) SetEmail(ref interface{}) {
 	this.NeedSave = true
 	this.M_email = ref.(string)
 }
@@ -117,16 +115,16 @@ func (this *Account) SetEmail(ref interface{}){
 /** Remove reference Email **/
 
 /** Sessions **/
-func (this *Account) GetSessions() []*Session{
+func (this *Account) GetSessions() []*Session {
 	return this.M_sessions
 }
 
 /** Init reference Sessions **/
-func (this *Account) SetSessions(ref interface{}){
+func (this *Account) SetSessions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var sessionss []*Session
-	for i:=0; i<len(this.M_sessions); i++ {
+	for i := 0; i < len(this.M_sessions); i++ {
 		if this.M_sessions[i].GetUUID() != ref.(*Session).GetUUID() {
 			sessionss = append(sessionss, this.M_sessions[i])
 		} else {
@@ -141,7 +139,7 @@ func (this *Account) SetSessions(ref interface{}){
 }
 
 /** Remove reference Sessions **/
-func (this *Account) RemoveSessions(ref interface{}){
+func (this *Account) RemoveSessions(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*Session)
 	sessions_ := make([]*Session, 0)
@@ -154,16 +152,16 @@ func (this *Account) RemoveSessions(ref interface{}){
 }
 
 /** Permissions **/
-func (this *Account) GetPermissions() []*Permission{
+func (this *Account) GetPermissions() []*Permission {
 	return this.M_permissions
 }
 
 /** Init reference Permissions **/
-func (this *Account) SetPermissions(ref interface{}){
+func (this *Account) SetPermissions(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var permissionss []*Permission
-	for i:=0; i<len(this.M_permissions); i++ {
+	for i := 0; i < len(this.M_permissions); i++ {
 		if this.M_permissions[i].GetUUID() != ref.(*Permission).GetUUID() {
 			permissionss = append(permissionss, this.M_permissions[i])
 		} else {
@@ -178,7 +176,7 @@ func (this *Account) SetPermissions(ref interface{}){
 }
 
 /** Remove reference Permissions **/
-func (this *Account) RemovePermissions(ref interface{}){
+func (this *Account) RemovePermissions(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*Permission)
 	permissions_ := make([]*Permission, 0)
@@ -191,16 +189,16 @@ func (this *Account) RemovePermissions(ref interface{}){
 }
 
 /** Messages **/
-func (this *Account) GetMessages() []Message{
+func (this *Account) GetMessages() []Message {
 	return this.M_messages
 }
 
 /** Init reference Messages **/
-func (this *Account) SetMessages(ref interface{}){
+func (this *Account) SetMessages(ref interface{}) {
 	this.NeedSave = true
 	isExist := false
 	var messagess []Message
-	for i:=0; i<len(this.M_messages); i++ {
+	for i := 0; i < len(this.M_messages); i++ {
 		if this.M_messages[i].(Entity).GetUUID() != ref.(Entity).GetUUID() {
 			messagess = append(messagess, this.M_messages[i])
 		} else {
@@ -215,7 +213,7 @@ func (this *Account) SetMessages(ref interface{}){
 }
 
 /** Remove reference Messages **/
-func (this *Account) RemoveMessages(ref interface{}){
+func (this *Account) RemoveMessages(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Entity)
 	messages_ := make([]Message, 0)
@@ -228,23 +226,23 @@ func (this *Account) RemoveMessages(ref interface{}){
 }
 
 /** UserRef **/
-func (this *Account) GetUserRef() *User{
+func (this *Account) GetUserRef() *User {
 	return this.m_userRef
 }
 
 /** Init reference UserRef **/
-func (this *Account) SetUserRef(ref interface{}){
+func (this *Account) SetUserRef(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_userRef = ref.(string)
-	}else{
+	} else {
 		this.m_userRef = ref.(*User)
 		this.M_userRef = ref.(Entity).GetUUID()
 	}
 }
 
 /** Remove reference UserRef **/
-func (this *Account) RemoveUserRef(ref interface{}){
+func (this *Account) RemoveUserRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(Entity)
 	if toDelete.GetUUID() == this.m_userRef.GetUUID() {
@@ -254,21 +252,21 @@ func (this *Account) RemoveUserRef(ref interface{}){
 }
 
 /** RolesRef **/
-func (this *Account) GetRolesRef() []*Role{
+func (this *Account) GetRolesRef() []*Role {
 	return this.m_rolesRef
 }
 
 /** Init reference RolesRef **/
-func (this *Account) SetRolesRef(ref interface{}){
+func (this *Account) SetRolesRef(ref interface{}) {
 	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
-		for i:=0; i < len(this.M_rolesRef); i++ {
+		for i := 0; i < len(this.M_rolesRef); i++ {
 			if this.M_rolesRef[i] == refStr {
 				return
 			}
 		}
 		this.M_rolesRef = append(this.M_rolesRef, ref.(string))
-	}else{
+	} else {
 		this.RemoveRolesRef(ref)
 		this.m_rolesRef = append(this.m_rolesRef, ref.(*Role))
 		this.M_rolesRef = append(this.M_rolesRef, ref.(*Role).GetUUID())
@@ -276,7 +274,7 @@ func (this *Account) SetRolesRef(ref interface{}){
 }
 
 /** Remove reference RolesRef **/
-func (this *Account) RemoveRolesRef(ref interface{}){
+func (this *Account) RemoveRolesRef(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*Role)
 	rolesRef_ := make([]*Role, 0)
@@ -292,23 +290,23 @@ func (this *Account) RemoveRolesRef(ref interface{}){
 }
 
 /** Entities **/
-func (this *Account) GetEntitiesPtr() *Entities{
+func (this *Account) GetEntitiesPtr() *Entities {
 	return this.m_entitiesPtr
 }
 
 /** Init reference Entities **/
-func (this *Account) SetEntitiesPtr(ref interface{}){
+func (this *Account) SetEntitiesPtr(ref interface{}) {
 	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
-	}else{
+	} else {
 		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
 	}
 }
 
 /** Remove reference Entities **/
-func (this *Account) RemoveEntitiesPtr(ref interface{}){
+func (this *Account) RemoveEntitiesPtr(ref interface{}) {
 	this.NeedSave = true
 	toDelete := ref.(*Entities)
 	if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {

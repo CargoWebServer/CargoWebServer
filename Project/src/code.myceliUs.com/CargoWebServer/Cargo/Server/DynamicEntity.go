@@ -75,8 +75,9 @@ func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error)
 func (this *EntityManager) newDynamicEntity(values map[string]interface{}) (*DynamicEntity, *CargoEntities.Error) {
 
 	var entity *DynamicEntity
-
+	log.Println("------> ", 78, values)
 	if len(values["UUID"].(string)) > 0 {
+
 		if val, ok := this.contain(values["UUID"].(string)); ok {
 			if val != nil {
 				entity = val.(*DynamicEntity)

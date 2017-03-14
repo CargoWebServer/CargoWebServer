@@ -164,6 +164,11 @@ func (this *EntityManager) removeEntity(uuid string) {
 func (this *EntityManager) deleteEntity(toDelete Entity) {
 	// first of all i will remove it from the cache.
 	this.removeEntity(toDelete.GetUuid())
+	storeId := toDelete.GetTypeName()[0:strings.Index(toDelete.GetTypeName(), ".")]
+	if reflect.TypeOf(GetServer().GetDataManager().getDataStore(storeId)).String() == "*Server.SqlDataStore" {
+		// I will try to found the prototype inside sql_info instead.
+		storeId = "sql_info"
+	}
 
 	// remove it's data from the database.
 	var deleteEntityQuery EntityQuery
@@ -172,7 +177,7 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 	var params []interface{}
 	query, _ := json.Marshal(deleteEntityQuery)
 
-	GetServer().GetDataManager().deleteData(toDelete.GetTypeName()[0:strings.Index(toDelete.GetTypeName(), ".")], string(query), params)
+	GetServer().GetDataManager().deleteData(storeId, string(query), params)
 
 	// delete it's childs.
 	for i := 0; i < len(toDelete.GetChildsPtr()); i++ {
