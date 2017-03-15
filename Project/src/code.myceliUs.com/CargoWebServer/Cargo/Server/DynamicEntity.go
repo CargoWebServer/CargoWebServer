@@ -72,16 +72,13 @@ func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error)
 /**
  * Create a new dynamic entity...
  */
-func (this *EntityManager) newDynamicEntity(values map[string]interface{}) (*DynamicEntity, *CargoEntities.Error) {
+func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string]interface{}) (*DynamicEntity, *CargoEntities.Error) {
 
 	var entity *DynamicEntity
-	log.Println("------> ", 78, values)
 	if len(values["UUID"].(string)) > 0 {
-
 		if val, ok := this.contain(values["UUID"].(string)); ok {
 			if val != nil {
 				entity = val.(*DynamicEntity)
-
 				// Calculate the checksum.
 				sum0 := Utility.GetChecksum(values)
 				sum1 := entity.GetChecksum()
@@ -124,7 +121,15 @@ func (this *EntityManager) newDynamicEntity(values map[string]interface{}) (*Dyn
 					entity.uuid = values["TYPENAME"].(string) + "%" + uuid.NewRandom().String()
 					values["UUID"] = entity.uuid
 				} else {
-					keyInfo := prototype.TypeName + ":"
+
+					// The key will be compose by the parent uuid.
+					var keyInfo string
+					if len(parentUuid) > 0 {
+						values["parentUuid"] = parentUuid
+						keyInfo += parentUuid + ":"
+					}
+
+					keyInfo += prototype.TypeName + ":"
 					for i := 1; i < len(prototype.Ids); i++ {
 						keyInfo += Utility.ToString(values[prototype.Ids[i]])
 						// Append underscore for readability in case of problem...
@@ -446,14 +451,15 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 
 												// I will try to create a static entity...
 												newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
-												params := make([]interface{}, 2)
-												params[0] = uuids[i]
-												params[1] = values
+												params := make([]interface{}, 3)
+												params[0] = ""
+												params[1] = uuids[i]
+												params[2] = values
 												staticEntity, err := Utility.CallMethod(GetServer().GetEntityManager(), newEntityMethod, params)
 
 												if err != nil {
 													// In that case I will try with dynamic entity.
-													dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(values)
+													dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity("", values)
 													if errObj == nil {
 														// initialise the sub entity.
 														err := dynamicEntity.initEntity(uuids[i], path+"|"+this.GetUuid())
@@ -507,14 +513,15 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 
 										// I will try to create a static entity...
 										newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
-										params := make([]interface{}, 2)
-										params[0] = uuid
-										params[1] = values
+										params := make([]interface{}, 3)
+										params[0] = ""
+										params[1] = uuid
+										params[2] = values
 										staticEntity, err := Utility.CallMethod(GetServer().GetEntityManager(), newEntityMethod, params)
 
 										if err != nil {
 											// In that case I will try with dynamic entity.
-											dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(values)
+											dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity("", values)
 											if errObj == nil {
 												// initialise the sub entity.
 												err := dynamicEntity.initEntity(uuid, path+"|"+this.GetUuid())
@@ -711,15 +718,16 @@ func (this *DynamicEntity) saveEntity(path string) {
 
 								// I will try to create a static entity...
 								newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
-								params := make([]interface{}, 2)
-								params[0] = uuid
-								params[1] = subValues
+								params := make([]interface{}, 3)
+								params[0] = ""
+								params[1] = uuid
+								params[2] = subValues
 								staticEntity, err := Utility.CallMethod(GetServer().GetEntityManager(), newEntityMethod, params)
 
 								if err != nil {
 									// In that case I will try with dynamic entity.
 									// I will create the sub value...
-									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(subValues)
+									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.uuid, subValues)
 									if errObj == nil {
 										subEntity.AppendReferenced(fieldName, this)
 										this.AppendChild(fieldName, subEntity)
@@ -753,15 +761,16 @@ func (this *DynamicEntity) saveEntity(path string) {
 
 									// I will try to create a static entity...
 									newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
-									params := make([]interface{}, 2)
-									params[0] = uuid
-									params[1] = subValues
+									params := make([]interface{}, 3)
+									params[0] = ""
+									params[1] = uuid
+									params[2] = subValues
 									staticEntity, err := Utility.CallMethod(GetServer().GetEntityManager(), newEntityMethod, params)
 
 									if err != nil {
 										// In that case I will try with dynamic entity.
 										// I will create the sub value...
-										subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(subValues)
+										subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.uuid, subValues)
 										if errObj == nil {
 											subEntity.AppendReferenced(fieldName, this)
 											this.AppendChild(fieldName, subEntity)
@@ -899,14 +908,15 @@ func (this *DynamicEntity) saveEntity(path string) {
 								// I will try to create a static entity...
 								newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
 								params := make([]interface{}, 2)
-								params[0] = uuid
-								params[1] = subValues
+								params[0] = ""
+								params[1] = uuid
+								params[2] = subValues
 								staticEntity, err := Utility.CallMethod(GetServer().GetEntityManager(), newEntityMethod, params)
 
 								if err != nil {
 									// In that case I will try with dynamic entity.
 									// I will create the sub value...
-									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(subValues)
+									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.uuid, subValues)
 									if errObj == nil {
 										subEntity.AppendReferenced(fieldName, this)
 										this.AppendChild(fieldName, subEntity)
@@ -1576,7 +1586,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 									subEntity.(*DynamicEntity).SetObjectValues(subValues)
 								} else {
 									var errObj *CargoEntities.Error
-									subEntity, errObj = GetServer().GetEntityManager().newDynamicEntity(subValues)
+									subEntity, errObj = GetServer().GetEntityManager().newDynamicEntity(this.uuid, subValues)
 									if errObj == nil {
 										this.setValue(k, subEntity.GetObject())
 									}

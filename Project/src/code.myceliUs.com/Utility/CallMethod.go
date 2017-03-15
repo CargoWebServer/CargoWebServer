@@ -2,7 +2,7 @@ package Utility
 
 import (
 	"errors"
-	"log"
+	//	"log"
 	"reflect"
 	"strconv"
 )
@@ -54,7 +54,6 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 		if !method.Type().IsVariadic() {
 			if method.Type().NumIn() != len(params) {
 				errMsg := "Wrong number of parameter for method " + methodName + " expected " + strconv.Itoa(method.Type().NumIn()-1) + " got " + strconv.Itoa(len(params))
-				log.Println(errMsg)
 				return nil, errors.New(errMsg)
 			}
 		}

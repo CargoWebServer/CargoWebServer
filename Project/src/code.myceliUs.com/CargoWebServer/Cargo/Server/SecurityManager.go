@@ -118,7 +118,7 @@ func (this *SecurityManager) createRole(id string) (*CargoEntities.Role, *CargoE
 	cargoEntities := server.GetEntityManager().getCargoEntities()
 
 	if len(uuid) == 0 {
-		roleEntity := GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(id, nil)
+		roleEntity := GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(cargoEntities.GetUuid(), id, nil)
 		role = roleEntity.GetObject().(*CargoEntities.Role)
 		role.SetId(id)
 		cargoEntities.GetObject().(*CargoEntities.Entities).SetRoles(role)

@@ -23,8 +23,6 @@ func generateEntity(packageId string) {
 	imports = append(imports, "code.myceliUs.com/Utility")
 	imports = append(imports, "log")
 	imports = append(imports, "strings")
-	imports = append(imports, "reflect")
-	imports = append(imports, "strconv")
 
 	for i := 0; i < len(classes); i++ {
 		class := classesMap[classes[i]]
@@ -312,7 +310,12 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 		className += "_impl"
 	}
 
-	entityConstructorStr += "func (this *EntityManager) New" + packageId + class.Name + "Entity(objectId string, object interface{}) *" + packageId + "_" + class.Name + "Entity{\n"
+	packageId_ := packageId
+	if packageId == "BPMNDI" || packageId == "DC" || packageId == "DI" {
+		packageId_ = "BPMN20"
+	}
+
+	entityConstructorStr += "func (this *EntityManager) New" + packageId + class.Name + "Entity(parentUuid string, objectId string, object interface{}) *" + packageId + "_" + class.Name + "Entity{\n"
 	entityConstructorStr += "	var uuidStr string\n"
 	entityConstructorStr += "	if len(objectId) > 0 {\n"
 	entityConstructorStr += "		if Utility.IsValidEntityReferenceName(objectId){\n"
@@ -340,24 +343,16 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "			// Here there is a new entity...\n"
 	entityConstructorStr += "			uuidStr = \"Config.Configurations%\" + Utility.RandomUUID()\n"
 	entityConstructorStr += "		} else {\n"
-	entityConstructorStr += "			keyInfo := prototype.TypeName + \":\"\n"
+	entityConstructorStr += "			var keyInfo string\n"
+	entityConstructorStr += "			if len(parentUuid) > 0{\n"
+	entityConstructorStr += "				keyInfo += parentUuid + \":\"\n"
+	entityConstructorStr += "			}\n"
+	entityConstructorStr += "			keyInfo += prototype.TypeName + \":\"\n"
 	entityConstructorStr += "			for i := 1; i < len(prototype.Ids); i++ {\n"
 	entityConstructorStr += "				var getter = \"Get\" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]\n"
 	entityConstructorStr += "				params := make([]interface{}, 0)\n"
 	entityConstructorStr += "				value, _ := Utility.CallMethod(object, getter, params)\n"
-	entityConstructorStr += "				if reflect.TypeOf(value).Kind() == reflect.String {\n"
-	entityConstructorStr += "					keyInfo += value.(string)\n"
-	entityConstructorStr += "				} else if reflect.TypeOf(value).Kind() == reflect.Int {\n"
-	entityConstructorStr += "					keyInfo += strconv.Itoa(value.(int))\n"
-	entityConstructorStr += "				} else if reflect.TypeOf(value).Kind() == reflect.Int8 {\n"
-	entityConstructorStr += "					keyInfo += strconv.Itoa(int(value.(int8)))\n"
-	entityConstructorStr += "				} else if reflect.TypeOf(value).Kind() == reflect.Int16 {\n"
-	entityConstructorStr += "					keyInfo += strconv.Itoa(int(value.(int16)))\n"
-	entityConstructorStr += "				} else if reflect.TypeOf(value).Kind() == reflect.Int32 {\n"
-	entityConstructorStr += "					keyInfo += strconv.Itoa(int(value.(int32)))\n"
-	entityConstructorStr += "				} else if reflect.TypeOf(value).Kind() == reflect.Int64 {\n"
-	entityConstructorStr += "					keyInfo += strconv.Itoa(int(value.(int64)))\n"
-	entityConstructorStr += "				}\n"
+	entityConstructorStr += "				keyInfo += Utility.ToString(value)\n"
 	entityConstructorStr += "				// Append underscore for readability in case of problem...\n"
 	entityConstructorStr += "				if i < len(prototype.Ids)-1 {\n"
 	entityConstructorStr += "					keyInfo += \"_\"\n"
@@ -381,10 +376,6 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "	entity.SetInit(false)\n"
 	entityConstructorStr += "	entity.uuid = uuidStr\n"
 	entityConstructorStr += "	this.insert(entity)\n"
-	packageId_ := packageId
-	if packageId == "BPMNDI" || packageId == "DC" || packageId == "DI" {
-		packageId_ = "BPMN20"
-	}
 
 	if strings.HasSuffix(className, "_impl") {
 		className = strings.Replace(className, "_impl", "", -1)
@@ -447,7 +438,7 @@ func generateNewEntityFromObject(packageId string, class *XML_Schemas.CMOF_Owned
 
 	functionStr := "/** instantiate a new entity from an existing object. **/\n"
 	functionStr += "func (this *EntityManager) New" + packageId + class.Name + "EntityFromObject(object " + objectType + ") *" + packageId + "_" + class.Name + "Entity {\n"
-	functionStr += "	 return this.New" + packageId + class.Name + "Entity(object.UUID, object)\n"
+	functionStr += "	 return this.New" + packageId + class.Name + "Entity(\"\", object.UUID, object)\n"
 	functionStr += "}\n\n"
 
 	return functionStr
@@ -920,7 +911,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 								memberStr += "								if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
 								memberStr += "									" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementations[i] + "Entity)\n"
 								memberStr += "								}else{\n"
-								memberStr += "									" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(uuids[i], nil)\n"
+								memberStr += "									" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), uuids[i], nil)\n"
 								memberStr += "									" + memberName + "Entity.InitEntity(uuids[i])\n"
 								memberStr += "									GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
 								memberStr += "								}\n"
@@ -938,7 +929,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 							memberStr += "							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
 							memberStr += "								" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementations[i] + "Entity)\n"
 							memberStr += "							}else{\n"
-							memberStr += "								" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(uuids[i], nil)\n"
+							memberStr += "								" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), uuids[i], nil)\n"
 							memberStr += "								" + memberName + "Entity.InitEntity(uuids[i])\n"
 							memberStr += "								GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
 							memberStr += "							}\n"
@@ -970,7 +961,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 							memberStr += "						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
 							memberStr += "						" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementation + "Entity)\n"
 							memberStr += "						}else{\n"
-							memberStr += "							" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementation + "Entity(uuids[i], nil)\n"
+							memberStr += "							" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementation + "Entity(this.GetUuid(), uuids[i], nil)\n"
 							memberStr += "							" + memberName + "Entity.InitEntity(uuids[i])\n"
 							memberStr += "							GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
 							memberStr += "						}\n"
@@ -989,7 +980,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 						memberStr += "					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
 						memberStr += "						" + memberName + "Entity = instance.(*" + elementPackName + "_" + typeName + "Entity)\n"
 						memberStr += "					}else{\n"
-						memberStr += "						" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(uuids[i], nil)\n"
+						memberStr += "						" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.GetUuid(), uuids[i], nil)\n"
 						memberStr += "						" + memberName + "Entity.InitEntity(uuids[i])\n"
 						memberStr += "						GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
 						memberStr += "					}\n"
@@ -1066,7 +1057,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 								memberStr += "						if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {\n"
 								memberStr += "							" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementation + "Entity)\n"
 								memberStr += "						}else{\n"
-								memberStr += "							" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementation + "Entity(uuid, nil)\n"
+								memberStr += "							" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementation + "Entity(this.GetUuid(), uuid, nil)\n"
 								memberStr += "							" + memberName + "Entity.InitEntity(uuid)\n"
 								memberStr += "							GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
 								memberStr += "						}\n"
@@ -1087,7 +1078,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 							memberStr += "					if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {\n"
 							memberStr += "						" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementations[i] + "Entity)\n"
 							memberStr += "					}else{\n"
-							memberStr += "						" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(uuid, nil)\n"
+							memberStr += "						" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), uuid, nil)\n"
 							memberStr += "						" + memberName + "Entity.InitEntity(uuid)\n"
 							memberStr += "						GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
 							memberStr += "					}\n"
@@ -1121,7 +1112,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 							memberStr += "				if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {\n"
 							memberStr += "					" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementation + "Entity)\n"
 							memberStr += "				}else{\n"
-							memberStr += "					" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementation + "Entity(uuid, nil)\n"
+							memberStr += "					" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementation + "Entity(this.GetUuid(), uuid, nil)\n"
 							memberStr += "					" + memberName + "Entity.InitEntity(uuid)\n"
 							memberStr += "					GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
 							memberStr += "				}\n"
@@ -1140,7 +1131,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 						memberStr += "				if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {\n"
 						memberStr += "					" + memberName + "Entity = instance.(*" + elementPackName + "_" + typeName + "Entity)\n"
 						memberStr += "				}else{\n"
-						memberStr += "					" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(uuid, nil)\n"
+						memberStr += "					" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.GetUuid(), uuid, nil)\n"
 						memberStr += "					" + memberName + "Entity.InitEntity(uuid)\n"
 						memberStr += "					GetServer().GetEntityManager().insert( " + memberName + "Entity)\n"
 						memberStr += "				}\n"
@@ -1344,7 +1335,7 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 							impl = "_impl"
 						}
 						entityInfoStr += "		case *" + elementPackName + "." + implementations[i] + impl + ":\n"
-						entityInfoStr += "		" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(v.UUID, v)\n"
+						entityInfoStr += "		" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), v.UUID, v)\n"
 						entityInfoStr += "		" + attribute.Name + "Ids=append(" + attribute.Name + "Ids," + attribute.Name + "Entity.uuid)\n"
 						entityInfoStr += "		" + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
 						entityInfoStr += "		this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"
@@ -1356,7 +1347,7 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 					entityInfoStr += "		}\n"
 				} else {
 					elementPackName := membersPackage[typeName]
-					entityInfoStr += "		" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.object.M_" + attribute.Name + "[i].UUID,this.object.M_" + attribute.Name + "[i])\n"
+					entityInfoStr += "		" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.GetUuid(), this.object.M_" + attribute.Name + "[i].UUID,this.object.M_" + attribute.Name + "[i])\n"
 					entityInfoStr += "		" + attribute.Name + "Ids=append(" + attribute.Name + "Ids," + attribute.Name + "Entity.uuid)\n"
 					entityInfoStr += "		" + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
 					entityInfoStr += "		this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"
@@ -1413,7 +1404,7 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 							}
 
 							entityInfoStr += "		case *" + elementPackName + "." + implementations[i] + impl + ":\n"
-							entityInfoStr += "			" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(v.UUID, v)\n"
+							entityInfoStr += "			" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), v.UUID, v)\n"
 							entityInfoStr += "			" + class.Name + "Info = append(" + class.Name + "Info, " + attribute.Name + "Entity.uuid)\n"
 							entityInfoStr += "		    " + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
 							entityInfoStr += "			this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"
@@ -1425,7 +1416,7 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 
 					} else {
 						elementPackName := membersPackage[typeName]
-						entityInfoStr += "		" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.object.M_" + attribute.Name + ".UUID, this.object.M_" + attribute.Name + ")\n"
+						entityInfoStr += "		" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.GetUuid(), this.object.M_" + attribute.Name + ".UUID, this.object.M_" + attribute.Name + ")\n"
 						entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info, " + attribute.Name + "Entity.uuid)\n"
 						entityInfoStr += "		" + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
 						entityInfoStr += "		this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"

@@ -5,8 +5,6 @@ package Server
 import (
 	"encoding/json"
 	//	"log"
-	"reflect"
-	"strconv"
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
@@ -76,7 +74,7 @@ type Config_SmtpConfigurationEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewConfigSmtpConfigurationEntity(objectId string, object interface{}) *Config_SmtpConfigurationEntity {
+func (this *EntityManager) NewConfigSmtpConfigurationEntity(parentUuid string, objectId string, object interface{}) *Config_SmtpConfigurationEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -88,6 +86,7 @@ func (this *EntityManager) NewConfigSmtpConfigurationEntity(objectId string, obj
 	if object != nil {
 		object.(*Config.SmtpConfiguration).TYPENAME = "Config.SmtpConfiguration"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.SmtpConfiguration", "Config")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*Config.SmtpConfiguration).UUID = uuidStr
@@ -100,7 +99,29 @@ func (this *EntityManager) NewConfigSmtpConfigurationEntity(objectId string, obj
 			return val.(*Config_SmtpConfigurationEntity)
 		}
 	} else {
-		uuidStr = "Config.SmtpConfiguration%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(Config_SmtpConfigurationEntity)
 	if object == nil {
@@ -116,7 +137,6 @@ func (this *EntityManager) NewConfigSmtpConfigurationEntity(objectId string, obj
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.SmtpConfiguration", "Config")
 	entity.prototype = prototype
 	return entity
 }
@@ -696,7 +716,7 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewConfigSmtpConfigurationEntityFromObject(object *Config.SmtpConfiguration) *Config_SmtpConfigurationEntity {
-	return this.NewConfigSmtpConfigurationEntity(object.UUID, object)
+	return this.NewConfigSmtpConfigurationEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -791,7 +811,7 @@ type Config_DataStoreConfigurationEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewConfigDataStoreConfigurationEntity(objectId string, object interface{}) *Config_DataStoreConfigurationEntity {
+func (this *EntityManager) NewConfigDataStoreConfigurationEntity(parentUuid string, objectId string, object interface{}) *Config_DataStoreConfigurationEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -803,6 +823,7 @@ func (this *EntityManager) NewConfigDataStoreConfigurationEntity(objectId string
 	if object != nil {
 		object.(*Config.DataStoreConfiguration).TYPENAME = "Config.DataStoreConfiguration"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.DataStoreConfiguration", "Config")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*Config.DataStoreConfiguration).UUID = uuidStr
@@ -815,7 +836,29 @@ func (this *EntityManager) NewConfigDataStoreConfigurationEntity(objectId string
 			return val.(*Config_DataStoreConfigurationEntity)
 		}
 	} else {
-		uuidStr = "Config.DataStoreConfiguration%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(Config_DataStoreConfigurationEntity)
 	if object == nil {
@@ -831,7 +874,6 @@ func (this *EntityManager) NewConfigDataStoreConfigurationEntity(objectId string
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.DataStoreConfiguration", "Config")
 	entity.prototype = prototype
 	return entity
 }
@@ -1473,7 +1515,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewConfigDataStoreConfigurationEntityFromObject(object *Config.DataStoreConfiguration) *Config_DataStoreConfigurationEntity {
-	return this.NewConfigDataStoreConfigurationEntity(object.UUID, object)
+	return this.NewConfigDataStoreConfigurationEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -1568,7 +1610,7 @@ type Config_LdapConfigurationEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewConfigLdapConfigurationEntity(objectId string, object interface{}) *Config_LdapConfigurationEntity {
+func (this *EntityManager) NewConfigLdapConfigurationEntity(parentUuid string, objectId string, object interface{}) *Config_LdapConfigurationEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -1580,6 +1622,7 @@ func (this *EntityManager) NewConfigLdapConfigurationEntity(objectId string, obj
 	if object != nil {
 		object.(*Config.LdapConfiguration).TYPENAME = "Config.LdapConfiguration"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.LdapConfiguration", "Config")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*Config.LdapConfiguration).UUID = uuidStr
@@ -1592,7 +1635,29 @@ func (this *EntityManager) NewConfigLdapConfigurationEntity(objectId string, obj
 			return val.(*Config_LdapConfigurationEntity)
 		}
 	} else {
-		uuidStr = "Config.LdapConfiguration%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(Config_LdapConfigurationEntity)
 	if object == nil {
@@ -1608,7 +1673,6 @@ func (this *EntityManager) NewConfigLdapConfigurationEntity(objectId string, obj
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.LdapConfiguration", "Config")
 	entity.prototype = prototype
 	return entity
 }
@@ -2091,7 +2155,7 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewConfigLdapConfigurationEntityFromObject(object *Config.LdapConfiguration) *Config_LdapConfigurationEntity {
-	return this.NewConfigLdapConfigurationEntity(object.UUID, object)
+	return this.NewConfigLdapConfigurationEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -2186,7 +2250,7 @@ type Config_ServiceConfigurationEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewConfigServiceConfigurationEntity(objectId string, object interface{}) *Config_ServiceConfigurationEntity {
+func (this *EntityManager) NewConfigServiceConfigurationEntity(parentUuid string, objectId string, object interface{}) *Config_ServiceConfigurationEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -2198,6 +2262,7 @@ func (this *EntityManager) NewConfigServiceConfigurationEntity(objectId string, 
 	if object != nil {
 		object.(*Config.ServiceConfiguration).TYPENAME = "Config.ServiceConfiguration"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.ServiceConfiguration", "Config")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*Config.ServiceConfiguration).UUID = uuidStr
@@ -2210,7 +2275,29 @@ func (this *EntityManager) NewConfigServiceConfigurationEntity(objectId string, 
 			return val.(*Config_ServiceConfigurationEntity)
 		}
 	} else {
-		uuidStr = "Config.ServiceConfiguration%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(Config_ServiceConfigurationEntity)
 	if object == nil {
@@ -2226,7 +2313,6 @@ func (this *EntityManager) NewConfigServiceConfigurationEntity(objectId string, 
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.ServiceConfiguration", "Config")
 	entity.prototype = prototype
 	return entity
 }
@@ -2697,7 +2783,7 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewConfigServiceConfigurationEntityFromObject(object *Config.ServiceConfiguration) *Config_ServiceConfigurationEntity {
-	return this.NewConfigServiceConfigurationEntity(object.UUID, object)
+	return this.NewConfigServiceConfigurationEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -2792,7 +2878,7 @@ type Config_ApplicationConfigurationEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewConfigApplicationConfigurationEntity(objectId string, object interface{}) *Config_ApplicationConfigurationEntity {
+func (this *EntityManager) NewConfigApplicationConfigurationEntity(parentUuid string, objectId string, object interface{}) *Config_ApplicationConfigurationEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -2804,6 +2890,7 @@ func (this *EntityManager) NewConfigApplicationConfigurationEntity(objectId stri
 	if object != nil {
 		object.(*Config.ApplicationConfiguration).TYPENAME = "Config.ApplicationConfiguration"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.ApplicationConfiguration", "Config")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*Config.ApplicationConfiguration).UUID = uuidStr
@@ -2816,7 +2903,29 @@ func (this *EntityManager) NewConfigApplicationConfigurationEntity(objectId stri
 			return val.(*Config_ApplicationConfigurationEntity)
 		}
 	} else {
-		uuidStr = "Config.ApplicationConfiguration%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(Config_ApplicationConfigurationEntity)
 	if object == nil {
@@ -2832,7 +2941,6 @@ func (this *EntityManager) NewConfigApplicationConfigurationEntity(objectId stri
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.ApplicationConfiguration", "Config")
 	entity.prototype = prototype
 	return entity
 }
@@ -3243,7 +3351,7 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewConfigApplicationConfigurationEntityFromObject(object *Config.ApplicationConfiguration) *Config_ApplicationConfigurationEntity {
-	return this.NewConfigApplicationConfigurationEntity(object.UUID, object)
+	return this.NewConfigApplicationConfigurationEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -3338,7 +3446,7 @@ type Config_ServerConfigurationEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewConfigServerConfigurationEntity(objectId string, object interface{}) *Config_ServerConfigurationEntity {
+func (this *EntityManager) NewConfigServerConfigurationEntity(parentUuid string, objectId string, object interface{}) *Config_ServerConfigurationEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -3350,6 +3458,7 @@ func (this *EntityManager) NewConfigServerConfigurationEntity(objectId string, o
 	if object != nil {
 		object.(*Config.ServerConfiguration).TYPENAME = "Config.ServerConfiguration"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.ServerConfiguration", "Config")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*Config.ServerConfiguration).UUID = uuidStr
@@ -3362,7 +3471,29 @@ func (this *EntityManager) NewConfigServerConfigurationEntity(objectId string, o
 			return val.(*Config_ServerConfigurationEntity)
 		}
 	} else {
-		uuidStr = "Config.ServerConfiguration%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(Config_ServerConfigurationEntity)
 	if object == nil {
@@ -3378,7 +3509,6 @@ func (this *EntityManager) NewConfigServerConfigurationEntity(objectId string, o
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.ServerConfiguration", "Config")
 	entity.prototype = prototype
 	return entity
 }
@@ -3921,7 +4051,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewConfigServerConfigurationEntityFromObject(object *Config.ServerConfiguration) *Config_ServerConfigurationEntity {
-	return this.NewConfigServerConfigurationEntity(object.UUID, object)
+	return this.NewConfigServerConfigurationEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -4016,7 +4146,7 @@ type Config_ConfigurationsEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewConfigConfigurationsEntity(objectId string, object interface{}) *Config_ConfigurationsEntity {
+func (this *EntityManager) NewConfigConfigurationsEntity(parentUuid string, objectId string, object interface{}) *Config_ConfigurationsEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -4029,7 +4159,6 @@ func (this *EntityManager) NewConfigConfigurationsEntity(objectId string, object
 		object.(*Config.Configurations).TYPENAME = "Config.Configurations"
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.Configurations", "Config")
-
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*Config.Configurations).UUID = uuidStr
@@ -4042,29 +4171,20 @@ func (this *EntityManager) NewConfigConfigurationsEntity(objectId string, object
 			return val.(*Config_ConfigurationsEntity)
 		}
 	} else {
-
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
 			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
 		} else {
-			keyInfo := prototype.TypeName + ":"
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
 			for i := 1; i < len(prototype.Ids); i++ {
 				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
 				params := make([]interface{}, 0)
 				value, _ := Utility.CallMethod(object, getter, params)
-				if reflect.TypeOf(value).Kind() == reflect.String {
-					keyInfo += value.(string)
-				} else if reflect.TypeOf(value).Kind() == reflect.Int {
-					keyInfo += strconv.Itoa(value.(int))
-				} else if reflect.TypeOf(value).Kind() == reflect.Int8 {
-					keyInfo += strconv.Itoa(int(value.(int8)))
-				} else if reflect.TypeOf(value).Kind() == reflect.Int16 {
-					keyInfo += strconv.Itoa(int(value.(int16)))
-				} else if reflect.TypeOf(value).Kind() == reflect.Int32 {
-					keyInfo += strconv.Itoa(int(value.(int32)))
-				} else if reflect.TypeOf(value).Kind() == reflect.Int64 {
-					keyInfo += strconv.Itoa(int(value.(int64)))
-				}
+				keyInfo += Utility.ToString(value)
 				// Append underscore for readability in case of problem...
 				if i < len(prototype.Ids)-1 {
 					keyInfo += "_"
@@ -4075,7 +4195,6 @@ func (this *EntityManager) NewConfigConfigurationsEntity(objectId string, object
 			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
 		}
 	}
-
 	entity := new(Config_ConfigurationsEntity)
 	if object == nil {
 		entity.object = new(Config.Configurations)
@@ -4389,7 +4508,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 
 	/** Save serverConfig type ServerConfiguration **/
 	if this.object.M_serverConfig != nil {
-		serverConfigEntity := GetServer().GetEntityManager().NewConfigServerConfigurationEntity(this.object.M_serverConfig.UUID, this.object.M_serverConfig)
+		serverConfigEntity := GetServer().GetEntityManager().NewConfigServerConfigurationEntity(this.GetUuid(), this.object.M_serverConfig.UUID, this.object.M_serverConfig)
 		ConfigurationsInfo = append(ConfigurationsInfo, serverConfigEntity.uuid)
 		serverConfigEntity.AppendReferenced("serverConfig", this)
 		this.AppendChild("serverConfig", serverConfigEntity)
@@ -4403,7 +4522,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	/** Save serviceConfigs type ServiceConfiguration **/
 	serviceConfigsIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_serviceConfigs); i++ {
-		serviceConfigsEntity := GetServer().GetEntityManager().NewConfigServiceConfigurationEntity(this.object.M_serviceConfigs[i].UUID, this.object.M_serviceConfigs[i])
+		serviceConfigsEntity := GetServer().GetEntityManager().NewConfigServiceConfigurationEntity(this.GetUuid(), this.object.M_serviceConfigs[i].UUID, this.object.M_serviceConfigs[i])
 		serviceConfigsIds = append(serviceConfigsIds, serviceConfigsEntity.uuid)
 		serviceConfigsEntity.AppendReferenced("serviceConfigs", this)
 		this.AppendChild("serviceConfigs", serviceConfigsEntity)
@@ -4417,7 +4536,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	/** Save dataStoreConfigs type DataStoreConfiguration **/
 	dataStoreConfigsIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_dataStoreConfigs); i++ {
-		dataStoreConfigsEntity := GetServer().GetEntityManager().NewConfigDataStoreConfigurationEntity(this.object.M_dataStoreConfigs[i].UUID, this.object.M_dataStoreConfigs[i])
+		dataStoreConfigsEntity := GetServer().GetEntityManager().NewConfigDataStoreConfigurationEntity(this.GetUuid(), this.object.M_dataStoreConfigs[i].UUID, this.object.M_dataStoreConfigs[i])
 		dataStoreConfigsIds = append(dataStoreConfigsIds, dataStoreConfigsEntity.uuid)
 		dataStoreConfigsEntity.AppendReferenced("dataStoreConfigs", this)
 		this.AppendChild("dataStoreConfigs", dataStoreConfigsEntity)
@@ -4431,7 +4550,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	/** Save smtpConfigs type SmtpConfiguration **/
 	smtpConfigsIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_smtpConfigs); i++ {
-		smtpConfigsEntity := GetServer().GetEntityManager().NewConfigSmtpConfigurationEntity(this.object.M_smtpConfigs[i].UUID, this.object.M_smtpConfigs[i])
+		smtpConfigsEntity := GetServer().GetEntityManager().NewConfigSmtpConfigurationEntity(this.GetUuid(), this.object.M_smtpConfigs[i].UUID, this.object.M_smtpConfigs[i])
 		smtpConfigsIds = append(smtpConfigsIds, smtpConfigsEntity.uuid)
 		smtpConfigsEntity.AppendReferenced("smtpConfigs", this)
 		this.AppendChild("smtpConfigs", smtpConfigsEntity)
@@ -4445,7 +4564,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	/** Save ldapConfigs type LdapConfiguration **/
 	ldapConfigsIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_ldapConfigs); i++ {
-		ldapConfigsEntity := GetServer().GetEntityManager().NewConfigLdapConfigurationEntity(this.object.M_ldapConfigs[i].UUID, this.object.M_ldapConfigs[i])
+		ldapConfigsEntity := GetServer().GetEntityManager().NewConfigLdapConfigurationEntity(this.GetUuid(), this.object.M_ldapConfigs[i].UUID, this.object.M_ldapConfigs[i])
 		ldapConfigsIds = append(ldapConfigsIds, ldapConfigsEntity.uuid)
 		ldapConfigsEntity.AppendReferenced("ldapConfigs", this)
 		this.AppendChild("ldapConfigs", ldapConfigsEntity)
@@ -4459,7 +4578,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	/** Save applicationConfigs type ApplicationConfiguration **/
 	applicationConfigsIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_applicationConfigs); i++ {
-		applicationConfigsEntity := GetServer().GetEntityManager().NewConfigApplicationConfigurationEntity(this.object.M_applicationConfigs[i].UUID, this.object.M_applicationConfigs[i])
+		applicationConfigsEntity := GetServer().GetEntityManager().NewConfigApplicationConfigurationEntity(this.GetUuid(), this.object.M_applicationConfigs[i].UUID, this.object.M_applicationConfigs[i])
 		applicationConfigsIds = append(applicationConfigsIds, applicationConfigsEntity.uuid)
 		applicationConfigsEntity.AppendReferenced("applicationConfigs", this)
 		this.AppendChild("applicationConfigs", applicationConfigsEntity)
@@ -4585,7 +4704,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 				if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
 					serverConfigEntity = instance.(*Config_ServerConfigurationEntity)
 				} else {
-					serverConfigEntity = GetServer().GetEntityManager().NewConfigServerConfigurationEntity(uuid, nil)
+					serverConfigEntity = GetServer().GetEntityManager().NewConfigServerConfigurationEntity(this.GetUuid(), uuid, nil)
 					serverConfigEntity.InitEntity(uuid)
 					GetServer().GetEntityManager().insert(serverConfigEntity)
 				}
@@ -4608,7 +4727,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						serviceConfigsEntity = instance.(*Config_ServiceConfigurationEntity)
 					} else {
-						serviceConfigsEntity = GetServer().GetEntityManager().NewConfigServiceConfigurationEntity(uuids[i], nil)
+						serviceConfigsEntity = GetServer().GetEntityManager().NewConfigServiceConfigurationEntity(this.GetUuid(), uuids[i], nil)
 						serviceConfigsEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(serviceConfigsEntity)
 					}
@@ -4632,7 +4751,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						dataStoreConfigsEntity = instance.(*Config_DataStoreConfigurationEntity)
 					} else {
-						dataStoreConfigsEntity = GetServer().GetEntityManager().NewConfigDataStoreConfigurationEntity(uuids[i], nil)
+						dataStoreConfigsEntity = GetServer().GetEntityManager().NewConfigDataStoreConfigurationEntity(this.GetUuid(), uuids[i], nil)
 						dataStoreConfigsEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(dataStoreConfigsEntity)
 					}
@@ -4656,7 +4775,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						smtpConfigsEntity = instance.(*Config_SmtpConfigurationEntity)
 					} else {
-						smtpConfigsEntity = GetServer().GetEntityManager().NewConfigSmtpConfigurationEntity(uuids[i], nil)
+						smtpConfigsEntity = GetServer().GetEntityManager().NewConfigSmtpConfigurationEntity(this.GetUuid(), uuids[i], nil)
 						smtpConfigsEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(smtpConfigsEntity)
 					}
@@ -4680,7 +4799,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						ldapConfigsEntity = instance.(*Config_LdapConfigurationEntity)
 					} else {
-						ldapConfigsEntity = GetServer().GetEntityManager().NewConfigLdapConfigurationEntity(uuids[i], nil)
+						ldapConfigsEntity = GetServer().GetEntityManager().NewConfigLdapConfigurationEntity(this.GetUuid(), uuids[i], nil)
 						ldapConfigsEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(ldapConfigsEntity)
 					}
@@ -4704,7 +4823,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						applicationConfigsEntity = instance.(*Config_ApplicationConfigurationEntity)
 					} else {
-						applicationConfigsEntity = GetServer().GetEntityManager().NewConfigApplicationConfigurationEntity(uuids[i], nil)
+						applicationConfigsEntity = GetServer().GetEntityManager().NewConfigApplicationConfigurationEntity(this.GetUuid(), uuids[i], nil)
 						applicationConfigsEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(applicationConfigsEntity)
 					}
@@ -4739,7 +4858,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewConfigConfigurationsEntityFromObject(object *Config.Configurations) *Config_ConfigurationsEntity {
-	return this.NewConfigConfigurationsEntity(object.UUID, object)
+	return this.NewConfigConfigurationsEntity("", object.UUID, object)
 }
 
 /** Delete **/

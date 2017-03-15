@@ -99,7 +99,7 @@ func (this *EntityManager) initialize() {
 	// I will create the cargo entities if it dosent already exist.
 	cargoEntitiesUuid := CargoEntitiesEntitiesExists("CARGO_ENTITIES")
 	if len(cargoEntitiesUuid) == 0 {
-		cargoEntities := this.NewCargoEntitiesEntitiesEntity("CARGO_ENTITIES", nil)
+		cargoEntities := this.NewCargoEntitiesEntitiesEntity("", "CARGO_ENTITIES", nil)
 		cargoEntities.object.M_id = "CARGO_ENTITIES"
 		cargoEntities.object.M_name = "Cargo entities"
 		cargoEntities.object.M_version = "1.0"
@@ -125,8 +125,8 @@ func (this *EntityManager) stop() {
  */
 func (this *EntityManager) getCargoEntities() *CargoEntities_EntitiesEntity {
 	cargoEntitiesUuid := CargoEntitiesEntitiesExists("CARGO_ENTITIES")
-	cargoEntities, _ := this.getEntityByUuid(cargoEntitiesUuid)
 
+	cargoEntities, _ := this.getEntityByUuid(cargoEntitiesUuid)
 	return cargoEntities.(*CargoEntities_EntitiesEntity)
 }
 
@@ -717,10 +717,11 @@ func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, s
 
 	if len(queryStr) == 0 {
 		values, err := dataStore.(*KeyValueDataStore).getIndexation(typeName)
-		if err != nil {
-			return entities, NewError(Utility.FileLine(), DATASTORE_INDEXATION_ERROR, SERVER_ERROR_CODE, errors.New("No indexation for type '"+typeName+"'."))
-		}
 
+		if err != nil {
+			errObj := NewError(Utility.FileLine(), DATASTORE_INDEXATION_ERROR, SERVER_ERROR_CODE, errors.New("No indexation for type '"+typeName+"'."))
+			return entities, errObj
+		}
 		for i := 0; i < len(values); i++ {
 			key := values[i].(string)
 			values_, err := dataStore.(*KeyValueDataStore).getValues(key)
@@ -741,6 +742,7 @@ func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, s
 				}
 			}
 		}
+
 	} else {
 		// Here I will create a new query and execute it...
 		var query EntityQuery
@@ -771,7 +773,6 @@ func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, s
 			}
 		}
 	}
-
 	return entities, nil
 }
 
@@ -848,9 +849,10 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 
 	funcName := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
 
-	params := make([]interface{}, 2)
-	params[0] = uuid
-	params[1] = nil
+	params := make([]interface{}, 3)
+	params[0] = "" // No parent uuid needed.
+	params[1] = uuid
+	params[2] = nil
 	result, err := Utility.CallMethod(this, funcName, params)
 
 	if err != nil {
@@ -882,7 +884,8 @@ func (this *EntityManager) getDynamicEntityByUuid(uuid string) (Entity, *CargoEn
 	values["TYPENAME"] = strings.Split(uuid, "%")[0]
 	values["UUID"] = uuid
 
-	entity, errObj := this.newDynamicEntity(values)
+	// here the parent uuid is not know.
+	entity, errObj := this.newDynamicEntity("", values)
 
 	if errObj != nil {
 		return nil, errObj
@@ -1209,9 +1212,10 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		}
 	}
 
-	params := make([]interface{}, 2)
-	params[0] = objectId
-	params[1] = values
+	params := make([]interface{}, 3)
+	params[0] = ""
+	params[1] = objectId
+	params[2] = values
 
 	methodName := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
 	entity, invalidMethod := Utility.CallMethod(this, methodName, params)
@@ -1222,7 +1226,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		if reflect.TypeOf(values).String() == "map[string]interface {}" {
 			values.(map[string]interface{})["parentUuid"] = parentUuid
 			var errObj *CargoEntities.Error
-			entity, errObj = this.newDynamicEntity(values.(map[string]interface{}))
+			entity, errObj = this.newDynamicEntity(parentUuid, values.(map[string]interface{}))
 			if errObj != nil {
 				GetServer().reportErrorMessage(messageId, sessionId, errObj)
 				return nil
@@ -1433,7 +1437,7 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 	if err != nil {
 		// I will try with dynamic entity insted...
 		var errObj *CargoEntities.Error
-		entity, errObj = this.newDynamicEntity(values.(map[string]interface{}))
+		entity, errObj = this.newDynamicEntity("", values.(map[string]interface{}))
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return nil

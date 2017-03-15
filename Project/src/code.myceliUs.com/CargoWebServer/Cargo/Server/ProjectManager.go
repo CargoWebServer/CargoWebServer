@@ -78,7 +78,7 @@ func (this *ProjectManager) synchronize() {
 			log.Println("Synchronize project ", f.Name())
 			if !strings.HasPrefix(".", f.Name()) {
 				// first of all i will see if the project exist...
-				projectEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(f.Name(), nil)
+				projectEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(cargoEntities.GetUuid(), f.Name(), nil)
 
 				// Get the reference to the object...
 				project := projectEntity.GetObject().(*CargoEntities.Project)

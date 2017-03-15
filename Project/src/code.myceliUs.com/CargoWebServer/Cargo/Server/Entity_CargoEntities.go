@@ -17,17 +17,17 @@ func (this *EntityManager) create_CargoEntities_EntityEntityPrototype() {
 	var entityEntityProto EntityPrototype
 	entityEntityProto.TypeName = "CargoEntities.Entity"
 	entityEntityProto.IsAbstract = true
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
 	entityEntityProto.Ids = append(entityEntityProto.Ids, "uuid")
 	entityEntityProto.Fields = append(entityEntityProto.Fields, "uuid")
 	entityEntityProto.FieldsType = append(entityEntityProto.FieldsType, "xs.string")
@@ -85,7 +85,7 @@ type CargoEntities_ParameterEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesParameterEntity(objectId string, object interface{}) *CargoEntities_ParameterEntity {
+func (this *EntityManager) NewCargoEntitiesParameterEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_ParameterEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -97,6 +97,7 @@ func (this *EntityManager) NewCargoEntitiesParameterEntity(objectId string, obje
 	if object != nil {
 		object.(*CargoEntities.Parameter).TYPENAME = "CargoEntities.Parameter"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Parameter", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Parameter).UUID = uuidStr
@@ -109,7 +110,29 @@ func (this *EntityManager) NewCargoEntitiesParameterEntity(objectId string, obje
 			return val.(*CargoEntities_ParameterEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Parameter%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_ParameterEntity)
 	if object == nil {
@@ -125,7 +148,6 @@ func (this *EntityManager) NewCargoEntitiesParameterEntity(objectId string, obje
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Parameter", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -537,7 +559,7 @@ func (this *CargoEntities_ParameterEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesParameterEntityFromObject(object *CargoEntities.Parameter) *CargoEntities_ParameterEntity {
-	return this.NewCargoEntitiesParameterEntity(object.UUID, object)
+	return this.NewCargoEntitiesParameterEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -632,7 +654,7 @@ type CargoEntities_ActionEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesActionEntity(objectId string, object interface{}) *CargoEntities_ActionEntity {
+func (this *EntityManager) NewCargoEntitiesActionEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_ActionEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -644,6 +666,7 @@ func (this *EntityManager) NewCargoEntitiesActionEntity(objectId string, object 
 	if object != nil {
 		object.(*CargoEntities.Action).TYPENAME = "CargoEntities.Action"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Action", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Action).UUID = uuidStr
@@ -656,7 +679,29 @@ func (this *EntityManager) NewCargoEntitiesActionEntity(objectId string, object 
 			return val.(*CargoEntities_ActionEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Action%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_ActionEntity)
 	if object == nil {
@@ -672,7 +717,6 @@ func (this *EntityManager) NewCargoEntitiesActionEntity(objectId string, object 
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Action", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -944,7 +988,7 @@ func (this *CargoEntities_ActionEntity) SaveEntity() {
 	/** Save parameters type Parameter **/
 	parametersIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_parameters); i++ {
-		parametersEntity := GetServer().GetEntityManager().NewCargoEntitiesParameterEntity(this.object.M_parameters[i].UUID, this.object.M_parameters[i])
+		parametersEntity := GetServer().GetEntityManager().NewCargoEntitiesParameterEntity(this.GetUuid(), this.object.M_parameters[i].UUID, this.object.M_parameters[i])
 		parametersIds = append(parametersIds, parametersEntity.uuid)
 		parametersEntity.AppendReferenced("parameters", this)
 		this.AppendChild("parameters", parametersEntity)
@@ -958,7 +1002,7 @@ func (this *CargoEntities_ActionEntity) SaveEntity() {
 	/** Save results type Parameter **/
 	resultsIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_results); i++ {
-		resultsEntity := GetServer().GetEntityManager().NewCargoEntitiesParameterEntity(this.object.M_results[i].UUID, this.object.M_results[i])
+		resultsEntity := GetServer().GetEntityManager().NewCargoEntitiesParameterEntity(this.GetUuid(), this.object.M_results[i].UUID, this.object.M_results[i])
 		resultsIds = append(resultsIds, resultsEntity.uuid)
 		resultsEntity.AppendReferenced("results", this)
 		this.AppendChild("results", resultsEntity)
@@ -1076,7 +1120,7 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						parametersEntity = instance.(*CargoEntities_ParameterEntity)
 					} else {
-						parametersEntity = GetServer().GetEntityManager().NewCargoEntitiesParameterEntity(uuids[i], nil)
+						parametersEntity = GetServer().GetEntityManager().NewCargoEntitiesParameterEntity(this.GetUuid(), uuids[i], nil)
 						parametersEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(parametersEntity)
 					}
@@ -1100,7 +1144,7 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						resultsEntity = instance.(*CargoEntities_ParameterEntity)
 					} else {
-						resultsEntity = GetServer().GetEntityManager().NewCargoEntitiesParameterEntity(uuids[i], nil)
+						resultsEntity = GetServer().GetEntityManager().NewCargoEntitiesParameterEntity(this.GetUuid(), uuids[i], nil)
 						resultsEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(resultsEntity)
 					}
@@ -1148,7 +1192,7 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesActionEntityFromObject(object *CargoEntities.Action) *CargoEntities_ActionEntity {
-	return this.NewCargoEntitiesActionEntity(object.UUID, object)
+	return this.NewCargoEntitiesActionEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -1243,7 +1287,7 @@ type CargoEntities_ErrorEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesErrorEntity(objectId string, object interface{}) *CargoEntities_ErrorEntity {
+func (this *EntityManager) NewCargoEntitiesErrorEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_ErrorEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -1255,6 +1299,7 @@ func (this *EntityManager) NewCargoEntitiesErrorEntity(objectId string, object i
 	if object != nil {
 		object.(*CargoEntities.Error).TYPENAME = "CargoEntities.Error"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Error", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Error).UUID = uuidStr
@@ -1267,7 +1312,29 @@ func (this *EntityManager) NewCargoEntitiesErrorEntity(objectId string, object i
 			return val.(*CargoEntities_ErrorEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Error%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_ErrorEntity)
 	if object == nil {
@@ -1283,7 +1350,6 @@ func (this *EntityManager) NewCargoEntitiesErrorEntity(objectId string, object i
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Error", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -1749,7 +1815,7 @@ func (this *CargoEntities_ErrorEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesErrorEntityFromObject(object *CargoEntities.Error) *CargoEntities_ErrorEntity {
-	return this.NewCargoEntitiesErrorEntity(object.UUID, object)
+	return this.NewCargoEntitiesErrorEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -1844,7 +1910,7 @@ type CargoEntities_LogEntryEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesLogEntryEntity(objectId string, object interface{}) *CargoEntities_LogEntryEntity {
+func (this *EntityManager) NewCargoEntitiesLogEntryEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_LogEntryEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -1856,6 +1922,7 @@ func (this *EntityManager) NewCargoEntitiesLogEntryEntity(objectId string, objec
 	if object != nil {
 		object.(*CargoEntities.LogEntry).TYPENAME = "CargoEntities.LogEntry"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.LogEntry", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.LogEntry).UUID = uuidStr
@@ -1868,7 +1935,29 @@ func (this *EntityManager) NewCargoEntitiesLogEntryEntity(objectId string, objec
 			return val.(*CargoEntities_LogEntryEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.LogEntry%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_LogEntryEntity)
 	if object == nil {
@@ -1884,7 +1973,6 @@ func (this *EntityManager) NewCargoEntitiesLogEntryEntity(objectId string, objec
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.LogEntry", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -2335,7 +2423,7 @@ func (this *CargoEntities_LogEntryEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesLogEntryEntityFromObject(object *CargoEntities.LogEntry) *CargoEntities_LogEntryEntity {
-	return this.NewCargoEntitiesLogEntryEntity(object.UUID, object)
+	return this.NewCargoEntitiesLogEntryEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -2430,7 +2518,7 @@ type CargoEntities_LogEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesLogEntity(objectId string, object interface{}) *CargoEntities_LogEntity {
+func (this *EntityManager) NewCargoEntitiesLogEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_LogEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -2442,6 +2530,7 @@ func (this *EntityManager) NewCargoEntitiesLogEntity(objectId string, object int
 	if object != nil {
 		object.(*CargoEntities.Log).TYPENAME = "CargoEntities.Log"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Log", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Log).UUID = uuidStr
@@ -2454,7 +2543,29 @@ func (this *EntityManager) NewCargoEntitiesLogEntity(objectId string, object int
 			return val.(*CargoEntities_LogEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Log%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_LogEntity)
 	if object == nil {
@@ -2470,7 +2581,6 @@ func (this *EntityManager) NewCargoEntitiesLogEntity(objectId string, object int
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Log", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -2744,7 +2854,7 @@ func (this *CargoEntities_LogEntity) SaveEntity() {
 	/** Save entries type LogEntry **/
 	entriesIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_entries); i++ {
-		entriesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.object.M_entries[i].UUID, this.object.M_entries[i])
+		entriesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), this.object.M_entries[i].UUID, this.object.M_entries[i])
 		entriesIds = append(entriesIds, entriesEntity.uuid)
 		entriesEntity.AppendReferenced("entries", this)
 		this.AppendChild("entries", entriesEntity)
@@ -2865,7 +2975,7 @@ func (this *CargoEntities_LogEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						entriesEntity = instance.(*CargoEntities_LogEntryEntity)
 					} else {
-						entriesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(uuids[i], nil)
+						entriesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
 						entriesEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(entriesEntity)
 					}
@@ -2913,7 +3023,7 @@ func (this *CargoEntities_LogEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesLogEntityFromObject(object *CargoEntities.Log) *CargoEntities_LogEntity {
-	return this.NewCargoEntitiesLogEntity(object.UUID, object)
+	return this.NewCargoEntitiesLogEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -3008,7 +3118,7 @@ type CargoEntities_ProjectEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesProjectEntity(objectId string, object interface{}) *CargoEntities_ProjectEntity {
+func (this *EntityManager) NewCargoEntitiesProjectEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_ProjectEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -3020,6 +3130,7 @@ func (this *EntityManager) NewCargoEntitiesProjectEntity(objectId string, object
 	if object != nil {
 		object.(*CargoEntities.Project).TYPENAME = "CargoEntities.Project"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Project", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Project).UUID = uuidStr
@@ -3032,7 +3143,29 @@ func (this *EntityManager) NewCargoEntitiesProjectEntity(objectId string, object
 			return val.(*CargoEntities_ProjectEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Project%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_ProjectEntity)
 	if object == nil {
@@ -3048,7 +3181,6 @@ func (this *EntityManager) NewCargoEntitiesProjectEntity(objectId string, object
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Project", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -3488,7 +3620,7 @@ func (this *CargoEntities_ProjectEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesProjectEntityFromObject(object *CargoEntities.Project) *CargoEntities_ProjectEntity {
-	return this.NewCargoEntitiesProjectEntity(object.UUID, object)
+	return this.NewCargoEntitiesProjectEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -3571,9 +3703,9 @@ func (this *EntityManager) create_CargoEntities_MessageEntityPrototype() {
 	messageEntityProto.TypeName = "CargoEntities.Message"
 	messageEntityProto.IsAbstract = true
 	messageEntityProto.SuperTypeNames = append(messageEntityProto.SuperTypeNames, "CargoEntities.Entity")
+	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Notification")
 	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Error")
-	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Notification")
 	messageEntityProto.Ids = append(messageEntityProto.Ids, "uuid")
 	messageEntityProto.Fields = append(messageEntityProto.Fields, "uuid")
 	messageEntityProto.FieldsType = append(messageEntityProto.FieldsType, "xs.string")
@@ -3637,7 +3769,7 @@ type CargoEntities_NotificationEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesNotificationEntity(objectId string, object interface{}) *CargoEntities_NotificationEntity {
+func (this *EntityManager) NewCargoEntitiesNotificationEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_NotificationEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -3649,6 +3781,7 @@ func (this *EntityManager) NewCargoEntitiesNotificationEntity(objectId string, o
 	if object != nil {
 		object.(*CargoEntities.Notification).TYPENAME = "CargoEntities.Notification"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Notification", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Notification).UUID = uuidStr
@@ -3661,7 +3794,29 @@ func (this *EntityManager) NewCargoEntitiesNotificationEntity(objectId string, o
 			return val.(*CargoEntities_NotificationEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Notification%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_NotificationEntity)
 	if object == nil {
@@ -3677,7 +3832,6 @@ func (this *EntityManager) NewCargoEntitiesNotificationEntity(objectId string, o
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Notification", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -4163,7 +4317,7 @@ func (this *CargoEntities_NotificationEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesNotificationEntityFromObject(object *CargoEntities.Notification) *CargoEntities_NotificationEntity {
-	return this.NewCargoEntitiesNotificationEntity(object.UUID, object)
+	return this.NewCargoEntitiesNotificationEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -4258,7 +4412,7 @@ type CargoEntities_TextMessageEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesTextMessageEntity(objectId string, object interface{}) *CargoEntities_TextMessageEntity {
+func (this *EntityManager) NewCargoEntitiesTextMessageEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_TextMessageEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -4270,6 +4424,7 @@ func (this *EntityManager) NewCargoEntitiesTextMessageEntity(objectId string, ob
 	if object != nil {
 		object.(*CargoEntities.TextMessage).TYPENAME = "CargoEntities.TextMessage"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.TextMessage", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.TextMessage).UUID = uuidStr
@@ -4282,7 +4437,29 @@ func (this *EntityManager) NewCargoEntitiesTextMessageEntity(objectId string, ob
 			return val.(*CargoEntities_TextMessageEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.TextMessage%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_TextMessageEntity)
 	if object == nil {
@@ -4298,7 +4475,6 @@ func (this *EntityManager) NewCargoEntitiesTextMessageEntity(objectId string, ob
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.TextMessage", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -4784,7 +4960,7 @@ func (this *CargoEntities_TextMessageEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesTextMessageEntityFromObject(object *CargoEntities.TextMessage) *CargoEntities_TextMessageEntity {
-	return this.NewCargoEntitiesTextMessageEntity(object.UUID, object)
+	return this.NewCargoEntitiesTextMessageEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -4879,7 +5055,7 @@ type CargoEntities_SessionEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesSessionEntity(objectId string, object interface{}) *CargoEntities_SessionEntity {
+func (this *EntityManager) NewCargoEntitiesSessionEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_SessionEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -4891,6 +5067,7 @@ func (this *EntityManager) NewCargoEntitiesSessionEntity(objectId string, object
 	if object != nil {
 		object.(*CargoEntities.Session).TYPENAME = "CargoEntities.Session"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Session", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Session).UUID = uuidStr
@@ -4903,7 +5080,29 @@ func (this *EntityManager) NewCargoEntitiesSessionEntity(objectId string, object
 			return val.(*CargoEntities_SessionEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Session%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_SessionEntity)
 	if object == nil {
@@ -4919,7 +5118,6 @@ func (this *EntityManager) NewCargoEntitiesSessionEntity(objectId string, object
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Session", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -5392,7 +5590,7 @@ func (this *CargoEntities_SessionEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesSessionEntityFromObject(object *CargoEntities.Session) *CargoEntities_SessionEntity {
-	return this.NewCargoEntitiesSessionEntity(object.UUID, object)
+	return this.NewCargoEntitiesSessionEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -5487,7 +5685,7 @@ type CargoEntities_RoleEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesRoleEntity(objectId string, object interface{}) *CargoEntities_RoleEntity {
+func (this *EntityManager) NewCargoEntitiesRoleEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_RoleEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -5499,6 +5697,7 @@ func (this *EntityManager) NewCargoEntitiesRoleEntity(objectId string, object in
 	if object != nil {
 		object.(*CargoEntities.Role).TYPENAME = "CargoEntities.Role"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Role", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Role).UUID = uuidStr
@@ -5511,7 +5710,29 @@ func (this *EntityManager) NewCargoEntitiesRoleEntity(objectId string, object in
 			return val.(*CargoEntities_RoleEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Role%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_RoleEntity)
 	if object == nil {
@@ -5527,7 +5748,6 @@ func (this *EntityManager) NewCargoEntitiesRoleEntity(objectId string, object in
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Role", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -5971,7 +6191,7 @@ func (this *CargoEntities_RoleEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesRoleEntityFromObject(object *CargoEntities.Role) *CargoEntities_RoleEntity {
-	return this.NewCargoEntitiesRoleEntity(object.UUID, object)
+	return this.NewCargoEntitiesRoleEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -6066,7 +6286,7 @@ type CargoEntities_AccountEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesAccountEntity(objectId string, object interface{}) *CargoEntities_AccountEntity {
+func (this *EntityManager) NewCargoEntitiesAccountEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_AccountEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -6078,6 +6298,7 @@ func (this *EntityManager) NewCargoEntitiesAccountEntity(objectId string, object
 	if object != nil {
 		object.(*CargoEntities.Account).TYPENAME = "CargoEntities.Account"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Account", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Account).UUID = uuidStr
@@ -6090,7 +6311,29 @@ func (this *EntityManager) NewCargoEntitiesAccountEntity(objectId string, object
 			return val.(*CargoEntities_AccountEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Account%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_AccountEntity)
 	if object == nil {
@@ -6106,7 +6349,6 @@ func (this *EntityManager) NewCargoEntitiesAccountEntity(objectId string, object
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Account", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -6419,7 +6661,7 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	/** Save sessions type Session **/
 	sessionsIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_sessions); i++ {
-		sessionsEntity := GetServer().GetEntityManager().NewCargoEntitiesSessionEntity(this.object.M_sessions[i].UUID, this.object.M_sessions[i])
+		sessionsEntity := GetServer().GetEntityManager().NewCargoEntitiesSessionEntity(this.GetUuid(), this.object.M_sessions[i].UUID, this.object.M_sessions[i])
 		sessionsIds = append(sessionsIds, sessionsEntity.uuid)
 		sessionsEntity.AppendReferenced("sessions", this)
 		this.AppendChild("sessions", sessionsEntity)
@@ -6433,7 +6675,7 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	/** Save permissions type Permission **/
 	permissionsIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_permissions); i++ {
-		permissionsEntity := GetServer().GetEntityManager().NewCargoEntitiesPermissionEntity(this.object.M_permissions[i].UUID, this.object.M_permissions[i])
+		permissionsEntity := GetServer().GetEntityManager().NewCargoEntitiesPermissionEntity(this.GetUuid(), this.object.M_permissions[i].UUID, this.object.M_permissions[i])
 		permissionsIds = append(permissionsIds, permissionsEntity.uuid)
 		permissionsEntity.AppendReferenced("permissions", this)
 		this.AppendChild("permissions", permissionsEntity)
@@ -6448,16 +6690,8 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	messagesIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_messages); i++ {
 		switch v := this.object.M_messages[i].(type) {
-		case *CargoEntities.TextMessage:
-			messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(v.UUID, v)
-			messagesIds = append(messagesIds, messagesEntity.uuid)
-			messagesEntity.AppendReferenced("messages", this)
-			this.AppendChild("messages", messagesEntity)
-			if messagesEntity.NeedSave() {
-				messagesEntity.SaveEntity()
-			}
 		case *CargoEntities.Error:
-			messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(v.UUID, v)
+			messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
 			messagesIds = append(messagesIds, messagesEntity.uuid)
 			messagesEntity.AppendReferenced("messages", this)
 			this.AppendChild("messages", messagesEntity)
@@ -6465,7 +6699,15 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 				messagesEntity.SaveEntity()
 			}
 		case *CargoEntities.Notification:
-			messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(v.UUID, v)
+			messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
+			messagesIds = append(messagesIds, messagesEntity.uuid)
+			messagesEntity.AppendReferenced("messages", this)
+			this.AppendChild("messages", messagesEntity)
+			if messagesEntity.NeedSave() {
+				messagesEntity.SaveEntity()
+			}
+		case *CargoEntities.TextMessage:
+			messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
 			messagesIds = append(messagesIds, messagesEntity.uuid)
 			messagesEntity.AppendReferenced("messages", this)
 			this.AppendChild("messages", messagesEntity)
@@ -6616,7 +6858,7 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						sessionsEntity = instance.(*CargoEntities_SessionEntity)
 					} else {
-						sessionsEntity = GetServer().GetEntityManager().NewCargoEntitiesSessionEntity(uuids[i], nil)
+						sessionsEntity = GetServer().GetEntityManager().NewCargoEntitiesSessionEntity(this.GetUuid(), uuids[i], nil)
 						sessionsEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(sessionsEntity)
 					}
@@ -6640,7 +6882,7 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						permissionsEntity = instance.(*CargoEntities_PermissionEntity)
 					} else {
-						permissionsEntity = GetServer().GetEntityManager().NewCargoEntitiesPermissionEntity(uuids[i], nil)
+						permissionsEntity = GetServer().GetEntityManager().NewCargoEntitiesPermissionEntity(this.GetUuid(), uuids[i], nil)
 						permissionsEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(permissionsEntity)
 					}
@@ -6664,13 +6906,26 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string) error {
 					log.Println("type ", typeName, " not found!")
 					return err
 				}
-				if typeName == "CargoEntities.Error" {
+				if typeName == "CargoEntities.TextMessage" {
+					if len(uuids[i]) > 0 {
+						var messagesEntity *CargoEntities_TextMessageEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							messagesEntity = instance.(*CargoEntities_TextMessageEntity)
+						} else {
+							messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
+							messagesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(messagesEntity)
+						}
+						messagesEntity.AppendReferenced("messages", this)
+						this.AppendChild("messages", messagesEntity)
+					}
+				} else if typeName == "CargoEntities.Error" {
 					if len(uuids[i]) > 0 {
 						var messagesEntity *CargoEntities_ErrorEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 							messagesEntity = instance.(*CargoEntities_ErrorEntity)
 						} else {
-							messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(uuids[i], nil)
+							messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), uuids[i], nil)
 							messagesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(messagesEntity)
 						}
@@ -6683,20 +6938,7 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string) error {
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 							messagesEntity = instance.(*CargoEntities_NotificationEntity)
 						} else {
-							messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(uuids[i], nil)
-							messagesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(messagesEntity)
-						}
-						messagesEntity.AppendReferenced("messages", this)
-						this.AppendChild("messages", messagesEntity)
-					}
-				} else if typeName == "CargoEntities.TextMessage" {
-					if len(uuids[i]) > 0 {
-						var messagesEntity *CargoEntities_TextMessageEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							messagesEntity = instance.(*CargoEntities_TextMessageEntity)
-						} else {
-							messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(uuids[i], nil)
+							messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), uuids[i], nil)
 							messagesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(messagesEntity)
 						}
@@ -6774,7 +7016,7 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesAccountEntityFromObject(object *CargoEntities.Account) *CargoEntities_AccountEntity {
-	return this.NewCargoEntitiesAccountEntity(object.UUID, object)
+	return this.NewCargoEntitiesAccountEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -6793,18 +7035,7 @@ func CargoEntitiesAccountExists(val string) string {
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(CargoEntitiesDB, string(queryStr), fieldsType, params)
 	if err != nil || len(results) == 0 {
-		var query EntityQuery
-		query.TypeName = "CargoEntities.Account"
-		query.Indexs = append(query.Indexs, "M_id="+val)
-		query.Fields = append(query.Fields, "uuid")
-		var fieldsType []interface{} // not use...
-		var params []interface{}
-		queryStr, _ := json.Marshal(query)
-		results, err := GetServer().GetDataManager().readData(CargoEntitiesDB, string(queryStr), fieldsType, params)
-		if err != nil || len(results) == 0 {
-			return ""
-		}
-		return results[0][0].(string)
+		return ""
 	}
 	return results[0][0].(string)
 }
@@ -6880,7 +7111,7 @@ type CargoEntities_ComputerEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesComputerEntity(objectId string, object interface{}) *CargoEntities_ComputerEntity {
+func (this *EntityManager) NewCargoEntitiesComputerEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_ComputerEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -6892,6 +7123,7 @@ func (this *EntityManager) NewCargoEntitiesComputerEntity(objectId string, objec
 	if object != nil {
 		object.(*CargoEntities.Computer).TYPENAME = "CargoEntities.Computer"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Computer", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Computer).UUID = uuidStr
@@ -6904,7 +7136,29 @@ func (this *EntityManager) NewCargoEntitiesComputerEntity(objectId string, objec
 			return val.(*CargoEntities_ComputerEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Computer%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_ComputerEntity)
 	if object == nil {
@@ -6920,7 +7174,6 @@ func (this *EntityManager) NewCargoEntitiesComputerEntity(objectId string, objec
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Computer", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -7426,7 +7679,7 @@ func (this *CargoEntities_ComputerEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesComputerEntityFromObject(object *CargoEntities.Computer) *CargoEntities_ComputerEntity {
-	return this.NewCargoEntitiesComputerEntity(object.UUID, object)
+	return this.NewCargoEntitiesComputerEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -7521,7 +7774,7 @@ type CargoEntities_PermissionEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesPermissionEntity(objectId string, object interface{}) *CargoEntities_PermissionEntity {
+func (this *EntityManager) NewCargoEntitiesPermissionEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_PermissionEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -7533,6 +7786,7 @@ func (this *EntityManager) NewCargoEntitiesPermissionEntity(objectId string, obj
 	if object != nil {
 		object.(*CargoEntities.Permission).TYPENAME = "CargoEntities.Permission"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Permission", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Permission).UUID = uuidStr
@@ -7545,7 +7799,29 @@ func (this *EntityManager) NewCargoEntitiesPermissionEntity(objectId string, obj
 			return val.(*CargoEntities_PermissionEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Permission%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_PermissionEntity)
 	if object == nil {
@@ -7561,7 +7837,6 @@ func (this *EntityManager) NewCargoEntitiesPermissionEntity(objectId string, obj
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Permission", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -7981,7 +8256,7 @@ func (this *CargoEntities_PermissionEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesPermissionEntityFromObject(object *CargoEntities.Permission) *CargoEntities_PermissionEntity {
-	return this.NewCargoEntitiesPermissionEntity(object.UUID, object)
+	return this.NewCargoEntitiesPermissionEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -8075,7 +8350,7 @@ type CargoEntities_FileEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesFileEntity(objectId string, object interface{}) *CargoEntities_FileEntity {
+func (this *EntityManager) NewCargoEntitiesFileEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_FileEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -8087,6 +8362,7 @@ func (this *EntityManager) NewCargoEntitiesFileEntity(objectId string, object in
 	if object != nil {
 		object.(*CargoEntities.File).TYPENAME = "CargoEntities.File"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.File", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.File).UUID = uuidStr
@@ -8099,7 +8375,29 @@ func (this *EntityManager) NewCargoEntitiesFileEntity(objectId string, object in
 			return val.(*CargoEntities_FileEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.File%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_FileEntity)
 	if object == nil {
@@ -8115,7 +8413,6 @@ func (this *EntityManager) NewCargoEntitiesFileEntity(objectId string, object in
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.File", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -8397,6 +8694,7 @@ func (this *CargoEntities_FileEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
+
 	this.object.UUID = this.uuid
 	this.object.TYPENAME = "CargoEntities.File"
 
@@ -8454,7 +8752,7 @@ func (this *CargoEntities_FileEntity) SaveEntity() {
 	/** Save files type File **/
 	filesIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_files); i++ {
-		filesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.object.M_files[i].UUID, this.object.M_files[i])
+		filesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), this.object.M_files[i].UUID, this.object.M_files[i])
 		filesIds = append(filesIds, filesEntity.uuid)
 		filesEntity.AppendReferenced("files", this)
 		this.AppendChild("files", filesEntity)
@@ -8643,7 +8941,7 @@ func (this *CargoEntities_FileEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						filesEntity = instance.(*CargoEntities_FileEntity)
 					} else {
-						filesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(uuids[i], nil)
+						filesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), uuids[i], nil)
 						filesEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(filesEntity)
 					}
@@ -8712,7 +9010,7 @@ func (this *CargoEntities_FileEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesFileEntityFromObject(object *CargoEntities.File) *CargoEntities_FileEntity {
-	return this.NewCargoEntitiesFileEntity(object.UUID, object)
+	return this.NewCargoEntitiesFileEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -8807,7 +9105,7 @@ type CargoEntities_UserEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesUserEntity(objectId string, object interface{}) *CargoEntities_UserEntity {
+func (this *EntityManager) NewCargoEntitiesUserEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_UserEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -8819,6 +9117,7 @@ func (this *EntityManager) NewCargoEntitiesUserEntity(objectId string, object in
 	if object != nil {
 		object.(*CargoEntities.User).TYPENAME = "CargoEntities.User"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.User", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.User).UUID = uuidStr
@@ -8831,7 +9130,29 @@ func (this *EntityManager) NewCargoEntitiesUserEntity(objectId string, object in
 			return val.(*CargoEntities_UserEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.User%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_UserEntity)
 	if object == nil {
@@ -8847,7 +9168,6 @@ func (this *EntityManager) NewCargoEntitiesUserEntity(objectId string, object in
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.User", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -9362,7 +9682,7 @@ func (this *CargoEntities_UserEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesUserEntityFromObject(object *CargoEntities.User) *CargoEntities_UserEntity {
-	return this.NewCargoEntitiesUserEntity(object.UUID, object)
+	return this.NewCargoEntitiesUserEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -9457,7 +9777,7 @@ type CargoEntities_GroupEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesGroupEntity(objectId string, object interface{}) *CargoEntities_GroupEntity {
+func (this *EntityManager) NewCargoEntitiesGroupEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_GroupEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -9469,6 +9789,7 @@ func (this *EntityManager) NewCargoEntitiesGroupEntity(objectId string, object i
 	if object != nil {
 		object.(*CargoEntities.Group).TYPENAME = "CargoEntities.Group"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Group", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Group).UUID = uuidStr
@@ -9481,7 +9802,29 @@ func (this *EntityManager) NewCargoEntitiesGroupEntity(objectId string, object i
 			return val.(*CargoEntities_GroupEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Group%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_GroupEntity)
 	if object == nil {
@@ -9497,7 +9840,6 @@ func (this *EntityManager) NewCargoEntitiesGroupEntity(objectId string, object i
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Group", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -9937,7 +10279,7 @@ func (this *CargoEntities_GroupEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesGroupEntityFromObject(object *CargoEntities.Group) *CargoEntities_GroupEntity {
-	return this.NewCargoEntitiesGroupEntity(object.UUID, object)
+	return this.NewCargoEntitiesGroupEntity("", object.UUID, object)
 }
 
 /** Delete **/
@@ -10032,7 +10374,7 @@ type CargoEntities_EntitiesEntity struct {
 }
 
 /** Constructor function **/
-func (this *EntityManager) NewCargoEntitiesEntitiesEntity(objectId string, object interface{}) *CargoEntities_EntitiesEntity {
+func (this *EntityManager) NewCargoEntitiesEntitiesEntity(parentUuid string, objectId string, object interface{}) *CargoEntities_EntitiesEntity {
 	var uuidStr string
 	if len(objectId) > 0 {
 		if Utility.IsValidEntityReferenceName(objectId) {
@@ -10044,6 +10386,7 @@ func (this *EntityManager) NewCargoEntitiesEntitiesEntity(objectId string, objec
 	if object != nil {
 		object.(*CargoEntities.Entities).TYPENAME = "CargoEntities.Entities"
 	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Entities", "CargoEntities")
 	if len(uuidStr) > 0 {
 		if object != nil {
 			object.(*CargoEntities.Entities).UUID = uuidStr
@@ -10056,7 +10399,29 @@ func (this *EntityManager) NewCargoEntitiesEntitiesEntity(objectId string, objec
 			return val.(*CargoEntities_EntitiesEntity)
 		}
 	} else {
-		uuidStr = "CargoEntities.Entities%" + Utility.RandomUUID()
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
 	}
 	entity := new(CargoEntities_EntitiesEntity)
 	if object == nil {
@@ -10072,7 +10437,6 @@ func (this *EntityManager) NewCargoEntitiesEntitiesEntity(objectId string, objec
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Entities", "CargoEntities")
 	entity.prototype = prototype
 	return entity
 }
@@ -10353,8 +10717,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	entitiesIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_entities); i++ {
 		switch v := this.object.M_entities[i].(type) {
-		case *CargoEntities.Error:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(v.UUID, v)
+		case *CargoEntities.Group:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10362,7 +10726,7 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				entitiesEntity.SaveEntity()
 			}
 		case *CargoEntities.LogEntry:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(v.UUID, v)
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10370,7 +10734,7 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				entitiesEntity.SaveEntity()
 			}
 		case *CargoEntities.Log:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntity(v.UUID, v)
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10378,31 +10742,7 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				entitiesEntity.SaveEntity()
 			}
 		case *CargoEntities.Project:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.User:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.Group:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.Notification:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(v.UUID, v)
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10410,7 +10750,23 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				entitiesEntity.SaveEntity()
 			}
 		case *CargoEntities.TextMessage:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(v.UUID, v)
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.Error:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.Notification:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10418,15 +10774,7 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				entitiesEntity.SaveEntity()
 			}
 		case *CargoEntities.Account:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.Computer:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(v.UUID, v)
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10434,7 +10782,23 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				entitiesEntity.SaveEntity()
 			}
 		case *CargoEntities.File:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(v.UUID, v)
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.Computer:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.User:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10449,7 +10813,7 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	/** Save roles type Role **/
 	rolesIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_roles); i++ {
-		rolesEntity := GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(this.object.M_roles[i].UUID, this.object.M_roles[i])
+		rolesEntity := GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(this.GetUuid(), this.object.M_roles[i].UUID, this.object.M_roles[i])
 		rolesIds = append(rolesIds, rolesEntity.uuid)
 		rolesEntity.AppendReferenced("roles", this)
 		this.AppendChild("roles", rolesEntity)
@@ -10463,7 +10827,7 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	/** Save actions type Action **/
 	actionsIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_actions); i++ {
-		actionsEntity := GetServer().GetEntityManager().NewCargoEntitiesActionEntity(this.object.M_actions[i].UUID, this.object.M_actions[i])
+		actionsEntity := GetServer().GetEntityManager().NewCargoEntitiesActionEntity(this.GetUuid(), this.object.M_actions[i].UUID, this.object.M_actions[i])
 		actionsIds = append(actionsIds, actionsEntity.uuid)
 		actionsEntity.AppendReferenced("actions", this)
 		this.AppendChild("actions", actionsEntity)
@@ -10586,65 +10950,13 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 					log.Println("type ", typeName, " not found!")
 					return err
 				}
-				if typeName == "CargoEntities.TextMessage" {
+				if typeName == "CargoEntities.Project" {
 					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_TextMessageEntity
+						var entitiesEntity *CargoEntities_ProjectEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_TextMessageEntity)
+							entitiesEntity = instance.(*CargoEntities_ProjectEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.Account" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_AccountEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_AccountEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.Computer" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_ComputerEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_ComputerEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.File" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_FileEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_FileEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.Group" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_GroupEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_GroupEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -10657,7 +10969,7 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 							entitiesEntity = instance.(*CargoEntities_ErrorEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -10670,46 +10982,59 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 							entitiesEntity = instance.(*CargoEntities_NotificationEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.Log" {
+				} else if typeName == "CargoEntities.TextMessage" {
 					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_LogEntity
+						var entitiesEntity *CargoEntities_TextMessageEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_LogEntity)
+							entitiesEntity = instance.(*CargoEntities_TextMessageEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.Project" {
+				} else if typeName == "CargoEntities.Account" {
 					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_ProjectEntity
+						var entitiesEntity *CargoEntities_AccountEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_ProjectEntity)
+							entitiesEntity = instance.(*CargoEntities_AccountEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.User" {
+				} else if typeName == "CargoEntities.File" {
 					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_UserEntity
+						var entitiesEntity *CargoEntities_FileEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_UserEntity)
+							entitiesEntity = instance.(*CargoEntities_FileEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.Group" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_GroupEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_GroupEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -10722,7 +11047,46 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 							entitiesEntity = instance.(*CargoEntities_LogEntryEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.Log" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_LogEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_LogEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.Computer" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_ComputerEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_ComputerEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.User" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_UserEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_UserEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -10747,7 +11111,7 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						rolesEntity = instance.(*CargoEntities_RoleEntity)
 					} else {
-						rolesEntity = GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(uuids[i], nil)
+						rolesEntity = GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(this.GetUuid(), uuids[i], nil)
 						rolesEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(rolesEntity)
 					}
@@ -10771,7 +11135,7 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 						actionsEntity = instance.(*CargoEntities_ActionEntity)
 					} else {
-						actionsEntity = GetServer().GetEntityManager().NewCargoEntitiesActionEntity(uuids[i], nil)
+						actionsEntity = GetServer().GetEntityManager().NewCargoEntitiesActionEntity(this.GetUuid(), uuids[i], nil)
 						actionsEntity.InitEntity(uuids[i])
 						GetServer().GetEntityManager().insert(actionsEntity)
 					}
@@ -10806,7 +11170,7 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 
 /** instantiate a new entity from an existing object. **/
 func (this *EntityManager) NewCargoEntitiesEntitiesEntityFromObject(object *CargoEntities.Entities) *CargoEntities_EntitiesEntity {
-	return this.NewCargoEntitiesEntitiesEntity(object.UUID, object)
+	return this.NewCargoEntitiesEntitiesEntity("", object.UUID, object)
 }
 
 /** Delete **/

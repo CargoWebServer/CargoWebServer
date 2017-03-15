@@ -114,11 +114,12 @@ func (this *ConfigurationManager) initialize() {
 	// So here if there is no configuration...
 	configsUuid := ConfigConfigurationsExists("CARGO_CONFIGURATIONS")
 	if len(configsUuid) > 0 {
-		this.m_configurationEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity(configsUuid, nil)
+		this.m_configurationEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity("", configsUuid, nil)
 		this.m_configurationEntity.InitEntity(configsUuid)
 		this.m_activeConfigurations = this.m_configurationEntity.GetObject().(*Config.Configurations)
 	} else {
-		this.m_configurationEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity(configsUuid, nil)
+
+		this.m_configurationEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity("", configsUuid, nil)
 		this.m_activeConfigurations = this.m_configurationEntity.GetObject().(*Config.Configurations)
 		this.m_activeConfigurations.M_id = "CARGO_CONFIGURATIONS"
 		this.m_activeConfigurations.M_name = "Default"
@@ -359,7 +360,9 @@ func (this *ConfigurationManager) GetDataStoreConfigurations() []*Config.DataSto
 	configurations := make([]*Config.DataStoreConfiguration, 0)
 
 	entities, err := GetServer().GetEntityManager().getEntitiesByType("Config.DataStoreConfiguration", "", "Config")
+
 	if err != nil {
+
 		return configurations
 	}
 

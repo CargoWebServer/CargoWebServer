@@ -94,12 +94,122 @@ func (this *ConfigXmlFactory) SerializeXml(outputPath string, toSerialize *Confi
 	return nil
 }
 
+/** inititialisation of SmtpConfiguration **/
+func (this *ConfigXmlFactory) InitSmtpConfiguration(xmlElement *Config.XsdSmtpConfiguration, object *Config.SmtpConfiguration) {
+	log.Println("Initialize SmtpConfiguration")
+
+	/** SmtpConfiguration **/
+	object.M_id = xmlElement.M_id
+
+	/** Configuration **/
+	object.M_hostName = xmlElement.M_hostName
+
+	/** Configuration **/
+	object.M_ipv4 = xmlElement.M_ipv4
+
+	/** Configuration **/
+	object.M_port = xmlElement.M_port
+
+	/** Configuration **/
+	object.M_user = xmlElement.M_user
+
+	/** Configuration **/
+	object.M_pwd = xmlElement.M_pwd
+
+	/** Encoding **/
+	if xmlElement.M_textEncoding == "##UTF8" {
+		object.M_textEncoding = Config.Encoding_UTF8
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1250" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1250
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1251" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1251
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1252" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1252
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1253" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1253
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1254" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1254
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1255" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1255
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1256" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1256
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1257" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1257
+	} else if xmlElement.M_textEncoding == "##WINDOWS_1258" {
+		object.M_textEncoding = Config.Encoding_WINDOWS_1258
+	} else if xmlElement.M_textEncoding == "##ISO8859_1" {
+		object.M_textEncoding = Config.Encoding_ISO8859_1
+	} else if xmlElement.M_textEncoding == "##ISO8859_2" {
+		object.M_textEncoding = Config.Encoding_ISO8859_2
+	} else if xmlElement.M_textEncoding == "##ISO8859_3" {
+		object.M_textEncoding = Config.Encoding_ISO8859_3
+	} else if xmlElement.M_textEncoding == "##ISO8859_4" {
+		object.M_textEncoding = Config.Encoding_ISO8859_4
+	} else if xmlElement.M_textEncoding == "##ISO8859_5" {
+		object.M_textEncoding = Config.Encoding_ISO8859_5
+	} else if xmlElement.M_textEncoding == "##ISO8859_6" {
+		object.M_textEncoding = Config.Encoding_ISO8859_6
+	} else if xmlElement.M_textEncoding == "##ISO8859_7" {
+		object.M_textEncoding = Config.Encoding_ISO8859_7
+	} else if xmlElement.M_textEncoding == "##ISO8859_8" {
+		object.M_textEncoding = Config.Encoding_ISO8859_8
+	} else if xmlElement.M_textEncoding == "##ISO8859_9" {
+		object.M_textEncoding = Config.Encoding_ISO8859_9
+	} else if xmlElement.M_textEncoding == "##ISO8859_10" {
+		object.M_textEncoding = Config.Encoding_ISO8859_10
+	} else if xmlElement.M_textEncoding == "##ISO8859_13" {
+		object.M_textEncoding = Config.Encoding_ISO8859_13
+	} else if xmlElement.M_textEncoding == "##ISO8859_14" {
+		object.M_textEncoding = Config.Encoding_ISO8859_14
+	} else if xmlElement.M_textEncoding == "##ISO8859_15" {
+		object.M_textEncoding = Config.Encoding_ISO8859_15
+	} else if xmlElement.M_textEncoding == "##ISO8859_16" {
+		object.M_textEncoding = Config.Encoding_ISO8859_16
+	} else if xmlElement.M_textEncoding == "##KOI8R" {
+		object.M_textEncoding = Config.Encoding_KOI8R
+	} else if xmlElement.M_textEncoding == "##KOI8U" {
+		object.M_textEncoding = Config.Encoding_KOI8U
+	}
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** inititialisation of LdapConfiguration **/
+func (this *ConfigXmlFactory) InitLdapConfiguration(xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
+	log.Println("Initialize LdapConfiguration")
+
+	/** LdapConfiguration **/
+	object.M_id = xmlElement.M_id
+
+	/** Configuration **/
+	object.M_hostName = xmlElement.M_hostName
+
+	/** Configuration **/
+	object.M_ipv4 = xmlElement.M_ipv4
+
+	/** Configuration **/
+	object.M_port = xmlElement.M_port
+
+	/** Configuration **/
+	object.M_user = xmlElement.M_user
+
+	/** Configuration **/
+	object.M_pwd = xmlElement.M_pwd
+
+	/** Configuration **/
+	object.M_domain = xmlElement.M_domain
+
+	/** Configuration **/
+	object.M_searchBase = xmlElement.M_searchBase
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
 /** inititialisation of DataStoreConfiguration **/
 func (this *ConfigXmlFactory) InitDataStoreConfiguration(xmlElement *Config.XsdDataStoreConfiguration, object *Config.DataStoreConfiguration) {
 	log.Println("Initialize DataStoreConfiguration")
-	if len(object.UUID) == 0 {
-		object.UUID = "Config.DataStoreConfiguration%" + Utility.RandomUUID()
-	}
 
 	/** DataStoreConfiguration **/
 	object.M_id = xmlElement.M_id
@@ -197,9 +307,6 @@ func (this *ConfigXmlFactory) InitDataStoreConfiguration(xmlElement *Config.XsdD
 /** inititialisation of ServiceConfiguration **/
 func (this *ConfigXmlFactory) InitServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
 	log.Println("Initialize ServiceConfiguration")
-	if len(object.UUID) == 0 {
-		object.UUID = "Config.ServiceConfiguration%" + Utility.RandomUUID()
-	}
 
 	/** ServiceConfiguration **/
 	object.M_id = xmlElement.M_id
@@ -229,9 +336,6 @@ func (this *ConfigXmlFactory) InitServiceConfiguration(xmlElement *Config.XsdSer
 /** inititialisation of Configurations **/
 func (this *ConfigXmlFactory) InitConfigurations(xmlElement *Config.XsdConfigurations, object *Config.Configurations) {
 	log.Println("Initialize Configurations")
-	if len(object.UUID) == 0 {
-		object.UUID = "Config.Configurations%" + Utility.RandomUUID()
-	}
 
 	/** Init serverConfiguration **/
 	if object.M_serverConfig == nil {
@@ -307,9 +411,6 @@ func (this *ConfigXmlFactory) InitConfigurations(xmlElement *Config.XsdConfigura
 /** inititialisation of ServerConfiguration **/
 func (this *ConfigXmlFactory) InitServerConfiguration(xmlElement *Config.XsdServerConfiguration, object *Config.ServerConfiguration) {
 	log.Println("Initialize ServerConfiguration")
-	if len(object.UUID) == 0 {
-		object.UUID = "Config.ServerConfiguration%" + Utility.RandomUUID()
-	}
 
 	/** ServerConfiguration **/
 	object.M_id = xmlElement.M_id
@@ -357,9 +458,6 @@ func (this *ConfigXmlFactory) InitServerConfiguration(xmlElement *Config.XsdServ
 /** inititialisation of ApplicationConfiguration **/
 func (this *ConfigXmlFactory) InitApplicationConfiguration(xmlElement *Config.XsdApplicationConfiguration, object *Config.ApplicationConfiguration) {
 	log.Println("Initialize ApplicationConfiguration")
-	if len(object.UUID) == 0 {
-		object.UUID = "Config.ApplicationConfiguration%" + Utility.RandomUUID()
-	}
 
 	/** ApplicationConfiguration **/
 	object.M_id = xmlElement.M_id
@@ -371,120 +469,32 @@ func (this *ConfigXmlFactory) InitApplicationConfiguration(xmlElement *Config.Xs
 	}
 }
 
-/** inititialisation of SmtpConfiguration **/
-func (this *ConfigXmlFactory) InitSmtpConfiguration(xmlElement *Config.XsdSmtpConfiguration, object *Config.SmtpConfiguration) {
-	log.Println("Initialize SmtpConfiguration")
-	if len(object.UUID) == 0 {
-		object.UUID = "Config.SmtpConfiguration%" + Utility.RandomUUID()
+/** serialysation of ServiceConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
+	if xmlElement == nil {
+		return
 	}
 
-	/** SmtpConfiguration **/
-	object.M_id = xmlElement.M_id
+	/** ServiceConfiguration **/
+	xmlElement.M_id = object.M_id
 
 	/** Configuration **/
-	object.M_hostName = xmlElement.M_hostName
+	xmlElement.M_hostName = object.M_hostName
 
 	/** Configuration **/
-	object.M_ipv4 = xmlElement.M_ipv4
+	xmlElement.M_ipv4 = object.M_ipv4
 
 	/** Configuration **/
-	object.M_port = xmlElement.M_port
+	xmlElement.M_port = object.M_port
 
 	/** Configuration **/
-	object.M_user = xmlElement.M_user
+	xmlElement.M_user = object.M_user
 
 	/** Configuration **/
-	object.M_pwd = xmlElement.M_pwd
-
-	/** Encoding **/
-	if xmlElement.M_textEncoding == "##UTF8" {
-		object.M_textEncoding = Config.Encoding_UTF8
-	} else if xmlElement.M_textEncoding == "##WINDOWS_1250" {
-		object.M_textEncoding = Config.Encoding_WINDOWS_1250
-	} else if xmlElement.M_textEncoding == "##WINDOWS_1251" {
-		object.M_textEncoding = Config.Encoding_WINDOWS_1251
-	} else if xmlElement.M_textEncoding == "##WINDOWS_1252" {
-		object.M_textEncoding = Config.Encoding_WINDOWS_1252
-	} else if xmlElement.M_textEncoding == "##WINDOWS_1253" {
-		object.M_textEncoding = Config.Encoding_WINDOWS_1253
-	} else if xmlElement.M_textEncoding == "##WINDOWS_1254" {
-		object.M_textEncoding = Config.Encoding_WINDOWS_1254
-	} else if xmlElement.M_textEncoding == "##WINDOWS_1255" {
-		object.M_textEncoding = Config.Encoding_WINDOWS_1255
-	} else if xmlElement.M_textEncoding == "##WINDOWS_1256" {
-		object.M_textEncoding = Config.Encoding_WINDOWS_1256
-	} else if xmlElement.M_textEncoding == "##WINDOWS_1257" {
-		object.M_textEncoding = Config.Encoding_WINDOWS_1257
-	} else if xmlElement.M_textEncoding == "##WINDOWS_1258" {
-		object.M_textEncoding = Config.Encoding_WINDOWS_1258
-	} else if xmlElement.M_textEncoding == "##ISO8859_1" {
-		object.M_textEncoding = Config.Encoding_ISO8859_1
-	} else if xmlElement.M_textEncoding == "##ISO8859_2" {
-		object.M_textEncoding = Config.Encoding_ISO8859_2
-	} else if xmlElement.M_textEncoding == "##ISO8859_3" {
-		object.M_textEncoding = Config.Encoding_ISO8859_3
-	} else if xmlElement.M_textEncoding == "##ISO8859_4" {
-		object.M_textEncoding = Config.Encoding_ISO8859_4
-	} else if xmlElement.M_textEncoding == "##ISO8859_5" {
-		object.M_textEncoding = Config.Encoding_ISO8859_5
-	} else if xmlElement.M_textEncoding == "##ISO8859_6" {
-		object.M_textEncoding = Config.Encoding_ISO8859_6
-	} else if xmlElement.M_textEncoding == "##ISO8859_7" {
-		object.M_textEncoding = Config.Encoding_ISO8859_7
-	} else if xmlElement.M_textEncoding == "##ISO8859_8" {
-		object.M_textEncoding = Config.Encoding_ISO8859_8
-	} else if xmlElement.M_textEncoding == "##ISO8859_9" {
-		object.M_textEncoding = Config.Encoding_ISO8859_9
-	} else if xmlElement.M_textEncoding == "##ISO8859_10" {
-		object.M_textEncoding = Config.Encoding_ISO8859_10
-	} else if xmlElement.M_textEncoding == "##ISO8859_13" {
-		object.M_textEncoding = Config.Encoding_ISO8859_13
-	} else if xmlElement.M_textEncoding == "##ISO8859_14" {
-		object.M_textEncoding = Config.Encoding_ISO8859_14
-	} else if xmlElement.M_textEncoding == "##ISO8859_15" {
-		object.M_textEncoding = Config.Encoding_ISO8859_15
-	} else if xmlElement.M_textEncoding == "##ISO8859_16" {
-		object.M_textEncoding = Config.Encoding_ISO8859_16
-	} else if xmlElement.M_textEncoding == "##KOI8R" {
-		object.M_textEncoding = Config.Encoding_KOI8R
-	} else if xmlElement.M_textEncoding == "##KOI8U" {
-		object.M_textEncoding = Config.Encoding_KOI8U
-	}
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** inititialisation of LdapConfiguration **/
-func (this *ConfigXmlFactory) InitLdapConfiguration(xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
-	log.Println("Initialize LdapConfiguration")
-	if len(object.UUID) == 0 {
-		object.UUID = "Config.LdapConfiguration%" + Utility.RandomUUID()
-	}
-
-	/** LdapConfiguration **/
-	object.M_id = xmlElement.M_id
+	xmlElement.M_pwd = object.M_pwd
 
 	/** Configuration **/
-	object.M_hostName = xmlElement.M_hostName
-
-	/** Configuration **/
-	object.M_ipv4 = xmlElement.M_ipv4
-
-	/** Configuration **/
-	object.M_port = xmlElement.M_port
-
-	/** Configuration **/
-	object.M_user = xmlElement.M_user
-
-	/** Configuration **/
-	object.M_pwd = xmlElement.M_pwd
-
-	/** Configuration **/
-	object.M_domain = xmlElement.M_domain
-
-	/** Configuration **/
-	object.M_searchBase = xmlElement.M_searchBase
+	xmlElement.M_start = object.M_start
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -847,37 +857,6 @@ func (this *ConfigXmlFactory) SerialyzeDataStoreConfiguration(xmlElement *Config
 	} else if object.M_textEncoding == Config.Encoding_KOI8U {
 		xmlElement.M_textEncoding = "##KOI8U"
 	}
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of ServiceConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** ServiceConfiguration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_hostName = object.M_hostName
-
-	/** Configuration **/
-	xmlElement.M_ipv4 = object.M_ipv4
-
-	/** Configuration **/
-	xmlElement.M_port = object.M_port
-
-	/** Configuration **/
-	xmlElement.M_user = object.M_user
-
-	/** Configuration **/
-	xmlElement.M_pwd = object.M_pwd
-
-	/** Configuration **/
-	xmlElement.M_start = object.M_start
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}

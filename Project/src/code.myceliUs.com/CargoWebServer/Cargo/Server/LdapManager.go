@@ -284,7 +284,7 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 	// Here I will print the information...
 	for i := 0; i < len(results); i++ {
 		row := results[i]
-		userEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity("", nil)
+		userEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", nil)
 		user := userEntity.GetObject().(*CargoEntities.User)
 		for j := 0; j < len(row); j++ {
 			// Print the result...
@@ -327,7 +327,11 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 			// The user must be save...
 			log.Println("Save user ", user.GetEmail(), "an id ", user.GetId())
 			if len(user.GetEmail()) > 0 {
-				accountEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(accountId, nil)
+				// Append the newly create account into the cargo entities
+				entities := cargoEntities.GetObject().(*CargoEntities.Entities)
+
+				accountEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(entities.GetUUID(), accountId, nil)
+
 				// Create the account in memory...
 				account := accountEntity.GetObject().(*CargoEntities.Account)
 				account.M_id = accountId
@@ -335,8 +339,6 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 				account.M_name = user.GetId()
 				account.M_email = user.GetEmail()
 
-				// Append the newly create account into the cargo entities
-				entities := cargoEntities.GetObject().(*CargoEntities.Entities)
 				entities.SetEntities(account)
 				account.SetEntitiesPtr(entities)
 
@@ -409,7 +411,7 @@ func (this *LdapManager) SynchronizeGroups(id string) error {
 	for i := 0; i < len(results); i++ {
 		// Here I will get the user in the group...
 		row := results[i]
-		groupEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity("", nil)
+		groupEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(server.GetEntityManager().getCargoEntities().GetUuid(), "", nil)
 		group := groupEntity.GetObject().(*CargoEntities.Group)
 		for j := 0; j < len(row); j++ {
 			// Print the result...
@@ -502,7 +504,7 @@ func (this *LdapManager) SynchronizeComputers(id string) error {
 	for i := 0; i < len(results); i++ {
 		// Here I will get the user in the group...
 		row := results[i]
-		computerEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity("", nil)
+		computerEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(server.GetEntityManager().getCargoEntities().GetUuid(), "", nil)
 		computer := computerEntity.GetObject().(*CargoEntities.Computer)
 
 		for j := 0; j < len(row); j++ {

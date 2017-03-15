@@ -68,14 +68,14 @@ func newDataManager() *DataManager {
 
 func (this *DataManager) initialize() {
 
-	log.Println("--> Initialize DataManager")
+	//log.Println("--> Initialize DataManager")
 
 	// Create the default configurations
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	// Here I will get the datastore configuration...
 	storeConfigurations := GetServer().GetConfigurationManager().GetDataStoreConfigurations()
-
+	log.Println("--> initialyze DataManager")
 	for i := 0; i < len(storeConfigurations); i++ {
 		if this.m_dataStores[storeConfigurations[i].GetId()] == nil {
 			store, err := NewDataStore(storeConfigurations[i])
@@ -92,7 +92,7 @@ func (this *DataManager) initialize() {
 			store.Connect()
 		}
 	}
-	log.Println("--> initialyze DataManager")
+
 }
 
 func (this *DataManager) getId() string {

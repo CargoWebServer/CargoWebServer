@@ -5,7 +5,7 @@
 package Server
 
 import (
-	//	"log"
+	//"log"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 )
@@ -13,7 +13,7 @@ import (
 func NewError(errorPath string, errorId string, errorCode int, err error) *CargoEntities.Error {
 
 	// Create a error object.
-	errorEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity("", nil)
+	errorEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity("", "", nil)
 	errorObject := errorEntity.GetObject().(*CargoEntities.Error)
 	errorObject.SetErrorPath(errorPath)
 	errorObject.SetId(errorId)
@@ -27,13 +27,11 @@ func NewError(errorPath string, errorId string, errorCode int, err error) *Cargo
 	errorObject.SetCode(errorCode)
 
 	// Uncomment pour logger dans le logger. Trop lourd pour le moment.
+	/*server.entityManager.cargoEntities.GetObject().(*CargoEntities.Entities).SetEntities(errorObject)
+	server.entityManager.cargoEntities.SaveEntity()
 
-	/*
-		server.entityManager.cargoEntities.GetObject().(*CargoEntities.Entities).SetEntities(errorObject)
-		server.entityManager.cargoEntities.SaveEntity()
-
-		// Create the log information for that error.
-		GetServer().GetDefaultErrorLogger().AppendLogEntry(errorObject)
+	// Create the log information for that error.
+	GetServer().GetDefaultErrorLogger().AppendLogEntry(errorObject)
 	*/
 
 	//log.Println("ERROR: ", errorObject)

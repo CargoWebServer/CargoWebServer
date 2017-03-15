@@ -62,6 +62,6 @@ func main() {
 		generateEntity("DC")
 		generateEntity("DI")
 		generateEntity("BPMNDI")
-		generateEntity("BPMN20")
-	*/
+		generateEntity("BPMN20")*/
+
 }

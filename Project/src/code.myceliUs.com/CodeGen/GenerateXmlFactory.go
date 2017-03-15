@@ -253,10 +253,6 @@ func generateGoXmlFactoryElementInitFunction(element *XML_Schemas.XSD_Element, p
 		elementFunctionParserStr += "){\n"
 		elementFunctionParserStr += "	log.Println(\"Initialize " + className + "\")\n"
 
-		elementFunctionParserStr += "	if len(object.UUID) == 0 {\n"
-		elementFunctionParserStr += "		object.UUID = \"" + elementPackName + className + impl + "%\" + Utility.RandomUUID()"
-		elementFunctionParserStr += "	}\n"
-
 		elementFunctionParserStr += generateGoXmlFactoryElementContent(elementType, elementType, packName, true, name)
 
 		// A little exception here for the expression class...

@@ -1358,7 +1358,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 							infos[id] = values[j][k-1]
 						}
 
-						entity, errObj := GetServer().GetEntityManager().newDynamicEntity(infos)
+						entity, errObj := GetServer().GetEntityManager().newDynamicEntity("", infos)
 						if errObj == nil {
 							// Save the entity.
 							toSave[uuid] = entity
@@ -1410,7 +1410,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 								for n := 0; n < len(values); n++ {
 									log.Println("1468 val n ", n, "/", len(values))
 									// Set the child uuid.
-									childUuid := childTypeName + "%" + Utility.GenerateUUID(childTypeName+":"+Utility.ToString(values[n][0]))
+									childUuid := childTypeName + "%" + Utility.GenerateUUID(entity.GetUuid()+":"+childTypeName+":"+Utility.ToString(values[n][0]))
 									var childEntity Entity
 									if toSave[childUuid] != nil {
 										childEntity = toSave[childUuid]

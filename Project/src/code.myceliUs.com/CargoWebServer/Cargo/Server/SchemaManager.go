@@ -1590,7 +1590,7 @@ func (this *XmlDocumentHandler) EndDocument() {
 		object := this.globalObjects[i]
 		compactObject(object)
 		object["NeedSave"] = true
-		entity, errObj := GetServer().GetEntityManager().newDynamicEntity(object)
+		entity, errObj := GetServer().GetEntityManager().newDynamicEntity("", object)
 		if errObj == nil {
 			entity.SaveEntity()
 
