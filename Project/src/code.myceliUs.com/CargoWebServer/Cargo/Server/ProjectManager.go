@@ -72,35 +72,36 @@ func (this *ProjectManager) stop() {
 func (this *ProjectManager) synchronize() {
 	// Each directory contain an application...
 	files, _ := ioutil.ReadDir(this.root)
-	cargoEntities := server.GetEntityManager().getCargoEntities()
+
 	for _, f := range files {
 		if f.IsDir() {
 			log.Println("Synchronize project ", f.Name())
 			if !strings.HasPrefix(".", f.Name()) {
-				// first of all i will see if the project exist...
-				projectEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(cargoEntities.GetUuid(), f.Name(), nil)
 
-				// Get the reference to the object...
-				project := projectEntity.GetObject().(*CargoEntities.Project)
-
-				// Set the project id...
-				project.SetId(f.Name())
-
-				// Set the projet name if is not already set.
-				if len(project.GetName()) == 0 {
+				projectUUID := CargoEntitiesProjectExists(f.Name())
+				var project *CargoEntities.Project
+				if len(projectUUID) == 0 {
+					project = new(CargoEntities.Project)
 					project.SetName(f.Name())
+					project.SetId(f.Name())
+					cargoEntities := server.GetEntityManager().getCargoEntities()
+
+					// first of all i will see if the project exist...
+					GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(cargoEntities.GetUuid(), "", project)
+
+					// Here I will synchronyse the project...
+					this.synchronizeProject(project, this.root+"/"+f.Name())
+
+					cargoEntities.GetObject().(*CargoEntities.Entities).SetEntities(project)
+					cargoEntities.SaveEntity()
+				} else {
+					projectEntity, _ := GetServer().GetEntityManager().getEntityByUuid(projectUUID)
+					this.synchronizeProject(projectEntity.GetObject().(*CargoEntities.Project), this.root+"/"+f.Name())
+					projectEntity.SaveEntity()
 				}
-
-				// Here I will synchronyse the project...
-				this.synchronizeProject(project, this.root+"/"+f.Name())
-
-				// Here i will save the entity...
-				projectEntity.SetNeedSave(true)
-				cargoEntities.GetObject().(*CargoEntities.Entities).SetEntities(project)
 			}
 		}
 	}
-	cargoEntities.SaveEntity()
 }
 
 /**
