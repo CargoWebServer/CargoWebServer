@@ -50,12 +50,13 @@ func (this *AccountManager) initialize() {
 	if len(adminUuid) == 0 {
 		// Create the account in memory.
 		account := new(CargoEntities.Account)
-		account.UUID = "CargoEntities.Account%" + Utility.RandomUUID()
 		account.M_id = "admin"
 		account.M_password = "adminadmin"
 		account.M_name = "admin"
 		account.NeedSave = true
 		account.M_email = ""
+		// Set it uuid
+		GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", account)
 
 		// Append the newly create account into the cargo entities
 		entities.SetEntities(account)
@@ -69,12 +70,13 @@ func (this *AccountManager) initialize() {
 	if len(guestUuid) == 0 {
 		// Create the account in memory.
 		account := new(CargoEntities.Account)
-		account.UUID = "CargoEntities.Account%" + Utility.RandomUUID()
 		account.M_id = "guest"
 		account.M_password = ""
 		account.M_name = "guest"
 		account.M_email = ""
 		account.NeedSave = true
+
+		GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", account)
 
 		// Append the newly create account into the cargo entities
 		entities.SetEntities(account)

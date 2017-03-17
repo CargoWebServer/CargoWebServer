@@ -95,6 +95,7 @@ func (this *EntityManager) NewConfigSmtpConfigurationEntity(parentUuid string, o
 			if object != nil {
 				this.setObjectValues(val, object)
 
+				uuidStr = object.(*Config.SmtpConfiguration).UUID
 			}
 			return val.(*Config_SmtpConfigurationEntity)
 		}
@@ -288,8 +289,8 @@ func (this *Config_SmtpConfigurationEntity) SetInit(isInit bool) {
 }
 
 func (this *Config_SmtpConfigurationEntity) GetChecksum() string {
-	objectStr, _ := json.Marshal(this.object)
-	return Utility.GetMD5Hash(string(objectStr))
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
 }
 
 func (this *Config_SmtpConfigurationEntity) Exist() bool {
@@ -832,6 +833,7 @@ func (this *EntityManager) NewConfigDataStoreConfigurationEntity(parentUuid stri
 			if object != nil {
 				this.setObjectValues(val, object)
 
+				uuidStr = object.(*Config.DataStoreConfiguration).UUID
 			}
 			return val.(*Config_DataStoreConfigurationEntity)
 		}
@@ -1025,8 +1027,8 @@ func (this *Config_DataStoreConfigurationEntity) SetInit(isInit bool) {
 }
 
 func (this *Config_DataStoreConfigurationEntity) GetChecksum() string {
-	objectStr, _ := json.Marshal(this.object)
-	return Utility.GetMD5Hash(string(objectStr))
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
 }
 
 func (this *Config_DataStoreConfigurationEntity) Exist() bool {
@@ -1631,6 +1633,7 @@ func (this *EntityManager) NewConfigLdapConfigurationEntity(parentUuid string, o
 			if object != nil {
 				this.setObjectValues(val, object)
 
+				uuidStr = object.(*Config.LdapConfiguration).UUID
 			}
 			return val.(*Config_LdapConfigurationEntity)
 		}
@@ -1824,8 +1827,8 @@ func (this *Config_LdapConfigurationEntity) SetInit(isInit bool) {
 }
 
 func (this *Config_LdapConfigurationEntity) GetChecksum() string {
-	objectStr, _ := json.Marshal(this.object)
-	return Utility.GetMD5Hash(string(objectStr))
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
 }
 
 func (this *Config_LdapConfigurationEntity) Exist() bool {
@@ -2271,6 +2274,7 @@ func (this *EntityManager) NewConfigServiceConfigurationEntity(parentUuid string
 			if object != nil {
 				this.setObjectValues(val, object)
 
+				uuidStr = object.(*Config.ServiceConfiguration).UUID
 			}
 			return val.(*Config_ServiceConfigurationEntity)
 		}
@@ -2464,8 +2468,8 @@ func (this *Config_ServiceConfigurationEntity) SetInit(isInit bool) {
 }
 
 func (this *Config_ServiceConfigurationEntity) GetChecksum() string {
-	objectStr, _ := json.Marshal(this.object)
-	return Utility.GetMD5Hash(string(objectStr))
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
 }
 
 func (this *Config_ServiceConfigurationEntity) Exist() bool {
@@ -2899,6 +2903,7 @@ func (this *EntityManager) NewConfigApplicationConfigurationEntity(parentUuid st
 			if object != nil {
 				this.setObjectValues(val, object)
 
+				uuidStr = object.(*Config.ApplicationConfiguration).UUID
 			}
 			return val.(*Config_ApplicationConfigurationEntity)
 		}
@@ -3092,8 +3097,8 @@ func (this *Config_ApplicationConfigurationEntity) SetInit(isInit bool) {
 }
 
 func (this *Config_ApplicationConfigurationEntity) GetChecksum() string {
-	objectStr, _ := json.Marshal(this.object)
-	return Utility.GetMD5Hash(string(objectStr))
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
 }
 
 func (this *Config_ApplicationConfigurationEntity) Exist() bool {
@@ -3467,6 +3472,7 @@ func (this *EntityManager) NewConfigServerConfigurationEntity(parentUuid string,
 			if object != nil {
 				this.setObjectValues(val, object)
 
+				uuidStr = object.(*Config.ServerConfiguration).UUID
 			}
 			return val.(*Config_ServerConfigurationEntity)
 		}
@@ -3660,8 +3666,8 @@ func (this *Config_ServerConfigurationEntity) SetInit(isInit bool) {
 }
 
 func (this *Config_ServerConfigurationEntity) GetChecksum() string {
-	objectStr, _ := json.Marshal(this.object)
-	return Utility.GetMD5Hash(string(objectStr))
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
 }
 
 func (this *Config_ServerConfigurationEntity) Exist() bool {
@@ -4167,6 +4173,7 @@ func (this *EntityManager) NewConfigConfigurationsEntity(parentUuid string, obje
 			if object != nil {
 				this.setObjectValues(val, object)
 
+				uuidStr = object.(*Config.Configurations).UUID
 			}
 			return val.(*Config_ConfigurationsEntity)
 		}
@@ -4360,8 +4367,8 @@ func (this *Config_ConfigurationsEntity) SetInit(isInit bool) {
 }
 
 func (this *Config_ConfigurationsEntity) GetChecksum() string {
-	objectStr, _ := json.Marshal(this.object)
-	return Utility.GetMD5Hash(string(objectStr))
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
 }
 
 func (this *Config_ConfigurationsEntity) Exist() bool {

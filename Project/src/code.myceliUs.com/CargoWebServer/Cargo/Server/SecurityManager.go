@@ -118,9 +118,9 @@ func (this *SecurityManager) createRole(id string) (*CargoEntities.Role, *CargoE
 	cargoEntities := server.GetEntityManager().getCargoEntities()
 
 	if len(uuid) == 0 {
-		roleEntity := GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(cargoEntities.GetUuid(), id, nil)
-		role = roleEntity.GetObject().(*CargoEntities.Role)
+		role = new(CargoEntities.Role)
 		role.SetId(id)
+		GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(cargoEntities.GetUuid(), "", role)
 		cargoEntities.GetObject().(*CargoEntities.Entities).SetRoles(role)
 		cargoEntities.SaveEntity()
 	} else {
@@ -488,13 +488,12 @@ func (this *SecurityManager) appendPermission(accountId string, permissionType C
 		}
 		// So here I will create the permission.
 		permission := new(CargoEntities.Permission)
-		permission.UUID = "CargoEntities.Permission%" + Utility.RandomUUID()
 		permission.TYPENAME = "CargoEntities.Permission"
 		permission.SetPattern(pattern)
 		permission.SetType(permissionType)
 		account.SetPermissions(permission)
+		GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(account.GetUUID(), "", permission)
 		accountEntity.SaveEntity()
-
 	} else {
 		// Account error
 		cargoError := NewError(Utility.FileLine(), ACCOUNT_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The account id '"+accountId+"' does not correspond to an existing account entity."))

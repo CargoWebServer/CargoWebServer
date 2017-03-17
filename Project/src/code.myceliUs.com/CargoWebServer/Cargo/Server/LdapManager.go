@@ -284,8 +284,7 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 	// Here I will print the information...
 	for i := 0; i < len(results); i++ {
 		row := results[i]
-		userEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", nil)
-		user := userEntity.GetObject().(*CargoEntities.User)
+		user := new(CargoEntities.User)
 		for j := 0; j < len(row); j++ {
 			// Print the result...
 			if attributes[j] == "name" {
@@ -324,20 +323,25 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 		// here i will test if the user exist...
 		userUuid := CargoEntitiesUserExists(user.M_id)
 		if len(userUuid) == 0 && len(user.GetEmail()) > 0 {
+
 			// The user must be save...
 			log.Println("Save user ", user.GetEmail(), "an id ", user.GetId())
 			if len(user.GetEmail()) > 0 {
+				// Create the user uuid
+				GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", user)
+
 				// Append the newly create account into the cargo entities
 				entities := cargoEntities.GetObject().(*CargoEntities.Entities)
 
-				accountEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(entities.GetUUID(), accountId, nil)
-
 				// Create the account in memory...
-				account := accountEntity.GetObject().(*CargoEntities.Account)
+				account := new(CargoEntities.Account)
 				account.M_id = accountId
 				account.M_password = "Dowty123"
 				account.M_name = user.GetId()
 				account.M_email = user.GetEmail()
+
+				// Set the account uuid.
+				GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", account)
 
 				entities.SetEntities(account)
 				account.SetEntitiesPtr(entities)
@@ -347,7 +351,6 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 				account.NeedSave = true
 				user.SetAccounts(account)
 
-				// Now append the user to the entities...
 				entities.SetEntities(user)
 				user.SetEntitiesPtr(entities)
 			}
@@ -411,8 +414,7 @@ func (this *LdapManager) SynchronizeGroups(id string) error {
 	for i := 0; i < len(results); i++ {
 		// Here I will get the user in the group...
 		row := results[i]
-		groupEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(server.GetEntityManager().getCargoEntities().GetUuid(), "", nil)
-		group := groupEntity.GetObject().(*CargoEntities.Group)
+		group := new(CargoEntities.Group)
 		for j := 0; j < len(row); j++ {
 			// Print the result...
 			if attributes[j] == "distinguishedName" {
@@ -444,6 +446,7 @@ func (this *LdapManager) SynchronizeGroups(id string) error {
 				// Now I will retrive user inside this group...
 				group.SetId(row[j].(string))
 				group.SetName(row[j].(string))
+				GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(server.GetEntityManager().getCargoEntities().GetUuid(), "", group)
 			}
 		}
 	}
@@ -504,9 +507,7 @@ func (this *LdapManager) SynchronizeComputers(id string) error {
 	for i := 0; i < len(results); i++ {
 		// Here I will get the user in the group...
 		row := results[i]
-		computerEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(server.GetEntityManager().getCargoEntities().GetUuid(), "", nil)
-		computer := computerEntity.GetObject().(*CargoEntities.Computer)
-
+		computer := new(CargoEntities.Computer)
 		for j := 0; j < len(row); j++ {
 			// Print the result...
 			if attributes[j] == "distinguishedName" {
@@ -552,6 +553,7 @@ func (this *LdapManager) SynchronizeComputers(id string) error {
 		/**/
 		computerUuid := CargoEntitiesComputerExists(computer.M_id)
 		if len(computerUuid) == 0 {
+
 			/*addrs, err := net.LookupIP(computer.GetName())
 			for _, addr := range addrs {
 				if ipv4 := addr.To4(); ipv4 != nil {
@@ -563,7 +565,10 @@ func (this *LdapManager) SynchronizeComputers(id string) error {
 			} else {
 				log.Println("Save computer", computer.GetName(), computer.GetIpv4())
 			}*/
+
 			entities := GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities)
+			// Set the computer uuid.
+			GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", computer)
 			entities.SetEntities(computer)
 			computer.SetEntitiesPtr(entities)
 		}

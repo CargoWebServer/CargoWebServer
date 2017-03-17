@@ -118,9 +118,7 @@ func (this *ConfigurationManager) initialize() {
 		this.m_configurationEntity.InitEntity(configsUuid)
 		this.m_activeConfigurations = this.m_configurationEntity.GetObject().(*Config.Configurations)
 	} else {
-
-		this.m_configurationEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity("", configsUuid, nil)
-		this.m_activeConfigurations = this.m_configurationEntity.GetObject().(*Config.Configurations)
+		this.m_activeConfigurations = new(Config.Configurations)
 		this.m_activeConfigurations.M_id = "CARGO_CONFIGURATIONS"
 		this.m_activeConfigurations.M_name = "Default"
 		this.m_activeConfigurations.M_version = "1.0"
@@ -158,6 +156,10 @@ func (this *ConfigurationManager) initialize() {
 		os.MkdirAll(this.GetQueriesPath(), 0777)
 
 		this.m_activeConfigurations.NeedSave = true
+
+		// Create the configuration entity from the configuration and save it.
+		this.m_configurationEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity("", "", this.m_activeConfigurations)
+
 		this.m_configurationEntity.SaveEntity()
 	}
 

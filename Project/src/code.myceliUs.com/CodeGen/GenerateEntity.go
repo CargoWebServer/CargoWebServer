@@ -216,8 +216,8 @@ func generateEntity(packageId string) {
 				classStr += "}\n\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetChecksum() string{\n"
-				classStr += "	objectStr, _ := json.Marshal(this.object)\n"
-				classStr += "	return  Utility.GetMD5Hash(string(objectStr))\n"
+				classStr += "	mapValues, _ := Utility.ToMap(this.object)\n"
+				classStr += "	return Utility.GetChecksum(mapValues)\n"
 				classStr += "}\n\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) Exist() bool{\n"
@@ -335,6 +335,7 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "		if val, ok := this.contain(uuidStr);ok {\n"
 	entityConstructorStr += "			if object != nil{\n"
 	entityConstructorStr += "				this.setObjectValues(val, object)\n\n"
+	entityConstructorStr += "				uuidStr = object.(*" + packageId + "." + className + ").UUID\n"
 	entityConstructorStr += "			}\n"
 	entityConstructorStr += "			return val.(*" + packageId + "_" + class.Name + "Entity)\n"
 	entityConstructorStr += "		}\n"

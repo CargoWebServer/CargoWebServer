@@ -234,7 +234,7 @@ func (this *EntityPrototype) generateConstructor() string {
 	// Common properties share by all entity.
 	constructorSrc += " this.__class__ = \"" + this.TypeName + "\"\n"
 	constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
-	constructorSrc += " this.UUID = this.TYPENAME + \"%\" + randomUUID()\n"
+	constructorSrc += " this.UUID = \"\"\n"
 	constructorSrc += " this.uuid = this.UUID\n"
 	constructorSrc += " this.parentUuid = \"\"\n"
 	constructorSrc += " this.childsUuid = []\n"

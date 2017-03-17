@@ -230,10 +230,12 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 							// Now I will get data from sql...
 							sqlData, err := this.readData(dataBaseName, query, fieldsType, params)
 							if err == nil {
-								// Now I will replace the data with the retreive values.
-								for j := 0; j < len(sqlData[0]); j++ {
-									// Set the value.
-									data[i][dataIndex[j]] = sqlData[0][j]
+								if len(sqlData) > 0 {
+									// Now I will replace the data with the retreive values.
+									for j := 0; j < len(sqlData[0]); j++ {
+										// Set the value.
+										data[i][dataIndex[j]] = sqlData[0][j]
+									}
 								}
 							}
 						}
@@ -251,12 +253,14 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
  * value to insert in the DB.
  */
 func (this *DataManager) createData(storeName string, query string, d []interface{}) (lastId interface{}, err error) {
+
 	// If the store is sql_info in that case I will need to create the information
 	// in the sql data store.
 	store := this.getDataStore(storeName)
 	if store == nil {
 		return nil, errors.New("Data store '" + storeName + " does not exist.")
 	}
+
 	lastId, err = store.Create(query, d)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
@@ -269,12 +273,19 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 			values := strings.Split(uuid[0:strings.Index(uuid, "%")], ".")
 			dataBaseName := values[0]
 			tableName := values[len(values)-1]
+
+			// we are not interested in system tables.
+			if tableName == "sysdiagrams" {
+				return nil, errors.New("system table " + tableName + " is not a valid table.")
+			}
+
 			schemaId := ""
 			if len(values) == 3 {
 				schemaId = values[1]
 			}
 			prototype, err := GetServer().GetEntityManager().getEntityPrototype(uuid[0:strings.Index(uuid, "%")], "sql_info")
 			if err == nil {
+
 				query := "INSERT INTO " + dataBaseName
 				if len(schemaId) > 0 {
 					query += "." + schemaId
@@ -317,6 +328,7 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 				query += ")" + values + ")"
 
 				id, err := this.createData(dataBaseName, query, data)
+
 				if err == nil {
 					log.Println("--------> data insert sucessfully! ", id)
 				}
@@ -376,7 +388,6 @@ func (this *DataManager) deleteData(storeName string, query string, params []int
 					}
 				}
 			}
-			log.Println("-------------> ", query, ids)
 			err = this.deleteData(dataBaseName, query, ids)
 			if err == nil {
 				log.Println("-------------> entity ", uuid, "was deleted!")
@@ -470,7 +481,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 				// Update the entity.
 				err = this.updateData(dataBaseName, query, data, ids)
 				if err == nil {
-					log.Println("-------> updata succed!")
+					log.Println("-------> update data succeeded!")
 				}
 			}
 		}

@@ -153,6 +153,7 @@ EntityPanel.prototype.init = function (proto, initCallback) {
 
 	// Call after the initialisation....
 	if (initCallback != undefined) {
+
 		initCallback(this)
 	}
 }
@@ -309,7 +310,6 @@ EntityPanel.prototype.setEntity = function (entity) {
  * Reset the content of the panel.
  */
 EntityPanel.prototype.clear = function () {
-	this.panel.innerHtml = ""
 	this.entity = null
 	this.init(this.proto)
 	if (this.initCallback != undefined) {
@@ -829,20 +829,30 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 					/** Here it's a string **/
 					if (isXsId(fieldType) || isXsString(fieldType || isXsRef(fieldType))) {
-						entity[attribute] = this.value
-						entity.NeedSave = true
+						if (entity[attribute] != this.value) {
+							entity[attribute] = this.value
+							entity.NeedSave = true
+						}
 					} else if (isXsNumeric(fieldType)) {
-						entity[attribute] = parseFloat(this.value)
-						entity.NeedSave = true
+						if (entity[attribute] != parseFloat(this.value)) {
+							entity[attribute] = parseFloat(this.value)
+							entity.NeedSave = true
+						}
 					} else if (isXsInt(fieldType)) {
-						entity[attribute] = parseInt(this.value)
-						entity.NeedSave = true
+						if (entity[attribute] != parseInt(this.value)) {
+							entity[attribute] = parseInt(this.value)
+							entity.NeedSave = true
+						}
 					} else if (isXsBoolean(fieldType)) {
-						entity[attribute] = this.checked
-						entity.NeedSave = true
+						if (entity[attribute] != this.checked) {
+							entity[attribute] = this.checked
+							entity.NeedSave = true
+						}
 					} else if (fieldType.startsWith("enum:")) {
-						entity[attribute] = this.selectedIndex + 1
-						entity.NeedSave = true
+						if (entity[attribute] != this.selectedIndex + 1) {
+							entity[attribute] = this.selectedIndex + 1
+							entity.NeedSave = true
+						}
 					} else {
 						// The field is a reference...
 
@@ -865,7 +875,11 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 			// Append the listener to display the save button.
 			control.element.addEventListener("keyup", function (entityPanel) {
 				return function () {
-					entityPanel.saveBtn.element.style.display = "table-cell"
+					if (entityPanel.entity != null) {
+						if (entityPanel.entity.NeedSave) {
+							entityPanel.saveBtn.element.style.display = "table-cell"
+						}
+					}
 				}
 			} (this))
 		}
@@ -1357,7 +1371,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 
 			attachAutoComplete(input, lst, false)
 
-			input.element.addEventListener("keyup", function (entityPanel, field, input) {
+			input.element.addEventListener("keyup", function (entityPanel, field, input, objMap) {
 				return function (e) {
 					// If the key is escape...
 					if (e.keyCode === 27) {
@@ -1373,14 +1387,20 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 							}
 						}
 					}
+					var value = objMap[this.value]
+					if (value != undefined) {
+						onSelect(value)
+					}
 				}
-			} (entityPanel, field, input))
+			} (entityPanel, field, input, objMap))
 
 			input.element.onblur = input.element.onchange = function (objMap, values, entityPanel, onSelect) {
 				return function (evt) {
 					var value = objMap[this.value]
 					if (value != undefined) {
 						onSelect(value)
+					} else {
+						entityPanel.clear()
 					}
 				}
 			} (objMap, values, entityPanel, onSelect)

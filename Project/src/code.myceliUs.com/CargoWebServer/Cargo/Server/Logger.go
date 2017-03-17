@@ -21,9 +21,12 @@ func NewLogger(id string) *Logger {
 		entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
 		logger.logEntity = entity.(*CargoEntities_LogEntity)
 	} else {
-		logger.logEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(server.GetEntityManager().getCargoEntities().GetUuid(), id, nil)
-		logger.logEntity.GetObject().(*CargoEntities.Log).SetId(id)
 
+		log := new(CargoEntities.Log)
+		log.SetId(id)
+
+		// Set the log entity.
+		logger.logEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(server.GetEntityManager().getCargoEntities().GetUuid(), "", log)
 		server.GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetEntities(logger.logEntity.GetObject())
 		server.GetEntityManager().getCargoEntities().SaveEntity()
 	}

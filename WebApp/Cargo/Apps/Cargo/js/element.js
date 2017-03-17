@@ -214,7 +214,7 @@ var Element = function (parent, params, callback, appendFront) {
     if (this.element.id.length > 0) {
         server.languageManager.setElementText(this, this.element.id)
     }
-    
+
     return this;
 };
 
@@ -308,8 +308,16 @@ Element.prototype.removeElement = function (e) {
 Element.prototype.removeAllChilds = function () {
     for (var id in this.childs) {
         if (this.childs[id].element != undefined) {
-            if (this.childs[id].element.parentNode != null) {
-                this.childs[id].element.parentNode.removeChild(this.childs[id].element)
+            var childElement = this.childs[id].element
+            if (childElement.parentNode != null) {
+                var parentNode = childElement.parentNode
+                childElement.style.display = "none"
+                setTimeout(function (parentNode, childElement) {
+                    return function () {
+                        parentNode.removeChild(childElement)
+                    }
+                } (parentNode, childElement), .1) // lillte work around...
+
             }
         }
     }

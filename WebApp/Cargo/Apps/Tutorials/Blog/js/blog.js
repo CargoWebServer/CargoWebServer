@@ -15,7 +15,7 @@ var BlogManager = function (parent) {
             "Blog.dbo.blog_user": "User's",
             "Blog.blog_user": "User's",
             "FK_blog_comment_blog_user": "Comments",
-            "fk_comment_2":"Comments",
+            "fk_comment_2": "Comments",
             "Name": "Name",
             "email": "Email",
             "website": "Website"
@@ -43,7 +43,9 @@ var BlogManager = function (parent) {
     // the blog_user was the table. Cargo offer you the EntityPanel class to 
     // manipulate entity of every type, just tell Cargo the type name you want and boom!
     var userTypeName = databaseName
-    //userTypeName += "." + schemaId
+    if (schemaId.length > 0) {
+        userTypeName += "." + schemaId
+    }
     userTypeName += ".blog_user"
 
     var userPanel = new EntityPanel(this.panel, userTypeName, function (panel) {

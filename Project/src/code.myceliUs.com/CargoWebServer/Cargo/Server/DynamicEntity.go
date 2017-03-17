@@ -75,85 +75,85 @@ func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error)
 func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string]interface{}) (*DynamicEntity, *CargoEntities.Error) {
 
 	var entity *DynamicEntity
-	if len(values["UUID"].(string)) > 0 {
-		if val, ok := this.contain(values["UUID"].(string)); ok {
-			if val != nil {
-				entity = val.(*DynamicEntity)
-				// Calculate the checksum.
-				sum0 := Utility.GetChecksum(values)
-				sum1 := entity.GetChecksum()
-				if sum0 != sum1 {
-					entity.SetObjectValues(values)
-				} else {
-					// If the value dosent exist It need to be save...
-					if entity.Exist() == false {
-						entity.SetNeedSave(true)
-					} else {
-						entity.SetNeedSave(false)
-					}
-				}
-				return entity, nil
+	prototype, err := getEntityPrototype(values)
+	if err != nil {
+		// Create the error message
+		cargoError := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Prototype not found for type '"+values["TYPENAME"].(string)+"'."))
+		return nil, cargoError
+	}
+
+	if len(values["UUID"].(string)) == 0 {
+		// I will alway prefer a determistic key over a ramdom value...
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			values["UUID"] = values["TYPENAME"].(string) + "%" + uuid.NewRandom().String()
+		} else {
+			// The key will be compose by the parent uuid.
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				values["parentUuid"] = parentUuid
+				keyInfo += parentUuid + ":"
 			}
+
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				keyInfo += Utility.ToString(values[prototype.Ids[i]])
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+			// The uuid is in that case a MD5 value.
+			values["UUID"] = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
+	}
+
+	// Try to retreive the entity.
+	if val, ok := this.contain(values["UUID"].(string)); ok {
+		if val != nil {
+			entity = val.(*DynamicEntity)
+			// Calculate the checksum.
+			sum0 := Utility.GetChecksum(values)
+			sum1 := entity.GetChecksum()
+			if sum0 != sum1 {
+				entity.SetObjectValues(values)
+				entity.SetNeedSave(true)
+			} else {
+				// If the value dosent exist It need to be save...
+				if entity.Exist() == false {
+					entity.SetNeedSave(true)
+				} else {
+					entity.SetNeedSave(false)
+				}
+			}
+			return entity, nil
+		}
+	}
+
+	// Here if the enity is nil I will create a new instance.
+	if entity == nil {
+		entity = new(DynamicEntity)
+
+		// If the object contain an id...
+		entity.uuid = values["UUID"].(string)
+
+		// keep the reference to the prototype.
+		entity.prototype = prototype
+
+		// If the entity does not exist I will generate it new uuid...
+		if len(entity.uuid) == 0 {
+			entity.uuid = values["UUID"].(string)
 		}
 
-		// Here if the enity is nil I will create a new instance.
-		if entity == nil {
-			entity = new(DynamicEntity)
+		entity.childsUuid = make([]string, 0)
+		entity.referencesUuid = make([]string, 0)
+		entity.referenced = make([]EntityRef, 0)
 
-			// If the object contain an id...
-			entity.uuid = values["UUID"].(string)
-			prototype, err := getEntityPrototype(values)
-
-			if err != nil {
-				// Create the error message
-				cargoError := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Prototype not found for type '"+values["TYPENAME"].(string)+"'."))
-				return nil, cargoError
-			}
-
-			// keep the reference to the prototype.
-			entity.prototype = prototype
-
-			// If the entity does not exist I will generate it new uuid...
-			if len(entity.uuid) == 0 {
-				// I will alway prefer a determistic key over a ramdom value...
-				if len(prototype.Ids) == 1 {
-					// Here there is a new entity...
-					entity.uuid = values["TYPENAME"].(string) + "%" + uuid.NewRandom().String()
-					values["UUID"] = entity.uuid
-				} else {
-
-					// The key will be compose by the parent uuid.
-					var keyInfo string
-					if len(parentUuid) > 0 {
-						values["parentUuid"] = parentUuid
-						keyInfo += parentUuid + ":"
-					}
-
-					keyInfo += prototype.TypeName + ":"
-					for i := 1; i < len(prototype.Ids); i++ {
-						keyInfo += Utility.ToString(values[prototype.Ids[i]])
-						// Append underscore for readability in case of problem...
-						if i < len(prototype.Ids)-1 {
-							keyInfo += "_"
-						}
-					}
-
-					// The uuid is in that case a MD5 value.
-					values["UUID"] = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
-					entity.uuid = values["UUID"].(string)
-				}
-			}
-
-			entity.childsUuid = make([]string, 0)
-			entity.referencesUuid = make([]string, 0)
-			entity.referenced = make([]EntityRef, 0)
-
-			// I will set it parent ptr...
-			if values["parentUuid"] != nil {
-				if len(values["parentUuid"].(string)) > 0 {
-					parentPtr, _ := GetServer().GetEntityManager().getDynamicEntityByUuid(values["parentUuid"].(string))
-					entity.SetParentPtr(parentPtr)
-				}
+		// I will set it parent ptr...
+		if values["parentUuid"] != nil {
+			if len(values["parentUuid"].(string)) > 0 {
+				parentPtr, _ := GetServer().GetEntityManager().getDynamicEntityByUuid(values["parentUuid"].(string))
+				entity.SetParentPtr(parentPtr)
 			}
 		}
 	}
@@ -577,7 +577,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
  */
 func (this *DynamicEntity) SaveEntity() {
 	this.saveEntity("")
-	log.Println("After save:", toJsonStr(this.object))
+	//log.Println("After save:", toJsonStr(this.object))
 }
 
 func (this *DynamicEntity) saveEntity(path string) {
@@ -1755,7 +1755,7 @@ func (this *DynamicEntity) Exist() bool {
 	if this == nil {
 		return false
 	}
-
+	log.Println("-------> test if entity ", this.uuid, " exist.")
 	var query EntityQuery
 	query.TypeName = this.GetTypeName()
 	query.Indexs = append(query.Indexs, "uuid="+this.uuid)

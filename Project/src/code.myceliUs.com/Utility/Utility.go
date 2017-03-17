@@ -262,6 +262,7 @@ func GetChecksum(values interface{}) string {
 		checksum += reflect.ValueOf(values).String()
 	}
 
+	//log.Println(checksum)
 	return GetMD5Hash(checksum)
 }
 

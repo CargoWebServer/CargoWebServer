@@ -341,17 +341,18 @@ func (this *EntityManager) setReferences(owner Entity) {
  */
 func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 
-	// in case of dynamic object...
-	if reflect.TypeOf(source).String() == "map[string]interface {}" {
-		target.(*DynamicEntity).SetObjectValues(source.(map[string]interface{}))
-	}
-
 	// here we have a static object...
 	prototype := target.GetPrototype()
 
 	// The need save evaluation...
 	mapValues, _ := Utility.ToMap(source)
 	needSave := target.GetChecksum() != Utility.GetChecksum(mapValues)
+
+	// in case of dynamic object...
+	if reflect.TypeOf(source).String() == "map[string]interface {}" {
+		target.(*DynamicEntity).SetObjectValues(source.(map[string]interface{}))
+	}
+
 	target.SetNeedSave(needSave)
 
 	// I will get the target object.

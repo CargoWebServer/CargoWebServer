@@ -17,51 +17,51 @@ func main() {
 	// Generate the module inside input...
 	generate(dir+"/input", "Config", "configurations")
 	generate(dir+"/input", "CargoEntities", "entities")
-	/*
-		// Now the runtime.
-		initMaps()
 
-		// set the output to
-		loadXSD("input/BPMS.xsd")
+	// Now the runtime.
+	initMaps()
 
-		// Now the cmof shcmea...
-		loadCMOF("input/BPMS.cmof")
+	// set the output to
+	loadXSD("input/BPMS.xsd")
 
-		generateCode("BPMS")
+	// Now the cmof shcmea...
+	loadCMOF("input/BPMS.cmof")
 
-		// xml roots element...
-		generateGoXmlFactory("runtimes", "Entities", outputPath, "BPMS_")
+	generateCode("BPMS")
 
-		generateEntity("BPMS")
+	// xml roots element...
+	generateGoXmlFactory("runtimes", "Entities", outputPath, "BPMS_")
 
-		// Bpmn stuff
-		initMaps()
+	generateEntity("BPMS")
 
-		// set the output to
-		loadXSD("input/DI.xsd")
-		loadXSD("input/DC.xsd")
-		loadXSD("input/BPMN20.xsd")
-		loadXSD("input/BPMNDI.xsd")
-		loadXSD("input/Semantic.xsd")
+	// Bpmn stuff
+	initMaps()
 
-		// Now the cmof shcmea...
-		loadCMOF("input/DC.cmof")
-		loadCMOF("input/DI.cmof")
-		loadCMOF("input/BPMNDI.cmof")
-		loadCMOF("input/BPMN20.cmof")
+	// set the output to
+	loadXSD("input/DI.xsd")
+	loadXSD("input/DC.xsd")
+	loadXSD("input/BPMN20.xsd")
+	loadXSD("input/BPMNDI.xsd")
+	loadXSD("input/Semantic.xsd")
 
-		generateCode("DC")
-		generateCode("DI")
-		generateCode("BPMNDI")
-		generateCode("BPMN20")
+	// Now the cmof shcmea...
+	loadCMOF("input/DC.cmof")
+	loadCMOF("input/DI.cmof")
+	loadCMOF("input/BPMNDI.cmof")
+	loadCMOF("input/BPMN20.cmof")
 
-		// xml roots element...
-		generateGoXmlFactory("definitions", "Entities", outputPath, "BPMN_")
+	generateCode("DC")
+	generateCode("DI")
+	generateCode("BPMNDI")
+	generateCode("BPMN20")
 
-		// The Entity...
-		generateEntity("DC")
-		generateEntity("DI")
-		generateEntity("BPMNDI")
-		generateEntity("BPMN20")*/
+	// xml roots element...
+	generateGoXmlFactory("definitions", "Entities", outputPath, "BPMN_")
+
+	// The Entity...
+	generateEntity("DC")
+	generateEntity("DI")
+	generateEntity("BPMNDI")
+	generateEntity("BPMN20")
 
 }

@@ -262,11 +262,13 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
 	lastId = int64(0)
 	stmt, err := this.m_db.Prepare(query)
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
+		return -1, err
 	}
 	_, err = stmt.Exec(data_...)
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
+		return -1, err
 	}
 
 	// First of all I need to find the key column id...
@@ -1341,7 +1343,6 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 					}
 
 					// The uuid is in that case a MD5 value.
-					//log.Println("---> ", keyInfo)
 					uuid := prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
 
 					// Now I will create the entity if it dosen't exist.

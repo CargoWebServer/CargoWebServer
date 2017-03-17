@@ -2,6 +2,7 @@
  * The query editor is use to edit query in EQL and SQL language.
  * It also contain a table to display it results.
  */
+ 
 var QueryEditor = function (parent, file, initCallback) {
 
     this.initCallback = initCallback

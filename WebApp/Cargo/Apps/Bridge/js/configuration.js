@@ -67,8 +67,6 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
                         if (entity.TYPENAME == "Config.DataStoreConfiguration") {
                             homepage.dataExplorer.removeDataSchema(entity.M_id)
                         }
-
-
                     }
                 }
 
@@ -84,11 +82,6 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
     server.entityManager.attach(this, NewEntityEvent, function (evt, configurationPanel) {
         if (evt.dataMap["entity"] != undefined) {
             if (evt.dataMap["entity"].TYPENAME == configurationPanel.typeName) {
-                // Hide the currently displayed view.
-                for (var i = 0; i < configurationPanel.contentViews.length; i++) {
-                    configurationPanel.contentViews[i].panel.element.style.display = "none"
-                }
-
                 // Hide all data panel.
                 homepage.dataExplorer.hidePanels()
 
@@ -98,9 +91,6 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
                 // Set the new configuration.
                 var contentView = configurationPanel.setConfiguration(configurationContent, entity)
                 var idField = contentView.getFieldControl("M_id")
-
-                // Set focus to the id field.
-                idField.element.focus()
             }
         }
     })
@@ -112,6 +102,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
  * Append a new configuration to the configuration panel.
  */
 ConfigurationPanel.prototype.setConfiguration = function (configurationContent, content) {
+
     // If the view already exist
     for (var i = 0; i < this.contentViews.length; i++) {
         if (this.contentViews[i].entity.UUID == content.UUID) {
@@ -120,7 +111,10 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                 this.contentViews[i].connectBtn.status = "disconnected"
                 this.contentViews[i].connectBtn.element.click()
             }
+            this.contentViews[i].panel.element.style.display = ""
             return this.contentViews[i]
+        }else{
+            this.contentViews[i].panel.element.style.display = "none"
         }
     }
 
@@ -346,6 +340,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
     // keep the index.
     this.contentViews.push(contentView)
+
     return contentView
 }
 
@@ -399,9 +394,6 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
             for (var j = 0; j < content.length; j++) {
                 if (content[j] != undefined) {
                     this.setConfiguration(configurationContent, content[j])
-                    if (j != 0) {
-                        this.contentViews[j].panel.element.style.display = "none"
-                    }
                 }
             }
 
@@ -486,15 +478,20 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                     entity.UUID = configurationPanel.typeName + "%" + randomUUID()
                     entity.M_id = "New " + configurationPanel.typeName.split(".")[1]
 
-                    server.entityManager.setEntity(entity)
+                    // Set the entity content.
+                    var configurationContent = configurationPanel.panel.getChildById("configurationContent")
 
-                    server.entityManager.createEntity(configuration.UUID, "M_" + configurationPanel.propertyName, configurationPanel.typeName, entity.M_id, entity,
-                        function (result, caller) {
-                            /** The interface update is made by the new entity event handler... */
-                        },
-                        function (errMsg) {
+                    // Set the new configuration.
+                    var contentView = configurationPanel.setConfiguration(configurationContent, entity)
+                    var idField = contentView.getFieldControl("M_id")
 
-                        }, configurationPanel)
+                    // Hide the data explorer panel.
+                    homepage.dataExplorer.hidePanels()
+
+                    // Set focus to the id field.
+                    idField.element.focus()
+                    idField.element.setSelectionRange(0, idField.element.value.length)
+
                 }
             } (this, configurationContent, configuration)
 
