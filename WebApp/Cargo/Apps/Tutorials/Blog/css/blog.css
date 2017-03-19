@@ -1,6 +1,20 @@
 
-.blog-manager{
-    display: table;
-    margin: 10px;
-    border: 1px solid grey;
+/**
+ Edit button.
+*/
+.edit-button{
+    position: absolute;
+    z-index: 4;
+    left: -20px;
+    top:-.75em;
+}
+
+.edit-button i {
+    color: #337ab7;
+    background-color: white;
+    font-size: 20px;
+}
+
+.edit-button :hover {
+    cursor: pointer;
 }

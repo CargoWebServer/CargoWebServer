@@ -25,6 +25,7 @@ server.languageManager.appendLanguageInfo(languageInfo)
 var ConfigurationPanel = function (parent, title, typeName, propertyName) {
     /** The parent div */
     this.parent = parent
+
     /** The panel */
     this.panel = new Element(parent, { "tag": "div", "class": "severConfiguration" })
 
@@ -39,6 +40,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
 
     /** The configuration selector */
     this.configurationSelect = null
+    this.activeConfiguration = null
 
     /** The header that contain the configuration selector... */
     this.header = null
@@ -113,7 +115,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
             }
             this.contentViews[i].panel.element.style.display = ""
             return this.contentViews[i]
-        }else{
+        } else {
             this.contentViews[i].panel.element.style.display = "none"
         }
     }
@@ -338,6 +340,22 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
         } (content, this.title))
 
+    // Set parent entity informations.
+    contentView.parentEntity = this.activeConfiguration
+    if (contentView.entity.TYPENAME == "Config.DataStoreConfiguration") {
+        contentView.parentLnk = "M_dataStoreConfigs"
+    }else if (contentView.entity.TYPENAME == "Config.ServerConfiguration") {
+        contentView.parentLnk = "M_serverConfig"
+    }else if (contentView.entity.TYPENAME == "Config.ServiceConfiguration") {
+        contentView.parentLnk = "M_serviceConfigs"
+    }else if (contentView.entity.TYPENAME == "Config.SmtpConfiguration") {
+        contentView.parentLnk = "M_smtpConfigs"
+    }else if (contentView.entity.TYPENAME == "Config.LdapConfiguration") {
+        contentView.parentLnk = "M_ldapConfigs"
+    }else if (contentView.entity.TYPENAME == "Config.ApplicationConfiguration") {
+        contentView.parentLnk = "M_applicationConfigs"
+    }
+
     // keep the index.
     this.contentViews.push(contentView)
 
@@ -356,6 +374,10 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
         .appendElement({ "tag": "select", "style": "margin-left: 5px;" }).down()
 
     for (var i = 0; i < configurations.length; i++) {
+        if(i==0){
+            // The first configuration as the default one.
+            this.activeConfiguration = configurations[i]
+        }
         var configuration = configurations[i]
         this.configurationSelect.appendElement({ "tag": "option", "value": configuration.M_id, "innerHtml": configuration.M_name })
 
@@ -394,6 +416,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
             for (var j = 0; j < content.length; j++) {
                 if (content[j] != undefined) {
                     this.setConfiguration(configurationContent, content[j])
+                    this.contentViews[j].panel.element.style.display = "none"
                 }
             }
 
@@ -483,6 +506,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
 
                     // Set the new configuration.
                     var contentView = configurationPanel.setConfiguration(configurationContent, entity)
+                
                     var idField = contentView.getFieldControl("M_id")
 
                     // Hide the data explorer panel.
@@ -500,5 +524,10 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                 this.setConfiguration(configurationContent, content)
             }
         }
+    }
+
+    // Show the first panel if there is one.
+    if (this.contentViews[0] != undefined) {
+        this.contentViews[0].panel.element.style.display = ""
     }
 }

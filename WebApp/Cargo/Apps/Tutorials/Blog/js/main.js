@@ -12,6 +12,11 @@ var languageInfo = {
 server.languageManager.appendLanguageInfo(languageInfo)
 // server.languageManager.setLanguage("fr")
 
+// This is the body that will be use by all other panel.
+var bodyElement = new Element(document.getElementsByTagName("body")[0], {"tag":"div", "style":"width: 100%; height: 100%;"})
+
+var blogManager = null
+
 /**
  * This function is the entry point of the application...
  */
@@ -21,7 +26,7 @@ function main() {
     server.entityManager.getEntityPrototypes("sql_info",
     // success callback
     function(results, caller){
-        new BlogManager(new Element(document.getElementsByTagName("body")[0], {"tag":"div", "style":"width: 100%; height: 100%;"}))
+        blogManager = new BlogManager(bodyElement)
     },
     // error callback.
     function(){

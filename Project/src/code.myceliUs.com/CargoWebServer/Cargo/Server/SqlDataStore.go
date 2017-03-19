@@ -1170,6 +1170,10 @@ func (this *SqlDataStore) setRefs() error {
 
 			// Test if source field and target field are id's
 			sourceField_isId := Utility.Contains(src.Ids, "M_"+values[i][3].(string))
+
+			// I will set the field as non visible, the ref will be display
+			src.FieldsVisibility[src.getFieldIndex("M_"+values[i][3].(string))] = false
+
 			targetField_isId := Utility.Contains(trg.Ids, "M_"+values[i][5].(string))
 
 			// I will append the field if is not already there.
@@ -1199,8 +1203,9 @@ func (this *SqlDataStore) setRefs() error {
 					}
 
 					if !sourceField_isId {
-
 						// one to one relationship in that case.
+						fieldType = "[]" + fieldType
+					} else if len(src.Ids) > len(trg.Ids) {
 						fieldType = "[]" + fieldType
 					}
 
