@@ -43,6 +43,7 @@ CargoWebServer(master depending if you clone the project or not)
 - go get golang.org/x/net/websocket
 - go get golang.org/x/text/runes
 - go get github.com/orcaman/concurrent-map
+- go get github.com/RangelReale/osin
 
 ###Build
 To build Cago from the top level directory:
