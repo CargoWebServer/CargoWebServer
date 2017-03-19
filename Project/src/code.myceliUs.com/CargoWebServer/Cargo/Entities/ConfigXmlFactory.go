@@ -469,118 +469,6 @@ func (this *ConfigXmlFactory) InitApplicationConfiguration(xmlElement *Config.Xs
 	}
 }
 
-/** serialysation of ServiceConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** ServiceConfiguration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_hostName = object.M_hostName
-
-	/** Configuration **/
-	xmlElement.M_ipv4 = object.M_ipv4
-
-	/** Configuration **/
-	xmlElement.M_port = object.M_port
-
-	/** Configuration **/
-	xmlElement.M_user = object.M_user
-
-	/** Configuration **/
-	xmlElement.M_pwd = object.M_pwd
-
-	/** Configuration **/
-	xmlElement.M_start = object.M_start
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of Configurations **/
-func (this *ConfigXmlFactory) SerialyzeConfigurations(xmlElement *Config.XsdConfigurations, object *Config.Configurations) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** Serialyze ServerConfiguration **/
-
-	/** Now I will save the value of serverConfig **/
-	if object.M_serverConfig != nil {
-		this.SerialyzeServerConfiguration(&xmlElement.M_serverConfig, object.M_serverConfig)
-	}
-
-	/** Serialyze ApplicationConfiguration **/
-	if len(object.M_applicationConfigs) > 0 {
-		xmlElement.M_applicationConfigs = make([]*Config.XsdApplicationConfiguration, 0)
-	}
-
-	/** Now I will save the value of applicationConfigs **/
-	for i := 0; i < len(object.M_applicationConfigs); i++ {
-		xmlElement.M_applicationConfigs = append(xmlElement.M_applicationConfigs, new(Config.XsdApplicationConfiguration))
-		this.SerialyzeApplicationConfiguration(xmlElement.M_applicationConfigs[i], object.M_applicationConfigs[i])
-	}
-
-	/** Serialyze SmtpConfiguration **/
-	if len(object.M_smtpConfigs) > 0 {
-		xmlElement.M_smtpConfigs = make([]*Config.XsdSmtpConfiguration, 0)
-	}
-
-	/** Now I will save the value of smtpConfigs **/
-	for i := 0; i < len(object.M_smtpConfigs); i++ {
-		xmlElement.M_smtpConfigs = append(xmlElement.M_smtpConfigs, new(Config.XsdSmtpConfiguration))
-		this.SerialyzeSmtpConfiguration(xmlElement.M_smtpConfigs[i], object.M_smtpConfigs[i])
-	}
-
-	/** Serialyze LdapConfiguration **/
-	if len(object.M_ldapConfigs) > 0 {
-		xmlElement.M_ldapConfigs = make([]*Config.XsdLdapConfiguration, 0)
-	}
-
-	/** Now I will save the value of ldapConfigs **/
-	for i := 0; i < len(object.M_ldapConfigs); i++ {
-		xmlElement.M_ldapConfigs = append(xmlElement.M_ldapConfigs, new(Config.XsdLdapConfiguration))
-		this.SerialyzeLdapConfiguration(xmlElement.M_ldapConfigs[i], object.M_ldapConfigs[i])
-	}
-
-	/** Serialyze DataStoreConfiguration **/
-	if len(object.M_dataStoreConfigs) > 0 {
-		xmlElement.M_dataStoreConfigs = make([]*Config.XsdDataStoreConfiguration, 0)
-	}
-
-	/** Now I will save the value of dataStoreConfigs **/
-	for i := 0; i < len(object.M_dataStoreConfigs); i++ {
-		xmlElement.M_dataStoreConfigs = append(xmlElement.M_dataStoreConfigs, new(Config.XsdDataStoreConfiguration))
-		this.SerialyzeDataStoreConfiguration(xmlElement.M_dataStoreConfigs[i], object.M_dataStoreConfigs[i])
-	}
-
-	/** Serialyze ServiceConfiguration **/
-	if len(object.M_serviceConfigs) > 0 {
-		xmlElement.M_serviceConfigs = make([]*Config.XsdServiceConfiguration, 0)
-	}
-
-	/** Now I will save the value of serviceConfigs **/
-	for i := 0; i < len(object.M_serviceConfigs); i++ {
-		xmlElement.M_serviceConfigs = append(xmlElement.M_serviceConfigs, new(Config.XsdServiceConfiguration))
-		this.SerialyzeServiceConfiguration(xmlElement.M_serviceConfigs[i], object.M_serviceConfigs[i])
-	}
-
-	/** Configurations **/
-	xmlElement.M_id = object.M_id
-
-	/** Configurations **/
-	xmlElement.M_name = object.M_name
-
-	/** Configurations **/
-	xmlElement.M_version = object.M_version
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
 /** serialysation of ServerConfiguration **/
 func (this *ConfigXmlFactory) SerialyzeServerConfiguration(xmlElement *Config.XsdServerConfiguration, object *Config.ServerConfiguration) {
 	if xmlElement == nil {
@@ -857,6 +745,118 @@ func (this *ConfigXmlFactory) SerialyzeDataStoreConfiguration(xmlElement *Config
 	} else if object.M_textEncoding == Config.Encoding_KOI8U {
 		xmlElement.M_textEncoding = "##KOI8U"
 	}
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of ServiceConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** ServiceConfiguration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_hostName = object.M_hostName
+
+	/** Configuration **/
+	xmlElement.M_ipv4 = object.M_ipv4
+
+	/** Configuration **/
+	xmlElement.M_port = object.M_port
+
+	/** Configuration **/
+	xmlElement.M_user = object.M_user
+
+	/** Configuration **/
+	xmlElement.M_pwd = object.M_pwd
+
+	/** Configuration **/
+	xmlElement.M_start = object.M_start
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of Configurations **/
+func (this *ConfigXmlFactory) SerialyzeConfigurations(xmlElement *Config.XsdConfigurations, object *Config.Configurations) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** Serialyze ServerConfiguration **/
+
+	/** Now I will save the value of serverConfig **/
+	if object.M_serverConfig != nil {
+		this.SerialyzeServerConfiguration(&xmlElement.M_serverConfig, object.M_serverConfig)
+	}
+
+	/** Serialyze ApplicationConfiguration **/
+	if len(object.M_applicationConfigs) > 0 {
+		xmlElement.M_applicationConfigs = make([]*Config.XsdApplicationConfiguration, 0)
+	}
+
+	/** Now I will save the value of applicationConfigs **/
+	for i := 0; i < len(object.M_applicationConfigs); i++ {
+		xmlElement.M_applicationConfigs = append(xmlElement.M_applicationConfigs, new(Config.XsdApplicationConfiguration))
+		this.SerialyzeApplicationConfiguration(xmlElement.M_applicationConfigs[i], object.M_applicationConfigs[i])
+	}
+
+	/** Serialyze SmtpConfiguration **/
+	if len(object.M_smtpConfigs) > 0 {
+		xmlElement.M_smtpConfigs = make([]*Config.XsdSmtpConfiguration, 0)
+	}
+
+	/** Now I will save the value of smtpConfigs **/
+	for i := 0; i < len(object.M_smtpConfigs); i++ {
+		xmlElement.M_smtpConfigs = append(xmlElement.M_smtpConfigs, new(Config.XsdSmtpConfiguration))
+		this.SerialyzeSmtpConfiguration(xmlElement.M_smtpConfigs[i], object.M_smtpConfigs[i])
+	}
+
+	/** Serialyze LdapConfiguration **/
+	if len(object.M_ldapConfigs) > 0 {
+		xmlElement.M_ldapConfigs = make([]*Config.XsdLdapConfiguration, 0)
+	}
+
+	/** Now I will save the value of ldapConfigs **/
+	for i := 0; i < len(object.M_ldapConfigs); i++ {
+		xmlElement.M_ldapConfigs = append(xmlElement.M_ldapConfigs, new(Config.XsdLdapConfiguration))
+		this.SerialyzeLdapConfiguration(xmlElement.M_ldapConfigs[i], object.M_ldapConfigs[i])
+	}
+
+	/** Serialyze DataStoreConfiguration **/
+	if len(object.M_dataStoreConfigs) > 0 {
+		xmlElement.M_dataStoreConfigs = make([]*Config.XsdDataStoreConfiguration, 0)
+	}
+
+	/** Now I will save the value of dataStoreConfigs **/
+	for i := 0; i < len(object.M_dataStoreConfigs); i++ {
+		xmlElement.M_dataStoreConfigs = append(xmlElement.M_dataStoreConfigs, new(Config.XsdDataStoreConfiguration))
+		this.SerialyzeDataStoreConfiguration(xmlElement.M_dataStoreConfigs[i], object.M_dataStoreConfigs[i])
+	}
+
+	/** Serialyze ServiceConfiguration **/
+	if len(object.M_serviceConfigs) > 0 {
+		xmlElement.M_serviceConfigs = make([]*Config.XsdServiceConfiguration, 0)
+	}
+
+	/** Now I will save the value of serviceConfigs **/
+	for i := 0; i < len(object.M_serviceConfigs); i++ {
+		xmlElement.M_serviceConfigs = append(xmlElement.M_serviceConfigs, new(Config.XsdServiceConfiguration))
+		this.SerialyzeServiceConfiguration(xmlElement.M_serviceConfigs[i], object.M_serviceConfigs[i])
+	}
+
+	/** Configurations **/
+	xmlElement.M_id = object.M_id
+
+	/** Configurations **/
+	xmlElement.M_name = object.M_name
+
+	/** Configurations **/
+	xmlElement.M_version = object.M_version
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}

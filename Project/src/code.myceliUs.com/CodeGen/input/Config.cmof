@@ -118,8 +118,38 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="searchBase" name="searchBase">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
-	  </ownedMember>
+	</ownedMember>
 	
+	<ownedMember xmi:type="cmof:Class" xmi:id="OAuth2Configuration" name="OAuth2Configuration" superClass="Configuration">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="authorizationExpiration" name="authorizationExpiration">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="accessExpiration" name="accessExpiration">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="tokenType" name="tokenType">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="errorStatusCode" name="errorStatusCode">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="allowClientSecretInParams" name="allowClientSecretInParams">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="allowGetAccessRequest" name="allowGetAccessRequest">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="redirectUriSeparator" name="redirectUriSeparator">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="allowedAuthorizeTypes" name="allowedAuthorizeTypes" lower="0" upper="*">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="allowedAccessTypes" name="allowedAccessTypes" lower="0" upper="*">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	</ownedMember>
+
 	<ownedMember xmi:type="cmof:Class" xmi:id="ServiceConfiguration" name="ServiceConfiguration" superClass="Configuration">
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hostName" name="hostName">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>

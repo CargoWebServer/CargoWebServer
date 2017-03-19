@@ -156,6 +156,22 @@ var BlogManager = function (parent) {
     //////////////////////////////////////////////////////////////////////
     // Blog manager action.
     //////////////////////////////////////////////////////////////////////
+    // login
+    this.loginBtn = this.navBar.getChildById("login-btn")
+    this.loginBtn.element.onclick = function () {
+        //Using popup (option 1)
+        OAuth.initialize('1010681964660.apps.googleusercontent.com');
+        OAuth.popup('google')
+            .done(function (result) {
+                //use result.access_token in your API request 
+                //or use result.get|post|put|del|patch|me methods (see below)
+                console.log(result)
+            })
+            .fail(function (err) {
+                //handle error with err
+                console.log(err)
+            });
+    }
 
     // Create a new blog.
     this.createBlog = this.navBar.getChildById("create-lnk")
@@ -176,6 +192,8 @@ var BlogManager = function (parent) {
  */
 BlogManager.prototype.createNewBlog = function () {
     // So here I will create a new blog post and from it I will set it view.
+    // TODO Create Author's from oauth2
+    // Create a new Blog.
     this.activeBlogView = new BlogPostView(this.blogContainer, 1)
 
     // Set the blog view editable.
@@ -183,13 +201,13 @@ BlogManager.prototype.createNewBlog = function () {
 }
 
 /**
- * Inject functionality to edit parts of the blog. 
+ * Inject functionality to edit parts of the blog.
  */
 BlogManager.prototype.setEditable = function (blogView) {
 
     function setEditable(div, onClickCallback) {
         div.element.style.position = "relative"
-        div.appendElement({ "tag": "div", "class": "edit-button", "title":"edit" }).down()
+        div.appendElement({ "tag": "div", "class": "edit-button", "title": "edit" }).down()
             .appendElement({ "tag": "i", "class": "fa fa-pencil-square" })
 
         // The action to do on click.
@@ -302,7 +320,7 @@ var BlogPostView = function (parent, id) {
         // The date and time 
         .appendElement({ "tag": "p" }).down().appendElement({ "tag": "span", "class": "fa fa-clock-o" }).appendElement({ "tag": "span", "id": "created-date" }).up()
         .appendElement({ "tag": "hr" })
-         // The page content.
+        // The page content.
         .appendElement({ "tag": "div", "id": "page-content" })
         .appendElement({ "tag": "hr" })
 

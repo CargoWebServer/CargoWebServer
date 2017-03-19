@@ -96,6 +96,7 @@ func (this *Server) initialize() {
 
 	// call other service in order to register theire configuration.
 	this.GetServiceManager().registerService(this.GetLdapManager())
+	this.GetServiceManager().registerService(this.GetOAuth2Manager())
 	this.GetServiceManager().registerService(this.GetFileManager())
 	this.GetServiceManager().registerService(this.GetEmailManager())
 	this.GetServiceManager().registerService(this.GetProjectManager())
@@ -197,7 +198,7 @@ func (this *Server) Stop() {
 	// must be call last
 	this.GetServiceManager().stop()
 
-	log.Panicln("Bye Bye :-)")
+	log.Println("Bye Bye :-)")
 
 	// Now stop the process.
 	os.Exit(0)

@@ -377,7 +377,7 @@ func (this *ConfigurationManager) GetDataStoreConfigurations() []*Config.DataSto
 }
 
 /**
- * Tha function retreive the ldap configuration.
+ * Tha function retreive the ldap configurations.
  */
 func (this *ConfigurationManager) GetLdapConfigurations() []Config.LdapConfiguration {
 	var configurations []Config.LdapConfiguration
@@ -390,6 +390,25 @@ func (this *ConfigurationManager) GetLdapConfigurations() []Config.LdapConfigura
 	for i := 0; i < len(entities); i++ {
 		ldapConfiguration := entities[i].GetObject().(*Config.LdapConfiguration)
 		configurations = append(configurations, *ldapConfiguration)
+	}
+
+	return configurations
+}
+
+/**
+ * Tha function retreive the oauth2 configurations.
+ */
+func (this *ConfigurationManager) GetOAuth2Configuration() []Config.OAuth2Configuration {
+	var configurations []Config.OAuth2Configuration
+
+	entities, err := GetServer().GetEntityManager().getEntitiesByType("Config.OAuth2Configuration", "", "Config")
+	if err != nil {
+		return configurations
+	}
+
+	for i := 0; i < len(entities); i++ {
+		oauth2Configuration := entities[i].GetObject().(*Config.OAuth2Configuration)
+		configurations = append(configurations, *oauth2Configuration)
 	}
 
 	return configurations

@@ -97,6 +97,26 @@
 			</xsd:extension> 
 		</xsd:complexContent> 
 	</xsd:complexType>
+	
+	<xsd:element name="oauth2Configuration" type="tOAuth2Configuration" substitutionGroup="configuration"/>
+	<xsd:complexType name="tOAuth2Configuration" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tConfiguration"> 
+				<xsd:attribute name="authorizationExpiration" type="xsd:integer" />
+				<xsd:attribute name="accessExpiration" type="xsd:integer" />
+				<xsd:attribute name="tokenType" type="xsd:string" />
+				<xsd:attribute name="errorStatusCode" type="xsd:integer" />
+				<xsd:attribute name="allowClientSecretInParams" type="xsd:boolean" />
+				<xsd:attribute name="allowGetAccessRequest" type="xsd:boolean" />
+				<xsd:attribute name="requirePKCEForPublicClients" type="xsd:boolean" />
+				<xsd:attribute name="redirectUriSeparator" type="xsd:string" />
+				<xsd:sequence>
+					<xsd:attribute name="allowedAuthorizeTypes" type="xsd:string" />
+					<xsd:attribute name="allowedAccessTypes" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent> 
+	</xsd:complexType>
 
 	<xsd:element name="dataStoreConfiguration" type="tDataStoreConfiguration" substitutionGroup="configuration"/>
 	<xsd:complexType name="tDataStoreConfiguration" abstract="false">
