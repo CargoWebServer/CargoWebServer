@@ -32,6 +32,10 @@ type OAuth2Configuration struct{
 	M_allowedAuthorizeTypes []string
 	M_allowedAccessTypes []string
 	M_clients []*OAuth2Client
+	M_authorize []*OAuth2Authorize
+	M_access []*OAuth2Access
+	M_refresh []*OAuth2Refresh
+	M_expire []*OAuth2Expires
 
 
 	/** Associations **/
@@ -253,6 +257,154 @@ func (this *OAuth2Configuration) RemoveClients(ref interface{}){
 		}
 	}
 	this.M_clients = clients_
+}
+
+/** Authorize **/
+func (this *OAuth2Configuration) GetAuthorize() []*OAuth2Authorize{
+	return this.M_authorize
+}
+
+/** Init reference Authorize **/
+func (this *OAuth2Configuration) SetAuthorize(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var authorizes []*OAuth2Authorize
+	for i:=0; i<len(this.M_authorize); i++ {
+		if this.M_authorize[i].GetUUID() != ref.(*OAuth2Authorize).GetUUID() {
+			authorizes = append(authorizes, this.M_authorize[i])
+		} else {
+			isExist = true
+			authorizes = append(authorizes, ref.(*OAuth2Authorize))
+		}
+	}
+	if !isExist {
+		authorizes = append(authorizes, ref.(*OAuth2Authorize))
+	}
+	this.M_authorize = authorizes
+}
+
+/** Remove reference Authorize **/
+func (this *OAuth2Configuration) RemoveAuthorize(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*OAuth2Authorize)
+	authorize_ := make([]*OAuth2Authorize, 0)
+	for i := 0; i < len(this.M_authorize); i++ {
+		if toDelete.GetUUID() != this.M_authorize[i].GetUUID() {
+			authorize_ = append(authorize_, this.M_authorize[i])
+		}
+	}
+	this.M_authorize = authorize_
+}
+
+/** Access **/
+func (this *OAuth2Configuration) GetAccess() []*OAuth2Access{
+	return this.M_access
+}
+
+/** Init reference Access **/
+func (this *OAuth2Configuration) SetAccess(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var accesss []*OAuth2Access
+	for i:=0; i<len(this.M_access); i++ {
+		if this.M_access[i].GetUUID() != ref.(*OAuth2Access).GetUUID() {
+			accesss = append(accesss, this.M_access[i])
+		} else {
+			isExist = true
+			accesss = append(accesss, ref.(*OAuth2Access))
+		}
+	}
+	if !isExist {
+		accesss = append(accesss, ref.(*OAuth2Access))
+	}
+	this.M_access = accesss
+}
+
+/** Remove reference Access **/
+func (this *OAuth2Configuration) RemoveAccess(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*OAuth2Access)
+	access_ := make([]*OAuth2Access, 0)
+	for i := 0; i < len(this.M_access); i++ {
+		if toDelete.GetUUID() != this.M_access[i].GetUUID() {
+			access_ = append(access_, this.M_access[i])
+		}
+	}
+	this.M_access = access_
+}
+
+/** Refresh **/
+func (this *OAuth2Configuration) GetRefresh() []*OAuth2Refresh{
+	return this.M_refresh
+}
+
+/** Init reference Refresh **/
+func (this *OAuth2Configuration) SetRefresh(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var refreshs []*OAuth2Refresh
+	for i:=0; i<len(this.M_refresh); i++ {
+		if this.M_refresh[i].GetUUID() != ref.(*OAuth2Refresh).GetUUID() {
+			refreshs = append(refreshs, this.M_refresh[i])
+		} else {
+			isExist = true
+			refreshs = append(refreshs, ref.(*OAuth2Refresh))
+		}
+	}
+	if !isExist {
+		refreshs = append(refreshs, ref.(*OAuth2Refresh))
+	}
+	this.M_refresh = refreshs
+}
+
+/** Remove reference Refresh **/
+func (this *OAuth2Configuration) RemoveRefresh(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*OAuth2Refresh)
+	refresh_ := make([]*OAuth2Refresh, 0)
+	for i := 0; i < len(this.M_refresh); i++ {
+		if toDelete.GetUUID() != this.M_refresh[i].GetUUID() {
+			refresh_ = append(refresh_, this.M_refresh[i])
+		}
+	}
+	this.M_refresh = refresh_
+}
+
+/** Expire **/
+func (this *OAuth2Configuration) GetExpire() []*OAuth2Expires{
+	return this.M_expire
+}
+
+/** Init reference Expire **/
+func (this *OAuth2Configuration) SetExpire(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var expires []*OAuth2Expires
+	for i:=0; i<len(this.M_expire); i++ {
+		if this.M_expire[i].GetUUID() != ref.(*OAuth2Expires).GetUUID() {
+			expires = append(expires, this.M_expire[i])
+		} else {
+			isExist = true
+			expires = append(expires, ref.(*OAuth2Expires))
+		}
+	}
+	if !isExist {
+		expires = append(expires, ref.(*OAuth2Expires))
+	}
+	this.M_expire = expires
+}
+
+/** Remove reference Expire **/
+func (this *OAuth2Configuration) RemoveExpire(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*OAuth2Expires)
+	expire_ := make([]*OAuth2Expires, 0)
+	for i := 0; i < len(this.M_expire); i++ {
+		if toDelete.GetUUID() != this.M_expire[i].GetUUID() {
+			expire_ = append(expire_, this.M_expire[i])
+		}
+	}
+	this.M_expire = expire_
 }
 
 /** Parent **/

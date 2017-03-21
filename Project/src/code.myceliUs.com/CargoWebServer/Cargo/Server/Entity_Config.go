@@ -17,13 +17,13 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "uuid")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "uuid")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -2527,7 +2527,7 @@ func (this *EntityManager) create_Config_OAuth2ClientEntityPrototype() {
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
 	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 5)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
-	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_userData")
+	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_extra")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.[]uint8")
 
 	/** associations of OAuth2Client **/
@@ -2571,7 +2571,7 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_secret")
 	query.Fields = append(query.Fields, "M_redirectUri")
-	query.Fields = append(query.Fields, "M_userData")
+	query.Fields = append(query.Fields, "M_extra")
 
 	/** associations of OAuth2Client **/
 	query.Fields = append(query.Fields, "M_parentPtr")
@@ -2591,7 +2591,7 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_id)
 	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_secret)
 	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_redirectUri)
-	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_userData)
+	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_extra)
 
 	/** associations of OAuth2Client **/
 
@@ -2651,7 +2651,7 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
 	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_secret")
 	query.Fields = append(query.Fields, "M_redirectUri")
-	query.Fields = append(query.Fields, "M_userData")
+	query.Fields = append(query.Fields, "M_extra")
 
 	/** associations of OAuth2Client **/
 	query.Fields = append(query.Fields, "M_parentPtr")
@@ -2697,9 +2697,9 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
 			this.object.M_redirectUri = results[0][4].(string)
 		}
 
-		/** userData **/
+		/** extra **/
 		if results[0][5] != nil {
-			this.object.M_userData = results[0][5].([]uint8)
+			this.object.M_extra = results[0][5].([]uint8)
 		}
 
 		/** associations of OAuth2Client **/
@@ -2797,6 +2797,2433 @@ func (this *Config_OAuth2ClientEntity) AppendChild(attributeName string, child E
 
 /** Append reference entity into parent entity. **/
 func (this *Config_OAuth2ClientEntity) AppendReference(reference Entity) {
+
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//              			OAuth2Authorize
+////////////////////////////////////////////////////////////////////////////////
+/** local type **/
+type Config_OAuth2AuthorizeEntity struct {
+	/** not the object id, except for the definition **/
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	referenced     []EntityRef
+	object         *Config.OAuth2Authorize
+}
+
+/** Constructor function **/
+func (this *EntityManager) NewConfigOAuth2AuthorizeEntity(parentUuid string, objectId string, object interface{}) *Config_OAuth2AuthorizeEntity {
+	var uuidStr string
+	if len(objectId) > 0 {
+		if Utility.IsValidEntityReferenceName(objectId) {
+			uuidStr = objectId
+		} else {
+			uuidStr = ConfigOAuth2AuthorizeExists(objectId)
+		}
+	}
+	if object != nil {
+		object.(*Config.OAuth2Authorize).TYPENAME = "Config.OAuth2Authorize"
+	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.OAuth2Authorize", "Config")
+	if len(uuidStr) > 0 {
+		if object != nil {
+			object.(*Config.OAuth2Authorize).UUID = uuidStr
+		}
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
+				this.setObjectValues(val, object)
+
+				uuidStr = object.(*Config.OAuth2Authorize).UUID
+			}
+			return val.(*Config_OAuth2AuthorizeEntity)
+		}
+	} else {
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
+	}
+	entity := new(Config_OAuth2AuthorizeEntity)
+	if object == nil {
+		entity.object = new(Config.OAuth2Authorize)
+		entity.SetNeedSave(true)
+	} else {
+		entity.object = object.(*Config.OAuth2Authorize)
+		entity.SetNeedSave(true)
+	}
+	entity.object.TYPENAME = "Config.OAuth2Authorize"
+
+	entity.object.UUID = uuidStr
+	entity.SetInit(false)
+	entity.uuid = uuidStr
+	this.insert(entity)
+	entity.prototype = prototype
+	return entity
+}
+
+/** Entity functions **/
+func (this *Config_OAuth2AuthorizeEntity) GetTypeName() string {
+	return "Config.OAuth2Authorize"
+}
+func (this *Config_OAuth2AuthorizeEntity) GetUuid() string {
+	return this.uuid
+}
+func (this *Config_OAuth2AuthorizeEntity) GetParentPtr() Entity {
+	return this.parentPtr
+}
+
+func (this *Config_OAuth2AuthorizeEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
+}
+
+func (this *Config_OAuth2AuthorizeEntity) AppendReferenced(name string, owner Entity) {
+	if owner.GetUuid() == this.GetUuid() {
+		return
+	}
+	var ref EntityRef
+	ref.Name = name
+	ref.OwnerUuid = owner.GetUuid()
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
+		}
+	}
+	this.referenced = append(this.referenced, ref)
+}
+
+func (this *Config_OAuth2AuthorizeEntity) GetReferenced() []EntityRef {
+	return this.referenced
+}
+
+func (this *Config_OAuth2AuthorizeEntity) RemoveReferenced(name string, owner Entity) {
+	var referenced []EntityRef
+	referenced = make([]EntityRef, 0)
+	for i := 0; i < len(this.referenced); i++ {
+		ref := this.referenced[i]
+		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
+			referenced = append(referenced, ref)
+		}
+	}
+	// Set the reference.
+	this.referenced = referenced
+}
+
+func (this *Config_OAuth2AuthorizeEntity) RemoveReference(name string, reference Entity) {
+	refsUuid := make([]string, 0)
+	refsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid != reference.GetUuid() {
+			refsPtr = append(refsPtr, reference)
+			refsUuid = append(refsUuid, reference.GetUuid())
+		}
+	}
+	// Set the new array...
+	this.SetReferencesUuid(refsUuid)
+	this.SetReferencesPtr(refsPtr)
+
+	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
+	params := make([]interface{}, 1)
+	params[0] = reference.GetObject()
+	Utility.CallMethod(this.GetObject(), removeMethode, params)
+}
+
+func (this *Config_OAuth2AuthorizeEntity) GetChildsPtr() []Entity {
+	return this.childsPtr
+}
+
+func (this *Config_OAuth2AuthorizeEntity) SetChildsPtr(childsPtr []Entity) {
+	this.childsPtr = childsPtr
+}
+
+func (this *Config_OAuth2AuthorizeEntity) GetChildsUuid() []string {
+	return this.childsUuid
+}
+
+func (this *Config_OAuth2AuthorizeEntity) SetChildsUuid(childsUuid []string) {
+	this.childsUuid = childsUuid
+}
+
+/**
+ * Remove a chidl uuid form the list of child in an entity.
+ */
+func (this *Config_OAuth2AuthorizeEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
+	params := make([]interface{}, 1)
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
+			params[0] = this.GetChildsPtr()[i].GetObject()
+		}
+	}
+	this.childsPtr = childsPtr
+
+	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
+	Utility.CallMethod(this.GetObject(), removeMethode, params)
+}
+
+func (this *Config_OAuth2AuthorizeEntity) GetReferencesUuid() []string {
+	return this.referencesUuid
+}
+
+func (this *Config_OAuth2AuthorizeEntity) SetReferencesUuid(refsUuid []string) {
+	this.referencesUuid = refsUuid
+}
+
+func (this *Config_OAuth2AuthorizeEntity) GetReferencesPtr() []Entity {
+	return this.referencesPtr
+}
+
+func (this *Config_OAuth2AuthorizeEntity) SetReferencesPtr(refsPtr []Entity) {
+	this.referencesPtr = refsPtr
+}
+
+func (this *Config_OAuth2AuthorizeEntity) GetObject() interface{} {
+	return this.object
+}
+
+func (this *Config_OAuth2AuthorizeEntity) NeedSave() bool {
+	return this.object.NeedSave
+}
+
+func (this *Config_OAuth2AuthorizeEntity) SetNeedSave(needSave bool) {
+	this.object.NeedSave = needSave
+}
+
+func (this *Config_OAuth2AuthorizeEntity) IsInit() bool {
+	return this.object.IsInit
+}
+
+func (this *Config_OAuth2AuthorizeEntity) SetInit(isInit bool) {
+	this.object.IsInit = isInit
+}
+
+func (this *Config_OAuth2AuthorizeEntity) GetChecksum() string {
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
+}
+
+func (this *Config_OAuth2AuthorizeEntity) Exist() bool {
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Authorize"
+	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Fields = append(query.Fields, "uuid")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return false
+	}
+	return len(results[0][0].(string)) > 0
+
+}
+
+/**
+* Return the entity prototype.
+ */
+func (this *Config_OAuth2AuthorizeEntity) GetPrototype() *EntityPrototype {
+	return this.prototype
+}
+
+/** Entity Prototype creation **/
+func (this *EntityManager) create_Config_OAuth2AuthorizeEntityPrototype() {
+
+	var oAuth2AuthorizeEntityProto EntityPrototype
+	oAuth2AuthorizeEntityProto.TypeName = "Config.OAuth2Authorize"
+	oAuth2AuthorizeEntityProto.Ids = append(oAuth2AuthorizeEntityProto.Ids, "uuid")
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "uuid")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 0)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, false)
+	oAuth2AuthorizeEntityProto.Indexs = append(oAuth2AuthorizeEntityProto.Indexs, "parentUuid")
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "parentUuid")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 1)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, false)
+
+	/** members of OAuth2Authorize **/
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 2)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_client")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "Config.OAuth2Client:Ref")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 3)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_code")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 4)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_expiresIn")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.long")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 5)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_scope")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 6)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_redirectUri")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 7)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_state")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 8)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_extra")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.[]uint8")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 9)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_createdAt")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.long")
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "childsUuid")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "[]xs.string")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 10)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, false)
+
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "referenced")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "[]EntityRef")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 11)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, false)
+
+	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
+	store.SetEntityPrototype(&oAuth2AuthorizeEntityProto)
+
+}
+
+/** Create **/
+func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
+	if this.object.NeedSave == false {
+		return
+	}
+
+	this.SetNeedSave(false)
+	this.SetInit(true)
+	this.object.UUID = this.uuid
+	this.object.TYPENAME = "Config.OAuth2Authorize"
+
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Authorize"
+
+	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "parentUuid")
+
+	/** members of OAuth2Authorize **/
+	query.Fields = append(query.Fields, "M_client")
+	query.Fields = append(query.Fields, "M_code")
+	query.Fields = append(query.Fields, "M_expiresIn")
+	query.Fields = append(query.Fields, "M_scope")
+	query.Fields = append(query.Fields, "M_redirectUri")
+	query.Fields = append(query.Fields, "M_state")
+	query.Fields = append(query.Fields, "M_extra")
+	query.Fields = append(query.Fields, "M_createdAt")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	var OAuth2AuthorizeInfo []interface{}
+
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.GetUuid())
+	if this.parentPtr != nil {
+		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.parentPtr.GetUuid())
+	} else {
+		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, "")
+	}
+
+	/** members of OAuth2Authorize **/
+
+	/** Save client type OAuth2Client **/
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_client)
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_code)
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_expiresIn)
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_scope)
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_redirectUri)
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_state)
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_extra)
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_createdAt)
+	childsUuidStr, _ := json.Marshal(this.childsUuid)
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, string(childsUuidStr))
+	referencedStr, _ := json.Marshal(this.referenced)
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, string(referencedStr))
+	eventData := make([]*MessageData, 1)
+	msgData := new(MessageData)
+	msgData.Name = "entity"
+	msgData.Value = this.GetObject()
+	eventData[0] = msgData
+	var err error
+	var evt *Event
+	if this.Exist() == true {
+		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
+		var params []interface{}
+		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		queryStr, _ := json.Marshal(query)
+		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2AuthorizeInfo, params)
+	} else {
+		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
+		queryStr, _ := json.Marshal(query)
+		_, err = GetServer().GetDataManager().createData(ConfigDB, string(queryStr), OAuth2AuthorizeInfo)
+	}
+	if err == nil {
+		GetServer().GetEntityManager().insert(this)
+		GetServer().GetEntityManager().setReferences(this)
+		GetServer().GetEventManager().BroadcastEvent(evt)
+	}
+}
+
+/** Read **/
+func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string) error {
+	if this.object.IsInit == true {
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		if err == nil {
+			// Return the already initialyse entity.
+			this = entity.(*Config_OAuth2AuthorizeEntity)
+			return nil
+		}
+		// I must reinit the entity if the entity manager dosent have it.
+		this.object.IsInit = false
+	}
+	this.uuid = id
+
+	// Set the reference on the map
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Authorize"
+
+	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "parentUuid")
+
+	/** members of OAuth2Authorize **/
+	query.Fields = append(query.Fields, "M_client")
+	query.Fields = append(query.Fields, "M_code")
+	query.Fields = append(query.Fields, "M_expiresIn")
+	query.Fields = append(query.Fields, "M_scope")
+	query.Fields = append(query.Fields, "M_redirectUri")
+	query.Fields = append(query.Fields, "M_state")
+	query.Fields = append(query.Fields, "M_extra")
+	query.Fields = append(query.Fields, "M_createdAt")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	var results [][]interface{}
+	var err error
+	queryStr, _ := json.Marshal(query)
+
+	results, err = GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil {
+		return err
+	}
+	// Initialisation of information of OAuth2Authorize...
+	if len(results) > 0 {
+
+		/** initialyzation of the entity object **/
+		this.object = new(Config.OAuth2Authorize)
+		this.object.UUID = this.uuid
+		this.object.TYPENAME = "Config.OAuth2Authorize"
+
+		this.parentUuid = results[0][1].(string)
+
+		/** members of OAuth2Authorize **/
+
+		/** client **/
+		if results[0][2] != nil {
+			id := results[0][2].(string)
+			if len(id) > 0 {
+				refTypeName := "Config.OAuth2Client"
+				id_ := refTypeName + "$$" + id
+				this.object.M_client = id
+				GetServer().GetEntityManager().appendReference("client", this.object.UUID, id_)
+			}
+		}
+
+		/** code **/
+		if results[0][3] != nil {
+			this.object.M_code = results[0][3].(string)
+		}
+
+		/** expiresIn **/
+		if results[0][4] != nil {
+			this.object.M_expiresIn = results[0][4].(int64)
+		}
+
+		/** scope **/
+		if results[0][5] != nil {
+			this.object.M_scope = results[0][5].(string)
+		}
+
+		/** redirectUri **/
+		if results[0][6] != nil {
+			this.object.M_redirectUri = results[0][6].(string)
+		}
+
+		/** state **/
+		if results[0][7] != nil {
+			this.object.M_state = results[0][7].(string)
+		}
+
+		/** extra **/
+		if results[0][8] != nil {
+			this.object.M_extra = results[0][8].([]uint8)
+		}
+
+		/** createdAt **/
+		if results[0][9] != nil {
+			this.object.M_createdAt = results[0][9].(int64)
+		}
+		childsUuidStr := results[0][10].(string)
+		this.childsUuid = make([]string, 0)
+		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+		if err != nil {
+			return err
+		}
+
+		referencedStr := results[0][11].(string)
+		this.referenced = make([]EntityRef, 0)
+		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+		if err != nil {
+			return err
+		}
+	}
+
+	// set need save to false.
+	this.SetNeedSave(false)
+	// set init done.
+	this.SetInit(true)
+	// Init the references...
+	GetServer().GetEntityManager().InitEntity(this)
+	return nil
+}
+
+/** instantiate a new entity from an existing object. **/
+func (this *EntityManager) NewConfigOAuth2AuthorizeEntityFromObject(object *Config.OAuth2Authorize) *Config_OAuth2AuthorizeEntity {
+	return this.NewConfigOAuth2AuthorizeEntity("", object.UUID, object)
+}
+
+/** Delete **/
+func (this *Config_OAuth2AuthorizeEntity) DeleteEntity() {
+	GetServer().GetEntityManager().deleteEntity(this)
+}
+
+/** Exists **/
+func ConfigOAuth2AuthorizeExists(val string) string {
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Authorize"
+	query.Fields = append(query.Fields, "uuid")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return ""
+	}
+	return results[0][0].(string)
+}
+
+/** Append child entity into parent entity. **/
+func (this *Config_OAuth2AuthorizeEntity) AppendChild(attributeName string, child Entity) error {
+
+	// Append child if is not there...
+	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
+		this.childsUuid = append(this.childsUuid, child.GetUuid())
+		this.childsPtr = append(this.childsPtr, child)
+	} else {
+		childsPtr := make([]Entity, 0)
+		for i := 0; i < len(this.childsPtr); i++ {
+			if this.childsPtr[i].GetUuid() != child.GetUuid() {
+				childsPtr = append(childsPtr, this.childsPtr[i])
+			}
+		}
+		childsPtr = append(childsPtr, child)
+		this.SetChildsPtr(childsPtr)
+	}
+	// Set this as parent in the child
+	child.SetParentPtr(this)
+
+	params := make([]interface{}, 1)
+	params[0] = child.GetObject()
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
+	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
+	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
+	if invalidMethod != nil {
+		return invalidMethod.(error)
+	}
+	return nil
+}
+
+/** Append reference entity into parent entity. **/
+func (this *Config_OAuth2AuthorizeEntity) AppendReference(reference Entity) {
+
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//              			OAuth2Access
+////////////////////////////////////////////////////////////////////////////////
+/** local type **/
+type Config_OAuth2AccessEntity struct {
+	/** not the object id, except for the definition **/
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	referenced     []EntityRef
+	object         *Config.OAuth2Access
+}
+
+/** Constructor function **/
+func (this *EntityManager) NewConfigOAuth2AccessEntity(parentUuid string, objectId string, object interface{}) *Config_OAuth2AccessEntity {
+	var uuidStr string
+	if len(objectId) > 0 {
+		if Utility.IsValidEntityReferenceName(objectId) {
+			uuidStr = objectId
+		} else {
+			uuidStr = ConfigOAuth2AccessExists(objectId)
+		}
+	}
+	if object != nil {
+		object.(*Config.OAuth2Access).TYPENAME = "Config.OAuth2Access"
+	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.OAuth2Access", "Config")
+	if len(uuidStr) > 0 {
+		if object != nil {
+			object.(*Config.OAuth2Access).UUID = uuidStr
+		}
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
+				this.setObjectValues(val, object)
+
+				uuidStr = object.(*Config.OAuth2Access).UUID
+			}
+			return val.(*Config_OAuth2AccessEntity)
+		}
+	} else {
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
+	}
+	entity := new(Config_OAuth2AccessEntity)
+	if object == nil {
+		entity.object = new(Config.OAuth2Access)
+		entity.SetNeedSave(true)
+	} else {
+		entity.object = object.(*Config.OAuth2Access)
+		entity.SetNeedSave(true)
+	}
+	entity.object.TYPENAME = "Config.OAuth2Access"
+
+	entity.object.UUID = uuidStr
+	entity.SetInit(false)
+	entity.uuid = uuidStr
+	this.insert(entity)
+	entity.prototype = prototype
+	return entity
+}
+
+/** Entity functions **/
+func (this *Config_OAuth2AccessEntity) GetTypeName() string {
+	return "Config.OAuth2Access"
+}
+func (this *Config_OAuth2AccessEntity) GetUuid() string {
+	return this.uuid
+}
+func (this *Config_OAuth2AccessEntity) GetParentPtr() Entity {
+	return this.parentPtr
+}
+
+func (this *Config_OAuth2AccessEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
+}
+
+func (this *Config_OAuth2AccessEntity) AppendReferenced(name string, owner Entity) {
+	if owner.GetUuid() == this.GetUuid() {
+		return
+	}
+	var ref EntityRef
+	ref.Name = name
+	ref.OwnerUuid = owner.GetUuid()
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
+		}
+	}
+	this.referenced = append(this.referenced, ref)
+}
+
+func (this *Config_OAuth2AccessEntity) GetReferenced() []EntityRef {
+	return this.referenced
+}
+
+func (this *Config_OAuth2AccessEntity) RemoveReferenced(name string, owner Entity) {
+	var referenced []EntityRef
+	referenced = make([]EntityRef, 0)
+	for i := 0; i < len(this.referenced); i++ {
+		ref := this.referenced[i]
+		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
+			referenced = append(referenced, ref)
+		}
+	}
+	// Set the reference.
+	this.referenced = referenced
+}
+
+func (this *Config_OAuth2AccessEntity) RemoveReference(name string, reference Entity) {
+	refsUuid := make([]string, 0)
+	refsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid != reference.GetUuid() {
+			refsPtr = append(refsPtr, reference)
+			refsUuid = append(refsUuid, reference.GetUuid())
+		}
+	}
+	// Set the new array...
+	this.SetReferencesUuid(refsUuid)
+	this.SetReferencesPtr(refsPtr)
+
+	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
+	params := make([]interface{}, 1)
+	params[0] = reference.GetObject()
+	Utility.CallMethod(this.GetObject(), removeMethode, params)
+}
+
+func (this *Config_OAuth2AccessEntity) GetChildsPtr() []Entity {
+	return this.childsPtr
+}
+
+func (this *Config_OAuth2AccessEntity) SetChildsPtr(childsPtr []Entity) {
+	this.childsPtr = childsPtr
+}
+
+func (this *Config_OAuth2AccessEntity) GetChildsUuid() []string {
+	return this.childsUuid
+}
+
+func (this *Config_OAuth2AccessEntity) SetChildsUuid(childsUuid []string) {
+	this.childsUuid = childsUuid
+}
+
+/**
+ * Remove a chidl uuid form the list of child in an entity.
+ */
+func (this *Config_OAuth2AccessEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
+	params := make([]interface{}, 1)
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
+			params[0] = this.GetChildsPtr()[i].GetObject()
+		}
+	}
+	this.childsPtr = childsPtr
+
+	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
+	Utility.CallMethod(this.GetObject(), removeMethode, params)
+}
+
+func (this *Config_OAuth2AccessEntity) GetReferencesUuid() []string {
+	return this.referencesUuid
+}
+
+func (this *Config_OAuth2AccessEntity) SetReferencesUuid(refsUuid []string) {
+	this.referencesUuid = refsUuid
+}
+
+func (this *Config_OAuth2AccessEntity) GetReferencesPtr() []Entity {
+	return this.referencesPtr
+}
+
+func (this *Config_OAuth2AccessEntity) SetReferencesPtr(refsPtr []Entity) {
+	this.referencesPtr = refsPtr
+}
+
+func (this *Config_OAuth2AccessEntity) GetObject() interface{} {
+	return this.object
+}
+
+func (this *Config_OAuth2AccessEntity) NeedSave() bool {
+	return this.object.NeedSave
+}
+
+func (this *Config_OAuth2AccessEntity) SetNeedSave(needSave bool) {
+	this.object.NeedSave = needSave
+}
+
+func (this *Config_OAuth2AccessEntity) IsInit() bool {
+	return this.object.IsInit
+}
+
+func (this *Config_OAuth2AccessEntity) SetInit(isInit bool) {
+	this.object.IsInit = isInit
+}
+
+func (this *Config_OAuth2AccessEntity) GetChecksum() string {
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
+}
+
+func (this *Config_OAuth2AccessEntity) Exist() bool {
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Access"
+	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Fields = append(query.Fields, "uuid")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return false
+	}
+	return len(results[0][0].(string)) > 0
+
+}
+
+/**
+* Return the entity prototype.
+ */
+func (this *Config_OAuth2AccessEntity) GetPrototype() *EntityPrototype {
+	return this.prototype
+}
+
+/** Entity Prototype creation **/
+func (this *EntityManager) create_Config_OAuth2AccessEntityPrototype() {
+
+	var oAuth2AccessEntityProto EntityPrototype
+	oAuth2AccessEntityProto.TypeName = "Config.OAuth2Access"
+	oAuth2AccessEntityProto.Ids = append(oAuth2AccessEntityProto.Ids, "uuid")
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "uuid")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 0)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
+	oAuth2AccessEntityProto.Indexs = append(oAuth2AccessEntityProto.Indexs, "parentUuid")
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "parentUuid")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 1)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
+
+	/** members of OAuth2Access **/
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 2)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_client")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "Config.OAuth2Client:Ref")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 3)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_authorize")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "Config.OAuth2Authorize:Ref")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 4)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_previous")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 5)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_accessToken")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 6)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_refreshToken")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "Config.OAuth2Refresh:Ref")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 7)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_expiresIn")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.long")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 8)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_scope")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 9)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_redirectUri")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 10)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_extra")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.[]uint8")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 11)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_createdAt")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.long")
+
+	/** associations of OAuth2Access **/
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 12)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_parentPtr")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "Config.OAuth2Configuration:Ref")
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "childsUuid")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "[]xs.string")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 13)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
+
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "referenced")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "[]EntityRef")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 14)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
+
+	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
+	store.SetEntityPrototype(&oAuth2AccessEntityProto)
+
+}
+
+/** Create **/
+func (this *Config_OAuth2AccessEntity) SaveEntity() {
+	if this.object.NeedSave == false {
+		return
+	}
+
+	this.SetNeedSave(false)
+	this.SetInit(true)
+	this.object.UUID = this.uuid
+	this.object.TYPENAME = "Config.OAuth2Access"
+
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Access"
+
+	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "parentUuid")
+
+	/** members of OAuth2Access **/
+	query.Fields = append(query.Fields, "M_client")
+	query.Fields = append(query.Fields, "M_authorize")
+	query.Fields = append(query.Fields, "M_previous")
+	query.Fields = append(query.Fields, "M_accessToken")
+	query.Fields = append(query.Fields, "M_refreshToken")
+	query.Fields = append(query.Fields, "M_expiresIn")
+	query.Fields = append(query.Fields, "M_scope")
+	query.Fields = append(query.Fields, "M_redirectUri")
+	query.Fields = append(query.Fields, "M_extra")
+	query.Fields = append(query.Fields, "M_createdAt")
+
+	/** associations of OAuth2Access **/
+	query.Fields = append(query.Fields, "M_parentPtr")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	var OAuth2AccessInfo []interface{}
+
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.GetUuid())
+	if this.parentPtr != nil {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, this.parentPtr.GetUuid())
+	} else {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
+	}
+
+	/** members of OAuth2Access **/
+
+	/** Save client type OAuth2Client **/
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_client)
+
+	/** Save authorize type OAuth2Authorize **/
+	/** attribute OAuth2Authorize has no method GetId, must be an error here...*/
+	OAuth2AccessInfo = append(OAuth2AccessInfo, "")
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_previous)
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_accessToken)
+
+	/** Save refreshToken type OAuth2Refresh **/
+	/** attribute OAuth2Refresh has no method GetId, must be an error here...*/
+	OAuth2AccessInfo = append(OAuth2AccessInfo, "")
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_expiresIn)
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_scope)
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_redirectUri)
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_extra)
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_createdAt)
+
+	/** associations of OAuth2Access **/
+
+	/** Save parent type OAuth2Configuration **/
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_parentPtr)
+	childsUuidStr, _ := json.Marshal(this.childsUuid)
+	OAuth2AccessInfo = append(OAuth2AccessInfo, string(childsUuidStr))
+	referencedStr, _ := json.Marshal(this.referenced)
+	OAuth2AccessInfo = append(OAuth2AccessInfo, string(referencedStr))
+	eventData := make([]*MessageData, 1)
+	msgData := new(MessageData)
+	msgData.Name = "entity"
+	msgData.Value = this.GetObject()
+	eventData[0] = msgData
+	var err error
+	var evt *Event
+	if this.Exist() == true {
+		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
+		var params []interface{}
+		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		queryStr, _ := json.Marshal(query)
+		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2AccessInfo, params)
+	} else {
+		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
+		queryStr, _ := json.Marshal(query)
+		_, err = GetServer().GetDataManager().createData(ConfigDB, string(queryStr), OAuth2AccessInfo)
+	}
+	if err == nil {
+		GetServer().GetEntityManager().insert(this)
+		GetServer().GetEntityManager().setReferences(this)
+		GetServer().GetEventManager().BroadcastEvent(evt)
+	}
+}
+
+/** Read **/
+func (this *Config_OAuth2AccessEntity) InitEntity(id string) error {
+	if this.object.IsInit == true {
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		if err == nil {
+			// Return the already initialyse entity.
+			this = entity.(*Config_OAuth2AccessEntity)
+			return nil
+		}
+		// I must reinit the entity if the entity manager dosent have it.
+		this.object.IsInit = false
+	}
+	this.uuid = id
+
+	// Set the reference on the map
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Access"
+
+	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "parentUuid")
+
+	/** members of OAuth2Access **/
+	query.Fields = append(query.Fields, "M_client")
+	query.Fields = append(query.Fields, "M_authorize")
+	query.Fields = append(query.Fields, "M_previous")
+	query.Fields = append(query.Fields, "M_accessToken")
+	query.Fields = append(query.Fields, "M_refreshToken")
+	query.Fields = append(query.Fields, "M_expiresIn")
+	query.Fields = append(query.Fields, "M_scope")
+	query.Fields = append(query.Fields, "M_redirectUri")
+	query.Fields = append(query.Fields, "M_extra")
+	query.Fields = append(query.Fields, "M_createdAt")
+
+	/** associations of OAuth2Access **/
+	query.Fields = append(query.Fields, "M_parentPtr")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	var results [][]interface{}
+	var err error
+	queryStr, _ := json.Marshal(query)
+
+	results, err = GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil {
+		return err
+	}
+	// Initialisation of information of OAuth2Access...
+	if len(results) > 0 {
+
+		/** initialyzation of the entity object **/
+		this.object = new(Config.OAuth2Access)
+		this.object.UUID = this.uuid
+		this.object.TYPENAME = "Config.OAuth2Access"
+
+		this.parentUuid = results[0][1].(string)
+
+		/** members of OAuth2Access **/
+
+		/** client **/
+		if results[0][2] != nil {
+			id := results[0][2].(string)
+			if len(id) > 0 {
+				refTypeName := "Config.OAuth2Client"
+				id_ := refTypeName + "$$" + id
+				this.object.M_client = id
+				GetServer().GetEntityManager().appendReference("client", this.object.UUID, id_)
+			}
+		}
+
+		/** authorize **/
+		if results[0][3] != nil {
+			id := results[0][3].(string)
+			if len(id) > 0 {
+				refTypeName := "Config.OAuth2Authorize"
+				id_ := refTypeName + "$$" + id
+				this.object.M_authorize = id
+				GetServer().GetEntityManager().appendReference("authorize", this.object.UUID, id_)
+			}
+		}
+
+		/** previous **/
+		if results[0][4] != nil {
+			this.object.M_previous = results[0][4].(string)
+		}
+
+		/** accessToken **/
+		if results[0][5] != nil {
+			this.object.M_accessToken = results[0][5].(string)
+		}
+
+		/** refreshToken **/
+		if results[0][6] != nil {
+			id := results[0][6].(string)
+			if len(id) > 0 {
+				refTypeName := "Config.OAuth2Refresh"
+				id_ := refTypeName + "$$" + id
+				this.object.M_refreshToken = id
+				GetServer().GetEntityManager().appendReference("refreshToken", this.object.UUID, id_)
+			}
+		}
+
+		/** expiresIn **/
+		if results[0][7] != nil {
+			this.object.M_expiresIn = results[0][7].(int64)
+		}
+
+		/** scope **/
+		if results[0][8] != nil {
+			this.object.M_scope = results[0][8].(string)
+		}
+
+		/** redirectUri **/
+		if results[0][9] != nil {
+			this.object.M_redirectUri = results[0][9].(string)
+		}
+
+		/** extra **/
+		if results[0][10] != nil {
+			this.object.M_extra = results[0][10].([]uint8)
+		}
+
+		/** createdAt **/
+		if results[0][11] != nil {
+			this.object.M_createdAt = results[0][11].(int64)
+		}
+
+		/** associations of OAuth2Access **/
+
+		/** parentPtr **/
+		if results[0][12] != nil {
+			id := results[0][12].(string)
+			if len(id) > 0 {
+				refTypeName := "Config.OAuth2Configuration"
+				id_ := refTypeName + "$$" + id
+				this.object.M_parentPtr = id
+				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
+			}
+		}
+		childsUuidStr := results[0][13].(string)
+		this.childsUuid = make([]string, 0)
+		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+		if err != nil {
+			return err
+		}
+
+		referencedStr := results[0][14].(string)
+		this.referenced = make([]EntityRef, 0)
+		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+		if err != nil {
+			return err
+		}
+	}
+
+	// set need save to false.
+	this.SetNeedSave(false)
+	// set init done.
+	this.SetInit(true)
+	// Init the references...
+	GetServer().GetEntityManager().InitEntity(this)
+	return nil
+}
+
+/** instantiate a new entity from an existing object. **/
+func (this *EntityManager) NewConfigOAuth2AccessEntityFromObject(object *Config.OAuth2Access) *Config_OAuth2AccessEntity {
+	return this.NewConfigOAuth2AccessEntity("", object.UUID, object)
+}
+
+/** Delete **/
+func (this *Config_OAuth2AccessEntity) DeleteEntity() {
+	GetServer().GetEntityManager().deleteEntity(this)
+}
+
+/** Exists **/
+func ConfigOAuth2AccessExists(val string) string {
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Access"
+	query.Fields = append(query.Fields, "uuid")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return ""
+	}
+	return results[0][0].(string)
+}
+
+/** Append child entity into parent entity. **/
+func (this *Config_OAuth2AccessEntity) AppendChild(attributeName string, child Entity) error {
+
+	// Append child if is not there...
+	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
+		this.childsUuid = append(this.childsUuid, child.GetUuid())
+		this.childsPtr = append(this.childsPtr, child)
+	} else {
+		childsPtr := make([]Entity, 0)
+		for i := 0; i < len(this.childsPtr); i++ {
+			if this.childsPtr[i].GetUuid() != child.GetUuid() {
+				childsPtr = append(childsPtr, this.childsPtr[i])
+			}
+		}
+		childsPtr = append(childsPtr, child)
+		this.SetChildsPtr(childsPtr)
+	}
+	// Set this as parent in the child
+	child.SetParentPtr(this)
+
+	params := make([]interface{}, 1)
+	params[0] = child.GetObject()
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
+	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
+	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
+	if invalidMethod != nil {
+		return invalidMethod.(error)
+	}
+	return nil
+}
+
+/** Append reference entity into parent entity. **/
+func (this *Config_OAuth2AccessEntity) AppendReference(reference Entity) {
+
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//              			OAuth2Refresh
+////////////////////////////////////////////////////////////////////////////////
+/** local type **/
+type Config_OAuth2RefreshEntity struct {
+	/** not the object id, except for the definition **/
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	referenced     []EntityRef
+	object         *Config.OAuth2Refresh
+}
+
+/** Constructor function **/
+func (this *EntityManager) NewConfigOAuth2RefreshEntity(parentUuid string, objectId string, object interface{}) *Config_OAuth2RefreshEntity {
+	var uuidStr string
+	if len(objectId) > 0 {
+		if Utility.IsValidEntityReferenceName(objectId) {
+			uuidStr = objectId
+		} else {
+			uuidStr = ConfigOAuth2RefreshExists(objectId)
+		}
+	}
+	if object != nil {
+		object.(*Config.OAuth2Refresh).TYPENAME = "Config.OAuth2Refresh"
+	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.OAuth2Refresh", "Config")
+	if len(uuidStr) > 0 {
+		if object != nil {
+			object.(*Config.OAuth2Refresh).UUID = uuidStr
+		}
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
+				this.setObjectValues(val, object)
+
+				uuidStr = object.(*Config.OAuth2Refresh).UUID
+			}
+			return val.(*Config_OAuth2RefreshEntity)
+		}
+	} else {
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
+	}
+	entity := new(Config_OAuth2RefreshEntity)
+	if object == nil {
+		entity.object = new(Config.OAuth2Refresh)
+		entity.SetNeedSave(true)
+	} else {
+		entity.object = object.(*Config.OAuth2Refresh)
+		entity.SetNeedSave(true)
+	}
+	entity.object.TYPENAME = "Config.OAuth2Refresh"
+
+	entity.object.UUID = uuidStr
+	entity.SetInit(false)
+	entity.uuid = uuidStr
+	this.insert(entity)
+	entity.prototype = prototype
+	return entity
+}
+
+/** Entity functions **/
+func (this *Config_OAuth2RefreshEntity) GetTypeName() string {
+	return "Config.OAuth2Refresh"
+}
+func (this *Config_OAuth2RefreshEntity) GetUuid() string {
+	return this.uuid
+}
+func (this *Config_OAuth2RefreshEntity) GetParentPtr() Entity {
+	return this.parentPtr
+}
+
+func (this *Config_OAuth2RefreshEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
+}
+
+func (this *Config_OAuth2RefreshEntity) AppendReferenced(name string, owner Entity) {
+	if owner.GetUuid() == this.GetUuid() {
+		return
+	}
+	var ref EntityRef
+	ref.Name = name
+	ref.OwnerUuid = owner.GetUuid()
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
+		}
+	}
+	this.referenced = append(this.referenced, ref)
+}
+
+func (this *Config_OAuth2RefreshEntity) GetReferenced() []EntityRef {
+	return this.referenced
+}
+
+func (this *Config_OAuth2RefreshEntity) RemoveReferenced(name string, owner Entity) {
+	var referenced []EntityRef
+	referenced = make([]EntityRef, 0)
+	for i := 0; i < len(this.referenced); i++ {
+		ref := this.referenced[i]
+		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
+			referenced = append(referenced, ref)
+		}
+	}
+	// Set the reference.
+	this.referenced = referenced
+}
+
+func (this *Config_OAuth2RefreshEntity) RemoveReference(name string, reference Entity) {
+	refsUuid := make([]string, 0)
+	refsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid != reference.GetUuid() {
+			refsPtr = append(refsPtr, reference)
+			refsUuid = append(refsUuid, reference.GetUuid())
+		}
+	}
+	// Set the new array...
+	this.SetReferencesUuid(refsUuid)
+	this.SetReferencesPtr(refsPtr)
+
+	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
+	params := make([]interface{}, 1)
+	params[0] = reference.GetObject()
+	Utility.CallMethod(this.GetObject(), removeMethode, params)
+}
+
+func (this *Config_OAuth2RefreshEntity) GetChildsPtr() []Entity {
+	return this.childsPtr
+}
+
+func (this *Config_OAuth2RefreshEntity) SetChildsPtr(childsPtr []Entity) {
+	this.childsPtr = childsPtr
+}
+
+func (this *Config_OAuth2RefreshEntity) GetChildsUuid() []string {
+	return this.childsUuid
+}
+
+func (this *Config_OAuth2RefreshEntity) SetChildsUuid(childsUuid []string) {
+	this.childsUuid = childsUuid
+}
+
+/**
+ * Remove a chidl uuid form the list of child in an entity.
+ */
+func (this *Config_OAuth2RefreshEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
+	params := make([]interface{}, 1)
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
+			params[0] = this.GetChildsPtr()[i].GetObject()
+		}
+	}
+	this.childsPtr = childsPtr
+
+	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
+	Utility.CallMethod(this.GetObject(), removeMethode, params)
+}
+
+func (this *Config_OAuth2RefreshEntity) GetReferencesUuid() []string {
+	return this.referencesUuid
+}
+
+func (this *Config_OAuth2RefreshEntity) SetReferencesUuid(refsUuid []string) {
+	this.referencesUuid = refsUuid
+}
+
+func (this *Config_OAuth2RefreshEntity) GetReferencesPtr() []Entity {
+	return this.referencesPtr
+}
+
+func (this *Config_OAuth2RefreshEntity) SetReferencesPtr(refsPtr []Entity) {
+	this.referencesPtr = refsPtr
+}
+
+func (this *Config_OAuth2RefreshEntity) GetObject() interface{} {
+	return this.object
+}
+
+func (this *Config_OAuth2RefreshEntity) NeedSave() bool {
+	return this.object.NeedSave
+}
+
+func (this *Config_OAuth2RefreshEntity) SetNeedSave(needSave bool) {
+	this.object.NeedSave = needSave
+}
+
+func (this *Config_OAuth2RefreshEntity) IsInit() bool {
+	return this.object.IsInit
+}
+
+func (this *Config_OAuth2RefreshEntity) SetInit(isInit bool) {
+	this.object.IsInit = isInit
+}
+
+func (this *Config_OAuth2RefreshEntity) GetChecksum() string {
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
+}
+
+func (this *Config_OAuth2RefreshEntity) Exist() bool {
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Refresh"
+	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Fields = append(query.Fields, "uuid")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return false
+	}
+	return len(results[0][0].(string)) > 0
+
+}
+
+/**
+* Return the entity prototype.
+ */
+func (this *Config_OAuth2RefreshEntity) GetPrototype() *EntityPrototype {
+	return this.prototype
+}
+
+/** Entity Prototype creation **/
+func (this *EntityManager) create_Config_OAuth2RefreshEntityPrototype() {
+
+	var oAuth2RefreshEntityProto EntityPrototype
+	oAuth2RefreshEntityProto.TypeName = "Config.OAuth2Refresh"
+	oAuth2RefreshEntityProto.Ids = append(oAuth2RefreshEntityProto.Ids, "uuid")
+	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "uuid")
+	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "xs.string")
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 0)
+	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
+	oAuth2RefreshEntityProto.Indexs = append(oAuth2RefreshEntityProto.Indexs, "parentUuid")
+	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "parentUuid")
+	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "xs.string")
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 1)
+	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
+
+	/** members of OAuth2Refresh **/
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 2)
+	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, true)
+	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "M_token")
+	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "xs.string")
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 3)
+	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, true)
+	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "M_access")
+	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "Config.OAuth2Access:Ref")
+
+	/** associations of OAuth2Refresh **/
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 4)
+	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
+	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "M_parentPtr")
+	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "Config.OAuth2Configuration:Ref")
+	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "childsUuid")
+	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "[]xs.string")
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 5)
+	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
+
+	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "referenced")
+	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "[]EntityRef")
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 6)
+	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
+
+	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
+	store.SetEntityPrototype(&oAuth2RefreshEntityProto)
+
+}
+
+/** Create **/
+func (this *Config_OAuth2RefreshEntity) SaveEntity() {
+	if this.object.NeedSave == false {
+		return
+	}
+
+	this.SetNeedSave(false)
+	this.SetInit(true)
+	this.object.UUID = this.uuid
+	this.object.TYPENAME = "Config.OAuth2Refresh"
+
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Refresh"
+
+	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "parentUuid")
+
+	/** members of OAuth2Refresh **/
+	query.Fields = append(query.Fields, "M_token")
+	query.Fields = append(query.Fields, "M_access")
+
+	/** associations of OAuth2Refresh **/
+	query.Fields = append(query.Fields, "M_parentPtr")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	var OAuth2RefreshInfo []interface{}
+
+	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.GetUuid())
+	if this.parentPtr != nil {
+		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.parentPtr.GetUuid())
+	} else {
+		OAuth2RefreshInfo = append(OAuth2RefreshInfo, "")
+	}
+
+	/** members of OAuth2Refresh **/
+	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_token)
+
+	/** Save access type OAuth2Access **/
+	/** attribute OAuth2Access has no method GetId, must be an error here...*/
+	OAuth2RefreshInfo = append(OAuth2RefreshInfo, "")
+
+	/** associations of OAuth2Refresh **/
+
+	/** Save parent type OAuth2Configuration **/
+	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_parentPtr)
+	childsUuidStr, _ := json.Marshal(this.childsUuid)
+	OAuth2RefreshInfo = append(OAuth2RefreshInfo, string(childsUuidStr))
+	referencedStr, _ := json.Marshal(this.referenced)
+	OAuth2RefreshInfo = append(OAuth2RefreshInfo, string(referencedStr))
+	eventData := make([]*MessageData, 1)
+	msgData := new(MessageData)
+	msgData.Name = "entity"
+	msgData.Value = this.GetObject()
+	eventData[0] = msgData
+	var err error
+	var evt *Event
+	if this.Exist() == true {
+		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
+		var params []interface{}
+		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		queryStr, _ := json.Marshal(query)
+		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2RefreshInfo, params)
+	} else {
+		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
+		queryStr, _ := json.Marshal(query)
+		_, err = GetServer().GetDataManager().createData(ConfigDB, string(queryStr), OAuth2RefreshInfo)
+	}
+	if err == nil {
+		GetServer().GetEntityManager().insert(this)
+		GetServer().GetEntityManager().setReferences(this)
+		GetServer().GetEventManager().BroadcastEvent(evt)
+	}
+}
+
+/** Read **/
+func (this *Config_OAuth2RefreshEntity) InitEntity(id string) error {
+	if this.object.IsInit == true {
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		if err == nil {
+			// Return the already initialyse entity.
+			this = entity.(*Config_OAuth2RefreshEntity)
+			return nil
+		}
+		// I must reinit the entity if the entity manager dosent have it.
+		this.object.IsInit = false
+	}
+	this.uuid = id
+
+	// Set the reference on the map
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Refresh"
+
+	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "parentUuid")
+
+	/** members of OAuth2Refresh **/
+	query.Fields = append(query.Fields, "M_token")
+	query.Fields = append(query.Fields, "M_access")
+
+	/** associations of OAuth2Refresh **/
+	query.Fields = append(query.Fields, "M_parentPtr")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	var results [][]interface{}
+	var err error
+	queryStr, _ := json.Marshal(query)
+
+	results, err = GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil {
+		return err
+	}
+	// Initialisation of information of OAuth2Refresh...
+	if len(results) > 0 {
+
+		/** initialyzation of the entity object **/
+		this.object = new(Config.OAuth2Refresh)
+		this.object.UUID = this.uuid
+		this.object.TYPENAME = "Config.OAuth2Refresh"
+
+		this.parentUuid = results[0][1].(string)
+
+		/** members of OAuth2Refresh **/
+
+		/** token **/
+		if results[0][2] != nil {
+			this.object.M_token = results[0][2].(string)
+		}
+
+		/** access **/
+		if results[0][3] != nil {
+			id := results[0][3].(string)
+			if len(id) > 0 {
+				refTypeName := "Config.OAuth2Access"
+				id_ := refTypeName + "$$" + id
+				this.object.M_access = id
+				GetServer().GetEntityManager().appendReference("access", this.object.UUID, id_)
+			}
+		}
+
+		/** associations of OAuth2Refresh **/
+
+		/** parentPtr **/
+		if results[0][4] != nil {
+			id := results[0][4].(string)
+			if len(id) > 0 {
+				refTypeName := "Config.OAuth2Configuration"
+				id_ := refTypeName + "$$" + id
+				this.object.M_parentPtr = id
+				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
+			}
+		}
+		childsUuidStr := results[0][5].(string)
+		this.childsUuid = make([]string, 0)
+		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+		if err != nil {
+			return err
+		}
+
+		referencedStr := results[0][6].(string)
+		this.referenced = make([]EntityRef, 0)
+		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+		if err != nil {
+			return err
+		}
+	}
+
+	// set need save to false.
+	this.SetNeedSave(false)
+	// set init done.
+	this.SetInit(true)
+	// Init the references...
+	GetServer().GetEntityManager().InitEntity(this)
+	return nil
+}
+
+/** instantiate a new entity from an existing object. **/
+func (this *EntityManager) NewConfigOAuth2RefreshEntityFromObject(object *Config.OAuth2Refresh) *Config_OAuth2RefreshEntity {
+	return this.NewConfigOAuth2RefreshEntity("", object.UUID, object)
+}
+
+/** Delete **/
+func (this *Config_OAuth2RefreshEntity) DeleteEntity() {
+	GetServer().GetEntityManager().deleteEntity(this)
+}
+
+/** Exists **/
+func ConfigOAuth2RefreshExists(val string) string {
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Refresh"
+	query.Fields = append(query.Fields, "uuid")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return ""
+	}
+	return results[0][0].(string)
+}
+
+/** Append child entity into parent entity. **/
+func (this *Config_OAuth2RefreshEntity) AppendChild(attributeName string, child Entity) error {
+
+	// Append child if is not there...
+	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
+		this.childsUuid = append(this.childsUuid, child.GetUuid())
+		this.childsPtr = append(this.childsPtr, child)
+	} else {
+		childsPtr := make([]Entity, 0)
+		for i := 0; i < len(this.childsPtr); i++ {
+			if this.childsPtr[i].GetUuid() != child.GetUuid() {
+				childsPtr = append(childsPtr, this.childsPtr[i])
+			}
+		}
+		childsPtr = append(childsPtr, child)
+		this.SetChildsPtr(childsPtr)
+	}
+	// Set this as parent in the child
+	child.SetParentPtr(this)
+
+	params := make([]interface{}, 1)
+	params[0] = child.GetObject()
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
+	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
+	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
+	if invalidMethod != nil {
+		return invalidMethod.(error)
+	}
+	return nil
+}
+
+/** Append reference entity into parent entity. **/
+func (this *Config_OAuth2RefreshEntity) AppendReference(reference Entity) {
+
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//              			OAuth2Expires
+////////////////////////////////////////////////////////////////////////////////
+/** local type **/
+type Config_OAuth2ExpiresEntity struct {
+	/** not the object id, except for the definition **/
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	referenced     []EntityRef
+	object         *Config.OAuth2Expires
+}
+
+/** Constructor function **/
+func (this *EntityManager) NewConfigOAuth2ExpiresEntity(parentUuid string, objectId string, object interface{}) *Config_OAuth2ExpiresEntity {
+	var uuidStr string
+	if len(objectId) > 0 {
+		if Utility.IsValidEntityReferenceName(objectId) {
+			uuidStr = objectId
+		} else {
+			uuidStr = ConfigOAuth2ExpiresExists(objectId)
+		}
+	}
+	if object != nil {
+		object.(*Config.OAuth2Expires).TYPENAME = "Config.OAuth2Expires"
+	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.OAuth2Expires", "Config")
+	if len(uuidStr) > 0 {
+		if object != nil {
+			object.(*Config.OAuth2Expires).UUID = uuidStr
+		}
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
+				this.setObjectValues(val, object)
+
+				uuidStr = object.(*Config.OAuth2Expires).UUID
+			}
+			return val.(*Config_OAuth2ExpiresEntity)
+		}
+	} else {
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
+	}
+	entity := new(Config_OAuth2ExpiresEntity)
+	if object == nil {
+		entity.object = new(Config.OAuth2Expires)
+		entity.SetNeedSave(true)
+	} else {
+		entity.object = object.(*Config.OAuth2Expires)
+		entity.SetNeedSave(true)
+	}
+	entity.object.TYPENAME = "Config.OAuth2Expires"
+
+	entity.object.UUID = uuidStr
+	entity.SetInit(false)
+	entity.uuid = uuidStr
+	this.insert(entity)
+	entity.prototype = prototype
+	return entity
+}
+
+/** Entity functions **/
+func (this *Config_OAuth2ExpiresEntity) GetTypeName() string {
+	return "Config.OAuth2Expires"
+}
+func (this *Config_OAuth2ExpiresEntity) GetUuid() string {
+	return this.uuid
+}
+func (this *Config_OAuth2ExpiresEntity) GetParentPtr() Entity {
+	return this.parentPtr
+}
+
+func (this *Config_OAuth2ExpiresEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
+}
+
+func (this *Config_OAuth2ExpiresEntity) AppendReferenced(name string, owner Entity) {
+	if owner.GetUuid() == this.GetUuid() {
+		return
+	}
+	var ref EntityRef
+	ref.Name = name
+	ref.OwnerUuid = owner.GetUuid()
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
+		}
+	}
+	this.referenced = append(this.referenced, ref)
+}
+
+func (this *Config_OAuth2ExpiresEntity) GetReferenced() []EntityRef {
+	return this.referenced
+}
+
+func (this *Config_OAuth2ExpiresEntity) RemoveReferenced(name string, owner Entity) {
+	var referenced []EntityRef
+	referenced = make([]EntityRef, 0)
+	for i := 0; i < len(this.referenced); i++ {
+		ref := this.referenced[i]
+		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
+			referenced = append(referenced, ref)
+		}
+	}
+	// Set the reference.
+	this.referenced = referenced
+}
+
+func (this *Config_OAuth2ExpiresEntity) RemoveReference(name string, reference Entity) {
+	refsUuid := make([]string, 0)
+	refsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid != reference.GetUuid() {
+			refsPtr = append(refsPtr, reference)
+			refsUuid = append(refsUuid, reference.GetUuid())
+		}
+	}
+	// Set the new array...
+	this.SetReferencesUuid(refsUuid)
+	this.SetReferencesPtr(refsPtr)
+
+	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
+	params := make([]interface{}, 1)
+	params[0] = reference.GetObject()
+	Utility.CallMethod(this.GetObject(), removeMethode, params)
+}
+
+func (this *Config_OAuth2ExpiresEntity) GetChildsPtr() []Entity {
+	return this.childsPtr
+}
+
+func (this *Config_OAuth2ExpiresEntity) SetChildsPtr(childsPtr []Entity) {
+	this.childsPtr = childsPtr
+}
+
+func (this *Config_OAuth2ExpiresEntity) GetChildsUuid() []string {
+	return this.childsUuid
+}
+
+func (this *Config_OAuth2ExpiresEntity) SetChildsUuid(childsUuid []string) {
+	this.childsUuid = childsUuid
+}
+
+/**
+ * Remove a chidl uuid form the list of child in an entity.
+ */
+func (this *Config_OAuth2ExpiresEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
+	params := make([]interface{}, 1)
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
+			params[0] = this.GetChildsPtr()[i].GetObject()
+		}
+	}
+	this.childsPtr = childsPtr
+
+	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
+	Utility.CallMethod(this.GetObject(), removeMethode, params)
+}
+
+func (this *Config_OAuth2ExpiresEntity) GetReferencesUuid() []string {
+	return this.referencesUuid
+}
+
+func (this *Config_OAuth2ExpiresEntity) SetReferencesUuid(refsUuid []string) {
+	this.referencesUuid = refsUuid
+}
+
+func (this *Config_OAuth2ExpiresEntity) GetReferencesPtr() []Entity {
+	return this.referencesPtr
+}
+
+func (this *Config_OAuth2ExpiresEntity) SetReferencesPtr(refsPtr []Entity) {
+	this.referencesPtr = refsPtr
+}
+
+func (this *Config_OAuth2ExpiresEntity) GetObject() interface{} {
+	return this.object
+}
+
+func (this *Config_OAuth2ExpiresEntity) NeedSave() bool {
+	return this.object.NeedSave
+}
+
+func (this *Config_OAuth2ExpiresEntity) SetNeedSave(needSave bool) {
+	this.object.NeedSave = needSave
+}
+
+func (this *Config_OAuth2ExpiresEntity) IsInit() bool {
+	return this.object.IsInit
+}
+
+func (this *Config_OAuth2ExpiresEntity) SetInit(isInit bool) {
+	this.object.IsInit = isInit
+}
+
+func (this *Config_OAuth2ExpiresEntity) GetChecksum() string {
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
+}
+
+func (this *Config_OAuth2ExpiresEntity) Exist() bool {
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Expires"
+	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Fields = append(query.Fields, "uuid")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return false
+	}
+	return len(results[0][0].(string)) > 0
+
+}
+
+/**
+* Return the entity prototype.
+ */
+func (this *Config_OAuth2ExpiresEntity) GetPrototype() *EntityPrototype {
+	return this.prototype
+}
+
+/** Entity Prototype creation **/
+func (this *EntityManager) create_Config_OAuth2ExpiresEntityPrototype() {
+
+	var oAuth2ExpiresEntityProto EntityPrototype
+	oAuth2ExpiresEntityProto.TypeName = "Config.OAuth2Expires"
+	oAuth2ExpiresEntityProto.Ids = append(oAuth2ExpiresEntityProto.Ids, "uuid")
+	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "uuid")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.string")
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 0)
+	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
+	oAuth2ExpiresEntityProto.Indexs = append(oAuth2ExpiresEntityProto.Indexs, "parentUuid")
+	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "parentUuid")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.string")
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 1)
+	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
+
+	/** members of OAuth2Expires **/
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 2)
+	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, true)
+	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "M_id")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.string")
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 3)
+	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, true)
+	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "M_token")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "Config.OAuth2Refresh:Ref")
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 4)
+	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, true)
+	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "M_expiresAt")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.long")
+
+	/** associations of OAuth2Expires **/
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 5)
+	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
+	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "M_parentPtr")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "Config.OAuth2Configuration:Ref")
+	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "childsUuid")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "[]xs.string")
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 6)
+	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
+
+	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "referenced")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "[]EntityRef")
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 7)
+	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
+
+	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
+	store.SetEntityPrototype(&oAuth2ExpiresEntityProto)
+
+}
+
+/** Create **/
+func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
+	if this.object.NeedSave == false {
+		return
+	}
+
+	this.SetNeedSave(false)
+	this.SetInit(true)
+	this.object.UUID = this.uuid
+	this.object.TYPENAME = "Config.OAuth2Expires"
+
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Expires"
+
+	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "parentUuid")
+
+	/** members of OAuth2Expires **/
+	query.Fields = append(query.Fields, "M_id")
+	query.Fields = append(query.Fields, "M_token")
+	query.Fields = append(query.Fields, "M_expiresAt")
+
+	/** associations of OAuth2Expires **/
+	query.Fields = append(query.Fields, "M_parentPtr")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	var OAuth2ExpiresInfo []interface{}
+
+	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.GetUuid())
+	if this.parentPtr != nil {
+		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.parentPtr.GetUuid())
+	} else {
+		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, "")
+	}
+
+	/** members of OAuth2Expires **/
+	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.object.M_id)
+
+	/** Save token type OAuth2Refresh **/
+	/** attribute OAuth2Refresh has no method GetId, must be an error here...*/
+	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, "")
+	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.object.M_expiresAt)
+
+	/** associations of OAuth2Expires **/
+
+	/** Save parent type OAuth2Configuration **/
+	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.object.M_parentPtr)
+	childsUuidStr, _ := json.Marshal(this.childsUuid)
+	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, string(childsUuidStr))
+	referencedStr, _ := json.Marshal(this.referenced)
+	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, string(referencedStr))
+	eventData := make([]*MessageData, 1)
+	msgData := new(MessageData)
+	msgData.Name = "entity"
+	msgData.Value = this.GetObject()
+	eventData[0] = msgData
+	var err error
+	var evt *Event
+	if this.Exist() == true {
+		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
+		var params []interface{}
+		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		queryStr, _ := json.Marshal(query)
+		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2ExpiresInfo, params)
+	} else {
+		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
+		queryStr, _ := json.Marshal(query)
+		_, err = GetServer().GetDataManager().createData(ConfigDB, string(queryStr), OAuth2ExpiresInfo)
+	}
+	if err == nil {
+		GetServer().GetEntityManager().insert(this)
+		GetServer().GetEntityManager().setReferences(this)
+		GetServer().GetEventManager().BroadcastEvent(evt)
+	}
+}
+
+/** Read **/
+func (this *Config_OAuth2ExpiresEntity) InitEntity(id string) error {
+	if this.object.IsInit == true {
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		if err == nil {
+			// Return the already initialyse entity.
+			this = entity.(*Config_OAuth2ExpiresEntity)
+			return nil
+		}
+		// I must reinit the entity if the entity manager dosent have it.
+		this.object.IsInit = false
+	}
+	this.uuid = id
+
+	// Set the reference on the map
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Expires"
+
+	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "parentUuid")
+
+	/** members of OAuth2Expires **/
+	query.Fields = append(query.Fields, "M_id")
+	query.Fields = append(query.Fields, "M_token")
+	query.Fields = append(query.Fields, "M_expiresAt")
+
+	/** associations of OAuth2Expires **/
+	query.Fields = append(query.Fields, "M_parentPtr")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	var results [][]interface{}
+	var err error
+	queryStr, _ := json.Marshal(query)
+
+	results, err = GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil {
+		return err
+	}
+	// Initialisation of information of OAuth2Expires...
+	if len(results) > 0 {
+
+		/** initialyzation of the entity object **/
+		this.object = new(Config.OAuth2Expires)
+		this.object.UUID = this.uuid
+		this.object.TYPENAME = "Config.OAuth2Expires"
+
+		this.parentUuid = results[0][1].(string)
+
+		/** members of OAuth2Expires **/
+
+		/** id **/
+		if results[0][2] != nil {
+			this.object.M_id = results[0][2].(string)
+		}
+
+		/** token **/
+		if results[0][3] != nil {
+			id := results[0][3].(string)
+			if len(id) > 0 {
+				refTypeName := "Config.OAuth2Refresh"
+				id_ := refTypeName + "$$" + id
+				this.object.M_token = id
+				GetServer().GetEntityManager().appendReference("token", this.object.UUID, id_)
+			}
+		}
+
+		/** expiresAt **/
+		if results[0][4] != nil {
+			this.object.M_expiresAt = results[0][4].(int64)
+		}
+
+		/** associations of OAuth2Expires **/
+
+		/** parentPtr **/
+		if results[0][5] != nil {
+			id := results[0][5].(string)
+			if len(id) > 0 {
+				refTypeName := "Config.OAuth2Configuration"
+				id_ := refTypeName + "$$" + id
+				this.object.M_parentPtr = id
+				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
+			}
+		}
+		childsUuidStr := results[0][6].(string)
+		this.childsUuid = make([]string, 0)
+		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+		if err != nil {
+			return err
+		}
+
+		referencedStr := results[0][7].(string)
+		this.referenced = make([]EntityRef, 0)
+		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+		if err != nil {
+			return err
+		}
+	}
+
+	// set need save to false.
+	this.SetNeedSave(false)
+	// set init done.
+	this.SetInit(true)
+	// Init the references...
+	GetServer().GetEntityManager().InitEntity(this)
+	return nil
+}
+
+/** instantiate a new entity from an existing object. **/
+func (this *EntityManager) NewConfigOAuth2ExpiresEntityFromObject(object *Config.OAuth2Expires) *Config_OAuth2ExpiresEntity {
+	return this.NewConfigOAuth2ExpiresEntity("", object.UUID, object)
+}
+
+/** Delete **/
+func (this *Config_OAuth2ExpiresEntity) DeleteEntity() {
+	GetServer().GetEntityManager().deleteEntity(this)
+}
+
+/** Exists **/
+func ConfigOAuth2ExpiresExists(val string) string {
+	var query EntityQuery
+	query.TypeName = "Config.OAuth2Expires"
+	query.Indexs = append(query.Indexs, "M_id="+val)
+	query.Fields = append(query.Fields, "uuid")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return ""
+	}
+	return results[0][0].(string)
+}
+
+/** Append child entity into parent entity. **/
+func (this *Config_OAuth2ExpiresEntity) AppendChild(attributeName string, child Entity) error {
+
+	// Append child if is not there...
+	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
+		this.childsUuid = append(this.childsUuid, child.GetUuid())
+		this.childsPtr = append(this.childsPtr, child)
+	} else {
+		childsPtr := make([]Entity, 0)
+		for i := 0; i < len(this.childsPtr); i++ {
+			if this.childsPtr[i].GetUuid() != child.GetUuid() {
+				childsPtr = append(childsPtr, this.childsPtr[i])
+			}
+		}
+		childsPtr = append(childsPtr, child)
+		this.SetChildsPtr(childsPtr)
+	}
+	// Set this as parent in the child
+	child.SetParentPtr(this)
+
+	params := make([]interface{}, 1)
+	params[0] = child.GetObject()
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
+	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
+	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
+	if invalidMethod != nil {
+		return invalidMethod.(error)
+	}
+	return nil
+}
+
+/** Append reference entity into parent entity. **/
+func (this *Config_OAuth2ExpiresEntity) AppendReference(reference Entity) {
 
 	// Here i will append the reference uuid
 	index := -1
@@ -3142,20 +5569,36 @@ func (this *EntityManager) create_Config_OAuth2ConfigurationEntityPrototype() {
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_clients")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Client")
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 13)
+	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
+	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_authorize")
+	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Authorize")
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 14)
+	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
+	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_access")
+	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Access")
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 15)
+	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
+	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_refresh")
+	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Refresh")
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 16)
+	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
+	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_expire")
+	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Expires")
 
 	/** associations of OAuth2Configuration **/
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 13)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 17)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_parentPtr")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "childsUuid")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]xs.string")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 14)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 18)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
 
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "referenced")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]EntityRef")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 15)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 19)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
@@ -3194,6 +5637,10 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_allowedAuthorizeTypes")
 	query.Fields = append(query.Fields, "M_allowedAccessTypes")
 	query.Fields = append(query.Fields, "M_clients")
+	query.Fields = append(query.Fields, "M_authorize")
+	query.Fields = append(query.Fields, "M_access")
+	query.Fields = append(query.Fields, "M_refresh")
+	query.Fields = append(query.Fields, "M_expire")
 
 	/** associations of OAuth2Configuration **/
 	query.Fields = append(query.Fields, "M_parentPtr")
@@ -3236,6 +5683,62 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	}
 	clientsStr, _ := json.Marshal(clientsIds)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(clientsStr))
+
+	/** Save authorize type OAuth2Authorize **/
+	authorizeIds := make([]string, 0)
+	for i := 0; i < len(this.object.M_authorize); i++ {
+		authorizeEntity := GetServer().GetEntityManager().NewConfigOAuth2AuthorizeEntity(this.GetUuid(), this.object.M_authorize[i].UUID, this.object.M_authorize[i])
+		authorizeIds = append(authorizeIds, authorizeEntity.uuid)
+		authorizeEntity.AppendReferenced("authorize", this)
+		this.AppendChild("authorize", authorizeEntity)
+		if authorizeEntity.NeedSave() {
+			authorizeEntity.SaveEntity()
+		}
+	}
+	authorizeStr, _ := json.Marshal(authorizeIds)
+	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(authorizeStr))
+
+	/** Save access type OAuth2Access **/
+	accessIds := make([]string, 0)
+	for i := 0; i < len(this.object.M_access); i++ {
+		accessEntity := GetServer().GetEntityManager().NewConfigOAuth2AccessEntity(this.GetUuid(), this.object.M_access[i].UUID, this.object.M_access[i])
+		accessIds = append(accessIds, accessEntity.uuid)
+		accessEntity.AppendReferenced("access", this)
+		this.AppendChild("access", accessEntity)
+		if accessEntity.NeedSave() {
+			accessEntity.SaveEntity()
+		}
+	}
+	accessStr, _ := json.Marshal(accessIds)
+	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(accessStr))
+
+	/** Save refresh type OAuth2Refresh **/
+	refreshIds := make([]string, 0)
+	for i := 0; i < len(this.object.M_refresh); i++ {
+		refreshEntity := GetServer().GetEntityManager().NewConfigOAuth2RefreshEntity(this.GetUuid(), this.object.M_refresh[i].UUID, this.object.M_refresh[i])
+		refreshIds = append(refreshIds, refreshEntity.uuid)
+		refreshEntity.AppendReferenced("refresh", this)
+		this.AppendChild("refresh", refreshEntity)
+		if refreshEntity.NeedSave() {
+			refreshEntity.SaveEntity()
+		}
+	}
+	refreshStr, _ := json.Marshal(refreshIds)
+	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(refreshStr))
+
+	/** Save expire type OAuth2Expires **/
+	expireIds := make([]string, 0)
+	for i := 0; i < len(this.object.M_expire); i++ {
+		expireEntity := GetServer().GetEntityManager().NewConfigOAuth2ExpiresEntity(this.GetUuid(), this.object.M_expire[i].UUID, this.object.M_expire[i])
+		expireIds = append(expireIds, expireEntity.uuid)
+		expireEntity.AppendReferenced("expire", this)
+		this.AppendChild("expire", expireEntity)
+		if expireEntity.NeedSave() {
+			expireEntity.SaveEntity()
+		}
+	}
+	expireStr, _ := json.Marshal(expireIds)
+	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(expireStr))
 
 	/** associations of OAuth2Configuration **/
 
@@ -3305,6 +5808,10 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 	query.Fields = append(query.Fields, "M_allowedAuthorizeTypes")
 	query.Fields = append(query.Fields, "M_allowedAccessTypes")
 	query.Fields = append(query.Fields, "M_clients")
+	query.Fields = append(query.Fields, "M_authorize")
+	query.Fields = append(query.Fields, "M_access")
+	query.Fields = append(query.Fields, "M_refresh")
+	query.Fields = append(query.Fields, "M_expire")
 
 	/** associations of OAuth2Configuration **/
 	query.Fields = append(query.Fields, "M_parentPtr")
@@ -3411,11 +5918,107 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 			}
 		}
 
+		/** authorize **/
+		if results[0][13] != nil {
+			uuidsStr := results[0][13].(string)
+			uuids := make([]string, 0)
+			err := json.Unmarshal([]byte(uuidsStr), &uuids)
+			if err != nil {
+				return err
+			}
+			for i := 0; i < len(uuids); i++ {
+				if len(uuids[i]) > 0 {
+					var authorizeEntity *Config_OAuth2AuthorizeEntity
+					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+						authorizeEntity = instance.(*Config_OAuth2AuthorizeEntity)
+					} else {
+						authorizeEntity = GetServer().GetEntityManager().NewConfigOAuth2AuthorizeEntity(this.GetUuid(), uuids[i], nil)
+						authorizeEntity.InitEntity(uuids[i])
+						GetServer().GetEntityManager().insert(authorizeEntity)
+					}
+					authorizeEntity.AppendReferenced("authorize", this)
+					this.AppendChild("authorize", authorizeEntity)
+				}
+			}
+		}
+
+		/** access **/
+		if results[0][14] != nil {
+			uuidsStr := results[0][14].(string)
+			uuids := make([]string, 0)
+			err := json.Unmarshal([]byte(uuidsStr), &uuids)
+			if err != nil {
+				return err
+			}
+			for i := 0; i < len(uuids); i++ {
+				if len(uuids[i]) > 0 {
+					var accessEntity *Config_OAuth2AccessEntity
+					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+						accessEntity = instance.(*Config_OAuth2AccessEntity)
+					} else {
+						accessEntity = GetServer().GetEntityManager().NewConfigOAuth2AccessEntity(this.GetUuid(), uuids[i], nil)
+						accessEntity.InitEntity(uuids[i])
+						GetServer().GetEntityManager().insert(accessEntity)
+					}
+					accessEntity.AppendReferenced("access", this)
+					this.AppendChild("access", accessEntity)
+				}
+			}
+		}
+
+		/** refresh **/
+		if results[0][15] != nil {
+			uuidsStr := results[0][15].(string)
+			uuids := make([]string, 0)
+			err := json.Unmarshal([]byte(uuidsStr), &uuids)
+			if err != nil {
+				return err
+			}
+			for i := 0; i < len(uuids); i++ {
+				if len(uuids[i]) > 0 {
+					var refreshEntity *Config_OAuth2RefreshEntity
+					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+						refreshEntity = instance.(*Config_OAuth2RefreshEntity)
+					} else {
+						refreshEntity = GetServer().GetEntityManager().NewConfigOAuth2RefreshEntity(this.GetUuid(), uuids[i], nil)
+						refreshEntity.InitEntity(uuids[i])
+						GetServer().GetEntityManager().insert(refreshEntity)
+					}
+					refreshEntity.AppendReferenced("refresh", this)
+					this.AppendChild("refresh", refreshEntity)
+				}
+			}
+		}
+
+		/** expire **/
+		if results[0][16] != nil {
+			uuidsStr := results[0][16].(string)
+			uuids := make([]string, 0)
+			err := json.Unmarshal([]byte(uuidsStr), &uuids)
+			if err != nil {
+				return err
+			}
+			for i := 0; i < len(uuids); i++ {
+				if len(uuids[i]) > 0 {
+					var expireEntity *Config_OAuth2ExpiresEntity
+					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+						expireEntity = instance.(*Config_OAuth2ExpiresEntity)
+					} else {
+						expireEntity = GetServer().GetEntityManager().NewConfigOAuth2ExpiresEntity(this.GetUuid(), uuids[i], nil)
+						expireEntity.InitEntity(uuids[i])
+						GetServer().GetEntityManager().insert(expireEntity)
+					}
+					expireEntity.AppendReferenced("expire", this)
+					this.AppendChild("expire", expireEntity)
+				}
+			}
+		}
+
 		/** associations of OAuth2Configuration **/
 
 		/** parentPtr **/
-		if results[0][13] != nil {
-			id := results[0][13].(string)
+		if results[0][17] != nil {
+			id := results[0][17].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -3423,14 +6026,14 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][14].(string)
+		childsUuidStr := results[0][18].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 		if err != nil {
 			return err
 		}
 
-		referencedStr := results[0][15].(string)
+		referencedStr := results[0][19].(string)
 		this.referenced = make([]EntityRef, 0)
 		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 		if err != nil {
@@ -6274,6 +8877,10 @@ func (this *EntityManager) registerConfigObjects() {
 	Utility.RegisterType((*Config.DataStoreConfiguration)(nil))
 	Utility.RegisterType((*Config.LdapConfiguration)(nil))
 	Utility.RegisterType((*Config.OAuth2Client)(nil))
+	Utility.RegisterType((*Config.OAuth2Authorize)(nil))
+	Utility.RegisterType((*Config.OAuth2Access)(nil))
+	Utility.RegisterType((*Config.OAuth2Refresh)(nil))
+	Utility.RegisterType((*Config.OAuth2Expires)(nil))
 	Utility.RegisterType((*Config.OAuth2Configuration)(nil))
 	Utility.RegisterType((*Config.ServiceConfiguration)(nil))
 	Utility.RegisterType((*Config.ApplicationConfiguration)(nil))
@@ -6288,6 +8895,10 @@ func (this *EntityManager) createConfigPrototypes() {
 	this.create_Config_DataStoreConfigurationEntityPrototype()
 	this.create_Config_LdapConfigurationEntityPrototype()
 	this.create_Config_OAuth2ClientEntityPrototype()
+	this.create_Config_OAuth2AuthorizeEntityPrototype()
+	this.create_Config_OAuth2AccessEntityPrototype()
+	this.create_Config_OAuth2RefreshEntityPrototype()
+	this.create_Config_OAuth2ExpiresEntityPrototype()
 	this.create_Config_OAuth2ConfigurationEntityPrototype()
 	this.create_Config_ServiceConfigurationEntityPrototype()
 	this.create_Config_ApplicationConfigurationEntityPrototype()

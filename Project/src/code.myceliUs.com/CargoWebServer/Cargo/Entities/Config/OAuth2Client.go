@@ -22,7 +22,7 @@ type OAuth2Client struct{
 	M_id string
 	M_secret string
 	M_redirectUri string
-	M_userData []uint8
+	M_extra []uint8
 
 
 	/** Associations **/
@@ -34,10 +34,6 @@ type OAuth2Client struct{
 /** Xml parser for OAuth2Client **/
 type XsdOAuth2Client struct {
 	XMLName xml.Name	`xml:"oauth2Client"`
-	M_id	string	`xml:"id,attr"`
-	M_secret	string	`xml:"secret,attr"`
-	M_redirectUri	string	`xml:"redirectUri,attr"`
-	M_userData	[]uint8	`xml:"userData,attr"`
 
 }
 /** UUID **/
@@ -84,18 +80,18 @@ func (this *OAuth2Client) SetRedirectUri(ref interface{}){
 
 /** Remove reference RedirectUri **/
 
-/** UserData **/
-func (this *OAuth2Client) GetUserData() []uint8{
-	return this.M_userData
+/** Extra **/
+func (this *OAuth2Client) GetExtra() []uint8{
+	return this.M_extra
 }
 
-/** Init reference UserData **/
-func (this *OAuth2Client) SetUserData(ref interface{}){
+/** Init reference Extra **/
+func (this *OAuth2Client) SetExtra(ref interface{}){
 	this.NeedSave = true
-	this.M_userData = ref.([]uint8)
+	this.M_extra = ref.([]uint8)
 }
 
-/** Remove reference UserData **/
+/** Remove reference Extra **/
 
 /** Parent **/
 func (this *OAuth2Client) GetParentPtr() *OAuth2Configuration{

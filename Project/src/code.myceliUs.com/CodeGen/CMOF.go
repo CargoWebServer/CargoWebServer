@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"log"
 	"strings"
 
 	"code.myceliUs.com/Utility"
@@ -67,6 +66,7 @@ func loadDocument(doc *XML_Schemas.CMOF_Document) {
 	cmofPrimitiveTypesMap["http://www.w3.org/2001/XMLSchema#date"] = "int64"
 	cmofPrimitiveTypesMap["DC.cmof#Integer"] = "int"
 	cmofPrimitiveTypesMap["Integer"] = "int"
+	cmofPrimitiveTypesMap["Long"] = "int64"
 	cmofPrimitiveTypesMap["http://schema.omg.org/spec/MOF/2.0/cmof.xml#Real"] = "float64"
 	cmofPrimitiveTypesMap["http://www.w3.org/2001/XMLSchema#double"] = "float64"
 	cmofPrimitiveTypesMap["DC.cmof#Real"] = "float64"
@@ -275,7 +275,6 @@ func getAbstractClassNameByAttributeName(attributeName string, member *XML_Schem
 	look recursively in the member super class if the type is not found.
 **/
 func getAttributeType(attributeName string, member *XML_Schemas.CMOF_OwnedMember) string {
-
 	for i := 0; i < len(member.Attributes); i++ {
 		if member.Attributes[i].Name == attributeName {
 

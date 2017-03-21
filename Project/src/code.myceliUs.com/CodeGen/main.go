@@ -19,7 +19,7 @@ func main() {
 	generate(dir+"/input", "CargoEntities", "entities")
 
 	// Now the runtime.
-	initMaps()
+	/*initMaps()
 
 	// set the output to
 	loadXSD("input/BPMS.xsd")
@@ -62,6 +62,6 @@ func main() {
 	generateEntity("DC")
 	generateEntity("DI")
 	generateEntity("BPMNDI")
-	generateEntity("BPMN20")
+	generateEntity("BPMN20")*/
 
 }
