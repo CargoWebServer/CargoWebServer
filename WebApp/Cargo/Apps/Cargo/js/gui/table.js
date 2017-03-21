@@ -692,7 +692,14 @@ function createItemLnk(entity, value, field, valueDiv) {
 	// Remove the content if any...
 	valueDiv.element.innerHTML = ""
 	var prototype = server.entityManager.entityPrototypes[value.TYPENAME]
-	var titles = value.getTitles()
+
+	var titles = []
+	if(value.getTitles != undefined){
+		titles = value.getTitles()
+	}else{
+		titles = ["lnk"]
+	}
+
 	var refName = ""
 	for (var j = 0; j < titles.length; j++) {
 		refName += titles[j]

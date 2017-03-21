@@ -68,34 +68,60 @@ func (this *OAuth2Manager) start() {
 	log.Println("--> Start OAuth2Manager")
 
 	// Here I will intialyse configurations.
-	configuration := GetServer().GetConfigurationManager().GetOAuth2Configuration()
-	this.m_configsInfo = configuration
-	if configuration != nil {
-		this.m_store = newOauth2Store()
+	this.m_configsInfo = GetServer().GetConfigurationManager().GetOAuth2Configuration()
+	if this.m_configsInfo == nil {
+		// Get the default configuration.
+		c := osin.NewServerConfig()
+		this.m_server = osin.NewServer(c, this.m_store)
 
-		// Set the OAuth server configuration.
-		cfg := osin.NewServerConfig()
+		// Save it into the entity.
+		cfg := new(Config.OAuth2Configuration)
+		cfg.SetId("OAuth2Config")
 
-		// Boolean values.
-		//cfg.AllowGetAccessRequest = configuration.GetAllowGetAccessRequest()
-		//cfg.AllowClientSecretInParams = configuration.GetAllowClientSecretInParams()
+		cfg.SetAccessExpiration(int(c.AccessExpiration))
 
-		// Expiration times.
-		/*cfg.AccessExpiration = configuration.GetAccessExpiration()
-		cfg.AuthorizationExpiration = configuration.GetAuthorizationExpiration()
+		cfg.SetAllowClientSecretInParams(c.AllowClientSecretInParams)
+		//cfg.SetAllowedAccessTypes(c.AllowedAccessTypes)
+		//cfg.SetAllowedAuthorizeTypes(c.AllowedAuthorizeTypes)
+		cfg.SetAllowGetAccessRequest(c.AllowGetAccessRequest)
+		for i := 0; i < len(c.AllowedAuthorizeTypes); i++ {
+			if c.AllowedAuthorizeTypes[i] == osin.CODE {
+				cfg.SetAllowedAuthorizeTypes("code")
+			} else if c.AllowedAuthorizeTypes[i] == osin.TOKEN {
+				cfg.SetAllowedAuthorizeTypes("token")
+			}
+		}
 
-		// Init properly...
-		// cfg.AllowedAccessTypes = configuration.GetAllowedAuthorizeTypes()
-		cfg.ErrorStatusCode = configuration.GetErrorStatusCode()
-		cfg.RedirectUriSeparator = configuration.GetRedirectUriSeparator()
-		cfg.TokenType = configuration.GetTokenType()*/
+		for i := 0; i < len(c.AllowedAccessTypes); i++ {
+			if c.AllowedAccessTypes[i] == osin.AUTHORIZATION_CODE {
+				cfg.SetAllowedAccessTypes("authorization_code")
+			} else if c.AllowedAccessTypes[i] == osin.REFRESH_TOKEN {
+				cfg.SetAllowedAuthorizeTypes("refresh_token")
+			} else if c.AllowedAccessTypes[i] == osin.PASSWORD {
+				cfg.SetAllowedAuthorizeTypes("password")
+			} else if c.AllowedAccessTypes[i] == osin.CLIENT_CREDENTIALS {
+				cfg.SetAllowedAuthorizeTypes("client_credentials")
+			} else if c.AllowedAccessTypes[i] == osin.ASSERTION {
+				cfg.SetAllowedAuthorizeTypes("assertion")
+			} else if c.AllowedAccessTypes[i] == osin.IMPLICIT {
+				cfg.SetAllowedAuthorizeTypes("__implicit")
+			}
+		}
 
-		// Test...
-		cfg.AllowGetAccessRequest = true
-		cfg.AllowClientSecretInParams = true
-
-		this.m_server = osin.NewServer(cfg, this.m_store)
+		cfg.SetAuthorizationExpiration(int(c.AuthorizationExpiration))
+		cfg.SetErrorStatusCode(c.ErrorStatusCode)
+		cfg.SetRedirectUriSeparator(c.RedirectUriSeparator)
+		cfg.SetTokenType(c.TokenType)
+		// Append to the active configuration and save the entity.
+		GetServer().GetConfigurationManager().m_activeConfigurations.SetOauth2Configuration(cfg)
+		GetServer().GetConfigurationManager().m_configurationEntity.SaveEntity()
+	} else {
+		c := osin.NewServerConfig()
+		// TODO set the c value from this.m_configsInfo.
+		this.m_server = osin.NewServer(c, this.m_store)
 	}
+
+	this.m_store = newOauth2Store()
 
 }
 
@@ -139,8 +165,7 @@ func (s *OAuth2Store) Clone() osin.Storage {
 func (this *OAuth2Store) GetClient(id string) (osin.Client, error) {
 	// From the list of registred client I will retreive the client
 	// with the given id.
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
 	clients := config.GetClients()
 
 	for i := 0; i < len(clients); i++ {
@@ -165,8 +190,8 @@ func (this *OAuth2Store) GetClient(id string) (osin.Client, error) {
  * Set the client value.
  */
 func (this *OAuth2Store) SetClient(id string, client osin.Client) error {
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+	configEntity, _ := GetServer().GetEntityManager().getEntityByUuid(config.GetUUID())
 
 	// Create a client configuration from the osin.Client.
 	c := new(Config.OAuth2Client)
@@ -190,8 +215,8 @@ func (this *OAuth2Store) SetClient(id string, client osin.Client) error {
  */
 func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 	// Get the config entity
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+	configEntity, _ := GetServer().GetEntityManager().getEntityByUuid(config.GetUUID())
 
 	a := new(Config.OAuth2Authorize)
 
@@ -210,7 +235,10 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 	a.SetRedirectUri(data.RedirectUri)
 	a.SetState(data.State)
 	a.SetCreatedAt(data.CreatedAt.Unix())
-	a.SetExtra(data.UserData)
+
+	if data.UserData != nil {
+		a.SetExtra(data.UserData)
+	}
 
 	// Put in the config.
 	config.SetAuthorize(a)
@@ -226,8 +254,8 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 // Client information MUST be loaded together.
 // Optionally can return error if expired.
 func (this *OAuth2Store) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+
 	var data *osin.AuthorizeData
 	for i := 0; i < len(config.GetAuthorize()); i++ {
 		if config.GetAuthorize()[i].GetCode() == code {
@@ -266,8 +294,9 @@ func (this *OAuth2Store) LoadAuthorize(code string) (*osin.AuthorizeData, error)
  */
 func (this *OAuth2Store) RemoveAuthorize(code string) error {
 
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+	configEntity, _ := GetServer().GetEntityManager().getEntityByUuid(config.GetUUID())
+
 	config.RemoveAuthorize(code)
 	configEntity.SaveEntity()
 	if err := this.RemoveExpireAtData(code); err != nil {
@@ -281,8 +310,8 @@ func (this *OAuth2Store) RemoveAuthorize(code string) error {
  * Save the access Data.
  */
 func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+	configEntity, _ := GetServer().GetEntityManager().getEntityByUuid(config.GetUUID())
 
 	access := new(Config.OAuth2Access)
 	for i := 0; i < len(config.GetAccess()); i++ {
@@ -344,13 +373,17 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
 	access.SetScope(data.Scope)
 	access.SetRedirectUri(data.RedirectUri)
 	access.SetCreatedAt(data.CreatedAt)
-	access.SetExtra(data.UserData)
+
+	if data.UserData != nil {
+		access.SetExtra(data.UserData)
+	}
 
 	// Add expire data.
 	if err = this.AddExpireAtData(data.AccessToken, data.ExpireAt()); err != nil {
 		return err
 	}
 
+	configEntity.SaveEntity()
 	return nil
 }
 
@@ -359,8 +392,8 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
  */
 func (this *OAuth2Store) LoadAccess(code string) (*osin.AccessData, error) {
 
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+
 	var access *osin.AccessData
 	for i := 0; i < len(config.GetAccess()); i++ {
 		if config.GetAccess()[i].GetAccessToken() == code {
@@ -401,8 +434,9 @@ func (this *OAuth2Store) LoadAccess(code string) (*osin.AccessData, error) {
  * Remove an access code.
  */
 func (this *OAuth2Store) RemoveAccess(code string) error {
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+	configEntity, _ := GetServer().GetEntityManager().getEntityByUuid(config.GetUUID())
+
 	config.RemoveAccess(code)
 	configEntity.SaveEntity()
 
@@ -418,8 +452,8 @@ func (this *OAuth2Store) RemoveAccess(code string) error {
  * Load the access data from it refresh code.
  */
 func (this *OAuth2Store) LoadRefresh(code string) (*osin.AccessData, error) {
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+
 	for i := 0; i < len(config.GetRefresh()); i++ {
 		if config.GetRefresh()[i].GetToken() == code {
 			return this.LoadAccess(config.GetRefresh()[i].GetAccess().GetAccessToken())
@@ -433,8 +467,9 @@ func (this *OAuth2Store) LoadRefresh(code string) (*osin.AccessData, error) {
  * Remove refresh.
  */
 func (this *OAuth2Store) RemoveRefresh(code string) error {
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+	configEntity, _ := GetServer().GetEntityManager().getEntityByUuid(config.GetUUID())
+
 	config.RemoveRefresh(code)
 	configEntity.SaveEntity()
 	return nil
@@ -443,8 +478,8 @@ func (this *OAuth2Store) RemoveRefresh(code string) error {
 // AddExpireAtData add info in expires table
 func (s *OAuth2Store) AddExpireAtData(code string, expireAt time.Time) error {
 	var expire *Config.OAuth2Expires
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+	configEntity, _ := GetServer().GetEntityManager().getEntityByUuid(config.GetUUID())
 
 	for i := 0; i < len(config.GetExpire()); i++ {
 		if config.GetExpire()[i].GetToken().GetToken() == code {
@@ -461,8 +496,9 @@ func (s *OAuth2Store) AddExpireAtData(code string, expireAt time.Time) error {
 
 // RemoveExpireAtData remove info in expires table
 func (s *OAuth2Store) RemoveExpireAtData(code string) error {
-	configEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Configuration", "OAuth2Manager")
-	config := configEntity.GetObject().(*Config.OAuth2Configuration)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+	configEntity, _ := GetServer().GetEntityManager().getEntityByUuid(config.GetUUID())
+
 	for i := 0; i < len(config.GetExpire()); i++ {
 		if config.GetExpire()[i].GetToken().GetToken() == code {
 			config.RemoveExpire(config.GetExpire()[i])
