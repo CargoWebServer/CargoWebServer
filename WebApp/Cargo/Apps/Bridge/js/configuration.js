@@ -107,16 +107,18 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
     // If the view already exist
     for (var i = 0; i < this.contentViews.length; i++) {
-        if (this.contentViews[i].entity.UUID == content.UUID) {
-            this.contentViews[i].setEntity(content)
-            if (this.contentViews[i].connectBtn != undefined) {
-                this.contentViews[i].connectBtn.status = "disconnected"
-                this.contentViews[i].connectBtn.element.click()
+        if (this.contentViews[i].entity != undefined) {
+            if (this.contentViews[i].entity.UUID == content.UUID) {
+                this.contentViews[i].setEntity(content)
+                if (this.contentViews[i].connectBtn != undefined) {
+                    this.contentViews[i].connectBtn.status = "disconnected"
+                    this.contentViews[i].connectBtn.element.click()
+                }
+                this.contentViews[i].panel.element.style.display = ""
+                return this.contentViews[i]
+            } else {
+                this.contentViews[i].panel.element.style.display = "none"
             }
-            this.contentViews[i].panel.element.style.display = ""
-            return this.contentViews[i]
-        } else {
-            this.contentViews[i].panel.element.style.display = "none"
         }
     }
 
@@ -334,26 +336,31 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                             }
                         }
                     } (currentPwd, newPwd, confirmPwd)
+                } else if (content.TYPENAME == "Config.OAuth2Configuration") {
+                    // So here I will append other element in the view here.
                 }
-
             }
 
         } (content, this.title))
 
     // Set parent entity informations.
     contentView.parentEntity = this.activeConfiguration
-    if (contentView.entity.TYPENAME == "Config.DataStoreConfiguration") {
-        contentView.parentLnk = "M_dataStoreConfigs"
-    }else if (contentView.entity.TYPENAME == "Config.ServerConfiguration") {
-        contentView.parentLnk = "M_serverConfig"
-    }else if (contentView.entity.TYPENAME == "Config.ServiceConfiguration") {
-        contentView.parentLnk = "M_serviceConfigs"
-    }else if (contentView.entity.TYPENAME == "Config.SmtpConfiguration") {
-        contentView.parentLnk = "M_smtpConfigs"
-    }else if (contentView.entity.TYPENAME == "Config.LdapConfiguration") {
-        contentView.parentLnk = "M_ldapConfigs"
-    }else if (contentView.entity.TYPENAME == "Config.ApplicationConfiguration") {
-        contentView.parentLnk = "M_applicationConfigs"
+    if (contentView.entity != null) {
+        if (contentView.entity.TYPENAME == "Config.DataStoreConfiguration") {
+            contentView.parentLnk = "M_dataStoreConfigs"
+        } else if (contentView.entity.TYPENAME == "Config.ServerConfiguration") {
+            contentView.parentLnk = "M_serverConfig"
+        } else if (contentView.entity.TYPENAME == "Config.ServiceConfiguration") {
+            contentView.parentLnk = "M_serviceConfigs"
+        } else if (contentView.entity.TYPENAME == "Config.SmtpConfiguration") {
+            contentView.parentLnk = "M_smtpConfigs"
+        } else if (contentView.entity.TYPENAME == "Config.LdapConfiguration") {
+            contentView.parentLnk = "M_ldapConfigs"
+        } else if (contentView.entity.TYPENAME == "Config.ApplicationConfiguration") {
+            contentView.parentLnk = "M_applicationConfigs"
+        } else if (contentView.entity.TYPENAME == "Config.OAuth2Configuration") {
+            contentView.parentLnk = "M_oauth2Configuration"
+        }
     }
 
     // keep the index.
@@ -374,7 +381,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
         .appendElement({ "tag": "select", "style": "margin-left: 5px;" }).down()
 
     for (var i = 0; i < configurations.length; i++) {
-        if(i==0){
+        if (i == 0) {
             // The first configuration as the default one.
             this.activeConfiguration = configurations[i]
         }
@@ -385,6 +392,31 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
         var content = configuration["M_" + this.propertyName]
         var prototype = server.entityManager.entityPrototypes[configuration.TYPENAME]
         var fieldType = prototype.FieldsType[prototype.getFieldIndex("M_" + this.propertyName)]
+
+        var newConfiguration = function (configurationPanel, configurationContent, configuration) {
+            return function () {
+                // Here I will create a new entity...
+                var entity = eval("new " + configurationPanel.typeName + "()")
+                entity.UUID = configurationPanel.typeName + "%" + randomUUID()
+                entity.M_id = "New " + configurationPanel.typeName.split(".")[1]
+
+                // Set the entity content.
+                var configurationContent = configurationPanel.panel.getChildById("configurationContent")
+
+                // Set the new configuration.
+                var contentView = configurationPanel.setConfiguration(configurationContent, entity)
+
+                var idField = contentView.getFieldControl("M_id")
+
+                // Hide the data explorer panel.
+                homepage.dataExplorer.hidePanels()
+
+                // Set focus to the id field.
+                idField.element.focus()
+                idField.element.setSelectionRange(0, idField.element.value.length)
+
+            }
+        } (this, configurationContent, configuration)
 
         // In case of multiple configurations element..
         if (fieldType.startsWith("[]")) {
@@ -493,34 +525,18 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                 }
             } (this)
 
-            // Now the append configuration button.
-            this.newConfigElementBtn.element.onclick = function (configurationPanel, configurationContent, configuration) {
-                return function () {
-                    // Here I will create a new entity...
-                    var entity = eval("new " + configurationPanel.typeName + "()")
-                    entity.UUID = configurationPanel.typeName + "%" + randomUUID()
-                    entity.M_id = "New " + configurationPanel.typeName.split(".")[1]
-
-                    // Set the entity content.
-                    var configurationContent = configurationPanel.panel.getChildById("configurationContent")
-
-                    // Set the new configuration.
-                    var contentView = configurationPanel.setConfiguration(configurationContent, entity)
-                
-                    var idField = contentView.getFieldControl("M_id")
-
-                    // Hide the data explorer panel.
-                    homepage.dataExplorer.hidePanels()
-
-                    // Set focus to the id field.
-                    idField.element.focus()
-                    idField.element.setSelectionRange(0, idField.element.value.length)
-
-                }
-            } (this, configurationContent, configuration)
+            // Set the new configuration click handler.
+            this.newConfigElementBtn.element.onclick = newConfiguration
 
         } else {
             if (content != undefined) {
+                if (this.contentViews[0] == null) {
+                    this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;color: #657383;" }).down()
+                    this.newConfigElementBtn.appendElement({ "tag": "i", "class": "fa fa-plus", "style": "" })
+
+                    // Set the new configuration click handler.
+                    this.newConfigElementBtn.element.onclick = newConfiguration
+                }
                 this.setConfiguration(configurationContent, content)
             }
         }
@@ -528,6 +544,8 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
 
     // Show the first panel if there is one.
     if (this.contentViews[0] != undefined) {
-        this.contentViews[0].panel.element.style.display = ""
+        if (this.contentViews[0].panel != null) {
+            this.contentViews[0].panel.element.style.display = ""
+        }
     }
 }

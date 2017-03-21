@@ -120,6 +120,25 @@
       </ownedAttribute>
 	</ownedMember>
 	
+	<ownedMember xmi:type="cmof:Class" xmi:id="OAuth2Client" name="OAuth2Client">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="config-id" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="config-secret" name="secret">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="config-redirectUri" name="redirectUri">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="config-userData" name="userData">
+        <type xmi:type="cmof:PrimitiveType" href="Byte"/>
+      </ownedAttribute>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_oauth2Client_oauth2Configuration" name="A_oauth2Client_oauth2Configuration" visibility="private" memberEnd="OAuth2Configuration-ServiceConfiguration A_oauth2Client_oauth2Configuration-Configurations">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_oauth2Client_oauth2Configuration-OAuth2Configuration" name="parent" _type="OAuth2Configuration" lower="0" upper="1" owningAssociation="A_oauth2Client_oauth2Configuration" association="A_oauth2Client_oauth2Configuration"/>
+    </ownedMember>
+	
 	<ownedMember xmi:type="cmof:Class" xmi:id="OAuth2Configuration" name="OAuth2Configuration" superClass="Configuration">
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="authorizationExpiration" name="authorizationExpiration">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
@@ -148,6 +167,7 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="allowedAccessTypes" name="allowedAccessTypes" lower="0" upper="*">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Configuration-OAuth2Client" name="clients" _type="OAuth2Client" lower="0"  upper="*" isComposite="true" association="A_oauth2Client_oauth2Configuration"/>
 	</ownedMember>
 
 	<ownedMember xmi:type="cmof:Class" xmi:id="ServiceConfiguration" name="ServiceConfiguration" superClass="Configuration">
@@ -220,6 +240,10 @@
       <ownedEnd xmi:type="cmof:Property" xmi:id="A_serverConfiguration_Configurations-Configuration" name="parent" _type="Configurations" lower="0" upper="1" owningAssociation="A_serverConfiguration_Configurations" association="A_serverConfiguration_Configurations"/>
     </ownedMember>
 
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_oauth2Configuration_Configurations" name="A_oauth2Configuration_Configurations" visibility="private" memberEnd="Configurations-ServerConfiguration A_oauth2Configuration_Configurations-Configurations">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_oauth2Configuration_Configurations-Configuration" name="parent" _type="Configurations" lower="0" upper="1" owningAssociation="A_oauth2Configuration_Configurations" association="A_oauth2Configuration_Configurations"/>
+    </ownedMember>
+
 	<ownedMember xmi:type="cmof:Association" xmi:id="A_dataConfiguration_Configurations" name="A_dataConfiguration_Configurations" visibility="private" memberEnd="Configurations-DataStoreConfiguration A_dataConfiguration_Configurations-Configurations">
       <ownedEnd xmi:type="cmof:Property" xmi:id="A_dataConfiguration_Configurations-Configuration" name="parent" _type="Configurations" lower="0" owningAssociation="A_dataConfiguration_Configurations" association="A_dataConfiguration_Configurations"/>
     </ownedMember>
@@ -256,6 +280,7 @@
       </ownedAttribute>
 	
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-ServerConfiguration" name="serverConfig" _type="ServerConfiguration" lower="1"  upper="1" isComposite="true" association="A_serverConfiguration_Configurations"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-ServerConfiguration" name="oauth2Configuration" _type="OAuth2Configuration" lower="0"  upper="1" isComposite="true" association="A_oauth2Configuration_Configurations"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-ServiceConfiguration" name="serviceConfigs" _type="ServiceConfiguration" lower="0"  upper="*" isComposite="true" association="A_serviceConfiguration_Configurations"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-DataStoreConfiguration" name="dataStoreConfigs" _type="DataStoreConfiguration" lower="0"  upper="*" isComposite="true" association="A_dataConfiguration_Configurations"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-SmtpConfiguration" name="smtpConfigs" _type="SmtpConfiguration" lower="0"  upper="*" isComposite="true" association="A_smptConfiguration_Configurations"/>

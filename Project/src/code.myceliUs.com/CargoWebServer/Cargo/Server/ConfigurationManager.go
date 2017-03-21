@@ -396,22 +396,13 @@ func (this *ConfigurationManager) GetLdapConfigurations() []Config.LdapConfigura
 }
 
 /**
- * Tha function retreive the oauth2 configurations.
+ * Tha function retreive the oauth2 configuration.
  */
-func (this *ConfigurationManager) GetOAuth2Configuration() []Config.OAuth2Configuration {
-	var configurations []Config.OAuth2Configuration
-
-	entities, err := GetServer().GetEntityManager().getEntitiesByType("Config.OAuth2Configuration", "", "Config")
-	if err != nil {
-		return configurations
+func (this *ConfigurationManager) GetOAuth2Configuration() *Config.OAuth2Configuration {
+	if this.m_activeConfigurations != nil {
+		return this.m_activeConfigurations.GetOauth2Configuration()
 	}
-
-	for i := 0; i < len(entities); i++ {
-		oauth2Configuration := entities[i].GetObject().(*Config.OAuth2Configuration)
-		configurations = append(configurations, *oauth2Configuration)
-	}
-
-	return configurations
+	return nil
 }
 
 /**

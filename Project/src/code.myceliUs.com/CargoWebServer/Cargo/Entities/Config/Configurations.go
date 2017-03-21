@@ -24,6 +24,7 @@ type Configurations struct{
 	M_version string
 	M_filePath string
 	M_serverConfig *ServerConfiguration
+	M_oauth2Configuration *OAuth2Configuration
 	M_serviceConfigs []*ServiceConfiguration
 	M_dataStoreConfigs []*DataStoreConfiguration
 	M_smtpConfigs []*SmtpConfiguration
@@ -41,6 +42,7 @@ type XsdConfigurations struct {
 	M_ldapConfigs	[]*XsdLdapConfiguration	`xml:"ldapConfigs,omitempty"`
 	M_dataStoreConfigs	[]*XsdDataStoreConfiguration	`xml:"dataStoreConfigs,omitempty"`
 	M_serviceConfigs	[]*XsdServiceConfiguration	`xml:"serviceConfigs,omitempty"`
+	M_oauth2Configuration	*XsdOAuth2Configuration	`xml:"oauth2Configuration,omitempty"`
 	M_id	string	`xml:"id,attr"`
 	M_name	string	`xml:"name,attr"`
 	M_version	string	`xml:"version,attr"`
@@ -120,6 +122,26 @@ func (this *Configurations) RemoveServerConfig(ref interface{}){
 	toDelete := ref.(Configuration)
 	if toDelete.GetUUID() == this.M_serverConfig.GetUUID() {
 		this.M_serverConfig = nil
+	}
+}
+
+/** Oauth2Configuration **/
+func (this *Configurations) GetOauth2Configuration() *OAuth2Configuration{
+	return this.M_oauth2Configuration
+}
+
+/** Init reference Oauth2Configuration **/
+func (this *Configurations) SetOauth2Configuration(ref interface{}){
+	this.NeedSave = true
+	this.M_oauth2Configuration = ref.(*OAuth2Configuration)
+}
+
+/** Remove reference Oauth2Configuration **/
+func (this *Configurations) RemoveOauth2Configuration(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(Configuration)
+	if toDelete.GetUUID() == this.M_oauth2Configuration.GetUUID() {
+		this.M_oauth2Configuration = nil
 	}
 }
 

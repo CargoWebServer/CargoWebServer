@@ -1,73 +1,76 @@
 <!DOCTYPE html>
 <html>
-	<head lang="en">
-		<meta http-equiv="x-ua-compatible" content="IE=edge">
-		<meta charset="UTF-8">
-		<title>Blog</title>
-		
-		<!-- css files -->
-		<link rel="stylesheet" type="text/css" href="/Cargo/css/main.css">	
 
-		<!-- Icon and glyph -->
-		<link rel="stylesheet" type="text/css" href="/Cargo/css/font-awesome/css/font-awesome.min.css">
-		<link rel="stylesheet" type="application/vnd.ms-fontobject" href="/Cargo/css/font-awesome/fonts/fontawesome-webfont.eot">
-		<link rel="stylesheet" type="image/svg+xml" href="/Cargo/css/font-awesome/fonts/fontawesome-webfont.svg">
-		<link rel="stylesheet" type="font/ttf" href="/Cargo/css/font-awesome/fonts/fontawesome-webfont.ttf">
-		<link rel="stylesheet" type="application/font-woff" href="/Cargo/css/font-awesome/fonts/fontawesome-webfont.woff">
-		<link rel="stylesheet" type="font/opentype" href="/Cargo/css/font-awesome/fonts/FontAwesome.otf">
+<head lang="en">
+	<meta http-equiv="x-ua-compatible" content="IE=edge">
+	<meta charset="UTF-8">
+	<title>Blog</title>
 
-		<!-- js files -->
-		<script src="/lib/protobuf/bytebuffer.js"></script>
-		<script src="/lib/protobuf/long.js"></script>
-		<script src="/lib/protobuf/protobuf.js"></script>
-		<script src="/lib/rollups/sha256.js"></script>
-		<script src="/lib/stringview.js"></script>
-		<script src="/lib/underscore.js"></script>
-		<script src="/lib/uuid.js"></script>
-		
-		<!-- Base Server files -->
-		<script src="/Cargo/js/utility.js"></script>
-		<script src="/Cargo/js/handlers.js"></script>
-		<script src="/Cargo/js/error.js"></script>
-		<script src="/Cargo/js/event.js"></script>
-		<script src="/Cargo/js/languageManager.js"></script>
-		<script src="/Cargo/js/server.js"></script>
-		<script src="/Cargo/js/security.js"></script>
-		<script src="/Cargo/js/main.js"></script>
+	<!-- css files -->
+	<link rel="stylesheet" type="text/css" href="/Cargo/css/main.css">
 
-		<!-- Listener -->
-		<script src="/Cargo/js/session.js"></script>
-		<script src="/Cargo/js/account.js"></script>
-		<script src="/Cargo/js/file.js"></script>
-		<script src="/Cargo/js/entity.js"></script>
-		<script src="/Cargo/js/data.js"></script>
-		<script src="/Cargo/js/message.js"></script>
-		<script src="/Cargo/js/project.js"></script>
+	<!-- Icon and glyph -->
+	<link rel="stylesheet" type="text/css" href="/Cargo/css/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="application/vnd.ms-fontobject" href="/Cargo/css/font-awesome/fonts/fontawesome-webfont.eot">
+	<link rel="stylesheet" type="image/svg+xml" href="/Cargo/css/font-awesome/fonts/fontawesome-webfont.svg">
+	<link rel="stylesheet" type="font/ttf" href="/Cargo/css/font-awesome/fonts/fontawesome-webfont.ttf">
+	<link rel="stylesheet" type="application/font-woff" href="/Cargo/css/font-awesome/fonts/fontawesome-webfont.woff">
+	<link rel="stylesheet" type="font/opentype" href="/Cargo/css/font-awesome/fonts/FontAwesome.otf">
 
-		<!-- GUI -->
-		<script src="/Cargo/js/element.js"></script>
-		<script src="/Cargo/js/gui/decorator.js"></script>
-		<script src="/Cargo/js/gui/dialog.js"></script>
-		<script src="/Cargo/js/gui/entity.js"></script>
+	<!-- js files -->
+	<script src="/lib/protobuf/bytebuffer.js"></script>
+	<script src="/lib/protobuf/long.js"></script>
+	<script src="/lib/protobuf/protobuf.js"></script>
+	<script src="/lib/rollups/sha256.js"></script>
+	<script src="/lib/stringview.js"></script>
+	<script src="/lib/underscore.js"></script>
+	<script src="/lib/uuid.js"></script>
 
-		<!-- blog tutorial files -->
-		<link rel="stylesheet" type="text/css" href="/Cargo/css/gui/entity.css">
-		<link rel="stylesheet" type="text/css" href="/Cargo/css/gui/dialog.css">
-		
-		<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
-		<link rel="stylesheet" type="text/css" href="css/main.css">	
-		<link rel="stylesheet" type="text/css" href="css/blog.css">
+	<!-- Base Server files -->
+	<script src="/Cargo/js/utility.js"></script>
+	<script src="/Cargo/js/handlers.js"></script>
+	<script src="/Cargo/js/error.js"></script>
+	<script src="/Cargo/js/event.js"></script>
+	<script src="/Cargo/js/languageManager.js"></script>
+	<script src="/Cargo/js/server.js"></script>
+	<script src="/Cargo/js/security.js"></script>
+	<script src="/Cargo/js/main.js"></script>
 
-	</head>
-	<body>
-		<!-- external lib -->
-		<script src="lib/jquery.js"></script>
-		<script src="lib/bootstrap.js"></script>
-		<link href="lib/summernote/summernote.css" rel="stylesheet">
-		<script src="lib/summernote/summernote.js"></script>
+	<!-- Listener -->
+	<script src="/Cargo/js/session.js"></script>
+	<script src="/Cargo/js/account.js"></script>
+	<script src="/Cargo/js/file.js"></script>
+	<script src="/Cargo/js/entity.js"></script>
+	<script src="/Cargo/js/data.js"></script>
+	<script src="/Cargo/js/message.js"></script>
+	<script src="/Cargo/js/project.js"></script>
 
-		<!-- blog tutortial script file -->
-		<script src="js/blog.js"></script>
-		<script src="js/main.js"></script>
-	</body>
+	<!-- GUI -->
+	<script src="/Cargo/js/element.js"></script>
+	<script src="/Cargo/js/gui/decorator.js"></script>
+	<script src="/Cargo/js/gui/dialog.js"></script>
+	<script src="/Cargo/js/gui/entity.js"></script>
+
+	<!-- blog tutorial files -->
+	<link rel="stylesheet" type="text/css" href="/Cargo/css/gui/entity.css">
+	<link rel="stylesheet" type="text/css" href="/Cargo/css/gui/dialog.css">
+
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<link rel="stylesheet" type="text/css" href="css/blog.css">
+
+</head>
+
+<body>
+	<!-- external lib -->
+	<script src="lib/jquery.js"></script>
+	<script src="lib/bootstrap.js"></script>
+	<link href="lib/summernote/summernote.css" rel="stylesheet">
+	<script src="lib/summernote/summernote.js"></script>
+
+	<!-- blog tutortial script file -->
+	<script src="js/blog.js"></script>
+	<script src="js/main.js"></script>
+</body>
+
 </html>

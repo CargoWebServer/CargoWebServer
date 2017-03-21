@@ -63,6 +63,7 @@ var HomePage = function () {
     this.dataConfiguration = null
     this.ldapConfiguration = null
     this.smtpConfiguration = null
+    this.oauth2Configuration = null
 
     /** The propertie div a the right */
     this.propertiesDiv = null
@@ -377,6 +378,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.securityDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": " left:50px; display:none;" })
     this.securityContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "security" }).appendElement({ "tag": "i", "class": "fa fa-shield" })
     setSelectAction(this.securityContext, this.securityDiv)
+    this.oauth2Configuration = new ConfigurationPanel(this.securityDiv, "Security configuration", "Config.OAuth2Configuration", "oauth2Configuration")
 
     // The services context...
     this.servicesSettingDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display: none;" })
@@ -422,6 +424,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
             caller.ldapConfiguration.setConfigurations(results)
             caller.smtpConfiguration.setConfigurations(results)
             caller.dataConfiguration.setConfigurations(results)
+            caller.oauth2Configuration.setConfigurations(results)
         },
         /** Error callback */
         function (errMsg, caller) {

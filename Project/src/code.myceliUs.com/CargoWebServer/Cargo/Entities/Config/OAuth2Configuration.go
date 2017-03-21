@@ -31,7 +31,13 @@ type OAuth2Configuration struct{
 	M_redirectUriSeparator string
 	M_allowedAuthorizeTypes []string
 	M_allowedAccessTypes []string
+	M_clients []*OAuth2Client
 
+
+	/** Associations **/
+	m_parentPtr *Configurations
+	/** If the ref is a string and not an object **/
+	M_parentPtr string
 }
 
 /** Xml parser for OAuth2Configuration **/
@@ -211,3 +217,66 @@ func (this *OAuth2Configuration) SetAllowedAccessTypes(ref interface{}){
 }
 
 /** Remove reference AllowedAccessTypes **/
+
+/** Clients **/
+func (this *OAuth2Configuration) GetClients() []*OAuth2Client{
+	return this.M_clients
+}
+
+/** Init reference Clients **/
+func (this *OAuth2Configuration) SetClients(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var clientss []*OAuth2Client
+	for i:=0; i<len(this.M_clients); i++ {
+		if this.M_clients[i].GetUUID() != ref.(*OAuth2Client).GetUUID() {
+			clientss = append(clientss, this.M_clients[i])
+		} else {
+			isExist = true
+			clientss = append(clientss, ref.(*OAuth2Client))
+		}
+	}
+	if !isExist {
+		clientss = append(clientss, ref.(*OAuth2Client))
+	}
+	this.M_clients = clientss
+}
+
+/** Remove reference Clients **/
+func (this *OAuth2Configuration) RemoveClients(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*OAuth2Client)
+	clients_ := make([]*OAuth2Client, 0)
+	for i := 0; i < len(this.M_clients); i++ {
+		if toDelete.GetUUID() != this.M_clients[i].GetUUID() {
+			clients_ = append(clients_, this.M_clients[i])
+		}
+	}
+	this.M_clients = clients_
+}
+
+/** Parent **/
+func (this *OAuth2Configuration) GetParentPtr() *Configurations{
+	return this.m_parentPtr
+}
+
+/** Init reference Parent **/
+func (this *OAuth2Configuration) SetParentPtr(ref interface{}){
+	this.NeedSave = true
+	if _, ok := ref.(string); ok {
+		this.M_parentPtr = ref.(string)
+	}else{
+		this.m_parentPtr = ref.(*Configurations)
+		this.M_parentPtr = ref.(*Configurations).GetUUID()
+	}
+}
+
+/** Remove reference Parent **/
+func (this *OAuth2Configuration) RemoveParentPtr(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*Configurations)
+	if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+		this.m_parentPtr = nil
+		this.M_parentPtr = ""
+	}
+}

@@ -98,6 +98,18 @@
 		</xsd:complexContent> 
 	</xsd:complexType>
 	
+	<xsd:element name="oauth2Client" type="tOAuth2Client"/>
+	<xsd:complexType name="tOAuth2Client" abstract="false">
+		<xsd:complexContent> 
+			<xsd:extension base="tConfiguration"> 
+				<xsd:attribute name="id" type="xsd:ID" />
+				<xsd:attribute name="secret" type="xsd:string" />
+				<xsd:attribute name="redirectUri" type="xsd:anyURI" />
+				<xsd:attribute name="userData" type="xsd:byte" />
+			</xsd:extension>
+		</xsd:complexContent> 
+	</xsd:complexType>
+	
 	<xsd:element name="oauth2Configuration" type="tOAuth2Configuration" substitutionGroup="configuration"/>
 	<xsd:complexType name="tOAuth2Configuration" abstract="false">
 		<xsd:complexContent> 
@@ -113,6 +125,7 @@
 				<xsd:sequence>
 					<xsd:attribute name="allowedAuthorizeTypes" type="xsd:string" />
 					<xsd:attribute name="allowedAccessTypes" type="xsd:string" />
+					<xsd:attribute name="clients" type="tOAuth2Client" />
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent> 
@@ -172,6 +185,7 @@
 			<xsd:element name="ldapConfigs" type="tLdapConfiguration" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="dataStoreConfigs" type="tDataStoreConfiguration" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="serviceConfigs" type="tServiceConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="oauth2Configuration" type="tOAuth2Configuration" minOccurs="0" maxOccurs="1"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:attribute name="name" type="xsd:string"/>

@@ -27,11 +27,12 @@ func NewError(errorPath string, errorId string, errorCode int, err error) *Cargo
 	errorObject.SetCode(errorCode)
 
 	// Uncomment pour logger dans le logger. Trop lourd pour le moment.
-	/*server.entityManager.cargoEntities.GetObject().(*CargoEntities.Entities).SetEntities(errorObject)
-	server.entityManager.cargoEntities.SaveEntity()
+	/*
+		server.entityManager.cargoEntities.GetObject().(*CargoEntities.Entities).SetEntities(errorObject)
+		server.entityManager.cargoEntities.SaveEntity()
 
-	// Create the log information for that error.
-	GetServer().GetDefaultErrorLogger().AppendLogEntry(errorObject)
+		// Create the log information for that error.
+		GetServer().GetDefaultErrorLogger().AppendLogEntry(errorObject)
 	*/
 
 	//log.Println("ERROR: ", errorObject)
@@ -109,6 +110,9 @@ const (
 	PROTOTYPE_CREATION_ERROR          = "PROTOTYPE_CREATION_ERROR"
 	ATTRIBUTE_NAME_DOESNT_EXIST_ERROR = "ATTRIBUTE_NAME_DOESNT_EXIST_ERROR"
 	TYPENAME_DOESNT_EXIST_ERROR       = "TYPENAME_DOESNT_EXIST_ERROR"
+
+	// OAuth2 errors.
+	REGISTER_CLIENT_ERROR = "TYPENAME_DOESNT_EXIST_ERROR"
 
 	XML_READ_ERROR        = "XML_READ_ERROR"
 	JSON_MARSHALING_ERROR = "JSON_MARSHALING_ERROR"

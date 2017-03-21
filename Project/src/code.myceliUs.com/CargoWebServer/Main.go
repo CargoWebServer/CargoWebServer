@@ -27,6 +27,13 @@ func main() {
 	// The file upload handler.
 	http.HandleFunc("/uploads", Server.FileUploadHandler)
 
+	// OAuth2 http handler's
+	http.HandleFunc("/authorize", Server.AuthorizeHandler)
+	http.HandleFunc("/token", Server.TokenHandler)
+	http.HandleFunc("/info", Server.InfoHandler)
+	http.HandleFunc("/app", Server.AppHandler)
+	http.HandleFunc("/appauth/code", Server.AppAuthCodeHandler)
+
 	// stop the server...
 	defer Server.GetServer().Stop()
 
