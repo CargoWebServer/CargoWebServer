@@ -572,8 +572,15 @@ func generateEntityAttribute(attribute *XML_Schemas.CMOF_OwnedAttribute, packNam
 			memberTypeName = "base64Binary"
 		}
 
+		// int64 can be a time, a date or a long.
 		if memberTypeName == "int64" {
-			memberTypeName = "long"
+			if attribute.AssociationTypeRef.Ref == "http://www.w3.org/2001/XMLSchema#date" {
+				memberTypeName = "date"
+			} else if attribute.AssociationTypeRef.Ref == "http://www.w3.org/2001/XMLSchema#time" {
+				memberTypeName = "time"
+			} else {
+				memberTypeName = "long"
+			}
 		}
 
 		memberTypeName = "xs." + memberTypeName

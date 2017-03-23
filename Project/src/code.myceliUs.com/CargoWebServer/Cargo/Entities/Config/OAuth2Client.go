@@ -22,6 +22,8 @@ type OAuth2Client struct{
 	M_id string
 	M_secret string
 	M_redirectUri string
+	M_tokenUri string
+	M_authorizationUri string
 	M_extra []uint8
 
 
@@ -79,6 +81,32 @@ func (this *OAuth2Client) SetRedirectUri(ref interface{}){
 }
 
 /** Remove reference RedirectUri **/
+
+/** TokenUri **/
+func (this *OAuth2Client) GetTokenUri() string{
+	return this.M_tokenUri
+}
+
+/** Init reference TokenUri **/
+func (this *OAuth2Client) SetTokenUri(ref interface{}){
+	this.NeedSave = true
+	this.M_tokenUri = ref.(string)
+}
+
+/** Remove reference TokenUri **/
+
+/** AuthorizationUri **/
+func (this *OAuth2Client) GetAuthorizationUri() string{
+	return this.M_authorizationUri
+}
+
+/** Init reference AuthorizationUri **/
+func (this *OAuth2Client) SetAuthorizationUri(ref interface{}){
+	this.NeedSave = true
+	this.M_authorizationUri = ref.(string)
+}
+
+/** Remove reference AuthorizationUri **/
 
 /** Extra **/
 func (this *OAuth2Client) GetExtra() []uint8{

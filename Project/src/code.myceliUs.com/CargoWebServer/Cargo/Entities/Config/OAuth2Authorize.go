@@ -19,10 +19,10 @@ type OAuth2Authorize struct{
 	IsInit   bool
 
 	/** members of OAuth2Authorize **/
+	M_id string
 	m_client *OAuth2Client
 	/** If the ref is a string and not an object **/
 	M_client string
-	M_code string
 	M_expiresIn int64
 	M_scope string
 	M_redirectUri string
@@ -41,6 +41,19 @@ type XsdOAuth2Authorize struct {
 func (this *OAuth2Authorize) GetUUID() string{
 	return this.UUID
 }
+
+/** Id **/
+func (this *OAuth2Authorize) GetId() string{
+	return this.M_id
+}
+
+/** Init reference Id **/
+func (this *OAuth2Authorize) SetId(ref interface{}){
+	this.NeedSave = true
+	this.M_id = ref.(string)
+}
+
+/** Remove reference Id **/
 
 /** Client **/
 func (this *OAuth2Authorize) GetClient() *OAuth2Client{
@@ -67,19 +80,6 @@ func (this *OAuth2Authorize) RemoveClient(ref interface{}){
 		this.M_client = ""
 	}
 }
-
-/** Code **/
-func (this *OAuth2Authorize) GetCode() string{
-	return this.M_code
-}
-
-/** Init reference Code **/
-func (this *OAuth2Authorize) SetCode(ref interface{}){
-	this.NeedSave = true
-	this.M_code = ref.(string)
-}
-
-/** Remove reference Code **/
 
 /** ExpiresIn **/
 func (this *OAuth2Authorize) GetExpiresIn() int64{

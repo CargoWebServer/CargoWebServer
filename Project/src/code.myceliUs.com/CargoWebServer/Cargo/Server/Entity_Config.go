@@ -17,13 +17,13 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "uuid")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "uuid")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -2516,6 +2516,7 @@ func (this *EntityManager) create_Config_OAuth2ClientEntityPrototype() {
 	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 2)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_id")
+	oAuth2ClientEntityProto.Ids = append(oAuth2ClientEntityProto.Ids, "M_id")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
 	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 3)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
@@ -2527,22 +2528,30 @@ func (this *EntityManager) create_Config_OAuth2ClientEntityPrototype() {
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
 	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 5)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
+	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_tokenUri")
+	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 6)
+	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
+	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_authorizationUri")
+	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 7)
+	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_extra")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.[]uint8")
 
 	/** associations of OAuth2Client **/
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 6)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 8)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, false)
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_parentPtr")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "Config.OAuth2Configuration:Ref")
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "childsUuid")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "[]xs.string")
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 7)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 9)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, false)
 
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "referenced")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "[]EntityRef")
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 8)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 10)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
@@ -2571,6 +2580,8 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_secret")
 	query.Fields = append(query.Fields, "M_redirectUri")
+	query.Fields = append(query.Fields, "M_tokenUri")
+	query.Fields = append(query.Fields, "M_authorizationUri")
 	query.Fields = append(query.Fields, "M_extra")
 
 	/** associations of OAuth2Client **/
@@ -2591,6 +2602,8 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_id)
 	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_secret)
 	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_redirectUri)
+	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_tokenUri)
+	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_authorizationUri)
 	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_extra)
 
 	/** associations of OAuth2Client **/
@@ -2651,6 +2664,8 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
 	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_secret")
 	query.Fields = append(query.Fields, "M_redirectUri")
+	query.Fields = append(query.Fields, "M_tokenUri")
+	query.Fields = append(query.Fields, "M_authorizationUri")
 	query.Fields = append(query.Fields, "M_extra")
 
 	/** associations of OAuth2Client **/
@@ -2697,16 +2712,26 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
 			this.object.M_redirectUri = results[0][4].(string)
 		}
 
-		/** extra **/
+		/** tokenUri **/
 		if results[0][5] != nil {
-			this.object.M_extra = results[0][5].([]uint8)
+			this.object.M_tokenUri = results[0][5].(string)
+		}
+
+		/** authorizationUri **/
+		if results[0][6] != nil {
+			this.object.M_authorizationUri = results[0][6].(string)
+		}
+
+		/** extra **/
+		if results[0][7] != nil {
+			this.object.M_extra = results[0][7].([]uint8)
 		}
 
 		/** associations of OAuth2Client **/
 
 		/** parentPtr **/
-		if results[0][6] != nil {
-			id := results[0][6].(string)
+		if results[0][8] != nil {
+			id := results[0][8].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Configuration"
 				id_ := refTypeName + "$$" + id
@@ -2714,14 +2739,14 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][7].(string)
+		childsUuidStr := results[0][9].(string)
 		this.childsUuid = make([]string, 0)
 		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 		if err != nil {
 			return err
 		}
 
-		referencedStr := results[0][8].(string)
+		referencedStr := results[0][10].(string)
 		this.referenced = make([]EntityRef, 0)
 		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 		if err != nil {
@@ -3096,16 +3121,17 @@ func (this *EntityManager) create_Config_OAuth2AuthorizeEntityPrototype() {
 	/** members of OAuth2Authorize **/
 	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 2)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
-	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_client")
-	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "Config.OAuth2Client:Ref")
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_id")
+	oAuth2AuthorizeEntityProto.Ids = append(oAuth2AuthorizeEntityProto.Ids, "M_id")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
 	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 3)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
-	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_code")
-	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_client")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "Config.OAuth2Client:Ref")
 	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 4)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_expiresIn")
-	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.long")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.time")
 	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 5)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_scope")
@@ -3125,7 +3151,7 @@ func (this *EntityManager) create_Config_OAuth2AuthorizeEntityPrototype() {
 	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 9)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_createdAt")
-	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.long")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.date")
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "childsUuid")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "[]xs.string")
 	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 10)
@@ -3159,8 +3185,8 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "parentUuid")
 
 	/** members of OAuth2Authorize **/
+	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_client")
-	query.Fields = append(query.Fields, "M_code")
 	query.Fields = append(query.Fields, "M_expiresIn")
 	query.Fields = append(query.Fields, "M_scope")
 	query.Fields = append(query.Fields, "M_redirectUri")
@@ -3180,10 +3206,10 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 	}
 
 	/** members of OAuth2Authorize **/
+	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_id)
 
 	/** Save client type OAuth2Client **/
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_client)
-	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_code)
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_expiresIn)
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_scope)
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_redirectUri)
@@ -3241,8 +3267,8 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string) error {
 	query.Fields = append(query.Fields, "parentUuid")
 
 	/** members of OAuth2Authorize **/
+	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_client")
-	query.Fields = append(query.Fields, "M_code")
 	query.Fields = append(query.Fields, "M_expiresIn")
 	query.Fields = append(query.Fields, "M_scope")
 	query.Fields = append(query.Fields, "M_redirectUri")
@@ -3276,20 +3302,20 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string) error {
 
 		/** members of OAuth2Authorize **/
 
-		/** client **/
+		/** id **/
 		if results[0][2] != nil {
-			id := results[0][2].(string)
+			this.object.M_id = results[0][2].(string)
+		}
+
+		/** client **/
+		if results[0][3] != nil {
+			id := results[0][3].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Client"
 				id_ := refTypeName + "$$" + id
 				this.object.M_client = id
 				GetServer().GetEntityManager().appendReference("client", this.object.UUID, id_)
 			}
-		}
-
-		/** code **/
-		if results[0][3] != nil {
-			this.object.M_code = results[0][3].(string)
 		}
 
 		/** expiresIn **/
@@ -3359,6 +3385,7 @@ func (this *Config_OAuth2AuthorizeEntity) DeleteEntity() {
 func ConfigOAuth2AuthorizeExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Authorize"
+	query.Indexs = append(query.Indexs, "M_id="+val)
 	query.Fields = append(query.Fields, "uuid")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -3702,19 +3729,20 @@ func (this *EntityManager) create_Config_OAuth2AccessEntityPrototype() {
 	/** members of OAuth2Access **/
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 2)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
-	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_client")
-	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "Config.OAuth2Client:Ref")
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_id")
+	oAuth2AccessEntityProto.Ids = append(oAuth2AccessEntityProto.Ids, "M_id")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 3)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
-	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_authorize")
-	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "Config.OAuth2Authorize:Ref")
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_client")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "Config.OAuth2Client:Ref")
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 4)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
-	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_previous")
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_authorize")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 5)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
-	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_accessToken")
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_previous")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 6)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
@@ -3723,7 +3751,7 @@ func (this *EntityManager) create_Config_OAuth2AccessEntityPrototype() {
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 7)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_expiresIn")
-	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.long")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.time")
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 8)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_scope")
@@ -3739,7 +3767,7 @@ func (this *EntityManager) create_Config_OAuth2AccessEntityPrototype() {
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 11)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_createdAt")
-	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.long")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.date")
 
 	/** associations of OAuth2Access **/
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 12)
@@ -3779,10 +3807,10 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "parentUuid")
 
 	/** members of OAuth2Access **/
+	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_client")
 	query.Fields = append(query.Fields, "M_authorize")
 	query.Fields = append(query.Fields, "M_previous")
-	query.Fields = append(query.Fields, "M_accessToken")
 	query.Fields = append(query.Fields, "M_refreshToken")
 	query.Fields = append(query.Fields, "M_expiresIn")
 	query.Fields = append(query.Fields, "M_scope")
@@ -3805,19 +3833,15 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	}
 
 	/** members of OAuth2Access **/
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_id)
 
 	/** Save client type OAuth2Client **/
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_client)
-
-	/** Save authorize type OAuth2Authorize **/
-	/** attribute OAuth2Authorize has no method GetId, must be an error here...*/
-	OAuth2AccessInfo = append(OAuth2AccessInfo, "")
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_authorize)
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_previous)
-	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_accessToken)
 
 	/** Save refreshToken type OAuth2Refresh **/
-	/** attribute OAuth2Refresh has no method GetId, must be an error here...*/
-	OAuth2AccessInfo = append(OAuth2AccessInfo, "")
+	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_refreshToken)
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_expiresIn)
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_scope)
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_redirectUri)
@@ -3879,10 +3903,10 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string) error {
 	query.Fields = append(query.Fields, "parentUuid")
 
 	/** members of OAuth2Access **/
+	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_client")
 	query.Fields = append(query.Fields, "M_authorize")
 	query.Fields = append(query.Fields, "M_previous")
-	query.Fields = append(query.Fields, "M_accessToken")
 	query.Fields = append(query.Fields, "M_refreshToken")
 	query.Fields = append(query.Fields, "M_expiresIn")
 	query.Fields = append(query.Fields, "M_scope")
@@ -3919,9 +3943,14 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string) error {
 
 		/** members of OAuth2Access **/
 
-		/** client **/
+		/** id **/
 		if results[0][2] != nil {
-			id := results[0][2].(string)
+			this.object.M_id = results[0][2].(string)
+		}
+
+		/** client **/
+		if results[0][3] != nil {
+			id := results[0][3].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Client"
 				id_ := refTypeName + "$$" + id
@@ -3931,24 +3960,13 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string) error {
 		}
 
 		/** authorize **/
-		if results[0][3] != nil {
-			id := results[0][3].(string)
-			if len(id) > 0 {
-				refTypeName := "Config.OAuth2Authorize"
-				id_ := refTypeName + "$$" + id
-				this.object.M_authorize = id
-				GetServer().GetEntityManager().appendReference("authorize", this.object.UUID, id_)
-			}
+		if results[0][4] != nil {
+			this.object.M_authorize = results[0][4].(string)
 		}
 
 		/** previous **/
-		if results[0][4] != nil {
-			this.object.M_previous = results[0][4].(string)
-		}
-
-		/** accessToken **/
 		if results[0][5] != nil {
-			this.object.M_accessToken = results[0][5].(string)
+			this.object.M_previous = results[0][5].(string)
 		}
 
 		/** refreshToken **/
@@ -4037,6 +4055,7 @@ func (this *Config_OAuth2AccessEntity) DeleteEntity() {
 func ConfigOAuth2AccessExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Access"
+	query.Indexs = append(query.Indexs, "M_id="+val)
 	query.Fields = append(query.Fields, "uuid")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -4380,7 +4399,8 @@ func (this *EntityManager) create_Config_OAuth2RefreshEntityPrototype() {
 	/** members of OAuth2Refresh **/
 	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 2)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, true)
-	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "M_token")
+	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "M_id")
+	oAuth2RefreshEntityProto.Ids = append(oAuth2RefreshEntityProto.Ids, "M_id")
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "xs.string")
 	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 3)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, true)
@@ -4425,7 +4445,7 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "parentUuid")
 
 	/** members of OAuth2Refresh **/
-	query.Fields = append(query.Fields, "M_token")
+	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_access")
 
 	/** associations of OAuth2Refresh **/
@@ -4443,11 +4463,10 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	}
 
 	/** members of OAuth2Refresh **/
-	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_token)
+	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_id)
 
 	/** Save access type OAuth2Access **/
-	/** attribute OAuth2Access has no method GetId, must be an error here...*/
-	OAuth2RefreshInfo = append(OAuth2RefreshInfo, "")
+	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_access)
 
 	/** associations of OAuth2Refresh **/
 
@@ -4504,7 +4523,7 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string) error {
 	query.Fields = append(query.Fields, "parentUuid")
 
 	/** members of OAuth2Refresh **/
-	query.Fields = append(query.Fields, "M_token")
+	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_access")
 
 	/** associations of OAuth2Refresh **/
@@ -4536,9 +4555,9 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string) error {
 
 		/** members of OAuth2Refresh **/
 
-		/** token **/
+		/** id **/
 		if results[0][2] != nil {
-			this.object.M_token = results[0][2].(string)
+			this.object.M_id = results[0][2].(string)
 		}
 
 		/** access **/
@@ -4602,6 +4621,7 @@ func (this *Config_OAuth2RefreshEntity) DeleteEntity() {
 func ConfigOAuth2RefreshExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Refresh"
+	query.Indexs = append(query.Indexs, "M_id="+val)
 	query.Fields = append(query.Fields, "uuid")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -4946,15 +4966,16 @@ func (this *EntityManager) create_Config_OAuth2ExpiresEntityPrototype() {
 	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 2)
 	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, true)
 	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "M_id")
-	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.string")
+	oAuth2ExpiresEntityProto.Ids = append(oAuth2ExpiresEntityProto.Ids, "M_id")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.int")
 	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 3)
 	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, true)
 	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "M_token")
-	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "Config.OAuth2Refresh:Ref")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.string")
 	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 4)
 	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, true)
 	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "M_expiresAt")
-	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.long")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.date")
 
 	/** associations of OAuth2Expires **/
 	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 5)
@@ -5014,10 +5035,7 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 
 	/** members of OAuth2Expires **/
 	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.object.M_id)
-
-	/** Save token type OAuth2Refresh **/
-	/** attribute OAuth2Refresh has no method GetId, must be an error here...*/
-	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, "")
+	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.object.M_token)
 	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.object.M_expiresAt)
 
 	/** associations of OAuth2Expires **/
@@ -5110,18 +5128,12 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string) error {
 
 		/** id **/
 		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+			this.object.M_id = results[0][2].(int)
 		}
 
 		/** token **/
 		if results[0][3] != nil {
-			id := results[0][3].(string)
-			if len(id) > 0 {
-				refTypeName := "Config.OAuth2Refresh"
-				id_ := refTypeName + "$$" + id
-				this.object.M_token = id
-				GetServer().GetEntityManager().appendReference("token", this.object.UUID, id_)
-			}
+			this.object.M_token = results[0][3].(string)
 		}
 
 		/** expiresAt **/

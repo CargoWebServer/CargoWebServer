@@ -1509,6 +1509,13 @@ var ColumnFormater = function () {
  * @param {format} format A string containing the format to apply, YYYY-MM-DD HH:mm:ss is the default.
  */
 ColumnFormater.prototype.formatDate = function (value, format) {
+
+	// Try to convert from a unix time.
+	var date = new Date(value * 1000)
+    if((date instanceof Date && !isNaN(date.valueOf()))){
+		value = date
+	}
+
 	format = typeof format !== 'undefined' ? format : 'YYYY-MM-DD HH:mm:ss'
 	value = moment(value).format(format);
 	return value

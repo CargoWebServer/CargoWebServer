@@ -64,6 +64,7 @@ func loadDocument(doc *XML_Schemas.CMOF_Document) {
 	cmofPrimitiveTypesMap["http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"] = "int"
 	cmofPrimitiveTypesMap["http://www.w3.org/2001/XMLSchema#integer"] = "int"
 	cmofPrimitiveTypesMap["http://www.w3.org/2001/XMLSchema#date"] = "int64"
+	cmofPrimitiveTypesMap["http://www.w3.org/2001/XMLSchema#time"] = "int64"
 	cmofPrimitiveTypesMap["DC.cmof#Integer"] = "int"
 	cmofPrimitiveTypesMap["Integer"] = "int"
 	cmofPrimitiveTypesMap["Long"] = "int64"

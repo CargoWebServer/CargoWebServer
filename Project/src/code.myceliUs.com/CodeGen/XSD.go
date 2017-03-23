@@ -43,6 +43,7 @@ func loadSchema(schema *XML_Schemas.XSD_Schema) {
 	xsdPrimitiveTypesMap["xsd:double"] = "float64"
 	xsdPrimitiveTypesMap["xsd:date"] = "int64"
 	xsdPrimitiveTypesMap["xsd:long"] = "int64"
+	xsdPrimitiveTypesMap["xsd:time"] = "int64"
 	xsdPrimitiveTypesMap["xsd:byte"] = "[]uint8"
 
 	/////////////////////////////////////////////////////////////

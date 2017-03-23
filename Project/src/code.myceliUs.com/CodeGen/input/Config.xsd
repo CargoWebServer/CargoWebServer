@@ -101,9 +101,9 @@
 	<xsd:element name="oauth2Authorize" type="tOAuth2Authorize"/>
 	<xsd:complexType name="tOAuth2Authorize" abstract="false">
 		<xsd:complexContent>
+				<xsd:attribute name="id" type="xsd:ID" />
 				<xsd:attribute ref="client"  type="tOAuth2Client" minOccurs="1" maxOccurs="1"/>
-				<xsd:attribute name="code" type="xsd:ID" />
-				<xsd:attribute name="expiresIn " type="xsd:long" />
+				<xsd:attribute name="expiresIn " type="xsd:time" />
 				<xsd:attribute name="scope" type="xsd:string" />
 				<xsd:attribute name="redirectUri" type="xsd:anyURI" />
 				<xsd:attribute name="state" type="xsd:string" />
@@ -115,14 +115,16 @@
 	<xsd:element name="oauth2Access" type="tOAuth2Access"/>
 	<xsd:complexType name="tOAuth2Access" abstract="false">
 		<xsd:complexContent>
+				<xsd:attribute name="id " type="xsd:ID" />
 				<xsd:attribute ref="client" type="tOAuth2Client" minOccurs="1" maxOccurs="1"/>
-				<xsd:attribute ref="authorize" type="tOAuth2Authorize" minOccurs="1" maxOccurs="1"/>
+				<xsd:attribute name="authorize" type="xsd:string" minOccurs="1" maxOccurs="1"/>
 				<xsd:attribute name="previous" type="xsd:string" />
-				<xsd:attribute name="accessToken " type="xsd:ID" />
 				<xsd:attribute ref="refreshToken " type="tOAuth2Refresh"  minOccurs="1" maxOccurs="1"/>
-				<xsd:attribute name="expiresIn " type="xsd:long" />
+				<xsd:attribute name="expiresIn " type="xsd:time" />
 				<xsd:attribute name="scope" type="xsd:string" />
 				<xsd:attribute name="redirectUri" type="xsd:anyURI" />
+				<xsd:attribute name="tokenUri" type="xsd:anyURI" />
+				<xsd:attribute name="authorizationUri" type="xsd:anyURI" />
 				<xsd:attribute name="extra" type="xsd:byte" />
 				<xsd:attribute name="createdAt " type="xsd:date" />
 		</xsd:complexContent> 
@@ -131,7 +133,7 @@
 	<xsd:element name="oauth2Refresh" type="tOAuth2Refresh"/>
 	<xsd:complexType name="tOAuth2Refresh" abstract="false">
 		<xsd:complexContent>
-				<xsd:attribute name="token" type="xsd:ID" />
+				<xsd:attribute name="id" type="xsd:ID" />
 				<xsd:attribute ref="access" type="tOAuth2Access" minOccurs="1" maxOccurs="1"/>
 		</xsd:complexContent> 
 	</xsd:complexType>
@@ -139,8 +141,8 @@
 	<xsd:element name="oauth2Expires" type="tOAuth2Expires"/>
 	<xsd:complexType name="tOAuth2Expires" abstract="false">
 		<xsd:complexContent>
-				<xsd:attribute name="id " type="xsd:ID" />
-				<xsd:attribute ref="token" type="tOAuth2Refresh" minOccurs="1" maxOccurs="1"/>
+				<xsd:attribute name="id " type="xsd:integer" />
+				<xsd:attribute name="token " type="xsd:string" />
 				<xsd:attribute name="expiresAt " type="xsd:long"/>
 		</xsd:complexContent> 
 	</xsd:complexType>

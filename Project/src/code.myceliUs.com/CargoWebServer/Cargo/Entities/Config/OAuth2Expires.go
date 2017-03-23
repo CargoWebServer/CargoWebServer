@@ -19,9 +19,7 @@ type OAuth2Expires struct{
 	IsInit   bool
 
 	/** members of OAuth2Expires **/
-	M_id string
-	m_token *OAuth2Refresh
-	/** If the ref is a string and not an object **/
+	M_id int
 	M_token string
 	M_expiresAt int64
 
@@ -43,43 +41,30 @@ func (this *OAuth2Expires) GetUUID() string{
 }
 
 /** Id **/
-func (this *OAuth2Expires) GetId() string{
+func (this *OAuth2Expires) GetId() int{
 	return this.M_id
 }
 
 /** Init reference Id **/
 func (this *OAuth2Expires) SetId(ref interface{}){
 	this.NeedSave = true
-	this.M_id = ref.(string)
+	this.M_id = ref.(int)
 }
 
 /** Remove reference Id **/
 
 /** Token **/
-func (this *OAuth2Expires) GetToken() *OAuth2Refresh{
-	return this.m_token
+func (this *OAuth2Expires) GetToken() string{
+	return this.M_token
 }
 
 /** Init reference Token **/
 func (this *OAuth2Expires) SetToken(ref interface{}){
 	this.NeedSave = true
-	if _, ok := ref.(string); ok {
-		this.M_token = ref.(string)
-	}else{
-		this.m_token = ref.(*OAuth2Refresh)
-		this.M_token = ref.(*OAuth2Refresh).GetUUID()
-	}
+	this.M_token = ref.(string)
 }
 
 /** Remove reference Token **/
-func (this *OAuth2Expires) RemoveToken(ref interface{}){
-	this.NeedSave = true
-	toDelete := ref.(*OAuth2Refresh)
-	if toDelete.GetUUID() == this.m_token.GetUUID() {
-		this.m_token = nil
-		this.M_token = ""
-	}
-}
 
 /** ExpiresAt **/
 func (this *OAuth2Expires) GetExpiresAt() int64{

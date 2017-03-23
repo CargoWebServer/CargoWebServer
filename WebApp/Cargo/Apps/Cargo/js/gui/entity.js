@@ -382,6 +382,13 @@ EntityPanel.prototype.initHeader = function () {
 						function (entity, entityPanel) {
 							if (entityPanel.saveCallback != undefined) {
 								entityPanel.saveCallback(entity)
+								if(entityPanel.parentEntity!=nil){
+									if(entityPanel.parentEntity.panel != null){
+										if(entityPanel.parentEntity.panel.saveCallback != undefined){
+											entityPanel.parentEntity.panel.saveCallback(entityPanel.parentEntity)
+										}
+									}
+								}
 							}
 						},
 						// Error callback.
@@ -395,6 +402,13 @@ EntityPanel.prototype.initHeader = function () {
 						function (entity, entityPanel) {
 							if (entityPanel.saveCallback != undefined) {
 								entityPanel.saveCallback(entity)
+								if(entityPanel.parentEntity!=nil){
+									if(entityPanel.parentEntity.panel != null){
+										if(entityPanel.parentEntity.panel.saveCallback != undefined){
+											entityPanel.parentEntity.panel.saveCallback(entityPanel.parentEntity)
+										}
+									}
+								}
 							}
 						},
 						// Error callback.

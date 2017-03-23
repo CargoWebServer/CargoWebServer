@@ -19,14 +19,12 @@ type OAuth2Access struct{
 	IsInit   bool
 
 	/** members of OAuth2Access **/
+	M_id string
 	m_client *OAuth2Client
 	/** If the ref is a string and not an object **/
 	M_client string
-	m_authorize *OAuth2Authorize
-	/** If the ref is a string and not an object **/
 	M_authorize string
 	M_previous string
-	M_accessToken string
 	m_refreshToken *OAuth2Refresh
 	/** If the ref is a string and not an object **/
 	M_refreshToken string
@@ -52,6 +50,19 @@ type XsdOAuth2Access struct {
 func (this *OAuth2Access) GetUUID() string{
 	return this.UUID
 }
+
+/** Id **/
+func (this *OAuth2Access) GetId() string{
+	return this.M_id
+}
+
+/** Init reference Id **/
+func (this *OAuth2Access) SetId(ref interface{}){
+	this.NeedSave = true
+	this.M_id = ref.(string)
+}
+
+/** Remove reference Id **/
 
 /** Client **/
 func (this *OAuth2Access) GetClient() *OAuth2Client{
@@ -80,30 +91,17 @@ func (this *OAuth2Access) RemoveClient(ref interface{}){
 }
 
 /** Authorize **/
-func (this *OAuth2Access) GetAuthorize() *OAuth2Authorize{
-	return this.m_authorize
+func (this *OAuth2Access) GetAuthorize() string{
+	return this.M_authorize
 }
 
 /** Init reference Authorize **/
 func (this *OAuth2Access) SetAuthorize(ref interface{}){
 	this.NeedSave = true
-	if _, ok := ref.(string); ok {
-		this.M_authorize = ref.(string)
-	}else{
-		this.m_authorize = ref.(*OAuth2Authorize)
-		this.M_authorize = ref.(*OAuth2Authorize).GetUUID()
-	}
+	this.M_authorize = ref.(string)
 }
 
 /** Remove reference Authorize **/
-func (this *OAuth2Access) RemoveAuthorize(ref interface{}){
-	this.NeedSave = true
-	toDelete := ref.(*OAuth2Authorize)
-	if toDelete.GetUUID() == this.m_authorize.GetUUID() {
-		this.m_authorize = nil
-		this.M_authorize = ""
-	}
-}
 
 /** Previous **/
 func (this *OAuth2Access) GetPrevious() string{
@@ -117,19 +115,6 @@ func (this *OAuth2Access) SetPrevious(ref interface{}){
 }
 
 /** Remove reference Previous **/
-
-/** AccessToken **/
-func (this *OAuth2Access) GetAccessToken() string{
-	return this.M_accessToken
-}
-
-/** Init reference AccessToken **/
-func (this *OAuth2Access) SetAccessToken(ref interface{}){
-	this.NeedSave = true
-	this.M_accessToken = ref.(string)
-}
-
-/** Remove reference AccessToken **/
 
 /** RefreshToken **/
 func (this *OAuth2Access) GetRefreshToken() *OAuth2Refresh{

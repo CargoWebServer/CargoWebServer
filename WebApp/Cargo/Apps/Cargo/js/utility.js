@@ -151,7 +151,7 @@ function isXsBaseType(fieldType) {
  * Helper function use to dertermine if a XS type must be considere integer.
  */
 function isXsInt(fieldType) {
-    if (fieldType.endsWith("byte") || fieldType.endsWith("int") || fieldType.endsWith("integer") || fieldType.endsWith("short")  // XML
+    if (fieldType.endsWith("byte")|| fieldType.endsWith("long") || fieldType.endsWith("int") || fieldType.endsWith("integer") || fieldType.endsWith("short")  // XML
         || fieldType.endsWith("unsignedInt") || fieldType.endsWith("unsignedBtype") || fieldType.endsWith("unsignedShort") || fieldType.endsWith("unsignedLong")  // XML
         || fieldType.endsWith("negativeInteger") || fieldType.endsWith("nonNegativeInteger") || fieldType.endsWith("nonPositiveInteger") || fieldType.endsWith("positiveInteger") // XML
         || fieldType.endsWith("tinyint") || fieldType.endsWith("smallint") || fieldType.endsWith("bigint"))// SQL

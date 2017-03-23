@@ -519,9 +519,8 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 	store, err := NewDataStore(storeConfig)
 	if err == nil {
 		// Append the new dataStore configuration.
-		GetServer().GetConfigurationManager().m_activeConfigurations.SetDataStoreConfigs(storeConfig)
-		// Save it.
-		GetServer().GetConfigurationManager().m_configurationEntity.SaveEntity()
+		GetServer().GetConfigurationManager().appendDataStoreConfiguration(storeConfig)
+
 		this.Lock()
 		this.m_dataStores[storeId] = store
 		this.Unlock()

@@ -94,6 +94,38 @@ func (this *ConfigXmlFactory) SerializeXml(outputPath string, toSerialize *Confi
 	return nil
 }
 
+/** inititialisation of OAuth2Configuration **/
+func (this *ConfigXmlFactory) InitOAuth2Configuration(xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
+	log.Println("Initialize OAuth2Configuration")
+
+	/** OAuth2Configuration **/
+	object.M_id = xmlElement.M_id
+
+	/** Configuration **/
+	object.M_authorizationExpiration = xmlElement.M_authorizationExpiration
+
+	/** Configuration **/
+	object.M_accessExpiration = xmlElement.M_accessExpiration
+
+	/** Configuration **/
+	object.M_tokenType = xmlElement.M_tokenType
+
+	/** Configuration **/
+	object.M_errorStatusCode = xmlElement.M_errorStatusCode
+
+	/** Configuration **/
+	object.M_allowClientSecretInParams = xmlElement.M_allowClientSecretInParams
+
+	/** Configuration **/
+	object.M_allowGetAccessRequest = xmlElement.M_allowGetAccessRequest
+
+	/** Configuration **/
+	object.M_redirectUriSeparator = xmlElement.M_redirectUriSeparator
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
 /** inititialisation of Configurations **/
 func (this *ConfigXmlFactory) InitConfigurations(xmlElement *Config.XsdConfigurations, object *Config.Configurations) {
 	log.Println("Initialize Configurations")
@@ -477,33 +509,66 @@ func (this *ConfigXmlFactory) InitServiceConfiguration(xmlElement *Config.XsdSer
 	}
 }
 
-/** inititialisation of OAuth2Configuration **/
-func (this *ConfigXmlFactory) InitOAuth2Configuration(xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
-	log.Println("Initialize OAuth2Configuration")
+/** serialysation of ServiceConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** ServiceConfiguration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_hostName = object.M_hostName
+
+	/** Configuration **/
+	xmlElement.M_ipv4 = object.M_ipv4
+
+	/** Configuration **/
+	xmlElement.M_port = object.M_port
+
+	/** Configuration **/
+	xmlElement.M_user = object.M_user
+
+	/** Configuration **/
+	xmlElement.M_pwd = object.M_pwd
+
+	/** Configuration **/
+	xmlElement.M_start = object.M_start
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of OAuth2Configuration **/
+func (this *ConfigXmlFactory) SerialyzeOAuth2Configuration(xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
+	if xmlElement == nil {
+		return
+	}
 
 	/** OAuth2Configuration **/
-	object.M_id = xmlElement.M_id
+	xmlElement.M_id = object.M_id
 
 	/** Configuration **/
-	object.M_authorizationExpiration = xmlElement.M_authorizationExpiration
+	xmlElement.M_authorizationExpiration = object.M_authorizationExpiration
 
 	/** Configuration **/
-	object.M_accessExpiration = xmlElement.M_accessExpiration
+	xmlElement.M_accessExpiration = object.M_accessExpiration
 
 	/** Configuration **/
-	object.M_tokenType = xmlElement.M_tokenType
+	xmlElement.M_tokenType = object.M_tokenType
 
 	/** Configuration **/
-	object.M_errorStatusCode = xmlElement.M_errorStatusCode
+	xmlElement.M_errorStatusCode = object.M_errorStatusCode
 
 	/** Configuration **/
-	object.M_allowClientSecretInParams = xmlElement.M_allowClientSecretInParams
+	xmlElement.M_allowClientSecretInParams = object.M_allowClientSecretInParams
 
 	/** Configuration **/
-	object.M_allowGetAccessRequest = xmlElement.M_allowGetAccessRequest
+	xmlElement.M_allowGetAccessRequest = object.M_allowGetAccessRequest
 
 	/** Configuration **/
-	object.M_redirectUriSeparator = xmlElement.M_redirectUriSeparator
+	xmlElement.M_redirectUriSeparator = object.M_redirectUriSeparator
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -876,71 +941,6 @@ func (this *ConfigXmlFactory) SerialyzeDataStoreConfiguration(xmlElement *Config
 	} else if object.M_textEncoding == Config.Encoding_KOI8U {
 		xmlElement.M_textEncoding = "##KOI8U"
 	}
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of ServiceConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** ServiceConfiguration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_hostName = object.M_hostName
-
-	/** Configuration **/
-	xmlElement.M_ipv4 = object.M_ipv4
-
-	/** Configuration **/
-	xmlElement.M_port = object.M_port
-
-	/** Configuration **/
-	xmlElement.M_user = object.M_user
-
-	/** Configuration **/
-	xmlElement.M_pwd = object.M_pwd
-
-	/** Configuration **/
-	xmlElement.M_start = object.M_start
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of OAuth2Configuration **/
-func (this *ConfigXmlFactory) SerialyzeOAuth2Configuration(xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** OAuth2Configuration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_authorizationExpiration = object.M_authorizationExpiration
-
-	/** Configuration **/
-	xmlElement.M_accessExpiration = object.M_accessExpiration
-
-	/** Configuration **/
-	xmlElement.M_tokenType = object.M_tokenType
-
-	/** Configuration **/
-	xmlElement.M_errorStatusCode = object.M_errorStatusCode
-
-	/** Configuration **/
-	xmlElement.M_allowClientSecretInParams = object.M_allowClientSecretInParams
-
-	/** Configuration **/
-	xmlElement.M_allowGetAccessRequest = object.M_allowGetAccessRequest
-
-	/** Configuration **/
-	xmlElement.M_redirectUriSeparator = object.M_redirectUriSeparator
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}

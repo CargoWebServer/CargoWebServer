@@ -19,7 +19,7 @@ type OAuth2Refresh struct{
 	IsInit   bool
 
 	/** members of OAuth2Refresh **/
-	M_token string
+	M_id string
 	m_access *OAuth2Access
 	/** If the ref is a string and not an object **/
 	M_access string
@@ -41,18 +41,18 @@ func (this *OAuth2Refresh) GetUUID() string{
 	return this.UUID
 }
 
-/** Token **/
-func (this *OAuth2Refresh) GetToken() string{
-	return this.M_token
+/** Id **/
+func (this *OAuth2Refresh) GetId() string{
+	return this.M_id
 }
 
-/** Init reference Token **/
-func (this *OAuth2Refresh) SetToken(ref interface{}){
+/** Init reference Id **/
+func (this *OAuth2Refresh) SetId(ref interface{}){
 	this.NeedSave = true
-	this.M_token = ref.(string)
+	this.M_id = ref.(string)
 }
 
-/** Remove reference Token **/
+/** Remove reference Id **/
 
 /** Access **/
 func (this *OAuth2Refresh) GetAccess() *OAuth2Access{

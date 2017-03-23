@@ -21,17 +21,12 @@ const (
  * used by applications served.
  */
 type ConfigurationManager struct {
-	// The service configuration.
-	m_config *Config.ServiceConfiguration
 
 	// This is the root of the server.
 	m_filePath string
 
 	// the active configurations...
-	m_activeConfigurations *Config.Configurations
-
-	// the configuration entity...
-	m_configurationEntity *Config_ConfigurationsEntity
+	m_activeConfigurationsEntity *Config_ConfigurationsEntity
 
 	// The list of service configurations...
 	m_servicesConfiguration []*Config.ServiceConfiguration
@@ -114,53 +109,51 @@ func (this *ConfigurationManager) initialize() {
 	// So here if there is no configuration...
 	configsUuid := ConfigConfigurationsExists("CARGO_CONFIGURATIONS")
 	if len(configsUuid) > 0 {
-		this.m_configurationEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity("", configsUuid, nil)
-		this.m_configurationEntity.InitEntity(configsUuid)
-		this.m_activeConfigurations = this.m_configurationEntity.GetObject().(*Config.Configurations)
+		entity, _ := GetServer().GetEntityManager().getEntityByUuid(configsUuid)
+		this.m_activeConfigurationsEntity = entity.(*Config_ConfigurationsEntity)
 	} else {
-		this.m_activeConfigurations = new(Config.Configurations)
-		this.m_activeConfigurations.M_id = "CARGO_CONFIGURATIONS"
-		this.m_activeConfigurations.M_name = "Default"
-		this.m_activeConfigurations.M_version = "1.0"
-		this.m_activeConfigurations.M_filePath = this.m_filePath
+		activeConfigurations := new(Config.Configurations)
+		activeConfigurations.M_id = "CARGO_CONFIGURATIONS"
+		activeConfigurations.M_name = "Default"
+		activeConfigurations.M_version = "1.0"
+		activeConfigurations.M_filePath = this.m_filePath
 
 		// Now the default server configuration...
 		// Sever default values...
-		this.m_activeConfigurations.M_serverConfig = new(Config.ServerConfiguration)
-		this.m_activeConfigurations.M_serverConfig.NeedSave = true
+		activeConfigurations.M_serverConfig = new(Config.ServerConfiguration)
+		activeConfigurations.M_serverConfig.NeedSave = true
 
-		this.m_activeConfigurations.M_serverConfig.M_id = "CARGO_DEFAULT_SERVER"
-		this.m_activeConfigurations.M_serverConfig.M_serverPort = 9393
-		this.m_activeConfigurations.M_serverConfig.M_servicePort = 9494
-		this.m_activeConfigurations.M_serverConfig.M_hostName = "localhost"
-		this.m_activeConfigurations.M_serverConfig.M_ipv4 = "127.0.0.1"
+		activeConfigurations.M_serverConfig.M_id = "CARGO_DEFAULT_SERVER"
+		activeConfigurations.M_serverConfig.M_serverPort = 9393
+		activeConfigurations.M_serverConfig.M_servicePort = 9494
+		activeConfigurations.M_serverConfig.M_hostName = "localhost"
+		activeConfigurations.M_serverConfig.M_ipv4 = "127.0.0.1"
 
 		// Server folders...
-		this.m_activeConfigurations.M_serverConfig.M_applicationsPath = "/Apps"
+		activeConfigurations.M_serverConfig.M_applicationsPath = "/Apps"
 		os.MkdirAll(this.GetApplicationDirectoryPath(), 0777)
-		this.m_activeConfigurations.M_serverConfig.M_dataPath = "/Data"
+		activeConfigurations.M_serverConfig.M_dataPath = "/Data"
 		os.MkdirAll(this.GetDataPath(), 0777)
-		this.m_activeConfigurations.M_serverConfig.M_definitionsPath = "/Definitions"
+		activeConfigurations.M_serverConfig.M_definitionsPath = "/Definitions"
 		os.MkdirAll(this.GetDefinitionsPath(), 0777)
-		this.m_activeConfigurations.M_serverConfig.M_scriptsPath = "/Script"
+		activeConfigurations.M_serverConfig.M_scriptsPath = "/Script"
 		os.MkdirAll(this.GetScriptPath(), 0777)
-		this.m_activeConfigurations.M_serverConfig.M_schemasPath = "/Schemas"
+		activeConfigurations.M_serverConfig.M_schemasPath = "/Schemas"
 		os.MkdirAll(this.GetSchemasPath(), 0777)
-		this.m_activeConfigurations.M_serverConfig.M_tmpPath = "/tmp"
+		activeConfigurations.M_serverConfig.M_tmpPath = "/tmp"
 		os.MkdirAll(this.GetTmpPath(), 0777)
-		this.m_activeConfigurations.M_serverConfig.M_binPath = "/bin"
+		activeConfigurations.M_serverConfig.M_binPath = "/bin"
 		os.MkdirAll(this.GetBinPath(), 0777)
 
 		// Where queries are store by default...
-		this.m_activeConfigurations.M_serverConfig.M_queriesPath = this.m_activeConfigurations.M_serverConfig.M_applicationsPath + "/queries"
+		activeConfigurations.M_serverConfig.M_queriesPath = activeConfigurations.M_serverConfig.M_applicationsPath + "/queries"
 		os.MkdirAll(this.GetQueriesPath(), 0777)
 
-		this.m_activeConfigurations.NeedSave = true
+		activeConfigurations.NeedSave = true
 
 		// Create the configuration entity from the configuration and save it.
-		this.m_configurationEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity("", "", this.m_activeConfigurations)
-
-		this.m_configurationEntity.SaveEntity()
+		this.m_activeConfigurationsEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity("", "", activeConfigurations)
+		this.m_activeConfigurationsEntity.SaveEntity()
 	}
 
 }
@@ -177,8 +170,8 @@ func (this *ConfigurationManager) start() {
 		serviceUuid := ConfigServiceConfigurationExists(this.m_servicesConfiguration[i].GetId())
 		if len(serviceUuid) == 0 {
 			// Set the new config...
-			this.m_activeConfigurations.SetServiceConfigs(this.m_servicesConfiguration[i])
-			this.m_configurationEntity.SaveEntity()
+			this.getActiveConfigurations().SetServiceConfigs(this.m_servicesConfiguration[i])
+			this.m_activeConfigurationsEntity.SaveEntity()
 		}
 	}
 
@@ -187,8 +180,9 @@ func (this *ConfigurationManager) start() {
 		storeUuid := ConfigDataStoreConfigurationExists(this.m_datastoreConfiguration[i].GetId())
 		if len(storeUuid) == 0 {
 			// Set the new config...
-			this.m_activeConfigurations.SetDataStoreConfigs(this.m_datastoreConfiguration[i])
-			this.m_configurationEntity.SaveEntity()
+			this.getActiveConfigurations().SetDataStoreConfigs(this.m_datastoreConfiguration[i])
+			configurationEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getActiveConfigurations().GetUUID())
+			configurationEntity.SaveEntity()
 		}
 	}
 
@@ -198,83 +192,90 @@ func (this *ConfigurationManager) stop() {
 	log.Println("--> Stop ConfigurationManager")
 }
 
-func (this *ConfigurationManager) getConfig() *Config.ServiceConfiguration {
-	return this.m_config
+/**
+ * Return the active configuration.
+ */
+func (this *ConfigurationManager) getActiveConfigurations() *Config.Configurations {
+	if this.m_activeConfigurationsEntity != nil {
+		activeConfigurationsEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.m_activeConfigurationsEntity.GetUuid())
+		return activeConfigurationsEntity.GetObject().(*Config.Configurations)
+	}
+	return nil
 }
 
 /**
  * Server configuration values...
  */
 func (this *ConfigurationManager) GetApplicationDirectoryPath() string {
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return this.m_filePath + "/Apps"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_applicationsPath
+	return this.m_filePath + this.getActiveConfigurations().M_serverConfig.M_applicationsPath
 }
 
 func (this *ConfigurationManager) GetDataPath() string {
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return this.m_filePath + "/Data"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_dataPath
+	return this.m_filePath + this.getActiveConfigurations().M_serverConfig.M_dataPath
 }
 
 func (this *ConfigurationManager) GetScriptPath() string {
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return this.m_filePath + "/Script"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_scriptsPath
+	return this.m_filePath + this.getActiveConfigurations().M_serverConfig.M_scriptsPath
 }
 
 func (this *ConfigurationManager) GetDefinitionsPath() string {
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return this.m_filePath + "/Definitions"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_definitionsPath
+	return this.m_filePath + this.getActiveConfigurations().M_serverConfig.M_definitionsPath
 }
 
 func (this *ConfigurationManager) GetSchemasPath() string {
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return this.m_filePath + "/Schemas"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_schemasPath
+	return this.m_filePath + this.getActiveConfigurations().M_serverConfig.M_schemasPath
 }
 
 func (this *ConfigurationManager) GetTmpPath() string {
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return this.m_filePath + "/tmp"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_tmpPath
+	return this.m_filePath + this.getActiveConfigurations().M_serverConfig.M_tmpPath
 }
 
 func (this *ConfigurationManager) GetBinPath() string {
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return this.m_filePath + "/bin"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_binPath
+	return this.m_filePath + this.getActiveConfigurations().M_serverConfig.M_binPath
 }
 
 func (this *ConfigurationManager) GetQueriesPath() string {
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return this.m_filePath + "/queries"
 	}
-	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_queriesPath
+	return this.m_filePath + this.getActiveConfigurations().M_serverConfig.M_queriesPath
 }
 
 func (this *ConfigurationManager) GetHostName() string {
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return "localhost"
 	}
 	// Default port...
-	return this.m_activeConfigurations.M_serverConfig.M_hostName
+	return this.getActiveConfigurations().M_serverConfig.M_hostName
 }
 
 func (this *ConfigurationManager) GetIpv4() string {
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return "127.0.0.1"
 	}
 	// Default port...
-	return this.m_activeConfigurations.M_serverConfig.M_ipv4
+	return this.getActiveConfigurations().M_serverConfig.M_ipv4
 }
 
 /**
@@ -282,10 +283,10 @@ func (this *ConfigurationManager) GetIpv4() string {
  **/
 func (this *ConfigurationManager) GetServerPort() int {
 	// Default port...
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return 9393
 	}
-	return this.m_activeConfigurations.M_serverConfig.M_serverPort
+	return this.getActiveConfigurations().M_serverConfig.M_serverPort
 }
 
 /**
@@ -293,10 +294,10 @@ func (this *ConfigurationManager) GetServerPort() int {
  */
 func (this *ConfigurationManager) GetServicePort() int {
 	// Default port...
-	if this.m_activeConfigurations == nil {
+	if this.getActiveConfigurations() == nil {
 		return 9494
 	}
-	return this.m_activeConfigurations.M_serverConfig.M_servicePort
+	return this.getActiveConfigurations().M_serverConfig.M_servicePort
 }
 
 /**
@@ -316,10 +317,25 @@ func (this *ConfigurationManager) setServiceConfiguration(id string) {
 }
 
 /**
- * Return the list of default store configurations.
+ * Append a default store configurations.
  */
 func (this *ConfigurationManager) appendDefaultDataStoreConfiguration(config *Config.DataStoreConfiguration) {
 	this.m_datastoreConfiguration = append(this.m_datastoreConfiguration, config)
+}
+
+/**
+ * Append a datastore config.
+ */
+func (this *ConfigurationManager) appendDataStoreConfiguration(config *Config.DataStoreConfiguration) {
+	// Save the data store.
+	configurations := this.getActiveConfigurations()
+	if configurations != nil {
+		configurations.SetDataStoreConfigs(config)
+		this.m_activeConfigurationsEntity.SaveEntity()
+	} else {
+		// append in the list of configuration store and save it latter...
+		this.m_datastoreConfiguration = append(this.m_datastoreConfiguration, config)
+	}
 }
 
 /**
@@ -334,9 +350,9 @@ func (this *ConfigurationManager) getDefaultDataStoreConfigurations() []*Config.
  */
 func (this *ConfigurationManager) getServiceConfigurationById(id string) *Config.ServiceConfiguration {
 
-	for i := 0; i < len(this.m_activeConfigurations.GetServiceConfigs()); i++ {
-		if this.m_activeConfigurations.GetServiceConfigs()[i].GetId() == id {
-			return this.m_activeConfigurations.GetServiceConfigs()[i]
+	for i := 0; i < len(this.getActiveConfigurations().GetServiceConfigs()); i++ {
+		if this.getActiveConfigurations().GetServiceConfigs()[i].GetId() == id {
+			return this.getActiveConfigurations().GetServiceConfigs()[i]
 		}
 	}
 
@@ -399,8 +415,8 @@ func (this *ConfigurationManager) GetLdapConfigurations() []Config.LdapConfigura
  * Tha function retreive the oauth2 configuration.
  */
 func (this *ConfigurationManager) GetOAuth2Configuration() *Config.OAuth2Configuration {
-	if this.m_activeConfigurations != nil {
-		return this.m_activeConfigurations.GetOauth2Configuration()
+	if this.getActiveConfigurations() != nil {
+		return this.getActiveConfigurations().GetOauth2Configuration()
 	}
 	return nil
 }
