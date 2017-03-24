@@ -351,3 +351,46 @@ SecurityManager.prototype.changeAdminPassword = function (pwd, newPwd, successCa
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// OAuth2 Ressource access... The client must be configure first to be able to get access to ressources.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function GetRessource(clientId, scope, query){
+    server.GetOAuth2Manager().GetRessource(clientId,scope, query, messageId, sessionId)
+}
+
+/**
+ * Execute a query to retreive given ressource. 
+ * @param {string} clientId The clien id, defined in configuration.
+ * @param {string} scope The access scope need for the query.
+ * @param {string} query The query that the OAuth2 provider will execute to retreive the information.
+ */
+SecurityManager.prototype.getRessource = function (clientId, scope, query, successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = []
+    params.push(createRpcData(clientId, "STRING", "clientId"))
+    params.push(createRpcData(scope, "STRING", "scope"))
+    params.push(createRpcData(query, "STRING", "query"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        GetRessource.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            caller.successCallback(result, caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback.
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+

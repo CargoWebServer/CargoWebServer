@@ -55,8 +55,8 @@ function main() {
 
    // entityDump("item_1", "Test.Item")
    //entityDump("1", "dt_methode_development.dbo.DT_DTS")
-   entityDump("11362", "dt_methode_development.dbo.DT_DTS")
-// entityDump("1", "employees.employees")
+   //entityDump("11362", "dt_methode_development.dbo.DT_DTS")
+   // entityDump("1", "employees.employees")
     
    //entitiesDump("COLLADASchema.COLLADA")
 //entitiesDump("CargoEntities.Action")
@@ -121,6 +121,15 @@ function main() {
     
      testServiceContainer()
   */
+
+
+  // The get ressource test...
+  server.securityManager.getRessource("1234", "everything", "", 
+  function(result, caller){
+      
+  }, 
+  function(errMsg, caller){
+  }, {})
 }
 
 function testServiceContainer() {

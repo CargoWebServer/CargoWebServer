@@ -6273,6 +6273,7 @@ func (this *CargoEntities_RoleEntity) AppendReference(reference Entity) {
 		this.referencesPtr = append(this.referencesPtr, reference)
 	} else {
 		// The reference must be update in that case.
+		//log.Println(index)
 		this.referencesPtr[index] = reference
 	}
 }

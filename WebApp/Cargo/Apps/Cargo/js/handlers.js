@@ -418,7 +418,7 @@ Request.prototype.getRpcMessageData = function () {
  */
 Request.prototype.process = function () {
     for (var i = 0; i < this.params.length; ++i) {
-        this.paramsMap[this.params[i].name] = this.parseData(params[i])
+        this.paramsMap[this.params[i].name] = this.parseData(this.params[i])
     }
 
     // The ping request is a special case of request.
@@ -426,8 +426,18 @@ Request.prototype.process = function () {
         // Send a ping response.
         var response = new Response(this.id, this.conn, [], null, null, null);
         response.send()
+    }if (this.method == "OAuth2Authorize") {
+        // Here We receice an authorization request.
+        var href = this.paramsMap["authorizationLnk"]
+        var lnk = new Element(document.getElementsByTagName("body")[0], {"tag":"a", "href":"#"})
+        lnk.element.onclick = function(href, lnk){
+            return function(){
+                //window.open('www.yourdomain.com','_blank');
+                document.getElementsByTagName("body")[0].innerHTML='<object type="text/html" data="'+ href +'"></object>';
+            }
+        }(href, lnk)
+        lnk.element.click()
     }
-
 
     // Now I will create the function prototype and try to call it.
     var fn = window[this.method];

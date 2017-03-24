@@ -31,7 +31,6 @@ func main() {
 	http.HandleFunc("/authorize", Server.AuthorizeHandler)
 	http.HandleFunc("/token", Server.TokenHandler)
 	http.HandleFunc("/info", Server.InfoHandler)
-	http.HandleFunc("/app", Server.AppHandler)
 	http.HandleFunc("/appauth/code", Server.AppAuthCodeHandler)
 
 	// stop the server...
