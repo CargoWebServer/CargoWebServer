@@ -6,12 +6,13 @@ package Server
 
 import (
 	//"encoding/json"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
-	//"net/url"
-	//"strconv"
+	"net/url"
+	//	"strconv"
 	"strings"
 	"time"
 
@@ -42,6 +43,63 @@ func setCodeExpiration(code string, duration time.Duration) {
 
 	// The function will be call after the duration.
 	time.AfterFunc(duration, f)
+}
+
+// AddExpireAtData add info in expires table
+func addExpireAtData(code string, expireAt time.Time) error {
+	expire := new(Config.OAuth2Expires)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+	configEntity, _ := GetServer().GetEntityManager().getEntityByUuid(config.GetUUID())
+
+	for i := 0; i < len(config.GetExpire()); i++ {
+		if config.GetExpire()[i].GetToken() == code {
+			return errors.New("Expire already exist for code " + code)
+		}
+	}
+
+	lastId := 0
+	for i := 0; i < len(config.GetExpire()); i++ {
+		if config.GetExpire()[i].GetId() > lastId {
+			lastId = config.GetExpire()[i].GetId()
+		}
+	}
+
+	lastId++
+	expire.SetId(lastId)
+	expire.SetToken(code)
+	expire.SetExpiresAt(expireAt.Unix())
+	config.SetExpire(expire)
+	configEntity.SaveEntity()
+
+	// Start the timer.
+	duration := expireAt.Sub(time.Now())
+	setCodeExpiration(code, duration)
+
+	return nil
+}
+
+// RemoveExpireAtData remove info in expires table
+func removeExpireAtData(code string) error {
+	log.Println("Remove Expire At Data", code)
+	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+
+	for i := 0; i < len(config.GetExpire()); i++ {
+
+		if config.GetExpire()[i] == nil {
+			entity, err := GetServer().GetEntityManager().getEntityByUuid(config.GetExpire()[i].GetUUID())
+			if err == nil {
+				entity.DeleteEntity()
+			}
+		} else {
+			if config.GetExpire()[i].GetToken() == code {
+				entity, err := GetServer().GetEntityManager().getEntityByUuid(config.GetExpire()[i].GetUUID())
+				if err == nil {
+					entity.DeleteEntity()
+				}
+			}
+		}
+	}
+	return nil
 }
 
 type OAuth2Manager struct {
@@ -332,7 +390,7 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 	log.Println("save authorize expire at ", data.ExpireAt().String())
 
 	// Add expire data.
-	if err := this.AddExpireAtData(data.Code, data.ExpireAt()); err != nil {
+	if err := addExpireAtData(data.Code, data.ExpireAt()); err != nil {
 		log.Println("Fail to create access data ", err)
 		return err
 	}
@@ -393,7 +451,7 @@ func (this *OAuth2Store) RemoveAuthorize(code string) error {
 			entity, err := GetServer().GetEntityManager().getEntityByUuid(config.GetAuthorize()[i].GetUUID())
 			entity.DeleteEntity()
 			if err == nil {
-				if err := this.RemoveExpireAtData(code); err != nil {
+				if err := removeExpireAtData(code); err != nil {
 					return err
 				}
 			}
@@ -473,7 +531,7 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
 	}
 
 	// Add expire data.
-	if err := this.AddExpireAtData(data.AccessToken, data.ExpireAt()); err != nil {
+	if err := addExpireAtData(data.AccessToken, data.ExpireAt()); err != nil {
 		log.Println("Fail to create access data ", err)
 		return err
 	}
@@ -571,7 +629,7 @@ func (this *OAuth2Store) RemoveAccess(code string) error {
 			if err == nil {
 				accessEntity.DeleteEntity()
 				// Remove the expire data.
-				if err := this.RemoveExpireAtData(code); err != nil {
+				if err := removeExpireAtData(code); err != nil {
 					return err
 				}
 
@@ -618,57 +676,6 @@ func (this *OAuth2Store) RemoveRefresh(code string) error {
 	}
 
 	return errors.New("No refresh was found with code " + code)
-}
-
-// AddExpireAtData add info in expires table
-func (s *OAuth2Store) AddExpireAtData(code string, expireAt time.Time) error {
-	expire := new(Config.OAuth2Expires)
-	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
-	configEntity, _ := GetServer().GetEntityManager().getEntityByUuid(config.GetUUID())
-
-	lastId := 0
-	for i := 0; i < len(config.GetExpire()); i++ {
-		if config.GetExpire()[i].GetId() > lastId {
-			lastId = config.GetExpire()[i].GetId()
-		}
-	}
-
-	lastId++
-	expire.SetId(lastId)
-	expire.SetToken(code)
-	expire.SetExpiresAt(expireAt.Unix())
-	config.SetExpire(expire)
-	configEntity.SaveEntity()
-
-	// Start the timer.
-	duration := expireAt.Sub(time.Now())
-	setCodeExpiration(code, duration)
-
-	return nil
-}
-
-// RemoveExpireAtData remove info in expires table
-func (s *OAuth2Store) RemoveExpireAtData(code string) error {
-	log.Println("Remove Expire At Data", code)
-	config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
-
-	for i := 0; i < len(config.GetExpire()); i++ {
-
-		if config.GetExpire()[i] == nil {
-			entity, err := GetServer().GetEntityManager().getEntityByUuid(config.GetExpire()[i].GetUUID())
-			if err == nil {
-				entity.DeleteEntity()
-			}
-		} else {
-			if config.GetExpire()[i].GetToken() == code {
-				entity, err := GetServer().GetEntityManager().getEntityByUuid(config.GetExpire()[i].GetUUID())
-				if err == nil {
-					entity.DeleteEntity()
-				}
-			}
-		}
-	}
-	return nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -726,18 +733,22 @@ func (this *OAuth2Manager) GetRessource(clientId string, scope string, query str
 		// Here I will made the API call.
 
 	} else {
-		log.Println("=----------------> authorization needed!")
+
 		// No access was found so here I will initiated the OAuth process...
 		// To do so I will create the href where the user will be ask to
 		// authorize the client application to access ressources.
 		var authorizationLnk = client.GetAuthorizationUri()
 		authorizationLnk += "?response_type=code&client_id=" + client.GetId()
-		authorizationLnk += "&state=" + messageId + ":" + sessionId + "&scope=" + scope
-		authorizationLnk += "&redirect_uri=" + client.GetRedirectUri() + "/code"
+		authorizationLnk += "&state=" + messageId + ":" + sessionId + ":" + clientId + "&scope=" + scope
+		authorizationLnk += "&redirect_uri=" + client.GetRedirectUri()
 
 		// I will create the request and send it to the client...
 		id := Utility.RandomUUID()
-		method := "OAuth2Authorize"
+
+		// Here if there is no user logged for the given session I will send an authentication request.
+		var method string
+		method = "OAuth2Authorization"
+
 		params := make([]*MessageData, 1)
 		data := new(MessageData)
 		data.Name = "authorizationLnk"
@@ -761,28 +772,64 @@ func (this *OAuth2Manager) GetRessource(clientId string, scope string, query str
 ////////////////////////////////////////////////////////////////////////////////
 // Auth Http handler.
 ////////////////////////////////////////////////////////////////////////////////
+/**
+ * Function use to downlaod the access token from OAuth server.
+ */
+func DownloadAccessToken(url string, auth *osin.BasicAuth, output map[string]interface{}) error {
+	// download access token
+	preq, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+	if auth != nil {
+		preq.SetBasicAuth(auth.Username, auth.Password)
+	}
+
+	pclient := &http.Client{}
+	presp, err := pclient.Do(preq)
+	if err != nil {
+		return err
+	}
+
+	if presp.StatusCode != 200 {
+		return errors.New("Invalid status code")
+	}
+
+	jdec := json.NewDecoder(presp.Body)
+	err = jdec.Decode(&output)
+	return err
+}
 
 /**
  * If the use is not logged...
  */
-func HandleLoginPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, r *http.Request) bool {
-	r.ParseForm()
+func HandleAuthenticationPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, r *http.Request) bool {
 
+	r.ParseForm()
 	user := r.Form.Get("login")
 	pwd := r.Form.Get("password")
 	state := r.URL.Query()["state"][0]
 
 	var sessionId string
 	var messageId string
-	if len(strings.Split(state, ":")) == 2 {
+	if len(strings.Split(state, ":")) == 3 {
 		messageId = strings.Split(state, ":")[0]
 		sessionId = strings.Split(state, ":")[1]
 	}
 
+	// If the user is already logged in i will return true.
+	if len(sessionId) > 0 {
+		if GetServer().GetSessionManager().GetActiveSessionById(sessionId) != nil {
+			if GetServer().GetSessionManager().GetActiveSessionById(sessionId).GetAccountPtr() != nil {
+				return true
+			}
+		}
+	}
+
+	// Here I will authenticate the user...
 	if r.Method == "POST" && len(sessionId) > 0 && len(messageId) > 0 {
 		session := GetServer().GetSessionManager().Login(user, pwd, "", messageId, sessionId)
 		if session != nil {
-			log.Println("--------> user " + user + " is logged in!")
 			return true
 		}
 	}
@@ -790,7 +837,7 @@ func HandleLoginPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, r *http.R
 	w.Write([]byte("<html><body>"))
 
 	// if the user is no logged...
-	w.Write([]byte(fmt.Sprintf("<form class='authorizationForm' action=\"/authorize?%s\" method=\"POST\">", r.URL.RawQuery)))
+	w.Write([]byte(fmt.Sprintf("<form class='oauth2-form' action=\"/authorize?%s\" method=\"POST\">", r.URL.RawQuery)))
 	w.Write([]byte("Login: <input type=\"text\" name=\"login\" /><br/>"))
 	w.Write([]byte("Password: <input type=\"password\" name=\"password\" /><br/>"))
 	w.Write([]byte("<input type=\"submit\"/>"))
@@ -804,6 +851,31 @@ func HandleLoginPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, r *http.R
  * Ask for Authorization.
  */
 func HandleAuthorizationPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, r *http.Request) bool {
+
+	// Here I will
+	r.ParseForm()
+	answer := r.FormValue("submitbutton")
+
+	if answer == "Yes" {
+		// Here the user accept the access to the ressource
+		return true
+	} else if answer == "No" {
+		// Here The user refuse the acess to the ressource.
+		// Here I will write the response that specifie that the user refuse
+		// the authorization to the ressource.
+		return false
+	}
+
+	// Here the user is logged and he need to ask if he give permission to
+	// the request.
+	w.Write([]byte("<html><body>"))
+	w.Write([]byte(fmt.Sprintf("<form class='oauth2-form' action=\"/authorize?%s\" method=\"POST\">", r.URL.RawQuery)))
+	w.Write([]byte("<span>Did you accept?</span></br>"))
+	w.Write([]byte("<input type=\"submit\" name=\"submitbutton\" value=\"Yes\"/>"))
+	w.Write([]byte("<input type=\"submit\" name=\"submitbutton\" value=\"No\"/>"))
+	w.Write([]byte("</form>"))
+	w.Write([]byte("</body></html>"))
+
 	return false
 }
 
@@ -818,14 +890,24 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "no OAuth2 service configure!")
 		return
 	}
-
 	resp := server.NewResponse()
 	defer resp.Close()
 
 	if ar := server.HandleAuthorizeRequest(resp, r); ar != nil {
-		if !HandleLoginPage(ar, w, r) {
+		if !HandleAuthenticationPage(ar, w, r) {
 			return
 		}
+		if !HandleAuthorizationPage(ar, w, r) {
+			if len(r.FormValue("submitbutton")) == 0 {
+				// No answer was given yet...
+				return
+			} else {
+				// I that case the user refuse the authorization.
+				ar.Authorized = false
+				server.FinishAuthorizeRequest(resp, r, ar)
+			}
+		}
+		// The user give the authorization.
 		ar.Authorized = true
 		server.FinishAuthorizeRequest(resp, r, ar)
 	}
@@ -846,7 +928,6 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "no OAuth2 service configure!")
 		return
 	}
-
 	resp := server.NewResponse()
 	defer resp.Close()
 
@@ -899,45 +980,52 @@ func InfoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 /**
- * Authorization code.
+ * This is the client redirect handler.
  */
-// Application destination - CODE
 func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("App Auth Code Handler")
-	/*	r.ParseForm()
+	r.ParseForm()
 
+	errorCode := r.Form.Get("error")
+	state := r.Form.Get("state")
+	// Send authentication end message...
+	var sessionId string
+	var clientId string
+	if len(strings.Split(state, ":")) == 3 {
+		sessionId = strings.Split(state, ":")[1]
+		clientId = strings.Split(state, ":")[2]
+	}
+
+	// I will get a reference to the client who generate the request.
+	clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", clientId)
+	client := clientEntity.GetObject().(*Config.OAuth2Client)
+
+	if len(errorCode) != 0 {
+		// The authorization fail!
+		errorDescription := r.Form.Get("error_description")
+		log.Println("error description: ", errorDescription)
+	} else {
 		code := r.Form.Get("code")
 
-		w.Write([]byte("<html><body>"))
-		w.Write([]byte("APP AUTH - CODE<br/>"))
-		defer w.Write([]byte("</body></html>"))
-
-		if code == "" {
-			w.Write([]byte("Nothing to do"))
-			return
+		var authorization *Config.OAuth2Authorize
+		authorizationEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Authorize", code)
+		if errObj == nil {
+			authorization = authorizationEntity.GetObject().(*Config.OAuth2Authorize)
 		}
+
+		// So here I have the authorization code, I will now ask for the access
+		// code.
+		aurl := fmt.Sprintf("?grant_type=authorization_code&client_id="+client.GetId()+"&client_secret="+client.GetSecret()+"&state="+state+"&redirect_uri=%s&code=%s",
+			url.QueryEscape(client.GetRedirectUri()), url.QueryEscape(code))
 
 		jr := make(map[string]interface{})
 
-		service := GetServer().GetConfigurationManager().getServiceConfigurationById("OAuth2Manager")
-		port := service.GetPort()
-		hostName := service.GetHostName()
-
-		// build access code url
-		aurl := fmt.Sprintf("/token?grant_type=authorization_code&client_id=1234&client_secret=aabbccdd&state=xyz&redirect_uri=%s&code=%s",
-			url.QueryEscape("http://"+hostName+":"+strconv.Itoa(port)+"/appauth/code"), url.QueryEscape(code))
-
-		// if parse, download and parse json
-		if r.Form.Get("doparse") == "1" {
-			port := GetServer().GetConfigurationManager().GetServerPort()
-			hostName := GetServer().GetConfigurationManager().GetHostName()
-			err := DownloadAccessToken(fmt.Sprintf("http://"+hostName+":"+strconv.Itoa(port)+"%s", aurl),
-				&osin.BasicAuth{"1234", "aabbccdd"}, jr)
-
-			if err != nil {
-				w.Write([]byte(err.Error()))
-				w.Write([]byte("<br/>"))
-			}
+		// download token
+		err := DownloadAccessToken(fmt.Sprintf(client.GetTokenUri()+"%s", aurl),
+			&osin.BasicAuth{Username: client.GetId(), Password: client.GetSecret()}, jr)
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			w.Write([]byte("<br/>"))
 		}
 
 		// show json error
@@ -947,18 +1035,103 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 		// show json access token
 		if at, ok := jr["access_token"]; ok {
-			w.Write([]byte(fmt.Sprintf("ACCESS TOKEN: %s<br/>\n", at)))
+			// Here if I already have access token in the store I will do nothing...
+			// It will be in the store if the client is on the same server as the
+			// OAuth2 server. In other case I will create the access token and
+			// refresh token if there is one.
+			_, err := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2.Access", at.(string))
+			if err != nil {
+				// Here I will create a new access token.
+				accessToken := new(Config.OAuth2Access)
+				// Set the id
+				accessToken.SetId(jr["access_token"])
+				// Set the creation time.
+				accessToken.SetCreatedAt(time.Now().Unix())
+				// Set the expiration delay.
+				expiresIn := int64(jr["expires_in"].(float64))
+				accessToken.SetExpiresIn(expiresIn)
+				// Set it scope.
+				accessToken.SetScope(jr["scope"])
+				// Set the custom parameters in the extra field.
+				extra, err := json.Marshal(jr["custom_parameter"])
+				if err == nil {
+					accessToken.SetExtra(extra) // Set as json struct...
+				}
+
+				// Here I will save the new access token.
+				config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
+				configEntity, _ := GetServer().GetEntityManager().getEntityByUuid(config.GetUUID())
+
+				// set the access uuid
+				GetServer().GetEntityManager().NewConfigOAuth2AccessEntity(config.GetUUID(), "", accessToken)
+
+				config.SetAccess(accessToken)
+
+				// Set the expiration...
+				expirationTime := time.Unix(accessToken.GetCreatedAt(), 0).Add(time.Duration(accessToken.GetExpiresIn()) * time.Second)
+
+				// Add the expire time.
+				addExpireAtData(accessToken.GetId(), expirationTime)
+
+				// Set the client.
+				accessToken.SetClient(client)
+
+				// Set the authorization code.
+				accessToken.SetAuthorize(code)
+				if authorization != nil {
+					if len(authorization.GetRedirectUri()) > 0 {
+						accessToken.SetRedirectUri(authorization.GetRedirectUri())
+					}
+				}
+
+				// If authorization object are found locally...
+				authorizationEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Authorize", code)
+				if errObj == nil {
+					authorization := authorizationEntity.GetObject().(*Config.OAuth2Authorize)
+					if len(authorization.GetRedirectUri()) > 0 {
+						accessToken.SetRedirectUri(authorization.GetRedirectUri())
+					}
+				}
+
+				// Now the refresh token if there some.
+				if jr["refresh_token"] != nil {
+					refreshCode := jr["refresh_token"].(string)
+					if len(refreshCode) > 0 {
+						// Here I will create the refresh token.
+						refreshToken := new(Config.OAuth2Refresh)
+						refreshToken.SetId(refreshCode)
+						refreshToken.SetAccess(accessToken)
+
+						// Set the object uuid...
+						GetServer().GetEntityManager().NewConfigOAuth2RefreshEntity(config.GetUUID(), "", refreshToken)
+
+						// Set the access
+						accessToken.SetRefreshToken(refreshToken)
+
+						// Set into it parent.
+						config.SetRefresh(refreshToken)
+					}
+				}
+
+				// Save the new access token.
+				configEntity.SaveEntity()
+			}
 		}
+	}
 
-		w.Write([]byte(fmt.Sprintf("FULL RESULT: %+v<br/>\n", jr)))
+	// The user take it decision so I will send the end authentication request.
+	// I will create the request and send it to the client...
+	id := Utility.RandomUUID()
 
-		// output links
-		w.Write([]byte(fmt.Sprintf("<a href=\"%s\">Goto Token URL</a><br/>", aurl)))
-
-		cururl := *r.URL
-		curq := cururl.Query()
-		curq.Add("doparse", "1")
-		cururl.RawQuery = curq.Encode()
-		w.Write([]byte(fmt.Sprintf("<a href=\"%s\">Download Token</a><br/>", cururl.String())))
-	*/
+	// Here if there is no user logged for the given session I will send an authentication request.
+	var method string
+	method = "OAuth2AuthorizationEnd"
+	params := make([]*MessageData, 0)
+	to := make([]connection, 1)
+	to[0] = GetServer().getConnectionById(sessionId)
+	oauth2AuthorizeEnd, err := NewRequestMessage(id, method, params, to, nil, nil, nil)
+	if err == nil {
+		// Send the request.
+		GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AuthorizeEnd
+	}
 }

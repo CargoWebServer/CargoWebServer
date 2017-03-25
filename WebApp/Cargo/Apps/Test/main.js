@@ -124,7 +124,14 @@ function main() {
 
 
   // The get ressource test...
-  server.securityManager.getRessource("1234", "everything", "", 
+  /*server.securityManager.getRessource("1234", "everything", "", 
+  function(result, caller){
+      
+  }, 
+  function(errMsg, caller){
+  }, {})*/
+
+  server.securityManager.getRessource("821916804492503", "public_profile user_posts", "", 
   function(result, caller){
       
   }, 

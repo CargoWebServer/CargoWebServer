@@ -31,7 +31,9 @@ func main() {
 	http.HandleFunc("/authorize", Server.AuthorizeHandler)
 	http.HandleFunc("/token", Server.TokenHandler)
 	http.HandleFunc("/info", Server.InfoHandler)
-	http.HandleFunc("/appauth/code", Server.AppAuthCodeHandler)
+
+	// Client redirect address.
+	http.HandleFunc("/appauth", Server.AppAuthCodeHandler)
 
 	// stop the server...
 	defer Server.GetServer().Stop()

@@ -350,6 +350,11 @@ Element.prototype.init = function () {
     return this
 }
 
+Element.prototype.delete = function () {
+    this.removeAllChilds()
+    this.element.parentNode.removeChild(this.element)
+    delete this
+}
 
 /**
 * Find a child inside the element or inside one of the child elements, 

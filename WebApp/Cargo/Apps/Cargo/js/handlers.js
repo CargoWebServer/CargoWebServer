@@ -108,7 +108,9 @@ var RpcError = root.com.mycelius.message.Error;
 var RpcEvent = root.com.mycelius.message.Event;
 
 // OAuth2 dialogs.
-var authorizationDialog
+// That dialog is use to give access to application to protected user
+// ressources. With it You can access to cargo, github, google, facebook user ressources
+var oauth2Dialog
 
 ////////////////////////////////////////////////////////////////////////////////
 //                      Web socket initialisation
@@ -429,22 +431,36 @@ Request.prototype.process = function () {
         // Send a ping response.
         var response = new Response(this.id, this.conn, [], null, null, null);
         response.send()
-    } if (this.method == "OAuth2Authorize") {
-        // Here We receice an authorization request.
-        var href = this.paramsMap["authorizationLnk"]
+    }
 
-        // Here I will create the authorization dialog.
-        authorizationDialog = new Dialog("authorizationDialog", document.getElementsByTagName("body")[0], true, "Authorization")
-        authorizationDialog.footer.element.style.display = "none"
+    if (this.method == "OAuth2Authorization") {
+        // Here I will create the  dialog.
+        if (oauth2Dialog == null) {
+            // Here We receice an OAuth request.
+            var href = this.paramsMap["authorizationLnk"]
+            oauth2Dialog = new Dialog("oauth2Dialog", document.getElementsByTagName("body")[0], true, "")
+            oauth2Dialog.footer.element.style.display = "none"
 
-        // The content will be the html receive from the request.
-        var content = new Element(authorizationDialog.content, { "tag": "object", "id": "authorizationContent", "type": "text/html", "data": href })
+            // The content will be the html receive from the request.
+            var content = new Element(oauth2Dialog.content, { "tag": "object", "type": "text/html", "data": href })
+        }
 
         // Set the width and heigth of the dialog to fit the content.
-        authorizationDialog.div.element.style.width = content.element.offsetWidth + "px"
-        authorizationDialog.div.element.style.heigth = content.element.offsetHeigth + "px"
+        oauth2Dialog.div.element.style.width = content.element.offsetWidth + "px"
+        oauth2Dialog.div.element.style.heigth = content.element.offsetHeigth + "px"
 
-        authorizationDialog.setCentered()
+        oauth2Dialog.setCentered()
+
+        // Send an empty response, the information will be sent via a form inside the content.
+        var response = new Response(this.id, this.conn, [], null, null, null);
+        response.send()
+    } else if (this.method == "OAuth2AuthorizationEnd") {
+        // Here I will simply destroy the oauth2 Dialog
+        oauth2Dialog.close()
+        delete oauth2Dialog
+        // Send an empty response, the information will be sent via a form inside the content.
+        var response = new Response(this.id, this.conn, [], null, null, null);
+        response.send()
     }
 
     // Now I will create the function prototype and try to call it.
