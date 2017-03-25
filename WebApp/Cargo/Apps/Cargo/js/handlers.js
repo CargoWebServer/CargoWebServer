@@ -107,6 +107,9 @@ var RpcResponse = root.com.mycelius.message.Response;
 var RpcError = root.com.mycelius.message.Error;
 var RpcEvent = root.com.mycelius.message.Event;
 
+// OAuth2 dialogs.
+var authorizationDialog
+
 ////////////////////////////////////////////////////////////////////////////////
 //                      Web socket initialisation
 ////////////////////////////////////////////////////////////////////////////////
@@ -426,17 +429,22 @@ Request.prototype.process = function () {
         // Send a ping response.
         var response = new Response(this.id, this.conn, [], null, null, null);
         response.send()
-    }if (this.method == "OAuth2Authorize") {
+    } if (this.method == "OAuth2Authorize") {
         // Here We receice an authorization request.
         var href = this.paramsMap["authorizationLnk"]
-        var lnk = new Element(document.getElementsByTagName("body")[0], {"tag":"a", "href":"#"})
-        lnk.element.onclick = function(href, lnk){
-            return function(){
-                //window.open('www.yourdomain.com','_blank');
-                document.getElementsByTagName("body")[0].innerHTML='<object type="text/html" data="'+ href +'"></object>';
-            }
-        }(href, lnk)
-        lnk.element.click()
+
+        // Here I will create the authorization dialog.
+        authorizationDialog = new Dialog("authorizationDialog", document.getElementsByTagName("body")[0], true, "Authorization")
+        authorizationDialog.footer.element.style.display = "none"
+
+        // The content will be the html receive from the request.
+        var content = new Element(authorizationDialog.content, { "tag": "object", "id": "authorizationContent", "type": "text/html", "data": href })
+
+        // Set the width and heigth of the dialog to fit the content.
+        authorizationDialog.div.element.style.width = content.element.offsetWidth + "px"
+        authorizationDialog.div.element.style.heigth = content.element.offsetHeigth + "px"
+
+        authorizationDialog.setCentered()
     }
 
     // Now I will create the function prototype and try to call it.

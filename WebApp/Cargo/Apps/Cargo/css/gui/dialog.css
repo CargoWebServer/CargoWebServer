@@ -57,9 +57,9 @@
 /** The delete button **/
 .dialog_delete_button{
     display: table-cell;
-    vertical-align: middle;
     padding-right: 2px;
     padding-left: 2px;
+    padding-top: 2px;
     text-align: center;
 }
 

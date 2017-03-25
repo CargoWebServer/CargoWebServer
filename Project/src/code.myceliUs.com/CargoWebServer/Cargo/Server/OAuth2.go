@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
-	"strconv"
+	//"net/url"
+	//"strconv"
 	"strings"
 	"time"
 
@@ -193,11 +193,12 @@ func (this *OAuth2Manager) start() {
 	for i := 0; i < len(cfg.GetExpire()); i++ {
 		expireTime := time.Unix(cfg.GetExpire()[i].GetExpiresAt(), 0)
 		if expireTime.Before(time.Now()) {
+			log.Println("------> remove authorize...")
 			// I that case the value must be remove expired values...
 			this.m_store.RemoveAccess(cfg.GetExpire()[i].GetToken())
 			this.m_store.RemoveAuthorize(cfg.GetExpire()[i].GetToken())
 		} else {
-			setCodeExpiration(cfg.GetExpire()[i].GetToken(), time.Now().Sub(expireTime))
+			setCodeExpiration(cfg.GetExpire()[i].GetToken(), expireTime.Sub(time.Now()))
 		}
 	}
 }
@@ -329,6 +330,12 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 	log.Println("Save Authorize completed!", a)
 	log.Println("save authorize created at ", data.CreatedAt.String())
 	log.Println("save authorize expire at ", data.ExpireAt().String())
+
+	// Add expire data.
+	if err := this.AddExpireAtData(data.Code, data.ExpireAt()); err != nil {
+		log.Println("Fail to create access data ", err)
+		return err
+	}
 
 	return nil
 }
@@ -634,7 +641,8 @@ func (s *OAuth2Store) AddExpireAtData(code string, expireAt time.Time) error {
 	configEntity.SaveEntity()
 
 	// Start the timer.
-	setCodeExpiration(code, time.Now().Sub(expireAt))
+	duration := expireAt.Sub(time.Now())
+	setCodeExpiration(code, duration)
 
 	return nil
 }
@@ -724,7 +732,7 @@ func (this *OAuth2Manager) GetRessource(clientId string, scope string, query str
 		// authorize the client application to access ressources.
 		var authorizationLnk = client.GetAuthorizationUri()
 		authorizationLnk += "?response_type=code&client_id=" + client.GetId()
-		authorizationLnk += "&state=" + messageId + "&scope=" + scope
+		authorizationLnk += "&state=" + messageId + ":" + sessionId + "&scope=" + scope
 		authorizationLnk += "&redirect_uri=" + client.GetRedirectUri() + "/code"
 
 		// I will create the request and send it to the client...
@@ -755,6 +763,51 @@ func (this *OAuth2Manager) GetRessource(clientId string, scope string, query str
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * If the use is not logged...
+ */
+func HandleLoginPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, r *http.Request) bool {
+	r.ParseForm()
+
+	user := r.Form.Get("login")
+	pwd := r.Form.Get("password")
+	state := r.URL.Query()["state"][0]
+
+	var sessionId string
+	var messageId string
+	if len(strings.Split(state, ":")) == 2 {
+		messageId = strings.Split(state, ":")[0]
+		sessionId = strings.Split(state, ":")[1]
+	}
+
+	if r.Method == "POST" && len(sessionId) > 0 && len(messageId) > 0 {
+		session := GetServer().GetSessionManager().Login(user, pwd, "", messageId, sessionId)
+		if session != nil {
+			log.Println("--------> user " + user + " is logged in!")
+			return true
+		}
+	}
+
+	w.Write([]byte("<html><body>"))
+
+	// if the user is no logged...
+	w.Write([]byte(fmt.Sprintf("<form class='authorizationForm' action=\"/authorize?%s\" method=\"POST\">", r.URL.RawQuery)))
+	w.Write([]byte("Login: <input type=\"text\" name=\"login\" /><br/>"))
+	w.Write([]byte("Password: <input type=\"password\" name=\"password\" /><br/>"))
+	w.Write([]byte("<input type=\"submit\"/>"))
+	w.Write([]byte("</form>"))
+	w.Write([]byte("</body></html>"))
+
+	return false
+}
+
+/**
+ * Ask for Authorization.
+ */
+func HandleAuthorizationPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, r *http.Request) bool {
+	return false
+}
+
+/**
  * OAuth Authorization handler.
  */
 func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
@@ -770,9 +823,9 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Close()
 
 	if ar := server.HandleAuthorizeRequest(resp, r); ar != nil {
-		/*if !HandleLoginPage(ar, w, r) {
+		if !HandleLoginPage(ar, w, r) {
 			return
-		}*/
+		}
 		ar.Authorized = true
 		server.FinishAuthorizeRequest(resp, r, ar)
 	}
@@ -843,21 +896,6 @@ func InfoHandler(w http.ResponseWriter, r *http.Request) {
 		server.FinishInfoRequest(resp, r, ir)
 	}
 	osin.OutputJSON(resp, w, r)
-}
-
-/**
- * Application home endpoint
- */
-func AppHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("App Handler")
-	w.Write([]byte("<html><body>"))
-
-	service := GetServer().GetConfigurationManager().getServiceConfigurationById("OAuth2Manager")
-	port := service.GetPort()
-	hostName := service.GetHostName()
-
-	w.Write([]byte(fmt.Sprintf("<a href=\"/authorize?response_type=code&client_id=1234&state=xyz&scope=everything&redirect_uri=%s\">Login</a><br/>", url.QueryEscape("http://"+hostName+":"+strconv.Itoa(port)+"/appauth/code"))))
-	w.Write([]byte("</body></html>"))
 }
 
 /**
