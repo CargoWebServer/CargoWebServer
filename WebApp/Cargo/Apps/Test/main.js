@@ -131,9 +131,17 @@ function main() {
   function(errMsg, caller){
   }, {})*/
 
-  server.securityManager.getRessource("821916804492503", "public_profile user_posts", "", 
+  // Google OAuth
+  /*server.securityManager.getRessource("1010681964660.apps.googleusercontent.com", "profile", "", 
   function(result, caller){
-      
+  }, 
+  function(errMsg, caller){
+  }, {})*/
+
+  // Facebook
+  server.securityManager.getRessource("821916804492503", "public_profile user_posts", "https://graph.facebook.com/v2.5/me/feed?limit=25", 
+  function(results, caller){
+      console.log("found results: ", results)
   }, 
   function(errMsg, caller){
   }, {})

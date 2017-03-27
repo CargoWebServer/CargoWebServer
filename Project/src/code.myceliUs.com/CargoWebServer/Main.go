@@ -32,8 +32,8 @@ func main() {
 	http.HandleFunc("/token", Server.TokenHandler)
 	http.HandleFunc("/info", Server.InfoHandler)
 
-	// Client redirect address.
-	http.HandleFunc("/appauth", Server.AppAuthCodeHandler)
+	// Client redirect address. ex. http://54.214.130.226:9393/oauth2callback
+	http.HandleFunc("/oauth2callback", Server.AppAuthCodeHandler)
 
 	// stop the server...
 	defer Server.GetServer().Stop()

@@ -5,21 +5,26 @@
 package Server
 
 import (
-	//"encoding/json"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
-	//	"strconv"
 	"strings"
 	"time"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	//"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 	"github.com/RangelReale/osin"
+	"golang.org/x/oauth2"
+)
+
+// variable use betheewen the http handlers and the OAuth service.
+var (
+	// Clients Configuration.
+	oauthConfigs map[string]*oauth2.Config
 )
 
 /**
@@ -121,7 +126,13 @@ func (this *Server) GetOAuth2Manager() *OAuth2Manager {
 }
 
 func newOAuth2Manager() *OAuth2Manager {
+
+	// The oauth manager.
 	oauth2Manager := new(OAuth2Manager)
+
+	// The configuration maps.
+	oauthConfigs = make(map[string]*oauth2.Config, 0)
+
 	return oauth2Manager
 }
 
@@ -684,8 +695,12 @@ func (this *OAuth2Store) RemoveRefresh(code string) error {
 
 /**
  * That function is use to get a given ressource for a given client.
+ * The client id is the id define in the configuration
+ * The scope are the scope of the ressources, ex. public_profile, email...
+ * The query is an http query from various api like facebook graph api.
+ * will start an authorization process if nothing is found.
  */
-func (this *OAuth2Manager) GetRessource(clientId string, scope string, query string, messageId string, sessionId string) (interface{}, *CargoEntities.Error) {
+func (this *OAuth2Manager) GetRessource(clientId string, scope string, query string, messageId string, sessionId string) interface{} {
 
 	log.Println("=----------------> GetRessource")
 
@@ -701,8 +716,9 @@ func (this *OAuth2Manager) GetRessource(clientId string, scope string, query str
 
 	if client == nil {
 		// Repport the error
-		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No client was found with id "+clientId))
+		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to execute query: "+query))
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
 	}
 
 	log.Println("=----------------> Client found!")
@@ -731,7 +747,16 @@ func (this *OAuth2Manager) GetRessource(clientId string, scope string, query str
 
 	if access != nil {
 		// Here I will made the API call.
-
+		log.Println("=----------------> Access found!")
+		result, err := DownloadRessource(query, access.GetId())
+		if err == nil {
+			log.Println("------> line 755:", result)
+			return result
+		} else {
+			errObj := NewError(Utility.FileLine(), RESSOURCE_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("No client was found with id "+clientId))
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
+		}
 	} else {
 
 		// No access was found so here I will initiated the OAuth process...
@@ -744,6 +769,19 @@ func (this *OAuth2Manager) GetRessource(clientId string, scope string, query str
 
 		// I will create the request and send it to the client...
 		id := Utility.RandomUUID()
+
+		oauthConf := &oauth2.Config{
+			ClientID:     client.GetId(),
+			ClientSecret: client.GetSecret(),
+			Endpoint: oauth2.Endpoint{
+				AuthURL:  client.GetAuthorizationUri(),
+				TokenURL: client.GetTokenUri(),
+			},
+			RedirectURL: client.GetRedirectUri(),
+			Scopes:      strings.Split(scope, " "),
+		}
+
+		oauthConfigs[client.GetId()] = oauthConf
 
 		// Here if there is no user logged for the given session I will send an authentication request.
 		var method string
@@ -764,40 +802,33 @@ func (this *OAuth2Manager) GetRessource(clientId string, scope string, query str
 
 	}
 
-	var result interface{}
-
-	return result, nil
+	return nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Auth Http handler.
 ////////////////////////////////////////////////////////////////////////////////
+
 /**
- * Function use to downlaod the access token from OAuth server.
+ * Download ressource specify with a given query.
  */
-func DownloadAccessToken(url string, auth *osin.BasicAuth, output map[string]interface{}) error {
-	// download access token
-	preq, err := http.NewRequest("GET", url, nil)
+func DownloadRessource(query string, accessToken string) (map[string]interface{}, error) {
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", query, nil)
+	req.Header.Add("Authorization", "Bearer "+accessToken)
+	resp, err := client.Do(req)
 	if err != nil {
-		return err
-	}
-	if auth != nil {
-		preq.SetBasicAuth(auth.Username, auth.Password)
+		return nil, err
 	}
 
-	pclient := &http.Client{}
-	presp, err := pclient.Do(preq)
-	if err != nil {
-		return err
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err == nil {
+		output := make(map[string]interface{}, 0)
+		json.Unmarshal(bodyBytes, &output)
+		return output, nil
 	}
 
-	if presp.StatusCode != 200 {
-		return errors.New("Invalid status code")
-	}
-
-	jdec := json.NewDecoder(presp.Body)
-	err = jdec.Decode(&output)
-	return err
+	return nil, err
 }
 
 /**
@@ -1013,50 +1044,49 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 			authorization = authorizationEntity.GetObject().(*Config.OAuth2Authorize)
 		}
 
-		// So here I have the authorization code, I will now ask for the access
-		// code.
-		aurl := fmt.Sprintf("?grant_type=authorization_code&client_id="+client.GetId()+"&client_secret="+client.GetSecret()+"&state="+state+"&redirect_uri=%s&code=%s",
-			url.QueryEscape(client.GetRedirectUri()), url.QueryEscape(code))
+		// Get the oauthConf from the map.
+		oauthConf := oauthConfigs[client.GetId()]
 
-		jr := make(map[string]interface{})
+		token, err := oauthConf.Exchange(oauth2.NoContext, code)
 
-		// download token
-		err := DownloadAccessToken(fmt.Sprintf(client.GetTokenUri()+"%s", aurl),
-			&osin.BasicAuth{Username: client.GetId(), Password: client.GetSecret()}, jr)
 		if err != nil {
-			w.Write([]byte(err.Error()))
-			w.Write([]byte("<br/>"))
-		}
-
-		// show json error
-		if erd, ok := jr["error"]; ok {
-			w.Write([]byte(fmt.Sprintf("ERROR: %s<br/>\n", erd)))
-		}
-
-		// show json access token
-		if at, ok := jr["access_token"]; ok {
+			fmt.Printf("oauthConf.Exchange() failed with '%s'\n", err)
+			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		} else {
+			log.Println("----> 1002")
+			// show json access token
 			// Here if I already have access token in the store I will do nothing...
 			// It will be in the store if the client is on the same server as the
 			// OAuth2 server. In other case I will create the access token and
 			// refresh token if there is one.
-			_, err := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2.Access", at.(string))
+			_, err := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2.Access", token.AccessToken)
 			if err != nil {
 				// Here I will create a new access token.
 				accessToken := new(Config.OAuth2Access)
 				// Set the id
-				accessToken.SetId(jr["access_token"])
+				accessToken.SetId(token.AccessToken)
 				// Set the creation time.
 				accessToken.SetCreatedAt(time.Now().Unix())
 				// Set the expiration delay.
-				expiresIn := int64(jr["expires_in"].(float64))
-				accessToken.SetExpiresIn(expiresIn)
+				accessToken.SetExpiresIn(token.Expiry.Unix())
 				// Set it scope.
-				accessToken.SetScope(jr["scope"])
+				scopes := oauthConf.Scopes
+				var scope string
+				for i := 0; i < len(scopes); i++ {
+					scope += scopes[i]
+					if i < len(scopes)-1 {
+						scope += " "
+					}
+				}
+				accessToken.SetScope(scope)
+
+				/**
 				// Set the custom parameters in the extra field.
 				extra, err := json.Marshal(jr["custom_parameter"])
 				if err == nil {
 					accessToken.SetExtra(extra) // Set as json struct...
 				}
+				*/
 
 				// Here I will save the new access token.
 				config := GetServer().GetConfigurationManager().GetOAuth2Configuration()
@@ -1094,28 +1124,27 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 				}
 
 				// Now the refresh token if there some.
-				if jr["refresh_token"] != nil {
-					refreshCode := jr["refresh_token"].(string)
-					if len(refreshCode) > 0 {
-						// Here I will create the refresh token.
-						refreshToken := new(Config.OAuth2Refresh)
-						refreshToken.SetId(refreshCode)
-						refreshToken.SetAccess(accessToken)
+				if len(token.RefreshToken) > 0 {
+					// Here I will create the refresh token.
+					refreshToken := new(Config.OAuth2Refresh)
+					refreshToken.SetId(token.RefreshToken)
+					refreshToken.SetAccess(accessToken)
 
-						// Set the object uuid...
-						GetServer().GetEntityManager().NewConfigOAuth2RefreshEntity(config.GetUUID(), "", refreshToken)
+					// Set the object uuid...
+					GetServer().GetEntityManager().NewConfigOAuth2RefreshEntity(config.GetUUID(), "", refreshToken)
 
-						// Set the access
-						accessToken.SetRefreshToken(refreshToken)
+					// Set the access
+					accessToken.SetRefreshToken(refreshToken)
 
-						// Set into it parent.
-						config.SetRefresh(refreshToken)
-					}
+					// Set into it parent.
+					config.SetRefresh(refreshToken)
 				}
-
 				// Save the new access token.
 				configEntity.SaveEntity()
+				delete(oauthConfigs, client.GetId()) // no more needed
+				log.Println("----> access token was created ", accessToken.GetId())
 			}
+
 		}
 	}
 

@@ -442,12 +442,34 @@ Request.prototype.process = function () {
             oauth2Dialog.footer.element.style.display = "none"
 
             // The content will be the html receive from the request.
-            var content = new Element(oauth2Dialog.content, { "tag": "object", "type": "text/html", "data": href })
-        }
+            if (href.startsWith("https://www.facebook.com/dialog/oauth")
+                || href.startsWith("https://accounts.google.com")) {
+                var lnk = oauth2Dialog.content.appendElement({ "tag": "a", "href": "#" }).down()
+                // Set specif oauth provider information here...
+                if (href.startsWith("https://accounts.google.com")) {
+                    lnk.element.innerHTML = "Google authentication"
+                } else if (href.startsWith("https://www.facebook.com/dialog/oauth")) {
+                    lnk.element.innerHTML = "Facebook authentication"
+                } else{
+                    lnk.element.innerHTML = "OAuth2 authentication"
+                }
 
-        // Set the width and heigth of the dialog to fit the content.
-        oauth2Dialog.div.element.style.width = content.element.offsetWidth + "px"
-        oauth2Dialog.div.element.style.heigth = content.element.offsetHeigth + "px"
+                // TODO append other provider here.
+
+                lnk.element.onclick = function (href) {
+                    return function () {
+                        window.open(href, '_blank');
+                    }
+                } (href)
+            } else {
+                var content = new Element(oauth2Dialog.content, { "tag": "iFrame" })
+                content.element.contentWindow.document.location.href = href;
+
+                // Set the width and heigth of the dialog to fit the content.
+                oauth2Dialog.div.element.style.width = content.element.offsetWidth + "px"
+                oauth2Dialog.div.element.style.heigth = content.element.offsetHeigth + "px"
+            }
+        }
 
         oauth2Dialog.setCentered()
 

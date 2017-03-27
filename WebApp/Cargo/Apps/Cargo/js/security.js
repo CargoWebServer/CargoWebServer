@@ -356,7 +356,8 @@ SecurityManager.prototype.changeAdminPassword = function (pwd, newPwd, successCa
 // OAuth2 Ressource access... The client must be configure first to be able to get access to ressources.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function GetRessource(clientId, scope, query){
-    server.GetOAuth2Manager().GetRessource(clientId,scope, query, messageId, sessionId)
+    var result = server.GetOAuth2Manager().GetRessource(clientId,scope, query, messageId, sessionId)
+    return result
 }
 
 /**
@@ -379,8 +380,8 @@ SecurityManager.prototype.getRessource = function (clientId, scope, query, succe
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
         },
-        function (result, caller) {
-            caller.successCallback(result, caller.caller)
+        function (results, caller) {
+            caller.successCallback(results[0], caller.caller)
         },
         function (errMsg, caller) {
             // display the message in the console.

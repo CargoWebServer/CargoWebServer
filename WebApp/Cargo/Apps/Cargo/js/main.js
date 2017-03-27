@@ -27,7 +27,7 @@
 var server = new Server("localhost", "127.0.0.1", 9393)
 
 // Amazon ec2 sever...
-//var server = new Server("www.cargowebserver.com", "54.214.130.226", 8080)
+//var server = new Server("www.cargowebserver.com", "54.214.130.226", 9393)
 
 
 /**

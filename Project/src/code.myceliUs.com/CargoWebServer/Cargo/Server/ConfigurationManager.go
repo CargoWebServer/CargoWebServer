@@ -197,7 +197,10 @@ func (this *ConfigurationManager) stop() {
  */
 func (this *ConfigurationManager) getActiveConfigurations() *Config.Configurations {
 	if this.m_activeConfigurationsEntity != nil {
-		activeConfigurationsEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.m_activeConfigurationsEntity.GetUuid())
+		activeConfigurationsEntity, err := GetServer().GetEntityManager().getEntityByUuid(this.m_activeConfigurationsEntity.GetUuid())
+		if err != nil {
+			return nil
+		}
 		return activeConfigurationsEntity.GetObject().(*Config.Configurations)
 	}
 	return nil
