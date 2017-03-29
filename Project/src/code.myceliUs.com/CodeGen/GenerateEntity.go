@@ -462,7 +462,7 @@ func generateAppendRefFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	functionStr += "	 if index == -1 {\n"
 	functionStr += "	 	this.referencesUuid = append(this.referencesUuid, reference.GetUuid())\n"
 	functionStr += "	 	this.referencesPtr = append(this.referencesPtr, reference)\n"
-	functionStr += "	 }else{\n"
+	functionStr += "	 }else if index < len(this.referencesPtr){\n"
 	functionStr += "	 	// The reference must be update in that case.\n"
 	functionStr += "	 	this.referencesPtr[index]  = reference\n"
 	functionStr += "	 }\n"
@@ -1279,9 +1279,11 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	// The childs uuid's
 	entityInitStr += "		childsUuidStr := results[0][" + strconv.Itoa(index) + "].(string)\n"
 	entityInitStr += "		this.childsUuid = make([]string, 0)\n"
-	entityInitStr += "		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)\n"
-	entityInitStr += "		if err != nil {\n"
-	entityInitStr += "			return err\n"
+	entityInitStr += "		if childsUuidStr != \"null\" {\n"
+	entityInitStr += "			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)\n"
+	entityInitStr += "			if err != nil {\n"
+	entityInitStr += "				return err\n"
+	entityInitStr += "			}\n"
 	entityInitStr += "		}\n\n"
 
 	index++
@@ -1289,10 +1291,12 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	// The referenced...
 	entityInitStr += "		referencedStr := results[0][" + strconv.Itoa(index) + "].(string)\n"
 	entityInitStr += "		this.referenced = make([]EntityRef, 0)\n"
-	entityInitStr += "		err = json.Unmarshal([]byte(referencedStr), &this.referenced)\n"
-	entityInitStr += "		if err != nil {\n"
-	entityInitStr += "			return err\n"
-	entityInitStr += "		}\n"
+	entityInitStr += "		if referencedStr != \"null\" {\n"
+	entityInitStr += "			err = json.Unmarshal([]byte(referencedStr), &this.referenced)\n"
+	entityInitStr += "			if err != nil {\n"
+	entityInitStr += "				return err\n"
+	entityInitStr += "			}\n"
+	entityInitStr += "		}\n\n"
 
 	entityInitStr += "	}\n\n"
 

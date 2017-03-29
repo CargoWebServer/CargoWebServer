@@ -27,12 +27,23 @@ func main() {
 	// The file upload handler.
 	http.HandleFunc("/uploads", Server.FileUploadHandler)
 
+	// Test values...
+	//	ClientId:     "1234",
+	// 	ClientSecret: "aabbccdd",
+	//	AuthorizeUrl: "http://localhost:9393/authorize",
+	//	TokenUrl:     "http://localhost:9393/token",
+	//	RedirectUrl:  "http://localhost:9393/oauth2callback"
+
 	// OAuth2 http handler's
 	http.HandleFunc("/authorize", Server.AuthorizeHandler)
 	http.HandleFunc("/token", Server.TokenHandler)
 	http.HandleFunc("/info", Server.InfoHandler)
 
-	// Client redirect address. ex. http://54.214.130.226:9393/oauth2callback
+	// OpenId
+	http.HandleFunc("/.well-known/openid-configuration", Server.DiscoveryHandler)
+	http.HandleFunc("/publickeys", Server.PublicKeysHandler)
+
+	// Client redirect address.
 	http.HandleFunc("/oauth2callback", Server.AppAuthCodeHandler)
 
 	// stop the server...

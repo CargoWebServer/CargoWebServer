@@ -1,7 +1,5 @@
 var applicationName = document.getElementsByTagName("title")[0].text
 
-var server = new Server("localhost", "127.0.0.1", 9393)
-
 var languageInfo = {
     "en": {
         "label": "What is your name?",
@@ -35,7 +33,7 @@ function main() {
         .appendElement({ "tag": "span", "id": "label" })
         .appendElement({ "tag": "input", "id": "input" }).up()
         .appendElement({ "tag": "div", "style": "display: table-row" }).down()
-        .appendElement({ "tag": "button", "id": "btn" })
+        .appendElement({ "tag": "button", "id": "btn" }).up()
         .appendElement({ "tag": "div", "style": "display: table-row" }).down()
         .appendElement({ "tag": "span", "id": "greeting" })
 

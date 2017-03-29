@@ -872,7 +872,6 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	this.setReferences(entity)
 
 	return entity, nil
-
 }
 
 func (this *EntityManager) getDynamicEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {

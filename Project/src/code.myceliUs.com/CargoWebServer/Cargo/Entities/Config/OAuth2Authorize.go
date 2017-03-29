@@ -27,7 +27,9 @@ type OAuth2Authorize struct{
 	M_scope string
 	M_redirectUri string
 	M_state string
-	M_extra []uint8
+	m_userData *OAuth2IdToken
+	/** If the ref is a string and not an object **/
+	M_userData string
 	M_createdAt int64
 
 }
@@ -35,6 +37,12 @@ type OAuth2Authorize struct{
 /** Xml parser for OAuth2Authorize **/
 type XsdOAuth2Authorize struct {
 	XMLName xml.Name	`xml:"oauth2Authorize"`
+	M_id	string	`xml:"id,attr"`
+	M_expiresIn 	int64	`xml:"expiresIn ,attr"`
+	M_scope	string	`xml:"scope,attr"`
+	M_redirectUri	string	`xml:"redirectUri,attr"`
+	M_state	string	`xml:"state,attr"`
+	M_createdAt 	int64	`xml:"createdAt ,attr"`
 
 }
 /** UUID **/
@@ -133,18 +141,31 @@ func (this *OAuth2Authorize) SetState(ref interface{}){
 
 /** Remove reference State **/
 
-/** Extra **/
-func (this *OAuth2Authorize) GetExtra() []uint8{
-	return this.M_extra
+/** UserData **/
+func (this *OAuth2Authorize) GetUserData() *OAuth2IdToken{
+	return this.m_userData
 }
 
-/** Init reference Extra **/
-func (this *OAuth2Authorize) SetExtra(ref interface{}){
+/** Init reference UserData **/
+func (this *OAuth2Authorize) SetUserData(ref interface{}){
 	this.NeedSave = true
-	this.M_extra = ref.([]uint8)
+	if _, ok := ref.(string); ok {
+		this.M_userData = ref.(string)
+	}else{
+		this.m_userData = ref.(*OAuth2IdToken)
+		this.M_userData = ref.(*OAuth2IdToken).GetUUID()
+	}
 }
 
-/** Remove reference Extra **/
+/** Remove reference UserData **/
+func (this *OAuth2Authorize) RemoveUserData(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*OAuth2IdToken)
+	if toDelete.GetUUID() == this.m_userData.GetUUID() {
+		this.m_userData = nil
+		this.M_userData = ""
+	}
+}
 
 /** CreatedAt **/
 func (this *OAuth2Authorize) GetCreatedAt() int64{

@@ -23,7 +23,8 @@ type OAuth2Configuration struct{
 
 	/** members of OAuth2Configuration **/
 	M_authorizationExpiration int
-	M_accessExpiration int
+	M_accessExpiration int64
+	M_refreshExpiration int64
 	M_tokenType string
 	M_errorStatusCode int
 	M_allowClientSecretInParams bool
@@ -34,6 +35,7 @@ type OAuth2Configuration struct{
 	M_clients []*OAuth2Client
 	M_authorize []*OAuth2Authorize
 	M_access []*OAuth2Access
+	M_ids []*OAuth2IdToken
 	M_refresh []*OAuth2Refresh
 	M_expire []*OAuth2Expires
 
@@ -52,7 +54,8 @@ type XsdOAuth2Configuration struct {
 
 
 	M_authorizationExpiration	int	`xml:"authorizationExpiration,attr"`
-	M_accessExpiration	int	`xml:"accessExpiration,attr"`
+	M_accessExpiration	int64	`xml:"accessExpiration,attr"`
+	M_refreshExpiration	int64	`xml:"refreshExpiration,attr"`
 	M_tokenType	string	`xml:"tokenType,attr"`
 	M_errorStatusCode	int	`xml:"errorStatusCode,attr"`
 	M_allowClientSecretInParams	bool	`xml:"allowClientSecretInParams,attr"`
@@ -93,17 +96,30 @@ func (this *OAuth2Configuration) SetAuthorizationExpiration(ref interface{}){
 /** Remove reference AuthorizationExpiration **/
 
 /** AccessExpiration **/
-func (this *OAuth2Configuration) GetAccessExpiration() int{
+func (this *OAuth2Configuration) GetAccessExpiration() int64{
 	return this.M_accessExpiration
 }
 
 /** Init reference AccessExpiration **/
 func (this *OAuth2Configuration) SetAccessExpiration(ref interface{}){
 	this.NeedSave = true
-	this.M_accessExpiration = ref.(int)
+	this.M_accessExpiration = ref.(int64)
 }
 
 /** Remove reference AccessExpiration **/
+
+/** RefreshExpiration **/
+func (this *OAuth2Configuration) GetRefreshExpiration() int64{
+	return this.M_refreshExpiration
+}
+
+/** Init reference RefreshExpiration **/
+func (this *OAuth2Configuration) SetRefreshExpiration(ref interface{}){
+	this.NeedSave = true
+	this.M_refreshExpiration = ref.(int64)
+}
+
+/** Remove reference RefreshExpiration **/
 
 /** TokenType **/
 func (this *OAuth2Configuration) GetTokenType() string{
@@ -331,6 +347,43 @@ func (this *OAuth2Configuration) RemoveAccess(ref interface{}){
 		}
 	}
 	this.M_access = access_
+}
+
+/** Ids **/
+func (this *OAuth2Configuration) GetIds() []*OAuth2IdToken{
+	return this.M_ids
+}
+
+/** Init reference Ids **/
+func (this *OAuth2Configuration) SetIds(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var idss []*OAuth2IdToken
+	for i:=0; i<len(this.M_ids); i++ {
+		if this.M_ids[i].GetUUID() != ref.(*OAuth2IdToken).GetUUID() {
+			idss = append(idss, this.M_ids[i])
+		} else {
+			isExist = true
+			idss = append(idss, ref.(*OAuth2IdToken))
+		}
+	}
+	if !isExist {
+		idss = append(idss, ref.(*OAuth2IdToken))
+	}
+	this.M_ids = idss
+}
+
+/** Remove reference Ids **/
+func (this *OAuth2Configuration) RemoveIds(ref interface{}){
+	this.NeedSave = true
+	toDelete := ref.(*OAuth2IdToken)
+	ids_ := make([]*OAuth2IdToken, 0)
+	for i := 0; i < len(this.M_ids); i++ {
+		if toDelete.GetUUID() != this.M_ids[i].GetUUID() {
+			ids_ = append(ids_, this.M_ids[i])
+		}
+	}
+	this.M_ids = ids_
 }
 
 /** Refresh **/

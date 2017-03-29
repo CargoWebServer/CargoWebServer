@@ -132,17 +132,24 @@ function main() {
   }, {})*/
 
   // Google OAuth
-  /*server.securityManager.getRessource("1010681964660.apps.googleusercontent.com", "profile", "", 
+  /*server.securityManager.getResource("1010681964660.apps.googleusercontent.com", "profile", "", 
   function(result, caller){
   }, 
   function(errMsg, caller){
   }, {})*/
 
   // Facebook
-  server.securityManager.getRessource("821916804492503", "public_profile user_posts", "https://graph.facebook.com/v2.5/me/feed?limit=25", 
+  /*server.securityManager.getResource("821916804492503", "public_profile user_posts", "https://graph.facebook.com/v2.5/me/feed?limit=25", 
   function(results, caller){
       console.log("found results: ", results)
-  }, 
+  },
+  function(errMsg, caller){
+  }, {})*/
+
+  server.securityManager.getResource("1234", "openid profile email", "", 
+  function(results, caller){
+      console.log("found results: ", results)
+  },
   function(errMsg, caller){
   }, {})
 }

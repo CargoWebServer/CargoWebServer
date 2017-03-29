@@ -36,6 +36,10 @@ type OAuth2Client struct{
 /** Xml parser for OAuth2Client **/
 type XsdOAuth2Client struct {
 	XMLName xml.Name	`xml:"oauth2Client"`
+	M_id	string	`xml:"id,attr"`
+	M_secret	string	`xml:"secret,attr"`
+	M_redirectUri	string	`xml:"redirectUri,attr"`
+	M_extra	[]uint8	`xml:"extra,attr"`
 
 }
 /** UUID **/

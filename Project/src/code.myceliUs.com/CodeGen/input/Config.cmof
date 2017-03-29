@@ -161,9 +161,7 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Authorize-state" name="state">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Authorize-extra" name="extra">
-        <type xmi:type="cmof:PrimitiveType" href="Byte"/>
-      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Authorize-userData" name="userData" _type="OAuth2IdToken" lower="1" upper="1"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Authorize-createdAt" name="createdAt">
         <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
       </ownedAttribute>
@@ -172,6 +170,43 @@
       <ownedEnd xmi:type="cmof:Property" xmi:id="A_oauth2Expires_oauth2Configuration-OAuth2Configuration" name="parent" _type="OAuth2Configuration" lower="0" upper="1" owningAssociation="A_oauth2Expires_oauth2Configuration" association="A_oauth2Expires_oauth2Configuration"/>
     </ownedMember>
 
+	<ownedMember xmi:type="cmof:Class" xmi:id="OAuth2IdToken" name="OAuth2IdToken">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2IdToken-issuer" name="issuer">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2IdToken-accessToken" name="id">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Authorize-client" name="client" _type="OAuth2Client" lower="1" upper="1"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2IdToken-clientId" name="expiration">
+        <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2IdToken-issuedAt" name="issuedAt">
+        <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2IdToken-nonce" name="nonce">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2IdToken-email" name="email">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2IdToken-emailVerified" name="emailVerified">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2IdToken-name" name="name">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2IdToken-familyName" name="familyName">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2IdToken-givenName" name="givenName">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2IdToken-local" name="local">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	</ownedMember>
+	
 	<ownedMember xmi:type="cmof:Class" xmi:id="OAuth2Access" name="OAuth2Access">
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Access-accessToken" name="id">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
@@ -193,40 +228,44 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Access-redirectUri" name="redirectUri">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Access-extra" name="extra">
-        <type xmi:type="cmof:PrimitiveType" href="Byte"/>
-      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Access-userData" name="userData" _type="OAuth2IdToken" lower="1" upper="1"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Access-createdAt" name="createdAt">
         <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
       </ownedAttribute>
 	</ownedMember>
+	
 	<ownedMember xmi:type="cmof:Association" xmi:id="A_oauth2Access_oauth2Configuration" name="A_oauth2Access_oauth2Configuration" visibility="private" memberEnd="OAuth2Configuration-OAuth2Access A_oauth2Access_oauth2Configuration-Configurations">
       <ownedEnd xmi:type="cmof:Property" xmi:id="A_oauth2Access_oauth2Configuration-OAuth2Configuration" name="parent" _type="OAuth2Configuration" lower="0" upper="1" owningAssociation="A_oauth2Access_oauth2Configuration" association="A_oauth2Access_oauth2Configuration"/>
     </ownedMember>
 	
 	<ownedMember xmi:type="cmof:Class" xmi:id="OAuth2Refresh" name="OAuth2Refresh">
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Refresh-token" name="id">
-        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
-      </ownedAttribute>
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Refresh-access" name="access" _type="OAuth2Access" lower="1" upper="1"/>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Refresh-token" name="id">
+	        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+	    </ownedAttribute>
+		<ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Refresh-access" name="access" _type="OAuth2Access" lower="1" upper="1"/>
+	    <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Refresh-expiresAt" name="expiresAt">
+           <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
+        </ownedAttribute>
 	</ownedMember>
+	
 	<ownedMember xmi:type="cmof:Association" xmi:id="A_oauth2Refresh_oauth2Configuration" name="A_oauth2Refresh_oauth2Configuration" visibility="private" memberEnd="OAuth2Configuration-OAuth2Refresh A_oauth2Refresh_oauth2Configuration-Configurations">
       <ownedEnd xmi:type="cmof:Property" xmi:id="A_oauth2Refresh_oauth2Configuration-OAuth2Configuration" name="parent" _type="OAuth2Configuration" lower="0" upper="1" owningAssociation="A_oauth2Refresh_oauth2Configuration" association="A_oauth2Refresh_oauth2Configuration"/>
     </ownedMember>
 	
 	<ownedMember xmi:type="cmof:Class" xmi:id="OAuth2Expires" name="OAuth2Expires">
-	   <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Expires-id" name="id">
-        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
-      </ownedAttribute>
-      <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Expires-id" name="token">
+      <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Expires-id" name="id">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Expires-expiresAt" name="expiresAt">
         <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
       </ownedAttribute>
 	</ownedMember>
+	
 	<ownedMember xmi:type="cmof:Association" xmi:id="A_oauth2Expires_oauth2Configuration" name="A_oauth2Expires_oauth2Configuration" visibility="private" memberEnd="OAuth2Configuration-OAuth2Expires A_oauth2Expires_oauth2Configuration-Configurations">
       <ownedEnd xmi:type="cmof:Property" xmi:id="A_oauth2Expires_oauth2Configuration-OAuth2Configuration" name="parent" _type="OAuth2Configuration" lower="0" upper="1" owningAssociation="A_oauth2Expires_oauth2Configuration" association="A_oauth2Expires_oauth2Configuration"/>
+    </ownedMember>
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_oauth2IdToken_oauth2Configuration" name="A_oauth2IdToken_oauth2Configuration" visibility="private" memberEnd="OAuth2Configuration-OAuth2IdToken A_oauth2IdToken_oauth2Configuration-Configurations">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_oauth2IdToken_oauth2Configuration-OAuth2Configuration" name="parent" _type="OAuth2Configuration" lower="0" upper="1" owningAssociation="A_oauth2IdToken_oauth2Configuration" association="A_oauth2IdToken_oauth2Configuration"/>
     </ownedMember>
 	
 	<ownedMember xmi:type="cmof:Class" xmi:id="OAuth2Configuration" name="OAuth2Configuration" superClass="Configuration">
@@ -234,7 +273,10 @@
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
       </ownedAttribute>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="accessExpiration" name="accessExpiration">
-        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+         <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#time"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="refreshExpiration" name="refreshExpiration">
+         <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#time"/>
       </ownedAttribute>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="tokenType" name="tokenType">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
@@ -260,6 +302,7 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Configuration-OAuth2Client" name="clients" _type="OAuth2Client" lower="0"  upper="*" isComposite="true" association="A_oauth2Client_oauth2Configuration"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Configuration-OAuth2Authorize" name="authorize" _type="OAuth2Authorize" lower="0"  upper="*" isComposite="true" association="A_oauth2Authorize_oauth2Configuration"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Configuration-OAuth2Access" name="access" _type="OAuth2Access" lower="0"  upper="*" isComposite="true" association="A_oauth2Access_oauth2Configuration"/>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Configuration-OAuth2Access" name="ids" _type="OAuth2IdToken" lower="0"  upper="*" isComposite="true" association="A_oauth2IdToken_oauth2Configuration"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Configuration-OAuth2Refresh" name="refresh" _type="OAuth2Refresh" lower="0"  upper="*" isComposite="true" association="A_oauth2Refresh_oauth2Configuration"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Configuration-OAuth2Expires" name="expire" _type="OAuth2Expires" lower="0"  upper="*" isComposite="true" association="A_oauth2Expires_oauth2Configuration"/>
 	</ownedMember>

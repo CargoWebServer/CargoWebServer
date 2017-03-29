@@ -17,16 +17,16 @@ func (this *EntityManager) create_CargoEntities_EntityEntityPrototype() {
 	var entityEntityProto EntityPrototype
 	entityEntityProto.TypeName = "CargoEntities.Entity"
 	entityEntityProto.IsAbstract = true
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
 	entityEntityProto.Ids = append(entityEntityProto.Ids, "uuid")
 	entityEntityProto.Fields = append(entityEntityProto.Fields, "uuid")
@@ -536,17 +536,22 @@ func (this *CargoEntities_ParameterEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -630,7 +635,7 @@ func (this *CargoEntities_ParameterEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -1170,17 +1175,23 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			log.Println("=-----------> ", childsUuidStr)
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -1264,7 +1275,7 @@ func (this *CargoEntities_ActionEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -1794,17 +1805,22 @@ func (this *CargoEntities_ErrorEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][8].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][9].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -1888,7 +1904,7 @@ func (this *CargoEntities_ErrorEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -2183,7 +2199,7 @@ func (this *EntityManager) create_CargoEntities_LogEntryEntityPrototype() {
 	logEntryEntityProto.FieldsOrder = append(logEntryEntityProto.FieldsOrder, 3)
 	logEntryEntityProto.FieldsVisibility = append(logEntryEntityProto.FieldsVisibility, true)
 	logEntryEntityProto.Fields = append(logEntryEntityProto.Fields, "M_creationTime")
-	logEntryEntityProto.FieldsType = append(logEntryEntityProto.FieldsType, "xs.long")
+	logEntryEntityProto.FieldsType = append(logEntryEntityProto.FieldsType, "xs.date")
 	logEntryEntityProto.FieldsOrder = append(logEntryEntityProto.FieldsOrder, 4)
 	logEntryEntityProto.FieldsVisibility = append(logEntryEntityProto.FieldsVisibility, true)
 	logEntryEntityProto.Fields = append(logEntryEntityProto.Fields, "M_entityRef")
@@ -2403,17 +2419,22 @@ func (this *CargoEntities_LogEntryEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][7].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][8].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -2497,7 +2518,7 @@ func (this *CargoEntities_LogEntryEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -3004,17 +3025,22 @@ func (this *CargoEntities_LogEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][5].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][6].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -3098,7 +3124,7 @@ func (this *CargoEntities_LogEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -3602,17 +3628,22 @@ func (this *CargoEntities_ProjectEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -3696,7 +3727,7 @@ func (this *CargoEntities_ProjectEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -4300,17 +4331,22 @@ func (this *CargoEntities_NotificationEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][9].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][10].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -4394,7 +4430,7 @@ func (this *CargoEntities_NotificationEntity) AppendReference(reference Entity) 
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -4696,7 +4732,7 @@ func (this *EntityManager) create_CargoEntities_TextMessageEntityPrototype() {
 	textMessageEntityProto.FieldsOrder = append(textMessageEntityProto.FieldsOrder, 4)
 	textMessageEntityProto.FieldsVisibility = append(textMessageEntityProto.FieldsVisibility, true)
 	textMessageEntityProto.Fields = append(textMessageEntityProto.Fields, "M_creationTime")
-	textMessageEntityProto.FieldsType = append(textMessageEntityProto.FieldsType, "xs.long")
+	textMessageEntityProto.FieldsType = append(textMessageEntityProto.FieldsType, "xs.date")
 	textMessageEntityProto.FieldsOrder = append(textMessageEntityProto.FieldsOrder, 5)
 	textMessageEntityProto.FieldsVisibility = append(textMessageEntityProto.FieldsVisibility, true)
 	textMessageEntityProto.Fields = append(textMessageEntityProto.Fields, "M_fromRef")
@@ -4944,17 +4980,22 @@ func (this *CargoEntities_TextMessageEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][9].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][10].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -5038,7 +5079,7 @@ func (this *CargoEntities_TextMessageEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -5330,15 +5371,15 @@ func (this *EntityManager) create_CargoEntities_SessionEntityPrototype() {
 	sessionEntityProto.FieldsOrder = append(sessionEntityProto.FieldsOrder, 3)
 	sessionEntityProto.FieldsVisibility = append(sessionEntityProto.FieldsVisibility, true)
 	sessionEntityProto.Fields = append(sessionEntityProto.Fields, "M_startTime")
-	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "xs.long")
+	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "xs.date")
 	sessionEntityProto.FieldsOrder = append(sessionEntityProto.FieldsOrder, 4)
 	sessionEntityProto.FieldsVisibility = append(sessionEntityProto.FieldsVisibility, true)
 	sessionEntityProto.Fields = append(sessionEntityProto.Fields, "M_endTime")
-	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "xs.long")
+	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "xs.date")
 	sessionEntityProto.FieldsOrder = append(sessionEntityProto.FieldsOrder, 5)
 	sessionEntityProto.FieldsVisibility = append(sessionEntityProto.FieldsVisibility, true)
 	sessionEntityProto.Fields = append(sessionEntityProto.Fields, "M_statusTime")
-	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "xs.long")
+	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "xs.date")
 	sessionEntityProto.FieldsOrder = append(sessionEntityProto.FieldsOrder, 6)
 	sessionEntityProto.FieldsVisibility = append(sessionEntityProto.FieldsVisibility, true)
 	sessionEntityProto.Fields = append(sessionEntityProto.Fields, "M_sessionState")
@@ -5575,17 +5616,22 @@ func (this *CargoEntities_SessionEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][9].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][10].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -5669,7 +5715,7 @@ func (this *CargoEntities_SessionEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -6177,17 +6223,22 @@ func (this *CargoEntities_RoleEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -6271,9 +6322,8 @@ func (this *CargoEntities_RoleEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
-		//log.Println(index)
 		this.referencesPtr[index] = reference
 	}
 }
@@ -6702,6 +6752,14 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	messagesIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_messages); i++ {
 		switch v := this.object.M_messages[i].(type) {
+		case *CargoEntities.Error:
+			messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
+			messagesIds = append(messagesIds, messagesEntity.uuid)
+			messagesEntity.AppendReferenced("messages", this)
+			this.AppendChild("messages", messagesEntity)
+			if messagesEntity.NeedSave() {
+				messagesEntity.SaveEntity()
+			}
 		case *CargoEntities.Notification:
 			messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
 			messagesIds = append(messagesIds, messagesEntity.uuid)
@@ -6712,14 +6770,6 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 			}
 		case *CargoEntities.TextMessage:
 			messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
-			messagesIds = append(messagesIds, messagesEntity.uuid)
-			messagesEntity.AppendReferenced("messages", this)
-			this.AppendChild("messages", messagesEntity)
-			if messagesEntity.NeedSave() {
-				messagesEntity.SaveEntity()
-			}
-		case *CargoEntities.Error:
-			messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
 			messagesIds = append(messagesIds, messagesEntity.uuid)
 			messagesEntity.AppendReferenced("messages", this)
 			this.AppendChild("messages", messagesEntity)
@@ -7004,17 +7054,22 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][12].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][13].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -7098,7 +7153,7 @@ func (this *CargoEntities_AccountEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -7668,17 +7723,22 @@ func (this *CargoEntities_ComputerEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][8].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][9].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -7762,7 +7822,7 @@ func (this *CargoEntities_ComputerEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -8246,17 +8306,22 @@ func (this *CargoEntities_PermissionEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][5].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][6].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -8339,7 +8404,7 @@ func (this *CargoEntities_PermissionEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -8647,7 +8712,7 @@ func (this *EntityManager) create_CargoEntities_FileEntityPrototype() {
 	fileEntityProto.FieldsOrder = append(fileEntityProto.FieldsOrder, 6)
 	fileEntityProto.FieldsVisibility = append(fileEntityProto.FieldsVisibility, true)
 	fileEntityProto.Fields = append(fileEntityProto.Fields, "M_modeTime")
-	fileEntityProto.FieldsType = append(fileEntityProto.FieldsType, "xs.long")
+	fileEntityProto.FieldsType = append(fileEntityProto.FieldsType, "xs.date")
 	fileEntityProto.FieldsOrder = append(fileEntityProto.FieldsOrder, 7)
 	fileEntityProto.FieldsVisibility = append(fileEntityProto.FieldsVisibility, true)
 	fileEntityProto.Fields = append(fileEntityProto.Fields, "M_isDir")
@@ -9000,17 +9065,22 @@ func (this *CargoEntities_FileEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][16].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][17].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -9094,7 +9164,7 @@ func (this *CargoEntities_FileEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -9673,17 +9743,22 @@ func (this *CargoEntities_UserEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][11].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][12].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -9767,7 +9842,7 @@ func (this *CargoEntities_UserEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -10271,17 +10346,22 @@ func (this *CargoEntities_GroupEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -10365,7 +10445,7 @@ func (this *CargoEntities_GroupEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}
@@ -10750,38 +10830,6 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 			if entitiesEntity.NeedSave() {
 				entitiesEntity.SaveEntity()
 			}
-		case *CargoEntities.Notification:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.TextMessage:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.File:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.Group:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
 		case *CargoEntities.Log:
 			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
@@ -10798,8 +10846,40 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 			if entitiesEntity.NeedSave() {
 				entitiesEntity.SaveEntity()
 			}
+		case *CargoEntities.Notification:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.TextMessage:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
 		case *CargoEntities.Account:
 			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.File:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.User:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10814,8 +10894,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 			if entitiesEntity.NeedSave() {
 				entitiesEntity.SaveEntity()
 			}
-		case *CargoEntities.User:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), v.UUID, v)
+		case *CargoEntities.Group:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10980,19 +11060,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.LogEntry" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_LogEntryEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_LogEntryEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
 				} else if typeName == "CargoEntities.Notification" {
 					if len(uuids[i]) > 0 {
 						var entitiesEntity *CargoEntities_NotificationEntity
@@ -11019,39 +11086,26 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.File" {
+				} else if typeName == "CargoEntities.Account" {
 					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_FileEntity
+						var entitiesEntity *CargoEntities_AccountEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_FileEntity)
+							entitiesEntity = instance.(*CargoEntities_AccountEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.Group" {
+				} else if typeName == "CargoEntities.LogEntry" {
 					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_GroupEntity
+						var entitiesEntity *CargoEntities_LogEntryEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_GroupEntity)
+							entitiesEntity = instance.(*CargoEntities_LogEntryEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.User" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_UserEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_UserEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -11084,13 +11138,26 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.Account" {
+				} else if typeName == "CargoEntities.File" {
 					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_AccountEntity
+						var entitiesEntity *CargoEntities_FileEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_AccountEntity)
+							entitiesEntity = instance.(*CargoEntities_FileEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.User" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_UserEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_UserEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -11104,6 +11171,19 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 							entitiesEntity = instance.(*CargoEntities_ComputerEntity)
 						} else {
 							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.Group" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_GroupEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_GroupEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -11163,17 +11243,22 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][8].(string)
 		this.childsUuid = make([]string, 0)
-		err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-		if err != nil {
-			return err
+		if childsUuidStr != "null" {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
 		}
 
 		referencedStr := results[0][9].(string)
 		this.referenced = make([]EntityRef, 0)
-		err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-		if err != nil {
-			return err
+		if referencedStr != "null" {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 
 	// set need save to false.
@@ -11257,7 +11342,7 @@ func (this *CargoEntities_EntitiesEntity) AppendReference(reference Entity) {
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
 		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
+	} else if index < len(this.referencesPtr) {
 		// The reference must be update in that case.
 		this.referencesPtr[index] = reference
 	}

@@ -23,6 +23,7 @@ type OAuth2Refresh struct{
 	m_access *OAuth2Access
 	/** If the ref is a string and not an object **/
 	M_access string
+	M_expiresAt int64
 
 
 	/** Associations **/
@@ -34,6 +35,8 @@ type OAuth2Refresh struct{
 /** Xml parser for OAuth2Refresh **/
 type XsdOAuth2Refresh struct {
 	XMLName xml.Name	`xml:"oauth2Refresh"`
+	M_id	string	`xml:"id,attr"`
+	M_expiresAt	int64	`xml:"expiresAt,attr"`
 
 }
 /** UUID **/
@@ -79,6 +82,19 @@ func (this *OAuth2Refresh) RemoveAccess(ref interface{}){
 		this.M_access = ""
 	}
 }
+
+/** ExpiresAt **/
+func (this *OAuth2Refresh) GetExpiresAt() int64{
+	return this.M_expiresAt
+}
+
+/** Init reference ExpiresAt **/
+func (this *OAuth2Refresh) SetExpiresAt(ref interface{}){
+	this.NeedSave = true
+	this.M_expiresAt = ref.(int64)
+}
+
+/** Remove reference ExpiresAt **/
 
 /** Parent **/
 func (this *OAuth2Refresh) GetParentPtr() *OAuth2Configuration{

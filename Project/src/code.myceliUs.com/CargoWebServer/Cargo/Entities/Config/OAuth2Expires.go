@@ -19,8 +19,7 @@ type OAuth2Expires struct{
 	IsInit   bool
 
 	/** members of OAuth2Expires **/
-	M_id int
-	M_token string
+	M_id string
 	M_expiresAt int64
 
 
@@ -33,6 +32,8 @@ type OAuth2Expires struct{
 /** Xml parser for OAuth2Expires **/
 type XsdOAuth2Expires struct {
 	XMLName xml.Name	`xml:"oauth2Expires"`
+	M_id	string	`xml:"id,attr"`
+	M_expiresAt	int64	`xml:"expiresAt,attr"`
 
 }
 /** UUID **/
@@ -41,30 +42,17 @@ func (this *OAuth2Expires) GetUUID() string{
 }
 
 /** Id **/
-func (this *OAuth2Expires) GetId() int{
+func (this *OAuth2Expires) GetId() string{
 	return this.M_id
 }
 
 /** Init reference Id **/
 func (this *OAuth2Expires) SetId(ref interface{}){
 	this.NeedSave = true
-	this.M_id = ref.(int)
+	this.M_id = ref.(string)
 }
 
 /** Remove reference Id **/
-
-/** Token **/
-func (this *OAuth2Expires) GetToken() string{
-	return this.M_token
-}
-
-/** Init reference Token **/
-func (this *OAuth2Expires) SetToken(ref interface{}){
-	this.NeedSave = true
-	this.M_token = ref.(string)
-}
-
-/** Remove reference Token **/
 
 /** ExpiresAt **/
 func (this *OAuth2Expires) GetExpiresAt() int64{

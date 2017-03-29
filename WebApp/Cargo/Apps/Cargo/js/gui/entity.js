@@ -553,7 +553,7 @@ EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType
 		} else if (isXsRef(fieldType)) {
 			// Reference here... autocomplete...
 			control = valueDiv.appendElement({ "tag": "input", "id": id }).down()
-		} else if (isXsInt(fieldType)) {
+		} else if (isXsInt(fieldType) || isXsTime(fieldType)) {
 			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "1", "id": id }).down()
 		} else if (isXsDate(fieldType)) {
 			control = valueDiv.appendElement({ "tag": "input", "type": "date", "id": id }).down()
@@ -852,7 +852,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							entity[attribute] = parseFloat(this.value)
 							entity.NeedSave = true
 						}
-					} else if (isXsInt(fieldType)) {
+					} else if (isXsInt(fieldType) || isXsTime(fieldType)) {
 						if (entity[attribute] != parseInt(this.value)) {
 							entity[attribute] = parseInt(this.value)
 							entity.NeedSave = true
@@ -1222,7 +1222,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 			} else {
 				control.element.value = ""
 			}
-		} else if (isXsInt(fieldType)) {
+		} else if (isXsInt(fieldType) || isXsTime(fieldType)) {
 			if (value != "") {
 				control.element.value = parseInt(value)
 			} else {

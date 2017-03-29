@@ -355,8 +355,8 @@ SecurityManager.prototype.changeAdminPassword = function (pwd, newPwd, successCa
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // OAuth2 Ressource access... The client must be configure first to be able to get access to ressources.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function GetRessource(clientId, scope, query){
-    var result = server.GetOAuth2Manager().GetRessource(clientId,scope, query, messageId, sessionId)
+function GetResource(clientId, scope, query){
+    var result = server.GetOAuth2Manager().GetResource(clientId,scope, query, messageId, sessionId)
     return result
 }
 
@@ -366,7 +366,7 @@ function GetRessource(clientId, scope, query){
  * @param {string} scope The access scope need for the query.
  * @param {string} query The query that the OAuth2 provider will execute to retreive the information.
  */
-SecurityManager.prototype.getRessource = function (clientId, scope, query, successCallback, errorCallback, caller) {
+SecurityManager.prototype.getResource = function (clientId, scope, query, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
     params.push(createRpcData(clientId, "STRING", "clientId"))
@@ -375,7 +375,7 @@ SecurityManager.prototype.getRessource = function (clientId, scope, query, succe
 
     // Call it on the server.
     server.executeJsFunction(
-        GetRessource.toString(), // The function to execute remotely on server
+        GetResource.toString(), // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
