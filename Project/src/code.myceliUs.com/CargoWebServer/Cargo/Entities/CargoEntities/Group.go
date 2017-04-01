@@ -12,6 +12,8 @@ type Group struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -100,7 +102,6 @@ func (this *Group) SetMembersRef(ref interface{}){
 
 /** Remove reference MembersRef **/
 func (this *Group) RemoveMembersRef(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
 	membersRef_ := make([]*User, 0)
 	membersRefUuid := make([]string, 0)
@@ -108,6 +109,8 @@ func (this *Group) RemoveMembersRef(ref interface{}){
 		if toDelete.GetUUID() != this.m_membersRef[i].GetUUID() {
 			membersRef_ = append(membersRef_, this.m_membersRef[i])
 			membersRefUuid = append(membersRefUuid, this.M_membersRef[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.m_membersRef = membersRef_
@@ -132,10 +135,13 @@ func (this *Group) SetEntitiesPtr(ref interface{}){
 
 /** Remove reference Entities **/
 func (this *Group) RemoveEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Entities)
-	if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
-		this.m_entitiesPtr = nil
-		this.M_entitiesPtr = ""
+	if this.m_entitiesPtr!= nil {
+		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+			this.m_entitiesPtr = nil
+			this.M_entitiesPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

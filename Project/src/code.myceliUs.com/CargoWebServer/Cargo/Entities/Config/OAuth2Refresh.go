@@ -12,6 +12,8 @@ type OAuth2Refresh struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -23,7 +25,6 @@ type OAuth2Refresh struct{
 	m_access *OAuth2Access
 	/** If the ref is a string and not an object **/
 	M_access string
-	M_expiresAt int64
 
 
 	/** Associations **/
@@ -36,7 +37,6 @@ type OAuth2Refresh struct{
 type XsdOAuth2Refresh struct {
 	XMLName xml.Name	`xml:"oauth2Refresh"`
 	M_id	string	`xml:"id,attr"`
-	M_expiresAt	int64	`xml:"expiresAt,attr"`
 
 }
 /** UUID **/
@@ -75,26 +75,16 @@ func (this *OAuth2Refresh) SetAccess(ref interface{}){
 
 /** Remove reference Access **/
 func (this *OAuth2Refresh) RemoveAccess(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2Access)
-	if toDelete.GetUUID() == this.m_access.GetUUID() {
-		this.m_access = nil
-		this.M_access = ""
+	if this.m_access!= nil {
+		if toDelete.GetUUID() == this.m_access.GetUUID() {
+			this.m_access = nil
+			this.M_access = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
-
-/** ExpiresAt **/
-func (this *OAuth2Refresh) GetExpiresAt() int64{
-	return this.M_expiresAt
-}
-
-/** Init reference ExpiresAt **/
-func (this *OAuth2Refresh) SetExpiresAt(ref interface{}){
-	this.NeedSave = true
-	this.M_expiresAt = ref.(int64)
-}
-
-/** Remove reference ExpiresAt **/
 
 /** Parent **/
 func (this *OAuth2Refresh) GetParentPtr() *OAuth2Configuration{
@@ -114,10 +104,13 @@ func (this *OAuth2Refresh) SetParentPtr(ref interface{}){
 
 /** Remove reference Parent **/
 func (this *OAuth2Refresh) RemoveParentPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Configuration)
-	if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
-		this.m_parentPtr = nil
-		this.M_parentPtr = ""
+	if this.m_parentPtr!= nil {
+		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+			this.m_parentPtr = nil
+			this.M_parentPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

@@ -17,16 +17,16 @@ func (this *EntityManager) create_CargoEntities_EntityEntityPrototype() {
 	var entityEntityProto EntityPrototype
 	entityEntityProto.TypeName = "CargoEntities.Entity"
 	entityEntityProto.IsAbstract = true
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
 	entityEntityProto.Ids = append(entityEntityProto.Ids, "uuid")
 	entityEntityProto.Fields = append(entityEntityProto.Fields, "uuid")
@@ -96,6 +96,7 @@ func (this *EntityManager) NewCargoEntitiesParameterEntity(parentUuid string, ob
 	}
 	if object != nil {
 		object.(*CargoEntities.Parameter).TYPENAME = "CargoEntities.Parameter"
+		object.(*CargoEntities.Parameter).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Parameter", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -146,6 +147,7 @@ func (this *EntityManager) NewCargoEntitiesParameterEntity(parentUuid string, ob
 	entity.object.TYPENAME = "CargoEntities.Parameter"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -260,7 +262,9 @@ func (this *CargoEntities_ParameterEntity) RemoveChild(name string, uuid string)
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_ParameterEntity) GetReferencesUuid() []string {
@@ -536,7 +540,7 @@ func (this *CargoEntities_ParameterEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -545,7 +549,7 @@ func (this *CargoEntities_ParameterEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -671,6 +675,7 @@ func (this *EntityManager) NewCargoEntitiesActionEntity(parentUuid string, objec
 	}
 	if object != nil {
 		object.(*CargoEntities.Action).TYPENAME = "CargoEntities.Action"
+		object.(*CargoEntities.Action).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Action", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -721,6 +726,7 @@ func (this *EntityManager) NewCargoEntitiesActionEntity(parentUuid string, objec
 	entity.object.TYPENAME = "CargoEntities.Action"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -835,7 +841,9 @@ func (this *CargoEntities_ActionEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_ActionEntity) GetReferencesUuid() []string {
@@ -1175,8 +1183,7 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
-			log.Println("=-----------> ", childsUuidStr)
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -1185,7 +1192,7 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -1311,6 +1318,7 @@ func (this *EntityManager) NewCargoEntitiesErrorEntity(parentUuid string, object
 	}
 	if object != nil {
 		object.(*CargoEntities.Error).TYPENAME = "CargoEntities.Error"
+		object.(*CargoEntities.Error).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Error", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -1361,6 +1369,7 @@ func (this *EntityManager) NewCargoEntitiesErrorEntity(parentUuid string, object
 	entity.object.TYPENAME = "CargoEntities.Error"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -1475,7 +1484,9 @@ func (this *CargoEntities_ErrorEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_ErrorEntity) GetReferencesUuid() []string {
@@ -1805,7 +1816,7 @@ func (this *CargoEntities_ErrorEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][8].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -1814,7 +1825,7 @@ func (this *CargoEntities_ErrorEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][9].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -1940,6 +1951,7 @@ func (this *EntityManager) NewCargoEntitiesLogEntryEntity(parentUuid string, obj
 	}
 	if object != nil {
 		object.(*CargoEntities.LogEntry).TYPENAME = "CargoEntities.LogEntry"
+		object.(*CargoEntities.LogEntry).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.LogEntry", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -1990,6 +2002,7 @@ func (this *EntityManager) NewCargoEntitiesLogEntryEntity(parentUuid string, obj
 	entity.object.TYPENAME = "CargoEntities.LogEntry"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -2104,7 +2117,9 @@ func (this *CargoEntities_LogEntryEntity) RemoveChild(name string, uuid string) 
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_LogEntryEntity) GetReferencesUuid() []string {
@@ -2419,7 +2434,7 @@ func (this *CargoEntities_LogEntryEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][7].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -2428,7 +2443,7 @@ func (this *CargoEntities_LogEntryEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][8].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -2554,6 +2569,7 @@ func (this *EntityManager) NewCargoEntitiesLogEntity(parentUuid string, objectId
 	}
 	if object != nil {
 		object.(*CargoEntities.Log).TYPENAME = "CargoEntities.Log"
+		object.(*CargoEntities.Log).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Log", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -2604,6 +2620,7 @@ func (this *EntityManager) NewCargoEntitiesLogEntity(parentUuid string, objectId
 	entity.object.TYPENAME = "CargoEntities.Log"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -2718,7 +2735,9 @@ func (this *CargoEntities_LogEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_LogEntity) GetReferencesUuid() []string {
@@ -3025,7 +3044,7 @@ func (this *CargoEntities_LogEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][5].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -3034,7 +3053,7 @@ func (this *CargoEntities_LogEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][6].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -3160,6 +3179,7 @@ func (this *EntityManager) NewCargoEntitiesProjectEntity(parentUuid string, obje
 	}
 	if object != nil {
 		object.(*CargoEntities.Project).TYPENAME = "CargoEntities.Project"
+		object.(*CargoEntities.Project).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Project", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -3210,6 +3230,7 @@ func (this *EntityManager) NewCargoEntitiesProjectEntity(parentUuid string, obje
 	entity.object.TYPENAME = "CargoEntities.Project"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -3324,7 +3345,9 @@ func (this *CargoEntities_ProjectEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_ProjectEntity) GetReferencesUuid() []string {
@@ -3628,7 +3651,7 @@ func (this *CargoEntities_ProjectEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -3637,7 +3660,7 @@ func (this *CargoEntities_ProjectEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -3817,6 +3840,7 @@ func (this *EntityManager) NewCargoEntitiesNotificationEntity(parentUuid string,
 	}
 	if object != nil {
 		object.(*CargoEntities.Notification).TYPENAME = "CargoEntities.Notification"
+		object.(*CargoEntities.Notification).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Notification", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -3867,6 +3891,7 @@ func (this *EntityManager) NewCargoEntitiesNotificationEntity(parentUuid string,
 	entity.object.TYPENAME = "CargoEntities.Notification"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -3981,7 +4006,9 @@ func (this *CargoEntities_NotificationEntity) RemoveChild(name string, uuid stri
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_NotificationEntity) GetReferencesUuid() []string {
@@ -4331,7 +4358,7 @@ func (this *CargoEntities_NotificationEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][9].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -4340,7 +4367,7 @@ func (this *CargoEntities_NotificationEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][10].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -4466,6 +4493,7 @@ func (this *EntityManager) NewCargoEntitiesTextMessageEntity(parentUuid string, 
 	}
 	if object != nil {
 		object.(*CargoEntities.TextMessage).TYPENAME = "CargoEntities.TextMessage"
+		object.(*CargoEntities.TextMessage).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.TextMessage", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -4516,6 +4544,7 @@ func (this *EntityManager) NewCargoEntitiesTextMessageEntity(parentUuid string, 
 	entity.object.TYPENAME = "CargoEntities.TextMessage"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -4630,7 +4659,9 @@ func (this *CargoEntities_TextMessageEntity) RemoveChild(name string, uuid strin
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_TextMessageEntity) GetReferencesUuid() []string {
@@ -4980,7 +5011,7 @@ func (this *CargoEntities_TextMessageEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][9].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -4989,7 +5020,7 @@ func (this *CargoEntities_TextMessageEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][10].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -5115,6 +5146,7 @@ func (this *EntityManager) NewCargoEntitiesSessionEntity(parentUuid string, obje
 	}
 	if object != nil {
 		object.(*CargoEntities.Session).TYPENAME = "CargoEntities.Session"
+		object.(*CargoEntities.Session).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Session", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -5165,6 +5197,7 @@ func (this *EntityManager) NewCargoEntitiesSessionEntity(parentUuid string, obje
 	entity.object.TYPENAME = "CargoEntities.Session"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -5279,7 +5312,9 @@ func (this *CargoEntities_SessionEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_SessionEntity) GetReferencesUuid() []string {
@@ -5616,7 +5651,7 @@ func (this *CargoEntities_SessionEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][9].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -5625,7 +5660,7 @@ func (this *CargoEntities_SessionEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][10].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -5751,6 +5786,7 @@ func (this *EntityManager) NewCargoEntitiesRoleEntity(parentUuid string, objectI
 	}
 	if object != nil {
 		object.(*CargoEntities.Role).TYPENAME = "CargoEntities.Role"
+		object.(*CargoEntities.Role).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Role", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -5801,6 +5837,7 @@ func (this *EntityManager) NewCargoEntitiesRoleEntity(parentUuid string, objectI
 	entity.object.TYPENAME = "CargoEntities.Role"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -5915,7 +5952,9 @@ func (this *CargoEntities_RoleEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_RoleEntity) GetReferencesUuid() []string {
@@ -6223,7 +6262,7 @@ func (this *CargoEntities_RoleEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -6232,7 +6271,7 @@ func (this *CargoEntities_RoleEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -6358,6 +6397,7 @@ func (this *EntityManager) NewCargoEntitiesAccountEntity(parentUuid string, obje
 	}
 	if object != nil {
 		object.(*CargoEntities.Account).TYPENAME = "CargoEntities.Account"
+		object.(*CargoEntities.Account).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Account", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -6408,6 +6448,7 @@ func (this *EntityManager) NewCargoEntitiesAccountEntity(parentUuid string, obje
 	entity.object.TYPENAME = "CargoEntities.Account"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -6522,7 +6563,9 @@ func (this *CargoEntities_AccountEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_AccountEntity) GetReferencesUuid() []string {
@@ -7054,7 +7097,7 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][12].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -7063,7 +7106,7 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][13].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -7189,6 +7232,7 @@ func (this *EntityManager) NewCargoEntitiesComputerEntity(parentUuid string, obj
 	}
 	if object != nil {
 		object.(*CargoEntities.Computer).TYPENAME = "CargoEntities.Computer"
+		object.(*CargoEntities.Computer).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Computer", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -7239,6 +7283,7 @@ func (this *EntityManager) NewCargoEntitiesComputerEntity(parentUuid string, obj
 	entity.object.TYPENAME = "CargoEntities.Computer"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -7353,7 +7398,9 @@ func (this *CargoEntities_ComputerEntity) RemoveChild(name string, uuid string) 
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_ComputerEntity) GetReferencesUuid() []string {
@@ -7723,7 +7770,7 @@ func (this *CargoEntities_ComputerEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][8].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -7732,7 +7779,7 @@ func (this *CargoEntities_ComputerEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][9].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -7858,6 +7905,7 @@ func (this *EntityManager) NewCargoEntitiesPermissionEntity(parentUuid string, o
 	}
 	if object != nil {
 		object.(*CargoEntities.Permission).TYPENAME = "CargoEntities.Permission"
+		object.(*CargoEntities.Permission).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Permission", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -7908,6 +7956,7 @@ func (this *EntityManager) NewCargoEntitiesPermissionEntity(parentUuid string, o
 	entity.object.TYPENAME = "CargoEntities.Permission"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -8022,7 +8071,9 @@ func (this *CargoEntities_PermissionEntity) RemoveChild(name string, uuid string
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_PermissionEntity) GetReferencesUuid() []string {
@@ -8306,7 +8357,7 @@ func (this *CargoEntities_PermissionEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][5].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -8315,7 +8366,7 @@ func (this *CargoEntities_PermissionEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][6].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -8440,6 +8491,7 @@ func (this *EntityManager) NewCargoEntitiesFileEntity(parentUuid string, objectI
 	}
 	if object != nil {
 		object.(*CargoEntities.File).TYPENAME = "CargoEntities.File"
+		object.(*CargoEntities.File).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.File", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -8490,6 +8542,7 @@ func (this *EntityManager) NewCargoEntitiesFileEntity(parentUuid string, objectI
 	entity.object.TYPENAME = "CargoEntities.File"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -8604,7 +8657,9 @@ func (this *CargoEntities_FileEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_FileEntity) GetReferencesUuid() []string {
@@ -9065,7 +9120,7 @@ func (this *CargoEntities_FileEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][16].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -9074,7 +9129,7 @@ func (this *CargoEntities_FileEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][17].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -9200,6 +9255,7 @@ func (this *EntityManager) NewCargoEntitiesUserEntity(parentUuid string, objectI
 	}
 	if object != nil {
 		object.(*CargoEntities.User).TYPENAME = "CargoEntities.User"
+		object.(*CargoEntities.User).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.User", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -9250,6 +9306,7 @@ func (this *EntityManager) NewCargoEntitiesUserEntity(parentUuid string, objectI
 	entity.object.TYPENAME = "CargoEntities.User"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -9364,7 +9421,9 @@ func (this *CargoEntities_UserEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_UserEntity) GetReferencesUuid() []string {
@@ -9743,7 +9802,7 @@ func (this *CargoEntities_UserEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][11].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -9752,7 +9811,7 @@ func (this *CargoEntities_UserEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][12].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -9878,6 +9937,7 @@ func (this *EntityManager) NewCargoEntitiesGroupEntity(parentUuid string, object
 	}
 	if object != nil {
 		object.(*CargoEntities.Group).TYPENAME = "CargoEntities.Group"
+		object.(*CargoEntities.Group).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Group", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -9928,6 +9988,7 @@ func (this *EntityManager) NewCargoEntitiesGroupEntity(parentUuid string, object
 	entity.object.TYPENAME = "CargoEntities.Group"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -10042,7 +10103,9 @@ func (this *CargoEntities_GroupEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_GroupEntity) GetReferencesUuid() []string {
@@ -10346,7 +10409,7 @@ func (this *CargoEntities_GroupEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -10355,7 +10418,7 @@ func (this *CargoEntities_GroupEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -10481,6 +10544,7 @@ func (this *EntityManager) NewCargoEntitiesEntitiesEntity(parentUuid string, obj
 	}
 	if object != nil {
 		object.(*CargoEntities.Entities).TYPENAME = "CargoEntities.Entities"
+		object.(*CargoEntities.Entities).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("CargoEntities.Entities", "CargoEntities")
 	if len(uuidStr) > 0 {
@@ -10531,6 +10595,7 @@ func (this *EntityManager) NewCargoEntitiesEntitiesEntity(parentUuid string, obj
 	entity.object.TYPENAME = "CargoEntities.Entities"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -10645,7 +10710,9 @@ func (this *CargoEntities_EntitiesEntity) RemoveChild(name string, uuid string) 
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *CargoEntities_EntitiesEntity) GetReferencesUuid() []string {
@@ -10822,24 +10889,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 			if entitiesEntity.NeedSave() {
 				entitiesEntity.SaveEntity()
 			}
-		case *CargoEntities.LogEntry:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
 		case *CargoEntities.Log:
 			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.Project:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10878,8 +10929,24 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 			if entitiesEntity.NeedSave() {
 				entitiesEntity.SaveEntity()
 			}
-		case *CargoEntities.User:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), v.UUID, v)
+		case *CargoEntities.Group:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.LogEntry:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.Project:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10894,8 +10961,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 			if entitiesEntity.NeedSave() {
 				entitiesEntity.SaveEntity()
 			}
-		case *CargoEntities.Group:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
+		case *CargoEntities.User:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -11047,7 +11114,33 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 					log.Println("type ", typeName, " not found!")
 					return err
 				}
-				if typeName == "CargoEntities.Error" {
+				if typeName == "CargoEntities.Log" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_LogEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_LogEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.TextMessage" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_TextMessageEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_TextMessageEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.Error" {
 					if len(uuids[i]) > 0 {
 						var entitiesEntity *CargoEntities_ErrorEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
@@ -11073,19 +11166,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.TextMessage" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_TextMessageEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_TextMessageEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
 				} else if typeName == "CargoEntities.Account" {
 					if len(uuids[i]) > 0 {
 						var entitiesEntity *CargoEntities_AccountEntity
@@ -11093,45 +11173,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 							entitiesEntity = instance.(*CargoEntities_AccountEntity)
 						} else {
 							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.LogEntry" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_LogEntryEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_LogEntryEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.Log" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_LogEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_LogEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.Project" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_ProjectEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_ProjectEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -11151,13 +11192,26 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.User" {
+				} else if typeName == "CargoEntities.Group" {
 					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_UserEntity
+						var entitiesEntity *CargoEntities_GroupEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_UserEntity)
+							entitiesEntity = instance.(*CargoEntities_GroupEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.Project" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_ProjectEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_ProjectEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -11177,13 +11231,26 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.Group" {
+				} else if typeName == "CargoEntities.User" {
 					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_GroupEntity
+						var entitiesEntity *CargoEntities_UserEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_GroupEntity)
+							entitiesEntity = instance.(*CargoEntities_UserEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.LogEntry" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_LogEntryEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_LogEntryEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -11243,7 +11310,7 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][8].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -11252,7 +11319,7 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][9].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err

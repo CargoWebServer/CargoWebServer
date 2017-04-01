@@ -17,7 +17,7 @@ import (
 
 type LdapManager struct {
 	// Contain the list of avalable ldap servers...
-	m_configsInfo map[string]Config.LdapConfiguration
+	m_configsInfo map[string]*Config.LdapConfiguration
 }
 
 var ldapManager *LdapManager
@@ -31,7 +31,7 @@ func (this *Server) GetLdapManager() *LdapManager {
 
 func newLdapManager() *LdapManager {
 	ldapManager := new(LdapManager)
-	ldapManager.m_configsInfo = make(map[string]Config.LdapConfiguration)
+	ldapManager.m_configsInfo = make(map[string]*Config.LdapConfiguration)
 	return ldapManager
 }
 
@@ -56,7 +56,7 @@ func (this *LdapManager) getId() string {
 
 func (this *LdapManager) start() {
 	log.Println("--> Start LdapManager")
-	ldapConfigurations := GetServer().GetConfigurationManager().GetLdapConfigurations()
+	ldapConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetLdapConfigs()
 
 	for i := 0; i < len(ldapConfigurations); i++ {
 		this.m_configsInfo[ldapConfigurations[i].M_id] = ldapConfigurations[i]

@@ -12,6 +12,8 @@ type OAuth2Access struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -93,11 +95,14 @@ func (this *OAuth2Access) SetClient(ref interface{}){
 
 /** Remove reference Client **/
 func (this *OAuth2Access) RemoveClient(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2Client)
-	if toDelete.GetUUID() == this.m_client.GetUUID() {
-		this.m_client = nil
-		this.M_client = ""
+	if this.m_client!= nil {
+		if toDelete.GetUUID() == this.m_client.GetUUID() {
+			this.m_client = nil
+			this.M_client = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 
@@ -145,11 +150,14 @@ func (this *OAuth2Access) SetRefreshToken(ref interface{}){
 
 /** Remove reference RefreshToken **/
 func (this *OAuth2Access) RemoveRefreshToken(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2Refresh)
-	if toDelete.GetUUID() == this.m_refreshToken.GetUUID() {
-		this.m_refreshToken = nil
-		this.M_refreshToken = ""
+	if this.m_refreshToken!= nil {
+		if toDelete.GetUUID() == this.m_refreshToken.GetUUID() {
+			this.m_refreshToken = nil
+			this.M_refreshToken = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 
@@ -210,11 +218,14 @@ func (this *OAuth2Access) SetUserData(ref interface{}){
 
 /** Remove reference UserData **/
 func (this *OAuth2Access) RemoveUserData(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2IdToken)
-	if toDelete.GetUUID() == this.m_userData.GetUUID() {
-		this.m_userData = nil
-		this.M_userData = ""
+	if this.m_userData!= nil {
+		if toDelete.GetUUID() == this.m_userData.GetUUID() {
+			this.m_userData = nil
+			this.M_userData = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 
@@ -249,10 +260,13 @@ func (this *OAuth2Access) SetParentPtr(ref interface{}){
 
 /** Remove reference Parent **/
 func (this *OAuth2Access) RemoveParentPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Configuration)
-	if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
-		this.m_parentPtr = nil
-		this.M_parentPtr = ""
+	if this.m_parentPtr!= nil {
+		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+			this.m_parentPtr = nil
+			this.M_parentPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

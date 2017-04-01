@@ -172,42 +172,44 @@ Table.prototype.init = function () {
 		server.entityManager.attach(this, DeleteEntityEvent, function (evt, table) {
 			// So here I will remove the line from the table...
 			var entity = evt.dataMap["entity"]
-			if (entity.parentUuid == table.model.getParentUuid()) {
-				// So here I will remove the line from the model...
-				table.model.removeRow(entity.UUID)
-				var orderedRows = []
-				for (var rowIndex in table.orderedRows) {
-					var row = table.orderedRows[rowIndex]
-					if (row.id != entity.UUID) {
-						orderedRows.push(row)
-					} else {
-						// remove from the display...
-						row.div.element.parentNode.removeChild(row.div.element)
-					}
-				}
-
-				table.orderedRows = orderedRows
-
-				var rows = []
-				var rowsId = {}
-
-				for (var rowIndex in table.rows) {
-					var row = table.rows[rowIndex]
-					if (row.id != entity.UUID) {
-						row.index = rows.length
-						row.id = entity.UUID
-						rows.push(row)
-						rowsId[entity.UUID] = row
-					} else {
-						// remove from the display...
-						if (row.div.element.parentNode != null) {
+			if (entity.TypeName == table.model.proto.TypeName) {
+				if (entity.parentUuid == table.model.getParentUuid()) {
+					// So here I will remove the line from the model...
+					table.model.removeRow(entity.UUID)
+					var orderedRows = []
+					for (var rowIndex in table.orderedRows) {
+						var row = table.orderedRows[rowIndex]
+						if (row.id != entity.UUID) {
+							orderedRows.push(row)
+						} else {
+							// remove from the display...
 							row.div.element.parentNode.removeChild(row.div.element)
 						}
 					}
+
+					table.orderedRows = orderedRows
+
+					var rows = []
+					var rowsId = {}
+
+					for (var rowIndex in table.rows) {
+						var row = table.rows[rowIndex]
+						if (row.id != entity.UUID) {
+							row.index = rows.length
+							row.id = entity.UUID
+							rows.push(row)
+							rowsId[entity.UUID] = row
+						} else {
+							// remove from the display...
+							if (row.div.element.parentNode != null) {
+								row.div.element.parentNode.removeChild(row.div.element)
+							}
+						}
+					}
+					table.rowsId = rowsId
+					table.rows = rows
+					table.refresh()
 				}
-				table.rowsId = rowsId
-				table.rows = rows
-				table.refresh()
 			}
 		})
 
@@ -216,10 +218,14 @@ Table.prototype.init = function () {
 			if (evt.dataMap["entity"] != undefined) {
 				var entity = server.entityManager.entities[evt.dataMap["entity"].UUID]
 				if (entity != undefined) {
-					if (table.model.getParentUuid() == entity.parentUuid) {
-						var row = table.appendRow(entity, entity.UUID)
-						row.table.model.entities[row.index] = entity
-						row.saveBtn.element.style.visibility = "hidden"
+					if (entity.TYPENAME == table.model.proto.TypeName) {
+						if (entity.parentUuid != undefined && table.model.getParentUuid() != undefined) {
+							if (table.model.getParentUuid() == entity.parentUuid) {
+								var row = table.appendRow(entity, entity.UUID)
+								row.table.model.entities[row.index] = entity
+								row.saveBtn.element.style.visibility = "hidden"
+							}
+						}
 					}
 				}
 			}
@@ -410,8 +416,6 @@ Table.prototype.appendRow = function (values, id) {
 									row = row.table.appendRow(entity, entity.UUID)
 									row.table.model.entities[row.index] = entity
 									row.saveBtn.element.style.visibility = "hidden"
-
-									console.log("update entity event: ", entity)
 								}
 							}
 						}
@@ -694,9 +698,9 @@ function createItemLnk(entity, value, field, valueDiv) {
 	var prototype = server.entityManager.entityPrototypes[value.TYPENAME]
 
 	var titles = []
-	if(value.getTitles != undefined){
+	if (value.getTitles != undefined) {
 		titles = value.getTitles()
-	}else{
+	} else {
 		titles = ["lnk"]
 	}
 
@@ -868,7 +872,7 @@ TableCell.prototype.formatValue = function (value) {
 			} else if (isXsString(fieldType)) {
 				this.valueDiv.element.className = "xs_string"
 				value = formater.formatString(value)
-			}else{
+			} else {
 				value = formater.formatString(value)
 			}
 		} else {
@@ -1042,7 +1046,6 @@ TableCell.prototype.formatValue = function (value) {
 
 				newLnkButton.element.onclick = function (valueDiv, entity, fieldType, field) {
 					return function () {
-						// console.log(typeName)
 						var newLnkInput = valueDiv.getChildById("new_" + field + "_input_lnk")
 
 						if (newLnkInput != undefined) {
@@ -1170,30 +1173,31 @@ TableCell.prototype.formatValue = function (value) {
 				}
 
 				var entity = this.row.table.model.entities[this.row.index]
-
-				entity = server.entityManager.entities[entity.UUID]
-				if (uuid != undefined) {
-					if (uuid.length > 0 && isObjectReference(uuid)) {
-						// TODO use setRef(owner, property, refValue, isArray) insted
-						if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
-							// In that case the value is a generic entity from arrary of byte so I will 
-							// create the function here.
-							// Here I must implement the set and reset function 
-							if (value.UUID != undefined) {
-								setRef(entity, field, value.UUID, false)
-							} else {
-								// In that case the reference is a string...
-								setRef(entity, field, value, false)
-							}
-						}
-
-						entity["set_" + field + "_" + uuid + "_ref"](
-							function (entity, field, valueDiv, createItemLnk) {
-								return function (ref) {
-									createItemLnk(entity, ref, field, valueDiv)
+				if (entity != undefined) {
+					entity = server.entityManager.entities[entity.UUID]
+					if (uuid != undefined && entity != undefined) {
+						if (uuid.length > 0 && isObjectReference(uuid)) {
+							// TODO use setRef(owner, property, refValue, isArray) insted
+							if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
+								// In that case the value is a generic entity from arrary of byte so I will 
+								// create the function here.
+								// Here I must implement the set and reset function 
+								if (value.UUID != undefined) {
+									setRef(entity, field, value.UUID, false)
+								} else {
+									// In that case the reference is a string...
+									setRef(entity, field, value, false)
 								}
-							} (entity, field, content, createItemLnk)
-						)
+							}
+
+							entity["set_" + field + "_" + uuid + "_ref"](
+								function (entity, field, valueDiv, createItemLnk) {
+									return function (ref) {
+										createItemLnk(entity, ref, field, valueDiv)
+									}
+								} (entity, field, content, createItemLnk)
+							)
+						}
 					}
 				}
 
@@ -1512,7 +1516,7 @@ ColumnFormater.prototype.formatDate = function (value, format) {
 
 	// Try to convert from a unix time.
 	var date = new Date(value * 1000)
-    if((date instanceof Date && !isNaN(date.valueOf()))){
+	if ((date instanceof Date && !isNaN(date.valueOf()))) {
 		value = date
 	}
 
@@ -1858,15 +1862,15 @@ ColumnFilter.prototype.getValues = function () {
 		} else if (isXsInt(this.type)) {
 			value = parseInt(value)
 		} else if (isXsBoolean(this.type)) {
-			if(value == "true"){
+			if (value == "true") {
 				value = true
-			}else{
+			} else {
 				value = false
 			}
-		} else if (isXsBinary(this.type)){
+		} else if (isXsBinary(this.type)) {
 			console.log("Binary value found")
-		}else if (isXsTime(this.type)){
-			console.log("Time value found")
+		} else if (isXsTime(this.type)) {
+			value = parseInt(value)
 		}
 
 		var j = 0

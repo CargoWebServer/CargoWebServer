@@ -12,6 +12,8 @@ type Role struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -82,7 +84,6 @@ func (this *Role) SetAccounts(ref interface{}){
 
 /** Remove reference Accounts **/
 func (this *Role) RemoveAccounts(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
 	accounts_ := make([]*Account, 0)
 	accountsUuid := make([]string, 0)
@@ -90,6 +91,8 @@ func (this *Role) RemoveAccounts(ref interface{}){
 		if toDelete.GetUUID() != this.m_accounts[i].GetUUID() {
 			accounts_ = append(accounts_, this.m_accounts[i])
 			accountsUuid = append(accountsUuid, this.M_accounts[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.m_accounts = accounts_
@@ -120,7 +123,6 @@ func (this *Role) SetActions(ref interface{}){
 
 /** Remove reference Actions **/
 func (this *Role) RemoveActions(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Action)
 	actions_ := make([]*Action, 0)
 	actionsUuid := make([]string, 0)
@@ -128,6 +130,8 @@ func (this *Role) RemoveActions(ref interface{}){
 		if toDelete.GetUUID() != this.m_actions[i].GetUUID() {
 			actions_ = append(actions_, this.m_actions[i])
 			actionsUuid = append(actionsUuid, this.M_actions[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.m_actions = actions_
@@ -152,10 +156,13 @@ func (this *Role) SetEntitiesPtr(ref interface{}){
 
 /** Remove reference Entities **/
 func (this *Role) RemoveEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Entities)
-	if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
-		this.m_entitiesPtr = nil
-		this.M_entitiesPtr = ""
+	if this.m_entitiesPtr!= nil {
+		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+			this.m_entitiesPtr = nil
+			this.M_entitiesPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

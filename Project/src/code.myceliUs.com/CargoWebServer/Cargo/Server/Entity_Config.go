@@ -17,13 +17,13 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "uuid")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "uuid")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -86,6 +86,7 @@ func (this *EntityManager) NewConfigSmtpConfigurationEntity(parentUuid string, o
 	}
 	if object != nil {
 		object.(*Config.SmtpConfiguration).TYPENAME = "Config.SmtpConfiguration"
+		object.(*Config.SmtpConfiguration).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.SmtpConfiguration", "Config")
 	if len(uuidStr) > 0 {
@@ -136,6 +137,7 @@ func (this *EntityManager) NewConfigSmtpConfigurationEntity(parentUuid string, o
 	entity.object.TYPENAME = "Config.SmtpConfiguration"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -250,7 +252,9 @@ func (this *Config_SmtpConfigurationEntity) RemoveChild(name string, uuid string
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_SmtpConfigurationEntity) GetReferencesUuid() []string {
@@ -694,7 +698,7 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][10].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -703,7 +707,7 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][11].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -829,6 +833,7 @@ func (this *EntityManager) NewConfigDataStoreConfigurationEntity(parentUuid stri
 	}
 	if object != nil {
 		object.(*Config.DataStoreConfiguration).TYPENAME = "Config.DataStoreConfiguration"
+		object.(*Config.DataStoreConfiguration).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.DataStoreConfiguration", "Config")
 	if len(uuidStr) > 0 {
@@ -879,6 +884,7 @@ func (this *EntityManager) NewConfigDataStoreConfigurationEntity(parentUuid stri
 	entity.object.TYPENAME = "Config.DataStoreConfiguration"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -993,7 +999,9 @@ func (this *Config_DataStoreConfigurationEntity) RemoveChild(name string, uuid s
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_DataStoreConfigurationEntity) GetReferencesUuid() []string {
@@ -1499,7 +1507,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][12].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -1508,7 +1516,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][13].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -1634,6 +1642,7 @@ func (this *EntityManager) NewConfigLdapConfigurationEntity(parentUuid string, o
 	}
 	if object != nil {
 		object.(*Config.LdapConfiguration).TYPENAME = "Config.LdapConfiguration"
+		object.(*Config.LdapConfiguration).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.LdapConfiguration", "Config")
 	if len(uuidStr) > 0 {
@@ -1684,6 +1693,7 @@ func (this *EntityManager) NewConfigLdapConfigurationEntity(parentUuid string, o
 	entity.object.TYPENAME = "Config.LdapConfiguration"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -1798,7 +1808,9 @@ func (this *Config_LdapConfigurationEntity) RemoveChild(name string, uuid string
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_LdapConfigurationEntity) GetReferencesUuid() []string {
@@ -2145,7 +2157,7 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][11].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -2154,7 +2166,7 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][12].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -2280,6 +2292,7 @@ func (this *EntityManager) NewConfigOAuth2ClientEntity(parentUuid string, object
 	}
 	if object != nil {
 		object.(*Config.OAuth2Client).TYPENAME = "Config.OAuth2Client"
+		object.(*Config.OAuth2Client).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.OAuth2Client", "Config")
 	if len(uuidStr) > 0 {
@@ -2330,6 +2343,7 @@ func (this *EntityManager) NewConfigOAuth2ClientEntity(parentUuid string, object
 	entity.object.TYPENAME = "Config.OAuth2Client"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -2444,7 +2458,9 @@ func (this *Config_OAuth2ClientEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_OAuth2ClientEntity) GetReferencesUuid() []string {
@@ -2756,7 +2772,7 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][9].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -2765,7 +2781,7 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][10].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -2891,6 +2907,7 @@ func (this *EntityManager) NewConfigOAuth2AuthorizeEntity(parentUuid string, obj
 	}
 	if object != nil {
 		object.(*Config.OAuth2Authorize).TYPENAME = "Config.OAuth2Authorize"
+		object.(*Config.OAuth2Authorize).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.OAuth2Authorize", "Config")
 	if len(uuidStr) > 0 {
@@ -2941,6 +2958,7 @@ func (this *EntityManager) NewConfigOAuth2AuthorizeEntity(parentUuid string, obj
 	entity.object.TYPENAME = "Config.OAuth2Authorize"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -3055,7 +3073,9 @@ func (this *Config_OAuth2AuthorizeEntity) RemoveChild(name string, uuid string) 
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_OAuth2AuthorizeEntity) GetReferencesUuid() []string {
@@ -3377,7 +3397,7 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][10].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -3386,7 +3406,7 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][11].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -3512,6 +3532,7 @@ func (this *EntityManager) NewConfigOAuth2IdTokenEntity(parentUuid string, objec
 	}
 	if object != nil {
 		object.(*Config.OAuth2IdToken).TYPENAME = "Config.OAuth2IdToken"
+		object.(*Config.OAuth2IdToken).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.OAuth2IdToken", "Config")
 	if len(uuidStr) > 0 {
@@ -3562,6 +3583,7 @@ func (this *EntityManager) NewConfigOAuth2IdTokenEntity(parentUuid string, objec
 	entity.object.TYPENAME = "Config.OAuth2IdToken"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -3676,7 +3698,9 @@ func (this *Config_OAuth2IdTokenEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_OAuth2IdTokenEntity) GetReferencesUuid() []string {
@@ -4068,7 +4092,7 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][15].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -4077,7 +4101,7 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][16].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -4203,6 +4227,7 @@ func (this *EntityManager) NewConfigOAuth2AccessEntity(parentUuid string, object
 	}
 	if object != nil {
 		object.(*Config.OAuth2Access).TYPENAME = "Config.OAuth2Access"
+		object.(*Config.OAuth2Access).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.OAuth2Access", "Config")
 	if len(uuidStr) > 0 {
@@ -4253,6 +4278,7 @@ func (this *EntityManager) NewConfigOAuth2AccessEntity(parentUuid string, object
 	entity.object.TYPENAME = "Config.OAuth2Access"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -4367,7 +4393,9 @@ func (this *Config_OAuth2AccessEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_OAuth2AccessEntity) GetReferencesUuid() []string {
@@ -4751,7 +4779,7 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][13].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -4760,7 +4788,7 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][14].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -4886,6 +4914,7 @@ func (this *EntityManager) NewConfigOAuth2RefreshEntity(parentUuid string, objec
 	}
 	if object != nil {
 		object.(*Config.OAuth2Refresh).TYPENAME = "Config.OAuth2Refresh"
+		object.(*Config.OAuth2Refresh).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.OAuth2Refresh", "Config")
 	if len(uuidStr) > 0 {
@@ -4936,6 +4965,7 @@ func (this *EntityManager) NewConfigOAuth2RefreshEntity(parentUuid string, objec
 	entity.object.TYPENAME = "Config.OAuth2Refresh"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -5050,7 +5080,9 @@ func (this *Config_OAuth2RefreshEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_OAuth2RefreshEntity) GetReferencesUuid() []string {
@@ -5143,24 +5175,20 @@ func (this *EntityManager) create_Config_OAuth2RefreshEntityPrototype() {
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, true)
 	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "M_access")
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "Config.OAuth2Access:Ref")
-	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 4)
-	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, true)
-	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "M_expiresAt")
-	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "xs.date")
 
 	/** associations of OAuth2Refresh **/
-	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 5)
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 4)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
 	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "M_parentPtr")
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "Config.OAuth2Configuration:Ref")
 	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "childsUuid")
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "[]xs.string")
-	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 6)
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 5)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
 
 	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "referenced")
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "[]EntityRef")
-	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 7)
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 6)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
@@ -5188,7 +5216,6 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	/** members of OAuth2Refresh **/
 	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_access")
-	query.Fields = append(query.Fields, "M_expiresAt")
 
 	/** associations of OAuth2Refresh **/
 	query.Fields = append(query.Fields, "M_parentPtr")
@@ -5209,7 +5236,6 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 
 	/** Save access type OAuth2Access **/
 	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_access)
-	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_expiresAt)
 
 	/** associations of OAuth2Refresh **/
 
@@ -5268,7 +5294,6 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string) error {
 	/** members of OAuth2Refresh **/
 	query.Fields = append(query.Fields, "M_id")
 	query.Fields = append(query.Fields, "M_access")
-	query.Fields = append(query.Fields, "M_expiresAt")
 
 	/** associations of OAuth2Refresh **/
 	query.Fields = append(query.Fields, "M_parentPtr")
@@ -5315,16 +5340,11 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string) error {
 			}
 		}
 
-		/** expiresAt **/
-		if results[0][4] != nil {
-			this.object.M_expiresAt = results[0][4].(int64)
-		}
-
 		/** associations of OAuth2Refresh **/
 
 		/** parentPtr **/
-		if results[0][5] != nil {
-			id := results[0][5].(string)
+		if results[0][4] != nil {
+			id := results[0][4].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Configuration"
 				id_ := refTypeName + "$$" + id
@@ -5332,18 +5352,18 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][6].(string)
+		childsUuidStr := results[0][5].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
 			}
 		}
 
-		referencedStr := results[0][7].(string)
+		referencedStr := results[0][6].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -5469,6 +5489,7 @@ func (this *EntityManager) NewConfigOAuth2ExpiresEntity(parentUuid string, objec
 	}
 	if object != nil {
 		object.(*Config.OAuth2Expires).TYPENAME = "Config.OAuth2Expires"
+		object.(*Config.OAuth2Expires).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.OAuth2Expires", "Config")
 	if len(uuidStr) > 0 {
@@ -5519,6 +5540,7 @@ func (this *EntityManager) NewConfigOAuth2ExpiresEntity(parentUuid string, objec
 	entity.object.TYPENAME = "Config.OAuth2Expires"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -5633,7 +5655,9 @@ func (this *Config_OAuth2ExpiresEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_OAuth2ExpiresEntity) GetReferencesUuid() []string {
@@ -5897,7 +5921,7 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][5].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -5906,7 +5930,7 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][6].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -6032,6 +6056,7 @@ func (this *EntityManager) NewConfigOAuth2ConfigurationEntity(parentUuid string,
 	}
 	if object != nil {
 		object.(*Config.OAuth2Configuration).TYPENAME = "Config.OAuth2Configuration"
+		object.(*Config.OAuth2Configuration).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.OAuth2Configuration", "Config")
 	if len(uuidStr) > 0 {
@@ -6082,6 +6107,7 @@ func (this *EntityManager) NewConfigOAuth2ConfigurationEntity(parentUuid string,
 	entity.object.TYPENAME = "Config.OAuth2Configuration"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -6196,7 +6222,9 @@ func (this *Config_OAuth2ConfigurationEntity) RemoveChild(name string, uuid stri
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_OAuth2ConfigurationEntity) GetReferencesUuid() []string {
@@ -6843,7 +6871,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][20].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -6852,7 +6880,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][21].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -6978,6 +7006,7 @@ func (this *EntityManager) NewConfigServiceConfigurationEntity(parentUuid string
 	}
 	if object != nil {
 		object.(*Config.ServiceConfiguration).TYPENAME = "Config.ServiceConfiguration"
+		object.(*Config.ServiceConfiguration).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.ServiceConfiguration", "Config")
 	if len(uuidStr) > 0 {
@@ -7028,6 +7057,7 @@ func (this *EntityManager) NewConfigServiceConfigurationEntity(parentUuid string
 	entity.object.TYPENAME = "Config.ServiceConfiguration"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -7142,7 +7172,9 @@ func (this *Config_ServiceConfigurationEntity) RemoveChild(name string, uuid str
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_ServiceConfigurationEntity) GetReferencesUuid() []string {
@@ -7477,7 +7509,7 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][10].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -7486,7 +7518,7 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][11].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -7612,6 +7644,7 @@ func (this *EntityManager) NewConfigApplicationConfigurationEntity(parentUuid st
 	}
 	if object != nil {
 		object.(*Config.ApplicationConfiguration).TYPENAME = "Config.ApplicationConfiguration"
+		object.(*Config.ApplicationConfiguration).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.ApplicationConfiguration", "Config")
 	if len(uuidStr) > 0 {
@@ -7662,6 +7695,7 @@ func (this *EntityManager) NewConfigApplicationConfigurationEntity(parentUuid st
 	entity.object.TYPENAME = "Config.ApplicationConfiguration"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -7776,7 +7810,9 @@ func (this *Config_ApplicationConfigurationEntity) RemoveChild(name string, uuid
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_ApplicationConfigurationEntity) GetReferencesUuid() []string {
@@ -8051,7 +8087,7 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][5].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -8060,7 +8096,7 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][6].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -8186,6 +8222,7 @@ func (this *EntityManager) NewConfigServerConfigurationEntity(parentUuid string,
 	}
 	if object != nil {
 		object.(*Config.ServerConfiguration).TYPENAME = "Config.ServerConfiguration"
+		object.(*Config.ServerConfiguration).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.ServerConfiguration", "Config")
 	if len(uuidStr) > 0 {
@@ -8236,6 +8273,7 @@ func (this *EntityManager) NewConfigServerConfigurationEntity(parentUuid string,
 	entity.object.TYPENAME = "Config.ServerConfiguration"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -8350,7 +8388,9 @@ func (this *Config_ServerConfigurationEntity) RemoveChild(name string, uuid stri
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_ServerConfigurationEntity) GetReferencesUuid() []string {
@@ -8757,7 +8797,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][16].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -8766,7 +8806,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][17].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err
@@ -8892,6 +8932,7 @@ func (this *EntityManager) NewConfigConfigurationsEntity(parentUuid string, obje
 	}
 	if object != nil {
 		object.(*Config.Configurations).TYPENAME = "Config.Configurations"
+		object.(*Config.Configurations).ParentUuid = parentUuid
 	}
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.Configurations", "Config")
 	if len(uuidStr) > 0 {
@@ -8942,6 +8983,7 @@ func (this *EntityManager) NewConfigConfigurationsEntity(parentUuid string, obje
 	entity.object.TYPENAME = "Config.Configurations"
 
 	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	entity.uuid = uuidStr
 	this.insert(entity)
@@ -9056,7 +9098,9 @@ func (this *Config_ConfigurationsEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
-	Utility.CallMethod(this.GetObject(), removeMethode, params)
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
 }
 
 func (this *Config_ConfigurationsEntity) GetReferencesUuid() []string {
@@ -9606,7 +9650,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 		}
 		childsUuidStr := results[0][13].(string)
 		this.childsUuid = make([]string, 0)
-		if childsUuidStr != "null" {
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
 				return err
@@ -9615,7 +9659,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 
 		referencedStr := results[0][14].(string)
 		this.referenced = make([]EntityRef, 0)
-		if referencedStr != "null" {
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
 			if err != nil {
 				return err

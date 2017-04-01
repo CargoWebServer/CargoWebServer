@@ -12,6 +12,8 @@ type Action struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -80,12 +82,13 @@ func (this *Action) SetParameters(ref interface{}){
 
 /** Remove reference Parameters **/
 func (this *Action) RemoveParameters(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Parameter)
 	parameters_ := make([]*Parameter, 0)
 	for i := 0; i < len(this.M_parameters); i++ {
 		if toDelete.GetUUID() != this.M_parameters[i].GetUUID() {
 			parameters_ = append(parameters_, this.M_parameters[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_parameters = parameters_
@@ -117,12 +120,13 @@ func (this *Action) SetResults(ref interface{}){
 
 /** Remove reference Results **/
 func (this *Action) RemoveResults(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Parameter)
 	results_ := make([]*Parameter, 0)
 	for i := 0; i < len(this.M_results); i++ {
 		if toDelete.GetUUID() != this.M_results[i].GetUUID() {
 			results_ = append(results_, this.M_results[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_results = results_
@@ -146,10 +150,13 @@ func (this *Action) SetEntitiesPtr(ref interface{}){
 
 /** Remove reference Entities **/
 func (this *Action) RemoveEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Entities)
-	if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
-		this.m_entitiesPtr = nil
-		this.M_entitiesPtr = ""
+	if this.m_entitiesPtr!= nil {
+		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+			this.m_entitiesPtr = nil
+			this.M_entitiesPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

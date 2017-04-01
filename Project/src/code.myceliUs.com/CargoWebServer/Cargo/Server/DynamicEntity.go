@@ -82,6 +82,7 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 		return nil, cargoError
 	}
 
+	// Keep track of the perent uuid inside the object.
 	if len(values["UUID"].(string)) == 0 {
 		// I will alway prefer a determistic key over a ramdom value...
 		if len(prototype.Ids) == 1 {
@@ -91,7 +92,7 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 			// The key will be compose by the parent uuid.
 			var keyInfo string
 			if len(parentUuid) > 0 {
-				values["parentUuid"] = parentUuid
+				values["ParentUuid"] = parentUuid
 				keyInfo += parentUuid + ":"
 			}
 
@@ -126,6 +127,7 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 					entity.SetNeedSave(false)
 				}
 			}
+
 			return entity, nil
 		}
 	}
@@ -150,8 +152,8 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 		entity.referenced = make([]EntityRef, 0)
 
 		// I will set it parent ptr...
-		if values["parentUuid"] != nil {
-			if len(values["parentUuid"].(string)) > 0 {
+		if values["ParentUuid"] != nil {
+			if len(values["ParentUuid"].(string)) > 0 {
 				parentPtr, _ := GetServer().GetEntityManager().getDynamicEntityByUuid(values["parentUuid"].(string))
 				entity.SetParentPtr(parentPtr)
 			}
@@ -352,7 +354,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 
 		// Set the parent uuid...
 		this.parentUuid = results[0][1].(string)
-		this.setValue("parentUuid", this.parentUuid) // Set the parent uuid.
+		this.setValue("ParentUuid", this.parentUuid) // Set the parent uuid.
 
 		//init the child...
 		childsUuidStr := results[0][this.prototype.getFieldIndex("childsUuid")].(string)
@@ -599,10 +601,10 @@ func (this *DynamicEntity) saveEntity(path string) {
 	query.Fields = append(query.Fields, "uuid")
 	DynamicEntityInfo = append(DynamicEntityInfo, this.GetUuid())
 
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "ParentUuid")
 	if len(this.parentUuid) > 0 {
 		DynamicEntityInfo = append(DynamicEntityInfo, this.parentUuid)
-		this.setValue("parentUuid", this.parentUuid)
+		this.setValue("ParentUuid", this.parentUuid)
 	} else {
 		DynamicEntityInfo = append(DynamicEntityInfo, "")
 	}

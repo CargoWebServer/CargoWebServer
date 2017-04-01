@@ -659,7 +659,6 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 
 			refRemover += "func (this *" + ownerName + ") Remove" + methodName + ref + "(ref interface{}){\n"
 			// Here the reference is an array...
-			refRemover += "	this.NeedSave = true\n"
 			var isInterfaceCast bool
 			if strings.Contains(cast, ".") {
 				isInterfaceCast = Utility.Contains(abstractClassLst, strings.Split(cast, ".")[1]) || Utility.Contains(superClassesLst, strings.Split(cast, ".")[1])
@@ -670,6 +669,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 			if isPointer && !isInterfaceCast && !strings.HasPrefix(cast, "*") {
 				cast = "*" + cast
 			}
+
 			refRemover += "	toDelete := ref.(" + cast + ")\n"
 
 			if attribute.Upper == "*" {
@@ -689,6 +689,8 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 						refRemover += "		if toDelete.GetUUID() != this.M_" + attribute.Name + ref + "[i].GetUUID() {\n"
 					}
 					refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.M_" + attribute.Name + ref + "[i])\n"
+					refRemover += "		}else{\n"
+					refRemover += "			this.NeedSave = true\n"
 					refRemover += "		}\n"
 					refRemover += "	}\n"
 
@@ -705,6 +707,8 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 
 					refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.m_" + attribute.Name + ref + "[i])\n"
 					refRemover += "			" + attribute.Name + ref + "Uuid = append(" + attribute.Name + ref + "Uuid, this.M_" + attribute.Name + ref + "[i])\n"
+					refRemover += "		}else{\n"
+					refRemover += "			this.NeedSave = true\n"
 					refRemover += "		}\n"
 					refRemover += "	}\n"
 
@@ -724,13 +728,17 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					refRemover += "		this.M_" + attribute.Name + ref + " = nil\n"
 				} else {
 					// The attribute is not an array...
+					refRemover += "	if this.m_" + attribute.Name + ref + "!= nil {\n"
 					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-						refRemover += "	if toDelete.GetUUID() == this.m_" + attribute.Name + ref + ".(" + cast + ").GetUUID() {\n"
+						refRemover += "		if toDelete.GetUUID() == this.m_" + attribute.Name + ref + ".(" + cast + ").GetUUID() {\n"
 					} else {
-						refRemover += "	if toDelete.GetUUID() == this.m_" + attribute.Name + ref + ".GetUUID() {\n"
+						refRemover += "		if toDelete.GetUUID() == this.m_" + attribute.Name + ref + ".GetUUID() {\n"
 					}
-					refRemover += "		this.m_" + attribute.Name + ref + " = nil\n"
-					refRemover += "		this.M_" + attribute.Name + ref + " = \"\"\n"
+					refRemover += "			this.m_" + attribute.Name + ref + " = nil\n"
+					refRemover += "			this.M_" + attribute.Name + ref + " = \"\"\n"
+					refRemover += "		}else{\n"
+					refRemover += "			this.NeedSave = true\n"
+					refRemover += "		}\n"
 				}
 				refRemover += "	}\n"
 			}
@@ -844,9 +852,10 @@ func generateGoClassCode(packageId string) {
 
 				classStr += "\n	/** The entity UUID **/\n"
 				classStr += "	UUID string\n"
-
 				classStr += "	/** The entity TypeName **/\n"
 				classStr += "	TYPENAME string\n"
+				classStr += "	/** The parent uuid if there is some. **/\n"
+				classStr += "	ParentUuid string\n"
 
 				classStr += "	/** If the entity value has change... **/\n"
 				classStr += "	NeedSave bool\n\n"

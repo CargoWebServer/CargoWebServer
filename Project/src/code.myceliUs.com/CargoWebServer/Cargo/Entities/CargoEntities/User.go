@@ -12,6 +12,8 @@ type User struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -163,7 +165,6 @@ func (this *User) SetMemberOfRef(ref interface{}){
 
 /** Remove reference MemberOfRef **/
 func (this *User) RemoveMemberOfRef(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
 	memberOfRef_ := make([]*Group, 0)
 	memberOfRefUuid := make([]string, 0)
@@ -171,6 +172,8 @@ func (this *User) RemoveMemberOfRef(ref interface{}){
 		if toDelete.GetUUID() != this.m_memberOfRef[i].GetUUID() {
 			memberOfRef_ = append(memberOfRef_, this.m_memberOfRef[i])
 			memberOfRefUuid = append(memberOfRefUuid, this.M_memberOfRef[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.m_memberOfRef = memberOfRef_
@@ -201,7 +204,6 @@ func (this *User) SetAccounts(ref interface{}){
 
 /** Remove reference Accounts **/
 func (this *User) RemoveAccounts(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
 	accounts_ := make([]*Account, 0)
 	accountsUuid := make([]string, 0)
@@ -209,6 +211,8 @@ func (this *User) RemoveAccounts(ref interface{}){
 		if toDelete.GetUUID() != this.m_accounts[i].GetUUID() {
 			accounts_ = append(accounts_, this.m_accounts[i])
 			accountsUuid = append(accountsUuid, this.M_accounts[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.m_accounts = accounts_
@@ -233,10 +237,13 @@ func (this *User) SetEntitiesPtr(ref interface{}){
 
 /** Remove reference Entities **/
 func (this *User) RemoveEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Entities)
-	if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
-		this.m_entitiesPtr = nil
-		this.M_entitiesPtr = ""
+	if this.m_entitiesPtr!= nil {
+		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+			this.m_entitiesPtr = nil
+			this.M_entitiesPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

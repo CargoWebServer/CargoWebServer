@@ -12,6 +12,8 @@ type Session struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -134,11 +136,14 @@ func (this *Session) SetComputerRef(ref interface{}){
 
 /** Remove reference ComputerRef **/
 func (this *Session) RemoveComputerRef(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
-	if toDelete.GetUUID() == this.m_computerRef.GetUUID() {
-		this.m_computerRef = nil
-		this.M_computerRef = ""
+	if this.m_computerRef!= nil {
+		if toDelete.GetUUID() == this.m_computerRef.GetUUID() {
+			this.m_computerRef = nil
+			this.M_computerRef = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 
@@ -160,10 +165,13 @@ func (this *Session) SetAccountPtr(ref interface{}){
 
 /** Remove reference Account **/
 func (this *Session) RemoveAccountPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
-	if toDelete.GetUUID() == this.m_accountPtr.GetUUID() {
-		this.m_accountPtr = nil
-		this.M_accountPtr = ""
+	if this.m_accountPtr!= nil {
+		if toDelete.GetUUID() == this.m_accountPtr.GetUUID() {
+			this.m_accountPtr = nil
+			this.M_accountPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

@@ -12,6 +12,8 @@ type Parameter struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -100,10 +102,13 @@ func (this *Parameter) SetParametersPtr(ref interface{}){
 
 /** Remove reference Parameters **/
 func (this *Parameter) RemoveParametersPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Parameter)
-	if toDelete.GetUUID() == this.m_parametersPtr.GetUUID() {
-		this.m_parametersPtr = nil
-		this.M_parametersPtr = ""
+	if this.m_parametersPtr!= nil {
+		if toDelete.GetUUID() == this.m_parametersPtr.GetUUID() {
+			this.m_parametersPtr = nil
+			this.M_parametersPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

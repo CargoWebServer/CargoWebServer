@@ -12,6 +12,8 @@ type OAuth2Configuration struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -264,12 +266,13 @@ func (this *OAuth2Configuration) SetClients(ref interface{}){
 
 /** Remove reference Clients **/
 func (this *OAuth2Configuration) RemoveClients(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2Client)
 	clients_ := make([]*OAuth2Client, 0)
 	for i := 0; i < len(this.M_clients); i++ {
 		if toDelete.GetUUID() != this.M_clients[i].GetUUID() {
 			clients_ = append(clients_, this.M_clients[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_clients = clients_
@@ -301,12 +304,13 @@ func (this *OAuth2Configuration) SetAuthorize(ref interface{}){
 
 /** Remove reference Authorize **/
 func (this *OAuth2Configuration) RemoveAuthorize(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2Authorize)
 	authorize_ := make([]*OAuth2Authorize, 0)
 	for i := 0; i < len(this.M_authorize); i++ {
 		if toDelete.GetUUID() != this.M_authorize[i].GetUUID() {
 			authorize_ = append(authorize_, this.M_authorize[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_authorize = authorize_
@@ -338,12 +342,13 @@ func (this *OAuth2Configuration) SetAccess(ref interface{}){
 
 /** Remove reference Access **/
 func (this *OAuth2Configuration) RemoveAccess(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2Access)
 	access_ := make([]*OAuth2Access, 0)
 	for i := 0; i < len(this.M_access); i++ {
 		if toDelete.GetUUID() != this.M_access[i].GetUUID() {
 			access_ = append(access_, this.M_access[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_access = access_
@@ -375,12 +380,13 @@ func (this *OAuth2Configuration) SetIds(ref interface{}){
 
 /** Remove reference Ids **/
 func (this *OAuth2Configuration) RemoveIds(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2IdToken)
 	ids_ := make([]*OAuth2IdToken, 0)
 	for i := 0; i < len(this.M_ids); i++ {
 		if toDelete.GetUUID() != this.M_ids[i].GetUUID() {
 			ids_ = append(ids_, this.M_ids[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_ids = ids_
@@ -412,12 +418,13 @@ func (this *OAuth2Configuration) SetRefresh(ref interface{}){
 
 /** Remove reference Refresh **/
 func (this *OAuth2Configuration) RemoveRefresh(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2Refresh)
 	refresh_ := make([]*OAuth2Refresh, 0)
 	for i := 0; i < len(this.M_refresh); i++ {
 		if toDelete.GetUUID() != this.M_refresh[i].GetUUID() {
 			refresh_ = append(refresh_, this.M_refresh[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_refresh = refresh_
@@ -449,12 +456,13 @@ func (this *OAuth2Configuration) SetExpire(ref interface{}){
 
 /** Remove reference Expire **/
 func (this *OAuth2Configuration) RemoveExpire(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2Expires)
 	expire_ := make([]*OAuth2Expires, 0)
 	for i := 0; i < len(this.M_expire); i++ {
 		if toDelete.GetUUID() != this.M_expire[i].GetUUID() {
 			expire_ = append(expire_, this.M_expire[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_expire = expire_
@@ -478,10 +486,13 @@ func (this *OAuth2Configuration) SetParentPtr(ref interface{}){
 
 /** Remove reference Parent **/
 func (this *OAuth2Configuration) RemoveParentPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Configurations)
-	if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
-		this.m_parentPtr = nil
-		this.M_parentPtr = ""
+	if this.m_parentPtr!= nil {
+		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+			this.m_parentPtr = nil
+			this.M_parentPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

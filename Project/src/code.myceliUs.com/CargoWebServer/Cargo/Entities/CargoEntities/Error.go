@@ -12,6 +12,8 @@ type Error struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -128,11 +130,14 @@ func (this *Error) SetAccountRef(ref interface{}){
 
 /** Remove reference AccountRef **/
 func (this *Error) RemoveAccountRef(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
-	if toDelete.GetUUID() == this.m_accountRef.GetUUID() {
-		this.m_accountRef = nil
-		this.M_accountRef = ""
+	if this.m_accountRef!= nil {
+		if toDelete.GetUUID() == this.m_accountRef.GetUUID() {
+			this.m_accountRef = nil
+			this.M_accountRef = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 
@@ -154,10 +159,13 @@ func (this *Error) SetEntitiesPtr(ref interface{}){
 
 /** Remove reference Entities **/
 func (this *Error) RemoveEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Entities)
-	if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
-		this.m_entitiesPtr = nil
-		this.M_entitiesPtr = ""
+	if this.m_entitiesPtr!= nil {
+		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+			this.m_entitiesPtr = nil
+			this.M_entitiesPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

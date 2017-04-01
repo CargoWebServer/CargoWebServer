@@ -224,6 +224,20 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 		}
 	}
 
+	// Now I will remove it from it parent...
+	if toDelete.GetParentPtr() != nil {
+		// First I will remove it from parent childs...
+		parent := toDelete.GetParentPtr()
+		parent.GetPrototype()
+		for i := 0; i < len(parent.GetPrototype().FieldsType); i++ {
+			if strings.Index(parent.GetPrototype().FieldsType[i], toDelete.GetTypeName()) != -1 {
+				// Potential property...
+				parent.RemoveChild(parent.GetPrototype().Fields[i], toDelete.GetUuid())
+			}
+		}
+		toSaves = append(toSaves, parent)
+	}
+
 	// Save refeferenced entity...
 	for i := 0; i < len(toSaves); i++ {
 		// Save it only if it dosen't already deleted.
@@ -240,7 +254,6 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 	eventDatas = append(eventDatas, evtData)
 	evt, _ := NewEvent(DeleteEntityEvent, EntityEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
-
 	log.Println("----------> entity ", toDelete.GetUuid(), " is remove ", !this.isExist(toDelete.GetUuid()))
 }
 
@@ -343,6 +356,9 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 
 	// here we have a static object...
 	prototype := target.GetPrototype()
+	if prototype == nil {
+		log.Println("------------------------------> ", target)
+	}
 
 	// The need save evaluation...
 	mapValues, _ := Utility.ToMap(source)
@@ -1177,43 +1193,33 @@ func (this *EntityManager) getEntityPrototype(typeName string, storeId string) (
 	return proto, err
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// API
-////////////////////////////////////////////////////////////////////////////////
-
 /**
  * Create a new entity with default value and append it inside it parent...
  *
  * TODO Est que "The attributeName is the name of the entity in it's parent whitout the M_" est vrai ou on doit lui donner avec le M_?
  */
-func (this *EntityManager) CreateEntity(parentUuid string, attributeName string, typeName string, objectId string, values interface{}, messageId string, sessionId string) interface{} {
+func (this *EntityManager) createEntity(parentUuid string, attributeName string, typeName string, objectId string, values interface{}) (Entity, *CargoEntities.Error) {
 
 	if !Utility.IsValidPackageName(typeName) {
 		cargoError := NewError(Utility.FileLine(), INVALID_PACKAGE_NAME_ERROR, SERVER_ERROR_CODE, errors.New("The typeName '"+typeName+"' is not valid."))
-		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-		return nil
+		return nil, cargoError
 	}
 
 	var parentPtr Entity
-
 	if len(parentUuid) > 0 {
-
 		if !Utility.IsValidEntityReferenceName(parentUuid) {
 			cargoError := NewError(Utility.FileLine(), INVALID_REFERENCE_NAME_ERROR, SERVER_ERROR_CODE, errors.New("The parentUuid '"+parentUuid+"' is not valid."))
-			GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-			return nil
+			return nil, cargoError
 		}
-
 		var errObj *CargoEntities.Error
 		parentPtr, errObj = this.getEntityByUuid(parentUuid)
 		if errObj != nil {
-			GetServer().reportErrorMessage(messageId, sessionId, errObj)
-			return nil
+			return nil, errObj
 		}
 	}
 
 	params := make([]interface{}, 3)
-	params[0] = ""
+	params[0] = parentUuid
 	params[1] = objectId
 	params[2] = values
 
@@ -1228,15 +1234,16 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 			var errObj *CargoEntities.Error
 			entity, errObj = this.newDynamicEntity(parentUuid, values.(map[string]interface{}))
 			if errObj != nil {
-				GetServer().reportErrorMessage(messageId, sessionId, errObj)
-				return nil
+				return nil, errObj
 			}
 		} else {
 			cargoError := NewError(Utility.FileLine(), TYPENAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The typeName '"+typeName+"' is does not exist."))
-			GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-			return nil
+			return nil, cargoError
 		}
 	}
+
+	// Set it parent.
+	entity.(Entity).SetParentPtr(parentPtr)
 
 	// Save the entity...
 	entity.(Entity).SetNeedSave(true)
@@ -1249,7 +1256,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		parentPrtPrototype, _ := this.getEntityPrototype(parentPtrTypeName, parentPtrStoreId)
 		if parentPrtPrototype.getFieldIndex(attributeName) < 0 {
 			cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The attribute name '"+attributeName+"' does not exist in the parent entity with uuid '"+parentUuid+"'."))
-			GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+			return nil, cargoError
 		} else {
 			// Append the child into it parent and save it.
 			parentPtr.AppendChild(attributeName, entity.(Entity))
@@ -1260,7 +1267,25 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 	}
 
 	// Return the object.
-	return entity.(Entity).GetObject()
+	return entity.(Entity), nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// API
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Create a new entity with default value and append it inside it parent...
+ *
+ * TODO Est que "The attributeName is the name of the entity in it's parent whitout the M_" est vrai ou on doit lui donner avec le M_?
+ */
+func (this *EntityManager) CreateEntity(parentUuid string, attributeName string, typeName string, objectId string, values interface{}, messageId string, sessionId string) interface{} {
+	result, errObj := this.createEntity(parentUuid, attributeName, typeName, objectId, values)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+	return result.GetObject()
 }
 
 /**
@@ -1415,8 +1440,6 @@ func (this *EntityManager) GetObjectById(storeId string, typeName string, id str
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-
-	log.Println(entity.GetObject())
 	return entity.GetObject()
 }
 

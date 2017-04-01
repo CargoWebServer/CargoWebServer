@@ -12,6 +12,8 @@ type Entities struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -117,12 +119,13 @@ func (this *Entities) SetEntities(ref interface{}){
 
 /** Remove reference Entities **/
 func (this *Entities) RemoveEntities(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
 	entities_ := make([]Entity, 0)
 	for i := 0; i < len(this.M_entities); i++ {
 		if toDelete.GetUUID() != this.M_entities[i].(Entity).GetUUID() {
 			entities_ = append(entities_, this.M_entities[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_entities = entities_
@@ -154,12 +157,13 @@ func (this *Entities) SetRoles(ref interface{}){
 
 /** Remove reference Roles **/
 func (this *Entities) RemoveRoles(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Role)
 	roles_ := make([]*Role, 0)
 	for i := 0; i < len(this.M_roles); i++ {
 		if toDelete.GetUUID() != this.M_roles[i].GetUUID() {
 			roles_ = append(roles_, this.M_roles[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_roles = roles_
@@ -191,12 +195,13 @@ func (this *Entities) SetActions(ref interface{}){
 
 /** Remove reference Actions **/
 func (this *Entities) RemoveActions(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Action)
 	actions_ := make([]*Action, 0)
 	for i := 0; i < len(this.M_actions); i++ {
 		if toDelete.GetUUID() != this.M_actions[i].GetUUID() {
 			actions_ = append(actions_, this.M_actions[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_actions = actions_

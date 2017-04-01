@@ -12,6 +12,8 @@ type OAuth2Authorize struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -81,11 +83,14 @@ func (this *OAuth2Authorize) SetClient(ref interface{}){
 
 /** Remove reference Client **/
 func (this *OAuth2Authorize) RemoveClient(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2Client)
-	if toDelete.GetUUID() == this.m_client.GetUUID() {
-		this.m_client = nil
-		this.M_client = ""
+	if this.m_client!= nil {
+		if toDelete.GetUUID() == this.m_client.GetUUID() {
+			this.m_client = nil
+			this.M_client = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 
@@ -159,11 +164,14 @@ func (this *OAuth2Authorize) SetUserData(ref interface{}){
 
 /** Remove reference UserData **/
 func (this *OAuth2Authorize) RemoveUserData(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*OAuth2IdToken)
-	if toDelete.GetUUID() == this.m_userData.GetUUID() {
-		this.m_userData = nil
-		this.M_userData = ""
+	if this.m_userData!= nil {
+		if toDelete.GetUUID() == this.m_userData.GetUUID() {
+			this.m_userData = nil
+			this.M_userData = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 

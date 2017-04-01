@@ -308,16 +308,9 @@ Element.prototype.removeElement = function (e) {
 Element.prototype.removeAllChilds = function () {
     for (var id in this.childs) {
         if (this.childs[id].element != undefined) {
-            var childElement = this.childs[id].element
-            if (childElement.parentNode != null) {
-                var parentNode = childElement.parentNode
-                childElement.style.display = "none"
-                setTimeout(function (parentNode, childElement) {
-                    return function () {
-                        parentNode.removeChild(childElement)
-                    }
-                } (parentNode, childElement), .1) // lillte work around...
-
+            var elem = this.childs[id].element
+            if (elem.parentNode != null) {
+                elem.parentNode.removeChild(elem);
             }
         }
     }

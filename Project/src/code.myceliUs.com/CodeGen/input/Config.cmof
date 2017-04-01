@@ -243,9 +243,6 @@
 	        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
 	    </ownedAttribute>
 		<ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Refresh-access" name="access" _type="OAuth2Access" lower="1" upper="1"/>
-	    <ownedAttribute xmi:type="cmof:Property" xmi:id="OAuth2Refresh-expiresAt" name="expiresAt">
-           <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#date"/>
-        </ownedAttribute>
 	</ownedMember>
 	
 	<ownedMember xmi:type="cmof:Association" xmi:id="A_oauth2Refresh_oauth2Configuration" name="A_oauth2Refresh_oauth2Configuration" visibility="private" memberEnd="OAuth2Configuration-OAuth2Refresh A_oauth2Refresh_oauth2Configuration-Configurations">

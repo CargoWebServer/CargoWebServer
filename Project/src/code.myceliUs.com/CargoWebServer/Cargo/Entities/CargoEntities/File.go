@@ -12,6 +12,8 @@ type File struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -225,12 +227,13 @@ func (this *File) SetFiles(ref interface{}){
 
 /** Remove reference Files **/
 func (this *File) RemoveFiles(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
 	files_ := make([]*File, 0)
 	for i := 0; i < len(this.M_files); i++ {
 		if toDelete.GetUUID() != this.M_files[i].GetUUID() {
 			files_ = append(files_, this.M_files[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_files = files_
@@ -267,11 +270,14 @@ func (this *File) SetParentDirPtr(ref interface{}){
 
 /** Remove reference ParentDir **/
 func (this *File) RemoveParentDirPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
-	if toDelete.GetUUID() == this.m_parentDirPtr.GetUUID() {
-		this.m_parentDirPtr = nil
-		this.M_parentDirPtr = ""
+	if this.m_parentDirPtr!= nil {
+		if toDelete.GetUUID() == this.m_parentDirPtr.GetUUID() {
+			this.m_parentDirPtr = nil
+			this.M_parentDirPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 
@@ -293,10 +299,13 @@ func (this *File) SetEntitiesPtr(ref interface{}){
 
 /** Remove reference Entities **/
 func (this *File) RemoveEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Entities)
-	if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
-		this.m_entitiesPtr = nil
-		this.M_entitiesPtr = ""
+	if this.m_entitiesPtr!= nil {
+		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+			this.m_entitiesPtr = nil
+			this.M_entitiesPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

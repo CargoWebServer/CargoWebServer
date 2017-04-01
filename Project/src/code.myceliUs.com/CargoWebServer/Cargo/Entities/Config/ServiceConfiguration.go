@@ -12,6 +12,8 @@ type ServiceConfiguration struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -165,10 +167,13 @@ func (this *ServiceConfiguration) SetParentPtr(ref interface{}){
 
 /** Remove reference Parent **/
 func (this *ServiceConfiguration) RemoveParentPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Configurations)
-	if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
-		this.m_parentPtr = nil
-		this.M_parentPtr = ""
+	if this.m_parentPtr!= nil {
+		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+			this.m_parentPtr = nil
+			this.M_parentPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

@@ -12,6 +12,8 @@ type TextMessage struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -120,11 +122,14 @@ func (this *TextMessage) SetFromRef(ref interface{}){
 
 /** Remove reference FromRef **/
 func (this *TextMessage) RemoveFromRef(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
-	if toDelete.GetUUID() == this.m_fromRef.GetUUID() {
-		this.m_fromRef = nil
-		this.M_fromRef = ""
+	if this.m_fromRef!= nil {
+		if toDelete.GetUUID() == this.m_fromRef.GetUUID() {
+			this.m_fromRef = nil
+			this.M_fromRef = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 
@@ -146,11 +151,14 @@ func (this *TextMessage) SetToRef(ref interface{}){
 
 /** Remove reference ToRef **/
 func (this *TextMessage) RemoveToRef(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
-	if toDelete.GetUUID() == this.m_toRef.GetUUID() {
-		this.m_toRef = nil
-		this.M_toRef = ""
+	if this.m_toRef!= nil {
+		if toDelete.GetUUID() == this.m_toRef.GetUUID() {
+			this.m_toRef = nil
+			this.M_toRef = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 
@@ -185,10 +193,13 @@ func (this *TextMessage) SetEntitiesPtr(ref interface{}){
 
 /** Remove reference Entities **/
 func (this *TextMessage) RemoveEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Entities)
-	if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
-		this.m_entitiesPtr = nil
-		this.M_entitiesPtr = ""
+	if this.m_entitiesPtr!= nil {
+		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+			this.m_entitiesPtr = nil
+			this.M_entitiesPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

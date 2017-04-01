@@ -175,8 +175,9 @@ func generateEntity(packageId string) {
 				classStr += " 	}\n"
 				classStr += " 	this.childsPtr = childsPtr\n\n"
 				classStr += "	var removeMethode = \"Remove\" + strings.ToUpper(name[0:1]) + name[1:]\n"
-				classStr += "	Utility.CallMethod(this.GetObject(), removeMethode, params)\n"
-
+				classStr += "	if params[0] != nil {\n"
+				classStr += "		Utility.CallMethod(this.GetObject(), removeMethode, params)\n"
+				classStr += " 	}\n"
 				classStr += " }\n\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetReferencesUuid() []string{\n"
@@ -326,6 +327,7 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "	}\n"
 	entityConstructorStr += "	if object != nil{\n"
 	entityConstructorStr += "		object.(*" + packageId + "." + className + ").TYPENAME = \"" + packageId + "." + class.Name + "\"\n"
+	entityConstructorStr += "		object.(*" + packageId + "." + className + ").ParentUuid = parentUuid\n"
 	entityConstructorStr += "	}\n"
 	entityConstructorStr += "	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(\"" + packageId + "." + className + "\",\"" + packageId_ + "\")\n"
 	entityConstructorStr += "	if len(uuidStr) > 0 {\n"
@@ -374,6 +376,7 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 
 	entityConstructorStr += "	entity.object.TYPENAME = \"" + packageId + "." + class.Name + "\"\n\n"
 	entityConstructorStr += "	entity.object.UUID = uuidStr\n"
+	entityConstructorStr += "	entity.object.ParentUuid = parentUuid\n"
 	entityConstructorStr += "	entity.SetInit(false)\n"
 	entityConstructorStr += "	entity.uuid = uuidStr\n"
 	entityConstructorStr += "	this.insert(entity)\n"
@@ -1279,7 +1282,7 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	// The childs uuid's
 	entityInitStr += "		childsUuidStr := results[0][" + strconv.Itoa(index) + "].(string)\n"
 	entityInitStr += "		this.childsUuid = make([]string, 0)\n"
-	entityInitStr += "		if childsUuidStr != \"null\" {\n"
+	entityInitStr += "		if strings.HasPrefix(childsUuidStr,\"[\") && strings.HasSuffix(childsUuidStr,\"]\") {\n"
 	entityInitStr += "			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)\n"
 	entityInitStr += "			if err != nil {\n"
 	entityInitStr += "				return err\n"
@@ -1291,7 +1294,7 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	// The referenced...
 	entityInitStr += "		referencedStr := results[0][" + strconv.Itoa(index) + "].(string)\n"
 	entityInitStr += "		this.referenced = make([]EntityRef, 0)\n"
-	entityInitStr += "		if referencedStr != \"null\" {\n"
+	entityInitStr += "		if strings.HasPrefix(referencedStr,\"[\") && strings.HasSuffix(referencedStr,\"]\") {\n"
 	entityInitStr += "			err = json.Unmarshal([]byte(referencedStr), &this.referenced)\n"
 	entityInitStr += "			if err != nil {\n"
 	entityInitStr += "				return err\n"

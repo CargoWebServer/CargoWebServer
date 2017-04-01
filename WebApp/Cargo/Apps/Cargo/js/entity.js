@@ -64,6 +64,7 @@ EntityManager.prototype.onEvent = function (evt) {
             var entity = eval("new " + evt.dataMap["entity"].TYPENAME + "()")
             entity.initCallback = function (self, evt, entity) {
                 return function (entity) {
+                    server.entityManager.setEntity(entity)
                     EventHub.prototype.onEvent.call(self, evt)
                 }
             } (this, evt, entity)
@@ -74,6 +75,7 @@ EntityManager.prototype.onEvent = function (evt) {
             var entity = this.entities[evt.dataMap["entity"].UUID]
             entity.initCallback = function (self, evt, entity) {
                 return function (entity) {
+                    server.entityManager.setEntity(entity)
                     EventHub.prototype.onEvent.call(self, evt)
                 }
             } (this, evt, entity)
@@ -1593,7 +1595,7 @@ function setObjectValues(object, values) {
     object.NeedSave = false
     object.exist = true
     object.IsInit = true // The object part only and not the refs...
-    object.parentUuid = values.parentUuid // set the parent uuid.
+    object.parentUuid = values.ParentUuid // set the parent uuid.
 
 
     // Call the init callback.

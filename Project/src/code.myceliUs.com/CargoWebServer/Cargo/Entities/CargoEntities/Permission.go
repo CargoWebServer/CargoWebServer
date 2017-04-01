@@ -12,6 +12,8 @@ type Permission struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -85,10 +87,13 @@ func (this *Permission) SetAccountPtr(ref interface{}){
 
 /** Remove reference Account **/
 func (this *Permission) RemoveAccountPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
-	if toDelete.GetUUID() == this.m_accountPtr.GetUUID() {
-		this.m_accountPtr = nil
-		this.M_accountPtr = ""
+	if this.m_accountPtr!= nil {
+		if toDelete.GetUUID() == this.m_accountPtr.GetUUID() {
+			this.m_accountPtr = nil
+			this.M_accountPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

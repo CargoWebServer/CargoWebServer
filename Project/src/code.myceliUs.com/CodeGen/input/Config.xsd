@@ -130,7 +130,6 @@
 	<xsd:complexType name="tOAuth2Refresh" abstract="false">
 			<xsd:attribute name="id" type="xsd:ID" />
 			<xsd:attribute ref="access" type="tOAuth2Access" minOccurs="1" maxOccurs="1"/>
-			<xsd:attribute name="expiresAt" type="xsd:date"/>
 	</xsd:complexType>
 	
 	<xsd:element name="oauth2Expires" type="tOAuth2Expires"/>

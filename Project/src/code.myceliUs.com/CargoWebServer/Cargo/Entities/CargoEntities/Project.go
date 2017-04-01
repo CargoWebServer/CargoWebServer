@@ -12,6 +12,8 @@ type Project struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -100,7 +102,6 @@ func (this *Project) SetFilesRef(ref interface{}){
 
 /** Remove reference FilesRef **/
 func (this *Project) RemoveFilesRef(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
 	filesRef_ := make([]*File, 0)
 	filesRefUuid := make([]string, 0)
@@ -108,6 +109,8 @@ func (this *Project) RemoveFilesRef(ref interface{}){
 		if toDelete.GetUUID() != this.m_filesRef[i].GetUUID() {
 			filesRef_ = append(filesRef_, this.m_filesRef[i])
 			filesRefUuid = append(filesRefUuid, this.M_filesRef[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.m_filesRef = filesRef_
@@ -132,10 +135,13 @@ func (this *Project) SetEntitiesPtr(ref interface{}){
 
 /** Remove reference Entities **/
 func (this *Project) RemoveEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Entities)
-	if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
-		this.m_entitiesPtr = nil
-		this.M_entitiesPtr = ""
+	if this.m_entitiesPtr!= nil {
+		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+			this.m_entitiesPtr = nil
+			this.M_entitiesPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

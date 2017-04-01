@@ -12,6 +12,8 @@ type LogEntry struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -97,11 +99,14 @@ func (this *LogEntry) SetEntityRef(ref interface{}){
 
 /** Remove reference EntityRef **/
 func (this *LogEntry) RemoveEntityRef(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
-	if toDelete.GetUUID() == this.m_entityRef.(Entity).GetUUID() {
-		this.m_entityRef = nil
-		this.M_entityRef = ""
+	if this.m_entityRef!= nil {
+		if toDelete.GetUUID() == this.m_entityRef.(Entity).GetUUID() {
+			this.m_entityRef = nil
+			this.M_entityRef = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 
@@ -123,11 +128,14 @@ func (this *LogEntry) SetLoggerPtr(ref interface{}){
 
 /** Remove reference Logger **/
 func (this *LogEntry) RemoveLoggerPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
-	if toDelete.GetUUID() == this.m_loggerPtr.GetUUID() {
-		this.m_loggerPtr = nil
-		this.M_loggerPtr = ""
+	if this.m_loggerPtr!= nil {
+		if toDelete.GetUUID() == this.m_loggerPtr.GetUUID() {
+			this.m_loggerPtr = nil
+			this.M_loggerPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }
 
@@ -149,10 +157,13 @@ func (this *LogEntry) SetEntitiesPtr(ref interface{}){
 
 /** Remove reference Entities **/
 func (this *LogEntry) RemoveEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Entities)
-	if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
-		this.m_entitiesPtr = nil
-		this.M_entitiesPtr = ""
+	if this.m_entitiesPtr!= nil {
+		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+			this.m_entitiesPtr = nil
+			this.M_entitiesPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

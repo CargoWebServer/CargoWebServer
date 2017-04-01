@@ -12,6 +12,8 @@ type Log struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -86,12 +88,13 @@ func (this *Log) SetEntries(ref interface{}){
 
 /** Remove reference Entries **/
 func (this *Log) RemoveEntries(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Entity)
 	entries_ := make([]*LogEntry, 0)
 	for i := 0; i < len(this.M_entries); i++ {
 		if toDelete.GetUUID() != this.M_entries[i].GetUUID() {
 			entries_ = append(entries_, this.M_entries[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_entries = entries_
@@ -115,10 +118,13 @@ func (this *Log) SetEntitiesPtr(ref interface{}){
 
 /** Remove reference Entities **/
 func (this *Log) RemoveEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(*Entities)
-	if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
-		this.m_entitiesPtr = nil
-		this.M_entitiesPtr = ""
+	if this.m_entitiesPtr!= nil {
+		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+			this.m_entitiesPtr = nil
+			this.M_entitiesPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

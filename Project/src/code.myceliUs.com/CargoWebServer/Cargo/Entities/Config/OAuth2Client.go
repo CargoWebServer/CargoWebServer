@@ -12,6 +12,8 @@ type OAuth2Client struct{
 	UUID string
 	/** The entity TypeName **/
 	TYPENAME string
+	/** The parent uuid if there is some. **/
+	ParentUuid string
 	/** If the entity value has change... **/
 	NeedSave bool
 
@@ -143,10 +145,13 @@ func (this *OAuth2Client) SetParentPtr(ref interface{}){
 
 /** Remove reference Parent **/
 func (this *OAuth2Client) RemoveParentPtr(ref interface{}){
-	this.NeedSave = true
 	toDelete := ref.(Configuration)
-	if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
-		this.m_parentPtr = nil
-		this.M_parentPtr = ""
+	if this.m_parentPtr!= nil {
+		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+			this.m_parentPtr = nil
+			this.M_parentPtr = ""
+		}else{
+			this.NeedSave = true
+		}
 	}
 }

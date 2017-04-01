@@ -74,7 +74,8 @@ func (this *DataManager) initialize() {
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	// Here I will get the datastore configuration...
-	storeConfigurations := GetServer().GetConfigurationManager().GetDataStoreConfigurations()
+	storeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetDataStoreConfigs()
+
 	log.Println("--> initialyze DataManager")
 	for i := 0; i < len(storeConfigurations); i++ {
 		if this.m_dataStores[storeConfigurations[i].GetId()] == nil {
