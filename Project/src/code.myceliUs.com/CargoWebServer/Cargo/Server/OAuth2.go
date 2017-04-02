@@ -453,12 +453,11 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 	// If the ressource is found all we have to do is to get the actual resource.
 	if access != nil {
 		// Here I will made the API call.
-		// TODO give support to other token type.
 		result, err := DownloadRessource(query, access.GetId(), "Bearer")
 		if err == nil {
 			return result
 		} else {
-			errObj := NewError(Utility.FileLine(), RESSOURCE_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("No client was found with id "+clientId))
+			errObj := NewError(Utility.FileLine(), RESSOURCE_NOT_FOUND_ERROR, SERVER_ERROR_CODE, err)
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return nil
 		}
@@ -554,16 +553,21 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 			// wait for access...
 			if <-done {
-				log.Println("--------> access grant!")
+				// Recal the method...
+				return this.GetResource(clientId, scope, query, accountUuid, messageId, sessionId)
 			} else {
-				log.Println("----------> access denied!")
+				errObj := NewError(Utility.FileLine(), ACCESS_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("Access denied to get resource with scope "+scope+" for client with id "+clientId))
+				GetServer().reportErrorMessage(messageId, sessionId, errObj)
+				return nil
 			}
 
 		} else {
 			// Here I will report the error to the user.
 			closeAuthorizeDialog()
+			errObj := NewError(Utility.FileLine(), AUTHORIZATION_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("Authorization denied to get resource with scope "+scope+" for client with id "+clientId))
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
 		}
-
 	}
 
 	return nil
@@ -1364,23 +1368,42 @@ func (this *OAuth2Store) saveIdToken(data *IDToken) *Config.OAuth2IdToken {
 	client := clientEntity.GetObject().(*Config.OAuth2Client)
 
 	// Create id token (OpenId)
-	idToken := new(Config.OAuth2IdToken)
-	idToken.SetClient(client)
-	idToken.SetId(data.UserID)
-	idToken.SetEmail(data.Email)
-	idToken.SetEmailVerified(*data.EmailVerified)
-	idToken.SetExpiration(data.Expiration)
-	idToken.SetFamilyName(data.FamilyName)
-	idToken.SetGivenName(data.GivenName)
-	idToken.SetIssuedAt(data.IssuedAt)
-	idToken.SetIssuer(data.Issuer)
-	idToken.SetLocal(data.Locale)
-	idToken.SetName(data.Name)
-	idToken.SetNonce(data.Nonce)
+	var idToken *Config.OAuth2IdToken
 
-	// Save into the config.
-	GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_ids", "Config.OAuth2IdToken", idToken.GetId(), idToken)
-
+	uuid := ConfigOAuth2IdTokenExists(data.UserID)
+	if len(uuid) > 0 {
+		// Update value...
+		entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
+		idToken = entity.GetObject().(*Config.OAuth2IdToken)
+		idToken.SetEmail(data.Email)
+		idToken.SetEmailVerified(*data.EmailVerified)
+		idToken.SetExpiration(data.Expiration)
+		idToken.SetFamilyName(data.FamilyName)
+		idToken.SetGivenName(data.GivenName)
+		idToken.SetIssuedAt(data.IssuedAt)
+		idToken.SetIssuer(data.Issuer)
+		idToken.SetLocal(data.Locale)
+		idToken.SetName(data.Name)
+		idToken.SetNonce(data.Nonce)
+		entity.SaveEntity()
+	} else {
+		// Create the id token.
+		idToken = new(Config.OAuth2IdToken)
+		idToken.SetClient(client)
+		idToken.SetId(data.UserID)
+		idToken.SetEmail(data.Email)
+		idToken.SetEmailVerified(*data.EmailVerified)
+		idToken.SetExpiration(data.Expiration)
+		idToken.SetFamilyName(data.FamilyName)
+		idToken.SetGivenName(data.GivenName)
+		idToken.SetIssuedAt(data.IssuedAt)
+		idToken.SetIssuer(data.Issuer)
+		idToken.SetLocal(data.Locale)
+		idToken.SetName(data.Name)
+		idToken.SetNonce(data.Nonce)
+		// Save into the config.
+		GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_ids", "Config.OAuth2IdToken", idToken.GetId(), idToken)
+	}
 	return idToken
 }
 
