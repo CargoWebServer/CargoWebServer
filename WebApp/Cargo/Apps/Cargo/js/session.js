@@ -95,6 +95,8 @@ SessionManager.prototype.login = function (name, password, serverId, successCall
                         session["set_M_accountPtr_" + session.M_accountPtr + "_ref"](function (caller, session) {
                             return function (accountPtr) {
                                 // call the callback after the session is intialysed.
+                                // Keep track of the accountUuid for future access.
+                                localStorage.setItem("accountUuid", accountPtr.UUID)
                                 if (accountPtr["set_M_userRef_" + accountPtr.M_userRef + "_ref"] != undefined) {
                                     accountPtr["set_M_userRef_" + accountPtr.M_userRef + "_ref"](function (session, caller) {
                                         return function () {
@@ -283,7 +285,7 @@ SessionManager.prototype.logout = function (sessionId, successCallback, errorCal
             // Nothing special to do here.
         },
         function (result, caller) {
-            console.log(result[0])
+            localStorage.removeItem("accountUuid")
             caller.successCallback(result, caller.caller)
         },
         function (errMsg, caller) {

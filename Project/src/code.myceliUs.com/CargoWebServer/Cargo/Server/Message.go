@@ -206,6 +206,8 @@ func NewRequestMessage(id string, method string, params []*MessageData, to []con
 	// The callback to excute if the request is
 	// no execute by the application server itself...
 	m.successCallback = successCallback
+	m.errorCallback = errorCallback
+	m.progressCallback = progressCallback
 
 	// Initialisation of response results...
 	index := 0

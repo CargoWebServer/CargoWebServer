@@ -168,7 +168,6 @@
 			<xsd:extension base="tConfiguration"> 
 				<xsd:attribute name="authorizationExpiration" type="xsd:integer" />
 				<xsd:attribute name="accessExpiration" type="xsd:time" />
-				<xsd:attribute name="refreshExpiration" type="xsd:time" />
 				<xsd:attribute name="tokenType" type="xsd:string" />
 				<xsd:attribute name="errorStatusCode" type="xsd:integer" />
 				<xsd:attribute name="allowClientSecretInParams" type="xsd:boolean" />

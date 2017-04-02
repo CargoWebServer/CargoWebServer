@@ -382,7 +382,6 @@ EventHandler.prototype.broadcastNetworkEvent = function (evtNumber, evtName, eve
             caller.successCallback(result[0], caller.caller)
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback

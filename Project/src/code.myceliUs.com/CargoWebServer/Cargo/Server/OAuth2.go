@@ -17,7 +17,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	//"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 	"github.com/RangelReale/osin"
@@ -127,6 +128,7 @@ func newOAuth2Manager() *OAuth2Manager {
 func (this *OAuth2Manager) initialize() {
 	// register service avalaible action here.
 	log.Println("--> initialyze OAuth2Manager")
+
 	// Create the default configurations
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
@@ -190,7 +192,6 @@ func (this *OAuth2Manager) start() {
 		// Save it into the entity.
 		cfg := new(Config.OAuth2Configuration)
 		cfg.SetId("OAuth2Config")
-		sconfig.AccessExpiration = 60 // Test only...
 		cfg.SetAccessExpiration(int64(sconfig.AccessExpiration))
 		cfg.SetAllowClientSecretInParams(sconfig.AllowClientSecretInParams)
 		cfg.SetAllowGetAccessRequest(sconfig.AllowGetAccessRequest)
@@ -389,31 +390,45 @@ func PublicKeysHandler(w http.ResponseWriter, r *http.Request) {
  * The query is an http query from various api like facebook graph api.
  * will start an authorization process if nothing is found.
  */
-func (this *OAuth2Manager) GetResource(clientId string, scope string, query string, messageId string, sessionId string) interface{} {
-
-	// So here the first thing to do is to get the client.
+func (this *OAuth2Manager) GetResource(clientId string, scope string, query string, accountUuid string, messageId string, sessionId string) interface{} {
+	// Get the config.
 	config := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetOauth2Configuration()
 
-	var client *Config.OAuth2Client
-	for i := 0; i < len(config.GetClients()); i++ {
-		if clientId == config.GetClients()[i].GetId() {
-			client = config.GetClients()[i]
-		}
-	}
-
-	if client == nil {
-		// Repport the error
-		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to execute query: "+query))
+	// I will get the client...
+	clientEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", clientId)
+	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
 
-	var access *Config.OAuth2Access
+	client := clientEntity.GetObject().(*Config.OAuth2Client)
+
+	var account *CargoEntities.Account
+	session := GetServer().GetSessionManager().GetActiveSessionById(sessionId)
+	if session != nil {
+		// If a session exist I will favorize it account id over the one
+		// given in parameter.
+		if session.GetAccountPtr() != nil {
+			account = session.GetAccountPtr()
+		}
+	} else if len(accountUuid) > 0 {
+		accountEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(accountUuid)
+		if errObj != nil {
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
+		}
+		account = accountEntity.GetObject().(*CargoEntities.Account)
+	}
+
+	// Get the accesses
+	accesses := config.GetAccess()
 
 	// Now the client was found I will try to get an access code for the given
 	// scope and client.
-	for i := 0; i < len(config.GetAccess()) && access == nil; i++ {
-		a := config.GetAccess()[i]
+	var access *Config.OAuth2Access
+
+	for i := 0; i < len(accesses) && access == nil && account != nil; i++ {
+		a := accesses[i]
 		if a.GetClient().GetId() == client.GetId() {
 			values := strings.Split(a.GetScope(), " ")
 			values_ := strings.Split(scope, " ")
@@ -427,11 +442,15 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 			// If the access has the correct scope.
 			if hasScope {
-				access = a
+				if a.GetUserData().GetId() == account.GetId() {
+					// We found an access to the ressource!-)
+					access = a
+				}
 			}
 		}
 	}
 
+	// If the ressource is found all we have to do is to get the actual resource.
 	if access != nil {
 		// Here I will made the API call.
 		// TODO give support to other token type.
@@ -443,23 +462,22 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return nil
 		}
-	} else {
 
-		// No access was found so here I will initiated the OAuth process...
+	} else {
+		// No access was found so here I will initiated the authorization process...
 		// To do so I will create the href where the user will be ask to
 		// authorize the client application to access ressources.
 		var authorizationLnk = client.GetAuthorizationUri()
 		authorizationLnk += "?response_type=code&client_id=" + client.GetId()
-		authorizationLnk += "&state=" + messageId + ":" + sessionId + ":" + clientId + "&scope=" + scope
-		authorizationLnk += "&redirect_uri=" + client.GetRedirectUri()
 
 		// I will create the request and send it to the client...
-		id := Utility.RandomUUID()
+		msgId := Utility.RandomUUID()
+		authorizationLnk += "&state=" + msgId + ":" + sessionId + ":" + clientId + "&scope=" + scope
+		authorizationLnk += "&redirect_uri=" + client.GetRedirectUri()
 
 		// Here if there is no user logged for the given session I will send an authentication request.
 		var method string
 		method = "OAuth2Authorization"
-
 		params := make([]*MessageData, 1)
 		data := new(MessageData)
 		data.Name = "authorizationLnk"
@@ -467,12 +485,87 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 		params[0] = data
 		to := make([]connection, 1)
 		to[0] = GetServer().getConnectionById(sessionId)
-		oauth2Authorize, err := NewRequestMessage(id, method, params, to, nil, nil, nil)
+
+		// synchronize the routine with a channel...
+		done := make(chan bool)
+
+		/** The authorize request **/
+		oauth2AuthorizeRqst, err := NewRequestMessage(msgId, method, params, to,
+			func(done chan bool) func(*message, interface{}) {
+				return func(rspMsg *message, caller interface{}) {
+					done <- true
+				}
+			}(done), nil,
+			func(done chan bool) func(*message, interface{}) {
+				return func(rspMsg *message, caller interface{}) {
+					done <- false
+				}
+			}(done))
+
 		if err == nil {
 			// Send the request.
-			GetServer().GetProcessor().m_pendingRequestChannel <- oauth2Authorize
+			GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AuthorizeRqst
 		}
+
+		// So here I must block the execution of that function and wait
+		// for the authorization. To do so I will made use of channel and
+		// a callback and closure tree powerfull tools...
+		// Wait for success or error...
+		closeAuthorizeDialog := func() {
+			var method string
+			method = "OAuth2AuthorizationEnd"
+			params := make([]*MessageData, 0)
+			to := make([]connection, 1)
+			to[0] = GetServer().getConnectionById(sessionId)
+			oauth2AuthorizeEnd, err := NewRequestMessage(Utility.RandomUUID(), method, params, to, nil, nil, nil)
+			if err == nil {
+				// Send the request.
+				GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AuthorizeEnd
+			}
+		}
+
+		// Wait for authorization
+		if <-done {
+			closeAuthorizeDialog()
+
+			var method string
+			method = "OAuth2Access"
+			params := make([]*MessageData, 0)
+			to := make([]connection, 1)
+			to[0] = GetServer().getConnectionById(sessionId)
+
+			// Now the access request...
+			oauth2AccessRqst, err := NewRequestMessage(msgId, method, params, to,
+				func(done chan bool) func(*message, interface{}) {
+					return func(rspMsg *message, caller interface{}) {
+						done <- true
+					}
+				}(done), nil,
+				func(done chan bool) func(*message, interface{}) {
+					return func(rspMsg *message, caller interface{}) {
+						done <- false
+					}
+				}(done))
+
+			if err == nil {
+				// Send the request.
+				GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AccessRqst
+			}
+
+			// wait for access...
+			if <-done {
+				log.Println("--------> access grant!")
+			} else {
+				log.Println("----------> access denied!")
+			}
+
+		} else {
+			// Here I will report the error to the user.
+			closeAuthorizeDialog()
+		}
+
 	}
+
 	return nil
 }
 
@@ -718,6 +811,7 @@ func DownloadAccessToken(url string, auth *osin.BasicAuth, output map[string]int
 
 /**
  * Download ressource specify with a given query.
+ * TODO interface http api call here...
  */
 func DownloadRessource(query string, accessToken string, tokenType string) (map[string]interface{}, error) {
 	client := &http.Client{}
@@ -838,6 +932,16 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Close()
 
 	if ar := server.HandleAuthorizeRequest(resp, r); ar != nil {
+
+		// The state contain the messageId:sessionId:clientId
+		state := r.URL.Query()["state"][0]
+		var sessionId string
+		var messageId string
+		if len(strings.Split(state, ":")) == 3 {
+			messageId = strings.Split(state, ":")[0]
+			sessionId = strings.Split(state, ":")[1]
+		}
+
 		if !HandleAuthenticationPage(ar, w, r) {
 			return
 		}
@@ -846,11 +950,21 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 				// No answer was given yet...
 				return
 			} else {
-				// I that case the user refuse the authorization.
+				// In that case the user refuse the authorization.
 				ar.Authorized = false
 				server.FinishAuthorizeRequest(resp, r, ar)
+
+				// Here I will create an error message...
+				to := make([]connection, 1)
+				to[0] = GetServer().getConnectionById(sessionId)
+				var errData []byte
+				authorizationDenied := NewErrorMessage(messageId, 1, "Permission Denied by user", errData, to)
+				GetServer().GetProcessor().m_incomingChannel <- authorizationDenied
+
+				return
 			}
 		}
+
 		// The user give the authorization.
 		ar.Authorized = true
 
@@ -862,7 +976,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 
 		// If the "openid" connect scope is specified, attach an ID Token to the
 		// authorization response.
-		//
+
 		// The ID Token will be serialized and signed during the code for token exchange.
 		if scopes["openid"] {
 			config := GetServer().GetConfigurationManager().getServiceConfigurationById(GetServer().GetOAuth2Manager().getId())
@@ -877,13 +991,6 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 				Expiration: now.Add(time.Hour).Unix(),
 				IssuedAt:   now.Unix(),
 				Nonce:      r.URL.Query().Get("nonce"),
-			}
-
-			// The state contain the messageId:sessionId:clientId
-			state := r.URL.Query()["state"][0]
-			var sessionId string
-			if len(strings.Split(state, ":")) == 3 {
-				sessionId = strings.Split(state, ":")[1]
 			}
 
 			// From the session I will retreive the user session->account->user
@@ -911,9 +1018,17 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			ar.UserData = &idToken
 		}
 		server.FinishAuthorizeRequest(resp, r, ar)
+
+		// Here I will create a response for the authorization.
+		results := make([]*MessageData, 0)
+		to := make([]connection, 1)
+		to[0] = GetServer().getConnectionById(sessionId)
+		authorizationAccept, _ := NewResponseMessage(messageId, results, to)
+		GetServer().GetProcessor().m_incomingChannel <- authorizationAccept
 	}
 	if resp.IsError && resp.InternalError != nil {
 		fmt.Printf("ERROR: %s\n", resp.InternalError)
+		// Here I will create an error message to complete the workflow.
 	}
 	osin.OutputJSON(resp, w, r)
 }
@@ -990,9 +1105,11 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 	errorCode := r.Form.Get("error")
 	state := r.Form.Get("state")
 	// Send authentication end message...
-	var sessionId string
 	var clientId string
+	var sessionId string
+	var messageId string
 	if len(strings.Split(state, ":")) == 3 {
+		messageId = strings.Split(state, ":")[0]
 		sessionId = strings.Split(state, ":")[1]
 		clientId = strings.Split(state, ":")[2]
 	}
@@ -1004,27 +1121,23 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 	if len(errorCode) != 0 {
 		// The authorization fail!
 		errorDescription := r.Form.Get("error_description")
-		log.Println("error description: ", errorDescription)
+		to := make([]connection, 1)
+		to[0] = GetServer().getConnectionById(sessionId)
+		var errData []byte
+		accessDenied := NewErrorMessage(messageId, 1, errorDescription, errData, to)
+		GetServer().GetProcessor().m_incomingChannel <- accessDenied
 	} else {
 		code := r.Form.Get("code")
 		createAccessToken("authorization_code", client, state, code, "")
+
+		// Send back the response to access request.
+		results := make([]*MessageData, 0)
+		to := make([]connection, 1)
+		to[0] = GetServer().getConnectionById(sessionId)
+		accessGrantResp, _ := NewResponseMessage(messageId, results, to)
+		GetServer().GetProcessor().m_incomingChannel <- accessGrantResp
 	}
 
-	// The user take it decision so I will send the end authentication request.
-	// I will create the request and send it to the client...
-	id := Utility.RandomUUID()
-
-	// Here if there is no user logged for the given session I will send an authentication request.
-	var method string
-	method = "OAuth2AuthorizationEnd"
-	params := make([]*MessageData, 0)
-	to := make([]connection, 1)
-	to[0] = GetServer().getConnectionById(sessionId)
-	oauth2AuthorizeEnd, err := NewRequestMessage(id, method, params, to, nil, nil, nil)
-	if err == nil {
-		// Send the request.
-		GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AuthorizeEnd
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

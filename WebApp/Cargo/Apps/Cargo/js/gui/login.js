@@ -155,9 +155,8 @@ var LoginPage = function (loginCallback, serverId) {
 						var rememberMe = localStorage.getItem('_remember_me_')
 						if (rememberMe != undefined) {
 							// In that case I will put the session info in the 
-							var loginInfo = { "userName": caller.userName, "password": caller.password }
 							// local storage...
-							localStorage.setItem('_remember_me_', JSON.stringify(loginInfo))
+							localStorage.setItem('_remember_me_', true)
 						}
 					}
 				},
@@ -202,7 +201,7 @@ var LoginPage = function (loginCallback, serverId) {
 			var remember = rememeberMe.element.checked
 			if (remember) {
 				// Here i set rememberme on the local store...
-				localStorage.setItem('_remember_me_', "");
+				localStorage.setItem('_remember_me_', true);
 			} else {
 				// Remove the key...
 				localStorage.removeItem('_remember_me_');
@@ -212,6 +211,7 @@ var LoginPage = function (loginCallback, serverId) {
 
 	if (localStorage.getItem("_remember_me_") != undefined) {
 		// Here I will retreive the session info create an event and send it to the server.
+		/*	TODO use get ressource instead!!!
 		var loginInfo = JSON.parse(localStorage.getItem("_remember_me_"))
 
 		server.sessionManager.login(loginInfo.userName, loginInfo.password, serverId,
@@ -224,7 +224,7 @@ var LoginPage = function (loginCallback, serverId) {
 
 			}
 			, { "loginCallback": this.loginCallback, "userName": loginInfo.userName, "password": loginInfo.password })
-
+		*/
 	}
 
 	return this

@@ -213,8 +213,6 @@ EntityManager.prototype.getObjectsByType = function (typeName, storeId, queryStr
                     }
                 },
                 function (errMsg, caller) {
-                    // display the message in the console.
-                    console.log(errMsg)
                     // call the immediate error callback.
                     caller.errorCallback(errMsg, caller.caller)
                     // dispatch the message.
@@ -225,8 +223,6 @@ EntityManager.prototype.getObjectsByType = function (typeName, storeId, queryStr
         },
         // The error callback.
         function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
             // call the immediate error callback.
             caller.errorCallback(errMsg, caller)
             // dispatch the message.
@@ -267,7 +263,6 @@ EntityManager.prototype.getEntityLnks = function (uuid, progressCallback, succes
             caller.successCallback(results[0], caller.caller)
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
@@ -348,7 +343,6 @@ EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, error
 
                 },
                 function (errMsg, caller) {
-                    console.log(errMsg)
                     server.errorManager.onError(errMsg)
                     caller.errorCallback(errMsg, caller.caller)
                 }, // Error callback
@@ -357,7 +351,6 @@ EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, error
         },
         // The error callback.
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller)
         }, { "uuid": uuid, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback })
@@ -436,7 +429,6 @@ EntityManager.prototype.getEntityById = function (storeId, typeName, id, success
                     entity.init(result[0])
                 },
                 function (errMsg, caller) {
-                    console.log(errMsg)
                     server.errorManager.onError(errMsg)
                     caller.errorCallback(errMsg, caller.caller)
                 }, // Error callback
@@ -445,7 +437,6 @@ EntityManager.prototype.getEntityById = function (storeId, typeName, id, success
         },
         // The error callback.
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller)
         }, { "storeId": storeId, "typeName": typeName, "id": id, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback })
@@ -501,7 +492,6 @@ EntityManager.prototype.createEntity = function (parentUuid, attributeName, type
             entity.init(result[0])
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
@@ -540,7 +530,6 @@ EntityManager.prototype.removeEntity = function (uuid, successCallback, errorCal
             caller.successCallback(true, caller.caller)
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
@@ -592,7 +581,6 @@ EntityManager.prototype.saveEntity = function (entity, successCallback, errorCal
             entity.init(result[0])
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             if (caller.errorCallback != undefined) {
                 caller.errorCallback(errMsg, caller.caller)
@@ -640,7 +628,6 @@ EntityManager.prototype.createEntityPrototype = function (storeId, prototype, su
             caller.successCallback(proto, caller.caller)
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
@@ -693,7 +680,6 @@ EntityManager.prototype.getEntityPrototype = function (typeName, storeId, succes
             caller.successCallback(proto, caller.caller)
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
@@ -746,7 +732,6 @@ EntityManager.prototype.getEntityPrototypes = function (storeId, successCallback
             caller.successCallback(protoypes, caller.caller)
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
@@ -803,7 +788,6 @@ EntityManager.prototype.getDerivedEntityPrototypes = function (typeName, success
             caller.successCallback(prototypes, caller.caller)
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
@@ -1299,7 +1283,6 @@ function setRef(owner, property, refValue, isArray) {
                                 }
                             },
                             function (errorMsg, caller) {
-                                console.log("error: ", errorMsg)
                             },
                             { "entityUuid": entityUuid, "propertyName": propertyName, "index": index, "refValue": refValue, "initCallback": initCallback }
                         )

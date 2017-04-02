@@ -382,6 +382,16 @@ Table.prototype.refresh = function () {
  * Return a row with a given id.
  */
 Table.prototype.getRow = function (id) {
+	if(this.rowsId[id] == undefined){
+		// Here it can be a new row...
+		for(i=0; i < this.rows.length; i++){
+			if(this.rows[i].id === ""){
+				this.rows[i].id = id
+				this.rowsId[id] = this.rows[i]
+				break
+			}
+		}
+	}
 	return this.rowsId[id]
 }
 

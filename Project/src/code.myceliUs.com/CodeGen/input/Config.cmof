@@ -272,9 +272,6 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="accessExpiration" name="accessExpiration">
          <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#time"/>
       </ownedAttribute>
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="refreshExpiration" name="refreshExpiration">
-         <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#time"/>
-      </ownedAttribute>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="tokenType" name="tokenType">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>

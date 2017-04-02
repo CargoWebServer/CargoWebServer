@@ -156,6 +156,7 @@ var Element = function (parent, params, callback, appendFront) {
                     } else {
                         this.element.setAttribute(param, params[param])
                     }
+                    server.languageManager.setElementText(this, this.element.id)
                 } else {
                     if (params["NS"] != undefined) {
                         this.element.setAttributeNS(param.NS, param, params[param])
@@ -208,11 +209,6 @@ var Element = function (parent, params, callback, appendFront) {
 
     if (this.callback != undefined) {
         this.callback(); // Calls the callback function
-    }
-
-    // try to set language text if the element is register.
-    if (this.element.id.length > 0) {
-        server.languageManager.setElementText(this, this.element.id)
     }
 
     return this;

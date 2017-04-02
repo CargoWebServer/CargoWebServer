@@ -355,8 +355,8 @@ SecurityManager.prototype.changeAdminPassword = function (pwd, newPwd, successCa
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // OAuth2 Ressource access... The client must be configure first to be able to get access to ressources.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function GetResource(clientId, scope, query){
-    var result = server.GetOAuth2Manager().GetResource(clientId,scope, query, messageId, sessionId)
+function GetResource(clientId, scope, query, accountUuid){
+    var result = server.GetOAuth2Manager().GetResource(clientId,scope, query, accountUuid, messageId, sessionId)
     return result
 }
 
@@ -365,13 +365,22 @@ function GetResource(clientId, scope, query){
  * @param {string} clientId The clien id, defined in configuration.
  * @param {string} scope The access scope need for the query.
  * @param {string} query The query that the OAuth2 provider will execute to retreive the information.
+ * @param {string} accountUuid Can be empty string if nothing was store previously.
  */
 SecurityManager.prototype.getResource = function (clientId, scope, query, successCallback, errorCallback, caller) {
     // server is the client side singleton.
+    
+    // Account uuid are set and reset at the time of login and logout respectively.
+    var accountUuid = ""
+    if(localStorage.getItem("accountUuid") != undefined){
+        accountUuid = localStorage.getItem("accountUuid")
+    }
+
     var params = []
     params.push(createRpcData(clientId, "STRING", "clientId"))
     params.push(createRpcData(scope, "STRING", "scope"))
     params.push(createRpcData(query, "STRING", "query"))
+    params.push(createRpcData(accountUuid, "STRING", "accountUuid"))
 
     // Call it on the server.
     server.executeJsFunction(

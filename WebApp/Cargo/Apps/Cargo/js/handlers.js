@@ -470,12 +470,7 @@ Request.prototype.process = function () {
                 oauth2Dialog.div.element.style.heigth = content.element.offsetHeigth + "px"
             }
         }
-
         oauth2Dialog.setCentered()
-
-        // Send an empty response, the information will be sent via a form inside the content.
-        var response = new Response(this.id, this.conn, [], null, null, null);
-        response.send()
     } else if (this.method == "OAuth2AuthorizationEnd") {
         // Here I will simply destroy the oauth2 Dialog
         oauth2Dialog.close()

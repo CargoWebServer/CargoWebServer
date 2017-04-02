@@ -26,7 +26,6 @@ type OAuth2Configuration struct{
 	/** members of OAuth2Configuration **/
 	M_authorizationExpiration int
 	M_accessExpiration int64
-	M_refreshExpiration int64
 	M_tokenType string
 	M_errorStatusCode int
 	M_allowClientSecretInParams bool
@@ -57,7 +56,6 @@ type XsdOAuth2Configuration struct {
 
 	M_authorizationExpiration	int	`xml:"authorizationExpiration,attr"`
 	M_accessExpiration	int64	`xml:"accessExpiration,attr"`
-	M_refreshExpiration	int64	`xml:"refreshExpiration,attr"`
 	M_tokenType	string	`xml:"tokenType,attr"`
 	M_errorStatusCode	int	`xml:"errorStatusCode,attr"`
 	M_allowClientSecretInParams	bool	`xml:"allowClientSecretInParams,attr"`
@@ -109,19 +107,6 @@ func (this *OAuth2Configuration) SetAccessExpiration(ref interface{}){
 }
 
 /** Remove reference AccessExpiration **/
-
-/** RefreshExpiration **/
-func (this *OAuth2Configuration) GetRefreshExpiration() int64{
-	return this.M_refreshExpiration
-}
-
-/** Init reference RefreshExpiration **/
-func (this *OAuth2Configuration) SetRefreshExpiration(ref interface{}){
-	this.NeedSave = true
-	this.M_refreshExpiration = ref.(int64)
-}
-
-/** Remove reference RefreshExpiration **/
 
 /** TokenType **/
 func (this *OAuth2Configuration) GetTokenType() string{

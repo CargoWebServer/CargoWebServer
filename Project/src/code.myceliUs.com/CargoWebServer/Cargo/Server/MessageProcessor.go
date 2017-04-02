@@ -448,6 +448,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 			//do something here
 			this.processPendingMessage(msg.Rsp.GetId())
 		} else {
+
 			// Here I received a response from the client so I will process it.
 			rqst := this.getPendingRequestById(msg.Rsp.GetId())
 
@@ -462,9 +463,13 @@ func (this *MessageProcessor) processIncomming(m *message) {
 		}
 
 	} else if *msg.Type == Message_ERROR {
-		err := msg.GetErr()
-		log.Printf("Error ", err.GetMessage())
 		// An error was encounter by the client.
+		// here error was received.
+		rqst := this.getPendingRequestById(msg.Err.GetId())
+		if rqst.errorCallback != nil {
+			rqst.errorCallback(m, rqst.caller)
+		}
+
 	} else if *msg.Type == Message_EVENT {
 
 		// When the client throw an event this is the place where
