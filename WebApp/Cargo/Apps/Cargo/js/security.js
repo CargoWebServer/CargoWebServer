@@ -356,7 +356,12 @@ SecurityManager.prototype.changeAdminPassword = function (pwd, newPwd, successCa
 // OAuth2 Ressource access... The client must be configure first to be able to get access to ressources.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function GetResource(clientId, scope, query, accountUuid){
+<<<<<<< HEAD
+    var accessUuid = "" // not know by the client side.
+    var result = server.GetOAuth2Manager().GetResource(clientId,scope, query, accountUuid, accessUuid, messageId, sessionId)
+=======
     var result = server.GetOAuth2Manager().GetResource(clientId,scope, query, accountUuid, messageId, sessionId)
+>>>>>>> ea7d06b8f2b68f5fa969ccca1c3fe608456d36f8
     return result
 }
 
@@ -369,7 +374,10 @@ function GetResource(clientId, scope, query, accountUuid){
  */
 SecurityManager.prototype.getResource = function (clientId, scope, query, successCallback, errorCallback, caller) {
     // server is the client side singleton.
+<<<<<<< HEAD
+=======
     
+>>>>>>> ea7d06b8f2b68f5fa969ccca1c3fe608456d36f8
     // Account uuid are set and reset at the time of login and logout respectively.
     var accountUuid = ""
     if(localStorage.getItem("accountUuid") != undefined){

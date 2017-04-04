@@ -6,12 +6,15 @@ package Server
 
 import (
 	"crypto/x509"
+	b64 "encoding/base64"
 	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
+	"mime"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -29,36 +32,6 @@ import (
 var (
 	// The manager.
 	oauth2Manager *OAuth2Manager
-
-	// The key
-	// TODO set in config???
-	privateKeyBytes = []byte(`-----BEGIN RSA PRIVATE KEY-----
-MIIEowIBAAKCAQEA4f5wg5l2hKsTeNem/V41fGnJm6gOdrj8ym3rFkEU/wT8RDtn
-SgFEZOQpHEgQ7JL38xUfU0Y3g6aYw9QT0hJ7mCpz9Er5qLaMXJwZxzHzAahlfA0i
-cqabvJOMvQtzD6uQv6wPEyZtDTWiQi9AXwBpHssPnpYGIn20ZZuNlX2BrClciHhC
-PUIIZOQn/MmqTD31jSyjoQoV7MhhMTATKJx2XrHhR+1DcKJzQBSTAGnpYVaqpsAR
-ap+nwRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKA
-Rdpd9AjQW5SIVPfdsz5B6GlYQ5LdYKtznTuy7wIDAQABAoIBAQCwia1k7+2oZ2d3
-n6agCAbqIE1QXfCmh41ZqJHbOY3oRQG3X1wpcGH4Gk+O+zDVTV2JszdcOt7E5dAy
-MaomETAhRxB7hlIOnEN7WKm+dGNrKRvV0wDU5ReFMRHg31/Lnu8c+5BvGjZX+ky9
-POIhFFYJqwCRlopGSUIxmVj5rSgtzk3iWOQXr+ah1bjEXvlxDOWkHN6YfpV5ThdE
-KdBIPGEVqa63r9n2h+qazKrtiRqJqGnOrHzOECYbRFYhexsNFz7YT02xdfSHn7gM
-IvabDDP/Qp0PjE1jdouiMaFHYnLBbgvlnZW9yuVf/rpXTUq/njxIXMmvmEyyvSDn
-FcFikB8pAoGBAPF77hK4m3/rdGT7X8a/gwvZ2R121aBcdPwEaUhvj/36dx596zvY
-mEOjrWfZhF083/nYWE2kVquj2wjs+otCLfifEEgXcVPTnEOPO9Zg3uNSL0nNQghj
-FuD3iGLTUBCtM66oTe0jLSslHe8gLGEQqyMzHOzYxNqibxcOZIe8Qt0NAoGBAO+U
-I5+XWjWEgDmvyC3TrOSf/KCGjtu0TSv30ipv27bDLMrpvPmD/5lpptTFwcxvVhCs
-2b+chCjlghFSWFbBULBrfci2FtliClOVMYrlNBdUSJhf3aYSG2Doe6Bgt1n2CpNn
-/iu37Y3NfemZBJA7hNl4dYe+f+uzM87cdQ214+jrAoGAXA0XxX8ll2+ToOLJsaNT
-OvNB9h9Uc5qK5X5w+7G7O998BN2PC/MWp8H+2fVqpXgNENpNXttkRm1hk1dych86
-EunfdPuqsX+as44oCyJGFHVBnWpm33eWQw9YqANRI+pCJzP08I5WK3osnPiwshd+
-hR54yjgfYhBFNI7B95PmEQkCgYBzFSz7h1+s34Ycr8SvxsOBWxymG5zaCsUbPsL0
-4aCgLScCHb9J+E86aVbbVFdglYa5Id7DPTL61ixhl7WZjujspeXZGSbmq0Kcnckb
-mDgqkLECiOJW2NHP/j0McAkDLL4tysF8TLDO8gvuvzNC+WQ6drO2ThrypLVZQ+ry
-eBIPmwKBgEZxhqa0gVvHQG/7Od69KWj4eJP28kq13RhKay8JOoN0vPmspXJo1HY3
-CKuHRG+AP579dncdUnOMvfXOtkdM4vk0+hWASBQzM9xzVcztCa+koAugjVaLS9A+
-9uQoqEeVNTckxx0S2bYevRy7hGQmUJTyQm3j1zEUR5jpdbL83Fbq
------END RSA PRIVATE KEY-----`)
 )
 
 // The ID Token represents a JWT passed to the client as part of the token response.
@@ -131,6 +104,35 @@ func (this *OAuth2Manager) initialize() {
 
 	// Create the default configurations
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+
+	privateKeyBytes := []byte(
+		`-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEA4f5wg5l2hKsTeNem/V41fGnJm6gOdrj8ym3rFkEU/wT8RDtn
+SgFEZOQpHEgQ7JL38xUfU0Y3g6aYw9QT0hJ7mCpz9Er5qLaMXJwZxzHzAahlfA0i
+cqabvJOMvQtzD6uQv6wPEyZtDTWiQi9AXwBpHssPnpYGIn20ZZuNlX2BrClciHhC
+PUIIZOQn/MmqTD31jSyjoQoV7MhhMTATKJx2XrHhR+1DcKJzQBSTAGnpYVaqpsAR
+ap+nwRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKA
+Rdpd9AjQW5SIVPfdsz5B6GlYQ5LdYKtznTuy7wIDAQABAoIBAQCwia1k7+2oZ2d3
+n6agCAbqIE1QXfCmh41ZqJHbOY3oRQG3X1wpcGH4Gk+O+zDVTV2JszdcOt7E5dAy
+MaomETAhRxB7hlIOnEN7WKm+dGNrKRvV0wDU5ReFMRHg31/Lnu8c+5BvGjZX+ky9
+POIhFFYJqwCRlopGSUIxmVj5rSgtzk3iWOQXr+ah1bjEXvlxDOWkHN6YfpV5ThdE
+KdBIPGEVqa63r9n2h+qazKrtiRqJqGnOrHzOECYbRFYhexsNFz7YT02xdfSHn7gM
+IvabDDP/Qp0PjE1jdouiMaFHYnLBbgvlnZW9yuVf/rpXTUq/njxIXMmvmEyyvSDn
+FcFikB8pAoGBAPF77hK4m3/rdGT7X8a/gwvZ2R121aBcdPwEaUhvj/36dx596zvY
+mEOjrWfZhF083/nYWE2kVquj2wjs+otCLfifEEgXcVPTnEOPO9Zg3uNSL0nNQghj
+FuD3iGLTUBCtM66oTe0jLSslHe8gLGEQqyMzHOzYxNqibxcOZIe8Qt0NAoGBAO+U
+I5+XWjWEgDmvyC3TrOSf/KCGjtu0TSv30ipv27bDLMrpvPmD/5lpptTFwcxvVhCs
+2b+chCjlghFSWFbBULBrfci2FtliClOVMYrlNBdUSJhf3aYSG2Doe6Bgt1n2CpNn
+/iu37Y3NfemZBJA7hNl4dYe+f+uzM87cdQ214+jrAoGAXA0XxX8ll2+ToOLJsaNT
+OvNB9h9Uc5qK5X5w+7G7O998BN2PC/MWp8H+2fVqpXgNENpNXttkRm1hk1dych86
+EunfdPuqsX+as44oCyJGFHVBnWpm33eWQw9YqANRI+pCJzP08I5WK3osnPiwshd+
+hR54yjgfYhBFNI7B95PmEQkCgYBzFSz7h1+s34Ycr8SvxsOBWxymG5zaCsUbPsL0
+4aCgLScCHb9J+E86aVbbVFdglYa5Id7DPTL61ixhl7WZjujspeXZGSbmq0Kcnckb
+mDgqkLECiOJW2NHP/j0McAkDLL4tysF8TLDO8gvuvzNC+WQ6drO2ThrypLVZQ+ry
+eBIPmwKBgEZxhqa0gVvHQG/7Od69KWj4eJP28kq13RhKay8JOoN0vPmspXJo1HY3
+CKuHRG+AP579dncdUnOMvfXOtkdM4vk0+hWASBQzM9xzVcztCa+koAugjVaLS9A+
+9uQoqEeVNTckxx0S2bYevRy7hGQmUJTyQm3j1zEUR5jpdbL83Fbq
+-----END RSA PRIVATE KEY-----`)
 
 	// Load signing key.
 	block, _ := pem.Decode(privateKeyBytes)
@@ -337,6 +339,8 @@ func (this *OAuth2Manager) cleanup() {
 func DiscoveryHandler(w http.ResponseWriter, r *http.Request) {
 	// For other example see: https://accounts.google.com/.well-known/openid-configuration
 	config := GetServer().GetConfigurationManager().getServiceConfigurationById(GetServer().GetOAuth2Manager().getId())
+
+	// The hostname and port must be correctly configure here, localhost will not work in many case.
 	issuer := "https://" + config.GetHostName() + ":" + strconv.Itoa(config.GetPort())
 	data := map[string]interface{}{
 		"issuer":                                issuer,
@@ -366,10 +370,8 @@ func DiscoveryHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(raw)
 }
 
-/**
- * handlePublicKeys publishes the public part of this server's signing keys.
- * This allows clients to verify the signature of ID Tokens.
- */
+// handlePublicKeys publishes the public part of this server's signing keys.
+// This allows clients to verify the signature of ID Tokens.
 func PublicKeysHandler(w http.ResponseWriter, r *http.Request) {
 	raw, err := json.MarshalIndent(GetServer().GetOAuth2Manager().m_publicKeys, "", "  ")
 	if err != nil {
@@ -390,6 +392,507 @@ func PublicKeysHandler(w http.ResponseWriter, r *http.Request) {
  * The query is an http query from various api like facebook graph api.
  * will start an authorization process if nothing is found.
  */
+func (this *OAuth2Manager) GetResource(clientId string, scope string, query string, accountUuid string, accessUuid string, messageId string, sessionId string) interface{} {
+
+	var access *Config.OAuth2Access
+	// I will get the client...
+	clientEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", clientId)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
+	client := clientEntity.GetObject().(*Config.OAuth2Client)
+
+	if len(accessUuid) == 0 {
+		// Try to find the access...
+
+		// Get the config.
+		config := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetOauth2Configuration()
+
+		var account *CargoEntities.Account
+		session := GetServer().GetSessionManager().GetActiveSessionById(sessionId)
+		if session != nil {
+			// If a session exist I will favorize it account id over the one
+			// given in parameter.
+			if session.GetAccountPtr() != nil {
+				account = session.GetAccountPtr()
+			}
+		} else if len(accountUuid) > 0 {
+			accountEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(accountUuid)
+			if errObj != nil {
+				GetServer().reportErrorMessage(messageId, sessionId, errObj)
+				return nil
+			}
+			account = accountEntity.GetObject().(*CargoEntities.Account)
+		}
+
+		// Get the accesses
+		accesses := config.GetAccess()
+
+		// Now the client was found I will try to get an access code for the given
+		// scope and client.
+		for i := 0; i < len(accesses) && access == nil && account != nil; i++ {
+			a := accesses[i]
+			if a.GetClient().GetId() == client.GetId() {
+				values := strings.Split(a.GetScope(), " ")
+				values_ := strings.Split(scope, " ")
+				hasScope := true
+				for j := 0; j < len(values_); j++ {
+					if !Utility.Contains(values, values_[j]) {
+						hasScope = false
+						break
+					}
+				}
+				// If the access has the correct scope.
+				if hasScope {
+					if a.GetUserData().GetId() == account.GetId() {
+						// We found an access to the ressource!-)
+						access = a
+					}
+				}
+			}
+		}
+	} else {
+		// Here the accessUuid is given so I will use it to get ressources.
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(accessUuid)
+		if err == nil {
+			access = entity.GetObject().(*Config.OAuth2Access)
+		}
+	}
+
+	// If the ressource is found all we have to do is to get the actual resource.
+	if access != nil {
+		// Here I will made the API call.
+		result, err := DownloadRessource(query, access.GetId(), "Bearer")
+		if err == nil {
+			return result
+		} else {
+			errObj := NewError(Utility.FileLine(), RESSOURCE_NOT_FOUND_ERROR, SERVER_ERROR_CODE, err)
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
+		}
+
+	} else {
+		log.Println("-----------> ask for authorization")
+		// No access was found so here I will initiated the authorization process...
+		// To do so I will create the href where the user will be ask to
+		// authorize the client application to access ressources.
+		var authorizationLnk = client.GetAuthorizationUri()
+		authorizationLnk += "?response_type=code&client_id=" + client.GetId()
+
+		// I will create the request and send it to the client...
+		msgId := Utility.RandomUUID()
+		authorizationLnk += "&state=" + msgId + ":" + sessionId + ":" + clientId + "&scope=" + scope + "&access_type=offline"
+		authorizationLnk += "&redirect_uri=" + client.GetRedirectUri()
+
+		// Here if there is no user logged for the given session I will send an authentication request.
+		var method string
+		method = "OAuth2Authorization"
+		params := make([]*MessageData, 1)
+		data := new(MessageData)
+		data.Name = "authorizationLnk"
+		data.Value = authorizationLnk
+		params[0] = data
+		to := make([]connection, 1)
+		to[0] = GetServer().getConnectionById(sessionId)
+
+		// synchronize the routine with a channel...
+		done := make(chan bool)
+
+		var authorizationCode string
+		/** The authorize request **/
+		oauth2AuthorizeRqst, _ := NewRequestMessage(msgId, method, params, to,
+			func(done chan bool, accessUuid *string, authorizationCode *string) func(*message, interface{}) {
+				return func(rspMsg *message, caller interface{}) {
+					// I will retreive the access uuid from the result.
+					results := rspMsg.msg.Rsp.GetResults()
+					if len(results) == 1 {
+						if Utility.IsValidEntityReferenceName(string(results[0].GetDataBytes())) {
+							// In that case is the access uuid
+							*accessUuid = string(results[0].GetDataBytes())
+						} else {
+							// Here is the authorization code.
+							*authorizationCode = string(results[0].GetDataBytes())
+						}
+					}
+					done <- true
+				}
+			}(done, &accessUuid, &authorizationCode), nil,
+			func(done chan bool) func(*message, interface{}) {
+				return func(rspMsg *message, caller interface{}) {
+					done <- false
+				}
+			}(done))
+
+		// Send the request.
+		GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AuthorizeRqst
+
+		// So here I must block the execution of that function and wait
+		// for the authorization. To do so I will made use of channel and
+		// a callback and closure tree powerfull tools...
+		// Wait for success or error...
+		closeAuthorizeDialog := func() {
+			var method string
+			method = "OAuth2AuthorizationEnd"
+			params := make([]*MessageData, 0)
+			to := make([]connection, 1)
+			to[0] = GetServer().getConnectionById(sessionId)
+			oauth2AuthorizeEnd, err := NewRequestMessage(Utility.RandomUUID(), method, params, to, nil, nil, nil)
+			if err == nil {
+				// Send the request.
+				GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AuthorizeEnd
+			}
+		}
+
+		// Wait for authorization
+		if <-done {
+			closeAuthorizeDialog()
+			if len(accessUuid) == 0 {
+				log.Println("-----------> authorization accept")
+				log.Println("-----------> Ask for access")
+				GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AuthorizeRqst
+
+				var resp http.ResponseWriter
+				rqst := new(http.Request)
+				rqst.URL.Parse(client.GetRedirectUri())
+				rqst.Form.Add("state", sessionId+":"+messageId+":"+client.GetId())
+				rqst.Form.Add("code", authorizationCode)
+
+				values := rqst.URL.Query()
+				rqst.URL.RawQuery = values.Encode()
+				AppAuthCodeHandler(resp, rqst)
+
+				<-done
+				// wait for access...
+				if len(accessUuid) > 0 {
+					// Recal the method with the grant access uuid...
+					log.Println("580 -----------> access accept")
+					return this.GetResource(clientId, scope, query, accountUuid, accessUuid, messageId, sessionId)
+				} else {
+					log.Println("-----------> access refuse")
+					errObj := NewError(Utility.FileLine(), ACCESS_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("Access denied to get resource with scope "+scope+" for client with id "+clientId))
+					GetServer().reportErrorMessage(messageId, sessionId, errObj)
+					return nil
+				}
+			} else {
+				// Recal the method with the grant access uuid...
+				log.Println("590 -----------> access accept")
+				return this.GetResource(clientId, scope, query, accountUuid, accessUuid, messageId, sessionId)
+			}
+
+		} else {
+			// Here I will report the error to the user.
+			log.Println("-----------> authorization refuse")
+			closeAuthorizeDialog()
+			errObj := NewError(Utility.FileLine(), AUTHORIZATION_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("Authorization denied to get resource with scope "+scope+" for client with id "+clientId))
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
+		}
+	}
+	return nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Helper function
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Clear expiring authorization and (access/refresh)
+ */
+func clearCodeExpired(code string) {
+
+	// Remove the expire
+	expireUuid := ConfigOAuth2ExpiresExists(code)
+	if len(expireUuid) > 0 {
+		expireEntity, _ := GetServer().GetEntityManager().getEntityByUuid(expireUuid)
+		GetServer().GetEntityManager().deleteEntity(expireEntity)
+	}
+
+	// Remove the authorization
+	authorizationUuid := ConfigOAuth2AuthorizeExists(code)
+	if len(authorizationUuid) > 0 {
+		authorizationEntity, _ := GetServer().GetEntityManager().getEntityByUuid(authorizationUuid)
+		GetServer().GetEntityManager().deleteEntity(authorizationEntity)
+	}
+
+	// Remove the access
+	accessUuid := ConfigOAuth2AccessExists(code)
+	if len(accessUuid) > 0 {
+		accessEntity, _ := GetServer().GetEntityManager().getEntityByUuid(accessUuid)
+		GetServer().GetEntityManager().deleteEntity(accessEntity)
+	}
+
+}
+
+/**
+ * Use a timer to execute clearExpiredCode when it can at end...
+ */
+func setCodeExpiration(code string, duration time.Duration) {
+	// Create a closure and wrap the code.
+	f := func(code string) func() {
+		return func() {
+
+			// In case of access token... Refresh it if it can.
+			entity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Access", code)
+			if errObj == nil {
+				access := entity.GetObject().(*Config.OAuth2Access)
+				if access.GetRefreshToken() != nil {
+					createAccessToken("refresh_token", access.GetClient(), access.GetAuthorize(), access.GetRefreshToken().GetId())
+				}
+			}
+
+			// Remove the old access...
+			clearCodeExpired(code)
+		}
+	}(code)
+
+	// The function will be call after the duration.
+	time.AfterFunc(duration, f)
+}
+
+/**
+ * AddExpireAtData add info in expires table
+ */
+func addExpireAtData(code string, expireAt time.Time) error {
+
+	configEntity := GetServer().GetConfigurationManager().getOAuthConfigurationEntity()
+	expireEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Expires", code)
+
+	var expire *Config.OAuth2Expires
+	if expireEntity == nil {
+		expire = new(Config.OAuth2Expires)
+		expire.SetId(code)
+
+		// append to config.
+		expireEntity, _ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_expire", "Config.OAuth2Expires", expire.GetId(), expire)
+
+	} else {
+		expire = expireEntity.GetObject().(*Config.OAuth2Expires)
+	}
+
+	// Set the date.
+	expire.SetExpiresAt(expireAt.Unix())
+	expireEntity.SaveEntity()
+
+	// Start the timer.
+	duration := expireAt.Sub(time.Now())
+
+	// Set it expiration function.
+	setCodeExpiration(code, duration)
+
+	return nil
+}
+
+/**
+ * Create Access token from refresh_token or authorization_code.
+ */
+func createAccessToken(grantType string, client *Config.OAuth2Client, authorizationCode string, refreshToken string) (*Config.OAuth2Access, error) {
+
+	// The map that will contain the results
+	jr := make(map[string]interface{})
+
+	// build access code url
+	parameters := url.Values{}
+	parameters.Add("grant_type", grantType)
+	parameters.Add("client_id", client.GetId())
+	parameters.Add("client_secret", client.GetSecret())
+	parameters.Add("redirect_uri", client.GetRedirectUri())
+
+	if grantType == "refresh_token" {
+		if len(refreshToken) > 0 {
+			parameters.Add("refresh_token", refreshToken)
+		}
+	} else if grantType == "authorization_code" {
+		parameters.Add("code", authorizationCode)
+	}
+
+	jr, err := RetrieveToken(client.GetId(), client.GetSecret(), client.GetTokenUri(), parameters)
+	var access *Config.OAuth2Access
+	if err != nil {
+		return nil, err
+	} else {
+		if jr["access_token"] != nil {
+			// Here I will save the new access token.
+			configEntity := GetServer().GetConfigurationManager().getOAuthConfigurationEntity()
+
+			// Here I will create a new access token if is not already exist.
+			accessUuid := ConfigOAuth2AccessExists(jr["access_token"].(string))
+
+			if len(accessUuid) == 0 {
+				// Here I will create a new access from json data.
+				access = new(Config.OAuth2Access)
+				// Set the id
+				access.SetId(jr["access_token"].(string))
+
+				// set the access uuid
+				accessEntity, _ := GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_access", "Config.OAuth2Access", access.GetId(), access)
+
+				// Set the creation time.
+				access.SetCreatedAt(time.Now().Unix())
+				// Set the expiration delay.
+				access.SetExpiresIn(int64(jr["expires_in"].(float64)))
+				// Set it scope.
+				if jr["scope"] != nil {
+					access.SetScope(jr["scope"].(string))
+				}
+
+				/**
+				// Set the custom parameters in the extra field.
+				extra, err := json.Marshal(jr["custom_parameter"])
+				if err == nil {
+					accessToken.SetExtra(extra) // Set as json struct...
+				}
+				*/
+
+				// Set the expiration...
+				expirationTime := time.Unix(access.GetCreatedAt(), 0).Add(time.Duration(access.GetExpiresIn()) * time.Second)
+
+				// Add the expire time.
+				addExpireAtData(access.GetId(), expirationTime)
+
+				// Set the client.
+				access.SetClient(client)
+
+				// Set the authorization code.
+				access.SetAuthorize(authorizationCode)
+
+				// If authorization object are found locally...
+				authorizationEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Authorize", authorizationCode)
+
+				if errObj == nil {
+					authorization := authorizationEntity.GetObject().(*Config.OAuth2Authorize)
+					if len(authorization.GetRedirectUri()) > 0 {
+						access.SetRedirectUri(authorization.GetRedirectUri())
+					}
+				}
+
+				// Now the refresh token if there some.
+				if jr["refresh_token"] != nil {
+					// Here I will create the refresh token.
+					refresh := new(Config.OAuth2Refresh)
+					refresh.SetId(jr["refresh_token"].(string))
+					refresh.SetAccess(access)
+
+					// Set into it parent.
+					GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_refresh", "Config.OAuth2Refresh", refresh.GetId(), refresh)
+
+					// Set the access
+					access.SetRefreshToken(refresh)
+
+					// Save the entity with it refresh token object.
+					accessEntity.SaveEntity()
+				}
+
+				// Now the id token.
+				if jr["id_token"] != nil {
+					userData, err := decodeIdToken(jr["id_token"].(string))
+					if err == nil {
+						access.SetUserData(userData)
+						// Save the entity with it refresh token object.
+						accessEntity.SaveEntity()
+					}
+				}
+
+				// Save the new access token.
+				configEntity.SaveEntity()
+			} else {
+				// set access to the existing object.
+				accessEntity, err := GetServer().GetEntityManager().getEntityByUuid(accessUuid)
+				if err == nil {
+					access = accessEntity.GetObject().(*Config.OAuth2Access)
+				} else {
+					return nil, errors.New(err.GetBody())
+				}
+			}
+		} else if jr["error"] != nil {
+			return nil, errors.New(jr["error"].(string))
+		}
+	}
+
+	return access, nil
+}
+
+/**
+ * That function is use to decode id token.
+ */
+func decodeIdToken(encoded string) (*IDToken, error) {
+	parts := strings.Split(encoded, ".")
+
+	var val []byte
+	var err error
+
+	// Read the header part.
+	val, err = b64.StdEncoding.DecodeString(parts[0])
+	if err != nil {
+		return nil, err
+	}
+	header := make(map[string]interface{}, 0)
+	json.Unmarshal(val, &header)
+
+	// Read the body part.
+	val, err = b64.StdEncoding.DecodeString(parts[1])
+	if err != nil {
+		return nil, err
+	}
+
+	// I will initialyse the body from it data.
+	idToken := new(IDToken)
+	json.Unmarshal(val, idToken)
+
+	return idToken, validateIdToken(idToken)
+}
+
+/**
+ * That function is use to validate a token id.
+ */
+<<<<<<< HEAD
+func validateIdToken(idToken *IDToken) error {
+	// Test if the token is expired.
+	if time.Unix(idToken.Expiration, 0).Before(time.Now()) {
+		return errors.New("The token is expired!")
+	}
+
+	// Now I will retreive the open-id configuration.
+	issuerConfigAddress := idToken.Issuer + "/.well-known/openid-configuration"
+
+	// Retreive the issuer configuration.
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", issuerConfigAddress, nil)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	issuerConfig := make(map[string]interface{}, 0)
+	json.Unmarshal(bodyBytes, &issuerConfig)
+
+	// Now I will retreive the public keys.
+	req, _ = http.NewRequest("GET", issuerConfig["jwks_uri"].(string), nil)
+
+	resp, err = client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	bodyBytes, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	pulbicKeys := make(map[string]interface{}, 0)
+	json.Unmarshal(bodyBytes, &pulbicKeys)
+
+	// So now i got the isser configuration and it's public keys I can validate
+	// the id token.
+	log.Println("--------> public keys", pulbicKeys)
+=======
 func (this *OAuth2Manager) GetResource(clientId string, scope string, query string, accountUuid string, messageId string, sessionId string) interface{} {
 	// Get the config.
 	config := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetOauth2Configuration()
@@ -569,10 +1072,16 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 			return nil
 		}
 	}
+>>>>>>> ea7d06b8f2b68f5fa969ccca1c3fe608456d36f8
 
 	return nil
+
+<<<<<<< HEAD
 }
 
+/**
+ * Retreive access token from a given url.
+=======
 ////////////////////////////////////////////////////////////////////////////////
 // Helper function
 ////////////////////////////////////////////////////////////////////////////////
@@ -787,30 +1296,81 @@ func createAccessToken(grantType string, client *Config.OAuth2Client, state stri
 
 /**
  * Download an access token.
+>>>>>>> ea7d06b8f2b68f5fa969ccca1c3fe608456d36f8
  */
-func DownloadAccessToken(url string, auth *osin.BasicAuth, output map[string]interface{}) error {
-	// download access token
-	preq, err := http.NewRequest("GET", url, nil)
+func RetrieveToken(clientID, clientSecret, tokenURL string, v url.Values) (map[string]interface{}, error) {
+
+	req, err := http.NewRequest("POST", tokenURL, strings.NewReader(v.Encode()))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if auth != nil {
-		preq.SetBasicAuth(auth.Username, auth.Password)
-	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(clientID, clientSecret)
 
 	pclient := &http.Client{}
-	presp, err := pclient.Do(preq)
+	r, err := pclient.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if presp.StatusCode != 200 {
-		return errors.New("Invalid status code")
+	defer r.Body.Close()
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1<<20))
+	if err != nil {
+		return nil, fmt.Errorf("oauth2: cannot fetch token: %v", err)
 	}
 
-	jdec := json.NewDecoder(presp.Body)
-	err = jdec.Decode(&output)
-	return err
+	if code := r.StatusCode; code < 200 || code > 299 {
+		return nil, fmt.Errorf("oauth2: cannot fetch token: %v\nResponse: %s", r.Status, body)
+	}
+
+	// values return.
+	token := make(map[string]interface{}, 0)
+
+	content, _, _ := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	switch content {
+	case "application/x-www-form-urlencoded", "text/plain":
+		vals, err := url.ParseQuery(string(body))
+		if err != nil {
+			return nil, err
+		}
+
+		token["access_token"] = vals.Get("access_token")
+		token["token_type"] = vals.Get("token_type")
+		token["refresh_token"] = vals.Get("refresh_token")
+		token["id_token"] = vals.Get("id_token")
+
+		e := vals.Get("expires_in")
+
+		if e == "" {
+			// TODO(jbd): Facebook's OAuth2 implementation is broken and
+			// returns expires_in field in expires. Remove the fallback to expires,
+			// when Facebook fixes their implementation.
+			e = vals.Get("expires")
+		}
+		expires, _ := strconv.Atoi(e)
+		if expires != 0 {
+			token["expires_in"] = time.Now().Add(time.Duration(expires) * time.Second)
+		}
+
+	default:
+		if err = json.Unmarshal(body, &token); err != nil {
+			return nil, err
+		}
+	}
+
+	// Don't overwrite `RefreshToken` with an empty value
+	// if this was a token refreshing request.
+	if token["refresh_token"] == "" {
+		token["refresh_token"] = v.Get("refresh_token")
+	}
+
+	if token["id_token"] != nil {
+		// Test only...
+		decodeIdToken(token["id_token"].(string))
+	}
+
+	return token, nil
 }
 
 /**
@@ -818,14 +1378,15 @@ func DownloadAccessToken(url string, auth *osin.BasicAuth, output map[string]int
  * TODO interface http api call here...
  */
 func DownloadRessource(query string, accessToken string, tokenType string) (map[string]interface{}, error) {
+
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", query, nil)
 	req.Header.Add("Authorization", tokenType+" "+accessToken)
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err == nil {
 		output := make(map[string]interface{}, 0)
@@ -936,7 +1497,10 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Close()
 
 	if ar := server.HandleAuthorizeRequest(resp, r); ar != nil {
+<<<<<<< HEAD
+=======
 
+>>>>>>> ea7d06b8f2b68f5fa969ccca1c3fe608456d36f8
 		// The state contain the messageId:sessionId:clientId
 		state := r.URL.Query()["state"][0]
 		var sessionId string
@@ -949,6 +1513,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		if !HandleAuthenticationPage(ar, w, r) {
 			return
 		}
+
 		if !HandleAuthorizationPage(ar, w, r) {
 			if len(r.FormValue("submitbutton")) == 0 {
 				// No answer was given yet...
@@ -964,6 +1529,11 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 				var errData []byte
 				authorizationDenied := NewErrorMessage(messageId, 1, "Permission Denied by user", errData, to)
 				GetServer().GetProcessor().m_incomingChannel <- authorizationDenied
+<<<<<<< HEAD
+				return
+			}
+		}
+=======
 
 				return
 			}
@@ -971,6 +1541,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 
 		// The user give the authorization.
 		ar.Authorized = true
+>>>>>>> ea7d06b8f2b68f5fa969ccca1c3fe608456d36f8
 
 		// OpenId part.
 		scopes := make(map[string]bool)
@@ -1021,10 +1592,21 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			// NOTE: The storage must be able to encode and decode this object.
 			ar.UserData = &idToken
 		}
+
+		// The user give the authorization.
+		ar.Authorized = true
 		server.FinishAuthorizeRequest(resp, r, ar)
 
 		// Here I will create a response for the authorization.
+<<<<<<< HEAD
+		results := make([]*MessageData, 1)
+		data := new(MessageData)
+		data.Name = "code"
+		data.Value = resp.Output["code"]
+		results[0] = data
+=======
 		results := make([]*MessageData, 0)
+>>>>>>> ea7d06b8f2b68f5fa969ccca1c3fe608456d36f8
 		to := make([]connection, 1)
 		to[0] = GetServer().getConnectionById(sessionId)
 		authorizationAccept, _ := NewResponseMessage(messageId, results, to)
@@ -1068,7 +1650,13 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 				ar.Authorized = true
 			}
 		}
+
 		server.FinishAccessRequest(resp, r, ar)
+
+		// If an ID Token was encoded as the UserData, serialize and sign it.
+		if idToken, ok := ar.UserData.(*IDToken); ok && idToken != nil {
+			encodeIDToken(resp, idToken, GetServer().GetOAuth2Manager().m_jwtSigner)
+		}
 	}
 	if resp.IsError && resp.InternalError != nil {
 		fmt.Printf("ERROR: %s\n", resp.InternalError)
@@ -1076,7 +1664,34 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	if !resp.IsError {
 		resp.Output["custom_parameter"] = 19923
 	}
+
 	osin.OutputJSON(resp, w, r)
+}
+
+// encodeIDToken serializes and signs an ID Token then adds a field to the token response.
+func encodeIDToken(resp *osin.Response, idToken *IDToken, singer jose.Signer) {
+	resp.InternalError = func() error {
+		payload, err := json.Marshal(idToken)
+		if err != nil {
+			return fmt.Errorf("failed to marshal token: %v", err)
+		}
+		jws, err := GetServer().GetOAuth2Manager().m_jwtSigner.Sign(payload)
+		if err != nil {
+			return fmt.Errorf("failed to sign token: %v", err)
+		}
+		raw, err := jws.CompactSerialize()
+		if err != nil {
+			return fmt.Errorf("failed to serialize token: %v", err)
+		}
+		resp.Output["id_token"] = raw
+		return nil
+	}()
+
+	// Record errors as internal server errors.
+	if resp.InternalError != nil {
+		resp.IsError = true
+		resp.ErrorId = osin.E_SERVER_ERROR
+	}
 }
 
 /**
@@ -1105,9 +1720,9 @@ func InfoHandler(w http.ResponseWriter, r *http.Request) {
 func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("App Auth Code Handler")
 	r.ParseForm()
-
 	errorCode := r.Form.Get("error")
 	state := r.Form.Get("state")
+
 	// Send authentication end message...
 	var clientId string
 	var sessionId string
@@ -1124,6 +1739,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if len(errorCode) != 0 {
 		// The authorization fail!
+		log.Println("--------> create access error.")
 		errorDescription := r.Form.Get("error_description")
 		to := make([]connection, 1)
 		to[0] = GetServer().getConnectionById(sessionId)
@@ -1131,6 +1747,31 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		accessDenied := NewErrorMessage(messageId, 1, errorDescription, errData, to)
 		GetServer().GetProcessor().m_incomingChannel <- accessDenied
 	} else {
+<<<<<<< HEAD
+		log.Println("-----------------> line 1200")
+		access, err := createAccessToken("authorization_code", client, r.Form.Get("code"), "")
+		if err == nil {
+			log.Println("--------> create access grant response.")
+			// Send back the response to access request.
+			results := make([]*MessageData, 1)
+			data := new(MessageData)
+			data.Name = "accessUuid"
+			data.Value = access.GetUUID()
+			results[0] = data
+			to := make([]connection, 1)
+			to[0] = GetServer().getConnectionById(sessionId)
+			accessGrantResp, _ := NewResponseMessage(messageId, results, to)
+			GetServer().GetProcessor().m_incomingChannel <- accessGrantResp
+		} else {
+			// send error
+			log.Println("--------> create access error.")
+			to := make([]connection, 1)
+			to[0] = GetServer().getConnectionById(sessionId)
+			var errData []byte
+			accessDenied := NewErrorMessage(messageId, 1, err.Error(), errData, to)
+			GetServer().GetProcessor().m_incomingChannel <- accessDenied
+		}
+=======
 		code := r.Form.Get("code")
 		createAccessToken("authorization_code", client, state, code, "")
 
@@ -1140,6 +1781,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		to[0] = GetServer().getConnectionById(sessionId)
 		accessGrantResp, _ := NewResponseMessage(messageId, results, to)
 		GetServer().GetProcessor().m_incomingChannel <- accessGrantResp
+>>>>>>> ea7d06b8f2b68f5fa969ccca1c3fe608456d36f8
 	}
 
 }
@@ -1340,7 +1982,6 @@ func (this *OAuth2Store) RemoveAuthorize(code string) error {
  */
 func (this *OAuth2Store) loadIdToken(idToken *Config.OAuth2IdToken) *IDToken {
 	it := new(IDToken)
-
 	it.ClientID = idToken.GetClient().GetId()
 	it.Email = idToken.GetEmail()
 	emailVerified := idToken.GetEmailVerified()
@@ -1354,7 +1995,6 @@ func (this *OAuth2Store) loadIdToken(idToken *Config.OAuth2IdToken) *IDToken {
 	it.Name = idToken.GetName()
 	it.Nonce = idToken.GetNonce()
 	it.UserID = idToken.GetId()
-
 	return it
 }
 

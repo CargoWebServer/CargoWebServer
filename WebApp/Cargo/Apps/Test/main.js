@@ -122,15 +122,6 @@ function main() {
      testServiceContainer()
   */
 
-
-  // The get ressource test...
-  /*server.securityManager.getRessource("1234", "everything", "", 
-  function(result, caller){
-      
-  }, 
-  function(errMsg, caller){
-  }, {})*/
-
   // Google OAuth
   /*server.securityManager.getResource("1010681964660.apps.googleusercontent.com", "profile", "", 
   function(result, caller){

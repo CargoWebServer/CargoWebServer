@@ -451,14 +451,15 @@ func (this *MessageProcessor) processIncomming(m *message) {
 
 			// Here I received a response from the client so I will process it.
 			rqst := this.getPendingRequestById(msg.Rsp.GetId())
-
 			//log.Println("The response for message ", rqst.GetId(), " was succefully received!")
-			this.removePendingRequest(rqst)
+			if rqst != nil {
+				this.removePendingRequest(rqst)
 
-			// Here I will execute the successCallback if some is define.
-			if rqst.successCallback != nil {
-				// Call the successCallback.
-				rqst.successCallback(m, rqst.caller)
+				// Here I will execute the successCallback if some is define.
+				if rqst.successCallback != nil {
+					// Call the successCallback.
+					rqst.successCallback(m, rqst.caller)
+				}
 			}
 		}
 

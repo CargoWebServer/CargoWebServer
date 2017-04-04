@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Server"
-	"github.com/skratchdot/open-golang/open"
+	//	"github.com/skratchdot/open-golang/open"
 	"golang.org/x/net/websocket"
 )
 
@@ -40,12 +40,12 @@ func main() {
 	http.HandleFunc("/token", Server.TokenHandler)
 	http.HandleFunc("/info", Server.InfoHandler)
 
-	// OpenId
-	http.HandleFunc("/.well-known/openid-configuration", Server.DiscoveryHandler)
-	http.HandleFunc("/publickeys", Server.PublicKeysHandler)
-
 	// Client redirect address.
 	http.HandleFunc("/oauth2callback", Server.AppAuthCodeHandler)
+
+	// OpenId service needed by client side.
+	http.HandleFunc("/.well-known/openid-configuration", Server.DiscoveryHandler)
+	http.HandleFunc("/publickeys", Server.PublicKeysHandler)
 
 	// stop the server...
 	defer Server.GetServer().Stop()
@@ -53,9 +53,15 @@ func main() {
 	// Start the server...
 	Server.GetServer().Start()
 
+<<<<<<< HEAD
+	//open.Run("http://127.0.0.1:9393/Bridge")
+
+	err := http.ListenAndServe(":"+strconv.Itoa(port), nil)
+=======
 	open.Run("http://127.0.0.1:9393/Bridge")
 
 	listener, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+>>>>>>> ea7d06b8f2b68f5fa969ccca1c3fe608456d36f8
 	if err != nil {
 		panic("ListenAndServe: " + err.Error())
 	}
