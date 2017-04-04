@@ -70,8 +70,7 @@ h6 { font-size: .75em; }
 
 .feature {
 	height: 300px;
-	padding-right: 150px;
-	padding-left: 150px;
+	padding-top: 20px;
 }
 
 .feature .col-md-3 {
