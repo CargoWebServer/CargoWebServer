@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net"
 	"net/http"
 	"strconv"
 
@@ -53,20 +52,11 @@ func main() {
 	// Start the server...
 	Server.GetServer().Start()
 
-<<<<<<< HEAD
 	//open.Run("http://127.0.0.1:9393/Bridge")
 
 	err := http.ListenAndServe(":"+strconv.Itoa(port), nil)
-=======
-	open.Run("http://127.0.0.1:9393/Bridge")
-
-	listener, err := net.Listen("tcp", ":"+strconv.Itoa(port))
->>>>>>> ea7d06b8f2b68f5fa969ccca1c3fe608456d36f8
 	if err != nil {
 		panic("ListenAndServe: " + err.Error())
 	}
-
-	log.Println("Server listen on Port:", port)
-	http.Serve(listener, nil)
 
 }

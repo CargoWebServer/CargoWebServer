@@ -448,7 +448,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
 			//do something here
 			this.processPendingMessage(msg.Rsp.GetId())
 		} else {
-
 			// Here I received a response from the client so I will process it.
 			rqst := this.getPendingRequestById(msg.Rsp.GetId())
 			//log.Println("The response for message ", rqst.GetId(), " was succefully received!")

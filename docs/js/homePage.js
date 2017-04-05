@@ -6,10 +6,10 @@ var HomePage = function (parent) {
     // Language of the starting page.
     var languageInfo = {
         "en": {
-            "first-msg": "Cargo is an open-source Golang web server and JavaScript client framework. <br> It's fast, easy and lightweight.",
+            "first-msg": "Cargo is an open-source, complete web application framework. It's fast, easy and lightweight.",
             "getStarted-btn": "Get started!",
-            "feature-complete-title": "All in one",
-            "feature-complete-desc": "Client, server, database.",
+            "feature-complete-title": "Complete",
+            "feature-complete-desc": "Front-end, server, database. All in one.",
             "feature-easy-title": "Easy setup",
             "feature-easy-desc": "One download.",
             "feature-smooth-title": "Smooth learning curve",
@@ -76,12 +76,12 @@ var HomePage = function (parent) {
         .appendElement({ "tag": "div", "class": "col-xs-12 text-center", "id": "cargo-intro-container" }).down()
         .appendElement({ "tag": "div", "class": "col-xs-12" }).down()
         .appendElement({ "tag": "img", "src": "img/wheel.svg", "id": "cargo-intro-wheel" }).up()
-        .appendElement({ "tag": "div", "class": "col-sm-8 col-sm-offset-2 text-center" }).down()
-        .appendElement({ "tag": "span" }).appendElement({ "tag": "h1", "id": "first-msg" }).appendElement({ "tag": "br" })
-        .appendElement({ "tag": "p" }).appendElement({ "tag": "a", "id": "getStarted-btn", "class": "btn btn-primary btn-lg", "href": "#", "role": "button" }).up().up().up()
+        .appendElement({ "tag": "div", "class": "col-sm-6 col-sm-offset-3 text-center" }).down()
+        .appendElement({ "tag": "span" }).appendElement({ "tag": "h2", "id": "first-msg" }).appendElement({ "tag": "br" })
+        .appendElement({ "tag": "p" }).appendElement({ "tag": "a", "id": "getStarted-btn", "class": "btn btn-primary btn-lg", "href": "#", "role": "button" }).up().up()
         .appendElement({ "tag": "div", "class": "row feature" }).down()
         // Complet
-        .appendElement({ "tag": "div", "class": "col-md-3"}).down()
+        .appendElement({ "tag": "div", "class": "col-md-3" }).down()
         .appendElement({ "tag": "span", "class": "glyphicon glyphicon glyphicon-ok" })
         .appendElement({ "tag": "h2", "id": "feature-complete-title" })
         .appendElement({ "tag": "p", "id": "feature-complete-desc" }).up()
