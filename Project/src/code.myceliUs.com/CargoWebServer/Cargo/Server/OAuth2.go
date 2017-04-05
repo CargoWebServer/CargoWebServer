@@ -519,9 +519,11 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 						if Utility.IsValidEntityReferenceName(string(results[0].GetDataBytes())) {
 							// In that case is the access uuid
 							*accessUuid = string(results[0].GetDataBytes())
+							log.Println("--------> line 522")
 						} else {
 							// Here is the authorization code.
 							*authorizationCode = string(results[0].GetDataBytes())
+							log.Println("--------> line 526")
 						}
 					}
 					done <- true
@@ -800,9 +802,11 @@ func createAccessToken(grantType string, client *Config.OAuth2Client, authorizat
 
 				// Now the id token.
 				if jr["id_token"] != nil {
-					userData, err := decodeIdToken(jr["id_token"].(string))
+					idToken, err := decodeIdToken(jr["id_token"].(string))
 					if err == nil {
+						userData := saveIdToken(idToken)
 						access.SetUserData(userData)
+						log.Println("------------------> 808 id token ")
 						// Save the entity with it refresh token object.
 						accessEntity.SaveEntity()
 					}
@@ -837,7 +841,8 @@ func decodeIdToken(encoded string) (*IDToken, error) {
 	var err error
 
 	// Read the header part.
-	val, err = b64.StdEncoding.DecodeString(parts[0])
+	log.Println("843 decode:", strings.TrimSpace(parts[0]))
+	val, err = b64.RawStdEncoding.DecodeString(strings.TrimSpace(parts[0]))
 	if err != nil {
 		return nil, err
 	}
@@ -845,7 +850,7 @@ func decodeIdToken(encoded string) (*IDToken, error) {
 	json.Unmarshal(val, &header)
 
 	// Read the body part.
-	val, err = b64.StdEncoding.DecodeString(parts[1])
+	val, err = b64.RawStdEncoding.DecodeString(parts[1])
 	if err != nil {
 		return nil, err
 	}
@@ -854,7 +859,7 @@ func decodeIdToken(encoded string) (*IDToken, error) {
 	idToken := new(IDToken)
 	json.Unmarshal(val, idToken)
 
-	return idToken, validateIdToken(idToken)
+	return idToken, nil //validateIdToken(idToken)
 }
 
 /**
@@ -980,6 +985,7 @@ func RetrieveToken(clientID, clientSecret, tokenURL string, v url.Values) (map[s
 		token["refresh_token"] = v.Get("refresh_token")
 	}
 
+	// TEST ONLY...
 	if token["id_token"] != nil {
 		// Test only...
 		decodeIdToken(token["id_token"].(string))
@@ -1348,10 +1354,25 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		access, err := createAccessToken("authorization_code", client, r.Form.Get("code"), "")
 		if err == nil {
 			log.Println("--------> create access grant response.", messageId)
+			// Send back the response to access request.
+			results := make([]*MessageData, 1)
+			data := new(MessageData)
+			data.Name = "accessUuid"
+			data.Value = access.GetUUID()
+			results[0] = data
+			to := make([]connection, 1)
+			to[0] = GetServer().getConnectionById(sessionId)
+			accessGrantResp, _ := NewResponseMessage(messageId, results, to)
+			GetServer().GetProcessor().m_incomingChannel <- accessGrantResp
 			channels[messageId] <- access.GetUUID()
 		} else {
 			// send error
 			log.Println("--------> access error: ", err)
+			to := make([]connection, 1)
+			to[0] = GetServer().getConnectionById(sessionId)
+			var errData []byte
+			accessDenied := NewErrorMessage(messageId, 1, err.Error(), errData, to)
+			GetServer().GetProcessor().m_incomingChannel <- accessDenied
 			channels[messageId] <- "" // deblock the channel...
 		}
 	}
@@ -1462,7 +1483,7 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 
 	// Save the id token if found.
 	if data.UserData != nil {
-		idToken := this.saveIdToken(data.UserData.(*IDToken))
+		idToken := saveIdToken(data.UserData.(*IDToken))
 		// Set into the user user
 		a.SetUserData(idToken)
 	}
@@ -1505,7 +1526,7 @@ func (this *OAuth2Store) LoadAuthorize(code string) (*osin.AuthorizeData, error)
 
 	// set the user data here.
 	if authorize.GetUserData() != nil {
-		data.UserData = this.loadIdToken(authorize.GetUserData())
+		data.UserData = loadIdToken(authorize.GetUserData())
 	}
 
 	c, err := this.GetClient(authorize.GetClient().GetId())
@@ -1552,7 +1573,7 @@ func (this *OAuth2Store) RemoveAuthorize(code string) error {
 /**
  * Load a given id token.
  */
-func (this *OAuth2Store) loadIdToken(idToken *Config.OAuth2IdToken) *IDToken {
+func loadIdToken(idToken *Config.OAuth2IdToken) *IDToken {
 	it := new(IDToken)
 	it.ClientID = idToken.GetClient().GetId()
 	it.Email = idToken.GetEmail()
@@ -1573,7 +1594,7 @@ func (this *OAuth2Store) loadIdToken(idToken *Config.OAuth2IdToken) *IDToken {
 /**
  * Save Token id.
  */
-func (this *OAuth2Store) saveIdToken(data *IDToken) *Config.OAuth2IdToken {
+func saveIdToken(data *IDToken) *Config.OAuth2IdToken {
 	// Get needed entities.
 	configEntity := GetServer().GetConfigurationManager().getOAuthConfigurationEntity()
 	clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", data.ClientID)
@@ -1678,7 +1699,7 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
 	access.SetCreatedAt(data.CreatedAt.Unix())
 
 	if data.UserData != nil {
-		idToken := this.saveIdToken(data.UserData.(*IDToken))
+		idToken := saveIdToken(data.UserData.(*IDToken))
 		// Set into the user user
 		access.SetUserData(idToken)
 	}
@@ -1733,7 +1754,7 @@ func (this *OAuth2Store) LoadAccess(code string) (*osin.AccessData, error) {
 	access.CreatedAt = time.Unix(int64(a.GetCreatedAt()), 0)
 
 	if a.GetUserData() != nil {
-		access.UserData = this.loadIdToken(a.GetUserData())
+		access.UserData = loadIdToken(a.GetUserData())
 	}
 
 	// The refresh token
