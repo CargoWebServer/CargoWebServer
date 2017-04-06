@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"regexp"
 
 	"code.myceliUs.com/Utility"
 	_ "github.com/Go-SQL-Driver/MySQL"
@@ -21,11 +22,12 @@ const (
 /**
  * Return the list of active map.
  */
-func getActives(db *sql.DB) (map[string]string, error) {
+func getActives(db *sql.DB) ([]string, error) {
 	// The map of active result.
-	actives := make(map[string]string, 0)
+	actives := make([]string, 0)
+	serialRegex, _ := regexp.Compile("^\\S{3}\\d{4}\\S$")
 
-	q := "SELECT Entry_COD,  max(ID_UNIT), UNIT_REF, max(UNIT_TIME)  FROM( \n"
+	q := "SELECT Entry_COD, max(ID_UNIT), UNIT_REF, max(UNIT_TIME)  FROM(\n"
 	q += "SELECT rca_one.rca_entry.Entry_COD AS Entry_COD, rca_one.rca_unit.UNIT_REF as UNIT_REF, rca_one.rca_unit.ID_UNIT as ID_UNIT, \n"
 	q += "	concat(rca_one.rca_unit.UNIT_DATE,' ',rca_one.rca_unit.UNIT_START_TIME) as UNIT_TIME \n"
 	q += "	FROM rca_one.rca_entry \n"
@@ -70,7 +72,10 @@ func getActives(db *sql.DB) (map[string]string, error) {
 		}
 
 		// Keep it in the map with it id.
-		actives[result[0]+":"+result[2]] = result[1]
+		if !Utility.Contains(actives, result[1]) && serialRegex.MatchString(result[2]) {
+			log.Println("------------> active ", result[1])
+			actives = append(actives, result[1])
+		}
 	}
 
 	return actives, nil
@@ -90,9 +95,9 @@ func getToRemove(db *sql.DB) ([]string, error) {
 	}
 
 	// The list of actual value in the db...
-	q := "SELECT rca_one.rca_entry.ID_Entry, rca_one.rca_entry.Entry_COD, rca_one.rca_unit.UNIT_REF\n"
+	q := "SELECT rca_one.rca_entry.Entry_COD, rca_one.rca_entry.ID_Entry, rca_one.rca_unit.UNIT_REF\n"
 	q += "FROM rca_one.rca_entry\n"
-	q += "INNER JOIN rca_one.rca_unit ON rca_one.rca_entry.ID_ENTRY = rca_one.rca_unit.ID_UNIT"
+	q += "JOIN rca_one.rca_unit ON rca_one.rca_entry.ID_ENTRY = rca_one.rca_unit.ID_UNIT"
 
 	rows, err := db.Query(q)
 	if err != nil {
@@ -131,15 +136,10 @@ func getToRemove(db *sql.DB) ([]string, error) {
 		}
 
 		// Keep it in the map with it id.
-		if val, ok := actives[result[1]+":"+result[2]]; ok {
-			if val != result[0] {
-				// In that case I need to remove the data...
-				if !Utility.Contains(toRemove, result[0]) {
-					toRemove = append(toRemove, result[0])
-				}
-			} else {
-				// Nothing to do here.
-				//log.Println("--------> Active: ", result[2], result[0])
+		if !Utility.Contains(actives, result[1]) {
+			// In that case I need to remove the data...
+			if !Utility.Contains(toRemove, result[1]) {
+				toRemove = append(toRemove, result[1])
 			}
 		}
 	}
@@ -153,9 +153,11 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
+	getToRemove(db)
 
 	// The list of values to remove.
 	toRemove, err := getToRemove(db)
+
 	if err == nil {
 		for i := 0; i < len(toRemove); i++ {
 			// I will remove the entry from the rca_one.rca_unit with key ID_UNIT
@@ -197,4 +199,5 @@ func main() {
 			}
 		}
 	}
+
 }

@@ -22,6 +22,7 @@ type OAuth2Client struct{
 
 	/** members of OAuth2Client **/
 	M_id string
+	M_issuer string
 	M_secret string
 	M_redirectUri string
 	M_tokenUri string
@@ -39,6 +40,7 @@ type OAuth2Client struct{
 type XsdOAuth2Client struct {
 	XMLName xml.Name	`xml:"oauth2Client"`
 	M_id	string	`xml:"id,attr"`
+	M_issuer	string	`xml:"issuer,attr"`
 	M_secret	string	`xml:"secret,attr"`
 	M_redirectUri	string	`xml:"redirectUri,attr"`
 	M_extra	[]uint8	`xml:"extra,attr"`
@@ -61,6 +63,19 @@ func (this *OAuth2Client) SetId(ref interface{}){
 }
 
 /** Remove reference Id **/
+
+/** Issuer **/
+func (this *OAuth2Client) GetIssuer() string{
+	return this.M_issuer
+}
+
+/** Init reference Issuer **/
+func (this *OAuth2Client) SetIssuer(ref interface{}){
+	this.NeedSave = true
+	this.M_issuer = ref.(string)
+}
+
+/** Remove reference Issuer **/
 
 /** Secret **/
 func (this *OAuth2Client) GetSecret() string{
