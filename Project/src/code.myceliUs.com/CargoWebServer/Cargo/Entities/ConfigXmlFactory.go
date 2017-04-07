@@ -94,89 +94,6 @@ func (this *ConfigXmlFactory) SerializeXml(outputPath string, toSerialize *Confi
 	return nil
 }
 
-/** inititialisation of Configurations **/
-func (this *ConfigXmlFactory) InitConfigurations(xmlElement *Config.XsdConfigurations, object *Config.Configurations) {
-	log.Println("Initialize Configurations")
-
-	/** Init serverConfiguration **/
-	if object.M_serverConfig == nil {
-		object.M_serverConfig = new(Config.ServerConfiguration)
-	}
-	this.InitServerConfiguration(&xmlElement.M_serverConfig, object.M_serverConfig)
-
-	/** association initialisation **/
-
-	/** Init applicationConfiguration **/
-	object.M_applicationConfigs = make([]*Config.ApplicationConfiguration, 0)
-	for i := 0; i < len(xmlElement.M_applicationConfigs); i++ {
-		val := new(Config.ApplicationConfiguration)
-		this.InitApplicationConfiguration(xmlElement.M_applicationConfigs[i], val)
-		object.M_applicationConfigs = append(object.M_applicationConfigs, val)
-
-		/** association initialisation **/
-	}
-
-	/** Init smtpConfiguration **/
-	object.M_smtpConfigs = make([]*Config.SmtpConfiguration, 0)
-	for i := 0; i < len(xmlElement.M_smtpConfigs); i++ {
-		val := new(Config.SmtpConfiguration)
-		this.InitSmtpConfiguration(xmlElement.M_smtpConfigs[i], val)
-		object.M_smtpConfigs = append(object.M_smtpConfigs, val)
-
-		/** association initialisation **/
-	}
-
-	/** Init ldapConfiguration **/
-	object.M_ldapConfigs = make([]*Config.LdapConfiguration, 0)
-	for i := 0; i < len(xmlElement.M_ldapConfigs); i++ {
-		val := new(Config.LdapConfiguration)
-		this.InitLdapConfiguration(xmlElement.M_ldapConfigs[i], val)
-		object.M_ldapConfigs = append(object.M_ldapConfigs, val)
-
-		/** association initialisation **/
-	}
-
-	/** Init dataStoreConfiguration **/
-	object.M_dataStoreConfigs = make([]*Config.DataStoreConfiguration, 0)
-	for i := 0; i < len(xmlElement.M_dataStoreConfigs); i++ {
-		val := new(Config.DataStoreConfiguration)
-		this.InitDataStoreConfiguration(xmlElement.M_dataStoreConfigs[i], val)
-		object.M_dataStoreConfigs = append(object.M_dataStoreConfigs, val)
-
-		/** association initialisation **/
-	}
-
-	/** Init serviceConfiguration **/
-	object.M_serviceConfigs = make([]*Config.ServiceConfiguration, 0)
-	for i := 0; i < len(xmlElement.M_serviceConfigs); i++ {
-		val := new(Config.ServiceConfiguration)
-		this.InitServiceConfiguration(xmlElement.M_serviceConfigs[i], val)
-		object.M_serviceConfigs = append(object.M_serviceConfigs, val)
-
-		/** association initialisation **/
-	}
-
-	/** Init oauth2Configuration **/
-	if xmlElement.M_oauth2Configuration != nil {
-		object.M_oauth2Configuration = new(Config.OAuth2Configuration)
-		this.InitOAuth2Configuration(xmlElement.M_oauth2Configuration, object.M_oauth2Configuration)
-
-		/** association initialisation **/
-	}
-
-	/** Configurations **/
-	object.M_id = xmlElement.M_id
-
-	/** Configurations **/
-	object.M_name = xmlElement.M_name
-
-	/** Configurations **/
-	object.M_version = xmlElement.M_version
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
 /** inititialisation of ServerConfiguration **/
 func (this *ConfigXmlFactory) InitServerConfiguration(xmlElement *Config.XsdServerConfiguration, object *Config.ServerConfiguration) {
 	log.Println("Initialize ServerConfiguration")
@@ -504,6 +421,123 @@ func (this *ConfigXmlFactory) InitOAuth2Configuration(xmlElement *Config.XsdOAut
 
 	/** Configuration **/
 	object.M_redirectUriSeparator = xmlElement.M_redirectUriSeparator
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** inititialisation of Configurations **/
+func (this *ConfigXmlFactory) InitConfigurations(xmlElement *Config.XsdConfigurations, object *Config.Configurations) {
+	log.Println("Initialize Configurations")
+
+	/** Init serverConfiguration **/
+	if object.M_serverConfig == nil {
+		object.M_serverConfig = new(Config.ServerConfiguration)
+	}
+	this.InitServerConfiguration(&xmlElement.M_serverConfig, object.M_serverConfig)
+
+	/** association initialisation **/
+
+	/** Init applicationConfiguration **/
+	object.M_applicationConfigs = make([]*Config.ApplicationConfiguration, 0)
+	for i := 0; i < len(xmlElement.M_applicationConfigs); i++ {
+		val := new(Config.ApplicationConfiguration)
+		this.InitApplicationConfiguration(xmlElement.M_applicationConfigs[i], val)
+		object.M_applicationConfigs = append(object.M_applicationConfigs, val)
+
+		/** association initialisation **/
+	}
+
+	/** Init smtpConfiguration **/
+	object.M_smtpConfigs = make([]*Config.SmtpConfiguration, 0)
+	for i := 0; i < len(xmlElement.M_smtpConfigs); i++ {
+		val := new(Config.SmtpConfiguration)
+		this.InitSmtpConfiguration(xmlElement.M_smtpConfigs[i], val)
+		object.M_smtpConfigs = append(object.M_smtpConfigs, val)
+
+		/** association initialisation **/
+	}
+
+	/** Init ldapConfiguration **/
+	object.M_ldapConfigs = make([]*Config.LdapConfiguration, 0)
+	for i := 0; i < len(xmlElement.M_ldapConfigs); i++ {
+		val := new(Config.LdapConfiguration)
+		this.InitLdapConfiguration(xmlElement.M_ldapConfigs[i], val)
+		object.M_ldapConfigs = append(object.M_ldapConfigs, val)
+
+		/** association initialisation **/
+	}
+
+	/** Init dataStoreConfiguration **/
+	object.M_dataStoreConfigs = make([]*Config.DataStoreConfiguration, 0)
+	for i := 0; i < len(xmlElement.M_dataStoreConfigs); i++ {
+		val := new(Config.DataStoreConfiguration)
+		this.InitDataStoreConfiguration(xmlElement.M_dataStoreConfigs[i], val)
+		object.M_dataStoreConfigs = append(object.M_dataStoreConfigs, val)
+
+		/** association initialisation **/
+	}
+
+	/** Init serviceConfiguration **/
+	object.M_serviceConfigs = make([]*Config.ServiceConfiguration, 0)
+	for i := 0; i < len(xmlElement.M_serviceConfigs); i++ {
+		val := new(Config.ServiceConfiguration)
+		this.InitServiceConfiguration(xmlElement.M_serviceConfigs[i], val)
+		object.M_serviceConfigs = append(object.M_serviceConfigs, val)
+
+		/** association initialisation **/
+	}
+
+	/** Init oauth2Configuration **/
+	if xmlElement.M_oauth2Configuration != nil {
+		object.M_oauth2Configuration = new(Config.OAuth2Configuration)
+		this.InitOAuth2Configuration(xmlElement.M_oauth2Configuration, object.M_oauth2Configuration)
+
+		/** association initialisation **/
+	}
+
+	/** Configurations **/
+	object.M_id = xmlElement.M_id
+
+	/** Configurations **/
+	object.M_name = xmlElement.M_name
+
+	/** Configurations **/
+	object.M_version = xmlElement.M_version
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of OAuth2Configuration **/
+func (this *ConfigXmlFactory) SerialyzeOAuth2Configuration(xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** OAuth2Configuration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_authorizationExpiration = object.M_authorizationExpiration
+
+	/** Configuration **/
+	xmlElement.M_accessExpiration = object.M_accessExpiration
+
+	/** Configuration **/
+	xmlElement.M_tokenType = object.M_tokenType
+
+	/** Configuration **/
+	xmlElement.M_errorStatusCode = object.M_errorStatusCode
+
+	/** Configuration **/
+	xmlElement.M_allowClientSecretInParams = object.M_allowClientSecretInParams
+
+	/** Configuration **/
+	xmlElement.M_allowGetAccessRequest = object.M_allowGetAccessRequest
+
+	/** Configuration **/
+	xmlElement.M_redirectUriSeparator = object.M_redirectUriSeparator
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -907,40 +941,6 @@ func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.X
 
 	/** Configuration **/
 	xmlElement.M_start = object.M_start
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of OAuth2Configuration **/
-func (this *ConfigXmlFactory) SerialyzeOAuth2Configuration(xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** OAuth2Configuration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_authorizationExpiration = object.M_authorizationExpiration
-
-	/** Configuration **/
-	xmlElement.M_accessExpiration = object.M_accessExpiration
-
-	/** Configuration **/
-	xmlElement.M_tokenType = object.M_tokenType
-
-	/** Configuration **/
-	xmlElement.M_errorStatusCode = object.M_errorStatusCode
-
-	/** Configuration **/
-	xmlElement.M_allowClientSecretInParams = object.M_allowClientSecretInParams
-
-	/** Configuration **/
-	xmlElement.M_allowGetAccessRequest = object.M_allowGetAccessRequest
-
-	/** Configuration **/
-	xmlElement.M_redirectUriSeparator = object.M_redirectUriSeparator
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}

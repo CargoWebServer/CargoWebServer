@@ -39,18 +39,23 @@ var (
 //
 // https://openid.net/specs/openid-connect-core-1_0.html#IDToken
 type IDToken struct {
-	Issuer     string `json:"iss"`
-	UserID     string `json:"sub"`
-	ClientID   string `json:"aud"`
-	Expiration int64  `json:"exp"`
-	IssuedAt   int64  `json:"iat"`
+	// Specifies the issuing authority (iss).
+	Issuer string `json:"iss"`
+	// Asserts the identity of the user, called subject in OpenID (sub).
+	UserID string `json:"sub"`
+	// Is generated for a particular audience, i.e. client (aud).
+	ClientID string `json:"aud"`
 
+	// Has an issue (iat) and an expiration date (exp).
+	Expiration int64 `json:"exp"`
+	IssuedAt   int64 `json:"iat"`
+
+	// May contain a nonce (nonce).
 	Nonce string `json:"nonce,omitempty"` // Non-manditory fields MUST be "omitempty"
 
 	// Custom claims supported by this server.
 	//
 	// See: https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
-
 	Email         string `json:"email,omitempty"`
 	EmailVerified *bool  `json:"email_verified,omitempty"`
 
@@ -491,7 +496,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 		// I will create the request and send it to the client...
 		msgId := Utility.RandomUUID()
-		authorizationLnk += "&state=" + msgId + ":" + sessionId + ":" + clientId + "&scope=" + scope + "&access_type=offline"
+		authorizationLnk += "&state=" + msgId + ":" + sessionId + ":" + clientId + "&scope=" + scope + "&access_type=offline&approval_prompt=force"
 		authorizationLnk += "&redirect_uri=" + client.GetRedirectUri()
 
 		// Here if there is no user logged for the given session I will send an authentication request.
@@ -859,7 +864,7 @@ func decodeIdToken(encoded string) (*IDToken, error) {
 	idToken := new(IDToken)
 	json.Unmarshal(val, idToken)
 
-	return idToken, nil //validateIdToken(idToken)
+	return idToken, validateIdToken(idToken)
 }
 
 /**
@@ -872,7 +877,7 @@ func validateIdToken(idToken *IDToken) error {
 	}
 
 	// Now I will retreive the open-id configuration.
-	issuerConfigAddress := idToken.Issuer + "/.well-known/openid-configuration"
+	issuerConfigAddress := "http://" + idToken.Issuer + "/.well-known/openid-configuration"
 
 	// Retreive the issuer configuration.
 	client := &http.Client{}

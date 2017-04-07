@@ -141,7 +141,6 @@
 	<xsd:element name="oauth2Client" type="tOAuth2Client"/>
 	<xsd:complexType name="tOAuth2Client" abstract="false">
 			<xsd:attribute name="id" type="xsd:ID" />
-			<xsd:attribute name="issuer" type="xsd:string" />
 			<xsd:attribute name="secret" type="xsd:string" />
 			<xsd:attribute name="redirectUri" type="xsd:anyURI" />
 			<xsd:attribute name="extra" type="xsd:byte" />
