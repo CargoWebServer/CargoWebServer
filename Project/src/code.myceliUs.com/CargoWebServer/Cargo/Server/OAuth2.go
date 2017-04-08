@@ -5,8 +5,13 @@
 package Server
 
 import (
+	"bytes"
+	"crypto"
+	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	b64 "encoding/base64"
+	"encoding/binary"
 	"encoding/json"
 	"encoding/pem"
 	"errors"
@@ -14,6 +19,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/big"
 	"mime"
 	"net/http"
 	"net/url"
@@ -21,7 +27,6 @@ import (
 	"strings"
 	"time"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 	"github.com/RangelReale/osin"
@@ -401,7 +406,7 @@ func PublicKeysHandler(w http.ResponseWriter, r *http.Request) {
  * The query is an http query from various api like facebook graph api.
  * will start an authorization process if nothing is found.
  */
-func (this *OAuth2Manager) GetResource(clientId string, scope string, query string, accountUuid string, accessUuid string, messageId string, sessionId string) interface{} {
+func (this *OAuth2Manager) GetResource(clientId string, scope string, query string, idTokenUuid string, accessUuid string, messageId string, sessionId string) interface{} {
 
 	var access *Config.OAuth2Access
 	// I will get the client...
@@ -413,27 +418,19 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 	client := clientEntity.GetObject().(*Config.OAuth2Client)
 
-	if len(accessUuid) == 0 {
+	if len(accessUuid) == 0 && len(idTokenUuid) > 0 {
 		// Try to find the access...
 
 		// Get the config.
 		config := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetOauth2Configuration()
 
-		var account *CargoEntities.Account
-		session := GetServer().GetSessionManager().GetActiveSessionById(sessionId)
-		if session != nil {
-			// If a session exist I will favorize it account id over the one
-			// given in parameter.
-			if session.GetAccountPtr() != nil {
-				account = session.GetAccountPtr()
+		// The id token.
+		var idToken *Config.OAuth2IdToken
+		for i := 0; i < len(config.GetIds()); i++ {
+			if config.GetIds()[i].GetUUID() == idTokenUuid {
+				idToken = config.GetIds()[i]
+				break
 			}
-		} else if len(accountUuid) > 0 {
-			accountEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(accountUuid)
-			if errObj != nil {
-				GetServer().reportErrorMessage(messageId, sessionId, errObj)
-				return nil
-			}
-			account = accountEntity.GetObject().(*CargoEntities.Account)
 		}
 
 		// Get the accesses
@@ -441,7 +438,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 		// Now the client was found I will try to get an access code for the given
 		// scope and client.
-		for i := 0; i < len(accesses) && access == nil && account != nil; i++ {
+		for i := 0; i < len(accesses) && access == nil; i++ {
 			a := accesses[i]
 			if a.GetClient().GetId() == client.GetId() {
 				values := strings.Split(a.GetScope(), " ")
@@ -455,7 +452,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 				}
 				// If the access has the correct scope.
 				if hasScope {
-					if a.GetUserData().GetId() == account.GetId() {
+					if a.GetUserData().GetId() == idToken.GetId() {
 						// We found an access to the ressource!-)
 						access = a
 					}
@@ -468,7 +465,6 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 		if err == nil {
 			access = entity.GetObject().(*Config.OAuth2Access)
 		} else {
-			log.Println("--------------------------------------> 467 acc")
 			GetServer().reportErrorMessage(messageId, sessionId, err)
 			return nil
 		}
@@ -524,11 +520,9 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 						if Utility.IsValidEntityReferenceName(string(results[0].GetDataBytes())) {
 							// In that case is the access uuid
 							*accessUuid = string(results[0].GetDataBytes())
-							log.Println("--------> line 522")
 						} else {
 							// Here is the authorization code.
 							*authorizationCode = string(results[0].GetDataBytes())
-							log.Println("--------> line 526")
 						}
 					}
 					done <- true
@@ -560,6 +554,9 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 			}
 		}
 
+		// That function finalyse the access and close the issuer window
+		// and save the idTokenUuid on the client side.
+
 		// Wait for authorization
 		if <-done {
 			closeAuthorizeDialog()
@@ -585,10 +582,10 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 				// wait for access...
 				if len(accessUuid) > 0 {
 					// Recal the method with the grant access uuid...
-					log.Println("580 -----------> access accept ", accessUuid)
-					return this.GetResource(clientId, scope, query, accountUuid, accessUuid, messageId, sessionId)
+					log.Println("590 -----------> access accept ", accessUuid)
+					return this.GetResource(clientId, scope, query, idTokenUuid, accessUuid, messageId, sessionId)
 				} else {
-					log.Println("-----------> access refuse")
+					log.Println("594 -----------> access refuse")
 					errObj := NewError(Utility.FileLine(), ACCESS_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("Access denied to get resource with scope "+scope+" for client with id "+clientId))
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
 					return nil
@@ -598,8 +595,8 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 			} else {
 				// Recal the method with the grant access uuid...
-				log.Println("590 -----------> access accept")
-				return this.GetResource(clientId, scope, query, accountUuid, accessUuid, messageId, sessionId)
+				log.Println("604 -----------> access accept")
+				return this.GetResource(clientId, scope, query, idTokenUuid, accessUuid, messageId, sessionId)
 			}
 
 		} else {
@@ -811,7 +808,6 @@ func createAccessToken(grantType string, client *Config.OAuth2Client, authorizat
 					if err == nil {
 						userData := saveIdToken(idToken)
 						access.SetUserData(userData)
-						log.Println("------------------> 808 id token ")
 						// Save the entity with it refresh token object.
 						accessEntity.SaveEntity()
 					}
@@ -845,15 +841,6 @@ func decodeIdToken(encoded string) (*IDToken, error) {
 	var val []byte
 	var err error
 
-	// Read the header part.
-	log.Println("843 decode:", strings.TrimSpace(parts[0]))
-	val, err = b64.RawStdEncoding.DecodeString(strings.TrimSpace(parts[0]))
-	if err != nil {
-		return nil, err
-	}
-	header := make(map[string]interface{}, 0)
-	json.Unmarshal(val, &header)
-
 	// Read the body part.
 	val, err = b64.RawStdEncoding.DecodeString(parts[1])
 	if err != nil {
@@ -862,22 +849,54 @@ func decodeIdToken(encoded string) (*IDToken, error) {
 
 	// I will initialyse the body from it data.
 	idToken := new(IDToken)
-	json.Unmarshal(val, idToken)
+	err = json.Unmarshal(val, idToken)
+	if err != nil {
+		return nil, err
+	}
 
-	return idToken, validateIdToken(idToken)
+	// Test if the token is expired.
+	if time.Unix(idToken.Expiration, 0).Before(time.Now()) {
+		return idToken, errors.New("The token is expired!")
+	}
+
+	// The issuer configuration address.
+	issuerConfigAddress := "https://" + idToken.Issuer + "/.well-known/openid-configuration"
+
+	return idToken, validateIdToken(encoded, issuerConfigAddress)
 }
 
 /**
  * That function is use to validate a token id.
  */
-func validateIdToken(idToken *IDToken) error {
-	// Test if the token is expired.
-	if time.Unix(idToken.Expiration, 0).Before(time.Now()) {
-		return errors.New("The token is expired!")
+func validateIdToken(tokenStr string, issuerConfigAddress string) error {
+
+	// The original values.
+	w := strings.Split(tokenStr, ".")
+
+	h_, s_ := w[0], w[2]
+
+	if m := len(h_) % 4; m != 0 {
+		h_ += strings.Repeat("=", 4-m)
+	}
+	if m := len(s_) % 4; m != 0 {
+		s_ += strings.Repeat("=", 4-m)
 	}
 
+	//extract kid from token header
+	var header interface{}
+	headerOauth, err := b64.URLEncoding.DecodeString(h_)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal([]byte(string(headerOauth)), &header)
+	if err != nil {
+		return err
+	}
+
+	kid := header.(map[string]interface{})["kid"]
+
 	// Now I will retreive the open-id configuration.
-	issuerConfigAddress := "http://" + idToken.Issuer + "/.well-known/openid-configuration"
 
 	// Retreive the issuer configuration.
 	client := &http.Client{}
@@ -914,7 +933,72 @@ func validateIdToken(idToken *IDToken) error {
 
 	// So now i got the isser configuration and it's public keys I can validate
 	// the id token.
-	log.Println("--------> public keys", pulbicKeys)
+	keys := pulbicKeys["keys"].([]interface{})
+	var publicKey map[string]interface{}
+	for i := 0; i < len(keys); i++ {
+		if keys[i].(map[string]interface{})["kid"].(string) == kid {
+			publicKey = keys[i].(map[string]interface{})
+			break
+		}
+	}
+
+	// If the public key dosent exist.
+	if publicKey == nil {
+		return errors.New("No public key with id " + kid.(string) + " was found!")
+	}
+
+	//build the google pub key
+	nStr := publicKey["n"].(string)
+	if m := len(nStr) % 4; m != 0 {
+		nStr += strings.Repeat("=", 4-m)
+	}
+
+	decN, err := b64.URLEncoding.DecodeString(nStr)
+	if err != nil {
+		return err
+	}
+
+	n := big.NewInt(0)
+	n.SetBytes(decN)
+	eStr := publicKey["e"].(string)
+	if m := len(eStr) % 4; m != 0 {
+		eStr += strings.Repeat("=", 4-m)
+	}
+
+	decE, err := b64.URLEncoding.DecodeString(eStr)
+	if err != nil {
+		return err
+	}
+
+	var eBytes []byte
+	if len(decE) < 8 {
+		eBytes = make([]byte, 8-len(decE), 8)
+		eBytes = append(eBytes, decE...)
+	} else {
+		eBytes = decE
+	}
+
+	eReader := bytes.NewReader(eBytes)
+	var e uint64
+	err = binary.Read(eReader, binary.BigEndian, &e)
+	if err != nil {
+		return err
+	}
+
+	pKey := rsa.PublicKey{N: n, E: int(e)}
+	//inblockOauth := base64.URLEncoding.DecodeString(w[1])
+	toHash := w[0] + "." + w[1]
+	digestOauth, err := b64.URLEncoding.DecodeString(s_)
+
+	hasherOauth := sha256.New()
+	hasherOauth.Write([]byte(toHash))
+
+	// verification of the signature
+	err = rsa.VerifyPKCS1v15(&pKey, crypto.SHA256, hasherOauth.Sum(nil), digestOauth)
+	if err != nil {
+		fmt.Printf("Error verifying key %s", err.Error())
+		return err
+	}
 
 	return nil
 
@@ -990,12 +1074,6 @@ func RetrieveToken(clientID, clientSecret, tokenURL string, v url.Values) (map[s
 		token["refresh_token"] = v.Get("refresh_token")
 	}
 
-	// TEST ONLY...
-	if token["id_token"] != nil {
-		// Test only...
-		decodeIdToken(token["id_token"].(string))
-	}
-
 	return token, nil
 }
 
@@ -1004,7 +1082,6 @@ func RetrieveToken(clientID, clientSecret, tokenURL string, v url.Values) (map[s
  * TODO interface http api call here...
  */
 func DownloadRessource(query string, accessToken string, tokenType string) (map[string]interface{}, error) {
-
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", query, nil)
 	req.Header.Add("Authorization", tokenType+" "+accessToken)
@@ -1031,7 +1108,6 @@ func DownloadRessource(query string, accessToken string, tokenType string) (map[
  * If the use is not logged...
  */
 func HandleAuthenticationPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, r *http.Request) bool {
-
 	r.ParseForm()
 	user := r.Form.Get("login")
 	pwd := r.Form.Get("password")
@@ -1080,7 +1156,6 @@ func HandleAuthenticationPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, 
  * Ask for Authorization.
  */
 func HandleAuthorizationPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, r *http.Request) bool {
-
 	// Here I will
 	r.ParseForm()
 	answer := r.FormValue("submitbutton")
@@ -1112,7 +1187,6 @@ func HandleAuthorizationPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, r
  * OAuth Authorization handler.
  */
 func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Authorize Handler")
 	server := GetServer().GetOAuth2Manager().m_server
 	if server == nil {
 		fmt.Printf("ERROR: %s\n", errors.New("no OAuth2 service configure!"))
@@ -1167,7 +1241,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		// The ID Token will be serialized and signed during the code for token exchange.
 		if scopes["openid"] {
 			config := GetServer().GetConfigurationManager().getServiceConfigurationById(GetServer().GetOAuth2Manager().getId())
-			issuer := "https://" + config.GetHostName() + ":" + strconv.Itoa(config.GetPort())
+			issuer := config.GetHostName() + ":" + strconv.Itoa(config.GetPort())
 
 			// These values would be tied to the end user authorizing the client.
 			now := time.Now()
@@ -1231,7 +1305,6 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
  * Access token endpoint
  */
 func TokenHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Token Handler")
 	server := GetServer().GetOAuth2Manager().m_server
 	if server == nil {
 		fmt.Printf("ERROR: %s\n", errors.New("no OAuth2 service configure!"))
@@ -1306,7 +1379,6 @@ func encodeIDToken(resp *osin.Response, idToken *IDToken, singer jose.Signer) {
  * Information endpoint
  */
 func InfoHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Info Handler")
 	server := GetServer().GetOAuth2Manager().m_server
 	if server == nil {
 		fmt.Printf("ERROR: %s\n", errors.New("no OAuth2 service configure!"))
@@ -1326,7 +1398,6 @@ func InfoHandler(w http.ResponseWriter, r *http.Request) {
  * This is the client redirect handler.
  */
 func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("App Auth Code Handler")
 	r.ParseForm()
 	errorCode := r.Form.Get("error")
 	state := r.Form.Get("state")
@@ -1355,10 +1426,10 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		accessDenied := NewErrorMessage(messageId, 1, errorDescription, errData, to)
 		GetServer().GetProcessor().m_incomingChannel <- accessDenied
 	} else {
-		log.Println("-----------------> line 1200")
 		access, err := createAccessToken("authorization_code", client, r.Form.Get("code"), "")
 		if err == nil {
 			log.Println("--------> create access grant response.", messageId)
+
 			// Send back the response to access request.
 			results := make([]*MessageData, 1)
 			data := new(MessageData)
@@ -1414,7 +1485,6 @@ func (s *OAuth2Store) Clone() osin.Storage {
  * Retrun a given client.
  */
 func (this *OAuth2Store) GetClient(id string) (osin.Client, error) {
-	log.Println("Get Client")
 	// From the list of registred client I will retreive the client
 	// with the given id.
 	clientEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", id)
@@ -1439,7 +1509,6 @@ func (this *OAuth2Store) GetClient(id string) (osin.Client, error) {
  * Set the client value.
  */
 func (this *OAuth2Store) SetClient(id string, client osin.Client) error {
-	log.Println("Set Client")
 	// The configuration.
 	configEntity := GetServer().GetConfigurationManager().getOAuthConfigurationEntity()
 
@@ -1453,7 +1522,6 @@ func (this *OAuth2Store) SetClient(id string, client osin.Client) error {
 	// append a new client.
 	GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_client", "Config.OAuth2Client", c.GetId(), c)
 
-	log.Println("Client with id ", id, " was save!")
 	return nil
 }
 
@@ -1461,7 +1529,6 @@ func (this *OAuth2Store) SetClient(id string, client osin.Client) error {
  * Save a given autorization.
  */
 func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
-	log.Println("Save Authorize")
 
 	// Get the config entity
 	configEntity := GetServer().GetConfigurationManager().getOAuthConfigurationEntity()
@@ -1498,7 +1565,6 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 
 	// Add expire data.
 	if err := addExpireAtData(data.Code, data.ExpireAt()); err != nil {
-		log.Println("Fail to create access data ", err)
 		return err
 	}
 
@@ -1510,7 +1576,6 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 // Optionally can return error if expired.
 func (this *OAuth2Store) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 
-	log.Println("Load Authorize", code)
 	authorizeEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Authorize", code)
 	if errObj != nil {
 		// No data was found.
@@ -1545,10 +1610,6 @@ func (this *OAuth2Store) LoadAuthorize(code string) (*osin.AuthorizeData, error)
 		return nil, errors.New("Token expired at " + data.ExpireAt().String())
 	}
 
-	log.Println("Load Authorize Data completed!")
-	log.Println("load authorize created at ", data.CreatedAt.String())
-	log.Println("load authorize expire at ", data.ExpireAt().String())
-
 	return data, nil
 
 }
@@ -1557,7 +1618,6 @@ func (this *OAuth2Store) LoadAuthorize(code string) (*osin.AuthorizeData, error)
  * Remove authorize from the db.
  */
 func (this *OAuth2Store) RemoveAuthorize(code string) error {
-	log.Println("Remove Authorize", code)
 	uuid := ConfigOAuth2AuthorizeExists(code)
 	if len(uuid) > 0 {
 		entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
@@ -1649,8 +1709,6 @@ func saveIdToken(data *IDToken) *Config.OAuth2IdToken {
  * Save the access Data.
  */
 func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
-	log.Println("Save Access")
-
 	configEntity := GetServer().GetConfigurationManager().getOAuthConfigurationEntity()
 	accessEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Access", data.AccessToken)
 	var access *Config.OAuth2Access
@@ -1711,7 +1769,6 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
 
 	// Add expire data.
 	if err := addExpireAtData(data.AccessToken, data.ExpireAt()); err != nil {
-		log.Println("Fail to create access data ", err)
 		return err
 	}
 
@@ -1742,7 +1799,6 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
  * Load the access for a given code.
  */
 func (this *OAuth2Store) LoadAccess(code string) (*osin.AccessData, error) {
-	log.Println("Load Access ", code)
 	accessEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Access", code)
 	if errObj != nil {
 		return nil, errors.New("No access found with code " + code)
@@ -1815,7 +1871,6 @@ func (this *OAuth2Store) LoadAccess(code string) (*osin.AccessData, error) {
  * Remove an access code.
  */
 func (this *OAuth2Store) RemoveAccess(code string) error {
-	log.Println("Remove Access ", code)
 	uuid := ConfigOAuth2AccessExists(code)
 	if len(uuid) > 0 {
 		entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
@@ -1835,8 +1890,6 @@ func (this *OAuth2Store) RemoveAccess(code string) error {
  * Load the access data from it refresh code.
  */
 func (this *OAuth2Store) LoadRefresh(code string) (*osin.AccessData, error) {
-	log.Println("Load Refresh ", code)
-
 	refreshEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Refresh", code)
 	if errObj != nil {
 		return nil, errors.New("Now refresh token found with code " + code)
@@ -1860,7 +1913,6 @@ func (this *OAuth2Store) LoadRefresh(code string) (*osin.AccessData, error) {
  * Remove refresh.
  */
 func (this *OAuth2Store) RemoveRefresh(code string) error {
-	log.Println("Remove Refresh ", code)
 	uuid := ConfigOAuth2RefreshExists(code)
 	if len(uuid) > 0 {
 		entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
