@@ -37,7 +37,7 @@ import (
 var (
 	// The manager.
 	oauth2Manager *OAuth2Manager
-	channels      map[string]chan string
+	channels      map[string]chan []string
 )
 
 // The ID Token represents a JWT passed to the client as part of the token response.
@@ -179,7 +179,7 @@ CKuHRG+AP579dncdUnOMvfXOtkdM4vk0+hWASBQzM9xzVcztCa+koAugjVaLS9A+
 		},
 	}
 
-	channels = make(map[string]chan string, 0)
+	channels = make(map[string]chan []string, 0)
 
 }
 
@@ -407,6 +407,7 @@ func PublicKeysHandler(w http.ResponseWriter, r *http.Request) {
  * will start an authorization process if nothing is found.
  */
 func (this *OAuth2Manager) GetResource(clientId string, scope string, query string, idTokenUuid string, accessUuid string, messageId string, sessionId string) interface{} {
+	log.Println("scope: ", scope)
 
 	var access *Config.OAuth2Access
 	// I will get the client...
@@ -423,15 +424,6 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 		// Get the config.
 		config := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetOauth2Configuration()
-
-		// The id token.
-		var idToken *Config.OAuth2IdToken
-		for i := 0; i < len(config.GetIds()); i++ {
-			if config.GetIds()[i].GetUUID() == idTokenUuid {
-				idToken = config.GetIds()[i]
-				break
-			}
-		}
 
 		// Get the accesses
 		accesses := config.GetAccess()
@@ -451,11 +443,9 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 					}
 				}
 				// If the access has the correct scope.
-				if hasScope {
-					if a.GetUserData().GetId() == idToken.GetId() {
-						// We found an access to the ressource!-)
-						access = a
-					}
+				if hasScope && a.M_userData == idTokenUuid {
+					// We found an access to the ressource!-)
+					access = a
 				}
 			}
 		}
@@ -492,7 +482,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 		// I will create the request and send it to the client...
 		msgId := Utility.RandomUUID()
-		authorizationLnk += "&state=" + msgId + ":" + sessionId + ":" + clientId + "&scope=" + scope + "&access_type=offline&approval_prompt=force"
+		authorizationLnk += "&state=" + msgId + ":" + sessionId + ":" + clientId + ":" + scope + "&scope=" + scope + "&access_type=offline&approval_prompt=force"
 		authorizationLnk += "&redirect_uri=" + client.GetRedirectUri()
 
 		// Here if there is no user logged for the given session I will send an authentication request.
@@ -512,14 +502,15 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 		var authorizationCode string
 		/** The authorize request **/
 		oauth2AuthorizeRqst, _ := NewRequestMessage(msgId, method, params, to,
-			func(done chan bool, accessUuid *string, authorizationCode *string) func(*message, interface{}) {
+			func(done chan bool, idTokenUuid *string, accessUuid *string, authorizationCode *string) func(*message, interface{}) {
 				return func(rspMsg *message, caller interface{}) {
 					// I will retreive the access uuid from the result.
 					results := rspMsg.msg.Rsp.GetResults()
-					if len(results) == 1 {
+					if len(results) == 2 {
 						if Utility.IsValidEntityReferenceName(string(results[0].GetDataBytes())) {
 							// In that case is the access uuid
 							*accessUuid = string(results[0].GetDataBytes())
+							*idTokenUuid = string(results[1].GetDataBytes())
 						} else {
 							// Here is the authorization code.
 							*authorizationCode = string(results[0].GetDataBytes())
@@ -527,7 +518,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 					}
 					done <- true
 				}
-			}(done, &accessUuid, &authorizationCode), nil,
+			}(done, &idTokenUuid, &accessUuid, &authorizationCode), nil,
 			func(done chan bool) func(*message, interface{}) {
 				return func(rspMsg *message, caller interface{}) {
 					done <- false
@@ -543,7 +534,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 		// Wait for success or error...
 		closeAuthorizeDialog := func() {
 			var method string
-			method = "OAuth2AuthorizationEnd"
+			method = "closeAuthorizeDialog"
 			params := make([]*MessageData, 0)
 			to := make([]connection, 1)
 			to[0] = GetServer().getConnectionById(sessionId)
@@ -556,6 +547,24 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 		// That function finalyse the access and close the issuer window
 		// and save the idTokenUuid on the client side.
+		finalyseAuthorize := func(idTokenUuid string) {
+			var method string
+			method = "finalyseAuthorize"
+			params := make([]*MessageData, 1)
+
+			// Put the id token uuid.
+			params[0] = new(MessageData)
+			params[0].Name = "idTokenUuid"
+			params[0].Value = idTokenUuid
+
+			to := make([]connection, 1)
+			to[0] = GetServer().getConnectionById(sessionId)
+			oauth2AuthorizeEnd, err := NewRequestMessage(Utility.RandomUUID(), method, params, to, nil, nil, nil)
+			if err == nil {
+				// Send the request.
+				GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AuthorizeEnd
+			}
+		}
 
 		// Wait for authorization
 		if <-done {
@@ -565,25 +574,25 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 				log.Println("-----------> Ask for access")
 
 				// That channel will contain the accessUuid
-				channels[messageId] = make(chan string)
-
+				channels[messageId] = make(chan []string)
 				var resp http.ResponseWriter
 				rqst := new(http.Request)
 				rqst.URL.Parse(client.GetRedirectUri())
 				rqst.Form = make(url.Values)
-				rqst.Form.Add("state", messageId+":"+sessionId+":"+client.GetId())
+				rqst.Form.Add("state", messageId+":"+sessionId+":"+client.GetId()+":"+scope)
 				rqst.Form.Add("code", authorizationCode)
 				go AppAuthCodeHandler(resp, rqst)
 
 				log.Println("------> wait for channel ", messageId)
 				// Wait for the response from AppAuthCodeHandler.
-				accessUuid = <-channels[messageId]
+				values := <-channels[messageId]
 
 				// wait for access...
-				if len(accessUuid) > 0 {
+				if len(values) > 0 {
 					// Recal the method with the grant access uuid...
 					log.Println("590 -----------> access accept ", accessUuid)
-					return this.GetResource(clientId, scope, query, idTokenUuid, accessUuid, messageId, sessionId)
+					finalyseAuthorize(values[0])
+					return this.GetResource(clientId, scope, query, values[0], values[1], messageId, sessionId)
 				} else {
 					log.Println("594 -----------> access refuse")
 					errObj := NewError(Utility.FileLine(), ACCESS_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("Access denied to get resource with scope "+scope+" for client with id "+clientId))
@@ -596,6 +605,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 			} else {
 				// Recal the method with the grant access uuid...
 				log.Println("604 -----------> access accept")
+				finalyseAuthorize(idTokenUuid)
 				return this.GetResource(clientId, scope, query, idTokenUuid, accessUuid, messageId, sessionId)
 			}
 
@@ -644,7 +654,7 @@ func clearCodeExpired(code string) {
 }
 
 /**
- * Use a timer to execute clearExpiredCode when it can at end...
+ * Use a timer to execute clearExpiredCode when it came at end...
  */
 func setCodeExpiration(code string, duration time.Duration) {
 	// Create a closure and wrap the code.
@@ -656,7 +666,8 @@ func setCodeExpiration(code string, duration time.Duration) {
 			if errObj == nil {
 				access := entity.GetObject().(*Config.OAuth2Access)
 				if access.GetRefreshToken() != nil {
-					createAccessToken("refresh_token", access.GetClient(), access.GetAuthorize(), access.GetRefreshToken().GetId())
+					createAccessToken("refresh_token", access.GetClient(), access.GetAuthorize(), access.GetRefreshToken().GetId(), access.GetScope())
+
 				}
 			}
 
@@ -705,7 +716,7 @@ func addExpireAtData(code string, expireAt time.Time) error {
 /**
  * Create Access token from refresh_token or authorization_code.
  */
-func createAccessToken(grantType string, client *Config.OAuth2Client, authorizationCode string, refreshToken string) (*Config.OAuth2Access, error) {
+func createAccessToken(grantType string, client *Config.OAuth2Client, authorizationCode string, refreshToken string, scope string) (*Config.OAuth2Access, error) {
 
 	// The map that will contain the results
 	jr := make(map[string]interface{})
@@ -750,10 +761,9 @@ func createAccessToken(grantType string, client *Config.OAuth2Client, authorizat
 				access.SetCreatedAt(time.Now().Unix())
 				// Set the expiration delay.
 				access.SetExpiresIn(int64(jr["expires_in"].(float64)))
+
 				// Set it scope.
-				if jr["scope"] != nil {
-					access.SetScope(jr["scope"].(string))
-				}
+				access.SetScope(scope)
 
 				/**
 				// Set the custom parameters in the extra field.
@@ -1115,7 +1125,7 @@ func HandleAuthenticationPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, 
 
 	var sessionId string
 	var messageId string
-	if len(strings.Split(state, ":")) == 3 {
+	if len(strings.Split(state, ":")) == 4 {
 		messageId = strings.Split(state, ":")[0]
 		sessionId = strings.Split(state, ":")[1]
 	}
@@ -1201,7 +1211,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		state := r.URL.Query()["state"][0]
 		var sessionId string
 		var messageId string
-		if len(strings.Split(state, ":")) == 3 {
+		if len(strings.Split(state, ":")) == 4 {
 			messageId = strings.Split(state, ":")[0]
 			sessionId = strings.Split(state, ":")[1]
 		}
@@ -1406,10 +1416,13 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 	var clientId string
 	var sessionId string
 	var messageId string
-	if len(strings.Split(state, ":")) == 3 {
+	var scope string
+
+	if len(strings.Split(state, ":")) == 4 {
 		messageId = strings.Split(state, ":")[0]
 		sessionId = strings.Split(state, ":")[1]
 		clientId = strings.Split(state, ":")[2]
+		scope = strings.Split(state, ":")[3]
 	}
 
 	// I will get a reference to the client who generate the request.
@@ -1426,21 +1439,40 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		accessDenied := NewErrorMessage(messageId, 1, errorDescription, errData, to)
 		GetServer().GetProcessor().m_incomingChannel <- accessDenied
 	} else {
-		access, err := createAccessToken("authorization_code", client, r.Form.Get("code"), "")
+		access, err := createAccessToken("authorization_code", client, r.Form.Get("code"), "", scope)
 		if err == nil {
 			log.Println("--------> create access grant response.", messageId)
+			var idTokenUuid string
+			if access.GetUserData() != nil {
+				idTokenUuid = access.GetUserData().GetUUID()
+			}
 
 			// Send back the response to access request.
-			results := make([]*MessageData, 1)
-			data := new(MessageData)
-			data.Name = "accessUuid"
-			data.Value = access.GetUUID()
-			results[0] = data
-			to := make([]connection, 1)
+			results := make([]*MessageData, 2)
+			// The access uuid
+			data0 := new(MessageData)
+			data0.Name = "accessUuid"
+			data0.Value = access.GetUUID()
+			results[0] = data0
+
+			// The id token uuid.
+			data1 := new(MessageData)
+			data1.Name = "idTokenUuid"
+			data1.Value = idTokenUuid
+			results[1] = data1
+
+			to := make([]connection, 2)
 			to[0] = GetServer().getConnectionById(sessionId)
 			accessGrantResp, _ := NewResponseMessage(messageId, results, to)
 			GetServer().GetProcessor().m_incomingChannel <- accessGrantResp
-			channels[messageId] <- access.GetUUID()
+
+			// Set the values inside a string array and send it over channel.
+			values := make([]string, 2)
+			values[0] = idTokenUuid
+			values[1] = access.GetUUID()
+
+			channels[messageId] <- values
+
 		} else {
 			// send error
 			log.Println("--------> access error: ", err)
@@ -1449,7 +1481,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 			var errData []byte
 			accessDenied := NewErrorMessage(messageId, 1, err.Error(), errData, to)
 			GetServer().GetProcessor().m_incomingChannel <- accessDenied
-			channels[messageId] <- "" // deblock the channel...
+			channels[messageId] <- make([]string, 0) // deblock the channel...
 		}
 	}
 

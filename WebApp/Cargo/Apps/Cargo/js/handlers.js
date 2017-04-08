@@ -450,7 +450,7 @@ Request.prototype.process = function () {
                     lnk.element.innerHTML = "Google authentication"
                 } else if (href.startsWith("https://www.facebook.com/dialog/oauth")) {
                     lnk.element.innerHTML = "Facebook authentication"
-                } else{
+                } else {
                     lnk.element.innerHTML = "OAuth2 authentication"
                 }
 
@@ -458,7 +458,8 @@ Request.prototype.process = function () {
 
                 lnk.element.onclick = function (href) {
                     return function () {
-                        window.open(href, '_blank');
+                        // Set the window...
+                        w = window.open(href, '_blank');
                     }
                 } (href)
             } else {
@@ -471,13 +472,21 @@ Request.prototype.process = function () {
             }
         }
         oauth2Dialog.setCentered()
-    } else if (this.method == "OAuth2AuthorizationEnd") {
+    } else if (this.method == "closeAuthorizeDialog") {
         // Here I will simply destroy the oauth2 Dialog
         oauth2Dialog.close()
         delete oauth2Dialog
         // Send an empty response, the information will be sent via a form inside the content.
         var response = new Response(this.id, this.conn, [], null, null, null);
         response.send()
+    } else if (this.method == "finalyseAuthorize") {
+
+        var idTokenUuid = this.paramsMap["idTokenUuid"]
+        // So here I will store the idTokenUuid in the local storage and close the issuer window.
+        localStorage.setItem("idTokenUuid", idTokenUuid)
+        w.close()
+        // remove the w ref.
+        w = null
     }
 
     // Now I will create the function prototype and try to call it.

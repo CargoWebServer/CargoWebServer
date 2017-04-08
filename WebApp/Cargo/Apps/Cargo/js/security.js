@@ -353,11 +353,11 @@ SecurityManager.prototype.changeAdminPassword = function (pwd, newPwd, successCa
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// OAuth2 Ressource access... The client must be configure first to be able to get access to ressources.
+// OAuth2 Ressource access... The client must be configure first to be able to get access to resources.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function GetResource(clientId, scope, query, accountUuid){
+function GetResource(clientId, scope, query, idTokenUuid){
     var accessUuid = "" // not know by the client side.
-    var result = server.GetOAuth2Manager().GetResource(clientId,scope, query, accountUuid, accessUuid, messageId, sessionId)
+    var result = server.GetOAuth2Manager().GetResource(clientId,scope, query, idTokenUuid, accessUuid, messageId, sessionId)
     return result
 }
 
@@ -370,16 +370,16 @@ function GetResource(clientId, scope, query, accountUuid){
 SecurityManager.prototype.getResource = function (clientId, scope, query, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     // Account uuid are set and reset at the time of login and logout respectively.
-    var accountUuid = ""
-    if(localStorage.getItem("accountUuid") != undefined){
-        accountUuid = localStorage.getItem("accountUuid")
+    var idTokenUuid = ""
+    if(localStorage.getItem("idTokenUuid") != undefined){
+        idTokenUuid = localStorage.getItem("idTokenUuid")
     }
 
     var params = []
     params.push(createRpcData(clientId, "STRING", "clientId"))
     params.push(createRpcData(scope, "STRING", "scope"))
     params.push(createRpcData(query, "STRING", "query"))
-    params.push(createRpcData(accountUuid, "STRING", "accountUuid"))
+    params.push(createRpcData(idTokenUuid, "STRING", "idTokenUuid"))
 
     // Call it on the server.
     server.executeJsFunction(
