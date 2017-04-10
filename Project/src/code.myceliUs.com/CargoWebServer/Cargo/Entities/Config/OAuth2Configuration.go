@@ -31,6 +31,7 @@ type OAuth2Configuration struct{
 	M_allowClientSecretInParams bool
 	M_allowGetAccessRequest bool
 	M_redirectUriSeparator string
+	M_privateKey string
 	M_allowedAuthorizeTypes []string
 	M_allowedAccessTypes []string
 	M_clients []*OAuth2Client
@@ -62,6 +63,7 @@ type XsdOAuth2Configuration struct {
 	M_allowGetAccessRequest	bool	`xml:"allowGetAccessRequest,attr"`
 	M_requirePKCEForPublicClients	bool	`xml:"requirePKCEForPublicClients,attr"`
 	M_redirectUriSeparator	string	`xml:"redirectUriSeparator,attr"`
+	M_privateKey	string	`xml:"privateKey,attr"`
 
 }
 /** UUID **/
@@ -172,6 +174,19 @@ func (this *OAuth2Configuration) SetRedirectUriSeparator(ref interface{}){
 }
 
 /** Remove reference RedirectUriSeparator **/
+
+/** PrivateKey **/
+func (this *OAuth2Configuration) GetPrivateKey() string{
+	return this.M_privateKey
+}
+
+/** Init reference PrivateKey **/
+func (this *OAuth2Configuration) SetPrivateKey(ref interface{}){
+	this.NeedSave = true
+	this.M_privateKey = ref.(string)
+}
+
+/** Remove reference PrivateKey **/
 
 /** AllowedAuthorizeTypes **/
 func (this *OAuth2Configuration) GetAllowedAuthorizeTypes() []string{

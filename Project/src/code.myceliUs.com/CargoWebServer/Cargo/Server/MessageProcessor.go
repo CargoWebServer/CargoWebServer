@@ -466,10 +466,11 @@ func (this *MessageProcessor) processIncomming(m *message) {
 		// An error was encounter by the client.
 		// here error was received.
 		rqst := this.getPendingRequestById(msg.Err.GetId())
-		if rqst.errorCallback != nil {
-			rqst.errorCallback(m, rqst.caller)
+		if rqst != nil {
+			if rqst.errorCallback != nil {
+				rqst.errorCallback(m, rqst.caller)
+			}
 		}
-
 	} else if *msg.Type == Message_EVENT {
 
 		// When the client throw an event this is the place where

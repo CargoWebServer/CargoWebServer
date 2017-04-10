@@ -7,6 +7,7 @@ package Server
 import (
 	"bytes"
 	"crypto"
+	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
@@ -23,6 +24,7 @@ import (
 	"mime"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -101,6 +103,26 @@ func newOAuth2Manager() *OAuth2Manager {
 	return oauth2Manager
 }
 
+func savePEMKey(fileName string, key *rsa.PrivateKey) error {
+	outFile, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer outFile.Close()
+
+	var privateKey = &pem.Block{
+		Type:  "PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(key),
+	}
+
+	err = pem.Encode(outFile, privateKey)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Service functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -115,69 +137,6 @@ func (this *OAuth2Manager) initialize() {
 
 	// Create the default configurations
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
-
-	privateKeyBytes := []byte(
-		`-----BEGIN RSA PRIVATE KEY-----
-MIIEowIBAAKCAQEA4f5wg5l2hKsTeNem/V41fGnJm6gOdrj8ym3rFkEU/wT8RDtn
-SgFEZOQpHEgQ7JL38xUfU0Y3g6aYw9QT0hJ7mCpz9Er5qLaMXJwZxzHzAahlfA0i
-cqabvJOMvQtzD6uQv6wPEyZtDTWiQi9AXwBpHssPnpYGIn20ZZuNlX2BrClciHhC
-PUIIZOQn/MmqTD31jSyjoQoV7MhhMTATKJx2XrHhR+1DcKJzQBSTAGnpYVaqpsAR
-ap+nwRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKA
-Rdpd9AjQW5SIVPfdsz5B6GlYQ5LdYKtznTuy7wIDAQABAoIBAQCwia1k7+2oZ2d3
-n6agCAbqIE1QXfCmh41ZqJHbOY3oRQG3X1wpcGH4Gk+O+zDVTV2JszdcOt7E5dAy
-MaomETAhRxB7hlIOnEN7WKm+dGNrKRvV0wDU5ReFMRHg31/Lnu8c+5BvGjZX+ky9
-POIhFFYJqwCRlopGSUIxmVj5rSgtzk3iWOQXr+ah1bjEXvlxDOWkHN6YfpV5ThdE
-KdBIPGEVqa63r9n2h+qazKrtiRqJqGnOrHzOECYbRFYhexsNFz7YT02xdfSHn7gM
-IvabDDP/Qp0PjE1jdouiMaFHYnLBbgvlnZW9yuVf/rpXTUq/njxIXMmvmEyyvSDn
-FcFikB8pAoGBAPF77hK4m3/rdGT7X8a/gwvZ2R121aBcdPwEaUhvj/36dx596zvY
-mEOjrWfZhF083/nYWE2kVquj2wjs+otCLfifEEgXcVPTnEOPO9Zg3uNSL0nNQghj
-FuD3iGLTUBCtM66oTe0jLSslHe8gLGEQqyMzHOzYxNqibxcOZIe8Qt0NAoGBAO+U
-I5+XWjWEgDmvyC3TrOSf/KCGjtu0TSv30ipv27bDLMrpvPmD/5lpptTFwcxvVhCs
-2b+chCjlghFSWFbBULBrfci2FtliClOVMYrlNBdUSJhf3aYSG2Doe6Bgt1n2CpNn
-/iu37Y3NfemZBJA7hNl4dYe+f+uzM87cdQ214+jrAoGAXA0XxX8ll2+ToOLJsaNT
-OvNB9h9Uc5qK5X5w+7G7O998BN2PC/MWp8H+2fVqpXgNENpNXttkRm1hk1dych86
-EunfdPuqsX+as44oCyJGFHVBnWpm33eWQw9YqANRI+pCJzP08I5WK3osnPiwshd+
-hR54yjgfYhBFNI7B95PmEQkCgYBzFSz7h1+s34Ycr8SvxsOBWxymG5zaCsUbPsL0
-4aCgLScCHb9J+E86aVbbVFdglYa5Id7DPTL61ixhl7WZjujspeXZGSbmq0Kcnckb
-mDgqkLECiOJW2NHP/j0McAkDLL4tysF8TLDO8gvuvzNC+WQ6drO2ThrypLVZQ+ry
-eBIPmwKBgEZxhqa0gVvHQG/7Od69KWj4eJP28kq13RhKay8JOoN0vPmspXJo1HY3
-CKuHRG+AP579dncdUnOMvfXOtkdM4vk0+hWASBQzM9xzVcztCa+koAugjVaLS9A+
-9uQoqEeVNTckxx0S2bYevRy7hGQmUJTyQm3j1zEUR5jpdbL83Fbq
------END RSA PRIVATE KEY-----`)
-
-	// Load signing key.
-	block, _ := pem.Decode(privateKeyBytes)
-	if block == nil {
-		log.Fatalf("no private key found")
-	}
-
-	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		log.Fatalf("failed to parse key: %v", err)
-	}
-
-	// Configure jwtSigner and public keys.
-	privateKey := &jose.JsonWebKey{
-		Key:       key,
-		Algorithm: "RS256",
-		Use:       "sig",
-		KeyID:     "1", // KeyID should use the key thumbprint.
-	}
-
-	this.m_jwtSigner, err = jose.NewSigner(jose.RS256, privateKey)
-	if err != nil {
-		log.Fatalf("failed to create jwtSigner: %v", err)
-	}
-
-	this.m_publicKeys = &jose.JsonWebKeySet{
-		Keys: []jose.JsonWebKey{
-			jose.JsonWebKey{Key: &key.PublicKey,
-				Algorithm: "RS256",
-				Use:       "sig",
-				KeyID:     "1",
-			},
-		},
-	}
 
 	channels = make(map[string]chan []string, 0)
 
@@ -206,7 +165,7 @@ func (this *OAuth2Manager) start() {
 		sconfig.AllowClientSecretInParams = true
 
 		// Save it into the entity.
-		cfg := new(Config.OAuth2Configuration)
+		cfg = new(Config.OAuth2Configuration)
 		cfg.SetId("OAuth2Config")
 		cfg.SetAccessExpiration(int64(sconfig.AccessExpiration))
 		cfg.SetAllowClientSecretInParams(sconfig.AllowClientSecretInParams)
@@ -240,6 +199,21 @@ func (this *OAuth2Manager) start() {
 		cfg.SetErrorStatusCode(sconfig.ErrorStatusCode)
 		cfg.SetRedirectUriSeparator(sconfig.RedirectUriSeparator)
 		cfg.SetTokenType(sconfig.TokenType)
+
+		// Now the key.
+		reader := rand.Reader
+		bitSize := 2048
+
+		key, err := rsa.GenerateKey(reader, bitSize)
+
+		// The file name will be a random number.
+		fileName := Utility.RandomUUID()
+
+		if err == nil {
+			savePEMKey(GetServer().GetConfigurationManager().GetDataPath()+"/Config/"+fileName+".pem", key)
+		}
+
+		cfg.SetPrivateKey(fileName)
 
 		// Create the new configuration entity.
 		GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_oauth2Configuration", "Config.OAuth2Configuration", cfg.GetId(), cfg)
@@ -282,6 +256,42 @@ func (this *OAuth2Manager) start() {
 
 		// Cleanup
 		this.cleanup()
+	}
+
+	// Load signing key.
+	b, _ := ioutil.ReadFile(GetServer().GetConfigurationManager().GetDataPath() + "/Config/" + cfg.GetPrivateKey() + ".pem")
+	block, _ := pem.Decode(b)
+
+	if block == nil {
+		log.Fatalf("no private key found")
+	}
+
+	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		log.Fatalf("failed to parse key: %v", err)
+	}
+
+	// Configure jwtSigner and public keys.
+	privateKey := &jose.JsonWebKey{
+		Key:       key,
+		Algorithm: "RS256",
+		Use:       "sig",
+		KeyID:     "1", // KeyID should use the key thumbprint.
+	}
+
+	this.m_jwtSigner, err = jose.NewSigner(jose.RS256, privateKey)
+	if err != nil {
+		log.Fatalf("failed to create jwtSigner: %v", err)
+	}
+
+	this.m_publicKeys = &jose.JsonWebKeySet{
+		Keys: []jose.JsonWebKey{
+			jose.JsonWebKey{Key: &key.PublicKey,
+				Algorithm: "RS256",
+				Use:       "sig",
+				KeyID:     "1",
+			},
+		},
 	}
 
 	// Start the oauth service.
@@ -418,7 +428,6 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 	}
 
 	client := clientEntity.GetObject().(*Config.OAuth2Client)
-
 	if len(accessUuid) == 0 && len(idTokenUuid) > 0 {
 		// Try to find the access...
 
@@ -449,7 +458,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 				}
 			}
 		}
-	} else {
+	} else if len(accessUuid) > 0 {
 		// Here the accessUuid is given so I will use it to get ressources.
 		entity, err := GetServer().GetEntityManager().getEntityByUuid(accessUuid)
 		if err == nil {
@@ -574,18 +583,11 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 				log.Println("-----------> Ask for access")
 
 				// That channel will contain the accessUuid
-				channels[messageId] = make(chan []string)
-				var resp http.ResponseWriter
-				rqst := new(http.Request)
-				rqst.URL.Parse(client.GetRedirectUri())
-				rqst.Form = make(url.Values)
-				rqst.Form.Add("state", messageId+":"+sessionId+":"+client.GetId()+":"+scope)
-				rqst.Form.Add("code", authorizationCode)
-				go AppAuthCodeHandler(resp, rqst)
+				channels[msgId] = make(chan []string)
 
-				log.Println("------> wait for channel ", messageId)
+				log.Println("------> wait for channel ", msgId)
 				// Wait for the response from AppAuthCodeHandler.
-				values := <-channels[messageId]
+				values := <-channels[msgId]
 
 				// wait for access...
 				if len(values) > 0 {
@@ -600,7 +602,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 					return nil
 				}
 
-				delete(channels, messageId)
+				delete(channels, msgId)
 
 			} else {
 				// Recal the method with the grant access uuid...
@@ -797,9 +799,13 @@ func createAccessToken(grantType string, client *Config.OAuth2Client, authorizat
 
 				// Now the refresh token if there some.
 				if jr["refresh_token"] != nil {
+					refreshToken = jr["refresh_token"].(string)
+				}
+
+				if len(refreshToken) > 0 {
 					// Here I will create the refresh token.
 					refresh := new(Config.OAuth2Refresh)
-					refresh.SetId(jr["refresh_token"].(string))
+					refresh.SetId(refreshToken)
 					refresh.SetAccess(access)
 
 					// Set into it parent.
@@ -996,7 +1002,6 @@ func validateIdToken(tokenStr string, issuerConfigAddress string) error {
 	}
 
 	pKey := rsa.PublicKey{N: n, E: int(e)}
-	//inblockOauth := base64.URLEncoding.DecodeString(w[1])
 	toHash := w[0] + "." + w[1]
 	digestOauth, err := b64.URLEncoding.DecodeString(s_)
 
@@ -1211,10 +1216,15 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		state := r.URL.Query()["state"][0]
 		var sessionId string
 		var messageId string
+		var clientId string
 		if len(strings.Split(state, ":")) == 4 {
 			messageId = strings.Split(state, ":")[0]
 			sessionId = strings.Split(state, ":")[1]
+			clientId = strings.Split(state, ":")[2]
 		}
+
+		clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", clientId)
+		client := clientEntity.GetObject().(*Config.OAuth2Client)
 
 		if !HandleAuthenticationPage(ar, w, r) {
 			return
@@ -1227,6 +1237,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			} else {
 				// In that case the user refuse the authorization.
 				ar.Authorized = false
+				ar.RedirectUri = client.GetRedirectUri()
 				server.FinishAuthorizeRequest(resp, r, ar)
 
 				// Here I will create an error message...
@@ -1291,6 +1302,8 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 
 		// The user give the authorization.
 		ar.Authorized = true
+		ar.RedirectUri = client.GetRedirectUri()
+		log.Println("=--------------------> redirect uri", ar.RedirectUri)
 		server.FinishAuthorizeRequest(resp, r, ar)
 
 		// Here I will create a response for the authorization.
@@ -1439,7 +1452,9 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		accessDenied := NewErrorMessage(messageId, 1, errorDescription, errData, to)
 		GetServer().GetProcessor().m_incomingChannel <- accessDenied
 	} else {
+
 		access, err := createAccessToken("authorization_code", client, r.Form.Get("code"), "", scope)
+
 		if err == nil {
 			log.Println("--------> create access grant response.", messageId)
 			var idTokenUuid string

@@ -484,9 +484,11 @@ Request.prototype.process = function () {
         var idTokenUuid = this.paramsMap["idTokenUuid"]
         // So here I will store the idTokenUuid in the local storage and close the issuer window.
         localStorage.setItem("idTokenUuid", idTokenUuid)
-        w.close()
-        // remove the w ref.
-        w = null
+        if (w != undefined) {
+            w.close()
+            // remove the w ref.
+            w = null
+        }
     }
 
     // Now I will create the function prototype and try to call it.

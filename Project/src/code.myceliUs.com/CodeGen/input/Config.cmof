@@ -287,6 +287,9 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="redirectUriSeparator" name="redirectUriSeparator">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="privateKey" name="privateKey">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="allowedAuthorizeTypes" name="allowedAuthorizeTypes" lower="0" upper="*">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>

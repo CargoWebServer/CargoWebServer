@@ -17,13 +17,13 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "uuid")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "uuid")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -6346,50 +6346,54 @@ func (this *EntityManager) create_Config_OAuth2ConfigurationEntityPrototype() {
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.string")
 	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 10)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
-	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_allowedAuthorizeTypes")
-	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]xs.string")
+	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_privateKey")
+	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.string")
 	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 11)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
-	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_allowedAccessTypes")
+	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_allowedAuthorizeTypes")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]xs.string")
 	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 12)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
+	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_allowedAccessTypes")
+	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]xs.string")
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 13)
+	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_clients")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Client")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 13)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 14)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_authorize")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Authorize")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 14)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 15)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_access")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Access")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 15)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 16)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_ids")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2IdToken")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 16)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 17)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_refresh")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Refresh")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 17)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 18)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_expire")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Expires")
 
 	/** associations of OAuth2Configuration **/
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 18)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 19)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_parentPtr")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "childsUuid")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]xs.string")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 19)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 20)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
 
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "referenced")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]EntityRef")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 20)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 21)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
@@ -6425,6 +6429,7 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_allowClientSecretInParams")
 	query.Fields = append(query.Fields, "M_allowGetAccessRequest")
 	query.Fields = append(query.Fields, "M_redirectUriSeparator")
+	query.Fields = append(query.Fields, "M_privateKey")
 	query.Fields = append(query.Fields, "M_allowedAuthorizeTypes")
 	query.Fields = append(query.Fields, "M_allowedAccessTypes")
 	query.Fields = append(query.Fields, "M_clients")
@@ -6459,6 +6464,7 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.object.M_allowClientSecretInParams)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.object.M_allowGetAccessRequest)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.object.M_redirectUriSeparator)
+	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.object.M_privateKey)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.object.M_allowedAuthorizeTypes)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.object.M_allowedAccessTypes)
 
@@ -6611,6 +6617,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 	query.Fields = append(query.Fields, "M_allowClientSecretInParams")
 	query.Fields = append(query.Fields, "M_allowGetAccessRequest")
 	query.Fields = append(query.Fields, "M_redirectUriSeparator")
+	query.Fields = append(query.Fields, "M_privateKey")
 	query.Fields = append(query.Fields, "M_allowedAuthorizeTypes")
 	query.Fields = append(query.Fields, "M_allowedAccessTypes")
 	query.Fields = append(query.Fields, "M_clients")
@@ -6691,19 +6698,24 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 			this.object.M_redirectUriSeparator = results[0][9].(string)
 		}
 
-		/** allowedAuthorizeTypes **/
+		/** privateKey **/
 		if results[0][10] != nil {
-			this.object.M_allowedAuthorizeTypes = append(this.object.M_allowedAuthorizeTypes, results[0][10].([]string)...)
+			this.object.M_privateKey = results[0][10].(string)
+		}
+
+		/** allowedAuthorizeTypes **/
+		if results[0][11] != nil {
+			this.object.M_allowedAuthorizeTypes = append(this.object.M_allowedAuthorizeTypes, results[0][11].([]string)...)
 		}
 
 		/** allowedAccessTypes **/
-		if results[0][11] != nil {
-			this.object.M_allowedAccessTypes = append(this.object.M_allowedAccessTypes, results[0][11].([]string)...)
+		if results[0][12] != nil {
+			this.object.M_allowedAccessTypes = append(this.object.M_allowedAccessTypes, results[0][12].([]string)...)
 		}
 
 		/** clients **/
-		if results[0][12] != nil {
-			uuidsStr := results[0][12].(string)
+		if results[0][13] != nil {
+			uuidsStr := results[0][13].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -6726,8 +6738,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 		}
 
 		/** authorize **/
-		if results[0][13] != nil {
-			uuidsStr := results[0][13].(string)
+		if results[0][14] != nil {
+			uuidsStr := results[0][14].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -6750,8 +6762,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 		}
 
 		/** access **/
-		if results[0][14] != nil {
-			uuidsStr := results[0][14].(string)
+		if results[0][15] != nil {
+			uuidsStr := results[0][15].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -6774,8 +6786,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 		}
 
 		/** ids **/
-		if results[0][15] != nil {
-			uuidsStr := results[0][15].(string)
+		if results[0][16] != nil {
+			uuidsStr := results[0][16].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -6798,8 +6810,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 		}
 
 		/** refresh **/
-		if results[0][16] != nil {
-			uuidsStr := results[0][16].(string)
+		if results[0][17] != nil {
+			uuidsStr := results[0][17].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -6822,8 +6834,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 		}
 
 		/** expire **/
-		if results[0][17] != nil {
-			uuidsStr := results[0][17].(string)
+		if results[0][18] != nil {
+			uuidsStr := results[0][18].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -6848,8 +6860,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 		/** associations of OAuth2Configuration **/
 
 		/** parentPtr **/
-		if results[0][18] != nil {
-			id := results[0][18].(string)
+		if results[0][19] != nil {
+			id := results[0][19].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -6857,7 +6869,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][19].(string)
+		childsUuidStr := results[0][20].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -6866,7 +6878,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 			}
 		}
 
-		referencedStr := results[0][20].(string)
+		referencedStr := results[0][21].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
