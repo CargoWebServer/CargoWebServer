@@ -10,7 +10,9 @@ var languageInfo = {
 
 // Depending of the language the correct text will be set.
 server.languageManager.appendLanguageInfo(languageInfo)
-// server.languageManager.setLanguage("fr")
+
+// TODO create la language bar.
+server.languageManager.setLanguage("en")
 
 // This is the body that will be use by all other panel.
 var bodyElement = new Element(document.getElementsByTagName("body")[0], {"tag":"div", "style":"width: 100%; height: 100%;"})

@@ -15,7 +15,14 @@ var BlogManager = function (parent) {
             "about-lnk": "about",
             "create-lnk": "New blog",
             "contact-lnk": "Contact",
-            "login-btn": "login",
+            "login-lnk": "login",
+            "login-header": "Log In",
+            "login-form-username-lbl":"Username",
+            "login-form-password-lbl":"Password",
+            "remember-login-form-lbl":" Remember Me",
+            "forgot-password-id" :"Forgot Password?",
+            "login-submit":"Log In",
+            "register-lnk": "register",
             "blog-search-title": "Blog Search",
             "blog-categories": "Blog Categories",
             "side-well-widget": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore, perspiciatis adipisci accusamus laudantium odit aliquam repellat tempore quos aspernatur vero.",
@@ -92,13 +99,41 @@ var BlogManager = function (parent) {
         .appendElement({ "tag": "a", "id": "create-lnk", "href": "#" }).up()
         .appendElement({ "tag": "li" }).down()
         .appendElement({ "tag": "a", "id": "about-lnk", "href": "#" }).up().up()
-        // Now the login input...
-        .appendElement({ "tag": "div", "id": "signin", "class": "navbar-form navbar-right" }).down()
-        .appendElement({ "tag": "div", "class": "input-group" }).down()
-        .appendElement({ "tag": "span", "class": "input-group-addon" }).down()
-        .appendElement({ "tag": "i", "class": "fa fa-user" }).up()
-        .appendElement({ "tag": "input", "id": "email-id", "class": "form-control", "name": "email", "placeholder": "Email Adrress" }).up()
-        .appendElement({ "tag": "button", "type": "submit", "class": "btn btn-primary", "id": "login-btn" })
+        .appendElement({ "tag": "ul", "class": "nav navbar-nav navbar-right" }).down()
+        .appendElement({ "tag": "li" }).down()
+        // The register link.
+        .appendElement({ "tag": "a", "id": "register-lnk", "href": "#" }).up()
+        .appendElement({ "tag": "li", "class": "dropdown open" }).down()
+        // Now the login dialog...
+        .appendElement({ "tag": "a", "id": "login-lnk", "href": "#" })
+        .appendElement({"tag":"ul", "class":"dropdown-menu dropdown-lr animated slideInRight", "role":"menu", "style":"min-width: 300px;"}).down()
+        .appendElement({ "tag": "div", "class": "col-lg-12" }).down()
+        .appendElement({ "tag": "div", "class": "text-center" }).down()
+        .appendElement({ "tag": "h3", "id": "login-header" }).up()
+        .appendElement({ "tag": "form"}).down()
+        // The user name
+        .appendElement({"tag":"div", "class":"form-group"}).down()
+        .appendElement({"tag":"label", "for":"username", "id":"login-form-username-lbl"})
+        .appendElement({"tag":"input", "name":"username", "id":"login-form-username-input", "tabindex":"1", "class":"form-control", "placeholder":"Username", "autocomplete":"off"}).up()
+        // The password
+        .appendElement({"tag":"div", "class":"form-group"}).down()
+        .appendElement({"tag":"label", "for":"password", "id":"login-form-password-lbl"})
+        .appendElement({"tag":"input", "name":"password", "id":"login-form-password-input", "tabindex":"2", "type":"password", "class":"form-control", "placeholder":"Password", "autocomplete":"off"}).up()
+        
+        // The remember me and login button.
+        .appendElement({"tag":"div", "class":"form-group"}).down()
+        .appendElement({"tag":"div", "class":"row"}).down()
+        .appendElement({"tag":"div", "class":"col-xs-7"}).down()
+        .appendElement({"tag":"input", "type":"checkbox", "name":"remember", "id":"remember", "tabindex":"3" })
+        .appendElement({"tag":"label", "for":"remember", "id":"remember-login-form-lbl", "style":"padding-left: 5px;"}).up()
+        .appendElement({"tag":"div", "class":"col-xs-5 pull-right"}).down()
+        .appendElement({"tag":"button", "name":"login-submit", "id":"login-submit", "class":"form-control btn btn-success", "tabindex":"4"}).up().up().up()
+        .appendElement({"tag":"div", "class":"form-group"}).down()
+        .appendElement({"tag":"div", "class":"row"}).down()
+        .appendElement({"tag":"div", "class":"col-lg-12"}).down()
+        .appendElement({ "tag": "div", "class": "text-center" }).down()
+        .appendElement({"tag":"a", "class":"forgot-password", "id":"forgot-password-id", "tabindex":"5"})
+
 
     // The content
     this.container = parent.appendElement({ "tag": "div", "class": "container" }).down()
@@ -157,20 +192,16 @@ var BlogManager = function (parent) {
     // Blog manager action.
     //////////////////////////////////////////////////////////////////////
     // login
-    this.loginBtn = this.navBar.getChildById("login-btn")
-    this.loginBtn.element.onclick = function () {
-        //Using popup (option 1)
-        OAuth.initialize('1010681964660.apps.googleusercontent.com');
-        OAuth.popup('google')
-            .done(function (result) {
-                //use result.access_token in your API request 
-                //or use result.get|post|put|del|patch|me methods (see below)
-                console.log(result)
-            })
-            .fail(function (err) {
-                //handle error with err
-                console.log(err)
-            });
+    this.loginLnk = this.navBar.getChildById("login-lnk")
+    this.loginLnk.element.onclick = function () {
+        alert("Aille!!!!")
+
+    }
+
+    // register
+    this.registerLnk = this.navBar.getChildById("register-lnk")
+    this.registerLnk.element.onclick = function () {
+        alert("Hooo!!!!")
     }
 
     // Create a new blog.

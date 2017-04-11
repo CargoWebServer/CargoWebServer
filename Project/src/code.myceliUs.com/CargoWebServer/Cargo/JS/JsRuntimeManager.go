@@ -80,6 +80,8 @@ func (this *JsRuntimeManager) GetVm(sessionId string) *otto.Otto {
 		this.m_session[sessionId].Run(script)
 		if err != nil {
 			log.Fatal("runtime script compilation error:", err)
+		} else {
+			//log.Println(sessionId, " Load: ", this.m_scripts[i])
 		}
 	}
 

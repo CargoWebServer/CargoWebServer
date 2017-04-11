@@ -42,7 +42,7 @@ func main() {
 	// Client redirect address.
 	http.HandleFunc("/oauth2callback", Server.AppAuthCodeHandler)
 
-	// OpenId service needed by client side.
+	// OpenId service.
 	http.HandleFunc("/.well-known/openid-configuration", Server.DiscoveryHandler)
 	http.HandleFunc("/publickeys", Server.PublicKeysHandler)
 

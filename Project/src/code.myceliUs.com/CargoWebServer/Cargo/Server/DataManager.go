@@ -91,6 +91,7 @@ func (this *DataManager) initialize() {
 
 			// Open connection.
 			store.Connect()
+
 		}
 	}
 
@@ -502,16 +503,17 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ALREADY_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The storeId '"+storeId+"' already exists."))
 		return nil, cargoError
 	}
+
 	var storeConfig *Config.DataStoreConfiguration
 	storeConfigEntity, err_ := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", storeId)
-
 	// Create the new store here.
 	if err_ != nil {
 		storeConfig = new(Config.DataStoreConfiguration)
 		storeConfig.M_id = storeId
 		storeConfig.M_dataStoreVendor = storeVendor
 		storeConfig.M_dataStoreType = storeType
-		storeConfig.NeedSave = true
+		configEntity := GetServer().GetConfigurationManager().m_activeConfigurationsEntity
+		GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_dataStoreConfigs", "config.DataStoreConfiguration", storeId, storeConfig)
 	} else {
 		storeConfig = storeConfigEntity.GetObject().(*Config.DataStoreConfiguration)
 	}
@@ -520,11 +522,11 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 	store, err := NewDataStore(storeConfig)
 	if err == nil {
 		// Append the new dataStore configuration.
-		GetServer().GetConfigurationManager().appendDataStoreConfiguration(storeConfig)
-
 		this.Lock()
 		this.m_dataStores[storeId] = store
 		this.Unlock()
+		// Create entity prototypes.
+		store.GetEntityPrototypes()
 	} else {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Failed to create dataStore with id '"+storeId+"' and with error '"+err.Error()+"'."))
 		return nil, cargoError

@@ -876,9 +876,11 @@ func decodeIdToken(encoded string) (*IDToken, error) {
 	}
 
 	// The issuer configuration address.
-	issuerConfigAddress := "https://" + idToken.Issuer + "/.well-known/openid-configuration"
+	// TODO implement the https server and remove comment after.
+	// http://www.kaihag.com/https-and-go/
+	//issuerConfigAddress := "https://" + idToken.Issuer + "/.well-known/openid-configuration"
 
-	return idToken, validateIdToken(encoded, issuerConfigAddress)
+	return idToken, nil //validateIdToken(encoded, issuerConfigAddress)
 }
 
 /**
@@ -1016,7 +1018,6 @@ func validateIdToken(tokenStr string, issuerConfigAddress string) error {
 	}
 
 	return nil
-
 }
 
 /**

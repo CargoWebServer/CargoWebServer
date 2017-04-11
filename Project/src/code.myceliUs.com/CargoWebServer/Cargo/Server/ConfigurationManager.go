@@ -90,6 +90,14 @@ func newConfigurationManager() *ConfigurationManager {
 	cargoEntitiesDB.NeedSave = true
 	configurationManager.appendDefaultDataStoreConfiguration(cargoEntitiesDB)
 
+	// The sql info data store.
+	sqlInfoDB := new(Config.DataStoreConfiguration)
+	sqlInfoDB.M_id = "sql_info"
+	sqlInfoDB.M_dataStoreVendor = Config.DataStoreVendor_MYCELIUS
+	sqlInfoDB.M_dataStoreType = Config.DataStoreType_KEY_VALUE_STORE
+	sqlInfoDB.NeedSave = true
+	configurationManager.appendDefaultDataStoreConfiguration(sqlInfoDB)
+
 	// Create the default configurations
 	configurationManager.setServiceConfiguration(configurationManager.getId())
 

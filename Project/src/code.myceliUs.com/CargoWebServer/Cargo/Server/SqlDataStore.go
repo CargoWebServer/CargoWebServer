@@ -594,9 +594,14 @@ func (this *SqlDataStore) Update(query string, fields []interface{}, params []in
 	}
 
 	stmt, err := this.m_db.Prepare(query)
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Close after use
+	defer stmt.Close()
+
 	var values []interface{}
 	values = append(values, fields...)
 	values = append(values, params...)
@@ -648,6 +653,9 @@ func (this *SqlDataStore) Delete(query string, params []interface{}) (err error)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Close after use
+	defer stmt.Close()
 
 	_, err = stmt.Exec(params...)
 	if err != nil {
@@ -817,7 +825,7 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 	// Read the
 	values, err := this.Read(query, fieldsType, params)
 	if err != nil {
-
+		log.Println("-------------->820 prototype: ", prototype)
 		return prototype, err
 	}
 
@@ -856,6 +864,8 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 
 	// Create the new prototype in sql_info store.
 	prototype.Create("sql_info")
+
+	log.Println("-------------->860 prototype: ", prototype)
 
 	return prototype, err
 }
@@ -1172,7 +1182,7 @@ func (this *SqlDataStore) setRefs() error {
 			sourceField_isId := Utility.Contains(src.Ids, "M_"+values[i][3].(string))
 
 			// I will set the field as non visible, the ref will be display
-			src.FieldsVisibility[src.getFieldIndex("M_"+values[i][3].(string))] = false
+			//src.FieldsVisibility[src.getFieldIndex("M_"+values[i][3].(string))] = false
 
 			targetField_isId := Utility.Contains(trg.Ids, "M_"+values[i][5].(string))
 

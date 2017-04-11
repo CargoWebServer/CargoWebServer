@@ -172,6 +172,28 @@ func GetServer() *Server {
 }
 
 /**
+ * Here I will use JS for generating a uuid.
+ */
+/*func (this *Server) GenerateUUID(val string) string {
+
+	fctStr := "function generateUUID(value){\n"
+	fctStr += "	uuid = new UUID(3, \"ns:URL\", value);\n"
+	fctStr += "	return uuid.toString()\n"
+	fctStr += "}"
+
+	params := make([]interface{}, 1)
+	params[0] = val
+	// Initialyse the vm is not already init for serverSession.
+	JS.GetJsRuntimeManager().GetVm("serverSession")
+	result, err := JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "serverSession", fctStr, params)
+	if err == nil {
+		return result[0].(string)
+	}
+
+	return ""
+}*/
+
+/**
  * Start the server.
  */
 func (this *Server) Start() {

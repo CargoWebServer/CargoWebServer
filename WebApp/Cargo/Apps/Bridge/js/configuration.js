@@ -108,7 +108,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
     // If the view already exist
     for (var i = 0; i < this.contentViews.length; i++) {
         if (this.contentViews[i].entity != undefined) {
-            if (this.contentViews[i].entity.UUID == content.UUID) {
+            if (this.contentViews[i].entity.M_id == content.M_id) {
                 this.contentViews[i].setEntity(content)
                 if (this.contentViews[i].connectBtn != undefined) {
                     this.contentViews[i].connectBtn.status = "disconnected"
@@ -173,7 +173,10 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                 }
                 if (content.TYPENAME == "Config.DataStoreConfiguration") {
                     // So here I will set the schema view for the releated store.
-                    homepage.dataExplorer.initDataSchema(content)
+                    if (content.UUID.length != 0) {
+                        // Set only if is not a new.
+                        homepage.dataExplorer.initDataSchema(content)
+                    }
 
                     // Here I will append the connection button...
                     contentView.connectBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell; color: lightgrey;" }).down()
@@ -397,7 +400,6 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
             return function () {
                 // Here I will create a new entity...
                 var entity = eval("new " + configurationPanel.typeName + "()")
-                entity.UUID = configurationPanel.typeName + "%" + randomUUID()
                 entity.M_id = "New " + configurationPanel.typeName.split(".")[1]
 
                 // Set the entity content.

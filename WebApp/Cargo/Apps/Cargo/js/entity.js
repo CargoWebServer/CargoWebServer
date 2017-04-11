@@ -60,6 +60,10 @@ EntityManager.prototype.constructor = EntityManager;
 EntityManager.prototype.onEvent = function (evt) {
     // Set the internal object.
     if (evt.code == UpdateEntityEvent || evt.code == NewEntityEvent) {
+        if(this.entityPrototypes[evt.dataMap["entity"].TYPENAME] == undefined){
+            console.log("Type " +evt.dataMap["entity"].TYPENAME + " not define!")
+            return
+        }
         if (this.entities[evt.dataMap["entity"].UUID] == undefined) {
             var entity = eval("new " + evt.dataMap["entity"].TYPENAME + "()")
             entity.initCallback = function (self, evt, entity) {
