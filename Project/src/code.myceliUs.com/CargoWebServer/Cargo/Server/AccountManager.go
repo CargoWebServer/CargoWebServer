@@ -61,6 +61,7 @@ func (this *AccountManager) initialize() {
 		// Append the newly create account into the cargo entities
 		entities.SetEntities(account)
 		account.SetEntitiesPtr(entities)
+
 		// Save the account
 		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
 	}
