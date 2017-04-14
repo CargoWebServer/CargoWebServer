@@ -1,6 +1,4 @@
 var applicationName = document.getElementsByTagName("title")[0].text
-var server = new Server("localhost", "127.0.0.1", 9393)
-
 var languageInfo = {
     "en": {
     },

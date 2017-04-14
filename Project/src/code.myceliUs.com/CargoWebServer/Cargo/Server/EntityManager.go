@@ -1232,6 +1232,7 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		if reflect.TypeOf(values).String() == "map[string]interface {}" {
 			values.(map[string]interface{})["parentUuid"] = parentUuid
 			var errObj *CargoEntities.Error
+			log.Println(values)
 			entity, errObj = this.newDynamicEntity(parentUuid, values.(map[string]interface{}))
 			if errObj != nil {
 				return nil, errObj

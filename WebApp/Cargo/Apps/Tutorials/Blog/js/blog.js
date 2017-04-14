@@ -561,8 +561,8 @@ BlogManager.prototype.createAuthor = function (user) {
         // success callback
         function (result, caller) {
             var lastId = 0
-            if (result[0][0] != null) {
-                lastId = parseInt(result[0][0])
+            if (result[0][0][0] != undefined) {
+                lastId = parseInt(result[0][0][0])
             }
 
             // Here I will use the display name to keep the user uuid inside the 
