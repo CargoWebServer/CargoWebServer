@@ -607,6 +607,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 		this.setValue("ParentUuid", this.parentUuid)
 	} else {
 		DynamicEntityInfo = append(DynamicEntityInfo, "")
+		this.setValue("ParentUuid", "")
 	}
 
 	// Now the fields of the object, from the prototype...
@@ -621,7 +622,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 
 		// Print the field name.
 		if this.getValue(fieldName) != nil {
-			//log.Println("--------> save ", fieldName, " whit value ", this.getValue(fieldName), " field type ", fieldType)
 			// Array's
 			if strings.HasPrefix(fieldType, "[]") {
 				if strings.HasPrefix(fieldType, "[]xs.") || strings.HasPrefix(fieldType, "[]sqltypes.") || fieldName == "M_listOf" {
@@ -985,8 +985,10 @@ func (this *DynamicEntity) saveEntity(path string) {
 		var params []interface{}
 		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
 		queryStr, _ := json.Marshal(query)
+		log.Println("------------------------------> ", this.uuid, " exist!")
 		err = GetServer().GetDataManager().updateData(storeId, string(queryStr), DynamicEntityInfo, params)
 	} else {
+		log.Println("------------------------------> ", this.uuid, " not exist!")
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 		// Save the values for that entity.
 		queryStr, _ := json.Marshal(query)
@@ -1757,20 +1759,24 @@ func (this *DynamicEntity) Exist() bool {
 	if this == nil {
 		return false
 	}
-	log.Println("-------> test if entity ", this.uuid, " exist.")
+	// log.Println("-------> test if entity ", this.uuid, " exist.")
 	var query EntityQuery
 	query.TypeName = this.GetTypeName()
 	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
-	var fieldsType []interface{} // not use...
+	query.Fields = append(query.Fields, this.prototype.Ids...) // Get all it ids...
+	var fieldsType []interface{}                               // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	storeId := this.GetPackageName()
+
+	// In case of search of sql data.
 	if reflect.TypeOf(dataManager.getDataStore(storeId)).String() == "*Server.SqlDataStore" {
 		storeId = "sql_info" // Must save or update value from sql info instead.
 	}
+
 	results, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
 	if err != nil || len(results) == 0 {
+		log.Println("--------------------> Not exist: ", this.uuid)
 		return false
 	}
 

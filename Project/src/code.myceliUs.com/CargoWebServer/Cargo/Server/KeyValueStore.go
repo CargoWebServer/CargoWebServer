@@ -1087,7 +1087,6 @@ func (this *KeyValueDataStore) Ping() error {
  * Create a new entry in the database.
  */
 func (this *KeyValueDataStore) Create(queryStr string, entity []interface{}) (lastId interface{}, err error) {
-
 	// First of all i will init the query...
 	var query EntityQuery
 	json.Unmarshal([]byte(queryStr), &query)
@@ -1200,10 +1199,16 @@ func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, p
 					if len(query.Fields) > 0 && len(result) > 0 {
 						// Here I will insert the fields asked by
 						// the user...
-						for k := 0; k < len(query.Fields) && k < len(result); k++ {
+						//log.Println(query.Fields, len(query.Fields))
+						//log.Println(result, len(result))
+						for k := 0; k < len(query.Fields); k++ {
 							field := query.Fields[k]
 							index := prototype.getFieldIndex(field)
-							result_ = append(result_, result[index])
+							if index < len(result) && index != -1 {
+								result_ = append(result_, result[index])
+							} else {
+								log.Println("------> Field ", field, " was not found for in result ", result, " at index ", index)
+							}
 						}
 					}
 					results = append(results, result_)
@@ -1213,7 +1218,6 @@ func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, p
 			return
 		}
 	}
-
 	return
 }
 
@@ -1273,7 +1277,10 @@ func (this *KeyValueDataStore) Update(queryStr string, fields []interface{}, par
 			value := fields[j] // The new value to insert...
 
 			// Now I will replace the value of the field...
-			entity[prototype.getFieldIndex(field)] = value
+			index := prototype.getFieldIndex(field)
+			if index != -1 {
+				entity[index] = value
+			}
 		}
 
 		// Create the new indexations.

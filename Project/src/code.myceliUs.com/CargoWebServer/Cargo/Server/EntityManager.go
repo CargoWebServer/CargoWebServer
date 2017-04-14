@@ -1242,15 +1242,15 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		}
 	}
 
-	// Set it parent.
-	entity.(Entity).SetParentPtr(parentPtr)
-
 	// Save the entity...
 	entity.(Entity).SetNeedSave(true)
 	entity.(Entity).SaveEntity()
 
 	// Now I will save it parent if there one.
 	if parentPtr != nil {
+		// Set it parent.
+		entity.(Entity).SetParentPtr(parentPtr)
+
 		parentPtrTypeName := parentPtr.GetTypeName()
 		parentPtrStoreId := parentPtrTypeName[:strings.Index(parentPtrTypeName, ".")]
 		parentPrtPrototype, _ := this.getEntityPrototype(parentPtrTypeName, parentPtrStoreId)

@@ -1,4 +1,6 @@
 // CodeGen project main.go
+// here is the complete line to append
+// -i -tags "CargoEntities Config BPMS BPMN20 BPMNDI DI DC"
 package main
 
 import (

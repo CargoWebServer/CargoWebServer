@@ -362,7 +362,6 @@ func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) int
 				val, _ = strconv.Atoi(string(value.([]uint8)))
 			}
 		}
-
 		return val
 	}
 

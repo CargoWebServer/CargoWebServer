@@ -1,4 +1,11 @@
 
+// global variable.
+var databaseName = "Blog."
+var schemaId = "" //"dbo."
+
+var userTypeName = databaseName + schemaId + "blog_user"
+var authorTypeName = databaseName + schemaId + "blog_author"
+
 /**
  * Utility class use to manage data element of the blog.
  */
@@ -66,20 +73,6 @@ var BlogManager = function (parent) {
     // Depending of the language the correct text will be set.
     server.languageManager.appendLanguageInfo(languageInfo)
 
-    // Local variable.
-    var databaseName = "Blog"
-    var schemaId = "" //"dbo"
-
-    // At the configuration time server create all needed entities from SQL schema,
-    // here Blog was the database we made use of and dbo are the sql schema and finaly
-    // the blog_user was the table. Cargo offer you the EntityPanel class to 
-    // manipulate entity of every type, just tell Cargo the type name you want and boom!
-    var userTypeName = databaseName
-    if (schemaId.length > 0) {
-        userTypeName += "." + schemaId
-    }
-    userTypeName += ".blog_user"
-
     /*
         var userPanel = new EntityPanel(this.panel, userTypeName, function (panel) {
             panel.maximizeBtn.element.click()
@@ -109,7 +102,7 @@ var BlogManager = function (parent) {
     // Collect the nav links, forms, and other content for toggling
     this.navBar.getChildById("nav-container").appendElement({ "tag": "div", "class": "collapse navbar-collapse", "id": "bs-example-navbar-collapse-1" }).down()
         .appendElement({ "tag": "ul", "class": "nav navbar-nav" }).down()
-        .appendElement({ "tag": "li", "id":"new-blog-lnk", "style":"display: none;" }).down()
+        .appendElement({ "tag": "li", "id": "new-blog-lnk", "style": "display: none;" }).down()
         .appendElement({ "tag": "a", "id": "create-lnk", "href": "#" }).up()
         .appendElement({ "tag": "li" }).down()
         .appendElement({ "tag": "a", "id": "about-lnk", "href": "#" }).up().up()
@@ -195,7 +188,7 @@ var BlogManager = function (parent) {
         .appendElement({ "tag": "div", "class": "input-group" }).down()
         .appendElement({ "tag": "span", "class": "input-group-addon" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-phone" }).up()
-        .appendElement({ "tag": "input", "id": "phone", "type":"tel", "pattern":"[\+]\d{2}[\(]\d{2}[\)]\d{4}[\-]\d{4}", "title":"Phone Number (Format: +99(99)9999-9999)", "placeholder": "(845)555-1212", "class": "form-control",  "data-bv-field": "phone", "tabindex": "5" }).up().up().up().up()
+        .appendElement({ "tag": "input", "id": "phone", "type": "tel", "pattern": "[\+]\d{2}[\(]\d{2}[\)]\d{4}[\-]\d{4}", "title": "Phone Number (Format: +99(99)9999-9999)", "placeholder": "(845)555-1212", "class": "form-control", "data-bv-field": "phone", "tabindex": "5" }).up().up().up().up()
         // The save button.
         .appendElement({ "tag": "div", "class": "form-group" }).down()
         .appendElement({ "tag": "div", "class": "row" }).down()
@@ -415,7 +408,7 @@ var BlogManager = function (parent) {
 
     // Only registered user can create a blog.
     this.newBlogLnk = this.navBar.getChildById("new-blog-lnk")
-   
+
     // Login the user.
     this.loginBtn.element.onclick = function (blogManager, loginNameInput, loginPasswordInput) {
         return function () {
@@ -443,7 +436,7 @@ var BlogManager = function (parent) {
                     blogManager.account = result.M_accountPtr
 
                     // If the account dosent have user info I will show it.
-                    if (result.M_accountPtr.M_userRef == null) {
+                    if (result.M_accountPtr.M_userRef == "") {
                         userInfoDropdownLnk.element.className = "dropdown open"
                         document.getElementById("first_name").focus()
                     } else {
@@ -532,6 +525,8 @@ var BlogManager = function (parent) {
                         // Now I will save the account with it newly created user.
                         server.entityManager.saveEntity(blogManager.account)
                         caller.blogManager.userInfoLnk.className = "dropdown"
+                        // Create the author...
+                        caller.blogManager.createAuthor(result)
                     },
                     // Error callback
                     function (errObj, caller) {
@@ -542,6 +537,7 @@ var BlogManager = function (parent) {
                     // The success callback
                     function (result, caller) {
                         caller.blogManager.userInfoLnk.className = "dropdown"
+                        //caller.blogManager.createAuthor(result)
                     },
                     // The error callback
                     function (errObj, caller) {
@@ -556,17 +552,76 @@ var BlogManager = function (parent) {
 }
 
 /**
+ * The post creator.
+ */
+BlogManager.prototype.createAuthor = function (user) {
+    // First I will get the next id...
+    var query = "SELECT MAX(id) FROM " + authorTypeName
+    server.dataManager.read("Blog", query, ["int"], [],
+        // success callback
+        function (result, caller) {
+            var lastId = 0
+            if (result[0][0] != null) {
+                lastId = parseInt(result[0][0])
+            }
+
+            // Here I will use the display name to keep the user uuid inside the 
+            // field display name.
+            var author = eval("new " + authorTypeName + "()")
+            author.M_id = lastId + 1 // Set to the next incremental value here.
+            author.M_display_name = user.UUID // The related user uuid.
+            author.M_first_name = user.M_firstName
+            author.M_last_name = user.M_lastName
+
+            // save the author information.
+            server.entityManager.createEntity("", "", authorTypeName, "", author)
+        },
+        // progress callback
+        function (index, total, caller) {
+
+        },
+        // error callback
+        function (errObj, caller) {
+
+        },
+        {})
+}
+
+/**
  * Create a new blog.
  */
 BlogManager.prototype.createNewBlog = function () {
-    // So here I will create a new blog post and from it I will set it view.
+    // Here I will use the data manager to get the number of post.
+    /*var query = "SELECT MAX(id) FROM Blog.blog_post"
+    server.dataManager.read("Blog", query, ["int"], [],
+        // success callback
+        function (result, caller) {
+            var lastId = 1
+            if (result[0][0] != null) {
+                lastId = result[0][0]
+            }
+
+            // So here I will create a new blog post and from it I will set it view.
+            var post = new Blog.blog_post()
+            post.M_id = lastId
+            
+        },
+        // progress callback
+        function (index, total, caller) {
+
+        },
+        // error callback
+        function (errObj, caller) {
+
+        },
+        {})*/
 
 
     // Create a new Blog.
-    this.activeBlogView = new BlogPostView(this.blogContainer, 1)
+    // this.activeBlogView = new BlogPostView(this.blogContainer, 1)
 
     // Set the blog view editable.
-    this.setEditable(this.activeBlogView)
+    //this.setEditable(this.activeBlogView)
 }
 
 /**
@@ -649,24 +704,15 @@ BlogManager.prototype.saveActiveBlog = function () {
 /**
  * There is the blog the blog view.
  */
-var BlogPostView = function (parent, id) {
+var BlogPostView = function (parent, blog) {
 
     // The blog text interface elements
     var languageInfo = {
         "en": {
             "blog-post-title": "Blog Post Title",
             "written-by": "by ",
-            // Use the 
-            "author-name": "Start Bootstrap",
-            "created-date": " Posted on August 24, 2013 at 9:00 PM",
-            "page-content": "<p class=\"lead\">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus, vero, obcaecati, aut, error quam sapiente nemo saepe quibusdam sit excepturi nam quia corporis eligendi eos magni recusandae laborum minus inventore?</p>"
-            + "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut, tenetur natus doloremque laborum quos iste ipsum rerum obcaecati impedit odit illo dolorum ab tempora nihil dicta earum fugiat. Temporibus, voluptatibus.</p>"
-            + " <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, doloribus, dolorem iusto blanditiis unde eius illum consequuntur neque dicta incidunt ullam ea hic porro optio ratione repellat perspiciatis. Enim, iure!</p>"
-            + "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Error, nostrum, aliquid, animi, ut quas placeat totam sunt tempora commodi nihil ullam alias modi dicta saepe minima ab quo voluptatem obcaecati?</p>"
-            + "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, dolor quis. Sunt, ut, explicabo, aliquam tenetur ratione tempore quidem voluptates cupiditate voluptas illo saepe quaerat numquam recusandae? Qui, necessitatibus, est!</p>",
-            
             "comment-header": "Leave a Comment",
-            "submit-comment": "Submit"
+            "submit-comment": "Submit",
         },
         "fr": {
 
@@ -683,16 +729,16 @@ var BlogPostView = function (parent, id) {
     // Blog Post Content Column
     this.pageContainer.appendElement({ "tag": "div", "class": "col-lg-8" }).down()
         .appendElement({ "tag": "h1", "id": "blog-post-title" })
-        
+
         // The author
         .appendElement({ "tag": "p", "class": "lead" }).down().appendElement({ "tag": "span", "id": "written-by" })
         .appendElement({ "tag": "a", "id": "author-name", "href": "#" }).up()
         .appendElement({ "tag": "hr" })
-        
+
         // The date and time 
         .appendElement({ "tag": "p" }).down().appendElement({ "tag": "span", "class": "fa fa-clock-o" }).appendElement({ "tag": "span", "id": "created-date" }).up()
         .appendElement({ "tag": "hr" })
-        
+
         // The page content.
         .appendElement({ "tag": "div", "id": "page-content" })
         .appendElement({ "tag": "hr" })

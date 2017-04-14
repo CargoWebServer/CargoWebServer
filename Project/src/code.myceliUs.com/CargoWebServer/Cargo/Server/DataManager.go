@@ -164,12 +164,17 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 	data, err := store.Read(query, fieldsType, params)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
+		return data, err
 	}
 
 	// In case of SQL data, the data we found will be use to get
 	// sql data in a second pass.
 	if storeName == "sql_info" && err == nil {
 		dataIndex := make([]int, 0)
+
+		q := new(EntityQuery)
+		json.Unmarshal([]byte(query), q)
+
 		// In that case the value will be read from sql.
 		for i := 0; i < len(data); i++ {
 			if len(data[i]) > 1 {
@@ -190,59 +195,68 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 							var ids []interface{}
 							var fields []string
 							var fieldsType []interface{}
-							for j := 0; j < len(prototype.Fields); j++ {
-								fieldName := prototype.Fields[j]
-								fieldType := prototype.FieldsType[j]
+							for j := 0; j < len(q.Fields); j++ {
+								fieldName := q.Fields[j]
+								fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
 								// If the field is an id
 								if !strings.HasSuffix(fieldType, ":Ref") && strings.HasPrefix(fieldName, "M_") {
-									if Utility.Contains(prototype.Ids, fieldName) {
-										ids = append(ids, data[i][j]) // append the id
-									}
-									fields = append(fields, fieldName[2:])
-									fieldsType = append(fieldsType, fieldType)
-									dataIndex = append(dataIndex, j)
-								}
-							}
-
-							// Now I will recreate the sql query string.
-							query := "SELECT "
-							for j := 0; j < len(fields); j++ {
-								query += fields[j]
-								if j < len(fields)-1 {
-									query += ", "
-								}
-							}
-
-							// The from close.
-							query += " FROM " + dataBaseName
-							if len(schemaId) > 0 {
-								query += "." + schemaId
-							}
-							query += "." + tableName
-
-							if len(ids) > 0 {
-								query += " WHERE "
-								for j := 0; j < len(ids); j++ {
-									// The first ids in the list of ids are always the uuid so
-									// the index is j+1
-									query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=" + Utility.ToString(ids[j])
-								}
-							}
-
-							// Now I will get data from sql...
-							sqlData, err := this.readData(dataBaseName, query, fieldsType, params)
-							if err == nil {
-								if len(sqlData) > 0 {
-									// Now I will replace the data with the retreive values.
-									for j := 0; j < len(sqlData[0]); j++ {
-										// Set the value.
-										data[i][dataIndex[j]] = sqlData[0][j]
+									if j < len(data[i]) {
+										if Utility.Contains(prototype.Ids, fieldName) {
+											ids = append(ids, data[i][j]) // append the id
+										}
+										fields = append(fields, fieldName[2:])
+										fieldsType = append(fieldsType, fieldType)
+										dataIndex = append(dataIndex, j)
 									}
 								}
+							}
+							if len(fields) > 0 {
+								// Now I will recreate the sql query string.
+								query := "SELECT "
+								for j := 0; j < len(fields); j++ {
+									query += fields[j]
+									if j < len(fields)-1 {
+										query += ", "
+									}
+								}
+
+								// The from close.
+								query += " FROM " + dataBaseName
+								if len(schemaId) > 0 {
+									query += "." + schemaId
+								}
+								query += "." + tableName
+
+								if len(ids) > 0 {
+									query += " WHERE "
+									for j := 0; j < len(ids); j++ {
+										// The first ids in the list of ids are always the uuid so
+										// the index is j+1
+										query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=" + Utility.ToString(ids[j])
+									}
+								}
+								// Now I will get data from sql...
+								sqlData, err := this.readData(dataBaseName, query, fieldsType, params)
+								if err == nil {
+									if len(sqlData) > 0 {
+										// Now I will replace the data with the retreive values.
+										for j := 0; j < len(sqlData[0]); j++ {
+											// Set the value.
+											data[i][dataIndex[j]] = sqlData[0][j]
+										}
+									}
+								} else {
+									return data, err
+								}
+							} else {
+								return data, errors.New("No sql data was found for entity " + data[i][0].(string))
 							}
 						}
 					}
 				}
+			} else if len(data[i]) == 1 {
+				// The entity exist but no data was found...
+				return data, errors.New("No sql data was found for entity " + data[i][0].(string))
 			}
 		}
 	}
@@ -266,6 +280,7 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 	lastId, err = store.Create(query, d)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
+		return
 	}
 
 	// In the case of sql data I also need to save the information in the database.
@@ -286,8 +301,11 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 				schemaId = values[1]
 			}
 			prototype, err := GetServer().GetEntityManager().getEntityPrototype(uuid[0:strings.Index(uuid, "%")], "sql_info")
-			if err == nil {
 
+			q := new(EntityQuery)
+			json.Unmarshal([]byte(query), q)
+
+			if err == nil {
 				query := "INSERT INTO " + dataBaseName
 				if len(schemaId) > 0 {
 					query += "." + schemaId
@@ -298,22 +316,26 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 
 				query += "." + tableName + "("
 				values := "VALUES("
-				for i := 0; i < len(d); i++ {
-					if strings.HasPrefix(prototype.Fields[i], "M_") && !strings.HasSuffix(prototype.FieldsType[i], ":Ref") {
-						fields = append(fields, prototype.Fields[i])
-						fieldsType = append(fieldsType, prototype.FieldsType[i])
-
-						// In case of null value...
-						if reflect.TypeOf(d[i]).Kind() == reflect.String {
-							if d[i] == "null" {
-								// if the field is an id it must not be null
-								if Utility.Contains(prototype.Ids, prototype.Fields[i]) {
-									return -1, nil
+				for i := 0; i < len(q.Fields); i++ {
+					fieldName := q.Fields[i]
+					index := prototype.getFieldIndex(fieldName)
+					if index > 0 {
+						fieldType := prototype.FieldsType[index]
+						if strings.HasPrefix(fieldName, "M_") && !strings.HasSuffix(fieldType, ":Ref") {
+							fields = append(fields, fieldName)
+							fieldsType = append(fieldsType, fieldType)
+							// In case of null value...
+							if reflect.TypeOf(d[i]).Kind() == reflect.String {
+								if d[i] == "null" {
+									// if the field is an id it must not be null
+									if Utility.Contains(prototype.Ids, fieldName) {
+										return -1, nil
+									}
+									d[i] = "NULL"
 								}
-								d[i] = "NULL"
 							}
+							data = append(data, d[i])
 						}
-						data = append(data, d[i])
 					}
 				}
 
@@ -330,9 +352,10 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 				query += ")" + values + ")"
 
 				id, err := this.createData(dataBaseName, query, data)
-
 				if err == nil {
 					log.Println("--------> data insert sucessfully! ", id)
+				} else {
+					log.Println("--------> data insert fail with err: ", err)
 				}
 			}
 		}
@@ -413,6 +436,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 	err = store.Update(query, fields, params)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
+		return
 	}
 
 	// In case of entity with sql database backend.
