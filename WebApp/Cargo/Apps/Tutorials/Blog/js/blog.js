@@ -44,6 +44,10 @@ var BlogManager = function (parent) {
             "register-lnk": "register",
             "register-header": "Register",
             "register-submit": "Register Now",
+            // error text...
+            "register-form-confirm-password-input": "Whoops, these don't match",
+            "register-form-emailaddress-input": "That email address is invalid",
+            "register-username-input-error": "",
             // Other parts of header.
             "blog-search-title": "Blog Search",
             "blog-categories": "Blog Categories",
@@ -115,19 +119,25 @@ var BlogManager = function (parent) {
         .appendElement({ "tag": "div", "class": "col-lg-12" }).down()
         .appendElement({ "tag": "div", "class": "text-center" }).down()
         .appendElement({ "tag": "h3", "id": "register-header" }).up()
-        .appendElement({ "tag": "div" }).down()
+        .appendElement({ "tag": "form", "role": "form", "id": "register-form" }).down()
         // The user name
         .appendElement({ "tag": "div", "class": "form-group" }).down()
-        .appendElement({ "tag": "input", "name": "username", "type": "text", "id": "register-form-username-input", "tabindex": "1", "class": "form-control", "placeholder": "Username", "autocomplete": "off" }).up()
+        .appendElement({ "tag": "input", "name": "username", "type": "text", "pattern": "^[_A-z0-9]{1,}$", "maxlength": "15", "id": "register-form-username-input", "tabindex": "1", "class": "form-control", "placeholder": "Username", "autocomplete": "off", "required": "" })
+        .appendElement({ "tag": "div", "class": "help-block with-errors", "id": "register-username-input-error" })
+        .up()
         // The email
         .appendElement({ "tag": "div", "class": "form-group" }).down()
-        .appendElement({ "tag": "input", "name": "emailAddress", "type": "email", "id": "register-form-emailaddress-input", "tabindex": "2", "class": "form-control", "placeholder": "Email Address", "autocomplete": "off" }).up()
+        .appendElement({ "tag": "input", "name": "emailAddress", "type": "email", "id": "register-form-emailaddress-input", "tabindex": "2", "class": "form-control", "placeholder": "Email Address", "autocomplete": "off", "data-error": "That email address is invalid" })
+        .appendElement({ "tag": "div", "class": "help-block with-errors" })
+        .up()
         // The password
         .appendElement({ "tag": "div", "class": "form-group" }).down()
         .appendElement({ "tag": "input", "name": "password", "type": "password", "id": "register-form-password-input", "tabindex": "3", "class": "form-control", "placeholder": "Password", "autocomplete": "off" }).up()
         // The confirm password
         .appendElement({ "tag": "div", "class": "form-group" }).down()
-        .appendElement({ "tag": "input", "name": "confirmPassword", "type": "password", "id": "register-form-confirm-password-input", "tabindex": "4", "class": "form-control", "placeholder": "Confirm Password", "autocomplete": "off" }).up()
+        .appendElement({ "tag": "input", "name": "confirmPassword", "type": "password", "id": "register-form-confirm-password-input", "tabindex": "4", "class": "form-control", "placeholder": "Confirm Password", "autocomplete": "off", "data-match": "#register-form-password-input", "data-match-error": "Whoops, these don't match" })
+        .appendElement({ "tag": "div", "class": "help-block with-errors" })
+        .up()
         // The register button.
         .appendElement({ "tag": "div", "class": "form-group" }).down()
         .appendElement({ "tag": "div", "class": "row" }).down()
@@ -143,52 +153,68 @@ var BlogManager = function (parent) {
         .appendElement({ "tag": "div", "class": "col-lg-12" }).down()
         .appendElement({ "tag": "div", "class": "text-center" }).down()
         .appendElement({ "tag": "h3", "id": "user-info-header" }).up()
-        .appendElement({ "tag": "div" }).down()
+        // The form.
+        .appendElement({ "tag": "form", "id": "user-info-form" }).down()
         // The First name.
         .appendElement({ "tag": "div", "class": "form-group has-feedback" }).down()
         .appendElement({ "tag": "div", "class": "row" }).down()
-        .appendElement({ "tag": "label", "id": "user-info-first-name-label", "class": "col-md-4 control-label" })
+        .appendElement({ "tag": "label", "for": "first_name", "id": "user-info-first-name-label", "class": "col-md-4 control-label" })
         .appendElement({ "tag": "div", "class": "col-md-8 inputGroupContainer" }).down()
         .appendElement({ "tag": "div", "class": "input-group" }).down()
         .appendElement({ "tag": "span", "class": "input-group-addon" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-user" }).up()
-        .appendElement({ "tag": "input", "id": "first_name", "placeholder": "First Name", "class": "form-control", "type": "text", "data-bv-field": "first_name", "tabindex": "1" }).up().up().up().up()
+        .appendElement({ "tag": "input", "id": "first_name", "placeholder": "First Name", "pattern": "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$", "class": "form-control", "type": "text", "tabindex": "1", "required": "" })
+        .up().up().up()
+        .appendElement({ "tag": "div", "class": "help-block with-errors", "style": "text-align: center;" })
+        .up()
         // The middle name.
         .appendElement({ "tag": "div", "class": "form-group has-feedback" }).down()
         .appendElement({ "tag": "div", "class": "row" }).down()
-        .appendElement({ "tag": "label", "id": "user-info-middle-label", "class": "col-md-4 control-label" })
+        .appendElement({ "tag": "label", "for": "middle_name", "id": "user-info-middle-label", "class": "col-md-4 control-label" })
         .appendElement({ "tag": "div", "class": "col-md-8 inputGroupContainer" }).down()
         .appendElement({ "tag": "div", "class": "input-group" }).down()
         .appendElement({ "tag": "span", "class": "input-group-addon" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-user" }).up()
-        .appendElement({ "tag": "input", "id": "middle_name", "placeholder": "Middle Name", "class": "form-control", "type": "text", "data-bv-field": "middle_name", "tabindex": "2" }).up().up().up().up()
+        .appendElement({ "tag": "input", "id": "middle_name", "placeholder": "Middle Name", "class": "form-control", "type": "text", "data-bv-field": "middle_name", "tabindex": "2" })
+        .up().up().up()
+        .appendElement({ "tag": "div", "class": "help-block with-errors", "style": "text-align: center;" })
+        .up()
         // The last name.
         .appendElement({ "tag": "div", "class": "form-group has-feedback" }).down()
         .appendElement({ "tag": "div", "class": "row" }).down()
-        .appendElement({ "tag": "label", "id": "user-info-last-name-label", "class": "col-md-4 control-label" })
+        .appendElement({ "tag": "label", "for": "last_name", "id": "user-info-last-name-label", "class": "col-md-4 control-label" })
         .appendElement({ "tag": "div", "class": "col-md-8 inputGroupContainer" }).down()
         .appendElement({ "tag": "div", "class": "input-group" }).down()
         .appendElement({ "tag": "span", "class": "input-group-addon" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-user" }).up()
-        .appendElement({ "tag": "input", "id": "last_name", "placeholder": "Last Name", "class": "form-control", "type": "text", "data-bv-field": "last_name", "tabindex": "3" }).up().up().up().up()
+        .appendElement({ "tag": "input", "id": "last_name", "placeholder": "Last Name", "class": "form-control", "type": "text", "tabindex": "3", "pattern": "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$", "required": "" })
+        .up().up().up()
+        .appendElement({ "tag": "div", "class": "help-block with-errors", "style": "text-align: center;" })
+        .up()
         // The email address.
         .appendElement({ "tag": "div", "class": "form-group has-feedback" }).down()
         .appendElement({ "tag": "div", "class": "row" }).down()
-        .appendElement({ "tag": "label", "id": "user-info-email-label", "class": "col-md-4 control-label" })
+        .appendElement({ "tag": "label", "for": "email", "id": "user-info-email-label", "class": "col-md-4 control-label" })
         .appendElement({ "tag": "div", "class": "col-md-8 inputGroupContainer" }).down()
         .appendElement({ "tag": "div", "class": "input-group" }).down()
         .appendElement({ "tag": "span", "class": "input-group-addon" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-envelope" }).up()
-        .appendElement({ "tag": "input", "id": "email", "placeholder": "E-Mail Address", "class": "form-control", "type": "email", "data-bv-field": "email", "tabindex": "4" }).up().up().up().up()
+        .appendElement({ "tag": "input", "id": "email", "placeholder": "E-Mail Address", "class": "form-control", "type": "email", "tabindex": "4", "data-error": "That email address is invalid" })
+        .up().up().up()
+        .appendElement({ "tag": "div", "class": "help-block with-errors", "style": "text-align: center;" })
+        .up()
         // The phone address.
         .appendElement({ "tag": "div", "class": "form-group has-feedback" }).down()
         .appendElement({ "tag": "div", "class": "row" }).down()
-        .appendElement({ "tag": "label", "id": "user-info-phone-label", "class": "col-md-4 control-label" })
+        .appendElement({ "tag": "label", "for": "phone", "id": "user-info-phone-label", "class": "col-md-4 control-label" })
         .appendElement({ "tag": "div", "class": "col-md-8 inputGroupContainer" }).down()
         .appendElement({ "tag": "div", "class": "input-group" }).down()
         .appendElement({ "tag": "span", "class": "input-group-addon" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-phone" }).up()
-        .appendElement({ "tag": "input", "id": "phone", "type": "tel", "pattern": "[\+]\d{2}[\(]\d{2}[\)]\d{4}[\-]\d{4}", "title": "Phone Number (Format: +99(99)9999-9999)", "placeholder": "(845)555-1212", "class": "form-control", "data-bv-field": "phone", "tabindex": "5" }).up().up().up().up()
+        .appendElement({ "tag": "input", "id": "phone", "type": "tel", "pattern": "^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$", "title": "Phone Number (Format: +99(99)9999-9999)", "placeholder": "(845)555-1212", "class": "form-control", "data-bv-field": "phone", "tabindex": "5" })
+        .up().up().up()
+        .appendElement({ "tag": "div", "class": "help-block with-errors", "style": "text-align: center;" })
+        .up()
         // The save button.
         .appendElement({ "tag": "div", "class": "form-group" }).down()
         .appendElement({ "tag": "div", "class": "row" }).down()
@@ -208,11 +234,15 @@ var BlogManager = function (parent) {
         // The user name
         .appendElement({ "tag": "div", "class": "form-group" }).down()
         .appendElement({ "tag": "label", "for": "username", "id": "login-form-username-lbl" })
-        .appendElement({ "tag": "input", "name": "username", "id": "login-form-username-input", "tabindex": "1", "class": "form-control", "placeholder": "Username", "autocomplete": "off" }).up()
+        .appendElement({ "tag": "input", "name": "username", "id": "login-form-username-input", "tabindex": "1", "class": "form-control", "placeholder": "Username", "autocomplete": "off" })
+        .appendElement({ "tag": "div", "id": "login-form-username-error", "class": "help-block with-errors", "style": "text-align: center;" })
+        .up()
         // The password
         .appendElement({ "tag": "div", "class": "form-group" }).down()
         .appendElement({ "tag": "label", "for": "password", "id": "login-form-password-lbl" })
-        .appendElement({ "tag": "input", "name": "password", "id": "login-form-password-input", "tabindex": "2", "type": "password", "class": "form-control", "placeholder": "Password", "autocomplete": "off" }).up()
+        .appendElement({ "tag": "input", "name": "password", "id": "login-form-password-input", "tabindex": "2", "type": "password", "class": "form-control", "placeholder": "Password", "autocomplete": "off" })
+        .appendElement({ "tag": "div", "id": "login-form-password-error", "class": "help-block with-errors", "style": "text-align: center;" })
+        .up()
         // The remember me and login button.
         .appendElement({ "tag": "div", "class": "form-group" }).down()
         .appendElement({ "tag": "div", "class": "row" }).down()
@@ -230,6 +260,10 @@ var BlogManager = function (parent) {
         // The logout link.
         .appendElement({ "tag": "li", "id": "logout-dropdown-lnk", "style": "display: none;" }).down()
         .appendElement({ "tag": "a", "id": "logout-lnk", "href": "#" })
+
+    // Set the form validator.
+    $('#register-form').validator()
+    $('#user-info-form').validator()
 
     // The content
     this.container = parent.appendElement({ "tag": "div", "class": "container" }).down()
@@ -438,6 +472,8 @@ var BlogManager = function (parent) {
                     // If the account dosent have user info I will show it.
                     if (result.M_accountPtr.M_userRef == "") {
                         userInfoDropdownLnk.element.className = "dropdown open"
+                        // Set the account email here.
+                        document.getElementById("email").value = result.M_accountPtr.M_email
                         document.getElementById("first_name").focus()
                     } else {
                         // In that case i will set the user values.
@@ -449,8 +485,30 @@ var BlogManager = function (parent) {
                     }
                 },
                 function (errObj, caller) {
+                    var err = errObj.dataMap.errorObj
+                    var loginNameInput = caller.loginNameInput.element
+                    var loginPasswordInput = caller.loginPasswordInput.element
+                    var loginFormPasswordError =  document.getElementById("login-form-password-error")
+                    var loginFormUsernameError =  document.getElementById("login-form-username-error")
 
-                }, { "blogManager": blogManager })
+                    if (err["M_id"] == "PASSWORD_MISMATCH_ERROR") {
+                        loginFormPasswordError.innerHTML = err["M_body"]
+                    }else if(err["M_id"]== "ACCOUNT_DOESNT_EXIST_ERROR"){
+                        loginFormUsernameError.innerHTML =  err["M_body"]
+                        loginNameInput.setSelectionRange(0, loginNameInput.value.length)
+                        loginNameInput.focus()
+                    }  
+                    loginPasswordInput.value = ""
+
+                    // Clear the message after 2 seconds.
+                    setTimeout(function(loginFormUsernameError, loginFormPasswordError){
+                        return function(){
+                            loginFormUsernameError.innerHTML = ""
+                            loginFormPasswordError.innerHTML = ""
+                        }
+                    }(loginFormUsernameError, loginFormPasswordError ), 2000)
+
+                }, { "blogManager": blogManager, "loginNameInput":loginNameInput, "loginPasswordInput":loginPasswordInput})
         }
     } (this, loginNameInput, loginPasswordInput)
 
@@ -506,12 +564,12 @@ var BlogManager = function (parent) {
             }
 
             // Set the user fields
+            user.M_id = blogManager.account.M_id
             user.M_firstName = firstNameInput.element.value
             user.M_lastName = lastNameInput.element.value
             user.M_middle = middleNameInput.element.value
             user.M_email = emailInput.element.value
             user.M_phone = phone.element.value
-            user.M_id = blogManager.account.M_id
             user.M_entitiesPtr = blogManager.account.M_entitiesPtr
             user.NeedSave = true
 
@@ -526,7 +584,7 @@ var BlogManager = function (parent) {
                         server.entityManager.saveEntity(blogManager.account)
                         caller.blogManager.userInfoLnk.className = "dropdown"
                         // Create the author...
-                        caller.blogManager.createAuthor(result)
+                        caller.blogManager.saveAuthor(result)
                     },
                     // Error callback
                     function (errObj, caller) {
@@ -537,7 +595,7 @@ var BlogManager = function (parent) {
                     // The success callback
                     function (result, caller) {
                         caller.blogManager.userInfoLnk.className = "dropdown"
-                        //caller.blogManager.createAuthor(result)
+                        caller.blogManager.saveAuthor(result)
                     },
                     // The error callback
                     function (errObj, caller) {
@@ -554,37 +612,13 @@ var BlogManager = function (parent) {
 /**
  * The post creator.
  */
-BlogManager.prototype.createAuthor = function (user) {
-    // First I will get the next id...
-    var query = "SELECT MAX(id) FROM " + authorTypeName
-    server.dataManager.read("Blog", query, ["int"], [],
-        // success callback
-        function (result, caller) {
-            var lastId = 0
-            if (result[0][0][0] != undefined) {
-                lastId = parseInt(result[0][0][0])
-            }
-
-            // Here I will use the display name to keep the user uuid inside the 
-            // field display name.
-            var author = eval("new " + authorTypeName + "()")
-            author.M_id = lastId + 1 // Set to the next incremental value here.
-            author.M_display_name = user.UUID // The related user uuid.
-            author.M_first_name = user.M_firstName
-            author.M_last_name = user.M_lastName
-
-            // save the author information.
-            server.entityManager.createEntity("", "", authorTypeName, "", author)
-        },
-        // progress callback
-        function (index, total, caller) {
-
-        },
-        // error callback
-        function (errObj, caller) {
-
-        },
-        {})
+BlogManager.prototype.saveAuthor = function (user) {
+    // Here I will use the display name to keep the user uuid inside the 
+    // field display name.
+    var author = eval("new " + authorTypeName + "()")
+    author.M_id = user.UUID // The related user uuid.
+    // save the author information.
+    server.entityManager.saveEntity(author)
 }
 
 /**

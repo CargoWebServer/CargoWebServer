@@ -1181,7 +1181,7 @@ func (this *SqlDataStore) setRefs() error {
 			sourceField_isId := Utility.Contains(src.Ids, "M_"+values[i][3].(string))
 
 			// I will set the field as non visible, the ref will be display
-			//src.FieldsVisibility[src.getFieldIndex("M_"+values[i][3].(string))] = false
+			src.FieldsVisibility[src.getFieldIndex("M_"+values[i][3].(string))] = false
 
 			targetField_isId := Utility.Contains(trg.Ids, "M_"+values[i][5].(string))
 

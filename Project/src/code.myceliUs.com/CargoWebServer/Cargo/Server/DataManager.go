@@ -232,9 +232,16 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 									for j := 0; j < len(ids); j++ {
 										// The first ids in the list of ids are always the uuid so
 										// the index is j+1
-										query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=" + Utility.ToString(ids[j])
+										id := Utility.ToString(ids[j])
+										typeName := prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[j+1])]
+										// if the type is a string...
+										if isXsString(typeName) {
+											id = "'" + id + "'"
+										}
+										query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=" + id
 									}
 								}
+
 								// Now I will get data from sql...
 								sqlData, err := this.readData(dataBaseName, query, fieldsType, params)
 								if err == nil {
@@ -479,35 +486,39 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 						}
 					}
 				}
-
-				// The sql query.
-				query := "UPDATE " + dataBaseName
-				if len(schemaId) > 0 {
-					query += "." + schemaId
-				}
-				query += "." + tableName + " SET "
-
-				for i := 0; i < len(fieldsName); i++ {
-					query += fieldsName[i] + "=?"
-					if i < len(fieldsName)-1 {
-						query += ", "
+				if len(fieldsName) > 0 {
+					// The sql query.
+					query := "UPDATE " + dataBaseName
+					if len(schemaId) > 0 {
+						query += "." + schemaId
 					}
-				}
+					query += "." + tableName + " SET "
 
-				if len(ids) > 0 {
-					query += " WHERE "
-					for i := 0; i < len(ids); i++ {
-						query += idsFieldsName[i] + "=?"
-						if i < len(ids)-1 {
-							query += " AND "
+					for i := 0; i < len(fieldsName); i++ {
+						query += fieldsName[i] + "=?"
+						if i < len(fieldsName)-1 {
+							query += ", "
 						}
 					}
-				}
 
-				// Update the entity.
-				err = this.updateData(dataBaseName, query, data, ids)
-				if err == nil {
-					log.Println("-------> update data succeeded!")
+					if len(ids) > 0 {
+						query += " WHERE "
+						for i := 0; i < len(ids); i++ {
+							query += idsFieldsName[i] + "=?"
+							if i < len(ids)-1 {
+								query += " AND "
+							}
+						}
+					}
+
+					// Update the entity.
+					err = this.updateData(dataBaseName, query, data, ids)
+					if err == nil {
+						log.Println("-------> update data succeeded!")
+						log.Println(query)
+						log.Println(data)
+						log.Println(ids)
+					}
 				}
 			}
 		}

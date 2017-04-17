@@ -156,7 +156,7 @@ var Element = function (parent, params, callback, appendFront) {
                     } else {
                         this.element.setAttribute(param, params[param])
                     }
-                    server.languageManager.setElementText(this, this.element.id)
+                    
                 } else {
                     if (params["NS"] != undefined) {
                         this.element.setAttributeNS(param.NS, param, params[param])
@@ -164,6 +164,10 @@ var Element = function (parent, params, callback, appendFront) {
                         this.element.setAttribute(param, params[param])
                     }
                 }
+            }
+
+            if(this.element.id.length > 0){
+                server.languageManager.setElementText(this, this.element.id)
             }
 
             if (parent != null) {

@@ -73,7 +73,7 @@ LanguageManager.prototype.registerElementText = function (element, textId) {
 	if (this.textElements[textId] == undefined) {
 		this.textElements[textId] = []
 	}
-	
+
 	this.textElements[textId].push(element)
 
 	// update the element in the array.
@@ -88,10 +88,9 @@ LanguageManager.prototype.setLanguage = function (language) {
 	this.language = language
 	for (var textElementsId in this.textElements) {
 		for (var i = 0; i < this.textElements[textElementsId].length; i++) {
-			var text = this.languageInfo[language][textElementsId]
 			var element = this.textElements[textElementsId][i]
 			if (text != undefined) {
-				element.setAttribute("innerHTML", text)
+				this.setElementText(element, textElementsId)
 			}
 		}
 	}
@@ -103,12 +102,17 @@ LanguageManager.prototype.setLanguage = function (language) {
  * @param {string} textId The id of an element in the languageInfo map.
  */
 LanguageManager.prototype.setElementText = function (element, textId) {
-	if(this.languageInfo[this.language][textId] == undefined){
+	if (this.languageInfo[this.language][textId] == undefined) {
 		return
 	}
 	this.registerElementText(element, textId)
-	if (this.elements[element.id].tagName == "SPAN") {
-		this.elements[element.id].textContent = this.languageInfo[this.language][textId]
+	if (this.elements[element.id].element.tagName == "SPAN") {
+		this.elements[element.id].element.textContent = this.languageInfo[this.language][textId]
+	} else if (this.elements[element.id].element.tagName == "INPUT"){
+		if(this.elements[element.id].element.getAttribute("data-match-error") != null){
+			// Set the error text here.
+			this.elements[element.id].element.attributes["data-match-error"].nodeValue = this.languageInfo[this.language][textId]
+		}
 	} else {
 		this.elements[element.id].setAttribute("innerHTML", this.languageInfo[this.language][textId])
 	}
