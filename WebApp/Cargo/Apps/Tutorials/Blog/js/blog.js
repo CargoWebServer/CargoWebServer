@@ -1,11 +1,11 @@
 
 // global variable.
 var databaseName = "Blog."
-var schemaId = "" //"dbo."
+var schemaId = "dbo."
 
 var userTypeName = databaseName + schemaId + "blog_user"
 var authorTypeName = databaseName + schemaId + "blog_author"
-
+var blogPostTypeName = databaseName + schemaId + "blog_post"
 /**
  * Utility class use to manage data element of the blog.
  */
@@ -51,7 +51,6 @@ var BlogManager = function (parent) {
             // Other parts of header.
             "blog-search-title": "Blog Search",
             "blog-categories": "Blog Categories",
-            "side-well-widget": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore, perspiciatis adipisci accusamus laudantium odit aliquam repellat tempore quos aspernatur vero.",
             "footer-text": "Copyright &copy; Your Website 2017",
             // The user input panel
             "Blog.dbo.blog_user": "User's",
@@ -119,7 +118,7 @@ var BlogManager = function (parent) {
         .appendElement({ "tag": "div", "class": "col-lg-12" }).down()
         .appendElement({ "tag": "div", "class": "text-center" }).down()
         .appendElement({ "tag": "h3", "id": "register-header" }).up()
-        .appendElement({ "tag": "form", "role": "form", "id": "register-form" }).down()
+        .appendElement({ "tag": "div", "role": "form", "id": "register-form" }).down()
         // The user name
         .appendElement({ "tag": "div", "class": "form-group" }).down()
         .appendElement({ "tag": "input", "name": "username", "type": "text", "pattern": "^[_A-z0-9]{1,}$", "maxlength": "15", "id": "register-form-username-input", "tabindex": "1", "class": "form-control", "placeholder": "Username", "autocomplete": "off", "required": "" })
@@ -154,7 +153,7 @@ var BlogManager = function (parent) {
         .appendElement({ "tag": "div", "class": "text-center" }).down()
         .appendElement({ "tag": "h3", "id": "user-info-header" }).up()
         // The form.
-        .appendElement({ "tag": "form", "id": "user-info-form" }).down()
+        .appendElement({ "tag": "div", "id": "user-info-form" }).down()
         // The First name.
         .appendElement({ "tag": "div", "class": "form-group has-feedback" }).down()
         .appendElement({ "tag": "div", "class": "row" }).down()
@@ -307,7 +306,7 @@ var BlogManager = function (parent) {
         .appendElement({ "tag": "li" }).down()
         .appendElement({ "tag": "a", innerHtml: "Category Name" }).up().up().up().up().up()
 
-        // The side Widget Well
+        // The side well widget.
         .appendElement({ "tag": "div", "class": "well" }).down()
         .appendElement({ "tag": "h4" })
         .appendElement({ "tag": "p", "id": "side-well-widget" }).up().appendElement({ "tag": "hr" }).up()
@@ -317,6 +316,9 @@ var BlogManager = function (parent) {
         .appendElement({ "tag": "div", "class": "row" }).down()
         .appendElement({ "tag": "div", "class": "col-lg-12" }).down()
         .appendElement({ "tag": "p", "id": "footer-text" })
+
+    // The side well widget is use to display additionall information like the list of blog for a user.
+    this.sideWellWidget = this.container.getChildById("side-well-widget")
 
     //////////////////////////////////////////////////////////////////////
     // Blog manager action.
@@ -439,6 +441,7 @@ var BlogManager = function (parent) {
 
     // The logged user.
     this.account = null
+    this.authorPostDiv = null
 
     // Only registered user can create a blog.
     this.newBlogLnk = this.navBar.getChildById("new-blog-lnk")
@@ -456,10 +459,12 @@ var BlogManager = function (parent) {
                     var userInfoDropdownLnk = caller.blogManager.userInfoDropdownLnk
                     var loginDropdownLnk = caller.blogManager.loginDropdownLnk
                     var logoutDropdownLnk = caller.blogManager.logoutDropdownLnk
+                    var registerLnk = caller.blogManager.registerLnk
                     var newBlogLnk = caller.blogManager.newBlogLnk
 
                     // Set visibility
                     loginDropdownLnk.element.style.display = "none"
+                    registerLnk.element.style.display = "none"
                     logoutDropdownLnk.element.style.display = ""
                     userInfoDropdownLnk.element.style.display = ""
                     newBlogLnk.element.style.display = ""
@@ -483,32 +488,34 @@ var BlogManager = function (parent) {
                         caller.blogManager.userInfoDropDown.getChildById("email").element.value = result.M_accountPtr.M_userRef.M_email
                         caller.blogManager.userInfoDropDown.getChildById("phone").element.value = result.M_accountPtr.M_userRef.M_phone
                     }
+
+                    // Display the author post inside the the side well widget.
+                    blogManager.displayAuthorPost()
                 },
                 function (errObj, caller) {
                     var err = errObj.dataMap.errorObj
                     var loginNameInput = caller.loginNameInput.element
                     var loginPasswordInput = caller.loginPasswordInput.element
-                    var loginFormPasswordError =  document.getElementById("login-form-password-error")
-                    var loginFormUsernameError =  document.getElementById("login-form-username-error")
-
+                    var loginFormPasswordError = document.getElementById("login-form-password-error")
+                    var loginFormUsernameError = document.getElementById("login-form-username-error")
+                    loginPasswordInput.value = ""
                     if (err["M_id"] == "PASSWORD_MISMATCH_ERROR") {
                         loginFormPasswordError.innerHTML = err["M_body"]
-                    }else if(err["M_id"]== "ACCOUNT_DOESNT_EXIST_ERROR"){
-                        loginFormUsernameError.innerHTML =  err["M_body"]
+                        loginPasswordInput.focus()
+                    } else if (err["M_id"] == "ACCOUNT_DOESNT_EXIST_ERROR") {
+                        loginFormUsernameError.innerHTML = err["M_body"]
                         loginNameInput.setSelectionRange(0, loginNameInput.value.length)
                         loginNameInput.focus()
-                    }  
-                    loginPasswordInput.value = ""
-
+                    }
                     // Clear the message after 2 seconds.
-                    setTimeout(function(loginFormUsernameError, loginFormPasswordError){
-                        return function(){
+                    setTimeout(function (loginFormUsernameError, loginFormPasswordError) {
+                        return function () {
                             loginFormUsernameError.innerHTML = ""
                             loginFormPasswordError.innerHTML = ""
                         }
-                    }(loginFormUsernameError, loginFormPasswordError ), 2000)
+                    } (loginFormUsernameError, loginFormPasswordError), 2000)
 
-                }, { "blogManager": blogManager, "loginNameInput":loginNameInput, "loginPasswordInput":loginPasswordInput})
+                }, { "blogManager": blogManager, "loginNameInput": loginNameInput, "loginPasswordInput": loginPasswordInput })
         }
     } (this, loginNameInput, loginPasswordInput)
 
@@ -622,23 +629,71 @@ BlogManager.prototype.saveAuthor = function (user) {
 }
 
 /**
+ * Set the content of author post.
+ */
+BlogManager.prototype.displayAuthorPost = function () {
+    // The list of post by an author.
+    if (this.authorPostDiv == null) {
+        this.authorPostDiv = this.sideWellWidget.appendElement({ "tag": "div" }).down()
+    }
+}
+
+/**
  * Create a new blog.
  */
-BlogManager.prototype.createNewBlog = function () {
+BlogManager.prototype.createNewBlog = function (author) {
     // Here I will use the data manager to get the number of post.
-    /*var query = "SELECT MAX(id) FROM Blog.blog_post"
+    var query = "SELECT MAX(id) FROM " + blogPostTypeName
     server.dataManager.read("Blog", query, ["int"], [],
         // success callback
         function (result, caller) {
-            var lastId = 1
-            if (result[0][0] != null) {
-                lastId = result[0][0]
+            var lastId = 0
+            if (result[0][0][0] != null) {
+                lastId = result[0][0][0]
             }
 
-            // So here I will create a new blog post and from it I will set it view.
-            var post = new Blog.blog_post()
-            post.M_id = lastId
-            
+            // Now I will save the post...
+            // The post is own by author, so if we delete an author all it's post will be deleted.
+            server.entityManager.getEntityById("sql_info", authorTypeName, caller.blogManager.account.M_userRef.UUID,
+                function (author, caller) {
+                    // So here I will create a new blog post and from it I will set it view.
+                    var post = eval("new " + blogPostTypeName + "()")
+                    post.M_id = caller.lastId + 1
+                    post.M_title = "Blog Post Title"
+                    post.M_article = "<p class=\"lead\">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus, vero, obcaecati, aut, error quam sapiente nemo saepe quibusdam sit excepturi nam quia corporis eligendi eos magni recusandae laborum minus inventore?</p>"
+                        + "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut, tenetur natus doloremque laborum quos iste ipsum rerum obcaecati impedit odit illo dolorum ab tempora nihil dicta earum fugiat. Temporibus, voluptatibus.</p>"
+                        + " <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, doloribus, dolorem iusto blanditiis unde eius illum consequuntur neque dicta incidunt ullam ea hic porro optio ratione repellat perspiciatis. Enim, iure!</p>"
+                        + "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Error, nostrum, aliquid, animi, ut quas placeat totam sunt tempora commodi nihil ullam alias modi dicta saepe minima ab quo voluptatem obcaecati?</p>"
+                        + "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, dolor quis. Sunt, ut, explicabo, aliquam tenetur ratione tempore quidem voluptates cupiditate voluptas illo saepe quaerat numquam recusandae? Qui, necessitatibus, est!</p>"
+                    post.M_author_id = author.M_id
+                    post.M_date_published = new Date()
+                    post.M_featuread = 1
+                    post.M_enabled = 1
+                    post.M_comments_enabled = 1
+                    post.M_views = 0
+
+                    // Attribute name can change from db... 
+                    var attributeName = "M_FK_blog_post_blog_author"
+
+                    server.entityManager.createEntity(author.UUID, attributeName, blogPostTypeName, "", post,
+                        // Success callback.
+                        function (post, caller) {
+                            // Create a new Blog.
+                            caller.blogManager.activeBlogView = new BlogPostView(caller.blogManager.blogContainer, post)
+
+                            // Set the blog view editable.
+                            caller.blogManager.setEditable(caller.blogManager.activeBlogView)
+                        },
+                        // Error callback
+                        function (errObj, caller) {
+                            // Error here.
+                        }, {"blogManager": caller.blogManager})
+
+
+                },
+                function (errObj, caller) {
+
+                }, { "blogManager": caller.blogManager, "lastId": lastId })
         },
         // progress callback
         function (index, total, caller) {
@@ -648,14 +703,7 @@ BlogManager.prototype.createNewBlog = function () {
         function (errObj, caller) {
 
         },
-        {})*/
-
-
-    // Create a new Blog.
-    // this.activeBlogView = new BlogPostView(this.blogContainer, 1)
-
-    // Set the blog view editable.
-    //this.setEditable(this.activeBlogView)
+        { "blogManager": this })
 }
 
 /**
@@ -738,7 +786,10 @@ BlogManager.prototype.saveActiveBlog = function () {
 /**
  * There is the blog the blog view.
  */
-var BlogPostView = function (parent, blog) {
+var BlogPostView = function (parent, post) {
+
+    // A reference to the post.
+    this.post = post
 
     // The blog text interface elements
     var languageInfo = {
@@ -795,15 +846,31 @@ var BlogPostView = function (parent, blog) {
 
     // The title div
     this.titleDiv = this.pageContainer.getChildById("blog-post-title")
+    this.titleDiv.element.innerHTML = this.post.M_title
 
     // The author div
     this.authorDiv = this.pageContainer.getChildById("author-name")
 
+    // The entity uuid.
+    server.entityManager.getEntityByUuid(this.post.M_author_id,
+        // Success Callback
+        function (result, caller) {
+            caller.authorDiv.element.innerHTML = result.M_firstName + " " + result.M_lastName
+        },
+        // Error Callback
+        function (errObj, caller) {
+            // Print error here...
+        },
+        { "authorDiv": this.authorDiv })
+
+
     // The created div.
     this.createdDiv = this.pageContainer.getChildById("created-date")
+    this.createdDiv.element.innerHTML = " " + this.post.M_date_published
 
     // The page content.
     this.pageContentDiv = this.pageContainer.getChildById("page-content")
+    this.pageContentDiv.element.innerHTML = this.post.M_article
 
     // The summit button.
     this.submitCommentBtn = this.pageContainer.getChildById("submit-comment")

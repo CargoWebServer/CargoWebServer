@@ -56,8 +56,8 @@ var CodeEditor = function (parent) {
             codeEditor.removeFile(fileId)
             if (codeEditor.toolbars[fileId] != undefined) {
                 for (var i = 0; i < codeEditor.toolbars[fileId].length; i++) {
-                    var toolbar = codeEditor.toolbars[fileId][i]
-                    homepage.toolbarDiv.removeElement(toolbar)
+                    var toolbar = codeEditor.toolbars[fileId][i];
+                    homepage.toolbarDiv.removeElement(toolbar);
                 }
             }
             codeEditor.toolbars[fileId] = []
@@ -66,7 +66,7 @@ var CodeEditor = function (parent) {
 
     // Attach the file update event.
     server.fileManager.attach(this, UpdateFileEvent, function (evt, codeEditor) {
-        if (evt.dataMap["fileInfo"] != undefined) {
+        if (evt.dataMap.fileInfo !== undefined) {
             var file = evt.dataMap["fileInfo"]
             var editor = codeEditor.editors[file.M_id + "_editor"]
             if (editor != undefined) {

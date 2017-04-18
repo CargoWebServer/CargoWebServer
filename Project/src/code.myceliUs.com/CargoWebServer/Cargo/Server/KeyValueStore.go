@@ -1441,7 +1441,7 @@ func isXsBoolean(fieldType string) bool {
  * Helper function use to dertermine if a XS type must be considere date value.
  */
 func isXsDate(fieldType string) bool {
-	if strings.HasSuffix(fieldType, "date") || strings.HasSuffix(fieldType, "dateTime") || strings.HasSuffix(fieldType, "datetime2") || strings.HasSuffix(fieldType, "smalldatetime") || strings.HasSuffix(fieldType, "datetimeoffset") {
+	if strings.HasSuffix(fieldType, "date") || strings.HasSuffix(fieldType, "datetime") || strings.HasSuffix(fieldType, "datetime2") || strings.HasSuffix(fieldType, "smalldatetime") || strings.HasSuffix(fieldType, "datetimeoffset") {
 		return true
 	}
 	return false

@@ -199,7 +199,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 								fieldName := q.Fields[j]
 								fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
 								// If the field is an id
-								if !strings.HasSuffix(fieldType, ":Ref") && strings.HasPrefix(fieldName, "M_") {
+								if !strings.HasSuffix(fieldType, ":Ref") && strings.HasPrefix(fieldName, "M_") && !strings.HasPrefix(fieldName, "M_FK_") {
 									if j < len(data[i]) {
 										if Utility.Contains(prototype.Ids, fieldName) {
 											ids = append(ids, data[i][j]) // append the id
@@ -210,6 +210,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 									}
 								}
 							}
+
 							if len(fields) > 0 {
 								// Now I will recreate the sql query string.
 								query := "SELECT "
@@ -251,6 +252,8 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 											// Set the value.
 											data[i][dataIndex[j]] = sqlData[0][j]
 										}
+									} else {
+										return data, errors.New("No sql data was found for entity " + data[i][0].(string))
 									}
 								} else {
 									return data, err
@@ -262,8 +265,8 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 					}
 				}
 			} else if len(data[i]) == 1 {
-				// The entity exist but no data was found...
-				return data, errors.New("No sql data was found for entity " + data[i][0].(string))
+				// The entity exist but no sql data was found...
+				return data, nil
 			}
 		}
 	}
@@ -284,6 +287,7 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 		return nil, errors.New("Data store '" + storeName + " does not exist.")
 	}
 
+	// Create the entity...
 	lastId, err = store.Create(query, d)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
@@ -302,7 +306,6 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 			if tableName == "sysdiagrams" {
 				return nil, errors.New("system table " + tableName + " is not a valid table.")
 			}
-
 			schemaId := ""
 			if len(values) == 3 {
 				schemaId = values[1]
@@ -328,7 +331,7 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 					index := prototype.getFieldIndex(fieldName)
 					if index > 0 {
 						fieldType := prototype.FieldsType[index]
-						if strings.HasPrefix(fieldName, "M_") && !strings.HasSuffix(fieldType, ":Ref") {
+						if strings.HasPrefix(fieldName, "M_") && !strings.HasSuffix(fieldType, ":Ref") && !strings.HasPrefix(fieldName, "M_FK_") {
 							fields = append(fields, fieldName)
 							fieldsType = append(fieldsType, fieldType)
 							// In case of null value...
@@ -341,7 +344,16 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 									d[i] = "NULL"
 								}
 							}
-							data = append(data, d[i])
+
+							// Here I will convert the data
+							if isXsBoolean(fieldType) && reflect.TypeOf(d[i]).String() == "float64" {
+								log.Println("=-----------> ", int8(d[i].(float64)))
+								data = append(data, int8(d[i].(float64)))
+							} else if isXsInt(fieldType) && reflect.TypeOf(d[i]).String() == "float64" {
+								data = append(data, int32(d[i].(float64)))
+							} else {
+								data = append(data, d[i])
+							}
 						}
 					}
 				}
@@ -357,16 +369,19 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 
 				// Set the values...
 				query += ")" + values + ")"
-
-				id, err := this.createData(dataBaseName, query, data)
+				_, err := this.createData(dataBaseName, query, data)
 				if err == nil {
-					log.Println("--------> data insert sucessfully! ", id)
+					log.Println("--------> data insert sucessfully!")
 				} else {
 					log.Println("--------> data insert fail with err: ", err)
+					log.Println(query)
+					log.Println(data)
+					return -1, err
 				}
 			}
 		}
 	}
+
 	return
 }
 
@@ -473,7 +488,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 				idsFieldsName := make([]string, 0)
 				prototype, _ := GetServer().GetEntityManager().getEntityPrototype(entityQuery.TypeName, "sql_info")
 				for i := 0; i < len(entityQuery.Fields); i++ {
-					if strings.HasPrefix(entityQuery.Fields[i], "M_") {
+					if strings.HasPrefix(entityQuery.Fields[i], "M_") && !strings.HasPrefix(entityQuery.Fields[i], "M_FK") {
 						fieldType := prototype.FieldsType[prototype.getFieldIndex(entityQuery.Fields[i])]
 						if !strings.HasSuffix(fieldType, ":Ref") {
 							if Utility.Contains(prototype.Ids, entityQuery.Fields[i]) {
@@ -481,7 +496,13 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 								idsFieldsName = append(idsFieldsName, entityQuery.Fields[i][2:])
 							} else {
 								fieldsName = append(fieldsName, entityQuery.Fields[i][2:])
-								data = append(data, fields[i])
+								if isXsBoolean(fieldType) && reflect.TypeOf(fields[i]).String() == "float64" {
+									data = append(data, int8(fields[i].(float64)))
+								} else if isXsInt(fieldType) && reflect.TypeOf(fields[i]).String() == "float64" {
+									data = append(data, int32(fields[i].(float64)))
+								} else {
+									data = append(data, fields[i])
+								}
 							}
 						}
 					}
@@ -515,9 +536,6 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 					err = this.updateData(dataBaseName, query, data, ids)
 					if err == nil {
 						log.Println("-------> update data succeeded!")
-						log.Println(query)
-						log.Println(data)
-						log.Println(ids)
 					}
 				}
 			}
