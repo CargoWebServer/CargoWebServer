@@ -13,7 +13,6 @@ import (
 	"github.com/pborman/uuid"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"github.com/orcaman/concurrent-map"
 )
 
 /**
@@ -39,7 +38,8 @@ type DynamicEntity struct {
 	prototype      *EntityPrototype
 
 	/** object will be a map... **/
-	object *cmap.ConcurrentMap
+	//object *cmap.ConcurrentMap
+	object map[string]interface{}
 
 	/**
 	 * Use to protected the ressource access...
@@ -73,6 +73,19 @@ func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error)
  * Create a new dynamic entity...
  */
 func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string]interface{}) (*DynamicEntity, *CargoEntities.Error) {
+
+	var parentPtr Entity
+
+	// Set the parent uuid in that case.
+	if len(parentUuid) == 0 && values["ParentUuid"] != nil {
+		parentUuid = values["ParentUuid"].(string)
+	}
+
+	// I will set it parent ptr...
+	if len(parentUuid) > 0 {
+		values["ParentUuid"] = parentUuid
+		parentPtr, _ = GetServer().GetEntityManager().getDynamicEntityByUuid(parentUuid)
+	}
 
 	var entity *DynamicEntity
 	prototype, err := getEntityPrototype(values)
@@ -110,10 +123,8 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 	}
 
 	// Try to retreive the entity.
-	log.Println("--------> try to find ", values["UUID"])
 	if val, ok := this.contain(values["UUID"].(string)); ok {
 		if val != nil {
-			log.Println("--------> try to find 116")
 			entity = val.(*DynamicEntity)
 			// Calculate the checksum.
 			sum0 := Utility.GetChecksum(values)
@@ -136,7 +147,6 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 
 	// Here if the enity is nil I will create a new instance.
 	if entity == nil {
-		log.Println("--------> try to find 139")
 		entity = new(DynamicEntity)
 
 		// If the object contain an id...
@@ -145,22 +155,15 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 		// keep the reference to the prototype.
 		entity.prototype = prototype
 
-		// If the entity does not exist I will generate it new uuid...
-		if len(entity.uuid) == 0 {
-			entity.uuid = values["UUID"].(string)
-		}
-
 		entity.childsUuid = make([]string, 0)
 		entity.referencesUuid = make([]string, 0)
 		entity.referenced = make([]EntityRef, 0)
 
-		// I will set it parent ptr...
-		if len(parentUuid) > 0 {
-			parentPtr, _ := GetServer().GetEntityManager().getDynamicEntityByUuid(parentUuid)
-			if parentPtr != nil {
-				entity.SetParentPtr(parentPtr)
-			}
-		}
+	}
+
+	if parentPtr != nil {
+		// Set the parent uuid.
+		entity.SetParentPtr(parentPtr)
 	}
 
 	// Set the object value with the values, need save will be set
@@ -180,57 +183,56 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
  * Thread safe function
  */
 func (this *DynamicEntity) setValue(field string, value interface{}) {
-	this.object.Set(field, value)
+	this.Lock()
+	defer this.Unlock()
+
+	this.object[field] = value
 }
 
 /**
  * Thread safe function
  */
 func (this *DynamicEntity) getValue(field string) interface{} {
-	val, exist := this.object.Get(field)
-	if exist {
-		return val
-	}
-
-	return nil
+	this.Lock()
+	defer this.Unlock()
+	return this.object[field]
 }
 
 /**
  * Thread safe function
  */
 func (this *DynamicEntity) deleteValue(field string) {
-	this.object.Remove(field)
+	this.Lock()
+	defer this.Unlock()
+	delete(this.object, field)
 }
 
 /**
  * Set object.
  */
 func (this *DynamicEntity) setObject(obj map[string]interface{}) {
-	if this.object == nil {
-		object := cmap.New()
-		this.object = &object
-	}
-
-	this.object.MSet(obj)
+	this.Lock()
+	defer this.Unlock()
+	this.object = obj
 }
 
 /**
  * Append a new value.
  */
 func (this *DynamicEntity) appendValue(field string, value interface{}) {
-	values, exist := this.object.Get(field)
+	values := this.getValue(field)
 
-	if !exist {
+	if values != nil {
 		// Here no value aready exist.
 		if reflect.TypeOf(value).Kind() == reflect.String {
 			values = make([]string, 1)
 			values.([]string)[0] = value.(string)
-			this.object.Set(field, values)
+			this.setValue(field, values)
 		} else if reflect.TypeOf(value).String() == "*Server.DynamicEntity" {
 			if strings.HasSuffix(this.prototype.FieldsType[this.prototype.getFieldIndex(field)], ":Ref") {
 				values = make([]string, 1)
 				values.([]string)[0] = value.(Entity).GetUuid()
-				this.object.Set(field, values)
+				this.setValue(field, values)
 			} else {
 				this.AppendChild(field, value.(Entity))
 			}
@@ -238,19 +240,19 @@ func (this *DynamicEntity) appendValue(field string, value interface{}) {
 			// Other types.
 			values = make([]interface{}, 1)
 			values.([]interface{})[0] = value
-			this.object.Set(field, values)
+			this.setValue(field, values)
 		}
 
 	} else {
 		// An array already exist in that case.
 		if reflect.TypeOf(value).Kind() == reflect.String {
 			values = append(values.([]string), value.(string))
-			this.object.Set(field, values)
+			this.setValue(field, values)
 		} else if reflect.TypeOf(value).String() == "*Server.DynamicEntity" {
 			if strings.HasSuffix(this.prototype.FieldsType[this.prototype.getFieldIndex(field)], ":Ref") {
 				if !Utility.Contains(values.([]string), value.(Entity).GetUuid()) {
 					values = append(values.([]string), value.(Entity).GetUuid())
-					this.object.Set(field, values)
+					this.setValue(field, values)
 				}
 			} else {
 				this.AppendChild(field, value.(Entity))
@@ -258,7 +260,7 @@ func (this *DynamicEntity) appendValue(field string, value interface{}) {
 		} else {
 			// Other types.
 			values = append(values.([]interface{}), value)
-			this.object.Set(field, values)
+			this.setValue(field, values)
 		}
 	}
 
@@ -333,7 +335,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 	query.Fields = append(query.Fields, this.prototype.Fields...)
 
 	// The index of search...
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 
@@ -464,7 +466,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 
 												if err != nil {
 													// In that case I will try with dynamic entity.
-													dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity("", values)
+													dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.GetUuid(), values)
 													if errObj == nil {
 														// initialise the sub entity.
 														err := dynamicEntity.initEntity(uuids[i], path+"|"+this.GetUuid())
@@ -526,7 +528,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 
 										if err != nil {
 											// In that case I will try with dynamic entity.
-											dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity("", values)
+											dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.GetUuid(), values)
 											if errObj == nil {
 												// initialise the sub entity.
 												err := dynamicEntity.initEntity(uuid, path+"|"+this.GetUuid())
@@ -582,7 +584,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
  */
 func (this *DynamicEntity) SaveEntity() {
 	this.saveEntity("")
-	//log.Println("After save:", toJsonStr(this.object))
+	log.Println("After save:", toJsonStr(this.object))
 }
 
 func (this *DynamicEntity) saveEntity(path string) {
@@ -601,13 +603,16 @@ func (this *DynamicEntity) saveEntity(path string) {
 	query.TypeName = this.GetTypeName()
 
 	// General information.
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	DynamicEntityInfo = append(DynamicEntityInfo, this.GetUuid())
 
 	query.Fields = append(query.Fields, "ParentUuid")
 	if len(this.parentUuid) > 0 {
 		DynamicEntityInfo = append(DynamicEntityInfo, this.parentUuid)
 		this.setValue("ParentUuid", this.parentUuid)
+	} else if this.getValue("ParentUuid") != nil {
+		DynamicEntityInfo = append(DynamicEntityInfo, this.getValue("ParentUuid"))
+		this.setValue("ParentUuid", this.getValue("ParentUuid"))
 	} else {
 		DynamicEntityInfo = append(DynamicEntityInfo, "")
 		this.setValue("ParentUuid", "")
@@ -986,12 +991,11 @@ func (this *DynamicEntity) saveEntity(path string) {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
-		log.Println("------------------------------> ", this.uuid, " exist!")
 		err = GetServer().GetDataManager().updateData(storeId, string(queryStr), DynamicEntityInfo, params)
 	} else {
-		log.Println("------------------------------> ", this.uuid, " not exist!")
+		log.Println("-----> ", this.uuid, " not exist!")
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 		// Save the values for that entity.
 		queryStr, _ := json.Marshal(query)
@@ -1412,7 +1416,10 @@ func (this *DynamicEntity) RemoveReferenced(name string, owner Entity) {
  * Return the object wrapped by this entity...
  */
 func (this *DynamicEntity) GetObject() interface{} {
-	return this.object.Items()
+	this.Lock()
+	defer this.Unlock()
+	//return this.object.Items()
+	return this.object
 }
 
 /**
@@ -1765,7 +1772,7 @@ func (this *DynamicEntity) Exist() bool {
 	// log.Println("-------> test if entity ", this.uuid, " exist.")
 	var query EntityQuery
 	query.TypeName = this.GetTypeName()
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 	query.Fields = append(query.Fields, this.prototype.Ids...) // Get all it ids...
 	var fieldsType []interface{}                               // not use...
 	var params []interface{}

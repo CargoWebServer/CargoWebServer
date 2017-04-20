@@ -281,7 +281,6 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
  * value to insert in the DB.
  */
 func (this *DataManager) createData(storeName string, query string, d []interface{}) (lastId interface{}, err error) {
-	log.Println("-------------> 284 ", d)
 	// If the store is sql_info in that case I will need to create the information
 	// in the sql data store.
 	store := this.getDataStore(storeName)
@@ -334,7 +333,6 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 					if index > 0 {
 						fieldType := prototype.FieldsType[index]
 						if strings.HasPrefix(fieldName, "M_") && !strings.HasSuffix(fieldType, ":Ref") && !strings.HasPrefix(fieldName, "M_FK_") && !strings.HasPrefix(fieldName, "M_fk_") {
-							log.Println("--------------> 336", fieldName)
 							fields = append(fields, fieldName)
 							fieldsType = append(fieldsType, fieldType)
 							// In case of null value...
@@ -383,8 +381,6 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 					log.Println("--------> data insert sucessfully!")
 				} else {
 					log.Println("--------> data insert fail with err: ", err)
-					log.Println(query)
-					log.Println(data)
 					return -1, err
 				}
 			}
@@ -464,6 +460,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 	if store == nil {
 		return errors.New("Data store " + storeName + " does not exist.")
 	}
+
 	err = store.Update(query, fields, params)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
@@ -552,8 +549,6 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 					err = this.updateData(dataBaseName, query, data, ids)
 					if err == nil {
 						log.Println("-------> update data succeeded!")
-						log.Println(query)
-						log.Println(data)
 					}
 				}
 			}

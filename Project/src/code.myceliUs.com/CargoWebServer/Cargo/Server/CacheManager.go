@@ -61,7 +61,7 @@ func newCacheManager() *CacheManager {
 }
 
 var (
-	timeout = time.Duration(30)
+	timeout = time.Duration(5 * time.Minute)
 )
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -316,7 +316,7 @@ func (this *KeyValueDataStore) GetEntityPrototype(id string) (*EntityPrototype, 
  */
 func (this *KeyValueDataStore) getKey(prototype *EntityPrototype, entity []interface{}) string {
 	// The first value of the entity must be the key...
-	return entity[prototype.getFieldIndex("uuid")].(string)
+	return entity[prototype.getFieldIndex("UUID")].(string)
 }
 
 /**

@@ -285,6 +285,7 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 	for i := 0; i < len(results); i++ {
 		row := results[i]
 		user := new(CargoEntities.User)
+
 		for j := 0; j < len(row); j++ {
 			// Print the result...
 			if attributes[j] == "name" {
@@ -322,7 +323,11 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 		// Specific ...
 		// here i will test if the user exist...
 		userUuid := CargoEntitiesUserExists(user.M_id)
+
 		if len(userUuid) == 0 && len(user.GetEmail()) > 0 {
+
+			// Set the uuid of the user.
+			GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", user)
 
 			// The user must be save...
 			log.Println("Save user ", user.GetEmail(), "an id ", user.GetId())
@@ -341,7 +346,7 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 				account.M_email = user.GetEmail()
 
 				// Set the account uuid.
-				GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", account)
+				GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(cargoEntities.GetUuid(), "", account)
 
 				entities.SetEntities(account)
 				account.SetEntitiesPtr(entities)
@@ -446,6 +451,7 @@ func (this *LdapManager) SynchronizeGroups(id string) error {
 				// Now I will retrive user inside this group...
 				group.SetId(row[j].(string))
 				group.SetName(row[j].(string))
+				// Set the uuid of the group.
 				GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(server.GetEntityManager().getCargoEntities().GetUuid(), "", group)
 			}
 		}
@@ -598,7 +604,7 @@ func (this *LdapManager) GetComputerByName(name string) (*CargoEntities.Computer
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Computer"
 	query.Indexs = append(query.Indexs, "M_name="+name)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)

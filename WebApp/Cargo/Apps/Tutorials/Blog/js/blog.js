@@ -612,7 +612,7 @@ var BlogManager = function (parent) {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     // The delete entity event.
     server.entityManager.attach(this, DeleteEntityEvent, function (evt, blogManager) {
-        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName) {
+        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView!=null) {
             if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
                 if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
                     console.log("delete post!")
@@ -624,7 +624,7 @@ var BlogManager = function (parent) {
     // The new entity event.
     server.entityManager.attach(this, NewEntityEvent, function (evt, blogManager) {
         // I will reinit the panel here...
-        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName) {
+        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView!=null) {
             if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
                 if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
                     console.log("new post!")
@@ -635,7 +635,7 @@ var BlogManager = function (parent) {
 
     // The update entity event.
     server.entityManager.attach(this, UpdateEntityEvent, function (evt, blogManager) {
-        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName) {
+        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView!=null) {
             if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
                 // I will reinit the panel here...
                 if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
@@ -760,8 +760,7 @@ BlogManager.prototype.createNewPost = function (author) {
                     post.M_views = 0
                     
                     // Link to the blog author object.
-
-                    //post.M_FK_blog_post_blog_author = author.UUID
+                    post.M_FK_blog_post_blog_author = author.UUID
 
 
                     server.entityManager.createEntity(author.UUID, "M_FK_blog_post_blog_author", blogPostTypeName, "", post,
@@ -884,7 +883,7 @@ BlogManager.prototype.setEditable = function (blogView) {
 BlogManager.prototype.saveActivePost = function () {
     // Here the post to save is in the active view.
     var post = this.activePostView.post
-    var author = server.entityManager.
+    //var author = server.entityManager.
     server.entityManager.saveEntity(post)
 }
 
@@ -961,7 +960,7 @@ var BlogPostView = function (parent, post) {
     this.authorDiv = this.pageContainer.getChildById("author-name")
 
     // The entity uuid.
-    server.entityManager.getEntityByUuid(this.post.M_author_id,
+    server.entityManager.getEntityByUuid(this.post.M_blog_author_id,
         // Success Callback
         function (result, caller) {
             caller.authorDiv.element.innerHTML = result.M_firstName + " " + result.M_lastName
@@ -975,7 +974,10 @@ var BlogPostView = function (parent, post) {
 
     // The created div.
     this.createdDiv = this.pageContainer.getChildById("created-date")
-    this.createdDiv.element.innerHTML = " " + this.post.M_date_published
+
+    // Format the date time to local time.
+    var m = moment(this.post.M_date_published);
+    this.createdDiv.element.innerHTML = " " + m.format('LLL') // Returns "February 8 2013 8:30 AM" on en-us
 
     // The page content.
     this.pageContentDiv = this.pageContainer.getChildById("page-content")

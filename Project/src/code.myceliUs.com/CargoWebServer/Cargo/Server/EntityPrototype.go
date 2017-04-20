@@ -145,14 +145,14 @@ func NewEntityPrototype() *EntityPrototype {
 	prototype.Ids = make([]string, 0)
 
 	// Append the default fields at begin...
-	prototype.Fields = append(prototype.Fields, "uuid")
-	prototype.Ids = append(prototype.Ids, "uuid")
+	prototype.Fields = append(prototype.Fields, "UUID")
+	prototype.Ids = append(prototype.Ids, "UUID")
 	prototype.FieldsOrder = append(prototype.FieldsOrder, 0)
 	prototype.FieldsType = append(prototype.FieldsType, "xs.string")
 	prototype.FieldsVisibility = append(prototype.FieldsVisibility, false)
 
-	prototype.Fields = append(prototype.Fields, "parentUuid")
-	prototype.Indexs = append(prototype.Indexs, "parentUuid")
+	prototype.Fields = append(prototype.Fields, "ParentUuid")
+	prototype.Indexs = append(prototype.Indexs, "ParentUuid")
 	prototype.FieldsOrder = append(prototype.FieldsOrder, 1)
 	prototype.FieldsType = append(prototype.FieldsType, "xs.string")
 	prototype.FieldsVisibility = append(prototype.FieldsVisibility, false)
@@ -235,8 +235,7 @@ func (this *EntityPrototype) generateConstructor() string {
 	constructorSrc += " this.__class__ = \"" + this.TypeName + "\"\n"
 	constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
 	constructorSrc += " this.UUID = \"\"\n"
-	constructorSrc += " this.uuid = this.UUID\n"
-	constructorSrc += " this.parentUuid = \"\"\n"
+	constructorSrc += " this.ParentUuid = \"\"\n"
 	constructorSrc += " this.childsUuid = []\n"
 	constructorSrc += " this.references = []\n"
 	constructorSrc += " this.NeedSave = true\n"

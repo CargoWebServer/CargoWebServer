@@ -224,8 +224,8 @@ func generateEntity(packageId string) {
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) Exist() bool{\n"
 				classStr += "	var query EntityQuery\n"
 				classStr += "	query.TypeName = \"" + packageId + "." + class.Name + "\"\n"
-				classStr += "	query.Indexs = append(query.Indexs, \"uuid=\"+this.uuid)\n"
-				classStr += "	query.Fields = append(query.Fields, \"uuid\")\n"
+				classStr += "	query.Indexs = append(query.Indexs, \"UUID=\"+this.uuid)\n"
+				classStr += "	query.Fields = append(query.Fields, \"UUID\")\n"
 				classStr += "	var fieldsType []interface {} // not use...\n"
 				classStr += "	var params []interface{}\n"
 				classStr += "	queryStr, _ := json.Marshal(query)\n"
@@ -705,8 +705,8 @@ func generateEntityPrototypeFunc(packageId string, class *XML_Schemas.CMOF_Owned
 	index := 0
 
 	// The entity uuid
-	entityPrototypeStr += "	" + prototypeVar + ".Ids = append(" + prototypeVar + ".Ids,\"uuid\")\n"
-	entityPrototypeStr += "	" + prototypeVar + ".Fields = append(" + prototypeVar + ".Fields,\"uuid\")\n"
+	entityPrototypeStr += "	" + prototypeVar + ".Ids = append(" + prototypeVar + ".Ids,\"UUID\")\n"
+	entityPrototypeStr += "	" + prototypeVar + ".Fields = append(" + prototypeVar + ".Fields,\"UUID\")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsType = append(" + prototypeVar + ".FieldsType,\"xs.string\")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsOrder = append(" + prototypeVar + ".FieldsOrder," + strconv.Itoa(index) + ")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsVisibility = append(" + prototypeVar + ".FieldsVisibility,false)\n"
@@ -714,8 +714,8 @@ func generateEntityPrototypeFunc(packageId string, class *XML_Schemas.CMOF_Owned
 	index++
 
 	// The parent uuid
-	entityPrototypeStr += "	" + prototypeVar + ".Indexs = append(" + prototypeVar + ".Indexs,\"parentUuid\")\n"
-	entityPrototypeStr += "	" + prototypeVar + ".Fields = append(" + prototypeVar + ".Fields,\"parentUuid\")\n"
+	entityPrototypeStr += "	" + prototypeVar + ".Indexs = append(" + prototypeVar + ".Indexs,\"ParentUuid\")\n"
+	entityPrototypeStr += "	" + prototypeVar + ".Fields = append(" + prototypeVar + ".Fields,\"ParentUuid\")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsType = append(" + prototypeVar + ".FieldsType,\"xs.string\")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsOrder = append(" + prototypeVar + ".FieldsOrder," + strconv.Itoa(index) + ")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsVisibility = append(" + prototypeVar + ".FieldsVisibility,false)\n"
@@ -1195,8 +1195,8 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	// First of all I will generate the query...
 	entityInitStr += "	var query EntityQuery\n"
 	entityInitStr += "	query.TypeName = \"" + packageId + "." + class.Name + "\"\n\n"
-	entityInitStr += "	query.Fields = append(query.Fields, \"uuid\")\n"
-	entityInitStr += "	query.Fields = append(query.Fields, \"parentUuid\")\n"
+	entityInitStr += "	query.Fields = append(query.Fields, \"UUID\")\n"
+	entityInitStr += "	query.Fields = append(query.Fields, \"ParentUuid\")\n"
 
 	// Now the fields...
 	entityInitStr += generateEntityQueryFields(class, packageId)
@@ -1208,7 +1208,7 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	entityInitStr += "	query.Fields = append(query.Fields, \"referenced\")\n"
 
 	// The indexation...
-	entityInitStr += "	query.Indexs = append(query.Indexs, \"uuid=\"+this.uuid)\n"
+	entityInitStr += "	query.Indexs = append(query.Indexs, \"UUID=\"+this.uuid)\n"
 
 	// In the proto...
 	entityInitStr += "\n	var fieldsType []interface{} // not use...\n"
@@ -1480,8 +1480,8 @@ func generateEntitySaveFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	entitySaveStr += "	var query EntityQuery\n"
 	entitySaveStr += "	query.TypeName = \"" + packageId + "." + class.Name + "\"\n\n"
 
-	entitySaveStr += "	query.Fields = append(query.Fields, \"uuid\")\n"
-	entitySaveStr += "	query.Fields = append(query.Fields, \"parentUuid\")\n"
+	entitySaveStr += "	query.Fields = append(query.Fields, \"UUID\")\n"
+	entitySaveStr += "	query.Fields = append(query.Fields, \"ParentUuid\")\n"
 
 	// Now the fields...
 	entitySaveStr += generateEntityQueryFields(class, packageId)
@@ -1560,7 +1560,7 @@ func generateEntitySaveFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	entitySaveStr += "	if this.Exist() == true {\n"
 	entitySaveStr += "		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)\n"
 	entitySaveStr += "		var params []interface{}\n"
-	entitySaveStr += "		query.Indexs = append(query.Indexs, \"uuid=\"+this.uuid)\n"
+	entitySaveStr += "		query.Indexs = append(query.Indexs, \"UUID=\"+this.uuid)\n"
 	entitySaveStr += "		queryStr, _ := json.Marshal(query)\n"
 	entitySaveStr += "		err = GetServer().GetDataManager().updateData(" + packageId + "DB, string(queryStr), " + class.Name + "Info, params)\n"
 	entitySaveStr += "	} else {\n"
@@ -1606,7 +1606,7 @@ func generateEntityExistsFunc(packageId string, class *XML_Schemas.CMOF_OwnedMem
 	} else if hasName(class) {
 		entityExistStr += "	query.Indexs = append(query.Indexs, \"M_name=\"+val)\n"
 	}
-	entityExistStr += "	query.Fields = append(query.Fields, \"uuid\")\n"
+	entityExistStr += "	query.Fields = append(query.Fields, \"UUID\")\n"
 	entityExistStr += "	var fieldsType []interface {} // not use...\n"
 	entityExistStr += "	var params []interface{}\n"
 

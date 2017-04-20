@@ -17,24 +17,24 @@ func (this *EntityManager) create_CargoEntities_EntityEntityPrototype() {
 	var entityEntityProto EntityPrototype
 	entityEntityProto.TypeName = "CargoEntities.Entity"
 	entityEntityProto.IsAbstract = true
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
-	entityEntityProto.Ids = append(entityEntityProto.Ids, "uuid")
-	entityEntityProto.Fields = append(entityEntityProto.Fields, "uuid")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
+	entityEntityProto.Ids = append(entityEntityProto.Ids, "UUID")
+	entityEntityProto.Fields = append(entityEntityProto.Fields, "UUID")
 	entityEntityProto.FieldsType = append(entityEntityProto.FieldsType, "xs.string")
 	entityEntityProto.FieldsOrder = append(entityEntityProto.FieldsOrder, 0)
 	entityEntityProto.FieldsVisibility = append(entityEntityProto.FieldsVisibility, false)
-	entityEntityProto.Indexs = append(entityEntityProto.Indexs, "parentUuid")
-	entityEntityProto.Fields = append(entityEntityProto.Fields, "parentUuid")
+	entityEntityProto.Indexs = append(entityEntityProto.Indexs, "ParentUuid")
+	entityEntityProto.Fields = append(entityEntityProto.Fields, "ParentUuid")
 	entityEntityProto.FieldsType = append(entityEntityProto.FieldsType, "xs.string")
 	entityEntityProto.FieldsOrder = append(entityEntityProto.FieldsOrder, 1)
 	entityEntityProto.FieldsVisibility = append(entityEntityProto.FieldsVisibility, false)
@@ -311,8 +311,8 @@ func (this *CargoEntities_ParameterEntity) GetChecksum() string {
 func (this *CargoEntities_ParameterEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Parameter"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -336,13 +336,13 @@ func (this *EntityManager) create_CargoEntities_ParameterEntityPrototype() {
 
 	var parameterEntityProto EntityPrototype
 	parameterEntityProto.TypeName = "CargoEntities.Parameter"
-	parameterEntityProto.Ids = append(parameterEntityProto.Ids, "uuid")
-	parameterEntityProto.Fields = append(parameterEntityProto.Fields, "uuid")
+	parameterEntityProto.Ids = append(parameterEntityProto.Ids, "UUID")
+	parameterEntityProto.Fields = append(parameterEntityProto.Fields, "UUID")
 	parameterEntityProto.FieldsType = append(parameterEntityProto.FieldsType, "xs.string")
 	parameterEntityProto.FieldsOrder = append(parameterEntityProto.FieldsOrder, 0)
 	parameterEntityProto.FieldsVisibility = append(parameterEntityProto.FieldsVisibility, false)
-	parameterEntityProto.Indexs = append(parameterEntityProto.Indexs, "parentUuid")
-	parameterEntityProto.Fields = append(parameterEntityProto.Fields, "parentUuid")
+	parameterEntityProto.Indexs = append(parameterEntityProto.Indexs, "ParentUuid")
+	parameterEntityProto.Fields = append(parameterEntityProto.Fields, "ParentUuid")
 	parameterEntityProto.FieldsType = append(parameterEntityProto.FieldsType, "xs.string")
 	parameterEntityProto.FieldsOrder = append(parameterEntityProto.FieldsOrder, 1)
 	parameterEntityProto.FieldsVisibility = append(parameterEntityProto.FieldsVisibility, false)
@@ -395,8 +395,8 @@ func (this *CargoEntities_ParameterEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Parameter"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Parameter **/
 	query.Fields = append(query.Fields, "M_name")
@@ -441,7 +441,7 @@ func (this *CargoEntities_ParameterEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), ParameterInfo, params)
 	} else {
@@ -474,8 +474,8 @@ func (this *CargoEntities_ParameterEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Parameter"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Parameter **/
 	query.Fields = append(query.Fields, "M_name")
@@ -487,7 +487,7 @@ func (this *CargoEntities_ParameterEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -582,7 +582,7 @@ func CargoEntitiesParameterExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Parameter"
 	query.Indexs = append(query.Indexs, "M_name="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -890,8 +890,8 @@ func (this *CargoEntities_ActionEntity) GetChecksum() string {
 func (this *CargoEntities_ActionEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Action"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -915,13 +915,13 @@ func (this *EntityManager) create_CargoEntities_ActionEntityPrototype() {
 
 	var actionEntityProto EntityPrototype
 	actionEntityProto.TypeName = "CargoEntities.Action"
-	actionEntityProto.Ids = append(actionEntityProto.Ids, "uuid")
-	actionEntityProto.Fields = append(actionEntityProto.Fields, "uuid")
+	actionEntityProto.Ids = append(actionEntityProto.Ids, "UUID")
+	actionEntityProto.Fields = append(actionEntityProto.Fields, "UUID")
 	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "xs.string")
 	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 0)
 	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, false)
-	actionEntityProto.Indexs = append(actionEntityProto.Indexs, "parentUuid")
-	actionEntityProto.Fields = append(actionEntityProto.Fields, "parentUuid")
+	actionEntityProto.Indexs = append(actionEntityProto.Indexs, "ParentUuid")
+	actionEntityProto.Fields = append(actionEntityProto.Fields, "ParentUuid")
 	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "xs.string")
 	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 1)
 	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, false)
@@ -975,8 +975,8 @@ func (this *CargoEntities_ActionEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Action"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Action **/
 	query.Fields = append(query.Fields, "M_name")
@@ -1046,7 +1046,7 @@ func (this *CargoEntities_ActionEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), ActionInfo, params)
 	} else {
@@ -1079,8 +1079,8 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Action"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Action **/
 	query.Fields = append(query.Fields, "M_name")
@@ -1092,7 +1092,7 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -1225,7 +1225,7 @@ func CargoEntitiesActionExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Action"
 	query.Indexs = append(query.Indexs, "M_name="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -1533,8 +1533,8 @@ func (this *CargoEntities_ErrorEntity) GetChecksum() string {
 func (this *CargoEntities_ErrorEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Error"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -1560,13 +1560,13 @@ func (this *EntityManager) create_CargoEntities_ErrorEntityPrototype() {
 	errorEntityProto.TypeName = "CargoEntities.Error"
 	errorEntityProto.SuperTypeNames = append(errorEntityProto.SuperTypeNames, "CargoEntities.Entity")
 	errorEntityProto.SuperTypeNames = append(errorEntityProto.SuperTypeNames, "CargoEntities.Message")
-	errorEntityProto.Ids = append(errorEntityProto.Ids, "uuid")
-	errorEntityProto.Fields = append(errorEntityProto.Fields, "uuid")
+	errorEntityProto.Ids = append(errorEntityProto.Ids, "UUID")
+	errorEntityProto.Fields = append(errorEntityProto.Fields, "UUID")
 	errorEntityProto.FieldsType = append(errorEntityProto.FieldsType, "xs.string")
 	errorEntityProto.FieldsOrder = append(errorEntityProto.FieldsOrder, 0)
 	errorEntityProto.FieldsVisibility = append(errorEntityProto.FieldsVisibility, false)
-	errorEntityProto.Indexs = append(errorEntityProto.Indexs, "parentUuid")
-	errorEntityProto.Fields = append(errorEntityProto.Fields, "parentUuid")
+	errorEntityProto.Indexs = append(errorEntityProto.Indexs, "ParentUuid")
+	errorEntityProto.Fields = append(errorEntityProto.Fields, "ParentUuid")
 	errorEntityProto.FieldsType = append(errorEntityProto.FieldsType, "xs.string")
 	errorEntityProto.FieldsOrder = append(errorEntityProto.FieldsOrder, 1)
 	errorEntityProto.FieldsVisibility = append(errorEntityProto.FieldsVisibility, false)
@@ -1632,8 +1632,8 @@ func (this *CargoEntities_ErrorEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Error"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -1691,7 +1691,7 @@ func (this *CargoEntities_ErrorEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), ErrorInfo, params)
 	} else {
@@ -1724,8 +1724,8 @@ func (this *CargoEntities_ErrorEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Error"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -1743,7 +1743,7 @@ func (this *CargoEntities_ErrorEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -1858,7 +1858,7 @@ func CargoEntitiesErrorExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Error"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -2166,8 +2166,8 @@ func (this *CargoEntities_LogEntryEntity) GetChecksum() string {
 func (this *CargoEntities_LogEntryEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.LogEntry"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -2192,13 +2192,13 @@ func (this *EntityManager) create_CargoEntities_LogEntryEntityPrototype() {
 	var logEntryEntityProto EntityPrototype
 	logEntryEntityProto.TypeName = "CargoEntities.LogEntry"
 	logEntryEntityProto.SuperTypeNames = append(logEntryEntityProto.SuperTypeNames, "CargoEntities.Entity")
-	logEntryEntityProto.Ids = append(logEntryEntityProto.Ids, "uuid")
-	logEntryEntityProto.Fields = append(logEntryEntityProto.Fields, "uuid")
+	logEntryEntityProto.Ids = append(logEntryEntityProto.Ids, "UUID")
+	logEntryEntityProto.Fields = append(logEntryEntityProto.Fields, "UUID")
 	logEntryEntityProto.FieldsType = append(logEntryEntityProto.FieldsType, "xs.string")
 	logEntryEntityProto.FieldsOrder = append(logEntryEntityProto.FieldsOrder, 0)
 	logEntryEntityProto.FieldsVisibility = append(logEntryEntityProto.FieldsVisibility, false)
-	logEntryEntityProto.Indexs = append(logEntryEntityProto.Indexs, "parentUuid")
-	logEntryEntityProto.Fields = append(logEntryEntityProto.Fields, "parentUuid")
+	logEntryEntityProto.Indexs = append(logEntryEntityProto.Indexs, "ParentUuid")
+	logEntryEntityProto.Fields = append(logEntryEntityProto.Fields, "ParentUuid")
 	logEntryEntityProto.FieldsType = append(logEntryEntityProto.FieldsType, "xs.string")
 	logEntryEntityProto.FieldsOrder = append(logEntryEntityProto.FieldsOrder, 1)
 	logEntryEntityProto.FieldsVisibility = append(logEntryEntityProto.FieldsVisibility, false)
@@ -2258,8 +2258,8 @@ func (this *CargoEntities_LogEntryEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.LogEntry"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2313,7 +2313,7 @@ func (this *CargoEntities_LogEntryEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), LogEntryInfo, params)
 	} else {
@@ -2346,8 +2346,8 @@ func (this *CargoEntities_LogEntryEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.LogEntry"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2362,7 +2362,7 @@ func (this *CargoEntities_LogEntryEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -2476,7 +2476,7 @@ func CargoEntitiesLogEntryExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.LogEntry"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -2784,8 +2784,8 @@ func (this *CargoEntities_LogEntity) GetChecksum() string {
 func (this *CargoEntities_LogEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Log"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -2810,13 +2810,13 @@ func (this *EntityManager) create_CargoEntities_LogEntityPrototype() {
 	var logEntityProto EntityPrototype
 	logEntityProto.TypeName = "CargoEntities.Log"
 	logEntityProto.SuperTypeNames = append(logEntityProto.SuperTypeNames, "CargoEntities.Entity")
-	logEntityProto.Ids = append(logEntityProto.Ids, "uuid")
-	logEntityProto.Fields = append(logEntityProto.Fields, "uuid")
+	logEntityProto.Ids = append(logEntityProto.Ids, "UUID")
+	logEntityProto.Fields = append(logEntityProto.Fields, "UUID")
 	logEntityProto.FieldsType = append(logEntityProto.FieldsType, "xs.string")
 	logEntityProto.FieldsOrder = append(logEntityProto.FieldsOrder, 0)
 	logEntityProto.FieldsVisibility = append(logEntityProto.FieldsVisibility, false)
-	logEntityProto.Indexs = append(logEntityProto.Indexs, "parentUuid")
-	logEntityProto.Fields = append(logEntityProto.Fields, "parentUuid")
+	logEntityProto.Indexs = append(logEntityProto.Indexs, "ParentUuid")
+	logEntityProto.Fields = append(logEntityProto.Fields, "ParentUuid")
 	logEntityProto.FieldsType = append(logEntityProto.FieldsType, "xs.string")
 	logEntityProto.FieldsOrder = append(logEntityProto.FieldsOrder, 1)
 	logEntityProto.FieldsVisibility = append(logEntityProto.FieldsVisibility, false)
@@ -2868,8 +2868,8 @@ func (this *CargoEntities_LogEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Log"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2928,7 +2928,7 @@ func (this *CargoEntities_LogEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), LogInfo, params)
 	} else {
@@ -2961,8 +2961,8 @@ func (this *CargoEntities_LogEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Log"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2975,7 +2975,7 @@ func (this *CargoEntities_LogEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -3086,7 +3086,7 @@ func CargoEntitiesLogExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Log"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -3394,8 +3394,8 @@ func (this *CargoEntities_ProjectEntity) GetChecksum() string {
 func (this *CargoEntities_ProjectEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Project"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -3420,13 +3420,13 @@ func (this *EntityManager) create_CargoEntities_ProjectEntityPrototype() {
 	var projectEntityProto EntityPrototype
 	projectEntityProto.TypeName = "CargoEntities.Project"
 	projectEntityProto.SuperTypeNames = append(projectEntityProto.SuperTypeNames, "CargoEntities.Entity")
-	projectEntityProto.Ids = append(projectEntityProto.Ids, "uuid")
-	projectEntityProto.Fields = append(projectEntityProto.Fields, "uuid")
+	projectEntityProto.Ids = append(projectEntityProto.Ids, "UUID")
+	projectEntityProto.Fields = append(projectEntityProto.Fields, "UUID")
 	projectEntityProto.FieldsType = append(projectEntityProto.FieldsType, "xs.string")
 	projectEntityProto.FieldsOrder = append(projectEntityProto.FieldsOrder, 0)
 	projectEntityProto.FieldsVisibility = append(projectEntityProto.FieldsVisibility, false)
-	projectEntityProto.Indexs = append(projectEntityProto.Indexs, "parentUuid")
-	projectEntityProto.Fields = append(projectEntityProto.Fields, "parentUuid")
+	projectEntityProto.Indexs = append(projectEntityProto.Indexs, "ParentUuid")
+	projectEntityProto.Fields = append(projectEntityProto.Fields, "ParentUuid")
 	projectEntityProto.FieldsType = append(projectEntityProto.FieldsType, "xs.string")
 	projectEntityProto.FieldsOrder = append(projectEntityProto.FieldsOrder, 1)
 	projectEntityProto.FieldsVisibility = append(projectEntityProto.FieldsVisibility, false)
@@ -3483,8 +3483,8 @@ func (this *CargoEntities_ProjectEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Project"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -3535,7 +3535,7 @@ func (this *CargoEntities_ProjectEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), ProjectInfo, params)
 	} else {
@@ -3568,8 +3568,8 @@ func (this *CargoEntities_ProjectEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Project"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -3583,7 +3583,7 @@ func (this *CargoEntities_ProjectEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -3693,7 +3693,7 @@ func CargoEntitiesProjectExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Project"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -3763,16 +3763,16 @@ func (this *EntityManager) create_CargoEntities_MessageEntityPrototype() {
 	messageEntityProto.TypeName = "CargoEntities.Message"
 	messageEntityProto.IsAbstract = true
 	messageEntityProto.SuperTypeNames = append(messageEntityProto.SuperTypeNames, "CargoEntities.Entity")
-	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Error")
 	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Notification")
-	messageEntityProto.Ids = append(messageEntityProto.Ids, "uuid")
-	messageEntityProto.Fields = append(messageEntityProto.Fields, "uuid")
+	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
+	messageEntityProto.Ids = append(messageEntityProto.Ids, "UUID")
+	messageEntityProto.Fields = append(messageEntityProto.Fields, "UUID")
 	messageEntityProto.FieldsType = append(messageEntityProto.FieldsType, "xs.string")
 	messageEntityProto.FieldsOrder = append(messageEntityProto.FieldsOrder, 0)
 	messageEntityProto.FieldsVisibility = append(messageEntityProto.FieldsVisibility, false)
-	messageEntityProto.Indexs = append(messageEntityProto.Indexs, "parentUuid")
-	messageEntityProto.Fields = append(messageEntityProto.Fields, "parentUuid")
+	messageEntityProto.Indexs = append(messageEntityProto.Indexs, "ParentUuid")
+	messageEntityProto.Fields = append(messageEntityProto.Fields, "ParentUuid")
 	messageEntityProto.FieldsType = append(messageEntityProto.FieldsType, "xs.string")
 	messageEntityProto.FieldsOrder = append(messageEntityProto.FieldsOrder, 1)
 	messageEntityProto.FieldsVisibility = append(messageEntityProto.FieldsVisibility, false)
@@ -4055,8 +4055,8 @@ func (this *CargoEntities_NotificationEntity) GetChecksum() string {
 func (this *CargoEntities_NotificationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Notification"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -4082,13 +4082,13 @@ func (this *EntityManager) create_CargoEntities_NotificationEntityPrototype() {
 	notificationEntityProto.TypeName = "CargoEntities.Notification"
 	notificationEntityProto.SuperTypeNames = append(notificationEntityProto.SuperTypeNames, "CargoEntities.Entity")
 	notificationEntityProto.SuperTypeNames = append(notificationEntityProto.SuperTypeNames, "CargoEntities.Message")
-	notificationEntityProto.Ids = append(notificationEntityProto.Ids, "uuid")
-	notificationEntityProto.Fields = append(notificationEntityProto.Fields, "uuid")
+	notificationEntityProto.Ids = append(notificationEntityProto.Ids, "UUID")
+	notificationEntityProto.Fields = append(notificationEntityProto.Fields, "UUID")
 	notificationEntityProto.FieldsType = append(notificationEntityProto.FieldsType, "xs.string")
 	notificationEntityProto.FieldsOrder = append(notificationEntityProto.FieldsOrder, 0)
 	notificationEntityProto.FieldsVisibility = append(notificationEntityProto.FieldsVisibility, false)
-	notificationEntityProto.Indexs = append(notificationEntityProto.Indexs, "parentUuid")
-	notificationEntityProto.Fields = append(notificationEntityProto.Fields, "parentUuid")
+	notificationEntityProto.Indexs = append(notificationEntityProto.Indexs, "ParentUuid")
+	notificationEntityProto.Fields = append(notificationEntityProto.Fields, "ParentUuid")
 	notificationEntityProto.FieldsType = append(notificationEntityProto.FieldsType, "xs.string")
 	notificationEntityProto.FieldsOrder = append(notificationEntityProto.FieldsOrder, 1)
 	notificationEntityProto.FieldsVisibility = append(notificationEntityProto.FieldsVisibility, false)
@@ -4158,8 +4158,8 @@ func (this *CargoEntities_NotificationEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Notification"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -4221,7 +4221,7 @@ func (this *CargoEntities_NotificationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), NotificationInfo, params)
 	} else {
@@ -4254,8 +4254,8 @@ func (this *CargoEntities_NotificationEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Notification"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -4274,7 +4274,7 @@ func (this *CargoEntities_NotificationEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -4400,7 +4400,7 @@ func CargoEntitiesNotificationExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Notification"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -4708,8 +4708,8 @@ func (this *CargoEntities_TextMessageEntity) GetChecksum() string {
 func (this *CargoEntities_TextMessageEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.TextMessage"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -4735,13 +4735,13 @@ func (this *EntityManager) create_CargoEntities_TextMessageEntityPrototype() {
 	textMessageEntityProto.TypeName = "CargoEntities.TextMessage"
 	textMessageEntityProto.SuperTypeNames = append(textMessageEntityProto.SuperTypeNames, "CargoEntities.Entity")
 	textMessageEntityProto.SuperTypeNames = append(textMessageEntityProto.SuperTypeNames, "CargoEntities.Message")
-	textMessageEntityProto.Ids = append(textMessageEntityProto.Ids, "uuid")
-	textMessageEntityProto.Fields = append(textMessageEntityProto.Fields, "uuid")
+	textMessageEntityProto.Ids = append(textMessageEntityProto.Ids, "UUID")
+	textMessageEntityProto.Fields = append(textMessageEntityProto.Fields, "UUID")
 	textMessageEntityProto.FieldsType = append(textMessageEntityProto.FieldsType, "xs.string")
 	textMessageEntityProto.FieldsOrder = append(textMessageEntityProto.FieldsOrder, 0)
 	textMessageEntityProto.FieldsVisibility = append(textMessageEntityProto.FieldsVisibility, false)
-	textMessageEntityProto.Indexs = append(textMessageEntityProto.Indexs, "parentUuid")
-	textMessageEntityProto.Fields = append(textMessageEntityProto.Fields, "parentUuid")
+	textMessageEntityProto.Indexs = append(textMessageEntityProto.Indexs, "ParentUuid")
+	textMessageEntityProto.Fields = append(textMessageEntityProto.Fields, "ParentUuid")
 	textMessageEntityProto.FieldsType = append(textMessageEntityProto.FieldsType, "xs.string")
 	textMessageEntityProto.FieldsOrder = append(textMessageEntityProto.FieldsOrder, 1)
 	textMessageEntityProto.FieldsVisibility = append(textMessageEntityProto.FieldsVisibility, false)
@@ -4811,8 +4811,8 @@ func (this *CargoEntities_TextMessageEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.TextMessage"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -4874,7 +4874,7 @@ func (this *CargoEntities_TextMessageEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), TextMessageInfo, params)
 	} else {
@@ -4907,8 +4907,8 @@ func (this *CargoEntities_TextMessageEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.TextMessage"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -4927,7 +4927,7 @@ func (this *CargoEntities_TextMessageEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -5053,7 +5053,7 @@ func CargoEntitiesTextMessageExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.TextMessage"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -5361,8 +5361,8 @@ func (this *CargoEntities_SessionEntity) GetChecksum() string {
 func (this *CargoEntities_SessionEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Session"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -5386,13 +5386,13 @@ func (this *EntityManager) create_CargoEntities_SessionEntityPrototype() {
 
 	var sessionEntityProto EntityPrototype
 	sessionEntityProto.TypeName = "CargoEntities.Session"
-	sessionEntityProto.Ids = append(sessionEntityProto.Ids, "uuid")
-	sessionEntityProto.Fields = append(sessionEntityProto.Fields, "uuid")
+	sessionEntityProto.Ids = append(sessionEntityProto.Ids, "UUID")
+	sessionEntityProto.Fields = append(sessionEntityProto.Fields, "UUID")
 	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "xs.string")
 	sessionEntityProto.FieldsOrder = append(sessionEntityProto.FieldsOrder, 0)
 	sessionEntityProto.FieldsVisibility = append(sessionEntityProto.FieldsVisibility, false)
-	sessionEntityProto.Indexs = append(sessionEntityProto.Indexs, "parentUuid")
-	sessionEntityProto.Fields = append(sessionEntityProto.Fields, "parentUuid")
+	sessionEntityProto.Indexs = append(sessionEntityProto.Indexs, "ParentUuid")
+	sessionEntityProto.Fields = append(sessionEntityProto.Fields, "ParentUuid")
 	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "xs.string")
 	sessionEntityProto.FieldsOrder = append(sessionEntityProto.FieldsOrder, 1)
 	sessionEntityProto.FieldsVisibility = append(sessionEntityProto.FieldsVisibility, false)
@@ -5458,8 +5458,8 @@ func (this *CargoEntities_SessionEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Session"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Session **/
 	query.Fields = append(query.Fields, "M_id")
@@ -5521,7 +5521,7 @@ func (this *CargoEntities_SessionEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), SessionInfo, params)
 	} else {
@@ -5554,8 +5554,8 @@ func (this *CargoEntities_SessionEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Session"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Session **/
 	query.Fields = append(query.Fields, "M_id")
@@ -5570,7 +5570,7 @@ func (this *CargoEntities_SessionEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -5693,7 +5693,7 @@ func CargoEntitiesSessionExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Session"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -6001,8 +6001,8 @@ func (this *CargoEntities_RoleEntity) GetChecksum() string {
 func (this *CargoEntities_RoleEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Role"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -6026,13 +6026,13 @@ func (this *EntityManager) create_CargoEntities_RoleEntityPrototype() {
 
 	var roleEntityProto EntityPrototype
 	roleEntityProto.TypeName = "CargoEntities.Role"
-	roleEntityProto.Ids = append(roleEntityProto.Ids, "uuid")
-	roleEntityProto.Fields = append(roleEntityProto.Fields, "uuid")
+	roleEntityProto.Ids = append(roleEntityProto.Ids, "UUID")
+	roleEntityProto.Fields = append(roleEntityProto.Fields, "UUID")
 	roleEntityProto.FieldsType = append(roleEntityProto.FieldsType, "xs.string")
 	roleEntityProto.FieldsOrder = append(roleEntityProto.FieldsOrder, 0)
 	roleEntityProto.FieldsVisibility = append(roleEntityProto.FieldsVisibility, false)
-	roleEntityProto.Indexs = append(roleEntityProto.Indexs, "parentUuid")
-	roleEntityProto.Fields = append(roleEntityProto.Fields, "parentUuid")
+	roleEntityProto.Indexs = append(roleEntityProto.Indexs, "ParentUuid")
+	roleEntityProto.Fields = append(roleEntityProto.Fields, "ParentUuid")
 	roleEntityProto.FieldsType = append(roleEntityProto.FieldsType, "xs.string")
 	roleEntityProto.FieldsOrder = append(roleEntityProto.FieldsOrder, 1)
 	roleEntityProto.FieldsVisibility = append(roleEntityProto.FieldsVisibility, false)
@@ -6086,8 +6086,8 @@ func (this *CargoEntities_RoleEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Role"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Role **/
 	query.Fields = append(query.Fields, "M_id")
@@ -6137,7 +6137,7 @@ func (this *CargoEntities_RoleEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), RoleInfo, params)
 	} else {
@@ -6170,8 +6170,8 @@ func (this *CargoEntities_RoleEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Role"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Role **/
 	query.Fields = append(query.Fields, "M_id")
@@ -6183,7 +6183,7 @@ func (this *CargoEntities_RoleEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -6304,7 +6304,7 @@ func CargoEntitiesRoleExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Role"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -6612,8 +6612,8 @@ func (this *CargoEntities_AccountEntity) GetChecksum() string {
 func (this *CargoEntities_AccountEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Account"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -6638,13 +6638,13 @@ func (this *EntityManager) create_CargoEntities_AccountEntityPrototype() {
 	var accountEntityProto EntityPrototype
 	accountEntityProto.TypeName = "CargoEntities.Account"
 	accountEntityProto.SuperTypeNames = append(accountEntityProto.SuperTypeNames, "CargoEntities.Entity")
-	accountEntityProto.Ids = append(accountEntityProto.Ids, "uuid")
-	accountEntityProto.Fields = append(accountEntityProto.Fields, "uuid")
+	accountEntityProto.Ids = append(accountEntityProto.Ids, "UUID")
+	accountEntityProto.Fields = append(accountEntityProto.Fields, "UUID")
 	accountEntityProto.FieldsType = append(accountEntityProto.FieldsType, "xs.string")
 	accountEntityProto.FieldsOrder = append(accountEntityProto.FieldsOrder, 0)
 	accountEntityProto.FieldsVisibility = append(accountEntityProto.FieldsVisibility, false)
-	accountEntityProto.Indexs = append(accountEntityProto.Indexs, "parentUuid")
-	accountEntityProto.Fields = append(accountEntityProto.Fields, "parentUuid")
+	accountEntityProto.Indexs = append(accountEntityProto.Indexs, "ParentUuid")
+	accountEntityProto.Fields = append(accountEntityProto.Fields, "ParentUuid")
 	accountEntityProto.FieldsType = append(accountEntityProto.FieldsType, "xs.string")
 	accountEntityProto.FieldsOrder = append(accountEntityProto.FieldsOrder, 1)
 	accountEntityProto.FieldsVisibility = append(accountEntityProto.FieldsVisibility, false)
@@ -6725,8 +6725,8 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Account"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -6849,7 +6849,7 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), AccountInfo, params)
 	} else {
@@ -6882,8 +6882,8 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Account"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -6903,7 +6903,7 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -7139,7 +7139,7 @@ func CargoEntitiesAccountExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Account"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -7447,8 +7447,8 @@ func (this *CargoEntities_ComputerEntity) GetChecksum() string {
 func (this *CargoEntities_ComputerEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Computer"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -7473,13 +7473,13 @@ func (this *EntityManager) create_CargoEntities_ComputerEntityPrototype() {
 	var computerEntityProto EntityPrototype
 	computerEntityProto.TypeName = "CargoEntities.Computer"
 	computerEntityProto.SuperTypeNames = append(computerEntityProto.SuperTypeNames, "CargoEntities.Entity")
-	computerEntityProto.Ids = append(computerEntityProto.Ids, "uuid")
-	computerEntityProto.Fields = append(computerEntityProto.Fields, "uuid")
+	computerEntityProto.Ids = append(computerEntityProto.Ids, "UUID")
+	computerEntityProto.Fields = append(computerEntityProto.Fields, "UUID")
 	computerEntityProto.FieldsType = append(computerEntityProto.FieldsType, "xs.string")
 	computerEntityProto.FieldsOrder = append(computerEntityProto.FieldsOrder, 0)
 	computerEntityProto.FieldsVisibility = append(computerEntityProto.FieldsVisibility, false)
-	computerEntityProto.Indexs = append(computerEntityProto.Indexs, "parentUuid")
-	computerEntityProto.Fields = append(computerEntityProto.Fields, "parentUuid")
+	computerEntityProto.Indexs = append(computerEntityProto.Indexs, "ParentUuid")
+	computerEntityProto.Fields = append(computerEntityProto.Fields, "ParentUuid")
 	computerEntityProto.FieldsType = append(computerEntityProto.FieldsType, "xs.string")
 	computerEntityProto.FieldsOrder = append(computerEntityProto.FieldsOrder, 1)
 	computerEntityProto.FieldsVisibility = append(computerEntityProto.FieldsVisibility, false)
@@ -7544,8 +7544,8 @@ func (this *CargoEntities_ComputerEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Computer"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -7629,7 +7629,7 @@ func (this *CargoEntities_ComputerEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), ComputerInfo, params)
 	} else {
@@ -7662,8 +7662,8 @@ func (this *CargoEntities_ComputerEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Computer"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -7679,7 +7679,7 @@ func (this *CargoEntities_ComputerEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -7812,7 +7812,7 @@ func CargoEntitiesComputerExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Computer"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -8120,8 +8120,8 @@ func (this *CargoEntities_PermissionEntity) GetChecksum() string {
 func (this *CargoEntities_PermissionEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Permission"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -8145,13 +8145,13 @@ func (this *EntityManager) create_CargoEntities_PermissionEntityPrototype() {
 
 	var permissionEntityProto EntityPrototype
 	permissionEntityProto.TypeName = "CargoEntities.Permission"
-	permissionEntityProto.Ids = append(permissionEntityProto.Ids, "uuid")
-	permissionEntityProto.Fields = append(permissionEntityProto.Fields, "uuid")
+	permissionEntityProto.Ids = append(permissionEntityProto.Ids, "UUID")
+	permissionEntityProto.Fields = append(permissionEntityProto.Fields, "UUID")
 	permissionEntityProto.FieldsType = append(permissionEntityProto.FieldsType, "xs.string")
 	permissionEntityProto.FieldsOrder = append(permissionEntityProto.FieldsOrder, 0)
 	permissionEntityProto.FieldsVisibility = append(permissionEntityProto.FieldsVisibility, false)
-	permissionEntityProto.Indexs = append(permissionEntityProto.Indexs, "parentUuid")
-	permissionEntityProto.Fields = append(permissionEntityProto.Fields, "parentUuid")
+	permissionEntityProto.Indexs = append(permissionEntityProto.Indexs, "ParentUuid")
+	permissionEntityProto.Fields = append(permissionEntityProto.Fields, "ParentUuid")
 	permissionEntityProto.FieldsType = append(permissionEntityProto.FieldsType, "xs.string")
 	permissionEntityProto.FieldsOrder = append(permissionEntityProto.FieldsOrder, 1)
 	permissionEntityProto.FieldsVisibility = append(permissionEntityProto.FieldsVisibility, false)
@@ -8200,8 +8200,8 @@ func (this *CargoEntities_PermissionEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Permission"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Permission **/
 	query.Fields = append(query.Fields, "M_pattern")
@@ -8255,7 +8255,7 @@ func (this *CargoEntities_PermissionEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), PermissionInfo, params)
 	} else {
@@ -8288,8 +8288,8 @@ func (this *CargoEntities_PermissionEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Permission"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Permission **/
 	query.Fields = append(query.Fields, "M_pattern")
@@ -8300,7 +8300,7 @@ func (this *CargoEntities_PermissionEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -8398,7 +8398,7 @@ func (this *CargoEntities_PermissionEntity) DeleteEntity() {
 func CargoEntitiesPermissionExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Permission"
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -8706,8 +8706,8 @@ func (this *CargoEntities_FileEntity) GetChecksum() string {
 func (this *CargoEntities_FileEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.File"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -8732,13 +8732,13 @@ func (this *EntityManager) create_CargoEntities_FileEntityPrototype() {
 	var fileEntityProto EntityPrototype
 	fileEntityProto.TypeName = "CargoEntities.File"
 	fileEntityProto.SuperTypeNames = append(fileEntityProto.SuperTypeNames, "CargoEntities.Entity")
-	fileEntityProto.Ids = append(fileEntityProto.Ids, "uuid")
-	fileEntityProto.Fields = append(fileEntityProto.Fields, "uuid")
+	fileEntityProto.Ids = append(fileEntityProto.Ids, "UUID")
+	fileEntityProto.Fields = append(fileEntityProto.Fields, "UUID")
 	fileEntityProto.FieldsType = append(fileEntityProto.FieldsType, "xs.string")
 	fileEntityProto.FieldsOrder = append(fileEntityProto.FieldsOrder, 0)
 	fileEntityProto.FieldsVisibility = append(fileEntityProto.FieldsVisibility, false)
-	fileEntityProto.Indexs = append(fileEntityProto.Indexs, "parentUuid")
-	fileEntityProto.Fields = append(fileEntityProto.Fields, "parentUuid")
+	fileEntityProto.Indexs = append(fileEntityProto.Indexs, "ParentUuid")
+	fileEntityProto.Fields = append(fileEntityProto.Fields, "ParentUuid")
 	fileEntityProto.FieldsType = append(fileEntityProto.FieldsType, "xs.string")
 	fileEntityProto.FieldsOrder = append(fileEntityProto.FieldsOrder, 1)
 	fileEntityProto.FieldsVisibility = append(fileEntityProto.FieldsVisibility, false)
@@ -8835,8 +8835,8 @@ func (this *CargoEntities_FileEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.File"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -8927,7 +8927,7 @@ func (this *CargoEntities_FileEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), FileInfo, params)
 	} else {
@@ -8960,8 +8960,8 @@ func (this *CargoEntities_FileEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.File"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -8985,7 +8985,7 @@ func (this *CargoEntities_FileEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -9162,7 +9162,7 @@ func CargoEntitiesFileExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.File"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -9470,8 +9470,8 @@ func (this *CargoEntities_UserEntity) GetChecksum() string {
 func (this *CargoEntities_UserEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.User"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -9496,13 +9496,13 @@ func (this *EntityManager) create_CargoEntities_UserEntityPrototype() {
 	var userEntityProto EntityPrototype
 	userEntityProto.TypeName = "CargoEntities.User"
 	userEntityProto.SuperTypeNames = append(userEntityProto.SuperTypeNames, "CargoEntities.Entity")
-	userEntityProto.Ids = append(userEntityProto.Ids, "uuid")
-	userEntityProto.Fields = append(userEntityProto.Fields, "uuid")
+	userEntityProto.Ids = append(userEntityProto.Ids, "UUID")
+	userEntityProto.Fields = append(userEntityProto.Fields, "UUID")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 0)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, false)
-	userEntityProto.Indexs = append(userEntityProto.Indexs, "parentUuid")
-	userEntityProto.Fields = append(userEntityProto.Fields, "parentUuid")
+	userEntityProto.Indexs = append(userEntityProto.Indexs, "ParentUuid")
+	userEntityProto.Fields = append(userEntityProto.Fields, "ParentUuid")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 1)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, false)
@@ -9578,8 +9578,8 @@ func (this *CargoEntities_UserEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.User"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -9643,7 +9643,7 @@ func (this *CargoEntities_UserEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), UserInfo, params)
 	} else {
@@ -9676,8 +9676,8 @@ func (this *CargoEntities_UserEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.User"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -9696,7 +9696,7 @@ func (this *CargoEntities_UserEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -9844,7 +9844,7 @@ func CargoEntitiesUserExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.User"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -10152,8 +10152,8 @@ func (this *CargoEntities_GroupEntity) GetChecksum() string {
 func (this *CargoEntities_GroupEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Group"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -10178,13 +10178,13 @@ func (this *EntityManager) create_CargoEntities_GroupEntityPrototype() {
 	var groupEntityProto EntityPrototype
 	groupEntityProto.TypeName = "CargoEntities.Group"
 	groupEntityProto.SuperTypeNames = append(groupEntityProto.SuperTypeNames, "CargoEntities.Entity")
-	groupEntityProto.Ids = append(groupEntityProto.Ids, "uuid")
-	groupEntityProto.Fields = append(groupEntityProto.Fields, "uuid")
+	groupEntityProto.Ids = append(groupEntityProto.Ids, "UUID")
+	groupEntityProto.Fields = append(groupEntityProto.Fields, "UUID")
 	groupEntityProto.FieldsType = append(groupEntityProto.FieldsType, "xs.string")
 	groupEntityProto.FieldsOrder = append(groupEntityProto.FieldsOrder, 0)
 	groupEntityProto.FieldsVisibility = append(groupEntityProto.FieldsVisibility, false)
-	groupEntityProto.Indexs = append(groupEntityProto.Indexs, "parentUuid")
-	groupEntityProto.Fields = append(groupEntityProto.Fields, "parentUuid")
+	groupEntityProto.Indexs = append(groupEntityProto.Indexs, "ParentUuid")
+	groupEntityProto.Fields = append(groupEntityProto.Fields, "ParentUuid")
 	groupEntityProto.FieldsType = append(groupEntityProto.FieldsType, "xs.string")
 	groupEntityProto.FieldsOrder = append(groupEntityProto.FieldsOrder, 1)
 	groupEntityProto.FieldsVisibility = append(groupEntityProto.FieldsVisibility, false)
@@ -10241,8 +10241,8 @@ func (this *CargoEntities_GroupEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Group"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -10293,7 +10293,7 @@ func (this *CargoEntities_GroupEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), GroupInfo, params)
 	} else {
@@ -10326,8 +10326,8 @@ func (this *CargoEntities_GroupEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Group"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entity **/
 	query.Fields = append(query.Fields, "M_id")
@@ -10341,7 +10341,7 @@ func (this *CargoEntities_GroupEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -10451,7 +10451,7 @@ func CargoEntitiesGroupExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Group"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -10759,8 +10759,8 @@ func (this *CargoEntities_EntitiesEntity) GetChecksum() string {
 func (this *CargoEntities_EntitiesEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Entities"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -10784,13 +10784,13 @@ func (this *EntityManager) create_CargoEntities_EntitiesEntityPrototype() {
 
 	var entitiesEntityProto EntityPrototype
 	entitiesEntityProto.TypeName = "CargoEntities.Entities"
-	entitiesEntityProto.Ids = append(entitiesEntityProto.Ids, "uuid")
-	entitiesEntityProto.Fields = append(entitiesEntityProto.Fields, "uuid")
+	entitiesEntityProto.Ids = append(entitiesEntityProto.Ids, "UUID")
+	entitiesEntityProto.Fields = append(entitiesEntityProto.Fields, "UUID")
 	entitiesEntityProto.FieldsType = append(entitiesEntityProto.FieldsType, "xs.string")
 	entitiesEntityProto.FieldsOrder = append(entitiesEntityProto.FieldsOrder, 0)
 	entitiesEntityProto.FieldsVisibility = append(entitiesEntityProto.FieldsVisibility, false)
-	entitiesEntityProto.Indexs = append(entitiesEntityProto.Indexs, "parentUuid")
-	entitiesEntityProto.Fields = append(entitiesEntityProto.Fields, "parentUuid")
+	entitiesEntityProto.Indexs = append(entitiesEntityProto.Indexs, "ParentUuid")
+	entitiesEntityProto.Fields = append(entitiesEntityProto.Fields, "ParentUuid")
 	entitiesEntityProto.FieldsType = append(entitiesEntityProto.FieldsType, "xs.string")
 	entitiesEntityProto.FieldsOrder = append(entitiesEntityProto.FieldsOrder, 1)
 	entitiesEntityProto.FieldsVisibility = append(entitiesEntityProto.FieldsVisibility, false)
@@ -10850,8 +10850,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Entities"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entities **/
 	query.Fields = append(query.Fields, "M_id")
@@ -10881,56 +10881,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	entitiesIds := make([]string, 0)
 	for i := 0; i < len(this.object.M_entities); i++ {
 		switch v := this.object.M_entities[i].(type) {
-		case *CargoEntities.TextMessage:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.Account:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.Computer:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.File:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.Error:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
 		case *CargoEntities.LogEntry:
 			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), v.UUID, v)
-			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-			entitiesEntity.AppendReferenced("entities", this)
-			this.AppendChild("entities", entitiesEntity)
-			if entitiesEntity.NeedSave() {
-				entitiesEntity.SaveEntity()
-			}
-		case *CargoEntities.Project:
-			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -10945,6 +10897,22 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 			if entitiesEntity.NeedSave() {
 				entitiesEntity.SaveEntity()
 			}
+		case *CargoEntities.Account:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.File:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
 		case *CargoEntities.Group:
 			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
@@ -10953,8 +10921,40 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 			if entitiesEntity.NeedSave() {
 				entitiesEntity.SaveEntity()
 			}
+		case *CargoEntities.Error:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
 		case *CargoEntities.Log:
 			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.Project:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.TextMessage:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
+			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+			entitiesEntity.AppendReferenced("entities", this)
+			this.AppendChild("entities", entitiesEntity)
+			if entitiesEntity.NeedSave() {
+				entitiesEntity.SaveEntity()
+			}
+		case *CargoEntities.Computer:
+			entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), v.UUID, v)
 			entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 			entitiesEntity.AppendReferenced("entities", this)
 			this.AppendChild("entities", entitiesEntity)
@@ -11015,7 +11015,7 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(CargoEntitiesDB, string(queryStr), EntitiesInfo, params)
 	} else {
@@ -11048,8 +11048,8 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Entities"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Entities **/
 	query.Fields = append(query.Fields, "M_id")
@@ -11061,7 +11061,7 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -11114,65 +11114,13 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 					log.Println("type ", typeName, " not found!")
 					return err
 				}
-				if typeName == "CargoEntities.TextMessage" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_TextMessageEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_TextMessageEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.Account" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_AccountEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_AccountEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.Computer" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_ComputerEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_ComputerEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.File" {
+				if typeName == "CargoEntities.File" {
 					if len(uuids[i]) > 0 {
 						var entitiesEntity *CargoEntities_FileEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
 							entitiesEntity = instance.(*CargoEntities_FileEntity)
 						} else {
 							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
-				} else if typeName == "CargoEntities.Error" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_ErrorEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_ErrorEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -11192,19 +11140,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.Project" {
-					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_ProjectEntity
-						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_ProjectEntity)
-						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), uuids[i], nil)
-							entitiesEntity.InitEntity(uuids[i])
-							GetServer().GetEntityManager().insert(entitiesEntity)
-						}
-						entitiesEntity.AppendReferenced("entities", this)
-						this.AppendChild("entities", entitiesEntity)
-					}
 				} else if typeName == "CargoEntities.Notification" {
 					if len(uuids[i]) > 0 {
 						var entitiesEntity *CargoEntities_NotificationEntity
@@ -11212,6 +11147,71 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 							entitiesEntity = instance.(*CargoEntities_NotificationEntity)
 						} else {
 							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.Account" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_AccountEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_AccountEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.TextMessage" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_TextMessageEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_TextMessageEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.Error" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_ErrorEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_ErrorEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.Computer" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_ComputerEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_ComputerEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity.InitEntity(uuids[i])
+							GetServer().GetEntityManager().insert(entitiesEntity)
+						}
+						entitiesEntity.AppendReferenced("entities", this)
+						this.AppendChild("entities", entitiesEntity)
+					}
+				} else if typeName == "CargoEntities.User" {
+					if len(uuids[i]) > 0 {
+						var entitiesEntity *CargoEntities_UserEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							entitiesEntity = instance.(*CargoEntities_UserEntity)
+						} else {
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -11244,13 +11244,13 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string) error {
 						entitiesEntity.AppendReferenced("entities", this)
 						this.AppendChild("entities", entitiesEntity)
 					}
-				} else if typeName == "CargoEntities.User" {
+				} else if typeName == "CargoEntities.Project" {
 					if len(uuids[i]) > 0 {
-						var entitiesEntity *CargoEntities_UserEntity
+						var entitiesEntity *CargoEntities_ProjectEntity
 						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-							entitiesEntity = instance.(*CargoEntities_UserEntity)
+							entitiesEntity = instance.(*CargoEntities_ProjectEntity)
 						} else {
-							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
+							entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), uuids[i], nil)
 							entitiesEntity.InitEntity(uuids[i])
 							GetServer().GetEntityManager().insert(entitiesEntity)
 						}
@@ -11352,7 +11352,7 @@ func CargoEntitiesEntitiesExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "CargoEntities.Entities"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)

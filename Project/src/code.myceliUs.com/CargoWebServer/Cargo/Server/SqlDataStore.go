@@ -824,7 +824,6 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 	// Read the
 	values, err := this.Read(query, fieldsType, params)
 	if err != nil {
-		log.Println("-------------->820 prototype: ", prototype)
 		return prototype, err
 	}
 
@@ -863,8 +862,6 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 
 	// Create the new prototype in sql_info store.
 	prototype.Create("sql_info")
-
-	log.Println("-------------->860 prototype: ", prototype)
 
 	return prototype, err
 }

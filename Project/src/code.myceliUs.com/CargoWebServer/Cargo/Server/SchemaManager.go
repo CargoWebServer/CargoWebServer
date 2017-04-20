@@ -277,7 +277,7 @@ func (this *SchemaManager) GetFieldsFieldsType(prototype *EntityPrototype, path 
 	*path = append(*path, prototype.TypeName)
 
 	for i := 0; i < len(prototype.Fields); i++ {
-		if prototype.Fields[i] != "uuid" && prototype.Fields[i] != "parentUuid" && prototype.Fields[i] != "childsUuid" && prototype.Fields[i] != "referenced" {
+		if prototype.Fields[i] != "UUID" && prototype.Fields[i] != "ParentUuid" && prototype.Fields[i] != "childsUuid" && prototype.Fields[i] != "referenced" {
 			fields = append(fields, prototype.Fields[i])
 			fieldsType = append(fieldsType, prototype.FieldsType[i])
 		}

@@ -4,7 +4,7 @@ package Server
 
 import (
 	"encoding/json"
-	//	"log"
+	//"log"
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
@@ -17,20 +17,20 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
-	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "uuid")
-	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "uuid")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
+	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "UUID")
+	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "UUID")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
 	configurationEntityProto.FieldsOrder = append(configurationEntityProto.FieldsOrder, 0)
 	configurationEntityProto.FieldsVisibility = append(configurationEntityProto.FieldsVisibility, false)
-	configurationEntityProto.Indexs = append(configurationEntityProto.Indexs, "parentUuid")
-	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "parentUuid")
+	configurationEntityProto.Indexs = append(configurationEntityProto.Indexs, "ParentUuid")
+	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "ParentUuid")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
 	configurationEntityProto.FieldsOrder = append(configurationEntityProto.FieldsOrder, 1)
 	configurationEntityProto.FieldsVisibility = append(configurationEntityProto.FieldsVisibility, false)
@@ -301,8 +301,8 @@ func (this *Config_SmtpConfigurationEntity) GetChecksum() string {
 func (this *Config_SmtpConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.SmtpConfiguration"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -327,13 +327,13 @@ func (this *EntityManager) create_Config_SmtpConfigurationEntityPrototype() {
 	var smtpConfigurationEntityProto EntityPrototype
 	smtpConfigurationEntityProto.TypeName = "Config.SmtpConfiguration"
 	smtpConfigurationEntityProto.SuperTypeNames = append(smtpConfigurationEntityProto.SuperTypeNames, "Config.Configuration")
-	smtpConfigurationEntityProto.Ids = append(smtpConfigurationEntityProto.Ids, "uuid")
-	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "uuid")
+	smtpConfigurationEntityProto.Ids = append(smtpConfigurationEntityProto.Ids, "UUID")
+	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "UUID")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "xs.string")
 	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 0)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, false)
-	smtpConfigurationEntityProto.Indexs = append(smtpConfigurationEntityProto.Indexs, "parentUuid")
-	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "parentUuid")
+	smtpConfigurationEntityProto.Indexs = append(smtpConfigurationEntityProto.Indexs, "ParentUuid")
+	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "ParentUuid")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "xs.string")
 	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 1)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, false)
@@ -405,8 +405,8 @@ func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.SmtpConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -518,7 +518,7 @@ func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), SmtpConfigurationInfo, params)
 	} else {
@@ -551,8 +551,8 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.SmtpConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -570,7 +570,7 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -740,7 +740,7 @@ func ConfigSmtpConfigurationExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.SmtpConfiguration"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -1048,8 +1048,8 @@ func (this *Config_DataStoreConfigurationEntity) GetChecksum() string {
 func (this *Config_DataStoreConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.DataStoreConfiguration"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -1074,13 +1074,13 @@ func (this *EntityManager) create_Config_DataStoreConfigurationEntityPrototype()
 	var dataStoreConfigurationEntityProto EntityPrototype
 	dataStoreConfigurationEntityProto.TypeName = "Config.DataStoreConfiguration"
 	dataStoreConfigurationEntityProto.SuperTypeNames = append(dataStoreConfigurationEntityProto.SuperTypeNames, "Config.Configuration")
-	dataStoreConfigurationEntityProto.Ids = append(dataStoreConfigurationEntityProto.Ids, "uuid")
-	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "uuid")
+	dataStoreConfigurationEntityProto.Ids = append(dataStoreConfigurationEntityProto.Ids, "UUID")
+	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "UUID")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 0)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, false)
-	dataStoreConfigurationEntityProto.Indexs = append(dataStoreConfigurationEntityProto.Indexs, "parentUuid")
-	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "parentUuid")
+	dataStoreConfigurationEntityProto.Indexs = append(dataStoreConfigurationEntityProto.Indexs, "ParentUuid")
+	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "ParentUuid")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 1)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, false)
@@ -1160,8 +1160,8 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.DataStoreConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -1299,7 +1299,7 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), DataStoreConfigurationInfo, params)
 	} else {
@@ -1332,8 +1332,8 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.DataStoreConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -1353,7 +1353,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -1549,7 +1549,7 @@ func ConfigDataStoreConfigurationExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.DataStoreConfiguration"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -1857,8 +1857,8 @@ func (this *Config_LdapConfigurationEntity) GetChecksum() string {
 func (this *Config_LdapConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.LdapConfiguration"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -1883,13 +1883,13 @@ func (this *EntityManager) create_Config_LdapConfigurationEntityPrototype() {
 	var ldapConfigurationEntityProto EntityPrototype
 	ldapConfigurationEntityProto.TypeName = "Config.LdapConfiguration"
 	ldapConfigurationEntityProto.SuperTypeNames = append(ldapConfigurationEntityProto.SuperTypeNames, "Config.Configuration")
-	ldapConfigurationEntityProto.Ids = append(ldapConfigurationEntityProto.Ids, "uuid")
-	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "uuid")
+	ldapConfigurationEntityProto.Ids = append(ldapConfigurationEntityProto.Ids, "UUID")
+	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "UUID")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "xs.string")
 	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 0)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, false)
-	ldapConfigurationEntityProto.Indexs = append(ldapConfigurationEntityProto.Indexs, "parentUuid")
-	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "parentUuid")
+	ldapConfigurationEntityProto.Indexs = append(ldapConfigurationEntityProto.Indexs, "ParentUuid")
+	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "ParentUuid")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "xs.string")
 	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 1)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, false)
@@ -1965,8 +1965,8 @@ func (this *Config_LdapConfigurationEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.LdapConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2024,7 +2024,7 @@ func (this *Config_LdapConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), LdapConfigurationInfo, params)
 	} else {
@@ -2057,8 +2057,8 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.LdapConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2077,7 +2077,7 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -2199,7 +2199,7 @@ func ConfigLdapConfigurationExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.LdapConfiguration"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -2507,8 +2507,8 @@ func (this *Config_OAuth2ClientEntity) GetChecksum() string {
 func (this *Config_OAuth2ClientEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Client"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -2532,13 +2532,13 @@ func (this *EntityManager) create_Config_OAuth2ClientEntityPrototype() {
 
 	var oAuth2ClientEntityProto EntityPrototype
 	oAuth2ClientEntityProto.TypeName = "Config.OAuth2Client"
-	oAuth2ClientEntityProto.Ids = append(oAuth2ClientEntityProto.Ids, "uuid")
-	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "uuid")
+	oAuth2ClientEntityProto.Ids = append(oAuth2ClientEntityProto.Ids, "UUID")
+	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "UUID")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
 	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 0)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, false)
-	oAuth2ClientEntityProto.Indexs = append(oAuth2ClientEntityProto.Indexs, "parentUuid")
-	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "parentUuid")
+	oAuth2ClientEntityProto.Indexs = append(oAuth2ClientEntityProto.Indexs, "ParentUuid")
+	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "ParentUuid")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
 	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 1)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, false)
@@ -2604,8 +2604,8 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Client"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2Client **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2655,7 +2655,7 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2ClientInfo, params)
 	} else {
@@ -2688,8 +2688,8 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Client"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2Client **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2704,7 +2704,7 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -2814,7 +2814,7 @@ func ConfigOAuth2ClientExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Client"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -3122,8 +3122,8 @@ func (this *Config_OAuth2AuthorizeEntity) GetChecksum() string {
 func (this *Config_OAuth2AuthorizeEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Authorize"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -3147,13 +3147,13 @@ func (this *EntityManager) create_Config_OAuth2AuthorizeEntityPrototype() {
 
 	var oAuth2AuthorizeEntityProto EntityPrototype
 	oAuth2AuthorizeEntityProto.TypeName = "Config.OAuth2Authorize"
-	oAuth2AuthorizeEntityProto.Ids = append(oAuth2AuthorizeEntityProto.Ids, "uuid")
-	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "uuid")
+	oAuth2AuthorizeEntityProto.Ids = append(oAuth2AuthorizeEntityProto.Ids, "UUID")
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "UUID")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
 	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 0)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, false)
-	oAuth2AuthorizeEntityProto.Indexs = append(oAuth2AuthorizeEntityProto.Indexs, "parentUuid")
-	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "parentUuid")
+	oAuth2AuthorizeEntityProto.Indexs = append(oAuth2AuthorizeEntityProto.Indexs, "ParentUuid")
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "ParentUuid")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
 	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 1)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, false)
@@ -3221,8 +3221,8 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Authorize"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2Authorize **/
 	query.Fields = append(query.Fields, "M_id")
@@ -3272,7 +3272,7 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2AuthorizeInfo, params)
 	} else {
@@ -3305,8 +3305,8 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Authorize"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2Authorize **/
 	query.Fields = append(query.Fields, "M_id")
@@ -3320,7 +3320,7 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -3439,7 +3439,7 @@ func ConfigOAuth2AuthorizeExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Authorize"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -3747,8 +3747,8 @@ func (this *Config_OAuth2IdTokenEntity) GetChecksum() string {
 func (this *Config_OAuth2IdTokenEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2IdToken"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -3772,13 +3772,13 @@ func (this *EntityManager) create_Config_OAuth2IdTokenEntityPrototype() {
 
 	var oAuth2IdTokenEntityProto EntityPrototype
 	oAuth2IdTokenEntityProto.TypeName = "Config.OAuth2IdToken"
-	oAuth2IdTokenEntityProto.Ids = append(oAuth2IdTokenEntityProto.Ids, "uuid")
-	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "uuid")
+	oAuth2IdTokenEntityProto.Ids = append(oAuth2IdTokenEntityProto.Ids, "UUID")
+	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "UUID")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.string")
 	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 0)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, false)
-	oAuth2IdTokenEntityProto.Indexs = append(oAuth2IdTokenEntityProto.Indexs, "parentUuid")
-	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "parentUuid")
+	oAuth2IdTokenEntityProto.Indexs = append(oAuth2IdTokenEntityProto.Indexs, "ParentUuid")
+	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "ParentUuid")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.string")
 	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 1)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, false)
@@ -3868,8 +3868,8 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2IdToken"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2IdToken **/
 	query.Fields = append(query.Fields, "M_issuer")
@@ -3933,7 +3933,7 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2IdTokenInfo, params)
 	} else {
@@ -3966,8 +3966,8 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2IdToken"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2IdToken **/
 	query.Fields = append(query.Fields, "M_issuer")
@@ -3988,7 +3988,7 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -4134,7 +4134,7 @@ func ConfigOAuth2IdTokenExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2IdToken"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -4442,8 +4442,8 @@ func (this *Config_OAuth2AccessEntity) GetChecksum() string {
 func (this *Config_OAuth2AccessEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Access"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -4467,13 +4467,13 @@ func (this *EntityManager) create_Config_OAuth2AccessEntityPrototype() {
 
 	var oAuth2AccessEntityProto EntityPrototype
 	oAuth2AccessEntityProto.TypeName = "Config.OAuth2Access"
-	oAuth2AccessEntityProto.Ids = append(oAuth2AccessEntityProto.Ids, "uuid")
-	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "uuid")
+	oAuth2AccessEntityProto.Ids = append(oAuth2AccessEntityProto.Ids, "UUID")
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "UUID")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 0)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
-	oAuth2AccessEntityProto.Indexs = append(oAuth2AccessEntityProto.Indexs, "parentUuid")
-	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "parentUuid")
+	oAuth2AccessEntityProto.Indexs = append(oAuth2AccessEntityProto.Indexs, "ParentUuid")
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "ParentUuid")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 1)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
@@ -4555,8 +4555,8 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Access"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2Access **/
 	query.Fields = append(query.Fields, "M_id")
@@ -4620,7 +4620,7 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2AccessInfo, params)
 	} else {
@@ -4653,8 +4653,8 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Access"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2Access **/
 	query.Fields = append(query.Fields, "M_id")
@@ -4673,7 +4673,7 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -4821,7 +4821,7 @@ func ConfigOAuth2AccessExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Access"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -5129,8 +5129,8 @@ func (this *Config_OAuth2RefreshEntity) GetChecksum() string {
 func (this *Config_OAuth2RefreshEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Refresh"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -5154,13 +5154,13 @@ func (this *EntityManager) create_Config_OAuth2RefreshEntityPrototype() {
 
 	var oAuth2RefreshEntityProto EntityPrototype
 	oAuth2RefreshEntityProto.TypeName = "Config.OAuth2Refresh"
-	oAuth2RefreshEntityProto.Ids = append(oAuth2RefreshEntityProto.Ids, "uuid")
-	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "uuid")
+	oAuth2RefreshEntityProto.Ids = append(oAuth2RefreshEntityProto.Ids, "UUID")
+	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "UUID")
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "xs.string")
 	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 0)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
-	oAuth2RefreshEntityProto.Indexs = append(oAuth2RefreshEntityProto.Indexs, "parentUuid")
-	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "parentUuid")
+	oAuth2RefreshEntityProto.Indexs = append(oAuth2RefreshEntityProto.Indexs, "ParentUuid")
+	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "ParentUuid")
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "xs.string")
 	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 1)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
@@ -5210,8 +5210,8 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Refresh"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2Refresh **/
 	query.Fields = append(query.Fields, "M_id")
@@ -5255,7 +5255,7 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2RefreshInfo, params)
 	} else {
@@ -5288,8 +5288,8 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Refresh"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2Refresh **/
 	query.Fields = append(query.Fields, "M_id")
@@ -5300,7 +5300,7 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -5396,7 +5396,7 @@ func ConfigOAuth2RefreshExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Refresh"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -5704,8 +5704,8 @@ func (this *Config_OAuth2ExpiresEntity) GetChecksum() string {
 func (this *Config_OAuth2ExpiresEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Expires"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -5729,13 +5729,13 @@ func (this *EntityManager) create_Config_OAuth2ExpiresEntityPrototype() {
 
 	var oAuth2ExpiresEntityProto EntityPrototype
 	oAuth2ExpiresEntityProto.TypeName = "Config.OAuth2Expires"
-	oAuth2ExpiresEntityProto.Ids = append(oAuth2ExpiresEntityProto.Ids, "uuid")
-	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "uuid")
+	oAuth2ExpiresEntityProto.Ids = append(oAuth2ExpiresEntityProto.Ids, "UUID")
+	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "UUID")
 	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.string")
 	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 0)
 	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
-	oAuth2ExpiresEntityProto.Indexs = append(oAuth2ExpiresEntityProto.Indexs, "parentUuid")
-	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "parentUuid")
+	oAuth2ExpiresEntityProto.Indexs = append(oAuth2ExpiresEntityProto.Indexs, "ParentUuid")
+	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "ParentUuid")
 	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.string")
 	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 1)
 	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
@@ -5785,8 +5785,8 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Expires"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2Expires **/
 	query.Fields = append(query.Fields, "M_id")
@@ -5828,7 +5828,7 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2ExpiresInfo, params)
 	} else {
@@ -5861,8 +5861,8 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Expires"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of OAuth2Expires **/
 	query.Fields = append(query.Fields, "M_id")
@@ -5873,7 +5873,7 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -5963,7 +5963,7 @@ func ConfigOAuth2ExpiresExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Expires"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -6271,8 +6271,8 @@ func (this *Config_OAuth2ConfigurationEntity) GetChecksum() string {
 func (this *Config_OAuth2ConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Configuration"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -6297,13 +6297,13 @@ func (this *EntityManager) create_Config_OAuth2ConfigurationEntityPrototype() {
 	var oAuth2ConfigurationEntityProto EntityPrototype
 	oAuth2ConfigurationEntityProto.TypeName = "Config.OAuth2Configuration"
 	oAuth2ConfigurationEntityProto.SuperTypeNames = append(oAuth2ConfigurationEntityProto.SuperTypeNames, "Config.Configuration")
-	oAuth2ConfigurationEntityProto.Ids = append(oAuth2ConfigurationEntityProto.Ids, "uuid")
-	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "uuid")
+	oAuth2ConfigurationEntityProto.Ids = append(oAuth2ConfigurationEntityProto.Ids, "UUID")
+	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "UUID")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.string")
 	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 0)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
-	oAuth2ConfigurationEntityProto.Indexs = append(oAuth2ConfigurationEntityProto.Indexs, "parentUuid")
-	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "parentUuid")
+	oAuth2ConfigurationEntityProto.Indexs = append(oAuth2ConfigurationEntityProto.Indexs, "ParentUuid")
+	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "ParentUuid")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.string")
 	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 1)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
@@ -6415,8 +6415,8 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Configuration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -6570,7 +6570,7 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2ConfigurationInfo, params)
 	} else {
@@ -6603,8 +6603,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Configuration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -6632,7 +6632,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -6913,7 +6913,7 @@ func ConfigOAuth2ConfigurationExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Configuration"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -7221,8 +7221,8 @@ func (this *Config_ServiceConfigurationEntity) GetChecksum() string {
 func (this *Config_ServiceConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.ServiceConfiguration"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -7247,13 +7247,13 @@ func (this *EntityManager) create_Config_ServiceConfigurationEntityPrototype() {
 	var serviceConfigurationEntityProto EntityPrototype
 	serviceConfigurationEntityProto.TypeName = "Config.ServiceConfiguration"
 	serviceConfigurationEntityProto.SuperTypeNames = append(serviceConfigurationEntityProto.SuperTypeNames, "Config.Configuration")
-	serviceConfigurationEntityProto.Ids = append(serviceConfigurationEntityProto.Ids, "uuid")
-	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "uuid")
+	serviceConfigurationEntityProto.Ids = append(serviceConfigurationEntityProto.Ids, "UUID")
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "UUID")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
 	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 0)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
-	serviceConfigurationEntityProto.Indexs = append(serviceConfigurationEntityProto.Indexs, "parentUuid")
-	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "parentUuid")
+	serviceConfigurationEntityProto.Indexs = append(serviceConfigurationEntityProto.Indexs, "ParentUuid")
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "ParentUuid")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
 	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 1)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
@@ -7325,8 +7325,8 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.ServiceConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -7382,7 +7382,7 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), ServiceConfigurationInfo, params)
 	} else {
@@ -7415,8 +7415,8 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.ServiceConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -7434,7 +7434,7 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -7551,7 +7551,7 @@ func ConfigServiceConfigurationExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.ServiceConfiguration"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -7859,8 +7859,8 @@ func (this *Config_ApplicationConfigurationEntity) GetChecksum() string {
 func (this *Config_ApplicationConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.ApplicationConfiguration"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -7885,13 +7885,13 @@ func (this *EntityManager) create_Config_ApplicationConfigurationEntityPrototype
 	var applicationConfigurationEntityProto EntityPrototype
 	applicationConfigurationEntityProto.TypeName = "Config.ApplicationConfiguration"
 	applicationConfigurationEntityProto.SuperTypeNames = append(applicationConfigurationEntityProto.SuperTypeNames, "Config.Configuration")
-	applicationConfigurationEntityProto.Ids = append(applicationConfigurationEntityProto.Ids, "uuid")
-	applicationConfigurationEntityProto.Fields = append(applicationConfigurationEntityProto.Fields, "uuid")
+	applicationConfigurationEntityProto.Ids = append(applicationConfigurationEntityProto.Ids, "UUID")
+	applicationConfigurationEntityProto.Fields = append(applicationConfigurationEntityProto.Fields, "UUID")
 	applicationConfigurationEntityProto.FieldsType = append(applicationConfigurationEntityProto.FieldsType, "xs.string")
 	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 0)
 	applicationConfigurationEntityProto.FieldsVisibility = append(applicationConfigurationEntityProto.FieldsVisibility, false)
-	applicationConfigurationEntityProto.Indexs = append(applicationConfigurationEntityProto.Indexs, "parentUuid")
-	applicationConfigurationEntityProto.Fields = append(applicationConfigurationEntityProto.Fields, "parentUuid")
+	applicationConfigurationEntityProto.Indexs = append(applicationConfigurationEntityProto.Indexs, "ParentUuid")
+	applicationConfigurationEntityProto.Fields = append(applicationConfigurationEntityProto.Fields, "ParentUuid")
 	applicationConfigurationEntityProto.FieldsType = append(applicationConfigurationEntityProto.FieldsType, "xs.string")
 	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 1)
 	applicationConfigurationEntityProto.FieldsVisibility = append(applicationConfigurationEntityProto.FieldsVisibility, false)
@@ -7943,8 +7943,8 @@ func (this *Config_ApplicationConfigurationEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.ApplicationConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -7990,7 +7990,7 @@ func (this *Config_ApplicationConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), ApplicationConfigurationInfo, params)
 	} else {
@@ -8023,8 +8023,8 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.ApplicationConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -8037,7 +8037,7 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -8129,7 +8129,7 @@ func ConfigApplicationConfigurationExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.ApplicationConfiguration"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -8437,8 +8437,8 @@ func (this *Config_ServerConfigurationEntity) GetChecksum() string {
 func (this *Config_ServerConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.ServerConfiguration"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -8463,13 +8463,13 @@ func (this *EntityManager) create_Config_ServerConfigurationEntityPrototype() {
 	var serverConfigurationEntityProto EntityPrototype
 	serverConfigurationEntityProto.TypeName = "Config.ServerConfiguration"
 	serverConfigurationEntityProto.SuperTypeNames = append(serverConfigurationEntityProto.SuperTypeNames, "Config.Configuration")
-	serverConfigurationEntityProto.Ids = append(serverConfigurationEntityProto.Ids, "uuid")
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "uuid")
+	serverConfigurationEntityProto.Ids = append(serverConfigurationEntityProto.Ids, "UUID")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "UUID")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 0)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
-	serverConfigurationEntityProto.Indexs = append(serverConfigurationEntityProto.Indexs, "parentUuid")
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "parentUuid")
+	serverConfigurationEntityProto.Indexs = append(serverConfigurationEntityProto.Indexs, "ParentUuid")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "ParentUuid")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 1)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
@@ -8565,8 +8565,8 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.ServerConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -8634,7 +8634,7 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), ServerConfigurationInfo, params)
 	} else {
@@ -8667,8 +8667,8 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.ServerConfiguration"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -8692,7 +8692,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -8839,7 +8839,7 @@ func ConfigServerConfigurationExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.ServerConfiguration"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -9147,8 +9147,8 @@ func (this *Config_ConfigurationsEntity) GetChecksum() string {
 func (this *Config_ConfigurationsEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.Configurations"
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
-	query.Fields = append(query.Fields, "uuid")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
@@ -9172,13 +9172,13 @@ func (this *EntityManager) create_Config_ConfigurationsEntityPrototype() {
 
 	var configurationsEntityProto EntityPrototype
 	configurationsEntityProto.TypeName = "Config.Configurations"
-	configurationsEntityProto.Ids = append(configurationsEntityProto.Ids, "uuid")
-	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "uuid")
+	configurationsEntityProto.Ids = append(configurationsEntityProto.Ids, "UUID")
+	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "UUID")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "xs.string")
 	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 0)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, false)
-	configurationsEntityProto.Indexs = append(configurationsEntityProto.Indexs, "parentUuid")
-	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "parentUuid")
+	configurationsEntityProto.Indexs = append(configurationsEntityProto.Indexs, "ParentUuid")
+	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "ParentUuid")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "xs.string")
 	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 1)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, false)
@@ -9258,8 +9258,8 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	var query EntityQuery
 	query.TypeName = "Config.Configurations"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configurations **/
 	query.Fields = append(query.Fields, "M_id")
@@ -9400,7 +9400,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), ConfigurationsInfo, params)
 	} else {
@@ -9433,8 +9433,8 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 	var query EntityQuery
 	query.TypeName = "Config.Configurations"
 
-	query.Fields = append(query.Fields, "uuid")
-	query.Fields = append(query.Fields, "parentUuid")
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
 
 	/** members of Configurations **/
 	query.Fields = append(query.Fields, "M_id")
@@ -9451,7 +9451,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "uuid="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -9692,7 +9692,7 @@ func ConfigConfigurationsExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.Configurations"
 	query.Indexs = append(query.Indexs, "M_id="+val)
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)

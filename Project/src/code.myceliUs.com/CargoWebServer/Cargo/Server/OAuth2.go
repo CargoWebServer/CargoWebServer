@@ -1304,7 +1304,6 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		// The user give the authorization.
 		ar.Authorized = true
 		ar.RedirectUri = client.GetRedirectUri()
-		log.Println("=--------------------> redirect uri", ar.RedirectUri)
 		server.FinishAuthorizeRequest(resp, r, ar)
 
 		// Here I will create a response for the authorization.

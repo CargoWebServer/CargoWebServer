@@ -104,7 +104,7 @@ EntityManager.prototype.setEntity = function (entity) {
         function (prototype, caller) {
             for (var i = 0; i < prototype.Ids.length; i++) {
                 var id = prototype.Ids[i]
-                if (id == "uuid") {
+                if (id == "UUID") {
                     server.entityManager.entities[entity.UUID] = entity
                 } else {
                     if (entity[id].length > 0) {
@@ -130,7 +130,7 @@ EntityManager.prototype.resetEntity = function (entity) {
     var prototype = this.entityPrototypes[entity.TYPENAME]
     for (var i = 0; i < prototype.Ids.length; i++) {
         var id = prototype.Ids[i]
-        if (id == "uuid") {
+        if (id == "UUID") {
             delete server.entityManager.entities[entity.UUID]
         } else {
             delete server.entityManager.entities[entity.TYPENAME + "_" + entity[id]]
@@ -959,32 +959,32 @@ EntityPrototype.prototype.init = function (object) {
     if (object.Fields != null && object.FieldsType != null && object.FieldsVisibility != null && object.FieldsOrder != null) {
 
         // Append parent uuid if none is define.
-        if (!contains(object.Fields, "parentUuid")) {
-            object.Fields.unshift("parentUuid")
+        if (!contains(object.Fields, "ParentUuid")) {
+            object.Fields.unshift("ParentUuid")
             object.FieldsType.unshift("xs.string")
             object.FieldsVisibility.unshift(false)
             object.FieldsOrder.push(object.FieldsOrder.length)
         }
 
         // Append the uuid if none is define.
-        if (!contains(object.Fields, "uuid")) {
+        if (!contains(object.Fields, "UUID")) {
             // append the uuid...
-            object.Fields.unshift("uuid")
+            object.Fields.unshift("UUID")
             object.FieldsType.unshift("xs.string")
             object.FieldsVisibility.unshift(false)
             object.FieldsOrder.push(object.FieldsOrder.length)
-            object.Ids.unshift("uuid")
+            object.Ids.unshift("UUID")
         }
 
         for (var i = 0; i < object.Fields.length; i++) {
             this.appendField(object.Fields[i], object.FieldsType[i], object.FieldsVisibility[i], object.FieldsOrder[i])
-            if (object.Fields[i] == "uuid") {
-                if (!contains(this.Ids, "uuid")) {
-                    this.Ids.unshift("uuid")
+            if (object.Fields[i] == "UUID") {
+                if (!contains(this.Ids, "UUID")) {
+                    this.Ids.unshift("UUID")
                 }
-            } else if (object.Fields[i] == "parentUuid") {
-                if (!contains(this.Indexs, "parentUuid")) {
-                    this.Indexs.unshift("parentUuid")
+            } else if (object.Fields[i] == "ParentUuid") {
+                if (!contains(this.Indexs, "ParentUuid")) {
+                    this.Indexs.unshift("ParentUuid")
                 }
             }
         }
@@ -1399,7 +1399,7 @@ function setSubObject(parent, property, values, isArray) {
                 parent[property] = object
             }
 
-            object.parentUuid = parent.UUID
+            object.ParentUuid = parent.UUID
 
             server.entityManager.setEntity(object)
 
@@ -1578,11 +1578,11 @@ function setObjectValues(object, values) {
 
     //////////////////////////////////////////////////////
     // Set common values...
-    object.uuid = values.UUID
+    object.UUID = values.UUID
     object.NeedSave = false
     object.exist = true
     object.IsInit = true // The object part only and not the refs...
-    object.parentUuid = values.ParentUuid // set the parent uuid.
+    object.ParentUuid = values.ParentUuid // set the parent uuid.
 
 
     // Call the init callback.
@@ -1613,10 +1613,9 @@ EntityPrototype.prototype.generateConstructor = function () {
 
     // Common properties share by all entity.
     constructorSrc += " this.__class__ = \"" + this.PackageName + "." + this.ClassName + "\"\n"
+    constructorSrc += " this.UUID = this.UUID\n"
     constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
-    constructorSrc += " this.UUID = \"\"\n"
-    constructorSrc += " this.uuid = this.UUID\n"
-    constructorSrc += " this.parentUuid = \"\"\n"
+    constructorSrc += " this.ParentUuid = \"\"\n"
     constructorSrc += " this.childsUuid = []\n"
     constructorSrc += " this.references = []\n"
     constructorSrc += " this.NeedSave = true\n"
@@ -1682,7 +1681,7 @@ EntityPrototype.prototype.generateConstructor = function () {
 
     // The get parent function
     constructorSrc += " this.getParent = function(){\n"
-    constructorSrc += "       return server.entityManager.entities[this.parentUuid]\n"
+    constructorSrc += "       return server.entityManager.entities[this.ParentUuid]\n"
     constructorSrc += "  }\n"
 
     // The setter function.

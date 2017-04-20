@@ -760,7 +760,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							item.TYPENAME = itemPrototype.TypeName
 
 							// Set the parent uuid.
-							item.parentUuid = entityPanel.entity.UUID
+							item.ParentUuid = entityPanel.entity.UUID
 							item.parentLnk = field
 
 							if (isArray) {
@@ -832,7 +832,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						var entity = eval("new " + entityPanel.typeName)
 						// set basic values.
 						if (entityPanel.parentEntity != null) {
-							entity.parentUuid = entityPanel.parentEntity.UUID
+							entity.ParentUuid = entityPanel.parentEntity.UUID
 							entity.parentLnk = entityPanel.parentLnk
 						}
 
@@ -966,7 +966,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 		itemsTable.clear()
 		for (var i = 0; i < values.length; i++) {
 			// keep information about the parent entity...
-			values[i].parentUuid = this.entity.UUID
+			values[i].ParentUuid = this.entity.UUID
 			values[i].parentLnk = field
 			if (values[i].UUID != undefined) {
 				var row = itemsTable.appendRow(values[i], values[i].UUID)

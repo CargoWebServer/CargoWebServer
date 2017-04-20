@@ -173,7 +173,7 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 	// remove it's data from the database.
 	var deleteEntityQuery EntityQuery
 	deleteEntityQuery.TypeName = toDelete.GetTypeName()
-	deleteEntityQuery.Indexs = append(deleteEntityQuery.Indexs, "uuid="+toDelete.GetUuid())
+	deleteEntityQuery.Indexs = append(deleteEntityQuery.Indexs, "UUID="+toDelete.GetUuid())
 	var params []interface{}
 	query, _ := json.Marshal(deleteEntityQuery)
 
@@ -646,7 +646,7 @@ func (this *EntityManager) getEntityById(storeId string, typeName string, id str
 	if err == nil {
 		var query EntityQuery
 		query.TypeName = typeName
-		query.Fields = append(query.Fields, "uuid")
+		query.Fields = append(query.Fields, "UUID")
 		var fieldsType []interface{} // not used
 		var params []interface{}
 		var ids []string
@@ -768,7 +768,7 @@ func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, s
 
 		// I will retreive the uuid...
 		query.TypeName = typeName
-		query.Fields = append(query.Fields, "uuid")
+		query.Fields = append(query.Fields, "UUID")
 		var fieldsType []interface{} // not used
 		var params []interface{}
 
@@ -1404,7 +1404,7 @@ func (this *EntityManager) isExist(uuid string) bool {
 
 	var query EntityQuery
 	query.TypeName = uuid[0:strings.Index(uuid, ".")]
-	query.Fields = append(query.Fields, "uuid")
+	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)

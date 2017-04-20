@@ -106,15 +106,17 @@ LanguageManager.prototype.setElementText = function (element, textId) {
 		return
 	}
 	this.registerElementText(element, textId)
-	if (this.elements[element.id].element.tagName == "SPAN") {
-		this.elements[element.id].element.textContent = this.languageInfo[this.language][textId]
-	} else if (this.elements[element.id].element.tagName == "INPUT"){
-		if(this.elements[element.id].element.getAttribute("data-match-error") != null){
-			// Set the error text here.
-			this.elements[element.id].element.attributes["data-match-error"].nodeValue = this.languageInfo[this.language][textId]
+	if (this.elements[element.id].element != undefined) {
+		if (this.elements[element.id].element.tagName == "SPAN") {
+			this.elements[element.id].element.textContent = this.languageInfo[this.language][textId]
+		} else if (this.elements[element.id].element.tagName == "INPUT") {
+			if (this.elements[element.id].element.getAttribute("data-match-error") != null) {
+				// Set the error text here.
+				this.elements[element.id].element.attributes["data-match-error"].nodeValue = this.languageInfo[this.language][textId]
+			}
+		} else {
+			this.elements[element.id].setAttribute("innerHTML", this.languageInfo[this.language][textId])
 		}
-	} else {
-		this.elements[element.id].setAttribute("innerHTML", this.languageInfo[this.language][textId])
 	}
 }
 
