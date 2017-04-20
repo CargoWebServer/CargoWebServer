@@ -1730,7 +1730,7 @@ func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, ty
 	} else if typeName == "xs.date" || typeName == "xs.datetime" || typeName == "xs.time" {
 		//////////////////////////// Time and date ////////////////////////////
 		if typeName == "xs.dateTime" {
-			dateTime := Utility.MatchISO8601_DateTime(value)
+			dateTime, _ := Utility.MatchISO8601_DateTime(value)
 
 			if isArray == true {
 				object[name] = append(object[name].([]interface{}), dateTime.UnixNano()/int64(time.Millisecond))
@@ -1738,7 +1738,7 @@ func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, ty
 				object[name] = dateTime
 			}
 		} else if typeName == "xs.time" {
-			time_ := Utility.MatchISO8601_Time(value)
+			time_, _ := Utility.MatchISO8601_Time(value)
 
 			if isArray == true {
 				object[name] = append(object[name].([]interface{}), time_.UnixNano()/int64(time.Millisecond))
@@ -1746,7 +1746,7 @@ func (this *XmlDocumentHandler) setObjectValue(object map[string]interface{}, ty
 				object[name] = time_
 			}
 		} else if typeName == "xs.date" {
-			date := Utility.MatchISO8601_Date(value)
+			date, _ := Utility.MatchISO8601_Date(value)
 			if isArray == true {
 				object[name] = append(object[name].([]interface{}), date.UnixNano()/int64(time.Millisecond))
 			} else {

@@ -17,6 +17,7 @@ import (
 const (
 	// The persistence db
 	CargoEntitiesDB = "CargoEntities"
+	createdFormat   = "2006-01-02 15:04:05"
 )
 
 /**
@@ -199,7 +200,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 								fieldName := q.Fields[j]
 								fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
 								// If the field is an id
-								if !strings.HasSuffix(fieldType, ":Ref") && strings.HasPrefix(fieldName, "M_") && !strings.HasPrefix(fieldName, "M_FK_") {
+								if !strings.HasSuffix(fieldType, ":Ref") && strings.HasPrefix(fieldName, "M_") && !strings.HasPrefix(fieldName, "M_FK_") && !strings.HasPrefix(fieldName, "M_fk_") {
 									if j < len(data[i]) {
 										if Utility.Contains(prototype.Ids, fieldName) {
 											ids = append(ids, data[i][j]) // append the id
@@ -239,6 +240,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 										if isXsString(typeName) {
 											id = "'" + id + "'"
 										}
+
 										query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=" + id
 									}
 								}
@@ -279,7 +281,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
  * value to insert in the DB.
  */
 func (this *DataManager) createData(storeName string, query string, d []interface{}) (lastId interface{}, err error) {
-
+	log.Println("-------------> 284 ", d)
 	// If the store is sql_info in that case I will need to create the information
 	// in the sql data store.
 	store := this.getDataStore(storeName)
@@ -331,7 +333,8 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 					index := prototype.getFieldIndex(fieldName)
 					if index > 0 {
 						fieldType := prototype.FieldsType[index]
-						if strings.HasPrefix(fieldName, "M_") && !strings.HasSuffix(fieldType, ":Ref") && !strings.HasPrefix(fieldName, "M_FK_") {
+						if strings.HasPrefix(fieldName, "M_") && !strings.HasSuffix(fieldType, ":Ref") && !strings.HasPrefix(fieldName, "M_FK_") && !strings.HasPrefix(fieldName, "M_fk_") {
+							log.Println("--------------> 336", fieldName)
 							fields = append(fields, fieldName)
 							fieldsType = append(fieldsType, fieldType)
 							// In case of null value...
@@ -347,10 +350,16 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 
 							// Here I will convert the data
 							if isXsBoolean(fieldType) && reflect.TypeOf(d[i]).String() == "float64" {
-								log.Println("=-----------> ", int8(d[i].(float64)))
 								data = append(data, int8(d[i].(float64)))
 							} else if isXsInt(fieldType) && reflect.TypeOf(d[i]).String() == "float64" {
 								data = append(data, int32(d[i].(float64)))
+							} else if isXsDate(fieldType) {
+								dateTime, err := Utility.MatchISO8601_DateTime(d[i].(string))
+								if err == nil {
+									data = append(data, dateTime.Format(createdFormat))
+								} else {
+									data = append(data, d[i])
+								}
 							} else {
 								data = append(data, d[i])
 							}
@@ -500,6 +509,13 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 									data = append(data, int8(fields[i].(float64)))
 								} else if isXsInt(fieldType) && reflect.TypeOf(fields[i]).String() == "float64" {
 									data = append(data, int32(fields[i].(float64)))
+								} else if isXsDate(fieldType) {
+									dateTime, err := Utility.MatchISO8601_DateTime(fields[i].(string))
+									if err == nil {
+										data = append(data, dateTime.Format(createdFormat))
+									} else {
+										data = append(data, fields[i])
+									}
 								} else {
 									data = append(data, fields[i])
 								}
@@ -536,6 +552,8 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 					err = this.updateData(dataBaseName, query, data, ids)
 					if err == nil {
 						log.Println("-------> update data succeeded!")
+						log.Println(query)
+						log.Println(data)
 					}
 				}
 			}

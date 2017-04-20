@@ -1,7 +1,7 @@
 
 // global variable.
 var databaseName = "Blog."
-var schemaId = "dbo."
+var schemaId = "" //"dbo."
 
 var userTypeName = databaseName + schemaId + "blog_user"
 var authorTypeName = databaseName + schemaId + "blog_author"
@@ -76,14 +76,8 @@ var BlogManager = function (parent) {
     // Depending of the language the correct text will be set.
     server.languageManager.appendLanguageInfo(languageInfo)
 
-    /*
-        var userPanel = new EntityPanel(this.panel, userTypeName, function (panel) {
-            panel.maximizeBtn.element.click()
-        }, null, false, null, null)
-    */
-
     // The active blog view.
-    this.activeBlogView = null
+    this.activePostView = null
 
     /////////////////////////////////////////////////////////////////////////////////
     // Interface.
@@ -260,7 +254,7 @@ var BlogManager = function (parent) {
         .appendElement({ "tag": "li", "id": "logout-dropdown-lnk", "style": "display: none;" }).down()
         .appendElement({ "tag": "a", "id": "logout-lnk", "href": "#" })
 
-    // Set the form validator.
+    // Set boostrap validation.
     $('#register-form').validator()
     $('#user-info-form').validator()
 
@@ -388,7 +382,7 @@ var BlogManager = function (parent) {
     this.createBlog.element.onclick = function (blogManager) {
         return function () {
             // Create a new blog.
-            blogManager.createNewBlog()
+            blogManager.createNewPost()
         }
     } (this)
 
@@ -613,6 +607,52 @@ var BlogManager = function (parent) {
         }
     } (this, firstNameInput, lastNameInput, middleNameInput, email, phone)
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    //  Event listener's
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    // The delete entity event.
+    server.entityManager.attach(this, DeleteEntityEvent, function (evt, blogManager) {
+        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName) {
+            if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
+                if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
+                    console.log("delete post!")
+                }
+            }
+        }
+    })
+
+    // The new entity event.
+    server.entityManager.attach(this, NewEntityEvent, function (evt, blogManager) {
+        // I will reinit the panel here...
+        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName) {
+            if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
+                if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
+                    console.log("new post!")
+                }
+            }
+        }
+    })
+
+    // The update entity event.
+    server.entityManager.attach(this, UpdateEntityEvent, function (evt, blogManager) {
+        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName) {
+            if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
+                // I will reinit the panel here...
+                if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
+                    // Set the entity.
+                    server.entityManager.entities[evt.dataMap["entity"].UUID] = evt.dataMap["entity"]
+
+                    // Udate the author post.
+                    blogManager.activePostView = new BlogPostView(blogManager.blogContainer, evt.dataMap["entity"])
+                    
+                    // Set the blog view editable.
+                    blogManager.setEditable(blogManager.activePostView)
+                    blogManager.displayAuthorPost()
+                }
+            }
+        }
+    })
+
     return this
 }
 
@@ -635,13 +675,49 @@ BlogManager.prototype.displayAuthorPost = function () {
     // The list of post by an author.
     if (this.authorPostDiv == null) {
         this.authorPostDiv = this.sideWellWidget.appendElement({ "tag": "div" }).down()
+    } else {
+        // reset it content.
+        this.authorPostDiv.removeAllChilds()
+        this.authorPostDiv.element.innerHTML = ""
     }
+
+    // Now I will get the all post from a given author.
+    server.entityManager.getEntityById("sql_info", authorTypeName, this.account.M_userRef.UUID,
+        // The success callback.
+        function (author, caller) {
+
+            var authorPostDiv = caller.blogManager.authorPostDiv
+            for (var i = 0; i < author.M_FK_blog_post_blog_author.length; i++) {
+                var post = author.M_FK_blog_post_blog_author[i]
+                if(server.entityManager.entities[post.UUID]!=undefined){
+                    post = server.entityManager.entities[post.UUID]
+                    author.M_FK_blog_post_blog_author[i] = post
+                }
+                // Here I will create the link with the title.
+                authorPostDiv.appendElement({ "tag": "div", "class": "row" }).down()
+                    .appendElement({ "tag": "div", "class": "col-md-1" }).down()
+                    .appendElement({ "tag": "i", "class": "fa fa-trash-o delete-button", "style": "vertical-align: center;" }).up()
+                    .appendElement({ "tag": "a", "id": post.UUID + "_lnk", "class": "col-md-10 control-label", "innerHtml": post.M_title, "href": "#" })
+
+                var postLnk = authorPostDiv.getChildById(post.UUID + "_lnk")
+                postLnk.element.onclick = function (post, blogManager) {
+                    return function () {
+                        blogManager.activePostView = new BlogPostView(blogManager.blogContainer, post)
+                        // Set the blog view editable.
+                        blogManager.setEditable(caller.blogManager.activePostView)
+                    }
+                } (post, caller.blogManager)
+            }
+        },
+        // Error callback.
+        function () { },
+        { "blogManager": this })
 }
 
 /**
  * Create a new blog.
  */
-BlogManager.prototype.createNewBlog = function (author) {
+BlogManager.prototype.createNewPost = function (author) {
     // Here I will use the data manager to get the number of post.
     var query = "SELECT MAX(id) FROM " + blogPostTypeName
     server.dataManager.read("Blog", query, ["int"], [],
@@ -652,10 +728,21 @@ BlogManager.prototype.createNewBlog = function (author) {
                 lastId = result[0][0][0]
             }
 
+            var userUuid
+            if(isString(caller.blogManager.account.M_userRef)){
+                userUuid = caller.blogManager.account.M_userRef
+            }else{
+                userUuid = caller.blogManager.account.M_userRef.UUID
+            }
+
             // Now I will save the post...
             // The post is own by author, so if we delete an author all it's post will be deleted.
-            server.entityManager.getEntityById("sql_info", authorTypeName, caller.blogManager.account.M_userRef.UUID,
+            server.entityManager.getEntityById("sql_info", authorTypeName, userUuid,
                 function (author, caller) {
+                    if(author.M_id.length == 0){
+                        return // Do nothing if the author id is not set properly.
+                    }
+
                     // So here I will create a new blog post and from it I will set it view.
                     var post = eval("new " + blogPostTypeName + "()")
                     post.M_id = caller.lastId + 1
@@ -665,30 +752,31 @@ BlogManager.prototype.createNewBlog = function (author) {
                         + " <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, doloribus, dolorem iusto blanditiis unde eius illum consequuntur neque dicta incidunt ullam ea hic porro optio ratione repellat perspiciatis. Enim, iure!</p>"
                         + "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Error, nostrum, aliquid, animi, ut quas placeat totam sunt tempora commodi nihil ullam alias modi dicta saepe minima ab quo voluptatem obcaecati?</p>"
                         + "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, dolor quis. Sunt, ut, explicabo, aliquam tenetur ratione tempore quidem voluptates cupiditate voluptas illo saepe quaerat numquam recusandae? Qui, necessitatibus, est!</p>"
-                    post.M_author_id = author.M_id
+                    post.M_blog_author_id = author.M_id
                     post.M_date_published = new Date()
                     post.M_featuread = 1
                     post.M_enabled = 1
                     post.M_comments_enabled = 1
                     post.M_views = 0
+                    
+                    // Link to the blog author object.
 
-                    // Attribute name can change from db... 
-                    var attributeName = "M_FK_blog_post_blog_author"
+                    //post.M_FK_blog_post_blog_author = author.UUID
 
-                    server.entityManager.createEntity(author.UUID, attributeName, blogPostTypeName, "", post,
+
+                    server.entityManager.createEntity(author.UUID, "M_FK_blog_post_blog_author", blogPostTypeName, "", post,
                         // Success callback.
                         function (post, caller) {
                             // Create a new Blog.
-                            caller.blogManager.activeBlogView = new BlogPostView(caller.blogManager.blogContainer, post)
+                            caller.blogManager.activePostView = new BlogPostView(caller.blogManager.blogContainer, post)
 
                             // Set the blog view editable.
-                            caller.blogManager.setEditable(caller.blogManager.activeBlogView)
+                            caller.blogManager.setEditable(caller.blogManager.activePostView)
                         },
                         // Error callback
                         function (errObj, caller) {
                             // Error here.
-                        }, {"blogManager": caller.blogManager})
-
+                        }, { "blogManager": caller.blogManager })
 
                 },
                 function (errObj, caller) {
@@ -725,31 +813,36 @@ BlogManager.prototype.setEditable = function (blogView) {
     }
 
     // Set the title div.
-    var setTitleCallback = function (div, btn) {
-        // Here I will use a simple input...
-        if (div.element.firstChild.id != "blog-post-title") {
-            // I will get the actual title value.
-            var title = div.element.innerText
-            div.element.innerText = ""
-            var inputTitle = new Element(div.element, { "tag": "input", "id": "blog-post-title", "value": title })
-            inputTitle.element.select()
+    var setTitleCallback = function (blogManager) {
+        return function (div, btn) {
+            // Here I will use a simple input...
+            if (div.element.firstChild.id != "blog-post-title") {
+                // I will get the actual title value.
+                var title = div.element.innerText
+                div.element.innerText = ""
+                var inputTitle = new Element(div.element, { "tag": "input", "id": "blog-post-title", "value": title })
+                inputTitle.element.select()
 
-            // Now the save button.
-            var saveBtn = div.appendElement({ "tag": "div", "class": "edit-button" }).down()
-                .appendElement({ "tag": "i", "class": "fa fa fa-floppy-o" })
+                // Now the save button.
+                var saveBtn = div.appendElement({ "tag": "div", "class": "edit-button" }).down()
+                    .appendElement({ "tag": "i", "class": "fa fa fa-floppy-o" })
 
-            // Now the save action.
-            saveBtn.element.onclick = function (inputTitle, div) {
-                return function (evt) {
-                    // Stop event propagation so we will not return direclty here...
-                    evt.stopPropagation()
-                    // Here I will set back the text inside the h1 element.
-                    div.element.innerText = inputTitle.element.value
-                    setEditable(div, setTitleCallback)
-                }
-            } (inputTitle, div)
+                // Now the save action.
+                saveBtn.element.onclick = function (inputTitle, div, blogManager) {
+                    return function (evt) {
+                        // Stop event propagation so we will not return direclty here...
+                        evt.stopPropagation()
+                        // Here I will set back the text inside the h1 element.
+                        div.element.innerText = inputTitle.element.value
+                        blogManager.activePostView.post.M_title = inputTitle.element.value
+                        setEditable(div, setTitleCallback)
+                        blogManager.saveActivePost()
+                    }
+                } (inputTitle, div, blogManager)
+            }
         }
-    }
+    } (this)
+
     // Set the title.
     setEditable(blogView.titleDiv, setTitleCallback)
 
@@ -757,21 +850,30 @@ BlogManager.prototype.setEditable = function (blogView) {
 
     // Set the content div
     setEditable(blogView.pageContentDiv,
-        function (div) {
-            // I made use of http://summernote.org/ Great work folk's
-            $('#page-content').summernote();
+        function (blogManager) {
+            return function (div) {
+                // I made use of http://summernote.org/ Great work folk's
+                $('#page-content').summernote();
 
-            // I will append the save button to existing toolbar, it's so easy...
-            var saveBtn = new Element(document.getElementsByClassName("note-view")[0], { "tag": "button", "tabindex": -1, "type": "button", "class": "note-btn btn btn-default btn-sm btn btn-primary btn-save", "title": "save", "data-original-title": "save" })
-            saveBtn.appendElement({ "tag": "i", "class": "fa fa-floppy-o" })
+                // I will append the save button to existing toolbar, it's so easy...
+                var saveBtn = new Element(document.getElementsByClassName("note-view")[0], { "tag": "button", "tabindex": -1, "type": "button", "class": "note-btn btn btn-default btn-sm btn btn-primary btn-save", "title": "save", "data-original-title": "save" })
+                saveBtn.appendElement({ "tag": "i", "class": "fa fa-floppy-o" })
 
-            // Now the save action.
-            saveBtn.element.onclick = function () {
-                // remove the editor.
-                $('#page-content').summernote('destroy');
-                blogManager.saveActiveBlog()
+                // Now the save action.
+                saveBtn.element.onclick = function (blogManager) {
+                    return function () {
+
+                        // remove the editor.
+                        $('#page-content').summernote('destroy');
+
+                        // Set the inner html value to the post.
+                        blogManager.activePostView.post.M_article = document.getElementById("page-content").innerHTML
+
+                        blogManager.saveActivePost()
+                    }
+                } (blogManager)
             }
-        })
+        } (this))
 
     // Here I will use use the clock to set the time.
 }
@@ -779,14 +881,21 @@ BlogManager.prototype.setEditable = function (blogView) {
 /**
  * Save the active blog.
  */
-BlogManager.prototype.saveActiveBlog = function () {
-    console.log("save blog!!!!")
+BlogManager.prototype.saveActivePost = function () {
+    // Here the post to save is in the active view.
+    var post = this.activePostView.post
+    var author = server.entityManager.
+    server.entityManager.saveEntity(post)
 }
 
 /**
  * There is the blog the blog view.
  */
 var BlogPostView = function (parent, post) {
+
+    // Reset the parent content here.
+    parent.removeAllChilds()
+    parent.element.innerHTML = ""
 
     // A reference to the post.
     this.post = post

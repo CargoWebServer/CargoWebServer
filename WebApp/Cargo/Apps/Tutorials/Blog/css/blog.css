@@ -15,6 +15,15 @@
     font-size: 20px;
 }
 
-.edit-button :hover {
+.edit-button:hover {
     cursor: pointer;
+}
+
+.delete-button {
+    color: #337ab7;
+}
+
+.delete-button:hover {
+    cursor: pointer;
+    text-shadow: 0px 0px 9px lightblue;
 }

@@ -5,10 +5,13 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"math"
+	"net/http"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -17,11 +20,8 @@ import (
 	"sort"
 	"strconv"
 	"time"
-	"unsafe"
-
-	"log"
-	"net/http"
 	"unicode"
+	"unsafe"
 
 	"github.com/pborman/uuid"
 	"golang.org/x/text/encoding/charmap"
@@ -80,9 +80,12 @@ func StringToBytes(s string) []byte {
  * Parse and return a time object from a 8601 iso string, the time zone is
  * the UTC.
  */
-func MatchISO8601_Time(str string) *time.Time {
+func MatchISO8601_Time(str string) (*time.Time, error) {
 	var exp = regexp.MustCompile(ISO_8601_TIME_PATTERN)
 	match := exp.FindStringSubmatch(str)
+	if len(match) == 0 {
+		return nil, errors.New(str + " now match iso 8601")
+	}
 	var hour, minute, second, miliSecond int
 	for i, name := range exp.SubexpNames() {
 		if i != 0 {
@@ -103,12 +106,15 @@ func MatchISO8601_Time(str string) *time.Time {
 	}
 	// year/mounth/day all set to zero in that case.
 	t := time.Date(0, time.Month(0), 0, hour, minute, second, miliSecond, time.UTC)
-	return &t
+	return &t, nil
 }
 
-func MatchISO8601_Date(str string) *time.Time {
+func MatchISO8601_Date(str string) (*time.Time, error) {
 	var exp = regexp.MustCompile(ISO_8601_DATE_PATTERN)
 	match := exp.FindStringSubmatch(str)
+	if len(match) == 0 {
+		return nil, errors.New(str + " now match iso 8601")
+	}
 	var year, month, day int
 	for i, name := range exp.SubexpNames() {
 		if i != 0 {
@@ -125,16 +131,19 @@ func MatchISO8601_Date(str string) *time.Time {
 		}
 	}
 	t := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
-	return &t
+	return &t, nil
 }
 
 /**
  * Parse and return a time object from a 8601 iso string, the time zone is
  * the UTC.
  */
-func MatchISO8601_DateTime(str string) *time.Time {
+func MatchISO8601_DateTime(str string) (*time.Time, error) {
 	var exp = regexp.MustCompile(ISO_8601_DATE_TIME_PATTERN)
 	match := exp.FindStringSubmatch(str)
+	if len(match) == 0 {
+		return nil, errors.New(str + " now match iso 8601")
+	}
 	var year, month, day, hour, minute, second, miliSecond int
 	for i, name := range exp.SubexpNames() {
 		if i != 0 {
@@ -163,7 +172,7 @@ func MatchISO8601_DateTime(str string) *time.Time {
 		}
 	}
 	t := time.Date(year, time.Month(month), day, hour, minute, second, miliSecond, time.UTC)
-	return &t
+	return &t, nil
 }
 
 // Create a random uuid value.

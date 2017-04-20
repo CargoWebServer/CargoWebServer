@@ -110,8 +110,10 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 	}
 
 	// Try to retreive the entity.
+	log.Println("--------> try to find ", values["UUID"])
 	if val, ok := this.contain(values["UUID"].(string)); ok {
 		if val != nil {
+			log.Println("--------> try to find 116")
 			entity = val.(*DynamicEntity)
 			// Calculate the checksum.
 			sum0 := Utility.GetChecksum(values)
@@ -134,6 +136,7 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 
 	// Here if the enity is nil I will create a new instance.
 	if entity == nil {
+		log.Println("--------> try to find 139")
 		entity = new(DynamicEntity)
 
 		// If the object contain an id...
@@ -152,9 +155,9 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 		entity.referenced = make([]EntityRef, 0)
 
 		// I will set it parent ptr...
-		if values["ParentUuid"] != nil {
-			if len(values["ParentUuid"].(string)) > 0 {
-				parentPtr, _ := GetServer().GetEntityManager().getDynamicEntityByUuid(values["parentUuid"].(string))
+		if len(parentUuid) > 0 {
+			parentPtr, _ := GetServer().GetEntityManager().getDynamicEntityByUuid(parentUuid)
+			if parentPtr != nil {
 				entity.SetParentPtr(parentPtr)
 			}
 		}

@@ -640,8 +640,8 @@ func (this *KeyValueDataStore) evaluate(typeName string, fieldName string, compa
 
 	// here for the date I will get it unix time value...
 	if fieldType == "xs.date" || fieldType == "xs.dateTime" {
-		expectedDateValue := Utility.MatchISO8601_Date(expected.(string))
-		dateValue := Utility.MatchISO8601_Date(value.(string))
+		expectedDateValue, _ := Utility.MatchISO8601_Date(expected.(string))
+		dateValue, _ := Utility.MatchISO8601_Date(value.(string))
 		if fieldType == "xs.dateTime" {
 			expected = expectedDateValue.Unix() // get the unix time for calcul
 			value = dateValue.Unix()            // get the unix time for calcul
