@@ -38,7 +38,6 @@ type DynamicEntity struct {
 	prototype      *EntityPrototype
 
 	/** object will be a map... **/
-	//object *cmap.ConcurrentMap
 	object map[string]interface{}
 
 	/**
@@ -584,7 +583,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
  */
 func (this *DynamicEntity) SaveEntity() {
 	this.saveEntity("")
-	log.Println("After save:", toJsonStr(this.object))
+	//log.Println("After save:", toJsonStr(this.object))
 }
 
 func (this *DynamicEntity) saveEntity(path string) {
@@ -1758,7 +1757,7 @@ func (this *DynamicEntity) GetPrototype() *EntityPrototype {
  * Calculate a unique value for a given entity object value...
  */
 func (this *DynamicEntity) GetChecksum() string {
-	return Utility.GetChecksum(this.object)
+	return Utility.GetChecksum(this.GetObject())
 }
 
 /**

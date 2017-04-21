@@ -235,13 +235,12 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 										// The first ids in the list of ids are always the uuid so
 										// the index is j+1
 										id := Utility.ToString(ids[j])
-										typeName := prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[j+1])]
-										// if the type is a string...
-										if isXsString(typeName) {
-											id = "'" + id + "'"
-										}
 
-										query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=" + id
+										query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=?"
+										if j < len(ids)-1 {
+											query += " AND "
+										}
+										params = append(params, id)
 									}
 								}
 
@@ -494,7 +493,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 				idsFieldsName := make([]string, 0)
 				prototype, _ := GetServer().GetEntityManager().getEntityPrototype(entityQuery.TypeName, "sql_info")
 				for i := 0; i < len(entityQuery.Fields); i++ {
-					if strings.HasPrefix(entityQuery.Fields[i], "M_") && !strings.HasPrefix(entityQuery.Fields[i], "M_FK") {
+					if strings.HasPrefix(entityQuery.Fields[i], "M_") && !strings.HasPrefix(entityQuery.Fields[i], "M_FK_") && !strings.HasPrefix(entityQuery.Fields[i], "M_fk_") {
 						fieldType := prototype.FieldsType[prototype.getFieldIndex(entityQuery.Fields[i])]
 						if !strings.HasSuffix(fieldType, ":Ref") {
 							if Utility.Contains(prototype.Ids, entityQuery.Fields[i]) {

@@ -85,6 +85,9 @@
   <xsd:simpleType name="ntext">
     <xsd:restriction base="xsd:string"/>
   </xsd:simpleType>
+  <xsd:simpleType name="longtext">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
   <xsd:simpleType name="varbinary">
     <xsd:restriction base="xsd:base64Binary"/>
   </xsd:simpleType>
