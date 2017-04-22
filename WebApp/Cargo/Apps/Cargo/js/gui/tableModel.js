@@ -191,7 +191,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
 
 EntityTableModel.prototype.getParentUuid = function () {
     if (this.entities.length > 0) {
-        return this.entities[0].parentUuid
+        return this.entities[0].ParentUuid
     }
     return undefined
 }
@@ -214,7 +214,7 @@ EntityTableModel.prototype.removeRow = function (rowIndex) {
         return
     }
 
-    var parentEntity = server.entityManager.entities[entity.parentUuid]
+    var parentEntity = server.entityManager.entities[entity.ParentUuid]
 
 
     // Now I will get the data type for that type.

@@ -173,7 +173,7 @@ Table.prototype.init = function () {
 			// So here I will remove the line from the table...
 			var entity = evt.dataMap["entity"]
 			if (entity.TypeName == table.model.proto.TypeName) {
-				if (entity.parentUuid == table.model.getParentUuid()) {
+				if (entity.ParentUuid == table.model.getParentUuid()) {
 					// So here I will remove the line from the model...
 					table.model.removeRow(entity.UUID)
 					var orderedRows = []
@@ -219,8 +219,8 @@ Table.prototype.init = function () {
 				var entity = server.entityManager.entities[evt.dataMap["entity"].UUID]
 				if (entity != undefined) {
 					if (entity.TYPENAME == table.model.proto.TypeName) {
-						if (entity.parentUuid != undefined && table.model.getParentUuid() != undefined) {
-							if (table.model.getParentUuid() == entity.parentUuid) {
+						if (entity.ParentUuid != undefined && table.model.getParentUuid() != undefined) {
+							if (table.model.getParentUuid() == entity.ParentUuid) {
 								var row = table.appendRow(entity, entity.UUID)
 								row.table.model.entities[row.index] = entity
 								row.saveBtn.element.style.visibility = "hidden"
@@ -601,7 +601,7 @@ var TableRow = function (table, index, data, id) {
 					entity.NeedSave = true
 					if (entity.exist == false) {
 						// Remove the tmp entity...
-						server.entityManager.createEntity(entity.parentUuid, entity.parentLnk, entity.TYPENAME, entity.M_id, entity,
+						server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, entity.M_id, entity,
 							// Success callback
 							function (entity, table) {
 
@@ -1029,7 +1029,7 @@ TableCell.prototype.formatValue = function (value) {
 					}
 
 					var entity = this.row.table.model.entities[this.row.index]
-					entity = server.entityManager.entities[entity.uuid]
+					entity = server.entityManager.entities[entity.UUID]
 
 					if (uuid.length > 0 && isObjectReference(uuid)) {
 						if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {

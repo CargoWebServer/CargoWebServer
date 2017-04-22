@@ -6,6 +6,7 @@ var schemaId = ""//"dbo."
 var userTypeName = databaseName + schemaId + "blog_user"
 var authorTypeName = databaseName + schemaId + "blog_author"
 var blogPostTypeName = databaseName + schemaId + "blog_post"
+var blogCommentTypeName = databaseName + schemaId + "blog_comment"
 /**
  * Utility class use to manage data element of the blog.
  */
@@ -612,7 +613,7 @@ var BlogManager = function (parent) {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     // The delete entity event.
     server.entityManager.attach(this, DeleteEntityEvent, function (evt, blogManager) {
-        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView!=null) {
+        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView != null) {
             if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
                 if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
                     console.log("delete post!")
@@ -624,7 +625,7 @@ var BlogManager = function (parent) {
     // The new entity event.
     server.entityManager.attach(this, NewEntityEvent, function (evt, blogManager) {
         // I will reinit the panel here...
-        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView!=null) {
+        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView != null) {
             if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
                 if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
                     console.log("new post!")
@@ -635,7 +636,7 @@ var BlogManager = function (parent) {
 
     // The update entity event.
     server.entityManager.attach(this, UpdateEntityEvent, function (evt, blogManager) {
-        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView!=null) {
+        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView != null) {
             if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
                 // I will reinit the panel here...
                 if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
@@ -644,7 +645,7 @@ var BlogManager = function (parent) {
 
                     // Udate the author post.
                     blogManager.activePostView = new BlogPostView(blogManager.blogContainer, evt.dataMap["entity"])
-                    
+
                     // Set the blog view editable.
                     blogManager.setEditable(blogManager.activePostView)
                     blogManager.displayAuthorPost()
@@ -689,7 +690,7 @@ BlogManager.prototype.displayAuthorPost = function () {
             var authorPostDiv = caller.blogManager.authorPostDiv
             for (var i = 0; i < author.M_FK_blog_post_blog_author.length; i++) {
                 var post = author.M_FK_blog_post_blog_author[i]
-                if(server.entityManager.entities[post.UUID]!=undefined){
+                if (server.entityManager.entities[post.UUID] != undefined) {
                     post = server.entityManager.entities[post.UUID]
                     author.M_FK_blog_post_blog_author[i] = post
                 }
@@ -729,9 +730,9 @@ BlogManager.prototype.createNewPost = function (author) {
             }
 
             var userUuid
-            if(isString(caller.blogManager.account.M_userRef)){
+            if (isString(caller.blogManager.account.M_userRef)) {
                 userUuid = caller.blogManager.account.M_userRef
-            }else{
+            } else {
                 userUuid = caller.blogManager.account.M_userRef.UUID
             }
 
@@ -739,7 +740,7 @@ BlogManager.prototype.createNewPost = function (author) {
             // The post is own by author, so if we delete an author all it's post will be deleted.
             server.entityManager.getEntityById("sql_info", authorTypeName, userUuid,
                 function (author, caller) {
-                    if(author.M_id.length == 0){
+                    if (author.M_id.length == 0) {
                         return // Do nothing if the author id is not set properly.
                     }
 
@@ -758,7 +759,7 @@ BlogManager.prototype.createNewPost = function (author) {
                     post.M_enabled = 1
                     post.M_comments_enabled = 1
                     post.M_views = 0
-                    
+
                     // Link to the blog author object.
                     post.M_FK_blog_post_blog_author = author.UUID
 
@@ -941,7 +942,27 @@ var BlogPostView = function (parent, post) {
         .appendElement({ "tag": "h4", id: "comment-header" })
         .appendElement({ "tag": "div", "class": "form-group" }).down()
         .appendElement({ "tag": "textarea", "id": "comment-text-area", "class": "form-control", "rows": "3" }).up()
-        .appendElement({ "tag": "button", "type": "submit", "class": "btn btn-primary", "id": "submit-comment" }).up().appendElement({ "tag": "hr" })
+        .appendElement({ "tag": "div", "class": "row" }).down()
+        .appendElement({ "tag": "div", "class": "col-md-2" }).down()
+        .appendElement({ "tag": "button", "type": "submit", "class": "btn btn-primary", "style": "display: none;", "id": "submit-comment" }).up()
+        // social bar.
+        .appendElement({ "tag": "div", "class": "col-md-10" }).down()
+        .appendElement({ "tag": "div", "class": "social" }).down()
+        // push the list to right.
+        .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%" })
+        // Cargo
+        .appendElement({ "tag": "div", "id": "cargo-oauth2-btn", "class": "socialBtn cargo", "title": "Cargo" }).down()
+        .appendElement({ "tag": "i", "class": "icon-cargo" }).up()
+        // facebook
+        .appendElement({ "tag": "div", "class": "socialBtn face", "title": "Facebook" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-facebook" }).up()
+        // google+
+        .appendElement({ "tag": "div", "class": "socialBtn google", "title": "Google+" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-google-plus" })
+        .up().up().up().up().up().up()
+
+        // The comment section.
+        .appendElement({ "tag": "hr" })
         .appendElement({ "tag": "div", "id": "comments-container" })
 
     // The comment container.
@@ -986,15 +1007,29 @@ var BlogPostView = function (parent, post) {
     // The summit button.
     this.submitCommentBtn = this.pageContainer.getChildById("submit-comment")
 
+    // The OAuth2 button.
+    this.connectCargo = this.pageContainer.getChildById("cargo-oauth2-btn")
+
     ////////////////////////////////////////////////////////////////////////
-    // Blog actions.
+    // Post view actions.
     ////////////////////////////////////////////////////////////////////////
+    this.connectCargo.element.onclick = function () {
+        server.securityManager.getResource("1234", "openid profile email", "",
+            function (results, caller) {
+                console.log("found results: ", results)
+            },
+            function (errMsg, caller) {
+            }, {})
+    }
+
     this.submitCommentBtn.element.onclick = function (pageContainer) {
         return function () {
-            new BlogPostCommentView(pageContainer.commentContainer, "toto", pageContainer.getChildById("comment-text-area").element.value, "121212")
-            pageContainer.getChildById("comment-text-area").element.value = ""
+            var post = postView.post
+            //postView.appendComment(this.post, )
+            //new BlogPostCommentView(pageContainer.commentContainer, "toto", pageContainer.getChildById("comment-text-area").element.value, "121212")
+            //pageContainer.getChildById("comment-text-area").element.value = ""
         }
-    } (this.pageContainer)
+    } (this)
 
     return this
 }
@@ -1002,7 +1037,9 @@ var BlogPostView = function (parent, post) {
 /**
  * Append a blog comment.
  */
-BlogPostView.prototype.appendComment = function (user, comment, date) {
+BlogPostView.prototype.appendComment = function (post, user, comment, date) {
+    var comment = blogCommentTypeName()
+    console.log(comment)
     // Create the comment
     new BlogPostCommentView(this.pageContainer, user, comment, date)
 }

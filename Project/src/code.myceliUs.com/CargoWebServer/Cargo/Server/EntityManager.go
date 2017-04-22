@@ -1230,7 +1230,7 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		log.Println("--------> invalid method name:", methodName)
 		// Try to create a dynamic entity...
 		if reflect.TypeOf(values).String() == "map[string]interface {}" {
-			values.(map[string]interface{})["parentUuid"] = parentUuid
+			values.(map[string]interface{})["ParentUuid"] = parentUuid
 			var errObj *CargoEntities.Error
 			log.Println(values)
 			entity, errObj = this.newDynamicEntity(parentUuid, values.(map[string]interface{}))
