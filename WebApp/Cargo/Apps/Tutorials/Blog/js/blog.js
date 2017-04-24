@@ -1014,6 +1014,10 @@ var BlogPostView = function (parent, post) {
     // Post view actions.
     ////////////////////////////////////////////////////////////////////////
     this.connectCargo.element.onclick = function () {
+        var accountUuid = localStorage.getItem("accountUuid")
+        accountUuid.replace("%", "%25")
+        // TODO create function 
+        var query = "http://" + server.hostName + ":" + server.port + "/api/Server/EntityManager/GetObjectByUuid?p0=" + accountUuid
         server.securityManager.getResource("1234", "openid profile email", "",
             function (results, caller) {
                 console.log("found results: ", results)

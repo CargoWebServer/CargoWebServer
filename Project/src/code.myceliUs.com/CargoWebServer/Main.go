@@ -27,6 +27,9 @@ func main() {
 	// The file upload handler.
 	http.HandleFunc("/uploads", Server.FileUploadHandler)
 
+	// The http query handler use by external http client or OAuth2
+	http.HandleFunc("/api/", Server.HttpQueryHandler)
+
 	// Test values...
 	//	ClientId:     "1234",
 	// 	ClientSecret: "aabbccdd",

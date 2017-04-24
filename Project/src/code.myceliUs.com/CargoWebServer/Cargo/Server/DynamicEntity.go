@@ -184,7 +184,6 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 func (this *DynamicEntity) setValue(field string, value interface{}) {
 	this.Lock()
 	defer this.Unlock()
-
 	this.object[field] = value
 }
 

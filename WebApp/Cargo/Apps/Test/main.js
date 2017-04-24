@@ -59,7 +59,7 @@ function main() {
    // entityDump("1", "employees.employees")
     
    //entitiesDump("COLLADASchema.COLLADA")
-//entitiesDump("CargoEntities.Action")
+    entitiesDump("CargoEntities.Action")
     //entityDump( "CARGO_ENTITIES", "CargoEntities.Entities")
     //entitiesDump("XPDMXML.ProcessStructureType")
     //entitiesDump("DT3_informations.Workpoint")
@@ -137,12 +137,13 @@ function main() {
   function(errMsg, caller){
   }, {})*/
 
-  server.securityManager.getResource("1234", "openid profile email", "", 
+ /* server.securityManager.getResource("1234", "openid profile email", "", 
   function(results, caller){
       console.log("found results: ", results)
   },
   function(errMsg, caller){
-  }, {})
+  }, {})*/
+
 }
 
 function testServiceContainer() {

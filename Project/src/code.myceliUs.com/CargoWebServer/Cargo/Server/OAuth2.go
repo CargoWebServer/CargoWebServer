@@ -25,10 +25,12 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 	"github.com/RangelReale/osin"
@@ -1104,6 +1106,7 @@ func DownloadRessource(query string, accessToken string, tokenType string) (map[
 
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Println("--------------> error 1107", err)
 		return nil, err
 	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
@@ -1500,6 +1503,114 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+}
+
+/**
+* That function handle http query as form of what so called API.
+* exemple of use.
+
+  Get all entity prototype from CargoEntities
+  http://localhost:9393/api/Server/EntityManager/GetEntityPrototypes?p0=CargoEntities
+
+  Get an entity object with a given uuid.
+  * Note because % is in the uuid string it must be escape with %25 so here
+  	 the uuid is CargoEntities.Action%7facc2a5-dcb7-4ae7-925a-fb0776a9da00
+  http://localhost:9393/api/Server/EntityManager/GetObjectByUuid?p0=CargoEntities.Action%257facc2a5-dcb7-4ae7-925a-fb0776a9da00
+*/
+func HttpQueryHandler(w http.ResponseWriter, r *http.Request) {
+
+	// So the request will contain...
+	// The last tow parameters must be empty because we don't use the websocket
+	// here.
+	ids := strings.Split(r.URL.Path[5:], "/")
+
+	// The action to be execute.
+	var errObj *CargoEntities.Error
+	var action *CargoEntities.Action
+
+	// I will get the action entity from the values.
+	if len(ids) == 3 {
+		var entity Entity
+		entity, errObj = GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Action", ids[0]+"."+ids[1]+"."+ids[2])
+		if errObj != nil {
+			w.Header().Set("Content-Type", "application/text")
+			w.Write([]byte(errObj.GetBody()))
+			return
+		}
+		action = entity.GetObject().(*CargoEntities.Action)
+	} else {
+		msg := "Incorrect number of parameter got " + strconv.Itoa(len(ids)) + " expected 3. "
+		w.Write([]byte(msg))
+		return
+	}
+
+	// The array of parameters.
+	params := make([]interface{}, 0)
+
+	// Here I will get the service object...
+	service, err := Utility.CallMethod(GetServer(), "Get"+ids[1], params)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/text")
+		w.Write([]byte(err.(error).Error()))
+		return
+	}
+
+	// The parameter values.
+	values := r.URL.Query()
+	log.Println("values", values)
+
+	// Now I will try to call the action.
+	// First of all I will create the parameters.
+	// The last tow parameters are always sessionId and messageId and
+	// are use by the websocket and not the http.
+	for i := 0; i < len(action.GetParameters())-2; i++ {
+		// Here I will make type mapping...
+		param := action.GetParameters()[i]
+		if param.IsArray() {
+			// Here the values inside the query must be parse...
+
+		} else {
+			// Not an array here.
+			if param.GetType() == "string" {
+				// The first parameter is a string.
+				//r.URL.Query()
+				v := values.Get(param.GetName())
+				log.Println(v, reflect.TypeOf(v).Kind())
+				if reflect.TypeOf(v).Kind() != reflect.String {
+					w.Header().Set("Content-Type", "application/text")
+					msg := "Incorrect parameter value for param " + param.GetName()
+					w.Write([]byte(msg))
+					return // report error here.
+				}
+
+				// Append the parameter to the parameter list.
+				params = append(params, v)
+			}
+		}
+	}
+
+	// Append the tow empty string at the end of the call.
+	params = append(params, "") // sessionId
+	params = append(params, "") // messageId
+
+	// Here I will call the function on the service.
+	results, err := Utility.CallMethod(service, ids[2], params)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/text")
+		w.Write([]byte(err.(error).Error()))
+		return
+	}
+
+	// Here I will get the res
+	resultStr, err := json.Marshal(results)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/text")
+		w.Write([]byte(err.(error).Error()))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(resultStr)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
