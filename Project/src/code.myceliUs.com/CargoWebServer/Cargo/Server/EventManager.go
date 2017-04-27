@@ -322,6 +322,7 @@ func (this *EventManager) BroadcastEvent(evt *Event) {
 
 	channel := this.m_channels[evt.GetName()]
 	if channel != nil {
+		//log.Println("-----> event send: ", evt)
 		channel.broadcastEvent(evt)
 	}
 	delete(this.m_eventDataMap, evt)

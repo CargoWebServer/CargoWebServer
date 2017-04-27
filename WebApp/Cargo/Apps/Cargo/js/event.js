@@ -155,7 +155,7 @@ EventHub.prototype.detach = function (observer, eventId) {
 * @public false
 */
 EventHub.prototype.onEvent = function (evt) {
-    console.log("Event received: ", evt)
+    //console.log("Event received: ", evt)
     var observers = this.observers[evt.code]
     if (observers != undefined) {
         for (var i = 0; i < observers.length; i++) {

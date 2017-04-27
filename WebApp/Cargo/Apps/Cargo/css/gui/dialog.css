@@ -5,7 +5,6 @@
 	background-color: white;
 	top: 0px;
 	left: 0px;
-	z-index: 20;
 	border: 1px solid darkgrey;
 
 	min-width: 200px;
@@ -16,16 +15,12 @@
 	box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
 	border: 1px solid darkgrey;
 	color: #657383;
-
 }
 
 .dialog_header{
 	width: 100%;
-	height: 21px;
 	display: table;
 	border-bottom: 1px solid darkgrey;
-	text-align: center;
-	vertical-align: middle;
 }
 
 /** The title **/
@@ -56,20 +51,17 @@
 
 /** The delete button **/
 .dialog_delete_button{
+	color: black;
     display: table-cell;
-    padding-right: 2px;
-    padding-left: 2px;
-    padding-top: 2px;
+	vertical-align: middle;
     text-align: center;
 }
 
 .dialog_delete_button:hover{
-    background: linear-gradient(to bottom, rgba(204,0,0,1) 0%,rgba(204,0,0,1) 100%);
     transition: all .2s ease;
 }
 
 .dialog_delete_button i {
-    color: lightgrey;
     height: 100%;
 }
 
@@ -91,7 +83,6 @@
 .dialog_footer{
 	display: table;
 	width: 100%;
-	height: 30px;
 	position: relative;
 	text-align: center;
 	vertical-align: middle;
@@ -107,6 +98,12 @@
     color: black;
     text-align: center;
 	overflow: hidden;
+}
+
+/** In case of iframe content **/
+.dialog_content iframe{
+	outline: none;
+	border: none;
 }
 
 .dialog_content span{

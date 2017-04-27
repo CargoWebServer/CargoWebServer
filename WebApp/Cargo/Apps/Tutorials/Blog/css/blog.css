@@ -73,17 +73,31 @@
 .rss:hover {
     background-color: #F56505;
 }
+.face.active{
+    background-color: #F56505;
+}
 .face:hover {
+    background-color: #3B5998;
+}
+.face.active{
     background-color: #3B5998;
 }
 .twit:hover {
      background-color: #33ccff;
 }
+.twit.active{
+    background-color: #33ccff;
+}
 .google:hover {
     background-color: #BD3518;
 }
-
+.google.active{
+    background-color: #BD3518;
+}
 .linkedin:hover {
+    background-color: #007bb7;
+}
+.linkedin.active{
     background-color: #007bb7;
 }
 
@@ -93,5 +107,9 @@
 }
 
 .cargo:hover {
+    background-color: #000026;
+}
+
+.cargo.active{
     background-color: #000026;
 }

@@ -418,6 +418,9 @@ Request.prototype.getRpcMessageData = function () {
     return bytes
 }
 
+// global var.
+var w
+
 /**
  * Read and parse data from the proto format to js format.
  */
@@ -438,7 +441,7 @@ Request.prototype.process = function () {
         if (oauth2Dialog == null) {
             // Here We receice an OAuth request.
             var href = this.paramsMap["authorizationLnk"]
-            oauth2Dialog = new Dialog("oauth2Dialog", document.getElementsByTagName("body")[0], true, "")
+            oauth2Dialog = new Dialog("oauth2Dialog", document.getElementsByTagName("body")[0], true, "Authorization")
             oauth2Dialog.footer.element.style.display = "none"
 
             // The content will be the html receive from the request.

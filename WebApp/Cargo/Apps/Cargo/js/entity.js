@@ -60,8 +60,8 @@ EntityManager.prototype.constructor = EntityManager;
 EntityManager.prototype.onEvent = function (evt) {
     // Set the internal object.
     if (evt.code == UpdateEntityEvent || evt.code == NewEntityEvent) {
-        if(this.entityPrototypes[evt.dataMap["entity"].TYPENAME] == undefined){
-            console.log("Type " +evt.dataMap["entity"].TYPENAME + " not define!")
+        if (this.entityPrototypes[evt.dataMap["entity"].TYPENAME] == undefined) {
+            console.log("Type " + evt.dataMap["entity"].TYPENAME + " not define!")
             return
         }
         if (this.entities[evt.dataMap["entity"].UUID] == undefined) {
@@ -79,6 +79,7 @@ EntityManager.prototype.onEvent = function (evt) {
             var entity = this.entities[evt.dataMap["entity"].UUID]
             entity.initCallback = function (self, evt, entity) {
                 return function (entity) {
+                    // Test if the object has change here befor calling it.
                     server.entityManager.setEntity(entity)
                     EventHub.prototype.onEvent.call(self, evt)
                 }
@@ -467,7 +468,7 @@ function CreateEntity(parentUuid, attributeName, typeName, id, values) {
  * @param {object} caller A place to store object from the request context and get it back from the response context.
  */
 EntityManager.prototype.createEntity = function (parentUuid, attributeName, typeName, id, entity, successCallback, errorCallback, caller) {
-    
+
     // server is the client side singleton.
     var params = []
     params.push(createRpcData(parentUuid, "STRING", "parentUuid"))
@@ -490,6 +491,7 @@ EntityManager.prototype.createEntity = function (parentUuid, attributeName, type
                 return function (entity) {
                     if (caller.successCallback != undefined) {
                         caller.successCallback(entity, caller.caller)
+                        caller.successCallback = undefined
                     }
                 }
             } (caller)
@@ -1271,6 +1273,7 @@ function setRef(owner, property, refValue, isArray) {
                         appendReferenced(propertyName, ref, entity)
                         if (initCallback != undefined) {
                             initCallback(ref)
+                            initCallback = undefined
                         }
 
                     } else {
@@ -1284,6 +1287,7 @@ function setRef(owner, property, refValue, isArray) {
                                 appendReferenced(propertyName, ref, entity)
                                 if (caller.initCallback != undefined) {
                                     caller.initCallback(ref)
+                                    caller.initCallback = undefined
                                 }
                             },
                             function (errorMsg, caller) {
@@ -1328,6 +1332,7 @@ function setRef(owner, property, refValue, isArray) {
                     appendReferenced(propertyName, ref, entity)
                     if (initCallback != undefined) {
                         initCallback(ref)
+                        initCallback = undefined
                     }
                 } else {
                     server.entityManager.getEntityByUuid(refValue,
@@ -1339,6 +1344,7 @@ function setRef(owner, property, refValue, isArray) {
                             appendReferenced(propertyName, ref, entity)
                             if (caller.initCallback != undefined) {
                                 caller.initCallback(ref)
+                                caller.initCallback = undefined
                             }
                         },
                         function () { },
@@ -1413,6 +1419,18 @@ function setSubObject(parent, property, values, isArray) {
 }
 
 /**
+ * Test an entity contain exaclty the same value has the object.
+ */
+function hasSameValues(entity, object) {
+
+    // I will user the json string to compare the object values.
+    var entityStr = entity.stringify()
+    var objStr = JSON.stringify(object)
+    console.log(entityStr)
+    console.log(objStr)
+}
+
+/**
  * That function initialyse an object created from a given prototype constructor with the values from a plain JSON object.
  * @param {object} object The object to initialyse.
  * @param {object} values The plain JSON object that contain values.
@@ -1467,6 +1485,15 @@ function setObjectValues(object, values) {
         }
         return
     }
+
+    // Test if the object to set are different to the actual object, if not there is nothing to do.
+    /*if (hasSameValues(object, values) == true) {
+        // Set object state.
+        object.NeedSave = false
+        object.exist = true
+        object.IsInit = true // The object part only and not the refs...
+        return
+    }*/
 
     ////////////////////////////////////////////////////////////////////
     // Reset actual object fields and cound number of sub-objects...

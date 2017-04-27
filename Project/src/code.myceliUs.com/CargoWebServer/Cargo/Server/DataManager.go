@@ -275,6 +275,129 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 	return data, err
 }
 
+func (this *DataManager) setEntityReference(storeId string, refName string, target *DynamicEntity, isArray bool) error {
+	store := this.m_dataStores[storeId]
+	if store == nil {
+		return errors.New("No data store was found with id " + storeId)
+	}
+
+	// So here I will find the reference information.
+	refInfo, err := store.(*SqlDataStore).getRefInfos(refName[2:])
+	if err == nil {
+		log.Println(refInfo)
+
+		// There is tow side in a reference, the source and the target.
+		// The entity parameter always contain the target.
+		// So I will retreive the source entity.
+		sourceTypeName := storeId
+		if len(refInfo[4]) > 0 {
+			sourceTypeName += "." + refInfo[4]
+		}
+
+		sourceTypeName += "." + refInfo[2]
+		var sourceId string
+		if target.GetObject().(map[string]interface{})["M_"+refInfo[1]] != nil {
+			sourceId = Utility.ToString(target.GetObject().(map[string]interface{})["M_"+refInfo[1]])
+		} else {
+			return errors.New("Entity " + target.GetUuid() + " has no field M_" + refInfo[1] + " value initialysed.")
+		}
+
+		source, err := entityManager.getEntityById("sql_info", sourceTypeName, sourceId)
+
+		if err != nil {
+			return errors.New(err.GetBody())
+		}
+
+		// Here I will set the reference.
+
+		if !isArray {
+			// Set the other side of relation ship.
+			target.setValue(refName, source.GetUuid())
+		} else {
+			// here the relation is an array...
+			refsUuid := target.getValue(refName)
+			if refsUuid == nil {
+				refsUuid = make([]string, 0)
+			}
+			if !Utility.Contains(refsUuid.([]string), source.GetUuid()) {
+				refsUuid = append(refsUuid.([]string), source.GetUuid())
+			}
+			// Set the source uuid.
+			target.setValue(refName, refsUuid)
+		}
+
+		// Now if the target is also a reference inside it parent...
+		prototype := source.GetPrototype()
+		fieldType := prototype.FieldsType[prototype.getFieldIndex(refName)]
+
+		// If the relation is also a reference in the source.
+		// if is not a reference the entity will added with the create entity
+		// function.
+		if strings.HasSuffix(fieldType, ":Ref") {
+			if !strings.HasPrefix(fieldType, "[]") {
+				// Set the other side of relation ship.
+				source.(*DynamicEntity).setValue(refName, target.GetUuid())
+			} else {
+				// here the relation is an array...
+				refsUuid := source.(*DynamicEntity).getValue(refName)
+				if refsUuid == nil {
+					refsUuid = make([]string, 0)
+				}
+				if !Utility.Contains(refsUuid.([]string), target.GetUuid()) {
+					refsUuid = append(refsUuid.([]string), target.GetUuid())
+				}
+				// Set the source uuid.
+				source.(*DynamicEntity).setValue(refName, refsUuid)
+			}
+
+			// Cross reference.
+			source.AppendReference(target)
+			// append referenced to.
+			target.AppendReferenced(refName, source)
+		}
+
+		// append the reference.
+		target.AppendReference(source)
+		// append referenced to.
+		source.AppendReferenced(refName, target)
+
+		// Save the target entity.
+		target.SetNeedSave(true)
+		target.SaveEntity()
+		source.SetNeedSave(true)
+		source.SaveEntity()
+	}
+
+	return nil
+}
+
+/**
+ * If the entity is save in sql database reference are not automaticaly set
+ * instead a field that contain the reference id are save in the db. Here I
+ * will retreive the associated entity and set it inside the M_FK_field_name.
+ */
+func (this *DataManager) setEntityReferences(uuid string) error {
+	entity, err := GetServer().GetEntityManager().getEntityByUuid(uuid)
+	if err != nil {
+		return errors.New(err.GetBody())
+	}
+	prototype := entity.GetPrototype()
+
+	// I will retreive reference fields.
+	for i := 0; i < len(prototype.FieldsType); i++ {
+		fieldType := prototype.FieldsType[i]
+		isArray := strings.HasPrefix(fieldType, "[]")
+		isRef := strings.HasSuffix(fieldType, ":Ref")
+
+		// I need to retreive the link between for example M_post_id and M_FK_blog_comment_blog_post.
+		if isRef {
+			storeId := prototype.TypeName[0:strings.Index(prototype.TypeName, ".")]
+			this.setEntityReference(storeId, prototype.Fields[i], entity.(*DynamicEntity), isArray)
+		}
+	}
+	return nil
+}
+
 /**
  * Execute a query that create a new data. The data contains the new
  * value to insert in the DB.
@@ -375,9 +498,13 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 
 				// Set the values...
 				query += ")" + values + ")"
-				_, err := this.createData(dataBaseName, query, data)
+				lastId, err = this.createData(dataBaseName, query, data)
 				if err == nil {
-					log.Println("--------> data insert sucessfully!")
+					// So here I have create a new object
+					err = this.setEntityReferences(uuid)
+					if err != nil {
+						return -1, err
+					}
 				} else {
 					log.Println("--------> data insert fail with err: ", err)
 					return -1, err

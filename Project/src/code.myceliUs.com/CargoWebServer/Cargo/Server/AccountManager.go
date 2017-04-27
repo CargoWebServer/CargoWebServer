@@ -55,6 +55,7 @@ func (this *AccountManager) initialize() {
 		account.M_name = "admin"
 		account.NeedSave = true
 		account.M_email = ""
+
 		// Set it uuid
 		GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", account)
 
@@ -189,4 +190,28 @@ func (this *AccountManager) GetUserById(id string, messageId string, sessionId s
 	}
 
 	return userEntity.GetObject().(*CargoEntities.User)
+}
+
+/**
+ * Retreive a account with a given session id, sessionId is in fact the entity
+ * uuid and not the connection id.
+ */
+func (this *AccountManager) Me(connectionId string, messageId string, sessionId string) *CargoEntities.Account {
+
+	session := GetServer().GetSessionManager().activeSessions[connectionId]
+
+	if session == nil {
+		cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The session with the id '"+connectionId+"' doesn't exist"))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return nil
+	}
+
+	if session.GetAccountPtr() == nil {
+		// Create the error message
+		cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The session with the id '"+connectionId+"' has not associated account."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return nil
+	}
+
+	return session.GetAccountPtr()
 }

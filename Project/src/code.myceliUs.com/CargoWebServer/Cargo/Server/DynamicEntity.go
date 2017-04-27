@@ -582,6 +582,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
  */
 func (this *DynamicEntity) SaveEntity() {
 	this.saveEntity("")
+	log.Println("entity saved: ", this.object["UUID"])
 	//log.Println("After save:", toJsonStr(this.object))
 }
 
@@ -1610,22 +1611,43 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 						} else {
 							if this.getValue(k) != nil {
 								if reflect.TypeOf(this.getValue(k)).String() == "[]map[string]interface {}" {
-									for i := 0; i < len(v.([]map[string]interface{})); i++ {
-										if v.([]map[string]interface{})[i]["UUID"] != nil {
-											exist := false
-											for j := 0; j < len(this.getValue(k).([]map[string]interface{})); j++ {
-												if this.getValue(k).([]map[string]interface{})[j]["UUID"] == v.([]map[string]interface{})[i]["UUID"] {
-													subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]map[string]interface{})[j]["UUID"].(string))
-													subEntity.(*DynamicEntity).SetObjectValues(v.([]map[string]interface{})[i])
-													exist = true
+									if reflect.TypeOf(v).String() == "[]map[string]interface {}" {
+										for i := 0; i < len(v.([]map[string]interface{})); i++ {
+											if v.([]map[string]interface{})[i]["UUID"] != nil {
+												exist := false
+												for j := 0; j < len(this.getValue(k).([]map[string]interface{})); j++ {
+													if this.getValue(k).([]map[string]interface{})[j]["UUID"] == v.([]map[string]interface{})[i]["UUID"] {
+														subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]map[string]interface{})[j]["UUID"].(string))
+														subEntity.(*DynamicEntity).SetObjectValues(v.([]map[string]interface{})[i])
+														exist = true
+													}
 												}
+												if !exist {
+													// Here I need to append the new object.
+													this.appendValue(k, v.([]map[string]interface{})[i])
+												}
+											} else {
+												// Here the value is an object without uuid.
 											}
-											if !exist {
-												// Here I need to append the new object.
-												this.appendValue(k, v.([]map[string]interface{})[i])
+										}
+									} else if reflect.TypeOf(v).String() == "[]interface {}" {
+										for i := 0; i < len(v.([]interface{})); i++ {
+											if v.([]interface{})[i].(map[string]interface{})["UUID"] != nil {
+												exist := false
+												for j := 0; j < len(this.getValue(k).([]map[string]interface{})); j++ {
+													if this.getValue(k).([]map[string]interface{})[j]["UUID"] == v.([]interface{})[i].(map[string]interface{})["UUID"] {
+														subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]map[string]interface{})[j]["UUID"].(string))
+														subEntity.(*DynamicEntity).SetObjectValues(v.([]interface{})[i].(map[string]interface{}))
+														exist = true
+													}
+												}
+												if !exist {
+													// Here I need to append the new object.
+													this.appendValue(k, v.([]interface{})[i].(map[string]interface{}))
+												}
+											} else {
+												// Here the value is an object without uuid.
 											}
-										} else {
-											// Here the value is an object without uuid.
 										}
 									}
 								} else if reflect.TypeOf(this.getValue(k)).String() == "[]interface {}" {
@@ -1803,6 +1825,7 @@ func (this *DynamicEntity) isRef(fieldType string, field string) bool {
 func toJsonStr(object interface{}) string {
 	b, _ := json.Marshal(object)
 	// Convert bytes to string.
+	b, _ = Utility.PrettyPrint(b)
 	s := string(b)
 	return s
 }

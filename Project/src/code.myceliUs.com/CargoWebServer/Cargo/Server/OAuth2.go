@@ -1101,12 +1101,12 @@ func RetrieveToken(clientID, clientSecret, tokenURL string, v url.Values) (map[s
  */
 func DownloadRessource(query string, accessToken string, tokenType string) (map[string]interface{}, error) {
 	client := &http.Client{}
+	log.Println("-------------> query", query)
 	req, _ := http.NewRequest("GET", query, nil)
 	req.Header.Add("Authorization", tokenType+" "+accessToken)
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("--------------> error 1107", err)
 		return nil, err
 	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
@@ -1150,6 +1150,7 @@ func HandleAuthenticationPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, 
 
 	// Here I will authenticate the user...
 	if r.Method == "POST" && len(sessionId) > 0 && len(messageId) > 0 {
+		// Try to open a new session user here...
 		session := GetServer().GetSessionManager().Login(user, pwd, "", messageId, sessionId)
 		if session != nil {
 			return true
@@ -1505,6 +1506,8 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// TODO remove the hidden field from the results.
+// manage action permission and authentication.
 /**
 * That function handle http query as form of what so called API.
 * exemple of use.
@@ -1610,6 +1613,7 @@ func HttpQueryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	resultStr, _ = Utility.PrettyPrint(resultStr)
 	w.Write(resultStr)
 }
 

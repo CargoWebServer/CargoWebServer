@@ -83,7 +83,7 @@ DEFAULT CHARACTER SET = utf8;
 DROP TABLE IF EXISTS `Blog`.`blog_user` ;
 
 CREATE TABLE IF NOT EXISTS `Blog`.`blog_user` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id` VARCHAR(45) NOT NULL,
   `first_name` VARCHAR(45) NULL DEFAULT NULL,
   `last_name` VARCHAR(45) NULL DEFAULT NULL,
   `email` VARCHAR(45) NULL DEFAULT NULL,
@@ -104,25 +104,25 @@ CREATE TABLE IF NOT EXISTS `Blog`.`blog_comment` (
   `post_id` INT(11) NOT NULL,
   `is_reply_to_id` INT(11) NOT NULL DEFAULT '0',
   `comment` TEXT NOT NULL,
-  `user_id` INT(11) NOT NULL,
+  `user_id` VARCHAR(45) NOT NULL,
   `mark_read` TINYINT(1) NULL DEFAULT '0',
   `enabled` TINYINT(1) NOT NULL DEFAULT '1',
   `date` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`, `user_id`),
-  INDEX `fk_comment_1` (`post_id` ASC),
-  INDEX `fk_comment_2` (`user_id` ASC),
-  CONSTRAINT `fk_comment_1`
+  PRIMARY KEY (`id`),
+  INDEX `FK_blog_comment_blog_post` (`post_id` ASC),
+  INDEX `FK_blog_comment_blog_user` (`user_id` ASC),
+  CONSTRAINT `FK_blog_comment_blog_post`
     FOREIGN KEY (`post_id`)
     REFERENCES `Blog`.`blog_post` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_comment_2`
+  CONSTRAINT `FK_blog_comment_blog_user`
     FOREIGN KEY (`user_id`)
     REFERENCES `Blog`.`blog_user` (`id`)
-    ON DELETE CASCADE
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------

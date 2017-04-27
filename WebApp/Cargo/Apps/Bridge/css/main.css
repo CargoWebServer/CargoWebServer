@@ -78,3 +78,7 @@ body {
   /* width: -webkit-fit-content;*/
   overflow-y: auto;
 }
+
+.dialog_delete_button:hover{
+    background: linear-gradient(to bottom, rgba(204,0,0,1) 0%,rgba(204,0,0,1) 100%);
+}

@@ -743,7 +743,7 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 	this.setRefs()
 
 	// Synchronize actual data
-	this.synchronize(prototypes)
+	//this.synchronize(prototypes)
 
 	return prototypes, nil
 }
@@ -1124,7 +1124,6 @@ func (this *SqlDataStore) setRefs() error {
 		query += "	and table_schema = '" + this.m_id + "'"
 	}
 
-	// TODO create the query for mySql here.
 	fieldsType := make([]interface{}, 6)
 	fieldsType[0] = "nvarchar"
 	fieldsType[1] = "nvarchar"
