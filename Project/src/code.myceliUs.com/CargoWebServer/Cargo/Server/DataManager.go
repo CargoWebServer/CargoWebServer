@@ -290,7 +290,7 @@ func (this *DataManager) setEntityReference(storeId string, refName string, targ
 		// The entity parameter always contain the target.
 		// So I will retreive the source entity.
 		sourceTypeName := storeId
-		if len(refInfo[4]) > 0 {
+		if len(refInfo[4]) > 0 && store.(*SqlDataStore).m_vendor != Config.DataStoreVendor_MYSQL {
 			sourceTypeName += "." + refInfo[4]
 		}
 
@@ -307,8 +307,6 @@ func (this *DataManager) setEntityReference(storeId string, refName string, targ
 		if err != nil {
 			return errors.New(err.GetBody())
 		}
-
-		// Here I will set the reference.
 
 		if !isArray {
 			// Set the other side of relation ship.
@@ -403,6 +401,8 @@ func (this *DataManager) setEntityReferences(uuid string) error {
  * value to insert in the DB.
  */
 func (this *DataManager) createData(storeName string, query string, d []interface{}) (lastId interface{}, err error) {
+	//log.Println("create data ", query, d)
+
 	// If the store is sql_info in that case I will need to create the information
 	// in the sql data store.
 	store := this.getDataStore(storeName)
@@ -675,6 +675,11 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 					err = this.updateData(dataBaseName, query, data, ids)
 					if err == nil {
 						log.Println("-------> update data succeeded!")
+					} else {
+						log.Println("Datamanager.go 681 -------> update data fail!")
+						log.Println(query)
+						log.Println(data)
+						log.Println(ids)
 					}
 				}
 			}

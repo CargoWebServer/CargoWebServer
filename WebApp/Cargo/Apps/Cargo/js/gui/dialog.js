@@ -138,11 +138,11 @@ Dialog.prototype.setCentered = function () {
     var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
 
     /* I will set the position of the dialog **/
-    this.x = (this.parent.element.offsetWidth - this.div.element.offsetWidth + scrollLeft) / 2
+    this.x = (this.parent.element.offsetWidth - scrollLeft - this.div.element.offsetWidth ) / 2 + scrollLeft
     this.div.element.style.left = this.x + "px"
 
-    this.y = (this.parent.element.offsetHeight - this.div.element.offsetHeight ) / 2 
-    this.div.element.style.top = this.y + scrollTop + "px"
+    this.y = (this.parent.element.offsetHeight - scrollTop - this.div.element.offsetHeight ) / 2 + scrollTop
+    this.div.element.style.top = this.y  + "px"
 }
 
 Dialog.prototype.setPosition = function (x, y) {

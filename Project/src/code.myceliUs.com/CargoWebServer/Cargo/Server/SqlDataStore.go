@@ -54,6 +54,9 @@ type SqlDataStore struct {
 
 	/** The list of associations **/
 	m_associations map[string]bool
+
+	/** The list of reference informations **/
+	m_refInfos map[string][]string
 }
 
 func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error) {
@@ -72,6 +75,7 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 
 	// Keep the list of associations...
 	store.m_associations = make(map[string]bool, 0)
+	store.m_refInfos = make(map[string][]string, 0)
 
 	return store, nil
 }
@@ -262,12 +266,10 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
 	lastId = int64(0)
 	stmt, err := this.m_db.Prepare(query)
 	if err != nil {
-		//log.Fatal(err)
 		return -1, err
 	}
 	_, err = stmt.Exec(data_...)
 	if err != nil {
-		//log.Fatal(err)
 		return -1, err
 	}
 
@@ -595,7 +597,7 @@ func (this *SqlDataStore) Update(query string, fields []interface{}, params []in
 	stmt, err := this.m_db.Prepare(query)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Close after use
@@ -608,7 +610,7 @@ func (this *SqlDataStore) Update(query string, fields []interface{}, params []in
 	_, err = stmt.Exec(values...)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	startIndex := strings.Index(strings.ToUpper(query), "UPDATE") + 6 // 5 is the len of INTO and one space...
@@ -650,7 +652,7 @@ func (this *SqlDataStore) Delete(query string, params []interface{}) (err error)
 
 	stmt, err := this.m_db.Prepare(query)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Close after use
@@ -743,7 +745,7 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 	this.setRefs()
 
 	// Synchronize actual data
-	//this.synchronize(prototypes)
+	this.synchronize(prototypes)
 
 	return prototypes, nil
 }
@@ -987,6 +989,11 @@ func (this *SqlDataStore) isAssociative(prototype *EntityPrototype) bool {
 		return val
 	}
 
+	if len(prototype.Ids) == 2 {
+		// Here the only value in table is a key...
+		return false
+	}
+
 	for j := 0; j < len(prototype.Fields); j++ {
 		if strings.HasPrefix(prototype.FieldsType[j], "sqltypes.") {
 			if strings.HasPrefix(prototype.Fields[j], "M_") {
@@ -1011,6 +1018,11 @@ func (this *SqlDataStore) isAssociative(prototype *EntityPrototype) bool {
 // the table column name, the referenced_table name and the referenced column name.
 // TODO handle multiple refs...
 func (this *SqlDataStore) getRefInfos(refId string) ([]string, error) {
+
+	// Return the previous found result here.
+	if this.m_refInfos[refId] != nil {
+		return this.m_refInfos[refId], nil
+	}
 
 	var results []string
 	var query string
@@ -1078,6 +1090,10 @@ func (this *SqlDataStore) getRefInfos(refId string) ([]string, error) {
 		}
 		return results, nil
 	}
+
+	// Keep the results in memory for future use.
+	this.m_refInfos[refId] = results
+
 	return results, nil
 }
 
@@ -1305,32 +1321,73 @@ func (this *SqlDataStore) DeleteEntityPrototypes() error {
 	return nil
 }
 
+// local function to genereate the entity uuid...
+// TODO handle multiple id key...
+func generateUuid(key string, info map[string]interface{}, infos map[string]map[string]map[string]interface{}) string {
+	keyInfo := key
+	if info["parentId"] != nil {
+		// here a parent exist for the entity so I will get it.
+		parentId := info["parentId"].(string)
+		parentType := parentId[0:strings.Index(parentId, ":")]
+		parentInfo := infos[parentType][parentId]
+		info["ParentUuid"] = generateUuid(parentId, parentInfo, infos)
+		keyInfo = info["ParentUuid"].(string) + ":" + keyInfo
+	}
+	uuid := info["TYPENAME"].(string) + "%" + Utility.GenerateUUID(keyInfo)
+	info["UUID"] = uuid // Keep the uuid.
+	return uuid
+}
+
 /**
  * synchronize the content of database with sql_info content. Only key's will be
  * save, the other field will be retreive as needed via sql querie's.
  */
 func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
-	// Keep entities before save...
-	toSave := make(map[string]Entity, 0)
-	entitiesByType := make(map[string][]Entity, 0)
+	// Contain entity info without parent uuid.
+	entityInfos := make(map[string]map[string]map[string]interface{}, 0)
 
-	// First of all I will sychronize create the enities information if it dosen't exist.
+	// First of all I will sychronize create the entities information if it dosen't exist.
 	for i := 0; i < len(prototypes); i++ {
 		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
 		if !this.isAssociative(prototype) { // Associative table object are not needed...
 			if len(prototype.Ids) > 1 {
 				query := "SELECT "
 				fieldsType := make([]interface{}, 0)
+				fieldsName := make([]string, 0)
 				for j := 0; j < len(prototype.Ids); j++ {
 					if strings.HasPrefix(prototype.Ids[j], "M_") {
 						query += strings.Replace(prototype.Ids[j], "M_", "", -1)
 						fieldsType = append(fieldsType, prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[j])])
+						fieldsName = append(fieldsName, prototype.Ids[j])
 						if j < len(prototype.Ids)-1 {
 							query += " ,"
 						}
 					}
 				}
+
+				// I will also append field's that are parts of relationship
+				for j := 0; j < len(prototype.Fields); j++ {
+					field := prototype.Fields[j]
+					// Not an id...
+					refInfos, err := this.getRefInfos(field[2:])
+					if err == nil {
+						// here a reference exist for that field so I will
+						// get it from sql.
+						if len(refInfos) > 0 {
+							if strings.HasSuffix(prototype.TypeName, refInfos[0]) {
+								if !Utility.Contains(fieldsName, "M_"+refInfos[1]) {
+									query += " ,"
+									query += refInfos[1]
+									fieldType := prototype.FieldsType[prototype.getFieldIndex("M_"+refInfos[1])]
+									fieldsType = append(fieldsType, fieldType)
+									fieldsName = append(fieldsName, "M_"+refInfos[1])
+								}
+							}
+						}
+					}
+				}
+
 				query += " FROM " + prototype.TypeName
 				var params []interface{}
 
@@ -1342,45 +1399,92 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 				// Now I will generate a unique key for the retreive information.
 				for j := 0; j < len(values); j++ {
-					//log.Println(prototype.TypeName, j, ":", len(values))
+					// Here I will keep entity id's information.
+					// UUID need ParentUuid before it can be generate so a second
+					// pass will be necessary.
+					entityInfo := make(map[string]interface{}, 0)
+					entityInfo["TYPENAME"] = prototype.TypeName
+
 					keyInfo := prototype.TypeName + ":"
-					for k := 0; k < len(values[j]); k++ {
+					// -1 the first ids is the uuid and we dont have it now.
+					for k := 0; k < len(prototype.Ids)-1; k++ {
 						keyInfo += Utility.ToString(values[j][k])
 						// Append underscore for readability in case of problem...
-						if k < len(values[j])-1 {
+						if k < len(prototype.Ids)-2 {
 							keyInfo += "_"
 						}
 					}
 
-					// The uuid is in that case a MD5 value.
-					uuid := prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
-
-					// Now I will create the entity if it dosen't exist.
-					_, errObj := GetServer().GetEntityManager().getDynamicEntityByUuid(uuid)
-					if errObj != nil {
-						// Here I will create the Dynamic entity.
-						infos := make(map[string]interface{}, 0)
-						infos["TYPENAME"] = prototype.TypeName
-						infos["UUID"] = uuid
-
-						// The 0 value is the uuid
-						for k := 1; k < len(prototype.Ids); k++ {
-							id := prototype.Ids[k]
-							infos[id] = values[j][k-1]
-						}
-
-						entity, errObj := GetServer().GetEntityManager().newDynamicEntity("", infos)
-						if errObj == nil {
-							// Save the entity.
-							toSave[uuid] = entity
-							if entitiesByType[entity.GetTypeName()] == nil {
-								entitiesByType[entity.GetTypeName()] = make([]Entity, 0)
-							}
-							entitiesByType[entity.GetTypeName()] = append(entitiesByType[entity.GetTypeName()], entity)
-						} else {
-							log.Println("------> error", errObj)
+					for k := 0; k < len(values[j]); k++ {
+						// Keep the id value in the entity field.
+						if values[j][k] != nil {
+							entityInfo[fieldsName[k]] = values[j][k] // also save entity values in the entity.
 						}
 					}
+
+					// Keep the info.
+					if entityInfos[prototype.TypeName] == nil {
+						entityInfos[prototype.TypeName] = make(map[string]map[string]interface{}, 0)
+					}
+
+					// append the entity
+					entityInfos[prototype.TypeName][keyInfo] = entityInfo
+				}
+			}
+		}
+	}
+
+	// Set the parent realationship here.
+	for i := 0; i < len(prototypes); i++ {
+		if !this.isAssociative(prototypes[i]) { // Associative table object are not needed...
+			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
+			for _, info := range entityInfos[prototypes[i].TypeName] {
+				for j := 0; j < len(prototype.FieldsType); j++ {
+					if !strings.HasPrefix(prototype.FieldsType[j], "sqltypes") && strings.HasSuffix(prototype.FieldsType[j], ":Ref") && !strings.HasPrefix(prototype.FieldsType[j], "[]sqltypes") && strings.HasPrefix(prototype.Fields[j], "M_") {
+						refInfos, err := this.getRefInfos(prototype.Fields[j][2:])
+						if err == nil {
+							if info["M_"+refInfos[1]] != nil {
+								// Here If the other side or the relation is not a reference that's mean
+								// it is he's parent.
+								prototype_, _ := GetServer().GetEntityManager().getEntityPrototype(strings.Replace(strings.Replace(prototype.FieldsType[j], "[]", "", -1), ":Ref", "", -1), "sql_info")
+								if !strings.HasSuffix(prototype_.FieldsType[prototype_.getFieldIndex(prototype.Fields[j])], ":Ref") {
+									// So here I will create the parent id string to retreive it later.
+									info["parentId"] = prototype_.TypeName + ":" + Utility.ToString(info["M_"+refInfos[1]])
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Now I will create the entity to save.
+	toSave := make(map[string]Entity, 0)
+
+	// I will generate ParentUuid and UUID for the infos.
+	for i := 0; i < len(prototypes); i++ {
+		if !this.isAssociative(prototypes[i]) { // Associative table object are not needed...
+			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
+			for key, info := range entityInfos[prototype.TypeName] {
+				// Generate the uuid and the parentUuid for a given entity.
+				uuid := generateUuid(key, info, entityInfos)
+				// In that case I will get the existing entity...
+				entity, errObj := GetServer().GetEntityManager().getEntityByUuid(uuid)
+				if errObj != nil {
+					var parentUuid string
+					if info["ParentUuid"] != nil {
+						parentUuid = info["ParentUuid"].(string)
+					}
+					entity, errObj := GetServer().GetEntityManager().newDynamicEntity(parentUuid, info)
+					if errObj == nil {
+						// Save the entity.
+						toSave[uuid] = entity
+					} else {
+						log.Println("------> error", errObj)
+					}
+				} else {
+					toSave[uuid] = entity
 				}
 			}
 		}
@@ -1390,67 +1494,68 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 	for i := 0; i < len(prototypes); i++ {
 		if !this.isAssociative(prototypes[i]) { // Associative table object are not needed...
 			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
-			for j := 0; j < len(prototype.FieldsType); j++ {
-				entities := entitiesByType[prototype.TypeName]
-				for k := 0; k < len(entities); k++ {
-					entity := entities[k]
-					log.Println("1428 ----> val ", k, "/", len(entities))
-					if !strings.HasPrefix(prototype.FieldsType[j], "sqltypes") && !strings.HasPrefix(prototype.FieldsType[j], "[]sqltypes") && strings.HasPrefix(prototype.Fields[j], "M_") {
-
-						// If the relation is aggregation or association.
-						isRef := strings.HasSuffix(prototype.FieldsType[j], ":Ref")
+			for _, entity := range toSave {
+				for j := 0; j < len(prototype.FieldsType); j++ {
+					if prototype.TypeName == entity.GetTypeName() && !strings.HasPrefix(prototype.FieldsType[j], "sqltypes") && !strings.HasPrefix(prototype.FieldsType[j], "[]sqltypes") && strings.HasPrefix(prototype.Fields[j], "M_") {
 						// This is an aggregation releationship.
 						refInfos, err := this.getRefInfos(prototype.Fields[j][2:])
-						var childTypeName string
-						if this.m_vendor == Config.DataStoreVendor_ODBC {
-							childTypeName = this.m_id + "." + refInfos[4] + "." + refInfos[0]
-						} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
-							childTypeName = this.m_id + "." + refInfos[0]
+						var subEntity Entity
+						if err == nil {
+							val := entity.(*DynamicEntity).getValue("M_" + refInfos[1])
+							log.Println(entity.GetTypeName(), "M_"+refInfos[1])
+							if val != nil {
+								prototype_, _ := GetServer().GetEntityManager().getEntityPrototype(strings.Replace(strings.Replace(prototype.FieldsType[j], "[]", "", -1), ":Ref", "", -1), "sql_info")
+								id := prototype_.TypeName + ":" + Utility.ToString(val)
+								subEntityInfo := entityInfos[prototype_.TypeName][id]
+								subEntity = toSave[subEntityInfo["UUID"].(string)]
+							}
 						}
-
-						if err == nil && !this.m_associations[childTypeName] {
-							id := entity.GetObject().(map[string]interface{})["M_"+refInfos[3]]
-							query := "SELECT " + refInfos[3] + " FROM " + refInfos[0] + " WHERE " + refInfos[1] + "=" + Utility.ToString(id)
-							var params []interface{}
-							var fieldsType []interface{}
-							fieldsType = append(fieldsType, prototype.FieldsType[prototype.getFieldIndex("M_"+refInfos[3])])
-
-							// Execute the query...
-							values, err := this.Read(query, fieldsType, params)
-							if err == nil {
-								for n := 0; n < len(values); n++ {
-									log.Println("1468 val n ", n, "/", len(values))
-									// Set the child uuid.
-									childUuid := childTypeName + "%" + Utility.GenerateUUID(entity.GetUuid()+":"+childTypeName+":"+Utility.ToString(values[n][0]))
-									var childEntity Entity
-									if toSave[childUuid] != nil {
-										childEntity = toSave[childUuid]
-									} else {
-										childEntity, _ = GetServer().GetEntityManager().getEntityByUuid(childUuid)
+						if subEntity != nil {
+							// If the relation is aggregation or association.
+							isRef := strings.HasSuffix(prototype.FieldsType[j], ":Ref")
+							if isRef {
+								// Here the field to append is a reference.
+								if !strings.HasPrefix(prototype.FieldsType[j], "[]") {
+									log.Println("---------> set reference ", entity.GetUuid(), ":", prototype.Fields[j], ":", subEntity.GetUuid())
+									entity.(*DynamicEntity).setValue(prototype.Fields[j], subEntity.GetUuid())
+									entity.SetNeedSave(true)
+								} else {
+									// here the relation is an array...
+									refsUuid := entity.(*DynamicEntity).getValue(prototype.Fields[j])
+									if refsUuid == nil {
+										refsUuid = make([]string, 0)
 									}
-
-									if childEntity != nil {
-										if !isRef {
-											entity.AppendChild(prototype.Fields[j], childEntity)
-											// The parent will save the child...
-											delete(toSave, childUuid)
-											log.Println("-------> child uuid ", childEntity.GetUuid(), " found!!!!")
-										} else {
-											if !strings.HasPrefix(prototype.FieldsType[j], "[]") {
-												entity.(*DynamicEntity).setValue(prototype.Fields[j], childEntity)
-											} else {
-												entity.(*DynamicEntity).appendValue(prototype.Fields[j], childEntity)
-											}
-											entity.AppendReference(childEntity)
-											childEntity.AppendReferenced(prototype.Fields[j], entity)
-											log.Println("-------> ref uuid ", childEntity.GetUuid(), " found!!!!")
-										}
-									} else {
-										log.Println("-------> child uuid ", childUuid, " not found!!!!")
+									if !Utility.Contains(refsUuid.([]string), subEntity.GetUuid()) {
+										refsUuid = append(refsUuid.([]string), subEntity.GetUuid())
 									}
+									// Set the source uuid.
+									entity.(*DynamicEntity).setValue(prototype.Fields[j], refsUuid)
+									entity.SetNeedSave(true)
 								}
+
+								log.Println("---------> append reference ", entity.GetUuid(), ":", prototype.Fields[j], ":", subEntity.GetUuid())
+
+								// Cross reference.
+								entity.AppendReference(subEntity)
+								// append referenced to.
+								subEntity.AppendReferenced(prototype.Fields[j], entity)
+							} else {
+								// append child instead of reference here.
+								entity.AppendChild(prototype.Fields[j], subEntity)
 							}
 
+							// Now from the other side of the relationship.
+							refType := subEntity.GetPrototype().FieldsType[subEntity.GetPrototype().getFieldIndex(prototype.Fields[j])]
+							if strings.HasSuffix(refType, ":Ref") {
+								subEntity.AppendReference(entity)
+								// append referenced to.
+								entity.AppendReferenced(prototype.Fields[j], subEntity)
+								subEntity.SetNeedSave(true)
+								entity.SetNeedSave(true)
+							} else {
+								subEntity.AppendChild(prototype.Fields[j], entity)
+								subEntity.SetNeedSave(true)
+							}
 						}
 					}
 				}
@@ -1460,10 +1565,15 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 	// Save changed entity.
 	for uuid, entity := range toSave {
-		log.Println("----> entity ", uuid, " was save successfully!")
 		entity.SaveEntity()
+		log.Println("----> entity ", uuid, " was save successfully!")
 	}
-
-	log.Println("------------> end of sync!")
+	// Reinit the entity.
+	for uuid, entity := range toSave {
+		// Read back value from the db
+		entity.(*DynamicEntity).setValue("IsInit", false)
+		entity.InitEntity(uuid)
+		log.Println("----> entity ", uuid, " was init successfully!")
+	}
 	return nil
 }

@@ -1403,15 +1403,26 @@ func (this *EntityManager) isExist(uuid string) bool {
 	}
 
 	var query EntityQuery
-	query.TypeName = uuid[0:strings.Index(uuid, ".")]
+	query.TypeName = uuid[0:strings.Index(uuid, "%")]
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
-	var params []interface{}
+	params := make([]interface{}, 1)
+	params[0] = uuid
+
 	queryStr, _ := json.Marshal(query)
-	_, err := GetServer().GetDataManager().readData(CargoEntitiesDB, string(queryStr), fieldsType, params)
+
+	// The store id.
+	storeId := query.TypeName[0:strings.Index(query.TypeName, ".")]
+	dataStore := GetServer().GetDataManager().getDataStore(storeId)
+	if reflect.TypeOf(dataStore).String() == "*Server.SqlDataStore" {
+		storeId = "sql_info"
+	}
+
+	_, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
 	if err != nil {
 		return false
 	}
+
 	return true
 }
 

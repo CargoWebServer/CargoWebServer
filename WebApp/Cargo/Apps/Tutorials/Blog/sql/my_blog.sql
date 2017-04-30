@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `Blog`.`blog_post` (
   `comments_enabled` TINYINT(1) NOT NULL DEFAULT '1',
   `views` INT(11) NOT NULL DEFAULT '0',
   `blog_author_id` VARCHAR(100) NOT NULL,
-  PRIMARY KEY (`id`, `blog_author_id`),
+  PRIMARY KEY (`id`),
   INDEX `fk_blog_post_blog_author1_idx` (`blog_author_id` ASC),
   CONSTRAINT `FK_blog_post_blog_author`
     FOREIGN KEY (`blog_author_id`)

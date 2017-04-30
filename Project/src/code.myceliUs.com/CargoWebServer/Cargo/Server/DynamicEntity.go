@@ -1655,24 +1655,44 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 										this.setValue(k, v)
 									} else {
 										if reflect.TypeOf(this.getValue(k).([]interface{})[0]).String() == "map[string]interface {}" {
-											for i := 0; i < len(v.([]map[string]interface{})); i++ {
-												if v.([]map[string]interface{})[i]["UUID"] != nil {
-													exist := false
-													for j := 0; j < len(this.getValue(k).([]interface{})); j++ {
-														if this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"] == v.([]interface{})[i].(map[string]interface{})["UUID"] {
-															subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"].(string))
-															subEntity.(*DynamicEntity).SetObjectValues(v.([]interface{})[i].(map[string]interface{}))
-															exist = true
+											if reflect.TypeOf(v).String() == "[]map[string]interface {}" {
+												for i := 0; i < len(v.([]map[string]interface{})); i++ {
+													if v.([]map[string]interface{})[i]["UUID"] != nil {
+														exist := false
+														for j := 0; j < len(this.getValue(k).([]interface{})); j++ {
+															if this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"] == v.([]map[string]interface{})[i]["UUID"] {
+																subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"].(string))
+																subEntity.(*DynamicEntity).SetObjectValues(v.([]map[string]interface{})[i])
+																exist = true
+															}
 														}
+														if !exist {
+															// Here I need to append the new object.
+															this.appendValue(k, v.([]map[string]interface{})[i])
+														}
+													} else {
+														// Here the value is an object without uuid.
 													}
-													if !exist {
-														// Here I need to append the new object.
-														this.appendValue(k, v.([]interface{})[i])
-													}
-												} else {
-													// Here the value is an object without uuid.
 												}
-
+											} else if reflect.TypeOf(this.getValue(k).([]interface{})[0]).String() == "[]interface {}" {
+												for i := 0; i < len(v.([]interface{})); i++ {
+													if v.([]interface{})[i].(map[string]interface{})["UUID"] != nil {
+														exist := false
+														for j := 0; j < len(this.getValue(k).([]interface{})); j++ {
+															if this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"] == v.([]interface{})[i].(map[string]interface{})["UUID"] {
+																subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"].(string))
+																subEntity.(*DynamicEntity).SetObjectValues(v.([]interface{})[i].(map[string]interface{}))
+																exist = true
+															}
+														}
+														if !exist {
+															// Here I need to append the new object.
+															this.appendValue(k, v.([]interface{})[i].(map[string]interface{}))
+														}
+													} else {
+														// Here the value is an object without uuid.
+													}
+												}
 											}
 										} else {
 											// Replace the array with the new value.

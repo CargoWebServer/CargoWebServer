@@ -1,7 +1,7 @@
 
 // global variable.
 var databaseName = "Blog."
-var schemaId = ""//"dbo."
+var schemaId = "" //"dbo."
 
 var userTypeName = databaseName + schemaId + "blog_user"
 var authorTypeName = databaseName + schemaId + "blog_author"
@@ -1086,21 +1086,37 @@ BlogPostCommentEditor = function (parent, parentDiv) {
                             server.entityManager.getEntityByUuid(results.UUID,
                                 // success callback
                                 function (results, caller) {
-                                    caller.activeUser = eval("new " + userTypeName + "()")
-                                    caller.activeUser.M_id = results.M_id
-                                    caller.activeUser.M_first_name = results.M_userRef.M_firstName
-                                    caller.activeUser.M_last_name = results.M_userRef.M_lastName
-                                    caller.activeUser.M_email = results.M_userRef.M_email
-                                    caller.activeUser.M_website = "www.cargoWebserver.com" // Powered by cargo.
-                                    caller.connectFacebook.element.className = caller.connectFacebook.element.className.replace(" active", "")
-                                    caller.connectGooglePlus.element.className = caller.connectGooglePlus.element.className.replace(" active", "")
-                                    caller.connectCargo.element.className += " active"
-                                    caller.activeUserSpan.element.innerHTML = "Leave a Comment as " + caller.activeUser.M_first_name + " " + caller.activeUser.M_last_name
+                                    var userUuid
+                                    if (isString(results.M_userRef)) {
+                                        userUuid = results.M_userRef
+                                    } else {
+                                        userUuid = results.M_userRef.UUID
+                                    }
 
-                                    // here I will display the button post.
-                                    caller.submitCommentBtn.element.style.display = ""
-                                    // Set the text focus.
-                                    caller.newCommentTextArea.element.focus()
+                                    // Now init the user reference.
+                                    results["set_M_userRef_" + userUuid + "_ref"](
+                                        function (caller, results) {
+                                            return function (ref) {
+                                                caller.activeUser = eval("new " + userTypeName + "()")
+                                                caller.activeUser.M_id = results.M_id
+                                                caller.activeUser.M_first_name = results.M_userRef.M_firstName
+                                                caller.activeUser.M_last_name = results.M_userRef.M_lastName
+                                                caller.activeUser.M_email = results.M_userRef.M_email
+                                                caller.activeUser.M_website = "www.cargoWebserver.com" // Powered by cargo.
+                                                caller.connectFacebook.element.className = caller.connectFacebook.element.className.replace(" active", "")
+                                                caller.connectGooglePlus.element.className = caller.connectGooglePlus.element.className.replace(" active", "")
+                                                caller.connectCargo.element.className += " active"
+
+                                                caller.activeUserSpan.element.innerHTML = "Leave a Comment as " + caller.activeUser.M_first_name + " " + caller.activeUser.M_last_name
+
+                                                // here I will display the button post.
+                                                caller.submitCommentBtn.element.style.display = ""
+                                                // Set the text focus.
+                                                caller.newCommentTextArea.element.focus()
+                                            }
+                                        } (caller, results)
+                                    )
+
                                 },
                                 // error callback
                                 function () {

@@ -474,8 +474,10 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 	// If the ressource is found all we have to do is to get the actual resource.
 	if access != nil {
 		// Here I will made the API call.
+		log.Println("-------------> dowload the ressource")
 		result, err := DownloadRessource(query, access.GetId(), "Bearer")
 		if err == nil {
+			log.Println("-------------> result found ", result)
 			return result
 		} else {
 			errObj := NewError(Utility.FileLine(), RESSOURCE_NOT_FOUND_ERROR, SERVER_ERROR_CODE, err)
@@ -1101,7 +1103,6 @@ func RetrieveToken(clientID, clientSecret, tokenURL string, v url.Values) (map[s
  */
 func DownloadRessource(query string, accessToken string, tokenType string) (map[string]interface{}, error) {
 	client := &http.Client{}
-	log.Println("-------------> query", query)
 	req, _ := http.NewRequest("GET", query, nil)
 	req.Header.Add("Authorization", tokenType+" "+accessToken)
 
@@ -1308,6 +1309,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		// The user give the authorization.
 		ar.Authorized = true
 		ar.RedirectUri = client.GetRedirectUri()
+		log.Println("--------> 1312 redirect uri: ", ar.RedirectUri)
 		server.FinishAuthorizeRequest(resp, r, ar)
 
 		// Here I will create a response for the authorization.
@@ -1425,6 +1427,7 @@ func InfoHandler(w http.ResponseWriter, r *http.Request) {
  * This is the client redirect handler.
  */
 func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
+
 	r.ParseForm()
 	errorCode := r.Form.Get("error")
 	state := r.Form.Get("state")
@@ -1442,6 +1445,8 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		scope = strings.Split(state, ":")[3]
 	}
 
+	log.Println("------> 1429 Autorize callback call. clientId ", clientId, "sessionId", sessionId, "messageId", messageId, "scope", scope)
+
 	// I will get a reference to the client who generate the request.
 	clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", clientId)
 	client := clientEntity.GetObject().(*Config.OAuth2Client)
@@ -1456,7 +1461,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		accessDenied := NewErrorMessage(messageId, 1, errorDescription, errData, to)
 		GetServer().GetProcessor().m_incomingChannel <- accessDenied
 	} else {
-
+		log.Println("--------> try to create access grant response whit id: ", messageId)
 		access, err := createAccessToken("authorization_code", client, r.Form.Get("code"), "", scope)
 
 		if err == nil {
@@ -1560,7 +1565,6 @@ func HttpQueryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// The parameter values.
 	values := r.URL.Query()
-	log.Println("values", values)
 
 	// Now I will try to call the action.
 	// First of all I will create the parameters.
