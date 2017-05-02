@@ -1470,6 +1470,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 				// Generate the uuid and the parentUuid for a given entity.
 				uuid := generateUuid(key, info, entityInfos)
 				// In that case I will get the existing entity...
+				log.Println("-------> uuid", uuid)
 				entity, errObj := GetServer().GetEntityManager().getEntityByUuid(uuid)
 				if errObj != nil {
 					var parentUuid string
@@ -1564,16 +1565,14 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 	}
 
 	// Save changed entity.
-	for uuid, entity := range toSave {
+	for _, entity := range toSave {
 		entity.SaveEntity()
-		log.Println("----> entity ", uuid, " was save successfully!")
 	}
-	// Reinit the entity.
+
 	for uuid, entity := range toSave {
-		// Read back value from the db
 		entity.(*DynamicEntity).setValue("IsInit", false)
 		entity.InitEntity(uuid)
-		log.Println("----> entity ", uuid, " was init successfully!")
 	}
+
 	return nil
 }

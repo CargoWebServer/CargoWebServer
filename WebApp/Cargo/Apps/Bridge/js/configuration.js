@@ -29,7 +29,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
     /** The panel */
     this.panel = new Element(parent, { "tag": "div", "class": "severConfiguration" })
 
-    /** The type */
+    /** The type */ 
     this.typeName = typeName
 
     /** The name in its parent. */

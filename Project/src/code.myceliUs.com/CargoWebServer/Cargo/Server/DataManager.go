@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
@@ -82,7 +83,7 @@ func (this *DataManager) initialize() {
 		if this.m_dataStores[storeConfigurations[i].GetId()] == nil {
 			store, err := NewDataStore(storeConfigurations[i])
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
 			}
 
 			this.m_dataStores[store.GetId()] = store
@@ -118,7 +119,7 @@ func (this *DataManager) stop() {
 func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfiguration) {
 	store, err := NewDataStore(config)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	this.m_dataStores[store.GetId()] = store
 	store.Connect()
@@ -171,104 +172,118 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 	// In case of SQL data, the data we found will be use to get
 	// sql data in a second pass.
 	if storeName == "sql_info" && err == nil {
-		dataIndex := make([]int, 0)
+		if len(data) > 0 {
+			if len(data[0]) > 0 {
+				dataIndex := make([]int, 0)
+				q := new(EntityQuery)
+				json.Unmarshal([]byte(query), q)
 
-		q := new(EntityQuery)
-		json.Unmarshal([]byte(query), q)
-
-		// In that case the value will be read from sql.
-		for i := 0; i < len(data); i++ {
-			if len(data[i]) > 1 {
-				if reflect.TypeOf(data[i][0]).Kind() == reflect.String {
-					if Utility.IsValidEntityReferenceName(data[i][0].(string)) {
-						// So I will create the sql query to get it data back.
-						uuid := data[i][0].(string)
-						values := strings.Split(uuid[0:strings.Index(uuid, "%")], ".")
-						dataBaseName := values[0]
-						tableName := values[len(values)-1]
-						schemaId := ""
-						if len(values) == 3 {
-							schemaId = values[1]
-						}
-						prototype, err := GetServer().GetEntityManager().getEntityPrototype(uuid[0:strings.Index(uuid, "%")], "sql_info")
-						if err == nil {
-							// Now I will create the query.
-							var ids []interface{}
-							var fields []string
-							var fieldsType []interface{}
-							for j := 0; j < len(q.Fields); j++ {
-								fieldName := q.Fields[j]
-								fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
-								// If the field is an id
-								if !strings.HasSuffix(fieldType, ":Ref") && strings.HasPrefix(fieldName, "M_") && !strings.HasPrefix(fieldName, "M_FK_") && !strings.HasPrefix(fieldName, "M_fk_") {
-									if j < len(data[i]) {
-										if Utility.Contains(prototype.Ids, fieldName) {
-											ids = append(ids, data[i][j]) // append the id
-										}
-										fields = append(fields, fieldName[2:])
-										fieldsType = append(fieldsType, fieldType)
-										dataIndex = append(dataIndex, j)
-									}
+				// In that case the value will be read from sql.
+				for i := 0; i < len(data); i++ {
+					if len(data[i]) > 1 {
+						if reflect.TypeOf(data[i][0]).Kind() == reflect.String {
+							if Utility.IsValidEntityReferenceName(data[i][0].(string)) {
+								// So I will create the sql query to get it data back.
+								uuid := data[i][0].(string)
+								values := strings.Split(uuid[0:strings.Index(uuid, "%")], ".")
+								dataBaseName := values[0]
+								tableName := values[len(values)-1]
+								schemaId := ""
+								if len(values) == 3 {
+									schemaId = values[1]
 								}
-							}
-
-							if len(fields) > 0 {
-								// Now I will recreate the sql query string.
-								query := "SELECT "
-								for j := 0; j < len(fields); j++ {
-									query += fields[j]
-									if j < len(fields)-1 {
-										query += ", "
-									}
-								}
-
-								// The from close.
-								query += " FROM " + dataBaseName
-								if len(schemaId) > 0 {
-									query += "." + schemaId
-								}
-								query += "." + tableName
-
-								if len(ids) > 0 {
-									query += " WHERE "
-									for j := 0; j < len(ids); j++ {
-										// The first ids in the list of ids are always the uuid so
-										// the index is j+1
-										id := Utility.ToString(ids[j])
-
-										query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=?"
-										if j < len(ids)-1 {
-											query += " AND "
-										}
-										params = append(params, id)
-									}
-								}
-
-								// Now I will get data from sql...
-								sqlData, err := this.readData(dataBaseName, query, fieldsType, params)
+								prototype, err := GetServer().GetEntityManager().getEntityPrototype(uuid[0:strings.Index(uuid, "%")], "sql_info")
 								if err == nil {
-									if len(sqlData) > 0 {
-										// Now I will replace the data with the retreive values.
-										for j := 0; j < len(sqlData[0]); j++ {
-											// Set the value.
-											data[i][dataIndex[j]] = sqlData[0][j]
+									// Now I will create the query.
+									var ids []interface{}
+									var fields []string
+									var fieldsType []interface{}
+									for j := 0; j < len(q.Fields); j++ {
+										fieldName := q.Fields[j]
+										fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
+										// If the field is an id
+										if !strings.HasSuffix(fieldType, ":Ref") && strings.HasPrefix(fieldName, "M_") && !strings.HasPrefix(fieldName, "M_FK_") && !strings.HasPrefix(fieldName, "M_fk_") {
+											if j < len(data[i]) {
+												if Utility.Contains(prototype.Ids, fieldName) {
+													ids = append(ids, data[i][j]) // append the id
+												}
+												fields = append(fields, fieldName[2:])
+												fieldsType = append(fieldsType, fieldType)
+												dataIndex = append(dataIndex, j)
+											}
+										}
+									}
+
+									if len(fields) > 0 {
+										// Now I will recreate the sql query string.
+										query := "SELECT "
+										for j := 0; j < len(fields); j++ {
+											query += fields[j]
+											if j < len(fields)-1 {
+												query += ", "
+											}
+										}
+
+										// The from close.
+										query += " FROM " + dataBaseName
+										if len(schemaId) > 0 {
+											query += "." + schemaId
+										}
+										query += "." + tableName
+
+										if len(ids) > 0 {
+											query += " WHERE "
+											for j := 0; j < len(ids); j++ {
+												// The first ids in the list of ids are always the uuid so
+												// the index is j+1
+												id := Utility.ToString(ids[j])
+												if id == "null" {
+													log.Panicln("--------> wrong id !! null")
+												}
+
+												query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=?"
+												if j < len(ids)-1 {
+													query += " AND "
+												}
+												params = append(params, id)
+											}
+										}
+
+										// Now I will get data from sql...
+										sqlData, err := this.readData(dataBaseName, query, fieldsType, params)
+										log.Println("-----------> ", query)
+										log.Println("-----------> ", params)
+										if err == nil {
+											if len(sqlData) > 0 {
+												// Now I will replace the data with the retreive values.
+												for j := 0; j < len(sqlData[0]); j++ {
+													// Set the value.
+													data[i][dataIndex[j]] = sqlData[0][j]
+												}
+											} else {
+												return data, errors.New("No sql data was found for entity " + data[i][0].(string))
+											}
+										} else {
+											return data, err
 										}
 									} else {
 										return data, errors.New("No sql data was found for entity " + data[i][0].(string))
 									}
-								} else {
-									return data, err
 								}
-							} else {
-								return data, errors.New("No sql data was found for entity " + data[i][0].(string))
 							}
 						}
+					} else if len(data[i]) == 1 {
+						return data, nil
 					}
+
 				}
-			} else if len(data[i]) == 1 {
-				// The entity exist but no sql data was found...
-				return data, nil
+			} else {
+				err = errors.New("No data found!")
+				data = nil
 			}
+		} else {
+			err = errors.New("No data found!")
+			data = nil
 		}
 	}
 
@@ -633,11 +648,15 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 								} else if isXsInt(fieldType) && reflect.TypeOf(fields[i]).String() == "float64" {
 									data = append(data, int32(fields[i].(float64)))
 								} else if isXsDate(fieldType) {
-									dateTime, err := Utility.MatchISO8601_DateTime(fields[i].(string))
-									if err == nil {
-										data = append(data, dateTime.Format(createdFormat))
+									if reflect.TypeOf(fields[i]).String() == "time.Time" {
+										data = append(data, fields[i].(time.Time).Format(createdFormat))
 									} else {
-										data = append(data, fields[i])
+										dateTime, err := Utility.MatchISO8601_DateTime(fields[i].(string))
+										if err == nil {
+											data = append(data, dateTime.Format(createdFormat))
+										} else {
+											data = append(data, fields[i])
+										}
 									}
 								} else {
 									data = append(data, fields[i])
@@ -674,7 +693,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 					// Update the entity.
 					err = this.updateData(dataBaseName, query, data, ids)
 					if err == nil {
-						log.Println("-------> update data succeeded!")
+						log.Println("-------> update data succeeded!", data)
 					} else {
 						log.Println("Datamanager.go 681 -------> update data fail!")
 						log.Println(query)

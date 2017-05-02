@@ -265,12 +265,14 @@ func (this *OAuth2Manager) start() {
 	block, _ := pem.Decode(b)
 
 	if block == nil {
-		log.Fatalf("no private key found")
+		log.Println("no private key found")
+		return
 	}
 
 	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
-		log.Fatalf("failed to parse key: %v", err)
+		log.Println("failed to parse key: %v", err)
+		return
 	}
 
 	// Configure jwtSigner and public keys.
@@ -283,7 +285,8 @@ func (this *OAuth2Manager) start() {
 
 	this.m_jwtSigner, err = jose.NewSigner(jose.RS256, privateKey)
 	if err != nil {
-		log.Fatalf("failed to create jwtSigner: %v", err)
+		log.Println("failed to create jwtSigner: %v", err)
+		return
 	}
 
 	this.m_publicKeys = &jose.JsonWebKeySet{
@@ -590,6 +593,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 				channels[msgId] = make(chan []string)
 
 				log.Println("------> wait for channel ", msgId)
+
 				// Wait for the response from AppAuthCodeHandler.
 				values := <-channels[msgId]
 
@@ -1307,9 +1311,9 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// The user give the authorization.
+		ar.State = state // Set the state to.
 		ar.Authorized = true
 		ar.RedirectUri = client.GetRedirectUri()
-		log.Println("--------> 1312 redirect uri: ", ar.RedirectUri)
 		server.FinishAuthorizeRequest(resp, r, ar)
 
 		// Here I will create a response for the authorization.
@@ -1321,7 +1325,20 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		to := make([]connection, 1)
 		to[0] = GetServer().getConnectionById(sessionId)
 		authorizationAccept, _ := NewResponseMessage(messageId, results, to)
+
 		GetServer().GetProcessor().m_incomingChannel <- authorizationAccept
+
+		/**ret := &osin.AccessRequest{
+			Code:            "",
+			Client:          ar.Client,
+			RedirectUri:     ar.RedirectUri,
+			Scope:           ar.Scope,
+			GenerateRefresh: false, // per the RFC, should NOT generate a refresh token in this case
+			Authorized:      true,
+			Expiration:      ar.Expiration,
+			UserData:        ar.UserData,
+		}
+		server.FinishAccessRequest(resp, r, ret)*/
 	}
 	if resp.IsError && resp.InternalError != nil {
 		fmt.Printf("ERROR: %s\n", resp.InternalError)
@@ -1427,11 +1444,12 @@ func InfoHandler(w http.ResponseWriter, r *http.Request) {
  * This is the client redirect handler.
  */
 func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
-
+	log.Println("--------> 1433")
 	r.ParseForm()
 	errorCode := r.Form.Get("error")
 	state := r.Form.Get("state")
 
+	log.Println("-----> request ", r)
 	// Send authentication end message...
 	var clientId string
 	var sessionId string
@@ -1445,7 +1463,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		scope = strings.Split(state, ":")[3]
 	}
 
-	log.Println("------> 1429 Autorize callback call. clientId ", clientId, "sessionId", sessionId, "messageId", messageId, "scope", scope)
+	log.Println("------> 1452 Autorize callback call. clientId ", clientId, "sessionId", sessionId, "messageId", messageId, "scope", scope)
 
 	// I will get a reference to the client who generate the request.
 	clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", clientId)

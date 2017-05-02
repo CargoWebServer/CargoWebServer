@@ -345,12 +345,15 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
 	if err != nil {
-		log.Fatalln(Utility.FileLine(), "--> No object found for entity ", id, " ", err)
+		log.Println(Utility.FileLine(), "--> No object found for entity ", id, " ", err)
 		return err
 	}
 
 	// Initialisation of information of Interface...
 	if len(results) > 0 {
+		if len(results[0]) == 0 {
+			return errors.New("No value found for entity " + this.uuid)
+		}
 		// Set the common values...
 		this.setValue("UUID", results[0][0].(string))
 		this.setValue("TYPENAME", typeName) // Set the typeName
@@ -1809,7 +1812,7 @@ func (this *DynamicEntity) Exist() bool {
 	if this == nil {
 		return false
 	}
-	// log.Println("-------> test if entity ", this.uuid, " exist.")
+	log.Println("-------> test if entity ", this.uuid, " exist.")
 	var query EntityQuery
 	query.TypeName = this.GetTypeName()
 	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
@@ -1830,7 +1833,15 @@ func (this *DynamicEntity) Exist() bool {
 		return false
 	}
 
-	return len(results[0][0].(string)) > 0
+	if len(results) == 0 {
+		return false
+	}
+
+	if len(results[0]) == 0 {
+		return false
+	}
+
+	return true
 }
 
 /**

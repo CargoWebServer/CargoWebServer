@@ -57,7 +57,7 @@ func newConfigurationManager() *ConfigurationManager {
 
 	dir = strings.Replace(dir, "\\", "/", -1)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	if strings.HasSuffix(dir, "/") == false {

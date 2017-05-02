@@ -76,6 +76,7 @@ EntityManager.prototype.onEvent = function (evt) {
 
         } else {
             // update the object values.
+            // but before I call the event I will be sure the entity have 
             var entity = this.entities[evt.dataMap["entity"].UUID]
             entity.initCallback = function (self, evt, entity) {
                 return function (entity) {
@@ -84,8 +85,10 @@ EntityManager.prototype.onEvent = function (evt) {
                     EventHub.prototype.onEvent.call(self, evt)
                 }
             } (this, evt, entity)
-            setObjectValues(entity, evt.dataMap["entity"])
+            if (hasChange(entity, evt.dataMap["entity"])) {
+                setObjectValues(entity, evt.dataMap["entity"])
 
+            }
         }
     } else if (evt.code == DeleteEntityEvent) {
         var entity = this.entities[evt.dataMap["entity"].UUID]
@@ -1357,6 +1360,48 @@ function setRef(owner, property, refValue, isArray) {
     return owner
 }
 
+function hasChange(entity, object) {
+    return true
+    /*
+    // cut reference here.
+    resetObjectValues(entity)
+
+    // Now I will look if the object value has change.
+    var prototype = server.entityManager.entityPrototypes[object["TYPENAME"]]
+
+    for (var property in object) {
+        var propertyType = getPropertyType(object["TYPENAME"], property)
+        if (propertyType != null) {
+            var isRef = propertyType.endsWith(":Ref")
+            if (propertyType.startsWith("[]")) {
+                // The property is an array.
+                if (object[property] != null) {
+                    if (object[property].length > 0) {
+                        for (var i = 0; i < object[property].length; i++) {
+                            if (isString(object[property][i])) {
+                                if (isRef) {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (object[property] != undefined) {
+                    if (isString(object[property])) {
+                        if (isRef) {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // set reference back.
+    setObjectValues(entity)*/
+}
+
 /**
  * Set object, that function call setObjectValues in this path so it's recursive.
  */
@@ -1419,18 +1464,6 @@ function setSubObject(parent, property, values, isArray) {
 }
 
 /**
- * Test an entity contain exaclty the same value has the object.
- */
-function hasSameValues(entity, object) {
-
-    // I will user the json string to compare the object values.
-    var entityStr = entity.stringify()
-    var objStr = JSON.stringify(object)
-    console.log(entityStr)
-    console.log(objStr)
-}
-
-/**
  * That function initialyse an object created from a given prototype constructor with the values from a plain JSON object.
  * @param {object} object The object to initialyse.
  * @param {object} values The plain JSON object that contain values.
@@ -1485,15 +1518,6 @@ function setObjectValues(object, values) {
         }
         return
     }
-
-    // Test if the object to set are different to the actual object, if not there is nothing to do.
-    /*if (hasSameValues(object, values) == true) {
-        // Set object state.
-        object.NeedSave = false
-        object.exist = true
-        object.IsInit = true // The object part only and not the refs...
-        return
-    }*/
 
     ////////////////////////////////////////////////////////////////////
     // Reset actual object fields and cound number of sub-objects...

@@ -1418,8 +1418,16 @@ func (this *EntityManager) isExist(uuid string) bool {
 		storeId = "sql_info"
 	}
 
-	_, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
+	data, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
 	if err != nil {
+		return false
+	}
+
+	if len(data) == 0 {
+		return false
+	}
+
+	if len(data[0]) == 0 {
 		return false
 	}
 

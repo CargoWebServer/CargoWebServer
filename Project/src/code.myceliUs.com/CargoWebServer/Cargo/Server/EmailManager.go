@@ -154,24 +154,24 @@ func (this *EmailManager) ReceiveMailFunc(address string, user string, pass stri
 	client, err := pop3.DialTLS(address)
 
 	if err != nil {
-		log.Fatalf("Error: %v\n", err)
+		log.Println("Error: %v\n", err)
 	} else {
 		err = client.Auth(user, pass)
 		if err != nil {
-			log.Fatalf("Error: %v\n", err)
+			log.Println("Error: %v\n", err)
 		} else {
 			msgs, sizes, err := client.ListAll()
 			if err != nil {
-				log.Fatalf("Error: %v\n", err)
+				log.Println("Error: %v\n", err)
 			} else {
 				for i := 0; i < len(msgs); i++ {
 					if err != nil {
-						log.Fatalf("Error: %v\n", err)
+						log.Println("Error: %v\n", err)
 					} else {
 						log.Println("msg:", msgs[i], "size:", sizes[i])
 						msgStr, err := client.Retr(msgs[i])
 						if err != nil {
-							log.Fatalf("Error: %v\n", err)
+							log.Println("Error: %v\n", err)
 						} else {
 							log.Println(msgStr)
 						}

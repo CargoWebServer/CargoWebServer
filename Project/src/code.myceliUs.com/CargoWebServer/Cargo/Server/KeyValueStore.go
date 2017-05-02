@@ -95,7 +95,7 @@ func NewKeyValueDataStore(info *Config.DataStoreConfiguration) (store *KeyValueD
 	store.m_db, err = leveldb.OpenFile(store.m_path, nil)
 
 	if err != nil {
-		log.Fatal("open:", err)
+		log.Println("open:", err)
 	}
 	return
 }
@@ -1297,7 +1297,7 @@ func (this *KeyValueDataStore) Update(queryStr string, fields []interface{}, par
 		// Here I will save the data into the database...
 		err = this.setValue([]byte(uuid), data.Bytes())
 		if err != nil {
-			log.Fatal("encode:", err)
+			log.Println("encode:", err)
 			return
 		}
 	}
