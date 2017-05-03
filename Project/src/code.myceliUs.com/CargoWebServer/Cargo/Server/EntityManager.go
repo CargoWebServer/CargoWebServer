@@ -1402,36 +1402,8 @@ func (this *EntityManager) isExist(uuid string) bool {
 		return true
 	}
 
-	var query EntityQuery
-	query.TypeName = uuid[0:strings.Index(uuid, "%")]
-	query.Fields = append(query.Fields, "UUID")
-	var fieldsType []interface{} // not use...
-	params := make([]interface{}, 1)
-	params[0] = uuid
-
-	queryStr, _ := json.Marshal(query)
-
-	// The store id.
-	storeId := query.TypeName[0:strings.Index(query.TypeName, ".")]
-	dataStore := GetServer().GetDataManager().getDataStore(storeId)
-	if reflect.TypeOf(dataStore).String() == "*Server.SqlDataStore" {
-		storeId = "sql_info"
-	}
-
-	data, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
-	if err != nil {
-		return false
-	}
-
-	if len(data) == 0 {
-		return false
-	}
-
-	if len(data[0]) == 0 {
-		return false
-	}
-
-	return true
+	_, err := this.getEntityByUuid(uuid)
+	return err == nil
 }
 
 /**

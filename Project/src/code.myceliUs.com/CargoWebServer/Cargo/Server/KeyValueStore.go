@@ -97,6 +97,7 @@ func NewKeyValueDataStore(info *Config.DataStoreConfiguration) (store *KeyValueD
 	if err != nil {
 		log.Println("open:", err)
 	}
+
 	return
 }
 

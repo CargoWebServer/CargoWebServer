@@ -586,7 +586,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 func (this *DynamicEntity) SaveEntity() {
 	this.saveEntity("")
 	log.Println("entity saved: ", this.object["UUID"])
-	//log.Println("After save:", toJsonStr(this.object))
+	log.Println("After save:", toJsonStr(this.object))
 }
 
 func (this *DynamicEntity) saveEntity(path string) {

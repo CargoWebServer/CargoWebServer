@@ -404,8 +404,8 @@ func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) int
 	//////////////////////////// Date ////////////////////////////////
 	if strings.HasSuffix(sqlTypeName, "date") || strings.HasSuffix(sqlTypeName, "datetime") {
 		if reflect.TypeOf(value).String() == "time.Time" {
-			var val time.Time
-			val = value.(time.Time)
+			var val string //time.Time
+			val = value.(time.Time).Format(createdFormat)
 			return val
 		} else if reflect.TypeOf(value).String() == "[]uint8" {
 			t, err := time.Parse(time.RFC3339Nano, string(value.([]uint8)))
@@ -1338,6 +1338,28 @@ func generateUuid(key string, info map[string]interface{}, infos map[string]map[
 	return uuid
 }
 
+// Generate the entity if is not already exist.
+func createEntityFromInfo(info map[string]interface{}, infos map[string]map[string]map[string]interface{}) Entity {
+	var parentUuid string
+	if info["ParentUuid"] != nil {
+		parentUuid = info["ParentUuid"].(string)
+		// Here I will generate the parent entity...
+		parentTypeName := parentUuid[0:strings.Index(parentUuid, "%")]
+		// Here I will retreive the parent information.
+		parentInfo := infos[parentTypeName][info["parentId"].(string)]
+
+		/* Create the parent entity first... */
+		createEntityFromInfo(parentInfo, infos)
+	}
+	entity, errObj := GetServer().GetEntityManager().newDynamicEntity(parentUuid, info)
+	if errObj == nil {
+		// Save the entity.
+		return entity
+	}
+
+	return nil
+}
+
 /**
  * synchronize the content of database with sql_info content. Only key's will be
  * save, the other field will be retreive as needed via sql querie's.
@@ -1467,25 +1489,15 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 		if !this.isAssociative(prototypes[i]) { // Associative table object are not needed...
 			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
 			for key, info := range entityInfos[prototype.TypeName] {
-				// Generate the uuid and the parentUuid for a given entity.
 				uuid := generateUuid(key, info, entityInfos)
-				// In that case I will get the existing entity...
-				log.Println("-------> uuid", uuid)
-				entity, errObj := GetServer().GetEntityManager().getEntityByUuid(uuid)
-				if errObj != nil {
-					var parentUuid string
-					if info["ParentUuid"] != nil {
-						parentUuid = info["ParentUuid"].(string)
-					}
-					entity, errObj := GetServer().GetEntityManager().newDynamicEntity(parentUuid, info)
-					if errObj == nil {
-						// Save the entity.
-						toSave[uuid] = entity
+				// Generate the uuid and the parentUuid for a given entity.
+				if toSave[uuid] == nil {
+					if !entityManager.isExist(uuid) {
+						toSave[uuid] = createEntityFromInfo(info, entityInfos)
 					} else {
-						log.Println("------> error", errObj)
+						entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
+						toSave[uuid] = entity
 					}
-				} else {
-					toSave[uuid] = entity
 				}
 			}
 		}
@@ -1543,6 +1555,8 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 							} else {
 								// append child instead of reference here.
 								entity.AppendChild(prototype.Fields[j], subEntity)
+								entity.SetNeedSave(true)
+								subEntity.SetNeedSave(true)
 							}
 
 							// Now from the other side of the relationship.
@@ -1555,6 +1569,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 								entity.SetNeedSave(true)
 							} else {
 								subEntity.AppendChild(prototype.Fields[j], entity)
+								entity.SetNeedSave(true)
 								subEntity.SetNeedSave(true)
 							}
 						}
@@ -1569,8 +1584,9 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 		entity.SaveEntity()
 	}
 
+	// Initialyse value from sql.
 	for uuid, entity := range toSave {
-		entity.(*DynamicEntity).setValue("IsInit", false)
+		entity.SetInit(false)
 		entity.InitEntity(uuid)
 	}
 

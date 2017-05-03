@@ -164,6 +164,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 	}
 
 	data, err := store.Read(query, fieldsType, params)
+	//log.Println(query, fieldsType, params)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
 		return data, err
@@ -477,6 +478,7 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 								if d[i] == "null" {
 									// if the field is an id it must not be null
 									if Utility.Contains(prototype.Ids, fieldName) {
+										log.Panicln(prototype.TypeName, fieldName, " is null.")
 										return -1, nil
 									}
 									d[i] = "NULL"
@@ -516,13 +518,11 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 				lastId, err = this.createData(dataBaseName, query, data)
 				if err == nil {
 					// So here I have create a new object
-					err = this.setEntityReferences(uuid)
-					if err != nil {
-						return -1, err
-					}
+					this.setEntityReferences(uuid)
 				} else {
-					log.Println("--------> data insert fail with err: ", err)
-					return -1, err
+					log.Println("---> data insert fail with err: ", err)
+					log.Println(query)
+					log.Println(d)
 				}
 			}
 		}

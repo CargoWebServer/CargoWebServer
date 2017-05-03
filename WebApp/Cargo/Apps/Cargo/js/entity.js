@@ -82,13 +82,15 @@ EntityManager.prototype.onEvent = function (evt) {
                 return function (entity) {
                     // Test if the object has change here befor calling it.
                     server.entityManager.setEntity(entity)
-                    EventHub.prototype.onEvent.call(self, evt)
+                    if(evt.done == undefined){
+                        EventHub.prototype.onEvent.call(self, evt)
+                    }
+                    evt.done = true // Cut the cyclic recursion.
                 }
             } (this, evt, entity)
-            if (hasChange(entity, evt.dataMap["entity"])) {
-                setObjectValues(entity, evt.dataMap["entity"])
-
-            }
+            // if (hasChange(entity, evt.dataMap["entity"])) {
+            setObjectValues(entity, evt.dataMap["entity"])
+            // }
         }
     } else if (evt.code == DeleteEntityEvent) {
         var entity = this.entities[evt.dataMap["entity"].UUID]
