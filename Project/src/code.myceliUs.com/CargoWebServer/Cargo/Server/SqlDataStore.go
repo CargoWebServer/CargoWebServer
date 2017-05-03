@@ -1579,15 +1579,15 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 		}
 	}
 
-	// Save changed entity.
-	for _, entity := range toSave {
-		entity.SaveEntity()
-	}
-
 	// Initialyse value from sql.
 	for uuid, entity := range toSave {
 		entity.SetInit(false)
 		entity.InitEntity(uuid)
+	}
+
+	// Save changed entity.
+	for _, entity := range toSave {
+		entity.SaveEntity()
 	}
 
 	return nil
