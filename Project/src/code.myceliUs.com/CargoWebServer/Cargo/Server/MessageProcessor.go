@@ -411,7 +411,12 @@ func (this *MessageProcessor) processIncomming(m *message) {
 							if err.Error() == "NotDynamicObject" {
 								p, err := Utility.InitializeArray(values.([]interface{}), param.GetTypeName())
 								if err == nil {
-									a.Params = append(a.Params, p.Interface())
+									if p.IsValid() {
+										a.Params = append(a.Params, p.Interface())
+									} else {
+										// here i will set an empty generic array.
+										a.Params = append(a.Params, make([]interface{}, 0))
+									}
 								}
 							}
 						}

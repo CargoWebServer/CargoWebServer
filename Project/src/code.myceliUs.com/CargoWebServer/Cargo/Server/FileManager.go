@@ -498,7 +498,8 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
  * Return a file with a given uuid, or id.
  */
 func (this *FileManager) getFileById(id string) (*CargoEntities.File, *CargoEntities.Error) {
-	fileEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", id)
+	ids := []interface{}{id}
+	fileEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", ids)
 	if errObj == nil {
 		// Initialize it's content.
 		fileEntity.InitEntity(fileEntity.GetUuid())

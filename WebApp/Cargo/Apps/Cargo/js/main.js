@@ -25,10 +25,10 @@
  * @see Server
  */
 var server = new Server("localhost", "127.0.0.1", 9393)
+//var server = new Server("www.cargowebserver.com", "10.67.44.63", 9393)
 
 // Amazon ec2 sever...
 //var server = new Server("www.cargowebserver.com", "54.214.130.226", 9393)
-
 
 /**
  * Each application must have a function called main. The main function will

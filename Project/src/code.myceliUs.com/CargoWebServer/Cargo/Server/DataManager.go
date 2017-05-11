@@ -96,7 +96,6 @@ func (this *DataManager) initialize() {
 
 		}
 	}
-
 }
 
 func (this *DataManager) getId() string {
@@ -203,7 +202,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 										fieldName := q.Fields[j]
 										fieldType := prototype.FieldsType[prototype.getFieldIndex(fieldName)]
 										// If the field is an id
-										if !strings.HasSuffix(fieldType, ":Ref") && strings.HasPrefix(fieldName, "M_") && !strings.HasPrefix(fieldName, "M_FK_") && !strings.HasPrefix(fieldName, "M_fk_") {
+										if !strings.HasSuffix(fieldType, ":Ref") && strings.HasPrefix(fieldName, "M_") && !isForeignKey(fieldName) {
 											if j < len(data[i]) {
 												if Utility.Contains(prototype.Ids, fieldName) {
 													ids = append(ids, data[i][j]) // append the id
@@ -252,8 +251,6 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 
 										// Now I will get data from sql...
 										sqlData, err := this.readData(dataBaseName, query, fieldsType, params)
-										log.Println("-----------> ", query)
-										log.Println("-----------> ", params)
 										if err == nil {
 											if len(sqlData) > 0 {
 												// Now I will replace the data with the retreive values.
@@ -264,6 +261,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 											} else {
 												return data, errors.New("No sql data was found for entity " + data[i][0].(string))
 											}
+
 										} else {
 											return data, err
 										}
@@ -276,7 +274,6 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 					} else if len(data[i]) == 1 {
 						return data, nil
 					}
-
 				}
 			} else {
 				err = errors.New("No data found!")
@@ -291,95 +288,375 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 	return data, err
 }
 
-func (this *DataManager) setEntityReference(storeId string, refName string, target *DynamicEntity, isArray bool) error {
+// Many to many relationship
+func (this *DataManager) setManyToManyEntityRelationship(tableName string, name string, fields []string, targetIdFields []string, targetType string, src *DynamicEntity, isInit bool) error {
+
+	// so here I will retreive information...
+	prototype, err := GetServer().GetEntityManager().getEntityPrototype(tableName, "sql_info")
+
+	// If the prototype is not found...
+	if err != nil {
+		return err
+	}
+
+	if isInit {
+		// In that case I want to initialyse the data from sql.
+		query := "SELECT "
+		for i := 0; i < len(fields); i++ {
+			query += fields[i]
+
+			if i < len(fields)-1 {
+				query += ", "
+			}
+		}
+
+		fieldsType := make([]interface{}, 0)
+		for i := 0; i < len(fields); i++ {
+			fieldsType = append(fieldsType, prototype.FieldsType[prototype.getFieldIndex("M_"+fields[i])])
+		}
+
+		ids := make([]string, 0)
+		for i := 1; i < len(prototype.Ids); i++ {
+			id := strings.Replace(prototype.Ids[i], "M_", "", -1)
+			if !Utility.Contains(fields, id) {
+				ids = append(ids, id)
+			}
+		}
+
+		// Params must be 1 id..
+		params := make([]interface{}, 0)
+		for i := 0; i < len(targetIdFields); i++ {
+			params = append(params, src.getValue("M_"+targetIdFields[i]))
+		}
+
+		query += " FROM " + tableName + " WHERE "
+
+		for i := 0; i < len(ids); i++ {
+			id := ids[i]
+			query += id + "=?"
+			if i < len(ids)-1 {
+				query += " AND "
+			}
+		}
+
+		storeName := tableName[0:strings.Index(tableName, ".")]
+		store := this.getDataStore(storeName)
+		if store == nil {
+			return errors.New("The datastore '" + storeName + "' does not exist.")
+		}
+
+		// Retreive id's
+		data, err := store.Read(query, fieldsType, params)
+		if err != nil {
+			log.Println(query)
+			log.Println(params)
+			return err
+		}
+
+		// Now I will initialyse the data.
+		for i := 0; i < len(data); i++ {
+			// TODO make multiple id search instead of id...
+			trg, err := GetServer().GetEntityManager().getEntityById("sql_info", targetType, data[i])
+			if err == nil {
+				// So here I will set the references.
+				refUuids := src.getValue(name)
+				if refUuids == nil {
+					refUuids = make([]string, 0)
+				}
+
+				// Here I will set the reference.
+				if !Utility.Contains(refUuids.([]string), trg.GetUuid()) {
+					refUuids = append(refUuids.([]string), trg.GetUuid())
+					src.AppendReference(trg)
+					src.setValue(name, refUuids)
+					trg.AppendReferenced(name, src)
+				}
+			}
+		}
+
+	} else {
+		// Init that case I need to save the content of entity relationship.
+
+	}
+
+	return nil
+}
+
+// One to many relationship
+func (this *DataManager) setOneToManyEntityRelationship(name string, src *DynamicEntity, dest *DynamicEntity, isRef bool) {
+	if isRef {
+		// here the relation is an array...
+		refsUuid := src.getValue(name)
+		if refsUuid == nil {
+			refsUuid = make([]string, 0)
+		}
+
+		if !Utility.Contains(refsUuid.([]string), dest.GetUuid()) {
+			refsUuid = append(refsUuid.([]string), dest.GetUuid())
+			src.SetNeedSave(true)
+		}
+
+		// Set the source uuid.
+		src.setValue(name, refsUuid)
+
+		// Set reference.
+		src.AppendReference(dest)
+
+		// Set referenced.
+		dest.AppendReferenced(name, src)
+
+	} else {
+		src.AppendChild(name, dest)
+	}
+
+	// Now if will set the ref in dest...
+	refUuid := dest.getValue(name)
+	if src.GetUuid() != refUuid {
+		dest.setValue(name, src.GetUuid())
+		dest.SetNeedSave(true)
+		src.AppendReferenced(name, dest)
+		dest.AppendReference(src)
+	}
+
+	// Save entities
+	dest.saveEntity(dest.GetUuid())
+	src.saveEntity(src.GetUuid())
+}
+
+// One to one relaltionship.
+func (this *DataManager) setOneToOneEntityRelationship(name string, src *DynamicEntity, dest *DynamicEntity, isRef bool) {
+	log.Println("One to one relationship found!")
+	if isRef {
+		uuid := src.getValue(name).(string)
+		// Set the other side of relation ship.
+		if uuid != dest.GetUuid() {
+			src.setValue(name, dest.GetUuid())
+			src.SetNeedSave(true)
+		}
+
+		// Set reference.
+		src.AppendReference(dest)
+		// Set referenced.
+		dest.AppendReferenced(name, src)
+
+	} else {
+		src.AppendChild(name, dest)
+	}
+
+	// Now if will set the ref in dest...
+	refUuid := dest.getValue(name)
+	if src.GetUuid() != refUuid {
+		dest.setValue(name, src.GetUuid())
+		dest.SetNeedSave(true)
+		src.AppendReferenced(name, dest)
+		dest.AppendReference(src)
+	}
+
+	// Save entities
+	dest.saveEntity(dest.GetUuid())
+	src.saveEntity(src.GetUuid())
+}
+
+/**
+ * Return the list of entities for a given relationship.
+ */
+func (this *DataManager) getRelationshipEntities(prototype *EntityPrototype, fields []string, ids []string) ([]*DynamicEntity, error) {
+
+	// The entities
+	entities := make([]*DynamicEntity, 0)
+
+	table := prototype.TypeName
+
+	query := "SELECT "
+	fieldsType := make([]interface{}, 0)
+
+	// The first element is the uuid and are not store in sql.
+	for i := 1; i < len(prototype.Ids); i++ {
+		query += strings.Replace(prototype.Ids[i], "M_", "", -1)
+		fieldsType = append(fieldsType, prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[i])])
+		if i < len(prototype.Ids)-1 {
+			query += ","
+		}
+	}
+
+	query += " FROM " + table + " WHERE "
+
+	// append the fields
+	for i := 0; i < len(fields); i++ {
+		query += strings.Replace(fields[i], "M_", "", -1) + "=?"
+		if i < len(fields)-1 {
+			query += " AND "
+		}
+	}
+
+	// append the ids
+	params := make([]interface{}, 0)
+	for i := 0; i < len(ids); i++ {
+		params = append(params, ids[i])
+	}
+
+	storeName := table[0:strings.Index(table, ".")]
+	store := this.getDataStore(storeName)
+	if store == nil {
+		return entities, errors.New("The datastore '" + storeName + "' does not exist.")
+	}
+
+	// Retreive id's
+	data, err := store.Read(query, fieldsType, params)
+	if err != nil {
+		log.Println(query)
+		log.Println(params)
+		return entities, err
+	}
+
+	// No I will get entities from their id's
+	for i := 0; i < len(data); i++ {
+		entity, err := GetServer().GetEntityManager().getEntityById("sql_info", table, data[i])
+		if err == nil {
+			entities = append(entities, entity.(*DynamicEntity))
+		}
+	}
+
+	return entities, nil
+}
+
+/**
+ * From entity I will get references and set it.
+ */
+func (this *DataManager) setEntityRelationship(storeId string, name string, ref_0 *DynamicEntity, isInit bool) error {
+
+	// First of all I will get the data store
 	store := this.m_dataStores[storeId]
 	if store == nil {
 		return errors.New("No data store was found with id " + storeId)
 	}
 
-	// So here I will find the reference information.
-	refInfo, err := store.(*SqlDataStore).getRefInfos(refName[2:])
-	if err == nil {
-		log.Println(refInfo)
+	// Now I will retreive the relationship information from sql
+	// * remove the M_ prefix.
+	refInfos, err := store.(*SqlDataStore).getRefInfos(name[2:])
+	if err == nil && len(refInfos) > 0 {
 
-		// There is tow side in a reference, the source and the target.
-		// The entity parameter always contain the target.
-		// So I will retreive the source entity.
-		sourceTypeName := storeId
-		if len(refInfo[4]) > 0 && store.(*SqlDataStore).m_vendor != Config.DataStoreVendor_MYSQL {
-			sourceTypeName += "." + refInfo[4]
+		// In that case the ref_0 is the source entity.
+		// Now I will determine the kind of relationship.
+		typeName := storeId
+		if len(refInfos[0][4]) > 0 && store.(*SqlDataStore).m_vendor != Config.DataStoreVendor_MYSQL {
+			typeName += "." + refInfos[0][4]
 		}
 
-		sourceTypeName += "." + refInfo[2]
-		var sourceId string
-		if target.GetObject().(map[string]interface{})["M_"+refInfo[1]] != nil {
-			sourceId = Utility.ToString(target.GetObject().(map[string]interface{})["M_"+refInfo[1]])
-		} else {
-			return errors.New("Entity " + target.GetUuid() + " has no field M_" + refInfo[1] + " value initialysed.")
-		}
+		typeName += "." + refInfos[0][0]
+		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, "sql_info")
+		isAssociative := store.(*SqlDataStore).isAssociative(prototype)
 
-		source, err := entityManager.getEntityById("sql_info", sourceTypeName, sourceId)
+		if isAssociative {
+			// Many to many relationship
+			fields := make([]string, 0)
+			targetIdFields := make([]string, 0)
 
-		if err != nil {
-			return errors.New(err.GetBody())
-		}
-
-		if !isArray {
-			// Set the other side of relation ship.
-			target.setValue(refName, source.GetUuid())
-		} else {
-			// here the relation is an array...
-			refsUuid := target.getValue(refName)
-			if refsUuid == nil {
-				refsUuid = make([]string, 0)
+			// The relation typename.
+			fieldTypeName := storeId
+			if len(refInfos[0][4]) > 0 && store.(*SqlDataStore).m_vendor != Config.DataStoreVendor_MYSQL {
+				fieldTypeName += "." + refInfos[0][4]
 			}
-			if !Utility.Contains(refsUuid.([]string), source.GetUuid()) {
-				refsUuid = append(refsUuid.([]string), source.GetUuid())
+			fieldTypeName += "." + refInfos[0][2]
+
+			for i := 0; i < len(refInfos); i++ {
+				field := refInfos[i][1]
+				fields = append(fields, field)
+				targetIdField := refInfos[i][3]
+				targetIdFields = append(targetIdFields, targetIdField)
 			}
-			// Set the source uuid.
-			target.setValue(refName, refsUuid)
-		}
 
-		// Now if the target is also a reference inside it parent...
-		prototype := source.GetPrototype()
-		fieldType := prototype.FieldsType[prototype.getFieldIndex(refName)]
+			this.setManyToManyEntityRelationship(typeName, name, fields, targetIdFields, fieldTypeName, ref_0, isInit)
+		} else {
+			// The ref_0 must be the source of relationship.
+			if strings.HasSuffix(ref_0.GetTypeName(), refInfos[0][2]) {
 
-		// If the relation is also a reference in the source.
-		// if is not a reference the entity will added with the create entity
-		// function.
-		if strings.HasSuffix(fieldType, ":Ref") {
-			if !strings.HasPrefix(fieldType, "[]") {
-				// Set the other side of relation ship.
-				source.(*DynamicEntity).setValue(refName, target.GetUuid())
+				fieldType := ref_0.GetPrototype().FieldsType[ref_0.GetPrototype().getFieldIndex(name)]
+				isArray := strings.HasPrefix(fieldType, "[]")
+				isRef := strings.HasSuffix(fieldType, ":Ref")
+
+				typeName := strings.Replace(fieldType, "[]", "", -1)
+				typeName = strings.Replace(typeName, ":Ref", "", -1)
+
+				// From the table i will retreive the entity prototype.
+				prototype, err := GetServer().GetEntityManager().getEntityPrototype(typeName, "sql_info")
+				if err != nil {
+					return err
+				}
+
+				ids := make([]string, 0)
+				fields := make([]string, 0)
+				for i := 0; i < len(refInfos); i++ {
+					id := Utility.ToString(ref_0.getValue("M_" + refInfos[0][3]))
+					ids = append(ids, id)
+					fields = append(fields, "M_"+refInfos[0][1])
+				}
+
+				ref_entities, err := this.getRelationshipEntities(prototype, fields, ids)
+
+				if err != nil {
+					log.Println("-------> error ", err)
+					return err
+				}
+
+				if isArray {
+					for i := 0; i < len(ref_entities); i++ {
+						// The one to many relationship.
+						this.setOneToManyEntityRelationship(name, ref_0, ref_entities[i], isRef)
+					}
+				} else {
+					if len(ref_entities) == 1 {
+						this.setOneToOneEntityRelationship(name, ref_0, ref_entities[0], isRef)
+					}
+				}
+
 			} else {
-				// here the relation is an array...
-				refsUuid := source.(*DynamicEntity).getValue(refName)
-				if refsUuid == nil {
-					refsUuid = make([]string, 0)
+				// The field type
+				fieldType := ref_0.GetPrototype().FieldsType[ref_0.GetPrototype().getFieldIndex(name)]
+				typeName := strings.Replace(fieldType, "[]", "", -1)
+				typeName = strings.Replace(typeName, ":Ref", "", -1)
+
+				prototype, err := GetServer().GetEntityManager().getEntityPrototype(typeName, "sql_info")
+				if err != nil {
+					return err
 				}
-				if !Utility.Contains(refsUuid.([]string), target.GetUuid()) {
-					refsUuid = append(refsUuid.([]string), target.GetUuid())
+
+				ids := make([]string, 0)
+				fields := make([]string, 0)
+				for i := 0; i < len(refInfos); i++ {
+
+					// All id's must be set to create the lnk.
+					if ref_0.getValue("M_"+refInfos[0][1]) == nil {
+						return errors.New("No id field " + "M_" + refInfos[0][1] + " was set for entity " + ref_0.GetUuid())
+					}
+
+					id := Utility.ToString(ref_0.getValue("M_" + refInfos[0][1]))
+					ids = append(ids, id)
+					fields = append(fields, "M_"+refInfos[0][3])
 				}
-				// Set the source uuid.
-				source.(*DynamicEntity).setValue(refName, refsUuid)
+
+				ref_entities, err := this.getRelationshipEntities(prototype, fields, ids)
+
+				// So here I will retreive the source value.
+				if err == nil {
+					if len(ref_entities) == 1 {
+						ref_1 := ref_entities[0]
+						index := ref_1.GetPrototype().getFieldIndex(name)
+						if index > -1 {
+							fieldType := ref_1.GetPrototype().FieldsType[index]
+							isArray := strings.HasPrefix(fieldType, "[]")
+							isRef := strings.HasSuffix(fieldType, ":Ref")
+							if isArray {
+								// The one to many relationship.
+								this.setOneToManyEntityRelationship(name, ref_1, ref_0, isRef)
+							} else {
+								this.setOneToOneEntityRelationship(name, ref_1, ref_0, isRef)
+							}
+						}
+					}
+				}
 			}
-
-			// Cross reference.
-			source.AppendReference(target)
-			// append referenced to.
-			target.AppendReferenced(refName, source)
 		}
-
-		// append the reference.
-		target.AppendReference(source)
-		// append referenced to.
-		source.AppendReferenced(refName, target)
-
-		// Save the target entity.
-		target.SetNeedSave(true)
-		target.SaveEntity()
-		source.SetNeedSave(true)
-		source.SaveEntity()
 	}
 
 	return nil
@@ -390,8 +667,9 @@ func (this *DataManager) setEntityReference(storeId string, refName string, targ
  * instead a field that contain the reference id are save in the db. Here I
  * will retreive the associated entity and set it inside the M_FK_field_name.
  */
-func (this *DataManager) setEntityReferences(uuid string) error {
+func (this *DataManager) setEntityReferences(uuid string, isInit bool) error {
 	entity, err := GetServer().GetEntityManager().getEntityByUuid(uuid)
+
 	if err != nil {
 		return errors.New(err.GetBody())
 	}
@@ -399,14 +677,10 @@ func (this *DataManager) setEntityReferences(uuid string) error {
 
 	// I will retreive reference fields.
 	for i := 0; i < len(prototype.FieldsType); i++ {
-		fieldType := prototype.FieldsType[i]
-		isArray := strings.HasPrefix(fieldType, "[]")
-		isRef := strings.HasSuffix(fieldType, ":Ref")
-
 		// I need to retreive the link between for example M_post_id and M_FK_blog_comment_blog_post.
-		if isRef {
+		if isForeignKey(prototype.Fields[i]) {
 			storeId := prototype.TypeName[0:strings.Index(prototype.TypeName, ".")]
-			this.setEntityReference(storeId, prototype.Fields[i], entity.(*DynamicEntity), isArray)
+			this.setEntityRelationship(storeId, prototype.Fields[i], entity.(*DynamicEntity), isInit)
 		}
 	}
 	return nil
@@ -470,7 +744,7 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 					index := prototype.getFieldIndex(fieldName)
 					if index > 0 {
 						fieldType := prototype.FieldsType[index]
-						if strings.HasPrefix(fieldName, "M_") && !strings.HasSuffix(fieldType, ":Ref") && !strings.HasPrefix(fieldName, "M_FK_") && !strings.HasPrefix(fieldName, "M_fk_") {
+						if strings.HasPrefix(fieldName, "M_") && !strings.HasSuffix(fieldType, ":Ref") && !isForeignKey(fieldName) {
 							fields = append(fields, fieldName)
 							fieldsType = append(fieldsType, fieldType)
 							// In case of null value...
@@ -516,13 +790,10 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 				// Set the values...
 				query += ")" + values + ")"
 				lastId, err = this.createData(dataBaseName, query, data)
-				if err == nil {
-					// So here I have create a new object
-					this.setEntityReferences(uuid)
-				} else {
+				if err != nil {
 					log.Println("---> data insert fail with err: ", err)
 					log.Println(query)
-					log.Println(d)
+					log.Println(data)
 				}
 			}
 		}
@@ -635,7 +906,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 				idsFieldsName := make([]string, 0)
 				prototype, _ := GetServer().GetEntityManager().getEntityPrototype(entityQuery.TypeName, "sql_info")
 				for i := 0; i < len(entityQuery.Fields); i++ {
-					if strings.HasPrefix(entityQuery.Fields[i], "M_") && !strings.HasPrefix(entityQuery.Fields[i], "M_FK_") && !strings.HasPrefix(entityQuery.Fields[i], "M_fk_") {
+					if strings.HasPrefix(entityQuery.Fields[i], "M_") && !isForeignKey(entityQuery.Fields[i]) {
 						fieldType := prototype.FieldsType[prototype.getFieldIndex(entityQuery.Fields[i])]
 						if !strings.HasSuffix(fieldType, ":Ref") {
 							if Utility.Contains(prototype.Ids, entityQuery.Fields[i]) {
@@ -692,13 +963,14 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 
 					// Update the entity.
 					err = this.updateData(dataBaseName, query, data, ids)
-					if err == nil {
-						log.Println("-------> update data succeeded!", data)
-					} else {
+					if err != nil {
 						log.Println("Datamanager.go 681 -------> update data fail!")
 						log.Println(query)
 						log.Println(data)
 						log.Println(ids)
+					} else {
+						// Set it entity references.
+						this.setEntityReferences(uuid, false)
 					}
 				}
 			}
@@ -721,7 +993,8 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 	}
 
 	var storeConfig *Config.DataStoreConfiguration
-	storeConfigEntity, err_ := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", storeId)
+	ids := []interface{}{storeId}
+	storeConfigEntity, err_ := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", ids)
 	// Create the new store here.
 	if err_ != nil {
 		storeConfig = new(Config.DataStoreConfiguration)
@@ -992,14 +1265,15 @@ func (this *DataManager) ImportXmlData(content string, messageId string, session
  */
 func NewDataStore(info *Config.DataStoreConfiguration) (DataStore, error) {
 	var err error
+
 	if info.M_dataStoreType == Config.DataStoreType_SQL_STORE {
 		dataStore, err := NewSqlDataStore(info)
 		return dataStore, err
 	} else if info.M_dataStoreType == Config.DataStoreType_KEY_VALUE_STORE {
+
 		dataStore, err := NewKeyValueDataStore(info)
 		return dataStore, err
 	}
-
 	return nil, err
 }
 

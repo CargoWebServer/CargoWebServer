@@ -110,13 +110,11 @@ func (this *ProjectManager) synchronize() {
 func (this *ProjectManager) synchronizeProject(project *CargoEntities.Project, projectPath string) {
 
 	// Set the file id...
-	fileId := Utility.CreateSha1Key([]byte("/" + project.GetId()))
+	ids := []interface{}{Utility.CreateSha1Key([]byte("/" + project.GetId()))}
 
 	// I will keep reference to the project directory only...
-	file, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", fileId) // get the first file level only...
+	file, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", ids) // get the first file level only...
 	if err == nil {
 		project.SetFilesRef(file.GetObject().(*CargoEntities.File))
-	} else {
-		log.Println("--------> file ", fileId, " was not found!")
 	}
 }

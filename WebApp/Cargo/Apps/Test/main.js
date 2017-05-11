@@ -54,12 +54,16 @@ function main() {
     //testDynamicEntity()
 
    // entityDump("item_1", "Test.Item")
+   // entityDump("1", "dt_methode_development.dbo.DT_STATE")
    //entityDump("1", "dt_methode_development.dbo.DT_DTS")
    //entityDump("11362", "dt_methode_development.dbo.DT_DTS")
    // entityDump("1", "employees.employees")
     
    //entitiesDump("COLLADASchema.COLLADA")
-    entitiesDump("CargoEntities.Action")
+   entitiesDump("DT3_informations.Department")
+   //entitiesDump("DT3_informations.Workpoint")
+   
+   // entitiesDump("CargoEntities.Action")
     //entityDump( "CARGO_ENTITIES", "CargoEntities.Entities")
     //entitiesDump("XPDMXML.ProcessStructureType")
     //entitiesDump("DT3_informations.Workpoint")
@@ -243,7 +247,7 @@ function entityDump(id, typeName) {
     server.entityManager.getEntityPrototypes(typeName.split(".")[0],
         function (result, caller) {
             // Here I will initialyse the catalog...
-            server.entityManager.getEntityById(typeName.split(".")[0], typeName, id,
+            server.entityManager.getEntityById(typeName.split(".")[0], typeName, [id],
                 function (result) {
 
                     // Here I will overload the way to display the name in the interface.
@@ -260,7 +264,8 @@ function entityDump(id, typeName) {
                         }
                     } (result), undefined, false, result, "")
                 },
-                function () {
+                function (errObj, caller) {
+                    console.log(errObj)
                 })
         })
 }

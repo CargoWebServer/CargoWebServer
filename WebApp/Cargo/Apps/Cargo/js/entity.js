@@ -82,7 +82,7 @@ EntityManager.prototype.onEvent = function (evt) {
                 return function (entity) {
                     // Test if the object has change here befor calling it.
                     server.entityManager.setEntity(entity)
-                    if(evt.done == undefined){
+                    if (evt.done == undefined) {
                         EventHub.prototype.onEvent.call(self, evt)
                     }
                     evt.done = true // Cut the cyclic recursion.
@@ -108,18 +108,26 @@ EntityManager.prototype.setEntity = function (entity) {
 
     this.getEntityPrototype(entity.TYPENAME, entity.TYPENAME.split(".")[0],
         function (prototype, caller) {
+            var id_ = entity.TYPENAME + ":"
             for (var i = 0; i < prototype.Ids.length; i++) {
                 var id = prototype.Ids[i]
                 if (id == "UUID") {
                     server.entityManager.entities[entity.UUID] = entity
                 } else {
                     if (entity[id].length > 0) {
-                        server.entityManager.entities[entity.TYPENAME + "_" + entity[id]] = entity
-                        // register the element in the workflow manager as needed.
-                        if (entity.TYPENAME.startsWith("BPMN20")) {
-                            server.workflowManager.bpmnElements[entity[id]] = entity
+                        id_ += entity[id]
+                        if (i < prototype.Ids.length - 1) {
+                            id_ += "_"
                         }
                     }
+                }
+            }
+
+            // Set the entity with it id.
+            if (entity.IsInit) {
+                server.entityManager.entities[id_] = entity
+                if (entity.TYPENAME.startsWith("BPMN20")) {
+                    server.workflowManager.bpmnElements[id_] = entity
                 }
             }
         },
@@ -127,6 +135,7 @@ EntityManager.prototype.setEntity = function (entity) {
             /** Nothing to do here. */
         },
         {})
+
 }
 
 /*
@@ -134,13 +143,17 @@ EntityManager.prototype.setEntity = function (entity) {
  */
 EntityManager.prototype.resetEntity = function (entity) {
     var prototype = this.entityPrototypes[entity.TYPENAME]
+    delete server.entityManager.entities[entity.UUID]
+
+    var id = entity.TYPENAME + ":"
     for (var i = 0; i < prototype.Ids.length; i++) {
-        var id = prototype.Ids[i]
-        if (id == "UUID") {
-            delete server.entityManager.entities[entity.UUID]
-        } else {
-            delete server.entityManager.entities[entity.TYPENAME + "_" + entity[id]]
+        id += entity[prototype.Ids[i]]
+        if (i < prototype.Ids.length - 1) {
+            id += "_"
         }
+    }
+    if (server.entityManager.entities[id] != undefined) {
+        delete server.entityManager.entities[id]
     }
 }
 
@@ -370,25 +383,38 @@ EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, error
 /*
  * Server side script
  */
-function GetEntityById(storeId, typeName, id) {
+function GetEntityById(storeId, typeName, ids) {
     var entity = null
-    entity = server.GetEntityManager().GetObjectById(storeId, typeName, id, messageId, sessionId)
+    entity = server.GetEntityManager().GetObjectById(storeId, typeName, ids, messageId, sessionId)
     return entity
 }
 
 /**
  * Retrieve an entity with a given typename and id.
  * @param {string} typeName The object type name.
- * @param {string} id The id (not uuid) of the object to look for.
+ * @param {string} ids The id's (not uuid) of the object to look for.
  * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
  * @param {function} errorCallback In case of error.
  * @param {object} caller A place to store object from the request context and get it back from the response context.
  * @param {parent} the parent object reference.
  */
-EntityManager.prototype.getEntityById = function (storeId, typeName, id, successCallback, errorCallback, caller, parent) {
+EntityManager.prototype.getEntityById = function (storeId, typeName, ids, successCallback, errorCallback, caller, parent) {
 
-    if (server.entityManager.entities[typeName + "_" + id] != undefined) {
-        successCallback(server.entityManager.entities[typeName + "_" + id], caller)
+    if (!isArray(ids)) {
+        console.log("ids must be an array! ", ids)
+    }
+
+    // key in the server.
+    var id = typeName + ":"
+    for (var i = 0; i < ids.length; i++) {
+        id += ids[i]
+        if (i < ids.length - 1) {
+            id += "_"
+        }
+    }
+
+    if (server.entityManager.entities[id] != undefined) {
+        successCallback(server.entityManager.entities[id_], caller)
         return // break it here.
     }
 
@@ -400,7 +426,7 @@ EntityManager.prototype.getEntityById = function (storeId, typeName, id, success
             // Set the parameters.
             var storeId = caller.storeId
             var typeName = caller.typeName
-            var id = caller.id
+            var ids = caller.ids
             var successCallback = caller.successCallback
             var progressCallback = caller.progressCallback
             var errorCallback = caller.errorCallback
@@ -409,7 +435,7 @@ EntityManager.prototype.getEntityById = function (storeId, typeName, id, success
             var params = []
             params.push(createRpcData(storeId, "STRING", "storeId"))
             params.push(createRpcData(typeName, "STRING", "typeName"))
-            params.push(createRpcData(id, "STRING", "id"))
+            params.push(createRpcData(ids, "JSON_STR", "ids")) // serialyse as an JSON object array...
 
             // Call it on the server.
             server.executeJsFunction(
@@ -442,14 +468,14 @@ EntityManager.prototype.getEntityById = function (storeId, typeName, id, success
                     server.errorManager.onError(errMsg)
                     caller.errorCallback(errMsg, caller.caller)
                 }, // Error callback
-                { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "prototype": result, "parent": parent, "id": id } // The caller
+                { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "prototype": result, "parent": parent, "ids": ids } // The caller
             )
         },
         // The error callback.
         function (errMsg, caller) {
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller)
-        }, { "storeId": storeId, "typeName": typeName, "id": id, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback })
+        }, { "storeId": storeId, "typeName": typeName, "ids": ids, "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback })
 }
 
 /*
@@ -584,6 +610,8 @@ EntityManager.prototype.saveEntity = function (entity, successCallback, errorCal
             var entity = eval("new " + result[0].TYPENAME + "()")
             entity.initCallback = function () {
                 return function (entity) {
+                    // Set the new entity values...
+                    server.entityManager.setEntity(entity)
                     if (caller.successCallback != undefined) {
                         caller.successCallback(entity, caller.caller)
                     }
@@ -1637,7 +1665,9 @@ function setObjectValues(object, values) {
     object.IsInit = true // The object part only and not the refs...
     object.ParentUuid = values.ParentUuid // set the parent uuid.
 
-
+    // Set the initialyse object.
+    server.entityManager.setEntity(object)
+    
     // Call the init callback.
     if (object.initCallback != undefined) {
         object.initCallback(object)

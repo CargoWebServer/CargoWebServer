@@ -1,7 +1,7 @@
 
 // global variable.
 var databaseName = "Blog."
-var schemaId = ""// "dbo."
+var schemaId = "dbo."
 
 var userTypeName = databaseName + schemaId + "blog_user"
 var authorTypeName = databaseName + schemaId + "blog_author"
@@ -682,7 +682,7 @@ BlogManager.prototype.displayAuthorPost = function () {
     }
 
     // Now I will get the all post from a given author.
-    server.entityManager.getEntityById("sql_info", authorTypeName, this.account.M_userRef.UUID,
+    server.entityManager.getEntityById("sql_info", authorTypeName, [this.account.M_userRef.UUID],
         // The success callback.
         function (author, caller) {
 
@@ -737,7 +737,7 @@ BlogManager.prototype.createNewPost = function (author) {
 
             // Now I will save the post...
             // The post is own by author, so if we delete an author all it's post will be deleted.
-            server.entityManager.getEntityById("sql_info", authorTypeName, userUuid,
+            server.entityManager.getEntityById("sql_info", authorTypeName, [userUuid],
                 function (author, caller) {
                     if (author.M_id.length == 0) {
                         return // Do nothing if the author id is not set properly.
@@ -1010,7 +1010,7 @@ var BlogPostView = function (parent, post) {
  */
 BlogPostView.prototype.appendComment = function (post, user, comment) {
     // First of all I will test if the user exist in the blog_user table.
-    server.entityManager.getEntityById("sql_info", userTypeName, user.M_id,
+    server.entityManager.getEntityById("sql_info", userTypeName, [user.M_id],
         function (result, caller) {
             // update entity here.
             server.entityManager.saveEntity(user)
@@ -1158,7 +1158,6 @@ BlogPostCommentView = function (parent, user, comment, post, id) {
             .appendElement({ "tag": "div", "class": "media-body" }).down()
             .appendElement({ "tag": "h4", "innerHtml": comment.M_user_id }).down().appendElement({ "tag": "br" }).appendElement({ "tag": "small", "innerHtml": m.format('LLL') }).up().up()
             .appendElement({ "tag": "div", "innerHtml": comment.M_comment })
-        console.log(comment)
     }
 
     // Set the id.

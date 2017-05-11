@@ -48,8 +48,8 @@ func (this *SecurityManager) initialize() {
 	cargoEntities := server.GetEntityManager().getCargoEntities()
 
 	if len(adminRoleUuid) == 0 {
-
-		adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", "admin")
+		ids := []interface{}{"admin"}
+		adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", ids)
 		if errObj != nil {
 			return
 		}
@@ -71,8 +71,8 @@ func (this *SecurityManager) initialize() {
 	// Create the guest role if it doesn't exist
 	guestRoleUuid := CargoEntitiesRoleExists("guestRole")
 	if len(guestRoleUuid) == 0 {
-
-		guestAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", "guest")
+		ids := []interface{}{"guest"}
+		guestAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", ids)
 		if errObj != nil {
 			return
 		}
@@ -574,8 +574,8 @@ func (this *SecurityManager) RemoveAccount(roleId string, accountId string, mess
  * Change the admin password.
  */
 func (this *SecurityManager) ChangeAdminPassword(pwd string, newPwd string, messageId string, sessionId string) {
-
-	adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", "admin")
+	ids := []interface{}{"admin"}
+	adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", ids)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}

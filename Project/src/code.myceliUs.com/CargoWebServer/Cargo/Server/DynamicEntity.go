@@ -297,6 +297,7 @@ func (this *DynamicEntity) SetNeedSave(needSave bool) {
  */
 func (this *DynamicEntity) InitEntity(id string) error {
 	err := this.initEntity(id, "")
+
 	//log.Println("After init:", toJsonStr(this.object))
 	return err
 }
@@ -577,6 +578,12 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 		this.saveEntity("")
 	}
 
+	if storeId == "sql_info" {
+		// Now I will initialyse references
+		dataManager.setEntityReferences(this.uuid, true)
+
+	}
+
 	return nil
 }
 
@@ -585,8 +592,8 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
  */
 func (this *DynamicEntity) SaveEntity() {
 	this.saveEntity("")
-	log.Println("entity saved: ", this.object["UUID"])
-	log.Println("After save:", toJsonStr(this.object))
+	//log.Println("entity saved: ", this.object["UUID"])
+	//log.Println("After save:", toJsonStr(this.object))
 }
 
 func (this *DynamicEntity) saveEntity(path string) {
@@ -919,7 +926,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 
 								// I will try to create a static entity...
 								newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
-								params := make([]interface{}, 2)
+								params := make([]interface{}, 3)
 								params[0] = ""
 								params[1] = uuid
 								params[2] = subValues
@@ -1005,6 +1012,10 @@ func (this *DynamicEntity) saveEntity(path string) {
 	}
 
 	if err == nil {
+		if storeId == "sql_info" {
+			// Now I will save the references
+			dataManager.setEntityReferences(this.uuid, false)
+		}
 		// Send the event.
 		GetServer().GetEventManager().BroadcastEvent(evt)
 		// resolved reference pointing to this entity and not already append...
@@ -1024,7 +1035,8 @@ func (this *DynamicEntity) DeleteEntity() {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child's in an entity. The name is the
+ * propertie name in the parent.
  */
 func (this *DynamicEntity) RemoveChild(name string, uuid string) {
 
@@ -1213,6 +1225,9 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 	// Set or reset the child ptr.
 	child.SetParentPtr(this)
 
+	// Append referenced.
+	child.AppendReferenced(attributeName, this)
+
 	// I will retreive the field type.
 	fieldTypeIndex := this.prototype.getFieldIndex(attributeName)
 	if fieldTypeIndex > 0 {
@@ -1389,6 +1404,9 @@ func (this *DynamicEntity) AppendReferenced(name string, owner Entity) {
 	ref.Name = name
 	ref.OwnerUuid = owner.GetUuid()
 	this.referenced = append(this.referenced, ref)
+
+	// Set need save.
+	this.SetNeedSave(true)
 }
 
 /**
@@ -1812,7 +1830,7 @@ func (this *DynamicEntity) Exist() bool {
 	if this == nil {
 		return false
 	}
-	log.Println("-------> test if entity ", this.uuid, " exist.")
+
 	var query EntityQuery
 	query.TypeName = this.GetTypeName()
 	query.Indexs = append(query.Indexs, "UUID="+this.uuid)

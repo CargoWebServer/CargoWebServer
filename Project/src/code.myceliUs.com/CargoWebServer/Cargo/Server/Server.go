@@ -55,7 +55,8 @@ func newServer() *Server {
 	}
 
 	// if the admin has password adminadmin I will display the setup wizard..
-	adminAccountEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", "admin")
+	ids := []interface{}{"admin"}
+	adminAccountEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", ids)
 	if err == nil {
 		adminAccount := adminAccountEntity.GetObject().(*CargoEntities.Account)
 		if adminAccount.GetPassword() == "adminadmin" {

@@ -1210,7 +1210,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 
 	this.maximizeBtn.element.click()
 	// Here I will see if the type is derived basetype...
-	if (!fieldType.startsWith("[]")) {
+	if (!fieldType.startsWith("[]") && fieldType.startsWith("xs.")) {
 		if (fieldType.startsWith("enum:")) {
 			// Here the value is an enumeration...
 			control.element.selectedIndex = parseInt(value) - 1

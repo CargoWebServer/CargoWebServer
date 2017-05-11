@@ -620,7 +620,7 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 /**
  * Return an entity with for a given type and id
  */
-func (this *EntityManager) getEntityById(storeId string, typeName string, id string) (Entity, *CargoEntities.Error) {
+func (this *EntityManager) getEntityById(storeId string, typeName string, ids []interface{}) (Entity, *CargoEntities.Error) {
 	// Verify that typeName is valid
 	// interface{} is an exception...
 	if !Utility.IsValidPackageName(typeName) && !strings.HasSuffix(typeName, "interface{}") {
@@ -649,12 +649,10 @@ func (this *EntityManager) getEntityById(storeId string, typeName string, id str
 		query.Fields = append(query.Fields, "UUID")
 		var fieldsType []interface{} // not used
 		var params []interface{}
-		var ids []string
-		ids = append(ids, prototype.Ids...)
-		for i := 1; i < len(ids) && len(results) == 0; i++ {
-			idField := ids[i]
+		for i := 1; i < len(prototype.Ids) && len(results) == 0; i++ {
+			idField := prototype.Ids[i]
 			query.Indexs = make([]string, 0)
-			query.Indexs = append(query.Indexs, idField+"="+id)
+			query.Indexs = append(query.Indexs, idField+"="+Utility.ToString(ids[i-1]))
 			queryStr, _ := json.Marshal(query)
 
 			results, err = GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
@@ -669,6 +667,13 @@ func (this *EntityManager) getEntityById(storeId string, typeName string, id str
 	// In that case not information are found.
 	if len(results) == 0 {
 		// Here I will send a an error...
+		var id string
+		for i := 0; i < len(ids); i++ {
+			id += Utility.ToString(ids[i])
+			if i < len(ids)-1 {
+				id += " "
+			}
+		}
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("No values found for type '"+typeName+"' and id '"+id+"'"))
 		return nil, cargoError
 	}
@@ -1088,7 +1093,8 @@ func (this *EntityManager) InitEntity(entity Entity) {
 				} else if len(refUUID) > 0 {
 					// Here we have an id not a uuid...
 					storeId := typeName[:strings.Index(typeName, ".")]
-					refTarget, errObj = this.getEntityById(storeId, typeName, refUUID)
+					ids := []interface{}{refUUID}
+					refTarget, errObj = this.getEntityById(storeId, typeName, ids)
 				}
 				// The set methode name...
 				if errObj == nil && refTarget != nil {
@@ -1394,16 +1400,24 @@ func (this *EntityManager) GetObjectsByType(typeName string, queryStr string, st
 }
 
 /**
- * Return true if an entity with a given uuid exist.
+ * Return true if an entity with a given uuid exist in the store.
  */
 func (this *EntityManager) isExist(uuid string) bool {
-	_, contained := this.contain(uuid)
-	if contained {
-		return true
+	storeId := uuid[0:strings.Index(uuid, ".")]
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	// Here the code is not nil
+	if store != nil {
+		if reflect.TypeOf(store).String() == "*Server.SqlDataStore" {
+			store = GetServer().GetDataManager().getDataStore("sql_info")
+		}
+
+		_, err := store.(*KeyValueDataStore).getValue(uuid)
+		if err == nil {
+			return true
+		}
 	}
 
-	_, err := this.getEntityByUuid(uuid)
-	return err == nil
+	return false
 }
 
 /**
@@ -1425,9 +1439,9 @@ func (this *EntityManager) GetObjectByUuid(uuid string, messageId string, sessio
 /**
  * Return the underlying object, mostly use by the client side to get object..
  */
-func (this *EntityManager) GetObjectById(storeId string, typeName string, id string, messageId string, sessionId string) interface{} {
+func (this *EntityManager) GetObjectById(storeId string, typeName string, ids []interface{}, messageId string, sessionId string) interface{} {
 
-	entity, errObj := this.getEntityById(storeId, typeName, id)
+	entity, errObj := this.getEntityById(storeId, typeName, ids)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil

@@ -298,12 +298,14 @@ func InitializeArray(data []interface{}, typeName string) (reflect.Value, error)
 	}
 
 	for i := 0; i < len(data); i++ {
-		if i == 0 {
-			if len(typeName) == 0 {
-				values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(data[i])), 0, 0)
+		if data[i] != nil {
+			if i == 0 {
+				if len(typeName) == 0 {
+					values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(data[i])), 0, 0)
+				}
 			}
+			values = reflect.Append(values, reflect.ValueOf(data[i]))
 		}
-		values = reflect.Append(values, reflect.ValueOf(data[i]))
 	}
 	return values, nil
 }

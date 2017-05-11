@@ -326,7 +326,8 @@ func (this *OAuth2Manager) cleanup() {
 				accessEntity.SaveEntity() // update it
 
 				// Now it expire time.
-				expireEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Expires", access.GetId())
+				ids := []interface{}{access.GetId()}
+				expireEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Expires", ids)
 				expireEntity.GetObject().(*Config.OAuth2Expires).SetExpiresAt(time.Unix(access.GetCreatedAt(), 0).Add(time.Duration(access.GetExpiresIn()) * time.Second).Unix())
 				expireEntity.SaveEntity()
 			}
@@ -426,7 +427,8 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 	var access *Config.OAuth2Access
 	// I will get the client...
-	clientEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", clientId)
+	ids := []interface{}{clientId}
+	clientEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", ids)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
@@ -672,7 +674,8 @@ func setCodeExpiration(code string, duration time.Duration) {
 		return func() {
 
 			// In case of access token... Refresh it if it can.
-			entity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Access", code)
+			ids := []interface{}{code}
+			entity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Access", ids)
 			if errObj == nil {
 				access := entity.GetObject().(*Config.OAuth2Access)
 				if access.GetRefreshToken() != nil {
@@ -694,9 +697,9 @@ func setCodeExpiration(code string, duration time.Duration) {
  * AddExpireAtData add info in expires table
  */
 func addExpireAtData(code string, expireAt time.Time) error {
-
+	ids := []interface{}{code}
 	configEntity := GetServer().GetConfigurationManager().getOAuthConfigurationEntity()
-	expireEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Expires", code)
+	expireEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Expires", ids)
 
 	var expire *Config.OAuth2Expires
 	if expireEntity == nil {
@@ -796,7 +799,8 @@ func createAccessToken(grantType string, client *Config.OAuth2Client, authorizat
 				access.SetAuthorize(authorizationCode)
 
 				// If authorization object are found locally...
-				authorizationEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Authorize", authorizationCode)
+				ids := []interface{}{authorizationCode}
+				authorizationEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Authorize", ids)
 
 				if errObj == nil {
 					authorization := authorizationEntity.GetObject().(*Config.OAuth2Authorize)
@@ -1232,8 +1236,8 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			sessionId = strings.Split(state, ":")[1]
 			clientId = strings.Split(state, ":")[2]
 		}
-
-		clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", clientId)
+		ids := []interface{}{clientId}
+		clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", ids)
 		client := clientEntity.GetObject().(*Config.OAuth2Client)
 
 		if !HandleAuthenticationPage(ar, w, r) {
@@ -1328,17 +1332,13 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 
 		GetServer().GetProcessor().m_incomingChannel <- authorizationAccept
 
-		/**ret := &osin.AccessRequest{
-			Code:            "",
-			Client:          ar.Client,
-			RedirectUri:     ar.RedirectUri,
-			Scope:           ar.Scope,
-			GenerateRefresh: false, // per the RFC, should NOT generate a refresh token in this case
-			Authorized:      true,
-			Expiration:      ar.Expiration,
-			UserData:        ar.UserData,
+		redirectUrl, err := resp.GetRedirectUrl()
+		if err == nil {
+			// Redirect to the url here.
+			client := &http.Client{}
+			req, _ := http.NewRequest("GET", redirectUrl, nil)
+			client.Do(req)
 		}
-		server.FinishAccessRequest(resp, r, ret)*/
 	}
 	if resp.IsError && resp.InternalError != nil {
 		fmt.Printf("ERROR: %s\n", resp.InternalError)
@@ -1466,7 +1466,8 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("------> 1452 Autorize callback call. clientId ", clientId, "sessionId", sessionId, "messageId", messageId, "scope", scope)
 
 	// I will get a reference to the client who generate the request.
-	clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", clientId)
+	ids := []interface{}{clientId}
+	clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", ids)
 	client := clientEntity.GetObject().(*Config.OAuth2Client)
 
 	if len(errorCode) != 0 {
@@ -1557,7 +1558,8 @@ func HttpQueryHandler(w http.ResponseWriter, r *http.Request) {
 	// I will get the action entity from the values.
 	if len(ids) == 3 {
 		var entity Entity
-		entity, errObj = GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Action", ids[0]+"."+ids[1]+"."+ids[2])
+		ids := []interface{}{ids[0] + "." + ids[1] + "." + ids[2]}
+		entity, errObj = GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Action", ids)
 		if errObj != nil {
 			w.Header().Set("Content-Type", "application/text")
 			w.Write([]byte(errObj.GetBody()))
@@ -1671,7 +1673,8 @@ func (s *OAuth2Store) Clone() osin.Storage {
 func (this *OAuth2Store) GetClient(id string) (osin.Client, error) {
 	// From the list of registred client I will retreive the client
 	// with the given id.
-	clientEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", id)
+	ids := []interface{}{id}
+	clientEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", ids)
 
 	if errObj != nil {
 		return nil, errors.New("No client found with id " + id)
@@ -1720,7 +1723,8 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 	a := new(Config.OAuth2Authorize)
 
 	// Set the client.
-	c, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", data.Client.GetId())
+	ids := []interface{}{data.Client.GetId()}
+	c, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", ids)
 
 	if errObj != nil {
 		return errors.New("No client found with id " + data.Client.GetId())
@@ -1759,8 +1763,8 @@ func (this *OAuth2Store) SaveAuthorize(data *osin.AuthorizeData) error {
 // Client information MUST be loaded together.
 // Optionally can return error if expired.
 func (this *OAuth2Store) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
-
-	authorizeEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Authorize", code)
+	ids := []interface{}{code}
+	authorizeEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Authorize", ids)
 	if errObj != nil {
 		// No data was found.
 		return nil, errors.New("No authorize data found with code " + code)
@@ -1846,7 +1850,8 @@ func loadIdToken(idToken *Config.OAuth2IdToken) *IDToken {
 func saveIdToken(data *IDToken) *Config.OAuth2IdToken {
 	// Get needed entities.
 	configEntity := GetServer().GetConfigurationManager().getOAuthConfigurationEntity()
-	clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", data.ClientID)
+	ids := []interface{}{data.ClientID}
+	clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", ids)
 	client := clientEntity.GetObject().(*Config.OAuth2Client)
 
 	// Create id token (OpenId)
@@ -1894,7 +1899,8 @@ func saveIdToken(data *IDToken) *Config.OAuth2IdToken {
  */
 func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
 	configEntity := GetServer().GetConfigurationManager().getOAuthConfigurationEntity()
-	accessEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Access", data.AccessToken)
+	ids := []interface{}{data.AccessToken}
+	accessEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Access", ids)
 	var access *Config.OAuth2Access
 	if errObj != nil {
 		access = new(Config.OAuth2Access)
@@ -1922,7 +1928,8 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
 	}
 
 	// Set the client.
-	clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", data.Client.GetId())
+	ids_ := []interface{}{data.Client.GetId()}
+	clientEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Client", ids_)
 	client := clientEntity.GetObject().(*Config.OAuth2Client)
 	access.SetClient(client)
 
@@ -1959,7 +1966,8 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
 	// Now the refresh token.
 	if len(data.RefreshToken) > 0 {
 		// In that case I will save the refresh token.
-		refreshEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Refresh", data.RefreshToken)
+		ids := []interface{}{data.RefreshToken}
+		refreshEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Refresh", ids)
 		if errObj != nil {
 			refresh := new(Config.OAuth2Refresh)
 			refresh.SetId(data.RefreshToken)
@@ -1983,7 +1991,8 @@ func (this *OAuth2Store) SaveAccess(data *osin.AccessData) error {
  * Load the access for a given code.
  */
 func (this *OAuth2Store) LoadAccess(code string) (*osin.AccessData, error) {
-	accessEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Access", code)
+	ids := []interface{}{code}
+	accessEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Access", ids)
 	if errObj != nil {
 		return nil, errors.New("No access found with code " + code)
 	}
@@ -2074,7 +2083,8 @@ func (this *OAuth2Store) RemoveAccess(code string) error {
  * Load the access data from it refresh code.
  */
 func (this *OAuth2Store) LoadRefresh(code string) (*osin.AccessData, error) {
-	refreshEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Refresh", code)
+	ids := []interface{}{code}
+	refreshEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Refresh", ids)
 	if errObj != nil {
 		return nil, errors.New("Now refresh token found with code " + code)
 	}

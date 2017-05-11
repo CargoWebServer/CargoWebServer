@@ -388,7 +388,8 @@ func (this *LdapManager) GetAllUsers() ([]*CargoEntities.User, *CargoEntities.Er
  * Return a user with a given id.
  */
 func (this *LdapManager) GetUserById(id string) (*CargoEntities.User, *CargoEntities.Error) {
-	userEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.User", id)
+	ids := []interface{}{id}
+	userEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.User", ids)
 	if errObj == nil {
 		user := userEntity.GetObject().(*CargoEntities.User)
 		return user, nil
@@ -428,7 +429,8 @@ func (this *LdapManager) SynchronizeGroups(id string) error {
 				membersRef, err := this.getLdapGroupMembers(id, row[j].(string))
 				if err == nil {
 					for k := 0; k < len(membersRef); k++ {
-						member, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.User", membersRef[k])
+						ids := []interface{}{membersRef[k]}
+						member, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.User", ids)
 						if err == nil {
 							group.SetMembersRef(member.GetObject().(*CargoEntities.User))
 							member.GetObject().(*CargoEntities.User).SetMemberOfRef(group)
@@ -481,7 +483,8 @@ func (this *LdapManager) GetAllGroups() ([]*CargoEntities.Group, *CargoEntities.
  * Return a group with a given id.
  */
 func (this *LdapManager) GetGroupById(id string) (*CargoEntities.Group, *CargoEntities.Error) {
-	groupEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Group", id)
+	ids := []interface{}{id}
+	groupEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Group", ids)
 	if errObj == nil {
 		group := groupEntity.GetObject().(*CargoEntities.Group)
 		return group, nil
@@ -588,7 +591,8 @@ func (this *LdapManager) SynchronizeComputers(id string) error {
  * Return a computer with a given id.
  */
 func (this *LdapManager) GetComputer(id string) (*CargoEntities.Computer, *CargoEntities.Error) {
-	computerEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Computer", id)
+	ids := []interface{}{id}
+	computerEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Computer", ids)
 	if errObj == nil {
 		computer := computerEntity.GetObject().(*CargoEntities.Computer)
 		return computer, errObj
