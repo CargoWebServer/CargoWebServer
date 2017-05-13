@@ -2,7 +2,6 @@
 package Server
 
 import (
-	//"log"
 	"reflect"
 	"strconv"
 
@@ -135,6 +134,28 @@ func (self *Action) GetSessionId() string {
 		return self.msg.from.GetUuid()
 	}
 	return ""
+}
+
+/**
+ * Execute a vb script.
+ */
+func (self *Action) ExecuteVbScript(scriptName string) []string {
+
+	// Run the given script on the server side.
+	results, err := GetServer().runVbs(scriptName)
+
+	// Get the session id and the message id...
+	if err != nil {
+		sessionId := self.msg.from.GetUuid()
+		messageId := self.msg.GetId()
+
+		// Create the error object.
+		cargoError := NewError(Utility.FileLine(), ACTION_EXECUTE_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return nil
+	}
+
+	return results
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"os/exec"
 	"strconv"
+	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/Utility"
@@ -156,6 +158,18 @@ func (this *Server) reportErrorMessage(messageId string, sessionId string, error
 		errMsg := NewErrorMessage(messageId, int32(errorObject.GetCode()), errorObject.GetBody(), errorObjectStr, to)
 		conn.Send(errMsg.GetBytes())
 	}
+}
+
+/**
+ * Execute a vb script cmd.
+ * * Windows only...
+ */
+func (this *Server) runVbs(scriptName string) ([]string, error) {
+	path := this.GetConfigurationManager().GetScriptPath() + "/" + scriptName
+	out, err := exec.Command("C:/WINDOWS/system32/cscript.exe", "/Nologo", path).Output()
+	results := strings.Split(string(out), "\n")
+	results = results[0 : len(results)-1]
+	return results, err
 }
 
 //////////////////////////////////////////////////////////

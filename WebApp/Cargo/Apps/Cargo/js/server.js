@@ -297,6 +297,28 @@ Server.prototype.setSessionId = function () {
     rqst.send();
 }
 
+/**
+ * Run a visual basic script with a given name on the server side.
+ */
+Server.prototype.executeVbSrcript = function (scriptName, successCallback, errorCallback, caller) {
+    var params = new Array();
+    params.push(createRpcData(scriptName, "STRING", "scriptName"))
+
+    // Register this listener to the server.
+    var rqst = new Request(randomUUID(), this.conn, "ExecuteVbScript", params,
+        // Progress callback
+        function () { },
+        // Success callback
+        function (id, results, caller) {
+            // Keep the session id...
+            caller.successCallback(results, caller.caller)
+        },
+        // Error callback...
+        function (errorMsg, caller) {
+            caller.errorCallback(errorMsg, caller.caller)
+        }, {successCallback, errorCallback, caller});
+    rqst.send();
+}
 
 /*
  * Sever side code.

@@ -6,7 +6,7 @@
 
 TEMPLATE        = lib
 CONFIG         += plugin
-QT             += widgets
+QT             += widgets core sql
 INCLUDEPATH    +=
 TARGET          = sayhelloplugin
 DESTDIR         = ../WebApp/Cargo/bin/plugins

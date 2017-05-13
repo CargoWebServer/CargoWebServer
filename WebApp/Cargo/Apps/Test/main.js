@@ -60,7 +60,17 @@ function main() {
    // entityDump("1", "employees.employees")
     
    //entitiesDump("COLLADASchema.COLLADA")
-   entitiesDump("DT3_informations.Department")
+   //entitiesDump("DT3_informations.Department")
+  // testServiceContainer()
+
+   server.executeVbSrcript("mon_ExtractSnFile.vbs", 
+   function(results){
+       console.log("cmd succed!", results)
+   }, 
+   function(errObj){
+       console.log("cmd failed: ", errObj)
+   }, this)
+
    //entitiesDump("DT3_informations.Workpoint")
    
    // entitiesDump("CargoEntities.Action")
@@ -122,8 +132,6 @@ function main() {
         function () {
 
         }, {})
-    
-     testServiceContainer()
   */
 
   // Google OAuth
