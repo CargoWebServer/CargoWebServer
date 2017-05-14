@@ -3,7 +3,7 @@
 var applicationName = document.getElementsByTagName("title")[0].text
 
 // Connection with the cargo server.
-var server = new Server("CargoWebServer.com", "54.214.130.226", 9393)
+var server = new Server("CargoWebServer.com", "54.218.110.52", 9393)
 
 // Set the language from the html lang attribute.
 server.languageManager.setLanguage($('html').attr('lang'))

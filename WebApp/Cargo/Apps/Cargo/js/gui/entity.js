@@ -352,7 +352,7 @@ EntityPanel.prototype.initHeader = function () {
 			minimizeBtn.element.style.display = "table-cell"
 			fireResize()
 		}
-	} (this.entitiesDiv, this.minimizeBtn)
+	}(this.entitiesDiv, this.minimizeBtn)
 
 	this.minimizeBtn.element.onclick = function (entitiesDiv, maximizeBtn) {
 		return function () {
@@ -361,7 +361,7 @@ EntityPanel.prototype.initHeader = function () {
 			maximizeBtn.element.style.display = "table-cell"
 			fireResize()
 		}
-	} (this.entitiesDiv, this.maximizeBtn)
+	}(this.entitiesDiv, this.maximizeBtn)
 	this.minimizeBtn.element.click()
 
 	// The save button.
@@ -382,9 +382,9 @@ EntityPanel.prototype.initHeader = function () {
 						function (entity, entityPanel) {
 							if (entityPanel.saveCallback != undefined) {
 								entityPanel.saveCallback(entity)
-								if(entityPanel.parentEntity!=null){
-									if(entityPanel.parentEntity.panel != null){
-										if(entityPanel.parentEntity.panel.saveCallback != undefined){
+								if (entityPanel.parentEntity != null) {
+									if (entityPanel.parentEntity.panel != null) {
+										if (entityPanel.parentEntity.panel.saveCallback != undefined) {
 											entityPanel.parentEntity.panel.saveCallback(entityPanel.parentEntity)
 										}
 									}
@@ -402,9 +402,9 @@ EntityPanel.prototype.initHeader = function () {
 						function (entity, entityPanel) {
 							if (entityPanel.saveCallback != undefined) {
 								entityPanel.saveCallback(entity)
-								if(entityPanel.parentEntity!=null){
-									if(entityPanel.parentEntity.panel != null){
-										if(entityPanel.parentEntity.panel.saveCallback != undefined){
+								if (entityPanel.parentEntity != null) {
+									if (entityPanel.parentEntity.panel != null) {
+										if (entityPanel.parentEntity.panel.saveCallback != undefined) {
 											entityPanel.parentEntity.panel.saveCallback(entityPanel.parentEntity)
 										}
 									}
@@ -419,7 +419,7 @@ EntityPanel.prototype.initHeader = function () {
 
 			}
 		}
-	} (this))
+	}(this))
 
 	// The remove button.
 	this.deleteBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: none;" }).down()
@@ -451,10 +451,10 @@ EntityPanel.prototype.initHeader = function () {
 							}, entityPanel)
 						dialog.close()
 					}
-				} (confirmDialog, entityPanel)
+				}(confirmDialog, entityPanel)
 			}
 		}
-	} (this)
+	}(this)
 
 	// Set the title div, the type is the default title.
 	this.header.appendElement({ "tag": "div", "class": "entity_type" }).down()
@@ -476,7 +476,7 @@ EntityPanel.prototype.initHeader = function () {
 				entityPanel.panel.element.style.display = "none"
 				entityPanel.parentEntityPanel.panel.element.style.display = ""
 			}
-		} (this)
+		}(this)
 	}
 }
 
@@ -657,7 +657,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							table.init()
 							table.refresh()
 						}
-					} (itemTable))
+					}(itemTable))
 
 				} else {
 					var tableModel = new TableModel(["index", "values"])
@@ -744,7 +744,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 												server.entityManager.saveEntity(entityPanel.entity)
 											}
 										}
-									} (entityPanel, field))
+									}(entityPanel, field))
 
 								entityPanel.controls[id + "_new"].element.focus()
 								entityPanel.controls[id + "_new"].element.select();
@@ -789,7 +789,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 											server.entityManager.saveEntity(entity)
 										}
 									}
-								} (entityPanel.entity, field, newRow)
+								}(entityPanel.entity, field, newRow)
 
 								// The save row action
 								newRow.saveBtn.element.onclick = function (entity, field, row) {
@@ -808,7 +808,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 												}, this)
 										}
 									}
-								} (entityPanel.entity, field, newRow)
+								}(entityPanel.entity, field, newRow)
 
 								//itemTable.refresh()
 							}
@@ -816,7 +816,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 					}
 				}
-			} (this, field, fieldType, valueDiv)
+			}(this, field, fieldType, valueDiv)
 		}
 	}
 
@@ -884,7 +884,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						server.entityManager.setEntity(entity)
 					}
 				}
-			} (this, field, fieldType))
+			}(this, field, fieldType))
 
 			// Append the listener to display the save button.
 			control.element.addEventListener("keyup", function (entityPanel) {
@@ -895,7 +895,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						}
 					}
 				}
-			} (this))
+			}(this))
 		}
 
 		// if the field is an index key i will set the auto complete on it...
@@ -911,7 +911,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							entityPanel.setEntity(value)
 						}
 					}
-				} (this))
+				}(this))
 		}
 	}
 }
@@ -985,7 +985,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 							server.entityManager.saveEntity(entity)
 						}
 					}
-				} (server.entityManager.entities[parentUuid], field, row)
+				}(server.entityManager.entities[parentUuid], field, row)
 
 				// The save row action
 				row.saveBtn.element.onclick = function (entity, field, row) {
@@ -1004,7 +1004,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 								}, this)
 						}
 					}
-				} (server.entityManager.entities[parentUuid], field, row)
+				}(server.entityManager.entities[parentUuid], field, row)
 			}
 		}
 	}
@@ -1020,7 +1020,7 @@ EntityPanel.prototype.appendObject = function (object, valueDiv, field, fieldTyp
 			return function (panel) {
 				panel.setEntity(value)
 			}
-		} (object),
+		}(object),
 		undefined, true, object, field)
 }
 
@@ -1091,7 +1091,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 							panel.setTitle(object.TYPENAME)
 
 						}
-					} (object), propertiePanel)
+					}(object), propertiePanel)
 				}
 
 				if (propertiePanel.subEntityPanel != null) {
@@ -1110,10 +1110,10 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 						entityPanel.panel.element.style.display = "none"
 						entityPanel.subEntityPanel.panel.element.style.display = ""
 					}
-				} (propertiePanel)
+				}(propertiePanel)
 
 			}
-		} (object, this)
+		}(object, this)
 
 		ref.element.onmouseover = function (object) {
 			return function () {
@@ -1133,7 +1133,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 					}
 				}
 			}
-		} (object)
+		}(object)
 
 		ref.element.onmouseout = function (object) {
 			return function () {
@@ -1154,7 +1154,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 					}
 				}
 			}
-		} (object)
+		}(object)
 
 		deleteLnkButton.element.onclick = function (entityUUID, object, field) {
 			return function () {
@@ -1173,7 +1173,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 					entity.onChange(entity)
 				}
 			}
-		} (this.entity.UUID, object, field)
+		}(this.entity.UUID, object, field)
 	}
 
 }
@@ -1209,8 +1209,11 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 	}
 
 	this.maximizeBtn.element.click()
+	// Here the entity is a reference to a complex type...
+	var isRef = fieldType.endsWith(":Ref")
+
 	// Here I will see if the type is derived basetype...
-	if (!fieldType.startsWith("[]") && fieldType.startsWith("xs.")) {
+	if (!fieldType.startsWith("[]") && !isRef) {
 		if (fieldType.startsWith("enum:")) {
 			// Here the value is an enumeration...
 			control.element.selectedIndex = parseInt(value) - 1
@@ -1243,8 +1246,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 			control.element.href = value
 		}
 	} else {
-		// Here the entity is a reference to a complex type...
-		var isRef = fieldType.endsWith(":Ref")
+
 		if (fieldType.startsWith("[]")) {
 			// The propertie is an array...
 			if (value != null && value != "") {
@@ -1269,7 +1271,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 									return function (ref) {
 										panel.appendObjectRef(ref, control, field, fieldType)
 									}
-								} (this, control, field, fieldType)
+								}(this, control, field, fieldType)
 							)
 						}
 					}
@@ -1305,7 +1307,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 								return function (ref) {
 									panel.appendObjectRef(ref, control, field, fieldType)
 								}
-							} (this, control, field, fieldType)
+							}(this, control, field, fieldType)
 						)
 					}
 				} else {
@@ -1406,7 +1408,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 						onSelect(value)
 					}
 				}
-			} (entityPanel, field, input, objMap))
+			}(entityPanel, field, input, objMap))
 
 			input.element.onblur = input.element.onchange = function (objMap, values, entityPanel, onSelect) {
 				return function (evt) {
@@ -1417,7 +1419,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 						entityPanel.clear()
 					}
 				}
-			} (objMap, values, entityPanel, onSelect)
+			}(objMap, values, entityPanel, onSelect)
 
 		},
 		function (errMsg, caller) {
