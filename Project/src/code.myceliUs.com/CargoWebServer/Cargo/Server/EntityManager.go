@@ -649,6 +649,12 @@ func (this *EntityManager) getEntityById(storeId string, typeName string, ids []
 		query.Fields = append(query.Fields, "UUID")
 		var fieldsType []interface{} // not used
 		var params []interface{}
+		
+		if len(ids) != len(prototype.Ids) - 1 {
+			cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Unexpecter number of ids got " + strconv.Itoa(len(ids)) + " expected "+ strconv.Itoa(len(prototype.Ids)) ))
+			return nil, cargoError
+		}
+
 		for i := 1; i < len(prototype.Ids) && len(results) == 0; i++ {
 			idField := prototype.Ids[i]
 			query.Indexs = make([]string, 0)

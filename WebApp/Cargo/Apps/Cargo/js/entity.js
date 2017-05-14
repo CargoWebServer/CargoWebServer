@@ -414,7 +414,7 @@ EntityManager.prototype.getEntityById = function (storeId, typeName, ids, succes
     }
 
     if (server.entityManager.entities[id] != undefined) {
-        successCallback(server.entityManager.entities[id_], caller)
+        successCallback(server.entityManager.entities[id], caller)
         return // break it here.
     }
 
