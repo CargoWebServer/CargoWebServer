@@ -50,7 +50,7 @@ var GettingStartedPage = function (parent) {
             "hello-cargo-intro-p1": "With Cargo up and runing on your computer, it's time to create our first application. The application will contain one input "
             + "box and one button. The user will enter a value in the input box and when it click on the button the server will "
             + "respond with a greeting composed from that value. You can get the code <a href=\"http://cargowebserver.com/example/HelloCargo.zip\">here</a> "
-            + " or try it <a href=\"http://54.214.130.226:9393/HelloCargo/\">here</a>. ",
+            + " or try it <a href=\"http://54.218.110.52:9393/HelloCargo/\">here</a>. ",
             "hello-cargo-intro-p2": "First of all, we will create the directory inside the <span>Apps</span> folder. Let's name it <span>HelloCargo</span>. "
             + "Inside it we will create tow folders, one named <span>css</span> the other named <span>js</span>. I like to regroup "
             + "Javascript files in one folder and style sheets in other folder, but there's no rules about it. In the <span>HelloCargo</span> "
@@ -115,7 +115,7 @@ var GettingStartedPage = function (parent) {
             "hello-cargo-intro-p1": "With Cargo up and runing on your computer, it's time to create our first application. The application will contain one input"
             + "box and one button. The user will enter a value in the input box and when it click on the button the server will"
             + "respond with a greeting composed from that value. You can get the code <a href=\"http://cargowebserver.com/example/HelloCargo.zip\">here</a>"
-            + " or try it <a href=\"http://54.214.130.226:9393/HelloCargo/\">here</a>.",
+            + " or try it <a href=\"http://54.218.110.52:9393/HelloCargo/\">here</a>.",
             "hello-cargo-intro-p2": "First of all, we will create the directory inside the <span>Apps</span> folder. Let's name it <span>HelloCargo</span>."
             + "Inside it we will create tow folders, one named <span>css</span> the other named <span>js</span>. I like to regroup"
             + "Javascript files in one folder and style sheets in other folder, but there's no rules about it. In the <span>HelloCargo</span> "
