@@ -2,15 +2,83 @@ package Server
 
 import (
 	"log"
+	"sort"
 	"time"
+
+	"code.myceliUs.com/Utility"
 )
 
+/**
+ * Cache item contain complentary informations to manage item in the cache.
+ */
+type CacheItem struct {
+	entity     Entity
+	hit        int
+	lastAccess int64
+}
+
+/**
+ * Return a metric value that represent the weight of the item in the cache.
+ */
+func (this *CacheItem) Weight() int64 {
+	//weigth := float64(this.hit / (now - this.hit))
+	now := Utility.MakeTimestamp()
+	elapsed := now - this.lastAccess
+	//log.Println("--------> item ", this.entity.GetUuid(), " elapsed ", elapsed)
+	return int64(elapsed)
+}
+
+// An array of Cache Item.
+type CacheItems []*CacheItem
+
+/**
+ * Return the size of an array
+ */
+func (this CacheItems) Len() int {
+	return len(this)
+}
+
+/**
+ * Return if an element must be considère less than other item.
+ */
+func (this CacheItems) Less(i, j int) bool {
+	return this[i].Weight() < this[j].Weight()
+}
+
+/**
+ * Swap tow element of the array.
+ */
+func (this CacheItems) Swap(i, j int) {
+	this[i], this[j] = this[j], this[i]
+}
+
+/**
+ * Swap tow element of the array.
+ */
+func (this CacheItems) getItemIndex(uuid string) int {
+	for i := 0; i < this.Len(); i++ {
+		if this[i].entity.GetUuid() == uuid {
+			return i
+		}
+	}
+
+	return this.Len()
+}
+
+/**
+ * I will made use of BoltDB as cache backend. The cache will store information
+ * of the engine on the disk.
+ */
 type CacheManager struct {
+	/**
+	 * The maximum number of items in the cache.
+	 */
+	max int
 
 	/**
-	 * This map will keep entities in memory.
+	 * Contain the item
 	 */
-	entitiesMap map[string]Entity
+	orderedItems CacheItems
 
 	/**
 	 * Each entity has a lifetime of 30 second. If an entity is not use
@@ -55,14 +123,14 @@ func (this *Server) GetCacheManager() *CacheManager {
  * The cacheManager manages the memory and the lifetime of entities.
  */
 func newCacheManager() *CacheManager {
-
 	cacheManager := new(CacheManager)
+
+	// Set the ordered items.
+	cacheManager.max = 10000
+	cacheManager.orderedItems = make(CacheItems, 0, cacheManager.max)
+
 	return cacheManager
 }
-
-var (
-	timeout = time.Duration(5 * time.Minute)
-)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Service functions
@@ -75,10 +143,6 @@ func (this *CacheManager) initialize() {
 
 	log.Println("--> Initialize CacheManager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
-
-	this.entitiesMap = make(map[string]Entity, 0)
-	this.timersMap = make(map[string]*time.Timer)
-
 	this.inputEntityChannel = make(chan Entity)
 	this.outputEntityChannel = make(chan struct {
 		entityUuid          string
@@ -100,6 +164,7 @@ func (this *CacheManager) getId() string {
 
 func (this *CacheManager) stop() {
 	log.Println("--> Stop CacheManager")
+
 	// Free the cache
 	this.abortedByEnvironment <- true
 }
@@ -111,45 +176,80 @@ func (this *CacheManager) run() {
 	for {
 		select {
 		case inputEntity := <-this.inputEntityChannel:
-			this.entitiesMap[inputEntity.GetUuid()] = inputEntity
-			if this.timersMap[inputEntity.GetUuid()] != nil {
-				// In that case I will reset the timer time to 30 sec...
-				this.timersMap[inputEntity.GetUuid()].Reset(time.Second * timeout)
-			} else {
-				this.timersMap[inputEntity.GetUuid()] = time.NewTimer(time.Second * timeout)
-			}
-
-			go func(timer *time.Timer, uuid string, removeChannel chan string) {
-
-				// Remove the entity from the cache.
-				<-timer.C
-				//log.Println("Timer expired for entity ", uuid)
-				removeChannel <- uuid
-
-			}(this.timersMap[inputEntity.GetUuid()], inputEntity.GetUuid(), this.removeEntityChannel)
+			// Append entity to the database.
+			this.set(inputEntity)
 
 		case outputEntity := <-this.outputEntityChannel:
-			outputEntity_ := this.entitiesMap[outputEntity.entityUuid]
-			// Reset the timeout value here.
-			if this.timersMap[outputEntity.entityUuid] != nil {
-				this.timersMap[outputEntity.entityUuid].Reset(time.Second * timeout)
-			}
+			outputEntity_ := this.get(outputEntity.entityUuid)
 			outputEntity.entityOutputChannel <- outputEntity_
 
 		case entityUuidToRemove := <-this.removeEntityChannel:
 			// The entity to remove.
-			delete(this.entitiesMap, entityUuidToRemove)
-			delete(this.timersMap, entityUuidToRemove)
+			this.remove(entityUuidToRemove)
 
 		case done := <-this.abortedByEnvironment:
 			if done {
 				return
 			}
 		}
-
-		//log.Println("Number of items in the cache ", len(this.entitiesMap))
-
 	}
+}
+
+/**
+ * Gets an entity with a given uuid from the entitiesMap
+ */
+func (this *CacheManager) set(entity Entity) {
+	// Set the entity.
+
+	index := this.orderedItems.getItemIndex(entity.GetUuid())
+	var item *CacheItem
+
+	if this.orderedItems.Len() == this.max {
+		item = new(CacheItem)
+		item.entity = entity
+		item.lastAccess = Utility.MakeTimestamp()
+
+		// Set the new one
+		this.orderedItems[this.max-1] = item
+
+	} else if index != this.orderedItems.Len() {
+		item = this.orderedItems[index]
+		item.entity = entity
+		item.lastAccess = Utility.MakeTimestamp()
+		// Set the item at the end.
+		this.orderedItems[index] = item
+	} else {
+		item = new(CacheItem)
+		item.entity = entity
+		item.lastAccess = Utility.MakeTimestamp()
+		this.orderedItems = append(this.orderedItems, item)
+	}
+
+	// reorder the array
+	sort.Sort(this.orderedItems)
+
+	log.Println("set entity -> ", entity.GetUuid(), " number of item: ", len(this.orderedItems))
+}
+
+/**
+ * Gets an entity with a given uuid from the entitiesMap
+ */
+func (this *CacheManager) get(uuid string) Entity {
+
+	index := this.orderedItems.getItemIndex(uuid)
+	if index != this.orderedItems.Len() {
+		return this.orderedItems[index].entity
+	}
+
+	return nil
+}
+
+/**
+ * Gets an entity with a given uuid from the entitiesMap
+ */
+func (this *CacheManager) remove(uuid string) {
+	log.Println("------> remove item: ", uuid, " from cache")
+	//delete(this.items, uuid)
 }
 
 /**
@@ -160,6 +260,7 @@ func (this *CacheManager) getEntity(uuid string) Entity {
 		entityUuid          string
 		entityOutputChannel chan Entity
 	})
+
 	outputInfo.entityOutputChannel = make(chan Entity)
 	outputInfo.entityUuid = uuid
 	this.outputEntityChannel <- *outputInfo

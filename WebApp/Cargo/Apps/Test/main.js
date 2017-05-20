@@ -53,27 +53,18 @@ function main() {
 
     //testDynamicEntity()
 
-   // entityDump("item_1", "Test.Item")
-   // entityDump("1", "dt_methode_development.dbo.DT_STATE")
-   //entityDump("1", "dt_methode_development.dbo.DT_DTS")
-   //entityDump("11362", "dt_methode_development.dbo.DT_DTS")
-   // entityDump("1", "employees.employees")
-    
-   //entitiesDump("COLLADASchema.COLLADA")
-   //entitiesDump("DT3_informations.Department")
-  // testServiceContainer()
+    // entityDump("item_1", "Test.Item")
+    // entityDump("1", "dt_methode_development.dbo.DT_STATE")
+    //entityDump("1", "dt_methode_development.dbo.DT_DTS")
+    //entityDump("11362", "dt_methode_development.dbo.DT_DTS")
+    // entityDump("1", "employees.employees")
 
-   server.executeVbSrcript("mon_ExtractSnFile.vbs", 
-   function(results){
-       console.log("cmd succed!", results)
-   }, 
-   function(errObj){
-       console.log("cmd failed: ", errObj)
-   }, this)
+    //entitiesDump("COLLADASchema.COLLADA")
+    //entitiesDump("DT3_informations.Department")
+    // testServiceContainer()
+    //entitiesDump("DT3_informations.Workpoint")
 
-   //entitiesDump("DT3_informations.Workpoint")
-   
-   // entitiesDump("CargoEntities.Action")
+     entitiesDump("CargoEntities.Action")
     //entityDump( "CARGO_ENTITIES", "CargoEntities.Entities")
     //entitiesDump("XPDMXML.ProcessStructureType")
     //entitiesDump("DT3_informations.Workpoint")
@@ -86,75 +77,75 @@ function main() {
     // TestUploadFile()
 
     // Test get bmpn defintion instance...
-/*
-    server.entityManager.getEntityPrototypes("Test",
-        // Success callback.
-        function (result, caller) {
-            server.entityManager.getEntityPrototypes("BPMN20",
-                // Success callback.
-                function (result, caller) {
-                    server.entityManager.getEntityPrototypes("BPMS",
-                        // Success callback.
-                        function (result, caller) {
-                            server.entityManager.getEntityById("BPMN20.Definitions", "_1484846640138",
-                                // success callbacak
-                                function (result, caller) {
-                                    server.workflowManager.getDefinitionInstances(result,
-                                        // success callback
-                                        function (results, caller) {
-                                            var result = results[0]
-                                            var parent = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; width: auto; height: auto;" })
-                                            new EntityPanel(parent, result.TYPENAME, function (entity) {
-                                                return function (panel) {
-                                                    panel.setEntity(entity)
-                                                }
-                                            } (result), undefined, false, result, "")
-                                        },
-                                        // error callback 
-                                        function (errMsg, caller) {
-                                        },
-                                        {})
-                                },
-                                // Error callback 
-                                function (errMsg, caller) {
-                                }, {})
-                        },
-                        // Error callback.
-                        function () {
-                        }, {})
-                },
-                // Error callback.
-                function () {
+    /*
+        server.entityManager.getEntityPrototypes("Test",
+            // Success callback.
+            function (result, caller) {
+                server.entityManager.getEntityPrototypes("BPMN20",
+                    // Success callback.
+                    function (result, caller) {
+                        server.entityManager.getEntityPrototypes("BPMS",
+                            // Success callback.
+                            function (result, caller) {
+                                server.entityManager.getEntityById("BPMN20.Definitions", "_1484846640138",
+                                    // success callbacak
+                                    function (result, caller) {
+                                        server.workflowManager.getDefinitionInstances(result,
+                                            // success callback
+                                            function (results, caller) {
+                                                var result = results[0]
+                                                var parent = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; width: auto; height: auto;" })
+                                                new EntityPanel(parent, result.TYPENAME, function (entity) {
+                                                    return function (panel) {
+                                                        panel.setEntity(entity)
+                                                    }
+                                                } (result), undefined, false, result, "")
+                                            },
+                                            // error callback 
+                                            function (errMsg, caller) {
+                                            },
+                                            {})
+                                    },
+                                    // Error callback 
+                                    function (errMsg, caller) {
+                                    }, {})
+                            },
+                            // Error callback.
+                            function () {
+                            }, {})
+                    },
+                    // Error callback.
+                    function () {
+    
+                    }, {})
+            },
+            // Error callback.
+            function () {
+    
+            }, {})
+      */
 
-                }, {})
-        },
-        // Error callback.
-        function () {
+    // Google OAuth
+    /*server.securityManager.getResource("1010681964660.apps.googleusercontent.com", "profile", "", 
+    function(result, caller){
+    }, 
+    function(errMsg, caller){
+    }, {})*/
 
-        }, {})
-  */
+    // Facebook
+    /*server.securityManager.getResource("821916804492503", "public_profile user_posts", "https://graph.facebook.com/v2.5/me/feed?limit=25", 
+    function(results, caller){
+        console.log("found results: ", results)
+    },
+    function(errMsg, caller){
+    }, {})*/
 
-  // Google OAuth
-  /*server.securityManager.getResource("1010681964660.apps.googleusercontent.com", "profile", "", 
-  function(result, caller){
-  }, 
-  function(errMsg, caller){
-  }, {})*/
-
-  // Facebook
-  /*server.securityManager.getResource("821916804492503", "public_profile user_posts", "https://graph.facebook.com/v2.5/me/feed?limit=25", 
-  function(results, caller){
-      console.log("found results: ", results)
-  },
-  function(errMsg, caller){
-  }, {})*/
-
- /* server.securityManager.getResource("1234", "openid profile email", "", 
-  function(results, caller){
-      console.log("found results: ", results)
-  },
-  function(errMsg, caller){
-  }, {})*/
+    /* server.securityManager.getResource("1234", "openid profile email", "", 
+     function(results, caller){
+         console.log("found results: ", results)
+     },
+     function(errMsg, caller){
+     }, {})*/
 
 }
 
@@ -165,13 +156,13 @@ function testServiceContainer() {
         function () {
             return function () {
                 console.log("Service is open!")
-                
+
                 // Now run a script...
-                function TestSayHelloPlugin(to){
+                function TestSayHelloPlugin(to) {
                     var msg = SayHello.sayHelloTo(to)
                     return msg
                 }
-              
+
                 var params = []
                 params.push(new RpcData({ "name": "rootPath", "type": 2, "dataBytes": utf8_to_b64("Mr. Kavalec!!!") }))
 

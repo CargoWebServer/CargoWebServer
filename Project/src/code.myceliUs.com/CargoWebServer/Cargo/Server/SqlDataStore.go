@@ -758,7 +758,7 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 	this.setRefs()
 
 	// Synchronize actual data
-	//this.synchronize(prototypes)
+	// this.synchronize(prototypes)
 
 	return prototypes, nil
 }

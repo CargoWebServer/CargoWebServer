@@ -562,7 +562,6 @@ func (this *LdapManager) SynchronizeComputers(id string) error {
 		/**/
 		computerUuid := CargoEntitiesComputerExists(computer.M_id)
 		if len(computerUuid) == 0 {
-
 			/*addrs, err := net.LookupIP(computer.GetName())
 			for _, addr := range addrs {
 				if ipv4 := addr.To4(); ipv4 != nil {

@@ -46,6 +46,8 @@ var Dialog = function (id, parent, isModal, title) {
     this.footerButtons = this.footer.appendElement({ "tag": "div", "class": "dialog_buttons", "style": "right: 2px;" }).down()
 
     /* The ok button **/
+    this.footerButtons.appendElement({ "tag": "div", "style":"display: table-cell; width: 100%;" })
+    
     this.ok = this.footerButtons.appendElement({ "tag": "div", "class": "diablog_button btn btn-default", "innerHtml": "ok" }).down()
 
     /* The cancel button **/

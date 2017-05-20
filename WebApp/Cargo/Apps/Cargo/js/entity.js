@@ -1072,7 +1072,9 @@ function appendObjectValue(object, field, value) {
                 for (var i = 0; i < object[field].length; i++) {
                     index = i
                     if (object[field][i].UUID == value.UUID) {
-                        isExist = true
+                        if (object[field][i].IsInit && value.IsInit) {
+                            isExist = true
+                        }
                         break
                     }
                 }
@@ -1667,7 +1669,7 @@ function setObjectValues(object, values) {
 
     // Set the initialyse object.
     server.entityManager.setEntity(object)
-    
+
     // Call the init callback.
     if (object.initCallback != undefined) {
         object.initCallback(object)

@@ -1,7 +1,7 @@
 
 // global variable.
 var databaseName = "Blog."
-var schemaId = ""//"dbo."
+var schemaId = "dbo."
 
 var userTypeName = databaseName + schemaId + "blog_user"
 var authorTypeName = databaseName + schemaId + "blog_author"

@@ -7145,7 +7145,18 @@ func CargoEntitiesAccountExists(val string) string {
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(CargoEntitiesDB, string(queryStr), fieldsType, params)
 	if err != nil || len(results) == 0 {
-		return ""
+		var query EntityQuery
+		query.TypeName = "CargoEntities.Account"
+		query.Indexs = append(query.Indexs, "M_name="+val)
+		query.Fields = append(query.Fields, "UUID")
+		var fieldsType []interface{} // not use...
+		var params []interface{}
+		queryStr, _ := json.Marshal(query)
+		results, err := GetServer().GetDataManager().readData(CargoEntitiesDB, string(queryStr), fieldsType, params)
+		if err != nil || len(results) == 0 {
+			return ""
+		}
+		return results[0][0].(string)
 	}
 	return results[0][0].(string)
 }

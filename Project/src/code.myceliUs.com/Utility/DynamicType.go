@@ -66,7 +66,6 @@ func toInt(value interface{}) int {
 	case float32:
 		return int(value.(float32))
 	default:
-		log.Println("type not found with type name ", reflect.TypeOf(value).String())
 		return 0
 	}
 }
@@ -84,7 +83,11 @@ func initializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
 		// I that case I will
 		v = reflect.ValueOf(value.(string))
 	case reflect.Bool:
-		v = reflect.ValueOf(value.(bool))
+		if value != nil {
+			v = reflect.ValueOf(value.(bool))
+		} else {
+			v = reflect.ValueOf(false)
+		}
 	case reflect.Int:
 		v = reflect.ValueOf(toInt(value))
 	case reflect.Int8:

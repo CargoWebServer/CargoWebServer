@@ -139,10 +139,11 @@ func (self *Action) GetSessionId() string {
 /**
  * Execute a vb script.
  */
-func (self *Action) ExecuteVbScript(scriptName string) []string {
+func (self *Action) ExecuteVbScript(scriptName string, args []string) []string {
 
+	//log.Println("----------> run ", scriptName, "args: ", args)
 	// Run the given script on the server side.
-	results, err := GetServer().runVbs(scriptName)
+	results, err := GetServer().runVbs(scriptName, args)
 
 	// Get the session id and the message id...
 	if err != nil {

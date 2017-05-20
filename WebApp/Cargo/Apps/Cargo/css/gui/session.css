@@ -101,8 +101,9 @@
 
 /** The panel that contain menu **/
 .session_display_panel {
+	height: 500px;
+    overflow-y: auto;
 	min-width: 200px;
-	overflow-y: auto;
 	font-size: 10pt;
 	overflow: hidden;
 	font-family: Arial, Helvetica, sans-serif;

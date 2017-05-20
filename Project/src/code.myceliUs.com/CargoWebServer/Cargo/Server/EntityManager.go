@@ -164,6 +164,7 @@ func (this *EntityManager) removeEntity(uuid string) {
 func (this *EntityManager) deleteEntity(toDelete Entity) {
 	// first of all i will remove it from the cache.
 	this.removeEntity(toDelete.GetUuid())
+
 	storeId := toDelete.GetTypeName()[0:strings.Index(toDelete.GetTypeName(), ".")]
 	if reflect.TypeOf(GetServer().GetDataManager().getDataStore(storeId)).String() == "*Server.SqlDataStore" {
 		// I will try to found the prototype inside sql_info instead.
@@ -357,7 +358,7 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 	// here we have a static object...
 	prototype := target.GetPrototype()
 	if prototype == nil {
-		log.Println("------------------------------> ", target)
+		log.Println("No prototype found for ----> ", target)
 	}
 
 	// The need save evaluation...
@@ -649,9 +650,9 @@ func (this *EntityManager) getEntityById(storeId string, typeName string, ids []
 		query.Fields = append(query.Fields, "UUID")
 		var fieldsType []interface{} // not used
 		var params []interface{}
-		
-		if len(ids) != len(prototype.Ids) - 1 {
-			cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Unexpecter number of ids got " + strconv.Itoa(len(ids)) + " expected "+ strconv.Itoa(len(prototype.Ids)) ))
+
+		if len(ids) != len(prototype.Ids)-1 {
+			cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Unexpecter number of ids got "+strconv.Itoa(len(ids))+" expected "+strconv.Itoa(len(prototype.Ids))))
 			return nil, cargoError
 		}
 
@@ -1004,6 +1005,8 @@ func (this *EntityManager) appendReferenced(name string, ownerId string, value s
 		// Append the referenced here...
 		this.referenced[targetId] = append(this.referenced[targetId], ref)
 	}
+
+	log.Println("---------> referenced ", len(this.referenced))
 }
 
 // used by dynamic entity only...
@@ -1066,7 +1069,6 @@ func (this *EntityManager) saveReferenced(entity Entity) {
 				}
 
 			}
-
 		}
 	}
 

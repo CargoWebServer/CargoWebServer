@@ -33,7 +33,6 @@
 
 /** Buttons of the dialog **/
 .dialog_buttons{
-	position: absolute;
 	display: table;
 	vertical-align: middle;
 	top: 1px;

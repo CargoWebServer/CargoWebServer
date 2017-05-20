@@ -756,6 +756,59 @@ func (this *FileManager) createThumbnail(file *os.File, thumbnailMaxHeight int, 
 // API
 ////////////////////////////////////////////////////////////////////////////////
 
+// Plain file...
+
+/**
+ * Read the content of a text file and return it.
+ */
+func (this *FileManager) ReadTextFile(filePath string, messageId string, sessionId string) string {
+	b, err := ioutil.ReadFile(filePath) // just pass the file name
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return ""
+	}
+	return string(b)
+}
+
+/**
+ * Read a csv file
+ */
+func (this *FileManager) ReadCsvFile(filePath string, messageId string, sessionId string) [][]string {
+	csvfile, err := os.Open(filePath)
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
+	reader := csv.NewReader(csvfile)
+	reader.FieldsPerRecord = -1 // see the Reader struct information below
+
+	rawCSVdata, err := reader.ReadAll()
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
+	return rawCSVdata
+}
+
+/**
+ * Delete a disck file.
+ */
+func (this *FileManager) RemoveFile(filePath string, messageId string, sessionId string) {
+
+	err := os.Remove(filePath)
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_DELETE_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+}
+
+// File entity...
+
 /**
  * Create a new directory and it's associated file entity on the server
  */

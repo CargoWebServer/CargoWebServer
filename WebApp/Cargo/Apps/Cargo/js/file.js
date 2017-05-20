@@ -364,7 +364,7 @@ function IsFileExist(fileName, filePath) {
  * @param {function} errorCallback In case of error.
  * @param {object} caller A place to store object from the request context and get it back from the response context.
  */
-FileManager.prototype.isFileExist = function (fileName, filePath, successCallback, errorCallback, caller) {
+FileManager.prototype.isFileExist = function (filename, filepath, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
     params.push(createRpcData(filename, "STRING", "filename"))
@@ -401,7 +401,7 @@ function DeleteFile(uuid) {
 }
 
 /**
- * Remove a file with a given uuid.
+ * Remove a file entity with a given uuid.
  * @param {string} uuid The file uuid.
  * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
  * @param {function} errorCallback In case of error.
@@ -414,6 +414,48 @@ FileManager.prototype.deleteFile = function (uuid, successCallback, errorCallbac
 
     server.executeJsFunction(
         DeleteFile.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback.
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * sever side code.
+ */
+function RemoveFile(filePath) {
+    var err
+    err = server.GetFileManager().RemoveFile(filePath, messageId, sessionId)
+    return err
+}
+
+/**
+ * Remove a file (not an entity) with a given path.
+ * @param {string} filePath The file path.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+FileManager.prototype.removeFile = function (filePath, successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = []
+    params.push(createRpcData(filePath, "STRING", "filePath"))
+
+    server.executeJsFunction(
+        RemoveFile.toString(), // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
