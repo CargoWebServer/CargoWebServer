@@ -4,11 +4,12 @@ package Server
 
 import (
 	"encoding/json"
-	//"log"
-	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
+	//"log"
+	"strings"
+	"unsafe"
 )
 
 /** Entity Prototype creation **/
@@ -17,13 +18,13 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "UUID")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "UUID")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -70,6 +71,8 @@ type Config_SmtpConfigurationEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.SmtpConfiguration
 }
@@ -134,6 +137,7 @@ func (this *EntityManager) NewConfigSmtpConfigurationEntity(parentUuid string, o
 		entity.object = object.(*Config.SmtpConfiguration)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.SmtpConfiguration"
 
 	entity.object.UUID = uuidStr
@@ -177,6 +181,10 @@ func (this *Config_SmtpConfigurationEntity) AppendReferenced(name string, owner 
 
 func (this *Config_SmtpConfigurationEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_SmtpConfigurationEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_SmtpConfigurationEntity) RemoveReferenced(name string, owner Entity) {
@@ -291,6 +299,10 @@ func (this *Config_SmtpConfigurationEntity) IsInit() bool {
 
 func (this *Config_SmtpConfigurationEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_SmtpConfigurationEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_SmtpConfigurationEntity) GetChecksum() string {
@@ -534,9 +546,9 @@ func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_SmtpConfigurationEntity) InitEntity(id string) error {
+func (this *Config_SmtpConfigurationEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_SmtpConfigurationEntity)
@@ -546,6 +558,7 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -721,7 +734,7 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -817,6 +830,8 @@ type Config_DataStoreConfigurationEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.DataStoreConfiguration
 }
@@ -881,6 +896,7 @@ func (this *EntityManager) NewConfigDataStoreConfigurationEntity(parentUuid stri
 		entity.object = object.(*Config.DataStoreConfiguration)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.DataStoreConfiguration"
 
 	entity.object.UUID = uuidStr
@@ -924,6 +940,10 @@ func (this *Config_DataStoreConfigurationEntity) AppendReferenced(name string, o
 
 func (this *Config_DataStoreConfigurationEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_DataStoreConfigurationEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_DataStoreConfigurationEntity) RemoveReferenced(name string, owner Entity) {
@@ -1038,6 +1058,10 @@ func (this *Config_DataStoreConfigurationEntity) IsInit() bool {
 
 func (this *Config_DataStoreConfigurationEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_DataStoreConfigurationEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_DataStoreConfigurationEntity) GetChecksum() string {
@@ -1315,9 +1339,9 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_DataStoreConfigurationEntity) InitEntity(id string) error {
+func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_DataStoreConfigurationEntity)
@@ -1327,6 +1351,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -1530,7 +1555,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -1626,6 +1651,8 @@ type Config_LdapConfigurationEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.LdapConfiguration
 }
@@ -1690,6 +1717,7 @@ func (this *EntityManager) NewConfigLdapConfigurationEntity(parentUuid string, o
 		entity.object = object.(*Config.LdapConfiguration)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.LdapConfiguration"
 
 	entity.object.UUID = uuidStr
@@ -1733,6 +1761,10 @@ func (this *Config_LdapConfigurationEntity) AppendReferenced(name string, owner 
 
 func (this *Config_LdapConfigurationEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_LdapConfigurationEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_LdapConfigurationEntity) RemoveReferenced(name string, owner Entity) {
@@ -1847,6 +1879,10 @@ func (this *Config_LdapConfigurationEntity) IsInit() bool {
 
 func (this *Config_LdapConfigurationEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_LdapConfigurationEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_LdapConfigurationEntity) GetChecksum() string {
@@ -2040,9 +2076,9 @@ func (this *Config_LdapConfigurationEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_LdapConfigurationEntity) InitEntity(id string) error {
+func (this *Config_LdapConfigurationEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_LdapConfigurationEntity)
@@ -2052,6 +2088,7 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -2180,7 +2217,7 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -2276,6 +2313,8 @@ type Config_OAuth2ClientEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.OAuth2Client
 }
@@ -2340,6 +2379,7 @@ func (this *EntityManager) NewConfigOAuth2ClientEntity(parentUuid string, object
 		entity.object = object.(*Config.OAuth2Client)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.OAuth2Client"
 
 	entity.object.UUID = uuidStr
@@ -2383,6 +2423,10 @@ func (this *Config_OAuth2ClientEntity) AppendReferenced(name string, owner Entit
 
 func (this *Config_OAuth2ClientEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_OAuth2ClientEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_OAuth2ClientEntity) RemoveReferenced(name string, owner Entity) {
@@ -2497,6 +2541,10 @@ func (this *Config_OAuth2ClientEntity) IsInit() bool {
 
 func (this *Config_OAuth2ClientEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_OAuth2ClientEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_OAuth2ClientEntity) GetChecksum() string {
@@ -2671,9 +2719,9 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
+func (this *Config_OAuth2ClientEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_OAuth2ClientEntity)
@@ -2683,6 +2731,7 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -2795,7 +2844,7 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -2891,6 +2940,8 @@ type Config_OAuth2AuthorizeEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.OAuth2Authorize
 }
@@ -2955,6 +3006,7 @@ func (this *EntityManager) NewConfigOAuth2AuthorizeEntity(parentUuid string, obj
 		entity.object = object.(*Config.OAuth2Authorize)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.OAuth2Authorize"
 
 	entity.object.UUID = uuidStr
@@ -2998,6 +3050,10 @@ func (this *Config_OAuth2AuthorizeEntity) AppendReferenced(name string, owner En
 
 func (this *Config_OAuth2AuthorizeEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_OAuth2AuthorizeEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_OAuth2AuthorizeEntity) RemoveReferenced(name string, owner Entity) {
@@ -3112,6 +3168,10 @@ func (this *Config_OAuth2AuthorizeEntity) IsInit() bool {
 
 func (this *Config_OAuth2AuthorizeEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_OAuth2AuthorizeEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_OAuth2AuthorizeEntity) GetChecksum() string {
@@ -3288,9 +3348,9 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string) error {
+func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_OAuth2AuthorizeEntity)
@@ -3300,6 +3360,7 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -3420,7 +3481,7 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -3516,6 +3577,8 @@ type Config_OAuth2IdTokenEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.OAuth2IdToken
 }
@@ -3580,6 +3643,7 @@ func (this *EntityManager) NewConfigOAuth2IdTokenEntity(parentUuid string, objec
 		entity.object = object.(*Config.OAuth2IdToken)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.OAuth2IdToken"
 
 	entity.object.UUID = uuidStr
@@ -3623,6 +3687,10 @@ func (this *Config_OAuth2IdTokenEntity) AppendReferenced(name string, owner Enti
 
 func (this *Config_OAuth2IdTokenEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_OAuth2IdTokenEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_OAuth2IdTokenEntity) RemoveReferenced(name string, owner Entity) {
@@ -3737,6 +3805,10 @@ func (this *Config_OAuth2IdTokenEntity) IsInit() bool {
 
 func (this *Config_OAuth2IdTokenEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_OAuth2IdTokenEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_OAuth2IdTokenEntity) GetChecksum() string {
@@ -3949,9 +4021,9 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_OAuth2IdTokenEntity) InitEntity(id string) error {
+func (this *Config_OAuth2IdTokenEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_OAuth2IdTokenEntity)
@@ -3961,6 +4033,7 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -4115,7 +4188,7 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -4211,6 +4284,8 @@ type Config_OAuth2AccessEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.OAuth2Access
 }
@@ -4275,6 +4350,7 @@ func (this *EntityManager) NewConfigOAuth2AccessEntity(parentUuid string, object
 		entity.object = object.(*Config.OAuth2Access)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.OAuth2Access"
 
 	entity.object.UUID = uuidStr
@@ -4318,6 +4394,10 @@ func (this *Config_OAuth2AccessEntity) AppendReferenced(name string, owner Entit
 
 func (this *Config_OAuth2AccessEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_OAuth2AccessEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_OAuth2AccessEntity) RemoveReferenced(name string, owner Entity) {
@@ -4432,6 +4512,10 @@ func (this *Config_OAuth2AccessEntity) IsInit() bool {
 
 func (this *Config_OAuth2AccessEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_OAuth2AccessEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_OAuth2AccessEntity) GetChecksum() string {
@@ -4636,9 +4720,9 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_OAuth2AccessEntity) InitEntity(id string) error {
+func (this *Config_OAuth2AccessEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_OAuth2AccessEntity)
@@ -4648,6 +4732,7 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -4802,7 +4887,7 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -4898,6 +4983,8 @@ type Config_OAuth2RefreshEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.OAuth2Refresh
 }
@@ -4962,6 +5049,7 @@ func (this *EntityManager) NewConfigOAuth2RefreshEntity(parentUuid string, objec
 		entity.object = object.(*Config.OAuth2Refresh)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.OAuth2Refresh"
 
 	entity.object.UUID = uuidStr
@@ -5005,6 +5093,10 @@ func (this *Config_OAuth2RefreshEntity) AppendReferenced(name string, owner Enti
 
 func (this *Config_OAuth2RefreshEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_OAuth2RefreshEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_OAuth2RefreshEntity) RemoveReferenced(name string, owner Entity) {
@@ -5119,6 +5211,10 @@ func (this *Config_OAuth2RefreshEntity) IsInit() bool {
 
 func (this *Config_OAuth2RefreshEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_OAuth2RefreshEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_OAuth2RefreshEntity) GetChecksum() string {
@@ -5271,9 +5367,9 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_OAuth2RefreshEntity) InitEntity(id string) error {
+func (this *Config_OAuth2RefreshEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_OAuth2RefreshEntity)
@@ -5283,6 +5379,7 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -5377,7 +5474,7 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -5473,6 +5570,8 @@ type Config_OAuth2ExpiresEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.OAuth2Expires
 }
@@ -5537,6 +5636,7 @@ func (this *EntityManager) NewConfigOAuth2ExpiresEntity(parentUuid string, objec
 		entity.object = object.(*Config.OAuth2Expires)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.OAuth2Expires"
 
 	entity.object.UUID = uuidStr
@@ -5580,6 +5680,10 @@ func (this *Config_OAuth2ExpiresEntity) AppendReferenced(name string, owner Enti
 
 func (this *Config_OAuth2ExpiresEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_OAuth2ExpiresEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_OAuth2ExpiresEntity) RemoveReferenced(name string, owner Entity) {
@@ -5694,6 +5798,10 @@ func (this *Config_OAuth2ExpiresEntity) IsInit() bool {
 
 func (this *Config_OAuth2ExpiresEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_OAuth2ExpiresEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_OAuth2ExpiresEntity) GetChecksum() string {
@@ -5844,9 +5952,9 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_OAuth2ExpiresEntity) InitEntity(id string) error {
+func (this *Config_OAuth2ExpiresEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_OAuth2ExpiresEntity)
@@ -5856,6 +5964,7 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -5944,7 +6053,7 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -6040,6 +6149,8 @@ type Config_OAuth2ConfigurationEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.OAuth2Configuration
 }
@@ -6104,6 +6215,7 @@ func (this *EntityManager) NewConfigOAuth2ConfigurationEntity(parentUuid string,
 		entity.object = object.(*Config.OAuth2Configuration)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.OAuth2Configuration"
 
 	entity.object.UUID = uuidStr
@@ -6147,6 +6259,10 @@ func (this *Config_OAuth2ConfigurationEntity) AppendReferenced(name string, owne
 
 func (this *Config_OAuth2ConfigurationEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_OAuth2ConfigurationEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_OAuth2ConfigurationEntity) RemoveReferenced(name string, owner Entity) {
@@ -6261,6 +6377,10 @@ func (this *Config_OAuth2ConfigurationEntity) IsInit() bool {
 
 func (this *Config_OAuth2ConfigurationEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_OAuth2ConfigurationEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_OAuth2ConfigurationEntity) GetChecksum() string {
@@ -6470,84 +6590,114 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 
 	/** Save clients type OAuth2Client **/
 	clientsIds := make([]string, 0)
-	for i := 0; i < len(this.object.M_clients); i++ {
-		clientsEntity := GetServer().GetEntityManager().NewConfigOAuth2ClientEntity(this.GetUuid(), this.object.M_clients[i].UUID, this.object.M_clients[i])
-		clientsIds = append(clientsIds, clientsEntity.uuid)
-		clientsEntity.AppendReferenced("clients", this)
-		this.AppendChild("clients", clientsEntity)
-		if clientsEntity.NeedSave() {
-			clientsEntity.SaveEntity()
+	lazy_clients := this.lazyMap["M_clients"] != nil && len(this.object.M_clients) == 0
+	if !lazy_clients {
+		for i := 0; i < len(this.object.M_clients); i++ {
+			clientsEntity := GetServer().GetEntityManager().NewConfigOAuth2ClientEntity(this.GetUuid(), this.object.M_clients[i].UUID, this.object.M_clients[i])
+			clientsIds = append(clientsIds, clientsEntity.uuid)
+			clientsEntity.AppendReferenced("clients", this)
+			this.AppendChild("clients", clientsEntity)
+			if clientsEntity.NeedSave() {
+				clientsEntity.SaveEntity()
+			}
 		}
+	} else {
+		clientsIds = this.lazyMap["M_clients"].([]string)
 	}
 	clientsStr, _ := json.Marshal(clientsIds)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(clientsStr))
 
 	/** Save authorize type OAuth2Authorize **/
 	authorizeIds := make([]string, 0)
-	for i := 0; i < len(this.object.M_authorize); i++ {
-		authorizeEntity := GetServer().GetEntityManager().NewConfigOAuth2AuthorizeEntity(this.GetUuid(), this.object.M_authorize[i].UUID, this.object.M_authorize[i])
-		authorizeIds = append(authorizeIds, authorizeEntity.uuid)
-		authorizeEntity.AppendReferenced("authorize", this)
-		this.AppendChild("authorize", authorizeEntity)
-		if authorizeEntity.NeedSave() {
-			authorizeEntity.SaveEntity()
+	lazy_authorize := this.lazyMap["M_authorize"] != nil && len(this.object.M_authorize) == 0
+	if !lazy_authorize {
+		for i := 0; i < len(this.object.M_authorize); i++ {
+			authorizeEntity := GetServer().GetEntityManager().NewConfigOAuth2AuthorizeEntity(this.GetUuid(), this.object.M_authorize[i].UUID, this.object.M_authorize[i])
+			authorizeIds = append(authorizeIds, authorizeEntity.uuid)
+			authorizeEntity.AppendReferenced("authorize", this)
+			this.AppendChild("authorize", authorizeEntity)
+			if authorizeEntity.NeedSave() {
+				authorizeEntity.SaveEntity()
+			}
 		}
+	} else {
+		authorizeIds = this.lazyMap["M_authorize"].([]string)
 	}
 	authorizeStr, _ := json.Marshal(authorizeIds)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(authorizeStr))
 
 	/** Save access type OAuth2Access **/
 	accessIds := make([]string, 0)
-	for i := 0; i < len(this.object.M_access); i++ {
-		accessEntity := GetServer().GetEntityManager().NewConfigOAuth2AccessEntity(this.GetUuid(), this.object.M_access[i].UUID, this.object.M_access[i])
-		accessIds = append(accessIds, accessEntity.uuid)
-		accessEntity.AppendReferenced("access", this)
-		this.AppendChild("access", accessEntity)
-		if accessEntity.NeedSave() {
-			accessEntity.SaveEntity()
+	lazy_access := this.lazyMap["M_access"] != nil && len(this.object.M_access) == 0
+	if !lazy_access {
+		for i := 0; i < len(this.object.M_access); i++ {
+			accessEntity := GetServer().GetEntityManager().NewConfigOAuth2AccessEntity(this.GetUuid(), this.object.M_access[i].UUID, this.object.M_access[i])
+			accessIds = append(accessIds, accessEntity.uuid)
+			accessEntity.AppendReferenced("access", this)
+			this.AppendChild("access", accessEntity)
+			if accessEntity.NeedSave() {
+				accessEntity.SaveEntity()
+			}
 		}
+	} else {
+		accessIds = this.lazyMap["M_access"].([]string)
 	}
 	accessStr, _ := json.Marshal(accessIds)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(accessStr))
 
 	/** Save ids type OAuth2IdToken **/
 	idsIds := make([]string, 0)
-	for i := 0; i < len(this.object.M_ids); i++ {
-		idsEntity := GetServer().GetEntityManager().NewConfigOAuth2IdTokenEntity(this.GetUuid(), this.object.M_ids[i].UUID, this.object.M_ids[i])
-		idsIds = append(idsIds, idsEntity.uuid)
-		idsEntity.AppendReferenced("ids", this)
-		this.AppendChild("ids", idsEntity)
-		if idsEntity.NeedSave() {
-			idsEntity.SaveEntity()
+	lazy_ids := this.lazyMap["M_ids"] != nil && len(this.object.M_ids) == 0
+	if !lazy_ids {
+		for i := 0; i < len(this.object.M_ids); i++ {
+			idsEntity := GetServer().GetEntityManager().NewConfigOAuth2IdTokenEntity(this.GetUuid(), this.object.M_ids[i].UUID, this.object.M_ids[i])
+			idsIds = append(idsIds, idsEntity.uuid)
+			idsEntity.AppendReferenced("ids", this)
+			this.AppendChild("ids", idsEntity)
+			if idsEntity.NeedSave() {
+				idsEntity.SaveEntity()
+			}
 		}
+	} else {
+		idsIds = this.lazyMap["M_ids"].([]string)
 	}
 	idsStr, _ := json.Marshal(idsIds)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(idsStr))
 
 	/** Save refresh type OAuth2Refresh **/
 	refreshIds := make([]string, 0)
-	for i := 0; i < len(this.object.M_refresh); i++ {
-		refreshEntity := GetServer().GetEntityManager().NewConfigOAuth2RefreshEntity(this.GetUuid(), this.object.M_refresh[i].UUID, this.object.M_refresh[i])
-		refreshIds = append(refreshIds, refreshEntity.uuid)
-		refreshEntity.AppendReferenced("refresh", this)
-		this.AppendChild("refresh", refreshEntity)
-		if refreshEntity.NeedSave() {
-			refreshEntity.SaveEntity()
+	lazy_refresh := this.lazyMap["M_refresh"] != nil && len(this.object.M_refresh) == 0
+	if !lazy_refresh {
+		for i := 0; i < len(this.object.M_refresh); i++ {
+			refreshEntity := GetServer().GetEntityManager().NewConfigOAuth2RefreshEntity(this.GetUuid(), this.object.M_refresh[i].UUID, this.object.M_refresh[i])
+			refreshIds = append(refreshIds, refreshEntity.uuid)
+			refreshEntity.AppendReferenced("refresh", this)
+			this.AppendChild("refresh", refreshEntity)
+			if refreshEntity.NeedSave() {
+				refreshEntity.SaveEntity()
+			}
 		}
+	} else {
+		refreshIds = this.lazyMap["M_refresh"].([]string)
 	}
 	refreshStr, _ := json.Marshal(refreshIds)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(refreshStr))
 
 	/** Save expire type OAuth2Expires **/
 	expireIds := make([]string, 0)
-	for i := 0; i < len(this.object.M_expire); i++ {
-		expireEntity := GetServer().GetEntityManager().NewConfigOAuth2ExpiresEntity(this.GetUuid(), this.object.M_expire[i].UUID, this.object.M_expire[i])
-		expireIds = append(expireIds, expireEntity.uuid)
-		expireEntity.AppendReferenced("expire", this)
-		this.AppendChild("expire", expireEntity)
-		if expireEntity.NeedSave() {
-			expireEntity.SaveEntity()
+	lazy_expire := this.lazyMap["M_expire"] != nil && len(this.object.M_expire) == 0
+	if !lazy_expire {
+		for i := 0; i < len(this.object.M_expire); i++ {
+			expireEntity := GetServer().GetEntityManager().NewConfigOAuth2ExpiresEntity(this.GetUuid(), this.object.M_expire[i].UUID, this.object.M_expire[i])
+			expireIds = append(expireIds, expireEntity.uuid)
+			expireEntity.AppendReferenced("expire", this)
+			this.AppendChild("expire", expireEntity)
+			if expireEntity.NeedSave() {
+				expireEntity.SaveEntity()
+			}
 		}
+	} else {
+		expireIds = this.lazyMap["M_expire"].([]string)
 	}
 	expireStr, _ := json.Marshal(expireIds)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(expireStr))
@@ -6586,9 +6736,9 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
+func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_OAuth2ConfigurationEntity)
@@ -6598,6 +6748,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -6722,17 +6873,21 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 				return err
 			}
 			for i := 0; i < len(uuids); i++ {
-				if len(uuids[i]) > 0 {
-					var clientsEntity *Config_OAuth2ClientEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-						clientsEntity = instance.(*Config_OAuth2ClientEntity)
-					} else {
-						clientsEntity = GetServer().GetEntityManager().NewConfigOAuth2ClientEntity(this.GetUuid(), uuids[i], nil)
-						clientsEntity.InitEntity(uuids[i])
-						GetServer().GetEntityManager().insert(clientsEntity)
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var clientsEntity *Config_OAuth2ClientEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							clientsEntity = instance.(*Config_OAuth2ClientEntity)
+						} else {
+							clientsEntity = GetServer().GetEntityManager().NewConfigOAuth2ClientEntity(this.GetUuid(), uuids[i], nil)
+							clientsEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(clientsEntity)
+						}
+						clientsEntity.AppendReferenced("clients", this)
+						this.AppendChild("clients", clientsEntity)
 					}
-					clientsEntity.AppendReferenced("clients", this)
-					this.AppendChild("clients", clientsEntity)
+				} else {
+					this.lazyMap["M_clients"] = uuids
 				}
 			}
 		}
@@ -6746,17 +6901,21 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 				return err
 			}
 			for i := 0; i < len(uuids); i++ {
-				if len(uuids[i]) > 0 {
-					var authorizeEntity *Config_OAuth2AuthorizeEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-						authorizeEntity = instance.(*Config_OAuth2AuthorizeEntity)
-					} else {
-						authorizeEntity = GetServer().GetEntityManager().NewConfigOAuth2AuthorizeEntity(this.GetUuid(), uuids[i], nil)
-						authorizeEntity.InitEntity(uuids[i])
-						GetServer().GetEntityManager().insert(authorizeEntity)
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var authorizeEntity *Config_OAuth2AuthorizeEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							authorizeEntity = instance.(*Config_OAuth2AuthorizeEntity)
+						} else {
+							authorizeEntity = GetServer().GetEntityManager().NewConfigOAuth2AuthorizeEntity(this.GetUuid(), uuids[i], nil)
+							authorizeEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(authorizeEntity)
+						}
+						authorizeEntity.AppendReferenced("authorize", this)
+						this.AppendChild("authorize", authorizeEntity)
 					}
-					authorizeEntity.AppendReferenced("authorize", this)
-					this.AppendChild("authorize", authorizeEntity)
+				} else {
+					this.lazyMap["M_authorize"] = uuids
 				}
 			}
 		}
@@ -6770,17 +6929,21 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 				return err
 			}
 			for i := 0; i < len(uuids); i++ {
-				if len(uuids[i]) > 0 {
-					var accessEntity *Config_OAuth2AccessEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-						accessEntity = instance.(*Config_OAuth2AccessEntity)
-					} else {
-						accessEntity = GetServer().GetEntityManager().NewConfigOAuth2AccessEntity(this.GetUuid(), uuids[i], nil)
-						accessEntity.InitEntity(uuids[i])
-						GetServer().GetEntityManager().insert(accessEntity)
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var accessEntity *Config_OAuth2AccessEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							accessEntity = instance.(*Config_OAuth2AccessEntity)
+						} else {
+							accessEntity = GetServer().GetEntityManager().NewConfigOAuth2AccessEntity(this.GetUuid(), uuids[i], nil)
+							accessEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(accessEntity)
+						}
+						accessEntity.AppendReferenced("access", this)
+						this.AppendChild("access", accessEntity)
 					}
-					accessEntity.AppendReferenced("access", this)
-					this.AppendChild("access", accessEntity)
+				} else {
+					this.lazyMap["M_access"] = uuids
 				}
 			}
 		}
@@ -6794,17 +6957,21 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 				return err
 			}
 			for i := 0; i < len(uuids); i++ {
-				if len(uuids[i]) > 0 {
-					var idsEntity *Config_OAuth2IdTokenEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-						idsEntity = instance.(*Config_OAuth2IdTokenEntity)
-					} else {
-						idsEntity = GetServer().GetEntityManager().NewConfigOAuth2IdTokenEntity(this.GetUuid(), uuids[i], nil)
-						idsEntity.InitEntity(uuids[i])
-						GetServer().GetEntityManager().insert(idsEntity)
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var idsEntity *Config_OAuth2IdTokenEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							idsEntity = instance.(*Config_OAuth2IdTokenEntity)
+						} else {
+							idsEntity = GetServer().GetEntityManager().NewConfigOAuth2IdTokenEntity(this.GetUuid(), uuids[i], nil)
+							idsEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(idsEntity)
+						}
+						idsEntity.AppendReferenced("ids", this)
+						this.AppendChild("ids", idsEntity)
 					}
-					idsEntity.AppendReferenced("ids", this)
-					this.AppendChild("ids", idsEntity)
+				} else {
+					this.lazyMap["M_ids"] = uuids
 				}
 			}
 		}
@@ -6818,17 +6985,21 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 				return err
 			}
 			for i := 0; i < len(uuids); i++ {
-				if len(uuids[i]) > 0 {
-					var refreshEntity *Config_OAuth2RefreshEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-						refreshEntity = instance.(*Config_OAuth2RefreshEntity)
-					} else {
-						refreshEntity = GetServer().GetEntityManager().NewConfigOAuth2RefreshEntity(this.GetUuid(), uuids[i], nil)
-						refreshEntity.InitEntity(uuids[i])
-						GetServer().GetEntityManager().insert(refreshEntity)
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var refreshEntity *Config_OAuth2RefreshEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							refreshEntity = instance.(*Config_OAuth2RefreshEntity)
+						} else {
+							refreshEntity = GetServer().GetEntityManager().NewConfigOAuth2RefreshEntity(this.GetUuid(), uuids[i], nil)
+							refreshEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(refreshEntity)
+						}
+						refreshEntity.AppendReferenced("refresh", this)
+						this.AppendChild("refresh", refreshEntity)
 					}
-					refreshEntity.AppendReferenced("refresh", this)
-					this.AppendChild("refresh", refreshEntity)
+				} else {
+					this.lazyMap["M_refresh"] = uuids
 				}
 			}
 		}
@@ -6842,17 +7013,21 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 				return err
 			}
 			for i := 0; i < len(uuids); i++ {
-				if len(uuids[i]) > 0 {
-					var expireEntity *Config_OAuth2ExpiresEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-						expireEntity = instance.(*Config_OAuth2ExpiresEntity)
-					} else {
-						expireEntity = GetServer().GetEntityManager().NewConfigOAuth2ExpiresEntity(this.GetUuid(), uuids[i], nil)
-						expireEntity.InitEntity(uuids[i])
-						GetServer().GetEntityManager().insert(expireEntity)
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var expireEntity *Config_OAuth2ExpiresEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							expireEntity = instance.(*Config_OAuth2ExpiresEntity)
+						} else {
+							expireEntity = GetServer().GetEntityManager().NewConfigOAuth2ExpiresEntity(this.GetUuid(), uuids[i], nil)
+							expireEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(expireEntity)
+						}
+						expireEntity.AppendReferenced("expire", this)
+						this.AppendChild("expire", expireEntity)
 					}
-					expireEntity.AppendReferenced("expire", this)
-					this.AppendChild("expire", expireEntity)
+				} else {
+					this.lazyMap["M_expire"] = uuids
 				}
 			}
 		}
@@ -6894,7 +7069,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -6990,6 +7165,8 @@ type Config_ServiceConfigurationEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.ServiceConfiguration
 }
@@ -7054,6 +7231,7 @@ func (this *EntityManager) NewConfigServiceConfigurationEntity(parentUuid string
 		entity.object = object.(*Config.ServiceConfiguration)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.ServiceConfiguration"
 
 	entity.object.UUID = uuidStr
@@ -7097,6 +7275,10 @@ func (this *Config_ServiceConfigurationEntity) AppendReferenced(name string, own
 
 func (this *Config_ServiceConfigurationEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_ServiceConfigurationEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_ServiceConfigurationEntity) RemoveReferenced(name string, owner Entity) {
@@ -7211,6 +7393,10 @@ func (this *Config_ServiceConfigurationEntity) IsInit() bool {
 
 func (this *Config_ServiceConfigurationEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_ServiceConfigurationEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_ServiceConfigurationEntity) GetChecksum() string {
@@ -7398,9 +7584,9 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_ServiceConfigurationEntity) InitEntity(id string) error {
+func (this *Config_ServiceConfigurationEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_ServiceConfigurationEntity)
@@ -7410,6 +7596,7 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -7532,7 +7719,7 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -7628,6 +7815,8 @@ type Config_ApplicationConfigurationEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.ApplicationConfiguration
 }
@@ -7692,6 +7881,7 @@ func (this *EntityManager) NewConfigApplicationConfigurationEntity(parentUuid st
 		entity.object = object.(*Config.ApplicationConfiguration)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.ApplicationConfiguration"
 
 	entity.object.UUID = uuidStr
@@ -7735,6 +7925,10 @@ func (this *Config_ApplicationConfigurationEntity) AppendReferenced(name string,
 
 func (this *Config_ApplicationConfigurationEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_ApplicationConfigurationEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_ApplicationConfigurationEntity) RemoveReferenced(name string, owner Entity) {
@@ -7849,6 +8043,10 @@ func (this *Config_ApplicationConfigurationEntity) IsInit() bool {
 
 func (this *Config_ApplicationConfigurationEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_ApplicationConfigurationEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_ApplicationConfigurationEntity) GetChecksum() string {
@@ -8006,9 +8204,9 @@ func (this *Config_ApplicationConfigurationEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_ApplicationConfigurationEntity) InitEntity(id string) error {
+func (this *Config_ApplicationConfigurationEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_ApplicationConfigurationEntity)
@@ -8018,6 +8216,7 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -8110,7 +8309,7 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -8206,6 +8405,8 @@ type Config_ServerConfigurationEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.ServerConfiguration
 }
@@ -8270,6 +8471,7 @@ func (this *EntityManager) NewConfigServerConfigurationEntity(parentUuid string,
 		entity.object = object.(*Config.ServerConfiguration)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.ServerConfiguration"
 
 	entity.object.UUID = uuidStr
@@ -8313,6 +8515,10 @@ func (this *Config_ServerConfigurationEntity) AppendReferenced(name string, owne
 
 func (this *Config_ServerConfigurationEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_ServerConfigurationEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_ServerConfigurationEntity) RemoveReferenced(name string, owner Entity) {
@@ -8427,6 +8633,10 @@ func (this *Config_ServerConfigurationEntity) IsInit() bool {
 
 func (this *Config_ServerConfigurationEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_ServerConfigurationEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_ServerConfigurationEntity) GetChecksum() string {
@@ -8650,9 +8860,9 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_ServerConfigurationEntity) InitEntity(id string) error {
+func (this *Config_ServerConfigurationEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_ServerConfigurationEntity)
@@ -8662,6 +8872,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -8820,7 +9031,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 
@@ -8916,6 +9127,8 @@ type Config_ConfigurationsEntity struct {
 	referencesUuid []string
 	referencesPtr  []Entity
 	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
 	referenced     []EntityRef
 	object         *Config.Configurations
 }
@@ -8980,6 +9193,7 @@ func (this *EntityManager) NewConfigConfigurationsEntity(parentUuid string, obje
 		entity.object = object.(*Config.Configurations)
 		entity.SetNeedSave(true)
 	}
+	entity.lazyMap = make(map[string]interface{})
 	entity.object.TYPENAME = "Config.Configurations"
 
 	entity.object.UUID = uuidStr
@@ -9023,6 +9237,10 @@ func (this *Config_ConfigurationsEntity) AppendReferenced(name string, owner Ent
 
 func (this *Config_ConfigurationsEntity) GetReferenced() []EntityRef {
 	return this.referenced
+}
+
+func (this *Config_ConfigurationsEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
 }
 
 func (this *Config_ConfigurationsEntity) RemoveReferenced(name string, owner Entity) {
@@ -9137,6 +9355,10 @@ func (this *Config_ConfigurationsEntity) IsInit() bool {
 
 func (this *Config_ConfigurationsEntity) SetInit(isInit bool) {
 	this.object.IsInit = isInit
+}
+
+func (this *Config_ConfigurationsEntity) IsLazy() bool {
+	return this.lazy
 }
 
 func (this *Config_ConfigurationsEntity) GetChecksum() string {
@@ -9292,7 +9514,8 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	ConfigurationsInfo = append(ConfigurationsInfo, this.object.M_filePath)
 
 	/** Save serverConfig type ServerConfiguration **/
-	if this.object.M_serverConfig != nil {
+	lazy_serverConfig := this.lazyMap["M_serverConfig"] != nil && this.object.M_serverConfig == nil
+	if this.object.M_serverConfig != nil && !lazy_serverConfig {
 		serverConfigEntity := GetServer().GetEntityManager().NewConfigServerConfigurationEntity(this.GetUuid(), this.object.M_serverConfig.UUID, this.object.M_serverConfig)
 		ConfigurationsInfo = append(ConfigurationsInfo, serverConfigEntity.uuid)
 		serverConfigEntity.AppendReferenced("serverConfig", this)
@@ -9300,12 +9523,15 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 		if serverConfigEntity.NeedSave() {
 			serverConfigEntity.SaveEntity()
 		}
-	} else {
+	} else if lazy_serverConfig {
+		ConfigurationsInfo = append(ConfigurationsInfo, this.lazyMap["M_serverConfig"].(string))
+	} else if this.object.M_serverConfig == nil {
 		ConfigurationsInfo = append(ConfigurationsInfo, "")
 	}
 
 	/** Save oauth2Configuration type OAuth2Configuration **/
-	if this.object.M_oauth2Configuration != nil {
+	lazy_oauth2Configuration := this.lazyMap["M_oauth2Configuration"] != nil && this.object.M_oauth2Configuration == nil
+	if this.object.M_oauth2Configuration != nil && !lazy_oauth2Configuration {
 		oauth2ConfigurationEntity := GetServer().GetEntityManager().NewConfigOAuth2ConfigurationEntity(this.GetUuid(), this.object.M_oauth2Configuration.UUID, this.object.M_oauth2Configuration)
 		ConfigurationsInfo = append(ConfigurationsInfo, oauth2ConfigurationEntity.uuid)
 		oauth2ConfigurationEntity.AppendReferenced("oauth2Configuration", this)
@@ -9313,76 +9539,103 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 		if oauth2ConfigurationEntity.NeedSave() {
 			oauth2ConfigurationEntity.SaveEntity()
 		}
-	} else {
+	} else if lazy_oauth2Configuration {
+		ConfigurationsInfo = append(ConfigurationsInfo, this.lazyMap["M_oauth2Configuration"].(string))
+	} else if this.object.M_oauth2Configuration == nil {
 		ConfigurationsInfo = append(ConfigurationsInfo, "")
 	}
 
 	/** Save serviceConfigs type ServiceConfiguration **/
 	serviceConfigsIds := make([]string, 0)
-	for i := 0; i < len(this.object.M_serviceConfigs); i++ {
-		serviceConfigsEntity := GetServer().GetEntityManager().NewConfigServiceConfigurationEntity(this.GetUuid(), this.object.M_serviceConfigs[i].UUID, this.object.M_serviceConfigs[i])
-		serviceConfigsIds = append(serviceConfigsIds, serviceConfigsEntity.uuid)
-		serviceConfigsEntity.AppendReferenced("serviceConfigs", this)
-		this.AppendChild("serviceConfigs", serviceConfigsEntity)
-		if serviceConfigsEntity.NeedSave() {
-			serviceConfigsEntity.SaveEntity()
+	lazy_serviceConfigs := this.lazyMap["M_serviceConfigs"] != nil && len(this.object.M_serviceConfigs) == 0
+	if !lazy_serviceConfigs {
+		for i := 0; i < len(this.object.M_serviceConfigs); i++ {
+			serviceConfigsEntity := GetServer().GetEntityManager().NewConfigServiceConfigurationEntity(this.GetUuid(), this.object.M_serviceConfigs[i].UUID, this.object.M_serviceConfigs[i])
+			serviceConfigsIds = append(serviceConfigsIds, serviceConfigsEntity.uuid)
+			serviceConfigsEntity.AppendReferenced("serviceConfigs", this)
+			this.AppendChild("serviceConfigs", serviceConfigsEntity)
+			if serviceConfigsEntity.NeedSave() {
+				serviceConfigsEntity.SaveEntity()
+			}
 		}
+	} else {
+		serviceConfigsIds = this.lazyMap["M_serviceConfigs"].([]string)
 	}
 	serviceConfigsStr, _ := json.Marshal(serviceConfigsIds)
 	ConfigurationsInfo = append(ConfigurationsInfo, string(serviceConfigsStr))
 
 	/** Save dataStoreConfigs type DataStoreConfiguration **/
 	dataStoreConfigsIds := make([]string, 0)
-	for i := 0; i < len(this.object.M_dataStoreConfigs); i++ {
-		dataStoreConfigsEntity := GetServer().GetEntityManager().NewConfigDataStoreConfigurationEntity(this.GetUuid(), this.object.M_dataStoreConfigs[i].UUID, this.object.M_dataStoreConfigs[i])
-		dataStoreConfigsIds = append(dataStoreConfigsIds, dataStoreConfigsEntity.uuid)
-		dataStoreConfigsEntity.AppendReferenced("dataStoreConfigs", this)
-		this.AppendChild("dataStoreConfigs", dataStoreConfigsEntity)
-		if dataStoreConfigsEntity.NeedSave() {
-			dataStoreConfigsEntity.SaveEntity()
+	lazy_dataStoreConfigs := this.lazyMap["M_dataStoreConfigs"] != nil && len(this.object.M_dataStoreConfigs) == 0
+	if !lazy_dataStoreConfigs {
+		for i := 0; i < len(this.object.M_dataStoreConfigs); i++ {
+			dataStoreConfigsEntity := GetServer().GetEntityManager().NewConfigDataStoreConfigurationEntity(this.GetUuid(), this.object.M_dataStoreConfigs[i].UUID, this.object.M_dataStoreConfigs[i])
+			dataStoreConfigsIds = append(dataStoreConfigsIds, dataStoreConfigsEntity.uuid)
+			dataStoreConfigsEntity.AppendReferenced("dataStoreConfigs", this)
+			this.AppendChild("dataStoreConfigs", dataStoreConfigsEntity)
+			if dataStoreConfigsEntity.NeedSave() {
+				dataStoreConfigsEntity.SaveEntity()
+			}
 		}
+	} else {
+		dataStoreConfigsIds = this.lazyMap["M_dataStoreConfigs"].([]string)
 	}
 	dataStoreConfigsStr, _ := json.Marshal(dataStoreConfigsIds)
 	ConfigurationsInfo = append(ConfigurationsInfo, string(dataStoreConfigsStr))
 
 	/** Save smtpConfigs type SmtpConfiguration **/
 	smtpConfigsIds := make([]string, 0)
-	for i := 0; i < len(this.object.M_smtpConfigs); i++ {
-		smtpConfigsEntity := GetServer().GetEntityManager().NewConfigSmtpConfigurationEntity(this.GetUuid(), this.object.M_smtpConfigs[i].UUID, this.object.M_smtpConfigs[i])
-		smtpConfigsIds = append(smtpConfigsIds, smtpConfigsEntity.uuid)
-		smtpConfigsEntity.AppendReferenced("smtpConfigs", this)
-		this.AppendChild("smtpConfigs", smtpConfigsEntity)
-		if smtpConfigsEntity.NeedSave() {
-			smtpConfigsEntity.SaveEntity()
+	lazy_smtpConfigs := this.lazyMap["M_smtpConfigs"] != nil && len(this.object.M_smtpConfigs) == 0
+	if !lazy_smtpConfigs {
+		for i := 0; i < len(this.object.M_smtpConfigs); i++ {
+			smtpConfigsEntity := GetServer().GetEntityManager().NewConfigSmtpConfigurationEntity(this.GetUuid(), this.object.M_smtpConfigs[i].UUID, this.object.M_smtpConfigs[i])
+			smtpConfigsIds = append(smtpConfigsIds, smtpConfigsEntity.uuid)
+			smtpConfigsEntity.AppendReferenced("smtpConfigs", this)
+			this.AppendChild("smtpConfigs", smtpConfigsEntity)
+			if smtpConfigsEntity.NeedSave() {
+				smtpConfigsEntity.SaveEntity()
+			}
 		}
+	} else {
+		smtpConfigsIds = this.lazyMap["M_smtpConfigs"].([]string)
 	}
 	smtpConfigsStr, _ := json.Marshal(smtpConfigsIds)
 	ConfigurationsInfo = append(ConfigurationsInfo, string(smtpConfigsStr))
 
 	/** Save ldapConfigs type LdapConfiguration **/
 	ldapConfigsIds := make([]string, 0)
-	for i := 0; i < len(this.object.M_ldapConfigs); i++ {
-		ldapConfigsEntity := GetServer().GetEntityManager().NewConfigLdapConfigurationEntity(this.GetUuid(), this.object.M_ldapConfigs[i].UUID, this.object.M_ldapConfigs[i])
-		ldapConfigsIds = append(ldapConfigsIds, ldapConfigsEntity.uuid)
-		ldapConfigsEntity.AppendReferenced("ldapConfigs", this)
-		this.AppendChild("ldapConfigs", ldapConfigsEntity)
-		if ldapConfigsEntity.NeedSave() {
-			ldapConfigsEntity.SaveEntity()
+	lazy_ldapConfigs := this.lazyMap["M_ldapConfigs"] != nil && len(this.object.M_ldapConfigs) == 0
+	if !lazy_ldapConfigs {
+		for i := 0; i < len(this.object.M_ldapConfigs); i++ {
+			ldapConfigsEntity := GetServer().GetEntityManager().NewConfigLdapConfigurationEntity(this.GetUuid(), this.object.M_ldapConfigs[i].UUID, this.object.M_ldapConfigs[i])
+			ldapConfigsIds = append(ldapConfigsIds, ldapConfigsEntity.uuid)
+			ldapConfigsEntity.AppendReferenced("ldapConfigs", this)
+			this.AppendChild("ldapConfigs", ldapConfigsEntity)
+			if ldapConfigsEntity.NeedSave() {
+				ldapConfigsEntity.SaveEntity()
+			}
 		}
+	} else {
+		ldapConfigsIds = this.lazyMap["M_ldapConfigs"].([]string)
 	}
 	ldapConfigsStr, _ := json.Marshal(ldapConfigsIds)
 	ConfigurationsInfo = append(ConfigurationsInfo, string(ldapConfigsStr))
 
 	/** Save applicationConfigs type ApplicationConfiguration **/
 	applicationConfigsIds := make([]string, 0)
-	for i := 0; i < len(this.object.M_applicationConfigs); i++ {
-		applicationConfigsEntity := GetServer().GetEntityManager().NewConfigApplicationConfigurationEntity(this.GetUuid(), this.object.M_applicationConfigs[i].UUID, this.object.M_applicationConfigs[i])
-		applicationConfigsIds = append(applicationConfigsIds, applicationConfigsEntity.uuid)
-		applicationConfigsEntity.AppendReferenced("applicationConfigs", this)
-		this.AppendChild("applicationConfigs", applicationConfigsEntity)
-		if applicationConfigsEntity.NeedSave() {
-			applicationConfigsEntity.SaveEntity()
+	lazy_applicationConfigs := this.lazyMap["M_applicationConfigs"] != nil && len(this.object.M_applicationConfigs) == 0
+	if !lazy_applicationConfigs {
+		for i := 0; i < len(this.object.M_applicationConfigs); i++ {
+			applicationConfigsEntity := GetServer().GetEntityManager().NewConfigApplicationConfigurationEntity(this.GetUuid(), this.object.M_applicationConfigs[i].UUID, this.object.M_applicationConfigs[i])
+			applicationConfigsIds = append(applicationConfigsIds, applicationConfigsEntity.uuid)
+			applicationConfigsEntity.AppendReferenced("applicationConfigs", this)
+			this.AppendChild("applicationConfigs", applicationConfigsEntity)
+			if applicationConfigsEntity.NeedSave() {
+				applicationConfigsEntity.SaveEntity()
+			}
 		}
+	} else {
+		applicationConfigsIds = this.lazyMap["M_applicationConfigs"].([]string)
 	}
 	applicationConfigsStr, _ := json.Marshal(applicationConfigsIds)
 	ConfigurationsInfo = append(ConfigurationsInfo, string(applicationConfigsStr))
@@ -9416,9 +9669,9 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 }
 
 /** Read **/
-func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
+func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error {
 	if this.object.IsInit == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*Config_ConfigurationsEntity)
@@ -9428,6 +9681,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 		this.object.IsInit = false
 	}
 	this.uuid = id
+	this.lazy = lazy
 
 	// Set the reference on the map
 	var query EntityQuery
@@ -9504,7 +9758,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 					serverConfigEntity = instance.(*Config_ServerConfigurationEntity)
 				} else {
 					serverConfigEntity = GetServer().GetEntityManager().NewConfigServerConfigurationEntity(this.GetUuid(), uuid, nil)
-					serverConfigEntity.InitEntity(uuid)
+					serverConfigEntity.InitEntity(uuid, lazy)
 					GetServer().GetEntityManager().insert(serverConfigEntity)
 				}
 				serverConfigEntity.AppendReferenced("serverConfig", this)
@@ -9521,7 +9775,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 					oauth2ConfigurationEntity = instance.(*Config_OAuth2ConfigurationEntity)
 				} else {
 					oauth2ConfigurationEntity = GetServer().GetEntityManager().NewConfigOAuth2ConfigurationEntity(this.GetUuid(), uuid, nil)
-					oauth2ConfigurationEntity.InitEntity(uuid)
+					oauth2ConfigurationEntity.InitEntity(uuid, lazy)
 					GetServer().GetEntityManager().insert(oauth2ConfigurationEntity)
 				}
 				oauth2ConfigurationEntity.AppendReferenced("oauth2Configuration", this)
@@ -9538,17 +9792,21 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 				return err
 			}
 			for i := 0; i < len(uuids); i++ {
-				if len(uuids[i]) > 0 {
-					var serviceConfigsEntity *Config_ServiceConfigurationEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-						serviceConfigsEntity = instance.(*Config_ServiceConfigurationEntity)
-					} else {
-						serviceConfigsEntity = GetServer().GetEntityManager().NewConfigServiceConfigurationEntity(this.GetUuid(), uuids[i], nil)
-						serviceConfigsEntity.InitEntity(uuids[i])
-						GetServer().GetEntityManager().insert(serviceConfigsEntity)
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var serviceConfigsEntity *Config_ServiceConfigurationEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							serviceConfigsEntity = instance.(*Config_ServiceConfigurationEntity)
+						} else {
+							serviceConfigsEntity = GetServer().GetEntityManager().NewConfigServiceConfigurationEntity(this.GetUuid(), uuids[i], nil)
+							serviceConfigsEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(serviceConfigsEntity)
+						}
+						serviceConfigsEntity.AppendReferenced("serviceConfigs", this)
+						this.AppendChild("serviceConfigs", serviceConfigsEntity)
 					}
-					serviceConfigsEntity.AppendReferenced("serviceConfigs", this)
-					this.AppendChild("serviceConfigs", serviceConfigsEntity)
+				} else {
+					this.lazyMap["M_serviceConfigs"] = uuids
 				}
 			}
 		}
@@ -9562,17 +9820,21 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 				return err
 			}
 			for i := 0; i < len(uuids); i++ {
-				if len(uuids[i]) > 0 {
-					var dataStoreConfigsEntity *Config_DataStoreConfigurationEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-						dataStoreConfigsEntity = instance.(*Config_DataStoreConfigurationEntity)
-					} else {
-						dataStoreConfigsEntity = GetServer().GetEntityManager().NewConfigDataStoreConfigurationEntity(this.GetUuid(), uuids[i], nil)
-						dataStoreConfigsEntity.InitEntity(uuids[i])
-						GetServer().GetEntityManager().insert(dataStoreConfigsEntity)
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var dataStoreConfigsEntity *Config_DataStoreConfigurationEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							dataStoreConfigsEntity = instance.(*Config_DataStoreConfigurationEntity)
+						} else {
+							dataStoreConfigsEntity = GetServer().GetEntityManager().NewConfigDataStoreConfigurationEntity(this.GetUuid(), uuids[i], nil)
+							dataStoreConfigsEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(dataStoreConfigsEntity)
+						}
+						dataStoreConfigsEntity.AppendReferenced("dataStoreConfigs", this)
+						this.AppendChild("dataStoreConfigs", dataStoreConfigsEntity)
 					}
-					dataStoreConfigsEntity.AppendReferenced("dataStoreConfigs", this)
-					this.AppendChild("dataStoreConfigs", dataStoreConfigsEntity)
+				} else {
+					this.lazyMap["M_dataStoreConfigs"] = uuids
 				}
 			}
 		}
@@ -9586,17 +9848,21 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 				return err
 			}
 			for i := 0; i < len(uuids); i++ {
-				if len(uuids[i]) > 0 {
-					var smtpConfigsEntity *Config_SmtpConfigurationEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-						smtpConfigsEntity = instance.(*Config_SmtpConfigurationEntity)
-					} else {
-						smtpConfigsEntity = GetServer().GetEntityManager().NewConfigSmtpConfigurationEntity(this.GetUuid(), uuids[i], nil)
-						smtpConfigsEntity.InitEntity(uuids[i])
-						GetServer().GetEntityManager().insert(smtpConfigsEntity)
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var smtpConfigsEntity *Config_SmtpConfigurationEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							smtpConfigsEntity = instance.(*Config_SmtpConfigurationEntity)
+						} else {
+							smtpConfigsEntity = GetServer().GetEntityManager().NewConfigSmtpConfigurationEntity(this.GetUuid(), uuids[i], nil)
+							smtpConfigsEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(smtpConfigsEntity)
+						}
+						smtpConfigsEntity.AppendReferenced("smtpConfigs", this)
+						this.AppendChild("smtpConfigs", smtpConfigsEntity)
 					}
-					smtpConfigsEntity.AppendReferenced("smtpConfigs", this)
-					this.AppendChild("smtpConfigs", smtpConfigsEntity)
+				} else {
+					this.lazyMap["M_smtpConfigs"] = uuids
 				}
 			}
 		}
@@ -9610,17 +9876,21 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 				return err
 			}
 			for i := 0; i < len(uuids); i++ {
-				if len(uuids[i]) > 0 {
-					var ldapConfigsEntity *Config_LdapConfigurationEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-						ldapConfigsEntity = instance.(*Config_LdapConfigurationEntity)
-					} else {
-						ldapConfigsEntity = GetServer().GetEntityManager().NewConfigLdapConfigurationEntity(this.GetUuid(), uuids[i], nil)
-						ldapConfigsEntity.InitEntity(uuids[i])
-						GetServer().GetEntityManager().insert(ldapConfigsEntity)
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var ldapConfigsEntity *Config_LdapConfigurationEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							ldapConfigsEntity = instance.(*Config_LdapConfigurationEntity)
+						} else {
+							ldapConfigsEntity = GetServer().GetEntityManager().NewConfigLdapConfigurationEntity(this.GetUuid(), uuids[i], nil)
+							ldapConfigsEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(ldapConfigsEntity)
+						}
+						ldapConfigsEntity.AppendReferenced("ldapConfigs", this)
+						this.AppendChild("ldapConfigs", ldapConfigsEntity)
 					}
-					ldapConfigsEntity.AppendReferenced("ldapConfigs", this)
-					this.AppendChild("ldapConfigs", ldapConfigsEntity)
+				} else {
+					this.lazyMap["M_ldapConfigs"] = uuids
 				}
 			}
 		}
@@ -9634,17 +9904,21 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 				return err
 			}
 			for i := 0; i < len(uuids); i++ {
-				if len(uuids[i]) > 0 {
-					var applicationConfigsEntity *Config_ApplicationConfigurationEntity
-					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-						applicationConfigsEntity = instance.(*Config_ApplicationConfigurationEntity)
-					} else {
-						applicationConfigsEntity = GetServer().GetEntityManager().NewConfigApplicationConfigurationEntity(this.GetUuid(), uuids[i], nil)
-						applicationConfigsEntity.InitEntity(uuids[i])
-						GetServer().GetEntityManager().insert(applicationConfigsEntity)
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var applicationConfigsEntity *Config_ApplicationConfigurationEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							applicationConfigsEntity = instance.(*Config_ApplicationConfigurationEntity)
+						} else {
+							applicationConfigsEntity = GetServer().GetEntityManager().NewConfigApplicationConfigurationEntity(this.GetUuid(), uuids[i], nil)
+							applicationConfigsEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(applicationConfigsEntity)
+						}
+						applicationConfigsEntity.AppendReferenced("applicationConfigs", this)
+						this.AppendChild("applicationConfigs", applicationConfigsEntity)
 					}
-					applicationConfigsEntity.AppendReferenced("applicationConfigs", this)
-					this.AppendChild("applicationConfigs", applicationConfigsEntity)
+				} else {
+					this.lazyMap["M_applicationConfigs"] = uuids
 				}
 			}
 		}
@@ -9673,7 +9947,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string) error {
 	// set init done.
 	this.SetInit(true)
 	// Init the references...
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 	return nil
 }
 

@@ -120,7 +120,7 @@ func (this *SessionManager) run() {
  */
 func (this *SessionManager) removeClosedSession() {
 
-	sessions, _ := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Session", "", CargoEntitiesDB)
+	sessions, _ := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Session", "", CargoEntitiesDB, false)
 
 	for i := 0; i < len(sessions); i++ {
 		sessionId := sessions[i].GetObject().(*CargoEntities.Session).GetId()
@@ -137,7 +137,7 @@ func (this *SessionManager) closeSession_(session *CargoEntities.Session) *Cargo
 	JS.GetJsRuntimeManager().CloseSession(session.GetId())
 
 	// Delete the session entity
-	sessionEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(session.UUID)
+	sessionEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(session.UUID, false)
 
 	if errObj != nil {
 		return NewError(Utility.FileLine(), SESSION_UUID_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("The session with uuid '"+session.UUID+"' was not found."))
@@ -240,7 +240,7 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 	if len(accountUuid) > 0 {
 		// The accout exists. It will be initialized
 		var accountEntity Entity
-		accountEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(accountUuid)
+		accountEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(accountUuid, false)
 
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)

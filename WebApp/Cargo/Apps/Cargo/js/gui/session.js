@@ -46,7 +46,7 @@ var SessionPanel = function (parent, sessionInfo) {
 	this.userSessionBtn.appendElement({ "tag": "i", "class": "fa fa-user" })
 
 	// Contain information about the current session...
-	this.sessionDisplayPanel = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "session_display_panel"})
+	this.sessionDisplayPanel = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "session_display_panel", "style":"heigth: auto;"})
 	this.currentSessionInfoPanel = null
 
 	// This contain the settings...

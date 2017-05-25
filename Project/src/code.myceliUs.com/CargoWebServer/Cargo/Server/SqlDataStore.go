@@ -644,6 +644,7 @@ func (this *SqlDataStore) Update(query string, fields []interface{}, params []in
 		id.Name = "id"
 		id.Value = Utility.ToString(params[0])
 		eventData[1] = id
+
 		evt, _ := NewEvent(UpdateRowEvent, TableEvent, eventData)
 		GetServer().GetEventManager().BroadcastEvent(evt)
 	}
@@ -758,8 +759,8 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 	this.setRefs()
 
 	// Synchronize actual data
-	// this.synchronize(prototypes)
-
+	this.synchronize(prototypes)
+	log.Println("----------> prototypes: ", prototypes)
 	return prototypes, nil
 }
 
@@ -1543,7 +1544,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 						entity := createEntityFromInfo(key, info, entityInfos)
 						toSave[uuid] = entity
 					} else {
-						entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
+						entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
 						if entity.NeedSave() {
 							toSave[uuid] = entity
 						}

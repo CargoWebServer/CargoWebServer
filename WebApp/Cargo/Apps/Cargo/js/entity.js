@@ -1681,6 +1681,9 @@ function setObjectValues(object, values) {
  * This function generate the js class base on the entity prototype.
  */
 EntityPrototype.prototype.generateConstructor = function () {
+    if(this.ClassName.indexOf(" ") > 0){
+        return
+    }
     var constructorSrc = this.PackageName + " = function(){\n"
     var constructorSrc = this.PackageName + " || {};\n"
 

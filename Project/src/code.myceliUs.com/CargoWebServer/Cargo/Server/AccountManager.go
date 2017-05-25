@@ -161,7 +161,7 @@ func (this *AccountManager) GetAccountById(name string, messageId string, sessio
 		return nil
 	}
 
-	accountEntity, errObj := server.GetEntityManager().getEntityByUuid(accountUuid)
+	accountEntity, errObj := server.GetEntityManager().getEntityByUuid(accountUuid, false)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
@@ -183,7 +183,7 @@ func (this *AccountManager) GetUserById(id string, messageId string, sessionId s
 		return nil
 	}
 
-	userEntity, errObj := server.GetEntityManager().getEntityByUuid(userUuid)
+	userEntity, errObj := server.GetEntityManager().getEntityByUuid(userUuid, false)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
@@ -212,6 +212,8 @@ func (this *AccountManager) Me(connectionId string, messageId string, sessionId 
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
+
+	log.Println("------------> 216", session.GetAccountPtr().GetEmail())
 
 	return session.GetAccountPtr()
 }

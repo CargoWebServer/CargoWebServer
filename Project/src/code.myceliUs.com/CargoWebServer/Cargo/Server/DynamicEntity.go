@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"unsafe"
 
 	"code.myceliUs.com/Utility"
 	"github.com/pborman/uuid"
@@ -83,7 +84,7 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 	// I will set it parent ptr...
 	if len(parentUuid) > 0 {
 		values["ParentUuid"] = parentUuid
-		parentPtr, _ = GetServer().GetEntityManager().getDynamicEntityByUuid(parentUuid)
+		parentPtr, _ = GetServer().GetEntityManager().getDynamicEntityByUuid(parentUuid, false)
 	}
 
 	var entity *DynamicEntity
@@ -163,6 +164,11 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 	if parentPtr != nil {
 		// Set the parent uuid.
 		entity.SetParentPtr(parentPtr)
+	}
+
+	// Dynamic entity are not lazy by default.
+	if values["lazy"] == nil {
+		values["lazy"] = false
 	}
 
 	// Set the object value with the values, need save will be set
@@ -293,16 +299,24 @@ func (this *DynamicEntity) SetNeedSave(needSave bool) {
 }
 
 /**
+ * Set if an entity need to be save.
+ */
+func (this *DynamicEntity) IsLazy() bool {
+	return this.getValue("lazy").(bool)
+}
+
+/**
  * Initialyse a entity with a given id.
  */
-func (this *DynamicEntity) InitEntity(id string) error {
-	err := this.initEntity(id, "")
+func (this *DynamicEntity) InitEntity(id string, lazy bool) error {
+	this.setValue("lazy", lazy)
+	err := this.initEntity(id, "", lazy)
 
 	//log.Println("After init:", toJsonStr(this.object))
 	return err
 }
 
-func (this *DynamicEntity) initEntity(id string, path string) error {
+func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 	// cut infinite recursion here.
 	if strings.Index(path, id) != -1 {
 		return nil
@@ -310,7 +324,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 
 	// If the value is already in the cache I have nothing todo...
 	if this.IsInit() == true {
-		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
 		if err == nil {
 			// Return the already initialyse entity.
 			this = entity.(*DynamicEntity)
@@ -443,7 +457,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 							// Only uuid's are accepted value's here.
 							if len(uuids) > 0 {
 								// Set an empty array here...
-								if Utility.IsValidEntityReferenceName(uuids[0]) {
+								if Utility.IsValidEntityReferenceName(uuids[0]) && !lazy {
 									this.setValue(fieldName, make([]map[string]interface{}, 0))
 									for i := 0; i < len(uuids); i++ {
 										if len(uuids[i]) > 0 {
@@ -471,7 +485,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 													dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.GetUuid(), values)
 													if errObj == nil {
 														// initialise the sub entity.
-														err := dynamicEntity.initEntity(uuids[i], path+"|"+this.GetUuid())
+														err := dynamicEntity.initEntity(uuids[i], path+"|"+this.GetUuid(), lazy)
 														if err != nil {
 															// I will try to remove it from it child if is there...
 															this.RemoveChild(fieldName, uuids[i])
@@ -482,7 +496,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 														}
 													}
 												} else {
-													staticEntity.(Entity).InitEntity(uuids[i])
+													staticEntity.(Entity).InitEntity(uuids[i], lazy)
 													staticEntity.(Entity).AppendReferenced(fieldName, this)
 													this.AppendChild(fieldName, staticEntity.(Entity))
 												}
@@ -490,6 +504,11 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 											}
 										}
 									}
+								} else if lazy {
+									// Lazy loaded object contain only the uuid of the object...
+									var uuids []string
+									json.Unmarshal([]byte(results[0][i].(string)), &uuids)
+									this.setValue(fieldName, uuids)
 								}
 							}
 						}
@@ -509,7 +528,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 							// Here I have an object...
 							if reflect.TypeOf(results[0][i]).String() == "string" {
 								uuid := results[0][i].(string)
-								if Utility.IsValidEntityReferenceName(uuid) {
+								if Utility.IsValidEntityReferenceName(uuid) && !lazy {
 									if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
 										dynamicEntity := instance.(*DynamicEntity)
 										dynamicEntity.AppendReferenced(fieldName, this)
@@ -533,7 +552,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 											dynamicEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.GetUuid(), values)
 											if errObj == nil {
 												// initialise the sub entity.
-												err := dynamicEntity.initEntity(uuid, path+"|"+this.GetUuid())
+												err := dynamicEntity.initEntity(uuid, path+"|"+this.GetUuid(), lazy)
 												if err != nil {
 													// I will try to remove it from it child if is there...
 													this.RemoveChild(fieldName, uuid)
@@ -544,7 +563,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 												}
 											}
 										} else {
-											staticEntity.(Entity).InitEntity(uuid)
+											staticEntity.(Entity).InitEntity(uuid, lazy)
 											staticEntity.(Entity).AppendReferenced(fieldName, this)
 											this.AppendChild(fieldName, staticEntity.(Entity))
 										}
@@ -570,7 +589,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 	this.SetInit(true)
 	this.SetNeedSave(false)
 
-	GetServer().GetEntityManager().InitEntity(this)
+	GetServer().GetEntityManager().InitEntity(this, lazy)
 
 	// if some change are found at initialysation I will update the values.
 	if this.NeedSave() == true {
@@ -580,7 +599,7 @@ func (this *DynamicEntity) initEntity(id string, path string) error {
 
 	if storeId == "sql_info" {
 		// Now I will initialyse references
-		dataManager.setEntityReferences(this.uuid, true)
+		dataManager.setEntityReferences(this.uuid, true, false)
 
 	}
 
@@ -812,6 +831,10 @@ func (this *DynamicEntity) saveEntity(path string) {
 							}
 							subEntityIdsStr, _ := json.Marshal(subEntityIds)
 							DynamicEntityInfo = append(DynamicEntityInfo, string(subEntityIdsStr))
+						} else if reflect.TypeOf(this.getValue(fieldName)).String() == "[]string" {
+							// Here it's a lazy intialysed object.
+							subEntityIdsStr, _ := json.Marshal(this.getValue(fieldName).([]string))
+							DynamicEntityInfo = append(DynamicEntityInfo, string(subEntityIdsStr))
 						}
 					}
 				}
@@ -952,6 +975,8 @@ func (this *DynamicEntity) saveEntity(path string) {
 										staticEntity.(Entity).SaveEntity()
 									}
 								}
+							} else if reflect.TypeOf(this.getValue(fieldName)).String() == "string" {
+								DynamicEntityInfo = append(DynamicEntityInfo, this.getValue(fieldName).(string))
 							}
 						}
 					}
@@ -1014,7 +1039,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	if err == nil {
 		if storeId == "sql_info" {
 			// Now I will save the references
-			dataManager.setEntityReferences(this.uuid, false)
+			dataManager.setEntityReferences(this.uuid, false, true)
 		}
 		// Send the event.
 		GetServer().GetEventManager().BroadcastEvent(evt)
@@ -1517,7 +1542,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 							for i := 0; i < len(this.getValue(field).([]string)); i++ {
 								if !Utility.Contains(v_, this.getValue(field).([]string)[i]) {
 									toRemove := this.getValue(field).([]string)[i]
-									ref, err := GetServer().GetEntityManager().getEntityByUuid(toRemove)
+									ref, err := GetServer().GetEntityManager().getEntityByUuid(toRemove, false)
 									if err == nil {
 										this.RemoveReference(field, ref)
 										ref.RemoveReferenced(field, this)
@@ -1530,7 +1555,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 
 						// Set the references links...
 						for i := 0; i < len(v_); i++ {
-							ref, err := GetServer().GetEntityManager().getEntityByUuid(v_[i])
+							ref, err := GetServer().GetEntityManager().getEntityByUuid(v_[i], true)
 							if err == nil {
 								ref.AppendReferenced(field, this)
 								this.AppendReference(ref)
@@ -1557,7 +1582,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 							}
 						}
 						if len(toRemove) > 0 {
-							ref, err := GetServer().GetEntityManager().getEntityByUuid(toRemove)
+							ref, err := GetServer().GetEntityManager().getEntityByUuid(toRemove, true)
 							if err == nil {
 								this.RemoveReference(field, ref)
 								ref.RemoveReferenced(field, this)
@@ -1574,7 +1599,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 							}
 
 							if len(refUuid) > 0 {
-								ref, err := GetServer().GetEntityManager().getEntityByUuid(refUuid)
+								ref, err := GetServer().GetEntityManager().getEntityByUuid(refUuid, true)
 								if err == nil {
 									ref.AppendReferenced(field, this)
 									this.AppendReference(ref)
@@ -1638,7 +1663,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 												exist := false
 												for j := 0; j < len(this.getValue(k).([]map[string]interface{})); j++ {
 													if this.getValue(k).([]map[string]interface{})[j]["UUID"] == v.([]map[string]interface{})[i]["UUID"] {
-														subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]map[string]interface{})[j]["UUID"].(string))
+														subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]map[string]interface{})[j]["UUID"].(string), true)
 														subEntity.(*DynamicEntity).SetObjectValues(v.([]map[string]interface{})[i])
 														exist = true
 													}
@@ -1657,7 +1682,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 												exist := false
 												for j := 0; j < len(this.getValue(k).([]map[string]interface{})); j++ {
 													if this.getValue(k).([]map[string]interface{})[j]["UUID"] == v.([]interface{})[i].(map[string]interface{})["UUID"] {
-														subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]map[string]interface{})[j]["UUID"].(string))
+														subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]map[string]interface{})[j]["UUID"].(string), true)
 														subEntity.(*DynamicEntity).SetObjectValues(v.([]interface{})[i].(map[string]interface{}))
 														exist = true
 													}
@@ -1682,7 +1707,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 														exist := false
 														for j := 0; j < len(this.getValue(k).([]interface{})); j++ {
 															if this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"] == v.([]map[string]interface{})[i]["UUID"] {
-																subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"].(string))
+																subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"].(string), true)
 																subEntity.(*DynamicEntity).SetObjectValues(v.([]map[string]interface{})[i])
 																exist = true
 															}
@@ -1701,7 +1726,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 														exist := false
 														for j := 0; j < len(this.getValue(k).([]interface{})); j++ {
 															if this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"] == v.([]interface{})[i].(map[string]interface{})["UUID"] {
-																subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"].(string))
+																subEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.getValue(k).([]interface{})[j].(map[string]interface{})["UUID"].(string), true)
 																subEntity.(*DynamicEntity).SetObjectValues(v.([]interface{})[i].(map[string]interface{}))
 																exist = true
 															}
@@ -1820,6 +1845,13 @@ func (this *DynamicEntity) GetPrototype() *EntityPrototype {
  */
 func (this *DynamicEntity) GetChecksum() string {
 	return Utility.GetChecksum(this.GetObject())
+}
+
+/**
+ * Calculate a unique value for a given entity object value...
+ */
+func (this *DynamicEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(this.object))
 }
 
 /**

@@ -260,7 +260,7 @@ func (this *KeyValueDataStore) DeleteEntityPrototype(typeName string) error {
 	}
 
 	// I will delete all entity...
-	entities, _ := GetServer().GetEntityManager().getEntitiesByType(prototype.TypeName, "", this.m_id)
+	entities, _ := GetServer().GetEntityManager().getEntitiesByType(prototype.TypeName, "", this.m_id, false)
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		// remove it...

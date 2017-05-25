@@ -35,7 +35,7 @@ var DataManager = function (id) {
         id = randomUUID()
     }
 
-    EventHub.call(this, id, TableEvent)
+    EventHub.call(this, TableEvent)
 
     return this
 }

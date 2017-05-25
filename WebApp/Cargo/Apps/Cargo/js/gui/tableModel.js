@@ -342,6 +342,37 @@ EntityTableModel.prototype.setValueAt = function (value, row, column) {
     }
 }
 
+/**
+ * Save the value contain at a given row.
+ */
+EntityTableModel.prototype.saveValue = function (row) {
+    var entity = row.table.model.entities[row.index]
+
+    // Here I will save the entity...
+    if (entity != null) {
+        entity.NeedSave = true
+        if (entity.exist == false) {
+            // Remove the tmp entity...
+            server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, entity.M_id, entity,
+                // Success callback
+                function (entity, table) {
+
+                },
+                // Error callback.
+                function (result, caller) {
+
+                }, row.table)
+        } else {
+            server.entityManager.saveEntity(entity,
+                function (result, row) {
+
+                }, function () {
+
+                }, this)
+        }
+    }
+}
+
 ////////////////////////////////////////////////////////////
 // Sql Table model
 ////////////////////////////////////////////////////////////
@@ -429,6 +460,53 @@ SqlTableModel.prototype.appendRow = function (values) {
     return values
 }
 
+SqlTableModel.prototype.saveValue = function (row) {
+    // here i will get the values and save it.
+    var queryValues = this.query.split(" ")
+    var fields = queryValues[1].split(",")
+    var from = queryValues[2]
+    var tableName = queryValues[3]
+
+    var params = new Array()
+    var updateQuery = ""
+    var values = []
+
+    // So here I will create the update query whit the info I know...
+    updateQuery += "Update " + tableName + " Set "
+    // The first column must be the id
+    for (var i = 1; i < fields.length; i++) {
+        updateQuery += fields[i] + "=?"
+        var val = this.values[row.index][i]
+
+        // format date...
+        if (this.getColumnClass(i) == 'date') {
+            val = moment(val).format('YYYY-MM-DD HH:mm:ss.SSS');
+        }
+
+        values.push(val)
+
+        if (i < fields.length - 1) {
+            updateQuery += ","
+        }
+    }
+
+    // The first row must be the id.
+    updateQuery += " WHERE " + fields[0] + "=?"
+    params.push(this.values[row.index][0])
+
+    // Send the update query...
+    server.dataManager.update(this.db, updateQuery, values, params,
+        // Success call back
+        function (result, caller) {
+            // Update the model value...
+        },
+        // Error callback
+        function () {
+
+        },
+        {})
+}
+
 /**
  * Set model propertie value.
  * @param {} value The map of value.
@@ -468,7 +546,7 @@ SqlTableModel.prototype.setValueAt = function (value, row, column) {
 
     // The other field will be use has parameters...
     var index = 0
-    for (var i = 0; i < fields.length; i++) {
+    for (var i = 0; i < /*fields.length*/ 1; i++) {
         var val = this.getValueAt(row, i)
         if (i != column && this.getColumnClass(i) != 'real') {
             if (i < fields.length && i != 0) {

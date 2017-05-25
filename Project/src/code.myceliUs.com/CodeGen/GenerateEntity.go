@@ -23,6 +23,7 @@ func generateEntity(packageId string) {
 	imports = append(imports, "code.myceliUs.com/Utility")
 	imports = append(imports, "log")
 	imports = append(imports, "strings")
+	imports = append(imports, "unsafe")
 
 	for i := 0; i < len(classes); i++ {
 		class := classesMap[classes[i]]
@@ -51,6 +52,8 @@ func generateEntity(packageId string) {
 				classStr += "	referencesUuid  	[]string\n"
 				classStr += "	referencesPtr  	    []Entity\n"
 				classStr += "	prototype      		*EntityPrototype\n"
+				classStr += "	lazyMap      		map[string]interface{}\n"
+				classStr += "   lazy 				bool\n"
 
 				// Keep track of object that have reference to that object.
 				classStr += "	referenced  		[]EntityRef\n"
@@ -98,6 +101,10 @@ func generateEntity(packageId string) {
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetReferenced() []EntityRef{\n"
 				classStr += "	return this.referenced\n"
+				classStr += "}\n\n"
+
+				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetSize() uint{\n"
+				classStr += "	return uint(unsafe.Sizeof(*this.object))\n"
 				classStr += "}\n\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) RemoveReferenced(name string, owner Entity) {\n"
@@ -214,6 +221,10 @@ func generateEntity(packageId string) {
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) SetInit(isInit bool) {\n"
 				classStr += "	this.object.IsInit = isInit\n"
+				classStr += "}\n\n"
+
+				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) IsLazy() bool{\n"
+				classStr += "	return this.lazy\n"
 				classStr += "}\n\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetChecksum() string{\n"
@@ -366,6 +377,7 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "		}\n"
 	entityConstructorStr += "	}\n"
 	entityConstructorStr += "	entity := new(" + packageId + "_" + class.Name + "Entity)\n"
+
 	entityConstructorStr += "	if object == nil{\n"
 	entityConstructorStr += "		entity.object = new(" + packageId + "." + className + ")\n"
 	entityConstructorStr += "		entity.SetNeedSave(true)\n"
@@ -374,6 +386,7 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "		entity.SetNeedSave(true)\n"
 	entityConstructorStr += "	}\n"
 
+	entityConstructorStr += "	entity.lazyMap = make(map[string]interface{})\n"
 	entityConstructorStr += "	entity.object.TYPENAME = \"" + packageId + "." + class.Name + "\"\n\n"
 	entityConstructorStr += "	entity.object.UUID = uuidStr\n"
 	entityConstructorStr += "	entity.object.ParentUuid = parentUuid\n"
@@ -883,15 +896,16 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 				memberStr += "				return err\n"
 				memberStr += "			}\n"
 				memberStr += "			for i:=0; i<len(uuids); i++{\n"
+				memberStr += "			if !lazy {\n"
 				// So here I will
 				// Now I will initalyse the value...
 				if Utility.Contains(abstractClassLst, typeName) {
 					// Here I need to cast the type to it implementation type...
-					memberStr += "			typeName := uuids[i][0:strings.Index(uuids[i], \"%\")]\n"
-					memberStr += "			if err!=nil{\n"
-					memberStr += "				log.Println(\"type \", typeName, \" not found!\")\n"
-					memberStr += "				return err\n"
-					memberStr += "			}\n"
+					memberStr += "				typeName := uuids[i][0:strings.Index(uuids[i], \"%\")]\n"
+					memberStr += "				if err!=nil{\n"
+					memberStr += "					log.Println(\"type \", typeName, \" not found!\")\n"
+					memberStr += "					return err\n"
+					memberStr += "				}\n"
 					// Now I will iterate over implementation...
 					implementations := getImplementationClasses(typeName)
 
@@ -901,10 +915,10 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 							impl = "_impl"
 						}
 						if i == 0 {
-							memberStr += "				if typeName == \"" + packName + "." + implementations[i] + impl + "\"{\n"
+							memberStr += "					if typeName == \"" + packName + "." + implementations[i] + impl + "\"{\n"
 
 						} else {
-							memberStr += "				} else if typeName == \"" + packName + "." + implementations[i] + impl + "\"{\n"
+							memberStr += "					} else if typeName == \"" + packName + "." + implementations[i] + impl + "\"{\n"
 						}
 						elementPackName := membersPackage[implementations[i]]
 						if Utility.Contains(superClassesLst, implementations[i]) {
@@ -913,35 +927,67 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 							for j := 0; j < len(implementations_); j++ {
 								implementation := implementations_[j]
 								if j == 0 {
-									memberStr += "						if strings.HasPrefix(uuids[i], \"" + elementPackName + "." + implementation + "\"){\n"
+									memberStr += "							if strings.HasPrefix(uuids[i], \"" + elementPackName + "." + implementation + "\"){\n"
 								} else {
-									memberStr += "						} else if strings.HasPrefix(uuids[i], \"" + elementPackName + "." + implementation + "\"){\n"
+									memberStr += "							} else if strings.HasPrefix(uuids[i], \"" + elementPackName + "." + implementation + "\"){\n"
 								}
-								memberStr += "							if len(uuids[i]) > 0 {\n"
-								memberStr += "								var " + memberName + "Entity *" + elementPackName + "_" + implementations[i] + "Entity\n"
-								memberStr += "								if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
-								memberStr += "									" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementations[i] + "Entity)\n"
-								memberStr += "								}else{\n"
-								memberStr += "									" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), uuids[i], nil)\n"
-								memberStr += "									" + memberName + "Entity.InitEntity(uuids[i])\n"
-								memberStr += "									GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
-								memberStr += "								}\n"
-								memberStr += "								" + memberName + "Entity.AppendReferenced(\"" + memberName + "\", this)\n"
-								memberStr += "								this.AppendChild(\"" + memberName + "\"," + memberName + "Entity)\n"
+								memberStr += "								if len(uuids[i]) > 0 {\n"
+								memberStr += "									var " + memberName + "Entity *" + elementPackName + "_" + implementations[i] + "Entity\n"
+								memberStr += "									if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
+								memberStr += "										" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementations[i] + "Entity)\n"
+								memberStr += "									}else{\n"
+								memberStr += "										" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), uuids[i], nil)\n"
+								memberStr += "										" + memberName + "Entity.InitEntity(uuids[i], lazy)\n"
+								memberStr += "										GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
+								memberStr += "									}\n"
+								memberStr += "									" + memberName + "Entity.AppendReferenced(\"" + memberName + "\", this)\n"
+								memberStr += "									this.AppendChild(\"" + memberName + "\"," + memberName + "Entity)\n"
 
-								memberStr += "							}\n"
+								memberStr += "								}\n"
 								if j == len(implementations_)-1 {
-									memberStr += "				}\n"
+									memberStr += "					}\n"
 								}
 							}
 						} else {
-							memberStr += "						if len(uuids[i]) > 0 {\n"
-							memberStr += "							var " + memberName + "Entity *" + elementPackName + "_" + implementations[i] + "Entity\n"
-							memberStr += "							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
+							memberStr += "							if len(uuids[i]) > 0 {\n"
+							memberStr += "								var " + memberName + "Entity *" + elementPackName + "_" + implementations[i] + "Entity\n"
+							memberStr += "								if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
 							memberStr += "								" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementations[i] + "Entity)\n"
+							memberStr += "								}else{\n"
+							memberStr += "									" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), uuids[i], nil)\n"
+							memberStr += "									" + memberName + "Entity.InitEntity(uuids[i], lazy)\n"
+							memberStr += "									GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
+							memberStr += "								}\n"
+
+							memberStr += "								" + memberName + "Entity.AppendReferenced(\"" + memberName + "\", this)\n"
+							memberStr += "								this.AppendChild(\"" + memberName + "\"," + memberName + "Entity)\n"
+
+							memberStr += "							}\n"
+						}
+
+						if i == len(implementations)-1 {
+							memberStr += "					}\n"
+						}
+					}
+				} else {
+					elementPackName := membersPackage[typeName]
+					if Utility.Contains(superClassesLst, typeName) {
+						memberStr += "					/** abstract class **/\n"
+						implementations_ := getImplementationClasses(typeName)
+						for j := 0; j < len(implementations_); j++ {
+							implementation := implementations_[j]
+							if j == 0 {
+								memberStr += "					if strings.HasPrefix(uuids[i], \"" + elementPackName + "." + implementation + "\"){\n"
+							} else {
+								memberStr += "					} else if strings.HasPrefix(uuids[i], \"" + elementPackName + "." + implementation + "\"){\n"
+							}
+							memberStr += "						if len(uuids[i]) > 0 {\n"
+							memberStr += "							var " + memberName + "Entity *" + elementPackName + "_" + implementation + "Entity\n"
+							memberStr += "							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
+							memberStr += "							" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementation + "Entity)\n"
 							memberStr += "							}else{\n"
-							memberStr += "								" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), uuids[i], nil)\n"
-							memberStr += "								" + memberName + "Entity.InitEntity(uuids[i])\n"
+							memberStr += "								" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementation + "Entity(this.GetUuid(), uuids[i], nil)\n"
+							memberStr += "								" + memberName + "Entity.InitEntity(uuids[i], lazy)\n"
 							memberStr += "								GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
 							memberStr += "							}\n"
 
@@ -949,61 +995,32 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 							memberStr += "							this.AppendChild(\"" + memberName + "\"," + memberName + "Entity)\n"
 
 							memberStr += "						}\n"
-						}
-
-						if i == len(implementations)-1 {
-							memberStr += "				}\n"
-						}
-					}
-				} else {
-					elementPackName := membersPackage[typeName]
-					if Utility.Contains(superClassesLst, typeName) {
-						memberStr += "				/** abstract class **/\n"
-						implementations_ := getImplementationClasses(typeName)
-						for j := 0; j < len(implementations_); j++ {
-							implementation := implementations_[j]
-							if j == 0 {
-								memberStr += "				if strings.HasPrefix(uuids[i], \"" + elementPackName + "." + implementation + "\"){\n"
-							} else {
-								memberStr += "				} else if strings.HasPrefix(uuids[i], \"" + elementPackName + "." + implementation + "\"){\n"
-							}
-							memberStr += "					if len(uuids[i]) > 0 {\n"
-							memberStr += "						var " + memberName + "Entity *" + elementPackName + "_" + implementation + "Entity\n"
-							memberStr += "						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
-							memberStr += "						" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementation + "Entity)\n"
-							memberStr += "						}else{\n"
-							memberStr += "							" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementation + "Entity(this.GetUuid(), uuids[i], nil)\n"
-							memberStr += "							" + memberName + "Entity.InitEntity(uuids[i])\n"
-							memberStr += "							GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
-							memberStr += "						}\n"
-
-							memberStr += "						" + memberName + "Entity.AppendReferenced(\"" + memberName + "\", this)\n"
-							memberStr += "						this.AppendChild(\"" + memberName + "\"," + memberName + "Entity)\n"
-
-							memberStr += "					}\n"
 							if j == len(implementations_)-1 {
-								memberStr += "				}\n"
+								memberStr += "					}\n"
 							}
 						}
 					} else {
-						memberStr += "				if len(uuids[i]) > 0 {\n"
-						memberStr += "					var " + memberName + "Entity *" + elementPackName + "_" + typeName + "Entity\n"
-						memberStr += "					if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
+						memberStr += "					if len(uuids[i]) > 0 {\n"
+						memberStr += "						var " + memberName + "Entity *" + elementPackName + "_" + typeName + "Entity\n"
+						memberStr += "						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {\n"
 						memberStr += "						" + memberName + "Entity = instance.(*" + elementPackName + "_" + typeName + "Entity)\n"
-						memberStr += "					}else{\n"
-						memberStr += "						" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.GetUuid(), uuids[i], nil)\n"
-						memberStr += "						" + memberName + "Entity.InitEntity(uuids[i])\n"
-						memberStr += "						GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
+						memberStr += "						}else{\n"
+						memberStr += "							" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.GetUuid(), uuids[i], nil)\n"
+						memberStr += "							" + memberName + "Entity.InitEntity(uuids[i], lazy)\n"
+						memberStr += "							GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
+						memberStr += "						}\n"
+
+						memberStr += "						" + memberName + "Entity.AppendReferenced(\"" + memberName + "\", this)\n"
+						memberStr += "						this.AppendChild(\"" + memberName + "\"," + memberName + "Entity)\n"
+
 						memberStr += "					}\n"
-
-						memberStr += "					" + memberName + "Entity.AppendReferenced(\"" + memberName + "\", this)\n"
-						memberStr += "					this.AppendChild(\"" + memberName + "\"," + memberName + "Entity)\n"
-
-						memberStr += "				}\n"
 					}
 
 				}
-				memberStr += " 			}\n"
+				memberStr += " 		}else{\n"
+				memberStr += " 			this.lazyMap[\"M_" + memberName + "\"] = uuids\n"
+				memberStr += " 		}\n"
+				memberStr += " 	}\n"
 			}
 
 		} else {
@@ -1030,7 +1047,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 				// Now I will initalyse the value...
 				if Utility.Contains(abstractClassLst, typeName) {
 					// Here I need to cast the type to it implementation type...
-					memberStr += "			if len(uuid) > 0 {\n"
+					memberStr += "			if len(uuid) > 0 && !lazy {\n"
 					memberStr += "				typeName := uuid[0:strings.Index(uuid, \"%\")]\n"
 					memberStr += "				if err!=nil{\n"
 					memberStr += "					log.Println(\"type \", typeName, \" not found!\")\n"
@@ -1069,7 +1086,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 								memberStr += "							" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementation + "Entity)\n"
 								memberStr += "						}else{\n"
 								memberStr += "							" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementation + "Entity(this.GetUuid(), uuid, nil)\n"
-								memberStr += "							" + memberName + "Entity.InitEntity(uuid)\n"
+								memberStr += "							" + memberName + "Entity.InitEntity(uuid, lazy)\n"
 								memberStr += "							GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
 								memberStr += "						}\n"
 
@@ -1090,7 +1107,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 							memberStr += "						" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementations[i] + "Entity)\n"
 							memberStr += "					}else{\n"
 							memberStr += "						" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), uuid, nil)\n"
-							memberStr += "						" + memberName + "Entity.InitEntity(uuid)\n"
+							memberStr += "						" + memberName + "Entity.InitEntity(uuid, lazy)\n"
 							memberStr += "						GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
 							memberStr += "					}\n"
 
@@ -1104,6 +1121,9 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 							memberStr += "			}\n"
 						}
 					}
+					memberStr += " 		}else if len(uuid) > 0 {\n"
+					memberStr += " 			this.lazyMap[\"M_" + memberName + "\"] = uuid\n"
+					memberStr += " 		}\n"
 					memberStr += "			}\n"
 
 				} else {
@@ -1124,7 +1144,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 							memberStr += "					" + memberName + "Entity = instance.(*" + elementPackName + "_" + implementation + "Entity)\n"
 							memberStr += "				}else{\n"
 							memberStr += "					" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + implementation + "Entity(this.GetUuid(), uuid, nil)\n"
-							memberStr += "					" + memberName + "Entity.InitEntity(uuid)\n"
+							memberStr += "					" + memberName + "Entity.InitEntity(uuid, lazy)\n"
 							memberStr += "					GetServer().GetEntityManager().insert(" + memberName + "Entity)\n"
 							memberStr += "				}\n"
 
@@ -1143,7 +1163,7 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 						memberStr += "					" + memberName + "Entity = instance.(*" + elementPackName + "_" + typeName + "Entity)\n"
 						memberStr += "				}else{\n"
 						memberStr += "					" + memberName + "Entity = GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.GetUuid(), uuid, nil)\n"
-						memberStr += "					" + memberName + "Entity.InitEntity(uuid)\n"
+						memberStr += "					" + memberName + "Entity.InitEntity(uuid, lazy)\n"
 						memberStr += "					GetServer().GetEntityManager().insert( " + memberName + "Entity)\n"
 						memberStr += "				}\n"
 
@@ -1173,11 +1193,11 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	}
 
 	entityInitStr := "/** Read **/\n"
-	entityInitStr += "func (this *" + packageId + "_" + class.Name + "Entity) InitEntity(id string) error{\n"
+	entityInitStr += "func (this *" + packageId + "_" + class.Name + "Entity) InitEntity(id string, lazy bool) error{\n"
 
 	// If the value is already in the cache I have nothing todo...
 	entityInitStr += "	if this.object.IsInit == true {\n"
-	entityInitStr += "		entity, err := GetServer().GetEntityManager().getEntityByUuid(id)\n"
+	entityInitStr += "		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)\n"
 	entityInitStr += "		if err == nil {\n"
 	entityInitStr += "			// Return the already initialyse entity.\n"
 	entityInitStr += "			this = entity.(*" + packageId + "_" + class.Name + "Entity)\n"
@@ -1189,6 +1209,9 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 
 	// Here If the entity already exist I will it...
 	entityInitStr += "	this.uuid = id\n"
+
+	// Set the lazy initialysation property.
+	entityInitStr += "	this.lazy = lazy\n"
 
 	entityInitStr += "\n	// Set the reference on the map\n"
 
@@ -1309,7 +1332,7 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	entityInitStr += "	this.SetInit(true)\n"
 
 	entityInitStr += "	// Init the references...\n"
-	entityInitStr += "	GetServer().GetEntityManager().InitEntity(this)\n"
+	entityInitStr += "	GetServer().GetEntityManager().InitEntity(this, lazy)\n"
 
 	entityInitStr += "	return nil\n"
 
@@ -1338,10 +1361,12 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 			// Here the reference is an array...
 			if !isRef {
 				entityInfoStr += "	" + attribute.Name + "Ids := make([]string,0)\n"
-				entityInfoStr += "	for i := 0; i < len(this.object.M_" + attribute.Name + "); i++ {\n"
+				entityInfoStr += "	lazy_" + attribute.Name + " := this.lazyMap[\"M_" + attribute.Name + "\"] != nil && len(this.object.M_" + attribute.Name + ") == 0\n"
+				entityInfoStr += "	if !lazy_" + attribute.Name + "{\n"
+				entityInfoStr += "		for i := 0; i < len(this.object.M_" + attribute.Name + "); i++ {\n"
 				if Utility.Contains(abstractClassLst, typeName) || Utility.Contains(superClassesLst, typeName) {
 					// So here I will test the type and save appropriately...
-					entityInfoStr += "		switch v := this.object.M_" + attribute.Name + "[i].(type) {\n"
+					entityInfoStr += "			switch v := this.object.M_" + attribute.Name + "[i].(type) {\n"
 					implementations := getImplementationClasses(typeName)
 					for i := 0; i < len(implementations); i++ {
 						elementPackName := membersPackage[implementations[i]]
@@ -1349,27 +1374,30 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 						if Utility.Contains(superClassesLst, implementations[i]) {
 							impl = "_impl"
 						}
-						entityInfoStr += "		case *" + elementPackName + "." + implementations[i] + impl + ":\n"
-						entityInfoStr += "		" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), v.UUID, v)\n"
-						entityInfoStr += "		" + attribute.Name + "Ids=append(" + attribute.Name + "Ids," + attribute.Name + "Entity.uuid)\n"
-						entityInfoStr += "		" + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
-						entityInfoStr += "		this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"
-						entityInfoStr += "		if " + attribute.Name + "Entity.NeedSave() {\n"
-						entityInfoStr += "			" + attribute.Name + "Entity.SaveEntity()\n"
-						entityInfoStr += "		}\n"
+						entityInfoStr += "			case *" + elementPackName + "." + implementations[i] + impl + ":\n"
+						entityInfoStr += "			" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), v.UUID, v)\n"
+						entityInfoStr += "			" + attribute.Name + "Ids=append(" + attribute.Name + "Ids," + attribute.Name + "Entity.uuid)\n"
+						entityInfoStr += "			" + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
+						entityInfoStr += "			this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"
+						entityInfoStr += "			if " + attribute.Name + "Entity.NeedSave() {\n"
+						entityInfoStr += "				" + attribute.Name + "Entity.SaveEntity()\n"
+						entityInfoStr += "			}\n"
 
 					}
-					entityInfoStr += "		}\n"
+					entityInfoStr += "			}\n"
 				} else {
 					elementPackName := membersPackage[typeName]
-					entityInfoStr += "		" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.GetUuid(), this.object.M_" + attribute.Name + "[i].UUID,this.object.M_" + attribute.Name + "[i])\n"
-					entityInfoStr += "		" + attribute.Name + "Ids=append(" + attribute.Name + "Ids," + attribute.Name + "Entity.uuid)\n"
-					entityInfoStr += "		" + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
-					entityInfoStr += "		this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"
-					entityInfoStr += "		if " + attribute.Name + "Entity.NeedSave() {\n"
-					entityInfoStr += "			" + attribute.Name + "Entity.SaveEntity()\n"
-					entityInfoStr += "		}\n"
+					entityInfoStr += "			" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.GetUuid(), this.object.M_" + attribute.Name + "[i].UUID,this.object.M_" + attribute.Name + "[i])\n"
+					entityInfoStr += "			" + attribute.Name + "Ids=append(" + attribute.Name + "Ids," + attribute.Name + "Entity.uuid)\n"
+					entityInfoStr += "			" + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
+					entityInfoStr += "			this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"
+					entityInfoStr += "			if " + attribute.Name + "Entity.NeedSave() {\n"
+					entityInfoStr += "				" + attribute.Name + "Entity.SaveEntity()\n"
+					entityInfoStr += "			}\n"
 				}
+				entityInfoStr += "		}\n"
+				entityInfoStr += "	}else{\n"
+				entityInfoStr += "		" + attribute.Name + "Ids = this.lazyMap[\"M_" + attribute.Name + "\"].([]string)\n"
 				entityInfoStr += "	}\n"
 				// Now I will save the array of id's...
 				entityInfoStr += "	" + attribute.Name + "Str, _ := json.Marshal(" + attribute.Name + "Ids)\n"
@@ -1406,7 +1434,8 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 
 			} else {
 				if !isRef {
-					entityInfoStr += "	if this.object.M_" + attribute.Name + " != nil {\n"
+					entityInfoStr += "	lazy_" + attribute.Name + " := this.lazyMap[\"M_" + attribute.Name + "\"] != nil && this.object.M_" + attribute.Name + " == nil\n"
+					entityInfoStr += "	if this.object.M_" + attribute.Name + " != nil && !lazy_" + attribute.Name + "{\n"
 					if Utility.Contains(abstractClassLst, typeName) || Utility.Contains(superClassesLst, typeName) {
 						// So here I will test the type and save appropriately...
 						entityInfoStr += "		switch v := this.object.M_" + attribute.Name + ".(type) {\n"
@@ -1440,7 +1469,9 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 						entityInfoStr += "		}\n"
 
 					}
-					entityInfoStr += "	}else{\n"
+					entityInfoStr += "	}else if lazy_" + attribute.Name + "{\n"
+					entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info, this.lazyMap[\"M_" + attribute.Name + "\"].(string))\n"
+					entityInfoStr += "	}else if this.object.M_" + attribute.Name + " == nil {\n"
 					entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info, \"\")\n"
 					entityInfoStr += "	}\n"
 				} else {

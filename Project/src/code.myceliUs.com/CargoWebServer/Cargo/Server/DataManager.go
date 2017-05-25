@@ -356,7 +356,7 @@ func (this *DataManager) setManyToManyEntityRelationship(tableName string, name 
 		// Now I will initialyse the data.
 		for i := 0; i < len(data); i++ {
 			// TODO make multiple id search instead of id...
-			trg, err := GetServer().GetEntityManager().getEntityById("sql_info", targetType, data[i])
+			trg, err := GetServer().GetEntityManager().getEntityById("sql_info", targetType, data[i], false)
 			if err == nil {
 				// So here I will set the references.
 				refUuids := src.getValue(name)
@@ -511,7 +511,7 @@ func (this *DataManager) getRelationshipEntities(prototype *EntityPrototype, fie
 
 	// No I will get entities from their id's
 	for i := 0; i < len(data); i++ {
-		entity, err := GetServer().GetEntityManager().getEntityById("sql_info", table, data[i])
+		entity, err := GetServer().GetEntityManager().getEntityById("sql_info", table, data[i], false)
 		if err == nil {
 			entities = append(entities, entity.(*DynamicEntity))
 		}
@@ -667,8 +667,8 @@ func (this *DataManager) setEntityRelationship(storeId string, name string, ref_
  * instead a field that contain the reference id are save in the db. Here I
  * will retreive the associated entity and set it inside the M_FK_field_name.
  */
-func (this *DataManager) setEntityReferences(uuid string, isInit bool) error {
-	entity, err := GetServer().GetEntityManager().getEntityByUuid(uuid)
+func (this *DataManager) setEntityReferences(uuid string, isInit bool, lazy bool) error {
+	entity, err := GetServer().GetEntityManager().getEntityByUuid(uuid, lazy)
 
 	if err != nil {
 		return errors.New(err.GetBody())
@@ -841,7 +841,7 @@ func (this *DataManager) deleteData(storeName string, query string, params []int
 			query += "." + tableName + " WHERE "
 
 			if err == nil {
-				entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
+				entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
 				for i := 0; i < len(prototype.Ids); i++ {
 					if strings.HasPrefix(prototype.Ids[i], "M_") {
 						ids = append(ids, entity.(*DynamicEntity).getValue(prototype.Ids[i]))
@@ -970,7 +970,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 						log.Println(ids)
 					} else {
 						// Set it entity references.
-						this.setEntityReferences(uuid, false)
+						this.setEntityReferences(uuid, false, false)
 					}
 				}
 			}
@@ -994,7 +994,7 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 
 	var storeConfig *Config.DataStoreConfiguration
 	ids := []interface{}{storeId}
-	storeConfigEntity, err_ := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", ids)
+	storeConfigEntity, err_ := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", ids, false)
 	// Create the new store here.
 	if err_ != nil {
 		storeConfig = new(Config.DataStoreConfiguration)
@@ -1039,7 +1039,7 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 
 	// Delete the dataStore configuration
 	dataStoreConfigurationUuid := ConfigDataStoreConfigurationExists(storeId)
-	dataStoreConfigurationEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(dataStoreConfigurationUuid)
+	dataStoreConfigurationEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(dataStoreConfigurationUuid, false)
 
 	// In case of the configuration is not already deleted...
 	if errObj == nil {

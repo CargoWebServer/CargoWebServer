@@ -13,8 +13,9 @@ type Entity interface {
 
 	/**
 	 * Create and initialize an entity with a given id.
+	 * if lazy is set at true sub-entity are not initialised
 	 */
-	InitEntity(id string) error
+	InitEntity(id string, lazy bool) error
 
 	/**
 	 * Delete the entity
@@ -25,6 +26,11 @@ type Entity interface {
 	 * Return the type name of an entity
 	 */
 	GetTypeName() string
+
+	/**
+	 * Return the size of an object in memory
+	 */
+	GetSize() uint
 
 	/**
 	 * Get an entity's uuid
@@ -132,6 +138,11 @@ type Entity interface {
 	 * Test if the entity is initialyse.
 	 */
 	IsInit() bool
+
+	/**
+	 * If the entity is lazy loaded.
+	 */
+	IsLazy() bool
 
 	/**
 	 * Set if an entity must be inityalyse.

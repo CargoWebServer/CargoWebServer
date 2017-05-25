@@ -35,7 +35,7 @@ type EntityManager struct {
 	/**
 	 * ref -> entity
 	 */
-	referenced map[string][]EntityRef
+	referenced map[string][]EntityRef // TODO remove when reference are initialyse.
 
 	/**
 	 * entity -> ref
@@ -43,9 +43,9 @@ type EntityManager struct {
 	reference map[string][]EntityRef
 
 	/**
-	* Lock referenced and references map.
+	 * Use to protected the ressource access...
 	 */
-	sync.Mutex
+	sync.RWMutex
 }
 
 var entityManager *EntityManager
@@ -104,8 +104,13 @@ func (this *EntityManager) initialize() {
 		cargoEntities.object.M_name = "Cargo entities"
 		cargoEntities.object.M_version = "1.0"
 		cargoEntities.object.NeedSave = true
+
 		cargoEntities.SaveEntity()
 	}
+
+	// Force complete intialysation of action.
+	this.getEntitiesByType("CargoEntities.Action", "", "CargoEntities", false)
+
 }
 
 func (this *EntityManager) getId() string {
@@ -125,8 +130,7 @@ func (this *EntityManager) stop() {
  */
 func (this *EntityManager) getCargoEntities() *CargoEntities_EntitiesEntity {
 	cargoEntitiesUuid := CargoEntitiesEntitiesExists("CARGO_ENTITIES")
-
-	cargoEntities, _ := this.getEntityByUuid(cargoEntitiesUuid)
+	cargoEntities, _ := this.getEntityByUuid(cargoEntitiesUuid, true)
 	return cargoEntities.(*CargoEntities_EntitiesEntity)
 }
 
@@ -193,7 +197,7 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 	for i := 0; i < len(toDelete.GetReferenced()); i++ {
 		ref := toDelete.GetReferenced()[i]
 		if this.isExist(ref.OwnerUuid) {
-			refOwner, err := this.getEntityByUuid(ref.OwnerUuid)
+			refOwner, err := this.getEntityByUuid(ref.OwnerUuid, true)
 			if err == nil {
 				prototype := refOwner.GetPrototype()
 
@@ -256,6 +260,68 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 	evt, _ := NewEvent(DeleteEntityEvent, EntityEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
 	log.Println("----------> entity ", toDelete.GetUuid(), " is remove ", !this.isExist(toDelete.GetUuid()))
+}
+
+/**
+ * Append a reference to an object. (Owner Uuid)
+ */
+func (this *EntityManager) appendReferences(ref EntityRef) {
+	this.Lock()
+	defer this.Unlock()
+	if this.reference[ref.OwnerUuid] == nil {
+		this.reference[ref.OwnerUuid] = make([]EntityRef, 0)
+	}
+	this.reference[ref.OwnerUuid] = append(this.reference[ref.OwnerUuid], ref)
+}
+
+/**
+ * Return the list of reference for a given object.
+ */
+func (this *EntityManager) getReferences(uuid string) []EntityRef {
+	this.Lock()
+	defer this.Unlock()
+	references := this.reference[uuid]
+	return references
+}
+
+/**
+ * Remove a references of an entity.
+ */
+func (this *EntityManager) removeReferences(uuid string) {
+	this.Lock()
+	defer this.Unlock()
+	delete(this.reference, uuid)
+}
+
+/**
+ * Append a reference to an object. (Owner Uuid)
+ */
+func (this *EntityManager) appendReferenceds(targetId string, ref EntityRef) {
+	this.Lock()
+	defer this.Unlock()
+	if this.referenced[targetId] == nil {
+		this.referenced[targetId] = make([]EntityRef, 0)
+	}
+	this.referenced[targetId] = append(this.referenced[targetId], ref)
+}
+
+/**
+ * Return the list of reference for a given object.
+ */
+func (this *EntityManager) getReferenceds(uuid string) []EntityRef {
+	this.Lock()
+	defer this.Unlock()
+	references := this.referenced[uuid]
+	return references
+}
+
+/**
+ * Remove a references of an entity.
+ */
+func (this *EntityManager) removeReferenceds(uuid string) {
+	this.Lock()
+	defer this.Unlock()
+	delete(this.reference, uuid)
 }
 
 /**
@@ -339,7 +405,7 @@ func (this *EntityManager) setReferences(owner Entity) {
 			// Now I will try to append the reference inside the
 			// entity.
 			for j := 0; j < len(uuids); j++ {
-				reference, err := this.getEntityByUuid(uuids[j])
+				reference, err := this.getEntityByUuid(uuids[j], true)
 				if err == nil {
 					owner.AppendReference(reference)
 				}
@@ -424,7 +490,7 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 							}
 						}
 						if needToBeRemove && len(ref.String()) > 0 {
-							toRemove, _ := this.getEntityByUuid(ref.String())
+							toRemove, _ := this.getEntityByUuid(ref.String(), true)
 							target.RemoveReference(fieldName, toRemove)
 							toRemove.RemoveReferenced(fieldName, target)
 							// I will call remove function...
@@ -436,7 +502,7 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 					// Append the references...
 					for i := 0; i < sourceField.Len(); i++ {
 						if len(sourceField.Index(i).String()) > 0 {
-							ref, err := this.getEntityByUuid(sourceField.Index(i).String())
+							ref, err := this.getEntityByUuid(sourceField.Index(i).String(), true)
 							if err == nil {
 								target.AppendReference(ref)
 								ref.AppendReferenced(fieldName, target)
@@ -455,7 +521,7 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 					// Remove the reference...
 					if sourceField.String() != targetField.String() {
 						if len(targetField.String()) > 0 {
-							toRemove, err := this.getEntityByUuid(targetField.String())
+							toRemove, err := this.getEntityByUuid(targetField.String(), true)
 							if err == nil {
 								target.RemoveReference(fieldName, toRemove)
 								toRemove.RemoveReferenced(fieldName, target)
@@ -468,7 +534,7 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 					}
 					// Append the reference...
 					if len(sourceField.String()) > 0 {
-						ref, err := this.getEntityByUuid(sourceField.String())
+						ref, err := this.getEntityByUuid(sourceField.String(), true)
 						if err == nil {
 							target.AppendReference(ref)
 							ref.AppendReferenced(fieldName, target)
@@ -560,7 +626,7 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 								val, err := Utility.CallMethod(subObject.Interface(), "GetUUID", params)
 								if err == nil {
 									subObjectUuid := val.(string)
-									subEntity, err := this.getEntityByUuid(subObjectUuid)
+									subEntity, err := this.getEntityByUuid(subObjectUuid, true)
 									if err == nil {
 										this.setObjectValues(subEntity, subObject.Interface())
 									}
@@ -596,7 +662,7 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 									log.Println("----------> fail to call method GetUUID on ", sourceField.Interface())
 								}
 
-								subEntity, err := this.getEntityByUuid(subObjectUuid)
+								subEntity, err := this.getEntityByUuid(subObjectUuid, true)
 								if err == nil {
 									this.setObjectValues(subEntity, sourceField.Interface())
 									setMethodName := strings.Replace(fieldName, "M_", "", -1)
@@ -621,7 +687,7 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 /**
  * Return an entity with for a given type and id
  */
-func (this *EntityManager) getEntityById(storeId string, typeName string, ids []interface{}) (Entity, *CargoEntities.Error) {
+func (this *EntityManager) getEntityById(storeId string, typeName string, ids []interface{}, lazy bool) (Entity, *CargoEntities.Error) {
 	// Verify that typeName is valid
 	// interface{} is an exception...
 	if !Utility.IsValidPackageName(typeName) && !strings.HasSuffix(typeName, "interface{}") {
@@ -685,10 +751,10 @@ func (this *EntityManager) getEntityById(storeId string, typeName string, ids []
 		return nil, cargoError
 	}
 
-	entity, errObj := this.getEntityByUuid(results[0][0].(string))
+	entity, errObj := this.getEntityByUuid(results[0][0].(string), lazy)
 
 	if errObj != nil || entity == nil {
-		entity, errObj = this.getDynamicEntityByUuid(results[0][0].(string))
+		entity, errObj = this.getDynamicEntityByUuid(results[0][0].(string), lazy)
 		if errObj != nil {
 			return nil, errObj
 		}
@@ -730,7 +796,7 @@ func (this *EntityManager) getDerivedEntityType(typeName string) ([]*EntityProto
 /**
  * Return the list of entities for a given type name.
  */
-func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, storeId string) ([]Entity, *CargoEntities.Error) {
+func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, storeId string, lazy bool) ([]Entity, *CargoEntities.Error) {
 
 	var entities []Entity
 
@@ -759,9 +825,9 @@ func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, s
 			}
 			if len(values_) > 0 {
 				uuid := values_[0].(string)
-				entity, errObj := this.getEntityByUuid(uuid)
+				entity, errObj := this.getEntityByUuid(uuid, lazy)
 				if errObj != nil {
-					entity, errObj = this.getDynamicEntityByUuid(uuid)
+					entity, errObj = this.getDynamicEntityByUuid(uuid, lazy)
 					if errObj != nil {
 						return entities, errObj
 					}
@@ -797,7 +863,7 @@ func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, s
 		if len(results) > 0 {
 			for i := 0; i < len(results); i++ {
 				uuid := results[i][0].(string)
-				entity, _ := this.getEntityByUuid(uuid)
+				entity, _ := this.getEntityByUuid(uuid, lazy)
 				entities = append(entities, entity)
 			}
 		}
@@ -808,12 +874,12 @@ func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, s
 /**
  * Return the list of all entities for different types.
  */
-func (this *EntityManager) getEntitiesByTypes(typeNames []string, storeId string) ([]Entity, *CargoEntities.Error) {
+func (this *EntityManager) getEntitiesByTypes(typeNames []string, storeId string, lazy bool) ([]Entity, *CargoEntities.Error) {
 	entitiesMap := make(map[string]Entity)
 	var entities []Entity
 
 	for i := 0; i < len(typeNames); i++ {
-		entities_, errObj := this.getEntitiesByType(typeNames[i], "", storeId)
+		entities_, errObj := this.getEntitiesByType(typeNames[i], "", storeId, lazy)
 		if errObj != nil {
 			return entities, errObj
 		}
@@ -860,12 +926,23 @@ func (this *EntityManager) getEntityLnkLst(entity Entity, visited *[]string, lnk
 	}
 }
 
-func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
+func (this *EntityManager) getEntityByUuid(uuid string, lazy bool) (Entity, *CargoEntities.Error) {
+
 	if !Utility.IsValidEntityReferenceName(uuid) {
 		return nil, NewError(Utility.FileLine(), INVALID_REFERENCE_NAME_ERROR, SERVER_ERROR_CODE, errors.New("The uuid '"+uuid+"' is not valid."))
 	}
 
 	if val, ok := this.contain(uuid); ok {
+
+		if lazy {
+			return val, nil
+		} else if !val.IsLazy() {
+			return val, nil
+		}
+		// Remove the actual entity from the cache
+		this.removeEntity(uuid)
+		// Init it, it will introduce it after it.
+		val.InitEntity(uuid, lazy)
 		return val, nil
 	}
 
@@ -886,7 +963,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 
 	if err != nil {
 		// Try with dynamic entity instead.
-		entity, errObj := this.getDynamicEntityByUuid(uuid)
+		entity, errObj := this.getDynamicEntityByUuid(uuid, lazy)
 		if errObj != nil {
 			return nil, errObj
 		}
@@ -894,15 +971,14 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	}
 
 	entity := result.(Entity)
-	entity.InitEntity(uuid)
-
+	entity.InitEntity(uuid, lazy)
 	// Here I will also set the reference for the entity...
 	this.setReferences(entity)
 
 	return entity, nil
 }
 
-func (this *EntityManager) getDynamicEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
+func (this *EntityManager) getDynamicEntityByUuid(uuid string, lazy bool) (Entity, *CargoEntities.Error) {
 
 	if val, ok := this.contain(uuid); ok {
 		return val, nil
@@ -927,7 +1003,7 @@ func (this *EntityManager) getDynamicEntityByUuid(uuid string) (Entity, *CargoEn
 	}
 
 	// initialyse the entity.
-	entity.InitEntity(uuid)
+	entity.InitEntity(uuid, lazy)
 
 	return entity, nil
 
@@ -942,20 +1018,14 @@ func (this *EntityManager) appendReference(name string, ownerId string, value st
 		ref.OwnerUuid = ownerId
 		ref.Value = value
 
-		this.Lock()
+		// append the reference.
+		this.appendReferences(ref)
 
-		if this.reference[ownerId] == nil {
-			this.reference[ownerId] = make([]EntityRef, 0)
-		}
-		this.reference[ownerId] = append(this.reference[ownerId], ref)
-
-		this.Unlock()
-
-		owner, err := this.getEntityByUuid(ownerId)
+		owner, err := this.getEntityByUuid(ownerId, true)
 		if err == nil {
 			targetId := strings.Split(value, "$$")[1]
 			if Utility.IsValidEntityReferenceName(targetId) {
-				target, err := this.getEntityByUuid(targetId)
+				target, err := this.getEntityByUuid(targetId, true)
 				if err == nil {
 					// Set the reference...
 					owner.AppendReference(target)
@@ -968,8 +1038,6 @@ func (this *EntityManager) appendReference(name string, ownerId string, value st
 
 // Use at creation time by dynamic entity... (Save)
 func (this *EntityManager) appendReferenced(name string, ownerId string, value string) {
-	//this.Lock()
-	//defer this.Unlock()
 
 	if value != "null" && !strings.HasSuffix(value, "$$null") {
 		var ref EntityRef
@@ -983,9 +1051,9 @@ func (this *EntityManager) appendReferenced(name string, ownerId string, value s
 		// Here I will try to find the targeted object...
 		if Utility.IsValidEntityReferenceName(targetId) {
 			// The key is an uuid
-			targetRef, err := GetServer().GetEntityManager().getEntityByUuid(targetId)
+			targetRef, err := GetServer().GetEntityManager().getEntityByUuid(targetId, true)
 			if err == nil {
-				ownerRef, _ := GetServer().GetEntityManager().getEntityByUuid(ownerId)
+				ownerRef, _ := GetServer().GetEntityManager().getEntityByUuid(ownerId, true)
 				ownerRef.AppendReference(targetRef)
 				// Append the reference here...
 				targetRef.AppendReferenced(name, ownerRef)
@@ -998,15 +1066,8 @@ func (this *EntityManager) appendReferenced(name string, ownerId string, value s
 
 		// Here the target object does not exist so when it will be created and
 		// save the reference to this owner object will be added to the target.
-		if this.referenced[targetId] == nil {
-			this.referenced[targetId] = make([]EntityRef, 0)
-		}
-
-		// Append the referenced here...
-		this.referenced[targetId] = append(this.referenced[targetId], ref)
+		this.appendReferenceds(targetId, ref)
 	}
-
-	log.Println("---------> referenced ", len(this.referenced))
 }
 
 // used by dynamic entity only...
@@ -1020,7 +1081,7 @@ func (this *EntityManager) saveReferenced(entity Entity) {
 			var referenced []EntityRef
 			if i == 0 {
 				// Get reference by uuid...
-				referenced = this.referenced[entity.GetUuid()]
+				referenced = this.getReferenceds(entity.GetUuid())
 			} else {
 				// Reference registered by other id...
 				id := prototype.Ids[i]
@@ -1042,7 +1103,7 @@ func (this *EntityManager) saveReferenced(entity Entity) {
 						} else if reflect.TypeOf(entity.GetObject().(map[string]interface{})[id]).Kind() == reflect.Int64 {
 							refId += strconv.Itoa(int(entity.GetObject().(map[string]interface{})[id].(int64)))
 						}
-						referenced = this.referenced[refId]
+						referenced = this.getReferenceds(refId)
 					}
 				} else {
 					// A static entity here...
@@ -1051,14 +1112,14 @@ func (this *EntityManager) saveReferenced(entity Entity) {
 					params := make([]interface{}, 0)
 					result, err := Utility.CallMethod(entity.GetObject(), methodName, params)
 					if err == nil {
-						referenced = this.referenced[result.(string)]
+						referenced = this.getReferenceds(result.(string))
 					}
 				}
 			}
 
 			for j := 0; j < len(referenced); j++ {
 				// So here I will get the owner entity
-				owner, _ := this.getEntityByUuid(referenced[j].OwnerUuid)
+				owner, _ := this.getEntityByUuid(referenced[j].OwnerUuid, true)
 				if reflect.TypeOf(owner.GetObject()).String() == "map[string]interface {}" {
 					// Set the uuid as value
 					if owner.GetObject().(map[string]interface{})[referenced[j].Name] != entity.GetUuid() {
@@ -1077,18 +1138,16 @@ func (this *EntityManager) saveReferenced(entity Entity) {
 /**
  * A function to initialyse an entity with a given id.
  */
-func (this *EntityManager) InitEntity(entity Entity) {
-	this.Lock()
-	defer this.Unlock()
+func (this *EntityManager) InitEntity(entity Entity, lazy bool) {
 
 	// Get the list of references.
-	references := this.reference[entity.GetUuid()]
+	references := this.getReferences(entity.GetUuid())
 
 	// Now I will call methode to initialyse the reference...
 	for i := 0; i < len(references); i++ {
 		ref := references[i]
 		// Retreive the reference owner...
-		refOwner, errObj := this.getEntityByUuid(ref.OwnerUuid)
+		refOwner, errObj := this.getEntityByUuid(ref.OwnerUuid, lazy)
 		if errObj == nil {
 			values := strings.Split(ref.Value, "$$")
 			if len(values) == 2 && refOwner != nil {
@@ -1097,12 +1156,12 @@ func (this *EntityManager) InitEntity(entity Entity) {
 				var refTarget Entity
 				if Utility.IsValidEntityReferenceName(refUUID) {
 					// We have a uuid here
-					refTarget, errObj = this.getEntityByUuid(refUUID)
+					refTarget, errObj = this.getEntityByUuid(refUUID, lazy)
 				} else if len(refUUID) > 0 {
 					// Here we have an id not a uuid...
 					storeId := typeName[:strings.Index(typeName, ".")]
 					ids := []interface{}{refUUID}
-					refTarget, errObj = this.getEntityById(storeId, typeName, ids)
+					refTarget, errObj = this.getEntityById(storeId, typeName, ids, lazy)
 				}
 				// The set methode name...
 				if errObj == nil && refTarget != nil {
@@ -1152,7 +1211,7 @@ func (this *EntityManager) InitEntity(entity Entity) {
 	this.insert(entity)
 
 	// remove it from the list...
-	delete(this.reference, entity.GetUuid())
+	this.removeReferences(entity.GetUuid())
 }
 
 /**
@@ -1226,7 +1285,7 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 			return nil, cargoError
 		}
 		var errObj *CargoEntities.Error
-		parentPtr, errObj = this.getEntityByUuid(parentUuid)
+		parentPtr, errObj = this.getEntityByUuid(parentUuid, true)
 		if errObj != nil {
 			return nil, errObj
 		}
@@ -1384,7 +1443,7 @@ func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, m
  */
 func (this *EntityManager) GetObjectsByType(typeName string, queryStr string, storeId string, messageId string, sessionId string) []interface{} {
 
-	entities, errObj := this.getEntitiesByType(typeName, queryStr, storeId)
+	entities, errObj := this.getEntitiesByType(typeName, queryStr, storeId, false)
 
 	var objects []interface{}
 
@@ -1398,7 +1457,7 @@ func (this *EntityManager) GetObjectsByType(typeName string, queryStr string, st
 		//
 		if entities[i] != nil {
 			// Init the entity
-			entities[i].InitEntity(entities[i].GetUuid())
+			entities[i].InitEntity(entities[i].GetUuid(), false)
 
 			objects = append(objects, entities[i].GetObject())
 		}
@@ -1432,9 +1491,9 @@ func (this *EntityManager) isExist(uuid string) bool {
  * Return the underlying object, mostly use by the client side to get object..
  */
 func (this *EntityManager) GetObjectByUuid(uuid string, messageId string, sessionId string) interface{} {
-	entity, errObj := this.getEntityByUuid(uuid)
+	entity, errObj := this.getEntityByUuid(uuid, false)
 	if errObj != nil {
-		entity, errObj = this.getDynamicEntityByUuid(uuid)
+		entity, errObj = this.getDynamicEntityByUuid(uuid, false)
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return nil
@@ -1449,7 +1508,7 @@ func (this *EntityManager) GetObjectByUuid(uuid string, messageId string, sessio
  */
 func (this *EntityManager) GetObjectById(storeId string, typeName string, ids []interface{}, messageId string, sessionId string) interface{} {
 
-	entity, errObj := this.getEntityById(storeId, typeName, ids)
+	entity, errObj := this.getEntityById(storeId, typeName, ids, false)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
@@ -1503,9 +1562,9 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 		return // exit here.
 	}*/
 
-	entity, errObj = this.getEntityByUuid(uuid)
+	entity, errObj = this.getEntityByUuid(uuid, false)
 	if errObj != nil {
-		entity, errObj = this.getDynamicEntityByUuid(uuid)
+		entity, errObj = this.getDynamicEntityByUuid(uuid, false)
 	}
 
 	if entity != nil {
@@ -1564,7 +1623,7 @@ func (this *EntityManager) GetEntityLnks(uuid string, messageId string, sessionI
 	// The entity to remove.
 	var entity Entity
 	var errObj *CargoEntities.Error
-	entity, errObj = this.getEntityByUuid(uuid)
+	entity, errObj = this.getEntityByUuid(uuid, false)
 	visited := make([]string, 0)
 	lnkLst := make([]Entity, 0)
 

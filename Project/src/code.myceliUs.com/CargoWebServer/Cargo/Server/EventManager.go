@@ -282,7 +282,9 @@ type EventChannel struct {
  * This funtion is use to broadcast the event over listener...
  */
 func (this *EventChannel) broadcastEvent(evt *Event) {
+	//log.Println("-----------> 285 ", evt)
 	for _, listener := range this.m_listeners {
+		//log.Println("----------> evt broadcast: ", evt, listener.m_id)
 		listener.onEvent(evt)
 	}
 }

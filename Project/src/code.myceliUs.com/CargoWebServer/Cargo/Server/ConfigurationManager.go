@@ -116,7 +116,7 @@ func (this *ConfigurationManager) initialize() {
 	// So here if there is no configuration...
 	configsUuid := ConfigConfigurationsExists("CARGO_CONFIGURATIONS")
 	if len(configsUuid) > 0 {
-		entity, _ := GetServer().GetEntityManager().getEntityByUuid(configsUuid)
+		entity, _ := GetServer().GetEntityManager().getEntityByUuid(configsUuid, false)
 		this.m_activeConfigurationsEntity = entity.(*Config_ConfigurationsEntity)
 	} else {
 		activeConfigurations := new(Config.Configurations)
@@ -203,7 +203,7 @@ func (this *ConfigurationManager) stop() {
  */
 func (this *ConfigurationManager) getActiveConfigurationsEntity() *Config_ConfigurationsEntity {
 	if this.m_activeConfigurationsEntity != nil {
-		activeConfigurationsEntity, err := GetServer().GetEntityManager().getEntityByUuid(this.m_activeConfigurationsEntity.GetUuid())
+		activeConfigurationsEntity, err := GetServer().GetEntityManager().getEntityByUuid(this.m_activeConfigurationsEntity.GetUuid(), false)
 		if err != nil {
 			return nil
 		}
@@ -219,7 +219,7 @@ func (this *ConfigurationManager) getOAuthConfigurationEntity() *Config_OAuth2Co
 	configurationsEntity := this.getActiveConfigurationsEntity()
 	if configurationsEntity != nil {
 		configurations := configurationsEntity.GetObject().(*Config.Configurations)
-		oauthConfigurationEntity, err := GetServer().GetEntityManager().getEntityByUuid(configurations.GetOauth2Configuration().GetUUID())
+		oauthConfigurationEntity, err := GetServer().GetEntityManager().getEntityByUuid(configurations.GetOauth2Configuration().GetUUID(), false)
 		if err == nil {
 			return oauthConfigurationEntity.(*Config_OAuth2ConfigurationEntity)
 		}

@@ -1,7 +1,7 @@
 
 // global variable.
 var databaseName = "Blog."
-var schemaId = "dbo."
+var schemaId = ""//"dbo."
 
 var userTypeName = databaseName + schemaId + "blog_user"
 var authorTypeName = databaseName + schemaId + "blog_author"
@@ -335,7 +335,7 @@ var BlogManager = function (parent) {
             }
             document.getElementById("login-form-username-input").focus()
         }
-    } (this.registerLnk, this.userInfoLnk)
+    }(this.registerLnk, this.userInfoLnk)
 
     // register
     this.registerLnk.element.onclick = function (loginLnk, userInfoLnk) {
@@ -349,7 +349,7 @@ var BlogManager = function (parent) {
             }
             document.getElementById("register-form-username-input").focus()
         }
-    } (this.loginLnk, this.userInfoLnk)
+    }(this.loginLnk, this.userInfoLnk)
 
     // The user informations.
     this.userInfoLnk.element.onclick = function (loginLnk, registerLnk) {
@@ -362,7 +362,7 @@ var BlogManager = function (parent) {
                 this.parentNode.className = "dropdown open"
             }
         }
-    } (this.loginLnk, this.registerLnk)
+    }(this.loginLnk, this.registerLnk)
 
     // Now the mouse out event.
     this.registerDropDown = this.navBar.getChildById("register-dropdown")
@@ -386,7 +386,7 @@ var BlogManager = function (parent) {
             // Create a new blog.
             blogManager.createNewPost()
         }
-    } (this)
+    }(this)
 
     // Register.
     this.registerBtn = this.navBar.getChildById("register-submit")
@@ -424,7 +424,7 @@ var BlogManager = function (parent) {
                 }, {})
 
         }
-    } (userNameInput, emailInput, passwordInput, confirmPasswordInput)
+    }(userNameInput, emailInput, passwordInput, confirmPasswordInput)
 
     // Now the login button.
     this.loginBtn = this.navBar.getChildById("login-submit")
@@ -510,11 +510,11 @@ var BlogManager = function (parent) {
                             loginFormUsernameError.innerHTML = ""
                             loginFormPasswordError.innerHTML = ""
                         }
-                    } (loginFormUsernameError, loginFormPasswordError), 2000)
+                    }(loginFormUsernameError, loginFormPasswordError), 2000)
 
                 }, { "blogManager": blogManager, "loginNameInput": loginNameInput, "loginPasswordInput": loginPasswordInput })
         }
-    } (this, loginNameInput, loginPasswordInput)
+    }(this, loginNameInput, loginPasswordInput)
 
     // Logout the user.
     this.logoutDropdownLnk.element.onclick = function (blogManager) {
@@ -543,7 +543,7 @@ var BlogManager = function (parent) {
                 function () { },
                 { "loginDropdownLnk": blogManager.loginDropdownLnk, "userInfoDropdownLnk": blogManager.userInfoDropdownLnk, "logoutDropdownLnk": blogManager.logoutDropdownLnk })
         }
-    } (this)
+    }(this)
 
     // Now the user infos.
     var firstNameInput = this.userInfoDropDown.getChildById("first_name")
@@ -559,7 +559,7 @@ var BlogManager = function (parent) {
             // So here I will create a new user if none exist.
             var user = null
             var exist = false
-            if (blogManager.account.m_userRef != null) {
+            if (isObject(blogManager.account.M_userRef)) {
                 user = blogManager.account.M_userRef
                 exist = true
             } else {
@@ -608,7 +608,7 @@ var BlogManager = function (parent) {
             }
 
         }
-    } (this, firstNameInput, lastNameInput, middleNameInput, email, phone)
+    }(this, firstNameInput, lastNameInput, middleNameInput, email, phone)
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //  Event listener's
@@ -682,36 +682,38 @@ BlogManager.prototype.displayAuthorPost = function () {
     }
 
     // Now I will get the all post from a given author.
-    server.entityManager.getEntityById("sql_info", authorTypeName, [this.account.M_userRef.UUID],
-        // The success callback.
-        function (author, caller) {
+    if (isObject(this.account.M_userRef)) {
+        server.entityManager.getEntityById("sql_info", authorTypeName, [this.account.M_userRef.UUID],
+            // The success callback.
+            function (author, caller) {
 
-            var authorPostDiv = caller.blogManager.authorPostDiv
-            for (var i = 0; i < author.M_FK_blog_post_blog_author.length; i++) {
-                var post = author.M_FK_blog_post_blog_author[i]
-                if (server.entityManager.entities[post.UUID] != undefined) {
-                    post = server.entityManager.entities[post.UUID]
-                    author.M_FK_blog_post_blog_author[i] = post
-                }
-                // Here I will create the link with the title.
-                authorPostDiv.appendElement({ "tag": "div", "class": "row" }).down()
-                    .appendElement({ "tag": "div", "class": "col-md-1" }).down()
-                    .appendElement({ "tag": "i", "class": "fa fa-trash-o delete-button", "style": "vertical-align: center;" }).up()
-                    .appendElement({ "tag": "a", "id": post.UUID + "_lnk", "class": "col-md-10 control-label", "innerHtml": post.M_title, "href": "#" })
-
-                var postLnk = authorPostDiv.getChildById(post.UUID + "_lnk")
-                postLnk.element.onclick = function (post, blogManager) {
-                    return function () {
-                        blogManager.activePostView = new BlogPostView(blogManager.blogContainer, post)
-                        // Set the blog view editable.
-                        blogManager.setEditable(caller.blogManager.activePostView)
+                var authorPostDiv = caller.blogManager.authorPostDiv
+                for (var i = 0; i < author.M_FK_blog_post_blog_author.length; i++) {
+                    var post = author.M_FK_blog_post_blog_author[i]
+                    if (server.entityManager.entities[post.UUID] != undefined) {
+                        post = server.entityManager.entities[post.UUID]
+                        author.M_FK_blog_post_blog_author[i] = post
                     }
-                } (post, caller.blogManager)
-            }
-        },
-        // Error callback.
-        function () { },
-        { "blogManager": this })
+                    // Here I will create the link with the title.
+                    authorPostDiv.appendElement({ "tag": "div", "class": "row" }).down()
+                        .appendElement({ "tag": "div", "class": "col-md-1" }).down()
+                        .appendElement({ "tag": "i", "class": "fa fa-trash-o delete-button", "style": "vertical-align: center;" }).up()
+                        .appendElement({ "tag": "a", "id": post.UUID + "_lnk", "class": "col-md-10 control-label", "innerHtml": post.M_title, "href": "#" })
+
+                    var postLnk = authorPostDiv.getChildById(post.UUID + "_lnk")
+                    postLnk.element.onclick = function (post, blogManager) {
+                        return function () {
+                            blogManager.activePostView = new BlogPostView(blogManager.blogContainer, post)
+                            // Set the blog view editable.
+                            blogManager.setEditable(caller.blogManager.activePostView)
+                        }
+                    }(post, caller.blogManager)
+                }
+            },
+            // Error callback.
+            function () { },
+            { "blogManager": this })
+    }
 }
 
 /**
@@ -808,7 +810,7 @@ BlogManager.prototype.setEditable = function (blogView) {
             return function () {
                 onClickCallback(div, this)
             }
-        } (onClickCallback, div)
+        }(onClickCallback, div)
     }
 
     // Set the title div.
@@ -837,10 +839,10 @@ BlogManager.prototype.setEditable = function (blogView) {
                         setEditable(div, setTitleCallback)
                         blogManager.saveActivePost()
                     }
-                } (inputTitle, div, blogManager)
+                }(inputTitle, div, blogManager)
             }
         }
-    } (this)
+    }(this)
 
     // Set the title.
     setEditable(blogView.titleDiv, setTitleCallback)
@@ -870,9 +872,9 @@ BlogManager.prototype.setEditable = function (blogView) {
 
                         blogManager.saveActivePost()
                     }
-                } (blogManager)
+                }(blogManager)
             }
-        } (this))
+        }(this))
 
     // Here I will use use the clock to set the time.
 }
@@ -991,7 +993,7 @@ var BlogPostView = function (parent, post) {
                     return function (ref) {
                         new BlogPostCommentView(blogPostView.commentContainer, ref, comment, post, comment.M_id)
                     }
-                } (this, comment, post)
+                }(this, comment, post)
             )
         } else {
             new BlogPostCommentView(this.commentContainer, comment.M_FK_blog_comment_blog_user, comment, post, comment.M_id)
@@ -1114,7 +1116,7 @@ BlogPostCommentEditor = function (parent, parentDiv) {
                                                 // Set the text focus.
                                                 caller.newCommentTextArea.element.focus()
                                             }
-                                        } (caller, results)
+                                        }(caller, results)
                                     )
 
                                 },
@@ -1129,7 +1131,7 @@ BlogPostCommentEditor = function (parent, parentDiv) {
                 function (errMsg, caller) {
                 }, commentEditor)
         }
-    } (this)
+    }(this)
 
     // The summit comment action.
     this.submitCommentBtn.element.onclick = function (commentEditor) {
@@ -1138,7 +1140,7 @@ BlogPostCommentEditor = function (parent, parentDiv) {
             commentEditor.parent.appendComment(commentEditor.parent.post, commentEditor.activeUser, commentEditor.newCommentTextArea.element.value)
             commentEditor.newCommentTextArea.element.value = ""
         }
-    } (this)
+    }(this)
 
     return this
 }

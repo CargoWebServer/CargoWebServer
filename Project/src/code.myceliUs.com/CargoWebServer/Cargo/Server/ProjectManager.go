@@ -95,7 +95,7 @@ func (this *ProjectManager) synchronize() {
 					cargoEntities.GetObject().(*CargoEntities.Entities).SetEntities(project)
 					cargoEntities.SaveEntity()
 				} else {
-					projectEntity, _ := GetServer().GetEntityManager().getEntityByUuid(projectUUID)
+					projectEntity, _ := GetServer().GetEntityManager().getEntityByUuid(projectUUID, false)
 					this.synchronizeProject(projectEntity.GetObject().(*CargoEntities.Project), this.root+"/"+f.Name())
 					projectEntity.SaveEntity()
 				}
@@ -113,7 +113,7 @@ func (this *ProjectManager) synchronizeProject(project *CargoEntities.Project, p
 	ids := []interface{}{Utility.CreateSha1Key([]byte("/" + project.GetId()))}
 
 	// I will keep reference to the project directory only...
-	file, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", ids) // get the first file level only...
+	file, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", ids, false) // get the first file level only...
 	if err == nil {
 		project.SetFilesRef(file.GetObject().(*CargoEntities.File))
 	}

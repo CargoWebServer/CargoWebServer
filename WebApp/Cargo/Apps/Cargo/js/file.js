@@ -169,15 +169,6 @@ FileManager.prototype.createFile = function (filename, filepath, filedata, thumb
     xhr.send(formData);
 }
 
-/*
- * server side code.
- */
-function GetFileByPath(path) {
-    var file = null
-    file = server.GetFileManager().GetFileByPath(path, messageId, sessionId)
-    return file
-}
-
 /**
  * Retreive a file with a given id
  * @param {string} id The file id.
@@ -218,6 +209,15 @@ FileManager.prototype.downloadFile = function (path, fileName, mimeType, progres
     } (progressCallback, caller)
 
     xhr.send();
+}
+
+/*
+ * server side code.
+ */
+function GetFileByPath(path) {
+    var file = null
+    file = server.GetFileManager().GetFileByPath(path, messageId, sessionId)
+    return file
 }
 
 /**

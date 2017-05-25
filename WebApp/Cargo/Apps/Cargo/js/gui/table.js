@@ -382,10 +382,10 @@ Table.prototype.refresh = function () {
  * Return a row with a given id.
  */
 Table.prototype.getRow = function (id) {
-	if(this.rowsId[id] == undefined){
+	if (this.rowsId[id] == undefined) {
 		// Here it can be a new row...
-		for(i=0; i < this.rows.length; i++){
-			if(this.rows[i].id === ""){
+		for (i = 0; i < this.rows.length; i++) {
+			if (this.rows[i].id === "") {
 				this.rows[i].id = id
 				this.rowsId[id] = this.rows[i]
 				break
@@ -593,34 +593,8 @@ var TableRow = function (table, index, data, id) {
 
 	this.saveBtn.element.onclick = function (row) {
 		return function () {
-			if (row.table.model.entities[row.index] != undefined) {
-				var entity = row.table.model.entities[row.index]
-				this.style.visibility = "hidden"
-				// Here I will save the entity...
-				if (entity != null) {
-					entity.NeedSave = true
-					if (entity.exist == false) {
-						// Remove the tmp entity...
-						server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, entity.M_id, entity,
-							// Success callback
-							function (entity, table) {
-
-							},
-							// Error callback.
-							function (result, caller) {
-
-							}, row.table)
-					} else {
-						server.entityManager.saveEntity(entity,
-							function (result, row) {
-
-							}, function () {
-
-							}, this)
-					}
-
-				}
-			}
+			this.style.visibility = "hidden"
+			row.table.model.saveValue(row)
 		}
 	} (this)
 
@@ -1313,13 +1287,13 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 	var editor = this.row.table.cellEditors[this.index]
 
 	// One editor at time.
-	if (editor != undefined) {
+	/*if (editor != undefined) {
 		if (editor.element.parentNode != undefined) {
 			editor.element.parentNode.removeChild(editor.element)
 		}
 		delete this.row.table.cellEditors[this.index]
 		editor = null
-	}
+	}*/
 
 	var prototype = this.row.table.model.proto
 	var entity = null
@@ -1474,7 +1448,6 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				}
 
 				if (self.value != value) {
-
 					if (editor.entity != undefined) {
 						if (editor.entity.M_valueOf != undefined) {
 							editor.entity.M_valueOf = value

@@ -374,7 +374,7 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
  */
 func (this *LdapManager) GetAllUsers() ([]*CargoEntities.User, *CargoEntities.Error) {
 	var allUsers []*CargoEntities.User
-	entities, errObj := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.User", "", CargoEntitiesDB)
+	entities, errObj := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.User", "", CargoEntitiesDB, false)
 	if errObj != nil {
 		return nil, errObj
 	}
@@ -389,7 +389,7 @@ func (this *LdapManager) GetAllUsers() ([]*CargoEntities.User, *CargoEntities.Er
  */
 func (this *LdapManager) GetUserById(id string) (*CargoEntities.User, *CargoEntities.Error) {
 	ids := []interface{}{id}
-	userEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.User", ids)
+	userEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.User", ids, false)
 	if errObj == nil {
 		user := userEntity.GetObject().(*CargoEntities.User)
 		return user, nil
@@ -430,7 +430,7 @@ func (this *LdapManager) SynchronizeGroups(id string) error {
 				if err == nil {
 					for k := 0; k < len(membersRef); k++ {
 						ids := []interface{}{membersRef[k]}
-						member, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.User", ids)
+						member, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.User", ids, false)
 						if err == nil {
 							group.SetMembersRef(member.GetObject().(*CargoEntities.User))
 							member.GetObject().(*CargoEntities.User).SetMemberOfRef(group)
@@ -469,7 +469,7 @@ func (this *LdapManager) SynchronizeGroups(id string) error {
  */
 func (this *LdapManager) GetAllGroups() ([]*CargoEntities.Group, *CargoEntities.Error) {
 	var allGroups []*CargoEntities.Group
-	entities, errObj := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Group", "", CargoEntitiesDB)
+	entities, errObj := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Group", "", CargoEntitiesDB, false)
 	if errObj != nil {
 		return nil, errObj
 	}
@@ -484,7 +484,7 @@ func (this *LdapManager) GetAllGroups() ([]*CargoEntities.Group, *CargoEntities.
  */
 func (this *LdapManager) GetGroupById(id string) (*CargoEntities.Group, *CargoEntities.Error) {
 	ids := []interface{}{id}
-	groupEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Group", ids)
+	groupEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Group", ids, false)
 	if errObj == nil {
 		group := groupEntity.GetObject().(*CargoEntities.Group)
 		return group, nil
@@ -591,7 +591,7 @@ func (this *LdapManager) SynchronizeComputers(id string) error {
  */
 func (this *LdapManager) GetComputer(id string) (*CargoEntities.Computer, *CargoEntities.Error) {
 	ids := []interface{}{id}
-	computerEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Computer", ids)
+	computerEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Computer", ids, false)
 	if errObj == nil {
 		computer := computerEntity.GetObject().(*CargoEntities.Computer)
 		return computer, errObj
@@ -624,7 +624,7 @@ func (this *LdapManager) GetComputerByName(name string) (*CargoEntities.Computer
 	}
 
 	// Get the computer with it name...
-	computerEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(results[0][0].(string))
+	computerEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(results[0][0].(string), false)
 	if errObj == nil {
 		computer := computerEntity.GetObject().(*CargoEntities.Computer)
 		return computer, errObj

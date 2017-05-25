@@ -98,7 +98,7 @@ var Attachment = function (fileName, fileData) {
  */
 function SendEmail(serverId, from_, to, cc, title, msg, attachs, bodyType) {
     var err = null
-    err = server.GetSmtpManager().SendEmail(serverId, from_, to, cc, title, msg, attachs, bodyType, messageId, sessionId)
+    err = server.GetEmailManager().SendEmail(serverId, from_, to, cc, title, msg, attachs, bodyType, messageId, sessionId)
     return err
 }
 
@@ -123,7 +123,7 @@ EmailManager.prototype.sendEmail = function (serverId, from_, to, cc, title, msg
     var params = []
     params.push(createRpcData(serverId, "STRING", "serverId"))
     params.push(createRpcData(from_, "STRING", "from"))
-    params.push(createRpcData(to, "STRING", "to"))
+    params.push(createRpcData(to, "JSON_STR", "to"))
     params.push(createRpcData(cc, "JSON_STR", "cc", "Server.CarbonCopy"))
     params.push(createRpcData(title, "STRING", "title"))
     params.push(createRpcData(msg, "STRING", "msg"))

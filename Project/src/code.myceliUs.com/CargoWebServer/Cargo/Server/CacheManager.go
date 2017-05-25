@@ -21,11 +21,9 @@ type CacheItem struct {
  * Return a metric value that represent the weight of the item in the cache.
  */
 func (this *CacheItem) Weight() int64 {
-	//weigth := float64(this.hit / (now - this.hit))
 	now := Utility.MakeTimestamp()
 	elapsed := now - this.lastAccess
-	//log.Println("--------> item ", this.entity.GetUuid(), " elapsed ", elapsed)
-	return int64(elapsed)
+	return int64(elapsed) * int64(this.hit)
 }
 
 // An array of Cache Item.
@@ -66,14 +64,26 @@ func (this CacheItems) getItemIndex(uuid string) int {
 }
 
 /**
+ * Return the size in memory of items.
+ */
+func (this CacheItems) getSize() uint {
+	var size uint
+	for i := 0; i < this.Len(); i++ {
+		size += this[i].entity.GetSize()
+	}
+
+	return size
+}
+
+/**
  * I will made use of BoltDB as cache backend. The cache will store information
  * of the engine on the disk.
  */
 type CacheManager struct {
 	/**
-	 * The maximum number of items in the cache.
+	 * The maximum cache size.
 	 */
-	max int
+	max uint
 
 	/**
 	 * Contain the item
@@ -125,9 +135,9 @@ func (this *Server) GetCacheManager() *CacheManager {
 func newCacheManager() *CacheManager {
 	cacheManager := new(CacheManager)
 
-	// Set the ordered items.
-	cacheManager.max = 10000
-	cacheManager.orderedItems = make(CacheItems, 0, cacheManager.max)
+	// The maximum size in memory allowed to the server.
+	cacheManager.max = 268435456 // 256 megabytes...
+	cacheManager.orderedItems = make(CacheItems, 0)
 
 	return cacheManager
 }
@@ -204,13 +214,16 @@ func (this *CacheManager) set(entity Entity) {
 	index := this.orderedItems.getItemIndex(entity.GetUuid())
 	var item *CacheItem
 
-	if this.orderedItems.Len() == this.max {
+	if this.orderedItems.getSize() >= this.max {
 		item = new(CacheItem)
 		item.entity = entity
 		item.lastAccess = Utility.MakeTimestamp()
 
-		// Set the new one
-		this.orderedItems[this.max-1] = item
+		// reorder the array
+		sort.Sort(this.orderedItems)
+
+		index := len(this.orderedItems) - 1
+		this.orderedItems[index] = item
 
 	} else if index != this.orderedItems.Len() {
 		item = this.orderedItems[index]
@@ -218,17 +231,14 @@ func (this *CacheManager) set(entity Entity) {
 		item.lastAccess = Utility.MakeTimestamp()
 		// Set the item at the end.
 		this.orderedItems[index] = item
+
 	} else {
 		item = new(CacheItem)
+		item.hit = 1
 		item.entity = entity
 		item.lastAccess = Utility.MakeTimestamp()
 		this.orderedItems = append(this.orderedItems, item)
 	}
-
-	// reorder the array
-	sort.Sort(this.orderedItems)
-
-	log.Println("set entity -> ", entity.GetUuid(), " number of item: ", len(this.orderedItems))
 }
 
 /**
@@ -238,6 +248,7 @@ func (this *CacheManager) get(uuid string) Entity {
 
 	index := this.orderedItems.getItemIndex(uuid)
 	if index != this.orderedItems.Len() {
+		this.orderedItems[index].hit += 1
 		return this.orderedItems[index].entity
 	}
 
@@ -249,7 +260,13 @@ func (this *CacheManager) get(uuid string) Entity {
  */
 func (this *CacheManager) remove(uuid string) {
 	log.Println("------> remove item: ", uuid, " from cache")
-	//delete(this.items, uuid)
+	var orderedItems CacheItems
+	for i := 0; i < len(this.orderedItems); i++ {
+		if this.orderedItems[i].entity.GetUuid() != uuid {
+			orderedItems = append(orderedItems, this.orderedItems[i])
+		}
+	}
+	this.orderedItems = orderedItems
 }
 
 /**

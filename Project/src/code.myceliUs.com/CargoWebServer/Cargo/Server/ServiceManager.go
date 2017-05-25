@@ -190,7 +190,7 @@ func (this *ServiceManager) registerActions(service Service) {
 			// I will append the action into the admin role that has all permission.
 			adminRoleUuid := CargoEntitiesRoleExists("adminRole")
 			if len(adminRoleUuid) > 0 {
-				adminRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(adminRoleUuid)
+				adminRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(adminRoleUuid, false)
 				adminRoleEntity.GetObject().(*CargoEntities.Role).SetActions(action)
 			}
 		}

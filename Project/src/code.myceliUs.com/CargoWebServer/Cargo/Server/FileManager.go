@@ -224,7 +224,17 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 // TODO add the logic for db files...
 func (this *FileManager) createDir(dirName string, dirPath string, sessionId string) (*CargoEntities.File, *CargoEntities.Error) {
 
-	log.Println("Create entity for Directory: ", dirPath+"/"+dirName)
+	// Return the dir entity if it already exist.
+	dirId := Utility.CreateSha1Key([]byte(dirPath + "/" + dirName))
+	dirUuid := CargoEntitiesFileExists(dirId)
+	if len(dirUuid) > 0 {
+		dirEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(dirUuid, false)
+		if errObj == nil {
+			return dirEntity.GetObject().(*CargoEntities.File), nil
+		}
+		return nil, errObj
+	}
+
 	// If the dir is the root dir
 	isRoot := len(dirName) == 0 && len(dirPath) == 0
 
@@ -328,7 +338,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 	fileId := Utility.CreateSha1Key([]byte(filepath + "/" + filename))
 	fileUuid := CargoEntitiesFileExists(fileId)
 
-	parentDirEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(parentDir.GetUUID())
+	parentDirEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(parentDir.GetUUID(), false)
 	if errObj != nil {
 		return nil, errObj
 	}
@@ -336,7 +346,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 	// I will retreive the file.
 	if len(fileUuid) > 0 {
 		isNew = false
-		entity, cargoError := GetServer().GetEntityManager().getEntityByUuid(fileUuid)
+		entity, cargoError := GetServer().GetEntityManager().getEntityByUuid(fileUuid, false)
 		if cargoError != nil {
 			return nil, cargoError
 		}
@@ -499,10 +509,11 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
  */
 func (this *FileManager) getFileById(id string) (*CargoEntities.File, *CargoEntities.Error) {
 	ids := []interface{}{id}
-	fileEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", ids)
+	fileEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", ids, false)
+
 	if errObj == nil {
 		// Initialize it's content.
-		fileEntity.InitEntity(fileEntity.GetUuid())
+		fileEntity.InitEntity(fileEntity.GetUuid(), false)
 		file := fileEntity.GetObject().(*CargoEntities.File)
 		return file, nil
 	}
@@ -572,7 +583,7 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
  */
 func (this *FileManager) deleteFile(uuid string) error {
 	fileEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity("", uuid, nil)
-	fileEntity.InitEntity(uuid)
+	fileEntity.InitEntity(uuid, false)
 	file := fileEntity.GetObject().(*CargoEntities.File)
 
 	if file.GetFileType() == CargoEntities.FileType_DiskFile {
@@ -832,17 +843,18 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 	// I will open the file form the tmp directory.
 	filedata, err := ioutil.ReadFile(tmpPath)
 
+	// remove the tmp file if it file path is not empty... otherwise the
+	// file will bee remove latter.
+	defer os.Remove(tmpPath)
+
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), FILE_NOT_FOUND_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
 
-	// remove the tmp file if it file path is not empty... otherwise the
-	// file will bee remove latter.
-	defer os.Remove(tmpPath)
-
 	dirEntity, dirErrObj := this.getFileById(Utility.CreateSha1Key([]byte(filepath)))
+
 	if dirErrObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, dirErrObj)
 		return nil

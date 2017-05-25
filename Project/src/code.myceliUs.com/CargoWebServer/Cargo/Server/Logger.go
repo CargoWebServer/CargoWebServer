@@ -18,7 +18,7 @@ func NewLogger(id string) *Logger {
 	uuid := CargoEntitiesLogExists(id)
 
 	if len(uuid) > 0 {
-		entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
+		entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
 		logger.logEntity = entity.(*CargoEntities_LogEntity)
 	} else {
 
