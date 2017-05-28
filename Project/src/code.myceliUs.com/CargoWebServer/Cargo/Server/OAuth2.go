@@ -1444,7 +1444,6 @@ func InfoHandler(w http.ResponseWriter, r *http.Request) {
  * This is the client redirect handler.
  */
 func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("--------> 1433")
 	r.ParseForm()
 	errorCode := r.Form.Get("error")
 	state := r.Form.Get("state")
@@ -1619,6 +1618,49 @@ func HttpQueryHandler(w http.ResponseWriter, r *http.Request) {
 	// Append the tow empty string at the end of the call.
 	params = append(params, "") // sessionId
 	params = append(params, "") // messageId
+
+	var accessTokenId string
+
+	// Try to get access token from the list of parameters.
+	accessTokenId = values.Get("access_token")
+
+	if len(accessTokenId) == 0 {
+		values := strings.Split(r.Header.Get("Authorization"), " ")
+		if len(values) == 2 {
+			if strings.ToLower(values[0]) == "bearer" {
+				accessTokenId = values[1]
+			}
+		}
+	}
+
+	if len(accessTokenId) == 0 {
+		if len(r.Form["access_token"]) == 1 {
+			accessTokenId = r.Form["access_token"][0]
+		}
+	}
+
+	// The access token variable.
+	var accessToken *Config.OAuth2Access
+
+	if len(accessTokenId) > 0 {
+		ids := []interface{}{accessTokenId}
+		entity, err := GetServer().GetEntityManager().getEntityById("Config", "Config.OAuth2Access", ids, false)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/text")
+			w.Write([]byte(err.GetBody()))
+			return
+		}
+
+		// Get the access token here.
+		accessToken = entity.GetObject().(*Config.OAuth2Access)
+
+	} else {
+		w.Header().Set("Content-Type", "application/text")
+		w.Write([]byte("Access denied!"))
+		return
+	}
+
+	log.Println("open id token: ", accessToken.GetUserData())
 
 	// Here I will call the function on the service.
 	results, err := Utility.CallMethod(service, ids[2], params)

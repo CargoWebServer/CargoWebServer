@@ -51,6 +51,10 @@ var HomePage = function () {
     /** The file navigation  */
     this.fileNavigator = null
 
+    /** Use to configure roles and permissions */
+    this.rolePermissionManager = null
+    this.rolePermissionDiv = null
+
     /** The code editor */
     this.codeEditor = null
 
@@ -156,7 +160,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
             // Error
             function () {
 
-            }, {"extension":extension})
+            }, { "extension": extension })
     }
 
     // Create a new Entity Query File.
@@ -165,19 +169,19 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     // Entity Query Language File.
     var newEqlQueryMenuItem = new MenuItem("new_eql_query_menu_item", "EQL Query", {}, 1, function (extension) {
         return function () { createQuery(extension) }
-    } (".eql"), "fa fa-file-o")
+    }(".eql"), "fa fa-file-o")
 
     // Structured Query Language Query Language File.
     var newSqlQueryMenuItem = new MenuItem("new_sql_query_menu_item", "SQL Query", {}, 1, function (extension) {
         return function () { createQuery(extension) }
-    } (".sql"), "fa fa-file-o")
+    }(".sql"), "fa fa-file-o")
 
     var newProjectMenuItem = new MenuItem("new_project_menu_item", "New Project...", {}, 1,
         function (homepage) {
             return function () {
                 homepage.createNewProject()
             }
-        } (this), "fa fa-files-o")
+        }(this), "fa fa-files-o")
 
     // The new menu in the file menu
     var newFileMenuItem = new MenuItem("new_file_menu_item", "New", { "new_project_menu_item": newProjectMenuItem }, 1)
@@ -198,15 +202,15 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                                 // Now I will load the content of the file.
                                 server.dataManager.importXsdSchema(file.name, e.target.result)
                             }
-                        } (f);
+                        }(f);
                         reader.readAsText(f);
                     }
                 }
-            } (this)
+            }(this)
             // Display the file explorer...
             fileExplorer.element.click()
         }
-    } (parent), "fa fa-file-o")
+    }(parent), "fa fa-file-o")
 
     var importXmlDataMenuItem = new MenuItem("import_xml_menu_item", "XML data", {}, 2, function (parent) {
         return function () {
@@ -232,11 +236,11 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                         reader.readAsText(f);
                     }
                 }
-            } (this)
+            }(this)
             // Display the file explorer...
             fileExplorer.element.click()
         }
-    } (parent), "fa fa-file-o")
+    }(parent), "fa fa-file-o")
 
     var importDataMenuItem = new MenuItem("import_data_menu_item", "Import", { "import_xsd_menu_item": importXsdSchemaMenuItem, "import_xml_menu_item": importXmlDataMenuItem }, 1)
 
@@ -288,14 +292,21 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                 // if the button is already active that mean the user want to expand or shring the 
                 // navigation panel.
                 if (this.firstChild.className.indexOf("active") > -1) {
-                    if (leftDiv.element.style.width == "50px") {
-                        var keyframe = "100% { width:431px;}"
+                    if (leftDiv.element.clientWidth == 50) {
+                        var w = 431
+                        /*var navigationDivs = document.getElementsByClassName("navigation_div")
+                        for(var i=0; i < navigationDivs.length; i++){
+                            if(navigationDivs[i].style.display != "none"){
+                                w = navigationDivs[i].clientWidth
+                            }
+                        }*/
+                        var keyframe = "100% { width:" + w + "px;}"
                         leftDiv.animate(keyframe, .5,
                             function (leftDiv) {
                                 return function () {
                                     leftDiv.element.style.width = "431px"
                                 }
-                            } (leftDiv))
+                            }(leftDiv))
                     } else {
                         var keyframe = "100% { width:50px;}"
                         leftDiv.element.style.overflowY = "hidden"
@@ -305,7 +316,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                                     leftDiv.element.style.width = "50px"
                                     leftDiv.element.style.overflowY = "hidden"
                                 }
-                            } (leftDiv))
+                            }(leftDiv))
                     }
                     return
                 }
@@ -335,7 +346,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                 homepage.dataExplorer.resize()
 
             }
-        } (div, leftDiv)
+        }(div, leftDiv)
     }
 
     // Now I will append the button inside the context selector.
@@ -374,9 +385,15 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     setSelectAction(this.serverSettingContext, this.serverSettingDiv)
     this.serverConfiguration = new ConfigurationPanel(this.serverSettingDiv, "Server configuration", "Config.ServerConfiguration", "serverConfig")
 
-    // The security context...
+    // The roles and permissions configuration.
+    this.rolePermissionDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display:none;" })
+    this.rolePermissionManager = new RolePermissionManager(this.rolePermissionDiv)
+    this.rolePermissionContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Roles/Permissions" }).appendElement({ "tag": "i", "class": "fa fa-shield" })
+    setSelectAction(this.rolePermissionContext, this.rolePermissionDiv)
+
+    // The Oauth context...
     this.securityDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": " left:50px; display:none;" })
-    this.securityContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "security" }).appendElement({ "tag": "i", "class": "fa fa-shield" })
+    this.securityContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "OAuth2" }).appendElement({ "tag": "i", "class": "fa fa-lock" })
     setSelectAction(this.securityContext, this.securityDiv)
     this.oauth2Configuration = new ConfigurationPanel(this.securityDiv, "Security configuration", "Config.OAuth2Configuration", "oauth2Configuration")
 
@@ -430,8 +447,6 @@ HomePage.prototype.init = function (parent, sessionInfo) {
         function (errMsg, caller) {
 
         }, this)
-
-
 }
 
 /**
