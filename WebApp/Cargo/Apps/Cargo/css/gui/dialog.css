@@ -54,6 +54,7 @@
     display: table-cell;
 	vertical-align: middle;
     text-align: center;
+	z-index: 10;
 }
 
 .dialog_delete_button:hover{

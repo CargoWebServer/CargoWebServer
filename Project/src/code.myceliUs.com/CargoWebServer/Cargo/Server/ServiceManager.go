@@ -144,17 +144,18 @@ func (this *ServiceManager) registerActions(service Service) {
 		if len(metodUuid) == 0 && !(strings.HasPrefix(method.Name, "New") && (strings.HasSuffix(method.Name, "Entity") || strings.HasSuffix(method.Name, "EntityFromObject"))) {
 
 			action := new(CargoEntities.Action)
-			action.UUID = "CargoEntities.Action%" + Utility.RandomUUID()
-			action.TYPENAME = "CargoEntities.Action"
 			action.SetName(methodName)
+
+			// Set the uuid
+			GetServer().GetEntityManager().NewCargoEntitiesActionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", action)
 
 			// The input
 			for j := 0; j < method.Type.NumIn(); j++ {
 				in := method.Type.In(j)
 				// The first paramters is the object itself.
-				if j > 0 {
+				if j > 2 {
 					parameter := new(CargoEntities.Parameter)
-					parameter.UUID = "CargoEntities.Parameter%" + Utility.RandomUUID()
+					parameter.UUID = "CargoEntities.Parameter%" + Utility.RandomUUID() // Ok must be random
 					parameter.TYPENAME = "CargoEntities.Parameter"
 					parameter.SetType(in.String())
 					parameter.SetName("p" + strconv.Itoa(j-1))
@@ -171,7 +172,7 @@ func (this *ServiceManager) registerActions(service Service) {
 			for j := 0; j < method.Type.NumOut(); j++ {
 				out := method.Type.Out(j)
 				parameter := new(CargoEntities.Parameter)
-				parameter.UUID = "CargoEntities.Parameter%" + Utility.RandomUUID()
+				parameter.UUID = "CargoEntities.Parameter%" + Utility.RandomUUID() // Ok must be random
 				parameter.TYPENAME = "CargoEntities.Parameter"
 				parameter.SetType(out.String())
 				parameter.SetName("r" + strconv.Itoa(j))

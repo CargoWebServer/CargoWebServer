@@ -121,8 +121,8 @@ func (this *SecurityManager) createRole(id string) (*CargoEntities.Role, *CargoE
 		role = new(CargoEntities.Role)
 		role.SetId(id)
 		GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(cargoEntities.GetUuid(), "", role)
-		cargoEntities.GetObject().(*CargoEntities.Entities).SetRoles(role)
-		cargoEntities.SaveEntity()
+		// Create the role.
+		GetServer().GetEntityManager().createEntity(cargoEntities.GetUuid(), "M_roles", "CargoEntities.Role", id, role)
 	} else {
 		// Create the error message
 		cargoError := NewError(Utility.FileLine(), ROLE_ID_ALEADY_EXISTS_ERROR, SERVER_ERROR_CODE, errors.New("The role id '"+id+"' is already attibuted to an existing role entity."))
@@ -166,15 +166,7 @@ func (this *SecurityManager) deleteRole(id string) *CargoEntities.Error {
 		return cargoError
 	}
 
-	// Remove the role from all accounts that have this role
-	accounts := roleEntity.GetObject().(*CargoEntities.Role).GetAccounts()
-	for i := 0; i < len(accounts); i++ {
-		accounts[i].RemoveRolesRef(roleEntity.GetObject())
-		accountEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntityFromObject(accounts[i])
-		accountEntity.SaveEntity()
-	}
-
-	roleEntity.DeleteEntity()
+	GetServer().GetEntityManager().deleteEntity(roleEntity)
 
 	return nil
 }
@@ -238,7 +230,7 @@ func (this *SecurityManager) hasAccount(roleId string, accountId string) bool {
 		if err == nil {
 			role := roleEntity.GetObject().(*CargoEntities.Role)
 			for i := 0; i < len(role.M_accounts); i++ {
-				if role.M_accounts[i] == accountId {
+				if role.M_accounts[i] == accountUuid {
 					return true
 				}
 			}
@@ -269,10 +261,8 @@ func (this *SecurityManager) removeAccount(roleId string, accountId string) *Car
 				// Remove the account from the role
 				role.RemoveAccounts(account)
 				roleEntity.SaveEntity()
-
 				account.RemoveRolesRef(role)
 				accountEntity.SaveEntity()
-
 			}
 		}
 	} else {
@@ -493,7 +483,7 @@ func (this *SecurityManager) appendPermission(accountId string, permissionType C
 		permission.SetType(permissionType)
 		account.SetPermissions(permission)
 		GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(account.GetUUID(), "", permission)
-		accountEntity.SaveEntity()
+		GetServer().GetEntityManager().createEntity(accountEntity.GetUuid(), "M_permissions", "CargoEntities.Permission", "", permission)
 	} else {
 		// Account error
 		cargoError := NewError(Utility.FileLine(), ACCOUNT_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The account id '"+accountId+"' does not correspond to an existing account entity."))

@@ -347,7 +347,6 @@ func (this *KeyValueDataStore) getIndexationKeys(prototype *EntityPrototype, ent
 
 		for i := 0; i < len(prototype.Indexs); i++ {
 			var indexationKey string
-			//log.Println("----------> indexation key ", prototype.Indexs[i])
 			index := prototype.getFieldIndex(prototype.Indexs[i])
 			// The indexation key is compose of the; type_name : filed_name : value_to_index
 			switch v := entity[index].(type) {

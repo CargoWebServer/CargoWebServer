@@ -36,7 +36,7 @@ var Dialog = function (id, parent, isModal, title) {
 
 
     this.deleteBtn = this.header.appendElement({ "tag": "div", "class": "dialog_delete_button close" }).down()
-        .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
+    this.deleteBtn.appendElement({ "tag": "i", "class": "fa fa-close" }).down()
 
     /* The content will contain text, input etc... */
     this.content = this.div.appendElement({ "tag": "div", "class": "dialog_content modal-body" }).down()
@@ -46,8 +46,8 @@ var Dialog = function (id, parent, isModal, title) {
     this.footerButtons = this.footer.appendElement({ "tag": "div", "class": "dialog_buttons", "style": "right: 2px;" }).down()
 
     /* The ok button **/
-    this.footerButtons.appendElement({ "tag": "div", "style":"display: table-cell; width: 100%;" })
-    
+    this.footerButtons.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" })
+
     this.ok = this.footerButtons.appendElement({ "tag": "div", "class": "diablog_button btn btn-default", "innerHtml": "ok" }).down()
 
     /* The cancel button **/
@@ -58,7 +58,7 @@ var Dialog = function (id, parent, isModal, title) {
     this.offsetX = 0
     this.offsetY = 0
 
-    this.header.element.onmousedown = function (dialog) {
+    this.title.element.onmousedown = function (dialog) {
         return function (evt) {
             if (evt.which == 1) {
                 dialog.isMoving = true
@@ -70,7 +70,7 @@ var Dialog = function (id, parent, isModal, title) {
         }
     } (this)
 
-    this.div.element.parentNode.onmouseup = this.header.element.onmouseup = function (dialog) {
+    this.div.element.parentNode.onmouseup = this.title.element.onmouseup = function (dialog) {
         return function (evt) {
             if (evt.which == 1) {
                 dialog.isMoving = false
@@ -109,9 +109,7 @@ var Dialog = function (id, parent, isModal, title) {
     } (this)
 
     this.div.element.parentNode.addEventListener("mousemove", this.mouseMoveListener)
-
-    /* The button action **/
-    this.cancel.element.onclick = this.deleteBtn.element.onclick = function (dialog) {
+    var closeHandler = function (dialog) {
         return function (evt) {
             evt.stopPropagation()
             dialog.parent.element.removeChild(dialog.div.element)
@@ -119,6 +117,23 @@ var Dialog = function (id, parent, isModal, title) {
             if (dialog.isModal) {
                 dialog.modalDiv.element.parentNode.removeChild(dialog.modalDiv.element)
             }
+
+            if (dialog.cancelCallback != undefined) {
+                dialog.cancelCallback()
+            }
+        }
+    } (this)
+
+    /* The button action **/
+    this.cancel.element.onclick = closeHandler
+    this.deleteBtn.element.onclick = closeHandler
+
+    this.ok.element.onclick = function (dialog) {
+        return function () {
+            if (dialog.okCallback != undefined) {
+                dialog.okCallback()
+            }
+            dialog.deleteBtn.element.click()
         }
     } (this)
 
@@ -140,11 +155,11 @@ Dialog.prototype.setCentered = function () {
     var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
 
     /* I will set the position of the dialog **/
-    this.x = (this.parent.element.offsetWidth - scrollLeft - this.div.element.offsetWidth ) / 2 + scrollLeft
+    this.x = (this.parent.element.offsetWidth - scrollLeft - this.div.element.offsetWidth) / 2 + scrollLeft
     this.div.element.style.left = this.x + "px"
 
-    this.y = (this.parent.element.offsetHeight - scrollTop - this.div.element.offsetHeight ) / 2 + scrollTop
-    this.div.element.style.top = this.y  + "px"
+    this.y = (this.parent.element.offsetHeight - scrollTop - this.div.element.offsetHeight) / 2 + scrollTop
+    this.div.element.style.top = this.y + "px"
 }
 
 Dialog.prototype.setPosition = function (x, y) {
@@ -154,6 +169,11 @@ Dialog.prototype.setPosition = function (x, y) {
 
     this.y = y
     this.div.element.style.top = this.y + "px"
+}
+
+Dialog.prototype.fitWidthToContent = function () {
+    this.content.element.style.width = "auto"
+    this.div.element.style.width = this.content.element.clientWidth + "px"
 }
 
 Dialog.prototype.appendButton = function (id, title, icon) {
