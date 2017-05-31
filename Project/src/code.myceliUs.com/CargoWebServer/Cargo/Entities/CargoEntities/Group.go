@@ -94,9 +94,21 @@ func (this *Group) SetMembersRef(ref interface{}){
 		}
 		this.M_membersRef = append(this.M_membersRef, ref.(string))
 	}else{
-		this.RemoveMembersRef(ref)
+		for i:=0; i < len(this.m_membersRef); i++ {
+			if this.m_membersRef[i].UUID == ref.(*User).UUID {
+				return
+			}
+		}
+		this.NeedSave = true
+		for i:=0; i < len(this.M_membersRef); i++ {
+			if this.M_membersRef[i] == ref.(*User).UUID {
+				this.NeedSave = false
+			}
+		}
 		this.m_membersRef = append(this.m_membersRef, ref.(*User))
+	if this.NeedSave {
 		this.M_membersRef = append(this.M_membersRef, ref.(Entity).GetUUID())
+	}
 	}
 }
 

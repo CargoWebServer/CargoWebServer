@@ -562,7 +562,17 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				refSetter += "	}else{\n"
 
 				if (isRef || attribute.IsComposite == "true") && classesMap[typeName_] != nil {
-					refSetter += "		this.Remove" + methodName + ref + "(ref)\n"
+					refSetter += "		for i:=0; i < len(this.m_" + attribute.Name + ref + "); i++ {\n"
+					refSetter += "			if this.m_" + attribute.Name + ref + "[i].UUID == ref.(" + typeName + ").UUID {\n"
+					refSetter += "				return\n"
+					refSetter += "			}\n"
+					refSetter += "		}\n"
+					refSetter += "		this.NeedSave = true\n"
+					refSetter += "		for i:=0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
+					refSetter += "			if this.M_" + attribute.Name + ref + "[i] == ref.(" + typeName + ").UUID {\n"
+					refSetter += "				this.NeedSave = false\n"
+					refSetter += "			}\n"
+					refSetter += "		}\n"
 				}
 
 				refSetter += "		this.m_" + attribute.Name + ref + " = append(this.m_" + attribute.Name + ref + ", ref.(" + typeName + "))\n"
@@ -575,8 +585,9 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					if isPointer && !isInterfaceCast {
 						cast = "*" + cast
 					}
+					refSetter += "	if this.NeedSave {\n"
 					refSetter += "		this.M_" + attribute.Name + ref + " = append(this.M_" + attribute.Name + ref + ", ref.(" + cast + ").GetUUID())\n"
-
+					refSetter += "	}\n"
 				}
 				refSetter += "	}\n"
 			} else {

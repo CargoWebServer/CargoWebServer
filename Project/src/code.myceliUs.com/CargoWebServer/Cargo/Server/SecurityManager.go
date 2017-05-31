@@ -359,13 +359,21 @@ func (this *SecurityManager) removeAction(roleId string, actionName string) *Car
 		if err == nil {
 			role := roleEntity.GetObject().(*CargoEntities.Role)
 			// Get the account entity
-			actionEntity, err := GetServer().GetEntityManager().getEntityByUuid(actionName, false)
+			actionUuid := CargoEntitiesActionExists(actionName)
+			actionEntity, err := GetServer().GetEntityManager().getEntityByUuid(actionUuid, false)
 			if err == nil {
 				action := actionEntity.GetObject().(*CargoEntities.Action)
 				// Remove the account from the role
 				role.RemoveActions(action)
 				roleEntity.SaveEntity()
+			} else {
+				cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The action with name '"+actionName+"' dosent exist."))
+				return cargoError
 			}
+		} else {
+			// If the role does not exist.
+			cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The role with the id '"+roleId+"' dosent exist."))
+			return cargoError
 		}
 	} else {
 		// Create the error message
@@ -533,6 +541,7 @@ func (this *SecurityManager) DeleteRole(id string, messageId string, sessionId s
 	}
 }
 
+////////////// Role //////////////
 /**
  * Return true if a role has an account.
  */
@@ -555,6 +564,34 @@ func (this *SecurityManager) AppendAccount(roleId string, accountId string, mess
  */
 func (this *SecurityManager) RemoveAccount(roleId string, accountId string, messageId string, sessionId string) {
 	errObj := this.removeAccount(roleId, accountId)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+}
+
+/////////// Action /////////////
+/**
+ * Return true if a role contain an action.
+ */
+func (this *SecurityManager) HasAction(roleId string, actionName string, messageId string, sessionId string) bool {
+	return this.hasAction(roleId, actionName)
+}
+
+/**
+ * Append a new account to a given role. Do nothing if the action is already in the role
+ */
+func (this *SecurityManager) AppendAction(roleId string, accountName string, messageId string, sessionId string) {
+	errObj := this.appendAction(roleId, accountName)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+}
+
+/**
+ * Remove an action from a given role.
+ */
+func (this *SecurityManager) RemoveAction(roleId string, accountName string, messageId string, sessionId string) {
+	errObj := this.removeAction(roleId, accountName)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}

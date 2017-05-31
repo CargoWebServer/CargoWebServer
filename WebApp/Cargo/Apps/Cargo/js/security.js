@@ -315,6 +315,136 @@ SecurityManager.prototype.removeAccount = function (roleId, accountId, successCa
 /*
  * Sever side code.
  */
+function HasAction(roleId, actionName) {
+    var roleHasAction = server.GetSecurityManager().HasAction(roleId, actionName, messageId, sessionId)
+    return roleHasAction
+}
+
+/**
+ * Determines if a role has a given action.
+ * @param {string} roleId The id of the role to verify
+ * @param {string} actionName The name of the action to verify
+ * @param {function} successCallback The function to execute in case of success
+ * @param {function} errorCallback The function to execute in case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+SecurityManager.prototype.hasAction = function (roleId, actionName, successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = []
+    params.push(createRpcData(roleId, "STRING", "roleId"))
+    params.push(createRpcData(actionName, "STRING", "actionName"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        HasAction.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback.
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Sever side code.
+ */
+function AppendAction(roleId, actionName) {
+    server.GetSecurityManager().AppendAction(roleId, actionName, messageId, sessionId)
+}
+
+/**
+ * Append a new action to a given role. Does nothing if the action is already in the role
+ * @param {string} roleId The id of the role to append the action to 
+ * @param {string} actionName The name of the action to append
+ * @param {function} successCallback The function to execute in case of success
+ * @param {function} errorCallback The function to execute in case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+SecurityManager.prototype.appendAction = function (roleId, actionName, successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = []
+    params.push(createRpcData(roleId, "STRING", "roleId"))
+    params.push(createRpcData(actionName, "STRING", "actionName"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        AppendAction.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            caller.successCallback(result, caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback.
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Sever side code.
+ */
+function RemoveAction(roleId, actionName) {
+    server.GetSecurityManager().RemoveAction(roleId, actionName, messageId, sessionId)
+}
+
+/**
+ * Remove an account from a given role.
+ * @param {string} roleId The id of the role to remove the account from 
+ * @param {string} actionName The name of the action to remove from the role
+ * @param {function} successCallback The function to execute in case of success
+ * @param {function} errorCallback The function to execute in case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+SecurityManager.prototype.removeAction= function (roleId, actionName, successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = []
+    params.push(createRpcData(roleId, "STRING", "roleId"))
+    params.push(createRpcData(actionName, "STRING", "actionName"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        RemoveAction.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            caller.successCallback(result, caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback.
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Sever side code.
+ */
 function ChangeAdminPassword(pwd, newPwd) {
     server.GetSecurityManager().ChangeAdminPassword(pwd, newPwd, messageId, sessionId)
 }

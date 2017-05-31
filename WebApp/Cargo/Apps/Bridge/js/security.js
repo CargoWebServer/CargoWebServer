@@ -274,7 +274,7 @@ RoleManager.prototype.displayRole = function (role) {
 
     this.actionsDiv = this.actionsCol.appendElement({ "tag": "div", "id": role.M_id + "_actions_table_header", "style": "width: 100%; background-color: #bbb; color: white; /*padding: 2px;*/" }).down()
         .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;", "innerHtml": "Actions" })
-        .appendElement({ "tag": "div", "id": "add_account_" + role.M_id + "_btn", "class": "row_button", "style": "display: table-cell;" }).down()
+        .appendElement({ "tag": "div", "id": "add_action_" + role.M_id + "_btn", "class": "row_button", "style": "display: table-cell;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-plus" }).up().up()
         .appendElement({ "tag": "div", "id": role.M_id + "_actions_div", "style": "display: table; width: 100%;" }).down()
 
@@ -294,6 +294,19 @@ RoleManager.prototype.displayRole = function (role) {
                     if (role.M_id == "adminRole" || role.M_id == "guestRole") {
                         deleteBtn.element.style.display = "none"
                     }
+                    // Now the delete action button.
+                    deleteBtn.element.onclick = function (role, action) {
+                        return function () {
+                            console.log("role " + role.M_id + " delete action " + action.M_name)
+                            server.securityManager.removeAction(role.M_id, action.M_name,
+                                // success callback
+                                function () {
+                                },
+                                // error callback
+                                function () { },
+                                {})
+                        }
+                    } (role, ref)
                 }
             } (this, this.actionsDiv, role)
         )
@@ -306,7 +319,6 @@ RoleManager.prototype.displayRole = function (role) {
 
     // append new account to role button.
     this.appendAccountBtn = this.panel.getChildById("add_account_" + role.M_id + "_btn")
-
 
     // Never delete guest or admin role.
     if (role.M_id == "adminRole" || role.M_id == "guestRole") {
@@ -329,6 +341,9 @@ RoleManager.prototype.displayRole = function (role) {
                     dialog.content.element.style.display = "block"
                     dialog.content.element.style.height = "350px"
                     dialog.content.element.style.overflowY = "auto"
+                    // Keep the account to append to the role.
+                    dialog.toAppend = {}
+
                     var results = _.sortBy(results, 'M_id');
                     for (var i = 0; i < results.length; i++) {
                         var account = results[i]
@@ -336,10 +351,6 @@ RoleManager.prototype.displayRole = function (role) {
                         // Here I will remove account that already there...
                         if (!objectPropInArray(caller.role.M_accounts, "UUID", account.UUID)) {
                             var row = dialog.content.appendElement({ "tag": "div", "style": "display: table-row" }).down()
-
-                            // Keep the account to append to the role.
-                            dialog.toAppend = {}
-
                             row.appendElement({ "tag": "div", "style": "display: table-cell; padding-left: 4px;" }).down()
                                 .appendElement({ "tag": "input", "id": account.UUID + "_input", "type": "checkbox" }).up()
                                 .appendElement({ "tag": "div", "style": "display: table-cell;padding-left: 4px;", "innerHtml": account.M_name })
@@ -381,7 +392,7 @@ RoleManager.prototype.displayRole = function (role) {
                                 }
                             } (account, dialog)
 
-                            // Now the ok action.
+                            // Now the ok button.
                             dialog.okCallback = function (dialog, role) {
                                 return function () {
                                     for (var id in dialog.toAppend) {
@@ -404,12 +415,81 @@ RoleManager.prototype.displayRole = function (role) {
                 },
                 // Error callback
                 function (results, caller) {
+                    console.log(errObj)
+                },
+                { "roleManager": roleManager, "role": role })
+        }
+    } (this, role)
 
-                }, { "roleManager": roleManager, "role": role }
+    // Append action button
+    this.appendActionBtn = this.panel.getChildById("add_action_" + role.M_id + "_btn")
 
-            )
+    this.appendActionBtn.element.onclick = function (roleManager, role) {
+        return function () {
+            server.entityManager.getObjectsByType("CargoEntities.Action", "CargoEntities", "",
+                // Progress callback
+                function (index, total, caller) { },
+                // Success callback
+                function (results, caller) {
 
+                    var dialog = new Dialog("new_role_dialog", roleManager.panel, true, "Append account to " + role.M_id)
 
+                    // first of all i will set the dialog with to be able to show more values.
+                    dialog.content.element.style.display = "block"
+                    dialog.content.element.style.height = "350px"
+                    dialog.content.element.style.overflowY = "auto"
+
+                    // Keep the account to append to the role.
+                    dialog.toAppend = {}
+
+                    var results = _.sortBy(results, 'M_name');
+                    for (var i = 0; i < results.length; i++) {
+                        var action = results[i]
+                        if (!objectPropInArray(caller.role.M_actions, "UUID", action.UUID)) {
+                            var row = dialog.content.appendElement({ "tag": "div", "style": "display: table-row" }).down()
+                            row.appendElement({ "tag": "div", "style": "display: table-cell; padding-left: 4px;" }).down()
+                                .appendElement({ "tag": "input", "id": action.UUID + "_input", "type": "checkbox" }).up()
+                                .appendElement({ "tag": "div", "style": "display: table-cell; padding-left: 4px; text-align: left;", "innerHtml": action.M_name })
+
+                            var input = row.getChildById(action.UUID + "_input")
+                            input.element.onclick = function (action, dialog) {
+                                return function () {
+                                    if (this.checked) {
+                                        // append to the map.
+                                        dialog.toAppend[action.UUID] = action
+                                    } else {
+                                        // remove it from the map.
+                                        delete dialog.toAppend[action.UUID]
+                                    }
+                                }
+                            } (action, dialog)
+                        }
+                    }
+
+                    // Now the ok button.
+                    dialog.okCallback = function (dialog, role) {
+                        return function () {
+                            for (var id in dialog.toAppend) {
+                                var action = dialog.toAppend[id]
+                                // Here I will append the action to the role.
+                                server.securityManager.appendAction(role.M_id, action.M_name,
+                                    function (result, caller) { },
+                                    function (errObj, caller) {
+                                        console.log(errObj)
+                                    }, {})
+                            }
+                        }
+                    } (dialog, role)
+
+                    // Set the dialog to center of the screen.
+                    dialog.setCentered()
+                    dialog.fitWidthToContent()
+                },
+                // Error callback.
+                function (errObj, caller) {
+                    console.log(errObj)
+                },
+                { "roleManager": roleManager, "role": role })
         }
     } (this, role)
 

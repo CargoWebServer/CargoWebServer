@@ -157,9 +157,21 @@ func (this *User) SetMemberOfRef(ref interface{}){
 		}
 		this.M_memberOfRef = append(this.M_memberOfRef, ref.(string))
 	}else{
-		this.RemoveMemberOfRef(ref)
+		for i:=0; i < len(this.m_memberOfRef); i++ {
+			if this.m_memberOfRef[i].UUID == ref.(*Group).UUID {
+				return
+			}
+		}
+		this.NeedSave = true
+		for i:=0; i < len(this.M_memberOfRef); i++ {
+			if this.M_memberOfRef[i] == ref.(*Group).UUID {
+				this.NeedSave = false
+			}
+		}
 		this.m_memberOfRef = append(this.m_memberOfRef, ref.(*Group))
+	if this.NeedSave {
 		this.M_memberOfRef = append(this.M_memberOfRef, ref.(Entity).GetUUID())
+	}
 	}
 }
 
@@ -196,9 +208,21 @@ func (this *User) SetAccounts(ref interface{}){
 		}
 		this.M_accounts = append(this.M_accounts, ref.(string))
 	}else{
-		this.RemoveAccounts(ref)
+		for i:=0; i < len(this.m_accounts); i++ {
+			if this.m_accounts[i].UUID == ref.(*Account).UUID {
+				return
+			}
+		}
+		this.NeedSave = true
+		for i:=0; i < len(this.M_accounts); i++ {
+			if this.M_accounts[i] == ref.(*Account).UUID {
+				this.NeedSave = false
+			}
+		}
 		this.m_accounts = append(this.m_accounts, ref.(*Account))
+	if this.NeedSave {
 		this.M_accounts = append(this.M_accounts, ref.(Entity).GetUUID())
+	}
 	}
 }
 

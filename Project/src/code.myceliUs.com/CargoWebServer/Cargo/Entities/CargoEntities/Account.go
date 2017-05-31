@@ -277,9 +277,21 @@ func (this *Account) SetRolesRef(ref interface{}){
 		}
 		this.M_rolesRef = append(this.M_rolesRef, ref.(string))
 	}else{
-		this.RemoveRolesRef(ref)
+		for i:=0; i < len(this.m_rolesRef); i++ {
+			if this.m_rolesRef[i].UUID == ref.(*Role).UUID {
+				return
+			}
+		}
+		this.NeedSave = true
+		for i:=0; i < len(this.M_rolesRef); i++ {
+			if this.M_rolesRef[i] == ref.(*Role).UUID {
+				this.NeedSave = false
+			}
+		}
 		this.m_rolesRef = append(this.m_rolesRef, ref.(*Role))
+	if this.NeedSave {
 		this.M_rolesRef = append(this.M_rolesRef, ref.(*Role).GetUUID())
+	}
 	}
 }
 

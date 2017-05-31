@@ -94,9 +94,21 @@ func (this *Project) SetFilesRef(ref interface{}){
 		}
 		this.M_filesRef = append(this.M_filesRef, ref.(string))
 	}else{
-		this.RemoveFilesRef(ref)
+		for i:=0; i < len(this.m_filesRef); i++ {
+			if this.m_filesRef[i].UUID == ref.(*File).UUID {
+				return
+			}
+		}
+		this.NeedSave = true
+		for i:=0; i < len(this.M_filesRef); i++ {
+			if this.M_filesRef[i] == ref.(*File).UUID {
+				this.NeedSave = false
+			}
+		}
 		this.m_filesRef = append(this.m_filesRef, ref.(*File))
+	if this.NeedSave {
 		this.M_filesRef = append(this.M_filesRef, ref.(Entity).GetUUID())
+	}
 	}
 }
 
