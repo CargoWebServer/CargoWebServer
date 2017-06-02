@@ -1637,6 +1637,7 @@ func generateEntityExistsFunc(packageId string, class *XML_Schemas.CMOF_OwnedMem
 	} else if hasName(class) {
 		entityExistStr += "	query.Indexs = append(query.Indexs, \"M_name=\"+val)\n"
 	}
+
 	entityExistStr += "	query.Fields = append(query.Fields, \"UUID\")\n"
 	entityExistStr += "	var fieldsType []interface {} // not use...\n"
 	entityExistStr += "	var params []interface{}\n"

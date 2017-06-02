@@ -80,6 +80,7 @@ var RolePermissionManager = function (parent) {
             this.className = "file_tab active"
             roleManager.panel.element.style.display = ""
             permissionManager.panel.element.style.display = "none"
+            appendItemBtn.element.style.display = ""
             appendItemBtn.element.onclick = appendRole
         }
     } (this.permissionTab, this.roleManager, this.permissionManager, this.appendItemBtn, appendRole)
@@ -90,6 +91,7 @@ var RolePermissionManager = function (parent) {
             this.className = "file_tab active"
             roleManager.panel.element.style.display = "none"
             permissionManager.panel.element.style.display = ""
+            appendItemBtn.element.style.display = "none"
             appendItemBtn.element.onclick = appendPermission
         }
     } (this.roleTab, this.roleManager, this.permissionManager, this.appendItemBtn, appendPermission)
@@ -549,6 +551,8 @@ RoleManager.prototype.removeRole = function (role) {
     delete this.roles[role.UUID]
 }
 
+///////////////////////////////////// Permission /////////////////////////////////////
+
 /**
  * The permission manager is use to change permission of an entity.
  */
@@ -559,6 +563,313 @@ var PermissionManager = function (parent) {
     // The interface panel.
     this.panel = parent.appendElement({ "tag": "div", "class": "permission_manager", "style": "display:none;" }).down()
 
+    // The search panel...
+    this.panel.appendElement({ "tag": "div", "style": "display: table; width: 99%; padding: 5px;" }).down()
+        .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" })
+        .appendElement({ "tag": "input", "id": "search_permission_input", "type": "text", "style": "display: table-cell;" })
+        .appendElement({ "tag": "div", "id": "search_permission_button", "class": "row_button", "style": "display: table-cell;" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-search" })
+
+    // The results div.
+    this.resultsDiv = this.panel.appendElement({ "tag": "div", "style": "display: table; width: 99%; padding: 5px;" }).down()
+
+    // The search button.
+    this.searchInput = this.panel.getChildById("search_permission_input")
+    this.searchBtn = this.panel.getChildById("search_permission_button")
+
+    this.searchBtn.element.onclick = function (permissionManager) {
+        return function () {
+            var values = permissionManager.searchInput.element.value.split(" ")
+            var query = ""
+            if (values.length == 1) {
+                query = "CargoEntities.User.M_firstName ~=\"" + values[0] + "\" || CargoEntities.User.M_lastName ~=\"" + values[0] + "\""
+            } else if (values.length == 2) {
+                query = "CargoEntities.User.M_firstName ~=\"" + values[0] + "\" && CargoEntities.User.M_lastName ~=\"" + values[1] + "\""
+            }
+
+            // Clear previous results.
+            permissionManager.resultsDiv.removeAllChilds()
+            permissionManager.resultsDiv.element.innerHTML = ""
+
+            server.entityManager.getObjectsByType("CargoEntities.User", "CargoEntities", query,
+                // Progress...
+                function () {
+
+                },
+                // Sucess...
+                function (results, caller) {
+                    console.log(results)
+                    for (var i = 0; i < results.length; i++) {
+                        var user = results[i]
+                        // I will get the associated user account and display permission they contain.
+                        for (var j = 0; j < user.M_accounts.length; j++) {
+                            user["set_M_accounts_" + user.M_accounts[j] + "_ref"](
+                                function (permissionManager, user) {
+                                    return function (account) {
+                                        permissionManager.displayPermissions(account, user)
+                                    }
+                                } (permissionManager, user)
+                            )
+                        }
+                    }
+                },
+                function () {
+
+                }, permissionManager)
+        }
+    } (this)
+
     // Return the permission manager.
     return this
+}
+
+/**
+ * Display the permissions for a given account.
+ */
+PermissionManager.prototype.displayPermissions = function (account, user) {
+
+    // Now display the new list.
+    var row = this.resultsDiv.getChildById("permissions_" + user.M_id + "_row")
+
+    if (row == undefined) {
+        row = this.resultsDiv.appendElement({ "tag": "div", "id": "permissions_" + user.M_id + "_row", "style": "display: table-row;" }).down()
+    } else {
+        return
+    }
+
+    // The user name.
+    var userName = user.M_firstName
+
+    if (user.M_middle.length > 0) {
+        userName += " " + user.M_middle + " "
+    }
+
+    userName += " " + user.M_lastName
+
+    // The account name.
+    row.appendElement({ "tag": "div", "id": user.M_id + "_header", "style": "display: table; width: 100%;" }).down()
+        .appendElement({ "tag": "div", "id": "expand_" + user.M_id + "_btn", "class": "row_button", "style": "display: table-cell;" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-caret-right" }).up()
+        .appendElement({ "tag": "div", "id": "collapse_" + user.M_id + "_btn", "class": "row_button", "style": "display: none " }).down() // switch to table-cell display...
+        .appendElement({ "tag": "i", "class": "fa fa-caret-down" }).up()
+        .appendElement({ "tag": "div", "style": "display: table-cell;width: 100%;", "innerHtml": userName + " (" + account.M_name + ")" })
+
+    // The permission panel.
+    var permissionPanel = row.appendElement({ "tag": "div", "style": "display: none; width: 95%; margin-left: 15px;" }).down()
+    // The header.
+    permissionPanel.appendElement({ "tag": "div", "style": "display: table; width:100%; background-color: #bbb; color: white;" }).down()
+        .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%; padding: 3px 0px 2px 4px; vertical-align: middle;", "innerHtml": "Permissions" })
+        .appendElement({ "tag": "div", "id": "new_permission_" + user.M_id + "_btn", "class": "row_button", "style": "display: table-cell; padding: 3px 0px 2px 4px;vertical-align: middle;" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-plus" }).up()
+
+    // Now the display the actual permission.
+    for (var i = 0; i < account.M_permissionsRef.length; i++) {
+
+        if (isString(account.M_permissionsRef[i])) {
+            account["set_M_permissionsRef_" + account.M_permissionsRef[i] + "_ref"](
+                function (permissionManager, permissionPanel, account) {
+                    return function (ref) {
+                        permissionManager.displayPermission(permissionPanel, ref, account)
+                    }
+                } (this, permissionPanel, account)
+
+            )
+        } else {
+            this.displayPermission(permissionPanel, account.M_permissionsRef[i], account)
+        }
+    }
+
+    // The permission expand and collapse button
+    var expandBtn = this.panel.getChildById("expand_" + user.M_id + "_btn")
+    var collapseBtn = this.panel.getChildById("collapse_" + user.M_id + "_btn")
+    var appendPermission = this.panel.getChildById("new_permission_" + user.M_id + "_btn")
+
+    expandBtn.element.onclick = function (collapseBtn, permissionPanel) {
+        return function () {
+            this.style.display = "none"
+            collapseBtn.element.style.display = "table-cell"
+            permissionPanel.element.style.display = "table"
+        }
+    } (collapseBtn, permissionPanel)
+
+    collapseBtn.element.onclick = function (expandBtn, permissionPanel) {
+        return function () {
+            this.style.display = "none"
+            expandBtn.element.style.display = "table-cell"
+            permissionPanel.element.style.display = "none"
+        }
+    } (expandBtn, permissionPanel)
+
+    // Append/Create permission and assign it to a user.
+    appendPermission.element.onclick = function (permissionManager, account, permissionPanel) {
+        return function () {
+            // Here I will create the new permission.
+            var permission = eval("new CargoEntities.Permission()")
+            permission.M_types = 0
+            permission.M_id = ""
+            permissionManager.displayPermission(permissionPanel, permission, account)
+        }
+    } (this, account, permissionPanel)
+}
+
+/**
+ * Display single permission panel.
+ */
+PermissionManager.prototype.displayPermission = function (parent, permission, account) {
+
+    // does nothing if the panel is already there.
+    if (parent.getChildById("permission_" + permission.M_id + "_panel") != undefined) {
+        return
+    }
+
+    var panel = parent.appendElement({ "tag": "div", "id": "permission_" + permission.M_id + "_panel", "style": "display: table; width: 100%; border-spacing:2px 2px; padding: 5px 0px 5px 0px; border-bottom: 1px solid lightgray;" }).down()
+    panel.appendElement({ "tag": "table", "style": "display: table; width: 100%;" }).down()
+        .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+        .appendElement({ "tag": "label", "for": "permission_id_" + permission.UUID + "_input", "innerHtml": "Filter " })
+        .appendElement({ "tag": "input", "id": "permission_id_" + permission.UUID + "_input", "type": "text", "style": "width: 75%;" }).up()
+        .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+        .appendElement({ "tag": "div", "id": "save_" + permission.UUID + "_btn", "class": "row_button", "style": "display:none;" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-save" }).up()
+        .appendElement({ "tag": "div", "id": "delete_" + permission.UUID + "_btn", "class": "row_button" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-trash" }).up()
+
+    // Now the permission type.
+    panel.appendElement({ "tag": "table", "style": "display: table; width: 100%;" }).down()
+        // Read button
+        .appendElement({ "tag": "div", "style": "display: table-cell;width: 33.33%;" }).down()
+        .appendElement({ "tag": "label", "for": "permission_read_" + permission.UUID + "_check", "innerHtml": "Read " })
+        .appendElement({ "tag": "input", "type": "checkbox", "id": "permission_read_" + permission.UUID + "_check" }).up()
+        // Write button
+        .appendElement({ "tag": "div", "style": "display: table-cell;width: 33.33%;" }).down()
+        .appendElement({ "tag": "label", "for": "permission_write_" + permission.UUID + "_check", "innerHtml": "Write " })
+        .appendElement({ "tag": "input", "type": "checkbox", "id": "permission_write_" + permission.UUID + "_check" }).up()
+        // Execute button.
+        .appendElement({ "tag": "div", "style": "display: table-cell;width: 33.33%;" }).down()
+        .appendElement({ "tag": "label", "for": "permission_exec_" + permission.UUID + "_check", "innerHtml": "Execute " })
+        .appendElement({ "tag": "input", "type": "checkbox", "id": "permission_exec_" + permission.UUID + "_check" })
+
+    // Save and delete button.
+    var saveBtn = this.panel.getChildById("save_" + permission.UUID + "_btn")
+    var deleteBtn = this.panel.getChildById("delete_" + permission.UUID + "_btn")
+    var patternInput = this.panel.getChildById("permission_id_" + permission.UUID + "_input")
+    // Now the permission.
+    var readCheckbox = this.panel.getChildById("permission_read_" + permission.UUID + "_check")
+    var writeCheckbox = this.panel.getChildById("permission_write_" + permission.UUID + "_check")
+    var execCheckbox = this.panel.getChildById("permission_exec_" + permission.UUID + "_check")
+
+    // Set the values...
+    var setPermissionType = function (permission, readCheckbox, writeCheckbox, execCheckbox) {
+        if (!readCheckbox.element.checked && !writeCheckbox.element.checked && !execCheckbox.element.checked) {
+            permission.M_types = 0
+        } else if (!readCheckbox.element.checked && !writeCheckbox.element.checked && execCheckbox.element.checked) {
+            permission.M_types = 1
+        } else if (!readCheckbox.element.checked && writeCheckbox.element.checked && !execCheckbox.element.checked) {
+            permission.M_types = 2
+        } else if (!readCheckbox.element.checked && writeCheckbox.element.checked && execCheckbox.element.checked) {
+            permission.M_types = 3
+        } else if (readCheckbox.element.checked && !writeCheckbox.element.checked && !execCheckbox.element.checked) {
+            permission.M_types = 4
+        } else if (readCheckbox.element.checked && !writeCheckbox.element.checked && execCheckbox.element.checked) {
+            permission.M_types = 5
+        } else if (readCheckbox.element.checked && writeCheckbox.element.checked && !execCheckbox.element.checked) {
+            permission.M_types = 6
+        } else if (readCheckbox.element.checked && writeCheckbox.element.checked && execCheckbox.element.checked) {
+            permission.M_types = 7
+        }
+    }
+
+    if (permission.UUID.length > 0) {
+        patternInput.element.value = permission.M_id
+        if (permission.M_types == 0) {
+            readCheckbox.element.checked = false
+            writeCheckbox.element.checked = false
+            execCheckbox.element.checked = false
+        } else if (permission.M_types == 1) {
+            readCheckbox.element.checked = false
+            writeCheckbox.element.checked = false
+            execCheckbox.element.checked = true
+        } else if (permission.M_types == 2) {
+            readCheckbox.element.checked = false
+            writeCheckbox.element.checked = true
+            execCheckbox.element.checked = false
+        } else if (permission.M_types == 3) {
+            readCheckbox.element.checked = true
+            writeCheckbox.element.checked = false
+            execCheckbox.element.checked = false
+        } else if (permission.M_types == 4) {
+            readCheckbox.element.checked = true
+            writeCheckbox.element.checked = false
+            execCheckbox.element.checked = false
+        } else if (permission.M_types == 5) {
+            readCheckbox.element.checked = true
+            writeCheckbox.element.checked = false
+            execCheckbox.element.checked = true
+        } else if (permission.M_types == 6) {
+            readCheckbox.element.checked = true
+            writeCheckbox.element.checked = true
+            execCheckbox.element.checked = false
+        } else if (permission.M_types == 7) {
+            readCheckbox.element.checked = true
+            writeCheckbox.element.checked = true
+            execCheckbox.element.checked = true
+        }
+    }
+
+    // Set the permission type.
+    readCheckbox.element.onclick = writeCheckbox.element.onclick = execCheckbox.element.onclick = function (permission, readCheckbox, writeCheckbox, execCheckbox, saveBtn) {
+        return function () {
+            setPermissionType(permission, readCheckbox, writeCheckbox, execCheckbox)
+            saveBtn.element.style.display = ""
+        }
+    } (permission, readCheckbox, writeCheckbox, execCheckbox, saveBtn)
+
+    // The button action's.
+    saveBtn.element.onclick = function (permission, account) {
+        return function () {
+            this.style.display = "none"
+            // Save the permission.
+            server.securityManager.appendPermission(account.M_id, permission.M_types, permission.M_id,
+                // successCallback
+                function (result, caller) {
+
+                },
+                // errorCallback
+                function (errObj, caller) {
+                    console.log(errObj)
+                },
+                {})
+        }
+    } (permission, account)
+
+    deleteBtn.element.onclick = function (account, permission, panel) {
+        return function () {
+            if (permission.UUID.length > 0) {
+                server.securityManager.removePermission(account.M_id, permission.M_id,
+                    // Success callback
+                    function (result, caller) {
+                    },
+                    // Error callback
+                    function (errObj, caller) {
+
+                    },
+                    {})
+            }
+            // remove the panel from the view.
+            panel.parentElement.removeElement(panel)
+        }
+    } (account, permission, panel)
+
+    patternInput.element.onchange = function (saveBtn, permission, panel) {
+        return function () {
+            saveBtn.element.style.display = ""
+            if (this.value.length == 0) {
+                saveBtn.element.style.display = "none"
+            } else {
+                permission.M_id = this.value
+                panel.element.id = "permission_" + permission.M_id + "_panel"
+            }
+        }
+    } (saveBtn, permission, panel)
+
+    console.log(permission)
 }

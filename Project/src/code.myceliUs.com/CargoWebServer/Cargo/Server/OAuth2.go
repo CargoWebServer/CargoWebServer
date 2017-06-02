@@ -1589,18 +1589,21 @@ func HttpQueryHandler(w http.ResponseWriter, r *http.Request) {
 	// First of all I will create the parameters.
 	// The last tow parameters are always sessionId and messageId and
 	// are use by the websocket and not the http.
-	for i := 0; i < len(action.GetParameters())-2; i++ {
+	//log.Println("--------> 1592", len(action.GetParameters()))
+	for i := 0; i < len(action.GetParameters()); i++ {
 		// Here I will make type mapping...
 		param := action.GetParameters()[i]
 		if param.IsArray() {
 			// Here the values inside the query must be parse...
 
 		} else {
+
 			// Not an array here.
 			if param.GetType() == "string" {
 				// The first parameter is a string.
 				//r.URL.Query()
 				v := values.Get(param.GetName())
+
 				log.Println(v, reflect.TypeOf(v).Kind())
 				if reflect.TypeOf(v).Kind() != reflect.String {
 					w.Header().Set("Content-Type", "application/text")
@@ -1626,6 +1629,7 @@ func HttpQueryHandler(w http.ResponseWriter, r *http.Request) {
 
 	if len(accessTokenId) == 0 {
 		values := strings.Split(r.Header.Get("Authorization"), " ")
+		log.Println("values: ", values)
 		if len(values) == 2 {
 			if strings.ToLower(values[0]) == "bearer" {
 				accessTokenId = values[1]
@@ -1664,6 +1668,7 @@ func HttpQueryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Here I will call the function on the service.
 	results, err := Utility.CallMethod(service, ids[2], params)
+	log.Println("-----> call method", ids[2], "params", params)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/text")
 		w.Write([]byte(err.(error).Error()))

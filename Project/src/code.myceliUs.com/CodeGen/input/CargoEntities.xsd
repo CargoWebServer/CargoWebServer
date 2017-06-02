@@ -14,7 +14,7 @@
 				<xsd:sequence>
 					<xsd:element ref="userRef" type="tUser" minOccurs="0" maxOccurs="1"/> 
 					<xsd:element ref="rolesRef" type="tRole" minOccurs="0" maxOccurs="unbounded"/> 
-					<xsd:element name="permissions" type="tPermission" minOccurs="0" maxOccurs="unbounded"/> 
+					<xsd:element ref="permissionsRef" type="tPermission" minOccurs="0" maxOccurs="unbounded"/> 
 					<xsd:element name="sessions" type="tSession" minOccurs="0" maxOccurs="unbounded"/> 
 					<xsd:element name="messages" type="tMessage" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
@@ -50,23 +50,15 @@
 			</xsd:sequence>
 		</xsd:complexContent> 
 	</xsd:complexType>
-	
-	<xsd:simpleType name="tPermissionType">
-		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="Create"/>
-			<xsd:enumeration value="Read"/>
-			<xsd:enumeration value="Update"/>
-			<xsd:enumeration value="Delete"/>
-		</xsd:restriction>
-	</xsd:simpleType>	
 
 	<xsd:element name="permission" type="tPermission"/> 
+	
 	<xsd:complexType name="tPermission">
-		<xsd:attribute name="pattern" type="xsd:string"/>
-		<xsd:attribute name="type" type="tPermissionType"/>
+		<xsd:attribute name="id" type="xsd:ID"/>
+		<xsd:attribute name="types" type="xsd:integer"/>
 		<xsd:complexContent> 
 			<xsd:sequence>
-				<xsd:element ref="account" type="tAccount" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="accountsRef" type="tAccount" minOccurs="0" maxOccurs="*"/>
 			</xsd:sequence>
 		</xsd:complexContent> 
 	</xsd:complexType>
@@ -200,6 +192,7 @@
 			<xsd:element name="entities" type="tEntity" minOccurs="0" maxOccurs="unbounded"/> 
 			<xsd:element name="roles" type="tRole" minOccurs="0" maxOccurs="unbounded"/> 
 			<xsd:element name="actions" type="tAction" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="permissions" type="tPermission" minOccurs="0" maxOccurs="unbounded"/> 
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:attribute name="name" type="xsd:string"/>

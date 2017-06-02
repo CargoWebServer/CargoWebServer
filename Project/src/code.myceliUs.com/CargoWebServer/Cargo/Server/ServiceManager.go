@@ -158,7 +158,7 @@ func (this *ServiceManager) registerActions(service Service) {
 					parameter.UUID = "CargoEntities.Parameter%" + Utility.RandomUUID() // Ok must be random
 					parameter.TYPENAME = "CargoEntities.Parameter"
 					parameter.SetType(in.String())
-					parameter.SetName("p" + strconv.Itoa(j-1))
+					parameter.SetName("p" + strconv.Itoa(len(action.M_parameters)))
 					if strings.HasPrefix(in.String(), "[]") {
 						parameter.SetIsArray(true)
 					} else {

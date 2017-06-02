@@ -392,6 +392,8 @@ func (this *SecurityManager) removeAction(roleId string, actionName string) *Car
  */
 func (this *SecurityManager) canExecuteAction(sessionId string, actionName string) *CargoEntities.Error {
 
+	// Here is the list of function where no permission apply...
+
 	// Format action name from code.myceliUs.com/CargoWebServer/Cargo/Server.(*WorkflowManager).StartProcess
 	// to Server.WorkflowManager.StartProcess
 	actionName = strings.Replace(actionName, "code.myceliUs.com/CargoWebServer/Cargo/", "", -1)
@@ -431,16 +433,16 @@ func (this *SecurityManager) canExecuteAction(sessionId string, actionName strin
  * Determine if a user session has the permission to Create, Read,
  * Update or Delete a given entity.
  */
-func (this *SecurityManager) hasPermission(sessionId string, permissionType CargoEntities.PermissionType, entity Entity) *CargoEntities.Error {
+func (this *SecurityManager) hasPermission(sessionId string, permissionType int, entity Entity) *CargoEntities.Error {
 	session := GetServer().GetSessionManager().activeSessions[sessionId]
 
 	var account *CargoEntities.Account
 	if session != nil {
 		account = session.GetAccountPtr()
-		permissions := account.GetPermissions()
+		permissions := account.GetPermissionsRef()
 		for i := 0; i < len(permissions); i++ {
 			// Here I will evaluate the pattern that is a regular expression.
-			log.Println("--------> evaluate ", permissions[i].GetPattern())
+			log.Println("--------> evaluate ", permissions[i].GetId())
 			// If the regex is a success then i will return nil here.
 		}
 	} else {
@@ -451,14 +453,22 @@ func (this *SecurityManager) hasPermission(sessionId string, permissionType Carg
 	}
 
 	var permissionName string
-	if permissionType == CargoEntities.PermissionType_Create {
-		permissionName = "create"
-	} else if permissionType == CargoEntities.PermissionType_Read {
-		permissionName = "read"
-	} else if permissionType == CargoEntities.PermissionType_Update {
-		permissionName = "update"
-	} else if permissionType == CargoEntities.PermissionType_Delete {
-		permissionName = "delete"
+	if permissionType == 0 {
+		permissionName = "---"
+	} else if permissionType == 1 {
+		permissionName = "--x"
+	} else if permissionType == 2 {
+		permissionName = "-w-"
+	} else if permissionType == 3 {
+		permissionName = "-wx"
+	} else if permissionType == 4 {
+		permissionName = "r--"
+	} else if permissionType == 5 {
+		permissionName = "r-x"
+	} else if permissionType == 6 {
+		permissionName = "rw-"
+	} else if permissionType == 7 {
+		permissionName = "rwx"
 	}
 
 	// Create the error message
@@ -471,27 +481,52 @@ func (this *SecurityManager) hasPermission(sessionId string, permissionType Carg
 /**
  * Append a new action to a given role. Do nothing if the action is already in the role
  */
-func (this *SecurityManager) appendPermission(accountId string, permissionType CargoEntities.PermissionType, pattern string) *CargoEntities.Error {
+func (this *SecurityManager) appendPermission(accountId string, permissionType int, pattern string) *CargoEntities.Error {
 	accountUuid := CargoEntitiesAccountExists(accountId)
 	accountEntity, err := GetServer().GetEntityManager().getEntityByUuid(accountUuid, false)
+
 	if err == nil {
-		// Here I will get the account and set the permission if is not already
-		// exist.
-		account := accountEntity.GetObject().(*CargoEntities.Account)
-		for i := 0; i < len(account.GetPermissions()); i++ {
-			permission := account.GetPermissions()[i]
-			if permission.GetPattern() == pattern && permission.GetType() == permissionType {
-				return nil // not a error but nothing to do here.
+		// Get or create the permission.
+		permissionUuid := CargoEntitiesPermissionExists(pattern)
+		var permissionEntity *CargoEntities_PermissionEntity
+		var permission *CargoEntities.Permission
+
+		if len(permissionUuid) > 0 {
+			entity, errObj := GetServer().GetEntityManager().getEntityByUuid(permissionUuid, false)
+			if errObj != nil {
+				return errObj
 			}
+			permissionEntity = entity.(*CargoEntities_PermissionEntity)
+			permission = permissionEntity.GetObject().(*CargoEntities.Permission)
+			permission.SetTypes(permissionType)
+			permission.SetId(pattern)
+		} else {
+			// So here I will create the permission.
+			permission = new(CargoEntities.Permission)
+			permission.TYPENAME = "CargoEntities.Permission"
+			permission.SetId(pattern)
+			permission.SetTypes(permissionType)
+			// Set the uuid
+			GetServer().GetEntityManager().NewCargoEntitiesPermissionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", permission)
+			var errObj *CargoEntities.Error
+			entity, errObj := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_permissions", "CargoEntities.Permission", "", permission)
+			if errObj != nil {
+				return errObj
+			}
+			permissionEntity = entity.(*CargoEntities_PermissionEntity)
+			permission = permissionEntity.GetObject().(*CargoEntities.Permission)
 		}
-		// So here I will create the permission.
-		permission := new(CargoEntities.Permission)
-		permission.TYPENAME = "CargoEntities.Permission"
-		permission.SetPattern(pattern)
-		permission.SetType(permissionType)
-		account.SetPermissions(permission)
-		GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(account.GetUUID(), "", permission)
-		GetServer().GetEntityManager().createEntity(accountEntity.GetUuid(), "M_permissions", "CargoEntities.Permission", "", permission)
+
+		// Append the account ref to the
+		permission.SetAccountsRef(accountEntity.GetObject().(*CargoEntities.Account))
+		accountEntity.GetObject().(*CargoEntities.Account).SetPermissionsRef(permission)
+
+		//accountEntity.SaveEntity()
+		//permissionEntity.SaveEntity()
+
+		// Save the entity...
+		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+
 	} else {
 		// Account error
 		cargoError := NewError(Utility.FileLine(), ACCOUNT_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The account id '"+accountId+"' does not correspond to an existing account entity."))
@@ -503,10 +538,56 @@ func (this *SecurityManager) appendPermission(accountId string, permissionType C
 	return nil
 }
 
+/**
+ * Remove a premission with a given pattern from an account with a given id.
+ */
+func (this *SecurityManager) removePermission(accountId string, pattern string) *CargoEntities.Error {
+
+	accountUuid := CargoEntitiesAccountExists(accountId)
+	accountEntity, err := GetServer().GetEntityManager().getEntityByUuid(accountUuid, false)
+
+	if err == nil {
+		account := accountEntity.GetObject().(*CargoEntities.Account)
+		// Get or create the permission.
+		permissionUuid := CargoEntitiesPermissionExists(pattern)
+		var permissionEntity *CargoEntities_PermissionEntity
+		var permission *CargoEntities.Permission
+		if len(permissionUuid) > 0 {
+			entity, errObj := GetServer().GetEntityManager().getEntityByUuid(permissionUuid, false)
+			if errObj != nil {
+				return errObj
+			}
+			permissionEntity = entity.(*CargoEntities_PermissionEntity)
+		} else {
+			cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The permission with pattern '"+pattern+"' does not correspond to an existing account entity."))
+			// Return the uuid of the created error in the err return param.
+			return cargoError
+		}
+
+		// Remove the permission
+		permission = permissionEntity.GetObject().(*CargoEntities.Permission)
+		account.RemovePermissionsRef(permission)
+		permission.RemoveAccountsRef(account)
+
+		// Save the account
+		accountEntity.SaveEntity()
+
+		// Save or delete the permission.
+		if len(permission.M_accountsRef) == 0 {
+			// if the permission is not used anymore I will delete it
+			permissionEntity.DeleteEntity()
+		} else {
+			permissionEntity.SaveEntity()
+		}
+	}
+	return nil
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // API
 ////////////////////////////////////////////////////////////////////////////////
 
+////////////// Role //////////////
 /**
  * Create a new Role with a given id.
  */
@@ -541,7 +622,6 @@ func (this *SecurityManager) DeleteRole(id string, messageId string, sessionId s
 	}
 }
 
-////////////// Role //////////////
 /**
  * Return true if a role has an account.
  */
@@ -597,6 +677,28 @@ func (this *SecurityManager) RemoveAction(roleId string, accountName string, mes
 	}
 }
 
+////////////// Permission //////////////
+/**
+ * Append a new permission an a given account.
+ */
+func (this *SecurityManager) AppendPermission(accountId string, permissionType int, pattern string, messageId string, sessionId string) {
+	errObj := this.appendPermission(accountId, permissionType, pattern)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+}
+
+/**
+ * Remove a permission from an account and delete it if no more account use it.
+ */
+func (this *SecurityManager) RemovePermission(accountId string, pattern string, messageId string, sessionId string) {
+	errObj := this.removePermission(accountId, pattern)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+}
+
+///////////////////////////////// Other stuff //////////////////////////////////
 /**
  * Change the admin password.
  */

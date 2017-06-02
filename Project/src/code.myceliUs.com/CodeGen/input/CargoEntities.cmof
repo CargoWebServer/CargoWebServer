@@ -113,9 +113,7 @@
 <ownedMember xmi:type="cmof:Association" xmi:id="A_session_account" name="A_session_account" visibility="private" memberEnd="Entities-entity A_session_account-account">
     <ownedEnd xmi:type="cmof:Property" xmi:id="A_session_account-account" name="account" _type="Account" lower="0" owningAssociation="A_session_account" association="A_session_account"/>
 </ownedMember>
-<ownedMember xmi:type="cmof:Association" xmi:id="A_session_permission" name="A_session_permission" visibility="private" memberEnd="Entities-entity A_session_permission-permission">
-    <ownedEnd xmi:type="cmof:Property" xmi:id="A_session_permission-account" name="account" _type="Account" lower="0" owningAssociation="A_session_permission" association="A_session_permission"/>
-</ownedMember>
+
 <ownedMember xmi:type="cmof:Class" xmi:id="Account" name="Account" superClass="Entity">
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-name" name="name">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
@@ -127,10 +125,10 @@
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
     </ownedAttribute>
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-sessions" name="sessions" visibility="public" _type="Session" upper="*" lower="0" isComposite="true" association="A_session_account"/>
-	<ownedAttribute xmi:type="cmof:Property" xmi:id="Account-permissions" name="permissions" _type="Permission" lower="0" upper="*" isComposite="true" association="A_session_permission"/>
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-messages" name="messages" visibility="public" _type="Message" upper="*" lower="0" isComposite="true"/>
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-userRef" name="userRef" _type="User" lower="0" upper="1"/>
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Account-rolesRef" name="rolesRef" _type="Role" lower="0" upper="*"/>
+	<ownedAttribute xmi:type="cmof:Property" xmi:id="Account-permissionsRef" name="permissionsRef" _type="Permission" lower="0" upper="*" />
 </ownedMember>
 <ownedMember xmi:type="cmof:Enumeration" xmi:id="OsType" name="OsType">
     <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="OsType-unknown" name="unknown" classifier="OsType" enumeration="OsType"/>
@@ -158,17 +156,14 @@
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Computer-osType" name="osType" _type="OsType"/>
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Computer-platformType" name="platformType" _type="PlatformType"/>
 </ownedMember>
-<ownedMember xmi:type="cmof:Enumeration" xmi:id="PermissionType" name="PermissionType">
-    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="PermissionType-Create" name="Create" classifier="PermissionType" enumeration="PermissionType"/>
-    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="PermissionType-Read" name="Read" classifier="PermissionType" enumeration="PermissionType"/>
-    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="PermissionType-Update" name="Update" classifier="PermissionType" enumeration="PermissionType"/>
-    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="PermissionType-Delete" name="Delete" classifier="PermissionType" enumeration="PermissionType"/>
-</ownedMember>
 <ownedMember xmi:type="cmof:Class" xmi:id="Permission" name="Permission">
-    <ownedAttribute xmi:type="cmof:Property" xmi:id="Permission-pattern" name="pattern">
+    <ownedAttribute xmi:type="cmof:Property" xmi:id="Permission-id" name="id">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
     </ownedAttribute>
-    <ownedAttribute xmi:type="cmof:Property" xmi:id="Permission-type" name="type" _type="PermissionType"/>
+	<ownedAttribute xmi:type="cmof:Property" xmi:id="Permission-type" name="types">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+    </ownedAttribute>
+	<ownedAttribute xmi:type="cmof:Property" xmi:id="Permission-accountsRef" name="accountsRef" _type="Account" lower="0" upper="*"/>
 </ownedMember>
 <ownedMember xmi:type="cmof:Association" xmi:id="A_file_file" name="A_file_file" visibility="private" memberEnd="File-entity A_file_file-file">
     <ownedEnd xmi:type="cmof:Property" xmi:id="A_file_file-file" name="parentDir" _type="File" lower="0" owningAssociation="A_file_file" association="A_file_file"/>
@@ -242,6 +237,9 @@
 <ownedMember xmi:type="cmof:Association" xmi:id="A_action_entities" name="A_action_entities" visibility="private" memberEnd="Entities-action A_action_entities-entities">
     <ownedEnd xmi:type="cmof:Property" xmi:id="A_action_entities-entities" name="entities" _type="Entities" lower="0" owningAssociation="A_action_entities" association="A_action_entities"/>
 </ownedMember>
+<ownedMember xmi:type="cmof:Association" xmi:id="A_permission_entities" name="A_permission_entities" visibility="private" memberEnd="Entities-entity A_permission_entities-permission">
+    <ownedEnd xmi:type="cmof:Property" xmi:id="A_permission_entities-entities" name="entities" _type="Entities" lower="0" owningAssociation="A_permission_entities" association="A_permission_entities"/>
+</ownedMember>
 <ownedMember xmi:type="cmof:Class" xmi:id="Entities" name="Entities">
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Entities-id" name="id">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
@@ -254,6 +252,7 @@
     </ownedAttribute>
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Entities-entity" name="entities" _type="Entity" lower="0" upper="*" isComposite="true" association="A_entity_entities"/>
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Entities-role" name="roles" _type="Role" lower="0" upper="*" isComposite="true" association="A_role_entities"/>
+	<ownedAttribute xmi:type="cmof:Property" xmi:id="Entities-permission" name="permissions" _type="Permission" lower="0" upper="*" isComposite="true" association="A_permission_entities"/>
 	<ownedAttribute xmi:type="cmof:Property" xmi:id="Entities-action" name="actions" _type="Action" lower="0" upper="*" isComposite="true" association="A_action_entities"/>
 </ownedMember>
 </cmof:Package>

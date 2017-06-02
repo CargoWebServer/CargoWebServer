@@ -442,6 +442,97 @@ SecurityManager.prototype.removeAction= function (roleId, actionName, successCal
     )
 }
 
+
+///////////////////////////////////// Permission //////////////////////////////////
+/*
+ * Sever side code.
+ */
+function AppendPermission(accountId, permissionType, pattern) {
+    server.GetSecurityManager().AppendPermission(accountId, permissionType, pattern, messageId, sessionId)
+}
+
+/**
+ * Append a new permission to a given account. Does nothing if the permission is already in the account
+ * @param {string} accountId The id of the account to append the permission to 
+ * @param {string} permissionType The type of the permission to append
+ * @param {string} pattern The pattern of the permission to eveluate.
+ * @param {function} successCallback The function to execute in case of success
+ * @param {function} errorCallback The function to execute in case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+SecurityManager.prototype.appendPermission = function (accountId, permissionType, pattern, successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = []
+    params.push(createRpcData(accountId, "STRING", "accountId"))
+    params.push(createRpcData(permissionType, "INTEGER", "permissionType"))
+    params.push(createRpcData(pattern, "STRING", "pattern"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        AppendPermission.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            caller.successCallback(result, caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback.
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+/*
+ * Sever side code.
+ */
+function RemovePermission(accountId, permissionPattern) {
+    server.GetSecurityManager().RemovePermission(accountId, permissionPattern, messageId, sessionId)
+}
+
+/**
+ * Remove a permission from an account
+ * @param {string} accountId The id of the account to remove the permission from 
+ * @param {string} permissionPattern The pattern of the permission to remove from the account
+ * @param {function} successCallback The function to execute in case of success
+ * @param {function} errorCallback The function to execute in case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+SecurityManager.prototype.removePermission= function (accountId, permissionPattern, successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = []
+    params.push(createRpcData(accountId, "STRING", "accountId"))
+    params.push(createRpcData(permissionPattern, "STRING", "permissionPattern"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        RemovePermission.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            caller.successCallback(result, caller.caller)
+        },
+        function (errMsg, caller) {
+            // display the message in the console.
+            console.log(errMsg)
+            // call the immediate error callback.
+            caller.errorCallback(errMsg, caller.caller)
+            // dispatch the message.
+            server.errorManager.onError(errMsg)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}
+
+///////////////////////////////////// Other stuff ////////////////////////////////////////////
 /*
  * Sever side code.
  */

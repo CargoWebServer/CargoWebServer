@@ -939,10 +939,17 @@ func (this *EntityManager) getEntityByUuid(uuid string, lazy bool) (Entity, *Car
 		} else if !val.IsLazy() {
 			return val, nil
 		}
+
 		// Remove the actual entity from the cache
-		this.removeEntity(uuid)
+
 		// Init it, it will introduce it after it.
+		if strings.HasPrefix(uuid, "CargoEntities.Entities%") {
+			return val, nil
+		}
+
+		this.removeEntity(uuid)
 		val.InitEntity(uuid, lazy)
+
 		return val, nil
 	}
 
@@ -1569,7 +1576,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 
 	if entity != nil {
 		// validate over the entity TODO active it latter...
-		errObj = GetServer().GetSecurityManager().hasPermission(sessionId, CargoEntities.PermissionType_Delete, entity)
+		//errObj = GetServer().GetSecurityManager().hasPermission(sessionId, CargoEntities.PermissionType_Delete, entity)
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return // exit here.

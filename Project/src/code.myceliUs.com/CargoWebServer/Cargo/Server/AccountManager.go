@@ -213,7 +213,13 @@ func (this *AccountManager) Me(connectionId string, messageId string, sessionId 
 		return nil
 	}
 
-	log.Println("------------> 216", session.GetAccountPtr().GetEmail())
+	/*errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		log.Println("------> action: ", Utility.FunctionName())
+		log.Println("------> error: ", errObj)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}*/
 
 	return session.GetAccountPtr()
 }

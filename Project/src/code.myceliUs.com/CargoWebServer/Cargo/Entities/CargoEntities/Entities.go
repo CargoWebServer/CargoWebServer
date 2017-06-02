@@ -26,6 +26,7 @@ type Entities struct{
 	M_version string
 	M_entities []Entity
 	M_roles []*Role
+	M_permissions []*Permission
 	M_actions []*Action
 
 }
@@ -44,6 +45,7 @@ type XsdEntities struct {
 
 	M_roles	[]*XsdRole	`xml:"roles,omitempty"`
 	M_actions	[]*XsdAction	`xml:"actions,omitempty"`
+	M_permissions	[]*XsdPermission	`xml:"permissions,omitempty"`
 	M_id	string	`xml:"id,attr"`
 	M_name	string	`xml:"name,attr"`
 	M_version	string	`xml:"version,attr"`
@@ -167,6 +169,44 @@ func (this *Entities) RemoveRoles(ref interface{}){
 		}
 	}
 	this.M_roles = roles_
+}
+
+/** Permissions **/
+func (this *Entities) GetPermissions() []*Permission{
+	return this.M_permissions
+}
+
+/** Init reference Permissions **/
+func (this *Entities) SetPermissions(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var permissionss []*Permission
+	for i:=0; i<len(this.M_permissions); i++ {
+		if this.M_permissions[i].GetUUID() != ref.(*Permission).GetUUID() {
+			permissionss = append(permissionss, this.M_permissions[i])
+		} else {
+			isExist = true
+			permissionss = append(permissionss, ref.(*Permission))
+		}
+	}
+	if !isExist {
+		permissionss = append(permissionss, ref.(*Permission))
+	}
+	this.M_permissions = permissionss
+}
+
+/** Remove reference Permissions **/
+func (this *Entities) RemovePermissions(ref interface{}){
+	toDelete := ref.(*Permission)
+	permissions_ := make([]*Permission, 0)
+	for i := 0; i < len(this.M_permissions); i++ {
+		if toDelete.GetUUID() != this.M_permissions[i].GetUUID() {
+			permissions_ = append(permissions_, this.M_permissions[i])
+		}else{
+			this.NeedSave = true
+		}
+	}
+	this.M_permissions = permissions_
 }
 
 /** Actions **/
