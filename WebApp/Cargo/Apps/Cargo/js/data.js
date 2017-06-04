@@ -525,3 +525,37 @@ DataManager.prototype.importXmlData = function (content, successCallback, errorC
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
 }
+
+/**
+ * Synchronize sql datastore with it sql data source.
+ */
+function Synchronize(storeId) {
+    err = server.GetDataManager().Synchronize(storeId, messageId, sessionId)
+    return err
+}
+
+DataManager.prototype.synchronize = function (storeId, successCallback, errorCallback, caller) {
+    // First of all I will upload the file in the tmp directory.
+    // server is the client side singleton...
+    var params = []
+    params.push(createRpcData(storeId, "STRING", "storeId"))
+
+    // Call it on the server.
+    server.executeJsFunction(
+        Synchronize.toString(), // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (results, caller) {
+            // Nothing todo here.
+            caller.successCallback(results[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            console.log(errMsg)
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+    )
+}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"strconv"
 	"strings"
 
@@ -1476,6 +1477,7 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 					entityInfoStr += "	}\n"
 				} else {
 					// The attribute is a reference.
+					log.Println(typeName)
 					if hasId(classesMap[typeName]) {
 						entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info,this.object.M_" + attribute.Name + ref + ")\n"
 					} else {

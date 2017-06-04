@@ -28,6 +28,7 @@ func (this *Server) GetSecurityManager() *SecurityManager {
 
 func newSecurityManager() *SecurityManager {
 	securityManager := new(SecurityManager)
+
 	return securityManager
 }
 
@@ -40,7 +41,7 @@ func newSecurityManager() *SecurityManager {
  */
 func (this *SecurityManager) initialize() {
 
-	log.Println("--> Initialize SessionManager")
+	log.Println("--> Initialize Security manager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
 
 	// Create the admin role if it doesn't exist
@@ -392,7 +393,28 @@ func (this *SecurityManager) removeAction(roleId string, actionName string) *Car
  */
 func (this *SecurityManager) canExecuteAction(sessionId string, actionName string) *CargoEntities.Error {
 
+	// format the action name...
+	actionName = actionName[strings.LastIndex(actionName, "/")+1:]
+	actionName = strings.Replace(actionName, "*", "", -1)
+	actionName = strings.Replace(actionName, ")", "", -1)
+	actionName = strings.Replace(actionName, "(", "", -1)
+
 	// Here is the list of function where no permission apply...
+	actionUuid := CargoEntitiesActionExists(actionName)
+	if len(actionUuid) == 0 {
+		// Create the error message
+		cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The action with the name '"+actionName+"' dosen't exist!"))
+		// Return the uuid of the created error in the err return param.
+		return cargoError
+	}
+
+	actionEntity, _ := GetServer().GetEntityManager().getEntityByUuid(actionUuid, true)
+	action := actionEntity.GetObject().(*CargoEntities.Action)
+
+	// if the action is public or hidden no validation is required.
+	if action.GetAccessType() == CargoEntities.AccessType_Hidden || action.GetAccessType() == CargoEntities.AccessType_Public {
+		return nil
+	}
 
 	// Format action name from code.myceliUs.com/CargoWebServer/Cargo/Server.(*WorkflowManager).StartProcess
 	// to Server.WorkflowManager.StartProcess
@@ -409,6 +431,7 @@ func (this *SecurityManager) canExecuteAction(sessionId string, actionName strin
 		roles := account.GetRolesRef()
 		for i := 0; i < len(roles); i++ {
 			if this.hasAction(roles[i].GetId(), actionName) {
+				log.Println("account ", actionName, " can execute action ", action.GetName())
 				return nil
 			}
 		}

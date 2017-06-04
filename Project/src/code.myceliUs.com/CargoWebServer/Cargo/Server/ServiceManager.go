@@ -18,6 +18,12 @@ type ServiceManager struct {
 	m_services            map[string]Service
 	m_servicesLst         []Service
 	m_serviceContainerCmd *exec.Cmd
+
+	// Here is the list of action with theire initial
+	// access type.
+	hidden     []string
+	public     []string
+	restricted []string
 }
 
 var serviceManager *ServiceManager
@@ -25,6 +31,156 @@ var serviceManager *ServiceManager
 func (this *Server) GetServiceManager() *ServiceManager {
 	if serviceManager == nil {
 		serviceManager = newServiceManager()
+		serviceManager.hidden = make([]string, 0)
+		serviceManager.public = make([]string, 0)
+		serviceManager.restricted = make([]string, 0)
+
+		// Here I will append action id's in there respective map.
+		/////////////////////////  hidden /////////////////////////
+		serviceManager.hidden = append(serviceManager.hidden, "Server.EventManager.Lock")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.EventManager.Unlock")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.EventManager.AddEventListener")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.EventManager.RemoveEventListener")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.EventManager.BroadcastEvent")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.EventManager.BroadcastEventTo")
+
+		serviceManager.hidden = append(serviceManager.hidden, "Server.DataManager.Lock")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.DataManager.RLock")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.DataManager.RUnlock")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.DataManager.RLocker")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.DataManager.Unlock")
+
+		serviceManager.hidden = append(serviceManager.hidden, "Server.EntityManager.RLock")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.EntityManager.RUnlock")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.EntityManager.RLocker")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.EntityManager.Lock")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.EntityManager.Unlock")
+		serviceManager.hidden = append(serviceManager.hidden, "Server.EntityManager.InitEntity")
+
+		serviceManager.hidden = append(serviceManager.hidden, "Server.SchemaManager.GetFieldsFieldsType")
+
+		/////////////////////////  public /////////////////////////
+
+		// Configuration manager
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetApplicationDirectoryPath")
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetBinPath")
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetDataPath")
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetDefinitionsPath")
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetHostName")
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetIpv4")
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetQueriesPath")
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetSchemasPath")
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetServerPort")
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetScriptPath")
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetServicePort")
+		serviceManager.public = append(serviceManager.public, "Server.ConfigurationManager.GetTmpPath")
+
+		// Session manager
+		serviceManager.public = append(serviceManager.public, "Server.SessionManager.Logout")
+		serviceManager.public = append(serviceManager.public, "Server.SessionManager.Login")
+		serviceManager.public = append(serviceManager.public, "Server.SessionManager.GetActiveSessions")
+		serviceManager.public = append(serviceManager.public, "Server.SessionManager.GetActiveSessionByAccountId")
+		serviceManager.public = append(serviceManager.public, "Server.SessionManager.GetActiveSessionById")
+		serviceManager.public = append(serviceManager.public, "Server.SessionManager.UpdateSessionState")
+
+		// Data manager
+		serviceManager.public = append(serviceManager.public, "Server.DataManager.Connect")
+		serviceManager.public = append(serviceManager.public, "Server.DataManager.Ping")
+		serviceManager.public = append(serviceManager.public, "Server.DataManager.Create")
+		serviceManager.public = append(serviceManager.public, "Server.DataManager.Read")
+		serviceManager.public = append(serviceManager.public, "Server.DataManager.Update")
+		serviceManager.public = append(serviceManager.public, "Server.DataManager.Delete")
+
+		// Entity manager
+		serviceManager.public = append(serviceManager.public, "Server.EntityManager.GenerateEntityUUID")
+		serviceManager.public = append(serviceManager.public, "Server.EntityManager.GetEntityPrototype")
+		serviceManager.public = append(serviceManager.public, "Server.EntityManager.GetDerivedEntityPrototypes")
+		serviceManager.public = append(serviceManager.public, "Server.EntityManager.GetEntityPrototypes")
+		serviceManager.public = append(serviceManager.public, "Server.EntityManager.GetEntityLnks")
+		serviceManager.public = append(serviceManager.public, "Server.EntityManager.GetObjectById")
+		serviceManager.public = append(serviceManager.public, "Server.EntityManager.GetObjectByUuid")
+		serviceManager.public = append(serviceManager.public, "Server.EntityManager.GetObjectsByType")
+		serviceManager.public = append(serviceManager.public, "Server.EntityManager.CreateEntity")
+		serviceManager.public = append(serviceManager.public, "Server.EntityManager.SaveEntity")
+		serviceManager.public = append(serviceManager.public, "Server.EntityManager.RemoveEntity")
+
+		// Account manager
+		serviceManager.public = append(serviceManager.public, "Server.AccountManager.Me")
+		serviceManager.public = append(serviceManager.public, "Server.AccountManager.GetUserById")
+		serviceManager.public = append(serviceManager.public, "Server.AccountManager.GetAccountById")
+		serviceManager.public = append(serviceManager.public, "Server.AccountManager.Register")
+
+		// Security manager
+		// Must be accessible to non admin role...
+		serviceManager.public = append(serviceManager.public, "Server.SecurityManager.ChangeAdminPassword")
+		serviceManager.public = append(serviceManager.public, "Server.SecurityManager.GetRole")
+		serviceManager.public = append(serviceManager.public, "Server.SecurityManager.HasAccount")
+		serviceManager.public = append(serviceManager.public, "Server.SecurityManager.HasAction")
+
+		// LDAP manager
+		serviceManager.public = append(serviceManager.public, "Server.LdapManager.Search")
+		serviceManager.public = append(serviceManager.public, "Server.LdapManager.Authenticate")
+		serviceManager.public = append(serviceManager.public, "Server.LdapManager.GetComputer")
+		serviceManager.public = append(serviceManager.public, "Server.LdapManager.GetAllGroups")
+		serviceManager.public = append(serviceManager.public, "Server.LdapManager.GetComputerByIp")
+		serviceManager.public = append(serviceManager.public, "Server.LdapManager.GetAllUsers")
+		serviceManager.public = append(serviceManager.public, "Server.LdapManager.GetGroupById")
+		serviceManager.public = append(serviceManager.public, "Server.LdapManager.GetComputerByName")
+		serviceManager.public = append(serviceManager.public, "Server.LdapManager.GetUserById")
+
+		// OAuth2
+		serviceManager.public = append(serviceManager.public, "Server.OAuth2Manager.GetResource")
+
+		// File manager
+		serviceManager.public = append(serviceManager.public, "Server.FileManager.GetFileByPath")
+		serviceManager.public = append(serviceManager.public, "Server.FileManager.GetMimeTypeByExtension")
+		serviceManager.public = append(serviceManager.public, "Server.FileManager.IsFileExist")
+		serviceManager.public = append(serviceManager.public, "Server.FileManager.OpenFile")
+		serviceManager.public = append(serviceManager.public, "Server.FileManager.ReadCsvFile")
+		serviceManager.public = append(serviceManager.public, "Server.FileManager.ReadTextFile")
+		serviceManager.public = append(serviceManager.public, "Server.FileManager.RemoveFile")
+		serviceManager.public = append(serviceManager.public, "Server.FileManager.CreateDir")
+		serviceManager.public = append(serviceManager.public, "Server.FileManager.CreateFile")
+		serviceManager.public = append(serviceManager.public, "Server.FileManager.DeleteFile")
+
+		// Email Manager
+		serviceManager.public = append(serviceManager.public, "Server.EmailManager.ReceiveMailFunc")
+		serviceManager.public = append(serviceManager.public, "Server.EmailManager.SendEmail")
+		serviceManager.public = append(serviceManager.public, "Server.EmailManager.ValidateEmail")
+
+		///////////////////////// restricted /////////////////////////
+
+		// Event manager
+		serviceManager.restricted = append(serviceManager.restricted, "Server.EventManager.BroadcastEventData")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.EventManager.AppendEventFilter")
+
+		// Data manager
+		serviceManager.restricted = append(serviceManager.restricted, "Server.DataManager.Close")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.DataManager.CreateDataStore")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.DataManager.ImportXmlData")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.DataManager.DeleteDataStore")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.DataManager.ImportXsdSchema")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.DataManager.Synchronize")
+
+		// Entity manager
+		serviceManager.restricted = append(serviceManager.restricted, "Server.EntityManager.CreateEntityPrototype")
+
+		// Security manager
+		serviceManager.restricted = append(serviceManager.restricted, "Server.SecurityManager.AppendAccount")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.SecurityManager.AppendPermission")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.SecurityManager.AppendAction")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.SecurityManager.CreateRole")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.SecurityManager.DeleteRole")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.SecurityManager.RemoveAccount")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.SecurityManager.RemovePermission")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.SecurityManager.RemoveAction")
+
+		// Ldap manager
+		serviceManager.restricted = append(serviceManager.restricted, "Server.LdapManager.Connect")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.LdapManager.SynchronizeComputers")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.LdapManager.SynchronizeGroups")
+		serviceManager.restricted = append(serviceManager.restricted, "Server.LdapManager.SynchronizeUsers")
+
 	}
 	return serviceManager
 }
@@ -184,6 +340,19 @@ func (this *ServiceManager) registerActions(service Service) {
 				action.SetResults(parameter)
 			}
 
+			// Now I will set the access type of the action before save it.
+			if Utility.Contains(this.hidden, action.M_name) {
+				action.SetAccessType(CargoEntities.AccessType_Hidden)
+			}
+
+			if Utility.Contains(this.public, action.M_name) {
+				action.SetAccessType(CargoEntities.AccessType_Public)
+			}
+
+			if Utility.Contains(this.restricted, action.M_name) {
+				action.SetAccessType(CargoEntities.AccessType_Restricted)
+			}
+
 			// apend it to the entities action.
 			action.SetEntitiesPtr(GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities))
 			GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetActions(action)
@@ -192,7 +361,17 @@ func (this *ServiceManager) registerActions(service Service) {
 			adminRoleUuid := CargoEntitiesRoleExists("adminRole")
 			if len(adminRoleUuid) > 0 {
 				adminRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(adminRoleUuid, false)
-				adminRoleEntity.GetObject().(*CargoEntities.Role).SetActions(action)
+				if action.GetAccessType() != CargoEntities.AccessType_Hidden {
+					adminRoleEntity.GetObject().(*CargoEntities.Role).SetActions(action)
+				}
+			}
+
+			guestRoleUuid := CargoEntitiesRoleExists("guestRole")
+			if len(guestRoleUuid) > 0 {
+				guestRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(guestRoleUuid, false)
+				if action.GetAccessType() == CargoEntities.AccessType_Public {
+					guestRoleEntity.GetObject().(*CargoEntities.Role).SetActions(action)
+				}
 			}
 		}
 	}

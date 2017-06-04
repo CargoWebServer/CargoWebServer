@@ -29,6 +29,14 @@
 		<xsd:attribute name="isArray" type="xsd:boolean"/>
 	</xsd:complexType>
 	
+	<xsd:simpleType name="tAccessType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Hidden"/>
+			<xsd:enumeration value="Public"/>
+			<xsd:enumeration value="Restricted"/>
+		</xsd:restriction>
+	</xsd:simpleType>	
+	
 	<xsd:element name="action" type="tAction"/> 
 	<xsd:complexType name="tAction">
 		<xsd:attribute name="name" type="xsd:ID"/>
@@ -37,6 +45,7 @@
 				<xsd:element ref="parameters" type="tParameter" minOccurs="0" maxOccurs="unbounded"/> 
 				<xsd:element ref="results" type="tParameter" minOccurs="0" maxOccurs="unbounded"/> 
 			</xsd:sequence>
+			<xsd:attribute name="accessType" type="tAccessType" default="Hidden"/>
 		</xsd:complexContent> 
 	</xsd:complexType>
 	
@@ -52,7 +61,6 @@
 	</xsd:complexType>
 
 	<xsd:element name="permission" type="tPermission"/> 
-	
 	<xsd:complexType name="tPermission">
 		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:attribute name="types" type="xsd:integer"/>

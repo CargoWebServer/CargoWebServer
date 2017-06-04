@@ -66,16 +66,16 @@ func (self *Action) execute() {
 	// method to call on a given object.
 	x, errMsg := Utility.CallMethod(*self, self.Name, self.Params)
 
+	// Get the session id and the message id...
+	sessionId := self.msg.from.GetUuid()
+	messageId := self.msg.GetId()
+
 	if errMsg != nil {
 		err := errMsg.(error)
-		// Get the session id and the message id...
-		sessionId := self.msg.from.GetUuid()
-		messageId := self.msg.GetId()
 
 		// Create the error object.
 		cargoError := NewError(Utility.FileLine(), ACTION_EXECUTE_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-
 		return
 	}
 

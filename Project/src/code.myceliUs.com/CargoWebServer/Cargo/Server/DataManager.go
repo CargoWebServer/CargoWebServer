@@ -1082,6 +1082,12 @@ func (this *DataManager) close() {
  * return the result and an array of interface...
  */
 func (this *DataManager) Ping(storeName string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
 	store := this.getDataStore(storeName)
 	if store == nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("The datastore '"+storeName+"' does not exist."))
@@ -1098,6 +1104,12 @@ func (this *DataManager) Ping(storeName string, messageId string, sessionId stri
 }
 
 func (this *DataManager) Connect(storeName string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
 	store := this.getDataStore(storeName)
 	if store == nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("The datastore '"+storeName+"' does not exist."))
@@ -1118,6 +1130,12 @@ func (this *DataManager) Connect(storeName string, messageId string, sessionId s
 }
 
 func (this *DataManager) Close(storeName string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
 	store := this.getDataStore(storeName)
 	if store == nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("The datastore '"+storeName+"' does not exist."))
@@ -1138,6 +1156,12 @@ func (this *DataManager) Close(storeName string, messageId string, sessionId str
  * return the result and an array of interface...
  */
 func (this *DataManager) Read(storeName string, query string, fieldsType []interface{}, params []interface{}, messageId string, sessionId string) [][]interface{} {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	data, err := this.readData(storeName, query, fieldsType, params)
 	if err != nil {
 		// Create the error message
@@ -1152,6 +1176,12 @@ func (this *DataManager) Read(storeName string, query string, fieldsType []inter
  * value to insert in the DB.
  */
 func (this *DataManager) Create(storeName string, query string, d []interface{}, messageId string, sessionId string) interface{} {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	lastId, err := this.createData(storeName, query, d)
 	if err != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err))
@@ -1164,6 +1194,12 @@ func (this *DataManager) Create(storeName string, query string, d []interface{},
  * Update the data.
  */
 func (this *DataManager) Update(storeName string, query string, fields []interface{}, params []interface{}, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
 	err := this.updateData(storeName, query, fields, params)
 	if err != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err))
@@ -1174,6 +1210,12 @@ func (this *DataManager) Update(storeName string, query string, fields []interfa
  * Remove the data.
  */
 func (this *DataManager) Delete(storeName string, query string, params []interface{}, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
 	err := this.deleteData(storeName, query, params)
 	if err != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err))
@@ -1184,8 +1226,14 @@ func (this *DataManager) Delete(storeName string, query string, params []interfa
  * Create a new data store.
  */
 func (this *DataManager) CreateDataStore(storeId string, storeType int64, storeVendor int64, messageId string, sessionId string) {
+	var errObj *CargoEntities.Error
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
 
-	_, errObj := this.createDataStore(storeId, Config.DataStoreType(storeType), Config.DataStoreVendor(storeVendor))
+	_, errObj = this.createDataStore(storeId, Config.DataStoreType(storeType), Config.DataStoreVendor(storeVendor))
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}
@@ -1195,8 +1243,14 @@ func (this *DataManager) CreateDataStore(storeId string, storeType int64, storeV
  * Delete a new data store.
  */
 func (this *DataManager) DeleteDataStore(storeId string, messageId string, sessionId string) {
+	var errObj *CargoEntities.Error
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
 
-	errObj := this.deleteDataStore(storeId)
+	errObj = this.deleteDataStore(storeId)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}
@@ -1206,6 +1260,12 @@ func (this *DataManager) DeleteDataStore(storeId string, messageId string, sessi
  * Create a new xsd datastore from a given xsd file content.
  */
 func (this *DataManager) ImportXsdSchema(name string, content string, messageId string, sessionId string) {
+	var errObj *CargoEntities.Error
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
 
 	// Here I will create a temporary file
 	schemaPath := GetServer().GetConfigurationManager().GetSchemasPath()
@@ -1220,7 +1280,7 @@ func (this *DataManager) ImportXsdSchema(name string, content string, messageId 
 	f.Close()
 
 	// Import the file.
-	errObj := GetServer().GetSchemaManager().importSchema(f.Name())
+	errObj = GetServer().GetSchemaManager().importSchema(f.Name())
 
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1231,6 +1291,12 @@ func (this *DataManager) ImportXsdSchema(name string, content string, messageId 
  * Import the content of an xml file into a dataStore.
  */
 func (this *DataManager) ImportXmlData(content string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
 	var err error
 	// Here I will create a temporary file
 	tmp := GetServer().GetConfigurationManager().GetTmpPath()
@@ -1252,6 +1318,43 @@ func (this *DataManager) ImportXmlData(content string, messageId string, session
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+}
+
+// Synchronize actual data
+func (this *DataManager) Synchronize(storeId string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
+	store := this.getDataStore(storeId)
+	if store == nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("The datastore '"+storeId+"' does not exist."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+
+	err := store.Connect()
+
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Fail to open the data store connection "+err.Error()+"'."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+
+	// I will get it entity prototypes.
+	var prototypes []*EntityPrototype
+	prototypes, err = store.GetEntityPrototypes()
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Fail to get prototypes for store "+storeId+" error: "+err.Error()+"'."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+
+	if reflect.TypeOf(store).Kind().String() == "*Server.SqlDataStore" {
+		store.(*SqlDataStore).synchronize(prototypes)
 	}
 }
 

@@ -29,7 +29,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
     /** The panel */
     this.panel = new Element(parent, { "tag": "div", "class": "severConfiguration" })
 
-    /** The type */ 
+    /** The type */
     this.typeName = typeName
 
     /** The name in its parent. */
@@ -144,15 +144,16 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                             // display the schemas information here...
                                             contentView.connectBtn.element.status = "disconnected"
                                             contentView.connectBtn.element.click()
+
                                         }
-                                    } (caller))
+                                    }(caller))
                                 },
                                 // Error callback
                                 function (errObj, caller) {
                                 }, contentView)
                         }
                     }
-                } (contentView)
+                }(contentView)
 
                 contentView.deleteCallback = function (entity) {
                     // Here I will remove the folder if the entity is 
@@ -182,10 +183,14 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     contentView.connectBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell; color: lightgrey;" }).down()
                     contentView.connectBtn.appendElement({ "tag": "i", "class": "fa fa-plug" })
 
+                    // Here I will append in case of sql datasotre the synchornize button.
+                    contentView.refreshBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell; color: lightgrey;" }).down()
+                    contentView.refreshBtn.appendElement({ "tag": "i", "class": "fa fa-refresh" })
+
                     // Now If the connection is activated...
-                    contentView.connectBtn.element.onclick = function (UUID) {
+                    contentView.connectBtn.element.onclick = function (contentView) {
                         return function () {
-                            var entity = server.entityManager.entities[UUID]
+                            var entity = server.entityManager.entities[contentView.entity.UUID]
 
                             if (this.status == "error") {
                                 this.status = "disconnected"
@@ -198,31 +203,55 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                         caller.connectBtn.style.color = "lightgrey"
                                         caller.connectBtn.status = "disconnected"
                                         homepage.dataExplorer.hidePanel(caller.entity.M_id)
+                                        caller.refreshBtn.element.style.display = "none"
                                     },
                                     function (errMsg, caller) {
                                         // Fail to disconnect
                                         caller.connectBtn.style.color = "#8B0000"
                                         caller.connectBtn.status = "error"
+                                        caller.refreshBtn.element.style.display = "none"
                                         homepage.dataExplorer.hidePanel(caller.entity.M_id)
-                                    }, { "connectBtn": this, "entity": entity })
+                                    }, { "connectBtn": this, "entity": entity, "refreshBtn": contentView.refreshBtn })
                             } else if (this.status == "disconnected") {
                                 server.dataManager.connect(entity.M_id,
                                     function (result, caller) {
                                         // Here the data store can be reach so I will try to connect.
                                         caller.connectBtn.style.color = "#4CAF50"
                                         caller.connectBtn.status = "connected"
+                                        caller.refreshBtn.element.style.display = "table-cell"
                                         homepage.dataExplorer.showPanel(caller.entity.M_id)
+
                                     },
                                     function (errMsg, caller) {
                                         // fail to connect...
                                         caller.connectBtn.style.color = "#8B0000"
                                         caller.connectBtn.status = "error"
+                                        caller.refreshBtn.element.style.display = "none"
                                         homepage.dataExplorer.hidePanel(caller.entity.M_id)
-                                    }, { "connectBtn": this, "entity": entity })
+                                    }, { "connectBtn": this, "entity": entity, "refreshBtn": contentView.refreshBtn })
                             }
 
                         }
-                    } (contentView.entity.UUID)
+                    }(contentView)
+
+                    // The refresh action.
+                    contentView.refreshBtn.element.onclick = function (contentView) {
+                        return function () {
+                            var entity = server.entityManager.entities[contentView.entity.UUID]
+                            this.style.color = "#428bca"
+                            server.dataManager.synchronize(entity.M_id,
+                                // success callback
+                                function (results, caller) {
+                                    console.log("synchronization success!")
+                                    caller.refreshBtn.element.style.color = "#4CAF50"
+                                },
+                                // error callback
+                                function (errObj, caller) {
+                                    console.log("synchronization fail!", error)
+                                    caller.refreshBtn.element.style.color = "#8B0000"
+                                }, {"refreshBtn":contentView.refreshBtn})
+                        }
+                    }(contentView)
 
                     // Set the connection status
                     server.dataManager.ping(contentView.entity.M_id,
@@ -282,7 +311,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 return false
                             }
                         }
-                    } (currentPwd), 3000)
+                    }(currentPwd), 3000)
 
                     setValidator("", newPwd, function (newPwd) {
                         return function (msgDiv) {
@@ -292,7 +321,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 return false
                             }
                         }
-                    } (newPwd), 3000)
+                    }(newPwd), 3000)
 
                     setValidator("", confirmPwd, function (newPwd) {
                         return function (msgDiv) {
@@ -302,7 +331,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 return false
                             }
                         }
-                    } (confirmPwd), 3000)
+                    }(confirmPwd), 3000)
 
                     setValidator("", confirmPwd, function (newPwd, confirmPwd) {
                         return function (msgDiv) {
@@ -317,11 +346,11 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                         newPwd.element.style.border = ""
                                         confirmPwd.element.style.border = ""
                                     }
-                                } (newPwd, confirmPwd)
+                                }(newPwd, confirmPwd)
                                 return false
                             }
                         }
-                    } (newPwd, confirmPwd), 3000)
+                    }(newPwd, confirmPwd), 3000)
 
                     changeAdminPwdBtn.element.onclick = function (currentPwd, newPwd, confirmPwd) {
                         return function () {
@@ -338,13 +367,13 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                     }, {})
                             }
                         }
-                    } (currentPwd, newPwd, confirmPwd)
+                    }(currentPwd, newPwd, confirmPwd)
                 } else if (content.TYPENAME == "Config.OAuth2Configuration") {
                     // So here I will append other element in the view here.
                 }
             }
 
-        } (content, this.title))
+        }(content, this.title))
 
     // Set parent entity informations.
     contentView.parentEntity = this.activeConfiguration
@@ -418,7 +447,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                 idField.element.setSelectionRange(0, idField.element.value.length)
 
             }
-        } (this, configurationContent, configuration)
+        }(this, configurationContent, configuration)
 
         // In case of multiple configurations element..
         if (fieldType.startsWith("[]")) {
@@ -490,7 +519,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                     }
 
                 }
-            } (this)
+            }(this)
 
             // The previous configuration button.
             this.previousConfigBtn.element.onclick = function (configurationPanel) {
@@ -525,7 +554,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
                     }
                 }
-            } (this)
+            }(this)
 
             // Set the new configuration click handler.
             this.newConfigElementBtn.element.onclick = newConfiguration

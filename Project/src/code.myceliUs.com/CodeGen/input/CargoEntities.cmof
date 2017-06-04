@@ -23,12 +23,18 @@
 <ownedMember xmi:type="cmof:Association" xmi:id="A_results_action" name="A_results_action" visibility="private" memberEnd="Action-parameter A_results_action-action">
     <ownedEnd xmi:type="cmof:Property" xmi:id="A_results_action-action" name="results" _type="Parameter" lower="0" upper="*" owningAssociation="A_results_action" association="A_results_action"/>
 </ownedMember>
+<ownedMember xmi:type="cmof:Enumeration" xmi:id="AccessType" name="AccessType">
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="AccessType-Hidden" name="Hidden" classifier="AccessType" enumeration="AccessType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="AccessType-Public" name="Public" classifier="AccessType" enumeration="AccessType"/>
+    <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="AccessType-Restricted" name="Restricted" classifier="AccessType" enumeration="AccessType"/>
+</ownedMember>
 <ownedMember xmi:type="cmof:Class" xmi:id="Action" name="Action">
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Action-name" name="name">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
     </ownedAttribute>
 	<ownedAttribute xmi:type="cmof:Property" xmi:id="Action-parameters" name="parameters" _type="Parameter" lower="0" upper="*" isComposite="true" association="A_parameter_action"/>
 	<ownedAttribute xmi:type="cmof:Property" xmi:id="Action-results" name="results" _type="Parameter" lower="0" upper="*" isComposite="true" association="A_result_action"/>
+	<ownedAttribute xmi:type="cmof:Property" xmi:id="Action-accessType" name="accessType" _type="AccessType"/>
 </ownedMember>
 <ownedMember xmi:type="cmof:Class" xmi:id="Error" name="Error" superClass="Entity Message">
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Error-errorPath" name="errorPath">

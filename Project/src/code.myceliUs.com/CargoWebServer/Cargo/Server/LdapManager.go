@@ -162,6 +162,7 @@ func (this *LdapManager) getLdapGroupMembers(id string, groupId string) ([]strin
  * Connect to a ldap server...
  */
 func (this *LdapManager) Connect(id string, userId string, psswd string) (*LDAP.LDAPConnection, error) {
+
 	ldapConfigInfo := this.m_configsInfo[id]
 
 	conn := LDAP.NewLDAPConnection(ldapConfigInfo.M_ipv4, uint16(ldapConfigInfo.M_port))

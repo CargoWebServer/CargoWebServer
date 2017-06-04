@@ -24,6 +24,7 @@ type Action struct{
 	M_name string
 	M_parameters []*Parameter
 	M_results []*Parameter
+	M_accessType AccessType
 
 
 	/** Associations **/
@@ -131,6 +132,19 @@ func (this *Action) RemoveResults(ref interface{}){
 	}
 	this.M_results = results_
 }
+
+/** AccessType **/
+func (this *Action) GetAccessType() AccessType{
+	return this.M_accessType
+}
+
+/** Init reference AccessType **/
+func (this *Action) SetAccessType(ref interface{}){
+	this.NeedSave = true
+	this.M_accessType = ref.(AccessType)
+}
+
+/** Remove reference AccessType **/
 
 /** Entities **/
 func (this *Action) GetEntitiesPtr() *Entities{

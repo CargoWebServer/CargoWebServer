@@ -231,6 +231,7 @@ func (this *ConfigurationManager) getOAuthConfigurationEntity() *Config_OAuth2Co
  * Server configuration values...
  */
 func (this *ConfigurationManager) GetApplicationDirectoryPath() string {
+
 	if this.getActiveConfigurationsEntity() == nil {
 		return this.m_filePath + "/Apps"
 	}

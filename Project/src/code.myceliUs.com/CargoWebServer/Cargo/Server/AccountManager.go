@@ -73,7 +73,7 @@ func (this *AccountManager) initialize() {
 		// Create the account in memory.
 		account := new(CargoEntities.Account)
 		account.M_id = "guest"
-		account.M_password = ""
+		account.M_password = "guest"
 		account.M_name = "guest"
 		account.M_email = ""
 		account.NeedSave = true
@@ -116,6 +116,12 @@ func (this *AccountManager) stop() {
  */
 func (this *AccountManager) Register(name string, password string, email string, messageId string, sessionId string) *CargoEntities.Account {
 
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	// The email address must be written in lower case.
 	email = strings.ToLower(email)
 
@@ -153,6 +159,12 @@ func (this *AccountManager) Register(name string, password string, email string,
  */
 func (this *AccountManager) GetAccountById(name string, messageId string, sessionId string) *CargoEntities.Account {
 
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	accountUuid := CargoEntitiesAccountExists(name)
 	if len(accountUuid) == 0 {
 		// Create the error message
@@ -174,6 +186,12 @@ func (this *AccountManager) GetAccountById(name string, messageId string, sessio
  * Retreive a user with a given id
  */
 func (this *AccountManager) GetUserById(id string, messageId string, sessionId string) *CargoEntities.User {
+
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
 
 	userUuid := CargoEntitiesUserExists(id)
 	if len(userUuid) == 0 {
@@ -197,6 +215,12 @@ func (this *AccountManager) GetUserById(id string, messageId string, sessionId s
  * uuid and not the connection id.
  */
 func (this *AccountManager) Me(connectionId string, messageId string, sessionId string) *CargoEntities.Account {
+
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
 
 	session := GetServer().GetSessionManager().activeSessions[connectionId]
 

@@ -1,7 +1,7 @@
 
 // global variable.
 var databaseName = "Blog."
-var schemaId = "dbo."
+var schemaId = "" //"dbo."
 
 var userTypeName = databaseName + schemaId + "blog_user"
 var authorTypeName = databaseName + schemaId + "blog_author"
@@ -561,10 +561,12 @@ var BlogManager = function (parent) {
             var exist = false
             if (isObject(blogManager.account.M_userRef)) {
                 user = blogManager.account.M_userRef
+                user.setAccounts(blogManager.account)
                 exist = true
             } else {
                 user = new CargoEntities.User()
-                user.M_accountPtr = [blogManager.account.UUID] // Set the array 
+                // user.M_accountPtr = [blogManager.account.UUID] // Set the array 
+                user.setAccounts(blogManager.account)
             }
 
             // Set the user fields
@@ -582,8 +584,9 @@ var BlogManager = function (parent) {
                     // Success callback
                     function (result, caller) {
                         // I that case I will set the account ref.
-                        blogManager.account.M_userRef = result.UUID
+                        blogManager.account.setUserRef(result)
                         blogManager.account.NeedSave = true
+
                         // Now I will save the account with it newly created user.
                         server.entityManager.saveEntity(blogManager.account)
                         caller.blogManager.userInfoLnk.className = "dropdown"

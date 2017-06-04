@@ -196,8 +196,14 @@ func (this *EmailManager) ReceiveMailFunc(address string, user string, pass stri
  * Send mail... The server id is the authentification id...
  */
 func (this *EmailManager) SendEmail(id string, from string, to []string, cc []*CarbonCopy, subject string, body string, attachs []*Attachment, bodyType string, messageId string, sessionId string) {
+	var errObj *CargoEntities.Error
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
 
-	errObj := this.sendEmail(id, from, to, cc, subject, body, attachs, bodyType)
+	errObj = this.sendEmail(id, from, to, cc, subject, body, attachs, bodyType)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return

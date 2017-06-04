@@ -1361,6 +1361,12 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
  * TODO Est que "The attributeName is the name of the entity in it's parent whitout the M_" est vrai ou on doit lui donner avec le M_?
  */
 func (this *EntityManager) CreateEntity(parentUuid string, attributeName string, typeName string, objectId string, values interface{}, messageId string, sessionId string) interface{} {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	result, errObj := this.createEntity(parentUuid, attributeName, typeName, objectId, values)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1373,6 +1379,11 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
  * Create a new entity prototype.
  */
 func (this *EntityManager) CreateEntityPrototype(storeId string, prototype interface{}, messageId string, sessionId string) *EntityPrototype {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
 
 	if reflect.TypeOf(prototype).String() != "*Server.EntityPrototype" {
 		cargoError := NewError(Utility.FileLine(), PARAMETER_TYPE_ERROR, SERVER_ERROR_CODE, errors.New("Expected '*Server.EntityPrototype' but got '"+reflect.TypeOf(prototype).String()+"' instead."))
@@ -1406,6 +1417,12 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
  * Return the list of entity prototype for a given package...
  */
 func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string, sessionId string) []*EntityPrototype {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	var schemaId string
 	if strings.Index(storeId, ".") > 0 {
 		schemaId = storeId[strings.Index(storeId, ".")+1:]
@@ -1424,6 +1441,12 @@ func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string,
  * Return the list of derived type for a given type.
  */
 func (this *EntityManager) GetDerivedEntityPrototypes(typeName string, messageId string, sessionId string) []*EntityPrototype {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	protos, errObj := this.getDerivedEntityType(typeName)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1436,6 +1459,12 @@ func (this *EntityManager) GetDerivedEntityPrototypes(typeName string, messageId
  * Return the entity prototype for an object of a given name.
  */
 func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, messageId string, sessionId string) *EntityPrototype {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	proto, err := this.getEntityPrototype(typeName, storeId)
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_PROTOTYPE_ERROR, SERVER_ERROR_CODE, err)
@@ -1449,6 +1478,12 @@ func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, m
  * Return the object contain in entity for a given type...
  */
 func (this *EntityManager) GetObjectsByType(typeName string, queryStr string, storeId string, messageId string, sessionId string) []interface{} {
+
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
 
 	entities, errObj := this.getEntitiesByType(typeName, queryStr, storeId, false)
 
@@ -1498,6 +1533,12 @@ func (this *EntityManager) isExist(uuid string) bool {
  * Return the underlying object, mostly use by the client side to get object..
  */
 func (this *EntityManager) GetObjectByUuid(uuid string, messageId string, sessionId string) interface{} {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	entity, errObj := this.getEntityByUuid(uuid, false)
 	if errObj != nil {
 		entity, errObj = this.getDynamicEntityByUuid(uuid, false)
@@ -1514,7 +1555,11 @@ func (this *EntityManager) GetObjectByUuid(uuid string, messageId string, sessio
  * Return the underlying object, mostly use by the client side to get object..
  */
 func (this *EntityManager) GetObjectById(storeId string, typeName string, ids []interface{}, messageId string, sessionId string) interface{} {
-
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
 	entity, errObj := this.getEntityById(storeId, typeName, ids, false)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1527,6 +1572,12 @@ func (this *EntityManager) GetObjectById(storeId string, typeName string, ids []
  * Save the vlaues of an entity.
  */
 func (this *EntityManager) SaveEntity(values interface{}, typeName string, messageId string, sessionId string) interface{} {
+	var errObj *CargoEntities.Error
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
 
 	// Need to be call before any new entity function to test the new value
 	// with the actual one.
@@ -1557,10 +1608,15 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
  * Remove an existing entity with a given uuid.
  */
 func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId string) {
+	var errObj *CargoEntities.Error
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
 
 	// The entity to remove.
 	var entity Entity
-	var errObj *CargoEntities.Error
 
 	// validate the action. TODO active it latter...
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
@@ -1598,6 +1654,12 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
  * generate a dertermistic UUID from it.
  */
 func (this *EntityManager) GenerateEntityUUID(typeName string, ids []interface{}, messageId string, sessionId string) string {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return ""
+	}
+
 	keyInfo := typeName + ":"
 	for i := 0; i < len(ids); i++ {
 		if reflect.TypeOf(ids[i]).Kind() == reflect.String {
@@ -1626,10 +1688,16 @@ func (this *EntityManager) GenerateEntityUUID(typeName string, ids []interface{}
  * Return the list of all link's for a given entity.
  */
 func (this *EntityManager) GetEntityLnks(uuid string, messageId string, sessionId string) []Entity {
+	var errObj *CargoEntities.Error
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
 
 	// The entity to remove.
 	var entity Entity
-	var errObj *CargoEntities.Error
+
 	entity, errObj = this.getEntityByUuid(uuid, false)
 	visited := make([]string, 0)
 	lnkLst := make([]Entity, 0)
@@ -1641,6 +1709,12 @@ func (this *EntityManager) GetEntityLnks(uuid string, messageId string, sessionI
 	// Repport the error
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
 	}
 
 	return lnkLst

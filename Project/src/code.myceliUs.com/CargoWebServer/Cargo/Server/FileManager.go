@@ -773,6 +773,12 @@ func (this *FileManager) createThumbnail(file *os.File, thumbnailMaxHeight int, 
  * Read the content of a text file and return it.
  */
 func (this *FileManager) ReadTextFile(filePath string, messageId string, sessionId string) string {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return ""
+	}
+
 	b, err := ioutil.ReadFile(filePath) // just pass the file name
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)
@@ -786,6 +792,12 @@ func (this *FileManager) ReadTextFile(filePath string, messageId string, session
  * Read a csv file
  */
 func (this *FileManager) ReadCsvFile(filePath string, messageId string, sessionId string) [][]string {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	csvfile, err := os.Open(filePath)
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)
@@ -810,6 +822,11 @@ func (this *FileManager) ReadCsvFile(filePath string, messageId string, sessionI
  * Delete a disck file.
  */
 func (this *FileManager) RemoveFile(filePath string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
 
 	err := os.Remove(filePath)
 	if err != nil {
@@ -824,6 +841,12 @@ func (this *FileManager) RemoveFile(filePath string, messageId string, sessionId
  * Create a new directory and it's associated file entity on the server
  */
 func (this *FileManager) CreateDir(dirName string, dirPath string, messageId string, sessionId string) *CargoEntities.File {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	dir, errObj := this.createDir(dirName, dirPath, sessionId)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -837,6 +860,11 @@ func (this *FileManager) CreateDir(dirName string, dirPath string, messageId str
  * Create a file
  */
 func (this *FileManager) CreateFile(filename string, filepath string, thumbnailMaxHeight int64, thumbnailMaxWidth int64, dbFile bool, messageId string, sessionId string) *CargoEntities.File {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
 
 	tmpPath := GetServer().GetConfigurationManager().GetTmpPath() + "/" + filename
 
@@ -873,6 +901,12 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
  * Delete a file with a given uuid
  */
 func (this *FileManager) DeleteFile(uuid string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
 	err := this.deleteFile(uuid)
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), FILE_DELETE_ERROR, SERVER_ERROR_CODE, errors.New("Failed to delete file with uuid '"+uuid+"'."))
@@ -884,6 +918,7 @@ func (this *FileManager) DeleteFile(uuid string, messageId string, sessionId str
  * Test if a given file exist.
  */
 func (this *FileManager) IsFileExist(filename string, filepath string) bool {
+
 	fileId := Utility.CreateSha1Key([]byte(filepath + "/" + filename))
 	fileUuid := CargoEntitiesFileExists(fileId)
 	if len(fileUuid) > 0 {
@@ -896,6 +931,12 @@ func (this *FileManager) IsFileExist(filename string, filepath string) bool {
  * Get the mime type information...
  */
 func (this *FileManager) GetMimeTypeByExtension(fileExtension string, messageId string, sessionId string) *MimeType {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	mimeType := this.mimeTypeMap[strings.ToLower(fileExtension)]
 	if mimeType == nil {
 		cargoError := NewError(Utility.FileLine(), MIMETYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("MimeType for file extension '"+fileExtension+"' doesn't exist."))
@@ -909,6 +950,12 @@ func (this *FileManager) GetMimeTypeByExtension(fileExtension string, messageId 
  * Return a file with a given path.
  */
 func (this *FileManager) GetFileByPath(path string, messageId string, sessionId string) *CargoEntities.File {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	fileId := Utility.CreateSha1Key([]byte(path))
 	file, errObj := this.getFileById(fileId)
 	if errObj != nil {
@@ -935,6 +982,11 @@ func (this *FileManager) GetFileByPath(path string, messageId string, sessionId 
  * Function call when the user open a file.
  */
 func (this *FileManager) OpenFile(fileId string, messageId string, sessionId string) *CargoEntities.File {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
 
 	file, errObj := this.openFile(fileId, sessionId)
 	if errObj != nil {
