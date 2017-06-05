@@ -61,6 +61,10 @@ SessionManager.prototype.onEvent = function (evt) {
 function Login(name, password, serverId) {
     var newSession = null
     newSession = server.GetSessionManager().Login(name, password, serverId, messageId, sessionId)
+    
+    var helloTest = new HelloTest()
+    helloTest.SayHello(name, messageId, sessionId)
+
     return newSession
 }
 

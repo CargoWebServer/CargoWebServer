@@ -1,6 +1,7 @@
 package Server
 
 import (
+	"errors"
 	"log"
 	"os/exec"
 	"reflect"
@@ -376,4 +377,49 @@ func (this *ServiceManager) registerActions(service Service) {
 		}
 	}
 	GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+}
+
+/////////////////////// API ///////////////////////////
+
+/**
+ * That function is run on the server side to register action from javascript
+ * files in the script folder.
+ */
+func (this *ServiceManager) RegisterAction(methodName string, acceessType CargoEntities.AccessType, parameters []interface{}, results []interface{}) error {
+
+	// I will try to find if the action was register
+	metodUuid := CargoEntitiesActionExists(methodName)
+
+	if len(metodUuid) == 0 {
+
+		action := new(CargoEntities.Action)
+		action.SetName(methodName)
+
+		// Set the uuid
+		GetServer().GetEntityManager().NewCargoEntitiesActionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", action)
+
+		// The input
+		for j := 0; j < len(parameters); j++ {
+			action.SetParameters(parameters[j].(*CargoEntities.Parameter))
+		}
+
+		// The output
+		for j := 0; j < len(results); j++ {
+			action.SetResults(results[j].(*CargoEntities.Parameter))
+		}
+
+		action.SetAccessType(acceessType)
+
+		// apend it to the entities action.
+		action.SetEntitiesPtr(GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities))
+		GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetActions(action)
+
+		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+		log.Println("Method ", methodName, " was success fully register!")
+	} else {
+		return errors.New("Method " + methodName + " already exist!")
+	}
+
+	return nil
+
 }
