@@ -995,14 +995,20 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 	var storeConfig *Config.DataStoreConfiguration
 	ids := []interface{}{storeId}
 	storeConfigEntity, err_ := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", ids, false)
+
 	// Create the new store here.
 	if err_ != nil {
+
 		storeConfig = new(Config.DataStoreConfiguration)
 		storeConfig.M_id = storeId
 		storeConfig.M_dataStoreVendor = storeVendor
 		storeConfig.M_dataStoreType = storeType
 		configEntity := GetServer().GetConfigurationManager().m_activeConfigurationsEntity
-		GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_dataStoreConfigs", "config.DataStoreConfiguration", storeId, storeConfig)
+		storeConfigEntity, err_ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_dataStoreConfigs", "Config.DataStoreConfiguration", storeId, storeConfig)
+		if err_ != nil {
+			return nil, err_
+		}
+
 	} else {
 		storeConfig = storeConfigEntity.GetObject().(*Config.DataStoreConfiguration)
 	}
@@ -1156,18 +1162,23 @@ func (this *DataManager) Close(storeName string, messageId string, sessionId str
  * return the result and an array of interface...
  */
 func (this *DataManager) Read(storeName string, query string, fieldsType []interface{}, params []interface{}, messageId string, sessionId string) [][]interface{} {
+
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-
 	data, err := this.readData(storeName, query, fieldsType, params)
+
 	if err != nil {
 		// Create the error message
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return nil
 	}
+
+	log.Println("1179", data)
+
 	return data
 }
 
@@ -1223,9 +1234,25 @@ func (this *DataManager) Delete(storeName string, query string, params []interfa
 }
 
 /**
+ * Determine if the datastore exist in the server.
+ */
+func (this *DataManager) HasDataStore(storeId string, messageId string, sessionId string) bool {
+	storeUuid := ConfigDataStoreConfigurationExists(storeId)
+	return len(storeUuid) > 0
+}
+
+/**
+ * Return a reference to a datastore with a given id.
+ */
+func (this *DataManager) GetDataStore(storeId string, messageId string, sessionId string) DataStore {
+	return this.m_dataStores[storeId]
+}
+
+/**
  * Create a new data store.
  */
 func (this *DataManager) CreateDataStore(storeId string, storeType int64, storeVendor int64, messageId string, sessionId string) {
+
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {

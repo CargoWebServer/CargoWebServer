@@ -195,7 +195,21 @@ func (this *EmailManager) ReceiveMailFunc(address string, user string, pass stri
 /**
  * Send mail... The server id is the authentification id...
  */
-func (this *EmailManager) SendEmail(id string, from string, to []string, cc []*CarbonCopy, subject string, body string, attachs []*Attachment, bodyType string, messageId string, sessionId string) {
+func (this *EmailManager) SendEmail(id string, from string, to []string, cc []interface{}, subject string, body string, attachs []interface{}, bodyType string, messageId string, sessionId string) {
+
+	// Initialyse the parameters object of not already intialyse.
+	var cc_ []*CarbonCopy
+	values, err := Utility.InitializeStructures(cc, "[]*Server.CarbonCopy")
+	if err == nil {
+		cc_ = values.Interface().([]*CarbonCopy)
+	}
+
+	var attachs_ []*Attachment
+	values, err = Utility.InitializeStructures(attachs, "[]*Server.Attachment")
+	if err == nil {
+		attachs_ = values.Interface().([]*Attachment)
+	}
+
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -203,15 +217,16 @@ func (this *EmailManager) SendEmail(id string, from string, to []string, cc []*C
 		return
 	}
 
-	errObj = this.sendEmail(id, from, to, cc, subject, body, attachs, bodyType)
+	errObj = this.sendEmail(id, from, to, cc_, subject, body, attachs_, bodyType)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
 	}
+
 	// Wrote message success here.
 	log.Println("Message was send to ", to, " by ", from)
 	for i := 0; i < len(cc); i++ {
-		log.Println("--> cc :", cc[i].Mail)
+		log.Println("--> cc :", cc_[i].Mail)
 	}
 
 	return

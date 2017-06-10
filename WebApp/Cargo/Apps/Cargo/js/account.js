@@ -62,15 +62,6 @@ AccountManager.prototype.getAccountType = function () {
     return this.account.M_accountType
 }
 
-/*
- * Server side code. 
- */
-function registerAccount(name, password, email) {
-    var newAccount = null
-    newAccount = server.GetAccountManager().Register(name, password, email, messageId, sessionId)
-    return newAccount
-}
-
 /**
  * Register a new account.
  * @param {string} name The name of the new account.
@@ -88,7 +79,7 @@ AccountManager.prototype.register = function (name, password, email, successCall
 
     // Call it on the server.
     server.executeJsFunction(
-        registerAccount.toString(), // The function to execute remotely on server
+        "RegisterAccount", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // Progress callback
             // Nothing to do here.
@@ -117,15 +108,6 @@ AccountManager.prototype.register = function (name, password, email, successCall
     )
 }
 
-/* 
- * Server side code.
- */
-function GetAccountById(id) {
-    var account
-    account = server.GetAccountManager().GetAccountById(id, messageId, sessionId)
-    return account
-}
-
 /**
  * Retreive an account with a given id.
  * @param {string} id The id of the account.
@@ -140,7 +122,7 @@ AccountManager.prototype.getAccountById = function (id, successCallback, errorCa
 
     // Call it on the server.
     server.executeJsFunction(
-        GetAccountById.toString(), // The function to execute remotely on server
+        "GetAccountById", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -168,15 +150,6 @@ AccountManager.prototype.getAccountById = function (id, successCallback, errorCa
     )
 }
 
-/*
- * Server side code.
- */
-function GetUserById(id) {
-    var objects
-    objects = server.GetAccountManager().GetUserById(id, messageId, sessionId)
-    return objects
-}
-
 /**
  * Retreive a user with a given id.
  * @param {string} id The id of the user.
@@ -191,7 +164,7 @@ AccountManager.prototype.getUserById = function (id, successCallback, errorCallb
 
     // Call it on the server.
     server.executeJsFunction(
-        GetUserById.toString(), // The function to execute remotely on server
+        "GetUserById", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

@@ -264,7 +264,7 @@ FileNavigator.prototype.removeFile = function (fileId) {
 FileNavigator.prototype.saveFile = function (fileId) {
 
     // Now I will save the file.
-    var file = server.entityManager.entities["CargoEntities.File_" + fileId]
+    var file = server.entityManager.entities["CargoEntities.File:" + fileId]
     var data = [decode64(file.M_data)]
     var f = null
     

@@ -321,14 +321,6 @@ Server.prototype.executeVbSrcript = function (scriptName, args, successCallback,
     rqst.send();
 }
 
-/*
- * Sever side code.
- */
-function SetRootPath(path) {
-    // Call set root path on the server...
-    server.SetRootPath(path)
-}
-
 /**
  * Set the application root path.
  * @param {string} path The application root path on the server.
@@ -344,7 +336,7 @@ Server.prototype.setRootPath = function (rootPath, successCallback, errorCallbac
 
     // Call it on the server.
     server.executeJsFunction(
-        SetRootPath.toString(), // The function to execute remotely on server
+        "SetRootPath", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -360,10 +352,6 @@ Server.prototype.setRootPath = function (rootPath, successCallback, errorCallbac
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-function Connect(host, port) {
-    server.Connect(host, port)
 }
 
 /**
@@ -383,7 +371,7 @@ Server.prototype.connect = function (host, port, successCallback, errorCallback,
 
     // Call it on the server.
     server.executeJsFunction(
-        Connect.toString(), // The function to execute remotely on server
+        "Connect", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -399,10 +387,6 @@ Server.prototype.connect = function (host, port, successCallback, errorCallback,
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "server": this } // The caller
     )
-}
-
-function Disconnect(host, port) {
-    server.Disconnect(host, port)
 }
 
 /**
@@ -422,7 +406,7 @@ Server.prototype.disconnect = function (host, port, successCallback, errorCallba
     
     // Call it on the server.
     server.executeJsFunction(
-        Disconnect.toString(), // The function to execute remotely on server
+        "Disconnect", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -440,11 +424,6 @@ Server.prototype.disconnect = function (host, port, successCallback, errorCallba
     )
 }
 
-
-function Stop() {
-    server.Stop()
-}
-
 /**
  * Close the server.
  */
@@ -453,7 +432,7 @@ Server.prototype.stop = function (successCallback, errorCallback, caller) {
     var params = []
     // Call it on the server.
     server.executeJsFunction(
-        Stop.toString(), // The function to execute remotely on server
+        "Stop", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

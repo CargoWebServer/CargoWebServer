@@ -93,15 +93,6 @@ var Attachment = function (fileName, fileData) {
     return this
 }
 
-/*
- * Server side function.
- */
-function SendEmail(serverId, from_, to, cc, title, msg, attachs, bodyType) {
-    var err = null
-    err = server.GetEmailManager().SendEmail(serverId, from_, to, cc, title, msg, attachs, bodyType, messageId, sessionId)
-    return err
-}
-
 /**
  * This function is use to send a email message to a given addresse.
  * @param serverId The server configuration id

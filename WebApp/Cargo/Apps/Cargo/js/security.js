@@ -47,15 +47,6 @@ SecurityManager.prototype.onEvent = function (evt) {
     EventHub.prototype.onEvent.call(this, evt)
 }
 
-/*
- * Sever side code.
- */
-function CreateRole(id) {
-    var newRole = null
-    newRole = server.GetSecurityManager().CreateRole(id, messageId, sessionId)
-    return newRole
-}
-
 /**
  * Create a new role
  * @param {string} id The id of the role to create
@@ -70,7 +61,7 @@ SecurityManager.prototype.createRole = function (id, successCallback, errorCallb
 
     // Call it on the server.
     server.executeJsFunction(
-        CreateRole.toString(), // The function to execute remotely on server
+        "CreateRole", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -92,15 +83,6 @@ SecurityManager.prototype.createRole = function (id, successCallback, errorCallb
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-/*
- * Sever side code.
- */
-function GetRole(id) {
-    var role = null
-    role = server.GetSecurityManager().GetRole(id, messageId, sessionId)
-    return role
 }
 
 /**
@@ -117,7 +99,7 @@ SecurityManager.prototype.getRole = function (id, successCallback, errorCallback
 
     // Call it on the server.
     server.executeJsFunction(
-        GetRole.toString(), // The function to execute remotely on server
+        "GetRole", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -141,13 +123,6 @@ SecurityManager.prototype.getRole = function (id, successCallback, errorCallback
     )
 }
 
-/*
- * Sever side code.
- */
-function DeleteRole(id) {
-    server.GetSecurityManager().DeleteRole(id, messageId, sessionId)
-}
-
 /**
  * Delete a role with a given id.
  * @param {string} id The id the of role to retreive
@@ -162,7 +137,7 @@ SecurityManager.prototype.deleteRole = function (id, successCallback, errorCallb
 
     // Call it on the server.
     server.executeJsFunction(
-        DeleteRole.toString(), // The function to execute remotely on server
+        "DeleteRole", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -180,14 +155,6 @@ SecurityManager.prototype.deleteRole = function (id, successCallback, errorCallb
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-/*
- * Sever side code.
- */
-function HasAccount(roleId, accountId) {
-    var roleHasAccount = server.GetSecurityManager().HasAccount(roleId, accountId, messageId, sessionId)
-    return roleHasAccount
 }
 
 /**
@@ -206,7 +173,7 @@ SecurityManager.prototype.hasAccount = function (roleId, accountId, successCallb
 
     // Call it on the server.
     server.executeJsFunction(
-        HasAccount.toString(), // The function to execute remotely on server
+        "HasAccount", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -224,13 +191,6 @@ SecurityManager.prototype.hasAccount = function (roleId, accountId, successCallb
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-/*
- * Sever side code.
- */
-function AppendAccount(roleId, accountId) {
-    server.GetSecurityManager().AppendAccount(roleId, accountId, messageId, sessionId)
 }
 
 /**
@@ -249,7 +209,7 @@ SecurityManager.prototype.appendAccount = function (roleId, accountId, successCa
 
     // Call it on the server.
     server.executeJsFunction(
-        AppendAccount.toString(), // The function to execute remotely on server
+        "AppendAccount".toString(), // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -267,13 +227,6 @@ SecurityManager.prototype.appendAccount = function (roleId, accountId, successCa
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-/*
- * Sever side code.
- */
-function RemoveAccount(roleId, accountId) {
-    server.GetSecurityManager().RemoveAccount(roleId, accountId, messageId, sessionId)
 }
 
 /**
@@ -292,7 +245,7 @@ SecurityManager.prototype.removeAccount = function (roleId, accountId, successCa
 
     // Call it on the server.
     server.executeJsFunction(
-        RemoveAccount.toString(), // The function to execute remotely on server
+        "RemoveAccount", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -312,14 +265,6 @@ SecurityManager.prototype.removeAccount = function (roleId, accountId, successCa
     )
 }
 
-/*
- * Sever side code.
- */
-function HasAction(roleId, actionName) {
-    var roleHasAction = server.GetSecurityManager().HasAction(roleId, actionName, messageId, sessionId)
-    return roleHasAction
-}
-
 /**
  * Determines if a role has a given action.
  * @param {string} roleId The id of the role to verify
@@ -336,7 +281,7 @@ SecurityManager.prototype.hasAction = function (roleId, actionName, successCallb
 
     // Call it on the server.
     server.executeJsFunction(
-        HasAction.toString(), // The function to execute remotely on server
+        "HasAction", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -356,13 +301,6 @@ SecurityManager.prototype.hasAction = function (roleId, actionName, successCallb
     )
 }
 
-/*
- * Sever side code.
- */
-function AppendAction(roleId, actionName) {
-    server.GetSecurityManager().AppendAction(roleId, actionName, messageId, sessionId)
-}
-
 /**
  * Append a new action to a given role. Does nothing if the action is already in the role
  * @param {string} roleId The id of the role to append the action to 
@@ -379,7 +317,7 @@ SecurityManager.prototype.appendAction = function (roleId, actionName, successCa
 
     // Call it on the server.
     server.executeJsFunction(
-        AppendAction.toString(), // The function to execute remotely on server
+        "AppendAction", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -399,13 +337,6 @@ SecurityManager.prototype.appendAction = function (roleId, actionName, successCa
     )
 }
 
-/*
- * Sever side code.
- */
-function RemoveAction(roleId, actionName) {
-    server.GetSecurityManager().RemoveAction(roleId, actionName, messageId, sessionId)
-}
-
 /**
  * Remove an account from a given role.
  * @param {string} roleId The id of the role to remove the account from 
@@ -422,7 +353,7 @@ SecurityManager.prototype.removeAction= function (roleId, actionName, successCal
 
     // Call it on the server.
     server.executeJsFunction(
-        RemoveAction.toString(), // The function to execute remotely on server
+        "RemoveAction", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -444,12 +375,6 @@ SecurityManager.prototype.removeAction= function (roleId, actionName, successCal
 
 
 ///////////////////////////////////// Permission //////////////////////////////////
-/*
- * Sever side code.
- */
-function AppendPermission(accountId, permissionType, pattern) {
-    server.GetSecurityManager().AppendPermission(accountId, permissionType, pattern, messageId, sessionId)
-}
 
 /**
  * Append a new permission to a given account. Does nothing if the permission is already in the account
@@ -469,7 +394,7 @@ SecurityManager.prototype.appendPermission = function (accountId, permissionType
 
     // Call it on the server.
     server.executeJsFunction(
-        AppendPermission.toString(), // The function to execute remotely on server
+        "AppendPermission", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -489,13 +414,6 @@ SecurityManager.prototype.appendPermission = function (accountId, permissionType
     )
 }
 
-/*
- * Sever side code.
- */
-function RemovePermission(accountId, permissionPattern) {
-    server.GetSecurityManager().RemovePermission(accountId, permissionPattern, messageId, sessionId)
-}
-
 /**
  * Remove a permission from an account
  * @param {string} accountId The id of the account to remove the permission from 
@@ -512,7 +430,7 @@ SecurityManager.prototype.removePermission= function (accountId, permissionPatte
 
     // Call it on the server.
     server.executeJsFunction(
-        RemovePermission.toString(), // The function to execute remotely on server
+        "RemovePermission", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -533,12 +451,6 @@ SecurityManager.prototype.removePermission= function (accountId, permissionPatte
 }
 
 ///////////////////////////////////// Other stuff ////////////////////////////////////////////
-/*
- * Sever side code.
- */
-function ChangeAdminPassword(pwd, newPwd) {
-    server.GetSecurityManager().ChangeAdminPassword(pwd, newPwd, messageId, sessionId)
-}
 
 /**
  * Change the current password for the admin account.
@@ -553,7 +465,7 @@ SecurityManager.prototype.changeAdminPassword = function (pwd, newPwd, successCa
 
     // Call it on the server.
     server.executeJsFunction(
-        ChangeAdminPassword.toString(), // The function to execute remotely on server
+        "ChangeAdminPassword", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -576,11 +488,6 @@ SecurityManager.prototype.changeAdminPassword = function (pwd, newPwd, successCa
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // OAuth2 Ressource access... The client must be configure first to be able to get access to ressources.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function GetResource(clientId, scope, query, idTokenUuid){
-    var accessUuid = "" // not know by the client side.
-    var result = server.GetOAuth2Manager().GetResource(clientId,scope, query, idTokenUuid, accessUuid, messageId, sessionId)
-    return result
-}
 
 /**
  * Execute a query to retreive given ressource. 
@@ -604,7 +511,7 @@ SecurityManager.prototype.getResource = function (clientId, scope, query, succes
 
     // Call it on the server.
     server.executeJsFunction(
-        GetResource.toString(), // The function to execute remotely on server
+        "GetResource", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

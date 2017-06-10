@@ -1269,7 +1269,9 @@ func (this *EntityManager) getEntityPrototype(typeName string, storeId string) (
 
 	if err != nil {
 		err = errors.New("Prototype for entity '" + typeName + "' was not found.")
+		return nil, err
 	}
+
 	return proto, err
 }
 
@@ -1298,6 +1300,14 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		}
 	}
 
+	// Try to cast the value as needed...
+	if reflect.TypeOf(values).String() == "map[string]interface {}" {
+		values_, err := Utility.InitializeStructure(values.(map[string]interface{}))
+		if err == nil {
+			values = values_.Interface()
+		}
+	}
+
 	params := make([]interface{}, 3)
 	params[0] = parentUuid
 	params[1] = objectId
@@ -1312,7 +1322,6 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		if reflect.TypeOf(values).String() == "map[string]interface {}" {
 			values.(map[string]interface{})["ParentUuid"] = parentUuid
 			var errObj *CargoEntities.Error
-			log.Println(values)
 			entity, errObj = this.newDynamicEntity(parentUuid, values.(map[string]interface{}))
 			if errObj != nil {
 				return nil, errObj
@@ -1383,6 +1392,14 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
+	}
+
+	// Cast it as needed...
+	if reflect.TypeOf(prototype).String() == "map[string]interface {}" {
+		values, err := Utility.InitializeStructure(prototype.(map[string]interface{}))
+		if err == nil {
+			prototype = values.Interface()
+		}
 	}
 
 	if reflect.TypeOf(prototype).String() != "*Server.EntityPrototype" {
@@ -1471,6 +1488,7 @@ func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, m
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
+
 	return proto
 }
 
@@ -1582,6 +1600,14 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 	// Need to be call before any new entity function to test the new value
 	// with the actual one.
 	funcName := "New" + strings.Replace(typeName, ".", "", -1) + "EntityFromObject"
+
+	// Try to cast the value as needed...
+	if reflect.TypeOf(values).String() == "map[string]interface {}" {
+		values_, err := Utility.InitializeStructure(values.(map[string]interface{}))
+		if err == nil {
+			values = values_.Interface()
+		}
+	}
 
 	params := make([]interface{}, 1)
 	params[0] = values

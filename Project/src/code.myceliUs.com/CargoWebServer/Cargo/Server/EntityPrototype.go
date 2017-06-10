@@ -4,6 +4,7 @@ import "fmt"
 import "strings"
 import "log"
 import "code.myceliUs.com/Utility"
+import "code.myceliUs.com/CargoWebServer/Cargo/JS"
 
 /**
  * Restrictions for Datatypes
@@ -209,6 +210,10 @@ func (this *EntityPrototype) Create(storeId string) {
 			log.Println("Fail to save entity prototype ", this.TypeName, " in store id ", storeId)
 		}
 	}
+
+	// Regrister it to the vm...
+	JS.GetJsRuntimeManager().AppendScript(this.generateConstructor())
+
 }
 
 /**
@@ -269,7 +274,6 @@ func (this *EntityPrototype) generateConstructor() string {
 	// Keep the reference on the entity prototype.
 	constructorSrc += " return this\n"
 	constructorSrc += "}\n"
-
 	return constructorSrc
 }
 

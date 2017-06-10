@@ -141,7 +141,7 @@ func (this *SchemaManager) initialize() {
 			var errObj *CargoEntities.Error
 			store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
 			if errObj != nil {
-				log.Println("-----------> ", errObj)
+				log.Println(errObj.GetBody())
 			}
 		}
 

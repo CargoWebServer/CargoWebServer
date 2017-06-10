@@ -29,9 +29,6 @@ type JsRuntimeManager struct {
 	/** Contain the scripts source **/
 	m_scripts []string
 
-	/** Contain the js/go function mapping **/
-	m_functors map[string]interface{}
-
 	/** One js interpreter by session */
 	m_session map[string]*otto.Otto
 
@@ -46,7 +43,6 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	jsRuntimeManager = new(JsRuntimeManager)
 	jsRuntimeManager.m_searchDir = searchDir
 	jsRuntimeManager.m_session = make(map[string]*otto.Otto)
-	jsRuntimeManager.m_functors = make(map[string]interface{})
 
 	// Load the script from the script repository...
 	jsRuntimeManager.AppendScriptFiles()
@@ -56,6 +52,36 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 
 func GetJsRuntimeManager() *JsRuntimeManager {
 	return jsRuntimeManager
+}
+
+/**
+ * Return the current vm for a given session.
+ */
+func (this *JsRuntimeManager) CreateVm(sessionId string) *otto.Otto {
+	// Protectect the map access...
+	this.Lock()
+	defer this.Unlock()
+
+	// Create a new js interpreter for the given session.
+	this.m_session[sessionId] = otto.New()
+
+	return this.m_session[sessionId]
+}
+
+/**
+ * Init script.
+ */
+func (this *JsRuntimeManager) InitScripts(sessionId string) {
+	// Compile the list of script...
+	for i := 0; i < len(this.m_scripts); i++ {
+		script, err := this.m_session[sessionId].Compile("", this.m_scripts[i])
+		this.m_session[sessionId].Run(script)
+		if err != nil {
+			log.Println("runtime script compilation error:", script, err)
+		} else {
+			//log.Println(sessionId, " Load: ", this.m_scripts[i])
+		}
+	}
 }
 
 /**
@@ -72,23 +98,9 @@ func (this *JsRuntimeManager) GetVm(sessionId string) *otto.Otto {
 	}
 
 	// Create a new js interpreter for the given session.
-	this.m_session[sessionId] = otto.New()
+	this.CreateVm(sessionId)
 
-	// Compile the list of script...
-	for i := 0; i < len(this.m_scripts); i++ {
-		script, err := this.m_session[sessionId].Compile("", this.m_scripts[i])
-		this.m_session[sessionId].Run(script)
-		if err != nil {
-			log.Fatal("runtime script compilation error:", err)
-		} else {
-			//log.Println(sessionId, " Load: ", this.m_scripts[i])
-		}
-	}
-
-	// Create the list of functors...
-	for prototype, functor := range this.m_functors {
-		this.m_session[sessionId].Set(prototype, functor)
-	}
+	this.InitScripts(sessionId)
 
 	return this.m_session[sessionId]
 }
@@ -147,6 +159,19 @@ func (this *JsRuntimeManager) AppendScript(src string) {
 	if Utility.Contains(this.m_scripts, src) == false {
 		this.m_scripts = append(this.m_scripts, src)
 	}
+
+	// I will compile the script and set it in each session...
+	for _, vm := range this.m_session {
+		script, err := vm.Compile("", src)
+		vm.Run(script)
+
+		if err != nil {
+			log.Println("runtime script compilation error:", script, err)
+		} else {
+			//log.Println(sessionId, " Load: ", this.m_scripts[i])
+		}
+
+	}
 }
 
 /**
@@ -157,20 +182,24 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
 	// Here i wil find the name of the function...
 	startIndex := strings.Index(functionStr, " ")
 	endIndex := strings.Index(functionStr, "(")
-
-	functionName := strings.Trim(functionStr[startIndex:endIndex], " ")
+	var functionName string
 
 	// Set the function on the JS runtime...
 	vm := this.GetVm(sessionId).Copy()
-
 	// Set the current session id.
 	vm.Set("sessionId", sessionId)
 	vm.Set("messageId", messageId)
 
-	_, err = vm.Run(functionStr)
-	if err != nil {
-		log.Println("Error in code of ", functionName)
-		return nil, err
+	// Remove withe space.
+	if endIndex != -1 {
+		_, err = vm.Run(functionStr)
+		if err != nil {
+			log.Println("Error in code of ", functionName)
+			return nil, err
+		}
+		functionName = strings.Trim(functionStr[startIndex:endIndex], " ")
+	} else {
+		functionName = functionStr
 	}
 
 	var params []interface{}

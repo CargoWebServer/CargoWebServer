@@ -287,13 +287,6 @@ EventHandler.prototype.removeEventManager = function (listener, callback) {
     rqst.send();
 }
 
-/*
-* Server side script
-*/
-function AppendEventFilter(filter, channelId) {
-    server.GetEventManager().AppendEventFilter(filter, channelId, messageId, sessionId)
-}
-
 /**
 * Append a new filter to a listener
 * @param {string} filter The filter to append
@@ -309,7 +302,7 @@ EventHandler.prototype.appendEventFilter = function (filter, channelId, successC
 
     // Call it on the server.
     server.executeJsFunction(
-        AppendEventFilter.toString(), // The function to execute remotely on server
+        "AppendEventFilter", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -345,14 +338,6 @@ EventHandler.prototype.broadcastLocalEvent = function (evt) {
     }
 }
 
-/*
-* Server side script
-*/
-function BroadcastNetworkEvent(evtNumber, eventName, eventDatas) {
-    // Call the method.
-    server.GetEventManager().BroadcastEventData(evtNumber, eventName, eventDatas, messageId, sessionId)
-}
-
 /**
 * Broadcast event over the network.
 * @param {int} evtNumber The event number.
@@ -372,7 +357,7 @@ EventHandler.prototype.broadcastNetworkEvent = function (evtNumber, evtName, eve
 
     // Call it on the server.
     server.executeJsFunction(
-        BroadcastNetworkEvent.toString(), // The function to execute remotely on server
+        "BroadcastNetworkEvent", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

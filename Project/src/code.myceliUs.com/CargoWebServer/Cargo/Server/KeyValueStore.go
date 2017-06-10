@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/ast"
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/lexer"
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/parser"
@@ -1072,6 +1073,14 @@ func (this *KeyValueDataStore) GetId() string {
 
 // TODO validate the user and password here...
 func (this *KeyValueDataStore) Connect() error {
+	// Here I will register all class in the vm.
+	prototypes, err := this.GetEntityPrototypes()
+	if err == nil {
+		for i := 0; i < len(prototypes); i++ {
+			JS.GetJsRuntimeManager().AppendScript(prototypes[i].generateConstructor())
+		}
+	}
+
 	return nil
 }
 

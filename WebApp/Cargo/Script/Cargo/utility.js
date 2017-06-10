@@ -22,3 +22,19 @@ function randomUUID() {
 
     return s.join('');
 }
+
+/**
+ * Evaluate if an array contain a given element.
+ * @param arr The target array.
+ * @param obj The object to find.
+ * @returns {boolean} True if the array contain the object.
+ */
+function contains(arr, obj) {
+    var i = arr.length;
+    while (i--) {
+        if (arr[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}

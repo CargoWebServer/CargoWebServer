@@ -55,19 +55,6 @@ SessionManager.prototype.onEvent = function (evt) {
     EventHub.prototype.onEvent.call(this, evt)
 }
 
-/*
- * Sever side code.
- */
-function Login(name, password, serverId) {
-    var newSession = null
-    newSession = server.GetSessionManager().Login(name, password, serverId, messageId, sessionId)
-    
-    var helloTest = new HelloTest()
-    helloTest.SayHello(name, messageId, sessionId)
-
-    return newSession
-}
-
 /**
  * Authenticate the user's account name and password on the server.
  * @see LoginPage
@@ -85,7 +72,7 @@ SessionManager.prototype.login = function (name, password, serverId, successCall
 
     // Call it on the server.
     server.executeJsFunction(
-        Login.toString(), // The function to execute remotely on server
+        "Login", // The function to execute remotely on server
         params, // The parameters to pass to this function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -131,15 +118,6 @@ SessionManager.prototype.login = function (name, password, serverId, successCall
     )
 }
 
-/*
- * Sever side code.
- */
-function GetActiveSessions() {
-    var sessions = null
-    sessions = server.GetSessionManager().GetActiveSessions()
-    return sessions
-}
-
 /**
  * Retreive information about all actives users sessions on the server.
  * @param {function} successCallback When the result is send back by the server, the parameter named result contain all sessions infromations.
@@ -152,7 +130,7 @@ SessionManager.prototype.getActiveSessions = function (successCallback, errorCal
 
     // Call it on the server.
     server.executeJsFunction(
-        GetActiveSessions.toString(), // The function to execute remotely on server
+        "GetActiveSessions", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -172,15 +150,6 @@ SessionManager.prototype.getActiveSessions = function (successCallback, errorCal
     )
 }
 
-/*
- * Sever side code.
- */
-function GetActiveSessionByAccountId(accountId) {
-    var sessions = null
-    sessions = server.GetSessionManager().GetActiveSessionByAccountId(accountId)
-    return sessions
-}
-
 /**
  * Get the list of all active session on the server for a given account name
  * @param {string} accountId The account name.
@@ -195,7 +164,7 @@ SessionManager.prototype.getActiveSessionByAccountId = function (accountId, succ
 
     // Call it on the server.
     server.executeJsFunction(
-        GetActiveSessionByAccountId.toString(), // The function to execute remotely on server
+        "GetActiveSessionByAccountId", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -215,14 +184,6 @@ SessionManager.prototype.getActiveSessionByAccountId = function (accountId, succ
     )
 }
 
-/*
- * Sever side code.
- */
-function UpdateSessionState(state) {
-    var err = server.GetSessionManager().UpdateSessionState(state, messageId, sessionId)
-    return err
-}
-
 /**
  * Change the state of a given session. 
  * @param {int} state 1: Online, 2:Away, other: Offline.
@@ -237,7 +198,7 @@ SessionManager.prototype.updateSessionState = function (state, successCallback, 
 
     // Call it on the server.
     server.executeJsFunction(
-        UpdateSessionState.toString(), // The function to execute remotely on server
+        "UpdateSessionState", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -261,14 +222,6 @@ SessionManager.prototype.updateSessionState = function (state, successCallback, 
     )
 }
 
-/*
- * Sever side code.
- */
-function Logout(toCloseId) {
-    var err = server.GetSessionManager().Logout(toCloseId, messageId, sessionId)
-    return err
-}
-
 /**
  * Close a user session from the server. A logout event is throw to inform other participant that the session
  * is closed.
@@ -283,7 +236,7 @@ SessionManager.prototype.logout = function (sessionId, successCallback, errorCal
 
     // Call it on the server.
     server.executeJsFunction(
-        Logout.toString(), // The function to execute remotely on server
+        "Logout", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

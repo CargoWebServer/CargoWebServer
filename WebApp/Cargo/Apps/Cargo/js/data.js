@@ -50,15 +50,6 @@ DataManager.prototype.onEvent = function (evt) {
     EventHub.prototype.onEvent.call(this, evt)
 }
 
-/*
- * Server side code.
- */
-function Read(connectionId, query, fields, params) {
-    var values = null
-    values = server.GetDataManager().Read(connectionId, query, fields, params, messageId, sessionId)
-    return values
-}
-
 /**
  * Execute a read query on the data sever.
  * @param {string} connectionId The data server connection (configuration) id
@@ -80,7 +71,7 @@ DataManager.prototype.read = function (connectionId, query, fields, params, succ
 
     // Call it on the server.
     server.executeJsFunction(
-        Read.toString(), // The function to execute remotely on server
+        "Read", // The function to execute remotely on server
         params_, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -102,15 +93,6 @@ DataManager.prototype.read = function (connectionId, query, fields, params, succ
     )
 }
 
-/*
- * server side code.
- */
-function Create(connectionId, query, values) {
-    var id = null
-    id = server.GetDataManager().Create(connectionId, query, values, messageId, sessionId)
-    return id
-}
-
 /**
  * Create an new entry in the DB and return it's id(s)
  * @param {string} connectionId The data server connection (configuration) id
@@ -129,7 +111,7 @@ DataManager.prototype.create = function (connectionId, query, values, successCal
 
     // Call it on the server.
     server.executeJsFunction(
-        Create.toString(), // The function to execute remotely on server
+        "Create", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -148,14 +130,6 @@ DataManager.prototype.create = function (connectionId, query, values, successCal
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-/*
- * server side code
- */
-function Update(connectionId, query, fields, params) {
-    // No value are return.
-    server.GetDataManager().Update(connectionId, query, fields, params, messageId, sessionId)
 }
 
 /**
@@ -178,7 +152,7 @@ DataManager.prototype.update = function (connectionId, query, fields, params, su
 
     // Call it on the server.
     server.executeJsFunction(
-        Update.toString(), // The function to execute remotely on server
+        "Update", // The function to execute remotely on server
         params_, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -197,14 +171,6 @@ DataManager.prototype.update = function (connectionId, query, fields, params, su
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-/*
- * Server side code.
- */
-function Delete(connectionId, query, params) {
-    // No value are return.
-    server.GetDataManager().Delete(connectionId, query, params, messageId, sessionId)
 }
 
 /**
@@ -225,7 +191,7 @@ DataManager.prototype.delete = function (connectionId, query, params, successCal
 
     // Call it on the server.
     server.executeJsFunction(
-        Delete.toString(), // The function to execute remotely on server
+        "Delete", // The function to execute remotely on server
         params_, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -246,14 +212,6 @@ DataManager.prototype.delete = function (connectionId, query, params, successCal
     )
 }
 
-
-/*
- * server side code
- */
-function CreateDataStore(storeId, storeType, storeVendor) {
-    server.GetDataManager().CreateDataStore(storeId, storeType, storeVendor, messageId, sessionId)
-}
-
 /**
  * Create a dataStore
  * @param {string} storeId The id of the dataStore to create
@@ -272,7 +230,7 @@ DataManager.prototype.createDataStore = function (storeId, storeType, storeVendo
 
     // Call it on the server.
     server.executeJsFunction(
-        CreateDataStore.toString(), // The function to execute remotely on server
+        "CreateDataStore", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -290,13 +248,6 @@ DataManager.prototype.createDataStore = function (storeId, storeType, storeVendo
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-/*
- * server side code
- */
-function DeleteDataStore(storeId) {
-    server.GetDataManager().DeleteDataStore(storeId, messageId, sessionId)
 }
 
 /**
@@ -312,7 +263,7 @@ DataManager.prototype.deleteDataStore = function (storeId, successCallback, erro
 
     // Call it on the server.
     server.executeJsFunction(
-        DeleteDataStore.toString(), // The function to execute remotely on server
+        "DeleteDataStore", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -330,14 +281,6 @@ DataManager.prototype.deleteDataStore = function (storeId, successCallback, erro
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-/*
- * Server side code.
- */
-function Ping_(connectionId) {
-    // No value are return.
-    server.GetDataManager().Ping(connectionId, messageId, sessionId)
 }
 
 /**
@@ -354,7 +297,7 @@ DataManager.prototype.ping = function (connectionId, successCallback, errorCallb
 
     // Call it on the server.
     server.executeJsFunction(
-        Ping_.toString(), // The function to execute remotely on server
+        "Ping_", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -375,14 +318,6 @@ DataManager.prototype.ping = function (connectionId, successCallback, errorCallb
     )
 }
 
-/*
- * Server side code.
- */
-function Connect_(connectionId) {
-    // No value are return.
-    server.GetDataManager().Connect(connectionId, messageId, sessionId)
-}
-
 /**
  * Open a new connection with the datastore.
  * @param {string} connectionId The data server connection (configuration) id
@@ -397,7 +332,7 @@ DataManager.prototype.connect = function (connectionId, successCallback, errorCa
 
     // Call it on the server.
     server.executeJsFunction(
-        Connect_.toString(), // The function to execute remotely on server
+        "Connect_", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -417,14 +352,6 @@ DataManager.prototype.connect = function (connectionId, successCallback, errorCa
     )
 }
 
-/*
- * Server side code.
- */
-function Close_(connectionId) {
-    // No value are return.
-    server.GetDataManager().Close(connectionId, messageId, sessionId)
-}
-
 /**
  * Close the connection to the datastore with a given id.
  * @param {string} connectionId The data server connection (configuration) id
@@ -439,7 +366,7 @@ DataManager.prototype.close = function (connectionId, successCallback, errorCall
 
     // Call it on the server.
     server.executeJsFunction(
-        Close_.toString(), // The function to execute remotely on server
+        "Close_", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -462,11 +389,6 @@ DataManager.prototype.close = function (connectionId, successCallback, errorCall
 /**
  * Create a new datastore from a given file.
  */
-function ImportXsdSchema(fileName, fileContent) {
-    err = server.GetDataManager().ImportXsdSchema(fileName, fileContent, messageId, sessionId)
-    return err
-}
-
 DataManager.prototype.importXsdSchema = function (fileName, fileContent, successCallback, errorCallback, caller) {
     // First of all I will upload the file in the tmp directory.
     // server is the client side singleton...
@@ -476,7 +398,7 @@ DataManager.prototype.importXsdSchema = function (fileName, fileContent, success
 
     // Call it on the server.
     server.executeJsFunction(
-        ImportXsdSchema.toString(), // The function to execute remotely on server
+        "ImportXsdSchema", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -496,11 +418,6 @@ DataManager.prototype.importXsdSchema = function (fileName, fileContent, success
 /**
  * Import data that correspond to a given xsd schema.
  */
-function ImportXmlData(content) {
-    err = server.GetDataManager().ImportXmlData(content, messageId, sessionId)
-    return err
-}
-
 DataManager.prototype.importXmlData = function (content, successCallback, errorCallback, caller) {
     // First of all I will upload the file in the tmp directory.
     // server is the client side singleton...
@@ -509,7 +426,7 @@ DataManager.prototype.importXmlData = function (content, successCallback, errorC
 
     // Call it on the server.
     server.executeJsFunction(
-        ImportXmlData.toString(), // The function to execute remotely on server
+        "ImportXmlData", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -529,11 +446,6 @@ DataManager.prototype.importXmlData = function (content, successCallback, errorC
 /**
  * Synchronize sql datastore with it sql data source.
  */
-function Synchronize(storeId) {
-    err = server.GetDataManager().Synchronize(storeId, messageId, sessionId)
-    return err
-}
-
 DataManager.prototype.synchronize = function (storeId, successCallback, errorCallback, caller) {
     // First of all I will upload the file in the tmp directory.
     // server is the client side singleton...
@@ -542,7 +454,7 @@ DataManager.prototype.synchronize = function (storeId, successCallback, errorCal
 
     // Call it on the server.
     server.executeJsFunction(
-        Synchronize.toString(), // The function to execute remotely on server
+        "Synchronize", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

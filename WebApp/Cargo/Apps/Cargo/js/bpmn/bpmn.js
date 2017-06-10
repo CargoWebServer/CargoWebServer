@@ -30,11 +30,6 @@ WorkflowManager.prototype.onEvent = function (evt) {
 /*
  * Import all definition from the definitions directory on the server.
  */
-function ImportXmlBpmnDefinitions(content) {
-    err = server.GetWorkflowManager().ImportXmlBpmnDefinitions(content, messageId, sessionId)
-    return err
-}
-
 WorkflowManager.prototype.importXmlBpmnDefinitions = function (content, successCallback, errorCallback, caller) {
     // server is the client side singleton...
     var params = []
@@ -42,7 +37,7 @@ WorkflowManager.prototype.importXmlBpmnDefinitions = function (content, successC
 
     // Call it on the server.
     server.executeJsFunction(
-        ImportXmlBpmnDefinitions.toString(), // The function to execute remotely on server
+        "ImportXmlBpmnDefinitions", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -62,19 +57,13 @@ WorkflowManager.prototype.importXmlBpmnDefinitions = function (content, successC
 /*
  * Get the list of all definition ids...
  */
-function GetDefinitionsIds() {
-    var ids = null
-    ids = server.GetWorkflowManager().GetDefinitionsIds(messageId, sessionId)
-    return ids
-}
-
 WorkflowManager.prototype.getDefinitionsIds = function (successCallback, errorCallback, caller) {
     // server is the client side singleton...
     var params = []
 
     // Call it on the server.
     server.executeJsFunction(
-        GetDefinitionsIds.toString(), // The function to execute remotely on server
+        "GetDefinitionsIds", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -96,12 +85,6 @@ WorkflowManager.prototype.getDefinitionsIds = function (successCallback, errorCa
 /*
  * Get the defintions with a given id.
  */
-function GetDefinitionsById(id) {
-    var definition = null
-    definition = server.GetWorkflowManager().GetDefinitionsById(id, messageId, sessionId)
-    return definition
-}
-
 WorkflowManager.prototype.getDefinitionsById = function (id, successCallback, errorCallback, caller) {
     // server is the client side singleton...
     var params = []
@@ -109,7 +92,7 @@ WorkflowManager.prototype.getDefinitionsById = function (id, successCallback, er
 
     // Call it on the server.
     server.executeJsFunction(
-        GetDefinitionsById.toString(), // The function to execute remotely on server
+        "GetDefinitionsById", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -157,12 +140,6 @@ function initDefinitions(definitions) {
 /*
  * Return the list of all definitions on the server.
  */
-function GetAllDefinitions() {
-    var allDefintions = null
-    allDefintions = server.GetWorkflowManager().GetAllDefinitions(messageId, sessionId)
-    return allDefintions
-}
-
 WorkflowManager.prototype.getAllDefinitions = function (successCallback, errorCallback, caller) {
     // server is the client side singleton...
     server.entityManager.getEntityPrototypes("BPMN20",
@@ -174,7 +151,7 @@ WorkflowManager.prototype.getAllDefinitions = function (successCallback, errorCa
             var params = []
             // Call it on the server.
             server.executeJsFunction(
-                GetAllDefinitions.toString(), // The function to execute remotely on server
+                "GetAllDefinitions", // The function to execute remotely on server
                 params, // The parameters to pass to that function
                 function (index, total, caller) { // The progress callback
                     // Nothing special to do here.
@@ -224,12 +201,6 @@ WorkflowManager.prototype.getAllDefinitions = function (successCallback, errorCa
 /*
  * Get the process entity.
  */
-function GetDefinitionInstances(definitionsId) {
-    var instances = null
-    instances = server.GetWorkflowManager().GetDefinitionInstances(definitionsId, messageId, sessionId)
-    return instances
-}
-
 WorkflowManager.prototype.getDefinitionInstances = function (definitions, successCallback, errorCallback, caller) {
     // server is the client side singleton...
     var params = []
@@ -237,7 +208,7 @@ WorkflowManager.prototype.getDefinitionInstances = function (definitions, succes
 
     // Call it on the server.
     server.executeJsFunction(
-        GetDefinitionInstances.toString(), // The function to execute remotely on server
+        "GetDefinitionInstances", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -295,13 +266,6 @@ WorkflowManager.prototype.getDefinitionInstances = function (definitions, succes
 /*
  * Create a new item definition instance.
  */
-function NewItemAwareElementInstance(bpmnElementId, data) {
-    // Now create the new process...
-    var itemDefinitionEntity = null
-    itemDefinitionEntity = server.GetWorkflowProcessor().NewItemAwareElementInstance(bpmnElementId, data, messageId, sessionId)
-    return itemDefinitionEntity
-}
-
 WorkflowManager.prototype.newItemAwareElementInstance = function (bpmnElementId, data, successCallback, errorCallback, caller) {
 
     // server is the client side singleton...
@@ -311,7 +275,7 @@ WorkflowManager.prototype.newItemAwareElementInstance = function (bpmnElementId,
 
     // Call it on the server.
     server.executeJsFunction(
-        NewItemAwareElementInstance.toString(), // The function to execute remotely on server
+        "NewItemAwareElementInstance", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -331,12 +295,6 @@ WorkflowManager.prototype.newItemAwareElementInstance = function (bpmnElementId,
 /**
  * Start a new process instance.
  */
-function StartProcess(processUUID, eventData, eventDefinitionData) {
-    // Now create the new process...
-    server.GetWorkflowManager().StartProcess(processUUID, eventData, eventDefinitionData, messageId, sessionId)
-
-}
-
 WorkflowManager.prototype.startProcess = function (processUUID, eventData, eventDefinitionData, successCallback, errorCallback, caller) {
 
     // server is the client side singleton...
@@ -347,7 +305,7 @@ WorkflowManager.prototype.startProcess = function (processUUID, eventData, event
 
     // Call it on the server.
     server.executeJsFunction(
-        StartProcess.toString(), // The function to execute remotely on server
+        "StartProcess", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -364,13 +322,6 @@ WorkflowManager.prototype.startProcess = function (processUUID, eventData, event
     )
 }
 
-/*
- * Serve side code
- */
-function GetActiveProcessInstances(bpmnElementId) {
-    server.GetWorkflowProcessor().GetActiveProcessInstances(bpmnElementId, messageId, sessionId)
-}
-
 /**
  * Get the list of active process instances for a bpmn process with given uuid.
  */
@@ -382,7 +333,7 @@ WorkflowManager.prototype.getActiveProcessInstances = function (uuid, successCal
 
     // Call it on the server.
     server.executeJsFunction(
-        GetActiveProcessInstances.toString(), // The function to execute remotely on server
+        "GetActiveProcessInstances", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -417,13 +368,6 @@ WorkflowManager.prototype.getActiveProcessInstances = function (uuid, successCal
     )
 }
 
-/*
- * Serve side code
- */
-function ActivateActivityInstance(instanceUuid) {
-    server.GetWorkflowProcessor().ActivateActivityInstance(instanceUuid, messageId, sessionId)
-}
-
 /**
  * Run an activity with a given uuid.
  */
@@ -435,7 +379,7 @@ WorkflowManager.prototype.activateActivityInstance = function (uuid, successCall
 
     // Call it on the server.
     server.executeJsFunction(
-        ActivateActivityInstance.toString(), // The function to execute remotely on server
+        "ActivateActivityInstance", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

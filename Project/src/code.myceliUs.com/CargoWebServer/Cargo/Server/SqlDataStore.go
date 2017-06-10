@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"code.myceliUs.com/Utility"
 
 	_ "github.com/alexbrainman/odbc"
@@ -233,6 +234,14 @@ func (this *SqlDataStore) Connect() error {
 	}
 
 	this.m_db, err = sql.Open(driver, connectionString)
+
+	// Generate js class definitions.
+	prototypes, err := this.GetEntityPrototypes()
+	if err == nil {
+		for i := 0; i < len(prototypes); i++ {
+			JS.GetJsRuntimeManager().AppendScript(prototypes[i].generateConstructor())
+		}
+	}
 
 	return err
 }
@@ -744,9 +753,9 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 	// Read the
 	values, err := this.Read(query, fieldsType, params)
 	if err != nil {
-
 		return prototypes, err
 	}
+
 	for i := 0; i < len(values); i++ {
 		prototype, err := this.GetEntityPrototype(values[i][0].(string))
 		if err != nil {
@@ -777,7 +786,6 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 
 	// Retreive the schema id.
 	var schemaId string
-
 	schemaId, err = this.getSchemaId(id)
 	if err != nil {
 		return nil, err
@@ -792,6 +800,11 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 		if err == nil {
 			return prototype, nil
 		}
+	}
+
+	// Here remove space and dash symbol...
+	if strings.Index(id, " ") > -1 || strings.Index(id, " ") > -1 {
+		return nil, errors.New("Id \"" + id + "\" must not contain space or dash")
 	}
 
 	// Initialyse the prototype.

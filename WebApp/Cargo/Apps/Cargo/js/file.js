@@ -39,15 +39,6 @@ var FileManager = function () {
 FileManager.prototype = new EventHub(null);
 FileManager.prototype.constructor = FileManager;
 
-/*
- * Sever side code.
- */
-function CreateDir(dirName, dirPath) {
-    var dir = null
-    dir = server.GetFileManager().CreateDir(dirName, dirPath, messageId, sessionId)
-    return dir
-}
-
 /**
  * Create a new directory on the server.
  * @param {string} dirName The name of the new directory.
@@ -62,7 +53,7 @@ FileManager.prototype.createDir = function (dirName, dirPath, successCallback, p
     params.push(createRpcData(dirPath, "STRING", "dirPath"))
 
     server.executeJsFunction(
-        CreateDir.toString(), // The function to execute remotely on server
+        "CreateDir", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Keep track of the file transfert.
@@ -81,15 +72,6 @@ FileManager.prototype.createDir = function (dirName, dirPath, successCallback, p
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-/*
- * server side code.
- */
-function CreateFile(filename, filepath, thumbnailMaxHeight, thumbnailMaxWidth, dbfile) {
-    var file = null
-    file = server.GetFileManager().CreateFile(filename, filepath, thumbnailMaxHeight, thumbnailMaxWidth, dbfile, messageId, sessionId)
-    return file
 }
 
 /**
@@ -131,7 +113,7 @@ FileManager.prototype.createFile = function (filename, filepath, filedata, thumb
                     console.log(xhr.responseText);
                     // Here I will create the file...
                     server.executeJsFunction(
-                        CreateFile.toString(), // The function to execute remotely on server
+                        "CreateFile", // The function to execute remotely on server
                         params, // The parameters to pass to that function
                         function (index, total, caller) { // The progress callback
                             // Keep track of the file transfert.
@@ -211,15 +193,6 @@ FileManager.prototype.downloadFile = function (path, fileName, mimeType, progres
     xhr.send();
 }
 
-/*
- * server side code.
- */
-function GetFileByPath(path) {
-    var file = null
-    file = server.GetFileManager().GetFileByPath(path, messageId, sessionId)
-    return file
-}
-
 /**
  * Retreive a file with a given id
  * @param {string} id The file id.
@@ -233,7 +206,7 @@ FileManager.prototype.getFileByPath = function (path, progressCallback, successC
     params.push(createRpcData(path, "STRING", "path"))
 
     server.executeJsFunction(
-        GetFileByPath.toString(), // The function to execute remotely on server
+        "GetFileByPath", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Keep track of the file transfert.
@@ -257,15 +230,6 @@ FileManager.prototype.getFileByPath = function (path, progressCallback, successC
     )
 }
 
-/*
- * server side code.
- */
-function OpenFile(fileId) {
-    var file = null
-    file = server.GetFileManager().OpenFile(fileId, messageId, sessionId)
-    return file
-}
-
 /**
  * Open a file with a given id
  * @param {string} id The file id.
@@ -279,7 +243,7 @@ FileManager.prototype.openFile = function (fileId, progressCallback, successCall
     params.push(createRpcData(fileId, "STRING", "fileId"))
 
     server.executeJsFunction(
-        OpenFile.toString(), // The function to execute remotely on server
+        "OpenFile", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Keep track of the file transfert.
@@ -305,15 +269,6 @@ FileManager.prototype.openFile = function (fileId, progressCallback, successCall
     )
 }
 
-/*
- * sever side code.
- */
-function GetMimeTypeByExtension(fileExtension) {
-    var file = null
-    file = server.GetFileManager().GetMimeTypeByExtension(fileExtension, messageId, sessionId)
-    return file
-}
-
 /**
  * Retreive the mime type information from a given extention.
  * @param {string} fileExtension The file extention ex. txt, xls, html, css
@@ -327,7 +282,7 @@ FileManager.prototype.getMimeTypeByExtension = function (fileExtension, successC
     params.push(createRpcData(fileExtension, "STRING", "fileExtension"))
 
     server.executeJsFunction(
-        GetMimeTypeByExtension.toString(), // The function to execute remotely on server
+        "GetMimeTypeByExtension", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -345,15 +300,6 @@ FileManager.prototype.getMimeTypeByExtension = function (fileExtension, successC
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-/*
- * sever side code.
- */
-function IsFileExist(fileName, filePath) {
-    var isFileExist
-    isFileExist = server.GetFileManager().IsFileExist(fileName, filePath)
-    return isFileExist
 }
 
 /**
@@ -371,7 +317,7 @@ FileManager.prototype.isFileExist = function (filename, filepath, successCallbac
     params.push(createRpcData(filepath, "STRING", "filepath"))
 
     server.executeJsFunction(
-        IsFileExist.toString(), // The function to execute remotely on server
+        "IsFileExist", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -389,15 +335,6 @@ FileManager.prototype.isFileExist = function (filename, filepath, successCallbac
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )
-}
-
-/*
- * sever side code.
- */
-function DeleteFile(uuid) {
-    var err
-    err = server.GetFileManager().DeleteFile(uuid, messageId, sessionId)
-    return err
 }
 
 /**
@@ -413,7 +350,7 @@ FileManager.prototype.deleteFile = function (uuid, successCallback, errorCallbac
     params.push(createRpcData(uuid, "STRING", "uuid"))
 
     server.executeJsFunction(
-        DeleteFile.toString(), // The function to execute remotely on server
+        "DeleteFile", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -433,15 +370,6 @@ FileManager.prototype.deleteFile = function (uuid, successCallback, errorCallbac
     )
 }
 
-/*
- * sever side code.
- */
-function RemoveFile(filePath) {
-    var err
-    err = server.GetFileManager().RemoveFile(filePath, messageId, sessionId)
-    return err
-}
-
 /**
  * Remove a file (not an entity) with a given path.
  * @param {string} filePath The file path.
@@ -455,7 +383,7 @@ FileManager.prototype.removeFile = function (filePath, successCallback, errorCal
     params.push(createRpcData(filePath, "STRING", "filePath"))
 
     server.executeJsFunction(
-        RemoveFile.toString(), // The function to execute remotely on server
+        "RemoveFile", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

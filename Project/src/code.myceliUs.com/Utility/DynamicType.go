@@ -108,6 +108,8 @@ func initializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
 		v = reflect.ValueOf(value.(float64))
 	case reflect.Float64:
 		v = reflect.ValueOf(value.(float64))
+	case reflect.Array:
+		log.Panicln("--------> array found!")
 	default:
 		log.Println("unexpected type %T\n", t)
 	}
@@ -119,6 +121,7 @@ func initializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
  * Create an instance of the type with it name.
  */
 func MakeInstance(typeName string, data map[string]interface{}) reflect.Value {
+
 	value := initializeStructureValue(typeName, data)
 	return value
 }
@@ -127,7 +130,7 @@ func MakeInstance(typeName string, data map[string]interface{}) reflect.Value {
  * Intialyse the struct fields with the values contain in the map.
  */
 func initializeStructureValue(typeName string, data map[string]interface{}) reflect.Value {
-
+	log.Println(typeName, data)
 	// Here I will create the value...
 	t := typeRegistry[typeName]
 	if t == nil {
@@ -140,37 +143,93 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 			switch ft.Type.Kind() {
 			case reflect.Slice:
 				// That's mean the value contain an array...
-				if reflect.TypeOf(value).String() == "[]interface {}" {
-					values := value.([]interface{})
-					for i := 0; i < len(values); i++ {
-						var fv reflect.Value
-						switch v_ := values[i].(type) {
-						// Here i have a sub-value.
-						case map[string]interface{}:
-							fv = initializeStructureValue(v_["TYPENAME"].(string), v_)
+				if strings.HasPrefix(reflect.TypeOf(value).String(), "[]") {
+					if reflect.TypeOf(value).String() == "[]interface {}" {
+						values := value.([]interface{})
+						for i := 0; i < len(values); i++ {
+							var fv reflect.Value
+							switch v_ := values[i].(type) {
+							// Here i have a sub-value.
+							case map[string]interface{}:
+								fv = initializeStructureValue(v_["TYPENAME"].(string), v_)
 
-						default:
-							// A base type...
-							// Here I will try to convert the base type to the one I have in
-							// the structure.
-							if v.Elem().FieldByName(name).Type().String() == "[]string" {
-								var string_ string
-								fv = initializeBaseTypeValue(reflect.TypeOf(string_), v_)
-							} else if v.Elem().FieldByName(name).Type().String() == "[]int" {
-								var int_ int
-								fv = initializeBaseTypeValue(reflect.TypeOf(int_), v_)
-							} else if v.Elem().FieldByName(name).Type().String() == "[]float" {
-								var float_ float64
-								fv = initializeBaseTypeValue(reflect.TypeOf(float_), v_)
-							} else if v.Elem().FieldByName(name).Type().String() == "[]bool" {
-								var bool_ bool
-								fv = initializeBaseTypeValue(reflect.TypeOf(bool_), v_)
-							} else {
-								fv = initializeBaseTypeValue(reflect.TypeOf(v_), v_)
+							default:
+								// A base type...
+								// Here I will try to convert the base type to the one I have in
+								// the structure.
+								if v.Elem().FieldByName(name).Type().String() == "[]string" {
+									var string_ string
+									fv = initializeBaseTypeValue(reflect.TypeOf(string_), v_)
+								} else if v.Elem().FieldByName(name).Type().String() == "[]int" {
+									var int_ int
+									fv = initializeBaseTypeValue(reflect.TypeOf(int_), v_)
+								} else if v.Elem().FieldByName(name).Type().String() == "[]float" {
+									var float_ float64
+									fv = initializeBaseTypeValue(reflect.TypeOf(float_), v_)
+								} else if v.Elem().FieldByName(name).Type().String() == "[]bool" {
+									var bool_ bool
+									fv = initializeBaseTypeValue(reflect.TypeOf(bool_), v_)
+								} else {
+									fv = initializeBaseTypeValue(reflect.TypeOf(v_), v_)
+								}
+
 							}
-
+							v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
 						}
-						v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+					} else if reflect.TypeOf(value).String() == "[]string" {
+						values := value.([]string)
+						for i := 0; i < len(values); i++ {
+							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+						}
+					} else if reflect.TypeOf(value).String() == "[]int" {
+						values := value.([]int)
+						for i := 0; i < len(values); i++ {
+							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+						}
+					} else if reflect.TypeOf(value).String() == "[]int64" {
+						values := value.([]int64)
+						for i := 0; i < len(values); i++ {
+							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+						}
+					} else if reflect.TypeOf(value).String() == "[]int32" {
+						values := value.([]int32)
+						for i := 0; i < len(values); i++ {
+							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+						}
+					} else if reflect.TypeOf(value).String() == "[]int16" {
+						values := value.([]int16)
+						for i := 0; i < len(values); i++ {
+							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+						}
+					} else if reflect.TypeOf(value).String() == "[]int8" {
+						values := value.([]int8)
+						for i := 0; i < len(values); i++ {
+							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+						}
+					} else if reflect.TypeOf(value).String() == "[]bool" {
+						values := value.([]bool)
+						for i := 0; i < len(values); i++ {
+							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+						}
+					} else if reflect.TypeOf(value).String() == "[]float64" {
+						values := value.([]bool)
+						for i := 0; i < len(values); i++ {
+							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+						}
+					} else if reflect.TypeOf(value).String() == "[]float32" {
+						values := value.([]float32)
+						for i := 0; i < len(values); i++ {
+							fv := initializeBaseTypeValue(reflect.TypeOf(values[i]), values[i])
+							v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+						}
 					}
 				} else {
 					// Here the value is a base type...

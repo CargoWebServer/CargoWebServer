@@ -158,6 +158,8 @@ func (this *Server) reportErrorMessage(messageId string, sessionId string, error
 		errMsg := NewErrorMessage(messageId, int32(errorObject.GetCode()), errorObject.GetBody(), errorObjectStr, to)
 		conn.Send(errMsg.GetBytes())
 	}
+	// Display the error on the server console.
+	log.Println(errorObject.GetBody())
 }
 
 /**

@@ -60,11 +60,12 @@ function main() {
     // entityDump("1", "employees.employees")
 
     //entitiesDump("COLLADASchema.COLLADA")
-    //entitiesDump("DT3_informations.Department")
+    entitiesDump("DT3_informations.Department")
     // testServiceContainer()
     //entitiesDump("DT3_informations.Workpoint")
 
-     entitiesDump("CargoEntities.Action")
+    //entitiesDump("CargoEntities.Action")
+    //testSayHello("Dave")
     //entityDump( "CARGO_ENTITIES", "CargoEntities.Entities")
     //entitiesDump("XPDMXML.ProcessStructureType")
     //entitiesDump("DT3_informations.Workpoint")
@@ -313,6 +314,31 @@ function TestUploadFile() {
 
         })
 
+}
+
+//////////////////////////////////////////////////////////////////////
+// Test JS extension and permission.
+//////////////////////////////////////////////////////////////////////
+function testSayHello(to) {
+    // Try 
+    var params = []
+    params.push(createRpcData(to, "STRING", "to"))
+
+    server.executeJsFunction(
+        "SayHello", // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            console.log(result)
+        },
+        function (errMsg, caller) {
+            server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        {} // The caller
+    )
 }
 
 //////////////////////////////////////////////////////////////////////

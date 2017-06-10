@@ -1,7 +1,7 @@
 package Server
 
 import (
-	"errors"
+	//	"errors"
 	"log"
 	"os/exec"
 	"reflect"
@@ -30,6 +30,7 @@ type ServiceManager struct {
 var serviceManager *ServiceManager
 
 func (this *Server) GetServiceManager() *ServiceManager {
+
 	if serviceManager == nil {
 		serviceManager = newServiceManager()
 		serviceManager.hidden = make([]string, 0)
@@ -183,6 +184,7 @@ func (this *Server) GetServiceManager() *ServiceManager {
 		serviceManager.restricted = append(serviceManager.restricted, "Server.LdapManager.SynchronizeUsers")
 
 	}
+
 	return serviceManager
 }
 
@@ -364,6 +366,7 @@ func (this *ServiceManager) registerActions(service Service) {
 				adminRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(adminRoleUuid, false)
 				if action.GetAccessType() != CargoEntities.AccessType_Hidden {
 					adminRoleEntity.GetObject().(*CargoEntities.Role).SetActions(action)
+					adminRoleEntity.SaveEntity()
 				}
 			}
 
@@ -372,11 +375,13 @@ func (this *ServiceManager) registerActions(service Service) {
 				guestRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(guestRoleUuid, false)
 				if action.GetAccessType() == CargoEntities.AccessType_Public {
 					guestRoleEntity.GetObject().(*CargoEntities.Role).SetActions(action)
+					guestRoleEntity.SaveEntity()
 				}
 			}
 		}
 	}
 	GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+
 }
 
 /////////////////////// API ///////////////////////////
@@ -385,40 +390,58 @@ func (this *ServiceManager) registerActions(service Service) {
  * That function is run on the server side to register action from javascript
  * files in the script folder.
  */
-func (this *ServiceManager) RegisterAction(methodName string, acceessType CargoEntities.AccessType, parameters []interface{}, results []interface{}) error {
+func (this *ServiceManager) RegisterAction(methodName string, parameters []interface{}, results []interface{}) error {
+
+	// The converted type.
+	var parameters_ []*CargoEntities.Parameter
+	var results_ []*CargoEntities.Parameter
+
+	// Initialyse the parameters object of not already intialyse.
+	values, err := Utility.InitializeStructures(parameters, "CargoEntities.Parameter")
+
+	if err == nil {
+		parameters_ = values.Interface().([]*CargoEntities.Parameter)
+	} else {
+		for i := 0; i < len(parameters); i++ {
+			parameters_ = append(parameters_, parameters[i].(*CargoEntities.Parameter))
+		}
+	}
+
+	values, err = Utility.InitializeStructures(results, "CargoEntities.Parameter")
+	if err == nil {
+		results_ = values.Interface().([]*CargoEntities.Parameter)
+	} else {
+		for i := 0; i < len(results); i++ {
+			results_ = append(results_, results[i].(*CargoEntities.Parameter))
+		}
+	}
 
 	// I will try to find if the action was register
-	metodUuid := CargoEntitiesActionExists(methodName)
+	//	metodUuid := CargoEntitiesActionExists(methodName)
+	action := new(CargoEntities.Action)
+	action.SetName(methodName)
 
-	if len(metodUuid) == 0 {
+	// Set the uuid
+	GetServer().GetEntityManager().NewCargoEntitiesActionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", action)
 
-		action := new(CargoEntities.Action)
-		action.SetName(methodName)
-
-		// Set the uuid
-		GetServer().GetEntityManager().NewCargoEntitiesActionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", action)
-
-		// The input
-		for j := 0; j < len(parameters); j++ {
-			action.SetParameters(parameters[j].(*CargoEntities.Parameter))
-		}
-
-		// The output
-		for j := 0; j < len(results); j++ {
-			action.SetResults(results[j].(*CargoEntities.Parameter))
-		}
-
-		action.SetAccessType(acceessType)
-
-		// apend it to the entities action.
-		action.SetEntitiesPtr(GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities))
-		GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetActions(action)
-
-		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
-		log.Println("Method ", methodName, " was success fully register!")
-	} else {
-		return errors.New("Method " + methodName + " already exist!")
+	// The input
+	for j := 0; j < len(parameters_); j++ {
+		action.SetParameters(parameters_[j])
 	}
+
+	// The output
+	for j := 0; j < len(results_); j++ {
+		action.SetResults(results_[j])
+	}
+
+	// Restricted by default.
+	action.SetAccessType(CargoEntities.AccessType_Restricted)
+
+	// apend it to the entities action.
+	action.SetEntitiesPtr(GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities))
+	GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetActions(action)
+
+	GetServer().GetEntityManager().getCargoEntities().SaveEntity()
 
 	return nil
 

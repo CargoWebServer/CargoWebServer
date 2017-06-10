@@ -392,6 +392,10 @@ func (this *SecurityManager) removeAction(roleId string, actionName string) *Car
  * no excute the action.
  */
 func (this *SecurityManager) canExecuteAction(sessionId string, actionName string) *CargoEntities.Error {
+	// Local action, when no sessionId was given.
+	if len(sessionId) == 0 {
+		return nil
+	}
 
 	// format the action name...
 	actionName = actionName[strings.LastIndex(actionName, "/")+1:]
@@ -719,6 +723,16 @@ func (this *SecurityManager) RemovePermission(accountId string, pattern string, 
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}
+}
+
+func (this *SecurityManager) CanExecuteAction(actionName string, sessionId string, messageId string) bool {
+	errObj := this.canExecuteAction(sessionId, actionName)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return false
+	}
+
+	return true
 }
 
 ///////////////////////////////// Other stuff //////////////////////////////////
