@@ -4,6 +4,9 @@
 #include "gen/rpc.pb.h"
 #include <QCoreApplication>
 #include <QThreadPool>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 /**
  * @brief serializeToByteArray Serialyse the message to an array of bytes...
@@ -89,22 +92,40 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
 
             ::com::mycelius::message::Data param = *it;
             QVariant var;
-
             if(param.type() == ::com::mycelius::message::Data_DataType_DOUBLE){
-
+                var = QVariant(param.databytes().c_str()).toFloat();
+                action->appendParam(QString::fromStdString(param.name()), var, "double");
             }else if(param.type() == ::com::mycelius::message::Data_DataType_INTEGER){
-
+                var = QVariant(param.databytes().c_str()).toInt();
+                action->appendParam(QString::fromStdString(param.name()), var, "int");
+            }else if(param.type() == ::com::mycelius::message::Data_DataType_BOOLEAN){
+                var = QVariant(param.databytes().c_str()).toBool();
+                action->appendParam(QString::fromStdString(param.name()), var, "bool");
             }else if(param.type() == ::com::mycelius::message::Data_DataType_STRING){
                 var = QVariant(param.databytes().c_str());
-                qDebug() << "Type name:" << var.typeName() << " value:" << var;
                 action->appendParam(QString::fromStdString(param.name()), var, "QString");
-
             }else if(param.type() == ::com::mycelius::message::Data_DataType_BYTES){
                 var = QVariant(QByteArray(param.databytes().c_str(), param.databytes().length()));
                 action->appendParam(QString::fromStdString(param.name()), var, "QByteArray");
             }else if(param.type() == ::com::mycelius::message::Data_DataType_JSON_STR){
+                // JSON object found here. It can be array or a map...
+                QString jsonStr = QVariant(QByteArray(param.databytes().c_str(), param.databytes().length())).toString();
+                QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8());
+                // From the jsonDoc...
+                if(jsonDoc.isObject()){
+                     QJsonObject jsonObject = jsonDoc.object();
+                     var = jsonObject;
+                     action->appendParam(QString::fromStdString(param.name()), var, "QJsonObject");
+                }else if(jsonDoc.isArray()){
+                    QJsonArray jsonArray = jsonDoc.array();
+                    var = jsonArray;
+                    action->appendParam(QString::fromStdString(param.name()), var, "QJsonArray");
+                }else if(jsonDoc.isEmpty() || jsonDoc.isNull()){
+                    var = NULL;
+                }
 
             }
+            qDebug() << "Type name:" << var.typeName() << " value:" << var;
         }
 
         // Connect the slot whit the signal...
@@ -121,7 +142,7 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
         // The message is a response...
         QString messageId = QString::fromStdString(msg.rsp().id());
         if(this->pending.contains(messageId)){
-            qDebug() << " process next pending message, message id is " << messageId;
+            //qDebug() << " process next pending message, message id is " << messageId;
             this->processPendingMessage(messageId);
         }
 

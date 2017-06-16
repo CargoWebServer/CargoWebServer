@@ -218,6 +218,10 @@ Server.prototype.handleMessage = function (conn, data) {
         // Now I will save the message.
         pendingMessage[msg.id][msg.index] = msg
 
+        if (pendingRequest[msg.id] == undefined) {
+            return // nothing to do here.
+        }
+
         if (pendingRequest[msg.id].progressCallback != null) {
             pendingRequest[msg.id].progressCallback(msg.index, msg.total, pendingRequest[msg.id].caller)
         }
@@ -304,7 +308,7 @@ Server.prototype.executeVbSrcript = function (scriptName, args, successCallback,
     var params = new Array();
     params.push(createRpcData(scriptName, "STRING", "scriptName"))
     params.push(createRpcData(args, "JSON_STR", "args"))
-    
+
     // Register this listener to the server.
     var rqst = new Request(randomUUID(), this.conn, "ExecuteVbScript", params,
         // Progress callback
@@ -317,7 +321,7 @@ Server.prototype.executeVbSrcript = function (scriptName, args, successCallback,
         // Error callback...
         function (errorMsg, caller) {
             caller.errorCallback(errorMsg, caller.caller)
-        }, {"successCallback":successCallback, "errorCallback":errorCallback, "caller":caller});
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
     rqst.send();
 }
 
@@ -403,7 +407,7 @@ Server.prototype.disconnect = function (host, port, successCallback, errorCallba
     var params = []
     params.push(createRpcData(host, "STRING", "host"))
     params.push(createRpcData(port, "INTEGER", "port"))
-    
+
     // Call it on the server.
     server.executeJsFunction(
         "Disconnect", // The function to execute remotely on server

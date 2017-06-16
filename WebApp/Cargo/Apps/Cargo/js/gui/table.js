@@ -818,7 +818,11 @@ TableCell.prototype.formatValue = function (value) {
 				this.valueDiv.element.className = "xs_date"
 			} else if (isXsNumeric(fieldType)) {
 				this.valueDiv.element.className = "xs_number"
-				value = formater.formatReal(value)
+				if (isXsMoney(fieldType)) {
+					value = formater.formatReal(value, 2)
+				} else {
+					value = formater.formatReal(value, 3)
+				}
 			} else if (isXsId(fieldType)) {
 				// here I have an entity now I need to know if is an abstact entity or not.
 				var entity = server.entityManager.entities[this.row.table.model.entities[this.row.index].UUID]
@@ -853,6 +857,8 @@ TableCell.prototype.formatValue = function (value) {
 				this.valueDiv.element.className = "xs_ref"
 			} else if (isXsInt(fieldType)) {
 				this.valueDiv.element.className = "xs_number"
+			} else if (isXsBoolean(fieldType)) {
+				this.valueDiv.element.className = "xs_bool"
 			} else if (isXsString(fieldType)) {
 				this.valueDiv.element.className = "xs_string"
 				value = formater.formatString(value)
@@ -1287,13 +1293,13 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 	var editor = this.row.table.cellEditors[this.index]
 
 	// One editor at time.
-	/*if (editor != undefined) {
+	if (editor != undefined) {
 		if (editor.element.parentNode != undefined) {
 			editor.element.parentNode.removeChild(editor.element)
 		}
 		delete this.row.table.cellEditors[this.index]
 		editor = null
-	}*/
+	}
 
 	var prototype = this.row.table.model.proto
 	var entity = null
@@ -1325,7 +1331,6 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 		} else if (isXsRef(type)) {
 			// Here I will put a text area..
 			console.log("------> ref found!!!!")
-
 		} else if (isXsDate(type)) {
 			editor = this.div.appendElement({ "tag": "input", "type": "datetime-local", "name": "date" }).down()
 			editor.element.value = moment(value).format('YYYY-MM-DDTHH:mm:ss');
@@ -1334,7 +1339,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "0.01" }).down()
 			editor.element.value = value
 		} else if (isXsBoolean(type)) {
-			editor = this.div.appendElement({ "tag": "input", "type": "checkbox" }).down()
+			editor = this.div.appendElement({ "tag": "input", "type": "checkbox"}).down()
 			editor.element.checked = value
 		} else if (isXsInt(type)) {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "1" }).down()
@@ -1431,8 +1436,10 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 		}
 
 		// Set the editor size...
-		editor.element.style.width = w + "px"
-		editor.element.style.height = h + "px"
+		if (isXsString(type)) {
+			editor.element.style.width = w + "px"
+			editor.element.style.height = h + "px"
+		}
 		editor.element.style.border = "none"
 		editor.element.style.padding = "0px"
 		editor.element.style.margin = "0px"
@@ -1517,7 +1524,7 @@ ColumnFormater.prototype.formatReal = function (value, digits) {
 	if (digits == undefined) {
 		digits = 2
 	}
-	value = parseFloat(Math.round(value * 100) / 100).toFixed(digits);
+	value = parseFloat(value).toFixed(digits);
 	return value
 }
 
@@ -1839,7 +1846,11 @@ ColumnFilter.prototype.getValues = function () {
 		if (isXsDate(this.type)) {
 			value = formater.formatDate(value, this.table.filterFormat);
 		} else if (isXsNumeric(this.type) || isXsMoney(this.type)) {
-			value = parseFloat(formater.formatReal(value))
+			var precision = 2
+			if (!isXsMoney(this.type)) {
+				precision = 3
+			}
+			value = parseFloat(formater.formatReal(value, precision))
 		} else if (isXsString(this.type)) {
 			value = formater.formatString(value)
 		} else if (isXsInt(this.type)) {

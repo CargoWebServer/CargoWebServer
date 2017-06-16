@@ -8,6 +8,7 @@
 #include <QMetaMethod>
 #include <QVariantList>
 #include <QJsonArray>
+#include <QJsonObject>
 #include <QJsonDocument>
 
 QVariant CallMethod(QObject* object, QMetaMethod metaMethod, QVariantList args)
@@ -194,7 +195,6 @@ void Action::run()
             doc.setArray(::QJsonArray::fromVariantList(retVal.toList()));
 
             // So here I will
-            qDebug()<<doc.toJson();
             d->set_databytes(doc.toJson().toStdString());
 
         } else if(retVal.type() == QMetaType::Int){
@@ -212,6 +212,25 @@ void Action::run()
             qDebug() << "The result is a string";
             d->set_type(::com::mycelius::message::Data_DataType_STRING);
             d->set_databytes(retVal.toString().toStdString());
+        }else if(retVal.canConvert(QMetaType::QJsonObject)){
+            // The type is a json object...
+            qDebug() << "The result is a json object";
+            d->set_type(::com::mycelius::message::Data_DataType_JSON_STR);
+            QJsonDocument doc;
+            doc.setObject(retVal.toJsonObject());
+
+            // So here I will
+            d->set_databytes(doc.toJson().toStdString());
+
+        }else if(retVal.canConvert(QMetaType::QJsonArray)){
+            // The type is a json array...
+            qDebug() << "The result is a json array";
+            d->set_type(::com::mycelius::message::Data_DataType_JSON_STR);
+            QJsonDocument doc;
+            doc.setArray(retVal.toJsonArray());
+
+            // So here I will
+            d->set_databytes(doc.toJson().toStdString());
         }
     }else{
         qDebug() << "The result is void";

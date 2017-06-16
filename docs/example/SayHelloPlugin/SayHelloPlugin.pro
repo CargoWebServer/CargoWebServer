@@ -18,3 +18,6 @@ HEADERS += \
 
 SOURCES += \
     sayhello.cpp
+
+DISTFILES += \
+    sayhelloplugin.json

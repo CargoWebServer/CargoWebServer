@@ -210,7 +210,7 @@ function isXsString(fieldType) {
 function isXsBinary(fieldType) {
     if (fieldType.endsWith("base64Binary") // XML
         || fieldType.endsWith("varbinary") || fieldType.endsWith("binary") // SQL
-        || fieldType.endsWith("image") || fieldType.endsWith("timestamp")  // SQL
+        || fieldType.endsWith("image") // SQL
     ) {
         return true
     }

@@ -64,6 +64,16 @@
     height: auto;
 }
 
+.xs_bool{
+    margin: 0 auto;
+    width: 100%;
+}
+
+.xs_bool input{
+    text-align:center;
+    vertical-align:middle;
+}
+
 .xs_string {
     min-width: 75px;
     text-align: left;
@@ -82,8 +92,6 @@
 
 .table_row {
     display: table-row;
-    /*visibility: hidden;*/
-    /* display: none; */
 }
 
 
