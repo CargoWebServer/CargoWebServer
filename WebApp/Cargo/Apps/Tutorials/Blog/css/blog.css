@@ -34,6 +34,22 @@
     transition: none;
 }
 
+#new-blog-categories-btn{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    display: none;
+}
+
+#new-blog-categories-btn:hover{
+    cursor: pointer;
+    text-shadow: 0px 0px 9px lightblue;
+}
+
+#blog-categories-title{
+    position: relative;
+}
+
 /*=========================
   Icons
  ================= */

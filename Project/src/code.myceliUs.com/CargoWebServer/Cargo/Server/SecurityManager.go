@@ -437,7 +437,7 @@ func (this *SecurityManager) canExecuteAction(sessionId string, actionName strin
 		roles := account.GetRolesRef()
 		for i := 0; i < len(roles); i++ {
 			if this.hasAction(roles[i].GetId(), actionName) {
-				log.Println("account ", actionName, " can execute action ", action.GetName())
+				log.Println("account ", account.GetId(), " can execute action ", action.GetName())
 				return nil
 			}
 		}

@@ -1378,7 +1378,7 @@ func (this *DataManager) Synchronize(storeId string, messageId string, sessionId
 		return
 	}
 
-	if reflect.TypeOf(store).Kind().String() == "*Server.SqlDataStore" {
+	if reflect.TypeOf(store).String() == "*Server.SqlDataStore" {
 		store.(*SqlDataStore).synchronize(prototypes)
 	}
 }

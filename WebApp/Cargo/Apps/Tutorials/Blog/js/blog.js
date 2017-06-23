@@ -1,12 +1,13 @@
 
 // global variable.
 var databaseName = "Blog."
-var schemaId = "dbo."
+var schemaId = "" //"dbo."
 
 var userTypeName = databaseName + schemaId + "blog_user"
 var authorTypeName = databaseName + schemaId + "blog_author"
 var blogPostTypeName = databaseName + schemaId + "blog_post"
 var blogCommentTypeName = databaseName + schemaId + "blog_comment"
+var categoryTypeName = databaseName + schemaId + "blog_category"
 
 /**
  * Utility class use to manage data element of the blog.
@@ -52,7 +53,7 @@ var BlogManager = function (parent) {
             "register-username-input-error": "",
             // Other parts of header.
             "blog-search-title": "Blog Search",
-            "blog-categories": "Blog Categories",
+            "blog-categories-title": "Blog Categories",
             "footer-text": "Copyright &copy; Your Website 2017",
             // The user input panel
             "Blog.dbo.blog_user": "User's",
@@ -278,29 +279,16 @@ var BlogManager = function (parent) {
         .appendElement({ "tag": "span", "class": "fa fa-search" }).up().up().up().up()
 
         // Blog Categories Well // TODO populate it with the db content.
-        .appendElement({ "tag": "div", "class": "well" }).down()
-        .appendElement({ "tag": "h4", "id": "blog-categories" })
-        .appendElement({ "tag": "div", "class": "row" }).down()
-        .appendElement({ "tag": "div", "class": "col-lg-6" }).down()
-        .appendElement({ "tag": "ul", "class": "list-unstyled" }).down()
-        .appendElement({ "tag": "li" }).down()
-        .appendElement({ "tag": "a", innerHtml: "Category Name" }).up()
-        .appendElement({ "tag": "li" }).down()
-        .appendElement({ "tag": "a", innerHtml: "Category Name" }).up()
-        .appendElement({ "tag": "li" }).down()
-        .appendElement({ "tag": "a", innerHtml: "Category Name" }).up()
-        .appendElement({ "tag": "li" }).down()
-        .appendElement({ "tag": "a", innerHtml: "Category Name" }).up().up().up()
-        .appendElement({ "tag": "div", "class": "col-lg-6" }).down()
-        .appendElement({ "tag": "ul", "class": "list-unstyled" }).down()
-        .appendElement({ "tag": "li" }).down()
-        .appendElement({ "tag": "a", innerHtml: "Category Name" }).up()
-        .appendElement({ "tag": "li" }).down()
-        .appendElement({ "tag": "a", innerHtml: "Category Name" }).up()
-        .appendElement({ "tag": "li" }).down()
-        .appendElement({ "tag": "a", innerHtml: "Category Name" }).up()
-        .appendElement({ "tag": "li" }).down()
-        .appendElement({ "tag": "a", innerHtml: "Category Name" }).up().up().up().up().up()
+        .appendElement({ "tag": "div", "class": "well", "id": "blog-categories" }).down()
+        .appendElement({ "tag": "h4", "id": "blog-categories-title" }).down()
+        .appendElement({ "tag": "div", "id": "new-blog-categories-btn" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-plus" }).up().up()
+        .appendElement({ "tag": "div", "class": "row", "id": "blog-categories-content" }).down()
+        .appendElement({ "tag": "div", "class": "col-lg-6" }).down() // col 1
+        .appendElement({ "tag": "ul", "class": "list-unstyled" }).up()
+        .appendElement({ "tag": "div", "class": "col-lg-6" }).down() // col 2
+        .appendElement({ "tag": "ul", "class": "list-unstyled" }).up()
+        .up().up()
 
         // The side well widget.
         .appendElement({ "tag": "div", "class": "well" }).down()
@@ -316,6 +304,7 @@ var BlogManager = function (parent) {
     // The side well widget is use to display additionall information like the list of blog for a user.
     this.sideWellWidget = this.container.getChildById("side-well-widget")
 
+
     //////////////////////////////////////////////////////////////////////
     // Blog manager action.
     //////////////////////////////////////////////////////////////////////
@@ -323,6 +312,9 @@ var BlogManager = function (parent) {
     this.loginLnk = this.navBar.getChildById("login-lnk")
     this.registerLnk = this.navBar.getChildById("register-lnk")
     this.userInfoLnk = this.navBar.getChildById("user-info-lnk")
+    // The new category button...
+    this.newCategoryBtn = this.container.getChildById("new-blog-categories-btn")
+    this.categoryContentDiv = this.container.getChildById("blog-categories-content")
 
     this.loginLnk.element.onclick = function (registerLnk, userInfoLnk) {
         return function () {
@@ -363,6 +355,61 @@ var BlogManager = function (parent) {
             }
         }
     }(this.loginLnk, this.registerLnk)
+
+    // Append a new category...
+    this.newCategoryBtn.element.onclick = function (blogManager) {
+        return function () {
+            // Here I will create a div to display to edit the new category name...
+            if (document.getElementById("save_category_btn") == undefined) {
+                var newCategoryPanel = blogManager.newCategoryBtn.appendElement({ "tag": "div", "class": "well", "style": "display: table; background-color: white; position: absolute; width: 200px;" }).down()
+                newCategoryPanel.appendElement({ "tag": "input", "id": "new_category_input", "class": "form-control", "placeholder": "Category Name" })
+                    .appendElement({ "tag": "button", "id": "save_category_btn", "class": "form-control btn btn-info", "style": "margin-top: 5px;" }).down()
+                    .appendElement({ "tag": "span", "innerHtml": " Save", "style": "padding-right: 10px;" })
+                    .appendElement({ "tag": "i", "class": "fa fa fa-floppy-o" })
+
+                // Here the save 
+                var saveCategoryBtn = blogManager.newCategoryBtn.getChildById("save_category_btn")
+                var newCategoryInput = blogManager.newCategoryBtn.getChildById("new_category_input")
+                newCategoryInput.element.focus() // set the focus...
+                saveCategoryBtn.element.onclick = function (blogManager, newCategoryPanel, newCategoryInput) {
+                    return function (evt) {
+                        evt.stopPropagation();
+                        var category = eval("new " + categoryTypeName + "()")
+                        category.M_name = newCategoryInput.element.value
+                        category.M_enable = true
+                        category.M_date_created = new Date()
+
+                        blogManager.appendCategory(category)
+
+                        // Remove the panel
+                        blogManager.newCategoryBtn.removeElement(newCategoryPanel)
+                    }
+                }(blogManager, newCategoryPanel, newCategoryInput)
+            } else {
+                var newCategoryPanel = blogManager.newCategoryBtn.childs[Object.keys(blogManager.newCategoryBtn.childs)[1]]
+                blogManager.newCategoryBtn.removeElement(newCategoryPanel)
+            }
+        }
+    }(this)
+
+    // Get the list of existing categories.
+    server.entityManager.getObjectsByType(categoryTypeName, "Blog", "",
+        // progress callback
+        function (index, total, caller) {
+            // Nothing to do here.
+        },
+        // success callback
+        function (results, caller) {
+            for (var i = 0; i < results.length; i++) {
+                // Append the category to the category panel.
+                caller.blogManager.appendCategory(results[i])
+            }
+        },
+        // error callback
+        function (errObj, caller) {
+
+        },
+        { "blogManager": this })
 
     // Now the mouse out event.
     this.registerDropDown = this.navBar.getChildById("register-dropdown")
@@ -488,6 +535,13 @@ var BlogManager = function (parent) {
 
                     // Display the author post inside the the side well widget.
                     blogManager.displayAuthorPost()
+
+                    // Display the category delete button...
+                    var deleteCategoryButtons = document.getElementsByClassName("category_delete_btn")
+                    for (var i = 0; i < deleteCategoryButtons.length; i++) {
+                        deleteCategoryButtons[i].style.display = ""
+                    }
+
                 },
                 function (errObj, caller) {
                     var err = errObj.dataMap.errorObj
@@ -616,50 +670,137 @@ var BlogManager = function (parent) {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //  Event listener's
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    // The delete entity event.
-    server.entityManager.attach(this, DeleteEntityEvent, function (evt, blogManager) {
-        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView != null) {
-            if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
-                if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
-                    console.log("delete post!")
-                    
-                    // remove the post lnk for the lst.
-                    blogManager.displayAuthorPost()
-                }
-            }
+    server.entityManager.attach(this, NewEntityEvent, function (evt, blogManager) {
+        if (evt.dataMap["entity"].TYPENAME == categoryTypeName) {
+            var category = evt.dataMap["entity"]
+            blogManager.appendCategory(category)
         }
     })
 
-    // The new entity event.
-    server.entityManager.attach(this, NewEntityEvent, function (evt, blogManager) {
-        // I will reinit the panel here...
-        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView != null) {
-            if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
-                if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
-                    console.log("new post!")
+    // The delete entity event.
+    server.entityManager.attach(this, DeleteEntityEvent, function (evt, blogManager) {
+        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName) {
+            // remove the post lnk for the lst.
+            if (blogManager.activePostView != null) {
+                if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
+                    if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
+                        // Remove the content of the page.
+                        blogManager.blogContainer.removeAllChilds()
+                    }
                 }
+            }
+        } else if (evt.dataMap["entity"].TYPENAME == categoryTypeName) {
+            var category = evt.dataMap["entity"]
+            // I will use DOM to remove the category li
+            var li = document.getElementById(category.UUID + "_li")
+            if (li != undefined) {
+                li.parentNode.removeChild(li)
             }
         }
     })
 
     // The update entity event.
     server.entityManager.attach(this, UpdateEntityEvent, function (evt, blogManager) {
-        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName && blogManager.activePostView != null) {
-            if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
-                // I will reinit the panel here...
-                if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
-                    // Udate the author post.
-                    blogManager.activePostView = new BlogPostView(blogManager.blogContainer, server.entityManager.entities[evt.dataMap["entity"].UUID])
+        if (evt.dataMap["entity"].TYPENAME == blogPostTypeName) {
+            // In case of post change.
+            blogManager.displayAuthorPost()
+            if (blogManager.activePostView != null) {
+                if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
+                    // I will reinit the panel here...
+                    if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
+                        // Udate the author post.
+                        blogManager.activePostView = new BlogPostView(blogManager.blogContainer, server.entityManager.entities[evt.dataMap["entity"].UUID])
 
-                    // Set the blog view editable.
-                    blogManager.setEditable(blogManager.activePostView)
-                    blogManager.displayAuthorPost()
+                        // Set the blog view editable.
+                        blogManager.setEditable(blogManager.activePostView)
+                    }
                 }
+            }
+        } else if (evt.dataMap["entity"].TYPENAME == authorTypeName) {
+            if (blogManager.account != null) {
+                // In case of author change...
+                blogManager.displayAuthorPost()
             }
         }
     })
 
     return this
+}
+
+/**
+ * Append a new category in the category div.
+ */
+BlogManager.prototype.appendCategory = function (category) {
+    if (category.UUID.length == 0) {
+        // Here the category dosen't exist...
+        var query = "SELECT MAX(id) FROM " + categoryTypeName
+        server.dataManager.read("Blog", query, ["int"], [],
+            // success callback
+            function (results, caller) {
+                // The last id...
+                var lastId = 1
+                if (results[0][0][0] != null) {
+                    lastId = parseInt(results[0][0]) + 1
+                }
+
+                // Now I will save the category...
+                category.M_id = lastId
+                server.entityManager.saveEntity(category,
+                    // Success callback
+                    function (result, caller) {
+                        // Nothing to do here I will use new entity event instead.
+                    },
+                    // Error callback
+                    function () {
+
+                    },
+                    caller.blogManager)
+            },
+            // progress callback
+            function (index, total, caller) {
+
+            },
+            // error callback
+            function (errObj) {
+
+            },
+            { "blogManager": this, "category": category })
+
+    } else {
+        // Here the category already exist.
+        var categoryContentDiv
+        if (category.M_id % 2 == 0) {
+            categoryContentDiv = this.categoryContentDiv.childs[Object.keys(this.categoryContentDiv.childs)[1]].lastChild
+        } else {
+            categoryContentDiv = this.categoryContentDiv.childs[Object.keys(this.categoryContentDiv.childs)[0]].lastChild
+        }
+
+        // I will append the category...
+        var lnk = categoryContentDiv.appendElement({ "tag": "li", "id": category.UUID + "_li" }).down()
+        var deleteCategoryBtn = lnk.appendElement({ "tag": "i", "id": category.UUID + "_delete_btn", "class": "fa fa-trash-o delete-button category_delete_btn", "style": "vertical-align: center; padding-right: 10px; display: none;" }).down()
+        lnk.appendElement({ "tag": "a", innerHtml: category.M_name })
+
+        // if the user is logged i will show the delete button.
+        if (this.account != undefined) {
+            deleteCategoryBtn.element.style.display = ""
+        }
+
+        // Now the delete action.
+        deleteCategoryBtn.element.onclick = function (category) {
+            return function () {
+                server.entityManager.removeEntity(category.UUID,
+                    /** Success Callback */
+                    function (result, caller) {
+
+                    },
+                    /** Error Callback  */
+                    function (errObj, caller) {
+
+                    },
+                    {})
+            }
+        }(category)
+    }
 }
 
 /**
@@ -687,6 +828,8 @@ BlogManager.prototype.displayAuthorPost = function () {
         this.authorPostDiv.element.innerHTML = ""
     }
 
+    this.newCategoryBtn.element.style.display = "block"
+
     // Now I will get the all post from a given author.
     if (isObject(this.account.M_userRef)) {
         server.entityManager.getEntityById("sql_info", authorTypeName, [this.account.M_userRef.UUID],
@@ -712,23 +855,26 @@ BlogManager.prototype.displayAuthorPost = function () {
                             blogManager.activePostView = new BlogPostView(blogManager.blogContainer, post)
                             // Set the blog view editable.
                             blogManager.setEditable(caller.blogManager.activePostView)
+
+                            // Here I will also display the new category button.
+
                         }
                     }(post, caller.blogManager)
 
                     var postDeleteBtn = authorPostDiv.getChildById(post.UUID + "_delete_btn")
-                    postDeleteBtn.element.onclick = function(post){
-                        return function(){
+                    postDeleteBtn.element.onclick = function (post) {
+                        return function () {
                             console.log("-------> delete post: ", post)
-                            if(post != undefined){
+                            if (post != undefined) {
                                 server.entityManager.removeEntity(post.UUID,
-                                // Success callback 
-                                function(results, caller){
-                                    console.log("Entity was remove sucessfully")
-                                },
-                                // Error callback
-                                function(errObj, caller){
-                                    // Nothing to do here...
-                                }, {/* no caller. */})
+                                    // Success callback 
+                                    function (results, caller) {
+                                        console.log("Entity was remove sucessfully")
+                                    },
+                                    // Error callback
+                                    function (errObj, caller) {
+                                        // Nothing to do here...
+                                    }, {/* no caller. */ })
                             }
                         }
                     }(post)

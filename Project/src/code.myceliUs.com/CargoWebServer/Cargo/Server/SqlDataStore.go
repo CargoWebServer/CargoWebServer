@@ -1393,7 +1393,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 	// Contain entity info without parent uuid.
 	entityInfos := make(map[string]map[string]map[string]interface{}, 0)
-
+	log.Println("------> synchronize")
 	// First of all I will sychronize create the entities information if it dosen't exist.
 	for i := 0; i < len(prototypes); i++ {
 		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
