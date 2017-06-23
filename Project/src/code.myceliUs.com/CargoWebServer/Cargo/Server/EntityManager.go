@@ -166,6 +166,7 @@ func (this *EntityManager) removeEntity(uuid string) {
  * That function is use to delete an entity from the store.
  */
 func (this *EntityManager) deleteEntity(toDelete Entity) {
+
 	// first of all i will remove it from the cache.
 	this.removeEntity(toDelete.GetUuid())
 
@@ -182,6 +183,9 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 	var params []interface{}
 	query, _ := json.Marshal(deleteEntityQuery)
 
+	// Here I will try to delete the data... sometime because of the cascade
+	// rule of sql the data is already deleted so error here dosent stop
+	// the execution of the reste of entity suppression.
 	GetServer().GetDataManager().deleteData(storeId, string(query), params)
 
 	// delete it's childs.
@@ -246,8 +250,10 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 	// Save refeferenced entity...
 	for i := 0; i < len(toSaves); i++ {
 		// Save it only if it dosen't already deleted.
-		toSaves[i].SetNeedSave(true)
-		toSaves[i].SaveEntity()
+		if toSaves[i].Exist() {
+			toSaves[i].SetNeedSave(true)
+			toSaves[i].SaveEntity()
+		}
 	}
 
 	// Send event message...
@@ -259,6 +265,9 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 	eventDatas = append(eventDatas, evtData)
 	evt, _ := NewEvent(DeleteEntityEvent, EntityEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
+
+	// Remove the ownership if there is one.
+	this.removeEntityOwner(toDelete)
 	log.Println("----------> entity ", toDelete.GetUuid(), " is remove ", !this.isExist(toDelete.GetUuid()))
 }
 
@@ -1360,6 +1369,71 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	return entity.(Entity), nil
 }
 
+/**
+ * Those function will be use to set entity ownership.
+ */
+func (this *EntityManager) setEntityOwner(owner *CargoEntities.Account, entity Entity) {
+	// First of all I will retreive the kv store.
+	uuid := entity.GetUuid()
+	storeId := uuid[0:strings.Index(uuid, ".")]
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	if reflect.TypeOf(store).String() == "*Server.SqlDataStore" {
+		store = GetServer().GetDataManager().getDataStore("sql_info")
+	}
+
+	if this.getEntityOwner(entity) != nil {
+		this.removeEntityOwner(entity)
+	}
+
+	// Here I will simply set the entity ownership to the given account.
+	store.(*KeyValueDataStore).setValue([]byte(uuid+"_owner"), []byte(owner.GetUUID()))
+}
+
+/**
+ * Retreive the entity owner for a given entity
+ */
+func (this *EntityManager) getEntityOwner(entity Entity) *CargoEntities.Account {
+
+	// First of all I will retreive the kv store.
+	uuid := entity.GetUuid()
+	storeId := uuid[0:strings.Index(uuid, ".")]
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	if reflect.TypeOf(store).String() == "*Server.SqlDataStore" {
+		store = GetServer().GetDataManager().getDataStore("sql_info")
+	}
+
+	// Retreive the owner
+	val, err := store.(*KeyValueDataStore).getValue(uuid + "_owner")
+	if err != nil {
+		return nil
+	}
+
+	// In that case the owner was retreive.
+	ownerEntity, errObj := this.getEntityByUuid(string(val), true)
+
+	if errObj != nil {
+		return nil
+	}
+
+	return ownerEntity.GetObject().(*CargoEntities.Account)
+}
+
+/**
+ * Remove the entity owner.
+ */
+func (this *EntityManager) removeEntityOwner(entity Entity) {
+
+	uuid := entity.GetUuid()
+	storeId := uuid[0:strings.Index(uuid, ".")]
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	if reflect.TypeOf(store).String() == "*Server.SqlDataStore" {
+		store = GetServer().GetDataManager().getDataStore("sql_info")
+	}
+
+	// Remove the ownership...
+	store.(*KeyValueDataStore).deleteValue(entity.GetUuid() + "_owner")
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // API
 ////////////////////////////////////////////////////////////////////////////////
@@ -1381,6 +1455,11 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
+
+	// Here I will set the ownership of the entity.
+	session := GetServer().GetSessionManager().GetActiveSessionById(sessionId)
+	this.setEntityOwner(session.GetAccountPtr(), result)
+
 	return result.GetObject()
 }
 

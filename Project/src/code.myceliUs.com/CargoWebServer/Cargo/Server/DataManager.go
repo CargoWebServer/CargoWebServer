@@ -237,15 +237,13 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 												// The first ids in the list of ids are always the uuid so
 												// the index is j+1
 												id := Utility.ToString(ids[j])
-												if id == "null" {
-													log.Panicln("--------> wrong id !! null")
+												if id != "null" {
+													query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=?"
+													if j < len(ids)-1 {
+														query += " AND "
+													}
+													params = append(params, id)
 												}
-
-												query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=?"
-												if j < len(ids)-1 {
-													query += " AND "
-												}
-												params = append(params, id)
 											}
 										}
 
@@ -752,8 +750,7 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 								if d[i] == "null" {
 									// if the field is an id it must not be null
 									if Utility.Contains(prototype.Ids, fieldName) {
-										log.Panicln(prototype.TypeName, fieldName, " is null.")
-										return -1, nil
+										return -1, errors.New(prototype.TypeName + "." + fieldName + " is null.")
 									}
 									d[i] = "NULL"
 								}
@@ -841,20 +838,19 @@ func (this *DataManager) deleteData(storeName string, query string, params []int
 			query += "." + tableName + " WHERE "
 
 			if err == nil {
-				entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
-				for i := 0; i < len(prototype.Ids); i++ {
-					if strings.HasPrefix(prototype.Ids[i], "M_") {
-						ids = append(ids, entity.(*DynamicEntity).getValue(prototype.Ids[i]))
-						query += prototype.Ids[i][2:] + "=?"
-						if i < len(prototype.Ids)-1 {
-							query += " AND "
+				entity, err := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
+				if err == nil {
+					for i := 0; i < len(prototype.Ids); i++ {
+						if strings.HasPrefix(prototype.Ids[i], "M_") {
+							ids = append(ids, entity.(*DynamicEntity).getValue(prototype.Ids[i]))
+							query += prototype.Ids[i][2:] + "=?"
+							if i < len(prototype.Ids)-1 {
+								query += " AND "
+							}
 						}
 					}
+					this.deleteData(dataBaseName, query, ids)
 				}
-			}
-			err = this.deleteData(dataBaseName, query, ids)
-			if err == nil {
-				log.Println("-------------> entity ", uuid, "was deleted!")
 			}
 		}
 	}
@@ -862,6 +858,8 @@ func (this *DataManager) deleteData(storeName string, query string, params []int
 	err = store.Delete(query, params)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
+	} else {
+		log.Println("-------> query execute successfully ", query, " ids ", params)
 	}
 
 	return

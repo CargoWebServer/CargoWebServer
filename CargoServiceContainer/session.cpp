@@ -206,7 +206,7 @@ void Session::completeProcessMessageData(com::mycelius::message::Message * msg){
         this->sendMessage(msg);
     }else{
 
-        int count = msg->ByteSize() / Session::MAX_MESSAGE_SIZE;
+        int count = int(double(msg->ByteSize() / Session::MAX_MESSAGE_SIZE) + .5f);
 
         // Round up...
         if(msg->ByteSize() % Session::MAX_MESSAGE_SIZE > 0){
@@ -218,10 +218,10 @@ void Session::completeProcessMessageData(com::mycelius::message::Message * msg){
 
         this->pending.insert(messageId, QList<com::mycelius::message::Message*>() );
 
-        for(int i=0; i<=count; i++){
+        for(int i=0; i<count; i++){
             QByteArray bytesSlice;
             int startIndex = i * Session::MAX_MESSAGE_SIZE;
-            if(i<count){
+            if(i<count-1){
                 bytesSlice = messageData.mid(startIndex, Session::MAX_MESSAGE_SIZE );
             } else {
                 bytesSlice = messageData.mid(startIndex);

@@ -579,6 +579,7 @@ Response.prototype.getRpcMessageData = function () {
  * Call the success callback if the response is completed.
  */
 Response.prototype.execute = function (rqst) {
+    delete pendingRequest[rqst.id]; 
     if (rqst.successCallback != null) {
         rqst.successCallback(this.id, this.resultsMap, rqst.caller)
     }

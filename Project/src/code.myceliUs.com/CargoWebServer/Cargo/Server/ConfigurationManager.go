@@ -51,6 +51,18 @@ func newConfigurationManager() *ConfigurationManager {
 	// The variable CARGOROOT must be set at first...
 	cargoRoot := os.Getenv("CARGOROOT")
 
+	if len(cargoRoot) == 0 {
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			panic(err)
+		}
+		if strings.Index(dir, "CargoWebServer") != -1 {
+			cargoRoot = dir[0:strings.Index(dir, "CargoWebServer")]
+		} else {
+			cargoRoot = dir
+		}
+	}
+
 	// Now I will load the configurations...
 	// Development...
 	dir, err := filepath.Abs(cargoRoot)

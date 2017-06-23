@@ -5,6 +5,8 @@ import (
 	"log"
 	"strings"
 
+	"regexp"
+
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/Utility"
 )
@@ -456,6 +458,24 @@ func (this *SecurityManager) canExecuteAction(sessionId string, actionName strin
 /////////////////////////////////////////////////////////////////////////////
 // Permission
 /////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Return the list of entity for a given permission.
+ */
+func (this *SecurityManager) getEntitiesByPermission(permission *CargoEntities.Permission) []Entity {
+	var entities []Entity
+	query := permission.GetId()
+
+	// I will retreive the datastore from the query...
+	regex := "p([a-z]+)ch"
+	match, _ := regexp.MatchString(regex, query)
+	log.Println(match)
+
+	//GetServer().GetEntityManager().getEntitiesByType()
+
+	return entities
+}
+
 /**
  * Determine if a user session has the permission to Create, Read,
  * Update or Delete a given entity.
@@ -466,11 +486,20 @@ func (this *SecurityManager) hasPermission(sessionId string, permissionType int,
 	var account *CargoEntities.Account
 	if session != nil {
 		account = session.GetAccountPtr()
+		owner := GetServer().GetEntityManager().getEntityOwner(entity)
+		if owner != nil {
+			if owner.GetUUID() == account.GetUUID() {
+				// Owner has all entity permission.
+				return nil
+			}
+		}
+
 		permissions := account.GetPermissionsRef()
 		for i := 0; i < len(permissions); i++ {
 			// Here I will evaluate the pattern that is a regular expression.
 			log.Println("--------> evaluate ", permissions[i].GetId())
 			// If the regex is a success then i will return nil here.
+
 		}
 	} else {
 		// Create the error message
@@ -575,6 +604,7 @@ func (this *SecurityManager) removePermission(accountId string, pattern string) 
 
 	if err == nil {
 		account := accountEntity.GetObject().(*CargoEntities.Account)
+
 		// Get or create the permission.
 		permissionUuid := CargoEntitiesPermissionExists(pattern)
 		var permissionEntity *CargoEntities_PermissionEntity

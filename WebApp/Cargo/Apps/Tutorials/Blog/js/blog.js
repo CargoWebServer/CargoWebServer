@@ -1,7 +1,7 @@
 
 // global variable.
 var databaseName = "Blog."
-var schemaId = "" //"dbo."
+var schemaId = "dbo."
 
 var userTypeName = databaseName + schemaId + "blog_user"
 var authorTypeName = databaseName + schemaId + "blog_author"
@@ -622,6 +622,9 @@ var BlogManager = function (parent) {
             if (evt.dataMap["entity"] != null && blogManager.activePostView.post != null) {
                 if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
                     console.log("delete post!")
+                    
+                    // remove the post lnk for the lst.
+                    blogManager.displayAuthorPost()
                 }
             }
         }
@@ -700,7 +703,7 @@ BlogManager.prototype.displayAuthorPost = function () {
                     // Here I will create the link with the title.
                     authorPostDiv.appendElement({ "tag": "div", "class": "row" }).down()
                         .appendElement({ "tag": "div", "class": "col-md-1" }).down()
-                        .appendElement({ "tag": "i", "class": "fa fa-trash-o delete-button", "style": "vertical-align: center;" }).up()
+                        .appendElement({ "tag": "i", "id": post.UUID + "_delete_btn", "class": "fa fa-trash-o delete-button", "style": "vertical-align: center;" }).up()
                         .appendElement({ "tag": "a", "id": post.UUID + "_lnk", "class": "col-md-10 control-label", "innerHtml": post.M_title, "href": "#" })
 
                     var postLnk = authorPostDiv.getChildById(post.UUID + "_lnk")
@@ -711,6 +714,24 @@ BlogManager.prototype.displayAuthorPost = function () {
                             blogManager.setEditable(caller.blogManager.activePostView)
                         }
                     }(post, caller.blogManager)
+
+                    var postDeleteBtn = authorPostDiv.getChildById(post.UUID + "_delete_btn")
+                    postDeleteBtn.element.onclick = function(post){
+                        return function(){
+                            console.log("-------> delete post: ", post)
+                            if(post != undefined){
+                                server.entityManager.removeEntity(post.UUID,
+                                // Success callback 
+                                function(results, caller){
+                                    console.log("Entity was remove sucessfully")
+                                },
+                                // Error callback
+                                function(errObj, caller){
+                                    // Nothing to do here...
+                                }, {/* no caller. */})
+                            }
+                        }
+                    }(post)
                 }
             },
             // Error callback.
@@ -1006,6 +1027,8 @@ var BlogPostView = function (parent, post) {
     ////////////////////////////////////////////////////////////////////////
     // Post view actions.
     ////////////////////////////////////////////////////////////////////////
+    // The delete action...
+
 
     return this
 }
