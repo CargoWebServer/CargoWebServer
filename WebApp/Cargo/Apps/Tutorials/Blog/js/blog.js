@@ -279,7 +279,7 @@ var BlogManager = function (parent) {
         .appendElement({ "tag": "span", "class": "fa fa-search" }).up().up().up().up()
 
         // Blog Categories Well // TODO populate it with the db content.
-        .appendElement({ "tag": "div", "class": "well", "id": "blog-categories" }).down()
+        .appendElement({ "tag": "div", "class": "well", "id": "blog-categories", "style": "display: none;" }).down()
         .appendElement({ "tag": "h4", "id": "blog-categories-title" }).down()
         .appendElement({ "tag": "div", "id": "new-blog-categories-btn" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-plus" }).up().up()
@@ -291,7 +291,7 @@ var BlogManager = function (parent) {
         .up().up()
 
         // The side well widget.
-        .appendElement({ "tag": "div", "class": "well" }).down()
+        .appendElement({ "tag": "div", "class": "well", "style": "display: none;" }).down()
         .appendElement({ "tag": "h4" })
         .appendElement({ "tag": "p", "id": "side-well-widget" }).up().appendElement({ "tag": "hr" }).up()
 
@@ -312,6 +312,7 @@ var BlogManager = function (parent) {
     this.loginLnk = this.navBar.getChildById("login-lnk")
     this.registerLnk = this.navBar.getChildById("register-lnk")
     this.userInfoLnk = this.navBar.getChildById("user-info-lnk")
+
     // The new category button...
     this.newCategoryBtn = this.container.getChildById("new-blog-categories-btn")
     this.categoryContentDiv = this.container.getChildById("blog-categories-content")
@@ -361,6 +362,7 @@ var BlogManager = function (parent) {
         return function () {
             // Here I will create a div to display to edit the new category name...
             if (document.getElementById("save_category_btn") == undefined) {
+
                 var newCategoryPanel = blogManager.newCategoryBtn.appendElement({ "tag": "div", "class": "well", "style": "display: table; background-color: white; position: absolute; width: 200px;" }).down()
                 newCategoryPanel.appendElement({ "tag": "input", "id": "new_category_input", "class": "form-control", "placeholder": "Category Name" })
                     .appendElement({ "tag": "button", "id": "save_category_btn", "class": "form-control btn btn-info", "style": "margin-top: 5px;" }).down()
@@ -371,6 +373,7 @@ var BlogManager = function (parent) {
                 var saveCategoryBtn = blogManager.newCategoryBtn.getChildById("save_category_btn")
                 var newCategoryInput = blogManager.newCategoryBtn.getChildById("new_category_input")
                 newCategoryInput.element.focus() // set the focus...
+
                 saveCategoryBtn.element.onclick = function (blogManager, newCategoryPanel, newCategoryInput) {
                     return function (evt) {
                         evt.stopPropagation();
@@ -379,12 +382,16 @@ var BlogManager = function (parent) {
                         category.M_enable = true
                         category.M_date_created = new Date()
 
+                        // TODO append category to the post.
+                        var post = blogManager.activePostView.post
+
                         blogManager.appendCategory(category)
 
                         // Remove the panel
                         blogManager.newCategoryBtn.removeElement(newCategoryPanel)
                     }
                 }(blogManager, newCategoryPanel, newCategoryInput)
+                
             } else {
                 var newCategoryPanel = blogManager.newCategoryBtn.childs[Object.keys(blogManager.newCategoryBtn.childs)[1]]
                 blogManager.newCategoryBtn.removeElement(newCategoryPanel)
@@ -393,7 +400,7 @@ var BlogManager = function (parent) {
     }(this)
 
     // Get the list of existing categories.
-    server.entityManager.getObjectsByType(categoryTypeName, "Blog", "",
+    /*server.entityManager.getObjectsByType(categoryTypeName, "Blog", "",
         // progress callback
         function (index, total, caller) {
             // Nothing to do here.
@@ -409,7 +416,7 @@ var BlogManager = function (parent) {
         function (errObj, caller) {
 
         },
-        { "blogManager": this })
+        { "blogManager": this })*/
 
     // Now the mouse out event.
     this.registerDropDown = this.navBar.getChildById("register-dropdown")
@@ -670,12 +677,6 @@ var BlogManager = function (parent) {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //  Event listener's
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    server.entityManager.attach(this, NewEntityEvent, function (evt, blogManager) {
-        if (evt.dataMap["entity"].TYPENAME == categoryTypeName) {
-            var category = evt.dataMap["entity"]
-            blogManager.appendCategory(category)
-        }
-    })
 
     // The delete entity event.
     server.entityManager.attach(this, DeleteEntityEvent, function (evt, blogManager) {
@@ -709,7 +710,7 @@ var BlogManager = function (parent) {
                     // I will reinit the panel here...
                     if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
                         // Udate the author post.
-                        blogManager.activePostView = new BlogPostView(blogManager.blogContainer, server.entityManager.entities[evt.dataMap["entity"].UUID])
+                        blogManager.activePostView = new BlogPostView(blogManager.blogContainer, server.entityManager.entities[evt.dataMap["entity"].UUID], blogManager.categoryContentDiv)
 
                         // Set the blog view editable.
                         blogManager.setEditable(blogManager.activePostView)
@@ -725,82 +726,6 @@ var BlogManager = function (parent) {
     })
 
     return this
-}
-
-/**
- * Append a new category in the category div.
- */
-BlogManager.prototype.appendCategory = function (category) {
-    if (category.UUID.length == 0) {
-        // Here the category dosen't exist...
-        var query = "SELECT MAX(id) FROM " + categoryTypeName
-        server.dataManager.read("Blog", query, ["int"], [],
-            // success callback
-            function (results, caller) {
-                // The last id...
-                var lastId = 1
-                if (results[0][0][0] != null) {
-                    lastId = parseInt(results[0][0]) + 1
-                }
-
-                // Now I will save the category...
-                category.M_id = lastId
-                server.entityManager.saveEntity(category,
-                    // Success callback
-                    function (result, caller) {
-                        // Nothing to do here I will use new entity event instead.
-                    },
-                    // Error callback
-                    function () {
-
-                    },
-                    caller.blogManager)
-            },
-            // progress callback
-            function (index, total, caller) {
-
-            },
-            // error callback
-            function (errObj) {
-
-            },
-            { "blogManager": this, "category": category })
-
-    } else {
-        // Here the category already exist.
-        var categoryContentDiv
-        if (category.M_id % 2 == 0) {
-            categoryContentDiv = this.categoryContentDiv.childs[Object.keys(this.categoryContentDiv.childs)[1]].lastChild
-        } else {
-            categoryContentDiv = this.categoryContentDiv.childs[Object.keys(this.categoryContentDiv.childs)[0]].lastChild
-        }
-
-        // I will append the category...
-        var lnk = categoryContentDiv.appendElement({ "tag": "li", "id": category.UUID + "_li" }).down()
-        var deleteCategoryBtn = lnk.appendElement({ "tag": "i", "id": category.UUID + "_delete_btn", "class": "fa fa-trash-o delete-button category_delete_btn", "style": "vertical-align: center; padding-right: 10px; display: none;" }).down()
-        lnk.appendElement({ "tag": "a", innerHtml: category.M_name })
-
-        // if the user is logged i will show the delete button.
-        if (this.account != undefined) {
-            deleteCategoryBtn.element.style.display = ""
-        }
-
-        // Now the delete action.
-        deleteCategoryBtn.element.onclick = function (category) {
-            return function () {
-                server.entityManager.removeEntity(category.UUID,
-                    /** Success Callback */
-                    function (result, caller) {
-
-                    },
-                    /** Error Callback  */
-                    function (errObj, caller) {
-
-                    },
-                    {})
-            }
-        }(category)
-    }
 }
 
 /**
@@ -828,7 +753,8 @@ BlogManager.prototype.displayAuthorPost = function () {
         this.authorPostDiv.element.innerHTML = ""
     }
 
-    this.newCategoryBtn.element.style.display = "block"
+    this.sideWellWidget.element.parentNode.style.display = "block"
+
 
     // Now I will get the all post from a given author.
     if (isObject(this.account.M_userRef)) {
@@ -852,11 +778,12 @@ BlogManager.prototype.displayAuthorPost = function () {
                     var postLnk = authorPostDiv.getChildById(post.UUID + "_lnk")
                     postLnk.element.onclick = function (post, blogManager) {
                         return function () {
-                            blogManager.activePostView = new BlogPostView(blogManager.blogContainer, post)
+                            blogManager.activePostView = new BlogPostView(blogManager.blogContainer, post, blogManager.categoryContentDiv)
                             // Set the blog view editable.
                             blogManager.setEditable(caller.blogManager.activePostView)
 
                             // Here I will also display the new category button.
+                            blogManager.newCategoryBtn.element.style.display = "block"
 
                         }
                     }(post, caller.blogManager)
@@ -939,7 +866,7 @@ BlogManager.prototype.createNewPost = function (author) {
                         // Success callback.
                         function (post, caller) {
                             // Create a new Blog.
-                            caller.blogManager.activePostView = new BlogPostView(caller.blogManager.blogContainer, post)
+                            caller.blogManager.activePostView = new BlogPostView(caller.blogManager.blogContainer, post, caller.blogManager.categoryContentDiv)
 
                             // Set the blog view editable.
                             caller.blogManager.setEditable(caller.blogManager.activePostView)
@@ -1062,7 +989,7 @@ BlogManager.prototype.saveActivePost = function () {
 /**
  * There is the blog the blog view.
  */
-var BlogPostView = function (parent, post) {
+var BlogPostView = function (parent, post, categoryContentDiv) {
 
     // Reset the parent content here.
     parent.removeAllChilds()
@@ -1070,6 +997,16 @@ var BlogPostView = function (parent, post) {
 
     // A reference to the post.
     this.post = post
+
+    // The list of category for that post.
+    this.categoryContentDiv = categoryContentDiv
+    this.categoryContentDiv.element.parentNode.style.display = ""
+    this.categoryContentDiv.removeAllChilds()
+
+    // Now I will display the categories...
+    for (var i = 0; i < post.M_fk_posts_to_categories_1.length; i++) {
+        this.appendCategory(post.M_fk_posts_to_categories_1[i])
+    }
 
     // The blog text interface elements
     var languageInfo = {
@@ -1173,10 +1110,96 @@ var BlogPostView = function (parent, post) {
     ////////////////////////////////////////////////////////////////////////
     // Post view actions.
     ////////////////////////////////////////////////////////////////////////
-    // The delete action...
 
+    ////////////////////////////////////////////////////////////////////////
+    // Post view listener.
+    ////////////////////////////////////////////////////////////////////////
+    server.entityManager.attach(this, NewEntityEvent, function (evt, blogView) {
+        if (evt.dataMap["entity"].TYPENAME == categoryTypeName) {
+            var category = evt.dataMap["entity"]
+            blogView.appendCategory(category)
+        }
+    })
 
     return this
+}
+
+/**
+ * Append a new category in the category div.
+ */
+BlogPostView.prototype.appendCategory = function (category) {
+    if (category.UUID.length == 0) {
+        // Here the category dosen't exist...
+        var query = "SELECT MAX(id) FROM " + categoryTypeName
+        server.dataManager.read("Blog", query, ["int"], [],
+            // success callback
+            function (results, category) {
+                // The last id...
+                var lastId = 1
+                if (results[0][0][0] != null) {
+                    lastId = parseInt(results[0][0]) + 1
+                }
+
+                // Now I will save the category...
+                category.M_id = lastId
+                server.entityManager.saveEntity(category,
+                    // Success callback
+                    function (result, caller) {
+                        // Nothing to do here I will use new entity event instead.
+                    },
+                    // Error callback
+                    function () {
+
+                    },
+                    {})
+            },
+            // progress callback
+            function (index, total, caller) {
+
+            },
+            // error callback
+            function (errObj) {
+
+            },
+            category)
+
+    } else {
+        // Here the category already exist.
+        var categoryContentDiv
+        var l0 = this.categoryContentDiv.childs[Object.keys(this.categoryContentDiv.childs)[0]].element.firstChild.childNodes.length
+        var l1 = this.categoryContentDiv.childs[Object.keys(this.categoryContentDiv.childs)[1]].element.firstChild.childNodes.length
+        if (l1 <= l0) {
+            categoryContentDiv = this.categoryContentDiv.childs[Object.keys(this.categoryContentDiv.childs)[1]].lastChild
+        } else {
+            categoryContentDiv = this.categoryContentDiv.childs[Object.keys(this.categoryContentDiv.childs)[0]].lastChild
+        }
+
+        // I will append the category...
+        var lnk = categoryContentDiv.appendElement({ "tag": "li", "id": category.UUID + "_li" }).down()
+        var deleteCategoryBtn = lnk.appendElement({ "tag": "i", "id": category.UUID + "_delete_btn", "class": "fa fa-trash-o delete-button category_delete_btn", "style": "vertical-align: center; padding-right: 10px; display: none;" }).down()
+        lnk.appendElement({ "tag": "a", innerHtml: category.M_name })
+
+        // if the user is logged i will show the delete button.
+        if (this.account != undefined) {
+            deleteCategoryBtn.element.style.display = ""
+        }
+
+        // Now the delete action.
+        deleteCategoryBtn.element.onclick = function (category) {
+            return function () {
+                server.entityManager.removeEntity(category.UUID,
+                    /** Success Callback */
+                    function (result, caller) {
+
+                    },
+                    /** Error Callback  */
+                    function (errObj, caller) {
+
+                    },
+                    {})
+            }
+        }(category)
+    }
 }
 
 /**

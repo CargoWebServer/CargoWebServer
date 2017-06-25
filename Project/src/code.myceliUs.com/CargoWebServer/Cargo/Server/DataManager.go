@@ -256,6 +256,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 													// Set the value.
 													data[i][dataIndex[j]] = sqlData[0][j]
 												}
+
 											} else {
 												return data, errors.New("No sql data was found for entity " + data[i][0].(string))
 											}
@@ -343,7 +344,6 @@ func (this *DataManager) setManyToManyEntityRelationship(tableName string, name 
 			return errors.New("The datastore '" + storeName + "' does not exist.")
 		}
 
-		// Retreive id's
 		data, err := store.Read(query, fieldsType, params)
 		if err != nil {
 			log.Println(query)
@@ -371,10 +371,9 @@ func (this *DataManager) setManyToManyEntityRelationship(tableName string, name 
 				}
 			}
 		}
-
 	} else {
-		// Init that case I need to save the content of entity relationship.
-
+		// Here I will create the value...
+		log.Println("-------> tableName ", tableName, name, fields, fields, targetIdFields, src)
 	}
 
 	return nil
@@ -961,15 +960,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 
 					// Update the entity.
 					err = this.updateData(dataBaseName, query, data, ids)
-					if err != nil {
-						log.Println("Datamanager.go 681 -------> update data fail!")
-						log.Println(query)
-						log.Println(data)
-						log.Println(ids)
-					} else {
-						// Set it entity references.
-						this.setEntityReferences(uuid, false, false)
-					}
+
 				}
 			}
 		}

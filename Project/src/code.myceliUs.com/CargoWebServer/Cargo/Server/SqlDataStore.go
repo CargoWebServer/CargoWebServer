@@ -1393,11 +1393,11 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 	// Contain entity info without parent uuid.
 	entityInfos := make(map[string]map[string]map[string]interface{}, 0)
-	log.Println("------> synchronize")
 	// First of all I will sychronize create the entities information if it dosen't exist.
 	for i := 0; i < len(prototypes); i++ {
 		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
-		if !this.isAssociative(prototype) { // Associative table object are not needed...
+		if !this.isAssociative(prototype) {
+			// Associative table object are not needed...
 			if len(prototype.Ids) > 1 {
 				query := "SELECT "
 				fieldsType := make([]interface{}, 0)
@@ -1436,9 +1436,6 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 				}
 
 				// append index fields
-				// TODO index only or all field's...
-				//for j := 0; j < len(prototype.Indexs); j++ {
-				//	field := prototype.Fields[prototype.getFieldIndex(prototype.Indexs[j])]
 				for j := 0; j < len(prototype.Fields); j++ {
 					field := prototype.Fields[j]
 					// Not an id...
@@ -1544,7 +1541,8 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 	// I will generate ParentUuid and UUID for the infos.
 	for i := 0; i < len(prototypes); i++ {
-		if !this.isAssociative(prototypes[i]) { // Associative table object are not needed...
+		if !this.isAssociative(prototypes[i]) {
+			// Associative table object are not needed...
 			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
 			for key, info := range entityInfos[prototype.TypeName] {
 				uuid := generateUuid(key, info, entityInfos)

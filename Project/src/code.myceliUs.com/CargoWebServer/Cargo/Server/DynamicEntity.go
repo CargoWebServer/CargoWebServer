@@ -600,7 +600,6 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 	if storeId == "sql_info" {
 		// Now I will initialyse references
 		dataManager.setEntityReferences(this.uuid, true, false)
-
 	}
 
 	return nil
