@@ -193,6 +193,9 @@ Table.prototype.init = function () {
 					var rowsId = {}
 
 					for (var rowIndex in table.rows) {
+						if (table.header == null) {
+							table.setHeader()
+						}
 						var row = table.rows[rowIndex]
 						if (row.id != entity.UUID) {
 							row.index = rows.length
@@ -235,6 +238,9 @@ Table.prototype.init = function () {
 		for (var i = 0; i < this.model.getRowCount(); i++) {
 			var data = []
 			for (var j = 0; j < this.model.getColumnCount(); j++) {
+				if (this.header == null) {
+					this.setHeader()
+				}
 				var value = this.model.getValueAt(i, j)
 				data.push(value)
 			}
@@ -370,7 +376,9 @@ Table.prototype.filterValues = function () {
 Table.prototype.refresh = function () {
 	// Add items to HTML table element
 	for (var rowIndex in this.orderedRows) {
-		this.header.div.element.style.display = ""
+		if (this.header != null) {
+			this.header.div.element.style.display = ""
+		}
 		var item = this.orderedRows[rowIndex].div
 		if (item != undefined) {
 			this.rowGroup.element.appendChild(item.element)
@@ -505,7 +513,9 @@ var TableHeader = function (table) {
 	this.minimizeBtn.element.onclick = function (rowGroup, maximizeBtn, numberOfRowLabel, table) {
 		return function () {
 			this.style.display = "none"
-			rowGroup.element.style.display = "none"
+			if (rowGroup != null) {
+				rowGroup.element.style.display = "none"
+			}
 			maximizeBtn.element.style.display = "table-cell"
 			if (table.rows.length > 0) {
 				numberOfRowLabel.element.style.display = "table-cell"
@@ -571,9 +581,9 @@ var TableRow = function (table, index, data, id) {
 		return
 	}
 
-	if (table.header == null) {
+	/*if (table.header == null) {
 		table.setHeader()
-	}
+	}*/
 
 	this.index = index
 	this.table = table
@@ -1339,7 +1349,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "0.01" }).down()
 			editor.element.value = value
 		} else if (isXsBoolean(type)) {
-			editor = this.div.appendElement({ "tag": "input", "type": "checkbox"}).down()
+			editor = this.div.appendElement({ "tag": "input", "type": "checkbox" }).down()
 			editor.element.checked = value
 		} else if (isXsInt(type)) {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "1" }).down()

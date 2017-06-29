@@ -55,7 +55,7 @@ DeleteRoleEvent = 26
 UpdateRoleEvent = 27
 ProjectEvent = "ProjectEvent"
 EmailEvent = "EmailEvent"
-
+ServiceEvent = "ServiceEvent"
 /**
 * EventHub contructor
 * @constructor
@@ -120,7 +120,7 @@ EventHub.prototype.attach = function (observer, eventId, updateFct) {
         this.observers[eventId].push(observer)
     }
 
-    if (observer.updateFunctions == undefined){
+    if (observer.updateFunctions == undefined) {
         observer.updateFunctions = {}
     }
 
@@ -214,10 +214,10 @@ var EventHandler = function () {
     /**
      * @property channels The channel 
      */
-     this.channels = {}
+    this.channels = {}
 
-     return this
- }
+    return this
+}
 
 /**
 * Append a new event manager.
@@ -319,7 +319,7 @@ EventHandler.prototype.appendEventFilter = function (filter, channelId, successC
             server.errorManager.onError(errMsg)
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-        )
+    )
 }
 
 /**
@@ -371,5 +371,5 @@ EventHandler.prototype.broadcastNetworkEvent = function (evtNumber, evtName, eve
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-        )
+    )
 }

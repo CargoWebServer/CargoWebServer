@@ -4,7 +4,6 @@ package Server
 
 import (
 	"encoding/json"
-	//	"log"
 	"strings"
 	"unsafe"
 
@@ -18,13 +17,13 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "UUID")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "UUID")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -8706,54 +8705,58 @@ func (this *EntityManager) create_Config_ServerConfigurationEntityPrototype() {
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.int")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 6)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_servicePort")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_ws_serviceContainerPort")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.int")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 7)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_applicationsPath")
-	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_tcp_serviceContainerPort")
+	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.int")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 8)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_dataPath")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_applicationsPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 9)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_scriptsPath")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_dataPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 10)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_definitionsPath")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_scriptsPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 11)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_schemasPath")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_definitionsPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 12)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_tmpPath")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_schemasPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 13)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
-	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_binPath")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_tmpPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 14)
+	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_binPath")
+	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 15)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_queriesPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 
 	/** associations of ServerConfiguration **/
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 15)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 16)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_parentPtr")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "childsUuid")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "[]xs.string")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 16)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 17)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "referenced")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "[]EntityRef")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 17)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 18)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
@@ -8785,7 +8788,8 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_hostName")
 	query.Fields = append(query.Fields, "M_ipv4")
 	query.Fields = append(query.Fields, "M_serverPort")
-	query.Fields = append(query.Fields, "M_servicePort")
+	query.Fields = append(query.Fields, "M_ws_serviceContainerPort")
+	query.Fields = append(query.Fields, "M_tcp_serviceContainerPort")
 	query.Fields = append(query.Fields, "M_applicationsPath")
 	query.Fields = append(query.Fields, "M_dataPath")
 	query.Fields = append(query.Fields, "M_scriptsPath")
@@ -8816,7 +8820,8 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_hostName)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_ipv4)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_serverPort)
-	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_servicePort)
+	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_ws_serviceContainerPort)
+	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_tcp_serviceContainerPort)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_applicationsPath)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_dataPath)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_scriptsPath)
@@ -8888,7 +8893,8 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string, lazy bool) e
 	query.Fields = append(query.Fields, "M_hostName")
 	query.Fields = append(query.Fields, "M_ipv4")
 	query.Fields = append(query.Fields, "M_serverPort")
-	query.Fields = append(query.Fields, "M_servicePort")
+	query.Fields = append(query.Fields, "M_ws_serviceContainerPort")
+	query.Fields = append(query.Fields, "M_tcp_serviceContainerPort")
 	query.Fields = append(query.Fields, "M_applicationsPath")
 	query.Fields = append(query.Fields, "M_dataPath")
 	query.Fields = append(query.Fields, "M_scriptsPath")
@@ -8949,56 +8955,61 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string, lazy bool) e
 			this.object.M_serverPort = results[0][5].(int)
 		}
 
-		/** servicePort **/
+		/** ws_serviceContainerPort **/
 		if results[0][6] != nil {
-			this.object.M_servicePort = results[0][6].(int)
+			this.object.M_ws_serviceContainerPort = results[0][6].(int)
+		}
+
+		/** tcp_serviceContainerPort **/
+		if results[0][7] != nil {
+			this.object.M_tcp_serviceContainerPort = results[0][7].(int)
 		}
 
 		/** applicationsPath **/
-		if results[0][7] != nil {
-			this.object.M_applicationsPath = results[0][7].(string)
+		if results[0][8] != nil {
+			this.object.M_applicationsPath = results[0][8].(string)
 		}
 
 		/** dataPath **/
-		if results[0][8] != nil {
-			this.object.M_dataPath = results[0][8].(string)
+		if results[0][9] != nil {
+			this.object.M_dataPath = results[0][9].(string)
 		}
 
 		/** scriptsPath **/
-		if results[0][9] != nil {
-			this.object.M_scriptsPath = results[0][9].(string)
+		if results[0][10] != nil {
+			this.object.M_scriptsPath = results[0][10].(string)
 		}
 
 		/** definitionsPath **/
-		if results[0][10] != nil {
-			this.object.M_definitionsPath = results[0][10].(string)
+		if results[0][11] != nil {
+			this.object.M_definitionsPath = results[0][11].(string)
 		}
 
 		/** schemasPath **/
-		if results[0][11] != nil {
-			this.object.M_schemasPath = results[0][11].(string)
+		if results[0][12] != nil {
+			this.object.M_schemasPath = results[0][12].(string)
 		}
 
 		/** tmpPath **/
-		if results[0][12] != nil {
-			this.object.M_tmpPath = results[0][12].(string)
+		if results[0][13] != nil {
+			this.object.M_tmpPath = results[0][13].(string)
 		}
 
 		/** binPath **/
-		if results[0][13] != nil {
-			this.object.M_binPath = results[0][13].(string)
+		if results[0][14] != nil {
+			this.object.M_binPath = results[0][14].(string)
 		}
 
 		/** queriesPath **/
-		if results[0][14] != nil {
-			this.object.M_queriesPath = results[0][14].(string)
+		if results[0][15] != nil {
+			this.object.M_queriesPath = results[0][15].(string)
 		}
 
 		/** associations of ServerConfiguration **/
 
 		/** parentPtr **/
-		if results[0][15] != nil {
-			id := results[0][15].(string)
+		if results[0][16] != nil {
+			id := results[0][16].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -9006,7 +9017,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string, lazy bool) e
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][16].(string)
+		childsUuidStr := results[0][17].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -9015,7 +9026,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string, lazy bool) e
 			}
 		}
 
-		referencedStr := results[0][17].(string)
+		referencedStr := results[0][18].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)

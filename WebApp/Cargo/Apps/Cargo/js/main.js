@@ -24,8 +24,8 @@
  * This global object represent a reference to the distant server.
  * @see Server
  */
-var server = new Server("localhost", "127.0.0.1", 9393)
-//var server = new Server("www.cargowebserver.com", "10.67.44.63", 9393)
+// var server = new Server("localhost", "127.0.0.1", 9393)
+var server = new Server("www.cargowebserver.com", "10.67.44.63", 9393)
 
 // Amazon ec2 sever...
 //var server = new Server("www.cargowebserver.com", "54.218.110.52", 9393)
@@ -57,6 +57,7 @@ function load() {
             server.emailManager = new EmailManager()
             server.projectManager = new ProjectManager()
             server.securityManager = new SecurityManager()
+            server.serviceManager = new ServiceManager()
 
             // Register the listener to the server.
             server.accountManager.registerListener()
@@ -67,6 +68,7 @@ function load() {
             server.emailManager.registerListener()
             server.projectManager.registerListener()
             server.securityManager.registerListener()
+            server.serviceManager.registerListener()
 
         },  // onOpen callback
         function () { // onClose callback

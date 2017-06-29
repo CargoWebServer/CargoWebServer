@@ -152,7 +152,7 @@ func newCacheManager() *CacheManager {
 func (this *CacheManager) initialize() {
 
 	log.Println("--> Initialize CacheManager")
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 	this.inputEntityChannel = make(chan Entity)
 	this.outputEntityChannel = make(chan struct {
 		entityUuid          string

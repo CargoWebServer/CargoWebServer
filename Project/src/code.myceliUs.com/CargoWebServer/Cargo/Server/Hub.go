@@ -44,22 +44,26 @@ func NewHub() *Hub {
 
 	go func() {
 		for t := range h.ticker.C {
-			for _, conn := range h.connections {
-				if conn.IsOpen() {
-					id := Utility.RandomUUID()
-					method := "Ping"
-					params := make([]*MessageData, 0)
-					to := make([]connection, 1)
-					to[0] = conn
-					ping, err := NewRequestMessage(id, method, params, to, nil, nil, nil)
-					if err != nil {
-						log.Println(err, " at time ", t)
+			for id, conn := range h.connections {
+				if conn != nil {
+					if conn.IsOpen() {
+						id := Utility.RandomUUID()
+						method := "Ping"
+						params := make([]*MessageData, 0)
+						to := make([]connection, 1)
+						to[0] = conn
+						ping, err := NewRequestMessage(id, method, params, to, nil, nil, nil)
+						if err != nil {
+							log.Println(err, " at time ", t)
+						}
+
+						GetServer().GetProcessor().m_pendingRequestChannel <- ping
+
+					} else {
+						GetServer().GetSessionManager().removeClosedSession()
 					}
-
-					GetServer().GetProcessor().m_pendingRequestChannel <- ping
-
 				} else {
-					GetServer().GetSessionManager().removeClosedSession()
+					delete(h.connections, id)
 				}
 			}
 		}
@@ -73,15 +77,17 @@ func (this *Hub) run() {
 		select {
 		case c := <-this.register:
 			this.connections[c.GetUuid()] = c
-
 			// initialyse js interpreter for the new connection.
-			vm := JS.GetJsRuntimeManager().CreateVm(c.GetUuid())
+			if c.GetPort() == GetServer().GetConfigurationManager().GetServerPort() {
 
-			// put server object in it context.
-			vm.Set("server", GetServer())
+				vm := JS.GetJsRuntimeManager().CreateVm(c.GetUuid())
 
-			// Init scripts
-			JS.GetJsRuntimeManager().InitScripts(c.GetUuid())
+				// put server object in it context.
+				vm.Set("server", GetServer())
+
+				// Init scripts
+				JS.GetJsRuntimeManager().InitScripts(c.GetUuid())
+			}
 
 		case c := <-this.unregister:
 			delete(this.connections, c.GetUuid())

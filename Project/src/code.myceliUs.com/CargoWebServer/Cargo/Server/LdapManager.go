@@ -47,7 +47,7 @@ func (this *LdapManager) initialize() {
 	// register service avalaible action here.
 	log.Println("--> initialyze LdapManager")
 	// Create the default configurations
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 }
 
 func (this *LdapManager) getId() string {

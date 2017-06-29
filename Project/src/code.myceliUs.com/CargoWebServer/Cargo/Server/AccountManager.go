@@ -42,7 +42,7 @@ func (this *Server) GetAccountManager() *AccountManager {
  */
 func (this *AccountManager) initialize() {
 
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	entities := GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities)
 	// Create the admin account if it doesn't exist

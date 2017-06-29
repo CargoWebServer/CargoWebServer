@@ -42,6 +42,9 @@ type connection interface {
 
 	// get the connection string...
 	GetAddrStr() string
+
+	// Return the port.
+	GetPort() int
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -87,6 +90,13 @@ func (c *tcpSocketConnection) GetAddrStr() string {
 	return address
 }
 
+func (c *tcpSocketConnection) GetPort() int {
+	address := c.m_socket.RemoteAddr().String()
+	port, _ := strconv.Atoi(address[strings.LastIndex(address, ":")+1:])
+
+	return port
+}
+
 func (c *tcpSocketConnection) GetUuid() string {
 	return c.m_uuid
 }
@@ -115,6 +125,10 @@ func (c *tcpSocketConnection) Open(host string, port int) (err error) {
 		c.m_isOpen = true
 	}
 
+	// Start reading and writing loop's
+	go c.Writer()
+	go c.Reader()
+
 	return nil
 }
 
@@ -131,17 +145,16 @@ func (c *tcpSocketConnection) IsOpen() bool {
 }
 
 func (c *tcpSocketConnection) Send(data []byte) {
+	log.Println("----------> send tcp socket data 148")
 	msgSize := make([]byte, 4)
 	binary.LittleEndian.PutUint32(msgSize, uint32(len(data)))
 	var data_ []byte
 	data_ = append(data_, msgSize...)
 	data_ = append(data_, data...)
 	c.send <- data_
-
 }
 
 func (c *tcpSocketConnection) Reader() {
-	//log.Println("Open new tcp connection whit id ", c.GetUuid())
 	for c.m_isOpen == true {
 		var in []byte
 
@@ -172,11 +185,10 @@ func (c *tcpSocketConnection) Writer() {
 	for c.m_isOpen == true {
 		for message := range c.send {
 			// I will get the message here...
+			log.Println("--------> send message!-)")
 			c.m_socket.Write(message)
 		}
-		time.Sleep(time.Duration(time.Millisecond))
 	}
-	//log.Println("Close the tcp connection writer ", c.GetUuid())
 	c.Close()
 }
 
@@ -208,9 +220,20 @@ func NewWebSocketConnection() *webSocketConnection {
 }
 
 func (c *webSocketConnection) GetAddrStr() string {
-	address := c.m_socket.Request().RemoteAddr
+	var address string
+	if c.m_socket.IsServerConn() {
+		address = c.m_socket.Request().RemoteAddr
+	} else {
+		address = c.m_socket.RemoteAddr().String()[5:] // ws:// (5 char to remove)
+	}
 	address = address[:strings.Index(address, ":")] // Remove the port...
 	return address
+}
+
+func (c *webSocketConnection) GetPort() int {
+	address := c.m_socket.RemoteAddr().String()
+	port, _ := strconv.Atoi(address[strings.LastIndex(address, ":")+1:])
+	return port
 }
 
 func (c *webSocketConnection) GetUuid() string {
@@ -218,12 +241,11 @@ func (c *webSocketConnection) GetUuid() string {
 }
 
 func (c *webSocketConnection) GenerateUuid() {
-	c.m_isOpen = true
 	c.m_uuid = uuid.NewRandom().String()
 }
 
 func (c *webSocketConnection) Open(host string, port int) (err error) {
-	c.m_isOpen = true
+
 	// Open the socket...
 	url := "http://" + host + ":" + strconv.Itoa(port)
 	origin := "ws://" + host + ":" + strconv.Itoa(port)
@@ -231,6 +253,9 @@ func (c *webSocketConnection) Open(host string, port int) (err error) {
 	if err != nil {
 		return err
 	}
+
+	c.m_isOpen = true
+
 	return nil
 }
 
@@ -260,11 +285,7 @@ func (c *webSocketConnection) Reader() {
 		if err == nil {
 			GetServer().GetHub().receivedMsg <- msg
 		}
-
 	}
-	// End the connection...
-	c.Close()
-	c.m_isOpen = false
 }
 
 func (c *webSocketConnection) Writer() {
@@ -273,9 +294,7 @@ func (c *webSocketConnection) Writer() {
 			// I will get the message here...
 			websocket.Message.Send(c.m_socket, message)
 		}
-		time.Sleep(time.Duration(time.Millisecond))
 	}
-	c.Close()
 }
 
 // The web socket handler function...
@@ -283,6 +302,7 @@ func HttpHandler(ws *websocket.Conn) {
 	// Here I will create the new connection...
 	c := NewWebSocketConnection()
 	c.m_socket = ws
+	c.m_isOpen = true
 
 	GetServer().GetHub().register <- c
 

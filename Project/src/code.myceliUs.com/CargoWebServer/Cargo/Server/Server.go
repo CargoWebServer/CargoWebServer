@@ -2,6 +2,7 @@ package Server
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"os"
 	"os/exec"
@@ -285,21 +286,25 @@ func (this *Server) Connect(host string, port int) error {
 
 	// Open the a new connection with the server.
 	err := conn.Open(host, port)
+
 	if err != nil {
 		return err // The connection fail...
+	}
+
+	if !conn.IsOpen() {
+		return errors.New("Fail to open connection with socket " + host + " at port " + strconv.Itoa(port))
 	}
 
 	// Here I will create the new connection...
 	this.hub.register <- conn
 
-	// Start the writing loop...
-	go conn.Writer()
-
-	// Start the reading loop...
-	go conn.Reader()
-
 	// Keep the reference... host:port will be the id.
-	this.peers[host+":"+strconv.Itoa(port)] = conn
+	connectionId := host + ":" + strconv.Itoa(port)
+	this.peers[connectionId] = conn
+
+	// Start reading and writing loop's
+	go conn.Writer()
+	go conn.Reader()
 
 	return nil
 }
@@ -308,10 +313,14 @@ func (this *Server) Connect(host string, port int) error {
  * Close the connection with the other server.
  */
 func (this *Server) Disconnect(host string, port int) {
-	conn := this.peers[host+":"+strconv.Itoa(port)]
+
+	connectionId := host + ":" + strconv.Itoa(port)
+	conn := this.peers[connectionId]
+
 	if conn != nil {
+		//this.hub.unregister <- conn
 		conn.Close()
-		delete(this.peers, host+":"+strconv.Itoa(port))
+		delete(this.peers, connectionId)
 	}
 }
 

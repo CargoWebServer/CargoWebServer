@@ -73,7 +73,7 @@ func (this *DataManager) initialize() {
 	//log.Println("--> Initialize DataManager")
 
 	// Create the default configurations
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	// Here I will get the datastore configuration...
 	storeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetDataStoreConfigs()

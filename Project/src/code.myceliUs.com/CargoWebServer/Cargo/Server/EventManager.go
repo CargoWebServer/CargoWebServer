@@ -88,7 +88,7 @@ func newEventManager() *EventManager {
  */
 func (this *EventManager) initialize() {
 	log.Println("--> Initialize EventManager")
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	this.m_eventDataMap = make(map[*Event]string, 0)
 }

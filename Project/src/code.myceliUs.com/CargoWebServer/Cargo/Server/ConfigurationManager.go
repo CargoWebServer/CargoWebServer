@@ -111,7 +111,7 @@ func newConfigurationManager() *ConfigurationManager {
 	configurationManager.appendDefaultDataStoreConfiguration(sqlInfoDB)
 
 	// Create the default configurations
-	configurationManager.setServiceConfiguration(configurationManager.getId())
+	configurationManager.setServiceConfiguration(configurationManager.getId(), -1)
 
 	return configurationManager
 }
@@ -144,7 +144,8 @@ func (this *ConfigurationManager) initialize() {
 
 		activeConfigurations.M_serverConfig.M_id = "CARGO_DEFAULT_SERVER"
 		activeConfigurations.M_serverConfig.M_serverPort = 9393
-		activeConfigurations.M_serverConfig.M_servicePort = 9494
+		activeConfigurations.M_serverConfig.M_ws_serviceContainerPort = 9494
+		activeConfigurations.M_serverConfig.M_tcp_serviceContainerPort = 9595
 		activeConfigurations.M_serverConfig.M_hostName = "localhost"
 		activeConfigurations.M_serverConfig.M_ipv4 = "127.0.0.1"
 
@@ -329,24 +330,37 @@ func (this *ConfigurationManager) GetServerPort() int {
 /**
  * Cargo service container port.
  */
-func (this *ConfigurationManager) GetServicePort() int {
+func (this *ConfigurationManager) GetWsConfigurationServicePort() int {
 	// Default port...
 	if this.getActiveConfigurationsEntity() == nil {
 		return 9494
 	}
-	return this.getActiveConfigurationsEntity().GetObject().(*Config.Configurations).M_serverConfig.M_servicePort
+	return this.getActiveConfigurationsEntity().GetObject().(*Config.Configurations).M_serverConfig.M_ws_serviceContainerPort
+}
+
+func (this *ConfigurationManager) GetTcpConfigurationServicePort() int {
+	// Default port...
+	if this.getActiveConfigurationsEntity() == nil {
+		return 9595
+	}
+	return this.getActiveConfigurationsEntity().GetObject().(*Config.Configurations).M_serverConfig.M_tcp_serviceContainerPort
 }
 
 /**
  * Append configuration to the list.
  */
-func (this *ConfigurationManager) setServiceConfiguration(id string) {
+func (this *ConfigurationManager) setServiceConfiguration(id string, port int) {
 	// Create the default service configurations
 	config := new(Config.ServiceConfiguration)
 	config.M_id = id
 	config.M_ipv4 = this.GetIpv4()
 	config.M_start = true
-	config.M_port = this.GetServerPort()
+	if port == -1 {
+		config.M_port = this.GetServerPort()
+	} else {
+		config.M_port = port
+	}
+
 	config.M_hostName = this.GetHostName()
 	this.m_servicesConfiguration = append(this.m_servicesConfiguration, config)
 	return

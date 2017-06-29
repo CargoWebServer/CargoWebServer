@@ -1,6 +1,12 @@
 #include <QCoreApplication>
 #include <QDebug>
-#include "serviceContainer.h"
+
+#ifdef WS {
+    #include "WS/serviceContainer.h"
+#else
+    #include "TCP/serviceContainer.h"
+#endif
+
 #include <iostream>
 
 using namespace std;
@@ -14,7 +20,7 @@ int main(int argc, char *argv[])
         int port = atoi(argv[1]);
         ServiceContainer::getInstance()->setPort(port);
     }else {
-        ServiceContainer::getInstance()->setPort(9494);
+        ServiceContainer::getInstance()->setPort(PORT_NUMBER);
     }
 
     // Set the application path...

@@ -377,6 +377,7 @@ var BlogManager = function (parent) {
                 saveCategoryBtn.element.onclick = function (blogManager, newCategoryPanel, newCategoryInput) {
                     return function (evt) {
                         evt.stopPropagation();
+
                         var category = eval("new " + categoryTypeName + "()")
                         category.M_name = newCategoryInput.element.value
                         category.M_enable = true
@@ -384,14 +385,13 @@ var BlogManager = function (parent) {
 
                         // TODO append category to the post.
                         var post = blogManager.activePostView.post
-
                         blogManager.appendCategory(category)
 
                         // Remove the panel
                         blogManager.newCategoryBtn.removeElement(newCategoryPanel)
                     }
                 }(blogManager, newCategoryPanel, newCategoryInput)
-                
+
             } else {
                 var newCategoryPanel = blogManager.newCategoryBtn.childs[Object.keys(blogManager.newCategoryBtn.childs)[1]]
                 blogManager.newCategoryBtn.removeElement(newCategoryPanel)

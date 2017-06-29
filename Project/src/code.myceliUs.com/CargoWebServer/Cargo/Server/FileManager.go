@@ -74,7 +74,7 @@ func newFileManager() *FileManager {
 func (this *FileManager) initialize() {
 	// register service avalaible action here.
 	log.Println("--> initialyze ConfigurationManager")
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 }
 

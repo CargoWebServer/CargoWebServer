@@ -44,7 +44,7 @@ func newSecurityManager() *SecurityManager {
 func (this *SecurityManager) initialize() {
 
 	log.Println("--> Initialize Security manager")
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	// Create the admin role if it doesn't exist
 	adminRoleUuid := CargoEntitiesRoleExists("adminRole")

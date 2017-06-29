@@ -138,7 +138,7 @@ func (this *OAuth2Manager) initialize() {
 	log.Println("--> initialyze OAuth2Manager")
 
 	// Create the default configurations
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	channels = make(map[string]chan []string, 0)
 

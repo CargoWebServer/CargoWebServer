@@ -27,7 +27,8 @@ type ServerConfiguration struct{
 	M_hostName string
 	M_ipv4 string
 	M_serverPort int
-	M_servicePort int
+	M_ws_serviceContainerPort int
+	M_tcp_serviceContainerPort int
 	M_applicationsPath string
 	M_dataPath string
 	M_scriptsPath string
@@ -54,7 +55,8 @@ type XsdServerConfiguration struct {
 	M_ipv4	string	`xml:"ipv4,attr"`
 	M_hostName	string	`xml:"hostName,attr"`
 	M_serverPort	int	`xml:"serverPort,attr"`
-	M_servicePort	int	`xml:"servicePort,attr"`
+	M_ws_serviceContainerPort	int	`xml:"ws_serviceContainerPort,attr"`
+	M_tcp_serviceContainerPort	int	`xml:"tcp_serviceContainerPort,attr"`
 	M_applicationsPath	string	`xml:"applicationsPath,attr"`
 	M_dataPath	string	`xml:"dataPath,attr"`
 	M_scriptsPath	string	`xml:"scriptsPath,attr"`
@@ -122,18 +124,31 @@ func (this *ServerConfiguration) SetServerPort(ref interface{}){
 
 /** Remove reference ServerPort **/
 
-/** ServicePort **/
-func (this *ServerConfiguration) GetServicePort() int{
-	return this.M_servicePort
+/** Ws_serviceContainerPort **/
+func (this *ServerConfiguration) GetWs_serviceContainerPort() int{
+	return this.M_ws_serviceContainerPort
 }
 
-/** Init reference ServicePort **/
-func (this *ServerConfiguration) SetServicePort(ref interface{}){
+/** Init reference Ws_serviceContainerPort **/
+func (this *ServerConfiguration) SetWs_serviceContainerPort(ref interface{}){
 	this.NeedSave = true
-	this.M_servicePort = ref.(int)
+	this.M_ws_serviceContainerPort = ref.(int)
 }
 
-/** Remove reference ServicePort **/
+/** Remove reference Ws_serviceContainerPort **/
+
+/** Tcp_serviceContainerPort **/
+func (this *ServerConfiguration) GetTcp_serviceContainerPort() int{
+	return this.M_tcp_serviceContainerPort
+}
+
+/** Init reference Tcp_serviceContainerPort **/
+func (this *ServerConfiguration) SetTcp_serviceContainerPort(ref interface{}){
+	this.NeedSave = true
+	this.M_tcp_serviceContainerPort = ref.(int)
+}
+
+/** Remove reference Tcp_serviceContainerPort **/
 
 /** ApplicationsPath **/
 func (this *ServerConfiguration) GetApplicationsPath() string{

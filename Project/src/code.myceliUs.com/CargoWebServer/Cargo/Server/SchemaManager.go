@@ -93,7 +93,7 @@ func newSchemaManager() *SchemaManager {
 func (this *SchemaManager) initialize() {
 
 	log.Println("--> Initialize SchemaManager")
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	// Here I will initialyse the schema found in the schema directory.
 	// Those schema must be xml schema...

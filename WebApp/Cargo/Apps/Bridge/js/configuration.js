@@ -146,14 +146,16 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                             contentView.connectBtn.element.click()
 
                                         }
-                                    }(caller))
+                                    } (caller))
                                 },
                                 // Error callback
                                 function (errObj, caller) {
                                 }, contentView)
+                        } else if (entity.TYPENAME == "Config.ServiceConfiguration") {
+                            console.log("------> service configuration! ", entity)
                         }
                     }
-                }(contentView)
+                } (contentView)
 
                 contentView.deleteCallback = function (entity) {
                     // Here I will remove the folder if the entity is 
@@ -232,7 +234,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                             }
 
                         }
-                    }(contentView)
+                    } (contentView)
 
                     // The refresh action.
                     contentView.refreshBtn.element.onclick = function (contentView) {
@@ -249,9 +251,9 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 function (errObj, caller) {
                                     console.log("synchronization fail!", error)
                                     caller.refreshBtn.element.style.color = "#8B0000"
-                                }, {"refreshBtn":contentView.refreshBtn})
+                                }, { "refreshBtn": contentView.refreshBtn })
                         }
-                    }(contentView)
+                    } (contentView)
 
                     // Set the connection status
                     server.dataManager.ping(contentView.entity.M_id,
@@ -311,7 +313,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 return false
                             }
                         }
-                    }(currentPwd), 3000)
+                    } (currentPwd), 3000)
 
                     setValidator("", newPwd, function (newPwd) {
                         return function (msgDiv) {
@@ -321,7 +323,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 return false
                             }
                         }
-                    }(newPwd), 3000)
+                    } (newPwd), 3000)
 
                     setValidator("", confirmPwd, function (newPwd) {
                         return function (msgDiv) {
@@ -331,7 +333,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 return false
                             }
                         }
-                    }(confirmPwd), 3000)
+                    } (confirmPwd), 3000)
 
                     setValidator("", confirmPwd, function (newPwd, confirmPwd) {
                         return function (msgDiv) {
@@ -346,11 +348,11 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                         newPwd.element.style.border = ""
                                         confirmPwd.element.style.border = ""
                                     }
-                                }(newPwd, confirmPwd)
+                                } (newPwd, confirmPwd)
                                 return false
                             }
                         }
-                    }(newPwd, confirmPwd), 3000)
+                    } (newPwd, confirmPwd), 3000)
 
                     changeAdminPwdBtn.element.onclick = function (currentPwd, newPwd, confirmPwd) {
                         return function () {
@@ -367,13 +369,50 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                     }, {})
                             }
                         }
-                    }(currentPwd, newPwd, confirmPwd)
+                    } (currentPwd, newPwd, confirmPwd)
                 } else if (content.TYPENAME == "Config.OAuth2Configuration") {
                     // So here I will append other element in the view here.
+
+                } else if (content.TYPENAME == "Config.ServiceConfiguration") {
+                    // Here I have a service configuration.
+                    var parent = content.panel.panel //.parentElement.parentElement
+                    // Keep the reference in the content.
+                    var actionsDiv = parent.appendElement({ "tag": "div", "id": content.UUID + "_actions_div", "style": "position:absolute; left: 0px; bottom: 0px; overflow: auto;" }).down()
+                    window.addEventListener('resize',
+                        function (actionsDiv) {
+                            return function () {
+                                var parent = actionsDiv.parentElement.parentElement.parentElement.parentElement
+                                var top = parent.element.firstChild.offsetHeight
+                                var right = parent.element.clientWidth;
+                                if (top > 0 && right > 0) {
+                                    actionsDiv.element.style.width = right + "px"
+                                    actionsDiv.element.style.top = top + "px"
+                                }
+                            }
+                        } (actionsDiv), true);
+
+                    // Now I will get the list of action for a given services.
+                    server.serviceManager.getServiceActions(content.M_id,
+                        // success callback
+                        function (results, parent) {
+                            // Now I will display the list of action in panel.
+                            for (var i = 0; i < results.length; i++) {
+                                var result = results[i]
+                                new EntityPanel(parent, result.TYPENAME, function (entity) {
+                                    return function (panel) {
+                                        panel.setEntity(entity)
+                                    }
+                                } (result), undefined, false, result, "")
+                            }
+                        },
+                        // error callback
+                        function (errObj, caller) {
+
+                        }, actionsDiv)
                 }
             }
 
-        }(content, this.title))
+        } (content, this.title))
 
     // Set parent entity informations.
     contentView.parentEntity = this.activeConfiguration
@@ -447,7 +486,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                 idField.element.setSelectionRange(0, idField.element.value.length)
 
             }
-        }(this, configurationContent, configuration)
+        } (this, configurationContent, configuration)
 
         // In case of multiple configurations element..
         if (fieldType.startsWith("[]")) {
@@ -519,7 +558,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                     }
 
                 }
-            }(this)
+            } (this)
 
             // The previous configuration button.
             this.previousConfigBtn.element.onclick = function (configurationPanel) {
@@ -554,7 +593,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
                     }
                 }
-            }(this)
+            } (this)
 
             // Set the new configuration click handler.
             this.newConfigElementBtn.element.onclick = newConfiguration

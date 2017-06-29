@@ -322,6 +322,13 @@ function GetResource(clientId, scope, query, idTokenUuid){
     return result
 }
 
+////////////////////////////////// Service Manager ///////////////////////
+function GetServiceActions(serviceName){
+    var result = server.GetServiceManager().GetServiceActions(serviceName, messageId, sessionId)
+    return result
+}
+
+
 ////////////////////////////////// Server //////////////////////////
 function SetRootPath(path) {
     // Call set root path on the server...

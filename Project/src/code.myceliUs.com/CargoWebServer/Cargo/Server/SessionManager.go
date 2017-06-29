@@ -71,7 +71,7 @@ func newSessionManager() *SessionManager {
 func (this *SessionManager) initialize() {
 
 	log.Println("--> Initialize SessionManager")
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	this.activeSessions = make(map[string]*CargoEntities.Session, 0)
 	this.sessionToCloseChannel = make(chan struct {

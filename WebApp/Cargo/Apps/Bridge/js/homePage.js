@@ -342,10 +342,11 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                 if (this.firstChild.id == "workflowImg") {
                     this.firstChild.src = "img/workflow_blue.svg"
                 }
-
-                homepage.dataExplorer.resize()
-
+                
+                // Set the size of absolute panel.
+                fireResize()
             }
+            
         }(div, leftDiv)
     }
 

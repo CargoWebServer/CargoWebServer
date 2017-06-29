@@ -110,6 +110,10 @@ var Server = function (hostName, ipv4, port) {
      */
     this.securityManager = null
 
+    /**
+     * @property {serviceManager} serviceManager Services functionalities
+     */
+    this.serviceManager = null
 
     this.projectManager = null
     this.workflowManager = null
@@ -298,6 +302,31 @@ Server.prototype.setSessionId = function () {
         function () {
 
         }, this);
+    rqst.send();
+}
+
+/**
+ * Test if a server is reachable. Receive Pong as answer.
+ */
+Server.prototype.ping = function (successCallback, errorCallback, caller) {
+    var params = new Array();
+    // Register this listener to the server.
+    var rqst = new Request(randomUUID(), this.conn, "Ping", params,
+        // Progress callback
+        function () { },
+        // Success callback
+        function (id, result, caller) {
+            // Keep the session id...
+            if (caller.successCallback != null) {
+                caller.successCallback(result, caller.caller)
+            }
+        },
+        // Error callback...
+        function (errObj, caller) {
+            if (caller.errorCallback != null) {
+                caller.errorCallback(errObj, caller.caller)
+            }
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
     rqst.send();
 }
 

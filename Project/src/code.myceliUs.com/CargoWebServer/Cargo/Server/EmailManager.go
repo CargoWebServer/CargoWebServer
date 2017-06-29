@@ -69,7 +69,7 @@ func (this *EmailManager) initialize() {
 
 	log.Println("--> Initialize EmailManager")
 	// Create the default configurations
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	this.m_infos = make(map[string]*Config.SmtpConfiguration, 0)
 	smtpConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetSmtpConfigs()

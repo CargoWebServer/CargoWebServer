@@ -39,6 +39,18 @@ function fireResize() {
     }
 };
 
+Array.prototype.removeDuplicates = function (){
+  var temp=new Array();
+  label:for(i=0;i<this.length;i++){
+        for(var j=0; j<temp.length;j++ ){//check duplicates
+            if(temp[j]==this[i])//skip if already present 
+               continue label;      
+        }
+        temp[temp.length] = this[i];
+  }
+  return temp;
+ } 
+ 
 ////////////////////////////////////////////////////////////////////////////
 //  Validation functions helpers
 ////////////////////////////////////////////////////////////////////////////

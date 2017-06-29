@@ -13,6 +13,10 @@ import (
 	"code.myceliUs.com/Utility"
 )
 
+const (
+	serviceContainer = "ServiceContainer"
+)
+
 type ServiceManager struct {
 
 	// info about connection on smtp server...
@@ -150,6 +154,9 @@ func (this *Server) GetServiceManager() *ServiceManager {
 		serviceManager.public = append(serviceManager.public, "Server.EmailManager.SendEmail")
 		serviceManager.public = append(serviceManager.public, "Server.EmailManager.ValidateEmail")
 
+		serviceManager.public = append(serviceManager.public, "Server.ServiceManager.RegisterAction")
+		serviceManager.public = append(serviceManager.public, "Server.ServiceManager.GetServiceActions")
+
 		///////////////////////// restricted /////////////////////////
 
 		// Event manager
@@ -211,7 +218,10 @@ func newServiceManager() *ServiceManager {
 func (this *ServiceManager) initialize() {
 	// Here I will start the c++ service container...
 	log.Println("--> Initialize ServiceManager")
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
+
+	// Set the service container port.
+	GetServer().GetConfigurationManager().setServiceConfiguration(serviceContainer, GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
 
 	for i := 0; i < len(this.m_servicesLst); i++ {
 		// Initialyse the service.
@@ -232,19 +242,19 @@ func (this *ServiceManager) start() {
 		this.registerActions(this.m_servicesLst[i])
 	}
 
+	// register itself as service.
+	this.registerActions(this)
+
 	// The first step will be to start the service manager.
-	serviceContainerPath := GetServer().GetConfigurationManager().GetBinPath() + "/CargoServiceContainer"
+	tcp_serviceContainerPath := GetServer().GetConfigurationManager().GetBinPath() + "/CargoServiceContainer_TCP"
 	if runtime.GOOS == "windows" {
-		serviceContainerPath += ".exe"
+		tcp_serviceContainerPath += ".exe"
 	}
+	serviceManager.m_serviceContainerCmd = exec.Command(tcp_serviceContainerPath)
+	serviceManager.m_serviceContainerCmd.Args = append(serviceManager.m_serviceContainerCmd.Args, strconv.Itoa(GetServer().GetConfigurationManager().GetTcpConfigurationServicePort()))
 
-	serviceManager.m_serviceContainerCmd = exec.Command(serviceContainerPath)
-
-	// Set the port number.
-	// Uncomment to start the service.
-	/*serviceManager.m_serviceContainerCmd.Args = append(serviceManager.m_serviceContainerCmd.Args, strconv.Itoa(GetServer().GetConfigurationManager().GetServicePort()))
 	//var err error
-	err := serviceManager.m_serviceContainerCmd.Start()
+	/*err := serviceManager.m_serviceContainerCmd.Start()
 	if err != nil {
 		log.Println("---> fail to start the service container!")
 	}*/
@@ -258,6 +268,44 @@ func (this *ServiceManager) start() {
 			}
 
 		}
+	}
+
+	// Now I will create a connection with the tcp service container.
+	err := GetServer().Connect(GetServer().GetConfigurationManager().GetIpv4(), GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
+
+	if err == nil {
+
+		log.Println("Connection is made!")
+		/*
+			connectionId := GetServer().GetConfigurationManager().GetIpv4() + ":" + strconv.Itoa(GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
+			conn := GetServer().peers[connectionId]
+			log.Println("----------> Try to ping connection ", connectionId)
+
+			// Here I will create a new request.
+			id := Utility.RandomUUID()
+			method := "Ping"
+			params := make([]*MessageData, 0)
+			to := make([]connection, 1)
+			to[0] = conn
+
+			successCallback := func(rspMsg *message, caller interface{}) {
+				log.Println("success!!!")
+			}
+
+			errorCallback := func(rspMsg *message, caller interface{}) {
+				log.Println("error!!!")
+			}
+
+			ping, err := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback)
+
+			if err != nil {
+				log.Println(err, "Fail to ping ", connectionId)
+			} else {
+				log.Println("--------> no ping error!-)")
+			}
+
+			GetServer().GetProcessor().m_pendingRequestChannel <- ping
+		*/
 	}
 }
 
@@ -279,7 +327,6 @@ func (this *ServiceManager) stop() {
  * Register a new service.
  */
 func (this *ServiceManager) registerService(service Service) {
-	log.Println("--------> register service ", service.getId())
 	this.m_services[service.getId()] = service
 	this.m_servicesLst = append(this.m_servicesLst, service)
 }
@@ -445,4 +492,19 @@ func (this *ServiceManager) RegisterAction(methodName string, parameters []inter
 
 	return nil
 
+}
+
+/**
+ * Return the list of action for a given service
+ */
+func (this *ServiceManager) GetServiceActions(serviceName string, messageId string, sessionId string) []*CargoEntities.Action {
+	actionsEntity, _ := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Action", "", "CargoEntities", false)
+	actions := make([]*CargoEntities.Action, 0)
+	for i := 0; i < len(actionsEntity); i++ {
+		action := actionsEntity[i].GetObject().(*CargoEntities.Action)
+		if strings.Contains(action.M_name, serviceName) {
+			actions = append(actions, action)
+		}
+	}
+	return actions
 }

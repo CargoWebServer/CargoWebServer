@@ -47,7 +47,7 @@ func newProjectManager() *ProjectManager {
 func (this *ProjectManager) initialize() {
 	// register service avalaible action here.
 	log.Println("--> Initialize ProjectManager")
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 }
 

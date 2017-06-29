@@ -133,6 +133,7 @@ func (this *MessageProcessor) appendPendingRequest(m *message) {
 	// to made the action later.
 	if isOpen {
 		//log.Println("append pending request with id ", m.GetId())
+		//log.Println("------> send message to ", m.to[0].GetAddrStr())
 		this.m_pendingRequest[*m.msg.Rqst.Id] = m
 		this.m_outgoingChannel <- m
 	}
@@ -568,6 +569,9 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 		for i := 0; i < len(m.to); i++ {
 			if m.to[i].IsOpen() {
 				m.to[i].Send(m.GetBytes())
+			} else {
+				// I will remove the message.
+
 			}
 		}
 	}

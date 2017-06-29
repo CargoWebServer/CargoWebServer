@@ -91,7 +91,7 @@ func (this *EntityManager) initialize() {
 	log.Println("--> Initialize EntityManager")
 
 	// Create the default configurations
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId())
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	gob.Register(map[string]interface{}{})
 	gob.Register([]interface{}{})

@@ -341,7 +341,10 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="serverPort" name="serverPort">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
       </ownedAttribute>
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="servicePort" name="servicePort">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="ws_serviceContainerPort" name="ws_serviceContainerPort">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="tcp_serviceContainerPort" name="tcp_serviceContainerPort">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
       </ownedAttribute>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="applicationsPath" name="applicationsPath">

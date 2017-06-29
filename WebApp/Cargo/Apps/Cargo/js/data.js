@@ -158,7 +158,6 @@ DataManager.prototype.update = function (connectionId, query, fields, params, su
             // Nothing special to do here.
         },
         function (result, caller) {
-            console.log(result[0])
             caller.successCallback(result, caller.caller)
         },
         function (errMsg, caller) {
@@ -197,7 +196,6 @@ DataManager.prototype.delete = function (connectionId, query, params, successCal
             // Nothing special to do here.
         },
         function (result, caller) {
-            console.log(result[0])
             caller.successCallback(result, caller.caller)
         },
         function (errMsg, caller) {
@@ -239,8 +237,6 @@ DataManager.prototype.createDataStore = function (storeId, storeType, storeVendo
             caller.successCallback(result[0], caller.caller)
         },
         function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
             // call the immediate error callback.
             caller.errorCallback(errMsg, caller.caller)
             // dispatch the message.
@@ -272,8 +268,6 @@ DataManager.prototype.deleteDataStore = function (storeId, successCallback, erro
             caller.successCallback(result[0], caller.caller)
         },
         function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
             // call the immediate error callback.
             caller.errorCallback(errMsg, caller.caller)
             // dispatch the message.
@@ -303,7 +297,6 @@ DataManager.prototype.ping = function (connectionId, successCallback, errorCallb
             // Nothing special to do here.
         },
         function (result, caller) {
-            console.log(result[0])
             caller.successCallback(result, caller.caller)
         },
         function (errMsg, caller) {
@@ -341,8 +334,6 @@ DataManager.prototype.connect = function (connectionId, successCallback, errorCa
             caller.successCallback(result, caller.caller)
         },
         function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
             // call the immediate error callback.
             caller.errorCallback(errMsg, caller.caller)
             // dispatch the message.
@@ -375,8 +366,6 @@ DataManager.prototype.close = function (connectionId, successCallback, errorCall
             caller.successCallback(result, caller.caller)
         },
         function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
             // call the immediate error callback.
             caller.errorCallback(errMsg, caller.caller)
             // dispatch the message.
@@ -407,7 +396,6 @@ DataManager.prototype.importXsdSchema = function (fileName, fileContent, success
             // Nothing todo here.
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
@@ -435,7 +423,6 @@ DataManager.prototype.importXmlData = function (content, successCallback, errorC
             // Nothing todo here.
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
@@ -464,7 +451,6 @@ DataManager.prototype.synchronize = function (storeId, successCallback, errorCal
             caller.successCallback(results[0], caller.caller)
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
