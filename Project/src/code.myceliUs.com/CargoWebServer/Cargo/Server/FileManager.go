@@ -767,11 +767,15 @@ func (this *FileManager) createThumbnail(file *os.File, thumbnailMaxHeight int, 
 // API
 ////////////////////////////////////////////////////////////////////////////////
 
-// Plain file...
-
-/**
- * Read the content of a text file and return it.
- */
+// @api 1.0
+// Read the content of a text file and return it.
+// @param {string} path The path on the sever relative to the sever root.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {string} The text content of the file.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *FileManager) ReadTextFile(filePath string, messageId string, sessionId string) string {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -788,9 +792,15 @@ func (this *FileManager) ReadTextFile(filePath string, messageId string, session
 	return string(b)
 }
 
-/**
- * Read a csv file
- */
+// @api 1.0
+// Read the content of a comma separated values file (CSV)
+// @param {string} path The path on the sever relative to the sever root.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {[][]} A tow dimensionnal array with values string
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *FileManager) ReadCsvFile(filePath string, messageId string, sessionId string) [][]string {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -818,9 +828,14 @@ func (this *FileManager) ReadCsvFile(filePath string, messageId string, sessionI
 	return rawCSVdata
 }
 
-/**
- * Delete a disck file.
- */
+// @api 1.0
+// Remove a file (not a file entity) from the server at a given path.
+// @param {string} path The path on the sever relative to the sever root.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *FileManager) RemoveFile(filePath string, messageId string, sessionId string) {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -835,11 +850,16 @@ func (this *FileManager) RemoveFile(filePath string, messageId string, sessionId
 	}
 }
 
-// File entity...
-
-/**
- * Create a new directory and it's associated file entity on the server
- */
+// @api 1.0
+// Create a new directory on the server.
+// @param {string} dirName The name of the new directory.
+// @param {string} dirPath The path of the parent of the new directory.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.File} The created directory entity.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *FileManager) CreateDir(dirName string, dirPath string, messageId string, sessionId string) *CargoEntities.File {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -856,9 +876,126 @@ func (this *FileManager) CreateDir(dirName string, dirPath string, messageId str
 	return dir
 }
 
-/**
- * Create a file
- */
+// @api 1.0
+// Dowload a file (not entity) from the sever.
+// @param {string} filepath The path of the directory where to create the file.
+// @param {string} filename The name of the file to create.
+// @param {*Server.MimeType} mimeType The file mime type.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.File} The created file entity.
+// @scope {public}
+// @param {callback} progressCallback The function is call when chunk of response is received.
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+// @src
+//FileManager.prototype.downloadFile = function (path, fileName, mimeType, progressCallback, successCallback, errorCallback, caller) {
+//    var xhr = new XMLHttpRequest();
+//    xhr.open('GET', path + '/' + fileName, true);
+//    xhr.responseType = 'blob';
+//    xhr.onload = function (successCallback) {
+//        return function (e) {
+//            if (this.status == 200) {
+//                // Note: .response instead of .responseText
+//                var blob = new Blob([this.response], { type: mimeType });
+//                // I will read the file as data url...
+//                var reader = new FileReader();
+//                reader.onload = function (successCallback, caller) {
+//                    return function (e) {
+//                        var dataURL = e.target.result;
+//                        // return the success callback with the result.
+//                        successCallback(dataURL, caller)
+//                    }
+//                } (successCallback, caller)
+//                reader.readAsDataURL(blob);
+//            }
+//        }
+//    } (successCallback, caller)
+//    xhr.onprogress = function (progressCallback, caller) {
+//        return function (e) {
+//            progressCallback(e.loaded, e.total, caller)
+//        }
+//    } (progressCallback, caller)
+//    xhr.send();
+//}
+func (this *FileManager) DownloadFile(path string, fileName string, mimeType *MimeType, messageId string, sessionId string) {
+	/** empty funtion **/
+}
+
+// @api 1.0
+// Create a new file on the server.
+// @param {string} filename The name of the file to create.
+// @param {string} filepath The path of the directory where to create the file.
+// @param {string} filedata The data of the file.
+// @param {int} thumbnailMaxHeight The maximum height size of the thumbnail associated with the file (keep the ratio).
+// @param {int} thumbnailMaxWidth The maximum width size of the thumbnail associated with the file (keep the ratio).
+// @param {bool} dbFile If it set to true the file will be save on the server local object store, otherwize a file on disck will be created.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.File} The created file entity.
+// @scope {public}
+// @param {callback} progressCallback The function is call when chunk of response is received.
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+// @src
+//FileManager.prototype.createFile = function (filename, filepath, filedata, thumbnailMaxHeight, thumbnailMaxWidth, dbFile, successCallback, progressCallback, errorCallback, caller) {
+//    // server is the client side singleton.
+//    var params = []
+//    // The file data (filedata) will be upload with the http protocol...
+//    params.push(createRpcData(filename, "STRING", "filename"))
+//    params.push(createRpcData(filepath, "STRING", "filepath"))
+//    params.push(createRpcData(thumbnailMaxHeight, "INTEGER", "thumbnailMaxHeight"))
+//    params.push(createRpcData(thumbnailMaxWidth, "INTEGER", "thumbnailMaxWidth"))
+//    params.push(createRpcData(dbFile, "BOOLEAN", "dbFile"))
+//    // Here I will create a new data form...
+//    var formData = new FormData()
+//    formData.append("multiplefiles", filedata, filename)
+//    // Use the post function to upload the file to the server.
+//    var xhr = new XMLHttpRequest()
+//    xhr.open('POST', '/uploads', true)
+//    // In case of error or success...
+//    xhr.onload = function (params, xhr) {
+//        return function (e) {
+//            if (xhr.readyState === 4) {
+//                if (xhr.status === 200) {
+//                    console.log(xhr.responseText);
+//                    // Here I will create the file...
+//                    server.executeJsFunction(
+//                        "FileManagerCreateFile", // The function to execute remotely on server
+//                        params, // The parameters to pass to that function
+//                        function (index, total, caller) { // The progress callback
+//                            // Keep track of the file transfert.
+//                            caller.progressCallback(index, total, caller.caller)
+//                        },
+//                        function (result, caller) {
+//                            caller.successCallback(result[0], caller.caller)
+//                        },
+//                        function (errMsg, caller) {
+//                            // display the message in the console.
+//                            console.log(errMsg)
+//                            // call the immediate error callback.
+//                            caller.errorCallback(errMsg, caller.caller)
+//                            // dispatch the message.
+//                            server.errorManager.onError(errMsg)
+//                        }, // Error callback
+//                        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
+//                    )
+//                } else {
+//                    console.error(xhr.statusText);
+//                }
+//            }
+//        }
+//    } (params, xhr)
+//    // now the progress event...
+//    xhr.upload.onprogress = function (progressCallback, caller) {
+//        return function (e) {
+//            if (e.lengthComputable) {
+//                progressCallback(e.loaded, e.total, caller)
+//            }
+//        }
+//    } (progressCallback, caller)
+//    xhr.send(formData);
+//}
 func (this *FileManager) CreateFile(filename string, filepath string, thumbnailMaxHeight int64, thumbnailMaxWidth int64, dbFile bool, messageId string, sessionId string) *CargoEntities.File {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -897,9 +1034,14 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 	return file
 }
 
-/**
- * Delete a file with a given uuid
- */
+// @api 1.0
+// Remove a file entity with a given uuid.
+// @param {string} uuid The file uuid.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *FileManager) DeleteFile(uuid string, messageId string, sessionId string) {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -914,9 +1056,16 @@ func (this *FileManager) DeleteFile(uuid string, messageId string, sessionId str
 	}
 }
 
-/**
- * Test if a given file exist.
- */
+// @api 1.0
+// Test if a given file exist.
+// @param {string} filename The name of the file to create.
+// @param {string} filepath The path of the directory where to create the file.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {bool} Return true if the file exist.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *FileManager) IsFileExist(filename string, filepath string) bool {
 
 	fileId := Utility.CreateSha1Key([]byte(filepath + "/" + filename))
@@ -927,9 +1076,15 @@ func (this *FileManager) IsFileExist(filename string, filepath string) bool {
 	return false
 }
 
-/**
- * Get the mime type information...
- */
+// @api 1.0
+// Retreive the mime type information from a given extention.
+// @param {string} fileExtension The file extention ex. txt, xls, html, css
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*Server.MimeType} The mime type information.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *FileManager) GetMimeTypeByExtension(fileExtension string, messageId string, sessionId string) *MimeType {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -946,9 +1101,14 @@ func (this *FileManager) GetMimeTypeByExtension(fileExtension string, messageId 
 	return mimeType
 }
 
-/**
- * Return a file with a given path.
- */
+// @api 1.0
+// Retreive a file with a given id
+// @param {string} path The file path.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *FileManager) GetFileByPath(path string, messageId string, sessionId string) *CargoEntities.File {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -978,9 +1138,15 @@ func (this *FileManager) GetFileByPath(path string, messageId string, sessionId 
 	return file
 }
 
-/**
- * Function call when the user open a file.
- */
+// @api 1.0
+// Open a file with a given id
+// @param {string} id The file id.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.File} Return the file with it content *In case of large file use downloadFile instead.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *FileManager) OpenFile(fileId string, messageId string, sessionId string) *CargoEntities.File {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -1004,20 +1170,6 @@ func (this *FileManager) OpenFile(fileId string, messageId string, sessionId str
 		// encode to a string 64 oject...
 		file.SetData(base64.StdEncoding.EncodeToString(filedata))
 	}
-
-	/*
-		eventData := make([]*MessageData, 1)
-		fileInfo := new(MessageData)
-		fileInfo.Name = "fileInfo"
-
-		fileInfo.Value = file
-		eventData[0] = fileInfo
-
-		var evt *Event
-		evt, _ = NewEvent(OpenFileEvent, FileEvent, eventData)
-
-		GetServer().GetEventManager().BroadcastEvent(evt)
-	*/
 
 	// Return the file object...
 	return file

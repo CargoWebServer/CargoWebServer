@@ -63,27 +63,27 @@ func (this *LdapManager) start() {
 	}
 
 	// configure all information from the servers...
-	for _, info := range this.m_configsInfo {
+	/*for _, info := range this.m_configsInfo {
 
 		// Synchronize the list of user...
-		err := this.SynchronizeUsers(info.M_id)
+		err := this.synchronizeUsers(info.M_id)
 		if err != nil {
 			log.Println("Synchronize Users Error ", err)
 		}
 
 		// Synchronize the list of group...
-		err = this.SynchronizeGroups(info.M_id)
+		err = this.synchronizeGroups(info.M_id)
 		if err != nil {
 			log.Println("Synchronize Groups Error ", err)
 		}
 
 		// Synchronize the list of computer...
-		err = this.SynchronizeComputers(info.M_id)
+		err = this.synchronizeComputers(info.M_id)
 		if err != nil {
 			log.Println("Synchronize Computers Error ", err)
 		}
 
-	}
+	}*/
 }
 
 func (this *LdapManager) stop() {
@@ -99,7 +99,7 @@ func (this *LdapManager) getLdapUserMemberOf(id string, userId string) ([]string
 
 	var filter string = "(&(objectClass=group)(objectcategory=Group)(member=" + userId + "))"
 	var attributes []string = []string{"sAMAccountName"}
-	results, err := this.Search(id, "", "", base_dn, filter, attributes)
+	results, err := this.search(id, "", "", base_dn, filter, attributes)
 	var memberOf []string
 	if err != nil {
 		log.Println("error, fail to search the groups information for user on ldap...")
@@ -127,7 +127,7 @@ func (this *LdapManager) getLdapGroupMembers(id string, groupId string) ([]strin
 
 	var filter string = "(&(objectClass=user)(objectcategory=Person)(memberOf=" + groupId + "))"
 	var attributes []string = []string{"sAMAccountName"}
-	results, err := this.Search(id, "", "", base_dn, filter, attributes)
+	results, err := this.search(id, "", "", base_dn, filter, attributes)
 	var members []string
 
 	if err != nil {
@@ -154,14 +154,10 @@ func (this *LdapManager) getLdapGroupMembers(id string, groupId string) ([]strin
 	return members, nil
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// API
-////////////////////////////////////////////////////////////////////////////////
-
 /**
  * Connect to a ldap server...
  */
-func (this *LdapManager) Connect(id string, userId string, psswd string) (*LDAP.LDAPConnection, error) {
+func (this *LdapManager) connect(id string, userId string, psswd string) (*LDAP.LDAPConnection, error) {
 
 	ldapConfigInfo := this.m_configsInfo[id]
 
@@ -186,19 +182,19 @@ func (this *LdapManager) Connect(id string, userId string, psswd string) (*LDAP.
  * not specify the default base is use. It return a list of values. This can
  * be interpret as a tow dimensional array.
  */
-func (this *LdapManager) Search(id string, login string, psswd string, base_dn string, filter string, attributes []string) ([][]interface{}, error) {
+func (this *LdapManager) search(id string, login string, psswd string, base_dn string, filter string, attributes []string) ([][]interface{}, error) {
 	ldapConfigInfo := this.m_configsInfo[id]
 	// Try to connect to the ldap server...
 	var err error
 	var conn *LDAP.LDAPConnection
 	if len(login) == 0 {
-		conn, err = this.Connect(ldapConfigInfo.M_id, ldapConfigInfo.M_user, ldapConfigInfo.M_pwd)
+		conn, err = this.connect(ldapConfigInfo.M_id, ldapConfigInfo.M_user, ldapConfigInfo.M_pwd)
 		if err != nil {
 			log.Println("Fail to connect:", ldapConfigInfo.M_id)
 			return nil, err
 		}
 	} else {
-		conn, err = this.Connect(ldapConfigInfo.M_id, login, psswd)
+		conn, err = this.connect(ldapConfigInfo.M_id, login, psswd)
 		if err != nil {
 			log.Println("Fail to connect:", ldapConfigInfo.M_id)
 			return nil, err
@@ -243,7 +239,7 @@ func (this *LdapManager) Search(id string, login string, psswd string, base_dn s
 	return results, nil
 }
 
-func (this *LdapManager) Authenticate(id string, login string, psswd string) bool {
+func (this *LdapManager) authenticate(id string, login string, psswd string) bool {
 
 	ldapConfigInfo := this.m_configsInfo[id]
 	// Now I will try to make a simple query if it fail that's mean the user
@@ -252,7 +248,7 @@ func (this *LdapManager) Authenticate(id string, login string, psswd string) boo
 
 	// Test get some user...
 	var attributes []string = []string{"sAMAccountName"}
-	_, err := this.Search(id, login, psswd, ldapConfigInfo.M_searchBase, filter, attributes)
+	_, err := this.search(id, login, psswd, ldapConfigInfo.M_searchBase, filter, attributes)
 	if err != nil {
 		return false
 	}
@@ -263,7 +259,7 @@ func (this *LdapManager) Authenticate(id string, login string, psswd string) boo
 ////////////////////////////////////////////////////////////////////////////////
 //	User
 ////////////////////////////////////////////////////////////////////////////////
-func (this *LdapManager) SynchronizeUsers(id string) error {
+func (this *LdapManager) synchronizeUsers(id string) error {
 
 	// Now i will create the user entry found in the ldap server...
 	var base_dn string = "OU=Users,OU=MON,OU=CA,DC=UD6,DC=UF6"
@@ -273,7 +269,7 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 	// a configuration file...
 	var attributes []string = []string{"sAMAccountName", "name", "mail", "telephoneNumber", "userPrincipalName", "distinguishedName"}
 
-	results, err := this.Search(id, "", "", base_dn, filter, attributes)
+	results, err := this.search(id, "", "", base_dn, filter, attributes)
 
 	if err != nil {
 		log.Println("error, fail to search the information on ldap...")
@@ -370,34 +366,6 @@ func (this *LdapManager) SynchronizeUsers(id string) error {
 	return nil
 }
 
-/**
- * That function return the list of all user's register in the database.
- */
-func (this *LdapManager) GetAllUsers() ([]*CargoEntities.User, *CargoEntities.Error) {
-	var allUsers []*CargoEntities.User
-	entities, errObj := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.User", "", CargoEntitiesDB, false)
-	if errObj != nil {
-		return nil, errObj
-	}
-	for i := 0; i < len(entities); i++ {
-		allUsers = append(allUsers, entities[i].GetObject().(*CargoEntities.User))
-	}
-	return allUsers, nil
-}
-
-/**
- * Return a user with a given id.
- */
-func (this *LdapManager) GetUserById(id string) (*CargoEntities.User, *CargoEntities.Error) {
-	ids := []interface{}{id}
-	userEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.User", ids, false)
-	if errObj == nil {
-		user := userEntity.GetObject().(*CargoEntities.User)
-		return user, nil
-	}
-	return nil, errObj
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 //	Group
 ////////////////////////////////////////////////////////////////////////////////
@@ -405,12 +373,12 @@ func (this *LdapManager) GetUserById(id string) (*CargoEntities.User, *CargoEnti
 /**
  * This Get the LDAP groups from the DB...
  */
-func (this *LdapManager) SynchronizeGroups(id string) error {
+func (this *LdapManager) synchronizeGroups(id string) error {
 	var base_dn string = "OU=Groups,OU=MON,OU=CA,DC=UD6,DC=UF6"
 	var filter string = "(objectClass=group)"
 	var attributes []string = []string{"name", "distinguishedName"}
 
-	results, err := this.Search(id, "", "", base_dn, filter, attributes)
+	results, err := this.search(id, "", "", base_dn, filter, attributes)
 
 	if err != nil {
 		log.Println("error, fail to search the information on ldap...")
@@ -465,48 +433,96 @@ func (this *LdapManager) SynchronizeGroups(id string) error {
 	return nil
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//	Computer
+////////////////////////////////////////////////////////////////////////////////
 /**
- * That function return the list of all group's register in the database.
+ * Return a computer with a given id.
  */
-func (this *LdapManager) GetAllGroups() ([]*CargoEntities.Group, *CargoEntities.Error) {
-	var allGroups []*CargoEntities.Group
-	entities, errObj := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Group", "", CargoEntitiesDB, false)
-	if errObj != nil {
-		return nil, errObj
-	}
-	for i := 0; i < len(entities); i++ {
-		allGroups = append(allGroups, entities[i].GetObject().(*CargoEntities.Group))
-	}
-	return allGroups, nil
-}
-
-/**
- * Return a group with a given id.
- */
-func (this *LdapManager) GetGroupById(id string) (*CargoEntities.Group, *CargoEntities.Error) {
+func (this *LdapManager) getComputer(id string) (*CargoEntities.Computer, *CargoEntities.Error) {
 	ids := []interface{}{id}
-	groupEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Group", ids, false)
+	computerEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Computer", ids, false)
 	if errObj == nil {
-		group := groupEntity.GetObject().(*CargoEntities.Group)
-		return group, nil
+		computer := computerEntity.GetObject().(*CargoEntities.Computer)
+		return computer, errObj
 	}
 	return nil, errObj
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//	Computer
-////////////////////////////////////////////////////////////////////////////////
+/**
+ * Return a computer with a given name
+ */
+func (this *LdapManager) getComputerByName(name string) (*CargoEntities.Computer, *CargoEntities.Error) {
+
+	var query EntityQuery
+	query.TypeName = "CargoEntities.Computer"
+	query.Indexs = append(query.Indexs, "M_name="+name)
+	query.Fields = append(query.Fields, "UUID")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(CargoEntitiesDB, string(queryStr), fieldsType, params)
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err)
+		return nil, cargoError
+	}
+
+	// Here nothing was found...
+	if len(results) == 0 {
+		cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No computer was found with name "+name))
+		return nil, cargoError
+	}
+
+	// Get the computer with it name...
+	computerEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(results[0][0].(string), false)
+	if errObj == nil {
+		computer := computerEntity.GetObject().(*CargoEntities.Computer)
+		return computer, errObj
+	}
+
+	return nil, errObj
+}
+
+/**
+ * Return a computer with a given Ip adress...
+ */
+func (this *LdapManager) getComputerByIp(ip string) (*CargoEntities.Computer, *CargoEntities.Error) {
+
+	// Il will make a lookup first and test if the computer contain the name
+	ids, _ := net.LookupAddr(ip)
+	if len(ids) > 0 {
+		return this.getComputer(strings.ToUpper(ids[0]))
+	} else {
+		hostname, _ := os.Hostname()
+		computer, err := this.getComputerByName(strings.ToUpper(hostname))
+		if err == nil {
+			return computer, nil
+		}
+
+		if len(hostname) > 0 {
+			computer := new(CargoEntities.Computer)
+			computer.M_name = strings.ToUpper(hostname)
+			computer.M_id = strings.ToUpper(hostname)
+			computer.M_osType = CargoEntities.OsType_Unknown
+			computer.M_platformType = CargoEntities.PlatformType_Unknown
+			computer.M_ipv4 = "127.0.0.1"
+			return computer, nil
+		}
+	}
+
+	return nil, NewError(Utility.FileLine(), COMPUTER_IP_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The computer with the ip '"+ip+"' was not found. "))
+}
 
 /**
  * Synchronize the computers from ldap information.
  */
-func (this *LdapManager) SynchronizeComputers(id string) error {
+func (this *LdapManager) synchronizeComputers(id string) error {
 	// This is the list of computer.
 	var base_dn string = "OU=Computers,OU=MON,OU=CA,DC=UD6,DC=UF6"
 	var filter string = "(objectClass=computer)"
 	var attributes []string = []string{"dNSHostName", "distinguishedName"}
 
-	results, err := this.Search(id, "", "", base_dn, filter, attributes)
+	results, err := this.search(id, "", "", base_dn, filter, attributes)
 
 	if err != nil {
 		log.Println("error, fail to search the information on ldap...")
@@ -587,79 +603,111 @@ func (this *LdapManager) SynchronizeComputers(id string) error {
 	return nil
 }
 
-/**
- * Return a computer with a given id.
- */
-func (this *LdapManager) GetComputer(id string) (*CargoEntities.Computer, *CargoEntities.Error) {
-	ids := []interface{}{id}
-	computerEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Computer", ids, false)
-	if errObj == nil {
-		computer := computerEntity.GetObject().(*CargoEntities.Computer)
-		return computer, errObj
-	}
-	return nil, errObj
-}
+////////////////////////////////////////////////////////////////////////////////
+// API
+////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Return a computer with a given name
- */
-func (this *LdapManager) GetComputerByName(name string) (*CargoEntities.Computer, *CargoEntities.Error) {
-
-	var query EntityQuery
-	query.TypeName = "CargoEntities.Computer"
-	query.Indexs = append(query.Indexs, "M_name="+name)
-	query.Fields = append(query.Fields, "UUID")
-	var fieldsType []interface{} // not use...
-	var params []interface{}
-	queryStr, _ := json.Marshal(query)
-	results, err := GetServer().GetDataManager().readData(CargoEntitiesDB, string(queryStr), fieldsType, params)
+// @api 1.0
+// Synchronize the computers, users and group of an LDAP server.
+// @param {string} id The LDAP server connection id.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.Account} The new registered account.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *LdapManager) Synchronize(id string, messageId string, sessionId string) {
+	// Synchronize the list of user...
+	err := this.synchronizeUsers(id)
 	if err != nil {
-		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err)
-		return nil, cargoError
+		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), LDAP_ERROR, SERVER_ERROR_CODE, err))
 	}
 
-	// Here nothing was found...
-	if len(results) == 0 {
-		cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No computer was found with name "+name))
-		return nil, cargoError
+	// Synchronize the list of group...
+	err = this.synchronizeGroups(id)
+	if err != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), LDAP_ERROR, SERVER_ERROR_CODE, err))
 	}
 
-	// Get the computer with it name...
-	computerEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(results[0][0].(string), false)
-	if errObj == nil {
-		computer := computerEntity.GetObject().(*CargoEntities.Computer)
-		return computer, errObj
+	// Synchronize the list of computer...
+	err = this.synchronizeComputers(id)
+	if err != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), LDAP_ERROR, SERVER_ERROR_CODE, err))
 	}
-
-	return nil, errObj
 }
 
-/**
- * Return a computer with a given Ip adress...
- */
-func (this *LdapManager) GetComputerByIp(ip string) (*CargoEntities.Computer, *CargoEntities.Error) {
+// @api 1.0
+// Authenticate a user with a given account id and psswd.
+// @param {string} id The account id
+// @param {string} password The password associated with the new account.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.Account} The new registered account.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *LdapManager) Authenticate(id string, login string, psswd string) bool {
+	ok := this.authenticate(id, login, psswd)
 
-	// Il will make a lookup first and test if the computer contain the name
-	ids, _ := net.LookupAddr(ip)
-	if len(ids) > 0 {
-		return this.GetComputer(strings.ToUpper(ids[0]))
-	} else {
-		hostname, _ := os.Hostname()
-		computer, err := this.GetComputerByName(strings.ToUpper(hostname))
-		if err == nil {
-			return computer, nil
-		}
+	return ok
+}
 
-		if len(hostname) > 0 {
-			computer := new(CargoEntities.Computer)
-			computer.M_name = strings.ToUpper(hostname)
-			computer.M_id = strings.ToUpper(hostname)
-			computer.M_osType = CargoEntities.OsType_Unknown
-			computer.M_platformType = CargoEntities.PlatformType_Unknown
-			computer.M_ipv4 = "127.0.0.1"
-			return computer, nil
-		}
+// @api 1.0
+// Execute a search over a LDAP server with a given connection id
+// @param {string} id The LDAP connection id
+// @param {string} login Account name to login over the LDAP server.
+// @param {string} password The password associated with the login.
+// @param {string} base_dn The base dns query
+// @param {string} filter The query filter
+// @param {[]string} attributes The query attributes
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {[][]interface{}} A tow dimensional array of values.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *LdapManager) Search(id string, login string, psswd string, base_dn string, filter string, attributes []string, messageId string, sessionId string) [][]interface{} {
+	values, err := this.search(id, login, psswd, base_dn, filter, attributes)
+	if err != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), LDAP_ERROR, SERVER_ERROR_CODE, err))
 	}
 
-	return nil, NewError(Utility.FileLine(), COMPUTER_IP_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The computer with the ip '"+ip+"' was not found. "))
+	return values
+}
+
+// @api 1.0
+// Return computer object from a given IPV4 address
+// @param {string} ip The IPV4 computer address
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.Computer} The computer associated with the address
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *LdapManager) GetComputerByIp(ip string, messageId string, sessionId string) *CargoEntities.Computer {
+	computer, err := this.getComputerByIp(ip)
+	if err != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, err)
+		return nil
+	}
+
+	return computer
+}
+
+// @api 1.0
+// Return computer object with a given name
+// @param {string} name The computer domain name on the network
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.Computer} The computer associated with the address
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *LdapManager) GetComputerByName(name string, messageId string, sessionId string) *CargoEntities.Computer {
+	computer, err := this.getComputerByName(name)
+	if err != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, err)
+		return nil
+	}
+	return computer
 }

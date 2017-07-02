@@ -77,7 +77,6 @@ func (this *Server) GetEventManager() *EventManager {
  * A singleton that manage the event channels...
  */
 func newEventManager() *EventManager {
-
 	eventManager := new(EventManager)
 	eventManager.m_channels = make(map[string]*EventChannel, 0)
 	return eventManager
@@ -318,9 +317,10 @@ func (this *EventChannel) removeEventListener(listener *EventListener) {
 // API Event manager
 //////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Event to broadcast on the channel...
- */
+// @api 1.0
+// Event to broadcast on the channel...
+// @param {*Server.Event} evt Event to broadcast over the network.
+// @scope {hidden}
 func (this *EventManager) BroadcastEvent(evt *Event) {
 	// Broadcast event over listener over the channel.
 	this.Lock()
@@ -334,9 +334,11 @@ func (this *EventManager) BroadcastEvent(evt *Event) {
 	delete(this.m_eventDataMap, evt)
 }
 
-/**
- * Send event to specific account.
- */
+// @api 1.0
+// Send event to specific account.
+// @param {*Server.Event} evt Event to broadcast over the network.
+// @param {*CargoEntities.Account} to The target account
+// @scope {hidden}
 func (this *EventManager) BroadcastEventTo(evt *Event, to *CargoEntities.Account) {
 	this.Lock()
 	defer this.Unlock()
@@ -347,9 +349,10 @@ func (this *EventManager) BroadcastEventTo(evt *Event, to *CargoEntities.Account
 	}
 }
 
-/**
- * Add and remove channel from the handler.
- */
+// @api 1.0
+// Add a new event listener
+// @param {*Server.EventListener} The event listener to append.
+// @scope {public}
 func (this *EventManager) AddEventListener(listener *EventListener) {
 	this.Lock()
 	defer this.Unlock()
@@ -367,9 +370,11 @@ func (this *EventManager) AddEventListener(listener *EventListener) {
 	channel.m_listeners[listener.getId()] = listener
 }
 
-/**
- * Remove specific listener from a channel.
- */
+// @api 1.0
+// Remove a event listener from a given channel
+// @param {string} id The event listener id to remove.
+// @param {string} name The name of the channel where the listner lisen to.
+// @scope {public}
 func (this *EventManager) RemoveEventListener(id string, name string) {
 	this.Lock()
 	defer this.Unlock()
@@ -383,13 +388,18 @@ func (this *EventManager) RemoveEventListener(id string, name string) {
 	}
 }
 
-/**
- * Broadcast the event data over the network. The envent datas must be
- * an array of Message Data.
- */
-func (this *EventManager) BroadcastEventData(evetNumber int64, evtType string, eventDatas interface{}, messageId string, sessionId string) {
+// @api 1.0
+// Broadcast event over the network.
+// @param {int} eventNumber The event number.
+// @param {string} channelId The event type.
+// @param {int} eventDatas An array of Message Data structures.
+// @param {interface{}} eventDatas An array of Message Data structures.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+func (this *EventManager) BroadcastEventData(eventNumber int64, channelId string, eventDatas interface{}, messageId string, sessionId string) {
 	// Create the new event objet...
-	evt, _ := NewEvent(int32(evetNumber), evtType, eventDatas.([]*MessageData))
+	evt, _ := NewEvent(int32(eventNumber), channelId, eventDatas.([]*MessageData))
 
 	b, err := json.Marshal(eventDatas.([]*MessageData))
 	this.appendEventData(evt, string(b))
@@ -403,13 +413,18 @@ func (this *EventManager) BroadcastEventData(evetNumber int64, evtType string, e
 	this.BroadcastEvent(evt)
 }
 
-/**
- * 	Append a new filter to a listener
- */
-func (this *EventManager) AppendEventFilter(filter string, eventType string, messageId string, sessionId string) {
+// @api 1.0
+// Append a new filter to a listener
+// @param {string} filter The filter to append
+// @param {string} channelId The id of the channel.
+// @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+func (this *EventManager) AppendEventFilter(filter string, channelId string, messageId string, sessionId string) {
 	//log.Println("append event filter ", filter, " for type ", eventType, " to session ", sessionId)
-	if this.m_channels[eventType] != nil {
-		listener := this.m_channels[eventType].m_listeners[sessionId]
+	if this.m_channels[channelId] != nil {
+		listener := this.m_channels[channelId].m_listeners[sessionId]
 		if listener != nil {
 			listener.appendFilter(filter)
 		}

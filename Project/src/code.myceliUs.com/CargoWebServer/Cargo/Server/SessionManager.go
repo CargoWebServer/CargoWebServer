@@ -270,7 +270,7 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 
 		// Verify if the password is correct
 		if _, ok := GetServer().GetLdapManager().m_configsInfo[serverId]; ok {
-			if GetServer().GetLdapManager().Authenticate(serverId, account.M_id, psswd) == false {
+			if GetServer().GetLdapManager().authenticate(serverId, account.M_id, psswd) == false {
 				if account.M_password != psswd {
 
 					// Create the error message
@@ -312,7 +312,7 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 			connection := GetServer().getConnectionById(sessionId)
 			if connection != nil {
 				addr := connection.GetAddrStr()
-				computer, err := GetServer().GetLdapManager().GetComputerByIp(addr)
+				computer, err := GetServer().GetLdapManager().getComputerByIp(addr)
 				if err == nil {
 					session.SetComputerRef(computer)
 				}
