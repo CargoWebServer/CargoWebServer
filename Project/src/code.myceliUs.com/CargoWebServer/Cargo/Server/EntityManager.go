@@ -1457,7 +1457,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 	}
 
 	// Here I will set the ownership of the entity.
-	session := GetServer().GetSessionManager().GetActiveSessionById(sessionId)
+	session := GetServer().GetSessionManager().getActiveSessionById(sessionId)
 	this.setEntityOwner(session.GetAccountPtr(), result)
 
 	return result.GetObject()

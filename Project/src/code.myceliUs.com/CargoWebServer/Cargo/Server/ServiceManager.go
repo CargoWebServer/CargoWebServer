@@ -2,6 +2,9 @@ package Server
 
 import (
 	//	"errors"
+	"go/doc"
+	"go/parser"
+	"go/token"
 	"log"
 	"os/exec"
 	"reflect"
@@ -20,9 +23,9 @@ const (
 type ServiceManager struct {
 
 	// info about connection on smtp server...
-	m_services            map[string]Service
-	m_servicesLst         []Service
-	m_serviceContainerCmd *exec.Cmd
+	m_services             map[string]Service
+	m_servicesLst          []Service
+	m_serviceContainerCmds []*exec.Cmd
 
 	// Here is the list of action with theire initial
 	// access type.
@@ -233,9 +236,34 @@ func (this *ServiceManager) getId() string {
 	return "ServiceManager"
 }
 
+func (this *ServiceManager) startServiceContainer(name string, port int) error {
+	// The first step will be to start the service manager.
+	tcp_serviceContainerPath := GetServer().GetConfigurationManager().GetBinPath() + "/" + name
+	if runtime.GOOS == "windows" {
+		tcp_serviceContainerPath += ".exe"
+	}
+
+	// Set the command
+	cmd := exec.Command(tcp_serviceContainerPath)
+	cmd.Args = append(cmd.Args, strconv.Itoa(port))
+
+	// Call it...
+	err := cmd.Start()
+	if err != nil {
+		log.Println("---> fail to start the service container!")
+		return err
+	}
+
+	// the command succed here.
+	serviceManager.m_serviceContainerCmds = append(serviceManager.m_serviceContainerCmds, cmd)
+
+	return nil
+}
+
 func (this *ServiceManager) start() {
 
 	log.Println("--> Start ServiceManager")
+
 	// I will create new action if there one's...
 	for i := 0; i < len(this.m_servicesLst); i++ {
 		// register the action inside the service.
@@ -244,20 +272,6 @@ func (this *ServiceManager) start() {
 
 	// register itself as service.
 	this.registerActions(this)
-
-	// The first step will be to start the service manager.
-	tcp_serviceContainerPath := GetServer().GetConfigurationManager().GetBinPath() + "/CargoServiceContainer_TCP"
-	if runtime.GOOS == "windows" {
-		tcp_serviceContainerPath += ".exe"
-	}
-	serviceManager.m_serviceContainerCmd = exec.Command(tcp_serviceContainerPath)
-	serviceManager.m_serviceContainerCmd.Args = append(serviceManager.m_serviceContainerCmd.Args, strconv.Itoa(GetServer().GetConfigurationManager().GetTcpConfigurationServicePort()))
-
-	//var err error
-	/*err := serviceManager.m_serviceContainerCmd.Start()
-	if err != nil {
-		log.Println("---> fail to start the service container!")
-	}*/
 
 	for i := 0; i < len(this.m_servicesLst); i++ {
 		// Get the service configuration information.
@@ -270,43 +284,12 @@ func (this *ServiceManager) start() {
 		}
 	}
 
-	// Now I will create a connection with the tcp service container.
-	err := GetServer().Connect(GetServer().GetConfigurationManager().GetIpv4(), GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
+	// TCP
+	// this.startServiceContainer("CargoServiceContainer_TCP", GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
 
-	if err == nil {
+	// WS
+	// this.startServiceContainer("CargoServiceContainer_WS", GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
 
-		log.Println("Connection is made!")
-		/*
-			connectionId := GetServer().GetConfigurationManager().GetIpv4() + ":" + strconv.Itoa(GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
-			conn := GetServer().peers[connectionId]
-			log.Println("----------> Try to ping connection ", connectionId)
-
-			// Here I will create a new request.
-			id := Utility.RandomUUID()
-			method := "Ping"
-			params := make([]*MessageData, 0)
-			to := make([]connection, 1)
-			to[0] = conn
-
-			successCallback := func(rspMsg *message, caller interface{}) {
-				log.Println("success!!!")
-			}
-
-			errorCallback := func(rspMsg *message, caller interface{}) {
-				log.Println("error!!!")
-			}
-
-			ping, err := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback)
-
-			if err != nil {
-				log.Println(err, "Fail to ping ", connectionId)
-			} else {
-				log.Println("--------> no ping error!-)")
-			}
-
-			GetServer().GetProcessor().m_pendingRequestChannel <- ping
-		*/
-	}
 }
 
 func (this *ServiceManager) stop() {
@@ -315,10 +298,10 @@ func (this *ServiceManager) stop() {
 		service.stop()
 	}
 
-	// Stop the process...
-	if serviceManager.m_serviceContainerCmd != nil {
-		if serviceManager.m_serviceContainerCmd.Process != nil {
-			serviceManager.m_serviceContainerCmd.Process.Kill()
+	// Stop the services containers...
+	for i := 0; i < len(serviceManager.m_serviceContainerCmds); i++ {
+		if serviceManager.m_serviceContainerCmds[i].Process != nil {
+			serviceManager.m_serviceContainerCmds[i].Process.Kill()
 		}
 	}
 }
@@ -340,31 +323,63 @@ func (this *ServiceManager) registerActions(service Service) {
 	// I will use the reflection to reteive method inside the service
 	serviceType := reflect.TypeOf(service)
 
+	// Here I will get the documentation information necessary to
+	// create the action js code.
+	methodsDoc := make(map[string]*doc.Func, 0)
+	fset := token.NewFileSet() // positions are relative to fset
+	d, err := parser.ParseDir(fset, "./Cargo/Server", nil, parser.ParseComments)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, f := range d {
+		p := doc.New(f, "./", 0)
+		for _, t := range p.Types {
+			if t.Name == service.getId() {
+				for _, m := range t.Methods {
+					methodsDoc[m.Name] = m
+				}
+				break
+			}
+		}
+	}
+
 	// Now I will print it list of function.
 	for i := 0; i < serviceType.NumMethod(); i++ {
 		// I will try to find if the action was register
 		method := serviceType.Method(i)
 		methodName := strings.Replace(serviceType.String(), "*", "", -1) + "." + method.Name
 		metodUuid := CargoEntitiesActionExists(methodName)
-
 		if len(metodUuid) == 0 && !(strings.HasPrefix(method.Name, "New") && (strings.HasSuffix(method.Name, "Entity") || strings.HasSuffix(method.Name, "EntityFromObject"))) {
 
 			action := new(CargoEntities.Action)
 			action.SetName(methodName)
+			m := methodsDoc[methodName[strings.LastIndex(methodName, ".")+1:]]
+			if m != nil {
+				action.SetDoc(m.Doc)
+			}
 
 			// Set the uuid
 			GetServer().GetEntityManager().NewCargoEntitiesActionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", action)
 
 			// The input
 			for j := 0; j < method.Type.NumIn(); j++ {
-				in := method.Type.In(j)
 				// The first paramters is the object itself.
-				if j > 2 {
+				if j >= 1 {
+					in := method.Type.In(j)
 					parameter := new(CargoEntities.Parameter)
 					parameter.UUID = "CargoEntities.Parameter%" + Utility.RandomUUID() // Ok must be random
 					parameter.TYPENAME = "CargoEntities.Parameter"
 					parameter.SetType(in.String())
-					parameter.SetName("p" + strconv.Itoa(len(action.M_parameters)))
+
+					if m != nil {
+						field := m.Decl.Type.Params.List[j-1]
+						parameter.SetName(field.Names[0].String())
+					} else {
+						parameter.SetName("p" + strconv.Itoa(len(action.M_parameters)))
+					}
+
 					if strings.HasPrefix(in.String(), "[]") {
 						parameter.SetIsArray(true)
 					} else {
@@ -427,7 +442,219 @@ func (this *ServiceManager) registerActions(service Service) {
 			}
 		}
 	}
+
 	GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+
+	// Here I will generate the client service class.
+	var src string
+	var eventTypename = strings.Replace(service.getId(), "Manager", "Event", -1)
+
+	// Here I will generate the javascript code use by client side.
+	src = "\nvar " + service.getId() + " = function(){\n"
+	src += "	if (server == undefined) {\n"
+	src += "		return\n"
+	src += "	}\n"
+	src += "	EventHub.call(this, " + eventTypename + ")\n\n"
+	src += "	return this\n"
+	src += "}\n\n"
+
+	src += service.getId() + ".prototype = new EventHub(null);\n"
+	src += service.getId() + ".prototype.constructor = " + service.getId() + ";\n\n"
+
+	src += service.getId() + ".prototype.onEvent = function (evt) {\n"
+	src += "	EventHub.prototype.onEvent.call(this, evt)\n"
+	src += "}\n"
+
+	actions := this.GetServiceActions(service.getId(), "", "")
+
+	for i := 0; i < len(actions); i++ {
+		action := actions[i]
+		name := action.M_name[strings.LastIndex(action.M_name, ".")+1:]
+		doc := action.GetDoc()
+		if strings.Index(doc, "@api ") != -1 {
+			src += service.getId() + ".prototype." + strings.ToLower(name[0:1]) + name[1:] + " = function("
+
+			// Now the parameters...
+			if action.M_parameters != nil {
+				// The last tow parameters are sessionId and message Id
+				for j := 0; j < len(action.M_parameters)-2; j++ {
+					src += action.M_parameters[j].GetName()
+					if j < len(action.M_parameters)-2 {
+						src += ", "
+					}
+				}
+			}
+
+			// I will look for callback function.
+			callbacks := make([]string, 0)
+
+			if strings.Index(doc, "@param {callback} successCallback") != -1 {
+				callbacks = append(callbacks, "successCallback")
+			}
+
+			if strings.Index(doc, "@param {callback} progressCallback") != -1 {
+				callbacks = append(callbacks, "progressCallback")
+			}
+
+			if strings.Index(doc, "@param {callback} errorCallback") != -1 {
+				callbacks = append(callbacks, "errorCallback")
+			}
+
+			for j := 0; j < len(callbacks); j++ {
+				src += callbacks[j]
+				if j < len(callbacks)-1 {
+					src += ", "
+				}
+			}
+			if len(callbacks) > 0 {
+				src += ", "
+			}
+			src += "caller){\n"
+
+			// Here I will generate the content of the function.
+			if action.M_parameters != nil {
+				src += "	var params = []\n"
+				for j := 0; j < len(action.M_parameters)-2; j++ {
+					param := action.M_parameters[j]
+					paramTypeName := param.GetType()
+					if paramTypeName == "string" {
+						src += "	params.push(createRpcData(" + param.GetName() + ", \"STRING\", \"" + param.GetName() + "\"))\n"
+					} else if strings.HasPrefix(paramTypeName, "int") {
+						src += "	params.push(createRpcData(" + param.GetName() + ", \"INTEGER\", \"" + param.GetName() + "\"))\n"
+					} else if paramTypeName == "bool" {
+						src += "	params.push(createRpcData(" + param.GetName() + ", \"BOOLEAN\", \"" + param.GetName() + "\"))\n"
+					} else if paramTypeName == "double" || strings.HasPrefix(paramTypeName, "float") {
+						src += "	params.push(createRpcData(" + param.GetName() + ", \"DOUBLE\", \"" + param.GetName() + "\"))\n"
+					} else if paramTypeName == "[]unit8" || paramTypeName == "[]byte" {
+						src += "	params.push(createRpcData(" + param.GetName() + ", \"BYTES\", \"" + param.GetName() + "\"))\n"
+					} else {
+						// Array or Object or array of object...
+						src += "	params.push(createRpcData(" + param.GetName() + ", \"JSON_STR\", \"" + param.GetName() + "\"))\n"
+					}
+				}
+			}
+
+			// Now will generate the code for executeJsFunction.
+			src += "\n	server.executeJsFunction(\n"
+			src += "	\"" + service.getId() + name + "\",\n"
+			src += "	params, \n"
+			caller := "{"
+			if Utility.Contains(callbacks, "progressCallback") {
+				// Set the progress callback.
+				src += "	function (index, total, caller) { // Progress callback\n"
+				src += "		caller.progressCallback(index, total, caller.caller)\n"
+				src += "	},\n"
+
+				// Set the caller.
+				caller += "\"progressCallback\":progressCallback, "
+			} else {
+				src += "	undefined, //progress callback\n"
+			}
+
+			if Utility.Contains(callbacks, "successCallback") {
+				// Set the progress callback.
+				src += "	function (results, caller) { // Success callback\n"
+				if len(action.M_results) > 0 {
+					typeName := action.M_results[0].M_type
+					isArray := strings.HasPrefix(typeName, "[]")
+					typeName = strings.Replace(typeName, "[]", "", -1)
+					typeName = strings.Replace(typeName, "*", "", -1)
+					// Now I will test if the type is an entity...
+					if strings.Index(typeName, ".") > -1 {
+						// Here I got an entity...
+
+						src += "		server.entityManager.getEntityPrototype(\"" + typeName + "\", \"" + typeName[0:strings.Index(typeName, ".")] + "\",\n"
+						src += "			function (prototype, caller) { // Success Callback\n"
+						// in case of an array...
+						if isArray {
+							src += "			var entities = []\n"
+							src += "			for (var i = 0; i < caller.results[0].length; i++) {\n"
+							src += "				var entity = eval(\"new \" + prototype.TypeName + \"()\")\n"
+							src += "				if (i == caller.results[0].length - 1) {\n"
+							src += "					entity.initCallback = function (caller) {\n"
+							src += "						return function (entity) {\n"
+							src += "							server.entityManager.setEntity(entity)\n"
+							src += "							caller.successCallback(entities, caller.caller)\n"
+							src += "						}\n"
+							src += "					} (caller)\n"
+							src += "				}else{\n"
+							src += "					entity.initCallback = function (entity) {\n"
+							src += "						server.entityManager.setEntity(entity)\n"
+							src += "					}\n"
+							src += "				}\n"
+							src += "				entities.push(entity)\n"
+							src += "				entity.init(caller.results[0][i])\n"
+							src += "			}\n"
+						} else {
+							// In case of a regular entity.
+							src += "			if (caller.results[0] == null) {\n"
+							src += "				return\n"
+							src += "			}\n"
+
+							// In case of existing entity.
+							src += "			if (entities[caller.results[0].UUID] != undefined && caller.results[0].TYPENAME == caller.results[0].__class__) {\n"
+							src += "				caller.successCallback(entities[caller.results[0].UUID], caller.caller)\n"
+							src += "				return // break it here.\n"
+							src += "			}\n\n"
+
+							src += "			var entity = eval(\"new \" + prototype.TypeName + \"()\")\n"
+							src += "				entity.initCallback = function () {\n"
+							src += "					return function (entity) {\n"
+							src += "						caller.successCallback(entity, caller.caller)\n"
+							src += "				}\n"
+							src += "			}(caller)\n"
+							src += "			entity.init(caller.results[0])\n"
+						}
+
+						src += "			},\n"
+						src += "			function (errMsg, caller) { // Error Callback\n"
+						src += "				caller.errorCallback(errMsg, caller.caller)\n"
+						src += "			},\n"
+						caller := "{ \"caller\": caller.caller"
+
+						if Utility.Contains(callbacks, "progressCallback") {
+							caller += ", \"progressCallback\": caller.progressCallback"
+						}
+						caller += ", \"successCallback\": caller.successCallback, \"errorCallback\": caller.errorCallback, \"results\": results }\n"
+						src += "			" + caller
+
+						src += "		)\n"
+
+					} else {
+						// Here I got a regulat type.
+						src += "		caller.successCallback(results, caller.caller)\n"
+					}
+				} else {
+					src += "		caller.successCallback(results, caller.caller)\n"
+				}
+
+				src += "	},\n"
+				// Set the caller.
+				caller += "\"successCallback\":successCallback, "
+			} else {
+				src += "	undefined, //success callback\n"
+			}
+
+			if Utility.Contains(callbacks, "errorCallback") {
+				src += "	function (errMsg, caller) { // Error callback\n"
+				src += "		caller.errorCallback(errMsg, caller.caller)\n"
+				src += "		server.errorManager.onError(errMsg)\n"
+				src += "	},"
+				// Set the caller.
+				caller += "\"errorCallback\":errorCallback, "
+			} else {
+				src += "	undefined, //error callback\n"
+			}
+
+			caller += "\"caller\": caller}"
+			src += caller + ")\n"
+			src += "}\n\n"
+		}
+	}
+
+	if service.getId() == "SecurityManager" {
+		log.Println(src)
+	}
 
 }
 

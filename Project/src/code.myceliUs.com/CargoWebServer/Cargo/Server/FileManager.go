@@ -1005,6 +1005,20 @@ func (this *FileManager) OpenFile(fileId string, messageId string, sessionId str
 		file.SetData(base64.StdEncoding.EncodeToString(filedata))
 	}
 
+	/*
+		eventData := make([]*MessageData, 1)
+		fileInfo := new(MessageData)
+		fileInfo.Name = "fileInfo"
+
+		fileInfo.Value = file
+		eventData[0] = fileInfo
+
+		var evt *Event
+		evt, _ = NewEvent(OpenFileEvent, FileEvent, eventData)
+
+		GetServer().GetEventManager().BroadcastEvent(evt)
+	*/
+
 	// Return the file object...
 	return file
 }

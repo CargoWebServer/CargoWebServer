@@ -214,11 +214,11 @@ EntityTableModel.prototype.removeRow = function (rowIndex) {
         return
     }
 
-    var parentEntity = server.entityManager.entities[entity.ParentUuid]
+    var parentEntity = entities[entity.ParentUuid]
 
 
     // Now I will get the data type for that type.
-    var parentPrototype = server.entityManager.entityPrototypes[parentEntity.TYPENAME]
+    var parentPrototype = entityPrototypes[parentEntity.TYPENAME]
     var field = entity.parentLnk
     var fieldType = parentPrototype.FieldsType[parentPrototype.getFieldIndex(field)]
 
@@ -235,7 +235,7 @@ EntityTableModel.prototype.removeRow = function (rowIndex) {
             var confirmDialog = new Dialog(randomUUID(), undefined, true)
             confirmDialog.setCentered()
             server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
-            var prototype = server.entityManager.entityPrototypes[entity.TYPENAME]
+            var prototype = entityPrototypes[entity.TYPENAME]
             var id = prototype.Ids[1] // 0 is the uuid...
             if (id == undefined) {
                 id = "uuid"
@@ -295,7 +295,7 @@ EntityTableModel.prototype.appendRow = function (values) {
     this.entities.push(values)
     var isListOf = server.entityManager.isListOf(this.proto.TypeName)
     var objectValues = []
-    var prototype = server.entityManager.entityPrototypes[values.TYPENAME]
+    var prototype = entityPrototypes[values.TYPENAME]
 
     for (var j = 0; j < this.titles.length; j++) {
         var field = "M_" + this.titles[j]

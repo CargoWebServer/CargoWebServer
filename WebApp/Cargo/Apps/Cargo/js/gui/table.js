@@ -219,7 +219,7 @@ Table.prototype.init = function () {
 		// The new entity event...
 		server.entityManager.attach(this, NewEntityEvent, function (evt, table) {
 			if (evt.dataMap["entity"] != undefined) {
-				var entity = server.entityManager.entities[evt.dataMap["entity"].UUID]
+				var entity = entities[evt.dataMap["entity"].UUID]
 				if (entity != undefined) {
 					if (entity.TYPENAME == table.model.proto.TypeName) {
 						if (entity.ParentUuid != undefined && table.model.getParentUuid() != undefined) {
@@ -426,7 +426,7 @@ Table.prototype.appendRow = function (values, id) {
 		if (this.model.constructor === EntityTableModel) {
 			server.entityManager.attach(this, UpdateEntityEvent, function (evt, table) {
 				if (evt.dataMap["entity"] != undefined) {
-					var entity = server.entityManager.entities[evt.dataMap["entity"].UUID]
+					var entity = entities[evt.dataMap["entity"].UUID]
 					if (entity != undefined) {
 						for (var i = 0; i < table.model.entities.length; i++) {
 							if (table.model.entities[i] != undefined) {
@@ -689,7 +689,7 @@ var TableCell = function (row, index, value) {
 function createItemLnk(entity, value, field, valueDiv) {
 	// Remove the content if any...
 	valueDiv.element.innerHTML = ""
-	var prototype = server.entityManager.entityPrototypes[value.TYPENAME]
+	var prototype = entityPrototypes[value.TYPENAME]
 
 	var titles = []
 	if (value.getTitles != undefined) {
@@ -719,7 +719,7 @@ function createItemLnk(entity, value, field, valueDiv) {
 				ref.subEntityPanel = new EntityPanel(valueDiv, entity.TYPENAME,
 					// The init callback. 
 					function (entityPanel) {
-						entityPanel.setEntity(server.entityManager.entities[entity.UUID])
+						entityPanel.setEntity(entities[entity.UUID])
 					},
 					undefined, true, entity, field)
 			} else {
@@ -735,7 +735,7 @@ function createItemLnk(entity, value, field, valueDiv) {
 	// Now the delete action...
 	deleteLnkButton.element.onclick = function (entityUuid, object, field, content) {
 		return function () {
-			var entity = server.entityManager.entities[entityUuid]
+			var entity = entities[entityUuid]
 			removeObjectValue(entity, field, object)
 			server.entityManager.saveEntity(entity,
 				function (result, content) {
@@ -835,13 +835,13 @@ TableCell.prototype.formatValue = function (value) {
 				}
 			} else if (isXsId(fieldType)) {
 				// here I have an entity now I need to know if is an abstact entity or not.
-				var entity = server.entityManager.entities[this.row.table.model.entities[this.row.index].UUID]
+				var entity = entities[this.row.table.model.entities[this.row.index].UUID]
 				if (entity == undefined) {
 					// In case of newly created entity.
 					entity = this.row.table.model.entities[this.row.index]
 				}
 				var entityType = entity.__class__
-				var entityPrototype = server.entityManager.entityPrototypes[entityType]
+				var entityPrototype = entityPrototypes[entityType]
 				if (entityPrototype.IsAbstract) {
 					// Here I will treat it as a reference.
 					var field = "M_" + this.row.table.model.titles[this.index]
@@ -852,7 +852,7 @@ TableCell.prototype.formatValue = function (value) {
 
 						}, { "valueDiv": this.valueDiv, "field": field, "createItemLnk": createItemLnk, "entity": entity })
 					// Here will create an indermine 
-					if (server.entityManager.entities[entity.UUID] == undefined) {
+					if (entities[entity.UUID] == undefined) {
 						return new Element(null, { "tag": "progress", "innerHtml": "Unknown" })// return here...
 					}
 					return new Element(null, { "tag": "div", "innerHtml": "" })
@@ -889,7 +889,7 @@ TableCell.prototype.formatValue = function (value) {
 			var tableModel = new TableModel(["index", "values"])
 			tableModel.fields = ["xs.int", baseType.replace("[]", "")]
 			tableModel.editable[1] = true
-			var entity = server.entityManager.entities[this.row.table.model.entities[this.row.index].UUID]
+			var entity = entities[this.row.table.model.entities[this.row.index].UUID]
 			var itemTable = new Table(randomUUID(), content)
 
 			itemTable.setModel(tableModel, function (table, items, entity, field) {
@@ -902,7 +902,7 @@ TableCell.prototype.formatValue = function (value) {
 								// Here I will simply remove the element 
 								// The entity must contain a list of field...
 								if (isString(entity)) {
-									entity = server.entityManager.entities[entity]
+									entity = entities[entity]
 								}
 								if (entity[field] != undefined) {
 									entity[field].splice(row.index, 1)
@@ -918,7 +918,7 @@ TableCell.prototype.formatValue = function (value) {
 								// Here I will simply remove the element 
 								// The entity must contain a list of field...
 								if (isString(entity)) {
-									entity = server.entityManager.entities[entity]
+									entity = entities[entity]
 								}
 								if (entity[field] != undefined) {
 									entity[field][row.index] = row.table.model.getValueAt(row.index, 1)
@@ -943,7 +943,7 @@ TableCell.prototype.formatValue = function (value) {
 			newLnkButton.element.onclick = function (itemTable, entity, field, fieldType) {
 				return function () {
 					if (isString(entity)) {
-						entity = server.entityManager.entities[entity]
+						entity = entities[entity]
 					}
 					var newRow = itemTable.appendRow([entity[field].length + 1, "0"], entity[field].length)
 					newRow.saveBtn.element.style.visibility = "visible"
@@ -985,7 +985,7 @@ TableCell.prototype.formatValue = function (value) {
 		}
 	} else {
 		if (isArray_) {
-			var entity = server.entityManager.entities[this.row.table.model.entities[this.row.index].UUID]
+			var entity = entities[this.row.table.model.entities[this.row.index].UUID]
 			if (entity == undefined) {
 				// In case of newly created entity.
 				entity = this.row.table.model.entities[this.row.index]
@@ -995,7 +995,7 @@ TableCell.prototype.formatValue = function (value) {
 
 				// In that case the array contain a list of reference.
 				// An entity table...
-				var itemPrototype = server.entityManager.entityPrototypes[fieldType.replace("[]", "").replace(":Ref", "")]
+				var itemPrototype = entityPrototypes[fieldType.replace("[]", "").replace(":Ref", "")]
 				var field = "M_" + this.row.table.model.titles[this.index]
 
 				var content = this.valueDiv.getChildById(field + "_content")
@@ -1019,7 +1019,7 @@ TableCell.prototype.formatValue = function (value) {
 					}
 
 					var entity = this.row.table.model.entities[this.row.index]
-					entity = server.entityManager.entities[entity.UUID]
+					entity = entities[entity.UUID]
 
 					if (uuid.length > 0 && isObjectReference(uuid)) {
 						if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
@@ -1063,7 +1063,7 @@ TableCell.prototype.formatValue = function (value) {
 							function (newLnkInput, entity, field, valueDiv) {
 								return function (value) {
 									// I will get the value from the entity manager...
-									value = server.entityManager.entities[value.UUID]
+									value = entities[value.UUID]
 									var lnkDiv = valueDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
 									createItemLnk(entity, value, field, lnkDiv)
 									newLnkInput.element.parentNode.removeChild(newLnkInput.element)
@@ -1090,7 +1090,7 @@ TableCell.prototype.formatValue = function (value) {
 				content = new Element(this.valueDiv, { "tag": "div", "style": "display: table-row;", "id": field + "_content" })
 				var newLnkButton = content.appendElement({ "tag": "div", "class": "new_row_button row_button", "id": field + "_plus_btn" }).down()
 				newLnkButton.appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
-				var itemPrototype = server.entityManager.entityPrototypes[fieldType.replace("[]", "")]
+				var itemPrototype = entityPrototypes[fieldType.replace("[]", "")]
 
 				if (value.length > 0) {
 					// An entity table...
@@ -1138,7 +1138,7 @@ TableCell.prototype.formatValue = function (value) {
 						}
 						if (itemTable == undefined) {
 							var itemTable = new Table(randomUUID(), content)
-							var itemsTableModel = new EntityTableModel(server.entityManager.entityPrototypes[fieldType])
+							var itemsTableModel = new EntityTableModel(entityPrototypes[fieldType])
 							itemTable.setModel(itemsTableModel, function (table, item) {
 								return function () {
 									newRow = itemTable.appendRow(item, item.UUID)
@@ -1174,7 +1174,7 @@ TableCell.prototype.formatValue = function (value) {
 
 				var entity = this.row.table.model.entities[this.row.index]
 				if (entity != undefined) {
-					entity = server.entityManager.entities[entity.UUID]
+					entity = entities[entity.UUID]
 					if (uuid != undefined && entity != undefined) {
 						if (uuid.length > 0 && isObjectReference(uuid)) {
 							// TODO use setRef(owner, property, refValue, isArray) insted
@@ -1356,7 +1356,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 			editor.element.value = value
 		} else if (prototype != null) {
 			// get the rentity reference from the model.
-			var entity = server.entityManager.entities[this.row.table.model.entities[this.row.index].UUID]
+			var entity = entities[this.row.table.model.entities[this.row.index].UUID]
 			if (entity == undefined) {
 				entity = this.row.table.model.entities[this.row.index]
 			}
@@ -1392,7 +1392,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 								if (value != null) {
 									if (entity != undefined) {
 										// Show the save button
-										value = server.entityManager.entities[value.UUID]
+										value = entities[value.UUID]
 										var lnkDiv = valueDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
 										createItemLnk(entity, value, field, lnkDiv)
 										delete tableCell.row.table.cellEditors[tableCell.index]
@@ -1408,7 +1408,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				}
 			} else {
 				// Here I will get the prototype for the field type
-				var fieldPrototype = server.entityManager.entityPrototypes[type]
+				var fieldPrototype = entityPrototypes[type]
 				if (fieldPrototype.Restrictions != undefined) {
 					if (fieldPrototype.Restrictions.length > 0) {
 						editor = this.div.appendElement({ "tag": "select", "id": "" }).down()

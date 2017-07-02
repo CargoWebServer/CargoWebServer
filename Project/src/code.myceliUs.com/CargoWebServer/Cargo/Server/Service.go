@@ -24,4 +24,5 @@ type Service interface {
 	 * Stoping the service.
 	 */
 	stop()
+	
 }

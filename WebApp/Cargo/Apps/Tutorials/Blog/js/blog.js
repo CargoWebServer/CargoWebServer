@@ -505,49 +505,74 @@ var BlogManager = function (parent) {
 
             // Here I will try to login in on the server.
             server.sessionManager.login(userName, password, "",
-                function (result, caller) {
-                    // short variable name.
-                    var userInfoDropdownLnk = caller.blogManager.userInfoDropdownLnk
-                    var loginDropdownLnk = caller.blogManager.loginDropdownLnk
-                    var logoutDropdownLnk = caller.blogManager.logoutDropdownLnk
-                    var registerLnk = caller.blogManager.registerLnk
-                    var newBlogLnk = caller.blogManager.newBlogLnk
+                function (session, caller) {
+                    caller.successCallback = function (session) {
+                        // short variable name.
+                        var userInfoDropdownLnk = this.blogManager.userInfoDropdownLnk
+                        var loginDropdownLnk = this.blogManager.loginDropdownLnk
+                        var logoutDropdownLnk = this.blogManager.logoutDropdownLnk
+                        var registerLnk = this.blogManager.registerLnk
+                        var newBlogLnk = this.blogManager.newBlogLnk
 
-                    // Set visibility
-                    loginDropdownLnk.element.style.display = "none"
-                    registerLnk.element.style.display = "none"
-                    logoutDropdownLnk.element.style.display = ""
-                    userInfoDropdownLnk.element.style.display = ""
-                    newBlogLnk.element.style.display = ""
+                        // Set visibility
+                        loginDropdownLnk.element.style.display = "none"
+                        registerLnk.element.style.display = "none"
+                        logoutDropdownLnk.element.style.display = ""
+                        userInfoDropdownLnk.element.style.display = ""
+                        newBlogLnk.element.style.display = ""
 
-                    userInfoDropdownLnk.element.firstChild.innerHTML = result.M_accountPtr.M_id
+                        userInfoDropdownLnk.element.firstChild.innerHTML = session.M_accountPtr.M_id
 
-                    // Keep track of the account ptr.
-                    blogManager.account = result.M_accountPtr
+                        // Keep track of the account ptr.
+                        blogManager.account = session.M_accountPtr
 
-                    // If the account dosent have user info I will show it.
-                    if (result.M_accountPtr.M_userRef == "") {
-                        userInfoDropdownLnk.element.className = "dropdown open"
-                        // Set the account email here.
-                        document.getElementById("email").value = result.M_accountPtr.M_email
-                        document.getElementById("first_name").focus()
-                    } else {
-                        // In that case i will set the user values.
-                        caller.blogManager.userInfoDropDown.getChildById("first_name").element.value = result.M_accountPtr.M_userRef.M_firstName
-                        caller.blogManager.userInfoDropDown.getChildById("last_name").element.value = result.M_accountPtr.M_userRef.M_lastName
-                        caller.blogManager.userInfoDropDown.getChildById("middle_name").element.value = result.M_accountPtr.M_userRef.M_middle
-                        caller.blogManager.userInfoDropDown.getChildById("email").element.value = result.M_accountPtr.M_userRef.M_email
-                        caller.blogManager.userInfoDropDown.getChildById("phone").element.value = result.M_accountPtr.M_userRef.M_phone
+                        // If the account dosent have user info I will show it.
+                        if (session.M_accountPtr.M_userRef == "") {
+                            userInfoDropdownLnk.element.className = "dropdown open"
+                            // Set the account email here.
+                            document.getElementById("email").value = session.M_accountPtr.M_email
+                            document.getElementById("first_name").focus()
+                        } else {
+                            // In that case i will set the user values.
+                            this.blogManager.userInfoDropDown.getChildById("first_name").element.value = session.M_accountPtr.M_userRef.M_firstName
+                            this.blogManager.userInfoDropDown.getChildById("last_name").element.value = session.M_accountPtr.M_userRef.M_lastName
+                            this.blogManager.userInfoDropDown.getChildById("middle_name").element.value = session.M_accountPtr.M_userRef.M_middle
+                            this.blogManager.userInfoDropDown.getChildById("email").element.value = session.M_accountPtr.M_userRef.M_email
+                            this.blogManager.userInfoDropDown.getChildById("phone").element.value = session.M_accountPtr.M_userRef.M_phone
+                        }
+                        
+                        // Display the author post inside the the side well widget.
+                        this.blogManager.displayAuthorPost()
+
                     }
 
-                    // Display the author post inside the the side well widget.
-                    blogManager.displayAuthorPost()
 
                     // Display the category delete button...
                     var deleteCategoryButtons = document.getElementsByClassName("category_delete_btn")
                     for (var i = 0; i < deleteCategoryButtons.length; i++) {
                         deleteCategoryButtons[i].style.display = ""
                     }
+
+                    // Save the active session id on the session manager.
+                    activeSessionAccountId = session.M_accountPtr
+
+                    // Initialisation of the account pointer and call the login callback on success.
+                    session["set_M_accountPtr_" + session.M_accountPtr + "_ref"](function (caller, session) {
+                        return function (accountPtr) {
+                            // call the callback after the session is intialysed.
+                            // Keep track of the accountUuid for future access.
+                            localStorage.setItem("accountUuid", accountPtr.UUID)
+                            if (accountPtr["set_M_userRef_" + accountPtr.M_userRef + "_ref"] != undefined) {
+                                accountPtr["set_M_userRef_" + accountPtr.M_userRef + "_ref"](function (session, caller) {
+                                    return function () {
+                                        caller.successCallback(session)
+                                    }
+                                }(session, caller))
+                            } else {
+                                caller.successCallback(session)
+                            }
+                        }
+                    }(caller, session))
 
                 },
                 function (errObj, caller) {
@@ -710,7 +735,7 @@ var BlogManager = function (parent) {
                     // I will reinit the panel here...
                     if (blogManager.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
                         // Udate the author post.
-                        blogManager.activePostView = new BlogPostView(blogManager.blogContainer, server.entityManager.entities[evt.dataMap["entity"].UUID], blogManager.categoryContentDiv)
+                        blogManager.activePostView = new BlogPostView(blogManager.blogContainer, entities[evt.dataMap["entity"].UUID], blogManager.categoryContentDiv)
 
                         // Set the blog view editable.
                         blogManager.setEditable(blogManager.activePostView)
@@ -765,8 +790,8 @@ BlogManager.prototype.displayAuthorPost = function () {
                 var authorPostDiv = caller.blogManager.authorPostDiv
                 for (var i = 0; i < author.M_FK_blog_post_blog_author.length; i++) {
                     var post = author.M_FK_blog_post_blog_author[i]
-                    if (server.entityManager.entities[post.UUID] != undefined) {
-                        post = server.entityManager.entities[post.UUID]
+                    if (entities[post.UUID] != undefined) {
+                        post = entities[post.UUID]
                         author.M_FK_blog_post_blog_author[i] = post
                     }
                     // Here I will create the link with the title.

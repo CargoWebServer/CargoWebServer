@@ -36,7 +36,7 @@ var ProjectManager = function () {
     /**
      * @property {object} entityPrototypes Keep track of prototypes in use.
      */
-    this.entityPrototypes = {}
+    entityPrototypes = {}
 
     return this
 }

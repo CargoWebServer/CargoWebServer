@@ -53,7 +53,7 @@ FileManager.prototype.createDir = function (dirName, dirPath, successCallback, p
     params.push(createRpcData(dirPath, "STRING", "dirPath"))
 
     server.executeJsFunction(
-        "CreateDir", // The function to execute remotely on server
+        "FileManagerCreateDir", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Keep track of the file transfert.
@@ -113,7 +113,7 @@ FileManager.prototype.createFile = function (filename, filepath, filedata, thumb
                     console.log(xhr.responseText);
                     // Here I will create the file...
                     server.executeJsFunction(
-                        "CreateFile", // The function to execute remotely on server
+                        "FileManagerCreateFile", // The function to execute remotely on server
                         params, // The parameters to pass to that function
                         function (index, total, caller) { // The progress callback
                             // Keep track of the file transfert.
@@ -206,7 +206,7 @@ FileManager.prototype.getFileByPath = function (path, progressCallback, successC
     params.push(createRpcData(path, "STRING", "path"))
 
     server.executeJsFunction(
-        "GetFileByPath", // The function to execute remotely on server
+        "FileManagerGetFileByPath", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Keep track of the file transfert.
@@ -282,7 +282,7 @@ FileManager.prototype.getMimeTypeByExtension = function (fileExtension, successC
     params.push(createRpcData(fileExtension, "STRING", "fileExtension"))
 
     server.executeJsFunction(
-        "GetMimeTypeByExtension", // The function to execute remotely on server
+        "FileManagerGetMimeTypeByExtension", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -317,7 +317,7 @@ FileManager.prototype.isFileExist = function (filename, filepath, successCallbac
     params.push(createRpcData(filepath, "STRING", "filepath"))
 
     server.executeJsFunction(
-        "IsFileExist", // The function to execute remotely on server
+        "FileManagerIsFileExist", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -350,7 +350,7 @@ FileManager.prototype.deleteFile = function (uuid, successCallback, errorCallbac
     params.push(createRpcData(uuid, "STRING", "uuid"))
 
     server.executeJsFunction(
-        "DeleteFile", // The function to execute remotely on server
+        "FileManagerDeleteFile", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -383,7 +383,7 @@ FileManager.prototype.removeFile = function (filePath, successCallback, errorCal
     params.push(createRpcData(filePath, "STRING", "filePath"))
 
     server.executeJsFunction(
-        "RemoveFile", // The function to execute remotely on server
+        "FileManagerRemoveFile", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

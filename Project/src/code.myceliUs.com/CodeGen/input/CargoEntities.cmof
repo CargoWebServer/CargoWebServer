@@ -32,6 +32,9 @@
     <ownedAttribute xmi:type="cmof:Property" xmi:id="Action-name" name="name">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
     </ownedAttribute>
+	<ownedAttribute xmi:type="cmof:Property" xmi:id="Action-doc" name="doc">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+    </ownedAttribute>
 	<ownedAttribute xmi:type="cmof:Property" xmi:id="Action-parameters" name="parameters" _type="Parameter" lower="0" upper="*" isComposite="true" association="A_parameter_action"/>
 	<ownedAttribute xmi:type="cmof:Property" xmi:id="Action-results" name="results" _type="Parameter" lower="0" upper="*" isComposite="true" association="A_result_action"/>
 	<ownedAttribute xmi:type="cmof:Property" xmi:id="Action-accessType" name="accessType" _type="AccessType"/>

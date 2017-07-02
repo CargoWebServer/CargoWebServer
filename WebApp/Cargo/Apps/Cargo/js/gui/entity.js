@@ -40,7 +40,7 @@ server.languageManager.appendLanguageInfo(languageInfo)
  */
 var EntityPanel = function (parent, typeName, initCallback, parentEntityPanel, removeOnDelete, parentEntity, parentLnk) {
 	// Only know enity can have an panel.
-	if (server.entityManager.entityPrototypes[typeName] == undefined) {
+	if (entityPrototypes[typeName] == undefined) {
 		return
 	}
 
@@ -117,7 +117,7 @@ var EntityPanel = function (parent, typeName, initCallback, parentEntityPanel, r
 	this.initCallback = initCallback
 
 	// Finish the intialysation...
-	this.init(server.entityManager.entityPrototypes[typeName], initCallback)
+	this.init(entityPrototypes[typeName], initCallback)
 
 	// retur the pointer to the entity panel.
 	return this
@@ -234,7 +234,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 			if (evt.dataMap["entity"] && entityPanel.entity != null) {
 				if (entityPanel.entity.UUID == evt.dataMap["entity"].UUID) {
 					entityPanel.init(entityPanel.proto)
-					entityPanel.setEntity(server.entityManager.entities[evt.dataMap["entity"].UUID])
+					entityPanel.setEntity(entities[evt.dataMap["entity"].UUID])
 				}
 			}
 		}
@@ -246,7 +246,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 			if (evt.dataMap["entity"] && entityPanel.entity != null) {
 				// I will reinit the panel here...
 				if (entityPanel.entity.UUID == evt.dataMap["entity"].UUID) {
-					entityPanel.setEntity(server.entityManager.entities[evt.dataMap["entity"].UUID])
+					entityPanel.setEntity(entities[evt.dataMap["entity"].UUID])
 				}
 			}
 		}
@@ -616,7 +616,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 	var isRef = fieldType.endsWith(":Ref")
 
 	fieldType = fieldType.replace("[]", "").replace(":Ref", "")
-	var prototype = server.entityManager.entityPrototypes[fieldType]
+	var prototype = entityPrototypes[fieldType]
 
 	// if there is no restriction
 	if (restrictions == undefined) {
@@ -648,7 +648,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 				var itemTable = undefined
 				if (field != "M_listOf" && !fieldType.startsWith("xs.")) {
 					// I will create the entity table.
-					var itemPrototype = server.entityManager.entityPrototypes[fieldType.replace("[]", "")]
+					var itemPrototype = entityPrototypes[fieldType.replace("[]", "")]
 					var itemsTableModel = new EntityTableModel(itemPrototype)
 					var itemTable = new Table(randomUUID(), valueDiv)
 
@@ -730,7 +730,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 								var entityPanel = caller.entityPanel
 								var id = caller.id
 								var field = caller.field
-								var prototype = server.entityManager.entityPrototypes[caller.typeName]
+								var prototype = entityPrototypes[caller.typeName]
 
 								// Now i will set it autocompletion list...
 								attachAutoCompleteInput(entityPanel.controls[id + "_new"], fieldType, field, entityPanel, prototype.getTitles(),
@@ -923,7 +923,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 EntityPanel.prototype.setGenericFieldValue = function (control, field, value, parentUuid) {
 
 	// First I will get the parent entity.
-	var parentEntity = server.entityManager.entities[parentUuid]
+	var parentEntity = entities[parentUuid]
 	var id = parentEntity.TYPENAME + "_" + field
 	var fieldType
 
@@ -985,7 +985,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 							server.entityManager.saveEntity(entity)
 						}
 					}
-				}(server.entityManager.entities[parentUuid], field, row)
+				}(entities[parentUuid], field, row)
 
 				// The save row action
 				row.saveBtn.element.onclick = function (entity, field, row) {
@@ -1004,7 +1004,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 								}, this)
 						}
 					}
-				}(server.entityManager.entities[parentUuid], field, row)
+				}(entities[parentUuid], field, row)
 			}
 		}
 	}
@@ -1030,7 +1030,7 @@ EntityPanel.prototype.appendObject = function (object, valueDiv, field, fieldTyp
  */
 EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, fieldType) {
 
-	var prototype = server.entityManager.entityPrototypes[object.TYPENAME]
+	var prototype = entityPrototypes[object.TYPENAME]
 	var titles = object.getTitles()
 	var refName = ""
 	for (var j = 0; j < titles.length; j++) {
@@ -1074,7 +1074,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 				if (parentEntityPanel != undefined) {
 					subPropertiePanel = parentEntityPanel
 					parentEntityPanel.panel.element.style.display = ""
-					var entity = server.entityManager.entities[object.UUID]
+					var entity = entities[object.UUID]
 					if (entity == undefined) {
 						entity = object
 					}
@@ -1083,7 +1083,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 					subPropertiePanel = new EntityPanel(propertiePanel.parent, object.TYPENAME, function (object) {
 						return function (panel) {
 							// Set the object.
-							var entity = server.entityManager.entities[object.UUID]
+							var entity = entities[object.UUID]
 							if (entity == undefined) {
 								entity = object
 							}
@@ -1158,7 +1158,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 
 		deleteLnkButton.element.onclick = function (entityUUID, object, field) {
 			return function () {
-				var entity = server.entityManager.entities[entityUUID]
+				var entity = entities[entityUUID]
 				removeObjectValue(entity, field, object)
 				server.entityManager.saveEntity(entity,
 					function (result, caller) {
@@ -1368,7 +1368,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 			input.element.style.cursor = "default"
 
 			if (results.length > 0) {
-				var prototype = server.entityManager.entityPrototypes[results[0].TYPENAME]
+				var prototype = entityPrototypes[results[0].TYPENAME]
 				// get title display a readable name for the end user
 				// or the first entity id.
 				for (var i = 0; i < results.length; i++) {

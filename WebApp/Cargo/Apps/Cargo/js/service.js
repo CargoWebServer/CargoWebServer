@@ -60,7 +60,7 @@ ServiceManager.prototype.getServiceActions = function (serviceName, successCallb
 
     // Call it on the server.
     server.executeJsFunction(
-        "GetServiceActions", // The function to execute remotely on server
+        "ServiceManagerGetServiceActions", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

@@ -18,17 +18,17 @@ func (this *EntityManager) create_CargoEntities_EntityEntityPrototype() {
 	var entityEntityProto EntityPrototype
 	entityEntityProto.TypeName = "CargoEntities.Entity"
 	entityEntityProto.IsAbstract = true
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
 	entityEntityProto.Ids = append(entityEntityProto.Ids, "UUID")
 	entityEntityProto.Fields = append(entityEntityProto.Fields, "UUID")
 	entityEntityProto.FieldsType = append(entityEntityProto.FieldsType, "xs.string")
@@ -958,30 +958,34 @@ func (this *EntityManager) create_CargoEntities_ActionEntityPrototype() {
 	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "xs.ID")
 	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 3)
 	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, true)
+	actionEntityProto.Fields = append(actionEntityProto.Fields, "M_doc")
+	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "xs.string")
+	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 4)
+	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, true)
 	actionEntityProto.Fields = append(actionEntityProto.Fields, "M_parameters")
 	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "[]CargoEntities.Parameter")
-	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 4)
+	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 5)
 	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, true)
 	actionEntityProto.Fields = append(actionEntityProto.Fields, "M_results")
 	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "[]CargoEntities.Parameter")
-	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 5)
+	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 6)
 	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, true)
 	actionEntityProto.Fields = append(actionEntityProto.Fields, "M_accessType")
 	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "enum:AccessType_Hidden:AccessType_Public:AccessType_Restricted")
 
 	/** associations of Action **/
-	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 6)
+	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 7)
 	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, false)
 	actionEntityProto.Fields = append(actionEntityProto.Fields, "M_entitiesPtr")
 	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "CargoEntities.Entities:Ref")
 	actionEntityProto.Fields = append(actionEntityProto.Fields, "childsUuid")
 	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "[]xs.string")
-	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 7)
+	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 8)
 	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, false)
 
 	actionEntityProto.Fields = append(actionEntityProto.Fields, "referenced")
 	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "[]EntityRef")
-	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 8)
+	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 9)
 	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
@@ -1008,6 +1012,7 @@ func (this *CargoEntities_ActionEntity) SaveEntity() {
 
 	/** members of Action **/
 	query.Fields = append(query.Fields, "M_name")
+	query.Fields = append(query.Fields, "M_doc")
 	query.Fields = append(query.Fields, "M_parameters")
 	query.Fields = append(query.Fields, "M_results")
 	query.Fields = append(query.Fields, "M_accessType")
@@ -1028,6 +1033,7 @@ func (this *CargoEntities_ActionEntity) SaveEntity() {
 
 	/** members of Action **/
 	ActionInfo = append(ActionInfo, this.object.M_name)
+	ActionInfo = append(ActionInfo, this.object.M_doc)
 
 	/** Save parameters type Parameter **/
 	parametersIds := make([]string, 0)
@@ -1135,6 +1141,7 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string, lazy bool) error {
 
 	/** members of Action **/
 	query.Fields = append(query.Fields, "M_name")
+	query.Fields = append(query.Fields, "M_doc")
 	query.Fields = append(query.Fields, "M_parameters")
 	query.Fields = append(query.Fields, "M_results")
 	query.Fields = append(query.Fields, "M_accessType")
@@ -1173,9 +1180,14 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string, lazy bool) error {
 			this.object.M_name = results[0][2].(string)
 		}
 
-		/** parameters **/
+		/** doc **/
 		if results[0][3] != nil {
-			uuidsStr := results[0][3].(string)
+			this.object.M_doc = results[0][3].(string)
+		}
+
+		/** parameters **/
+		if results[0][4] != nil {
+			uuidsStr := results[0][4].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -1202,8 +1214,8 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string, lazy bool) error {
 		}
 
 		/** results **/
-		if results[0][4] != nil {
-			uuidsStr := results[0][4].(string)
+		if results[0][5] != nil {
+			uuidsStr := results[0][5].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -1230,8 +1242,8 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string, lazy bool) error {
 		}
 
 		/** accessType **/
-		if results[0][5] != nil {
-			enumIndex := results[0][5].(int)
+		if results[0][6] != nil {
+			enumIndex := results[0][6].(int)
 			if enumIndex == 0 {
 				this.object.M_accessType = CargoEntities.AccessType_Hidden
 			} else if enumIndex == 1 {
@@ -1244,8 +1256,8 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string, lazy bool) error {
 		/** associations of Action **/
 
 		/** entitiesPtr **/
-		if results[0][6] != nil {
-			id := results[0][6].(string)
+		if results[0][7] != nil {
+			id := results[0][7].(string)
 			if len(id) > 0 {
 				refTypeName := "CargoEntities.Entities"
 				id_ := refTypeName + "$$" + id
@@ -1253,7 +1265,7 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][7].(string)
+		childsUuidStr := results[0][8].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -1262,7 +1274,7 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string, lazy bool) error {
 			}
 		}
 
-		referencedStr := results[0][8].(string)
+		referencedStr := results[0][9].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -6857,6 +6869,7 @@ func (this *EntityManager) create_CargoEntities_AccountEntityPrototype() {
 	accountEntityProto.FieldsOrder = append(accountEntityProto.FieldsOrder, 5)
 	accountEntityProto.FieldsVisibility = append(accountEntityProto.FieldsVisibility, true)
 	accountEntityProto.Fields = append(accountEntityProto.Fields, "M_email")
+	accountEntityProto.Indexs = append(accountEntityProto.Indexs, "M_email")
 	accountEntityProto.FieldsType = append(accountEntityProto.FieldsType, "xs.string")
 	accountEntityProto.FieldsOrder = append(accountEntityProto.FieldsOrder, 6)
 	accountEntityProto.FieldsVisibility = append(accountEntityProto.FieldsVisibility, true)
@@ -7181,20 +7194,7 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string, lazy bool) error 
 						log.Println("type ", typeName, " not found!")
 						return err
 					}
-					if typeName == "CargoEntities.TextMessage" {
-						if len(uuids[i]) > 0 {
-							var messagesEntity *CargoEntities_TextMessageEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								messagesEntity = instance.(*CargoEntities_TextMessageEntity)
-							} else {
-								messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
-								messagesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(messagesEntity)
-							}
-							messagesEntity.AppendReferenced("messages", this)
-							this.AppendChild("messages", messagesEntity)
-						}
-					} else if typeName == "CargoEntities.Error" {
+					if typeName == "CargoEntities.Error" {
 						if len(uuids[i]) > 0 {
 							var messagesEntity *CargoEntities_ErrorEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
@@ -7214,6 +7214,19 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string, lazy bool) error 
 								messagesEntity = instance.(*CargoEntities_NotificationEntity)
 							} else {
 								messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), uuids[i], nil)
+								messagesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(messagesEntity)
+							}
+							messagesEntity.AppendReferenced("messages", this)
+							this.AppendChild("messages", messagesEntity)
+						}
+					} else if typeName == "CargoEntities.TextMessage" {
+						if len(uuids[i]) > 0 {
+							var messagesEntity *CargoEntities_TextMessageEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								messagesEntity = instance.(*CargoEntities_TextMessageEntity)
+							} else {
+								messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
 								messagesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(messagesEntity)
 							}
@@ -9784,17 +9797,18 @@ func (this *EntityManager) create_CargoEntities_UserEntityPrototype() {
 	/** members of User **/
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 3)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
-	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_firstName")
 	userEntityProto.Fields = append(userEntityProto.Fields, "M_firstName")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
+	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_firstName")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 4)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
-	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_lastName")
 	userEntityProto.Fields = append(userEntityProto.Fields, "M_lastName")
+	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_lastName")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 5)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
 	userEntityProto.Fields = append(userEntityProto.Fields, "M_middle")
+	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_middle")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 6)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
@@ -9802,8 +9816,8 @@ func (this *EntityManager) create_CargoEntities_UserEntityPrototype() {
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 7)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
-	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_email")
 	userEntityProto.Fields = append(userEntityProto.Fields, "M_email")
+	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_email")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 8)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
@@ -11182,14 +11196,6 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	if !lazy_entities {
 		for i := 0; i < len(this.object.M_entities); i++ {
 			switch v := this.object.M_entities[i].(type) {
-			case *CargoEntities.Log:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
 			case *CargoEntities.Project:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.uuid)
@@ -11214,14 +11220,6 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				if entitiesEntity.NeedSave() {
 					entitiesEntity.SaveEntity()
 				}
-			case *CargoEntities.Group:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
 			case *CargoEntities.Error:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.uuid)
@@ -11238,16 +11236,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				if entitiesEntity.NeedSave() {
 					entitiesEntity.SaveEntity()
 				}
-			case *CargoEntities.Notification:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.uuid)
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.TextMessage:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
+			case *CargoEntities.Log:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -11264,6 +11254,30 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				}
 			case *CargoEntities.Computer:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.Group:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.Notification:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.uuid)
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.TextMessage:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.uuid)
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -11450,72 +11464,7 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 						log.Println("type ", typeName, " not found!")
 						return err
 					}
-					if typeName == "CargoEntities.Project" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_ProjectEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_ProjectEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.File" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_FileEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_FileEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.User" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_UserEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_UserEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.Log" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_LogEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_LogEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.LogEntry" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_LogEntryEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_LogEntryEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.Error" {
+					if typeName == "CargoEntities.Error" {
 						if len(uuids[i]) > 0 {
 							var entitiesEntity *CargoEntities_ErrorEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
@@ -11587,6 +11536,71 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 								entitiesEntity = instance.(*CargoEntities_GroupEntity)
 							} else {
 								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.LogEntry" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_LogEntryEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_LogEntryEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.Log" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_LogEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_LogEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.Project" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_ProjectEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_ProjectEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.File" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_FileEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_FileEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.User" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_UserEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_UserEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
 								entitiesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(entitiesEntity)
 							}

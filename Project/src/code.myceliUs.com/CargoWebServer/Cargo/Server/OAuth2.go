@@ -415,13 +415,26 @@ func PublicKeysHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 ///////////////////////////////////// OAuth2 ///////////////////////////////////
-/**
- * That function is use to get a given ressource for a given client.
- * The client id is the id define in the configuration
- * The scope are the scope of the ressources, ex. public_profile, email...
- * The query is an http query from various api like facebook graph api.
- * will start an authorization process if nothing is found.
- */
+
+// @api 1.0
+// That function is use to get a given ressource for a given client.
+// The client id is the id define in the configuration
+// The scope are the scope of the ressources, ex. public_profile, email...
+// The query is an http query from various api like facebook graph api.
+// will start an authorization process if nothing is found.
+// @param {string} clientId The oauth2 client identifier
+// @param {string} scope string The resource scope
+// @param {string} query string
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @param {string} query The http query string
+// @param {string} idTokenUuid The id token uuid.
+// @param {string} accessUuid The access uuid.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *OAuth2Manager) GetResource(clientId string, scope string, query string, idTokenUuid string, accessUuid string, messageId string, sessionId string) interface{} {
 	log.Println("scope: ", scope)
 
@@ -1150,8 +1163,8 @@ func HandleAuthenticationPage(ar *osin.AuthorizeRequest, w http.ResponseWriter, 
 
 	// If the user is already logged in i will return true.
 	if len(sessionId) > 0 {
-		if GetServer().GetSessionManager().GetActiveSessionById(sessionId) != nil {
-			if GetServer().GetSessionManager().GetActiveSessionById(sessionId).GetAccountPtr() != nil {
+		if GetServer().GetSessionManager().getActiveSessionById(sessionId) != nil {
+			if GetServer().GetSessionManager().getActiveSessionById(sessionId).GetAccountPtr() != nil {
 				return true
 			}
 		}
@@ -1290,7 +1303,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			// From the session I will retreive the user session->account->user
-			session := GetServer().GetSessionManager().GetActiveSessionById(sessionId)
+			session := GetServer().GetSessionManager().getActiveSessionById(sessionId)
 
 			// If the scope contain a profile
 			if scopes["profile"] {

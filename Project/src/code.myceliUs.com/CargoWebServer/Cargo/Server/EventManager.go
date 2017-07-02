@@ -35,6 +35,8 @@ const (
 	NewFileEvent                   = 17
 	DeleteFileEvent                = 18
 	UpdateFileEvent                = 19
+	OpenFileEvent                  = 20
+	CloseFileEvent                 = 21
 	TableEvent                     = "TableEvent"
 	DeleteRowEvent                 = 22
 	NewRowEvent                    = 23
@@ -45,6 +47,8 @@ const (
 	UpdateRoleEvent                = 27
 	ProjectEvent                   = "ProjectEvent"
 	EmailEvent                     = "EmailEvent"
+	ServiceEvent                   = "ServiceEvent"
+	DataEvent                      = "DataEvent"
 )
 
 ////////////////////////////////////////////////////////////////////////////////

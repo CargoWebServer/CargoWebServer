@@ -645,10 +645,17 @@ func (this *SecurityManager) removePermission(accountId string, pattern string) 
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////// Role //////////////
-/**
- * Create a new Role with a given id.
- */
-func (this *SecurityManager) CreateRole(id string, messageId string, sessionId string) interface{} {
+
+// @api 1.0
+// Create a new role
+// @param {string} id The id of the role to create
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.Role} The created role
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *SecurityManager) CreateRole(id string, messageId string, sessionId string) *CargoEntities.Role {
 	role, errObj := this.createRole(id)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -657,10 +664,16 @@ func (this *SecurityManager) CreateRole(id string, messageId string, sessionId s
 	return role
 }
 
-/**
- * Retreive a role with a given id.
- */
-func (this *SecurityManager) GetRole(id string, messageId string, sessionId string) interface{} {
+// @api 1.0
+// Retreive a role with a given id.
+// @param {string} id The id of the role to retreive
+// @return {*CargoEntities.Role} The retrieved role
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *SecurityManager) GetRole(id string, messageId string, sessionId string) *CargoEntities.Role {
 	role, errObj := this.getRole(id)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -669,9 +682,14 @@ func (this *SecurityManager) GetRole(id string, messageId string, sessionId stri
 	return role
 }
 
-/**
- * Delete a role with a given id.
- */
+// @api 1.0
+// Delete a role with a given id.
+// @param {string} id The id the of role to delete
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SecurityManager) DeleteRole(id string, messageId string, sessionId string) {
 	errObj := this.deleteRole(id)
 	if errObj != nil {
@@ -679,16 +697,28 @@ func (this *SecurityManager) DeleteRole(id string, messageId string, sessionId s
 	}
 }
 
-/**
- * Return true if a role has an account.
- */
+// @api 1.0
+// Determines if a role has a given account.
+// @param {string} roleId The id of the role to verify
+// @param {string} accountId The id of the account to verify
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SecurityManager) HasAccount(roleId string, accountId string, messageId string, sessionId string) bool {
 	return this.hasAccount(roleId, accountId)
 }
 
-/**
- * Append a new account to a given role. Do nothing if the account is already in the role
- */
+// @api 1.0
+// Append a new account to a given role. Does nothing if the account is already in the role
+// @param {string} roleId The id of the role to append the account to
+// @param {string} accountId The id of the account to append
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SecurityManager) AppendAccount(roleId string, accountId string, messageId string, sessionId string) {
 	errObj := this.appendAccount(roleId, accountId)
 	if errObj != nil {
@@ -696,9 +726,15 @@ func (this *SecurityManager) AppendAccount(roleId string, accountId string, mess
 	}
 }
 
-/**
- * Remove an account from a given role.
- */
+// @api 1.0
+// Remove an account from a given role.
+// @param {string} roleId The id of the role to remove the account from
+// @param {string} accountId The id of the account to remove from the role
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SecurityManager) RemoveAccount(roleId string, accountId string, messageId string, sessionId string) {
 	errObj := this.removeAccount(roleId, accountId)
 	if errObj != nil {
@@ -707,16 +743,29 @@ func (this *SecurityManager) RemoveAccount(roleId string, accountId string, mess
 }
 
 /////////// Action /////////////
-/**
- * Return true if a role contain an action.
- */
+
+// @api 1.0
+// Determines if a role has a given action.
+// @param {string} roleId The id of the role to verify
+// @param {string} actionName The name of the action to verify
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SecurityManager) HasAction(roleId string, actionName string, messageId string, sessionId string) bool {
 	return this.hasAction(roleId, actionName)
 }
 
-/**
- * Append a new account to a given role. Do nothing if the action is already in the role
- */
+// @api 1.0
+// Append a new action to a given role. Does nothing if the action is already in the role
+// @param {string} roleId The id of the role to append the action to
+// @param {string} actionName The name of the action to append
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SecurityManager) AppendAction(roleId string, accountName string, messageId string, sessionId string) {
 	errObj := this.appendAction(roleId, accountName)
 	if errObj != nil {
@@ -724,9 +773,15 @@ func (this *SecurityManager) AppendAction(roleId string, accountName string, mes
 	}
 }
 
-/**
- * Remove an action from a given role.
- */
+// @api 1.0
+// Remove an account from a given role.
+// @param {string} roleId The id of the role to remove the account from
+// @param {string} actionName The name of the action to remove from the role
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SecurityManager) RemoveAction(roleId string, accountName string, messageId string, sessionId string) {
 	errObj := this.removeAction(roleId, accountName)
 	if errObj != nil {
@@ -735,9 +790,17 @@ func (this *SecurityManager) RemoveAction(roleId string, accountName string, mes
 }
 
 ////////////// Permission //////////////
-/**
- * Append a new permission an a given account.
- */
+
+// @api 1.0
+// Append a new permission to a given account. Does nothing if the permission is already in the account
+// @param {string} accountId The id of the account to append the permission to
+// @param {string} permissionType The type of the permission to append
+// @param {string} pattern The pattern of the permission to eveluate.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SecurityManager) AppendPermission(accountId string, permissionType int, pattern string, messageId string, sessionId string) {
 	errObj := this.appendPermission(accountId, permissionType, pattern)
 	if errObj != nil {
@@ -745,9 +808,15 @@ func (this *SecurityManager) AppendPermission(accountId string, permissionType i
 	}
 }
 
-/**
- * Remove a permission from an account and delete it if no more account use it.
- */
+// @api 1.0
+// Remove a permission from an account
+// @param {string} accountId The id of the account to remove the permission from
+// @param {string} permissionPattern The pattern of the permission to remove from the account
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SecurityManager) RemovePermission(accountId string, pattern string, messageId string, sessionId string) {
 	errObj := this.removePermission(accountId, pattern)
 	if errObj != nil {
@@ -755,6 +824,14 @@ func (this *SecurityManager) RemovePermission(accountId string, pattern string, 
 	}
 }
 
+// @api 1.0
+// Determines if actual the caller of the method can execute a given action.
+// @param {string} actionName The name of the action the user want to execute.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SecurityManager) CanExecuteAction(actionName string, sessionId string, messageId string) bool {
 	errObj := this.canExecuteAction(sessionId, actionName)
 	if errObj != nil {
@@ -766,9 +843,16 @@ func (this *SecurityManager) CanExecuteAction(actionName string, sessionId strin
 }
 
 ///////////////////////////////// Other stuff //////////////////////////////////
-/**
- * Change the admin password.
- */
+
+// @api 1.0
+// Change the current password for the admin account.
+// @param {string} pwd The current password
+// @param {string} newPwd The new password
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SecurityManager) ChangeAdminPassword(pwd string, newPwd string, messageId string, sessionId string) {
 	ids := []interface{}{"admin"}
 	adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", ids, false)

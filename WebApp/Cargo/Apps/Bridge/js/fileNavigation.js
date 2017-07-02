@@ -52,9 +52,9 @@ var FileNavigator = function (parent) {
     server.fileManager.attach(this, OpenEntityEvent, function (evt, fileNavigator) {
         var file
         if (evt.dataMap.fileInfo !== undefined) {
-            file = server.entityManager.entities[evt.dataMap["fileInfo"].UUID]
+            file = entities[evt.dataMap["fileInfo"].UUID]
         } else if (evt.dataMap.bpmnDiagramInfo !== undefined) {
-            file = server.entityManager.entities[evt.dataMap["bpmnDiagramInfo"].UUID]
+            file = entities[evt.dataMap["bpmnDiagramInfo"].UUID]
         }
 
         if (file !== undefined) {
@@ -264,7 +264,7 @@ FileNavigator.prototype.removeFile = function (fileId) {
 FileNavigator.prototype.saveFile = function (fileId) {
 
     // Now I will save the file.
-    var file = server.entityManager.entities["CargoEntities.File:" + fileId]
+    var file = entities["CargoEntities.File:" + fileId]
     var data = [decode64(file.M_data)]
     var f = null
     

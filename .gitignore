@@ -8,6 +8,7 @@
 /Project/src/golang.org/
 /Project/src/gopkg.in/
 /Project/src/sourcegraph.com/*.exe
+/build*
 
 /Project/src/code.myceliUs.com/CodeGen/CodeGen
 /Project/src/code.myceliUs.com/CodeGen/input/BPMN20.cmof

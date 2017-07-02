@@ -281,7 +281,7 @@ EntityPrototype.prototype.generateConstructor = function () {
 
     // The get parent function
     constructorSrc += " this.getParent = function(){\n"
-    constructorSrc += "       return server.entityManager.entities[this.ParentUuid]\n"
+    constructorSrc += "       return entities[this.ParentUuid]\n"
     constructorSrc += "  }\n"
 
     // The setter function.

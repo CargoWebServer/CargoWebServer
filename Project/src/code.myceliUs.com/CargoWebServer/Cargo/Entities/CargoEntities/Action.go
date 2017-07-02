@@ -22,6 +22,7 @@ type Action struct{
 
 	/** members of Action **/
 	M_name string
+	M_doc string
 	M_parameters []*Parameter
 	M_results []*Parameter
 	M_accessType AccessType
@@ -37,6 +38,7 @@ type Action struct{
 type XsdAction struct {
 	XMLName xml.Name	`xml:"action"`
 	M_name	string	`xml:"name,attr"`
+	M_doc	string	`xml:"doc,attr"`
 
 }
 /** UUID **/
@@ -56,6 +58,19 @@ func (this *Action) SetName(ref interface{}){
 }
 
 /** Remove reference Name **/
+
+/** Doc **/
+func (this *Action) GetDoc() string{
+	return this.M_doc
+}
+
+/** Init reference Doc **/
+func (this *Action) SetDoc(ref interface{}){
+	this.NeedSave = true
+	this.M_doc = ref.(string)
+}
+
+/** Remove reference Doc **/
 
 /** Parameters **/
 func (this *Action) GetParameters() []*Parameter{

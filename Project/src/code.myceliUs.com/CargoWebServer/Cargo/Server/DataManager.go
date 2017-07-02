@@ -1072,10 +1072,15 @@ func (this *DataManager) close() {
 ////////////////////////////////////////////////////////////////////////////////
 // API
 ////////////////////////////////////////////////////////////////////////////////
-/**
- * Execute a query that read information from the store and
- * return the result and an array of interface...
- */
+
+// @api 1.0
+// Test if a datastore is reachable.
+// @param {string} storeName The data server connection (configuration) id
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *DataManager) Ping(storeName string, messageId string, sessionId string) {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -1098,6 +1103,14 @@ func (this *DataManager) Ping(storeName string, messageId string, sessionId stri
 	}
 }
 
+// @api 1.0
+// Open a new connection with the datastore.
+// @param {string} storeName The data server connection (configuration) id
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *DataManager) Connect(storeName string, messageId string, sessionId string) {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -1124,6 +1137,14 @@ func (this *DataManager) Connect(storeName string, messageId string, sessionId s
 
 }
 
+// @api 1.0
+// Close the connection to the datastore with a given id.
+// @param {string} storeName The data server connection (configuration) id
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *DataManager) Close(storeName string, messageId string, sessionId string) {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -1146,18 +1167,28 @@ func (this *DataManager) Close(storeName string, messageId string, sessionId str
 	}
 }
 
-/**
- * Execute a query that read information from the store and
- * return the result and an array of interface...
- */
-func (this *DataManager) Read(storeName string, query string, fieldsType []interface{}, params []interface{}, messageId string, sessionId string) [][]interface{} {
+// @api 1.0
+// Execute a read query on the data sever.
+// @param {string} storeName The data server connection (configuration) id
+// @param {string} query The query string to execute.
+// @param {[]string} fieldsType Contain the list of type of queryied data. ex. string, date, int, float.
+// @param {[]interface{}} parameters Contain filter expression, ex. id=0, id != 3.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @result{[][]interface} Return a tow dimentionnal array of values.
+// @scope {public}
+// @param {callback} progressCallback The function is call when chunk of response is received.
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *DataManager) Read(storeName string, query string, fieldsType []interface{}, parameters []interface{}, messageId string, sessionId string) [][]interface{} {
 
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-	data, err := this.readData(storeName, query, fieldsType, params)
+
+	data, err := this.readData(storeName, query, fieldsType, parameters)
 
 	if err != nil {
 		// Create the error message
@@ -1166,15 +1197,20 @@ func (this *DataManager) Read(storeName string, query string, fieldsType []inter
 		return nil
 	}
 
-	log.Println("1179", data)
-
 	return data
 }
 
-/**
- * Execute a query that create a new data. The data contain de the new
- * value to insert in the DB.
- */
+// @api 1.0
+// Create an new entry in the DB and return it's id(s)
+// @param {string} storeName The data server connection (configuration) id
+// @param {string} query The query string to execute.
+// @param {[]interface{}} d values Contain the list of values associated with the fields in the query.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {interface{}} Return the last id if there is primary key set on the datastore table.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *DataManager) Create(storeName string, query string, d []interface{}, messageId string, sessionId string) interface{} {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -1190,56 +1226,76 @@ func (this *DataManager) Create(storeName string, query string, d []interface{},
 	return lastId
 }
 
-/**
- * Update the data.
- */
-func (this *DataManager) Update(storeName string, query string, fields []interface{}, params []interface{}, messageId string, sessionId string) {
+// api 1.0
+// Update existing database values.
+// @param {string} connectionId The data server connection (configuration) id
+// @param {string} query The query string to execute.
+// @param {[]interfaces{}} fields Contain the list of type of queryied data. ex. string, date, int, float.
+// @param {[]interfaces{}} parameters Contain filter expression, ex. id=0, id != 3.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *DataManager) Update(storeName string, query string, fields []interface{}, parameters []interface{}, messageId string, sessionId string) {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
 	}
 
-	err := this.updateData(storeName, query, fields, params)
+	err := this.updateData(storeName, query, fields, parameters)
 	if err != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err))
 	}
 }
 
-/**
- * Remove the data.
- */
-func (this *DataManager) Delete(storeName string, query string, params []interface{}, messageId string, sessionId string) {
+// @api 1.0
+// Delete db value.
+// @param {string} storeName The data server connection (configuration) id
+// @param {string} query The query string to execute.
+// @param {[]interface{}} parameters Contain filter expression, ex. id=0, id != 3.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *DataManager) Delete(storeName string, query string, parameters []interface{}, messageId string, sessionId string) {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
 	}
 
-	err := this.deleteData(storeName, query, params)
+	err := this.deleteData(storeName, query, parameters)
 	if err != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err))
 	}
 }
 
-/**
- * Determine if the datastore exist in the server.
- */
-func (this *DataManager) HasDataStore(storeId string, messageId string, sessionId string) bool {
-	storeUuid := ConfigDataStoreConfigurationExists(storeId)
+// @api 1.0
+// Determine if the datastore exist in the server.
+// @param {string} storeName The data server connection (configuration) id
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *DataManager) HasDataStore(storeName string, messageId string, sessionId string) bool {
+	storeUuid := ConfigDataStoreConfigurationExists(storeName)
 	return len(storeUuid) > 0
 }
 
-/**
- * Return a reference to a datastore with a given id.
- */
-func (this *DataManager) GetDataStore(storeId string, messageId string, sessionId string) DataStore {
-	return this.m_dataStores[storeId]
-}
-
-/**
- * Create a new data store.
- */
+// @api 1.0
+// Create a dataStore
+// @param {string} storeId The id of the dataStore to create
+// @param {int} storeType The type of the store to create. SQL: 1; KEY_VALUE: 3
+// @param {int} storeVendor The store vendor. DataStoreVendor_MYCELIUS: 1; 	DataStoreVendor_MYSQL: 2; DataStoreVendor_MSSQL:3; DataStoreVendor_ODBC
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *DataManager) CreateDataStore(storeId string, storeType int64, storeVendor int64, messageId string, sessionId string) {
 
 	var errObj *CargoEntities.Error
@@ -1255,9 +1311,14 @@ func (this *DataManager) CreateDataStore(storeId string, storeType int64, storeV
 	}
 }
 
-/**
- * Delete a new data store.
- */
+// @api 1.0
+// Delete a dataStore
+// @param {string} storeId The id of the dataStore to delete
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *DataManager) DeleteDataStore(storeId string, messageId string, sessionId string) {
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
@@ -1272,10 +1333,16 @@ func (this *DataManager) DeleteDataStore(storeId string, messageId string, sessi
 	}
 }
 
-/**
- * Create a new xsd datastore from a given xsd file content.
- */
-func (this *DataManager) ImportXsdSchema(name string, content string, messageId string, sessionId string) {
+// @api 1.0
+// Create a new xsd datastore from a given xsd file content.
+// @param {string} storeId The id of the dataStore to delete
+// @param {string} content The xsd file content
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *DataManager) ImportXsdSchema(storeId string, content string, messageId string, sessionId string) {
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -1285,7 +1352,7 @@ func (this *DataManager) ImportXsdSchema(name string, content string, messageId 
 
 	// Here I will create a temporary file
 	schemaPath := GetServer().GetConfigurationManager().GetSchemasPath()
-	f, err := os.Create(schemaPath + "/" + name)
+	f, err := os.Create(schemaPath + "/" + storeId)
 
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)
@@ -1303,9 +1370,14 @@ func (this *DataManager) ImportXsdSchema(name string, content string, messageId 
 	}
 }
 
-/**
- * Import the content of an xml file into a dataStore.
- */
+// @api 1.0
+// Import the content of an xml file into a dataStore.
+// @param {string} content The xsd file content
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *DataManager) ImportXmlData(content string, messageId string, sessionId string) {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -1337,7 +1409,14 @@ func (this *DataManager) ImportXmlData(content string, messageId string, session
 	}
 }
 
-// Synchronize actual data
+// @api 1.0
+// Synchronize sql datastore with it sql data source.
+// @param {string} storeId The id of the dataStore to synchronize
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *DataManager) Synchronize(storeId string, messageId string, sessionId string) {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -1372,89 +1451,4 @@ func (this *DataManager) Synchronize(storeId string, messageId string, sessionId
 	if reflect.TypeOf(store).String() == "*Server.SqlDataStore" {
 		store.(*SqlDataStore).synchronize(prototypes)
 	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-//                              DataStore
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * This is the factory function that create the correct store depending
- * of he's information.
- */
-func NewDataStore(info *Config.DataStoreConfiguration) (DataStore, error) {
-	var err error
-
-	if info.M_dataStoreType == Config.DataStoreType_SQL_STORE {
-		dataStore, err := NewSqlDataStore(info)
-		return dataStore, err
-	} else if info.M_dataStoreType == Config.DataStoreType_KEY_VALUE_STORE {
-
-		dataStore, err := NewKeyValueDataStore(info)
-		return dataStore, err
-	}
-	return nil, err
-}
-
-/**
- * DataStore is use to store data and do CRUD operation on it...
- */
-type DataStore interface {
-	/**
-	 * Connection related stuff
-	 */
-	GetId() string
-
-	/**
-	 * Test if there's a connection with the server...
-	 */
-	Ping() error
-
-	/** Crud interface **/
-	Create(query string, data []interface{}) (lastId interface{}, err error)
-
-	/**
-	 * Param are filter to discard some element...
-	 */
-	Read(query string, fieldsType []interface{}, params []interface{}) ([][]interface{}, error)
-
-	/**
-	 * Update
-	 */
-	Update(query string, fields []interface{}, params []interface{}) error
-
-	/**
-	 * Delete values that match given parameter...
-	 */
-	Delete(query string, params []interface{}) error
-
-	/**
-	 * Close the data store, remove all connections or lnk to the data store.
-	 */
-	Close() error
-
-	/**
-	 * Open the data store connection.
-	 */
-	Connect() error
-
-	/**
-	 * Return the list of all entity prototypes from a dataStore
-	 */
-	GetEntityPrototypes() ([]*EntityPrototype, error)
-
-	/**
-	 * Return the prototype of a given type.
-	 */
-	GetEntityPrototype(id string) (*EntityPrototype, error)
-
-	/**
-	 * Remove a given entity prototype.
-	 */
-	DeleteEntityPrototype(id string) error
-
-	/**
-	 * Remove all prototypes.
-	 */
-	DeleteEntityPrototypes() error
 }

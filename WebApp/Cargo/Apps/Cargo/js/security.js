@@ -19,19 +19,10 @@
  * @author Dave Courtois, Eric Kavalec
  * @version 1.0
  */
-
-/**
- * The security manager's role is to manipulate 
- * roles and permissions on entities
- * @constructor
- * @extends EventHub
- */
 var SecurityManager = function () {
-
     if (server == undefined) {
         return
     }
-
     EventHub.call(this, SecurityEvent)
 
     return this
@@ -40,449 +31,282 @@ var SecurityManager = function () {
 SecurityManager.prototype = new EventHub(null);
 SecurityManager.prototype.constructor = SecurityManager;
 
-/*
- * Dispatch event.
- */
 SecurityManager.prototype.onEvent = function (evt) {
     EventHub.prototype.onEvent.call(this, evt)
 }
-
-/**
- * Create a new role
- * @param {string} id The id of the role to create
- * @param {function} successCallback The function to execute in case of role creation success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-SecurityManager.prototype.createRole = function (id, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(id, "STRING", "id"))
-
-    // Call it on the server.
-    server.executeJsFunction(
-        "CreateRole", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            if (result[0] != null) {
-                var role = eval("new " + result[0].TYPENAME + "()")
-                role.init(result[0])
-                caller.successCallback(role, caller.caller)
-            }
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
-            caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
-            server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
-}
-
-/**
- * Retreive a role with a given id.
- * @param {string} id The id of the role to retreive
- * @param {function} successCallback The function to execute in case of success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-SecurityManager.prototype.getRole = function (id, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(id, "STRING", "id"))
-
-    // Call it on the server.
-    server.executeJsFunction(
-        "GetRole", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            if (result[0] != null) {
-                var role = eval("new " + result[0].TYPENAME + "()")
-                role.init(result[0])
-                caller.successCallback(role, caller.caller)
-            }
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
-            caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
-            server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
-}
-
-/**
- * Delete a role with a given id.
- * @param {string} id The id the of role to retreive
- * @param {function} successCallback The function to execute in case of success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-SecurityManager.prototype.deleteRole = function (id, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(id, "STRING", "id"))
-
-    // Call it on the server.
-    server.executeJsFunction(
-        "DeleteRole", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            caller.successCallback(result, caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
-            caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
-            server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
-}
-
-/**
- * Determines if a role has a given account.
- * @param {string} roleId The id of the role to verify
- * @param {string} accountId The id of the account to verify
- * @param {function} successCallback The function to execute in case of success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-SecurityManager.prototype.hasAccount = function (roleId, accountId, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(roleId, "STRING", "roleId"))
-    params.push(createRpcData(accountId, "STRING", "accountId"))
-
-    // Call it on the server.
-    server.executeJsFunction(
-        "HasAccount", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            caller.successCallback(result[0], caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
-            caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
-            server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
-}
-
-/**
- * Append a new account to a given role. Does nothing if the account is already in the role
- * @param {string} roleId The id of the role to append the account to 
- * @param {string} accountId The id of the account to append
- * @param {function} successCallback The function to execute in case of success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
 SecurityManager.prototype.appendAccount = function (roleId, accountId, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
     var params = []
     params.push(createRpcData(roleId, "STRING", "roleId"))
     params.push(createRpcData(accountId, "STRING", "accountId"))
 
-    // Call it on the server.
     server.executeJsFunction(
-        "AppendAccount".toString(), // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
+        "SecurityManagerAppendAccount",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
         },
-        function (result, caller) {
-            caller.successCallback(result, caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
+        function (errMsg, caller) { // Error callback
             caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
             server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
 }
 
-/**
- * Remove an account from a given role.
- * @param {string} roleId The id of the role to remove the account from 
- * @param {string} accountId The id of the account to remove from the role
- * @param {function} successCallback The function to execute in case of success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-SecurityManager.prototype.removeAccount = function (roleId, accountId, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
+SecurityManager.prototype.appendAction = function (roleId, accountName, successCallback, errorCallback, caller) {
     var params = []
     params.push(createRpcData(roleId, "STRING", "roleId"))
-    params.push(createRpcData(accountId, "STRING", "accountId"))
+    params.push(createRpcData(accountName, "STRING", "accountName"))
 
-    // Call it on the server.
     server.executeJsFunction(
-        "RemoveAccount", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
+        "SecurityManagerAppendAction",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
         },
-        function (result, caller) {
-            caller.successCallback(result, caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
+        function (errMsg, caller) { // Error callback
             caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
             server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
 }
 
-/**
- * Determines if a role has a given action.
- * @param {string} roleId The id of the role to verify
- * @param {string} actionName The name of the action to verify
- * @param {function} successCallback The function to execute in case of success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-SecurityManager.prototype.hasAction = function (roleId, actionName, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(roleId, "STRING", "roleId"))
-    params.push(createRpcData(actionName, "STRING", "actionName"))
-
-    // Call it on the server.
-    server.executeJsFunction(
-        "HasAction", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            caller.successCallback(result[0], caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
-            caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
-            server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
-}
-
-/**
- * Append a new action to a given role. Does nothing if the action is already in the role
- * @param {string} roleId The id of the role to append the action to 
- * @param {string} actionName The name of the action to append
- * @param {function} successCallback The function to execute in case of success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-SecurityManager.prototype.appendAction = function (roleId, actionName, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(roleId, "STRING", "roleId"))
-    params.push(createRpcData(actionName, "STRING", "actionName"))
-
-    // Call it on the server.
-    server.executeJsFunction(
-        "AppendAction", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            caller.successCallback(result, caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
-            caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
-            server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
-}
-
-/**
- * Remove an account from a given role.
- * @param {string} roleId The id of the role to remove the account from 
- * @param {string} actionName The name of the action to remove from the role
- * @param {function} successCallback The function to execute in case of success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-SecurityManager.prototype.removeAction= function (roleId, actionName, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(roleId, "STRING", "roleId"))
-    params.push(createRpcData(actionName, "STRING", "actionName"))
-
-    // Call it on the server.
-    server.executeJsFunction(
-        "RemoveAction", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            caller.successCallback(result, caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
-            caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
-            server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
-}
-
-
-///////////////////////////////////// Permission //////////////////////////////////
-
-/**
- * Append a new permission to a given account. Does nothing if the permission is already in the account
- * @param {string} accountId The id of the account to append the permission to 
- * @param {string} permissionType The type of the permission to append
- * @param {string} pattern The pattern of the permission to eveluate.
- * @param {function} successCallback The function to execute in case of success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
 SecurityManager.prototype.appendPermission = function (accountId, permissionType, pattern, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
     var params = []
     params.push(createRpcData(accountId, "STRING", "accountId"))
     params.push(createRpcData(permissionType, "INTEGER", "permissionType"))
     params.push(createRpcData(pattern, "STRING", "pattern"))
 
-    // Call it on the server.
     server.executeJsFunction(
-        "AppendPermission", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
+        "SecurityManagerAppendPermission",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
         },
-        function (result, caller) {
-            caller.successCallback(result, caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
+        function (errMsg, caller) { // Error callback
             caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
             server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
 }
 
-/**
- * Remove a permission from an account
- * @param {string} accountId The id of the account to remove the permission from 
- * @param {string} permissionPattern The pattern of the permission to remove from the account
- * @param {function} successCallback The function to execute in case of success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-SecurityManager.prototype.removePermission= function (accountId, permissionPattern, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
+SecurityManager.prototype.canExecuteAction = function (actionName, successCallback, errorCallback, caller) {
     var params = []
-    params.push(createRpcData(accountId, "STRING", "accountId"))
-    params.push(createRpcData(permissionPattern, "STRING", "permissionPattern"))
+    params.push(createRpcData(actionName, "STRING", "actionName"))
 
-    // Call it on the server.
     server.executeJsFunction(
-        "RemovePermission", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
+        "SecurityManagerCanExecuteAction",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
         },
-        function (result, caller) {
-            caller.successCallback(result, caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
+        function (errMsg, caller) { // Error callback
             caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
             server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
 }
 
-///////////////////////////////////// Other stuff ////////////////////////////////////////////
-
-/**
- * Change the current password for the admin account.
- * @param {string} pwd The current password
- * @param {string} newPwd The new password
- */
 SecurityManager.prototype.changeAdminPassword = function (pwd, newPwd, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
     var params = []
     params.push(createRpcData(pwd, "STRING", "pwd"))
     params.push(createRpcData(newPwd, "STRING", "newPwd"))
 
-    // Call it on the server.
     server.executeJsFunction(
-        "ChangeAdminPassword", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
+        "SecurityManagerChangeAdminPassword",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
         },
-        function (result, caller) {
-            caller.successCallback(result, caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
+        function (errMsg, caller) { // Error callback
             caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
             server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
+SecurityManager.prototype.createRole = function (id, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(id, "STRING", "id"))
+
+    server.executeJsFunction(
+        "SecurityManagerCreateRole",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            server.entityManager.getEntityPrototype("CargoEntities.Role", "CargoEntities",
+                function (prototype, caller) { // Success Callback
+                    if (caller.results[0] == null) {
+                        return
+                    }
+                    if (entities[caller.results[0].UUID] != undefined && caller.results[0].TYPENAME == caller.results[0].__class__) {
+                        caller.successCallback(entities[caller.results[0].UUID], caller.caller)
+                        return // break it here.
+                    }
+
+                    var entity = eval("new " + prototype.TypeName + "()")
+                    entity.initCallback = function () {
+                        return function (entity) {
+                            caller.successCallback(entity, caller.caller)
+                        }
+                    }(caller)
+                    entity.init(caller.results[0])
+                },
+                function (errMsg, caller) { // Error Callback
+                    caller.errorCallback(errMsg, caller.caller)
+                },
+                { "caller": caller.caller, "successCallback": caller.successCallback, "errorCallback": caller.errorCallback, "results": results }
+            )
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
+SecurityManager.prototype.deleteRole = function (id, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(id, "STRING", "id"))
+
+    server.executeJsFunction(
+        "SecurityManagerDeleteRole",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
+SecurityManager.prototype.getRole = function (id, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(id, "STRING", "id"))
+
+    server.executeJsFunction(
+        "SecurityManagerGetRole",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            server.entityManager.getEntityPrototype("CargoEntities.Role", "CargoEntities",
+                function (prototype, caller) { // Success Callback
+                    if (caller.results[0] == null) {
+                        return
+                    }
+                    if (entities[caller.results[0].UUID] != undefined && caller.results[0].TYPENAME == caller.results[0].__class__) {
+                        caller.successCallback(entities[caller.results[0].UUID], caller.caller)
+                        return // break it here.
+                    }
+
+                    var entity = eval("new " + prototype.TypeName + "()")
+                    entity.initCallback = function () {
+                        return function (entity) {
+                            caller.successCallback(entity, caller.caller)
+                        }
+                    }(caller)
+                    entity.init(caller.results[0])
+                },
+                function (errMsg, caller) { // Error Callback
+                    caller.errorCallback(errMsg, caller.caller)
+                },
+                { "caller": caller.caller, "successCallback": caller.successCallback, "errorCallback": caller.errorCallback, "results": results }
+            )
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
+SecurityManager.prototype.hasAccount = function (roleId, accountId, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(roleId, "STRING", "roleId"))
+    params.push(createRpcData(accountId, "STRING", "accountId"))
+
+    server.executeJsFunction(
+        "SecurityManagerHasAccount",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
+SecurityManager.prototype.hasAction = function (roleId, actionName, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(roleId, "STRING", "roleId"))
+    params.push(createRpcData(actionName, "STRING", "actionName"))
+
+    server.executeJsFunction(
+        "SecurityManagerHasAction",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
+SecurityManager.prototype.removeAccount = function (roleId, accountId, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(roleId, "STRING", "roleId"))
+    params.push(createRpcData(accountId, "STRING", "accountId"))
+
+    server.executeJsFunction(
+        "SecurityManagerRemoveAccount",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
+SecurityManager.prototype.removeAction = function (roleId, accountName, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(roleId, "STRING", "roleId"))
+    params.push(createRpcData(accountName, "STRING", "accountName"))
+
+    server.executeJsFunction(
+        "SecurityManagerRemoveAction",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
+SecurityManager.prototype.removePermission = function (accountId, pattern, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(accountId, "STRING", "accountId"))
+    params.push(createRpcData(pattern, "STRING", "pattern"))
+
+    server.executeJsFunction(
+        "SecurityManagerRemovePermission",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -499,7 +323,7 @@ SecurityManager.prototype.getResource = function (clientId, scope, query, succes
     // server is the client side singleton.
     // Account uuid are set and reset at the time of login and logout respectively.
     var idTokenUuid = ""
-    if(localStorage.getItem("idTokenUuid") != undefined){
+    if (localStorage.getItem("idTokenUuid") != undefined) {
         idTokenUuid = localStorage.getItem("idTokenUuid")
     }
 
@@ -511,7 +335,7 @@ SecurityManager.prototype.getResource = function (clientId, scope, query, succes
 
     // Call it on the server.
     server.executeJsFunction(
-        "GetResource", // The function to execute remotely on server
+        "SecurityManagerGetResource", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

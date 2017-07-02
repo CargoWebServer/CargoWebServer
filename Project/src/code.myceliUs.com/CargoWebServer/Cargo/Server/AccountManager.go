@@ -85,7 +85,6 @@ func (this *AccountManager) initialize() {
 		account.SetEntitiesPtr(entities)
 		// Save the account
 		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
-		log.Println("------> guest account was create: ", account)
 	}
 
 }
@@ -106,14 +105,16 @@ func (this *AccountManager) stop() {
 // API
 ////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Function used to register an new account on the server.
- * @name of the new account
- * @password the account password
- * @email the email address
- * @messageId the id of the message at the root of the action.
- * @sessionId the id of the session at the root of the action.
- */
+// @api 1.0
+// Register a new account.
+// @param {string} name The name of the new account.
+// @param {string} password The password associated with the new account.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.Account} The new registered account.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *AccountManager) Register(name string, password string, email string, messageId string, sessionId string) *CargoEntities.Account {
 
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
@@ -154,10 +155,16 @@ func (this *AccountManager) Register(name string, password string, email string,
 
 }
 
-/**
- * Retreive an account with a given id.
- */
-func (this *AccountManager) GetAccountById(name string, messageId string, sessionId string) *CargoEntities.Account {
+// @api 1.0
+// Retreive an account with a given id.
+// @param {string} id The id of the account.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.Account} The retreived account.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *AccountManager) GetAccountById(id string, messageId string, sessionId string) *CargoEntities.Account {
 
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -165,10 +172,10 @@ func (this *AccountManager) GetAccountById(name string, messageId string, sessio
 		return nil
 	}
 
-	accountUuid := CargoEntitiesAccountExists(name)
+	accountUuid := CargoEntitiesAccountExists(id)
 	if len(accountUuid) == 0 {
 		// Create the error message
-		cargoError := NewError(Utility.FileLine(), ACCOUNT_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The account '"+name+"' doesn't exist"))
+		cargoError := NewError(Utility.FileLine(), ACCOUNT_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The account '"+id+"' doesn't exist"))
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
@@ -182,9 +189,14 @@ func (this *AccountManager) GetAccountById(name string, messageId string, sessio
 	return accountEntity.GetObject().(*CargoEntities.Account)
 }
 
-/**
- * Retreive a user with a given id
- */
+// @api 1.0
+// Retreive a user with a given id.
+// @param {string} id The id of the user.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *AccountManager) GetUserById(id string, messageId string, sessionId string) *CargoEntities.User {
 
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
@@ -210,10 +222,15 @@ func (this *AccountManager) GetUserById(id string, messageId string, sessionId s
 	return userEntity.GetObject().(*CargoEntities.User)
 }
 
-/**
- * Retreive a account with a given session id, sessionId is in fact the entity
- * uuid and not the connection id.
- */
+// @api 1.0
+// Retreive a account with a given session id, sessionId is in fact the entity
+// uuid and not the connection id.
+// @param {string} connectionId The current socket connection id.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *AccountManager) Me(connectionId string, messageId string, sessionId string) *CargoEntities.Account {
 
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())

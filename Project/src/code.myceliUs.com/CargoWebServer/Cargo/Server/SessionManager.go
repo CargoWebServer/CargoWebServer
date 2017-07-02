@@ -224,13 +224,33 @@ func (this *SessionManager) getActiveSessionByAccountId(accountId string) Sessio
 	return sessions
 }
 
+func (this *SessionManager) getActiveSessionById(id string) *CargoEntities.Session {
+
+	activeSessions := this.getActiveSessions()
+
+	for i := 0; i < len(activeSessions); i++ {
+		if activeSessions[i].GetId() == id {
+			return activeSessions[i]
+		}
+	}
+	return nil
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // API
 ////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Authenticate a user with a given account name and password on a given ldap server.
- */
+// @api 1.0
+// Authenticate the user's account name and password on the server.
+// @see LoginPage
+// @param {string} name The account name
+// @param {string} password The account password
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.Session} The created session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SessionManager) Login(accountName string, psswd string, serverId string, messageId string, sessionId string) *CargoEntities.Session {
 
 	var session *CargoEntities.Session
@@ -317,7 +337,7 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 			// Append the user data
 			sessionsInfo := new(MessageData)
 			sessionsInfo.Name = "sessionsInfo"
-			sessionsInfo.Value = this.GetActiveSessionByAccountId(account.M_id)
+			sessionsInfo.Value = this.getActiveSessionByAccountId(account.M_id)
 			eventData[1] = sessionsInfo
 
 			evt, _ := NewEvent(LoginEvent, SessionEvent, eventData)
@@ -343,12 +363,18 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 	return nil
 }
 
-/**
- * Close a user session
- */
+// @api 1.0
+// Close a user session on the server. A logout event is throw to inform other participant that the session
+// is closed.
+// @param {string} toCloseId The id of the session to close.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SessionManager) Logout(toCloseId string, messageId string, sessionId string) {
 	// Simply close the session
-	currentSession := this.GetActiveSessionById(toCloseId)
+	currentSession := this.getActiveSessionById(toCloseId)
 
 	if currentSession != nil {
 		this.closeSession(currentSession)
@@ -359,57 +385,32 @@ func (this *SessionManager) Logout(toCloseId string, messageId string, sessionId
 	}
 }
 
-/**
- * Return the list of all active sessions on the server.
- */
-func (this *SessionManager) GetActiveSessions() []*CargoEntities.Session {
-	activeSessions := new(struct {
-		activeSessionsChan chan []*CargoEntities.Session
-	})
-
-	activeSessions.activeSessionsChan = make(chan []*CargoEntities.Session)
-
-	this.activeSessionsChannel <- *activeSessions
-
-	return <-activeSessions.activeSessionsChan
-}
-
-/**
- * This function returns the session with a given id, if the session is active.
- */
-func (this *SessionManager) GetActiveSessionById(sessionId string) *CargoEntities.Session {
-
-	activeSessions := this.GetActiveSessions()
-
-	for i := 0; i < len(activeSessions); i++ {
-		if activeSessions[i].GetId() == sessionId {
-			return activeSessions[i]
-		}
-	}
-	return nil
-}
-
-/**
- * Returns the list of sessions for a given accout.
- */
-func (this *SessionManager) GetActiveSessionByAccountId(accountId string) Sessions {
-	var sessions Sessions
-	for _, session := range this.GetActiveSessions() {
-		if session.M_accountPtr == accountId {
-			sessions = append(sessions, session)
-		}
-	}
-	sort.Sort(sessions)
+// @api 1.0
+// Get the list of all active session on the server for a given account name
+// @param {string} accountId The account name.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {[]*CargoEntities.Session} Return an array of session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *SessionManager) GetActiveSessionByAccountId(accountId string, messageId string, sessionId string) Sessions {
+	sessions := this.getActiveSessionByAccountId(accountId)
 	return sessions
 }
 
-/**
- * Update the state of a session.
- */
+// @api 1.0
+// Change the state of a given session.
+// @param {int} state 1: Online, 2:Away, other: Offline.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *SessionManager) UpdateSessionState(state int64, messageId string, sessionId string) {
 
 	// Get the session object...
-	session := this.GetActiveSessionById(sessionId)
+	session := this.getActiveSessionById(sessionId)
 
 	if session == nil {
 		// Create the error message
@@ -445,7 +446,7 @@ func (this *SessionManager) UpdateSessionState(state int64, messageId string, se
 	// Append the user data
 	sessionsInfo := new(MessageData)
 	sessionsInfo.Name = "sessionsInfo"
-	sessionsInfo.Value = this.GetActiveSessionByAccountId(session.M_accountPtr)
+	sessionsInfo.Value = this.getActiveSessionByAccountId(session.M_accountPtr)
 	eventData[1] = sessionsInfo
 
 	evt, _ := NewEvent(StateChangeEvent, SessionEvent, eventData)

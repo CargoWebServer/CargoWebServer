@@ -124,7 +124,7 @@ EmailManager.prototype.sendEmail = function (serverId, from_, to, cc, title, msg
     // Call it on the server.
     server.executeJsFunction(
         // The session id on the server.
-        SendEmail.toString(), // The function to execute remotely on server
+        "EmailManagerSendEmail", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             caller.progressCallback(index, total, caller.caller)

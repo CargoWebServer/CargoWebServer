@@ -271,27 +271,22 @@ Server.prototype.handleMessage = function (conn, data) {
 /**
  * Get the current session id.
  */
-Server.prototype.setSessionId = function () {
+Server.prototype.setSessionId = function (initCallback) {
     var params = new Array();
     // Register this listener to the server.
     var rqst = new Request(randomUUID(), this.conn, "GetSessionId", params,
         // Progress callback
         function () { },
         // Success callback
-        function (id, results, server) {
+        function (id, results, caller) {
             // Keep the session id...
-            server.sessionId = results.result
+            caller.server.sessionId = results.result
 
             // Each application must contain a main.
             if (main != null) {
-                // Go to the main entry point
-                // Append the listener for the entity.
-                // The session listener.
-                server.entityManager.getEntityPrototypes("Config", function (result, caller) {
-                    server.entityManager.getEntityPrototypes("CargoEntities", function (result, caller) {
-                        main()
-                    }, function () {/* Error callback */ }, null)
-                }, function () {/* Error callback */ }, null)
+                if(caller.initCallback!=undefined) {
+                    caller.initCallback()
+                }
             } else {
                 // I will show the project manager page.
                 // TODOO error 404
@@ -301,7 +296,7 @@ Server.prototype.setSessionId = function () {
         // Error callback...
         function () {
 
-        }, this);
+        }, {"server":this, "initCallback":initCallback});
     rqst.send();
 }
 

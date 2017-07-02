@@ -87,7 +87,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
                 // Hide all data panel.
                 homepage.dataExplorer.hidePanels()
 
-                var entity = server.entityManager.entities[evt.dataMap["entity"].UUID]
+                var entity = entities[evt.dataMap["entity"].UUID]
                 var configurationContent = configurationPanel.panel.getChildById("configurationContent")
 
                 // Set the new configuration.
@@ -192,7 +192,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     // Now If the connection is activated...
                     contentView.connectBtn.element.onclick = function (contentView) {
                         return function () {
-                            var entity = server.entityManager.entities[contentView.entity.UUID]
+                            var entity = entities[contentView.entity.UUID]
 
                             if (this.status == "error") {
                                 this.status = "disconnected"
@@ -239,7 +239,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     // The refresh action.
                     contentView.refreshBtn.element.onclick = function (contentView) {
                         return function () {
-                            var entity = server.entityManager.entities[contentView.entity.UUID]
+                            var entity = entities[contentView.entity.UUID]
                             this.style.color = "#428bca"
                             server.dataManager.synchronize(entity.M_id,
                                 // success callback
@@ -461,7 +461,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
 
         var configurationContent = this.panel.appendElement({ "tag": "div", "id": "configurationContent", "style": "display: table;" }).down()
         var content = configuration["M_" + this.propertyName]
-        var prototype = server.entityManager.entityPrototypes[configuration.TYPENAME]
+        var prototype = entityPrototypes[configuration.TYPENAME]
         var fieldType = prototype.FieldsType[prototype.getFieldIndex("M_" + this.propertyName)]
 
         var newConfiguration = function (configurationPanel, configurationContent, configuration) {

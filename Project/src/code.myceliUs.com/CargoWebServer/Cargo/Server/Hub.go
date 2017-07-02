@@ -52,12 +52,22 @@ func NewHub() *Hub {
 						params := make([]*MessageData, 0)
 						to := make([]connection, 1)
 						to[0] = conn
-						ping, err := NewRequestMessage(id, method, params, to, nil, nil, nil)
-						if err != nil {
-							log.Println(err, " at time ", t)
+						successCallback := func(rspMsg *message, caller interface{}) {
+							//log.Println("success!!!")
 						}
 
-						GetServer().GetProcessor().m_pendingRequestChannel <- ping
+						errorCallback := func(rspMsg *message, caller interface{}) {
+							//log.Println("error!!!")
+						}
+
+						ping, err := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback)
+
+						if err != nil {
+							log.Println(err, " at time ", t)
+							conn.Close() // Here I will close the connection.
+						} else {
+							GetServer().GetProcessor().m_pendingRequestChannel <- ping
+						}
 
 					} else {
 						GetServer().GetSessionManager().removeClosedSession()
@@ -90,10 +100,11 @@ func (this *Hub) run() {
 			}
 
 		case c := <-this.unregister:
+			log.Println("----> remove connection ", c.GetAddrStr(), c.GetPort())
 			delete(this.connections, c.GetUuid())
-			c.Close()
 			GetServer().GetEventManager().removeClosedListener()
 			GetServer().GetSessionManager().removeClosedSession()
+
 		case msg := <-this.receivedMsg:
 			GetServer().GetProcessor().m_incomingChannel <- msg
 		case done := <-this.abortedByEnvironment:

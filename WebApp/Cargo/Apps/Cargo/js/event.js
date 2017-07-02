@@ -45,6 +45,8 @@ FileEvent = "FileEvent"
 NewFileEvent = 17
 DeleteFileEvent = 18
 UpdateFileEvent = 19
+OpenFileEvent = 20
+CloseFileEvent = 21
 TableEvent = "TableEvent"
 DeleteRowEvent = 22
 NewRowEvent = 23
@@ -56,6 +58,8 @@ UpdateRoleEvent = 27
 ProjectEvent = "ProjectEvent"
 EmailEvent = "EmailEvent"
 ServiceEvent = "ServiceEvent"
+DataEvent = "DataEvent"
+
 /**
 * EventHub contructor
 * @constructor
@@ -302,7 +306,7 @@ EventHandler.prototype.appendEventFilter = function (filter, channelId, successC
 
     // Call it on the server.
     server.executeJsFunction(
-        "AppendEventFilter", // The function to execute remotely on server
+        "EventManagerAppendEventFilter", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -357,7 +361,7 @@ EventHandler.prototype.broadcastNetworkEvent = function (evtNumber, evtName, eve
 
     // Call it on the server.
     server.executeJsFunction(
-        "BroadcastNetworkEvent", // The function to execute remotely on server
+        "EventManagerBroadcastNetworkEvent", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

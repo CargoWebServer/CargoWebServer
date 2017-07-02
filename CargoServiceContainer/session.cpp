@@ -76,7 +76,7 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
                     var = jsonArray;
                     action->appendParam(QString::fromStdString(param.name()), var, "QJsonArray");
                 }else if(jsonDoc.isEmpty() || jsonDoc.isNull()){
-                    var = NULL;
+                    //var = NULL;
                 }
 
             }

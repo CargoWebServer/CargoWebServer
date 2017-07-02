@@ -95,7 +95,7 @@ var LoginPage = function (loginCallback, serverId) {
 			if (evt.dataMap["entity"] && entityPanel.entity != null) {
 				if (entityPanel.entity.UUID == evt.dataMap["entity"].UUID) {
 					entityPanel.init(entityPanel.proto)
-					entityPanel.setEntity(server.entityManager.entities[evt.dataMap["entity"].UUID])
+					entityPanel.setEntity(entities[evt.dataMap["entity"].UUID])
 				}
 			}
 		}*/
@@ -117,10 +117,10 @@ var LoginPage = function (loginCallback, serverId) {
 					rememeberMe.element.checked = false
 					localStorage.removeItem('_remember_me_');
 				}
-			} (usernameError, passwordInput, usernameInput, rememeberMe), 1000)
+			}(usernameError, passwordInput, usernameInput, rememeberMe), 1000)
 
 		}
-	} (this.usernameError, this.usernameInput, this.passwordInput, this.rememeberMe))
+	}(this.usernameError, this.usernameInput, this.passwordInput, this.rememeberMe))
 
 	server.errorManager.attach(this.passwordError.element, "PASSWORD_MISMATCH_ERROR", function (passwordError, passwordInput, rememeberMe) {
 		return function (err) {
@@ -133,9 +133,9 @@ var LoginPage = function (loginCallback, serverId) {
 					rememeberMe.element.checked = false
 					localStorage.removeItem('_remember_me_');
 				}
-			} (passwordError, passwordInput, rememeberMe), 1000)
+			}(passwordError, passwordInput, rememeberMe), 1000)
 		}
-	} (this.passwordError, this.passwordInput, this.rememeberMe))
+	}(this.passwordError, this.passwordInput, this.rememeberMe))
 
 	// The event handling...
 	this.loginButton.element.onclick = function (usernameInput, passwordInput, loginCallback, loginPage) {
@@ -147,18 +147,44 @@ var LoginPage = function (loginCallback, serverId) {
 
 			/* Here I will call the login... **/
 			if (password.length > 0 && userName.length > 0) {
-				server.sessionManager.login(userName, password, serverId, function (result, caller) {
-					if (caller.loginCallback != undefined) {
-						caller.loginCallback(result)
-						// call once...
-						caller.loginCallback = undefined
-						var rememberMe = localStorage.getItem('_remember_me_')
-						if (rememberMe != undefined) {
-							// In that case I will put the session info in the 
-							// local storage...
-							localStorage.setItem('_remember_me_', true)
+				server.sessionManager.login(userName, password, serverId, function (session, caller) {
+					
+					// Must be call after account pointer initialisation.
+					caller.successCallback = function (session) {
+						if (this.loginCallback != undefined) {
+							this.loginCallback(session)
+							// call once...
+							this.loginCallback = undefined
+							var rememberMe = localStorage.getItem('_remember_me_')
+							if (rememberMe != undefined) {
+								// In that case I will put the session info in the 
+								// local storage...
+								localStorage.setItem('_remember_me_', true)
+							}
 						}
 					}
+
+					// Save the active session id on the session manager.
+					activeSessionAccountId = session.M_accountPtr
+
+					// Initialisation of the account pointer and call the login callback on success.
+					session["set_M_accountPtr_" + session.M_accountPtr + "_ref"](function (caller, session) {
+						return function (accountPtr) {
+							// call the callback after the session is intialysed.
+							// Keep track of the accountUuid for future access.
+							localStorage.setItem("accountUuid", accountPtr.UUID)
+							if (accountPtr["set_M_userRef_" + accountPtr.M_userRef + "_ref"] != undefined) {
+								accountPtr["set_M_userRef_" + accountPtr.M_userRef + "_ref"](function (session, caller) {
+									return function () {
+										caller.successCallback(session)
+									}
+								}(session, caller))
+							} else {
+								caller.successCallback(session)
+							}
+						}
+					}(caller, session))
+
 				},
 					function (error, caller) {
 						/* Nothing todo here */
@@ -172,7 +198,7 @@ var LoginPage = function (loginCallback, serverId) {
 				}
 			}
 		}
-	} (this.usernameInput, this.passwordInput, this.loginCallback, this)
+	}(this.usernameInput, this.passwordInput, this.loginCallback, this)
 
 	// Now the key down event...
 	this.usernameInput.element.onkeydown = function (usernameInput, passwordInput) {
@@ -183,7 +209,7 @@ var LoginPage = function (loginCallback, serverId) {
 				passwordInput.element.focus()
 			}
 		}
-	} (this.usernameInput, this.passwordInput)
+	}(this.usernameInput, this.passwordInput)
 
 	// Same as login button...
 	this.passwordInput.element.onkeydown = function (passwordInput, loginButton) {
@@ -193,7 +219,7 @@ var LoginPage = function (loginCallback, serverId) {
 				loginButton.element.click()
 			}
 		}
-	} (this.passwordInput, this.loginButton)
+	}(this.passwordInput, this.loginButton)
 
 	// Now the remember me...
 	this.rememeberMe.element.onclick = function (rememeberMe) {
@@ -207,7 +233,7 @@ var LoginPage = function (loginCallback, serverId) {
 				localStorage.removeItem('_remember_me_');
 			}
 		}
-	} (this.rememeberMe)
+	}(this.rememeberMe)
 
 	if (localStorage.getItem("_remember_me_") != undefined) {
 		// Here I will retreive the session info create an event and send it to the server.

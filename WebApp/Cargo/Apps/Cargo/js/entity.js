@@ -20,7 +20,6 @@
  * @version 1.0
  */
 
-
 /**
  * The entity manager gives acces to ojects stored on the server.
  * @constructor
@@ -34,20 +33,6 @@ var EntityManager = function () {
 
     EventHub.call(this, EntityEvent)
 
-    /**
-     * @property {object} entityPrototypes Keeps track of prototypes in use.
-     */
-    this.entityPrototypes = {}
-
-    /**
-     * Keep the entity localy to reduce the network traffic and
-     * prevent infinite recurion.
-     */
-    this.entities = {}
-
-    // The list of item to init...
-    this.toInit = {}
-
     return this
 }
 
@@ -60,11 +45,11 @@ EntityManager.prototype.constructor = EntityManager;
 EntityManager.prototype.onEvent = function (evt) {
     // Set the internal object.
     if (evt.code == UpdateEntityEvent || evt.code == NewEntityEvent) {
-        if (this.entityPrototypes[evt.dataMap["entity"].TYPENAME] == undefined) {
+        if (entityPrototypes[evt.dataMap["entity"].TYPENAME] == undefined) {
             console.log("Type " + evt.dataMap["entity"].TYPENAME + " not define!")
             return
         }
-        if (this.entities[evt.dataMap["entity"].UUID] == undefined) {
+        if (entities[evt.dataMap["entity"].UUID] == undefined) {
             var entity = eval("new " + evt.dataMap["entity"].TYPENAME + "()")
             entity.initCallback = function (self, evt, entity) {
                 return function (entity) {
@@ -77,7 +62,7 @@ EntityManager.prototype.onEvent = function (evt) {
         } else {
             // update the object values.
             // but before I call the event I will be sure the entity have 
-            var entity = this.entities[evt.dataMap["entity"].UUID]
+            var entity = entities[evt.dataMap["entity"].UUID]
             entity.initCallback = function (self, evt, entity) {
                 return function (entity) {
                     // Test if the object has change here befor calling it.
@@ -93,7 +78,7 @@ EntityManager.prototype.onEvent = function (evt) {
             // }
         }
     } else if (evt.code == DeleteEntityEvent) {
-        var entity = this.entities[evt.dataMap["entity"].UUID]
+        var entity = entities[evt.dataMap["entity"].UUID]
         if (entity != undefined) {
             this.resetEntity(entity)
             EventHub.prototype.onEvent.call(this, evt)
@@ -112,7 +97,7 @@ EntityManager.prototype.setEntity = function (entity) {
             for (var i = 0; i < prototype.Ids.length; i++) {
                 var id = prototype.Ids[i]
                 if (id == "UUID") {
-                    server.entityManager.entities[entity.UUID] = entity
+                    entities[entity.UUID] = entity
                 } else {
                     if (entity[id].length > 0) {
                         id_ += entity[id]
@@ -125,7 +110,7 @@ EntityManager.prototype.setEntity = function (entity) {
 
             // Set the entity with it id.
             if (entity.IsInit) {
-                server.entityManager.entities[id_] = entity
+                entities[id_] = entity
                 if (entity.TYPENAME.startsWith("BPMN20")) {
                     server.workflowManager.bpmnElements[id_] = entity
                 }
@@ -142,8 +127,8 @@ EntityManager.prototype.setEntity = function (entity) {
  * Remove an entity.
  */
 EntityManager.prototype.resetEntity = function (entity) {
-    var prototype = this.entityPrototypes[entity.TYPENAME]
-    delete server.entityManager.entities[entity.UUID]
+    var prototype = entityPrototypes[entity.TYPENAME]
+    delete entities[entity.UUID]
 
     var id = entity.TYPENAME + ":"
     for (var i = 0; i < prototype.Ids.length; i++) {
@@ -152,8 +137,8 @@ EntityManager.prototype.resetEntity = function (entity) {
             id += "_"
         }
     }
-    if (server.entityManager.entities[id] != undefined) {
-        delete server.entityManager.entities[id]
+    if (entities[id] != undefined) {
+        delete entities[id]
     }
 }
 
@@ -190,7 +175,7 @@ EntityManager.prototype.getObjectsByType = function (typeName, storeId, queryStr
 
             // Call it on the server.
             server.executeJsFunction(
-                "GetObjectsByType", // The function to execute remotely on server
+                "EntityManagerGetObjectsByType", // The function to execute remotely on server
                 params, // The parameters to pass to that function
                 function (index, total, caller) { // The progress callback
                     // Keep track of the file transfert.
@@ -259,7 +244,7 @@ EntityManager.prototype.getEntityLnks = function (uuid, progressCallback, succes
 
     // Call it on the server.
     server.executeJsFunction(
-        "GetEntityLnks", // The function to execute remotely on server
+        "EntityManagerGetEntityLnks", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             caller.progressCallback(index, total, caller)
@@ -284,7 +269,7 @@ EntityManager.prototype.getEntityLnks = function (uuid, progressCallback, succes
  */
 EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, errorCallback, caller) {
 
-    var entity = server.entityManager.entities[uuid]
+    var entity = entities[uuid]
     if (entity != undefined) {
         if (entity.TYPENAME == entity.__class__ && entity.IsInit == true) {
             successCallback(entity, caller)
@@ -317,13 +302,13 @@ EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, error
 
             // Call it on the server.
             server.executeJsFunction(
-                "GetEntityByUuid", // The function to execute remotely on server
+                "EntityManagerGetEntityByUuid", // The function to execute remotely on server
                 params, // The parameters to pass to that function
                 function (index, total, caller) { // The progress callback
                     // Nothing special to do here.
                 },
                 function (result, caller) {
-                    var entity = server.entityManager.entities[result[0].UUID]
+                    var entity = entities[result[0].UUID]
                     entity.initCallback = function (caller) {
                         return function (entity) {
                             server.entityManager.setEntity(entity)
@@ -375,8 +360,8 @@ EntityManager.prototype.getEntityById = function (storeId, typeName, ids, succes
         }
     }
 
-    if (server.entityManager.entities[id] != undefined) {
-        successCallback(server.entityManager.entities[id], caller)
+    if (entities[id] != undefined) {
+        successCallback(entities[id], caller)
         return // break it here.
     }
 
@@ -401,7 +386,7 @@ EntityManager.prototype.getEntityById = function (storeId, typeName, ids, succes
 
             // Call it on the server.
             server.executeJsFunction(
-                "GetEntityById", // The function to execute remotely on server
+                "EntityManagerGetEntityById", // The function to execute remotely on server
                 params, // The parameters to pass to that function
                 function (index, total, caller) { // The progress callback
                     // Nothing special to do here.
@@ -412,8 +397,8 @@ EntityManager.prototype.getEntityById = function (storeId, typeName, ids, succes
                     }
 
                     // In case of existing entity.
-                    if (server.entityManager.entities[result[0].UUID] != undefined && result[0].TYPENAME == result[0].__class__) {
-                        caller.successCallback(server.entityManager.entities[result[0].UUID], caller.caller)
+                    if (entities[result[0].UUID] != undefined && result[0].TYPENAME == result[0].__class__) {
+                        caller.successCallback(entities[result[0].UUID], caller.caller)
                         return // break it here.
                     }
 
@@ -464,7 +449,7 @@ EntityManager.prototype.createEntity = function (parentUuid, attributeName, type
 
     // Call it on the server.
     server.executeJsFunction(
-        "CreateEntity", // The function to execute remotely on server
+        "EntityManagerCreateEntity", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -504,7 +489,7 @@ EntityManager.prototype.removeEntity = function (uuid, successCallback, errorCal
 
     // Call it on the server.
     server.executeJsFunction(
-        "RemoveEntity", // The function to execute remotely on server
+        "EntityManagerRemoveEntity", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -536,7 +521,7 @@ EntityManager.prototype.saveEntity = function (entity, successCallback, errorCal
 
     // Call it on the server.
     server.executeJsFunction(
-        "SaveEntity", // The function to execute remotely on server
+        "EntityManagerSaveEntity", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -581,7 +566,7 @@ EntityManager.prototype.createEntityPrototype = function (storeId, prototype, su
 
     // Call it on the server.
     server.executeJsFunction(
-        "CreateEntityPrototype", // The function to execute remotely on server
+        "EntityManagerCreateEntityPrototype", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -589,7 +574,7 @@ EntityManager.prototype.createEntityPrototype = function (storeId, prototype, su
         function (results, caller) {
             var proto = new EntityPrototype()
             proto.init(results[0])
-            server.entityManager.entityPrototypes[results[0].TypeName] = proto
+            entityPrototypes[results[0].TypeName] = proto
             caller.successCallback(proto, caller.caller)
         },
         function (errMsg, caller) {
@@ -612,8 +597,8 @@ EntityManager.prototype.createEntityPrototype = function (storeId, prototype, su
 EntityManager.prototype.getEntityPrototype = function (typeName, storeId, successCallback, errorCallback, caller) {
 
     // Retrun entity prototype that aleady exist.
-    if (server.entityManager.entityPrototypes[typeName] != undefined) {
-        successCallback(server.entityManager.entityPrototypes[typeName], caller)
+    if (entityPrototypes[typeName] != undefined) {
+        successCallback(entityPrototypes[typeName], caller)
         return
     }
 
@@ -624,14 +609,14 @@ EntityManager.prototype.getEntityPrototype = function (typeName, storeId, succes
 
     // Call it on the server.
     server.executeJsFunction(
-        "GetEntityPrototype", // The function to execute remotely on server
+        "EntityManagerGetEntityPrototype", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
         },
         function (results, caller) {
             var proto = new EntityPrototype()
-            server.entityManager.entityPrototypes[results[0].TypeName] = proto
+            entityPrototypes[results[0].TypeName] = proto
             proto.init(results[0])
             caller.successCallback(proto, caller.caller)
         },
@@ -659,7 +644,7 @@ EntityManager.prototype.getEntityPrototypes = function (storeId, successCallback
 
     // Call it on the server.
     server.executeJsFunction(
-        "GetEntityPrototypes", // The function to execute remotely on server
+        "EntityManagerGetEntityPrototypes", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -670,7 +655,7 @@ EntityManager.prototype.getEntityPrototypes = function (storeId, successCallback
             if (results != null) {
                 for (var i = 0; i < results.length; i++) {
                     var proto = new EntityPrototype()
-                    server.entityManager.entityPrototypes[results[i].TypeName] = proto
+                    entityPrototypes[results[i].TypeName] = proto
                     proto.init(results[i])
                     protoypes.push(proto)
                 }
@@ -703,7 +688,7 @@ EntityManager.prototype.getDerivedEntityPrototypes = function (typeName, success
 
     // Call it on the server.
     server.executeJsFunction(
-        "GetDerivedEntityPrototypes", // The function to execute remotely on server
+        "EntityManagerGetDerivedEntityPrototypes", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -713,12 +698,12 @@ EntityManager.prototype.getDerivedEntityPrototypes = function (typeName, success
             if (results[0] != null) {
                 for (var i = 0; i < results[0].length; i++) {
                     var result = results[0][i]
-                    if (server.entityManager.entityPrototypes[results[0][i].TypeName] != undefined) {
-                        prototypes.push(server.entityManager.entityPrototypes[results[0][i].TypeName])
+                    if (entityPrototypes[results[0][i].TypeName] != undefined) {
+                        prototypes.push(entityPrototypes[results[0][i].TypeName])
                     } else {
                         var proto = new EntityPrototype()
                         proto.init(results[0][i])
-                        server.entityManager.entityPrototypes[results[0][i].TypeName] = proto
+                        entityPrototypes[results[0][i].TypeName] = proto
                     }
                 }
             }
@@ -764,9 +749,9 @@ var Restriction = function () {
  * Append a new object value into an entity.
  */
 function appendObjectValue(object, field, value) {
-    var prototype = server.entityManager.entityPrototypes[object.TYPENAME]
+    var prototype = entityPrototypes[object.TYPENAME]
     var fieldIndex = prototype.getFieldIndex(field)
-    var prototype = server.entityManager.entityPrototypes[object.TYPENAME]
+    var prototype = entityPrototypes[object.TYPENAME]
     var fieldType = prototype.FieldsType[fieldIndex]
     var isArray = fieldType.startsWith("[]")
     var isRef = fieldType.endsWith(":Ref")
@@ -823,7 +808,7 @@ function appendObjectValue(object, field, value) {
  * Remove an object from a given object.
  */
 function removeObjectValue(object, field, value) {
-    var prototype = server.entityManager.entityPrototypes[object.TYPENAME]
+    var prototype = entityPrototypes[object.TYPENAME]
     var index = prototype.getFieldIndex(field)
     if (index > -1) {
         var fieldType = prototype.FieldsType[index]
@@ -872,7 +857,7 @@ function removeObjectValue(object, field, value) {
 function resetObjectValues(object) {
     // Remove the object panel...
     delete object["panel"]
-    var prototype = server.entityManager.entityPrototypes[object.TYPENAME]
+    var prototype = entityPrototypes[object.TYPENAME]
 
     for (var propertyId in object) {
         var propretyType = prototype.FieldsType[prototype.getFieldIndex(propertyId)]
@@ -912,7 +897,7 @@ function resetObjectValues(object) {
  * Return a property field type for a given field for a given type name.
  */
 function getPropertyType(typeName, property) {
-    var prototype = server.entityManager.entityPrototypes[typeName]
+    var prototype = entityPrototypes[typeName]
     var propertyType = null
     for (var i = 0; i < prototype.Fields.length; i++) {
         if (prototype.Fields[i] == property) {
@@ -1001,17 +986,17 @@ function setRef(owner, property, refValue, isArray) {
             /* The set reference fucntion **/
             owner["set_" + property + "_" + refValue + "_ref"] = function (entityUuid, propertyName, index, refValue) {
                 return function (initCallback) {
-                    var isExist = server.entityManager.entities[refValue] != undefined
+                    var isExist = entities[refValue] != undefined
                     var isInit = false
 
                     if (isExist) {
-                        isInit = server.entityManager.entities[refValue].IsInit
+                        isInit = entities[refValue].IsInit
                     }
 
                     if (isExist && isInit) {
                         // Here the reference exist on the server.
-                        var entity = server.entityManager.entities[entityUuid]
-                        var ref = server.entityManager.entities[refValue]
+                        var entity = entities[entityUuid]
+                        var ref = entities[refValue]
                         entity[propertyName][index] = ref
                         appendReferenced(propertyName, ref, entity)
                         if (initCallback != undefined) {
@@ -1024,8 +1009,8 @@ function setRef(owner, property, refValue, isArray) {
                             function (result, caller) {
                                 var propertyName = caller.propertyName
                                 var index = caller.index
-                                var entity = server.entityManager.entities[caller.entityUuid]
-                                var ref = server.entityManager.entities[caller.refValue]
+                                var entity = entities[caller.entityUuid]
+                                var ref = entities[caller.refValue]
                                 entity[propertyName][index] = ref
                                 appendReferenced(propertyName, ref, entity)
                                 if (caller.initCallback != undefined) {
@@ -1047,7 +1032,7 @@ function setRef(owner, property, refValue, isArray) {
         /* The reset fucntion **/
         owner["reset_" + property + "_" + refValue + "_ref"] = function (entityUuid, propertyName) {
             return function () {
-                var entity = server.entityManager.entities[entityUuid]
+                var entity = entities[entityUuid]
                 // Set back the id of the reference
                 if (isObject(entity[propertyName])) {
                     entity[propertyName] = entity[propertyName].UUID
@@ -1059,18 +1044,18 @@ function setRef(owner, property, refValue, isArray) {
         owner["set_" + property + "_" + refValue + "_ref"] = function (entityUuid, propertyName, refValue) {
             return function (initCallback) {
 
-                var isExist = server.entityManager.entities[refValue] != undefined
+                var isExist = entities[refValue] != undefined
                 var isInit = false
 
                 if (isExist) {
-                    isInit = server.entityManager.entities[refValue].IsInit
+                    isInit = entities[refValue].IsInit
                 }
 
                 // If the entity is already on the client side...
                 if (isExist && isInit) {
                     // Here the reference exist on the server.
-                    var entity = server.entityManager.entities[entityUuid]
-                    var ref = server.entityManager.entities[refValue]
+                    var entity = entities[entityUuid]
+                    var ref = entities[refValue]
                     entity[propertyName] = ref
                     appendReferenced(propertyName, ref, entity)
                     if (initCallback != undefined) {
@@ -1081,8 +1066,8 @@ function setRef(owner, property, refValue, isArray) {
                     server.entityManager.getEntityByUuid(refValue,
                         function (result, caller) {
                             var propertyName = caller.propertyName
-                            var entity = server.entityManager.entities[caller.entityUuid]
-                            var ref = server.entityManager.entities[caller.refValue]
+                            var entity = entities[caller.entityUuid]
+                            var ref = entities[caller.refValue]
                             entity[propertyName] = ref
                             appendReferenced(propertyName, ref, entity)
                             if (caller.initCallback != undefined) {
@@ -1107,7 +1092,7 @@ function hasChange(entity, object) {
     resetObjectValues(entity)
 
     // Now I will look if the object value has change.
-    var prototype = server.entityManager.entityPrototypes[object["TYPENAME"]]
+    var prototype = entityPrototypes[object["TYPENAME"]]
 
     for (var property in object) {
         var propertyType = getPropertyType(object["TYPENAME"], property)
@@ -1161,7 +1146,7 @@ function setSubObject(parent, property, values, isArray) {
                 i = 0;
             }
 
-            var object = server.entityManager.entities[values.UUID]
+            var object = entities[values.UUID]
             if (object == undefined) {
                 object = eval("new " + values.TYPENAME + "()")
                 // Keep track of the parent uuid in the child.
@@ -1211,7 +1196,7 @@ function setSubObject(parent, property, values, isArray) {
 function setObjectValues(object, values) {
 
     // Get the entity prototype.
-    var prototype = server.entityManager.entityPrototypes[object["TYPENAME"]]
+    var prototype = entityPrototypes[object["TYPENAME"]]
     if (prototype == undefined) {
         return
     }
@@ -1314,7 +1299,7 @@ function setObjectValues(object, values) {
                                 var obj = eval("new " + jsonObj.TYPENAME + "()")
                                 obj.initCallback = function (uuid, property) {
                                     return function (val) {
-                                        server.entityManager.entities[uuid][property] = val
+                                        entities[uuid][property] = val
                                     }
                                 } (object.UUID, property)
 
@@ -1325,10 +1310,10 @@ function setObjectValues(object, values) {
                                     var obj = eval("new " + jsonObj_.TYPENAME + "()")
                                     obj.initCallback = function (uuid, property) {
                                         return function (val) {
-                                            if (server.entityManager.entities[uuid][property] == "") {
-                                                server.entityManager.entities[uuid][property] = []
+                                            if (entities[uuid][property] == "") {
+                                                entities[uuid][property] = []
                                             }
-                                            server.entityManager.entities[uuid][property].push(val)
+                                            entities[uuid][property].push(val)
                                         }
                                     } (object.UUID, property)
                                     obj.init(jsonObj_)
@@ -1391,7 +1376,7 @@ function setObjectValues(object, values) {
  */
 EntityManager.prototype.isListOf = function (typeName) {
     typeName = typeName.replace("[]", "").replace(":Ref", "")
-    var prototype = this.entityPrototypes[typeName]
+    var prototype = entityPrototypes[typeName]
 
     if (prototype != null) {
         if (prototype.ListOf != null) {
@@ -1421,7 +1406,7 @@ EntityManager.prototype.getBaseTypeExtension = function (typeName, isArray) {
         isArray = typeName.startsWith("[]")
     }
     typeName = typeName.replace("[]", "").replace(":Ref", "")
-    var prototype = this.entityPrototypes[typeName]
+    var prototype = entityPrototypes[typeName]
 
     if (prototype != null) {
         if (prototype.SuperTypeNames != null) {

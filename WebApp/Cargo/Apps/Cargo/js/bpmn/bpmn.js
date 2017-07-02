@@ -37,7 +37,7 @@ WorkflowManager.prototype.importXmlBpmnDefinitions = function (content, successC
 
     // Call it on the server.
     server.executeJsFunction(
-        "ImportXmlBpmnDefinitions", // The function to execute remotely on server
+        "WorkflowManagerImportXmlBpmnDefinitions", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -63,7 +63,7 @@ WorkflowManager.prototype.getDefinitionsIds = function (successCallback, errorCa
 
     // Call it on the server.
     server.executeJsFunction(
-        "GetDefinitionsIds", // The function to execute remotely on server
+        "WorkflowManagerGetDefinitionsIds", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -92,7 +92,7 @@ WorkflowManager.prototype.getDefinitionsById = function (id, successCallback, er
 
     // Call it on the server.
     server.executeJsFunction(
-        "GetDefinitionsById", // The function to execute remotely on server
+        "WorkflowManagerGetDefinitionsById", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -151,7 +151,7 @@ WorkflowManager.prototype.getAllDefinitions = function (successCallback, errorCa
             var params = []
             // Call it on the server.
             server.executeJsFunction(
-                "GetAllDefinitions", // The function to execute remotely on server
+                "WorkflowManagerGetAllDefinitions", // The function to execute remotely on server
                 params, // The parameters to pass to that function
                 function (index, total, caller) { // The progress callback
                     // Nothing special to do here.
@@ -208,7 +208,7 @@ WorkflowManager.prototype.getDefinitionInstances = function (definitions, succes
 
     // Call it on the server.
     server.executeJsFunction(
-        "GetDefinitionInstances", // The function to execute remotely on server
+        "WorkflowManagerGetDefinitionInstances", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -275,7 +275,7 @@ WorkflowManager.prototype.newItemAwareElementInstance = function (bpmnElementId,
 
     // Call it on the server.
     server.executeJsFunction(
-        "NewItemAwareElementInstance", // The function to execute remotely on server
+        "WorkflowManagerNewItemAwareElementInstance", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -305,7 +305,7 @@ WorkflowManager.prototype.startProcess = function (processUUID, eventData, event
 
     // Call it on the server.
     server.executeJsFunction(
-        "StartProcess", // The function to execute remotely on server
+        "WorkflowManagerStartProcess", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -333,7 +333,7 @@ WorkflowManager.prototype.getActiveProcessInstances = function (uuid, successCal
 
     // Call it on the server.
     server.executeJsFunction(
-        "GetActiveProcessInstances", // The function to execute remotely on server
+        "WorkflowManagerGetActiveProcessInstances", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.
@@ -379,7 +379,7 @@ WorkflowManager.prototype.activateActivityInstance = function (uuid, successCall
 
     // Call it on the server.
     server.executeJsFunction(
-        "ActivateActivityInstance", // The function to execute remotely on server
+        "WorkflowManagerActivateActivityInstance", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

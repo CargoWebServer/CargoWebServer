@@ -27,10 +27,6 @@ type Server struct {
 	hub              *Hub
 	messageProcessor *MessageProcessor
 
-	// That map contain list of other server on the network.
-	// Use by services manager as example.
-	peers map[string]connection
-
 	// The address information.
 	addressInfo *Utility.IPInfo
 }
@@ -75,9 +71,6 @@ func newServer() *Server {
  * Do intialysation stuff here.
  */
 func (this *Server) initialize() {
-
-	// Contain the reference to other services on the network.
-	this.peers = make(map[string]connection)
 
 	// Must be call first.
 	this.GetConfigurationManager()
@@ -276,13 +269,14 @@ func (this *Server) SetRootPath(path string) error {
 //////////////////////////////////////////////////////////
 // Interface to other servers...
 //////////////////////////////////////////////////////////
+
 /**
- * Open a new connection with server on the network...
+ * Open a new TCP connection with server on the network...
  */
 func (this *Server) Connect(host string, port int) error {
 
 	// Create the new connection.
-	conn := new(tcpSocketConnection)
+	conn := NewTcpSocketConnection()
 
 	// Open the a new connection with the server.
 	err := conn.Open(host, port)
@@ -295,17 +289,6 @@ func (this *Server) Connect(host string, port int) error {
 		return errors.New("Fail to open connection with socket " + host + " at port " + strconv.Itoa(port))
 	}
 
-	// Here I will create the new connection...
-	this.hub.register <- conn
-
-	// Keep the reference... host:port will be the id.
-	connectionId := host + ":" + strconv.Itoa(port)
-	this.peers[connectionId] = conn
-
-	// Start reading and writing loop's
-	go conn.Writer()
-	go conn.Reader()
-
 	return nil
 }
 
@@ -315,12 +298,11 @@ func (this *Server) Connect(host string, port int) error {
 func (this *Server) Disconnect(host string, port int) {
 
 	connectionId := host + ":" + strconv.Itoa(port)
-	conn := this.peers[connectionId]
+	conn := this.getConnectionById(Utility.GenerateUUID(connectionId))
 
 	if conn != nil {
 		//this.hub.unregister <- conn
 		conn.Close()
-		delete(this.peers, connectionId)
 	}
 }
 

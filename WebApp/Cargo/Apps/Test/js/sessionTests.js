@@ -62,53 +62,6 @@ function login_passwordError_Test() {
 }
 
 
-function getActiveSessions_Test() {
-    nbTests++
-    server.sessionManager.login("admin", "adminadmin",
-        function () {
-            server.sessionManager.getActiveSessions(
-                function (result) {
-                    QUnit.test("getActiveSessions_Test",
-                        function (result) {
-                            return function (assert) {
-                                assert.ok(result[0].M_accountPtr == "admin");
-                                nbTestsAsserted++
-                            }
-                        } (result))
-                }, function (result) {
-
-                },
-                undefined)
-        }, function () {
-
-        },
-        undefined)
-
-
-}
-
-function getActiveSessionByAccountId_Test() {
-    nbTests++
-    server.sessionManager.login("admin", "adminadmin",
-        function () {
-            server.sessionManager.getActiveSessions(
-                function (result) {
-                    QUnit.test("getActiveSessionByAccountId_Test",
-                        function (result) {
-                            return function (assert) {
-                                assert.ok(result[0].M_accountPtr == "admin");
-                                nbTestsAsserted++
-                            }
-                        } (result))
-                }, function (result) {
-
-                },
-                undefined)
-        }, function () {
-
-        },
-        undefined)
-}
 
 /* FAIL: Fonction updateSessionState retourne rien
     cause par GetActiveSessions
@@ -238,7 +191,6 @@ function sessionTests() {
     login_accountNameError_Test()
     login_passwordError_Test()
 
-    getActiveSessions_Test()
     getActiveSessionByAccountId_Test()
     /*
     updateSessionState_1_Test()
@@ -248,9 +200,6 @@ function sessionTests() {
     logout_Test()
     logout_Error_Test
     */
-
-
-
 
     setTimeout(function () {
         return function () {

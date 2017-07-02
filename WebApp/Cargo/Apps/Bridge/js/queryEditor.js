@@ -64,7 +64,7 @@ var QueryEditor = function (parent, file, initCallback) {
         this.editor.getSession().on('change', function (fileId, fileUUID, editor) {
             return function () {
                 var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileId } }
-                var file = server.entityManager.entities[fileUUID]
+                var file = entities[fileUUID]
                 file.M_data = encode64(editor.getSession().getValue())
                 server.eventHandler.broadcastLocalEvent(evt)
             }

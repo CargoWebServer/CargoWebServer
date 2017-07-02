@@ -45,7 +45,7 @@ BpmnDataView.prototype.init = function () {
                     // Generate the entity constructor.
                     prototype.generateConstructor()
                     prototype.generateInit()
-                    server.entityManager.entityPrototypes[prototype.TypeName] = prototype
+                    entityPrototypes[prototype.TypeName] = prototype
 
                     // So here with the entity prototype i will generate the entity panel.
                     dataView.dataInputsPanel = new EntityPanel(dataView.panel, prototype.TypeName, function () { }, null, true, null, "")
@@ -53,7 +53,7 @@ BpmnDataView.prototype.init = function () {
 
                     // Set an empty entity.
                     var entity = eval("new " + prototype.TypeName + "()")
-                    server.entityManager.entities[entity.UUID] = entity
+                    entities[entity.UUID] = entity
 
                     entity.onChange = function (dataView) {
                         return function (entity) {
@@ -76,7 +76,7 @@ BpmnDataView.prototype.init = function () {
                     // Generate the entity constructor.
                     prototype.generateConstructor()
                     prototype.generateInit()
-                    server.entityManager.entityPrototypes[prototype.TypeName] = prototype
+                    entityPrototypes[prototype.TypeName] = prototype
 
                     // So here with the entity prototype i will generate the entity panel.
                     dataView.dataOutputsPanel = new EntityPanel(dataView.panel, prototype.TypeName, function () { }, null, true, null, "")
@@ -84,7 +84,7 @@ BpmnDataView.prototype.init = function () {
 
                     // Set an empty entity.
                     var entity = eval("new " + prototype.TypeName + "()")
-                    server.entityManager.entities[entity.UUID] = entity
+                    entities[entity.UUID] = entity
 
                     entity.onChange = function (dataView) {
                         return function (entity) {
@@ -168,7 +168,7 @@ BpmnDataView.prototype.save = function (callback) {
 
     // Save the entity data.
     function saveData(entity, callback) {
-        var prototype = server.entityManager.entityPrototypes[entity.TYPENAME]
+        var prototype = entityPrototypes[entity.TYPENAME]
         var itemAwareInstances = []
         for (var i = 0; i < prototype.Fields.length; i++) {
             var data = entity[prototype.Fields[i]]

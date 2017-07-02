@@ -34,7 +34,7 @@ var CodeEditor = function (parent) {
     // Open.
     server.fileManager.attach(this, OpenEntityEvent, function (evt, codeEditor) {
         if (evt.dataMap["fileInfo"] != undefined) {
-            var file = server.entityManager.entities[evt.dataMap["fileInfo"].UUID]
+            var file = entities[evt.dataMap["fileInfo"].UUID]
             if (file != undefined) {
                 if (file.M_data != undefined && file.M_data != "") {
                     // Here thats mean the file was open
@@ -42,7 +42,7 @@ var CodeEditor = function (parent) {
                 }
             }
         } else if (evt.dataMap["bpmnDiagramInfo"] != undefined) {
-            var diagram = server.entityManager.entities[evt.dataMap["bpmnDiagramInfo"].UUID]
+            var diagram = entities[evt.dataMap["bpmnDiagramInfo"].UUID]
             if (diagram != undefined) {
                 codeEditor.appendBpmnDiagram(diagram)
             }
@@ -192,7 +192,7 @@ CodeEditor.prototype.appendFile = function (file) {
             if (!codeEditor.quiet) {
                 var editor = codeEditor.editors[fileId + "_editor"]
                 var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileId } }
-                var file = server.entityManager.entities[fileUUID]
+                var file = entities[fileUUID]
                 file.M_data = encode64(editor.getSession().getValue())
                 server.eventHandler.broadcastLocalEvent(evt)
             }

@@ -24,11 +24,20 @@
  * This global object represent a reference to the distant server.
  * @see Server
  */
-// var server = new Server("localhost", "127.0.0.1", 9393)
-var server = new Server("www.cargowebserver.com", "10.67.44.63", 9393)
+var server = new Server("localhost", "127.0.0.1", 9393)
+//var server = new Server("www.cargowebserver.com", "10.67.44.63", 9393)
 
 // Amazon ec2 sever...
 //var server = new Server("www.cargowebserver.com", "54.218.110.52", 9393)
+
+// Keep the initialysed entitie in memory
+var entities = {}
+
+// Keep the list of entity prototype in memory
+var entityPrototypes = {}
+
+// Keep the active user session id here.
+var activeSessionAccountId = null
 
 /**
  * Each application must have a function called main. The main function will
@@ -45,30 +54,41 @@ function load() {
     server.conn = initConnection("ws://" + server.ipv4 + ":" + server.port.toString() + "/ws",
         function () {
             // Get the session id from the server.
-            server.setSessionId()
+            server.setSessionId(function () {
+                // Create the listener
+                server.accountManager = new AccountManager()
+                server.sessionManager = new SessionManager()
+                server.errorManager = new ErrorManager()
+                server.fileManager = new FileManager()
+                server.entityManager = new EntityManager()
+                server.dataManager = new DataManager()
+                server.emailManager = new EmailManager()
+                server.projectManager = new ProjectManager()
+                server.securityManager = new SecurityManager()
+                server.serviceManager = new ServiceManager()
 
-            // Create the listener
-            server.accountManager = new AccountManager()
-            server.sessionManager = new SessionManager()
-            server.errorManager = new ErrorManager()
-            server.fileManager = new FileManager()
-            server.entityManager = new EntityManager()
-            server.dataManager = new DataManager()
-            server.emailManager = new EmailManager()
-            server.projectManager = new ProjectManager()
-            server.securityManager = new SecurityManager()
-            server.serviceManager = new ServiceManager()
+                // Register the listener to the server.
+                server.accountManager.registerListener()
+                server.sessionManager.registerListener()
+                server.fileManager.registerListener()
+                server.entityManager.registerListener()
+                server.dataManager.registerListener()
+                server.emailManager.registerListener()
+                server.projectManager.registerListener()
+                server.securityManager.registerListener()
+                server.serviceManager.registerListener()
 
-            // Register the listener to the server.
-            server.accountManager.registerListener()
-            server.sessionManager.registerListener()
-            server.fileManager.registerListener()
-            server.entityManager.registerListener()
-            server.dataManager.registerListener()
-            server.emailManager.registerListener()
-            server.projectManager.registerListener()
-            server.securityManager.registerListener()
-            server.serviceManager.registerListener()
+                // Go to the main entry point
+                // Append the listener for the entity.
+                // The session listener.
+                server.entityManager.getEntityPrototypes("Config", function (result, caller) {
+                    server.entityManager.getEntityPrototypes("CargoEntities", function (result, initCallback) {
+                        if(main!= null){
+                            main()
+                        }
+                    }, function () {/* Error callback */ }, null)
+                }, function () {/* Error callback */ }, )
+            })
 
         },  // onOpen callback
         function () { // onClose callback

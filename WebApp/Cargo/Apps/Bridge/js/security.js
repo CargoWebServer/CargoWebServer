@@ -100,7 +100,7 @@ var RolePermissionManager = function (parent) {
     // The new entity event listener
     server.entityManager.attach(this, NewEntityEvent, function (evt, rolePermissionManager) {
         if (evt.dataMap["entity"] != undefined) {
-            var entity = server.entityManager.entities[evt.dataMap["entity"].UUID]
+            var entity = entities[evt.dataMap["entity"].UUID]
             if (entity != undefined) {
                 console.log("new role ", entity)
                 if (entity.TYPENAME == "CargoEntities.Role") {
@@ -162,7 +162,7 @@ var RoleManager = function (parent) {
      */
     server.entityManager.attach(this, UpdateEntityEvent, function (evt, roleManager) {
         if (evt.dataMap["entity"] != undefined) {
-            var entity = server.entityManager.entities[evt.dataMap["entity"].UUID]
+            var entity = entities[evt.dataMap["entity"].UUID]
             if (entity != undefined) {
                 if (entity.TYPENAME == "CargoEntities.Role") {
                     // Romove the role if it already exist...

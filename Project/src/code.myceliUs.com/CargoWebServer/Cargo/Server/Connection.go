@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pborman/uuid"
+	"code.myceliUs.com/Utility"
 	"golang.org/x/net/websocket"
 )
 
@@ -37,9 +37,6 @@ type connection interface {
 	// Return the uuid for that connection.
 	GetUuid() string
 
-	// Generate a unique id...
-	GenerateUuid()
-
 	// get the connection string...
 	GetAddrStr() string
 
@@ -63,11 +60,11 @@ type tcpSocketConnection struct {
 	// The socket state.
 	m_isOpen bool
 
-	// The channel uuid...
-	m_uuid string
-
 	// The number of connection try before give up...
 	m_try int
+
+	// The connection uuid
+	m_uuid string
 }
 
 func NewTcpSocketConnection() *tcpSocketConnection {
@@ -79,7 +76,7 @@ func NewTcpSocketConnection() *tcpSocketConnection {
 
 	// init members...
 	conn.send = make(chan []byte /*, connection_channel_size*/)
-	conn.GenerateUuid()
+	conn.m_uuid = Utility.RandomUUID()
 
 	return conn
 }
@@ -101,13 +98,12 @@ func (c *tcpSocketConnection) GetUuid() string {
 	return c.m_uuid
 }
 
-func (c *tcpSocketConnection) GenerateUuid() {
-	c.m_uuid = uuid.NewRandom().String()
-}
-
 func (c *tcpSocketConnection) Open(host string, port int) (err error) {
+
+	connectionId := host + ":" + strconv.Itoa(port)
+
 	// Open the socket...
-	c.m_socket, _ = net.Dial("tcp", host+":"+strconv.Itoa(port))
+	c.m_socket, _ = net.Dial("tcp", connectionId)
 
 	if err != nil {
 		log.Println("Connection with host ", host, " on port ", strconv.Itoa(port), " fail!!!")
@@ -119,22 +115,27 @@ func (c *tcpSocketConnection) Open(host string, port int) (err error) {
 		c.Open(host, port)
 		c.m_try += 1
 	} else if c.m_try == 10 {
-		return errors.New("fail to connect with " + host + ":" + strconv.Itoa(port))
+		return errors.New("fail to connect with " + connectionId)
 	} else {
-		log.Println("Connection with host ", host, " on port ", strconv.Itoa(port), " is open")
-		c.m_isOpen = true
-	}
 
-	// Start reading and writing loop's
-	go c.Writer()
-	go c.Reader()
+		c.m_isOpen = true
+
+		GetServer().hub.register <- c
+
+		// Start reading and writing loop's
+		go c.Writer()
+		go c.Reader()
+	}
 
 	return nil
 }
 
 func (c *tcpSocketConnection) Close() {
-	c.m_socket.Close() // Close the socket..
-	c.m_isOpen = false
+	if c.m_isOpen {
+		c.m_isOpen = false
+		c.m_socket.Close() // Close the socket..
+		GetServer().hub.unregister <- c
+	}
 }
 
 /**
@@ -145,7 +146,6 @@ func (c *tcpSocketConnection) IsOpen() bool {
 }
 
 func (c *tcpSocketConnection) Send(data []byte) {
-	log.Println("----------> send tcp socket data 148")
 	msgSize := make([]byte, 4)
 	binary.LittleEndian.PutUint32(msgSize, uint32(len(data)))
 	var data_ []byte
@@ -162,7 +162,6 @@ func (c *tcpSocketConnection) Reader() {
 		in = make([]byte, getMaxMessageSize()+200)
 
 		if _, err := c.m_socket.Read(in); err != nil {
-			log.Println("error!!! ", err)
 			break
 		}
 
@@ -185,7 +184,6 @@ func (c *tcpSocketConnection) Writer() {
 	for c.m_isOpen == true {
 		for message := range c.send {
 			// I will get the message here...
-			log.Println("--------> send message!-)")
 			c.m_socket.Write(message)
 		}
 	}
@@ -208,14 +206,17 @@ type webSocketConnection struct {
 	// The socket state.
 	m_isOpen bool
 
-	// The channel uuid...
+	// number of try before giving up
+	m_try int
+
+	// The uuid of the connection
 	m_uuid string
 }
 
 func NewWebSocketConnection() *webSocketConnection {
 	var conn = new(webSocketConnection)
 	conn.send = make(chan []byte /*, connection_channel_size*/)
-	conn.GenerateUuid()
+	conn.m_uuid = Utility.RandomUUID()
 	return conn
 }
 
@@ -240,28 +241,37 @@ func (c *webSocketConnection) GetUuid() string {
 	return c.m_uuid
 }
 
-func (c *webSocketConnection) GenerateUuid() {
-	c.m_uuid = uuid.NewRandom().String()
-}
-
 func (c *webSocketConnection) Open(host string, port int) (err error) {
 
 	// Open the socket...
 	url := "http://" + host + ":" + strconv.Itoa(port)
 	origin := "ws://" + host + ":" + strconv.Itoa(port)
-	c.m_socket, err = websocket.Dial(origin, "", url)
-	if err != nil {
-		return err
-	}
+	c.m_socket, _ = websocket.Dial(origin, "", url)
 
-	c.m_isOpen = true
+	if c.m_socket == nil && c.m_try < 10 {
+		time.Sleep(100 * time.Millisecond)
+		c.Open(host, port)
+		c.m_try += 1
+	} else if c.m_try == 10 {
+		return errors.New("fail to connect with " + origin)
+	} else {
+		c.m_isOpen = true
+		GetServer().GetHub().register <- c
+
+		// Start reading and writing loop's
+		go c.Writer()
+		go c.Reader()
+	}
 
 	return nil
 }
 
 func (c *webSocketConnection) Close() {
-	c.m_socket.Close() // Close the socket..
-	c.m_isOpen = false
+	if c.m_isOpen {
+		c.m_isOpen = false
+		c.m_socket.Close() // Close the socket..
+		GetServer().GetHub().unregister <- c
+	}
 }
 
 /**
@@ -303,16 +313,18 @@ func HttpHandler(ws *websocket.Conn) {
 	c := NewWebSocketConnection()
 	c.m_socket = ws
 	c.m_isOpen = true
+	c.send = make(chan []byte)
+	c.m_uuid = Utility.RandomUUID()
 
 	GetServer().GetHub().register <- c
 
 	defer func() {
-		GetServer().GetHub().unregister <- c
+		c.Close()
 	}()
 
 	// Start the writing loop...
 	go c.Writer()
 
-	// continue to the reading loop...
+	// here the it stay in reader loop until the connection is close.
 	c.Reader()
 }
