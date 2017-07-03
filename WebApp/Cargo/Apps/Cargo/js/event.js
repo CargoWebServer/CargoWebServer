@@ -59,6 +59,11 @@ ProjectEvent = "ProjectEvent"
 EmailEvent = "EmailEvent"
 ServiceEvent = "ServiceEvent"
 DataEvent = "DataEvent"
+ConfigurationEvent = "ConfigurationEvent"
+EventEvent  = "EventEvent"
+LdapEvent  = "LdapEvent"
+OAuth2Event = "OAuth2Event"
+SchemaEvent  = "SchemaEvent"
 
 /**
 * EventHub contructor

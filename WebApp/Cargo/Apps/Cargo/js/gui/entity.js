@@ -665,7 +665,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 					var baseType = fieldType
 					if (!baseType.startsWith('xs.') && !baseType.startsWith('sqltypes.')) {
-						baseType = server.entityManager.getBaseTypeExtension(fieldType)
+						baseType = getBaseTypeExtension(fieldType)
 					}
 
 					tableModel.fields = ["xs.int", baseType.replace("[]", "")]

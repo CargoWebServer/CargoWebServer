@@ -809,7 +809,7 @@ TableCell.prototype.formatValue = function (value) {
 	// if is extension of a base type.
 	var baseType = fieldType
 	if (!baseType.startsWith('[]xs.')) {
-		baseType = server.entityManager.getBaseTypeExtension(fieldType)
+		baseType = getBaseTypeExtension(fieldType)
 	}
 
 	var field = "M_" + this.row.table.model.titles[this.index]

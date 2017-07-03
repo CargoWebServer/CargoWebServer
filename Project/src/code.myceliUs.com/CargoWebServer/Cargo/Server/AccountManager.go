@@ -106,6 +106,18 @@ func (this *AccountManager) stop() {
 ////////////////////////////////////////////////////////////////////////////////
 
 // @api 1.0
+// Event handler function.
+// @param {interface{}} values The entity to set.
+// @scope {public}
+// @src
+//AccountManager.prototype.onEvent = function (evt) {
+//    EventHub.prototype.onEvent.call(this, evt)
+//}
+func (this *AccountManager) OnEvent(evt interface{}) {
+	/** empty function here... **/
+}
+
+// @api 1.0
 // Register a new account.
 // @param {string} name The name of the new account.
 // @param {string} password The password associated with the new account.

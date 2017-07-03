@@ -201,8 +201,8 @@ function getObjectsByType_queryStrError_Test() {
 function getEntityByUuid_Test() {
     testsMap["getEntityByUuid_Test"] = getEntityByUuid_Test
     server.entityManager.getEntityById(
-        "CargoEntities.Entities",
         "CARGO_ENTITIES",
+        "CargoEntities.Entities",
         true,
         -1,
         function (result) {
@@ -281,8 +281,8 @@ function getEntityById_Test() {
 function getEntityById_typeNameError_Test() {
     testsMap["getEntityById_typeNameError_Test"] = getEntityById_typeNameError_Test
     server.entityManager.getEntityById(
-        "ccc",
         "CARGO_ENTITIES",
+        "ccc",
         true,
         -1,
         function () {
@@ -303,8 +303,8 @@ function getEntityById_typeNameError_Test() {
 function getEntityById_idError_Test() {
     testsMap["getEntityById_idError_Test"] = getEntityById_idError_Test
     server.entityManager.getEntityById(
-        "CargoEntities.Entities",
         "ddd",
+        "CargoEntities.Entities",
         true,
         -1,
         function () {

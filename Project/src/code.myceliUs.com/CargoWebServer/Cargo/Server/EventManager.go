@@ -49,6 +49,11 @@ const (
 	EmailEvent                     = "EmailEvent"
 	ServiceEvent                   = "ServiceEvent"
 	DataEvent                      = "DataEvent"
+	ConfigurationEvent             = "ConfigurationEvent"
+	EventEvent                     = "EventEvent"
+	LdapEvent                      = "LdapEvent"
+	OAuth2Event                    = "OAuth2Event"
+	SchemaEvent                    = "SchemaEvent"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -316,6 +321,18 @@ func (this *EventChannel) removeEventListener(listener *EventListener) {
 //////////////////////////////////////////////////////////////////////////////////
 // API Event manager
 //////////////////////////////////////////////////////////////////////////////////
+
+// @api 1.0
+// Event handler function.
+// @param {interface{}} values The entity to set.
+// @scope {public}
+// @src
+//EventManager.prototype.onEvent = function (evt) {
+//    EventHub.prototype.onEvent.call(this, evt)
+//}
+func (this *EventManager) OnEvent(evt interface{}) {
+	/** empty function here... **/
+}
 
 // @api 1.0
 // Event to broadcast on the channel...

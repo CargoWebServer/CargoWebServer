@@ -137,6 +137,17 @@ func (self *Action) GetSessionId() string {
 }
 
 /**
+ * That function return the client services code.
+ * The code must be inject in the client JS interpreter in order
+ * to access server side service.
+ * The map contain the service id as key and the service source code as value.
+ */
+func (self *Action) GetServicesClientCode() map[string]string {
+	// Simply return the internal map.
+	return GetServer().GetServiceManager().m_serviceSrc
+}
+
+/**
  * Execute a vb script.
  */
 func (self *Action) ExecuteVbScript(scriptName string, args []string) []string {

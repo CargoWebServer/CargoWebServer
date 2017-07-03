@@ -241,6 +241,18 @@ func (this *SessionManager) getActiveSessionById(id string) *CargoEntities.Sessi
 ////////////////////////////////////////////////////////////////////////////////
 
 // @api 1.0
+// Event handler function.
+// @param {interface{}} values The entity to set.
+// @scope {public}
+// @src
+//SessionManager.prototype.onEvent = function (evt) {
+//    EventHub.prototype.onEvent.call(this, evt)
+//}
+func (this *SessionManager) OnEvent(evt interface{}) {
+	/** empty function here... **/
+}
+
+// @api 1.0
 // Authenticate the user's account name and password on the server.
 // @see LoginPage
 // @param {string} name The account name

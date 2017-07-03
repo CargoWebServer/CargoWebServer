@@ -49,6 +49,17 @@ function WorkflowProcessorActivateActivityInstance(instanceUuid) {
     server.GetWorkflowProcessor().ActivateActivityInstance(instanceUuid, messageId, sessionId)
 }
 
+/////////////////////////////////////////  Project Manager calls ////////////////////////////////////////////
+function ProjectManagerGetAllProjects() {
+    var projects = []
+    projects = server.GetProjectManager().GetAllProjects(messageId, sessionId)
+    return projects
+}
+
+function ProjectManagerSynchronize() {
+    server.GetProjectManager().Synchronize(messageId, sessionId)
+}
+
 /////////////////////////////////////////  Account Manager calls ////////////////////////////////////////////
 function AccountManagerRegister(name, password, email) {
     var newAccount = null
@@ -70,9 +81,9 @@ function AccountManagerGetUserById(id) {
 
 
 /////////////////////////////////////////  Entity Manager calls /////////////////////////////////////////////
-function EntityManagerGetObjectsByType(typeName, queryStr, storeId) {
+function EntityManagerGetObjectsByType(typeName, storeId, queryStr) {
     var objects
-    objects = server.GetEntityManager().GetObjectsByType(typeName, queryStr, storeId, messageId, sessionId)
+    objects = server.GetEntityManager().GetObjectsByType(typeName, storeId, queryStr, messageId, sessionId)
     return objects
 }
 
@@ -84,13 +95,13 @@ function EntityManagerGetEntityLnks(uuid) {
 
 function EntityManagerGetEntityByUuid(uuid) {
     var entity = null
-    entity = server.GetEntityManager().GetObjectByUuid(uuid, messageId, sessionId)
+    entity = server.GetEntityManager().GetEntityByUuid(uuid, messageId, sessionId)
     return entity
 }
 
-function EntityManagerGetEntityById(storeId, typeName, ids) {
+function EntityManagerGetEntityById(typeName, storeId, ids) {
     var entity = null
-    entity = server.GetEntityManager().GetObjectById(storeId, typeName, ids, messageId, sessionId)
+    entity = server.GetEntityManager().GetEntityById(typeName, storeId, ids, messageId, sessionId)
     return entity
 }
 
@@ -110,9 +121,9 @@ function EntityManagerSaveEntity(entity, typeName) {
     return entity
 }
 
-function EntityManagerCreateEntityPrototype(storeId, prototype) {
+function EntityManagerCreateEntityPrototype(storeId, proto) {
     var proto = null
-    proto = server.GetEntityManager().CreateEntityPrototype(storeId, prototype, messageId, sessionId)
+    proto = server.GetEntityManager().CreateEntityPrototype(storeId, proto, messageId, sessionId)
     return proto
 }
 

@@ -768,6 +768,18 @@ func (this *FileManager) createThumbnail(file *os.File, thumbnailMaxHeight int, 
 ////////////////////////////////////////////////////////////////////////////////
 
 // @api 1.0
+// Event handler function.
+// @param {interface{}} values The entity to set.
+// @scope {public}
+// @src
+//FileManager.prototype.onEvent = function (evt) {
+//    EventHub.prototype.onEvent.call(this, evt)
+//}
+func (this *FileManager) OnEvent(evt interface{}) {
+	/** empty function here... **/
+}
+
+// @api 1.0
 // Read the content of a text file and return it.
 // @param {string} path The path on the sever relative to the sever root.
 // @param {string} messageId The request id that need to access this method.

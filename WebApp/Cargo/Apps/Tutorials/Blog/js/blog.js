@@ -783,7 +783,7 @@ BlogManager.prototype.displayAuthorPost = function () {
 
     // Now I will get the all post from a given author.
     if (isObject(this.account.M_userRef)) {
-        server.entityManager.getEntityById("sql_info", authorTypeName, [this.account.M_userRef.UUID],
+        server.entityManager.getEntityById(authorTypeName, "sql_info",  [this.account.M_userRef.UUID],
             // The success callback.
             function (author, caller) {
 
@@ -861,7 +861,7 @@ BlogManager.prototype.createNewPost = function (author) {
 
             // Now I will save the post...
             // The post is own by author, so if we delete an author all it's post will be deleted.
-            server.entityManager.getEntityById("sql_info", authorTypeName, [userUuid],
+            server.entityManager.getEntityById(authorTypeName, "sql_info", [userUuid],
                 function (author, caller) {
                     if (author.M_id.length == 0) {
                         return // Do nothing if the author id is not set properly.
@@ -1232,7 +1232,7 @@ BlogPostView.prototype.appendCategory = function (category) {
  */
 BlogPostView.prototype.appendComment = function (post, user, comment) {
     // First of all I will test if the user exist in the blog_user table.
-    server.entityManager.getEntityById("sql_info", userTypeName, [user.M_id],
+    server.entityManager.getEntityById(userTypeName, "sql_info", [user.M_id],
         function (result, caller) {
             // update entity here.
             server.entityManager.saveEntity(user)

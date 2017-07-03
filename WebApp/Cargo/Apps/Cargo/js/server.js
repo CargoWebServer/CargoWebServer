@@ -70,54 +70,6 @@ var Server = function (hostName, ipv4, port) {
      */
     this.eventHandler = new EventHandler()
 
-    /**
-     * @property {ErrorManager} errorManager Manage errors 
-     */
-    this.errorManager = null
-
-    /**
-     * @property {AccountManager} accountManager Accounts related functions. 
-     */
-    this.accountManager = null
-
-    /**
-     * @property {SessionManager} sessionManager Users sessions related functions. 
-     */
-    this.sessionManager = null
-
-    /**
-     * @property {fileManager} fileManager File manupulation related functions
-     */
-    this.fileManager = null
-
-    /**
-     * @property {entityManager} entityManager Object persistence functionalities
-     */
-    this.entityManager = null
-
-    /**
-     * @property {dataManager} dataManager Database access functionalities
-     */
-    this.dataManager = null
-
-    /**
-     * @property {emailManager} emailManager Email functionalities
-     */
-    this.emailManager = null
-
-    /**
-     * @property {securityManager} securityManager Security functionalities
-     */
-    this.securityManager = null
-
-    /**
-     * @property {serviceManager} serviceManager Services functionalities
-     */
-    this.serviceManager = null
-
-    this.projectManager = null
-    this.workflowManager = null
-
     return this;
 }
 
@@ -143,19 +95,25 @@ Server.prototype.executeJsFunction = function (functionSrc, functionParams, prog
     var rqst = new Request(randomUUID(), this.conn, "ExecuteJsFunction", params,
         // Progress call back
         function (index, total, caller) {
-            progressCallback(index, total, caller)
+            if (progressCallback != undefined) {
+                progressCallback(index, total, caller)
+            }
         },
         // success call back
         function (id, results, caller) {
             // Format the results.
             var result = results["result"]
             // Call the successCallback whit the information.
-            successCallback(result, caller)
+            if (successCallback != undefined) {
+                successCallback(result, caller)
+            }
             return true;
         },
         // Error call back
         function (errMsg, caller) {
-            errorCallback(errMsg, caller)
+            if (errorCallback != undefined) {
+                errorCallback(errMsg, caller)
+            }
         },
         caller
     );
@@ -284,7 +242,7 @@ Server.prototype.setSessionId = function (initCallback) {
 
             // Each application must contain a main.
             if (main != null) {
-                if(caller.initCallback!=undefined) {
+                if (caller.initCallback != undefined) {
                     caller.initCallback()
                 }
             } else {
@@ -296,7 +254,7 @@ Server.prototype.setSessionId = function (initCallback) {
         // Error callback...
         function () {
 
-        }, {"server":this, "initCallback":initCallback});
+        }, { "server": this, "initCallback": initCallback });
     rqst.send();
 }
 
@@ -383,6 +341,33 @@ Server.prototype.setRootPath = function (rootPath, successCallback, errorCallbac
 }
 
 /**
+ * Get the list of services and their respective source code. The code
+ * permit to get access to service remote actions.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+Server.prototype.getServicesClientCode = function (successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = new Array();
+
+    // Register this listener to the server.
+    var rqst = new Request(randomUUID(), this.conn, "GetServicesClientCode", params,
+        // Progress callback
+        function () { },
+        // Success callback
+        function (id, results, caller) {
+            // Keep the session id...
+            caller.successCallback(results["result"], caller.caller)
+        },
+        // Error callback...
+        function (errorMsg, caller) {
+            caller.errorCallback(errorMsg, caller.caller)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
+    rqst.send();
+}
+
+/**
  * Create a connection to another server from the current server.
  * @param {string} host The host name of the server to connect with.
  * @param {int} port The port number of the distant host.
@@ -409,7 +394,6 @@ Server.prototype.connect = function (host, port, successCallback, errorCallback,
             caller.successCallback(result[0], caller.caller)
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             caller.server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
@@ -444,7 +428,6 @@ Server.prototype.disconnect = function (host, port, successCallback, errorCallba
             caller.successCallback(result[0], caller.caller)
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             caller.server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback
@@ -470,7 +453,6 @@ Server.prototype.stop = function (successCallback, errorCallback, caller) {
             caller.successCallback(result[0], caller.caller)
         },
         function (errMsg, caller) {
-            console.log(errMsg)
             caller.server.errorManager.onError(errMsg)
             caller.errorCallback(errMsg, caller.caller)
         }, // Error callback

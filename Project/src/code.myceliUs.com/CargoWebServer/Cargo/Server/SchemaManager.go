@@ -265,7 +265,7 @@ func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Er
 /**
  * Return the list of fields including parent fields
  */
-func (this *SchemaManager) GetFieldsFieldsType(prototype *EntityPrototype, path *[]string) ([]string, []string) {
+func (this *SchemaManager) getFieldsFieldsType(prototype *EntityPrototype, path *[]string) ([]string, []string) {
 
 	var fields []string
 	var fieldsType []string
@@ -286,7 +286,7 @@ func (this *SchemaManager) GetFieldsFieldsType(prototype *EntityPrototype, path 
 	for i := 0; i < len(prototype.SuperTypeNames); i++ {
 		p := this.prototypes[prototype.SuperTypeNames[i]]
 
-		fields_, fieldsType_ := this.GetFieldsFieldsType(p, path)
+		fields_, fieldsType_ := this.getFieldsFieldsType(p, path)
 		for j := 0; j < len(fields_); j++ {
 			if Utility.Contains(fields, fields_[j]) == false {
 				fields = append(fields, fields_[j])
@@ -302,7 +302,7 @@ func (this *SchemaManager) GetFieldsFieldsType(prototype *EntityPrototype, path 
 //Append the super type fields...
 func (this *SchemaManager) setSuperTypeField(prototype *EntityPrototype) {
 	path := make([]string, 0)
-	fields, fieldsType := this.GetFieldsFieldsType(prototype, &path)
+	fields, fieldsType := this.getFieldsFieldsType(prototype, &path)
 	for i := 0; i < len(fields); i++ {
 		if Utility.Contains(prototype.Fields, fields[i]) == false {
 			prototype.Fields = append(prototype.Fields, fields[i])
@@ -310,7 +310,6 @@ func (this *SchemaManager) setSuperTypeField(prototype *EntityPrototype) {
 			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
 		}
 	}
-
 }
 
 /**
@@ -2035,3 +2034,91 @@ func (this *SchemaManager) importXmlFile(filePath string) error {
 ////////////////////////////////////////////////////////////////////////////////
 // Api
 ////////////////////////////////////////////////////////////////////////////////
+
+// @api 1.0
+// Event handler function.
+// @param {interface{}} values The entity to set.
+// @scope {public}
+// @src
+//SchemaManager.prototype.onEvent = function (evt) {
+//    EventHub.prototype.onEvent.call(this, evt)
+//}
+func (this *SchemaManager) OnEvent(evt interface{}) {
+	/** empty function here... **/
+}
+
+// @api 1.0
+// Create a new xsd datastore from a given xsd file content.
+// @param {string} storeId The id of the dataStore to delete
+// @param {string} content The xsd file content
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *SchemaManager) ImportXsdSchema(storeId string, content string, messageId string, sessionId string) {
+	var errObj *CargoEntities.Error
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
+	// Here I will create a temporary file
+	schemaPath := GetServer().GetConfigurationManager().GetSchemasPath()
+	f, err := os.Create(schemaPath + "/" + storeId)
+
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+
+	f.WriteString(content)
+	f.Close()
+
+	// Import the file.
+	errObj = this.importSchema(f.Name())
+
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+}
+
+// @api 1.0
+// Import the content of an xml file into a dataStore.
+// @param {string} content The xsd file content
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *SchemaManager) ImportXmlData(content string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
+	var err error
+	// Here I will create a temporary file
+	tmp := GetServer().GetConfigurationManager().GetTmpPath()
+	f, err := os.Create(tmp + "/" + Utility.RandomUUID())
+
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_NOT_FOUND_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+
+	f.WriteString(content)
+	f.Close()
+
+	// Remove the file when done.
+	defer os.Remove(f.Name())
+
+	// Import the file.
+	err = this.importXmlFile(f.Name())
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+	}
+}

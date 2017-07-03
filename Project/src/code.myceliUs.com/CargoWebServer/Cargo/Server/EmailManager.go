@@ -149,7 +149,7 @@ func (this *EmailManager) sendEmail(id string, from string, to []string, cc []*C
 /**
  * That function read the content of the mailbox
  */
-func (this *EmailManager) ReceiveMailFunc(address string, user string, pass string) {
+func (this *EmailManager) receiveMailFunc(address string, user string, pass string) {
 
 	client, err := pop3.DialTLS(address)
 
@@ -192,9 +192,34 @@ func (this *EmailManager) ReceiveMailFunc(address string, user string, pass stri
 // Api
 //////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Send mail... The server id is the authentification id...
- */
+// @api 1.0
+// Event handler function.
+// @param {interface{}} values The entity to set.
+// @scope {public}
+// @src
+//EmailManager.prototype.onEvent = function (evt) {
+//    EventHub.prototype.onEvent.call(this, evt)
+//}
+func (this *EmailManager) OnEvent(evt interface{}) {
+	/** empty function here... **/
+}
+
+// @api 1.0
+// This function is use to send a email message to a given addresse.
+// @param {string} id The server connection id
+// @param {string} from The email of the sender
+// @param {string} to The destination email's list
+// @param {[]interface{}} cc The carbon copy's.
+// @param {string} title The email title.
+// @param {string} msg The message to send must be html format.
+// @param {[]interface} attachs The list of local file to upload to the server and attach to the message.
+// @param {string} bodyType text/html or text/plain
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} progressCallback The function is call when chunk of response is received.
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
 func (this *EmailManager) SendEmail(id string, from string, to []string, cc []interface{}, subject string, body string, attachs []interface{}, bodyType string, messageId string, sessionId string) {
 
 	// Initialyse the parameters object of not already intialyse.

@@ -644,6 +644,18 @@ func (this *SecurityManager) removePermission(accountId string, pattern string) 
 // API
 ////////////////////////////////////////////////////////////////////////////////
 
+// @api 1.0
+// Event handler function.
+// @param {interface{}} values The entity to set.
+// @scope {public}
+// @src
+//SecurityManager.prototype.onEvent = function (evt) {
+//    EventHub.prototype.onEvent.call(this, evt)
+//}
+func (this *SecurityManager) OnEvent(evt interface{}) {
+	/** empty function here... **/
+}
+
 ////////////// Role //////////////
 
 // @api 1.0

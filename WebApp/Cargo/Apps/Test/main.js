@@ -247,7 +247,7 @@ function entityDump(id, typeName) {
     server.entityManager.getEntityPrototypes(typeName.split(".")[0],
         function (result, caller) {
             // Here I will initialyse the catalog...
-            server.entityManager.getEntityById(typeName.split(".")[0], typeName, [id],
+            server.entityManager.getEntityById(typeName, typeName.split(".")[0], [id],
                 function (result) {
 
                     // Here I will overload the way to display the name in the interface.

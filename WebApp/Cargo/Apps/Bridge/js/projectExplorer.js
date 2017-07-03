@@ -10,7 +10,7 @@ var ProjectExplorer = function (parent) {
     this.panel = parent.appendElement({ "tag": "div", "class": "project_explorer" }).down()
 
     // Here I will init the projects...
-    server.projectManager.GetAllProjects(
+    server.projectManager.getAllProjects(
         // success callback
         function (results, caller) {
             caller.initProjects(results)

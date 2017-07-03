@@ -118,3 +118,66 @@ func (this *ProjectManager) synchronizeProject(project *CargoEntities.Project, p
 		project.SetFilesRef(file.GetObject().(*CargoEntities.File))
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// API
+////////////////////////////////////////////////////////////////////////////////
+
+// @api 1.0
+// Event handler function.
+// @param {interface{}} values The entity to set.
+// @scope {public}
+// @src
+//ProjectManager.prototype.onEvent = function (evt) {
+//    EventHub.prototype.onEvent.call(this, evt)
+//}
+func (this *ProjectManager) OnEvent(evt interface{}) {
+	/** empty function here... **/
+}
+
+// @api 1.0
+// Synchronize the project found in the server Apps directory.
+// @param {string} id The LDAP server connection id.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.Account} The new registered account.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *ProjectManager) Synchronize(sessionId string, messageId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+	// Synchronize the content of project.
+	this.synchronize()
+}
+
+// @api 1.0
+// Return the list of all projects on the server.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.Account} The new registered account.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *ProjectManager) GetAllProjects(sessionId string, messageId string) []*CargoEntities.Project {
+	projects := make([]*CargoEntities.Project, 0)
+	/*errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return projects
+	}*/
+	entities, errObj := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Project", "", "CargoEntities", false)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return projects
+	}
+
+	// Here I will parse the list of entities retreived...
+	for i := 0; i < len(entities); i++ {
+		projects = append(projects, entities[i].GetObject().(*CargoEntities.Project))
+	}
+	return projects
+}

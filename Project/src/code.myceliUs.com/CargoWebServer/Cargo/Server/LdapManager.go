@@ -608,6 +608,18 @@ func (this *LdapManager) synchronizeComputers(id string) error {
 ////////////////////////////////////////////////////////////////////////////////
 
 // @api 1.0
+// Event handler function.
+// @param {interface{}} values The entity to set.
+// @scope {public}
+// @src
+//LdapManager.prototype.onEvent = function (evt) {
+//    EventHub.prototype.onEvent.call(this, evt)
+//}
+func (this *LdapManager) OnEvent(evt interface{}) {
+	/** empty function here... **/
+}
+
+// @api 1.0
 // Synchronize the computers, users and group of an LDAP server.
 // @param {string} id The LDAP server connection id.
 // @param {string} messageId The request id that need to access this method.
@@ -617,6 +629,12 @@ func (this *LdapManager) synchronizeComputers(id string) error {
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *LdapManager) Synchronize(id string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
 	// Synchronize the list of user...
 	err := this.synchronizeUsers(id)
 	if err != nil {

@@ -293,7 +293,7 @@ EntityTableModel.prototype.appendRow = function (values) {
     }
 
     this.entities.push(values)
-    var isListOf = server.entityManager.isListOf(this.proto.TypeName)
+    var isListOf_ = isListOf(this.proto.TypeName)
     var objectValues = []
     var prototype = entityPrototypes[values.TYPENAME]
 
@@ -314,7 +314,7 @@ EntityTableModel.prototype.appendRow = function (values) {
         }
         if (j == this.titles.length - 1) {
             // In that case the value is a list of base value.
-            if (isListOf) {
+            if (isListOf_) {
                 // here I will append the values...
                 objectValues.push(values.values)
             }
