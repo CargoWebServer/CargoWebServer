@@ -468,7 +468,7 @@ func (this *ServiceManager) registerActions(service Service) {
 		if strings.Index(doc, "@api ") != -1 {
 			if strings.Index(doc, "@src\n") != -1 {
 				// Here the code of the method is defined in the documentation.
-				src += doc[strings.Index(doc, "@src\n")+5:]
+				src += doc[strings.Index(doc, "@src\n")+5:] + "\n"
 			} else {
 				src += service.getId() + ".prototype." + strings.ToLower(name[0:1]) + name[1:] + " = function("
 
@@ -646,8 +646,8 @@ func (this *ServiceManager) registerActions(service Service) {
 
 				caller += "\"caller\": caller}"
 				src += caller + ")\n"
+				src += "}\n\n"
 			}
-			src += "}\n\n"
 		}
 	}
 

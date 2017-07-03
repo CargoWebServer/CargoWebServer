@@ -19,18 +19,10 @@
  * @author Dave Courtois
  * @version 1.0
  */
-
-/**
- * The FileManager contain functionality to work with files.
-  *@constructor
- * @extends EventHub
- */
 var FileManager = function () {
-
     if (server == undefined) {
         return
     }
-
     EventHub.call(this, FileEvent)
 
     return this
@@ -39,54 +31,49 @@ var FileManager = function () {
 FileManager.prototype = new EventHub(null);
 FileManager.prototype.constructor = FileManager;
 
-/**
- * Create a new directory on the server.
- * @param {string} dirName The name of the new directory.
- * @param {string} dirPath The path of the parent of the new directory.
- * @param {function} successCallback The function to execute in case of success
- * @param {function} errorCallback The function to execute in case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-FileManager.prototype.createDir = function (dirName, dirPath, successCallback, progressCallback, errorCallback, caller) {
+FileManager.prototype.onEvent = function (evt) {
+    EventHub.prototype.onEvent.call(this, evt)
+}
+FileManager.prototype.createDir = function (dirName, dirPath, successCallback, errorCallback, caller) {
     var params = []
     params.push(createRpcData(dirName, "STRING", "dirName"))
     params.push(createRpcData(dirPath, "STRING", "dirPath"))
 
     server.executeJsFunction(
-        "FileManagerCreateDir", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Keep track of the file transfert.
-            caller.progressCallback(index, total, caller.caller)
+        "FileManagerCreateDir",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            server.entityManager.getEntityPrototype("CargoEntities.File", "CargoEntities",
+                function (prototype, caller) { // Success Callback
+                    if (caller.results[0] == null) {
+                        return
+                    }
+                    if (entities[caller.results[0].UUID] != undefined && caller.results[0].TYPENAME == caller.results[0].__class__) {
+                        caller.successCallback(entities[caller.results[0].UUID], caller.caller)
+                        return // break it here.
+                    }
+
+                    var entity = eval("new " + prototype.TypeName + "()")
+                    entity.initCallback = function () {
+                        return function (entity) {
+                            caller.successCallback(entity, caller.caller)
+                        }
+                    }(caller)
+                    entity.init(caller.results[0])
+                },
+                function (errMsg, caller) { // Error Callback
+                    caller.errorCallback(errMsg, caller.caller)
+                },
+                { "caller": caller.caller, "successCallback": caller.successCallback, "errorCallback": caller.errorCallback, "results": results }
+            )
         },
-        function (result, caller) {
-            caller.successCallback(result[0], caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
+        function (errMsg, caller) { // Error callback
             caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
             server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
-    )
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
 }
 
-/**
- * Create a new file on the server.
- * @param {string} filename The name of the file to create.
- * @param {string} filepath The path of the directory where to create the file.
- * @param {string} filedata The data of the file.
- * @param {int} thumbnailMaxHeight The maximum height size of the thumbnail associated with the file (keep the ratio).
- * @param {int} thumbnailMaxWidth The maximum width size of the thumbnail associated with the file (keep the ratio).
- * @param {bool} dbFile If it set to true the file will be save on the server local object store, otherwize a file on disck will be created.
- * @param {function} progressCallback The function is call when chunk of response is received.
- * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
- * @param {function} errorCallback In case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
 FileManager.prototype.createFile = function (filename, filepath, filedata, thumbnailMaxHeight, thumbnailMaxWidth, dbFile, successCallback, progressCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
@@ -96,15 +83,12 @@ FileManager.prototype.createFile = function (filename, filepath, filedata, thumb
     params.push(createRpcData(thumbnailMaxHeight, "INTEGER", "thumbnailMaxHeight"))
     params.push(createRpcData(thumbnailMaxWidth, "INTEGER", "thumbnailMaxWidth"))
     params.push(createRpcData(dbFile, "BOOLEAN", "dbFile"))
-
     // Here I will create a new data form...
     var formData = new FormData()
     formData.append("multiplefiles", filedata, filename)
-
     // Use the post function to upload the file to the server.
     var xhr = new XMLHttpRequest()
     xhr.open('POST', '/uploads', true)
-
     // In case of error or success...
     xhr.onload = function (params, xhr) {
         return function (e) {
@@ -137,8 +121,7 @@ FileManager.prototype.createFile = function (filename, filepath, filedata, thumb
                 }
             }
         }
-    } (params, xhr)
-
+    }(params, xhr)
     // now the progress event...
     xhr.upload.onprogress = function (progressCallback, caller) {
         return function (e) {
@@ -146,29 +129,36 @@ FileManager.prototype.createFile = function (filename, filepath, filedata, thumb
                 progressCallback(e.loaded, e.total, caller)
             }
         }
-    } (progressCallback, caller)
-
+    }(progressCallback, caller)
     xhr.send(formData);
 }
 
-/**
- * Retreive a file with a given id
- * @param {string} id The file id.
- * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
- * @param {function} errorCallback In case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
+FileManager.prototype.deleteFile = function (uuid, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(uuid, "STRING", "uuid"))
+
+    server.executeJsFunction(
+        "FileManagerDeleteFile",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
 FileManager.prototype.downloadFile = function (path, fileName, mimeType, progressCallback, successCallback, errorCallback, caller) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', path + '/' + fileName, true);
     xhr.responseType = 'blob';
-
     xhr.onload = function (successCallback) {
         return function (e) {
             if (this.status == 200) {
                 // Note: .response instead of .responseText
                 var blob = new Blob([this.response], { type: mimeType });
-
                 // I will read the file as data url...
                 var reader = new FileReader();
                 reader.onload = function (successCallback, caller) {
@@ -177,76 +167,121 @@ FileManager.prototype.downloadFile = function (path, fileName, mimeType, progres
                         // return the success callback with the result.
                         successCallback(dataURL, caller)
                     }
-                } (successCallback, caller)
+                }(successCallback, caller)
                 reader.readAsDataURL(blob);
             }
         }
-    } (successCallback, caller)
-
+    }(successCallback, caller)
     xhr.onprogress = function (progressCallback, caller) {
         return function (e) {
             progressCallback(e.loaded, e.total, caller)
-
         }
-    } (progressCallback, caller)
-
+    }(progressCallback, caller)
     xhr.send();
 }
 
-/**
- * Retreive a file with a given id
- * @param {string} id The file id.
- * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
- * @param {function} errorCallback In case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-FileManager.prototype.getFileByPath = function (path, progressCallback, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
+FileManager.prototype.getFileByPath = function (path, successCallback, errorCallback, caller) {
     var params = []
     params.push(createRpcData(path, "STRING", "path"))
 
     server.executeJsFunction(
-        "FileManagerGetFileByPath", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Keep track of the file transfert.
-            caller.progressCallback(index, total, caller.caller)
+        "FileManagerGetFileByPath",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            server.entityManager.getEntityPrototype("CargoEntities.File", "CargoEntities",
+                function (prototype, caller) { // Success Callback
+                    if (caller.results[0] == null) {
+                        return
+                    }
+                    if (entities[caller.results[0].UUID] != undefined && caller.results[0].TYPENAME == caller.results[0].__class__) {
+                        caller.successCallback(entities[caller.results[0].UUID], caller.caller)
+                        return // break it here.
+                    }
+
+                    var entity = eval("new " + prototype.TypeName + "()")
+                    entity.initCallback = function () {
+                        return function (entity) {
+                            caller.successCallback(entity, caller.caller)
+                        }
+                    }(caller)
+                    entity.init(caller.results[0])
+                },
+                function (errMsg, caller) { // Error Callback
+                    caller.errorCallback(errMsg, caller.caller)
+                },
+                { "caller": caller.caller, "successCallback": caller.successCallback, "errorCallback": caller.errorCallback, "results": results }
+            )
         },
-        function (result, caller) {
-            var file = new CargoEntities.File()
-            file.init(result[0])
-            server.entityManager.setEntity(file)
-            caller.successCallback(file, caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
+        function (errMsg, caller) { // Error callback
             caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
             server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
-    )
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
 }
 
-/**
- * Open a file with a given id
- * @param {string} id The file id.
- * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
- * @param {function} errorCallback In case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
+FileManager.prototype.getMimeTypeByExtension = function (fileExtension, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(fileExtension, "STRING", "fileExtension"))
+
+    server.executeJsFunction(
+        "FileManagerGetMimeTypeByExtension",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            server.entityManager.getEntityPrototype("Server.MimeType", "Server",
+                function (prototype, caller) { // Success Callback
+                    if (caller.results[0] == null) {
+                        return
+                    }
+                    if (entities[caller.results[0].UUID] != undefined && caller.results[0].TYPENAME == caller.results[0].__class__) {
+                        caller.successCallback(entities[caller.results[0].UUID], caller.caller)
+                        return // break it here.
+                    }
+
+                    var entity = eval("new " + prototype.TypeName + "()")
+                    entity.initCallback = function () {
+                        return function (entity) {
+                            caller.successCallback(entity, caller.caller)
+                        }
+                    }(caller)
+                    entity.init(caller.results[0])
+                },
+                function (errMsg, caller) { // Error Callback
+                    caller.errorCallback(errMsg, caller.caller)
+                },
+                { "caller": caller.caller, "successCallback": caller.successCallback, "errorCallback": caller.errorCallback, "results": results }
+            )
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
+FileManager.prototype.isFileExist = function (successCallback, errorCallback, caller) {
+    var params = []
+
+    server.executeJsFunction(
+        "FileManagerIsFileExist",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
 FileManager.prototype.openFile = function (fileId, progressCallback, successCallback, errorCallback, caller) {
     // server is the client side singleton.
     var params = []
     params.push(createRpcData(fileId, "STRING", "fileId"))
-
     server.executeJsFunction(
-        "OpenFile", // The function to execute remotely on server
+        "FileManagerOpenFile", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
-            // Keep track of the file transfert.
             caller.progressCallback(index, total, caller.caller)
         },
         function (result, caller) {
@@ -258,147 +293,60 @@ FileManager.prototype.openFile = function (fileId, progressCallback, successCall
             server.eventHandler.broadcastLocalEvent(evt)
         },
         function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
             caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
             server.errorHandler.onError(errMsg)
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
     )
 }
 
-/**
- * Retreive the mime type information from a given extention.
- * @param {string} fileExtension The file extention ex. txt, xls, html, css
- * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
- * @param {function} errorCallback In case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-FileManager.prototype.getMimeTypeByExtension = function (fileExtension, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(fileExtension, "STRING", "fileExtension"))
-
-    server.executeJsFunction(
-        "FileManagerGetMimeTypeByExtension", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            caller.successCallback(result[0], caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
-            caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
-            server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
-}
-
-/**
- * Test if a given file exist.
- * @param {string} filename The name of the file to create.
- * @param {string} filepath The path of the directory where to create the file.
- * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
- * @param {function} errorCallback In case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-FileManager.prototype.isFileExist = function (filename, filepath, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(filename, "STRING", "filename"))
-    params.push(createRpcData(filepath, "STRING", "filepath"))
-
-    server.executeJsFunction(
-        "FileManagerIsFileExist", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            caller.successCallback(result[0], caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
-            caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
-            server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
-}
-
-/**
- * Remove a file entity with a given uuid.
- * @param {string} uuid The file uuid.
- * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
- * @param {function} errorCallback In case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-FileManager.prototype.deleteFile = function (uuid, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(uuid, "STRING", "uuid"))
-
-    server.executeJsFunction(
-        "FileManagerDeleteFile", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            caller.successCallback(result[0], caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
-            caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
-            server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
-}
-
-/**
- * Remove a file (not an entity) with a given path.
- * @param {string} filePath The file path.
- * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
- * @param {function} errorCallback In case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-FileManager.prototype.removeFile = function (filePath, successCallback, errorCallback, caller) {
-    // server is the client side singleton.
+FileManager.prototype.readCsvFile = function (filePath, successCallback, errorCallback, caller) {
     var params = []
     params.push(createRpcData(filePath, "STRING", "filePath"))
 
     server.executeJsFunction(
-        "FileManagerRemoveFile", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
+        "FileManagerReadCsvFile",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
         },
-        function (result, caller) {
-            caller.successCallback(result[0], caller.caller)
-        },
-        function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
-            // call the immediate error callback.
+        function (errMsg, caller) { // Error callback
             caller.errorCallback(errMsg, caller.caller)
-            // dispatch the message.
             server.errorManager.onError(errMsg)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
+FileManager.prototype.readTextFile = function (filePath, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(filePath, "STRING", "filePath"))
+
+    server.executeJsFunction(
+        "FileManagerReadTextFile",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
+}
+
+FileManager.prototype.removeFile = function (filePath, successCallback, errorCallback, caller) {
+    var params = []
+    params.push(createRpcData(filePath, "STRING", "filePath"))
+
+    server.executeJsFunction(
+        "FileManagerRemoveFile",
+        params,
+        undefined, //progress callback
+        function (results, caller) { // Success callback
+            caller.successCallback(results, caller.caller)
+        },
+        function (errMsg, caller) { // Error callback
+            caller.errorCallback(errMsg, caller.caller)
+            server.errorManager.onError(errMsg)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller })
 }

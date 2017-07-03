@@ -1145,8 +1145,35 @@ func (this *FileManager) GetFileByPath(path string, messageId string, sessionId 
 // @param {string} sessionId The user session.
 // @return {*CargoEntities.File} Return the file with it content *In case of large file use downloadFile instead.
 // @scope {public}
+// @param {callback} progressCallback The function is call when chunk of response is received.
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
+// @src
+//FileManager.prototype.openFile = function (fileId, progressCallback, successCallback, errorCallback, caller) {
+//    // server is the client side singleton.
+//    var params = []
+//    params.push(createRpcData(fileId, "STRING", "fileId"))
+//    server.executeJsFunction(
+//        "FileManagerOpenFile", // The function to execute remotely on server
+//        params, // The parameters to pass to that function
+//        function (index, total, caller) { // The progress callback
+//            caller.progressCallback(index, total, caller.caller)
+//        },
+//        function (result, caller) {
+//            var file = new CargoEntities.File()
+//            file.init(result[0])
+//            server.entityManager.setEntity(file)
+//            caller.successCallback(file, caller.caller)
+//            var evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
+//            server.eventHandler.broadcastLocalEvent(evt)
+//        },
+//        function (errMsg, caller) {
+//            caller.errorCallback(errMsg, caller.caller)
+//            server.errorHandler.onError(errMsg)
+//        }, // Error callback
+//        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
+//    )
+//}
 func (this *FileManager) OpenFile(fileId string, messageId string, sessionId string) *CargoEntities.File {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
