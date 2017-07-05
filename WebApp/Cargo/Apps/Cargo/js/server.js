@@ -208,7 +208,7 @@ Server.prototype.handleMessage = function (conn, data) {
             // Now I will delete the message.
             delete pendingMessage[msg.id]
 
-
+            // Here i will made use of file data to read a messge...
             var fileReader = new FileReader();
             fileReader.onload = function (server) {
                 return function () {
@@ -263,6 +263,7 @@ Server.prototype.setSessionId = function (initCallback) {
  */
 Server.prototype.ping = function (successCallback, errorCallback, caller) {
     var params = new Array();
+
     // Register this listener to the server.
     var rqst = new Request(randomUUID(), this.conn, "Ping", params,
         // Progress callback
@@ -369,56 +370,20 @@ Server.prototype.getServicesClientCode = function (successCallback, errorCallbac
 
 /**
  * Create a connection to another server from the current server.
- * @param {string} host The host name of the server to connect with.
- * @param {int} port The port number of the distant host.
+ * @param {string} Address The address of the sever to connect with.
  * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
  * @param {function} errorCallback In case of error.
  * @param {object} caller A place to store object from the request context and get it back from the response context.
  */
-Server.prototype.connect = function (host, port, successCallback, errorCallback, caller) {
+Server.prototype.connect = function (address, successCallback, errorCallback, caller) {
 
     // server is the client side singleton.
     var params = []
-    params.push(createRpcData(host, "STRING", "host"))
-    params.push(createRpcData(port, "INTEGER", "port"))
+    params.push(createRpcData(address, "STRING", "address"))
 
     // Call it on the server.
     server.executeJsFunction(
         "Connect", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            //console.log(result)
-            caller.successCallback(result[0], caller.caller)
-        },
-        function (errMsg, caller) {
-            caller.server.errorManager.onError(errMsg)
-            caller.errorCallback(errMsg, caller.caller)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "server": this } // The caller
-    )
-}
-
-/**
- * Close the connection to another server from the current server.
- * @param {string} host The host name of the server to connect with.
- * @param {int} port The port number of the distant host.
- * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
- * @param {function} errorCallback In case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-Server.prototype.disconnect = function (host, port, successCallback, errorCallback, caller) {
-
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(host, "STRING", "host"))
-    params.push(createRpcData(port, "INTEGER", "port"))
-
-    // Call it on the server.
-    server.executeJsFunction(
-        "Disconnect", // The function to execute remotely on server
         params, // The parameters to pass to that function
         function (index, total, caller) { // The progress callback
             // Nothing special to do here.

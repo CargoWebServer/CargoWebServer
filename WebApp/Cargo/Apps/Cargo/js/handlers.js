@@ -84,6 +84,11 @@ var pendingRequest = {};
 // Map of array of message chunk.
 var pendingMessage = {}
 
+// OAuth2 dialogs.
+// That dialog is use to give access to application to protected user
+// ressources. With it You can access to cargo, github, google, facebook user ressources
+var oauth2Dialog
+
 ////////////////////////////////////////////////////////////////////////////////
 //                      The proto buffer objects.
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,14 +112,11 @@ var RpcResponse = root.com.mycelius.message.Response;
 var RpcError = root.com.mycelius.message.Error;
 var RpcEvent = root.com.mycelius.message.Event;
 
-// OAuth2 dialogs.
-// That dialog is use to give access to application to protected user
-// ressources. With it You can access to cargo, github, google, facebook user ressources
-var oauth2Dialog
 
 ////////////////////////////////////////////////////////////////////////////////
 //                      Web socket initialisation
 ////////////////////////////////////////////////////////////////////////////////
+
 /*
  * Initialisation of the web socket handler.
  */
@@ -232,17 +234,6 @@ var Message = function (id, conn, progressCallback, successCallback, errorCallba
 Message.prototype.getRpcMessageData = function () {
     var msg = new RpcMessage({ "id": this.id, "type": Msg_TRANSFER, "index": this.index, "total": this.total, "data": utf8_to_b64(this.data) });
     return msg.toArrayBuffer();
-}
-
-function _arrayBufferToBase64(uarr) {
-    var strings = [], chunksize = 0xffff;
-    var len = uarr.length;
-
-    for (var i = 0; i * chunksize < len; i++) {
-        strings.push(String.fromCharCode.apply(null, uarr.subarray(i * chunksize, (i + 1) * chunksize)));
-    }
-
-    return strings.join("");
 }
 
 /**
@@ -418,7 +409,7 @@ Request.prototype.getRpcMessageData = function () {
     return bytes
 }
 
-// global var.
+// global var use in process
 var w
 
 /**
@@ -505,29 +496,8 @@ Request.prototype.process = function () {
     // is object a function?
     if (typeof fn === "function") {
         var result = fn.apply(null, fnparams);
-        //console.log("Result of request processing is " + result)
-        //alert("result is : " + result)
         // Todo get the response from the funtion and create a response to send back to the server.
     }
-}
-
-/**
- * That function take the function source and function param and execute it by the client.
- * @param {string} functionSrc The js source of the function.
- * @param params The list of function parameters.
- * @constructor
- */
-function ExecuteJsFunction(functionSrc, params) {
-    var fn = eval("(" + functionSrc + ")")
-    if (typeof fn === "function") {
-        var fnparams = []
-        for (var i = 0; i < params.length; ++i) {
-            fnparams.push(params[i].Value)
-        }
-        var result = fn.apply(null, fnparams)
-        return result
-    }
-    return undefined // Nothing to be evaluated
 }
 
 ////////////////////////////////////////////////////////////////////////////////

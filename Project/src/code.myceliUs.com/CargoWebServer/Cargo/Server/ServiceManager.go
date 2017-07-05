@@ -25,7 +25,8 @@ type ServiceManager struct {
 	m_services             map[string]Service
 	m_servicesLst          []Service
 	m_serviceContainerCmds []*exec.Cmd
-	m_serviceSrc           map[string]string
+	m_serviceClientSrc     map[string]string
+	m_serviceServerSrc     map[string]string
 }
 
 var serviceManager *ServiceManager
@@ -48,8 +49,9 @@ func newServiceManager() *ServiceManager {
 
 	// Here I will initialyse the optional services...
 	serviceManager.m_services = make(map[string]Service)
-	serviceManager.m_servicesLst = make([]Service, 0)     // Keep the order of intialisation.
-	serviceManager.m_serviceSrc = make(map[string]string) // Keep the services sources.
+	serviceManager.m_servicesLst = make([]Service, 0)           // Keep the order of intialisation.
+	serviceManager.m_serviceClientSrc = make(map[string]string) // Keep the services sources.
+	serviceManager.m_serviceServerSrc = make(map[string]string)
 
 	return serviceManager
 }
@@ -193,95 +195,113 @@ func (this *ServiceManager) registerActions(service Service) {
 		// I will try to find if the action was register
 		method := serviceType.Method(i)
 		methodName := strings.Replace(serviceType.String(), "*", "", -1) + "." + method.Name
-		metodUuid := CargoEntitiesActionExists(methodName)
-		if len(metodUuid) == 0 && !(strings.HasPrefix(method.Name, "New") && (strings.HasSuffix(method.Name, "Entity") || strings.HasSuffix(method.Name, "EntityFromObject"))) {
-			action := new(CargoEntities.Action)
+		methodUuid := CargoEntitiesActionExists(methodName)
+		var action *CargoEntities.Action
+		if len(methodUuid) == 0 {
+			action = new(CargoEntities.Action)
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(methodUuid, false)
+			action = entity.GetObject().(*CargoEntities.Action)
+		}
+
+		if !(strings.HasPrefix(method.Name, "New") && (strings.HasSuffix(method.Name, "Entity") || strings.HasSuffix(method.Name, "EntityFromObject"))) {
 			action.SetName(methodName)
 			m := methodsDoc[methodName[strings.LastIndex(methodName, ".")+1:]]
 			if m != nil {
 				action.SetDoc(m.Doc)
+				if len(action.UUID) == 0 {
+					if strings.Index(action.M_doc, "@api ") != -1 { // Only api action are exported...
 
-				if strings.Index(action.M_doc, "@api ") != -1 { // Only api action are exported...
-					// Set the uuid
-					GetServer().GetEntityManager().NewCargoEntitiesActionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", action)
+						// Set the uuid if is not set...
+						if len(action.UUID) == 0 {
+							GetServer().GetEntityManager().NewCargoEntitiesActionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", action)
+						}
 
-					// The input
-					for j := 0; j < method.Type.NumIn(); j++ {
-						// The first paramters is the object itself.
-						if j >= 1 {
-							in := method.Type.In(j)
-							parameter := new(CargoEntities.Parameter)
-							parameter.UUID = "CargoEntities.Parameter%" + Utility.RandomUUID() // Ok must be random
-							parameter.TYPENAME = "CargoEntities.Parameter"
-							parameter.SetType(in.String())
+						// The input
+						for j := 0; j < method.Type.NumIn(); j++ {
+							// The first paramters is the object itself.
+							if j >= 1 {
+								in := method.Type.In(j)
+								parameter := new(CargoEntities.Parameter)
+								parameter.TYPENAME = "CargoEntities.Parameter"
+								parameter.SetType(in.String())
 
-							if m != nil {
-								field := m.Decl.Type.Params.List[j-1]
-								parameter.SetName(field.Names[0].String())
-							} else {
-								parameter.SetName("p" + strconv.Itoa(len(action.M_parameters)))
+								if m != nil {
+									field := m.Decl.Type.Params.List[j-1]
+									parameter.SetName(field.Names[0].String())
+								} else {
+									parameter.SetName("p" + strconv.Itoa(len(action.M_parameters)))
+								}
+
+								if strings.HasPrefix(in.String(), "[]") {
+									parameter.SetIsArray(true)
+								} else {
+									parameter.SetIsArray(false)
+								}
+
+								parameterId := action.GetName() + ":" + parameter.GetName() + ":" + parameter.GetType()
+								parameter.UUID = "CargoEntities.Parameter%" + Utility.GenerateUUID(parameterId) // Ok must be random
+
+								action.SetParameters(parameter)
 							}
+						}
 
-							if strings.HasPrefix(in.String(), "[]") {
+						// The output
+						for j := 0; j < method.Type.NumOut(); j++ {
+							out := method.Type.Out(j)
+							parameter := new(CargoEntities.Parameter)
+
+							parameter.TYPENAME = "CargoEntities.Parameter"
+							parameter.SetType(out.String())
+							parameter.SetName("r" + strconv.Itoa(j))
+							if strings.HasPrefix(out.String(), "[]") {
 								parameter.SetIsArray(true)
 							} else {
 								parameter.SetIsArray(false)
 							}
-							action.SetParameters(parameter)
+
+							parameterId := action.GetName() + ":" + parameter.GetName() + ":" + parameter.GetType()
+							parameter.UUID = "CargoEntities.Parameter%" + Utility.GenerateUUID(parameterId) // Ok must be random
+
+							action.SetResults(parameter)
 						}
-					}
 
-					// The output
-					for j := 0; j < method.Type.NumOut(); j++ {
-						out := method.Type.Out(j)
-						parameter := new(CargoEntities.Parameter)
-						parameter.UUID = "CargoEntities.Parameter%" + Utility.RandomUUID() // Ok must be random
-						parameter.TYPENAME = "CargoEntities.Parameter"
-						parameter.SetType(out.String())
-						parameter.SetName("r" + strconv.Itoa(j))
-						if strings.HasPrefix(out.String(), "[]") {
-							parameter.SetIsArray(true)
-						} else {
-							parameter.SetIsArray(false)
-						}
-						action.SetResults(parameter)
-					}
-
-					action.SetAccessType(CargoEntities.AccessType_Public)
-
-					// Now I will set the access type of the action before save it.
-					if strings.Index(action.M_doc, "@scope {hidden}") != -1 {
-						action.SetAccessType(CargoEntities.AccessType_Hidden)
-					}
-
-					if strings.Index(action.M_doc, "@scope {public}") != -1 {
 						action.SetAccessType(CargoEntities.AccessType_Public)
-					}
 
-					if strings.Index(action.M_doc, "@scope {restricted}") != -1 {
-						action.SetAccessType(CargoEntities.AccessType_Restricted)
-					}
-
-					// apend it to the entities action.
-					action.SetEntitiesPtr(GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities))
-					GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetActions(action)
-
-					// I will append the action into the admin role that has all permission.
-					adminRoleUuid := CargoEntitiesRoleExists("adminRole")
-					if len(adminRoleUuid) > 0 {
-						adminRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(adminRoleUuid, false)
-						if action.GetAccessType() != CargoEntities.AccessType_Hidden {
-							adminRoleEntity.GetObject().(*CargoEntities.Role).SetActions(action)
-							adminRoleEntity.SaveEntity()
+						// Now I will set the access type of the action before save it.
+						if strings.Index(action.M_doc, "@scope {hidden}") != -1 {
+							action.SetAccessType(CargoEntities.AccessType_Hidden)
 						}
-					}
 
-					guestRoleUuid := CargoEntitiesRoleExists("guestRole")
-					if len(guestRoleUuid) > 0 {
-						guestRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(guestRoleUuid, false)
-						if action.GetAccessType() == CargoEntities.AccessType_Public {
-							guestRoleEntity.GetObject().(*CargoEntities.Role).SetActions(action)
-							guestRoleEntity.SaveEntity()
+						if strings.Index(action.M_doc, "@scope {public}") != -1 {
+							action.SetAccessType(CargoEntities.AccessType_Public)
+						}
+
+						if strings.Index(action.M_doc, "@scope {restricted}") != -1 {
+							action.SetAccessType(CargoEntities.AccessType_Restricted)
+						}
+
+						// apend it to the entities action.
+						action.SetEntitiesPtr(GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities))
+						GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetActions(action)
+
+						// I will append the action into the admin role that has all permission.
+						adminRoleUuid := CargoEntitiesRoleExists("adminRole")
+						if len(adminRoleUuid) > 0 {
+							adminRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(adminRoleUuid, false)
+							if action.GetAccessType() != CargoEntities.AccessType_Hidden {
+								adminRoleEntity.GetObject().(*CargoEntities.Role).SetActions(action)
+								adminRoleEntity.SaveEntity()
+							}
+						}
+
+						guestRoleUuid := CargoEntitiesRoleExists("guestRole")
+						if len(guestRoleUuid) > 0 {
+							guestRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(guestRoleUuid, false)
+							if action.GetAccessType() == CargoEntities.AccessType_Public {
+								guestRoleEntity.GetObject().(*CargoEntities.Role).SetActions(action)
+								guestRoleEntity.SaveEntity()
+							}
 						}
 					}
 				}
@@ -293,10 +313,15 @@ func (this *ServiceManager) registerActions(service Service) {
 
 	// Here I will generate the client service class.
 	var clientSrc string
+	// And the server side code to.
+	var serverSrc string
+
 	var eventTypename = strings.Replace(service.getId(), "Manager", "Event", -1)
 
 	// Here I will generate the javascript code use by client side.
 	clientSrc = "// ============================= " + service.getId() + " ========================================\n"
+	serverSrc = clientSrc // same comment.
+
 	clientSrc += "\nvar " + service.getId() + " = function(){\n"
 	clientSrc += "	if (server == undefined) {\n"
 	clientSrc += "		return\n"
@@ -315,6 +340,7 @@ func (this *ServiceManager) registerActions(service Service) {
 		name := action.M_name[strings.LastIndex(action.M_name, ".")+1:]
 		doc := action.GetDoc()
 		if strings.Index(doc, "@api ") != -1 {
+
 			if strings.Index(doc, "@src\n") != -1 {
 				// Here the code of the method is defined in the documentation.
 				clientSrc += doc[strings.Index(doc, "@src\n")+5:] + "\n"
@@ -498,10 +524,50 @@ func (this *ServiceManager) registerActions(service Service) {
 				clientSrc += "}\n\n"
 			}
 		}
+
+		// Now the server side function...
+		serverSrc += "function " + service.getId() + name + "("
+		params_ := ""
+		if action.M_parameters != nil {
+			// The last tow parameters are sessionId and message Id
+			for j := 0; j < len(action.M_parameters)-2; j++ {
+				params_ += action.M_parameters[j].GetName()
+				if j < len(action.M_parameters)-3 {
+					params_ += ", "
+				}
+			}
+		}
+		serverSrc += params_
+		serverSrc += "){\n"
+
+		if len(params_) > 0 {
+			params_ += ", "
+		}
+
+		params_ += "messageId, sessionId"
+
+		// The content of the action code will depend of the parameter output.
+		if len(action.M_results) > 0 {
+			// It can be an array or not...
+			if action.M_results[0].IsArray() {
+				serverSrc += "	var " + action.M_results[0].M_name + " = []\n"
+			} else {
+				serverSrc += "	var " + action.M_results[0].M_name + " = null\n"
+			}
+			serverSrc += "	" + action.M_results[0].M_name + " = server.Get" + service.getId() + "()." + name + "(" + params_ + ")\n"
+			serverSrc += "	return " + action.M_results[0].M_name + "\n"
+		} else {
+			// Here I will simply call the method on the service object..
+			serverSrc += "	server.Get" + service.getId() + "()." + name + "(" + params_ + ")\n"
+		}
+
+		serverSrc += "}\n\n"
 	}
 
 	// Keep the service javaScript code in the map.
-	serviceManager.m_serviceSrc[service.getId()] = clientSrc
+	serviceManager.m_serviceClientSrc[service.getId()] = clientSrc
+	serviceManager.m_serviceServerSrc[service.getId()] = serverSrc
+
 }
 
 func (this *ServiceManager) registerAction(methodName string, parameters []interface{}, results []interface{}) (*CargoEntities.Action, error) {

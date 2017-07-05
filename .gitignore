@@ -52,5 +52,8 @@
 /WebApp/Cargo/Apps/Proactive/
 
 /CargoServiceContainer/plugins
+/CargoServiceContainer/lib
+/CargoServiceContainer/include
+/CargoServiceContainer/*.user
 
 /build

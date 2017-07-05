@@ -12,6 +12,7 @@ import (
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/Utility"
 	//"github.com/skratchdot/open-golang/open"
+	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 )
 
 var (
@@ -221,6 +222,31 @@ func (this *Server) Start() {
 	// the service manager will start previous service depending of there
 	// configurations.
 	this.GetServiceManager().start()
+
+	// Here I will set the services code...
+	apiSrc := ""
+	for _, src := range this.GetServiceManager().m_serviceServerSrc {
+		apiSrc += src + "\n"
+	}
+
+	// Server side binded functions.
+	JS.GetJsRuntimeManager().AppendScript(apiSrc)
+
+	// Now I will set JS function needed by the server side.
+
+	// Init connection is call when a Server object need to be connect on the net work.
+	JS.GetJsRuntimeManager().AppendFunction("initConnection",
+		func(adress string, openCallback string, closeCallback string, messageCallback string, sessionId string, caller interface{}) {
+			log.Println(" init connection with : ", adress)
+			err := GetServer().Connect(adress)
+			if err != nil {
+				// return // TODO uncomment it...
+			}
+
+			// The connection is open sucessfully.
+
+		})
+
 }
 
 /**
@@ -271,39 +297,47 @@ func (this *Server) SetRootPath(path string) error {
 //////////////////////////////////////////////////////////
 
 /**
- * Open a new TCP connection with server on the network...
+ * Open a new connection with server on the network...
  */
-func (this *Server) Connect(host string, port int) error {
+func (this *Server) Connect(address string) error {
+
+	var conn connection
+	values := strings.Split(address, ":")
+
+	var host string
+	var socket string
+	var port int
+	if len(values) == 3 {
+		socket = values[0]
+		host = strings.Replace(values[1], "//", "", -1)
+		port, _ = strconv.Atoi(values[2])
+	} else if len(values) == 2 {
+		socket = "tcp"
+		host = values[0]
+		port, _ = strconv.Atoi(values[1])
+	}
 
 	// Create the new connection.
-	conn := NewTcpSocketConnection()
+	if socket == "ws" {
+		conn = NewWebSocketConnection()
+	} else {
+		conn = NewTcpSocketConnection()
+	}
 
 	// Open the a new connection with the server.
+	log.Println("---> try to open ", host, port)
 	err := conn.Open(host, port)
-
 	if err != nil {
+		log.Println("=----------> 329: ", err)
 		return err // The connection fail...
 	}
 
+	// Test if the connection is open.
 	if !conn.IsOpen() {
 		return errors.New("Fail to open connection with socket " + host + " at port " + strconv.Itoa(port))
 	}
 
 	return nil
-}
-
-/**
- * Close the connection with the other server.
- */
-func (this *Server) Disconnect(host string, port int) {
-
-	connectionId := host + ":" + strconv.Itoa(port)
-	conn := this.getConnectionById(Utility.GenerateUUID(connectionId))
-
-	if conn != nil {
-		//this.hub.unregister <- conn
-		conn.Close()
-	}
 }
 
 //////////////////////////////////////////////////////////

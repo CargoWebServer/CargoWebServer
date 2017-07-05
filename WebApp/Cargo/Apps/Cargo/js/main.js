@@ -58,32 +58,34 @@ function load() {
 
                 server.errorManager = new ErrorManager()
 
-                server.getServicesClientCode(function (results, caller) {
-                    for (var key in results) {
-                        // create the listener if is not already exist.
-                        if (server[key] == undefined) {
-                            // inject the code in the client memory
-                            eval(results[key])
+                // Inject service code accessors.
+                server.getServicesClientCode(
+                    function (results, caller) {
+                        for (var key in results) {
+                            // create the listener if is not already exist.
+                            if (server[key] == undefined) {
+                                // inject the code in the client memory
+                                eval(results[key])
 
-                            // Now I will create the listener
-                            var listenerName = key.charAt(0).toLowerCase() + key.slice(1);
-                            server[listenerName] = eval("new " + key + "()")
-                            server[listenerName].registerListener()
-                        }
-                    }
-                    // Go to the main entry point
-                    // Append the listener for the entity.
-                    // The session listener.
-                    server.entityManager.getEntityPrototypes("Config", function (result, caller) {
-                        server.entityManager.getEntityPrototypes("CargoEntities", function (result, initCallback) {
-                            if (main != null) {
-                                main()
+                                // Now I will create the listener
+                                var listenerName = key.charAt(0).toLowerCase() + key.slice(1);
+                                server[listenerName] = eval("new " + key + "()")
+                                server[listenerName].registerListener()
                             }
-                        }, function () {/* Error callback */ }, null)
-                    }, function () {/* Error callback */ }, {})
-                },
+                        }
+                        // Go to the main entry point
+                        // Append the listener for the entity.
+                        // The session listener.
+                        server.entityManager.getEntityPrototypes("Config", function (result, caller) {
+                            server.entityManager.getEntityPrototypes("CargoEntities", function (result, initCallback) {
+                                if (main != null) {
+                                    main()
+                                }
+                            }, function () {/* Error callback */ }, null)
+                        }, function () {/* Error callback */ }, {})
+                    },
                     function (errObj, caller) {
-
+                        // Here no client service code was found.
                     }, {})
 
 

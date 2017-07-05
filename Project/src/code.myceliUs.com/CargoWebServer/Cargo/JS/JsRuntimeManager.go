@@ -32,6 +32,9 @@ type JsRuntimeManager struct {
 	/** One js interpreter by session */
 	m_session map[string]*otto.Otto
 
+	/** a list of function define in cargo to inject in the VM. **/
+	m_functions map[string]interface{}
+
 	/**
 	 * Use to protected the entitiesMap access...
 	 */
@@ -43,6 +46,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	jsRuntimeManager = new(JsRuntimeManager)
 	jsRuntimeManager.m_searchDir = searchDir
 	jsRuntimeManager.m_session = make(map[string]*otto.Otto)
+	jsRuntimeManager.m_functions = make(map[string]interface{})
 
 	// Load the script from the script repository...
 	jsRuntimeManager.AppendScriptFiles()
@@ -82,6 +86,11 @@ func (this *JsRuntimeManager) InitScripts(sessionId string) {
 			//log.Println(sessionId, " Load: ", this.m_scripts[i])
 		}
 	}
+
+	// Set the list of binded function.
+	for name, function := range this.m_functions {
+		this.m_session[sessionId].Set(name, function)
+	}
 }
 
 /**
@@ -97,12 +106,7 @@ func (this *JsRuntimeManager) GetVm(sessionId string) *otto.Otto {
 		return vm
 	}
 
-	// Create a new js interpreter for the given session.
-	this.CreateVm(sessionId)
-
-	this.InitScripts(sessionId)
-
-	return this.m_session[sessionId]
+	return nil
 }
 
 func (this *JsRuntimeManager) CloseSession(sessionId string) {
@@ -132,6 +136,14 @@ func (this *JsRuntimeManager) AppendScriptFiles() error {
 		}
 	}
 	return err
+}
+
+/**
+ * Append function in the JS.
+ */
+func (this *JsRuntimeManager) AppendFunction(name string, function interface{}) {
+	// I will compile the script and set it in each session...
+	this.m_functions[name] = function
 }
 
 /**

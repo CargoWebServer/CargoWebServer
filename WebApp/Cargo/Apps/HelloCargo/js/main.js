@@ -18,6 +18,18 @@ server.languageManager.appendLanguageInfo(languageInfo)
  * Server side function
  */
 function SayHello(to) {
+
+    // Test service usage here...
+    var service = new Server("mon176", "10.67.44.63", 9494)
+   
+    service.conn = initConnection("ws://" + service.ipv4 + ":" + service.port.toString(),
+        function () {
+
+        },
+        function () {
+
+        }, sessionId, {})
+
     return "Hello " + to + "!"
 }
 

@@ -246,15 +246,16 @@ func (c *webSocketConnection) Open(host string, port int) (err error) {
 	// Open the socket...
 	url := "http://" + host + ":" + strconv.Itoa(port)
 	origin := "ws://" + host + ":" + strconv.Itoa(port)
-	c.m_socket, _ = websocket.Dial(origin, "", url)
-
-	if c.m_socket == nil && c.m_try < 10 {
+	c.m_socket, err = websocket.Dial(origin, "", url)
+	log.Println("----> ", 250, err)
+	if err != nil && c.m_try < 10 {
 		time.Sleep(100 * time.Millisecond)
-		c.Open(host, port)
 		c.m_try += 1
+		c.Open(host, port)
 	} else if c.m_try == 10 {
 		return errors.New("fail to connect with " + origin)
-	} else {
+	} else if c.m_socket != nil {
+		log.Println("--------> connection whit ", host, " at port ", port, " is now open!")
 		c.m_isOpen = true
 		GetServer().GetHub().register <- c
 
@@ -263,7 +264,7 @@ func (c *webSocketConnection) Open(host string, port int) (err error) {
 		go c.Reader()
 	}
 
-	return nil
+	return
 }
 
 func (c *webSocketConnection) Close() {

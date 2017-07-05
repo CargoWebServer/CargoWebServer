@@ -144,7 +144,7 @@ func (self *Action) GetSessionId() string {
  */
 func (self *Action) GetServicesClientCode() map[string]string {
 	// Simply return the internal map.
-	return GetServer().GetServiceManager().m_serviceSrc
+	return GetServer().GetServiceManager().m_serviceClientSrc
 }
 
 /**
@@ -152,7 +152,6 @@ func (self *Action) GetServicesClientCode() map[string]string {
  */
 func (self *Action) ExecuteVbScript(scriptName string, args []string) []string {
 
-	//log.Println("----------> run ", scriptName, "args: ", args)
 	// Run the given script on the server side.
 	results, err := GetServer().runVbs(scriptName, args)
 
