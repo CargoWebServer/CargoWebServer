@@ -217,7 +217,9 @@ void Session::processPendingMessage(QString messageId){
 
 void Session::disconnected()
 {
-	qDebug() << "session closed!";
-    socket->deleteLater();
+    qDebug() << "session closed!";
+    if(socket != NULL){
+        socket->deleteLater();
+    }
     exit(0);
 }

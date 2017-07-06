@@ -20,15 +20,30 @@ server.languageManager.appendLanguageInfo(languageInfo)
 function SayHello(to) {
 
     // Test service usage here...
-    var service = new Server("mon176", "10.67.44.63", 9494)
-   
-    service.conn = initConnection("ws://" + service.ipv4 + ":" + service.port.toString(),
+    var hostName = "localhost"
+    var ipv4 = "127.0.0.1"
+    var port = 9494
+
+    var service = new Server(hostName, ipv4, port)
+    
+    var address =  "ws://" +service.ipv4 + ":" + service.port.toString()
+    //var address =  service.ipv4 + ":" + service.port.toString()
+    service.conn = initConnection( address,
+        // on open connection callback
+        function (connectionId) {
+            // display the connection id...
+            console.log(connectionId)
+        },
+        // on close callback
         function () {
 
         },
+        // on message callback
         function () {
 
-        }, sessionId, {})
+        },
+        // the local session id.
+        sessionId, {})
 
     return "Hello " + to + "!"
 }

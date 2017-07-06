@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
         int port = atoi(argv[1]);
         ServiceContainer::getInstance()->setPort(port);
     }else {
+        qDebug() << PORT_NUMBER;
         ServiceContainer::getInstance()->setPort(PORT_NUMBER);
     }
 

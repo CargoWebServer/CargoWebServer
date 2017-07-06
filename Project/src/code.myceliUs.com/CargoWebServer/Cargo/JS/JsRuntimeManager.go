@@ -204,12 +204,16 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
 
 	// Remove withe space.
 	if endIndex != -1 {
+		functionName = strings.TrimSpace(functionStr[startIndex:endIndex])
+		if len(functionName) == 0 {
+			functionName = "_anonymous_"
+			functionStr = "function " + functionName + strings.TrimSpace(functionStr)[8:]
+		}
 		_, err = vm.Run(functionStr)
 		if err != nil {
 			log.Println("Error in code of ", functionName)
 			return nil, err
 		}
-		functionName = strings.Trim(functionStr[startIndex:endIndex], " ")
 	} else {
 		functionName = functionStr
 	}

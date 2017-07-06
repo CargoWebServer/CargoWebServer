@@ -26,9 +26,7 @@ Session::Session(QWebSocket* socket, QObject *parent) :
 }
 
 Session::~Session(){
-    disconnect(this->socket, &QWebSocket::binaryMessageReceived, this, &Session::processBinaryMessage);
-    disconnect(this->socket, &QWebSocket::disconnected, this, &Session::disconnected);
-    qDebug() << "session is now closed!";
+    qDebug() << "session is deleted!";
 }
 
 void Session::run()
@@ -52,3 +50,8 @@ void Session::processBinaryMessage(QByteArray data)
     this->processIncommingMessage(msg);
 }
 
+
+/*if(this->socket != NULL){
+    disconnect(this->socket, &QWebSocket::binaryMessageReceived, this, &Session::processBinaryMessage);
+    disconnect(this->socket, &QWebSocket::disconnected, this, &Session::disconnected);
+}*/

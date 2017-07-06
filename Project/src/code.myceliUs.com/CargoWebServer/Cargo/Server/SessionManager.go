@@ -74,10 +74,12 @@ func (this *SessionManager) initialize() {
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	this.activeSessions = make(map[string]*CargoEntities.Session, 0)
+
 	this.sessionToCloseChannel = make(chan struct {
 		session *CargoEntities.Session
 		err     chan *CargoEntities.Error
 	})
+
 	this.activeSessionsChannel = make(chan struct {
 		activeSessionsChan chan []*CargoEntities.Session
 	})
@@ -129,6 +131,7 @@ func (this *SessionManager) removeClosedSession() {
 			this.closeSession(sessions[i].GetObject().(*CargoEntities.Session))
 		}
 	}
+
 }
 
 func (this *SessionManager) closeSession_(session *CargoEntities.Session) *CargoEntities.Error {

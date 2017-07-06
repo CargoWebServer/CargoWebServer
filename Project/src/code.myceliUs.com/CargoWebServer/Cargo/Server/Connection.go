@@ -111,15 +111,14 @@ func (c *tcpSocketConnection) Open(host string, port int) (err error) {
 	}
 
 	if c.m_socket == nil && c.m_try < 10 {
+		c.m_try += 1
 		time.Sleep(100 * time.Millisecond)
 		c.Open(host, port)
-		c.m_try += 1
+
 	} else if c.m_try == 10 {
 		return errors.New("fail to connect with " + connectionId)
 	} else {
-
 		c.m_isOpen = true
-
 		GetServer().hub.register <- c
 
 		// Start reading and writing loop's
@@ -135,6 +134,7 @@ func (c *tcpSocketConnection) Close() {
 		c.m_isOpen = false
 		c.m_socket.Close() // Close the socket..
 		GetServer().hub.unregister <- c
+		GetServer().removeAllOpenSubConnections(c.GetUuid())
 	}
 }
 
@@ -246,8 +246,9 @@ func (c *webSocketConnection) Open(host string, port int) (err error) {
 	// Open the socket...
 	url := "http://" + host + ":" + strconv.Itoa(port)
 	origin := "ws://" + host + ":" + strconv.Itoa(port)
+
 	c.m_socket, err = websocket.Dial(origin, "", url)
-	log.Println("----> ", 250, err)
+
 	if err != nil && c.m_try < 10 {
 		time.Sleep(100 * time.Millisecond)
 		c.m_try += 1
@@ -272,6 +273,7 @@ func (c *webSocketConnection) Close() {
 		c.m_isOpen = false
 		c.m_socket.Close() // Close the socket..
 		GetServer().GetHub().unregister <- c
+		GetServer().removeAllOpenSubConnections(c.GetUuid())
 	}
 }
 
@@ -310,21 +312,26 @@ func (c *webSocketConnection) Writer() {
 
 // The web socket handler function...
 func HttpHandler(ws *websocket.Conn) {
+
 	// Here I will create the new connection...
 	c := NewWebSocketConnection()
 	c.m_socket = ws
 	c.m_isOpen = true
 	c.send = make(chan []byte)
 	c.m_uuid = Utility.RandomUUID()
-
 	GetServer().GetHub().register <- c
 
 	defer func() {
+		//  I will remove all sub-connection associated with the connection
+		GetServer().removeAllOpenSubConnections(c.GetUuid())
+
 		c.Close()
 	}()
 
 	// Start the writing loop...
 	go c.Writer()
+
+	log.Println("------------> new connection with id: ", c.GetUuid())
 
 	// here the it stay in reader loop until the connection is close.
 	c.Reader()

@@ -30,6 +30,9 @@ type Server struct {
 
 	// The address information.
 	addressInfo *Utility.IPInfo
+
+	// The list of open sub-connection by connection id.
+	subConnectionIds map[string][]string
 }
 
 /**
@@ -64,7 +67,8 @@ func newServer() *Server {
 		}
 	}
 
-	log.Println("adminAccount", adminAccountEntity)
+	server.subConnectionIds = make(map[string][]string, 0)
+
 	return server
 }
 
@@ -125,6 +129,33 @@ func (this *Server) getConnectionById(id string) connection {
 	}
 	// The connection dosen't exist anymore...
 	return nil
+}
+
+/**
+ * Remove all session connections.
+ */
+func (this *Server) removeAllOpenSubConnections(connectionId string) {
+	log.Println("---------> remove all open sub-connection...")
+	// Now I will remove it connections.
+	subConnectionIds := this.subConnectionIds[connectionId]
+	if subConnectionIds != nil {
+		for i := 0; i < len(subConnectionIds); i++ {
+			connection := this.getConnectionById(subConnectionIds[i])
+			connection.Close()
+		}
+	}
+	// Remove it from memory...
+	this.subConnectionIds[connectionId] = make([]string, 0)
+}
+
+func (this *Server) appendSubConnectionId(connectionId string, subConnectionId string) {
+	if this.subConnectionIds[connectionId] == nil {
+		this.subConnectionIds[connectionId] = make([]string, 0)
+	}
+
+	if !Utility.Contains(this.subConnectionIds[connectionId], subConnectionId) {
+		this.subConnectionIds[connectionId] = append(this.subConnectionIds[connectionId], subConnectionId)
+	}
 }
 
 /**
@@ -236,14 +267,24 @@ func (this *Server) Start() {
 
 	// Init connection is call when a Server object need to be connect on the net work.
 	JS.GetJsRuntimeManager().AppendFunction("initConnection",
-		func(adress string, openCallback string, closeCallback string, messageCallback string, sessionId string, caller interface{}) {
+		func(adress string, openCallback string, closeCallback string, messageCallback string, connectionId string, caller interface{}) {
 			log.Println(" init connection with : ", adress)
-			err := GetServer().Connect(adress)
+
+			// Get the new connection id.
+			subConnectionId, err := GetServer().Connect(adress)
+
 			if err != nil {
-				// return // TODO uncomment it...
+				log.Println("-------> connection fail: ", err)
+				return
 			}
 
-			// The connection is open sucessfully.
+			// I will append the connection the session.
+			GetServer().appendSubConnectionId(connectionId, subConnectionId)
+
+			// I will execute the openCallback function...
+			functionParams := make([]interface{}, 1)
+			functionParams[0] = subConnectionId
+			JS.GetJsRuntimeManager().ExecuteJsFunction("", connectionId, openCallback, functionParams)
 
 		})
 
@@ -299,7 +340,7 @@ func (this *Server) SetRootPath(path string) error {
 /**
  * Open a new connection with server on the network...
  */
-func (this *Server) Connect(address string) error {
+func (this *Server) Connect(address string) (string, error) {
 
 	var conn connection
 	values := strings.Split(address, ":")
@@ -329,15 +370,15 @@ func (this *Server) Connect(address string) error {
 	err := conn.Open(host, port)
 	if err != nil {
 		log.Println("=----------> 329: ", err)
-		return err // The connection fail...
+		return "", err // The connection fail...
 	}
 
 	// Test if the connection is open.
 	if !conn.IsOpen() {
-		return errors.New("Fail to open connection with socket " + host + " at port " + strconv.Itoa(port))
+		return "", errors.New("Fail to open connection with socket " + host + " at port " + strconv.Itoa(port))
 	}
 
-	return nil
+	return conn.GetUuid(), nil
 }
 
 //////////////////////////////////////////////////////////
