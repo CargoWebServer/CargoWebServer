@@ -130,10 +130,10 @@ func (this *ServiceManager) start() {
 	}
 
 	// TCP
-	// this.startServiceContainer("CargoServiceContainer_TCP", GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
+	//this.startServiceContainer("CargoServiceContainer_TCP", GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
 
 	// WS
-	// this.startServiceContainer("CargoServiceContainer_WS", GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
+	//this.startServiceContainer("CargoServiceContainer_WS", GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
 
 }
 
@@ -402,7 +402,7 @@ func (this *ServiceManager) registerActions(service Service) {
 							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"BYTES\", \"" + param.GetName() + "\"))\n"
 						} else {
 							// Array or Object or array of object...
-							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"JSON_STR\", \"" + param.GetName() + "\"))\n"
+							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"JSON_STR\", \"" + param.GetName() + "\", \"" + param.GetType() + "\"))\n"
 						}
 					}
 				}

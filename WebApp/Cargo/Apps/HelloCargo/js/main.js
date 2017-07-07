@@ -13,6 +13,7 @@ var languageInfo = {
 
 // Depending of the language the correct text will be set.
 server.languageManager.appendLanguageInfo(languageInfo)
+var service = null
 
 /**
  * Server side function
@@ -24,15 +25,51 @@ function SayHello(to) {
     var ipv4 = "127.0.0.1"
     var port = 9494
 
-    var service = new Server(hostName, ipv4, port)
-    
-    var address =  "ws://" +service.ipv4 + ":" + service.port.toString()
+    service = new Server(hostName, ipv4, port)
+
+    var address = "ws://" + service.ipv4 + ":" + service.port.toString()
     //var address =  service.ipv4 + ":" + service.port.toString()
-    service.conn = initConnection( address,
+    service.conn = initConnection(address,
         // on open connection callback
-        function (connectionId) {
+        function (caller) {
             // display the connection id...
-            console.log(connectionId)
+            caller.conn = this
+            caller.ping(
+                // success callback
+                function (result, caller) {
+                    // Here I received the pong message.
+                    console.log("----------> ln 41 Ping response: ", result)
+  
+                    // Now I will call a JS function...
+                    function TestSayHelloPlugin(to) {
+                        var msg = SayHello.sayHelloTo(to)
+                        return msg
+                    }
+
+                    var params = []
+                    params.push(createRpcData("Cargo !!!!", "STRING", "str"))
+
+                    // Call it on the server.
+                    caller.executeJsFunction(
+                        TestSayHelloPlugin.toString(), // The function to execute remotely on server
+                        params, // The parameters to pass to that function
+                        function (index, total, caller) { // The progress callback
+                            // Nothing special to do here.
+                        },
+                        function (results, caller) {
+                            // Here I received the result.
+                            console.log("----------> ln 61 result received: ", results[0])
+                        },
+                        function (errMsg, caller) {
+
+                        }, // Error callback
+                        {} // The caller
+                    )
+
+                },
+                // error callback
+                function (errObj, caller) {
+                }, caller)
         },
         // on close callback
         function () {
@@ -43,9 +80,9 @@ function SayHello(to) {
 
         },
         // the local session id.
-        sessionId, {})
+        sessionId, service)
 
-    return "Hello " + to + "!"
+    return "Hello " + to + "!!!"
 }
 
 /**

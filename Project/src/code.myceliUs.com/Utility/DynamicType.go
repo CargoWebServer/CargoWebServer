@@ -351,7 +351,6 @@ func InitializeStructure(data map[string]interface{}) (reflect.Value, error) {
  * Initialyse an array of values other than structure...
  */
 func InitializeArray(data []interface{}, typeName string) (reflect.Value, error) {
-
 	var values reflect.Value
 
 	if strings.HasPrefix(typeName, "[]") {

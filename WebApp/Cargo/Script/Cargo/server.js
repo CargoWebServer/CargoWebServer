@@ -1,4 +1,23 @@
 /**
+ * Connection class
+ */
+var Connection = function(){
+	this.id = "" // The connection on the server side.
+
+	return this;
+}
+
+/**
+ * Contain the informations use by executeJsFunction function parameters.
+ */
+var RpcData = function(values){
+	this.name = values.name
+	this.type = values.type
+	this.dataBytes = values.dataBytes
+	this.typeName = values.typeName
+}
+
+/**
  * The sever class is a representation of a distant server into a local object.
  */
  var Server = function (hostName, ipv4, port) {
@@ -27,12 +46,26 @@
     this.sessionId = null
 
 
+	/**
+	 * @property {string} The socket connection.
+	 */
+	 this.conn = null
+	 
+	 
 	return this
  }
  
  /*
- * Initialisation of the socket handler.
+ * Ping a given sever.
  */
- function initConnection(adress, onOpenCallback, onCloseCallback, onMessageCallback, sessionId) {
-	console.log("try to open connection with service: " + adress)
+ Server.prototype.ping = function (successCallback, errorCallback, caller) {
+	ping(successCallback, errorCallback, caller, this.conn.id)
  }
+ 
+/*
+ * Execute JavaScript function.
+ */
+ Server.prototype.executeJsFunction = function (functionSrc, functionParams, progressCallback, successCallback, errorCallback, caller) {
+	executeJsFunction(functionSrc, functionParams, progressCallback, successCallback, errorCallback, caller, this.conn.id)
+ }
+ 

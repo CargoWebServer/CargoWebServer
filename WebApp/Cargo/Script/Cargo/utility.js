@@ -38,3 +38,73 @@ function contains(arr, obj) {
     }
     return false;
 }
+
+/**
+ *  @constant {int}  Double data type identifier.
+ */
+Data_DOUBLE = 0
+/**
+ *  @constant {int}  Interger data type identifier.
+ */
+Data_INTEGER = 1
+/**
+ *  @constant {int}  String data type identifier.
+ */
+Data_STRING = 2
+/**
+ *  @constant {int}  Bytes data type identifier.
+ */
+Data_BYTES = 3
+/**
+ *  @constant {int}  Struct (JSON) data type identifier.
+ */
+Data_JSON_STR = 4
+/**
+ *  @constant {int}  Boolean data type identifier.
+ */
+Data_BOOLEAN = 5
+
+
+/**
+ * Creates a new RpcData.
+ * @param variable The variable to create as RpcData
+ * @param {string} variableType The type of the variable. Can be: DOUBLE, INTEGER, STRING, BYTES, JSON_STR, BOOLEAN
+ * @param {string} variableName The name of the variable to create as RpcData. This parameter is optional
+ * @param {string} typeName This is the name on the server side that must be use to interprest the data.
+ * @returns {RpcData} The created RpcData or undefined if variableType was invalid
+ */
+function createRpcData(variable, variableType, variableName, typeName) {
+    if (variableName == undefined) {
+        variableName = "varName"
+    }
+    if (variableType == "DOUBLE") {
+        variableType = Data_DOUBLE
+        typeName = "double"
+    } else if (variableType == "INTEGER") {
+        variableType = Data_INTEGER
+        typeName = "int"
+    } else if (variableType == "STRING") {
+        variableType = Data_STRING
+        typeName = "string"
+    } else if (variableType == "BYTES") {
+        variableType = Data_BYTES
+        typeName = "[]unit8"
+    } else if (variableType == "JSON_STR") {
+        variableType = Data_JSON_STR
+        if (variable.stringify != undefined) {
+            variableType = Data_JSON_STR
+            typeName = variable.TYPENAME
+            variable = variable.stringify()
+        } else {
+            variable = JSON.stringify(variable)
+        }
+    } else if (variableType == "BOOLEAN") {
+        variableType = Data_BOOLEAN
+        typeName = "bool"
+    } else {
+        return undefined
+    }
+
+    // Now I will create the rpc data.
+    return new RpcData({ "name": variableName, "type": variableType, "dataBytes": variable, "typeName": typeName });
+}

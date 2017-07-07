@@ -105,9 +105,11 @@ func (this *Hub) run() {
 			delete(this.connections, c.GetUuid())
 			GetServer().GetEventManager().removeClosedListener()
 			GetServer().GetSessionManager().removeClosedSession()
+			GetServer().onClose(c.GetUuid())
 
 		case msg := <-this.receivedMsg:
 			GetServer().GetProcessor().m_incomingChannel <- msg
+
 		case done := <-this.abortedByEnvironment:
 			if done {
 				return

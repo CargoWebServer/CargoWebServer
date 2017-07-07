@@ -309,39 +309,6 @@ Server.prototype.executeVbSrcript = function (scriptName, args, successCallback,
 }
 
 /**
- * Set the application root path.
- * @param {string} path The application root path on the server.
- * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
- * @param {function} errorCallback In case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-Server.prototype.setRootPath = function (rootPath, successCallback, errorCallback, caller) {
-
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(rootPath, "STRING", "rootPath"))
-
-    // Call it on the server.
-    server.executeJsFunction(
-        "SetRootPath", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            //console.log(result)
-            caller.successCallback(result[0], caller.caller)
-        },
-        function (errMsg, caller) {
-            console.log(errMsg)
-            server.errorManager.onError(errMsg)
-            caller.errorCallback(errMsg, caller.caller)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
-    )
-}
-
-/**
  * Get the list of services and their respective source code. The code
  * permit to get access to service remote actions.
  * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
@@ -366,38 +333,6 @@ Server.prototype.getServicesClientCode = function (successCallback, errorCallbac
             caller.errorCallback(errorMsg, caller.caller)
         }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
     rqst.send();
-}
-
-/**
- * Create a connection to another server from the current server.
- * @param {string} Address The address of the sever to connect with.
- * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
- * @param {function} errorCallback In case of error.
- * @param {object} caller A place to store object from the request context and get it back from the response context.
- */
-Server.prototype.connect = function (address, successCallback, errorCallback, caller) {
-
-    // server is the client side singleton.
-    var params = []
-    params.push(createRpcData(address, "STRING", "address"))
-
-    // Call it on the server.
-    server.executeJsFunction(
-        "Connect", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            //console.log(result)
-            caller.successCallback(result[0], caller.caller)
-        },
-        function (errMsg, caller) {
-            caller.server.errorManager.onError(errMsg)
-            caller.errorCallback(errMsg, caller.caller)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "server": this } // The caller
-    )
 }
 
 /**

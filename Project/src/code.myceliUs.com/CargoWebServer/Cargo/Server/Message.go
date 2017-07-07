@@ -178,7 +178,7 @@ func NewErrorMessage(id string, code int32, errMsg string, errData []byte, to []
 /**
  * Create a request to send.
  */
-func NewRequestMessage(id string, method string, params []*MessageData, to []connection, successCallback func(rspMsg *message, caller interface{}), progressCallback func(rspMsg *message, index int, total int, caller interface{}), errorCallback func(rspMsg *message, caller interface{})) (*message, error) {
+func NewRequestMessage(id string, method string, params []*MessageData, to []connection, successCallback func(rspMsg *message, caller interface{}), progressCallback func(rspMsg *message, index int, total int, caller interface{}), errorCallback func(errMsg *message, caller interface{})) (*message, error) {
 
 	// Create the protobuffer message...
 	m := new(message)
