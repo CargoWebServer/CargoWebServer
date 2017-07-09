@@ -41,13 +41,41 @@ void ServiceContainer::loadPluginObjects(){
     pluginsDir.cd("plugins");
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+
+        QString iid =  pluginLoader.metaData().value("IID").toString();
+        QJsonObject metaData = pluginLoader.metaData().value("MetaData").toObject();
+
         QObject *plugin = pluginLoader.instance();
         if(plugin != NULL){
             this->objects.insert(plugin->metaObject()->className(), plugin);
+
+            // Keep meta infos...
+            this->metaInfos.insert(iid,metaData);
+
             // Append the plugin object.
             qDebug() << "Load object: " << plugin->metaObject()->className();
+
         }
     }
+}
+
+
+QString ServiceContainer::GetServicesClientCode(){
+    qDebug() << "Generate the client code.";
+    return "";
+}
+
+QJsonArray ServiceContainer::GetActionInfos(){
+    QJsonArray actionInfos;
+    QMapIterator<QString, QJsonObject> i(this->metaInfos);
+    while (i.hasNext()) {
+        i.next();
+        QJsonObject info;
+        info["IID"] = i.key();
+        info["actions"] = i.value().value("actions").toArray();
+        actionInfos.append(info);
+    }
+    return actionInfos;
 }
 
 QString ServiceContainer::Ping(){
@@ -66,13 +94,21 @@ QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
     }
 
     // I will now evaluate the script function...
-    QScriptValue object = engine.evaluate("({toEvaluate:" + params[0].toString() + "})");
+    QString function = params[0].toString();
+
+    qDebug() << function;
+
+    if(!function.indexOf("function") == 0){
+        // Here I have the name of the function.
+
+    }
+
+    QScriptValue object = engine.evaluate("({toEvaluate:" + function + "})");
     QScriptValue toEvaluate = object.property("toEvaluate");
 
     QScriptValueList params_;
     // Now I will set the function parameters...
     for(int i= 1; i < params.length(); i++){
-        qDebug() << params.at(i);
         params_.append(engine.newVariant(params.at(i)));
     }
 

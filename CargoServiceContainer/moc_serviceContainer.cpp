@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_ServiceContainer_t {
-    QByteArrayData data[6];
-    char stringdata0[64];
+    QByteArrayData data[8];
+    char stringdata0[101];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -36,11 +36,14 @@ QT_MOC_LITERAL(1, 17, 6), // "closed"
 QT_MOC_LITERAL(2, 24, 0), // ""
 QT_MOC_LITERAL(3, 25, 15), // "onNewConnection"
 QT_MOC_LITERAL(4, 41, 4), // "Ping"
-QT_MOC_LITERAL(5, 46, 17) // "ExecuteJsFunction"
+QT_MOC_LITERAL(5, 46, 17), // "ExecuteJsFunction"
+QT_MOC_LITERAL(6, 64, 21), // "GetServicesClientCode"
+QT_MOC_LITERAL(7, 86, 14) // "GetActionInfos"
 
     },
     "ServiceContainer\0closed\0\0onNewConnection\0"
-    "Ping\0ExecuteJsFunction"
+    "Ping\0ExecuteJsFunction\0GetServicesClientCode\0"
+    "GetActionInfos"
 };
 #undef QT_MOC_LITERAL
 
@@ -50,7 +53,7 @@ static const uint qt_meta_data_ServiceContainer[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   14, // methods
+       6,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -58,12 +61,14 @@ static const uint qt_meta_data_ServiceContainer[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,   34,    2, 0x06 /* Public */,
+       1,    0,   44,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       3,    0,   35,    2, 0x08 /* Private */,
-       4,    0,   36,    2, 0x0a /* Public */,
-       5,    1,   37,    2, 0x0a /* Public */,
+       3,    0,   45,    2, 0x08 /* Private */,
+       4,    0,   46,    2, 0x0a /* Public */,
+       5,    1,   47,    2, 0x0a /* Public */,
+       6,    0,   50,    2, 0x0a /* Public */,
+       7,    0,   51,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void,
@@ -72,6 +77,8 @@ static const uint qt_meta_data_ServiceContainer[] = {
     QMetaType::Void,
     QMetaType::QString,
     QMetaType::QVariantList, QMetaType::QVariantList,    2,
+    QMetaType::QString,
+    QMetaType::QJsonArray,
 
        0        // eod
 };
@@ -88,6 +95,10 @@ void ServiceContainer::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
         case 3: { QVariantList _r = _t->ExecuteJsFunction((*reinterpret_cast< QVariantList(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 4: { QString _r = _t->GetServicesClientCode();
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 5: { QJsonArray _r = _t->GetActionInfos();
+            if (_a[0]) *reinterpret_cast< QJsonArray*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -128,13 +139,13 @@ int ServiceContainer::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 4)
+        if (_id < 6)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 4;
+        _id -= 6;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 4)
+        if (_id < 6)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 4;
+        _id -= 6;
     }
     return _id;
 }

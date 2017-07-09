@@ -6,6 +6,8 @@
 #include <QSettings>
 #include <QStringList>
 #include <QMap>
+#include <QJsonArray>
+#include <QJsonObject>
 
 /**
  * @brief Service Container is a TCP server. It's use to interface
@@ -60,6 +62,31 @@ public Q_SLOTS:
      */
     QVariantList ExecuteJsFunction(QVariantList);
 
+
+    /**
+     * @brief GetServicesClientCode
+     * Return the client side source code to inject in the VM to be able to
+     * make remote methode call.
+     * @return
+     */
+    QString GetServicesClientCode();
+
+
+    /**
+     * @brief GetActionInfos
+     * Return plugin and array of JSON object of the form:
+     * [{"IID":"plugin_1",
+     *  "actions":[
+     *              { "name":"action_1","doc":"@api 1.0... ",
+     *                "parameters":[{"name":"p0", "type":"string", "isArray":"false"}, ...],
+     *                "results":[{"name":"r0", "type":"string", "isArray":"false"}, ...]
+     *              ]}, ...
+     *             ]}
+     * ]
+     * @return
+     */
+    QJsonArray GetActionInfos();
+
 private:
     // plugins...
     void loadPluginObjects();
@@ -69,6 +96,9 @@ private:
 
     // Object define by plugin...
     QMap<QString, QObject*> objects;
+
+    // Contain metadata informations.
+    QMap<QString, QJsonObject> metaInfos;
 
     // The instance to the server itself...
     static ServiceContainer* instance;
