@@ -88,6 +88,7 @@ func (this *Hub) run() {
 		case c := <-this.register:
 			log.Println("------>Hub append connection ", c.GetUuid())
 			this.connections[c.GetUuid()] = c
+
 			// initialyse js interpreter for the new connection.
 			if c.GetPort() == GetServer().GetConfigurationManager().GetServerPort() {
 

@@ -1,6 +1,7 @@
 package Server
 
 import (
+	"encoding/json"
 	"errors"
 	"go/doc"
 	"go/parser"
@@ -13,11 +14,8 @@ import (
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
-)
-
-const (
-	serviceContainer = "ServiceContainer"
 )
 
 type ServiceManager struct {
@@ -27,6 +25,9 @@ type ServiceManager struct {
 	m_serviceContainerCmds []*exec.Cmd
 	m_serviceClientSrc     map[string]string
 	m_serviceServerSrc     map[string]string
+
+	// Keep list of action by services.
+	m_serviceAction map[string][]*CargoEntities.Action
 }
 
 var serviceManager *ServiceManager
@@ -52,6 +53,7 @@ func newServiceManager() *ServiceManager {
 	serviceManager.m_servicesLst = make([]Service, 0)           // Keep the order of intialisation.
 	serviceManager.m_serviceClientSrc = make(map[string]string) // Keep the services sources.
 	serviceManager.m_serviceServerSrc = make(map[string]string)
+	serviceManager.m_serviceAction = make(map[string][]*CargoEntities.Action) // Keep the list of action here.
 
 	return serviceManager
 }
@@ -68,13 +70,17 @@ func (this *ServiceManager) initialize() {
 	log.Println("--> Initialize ServiceManager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
-	// Set the service container port.
-	GetServer().GetConfigurationManager().setServiceConfiguration(serviceContainer, GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
-
 	for i := 0; i < len(this.m_servicesLst); i++ {
 		// Initialyse the service.
 		this.m_servicesLst[i].initialize()
 	}
+
+	// TCP
+	this.startServiceContainer("CargoServiceContainer_TCP", GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
+
+	// WS
+	this.startServiceContainer("CargoServiceContainer_WS", GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
+
 }
 
 func (this *ServiceManager) getId() string {
@@ -83,13 +89,13 @@ func (this *ServiceManager) getId() string {
 
 func (this *ServiceManager) startServiceContainer(name string, port int) error {
 	// The first step will be to start the service manager.
-	tcp_serviceContainerPath := GetServer().GetConfigurationManager().GetBinPath() + "/" + name
+	serviceContainerPath := GetServer().GetConfigurationManager().GetBinPath() + "/" + name
 	if runtime.GOOS == "windows" {
-		tcp_serviceContainerPath += ".exe"
+		serviceContainerPath += ".exe"
 	}
 
 	// Set the command
-	cmd := exec.Command(tcp_serviceContainerPath)
+	cmd := exec.Command(serviceContainerPath)
 	cmd.Args = append(cmd.Args, strconv.Itoa(port))
 
 	// Call it...
@@ -102,6 +108,9 @@ func (this *ServiceManager) startServiceContainer(name string, port int) error {
 	// the command succed here.
 	serviceManager.m_serviceContainerCmds = append(serviceManager.m_serviceContainerCmds, cmd)
 
+	// Set the service container port.
+	GetServer().GetConfigurationManager().setServiceConfiguration(name, port)
+
 	return nil
 }
 
@@ -112,11 +121,15 @@ func (this *ServiceManager) start() {
 	// I will create new action if there one's...
 	for i := 0; i < len(this.m_servicesLst); i++ {
 		// register the action inside the service.
-		this.registerActions(this.m_servicesLst[i])
+		this.registerServiceActions(this.m_servicesLst[i])
+		// Generate the service code.
+		this.generateActionCode(this.m_servicesLst[i].getId())
+
 	}
 
 	// register itself as service.
-	this.registerActions(this)
+	this.registerServiceActions(this)
+	this.generateActionCode(this.getId())
 
 	for i := 0; i < len(this.m_servicesLst); i++ {
 		// Get the service configuration information.
@@ -125,15 +138,18 @@ func (this *ServiceManager) start() {
 			if config.M_start == true {
 				this.m_servicesLst[i].start()
 			}
-
 		}
 	}
 
-	// TCP
-	//this.startServiceContainer("CargoServiceContainer_TCP", GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
+	// Now I will register actions for services container.
+	activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations)
+	for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
+		config := activeConfigurations.GetServiceConfigs()[i]
+		if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
+			this.registerServiceContainerActions(config)
 
-	// WS
-	//this.startServiceContainer("CargoServiceContainer_WS", GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
+		}
+	}
 
 }
 
@@ -160,10 +176,136 @@ func (this *ServiceManager) registerService(service Service) {
 }
 
 /**
+ * Here I will register external services. (WS or TCP)
+ */
+func (this *ServiceManager) registerServiceContainerActions(config *Config.ServiceConfiguration) {
+	// If the action array does not exist.
+	if this.m_serviceAction[config.GetId()] == nil {
+		this.m_serviceAction[config.GetId()] = make([]*CargoEntities.Action, 0)
+	}
+
+	address := GetServer().GetConfigurationManager().GetIpv4() + ":" + strconv.Itoa(config.GetPort())
+	if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() {
+		address = "ws://" + address
+	}
+
+	// I will open a connection with the service and get it list of actions.
+	conn, err := GetServer().connect(address)
+
+	if err != nil {
+		return
+	}
+
+	// So here I will request the list of actions.
+	id := Utility.RandomUUID()
+	method := "GetActionInfos"
+	params := make([]*MessageData, 0)
+
+	to := make([]connection, 1)
+	to[0] = conn
+
+	// The success callback.
+	successCallback_ := func(rspMsg *message, caller_ interface{}) {
+		// So here i will get the message value...
+		results := rspMsg.msg.Rsp.Results
+		for i := 0; i < len(results); i++ {
+			infos := make([]map[string]interface{}, 0)
+			err := json.Unmarshal(results[i].DataBytes, &infos)
+			if err == nil {
+				// Here I got the informations..
+				for j := 0; j < len(infos); j++ {
+					// Represent the id of the interface that contain the
+					// the method...
+					interfaceId := infos[j]["IID"].(string)
+					actionInfos := infos[j]["actions"].([]interface{})
+
+					for k := 0; k < len(actionInfos); k++ {
+						actionId := interfaceId + "." + actionInfos[k].(map[string]interface{})["name"].(string)
+						actionUuid := CargoEntitiesActionExists(actionId)
+						var action *CargoEntities.Action
+						if len(actionUuid) == 0 {
+							action = new(CargoEntities.Action)
+							action.TYPENAME = "CargoEntities.Action"
+							action.SetName(actionId)
+
+							// Now the documentation.
+							var doc string
+							for l := 0; l < len(actionInfos[k].(map[string]interface{})["doc"].([]interface{})); l++ {
+								doc += actionInfos[k].(map[string]interface{})["doc"].([]interface{})[l].(string) + "\n"
+							}
+							action.SetDoc(doc)
+
+							if len(action.UUID) == 0 {
+								GetServer().GetEntityManager().NewCargoEntitiesActionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", action)
+							}
+
+							// Now the parameters.
+							parameterInfos := actionInfos[k].(map[string]interface{})["parameters"].([]interface{})
+							for l := 0; l < len(parameterInfos); l++ {
+								parameterInfo := parameterInfos[l]
+								parameter := new(CargoEntities.Parameter)
+								parameter.UUID = Utility.RandomUUID()
+								parameter.SetName(parameterInfo.(map[string]interface{})["name"].(string))
+								isArray, _ := strconv.ParseBool(parameterInfo.(map[string]interface{})["isArray"].(string))
+								parameter.SetIsArray(isArray)
+								parameter.SetType(parameterInfo.(map[string]interface{})["type"].(string))
+								action.SetParameters(parameter)
+							}
+
+							// Now the return values.
+							resultInfos := actionInfos[k].(map[string]interface{})["results"].([]interface{})
+							for l := 0; l < len(resultInfos); l++ {
+								resultInfo := resultInfos[l]
+								result := new(CargoEntities.Parameter)
+								result.UUID = Utility.RandomUUID()
+								result.SetName(resultInfo.(map[string]interface{})["name"].(string))
+								isArray, _ := strconv.ParseBool(resultInfo.(map[string]interface{})["isArray"].(string))
+								result.SetIsArray(isArray)
+								result.SetType(resultInfo.(map[string]interface{})["type"].(string))
+								action.SetResults(result)
+							}
+
+							action.SetAccessType(CargoEntities.AccessType_Public)
+
+							action.SetEntitiesPtr(GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities))
+							GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetActions(action)
+
+						} else {
+							entity, _ := GetServer().GetEntityManager().getEntityByUuid(actionUuid, false)
+							action = entity.GetObject().(*CargoEntities.Action)
+						}
+						this.m_serviceAction[config.GetId()] = append(this.m_serviceAction[config.GetId()], action)
+					}
+				}
+			}
+		}
+	}
+	GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+	// The error callback.
+	errorCallback_ := func(errMsg *message, caller interface{}) {
+		errStr := errMsg.msg.Err.Message
+		log.Println("--------> error: 207 ", errStr)
+	}
+
+	rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_)
+
+	GetServer().GetProcessor().m_pendingRequestChannel <- rqst
+
+	// Close the connection.
+	//conn.Close()
+}
+
+/**
  * That function use reflection to create the actions information contain in a
  * given service. The information will be use by role.
  */
-func (this *ServiceManager) registerActions(service Service) {
+func (this *ServiceManager) registerServiceActions(service Service) {
+
+	// Now  I will register action for that service.
+	// If the action array does not exist.
+	if this.m_serviceAction[service.getId()] == nil {
+		this.m_serviceAction[service.getId()] = make([]*CargoEntities.Action, 0)
+	}
 
 	// I will use the reflection to reteive method inside the service
 	serviceType := reflect.TypeOf(service)
@@ -204,14 +346,13 @@ func (this *ServiceManager) registerActions(service Service) {
 			action = entity.GetObject().(*CargoEntities.Action)
 		}
 
-		if !(strings.HasPrefix(method.Name, "New") && (strings.HasSuffix(method.Name, "Entity") || strings.HasSuffix(method.Name, "EntityFromObject"))) {
+		if len(methodName) > 0 && !(strings.HasPrefix(method.Name, "New") && (strings.HasSuffix(method.Name, "Entity") || strings.HasSuffix(method.Name, "EntityFromObject"))) {
 			action.SetName(methodName)
 			m := methodsDoc[methodName[strings.LastIndex(methodName, ".")+1:]]
 			if m != nil {
 				action.SetDoc(m.Doc)
 				if len(action.UUID) == 0 {
 					if strings.Index(action.M_doc, "@api ") != -1 { // Only api action are exported...
-
 						// Set the uuid if is not set...
 						if len(action.UUID) == 0 {
 							GetServer().GetEntityManager().NewCargoEntitiesActionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", action)
@@ -305,24 +446,32 @@ func (this *ServiceManager) registerActions(service Service) {
 						}
 					}
 				}
+
+				// Export only action with api...
+				if strings.Index(action.M_doc, "@api ") != -1 { // Only api action are exported...
+					this.m_serviceAction[service.getId()] = append(this.m_serviceAction[service.getId()], action)
+				}
 			}
 		}
 	}
 
 	GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+}
+
+func (this *ServiceManager) generateActionCode(serviceId string) {
 
 	// Here I will generate the client service class.
 	var clientSrc string
 	// And the server side code to.
 	var serverSrc string
 
-	var eventTypename = strings.Replace(service.getId(), "Manager", "Event", -1)
+	var eventTypename = strings.Replace(serviceId, "Manager", "Event", -1)
 
 	// Here I will generate the javascript code use by client side.
-	clientSrc = "// ============================= " + service.getId() + " ========================================\n"
+	clientSrc = "// ============================= " + serviceId + " ========================================\n"
 	serverSrc = clientSrc // same comment.
 
-	clientSrc += "\nvar " + service.getId() + " = function(){\n"
+	clientSrc += "\nvar " + serviceId + " = function(){\n"
 	clientSrc += "	if (server == undefined) {\n"
 	clientSrc += "		return\n"
 	clientSrc += "	}\n"
@@ -330,10 +479,10 @@ func (this *ServiceManager) registerActions(service Service) {
 	clientSrc += "	return this\n"
 	clientSrc += "}\n\n"
 
-	clientSrc += service.getId() + ".prototype = new EventHub(null);\n"
-	clientSrc += service.getId() + ".prototype.constructor = " + service.getId() + ";\n\n"
+	clientSrc += serviceId + ".prototype = new EventHub(null);\n"
+	clientSrc += serviceId + ".prototype.constructor = " + serviceId + ";\n\n"
 
-	actions := this.GetServiceActions(service.getId(), "", "")
+	actions := this.GetServiceActions(serviceId, "", "")
 
 	for i := 0; i < len(actions); i++ {
 		action := actions[i]
@@ -345,7 +494,7 @@ func (this *ServiceManager) registerActions(service Service) {
 				// Here the code of the method is defined in the documentation.
 				clientSrc += doc[strings.Index(doc, "@src\n")+5:] + "\n"
 			} else {
-				clientSrc += service.getId() + ".prototype." + strings.ToLower(name[0:1]) + name[1:] + " = function("
+				clientSrc += serviceId + ".prototype." + strings.ToLower(name[0:1]) + name[1:] + " = function("
 
 				// Now the parameters...
 				if action.M_parameters != nil {
@@ -409,7 +558,7 @@ func (this *ServiceManager) registerActions(service Service) {
 
 				// Now will generate the code for executeJsFunction.
 				clientSrc += "\n	server.executeJsFunction(\n"
-				clientSrc += "	\"" + service.getId() + name + "\",\n"
+				clientSrc += "	\"" + serviceId + name + "\",\n"
 				clientSrc += "	params, \n"
 				caller := "{"
 				if Utility.Contains(callbacks, "progressCallback") {
@@ -441,6 +590,10 @@ func (this *ServiceManager) registerActions(service Service) {
 							// in case of an array...
 							if isArray {
 								clientSrc += "			var entities = []\n"
+								clientSrc += "			if(caller.results[0] == null){\n"
+								clientSrc += "				caller.successCallback(entities, caller.caller)\n"
+								clientSrc += "				return\n"
+								clientSrc += "			}\n"
 								clientSrc += "			for (var i = 0; i < caller.results[0].length; i++) {\n"
 								clientSrc += "				var entity = eval(\"new \" + prototype.TypeName + \"()\")\n"
 								clientSrc += "				if (i == caller.results[0].length - 1) {\n"
@@ -526,7 +679,7 @@ func (this *ServiceManager) registerActions(service Service) {
 		}
 
 		// Now the server side function...
-		serverSrc += "function " + service.getId() + name + "("
+		serverSrc += "function " + serviceId + name + "("
 		params_ := ""
 		if action.M_parameters != nil {
 			// The last tow parameters are sessionId and message Id
@@ -554,20 +707,19 @@ func (this *ServiceManager) registerActions(service Service) {
 			} else {
 				serverSrc += "	var " + action.M_results[0].M_name + " = null\n"
 			}
-			serverSrc += "	" + action.M_results[0].M_name + " = server.Get" + service.getId() + "()." + name + "(" + params_ + ")\n"
+			serverSrc += "	" + action.M_results[0].M_name + " = server.Get" + serviceId + "()." + name + "(" + params_ + ")\n"
 			serverSrc += "	return " + action.M_results[0].M_name + "\n"
 		} else {
 			// Here I will simply call the method on the service object..
-			serverSrc += "	server.Get" + service.getId() + "()." + name + "(" + params_ + ")\n"
+			serverSrc += "	server.Get" + serviceId + "()." + name + "(" + params_ + ")\n"
 		}
 
 		serverSrc += "}\n\n"
 	}
 
 	// Keep the service javaScript code in the map.
-	serviceManager.m_serviceClientSrc[service.getId()] = clientSrc
-	serviceManager.m_serviceServerSrc[service.getId()] = serverSrc
-
+	serviceManager.m_serviceClientSrc[serviceId] = clientSrc
+	serviceManager.m_serviceServerSrc[serviceId] = serverSrc
 }
 
 func (this *ServiceManager) registerAction(methodName string, parameters []interface{}, results []interface{}) (*CargoEntities.Action, error) {
@@ -678,13 +830,8 @@ func (this *ServiceManager) RegisterAction(name string, parameters []interface{}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *ServiceManager) GetServiceActions(serviceName string, messageId string, sessionId string) []*CargoEntities.Action {
-	actionsEntity, _ := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Action", "", "CargoEntities", false)
-	actions := make([]*CargoEntities.Action, 0)
-	for i := 0; i < len(actionsEntity); i++ {
-		action := actionsEntity[i].GetObject().(*CargoEntities.Action)
-		if strings.Contains(action.M_name, serviceName) {
-			actions = append(actions, action)
-		}
+	for i := 0; i < len(this.m_serviceAction[serviceName]); i++ {
+		log.Println(this.m_serviceAction[serviceName][i])
 	}
-	return actions
+	return this.m_serviceAction[serviceName]
 }

@@ -64,7 +64,7 @@ function main() {
     // testServiceContainer()
     //entitiesDump("DT3_informations.Workpoint")
 
-    //entitiesDump("CargoEntities.Action")
+    entitiesDump("CargoEntities.Action")
     //testSayHello("Dave")
     //entityDump( "CARGO_ENTITIES", "CargoEntities.Entities")
     //entitiesDump("XPDMXML.ProcessStructureType")

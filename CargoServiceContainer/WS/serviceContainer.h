@@ -102,6 +102,10 @@ private:
 
     // The instance to the server itself...
     static ServiceContainer* instance;
+
+    // The server side functions.
+    QMap<QString, QString> serverCodes;
+
 };
 
 #endif // TRIPLESERVER_H

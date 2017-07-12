@@ -2,6 +2,7 @@ package JS
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -79,11 +80,18 @@ func (this *JsRuntimeManager) InitScripts(sessionId string) {
 	// Compile the list of script...
 	for i := 0; i < len(this.m_scripts); i++ {
 		script, err := this.m_session[sessionId].Compile("", this.m_scripts[i])
-		this.m_session[sessionId].Run(script)
-		if err != nil {
-			log.Println("runtime script compilation error:", script, err)
+		if err == nil {
+			if this.m_session[sessionId] != nil {
+				this.m_session[sessionId].Run(script)
+				if err != nil {
+					log.Println("runtime script compilation error:", script, err)
+				} else {
+					//log.Println(sessionId, " Load: ", this.m_scripts[i])
+				}
+			}
 		} else {
-			//log.Println(sessionId, " Load: ", this.m_scripts[i])
+			log.Println("-------> error in script: ", this.m_scripts[i])
+			log.Println(err)
 		}
 	}
 
@@ -190,10 +198,19 @@ func (this *JsRuntimeManager) AppendScript(src string) {
  * Append and excute a javacript function on the JS...
  */
 func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId string, functionStr string, functionParams []interface{}) (results []interface{}, err error) {
-
+	if len(functionStr) == 0 {
+		return nil, errors.New("No function string.")
+	}
 	// Here i wil find the name of the function...
-	startIndex := strings.Index(functionStr, " ")
+	startIndex := strings.Index(functionStr, "function")
+	if startIndex != -1 {
+		startIndex += len("function")
+	} else {
+		startIndex = 0
+	}
+
 	endIndex := strings.Index(functionStr, "(")
+
 	var functionName string
 
 	// Set the function on the JS runtime...

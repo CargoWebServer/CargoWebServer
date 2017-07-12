@@ -196,7 +196,7 @@ EntityPrototype.prototype.generateConstructor = function () {
     if(this.ClassName.indexOf(" ") > 0){
         return
     }
-    var constructorSrc = this.PackageName + " = function(){\n"
+    
     var constructorSrc = this.PackageName + " || {};\n"
 
     var packageName = this.PackageName

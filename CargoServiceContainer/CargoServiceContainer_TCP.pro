@@ -15,7 +15,8 @@ SOURCES += \
     TCP/serviceContainer.cpp \
     TCP/session.cpp \
     gen/rpc.pb.cc \
-    main.cpp
+    main.cpp \
+    serviceContainer.cpp
 
 DEFINES += PORT_NUMBER=9595
 
@@ -23,5 +24,5 @@ DEFINES += PORT_NUMBER=9595
 INCLUDEPATH += $$PWD/include
 DEPENDPATH += $$PWD/lib
 
-#LIBS += -L$$PWD/lib/ -llibprotobuf
-unix:!macx|win32: LIBS += -lprotobuf
+win32: LIBS += -L$$PWD/lib/ -llibprotobuf
+unix:!macx: LIBS += -lprotobuf

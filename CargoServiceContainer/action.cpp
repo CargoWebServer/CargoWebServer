@@ -164,6 +164,9 @@ void Action::run()
     QMetaMethod metaMethod = obj->metaObject()->method(index);
     QVariant retVal = CallMethod(obj, metaMethod, list);
 
+    // TODO test retVal for error and report error instead of response in that case.
+
+
     // Wait for the answer...
     com::mycelius::message::Message* result = new com::mycelius::message::Message();
     result->set_type(com::mycelius::message::Message_MessageType_RESPONSE);

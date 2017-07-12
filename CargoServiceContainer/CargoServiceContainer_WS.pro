@@ -23,7 +23,5 @@ DEFINES += PORT_NUMBER=9494 WS
 INCLUDEPATH += $$PWD/include
 DEPENDPATH += $$PWD/lib
 
-#LIBS += -L$$PWD/lib/ -llibprotobuf
-
-
-unix:!macx|win32: LIBS += -lprotobuf
+win32: LIBS += -L$$PWD/lib/ -llibprotobuf
+unix:!macx: LIBS += -lprotobuf

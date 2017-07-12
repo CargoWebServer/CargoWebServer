@@ -284,7 +284,6 @@ func (this *Server) runVbs(scriptName string, args []string) ([]string, error) {
  */
 func (this *Server) ExecuteVbScript(scriptName string, args []string, messageId string, sessionId string) []string {
 
-	//log.Println("----------> run ", scriptName, "args: ", args)
 	// Run the given script on the server side.
 	results, err := this.runVbs(scriptName, args)
 
@@ -582,7 +581,7 @@ func (this *Server) Start() {
 			log.Println(" init connection with : ", adress)
 
 			// Get the new connection id.
-			subConnectionId, err := GetServer().connect(adress)
+			subConnection, err := GetServer().connect(adress)
 
 			// The new created connection Js object.
 			var conn otto.Value
@@ -591,6 +590,8 @@ func (this *Server) Start() {
 				log.Println("-------> connection fail: ", err)
 				return conn
 			}
+
+			subConnectionId := subConnection.GetUuid()
 
 			vm := JS.GetJsRuntimeManager().GetVm(connectionId)
 
@@ -631,6 +632,26 @@ func (this *Server) Start() {
 
 			// Keep the connection link...
 			GetServer().subConnections[subConnectionId] = conn
+
+			// I will get the client code and inject it in the vm.
+			id := Utility.RandomUUID()
+			method := "GetServicesClientCode"
+			params := make([]*MessageData, 0)
+			to := make([]connection, 1)
+			to[0] = subConnection
+			successCallback := func(connectionId string) func(rspMsg *message, caller interface{}) {
+				return func(rspMsg *message, caller interface{}) {
+					src := string(rspMsg.msg.Rsp.Results[0].DataBytes)
+					JS.GetJsRuntimeManager().AppendScript(src)
+				}
+			}(connectionId)
+
+			errorCallback := func(rspMsg *message, caller interface{}) {
+				log.Println("GetServicesClientCode error!!!")
+			}
+
+			rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback)
+			GetServer().GetProcessor().m_pendingRequestChannel <- rqst
 
 			return conn
 
@@ -688,7 +709,7 @@ func (this *Server) SetRootPath(path string) error {
 /**
  * Open a new connection with server on the network...
  */
-func (this *Server) connect(address string) (string, error) {
+func (this *Server) connect(address string) (connection, error) {
 
 	var conn connection
 	values := strings.Split(address, ":")
@@ -716,16 +737,18 @@ func (this *Server) connect(address string) (string, error) {
 	// Open the a new connection with the server.
 	log.Println("---> try to open ", host, port)
 	err := conn.Open(host, port)
+
 	if err != nil {
-		return "", err // The connection fail...
+		log.Println("--------------> connection fail! ", host, port, err)
+		return nil, err // The connection fail...
 	}
 
 	// Test if the connection is open.
 	if !conn.IsOpen() {
-		return "", errors.New("Fail to open connection with socket " + host + " at port " + strconv.Itoa(port))
+		return nil, errors.New("Fail to open connection with socket " + host + " at port " + strconv.Itoa(port))
 	}
 
-	return conn.GetUuid(), nil
+	return conn, nil
 }
 
 //////////////////////////////////////////////////////////

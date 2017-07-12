@@ -577,6 +577,7 @@ func (this *CargoEntities_ParameterEntity) InitEntity(id string, lazy bool) erro
 	this.SetInit(true)
 	// Init the references...
 	GetServer().GetEntityManager().InitEntity(this, lazy)
+
 	return nil
 }
 
