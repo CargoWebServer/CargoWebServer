@@ -21,25 +21,20 @@ var service = null
 function SayHello(to) {
 
     // Test service usage here...
-    var hostName = "localhost"
-    var ipv4 = "127.0.0.1"
-    var port = 9494 // use 9595 for TCP socket and 9494 for websocket.
-    service = new Server(hostName, ipv4, port)
 
-    var address = "ws://" + service.ipv4 + ":" + service.port.toString()
-    //var address =  service.ipv4 + ":" + service.port.toString()
-    service.conn = initConnection(address,
+    // New service object
+    service = new Server("localhost", "127.0.0.1", 9595)
+
+    // Initialyse the server connection.
+    service.init( 
         // on open connection callback
         function (caller) {
-            // display the connection id...
-            caller.conn = this
+            // Test ping function.
             caller.ping(
                 // success callback
                 function (result, caller) {
-
-                    // I will try to create
+                    // Now I will create a new interface found on the ser 
                     var sayHello = new com.mycelius.SayHelloInterface(caller)
-
                     // Call say hello. 
                     sayHello.sayHelloTo("Cargo!!!",
                         // Success Callback
@@ -50,22 +45,16 @@ function SayHello(to) {
                         function (errObj, caller) {
 
                         }, {})
-
                 },
                 // error callback
                 function (errObj, caller) {
+                    // Ping fail.
                 }, caller)
         },
         // on close callback
         function () {
 
-        },
-        // on message callback
-        function () {
-
-        },
-        // the local session id.
-        sessionId, service)
+        })
 
     return "Hello " + to + "!!!"
 }

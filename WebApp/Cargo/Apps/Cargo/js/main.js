@@ -51,8 +51,7 @@ var main = null
 function load() {
 
     // Open a new connection whit the web server.
-    server.conn = initConnection("ws://" + server.ipv4 + ":" + server.port.toString() + "/ws",
-        function () {
+    server.init(function () {
             // Get the session id from the server.
             server.setSessionId(function () {
 

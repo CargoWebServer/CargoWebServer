@@ -70,7 +70,18 @@ var Server = function (hostName, ipv4, port) {
      */
     this.eventHandler = new EventHandler()
 
+
     return this;
+}
+
+/**
+ * Initialyse the server connection.
+ * @param {function} onConnectionOpenCallback That function is call when the connection is open and ready to be use.
+ * @param {function} onConnectionCloseCallback That function is call when the connection is close with the server. 
+ */
+Server.prototype.init = function(onConnectionOpenCallback, onConnectionCloseCallback){
+    // Initialisation of the connection.
+    this.conn = initConnection("ws://" + this.ipv4 + ":" + this.port.toString() + "/ws", onConnectionOpenCallback, onConnectionCloseCallback)
 }
 
 /**

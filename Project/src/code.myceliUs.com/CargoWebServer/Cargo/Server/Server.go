@@ -577,8 +577,8 @@ func (this *Server) Start() {
 	 * Init connection is call when a Server object need to be connect on the net work.
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("initConnection",
-		func(adress string, openCallback string, closeCallback string, messageCallback string, connectionId string, caller otto.Value) otto.Value {
-			log.Println(" init connection with : ", adress)
+		func(adress string, openCallback string, closeCallback string, connectionId string, caller otto.Value) otto.Value {
+			log.Println(" init connection with : ", adress, " session id: ", connectionId)
 
 			// Get the new connection id.
 			subConnection, err := GetServer().connect(adress)
@@ -605,23 +605,17 @@ func (this *Server) Start() {
 				// I will set the connection id.
 				conn.Object().Set("id", subConnectionId)
 
+				// Set the connection in the caller.
+				caller.Object().Set("conn", conn)
+
 				// I will set the open callback.
 				_, err := vm.Run("Connection.prototype.onopen = " + openCallback)
-				if err == nil {
-					// Call on open...
-					conn.Object().Call("onopen", caller)
-				} else {
+				if err != nil {
 					log.Println("-----> error!", err)
 				}
 
 				// Now the close callback.
 				_, err = vm.Run("Connection.prototype.onclose = " + closeCallback)
-				if err != nil {
-					log.Println("-----> error!", err)
-				}
-
-				// Now the onmesasage callback.
-				_, err = vm.Run("Connection.prototype.onmessage = " + messageCallback)
 				if err != nil {
 					log.Println("-----> error!", err)
 				}
@@ -639,12 +633,15 @@ func (this *Server) Start() {
 			params := make([]*MessageData, 0)
 			to := make([]connection, 1)
 			to[0] = subConnection
-			successCallback := func(connectionId string) func(rspMsg *message, caller interface{}) {
+			successCallback := func(connectionId string, conn otto.Value, caller_ otto.Value) func(rspMsg *message, caller interface{}) {
 				return func(rspMsg *message, caller interface{}) {
 					src := string(rspMsg.msg.Rsp.Results[0].DataBytes)
 					JS.GetJsRuntimeManager().AppendScript(src)
+					// Call on open...
+					log.Println("-----------------> 641 on open!")
+					conn.Object().Call("onopen", caller_)
 				}
-			}(connectionId)
+			}(connectionId, conn, caller)
 
 			errorCallback := func(rspMsg *message, caller interface{}) {
 				log.Println("GetServicesClientCode error!!!")
@@ -657,6 +654,13 @@ func (this *Server) Start() {
 
 		})
 
+	// Now I will create the empty session...
+	JS.GetJsRuntimeManager().CreateVm("")    // The anonymous session.
+	JS.GetJsRuntimeManager().InitScripts("") // Run the script for the default session.
+
+	// Test compile analyse...
+	JS.GetJsRuntimeManager().GetVm("").Set("server", this)
+	JS.GetJsRuntimeManager().GetVm("").Run("compileAnalyseCSP(30)")
 }
 
 /**

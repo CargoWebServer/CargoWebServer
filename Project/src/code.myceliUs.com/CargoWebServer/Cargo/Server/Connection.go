@@ -166,13 +166,14 @@ func (c *tcpSocketConnection) Reader() {
 		}
 
 		msgSize := int32(uint32(in[0]) | uint32(in[1])<<8 | uint32(in[2])<<16 | uint32(in[3])<<24)
-		msgData := in[4 : msgSize+4] // The message start at 4 so it end four byte after...
-
-		msg, err := NewMessageFromData(msgData, c)
-		if err == nil {
-			GetServer().GetHub().receivedMsg <- msg
-		} else {
-			log.Println("error: ", err)
+		if int(msgSize+4) <= len(in) {
+			msgData := in[4 : msgSize+4] // The message start at 4 so it end four byte after...
+			msg, err := NewMessageFromData(msgData, c)
+			if err == nil {
+				GetServer().GetHub().receivedMsg <- msg
+			} else {
+				log.Println("error: ", err)
+			}
 		}
 	}
 

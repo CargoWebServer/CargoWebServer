@@ -76,10 +76,10 @@ func (this *ServiceManager) initialize() {
 	}
 
 	// TCP
-	this.startServiceContainer("CargoServiceContainer_TCP", GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
+	//this.startServiceContainer("CargoServiceContainer_TCP", GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
 
 	// WS
-	this.startServiceContainer("CargoServiceContainer_WS", GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
+	//this.startServiceContainer("CargoServiceContainer_WS", GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
 
 }
 
@@ -830,8 +830,8 @@ func (this *ServiceManager) RegisterAction(name string, parameters []interface{}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *ServiceManager) GetServiceActions(serviceName string, messageId string, sessionId string) []*CargoEntities.Action {
-	for i := 0; i < len(this.m_serviceAction[serviceName]); i++ {
-		log.Println(this.m_serviceAction[serviceName][i])
-	}
+	//for i := 0; i < len(this.m_serviceAction[serviceName]); i++ {
+	//log.Println(this.m_serviceAction[serviceName][i])
+	//}
 	return this.m_serviceAction[serviceName]
 }

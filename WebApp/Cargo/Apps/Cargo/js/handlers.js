@@ -120,7 +120,7 @@ var RpcEvent = root.com.mycelius.message.Event;
 /*
  * Initialisation of the web socket handler.
  */
-function initConnection(adress, onOpenCallback, onCloseCallback, onMessageCallback) {
+function initConnection(adress, onOpenCallback, onCloseCallback) {
     if ("WebSocket" in window) {
         // Let us open a web socket
         var connection = new WebSocket(adress);
@@ -143,10 +143,6 @@ function initConnection(adress, onOpenCallback, onCloseCallback, onMessageCallba
             };
 
             fileReader.readAsArrayBuffer(evt.data);
-
-            if (onMessageCallback != undefined) {
-                onMessageCallback();
-            }
         };
 
         connection.onclose = function () {

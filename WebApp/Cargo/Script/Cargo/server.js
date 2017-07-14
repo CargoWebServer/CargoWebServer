@@ -1,3 +1,6 @@
+// The default session id.
+var sessionId = ""
+
 /**
  * Connection class
  */
@@ -53,6 +56,15 @@ var RpcData = function(values){
 	 
 	 
 	return this
+ }
+ 
+ /*
+  * Open the connection with the other peer.
+  */
+ Server.prototype.init = function (onOpenConnectionCallback, onCloseConnectionCallback) {
+	var address = this.ipv4 + ":" + this.port.toString()
+	// The connection will be set on the sever side.
+	initConnection(address, onOpenConnectionCallback, onCloseConnectionCallback, sessionId, this)
  }
  
  /*

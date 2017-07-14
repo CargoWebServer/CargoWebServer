@@ -198,9 +198,11 @@ func (this *JsRuntimeManager) AppendScript(src string) {
  * Append and excute a javacript function on the JS...
  */
 func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId string, functionStr string, functionParams []interface{}) (results []interface{}, err error) {
+
 	if len(functionStr) == 0 {
 		return nil, errors.New("No function string.")
 	}
+
 	// Here i wil find the name of the function...
 	startIndex := strings.Index(functionStr, "function")
 	if startIndex != -1 {

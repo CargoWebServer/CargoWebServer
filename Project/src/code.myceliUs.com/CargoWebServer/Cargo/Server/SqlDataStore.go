@@ -378,6 +378,7 @@ func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) int
 
 	/////////////////////////// Boolean ////////////////////////////////
 	if strings.HasSuffix(sqlTypeName, "bit") {
+
 		if reflect.TypeOf(value).Kind() == reflect.Bool {
 			return value.(bool)
 		} else if reflect.TypeOf(value).String() == "[]uint8" {
@@ -386,6 +387,14 @@ func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) int
 			} else {
 				return false
 			}
+		} else if reflect.TypeOf(value).String() == "int64" {
+			if value.(int64) == 1 {
+				return true
+			} else {
+				return false
+			}
+		} else {
+			log.Println("-----------> bit cast fail! ", reflect.TypeOf(value).String())
 		}
 	}
 

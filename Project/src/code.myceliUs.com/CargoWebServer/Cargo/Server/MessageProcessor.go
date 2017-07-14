@@ -124,8 +124,10 @@ func (this *MessageProcessor) appendPendingRequest(m *message) {
 	var isOpen = false
 
 	for i := 0; i < len(m.to); i++ {
-		if m.to[i].IsOpen() {
-			isOpen = true
+		if m.to[i] != nil {
+			if m.to[i].IsOpen() {
+				isOpen = true
+			}
 		}
 	}
 
