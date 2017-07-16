@@ -49,6 +49,8 @@ void Session::run()
 }
 
 void Session::sendMessage(com::mycelius::message::Message *msg){
+    qDebug() << QString::fromStdString(msg->mutable_id()->c_str());
+    qDebug() << QString::fromStdString(msg->mutable_rsp()->mutable_id()->c_str());
     writelen(this->socket,msg->ByteSize());
     this->socket->write(serializeToByteArray(msg));
     this->socket->waitForBytesWritten();

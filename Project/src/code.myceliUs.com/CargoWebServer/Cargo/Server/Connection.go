@@ -170,10 +170,13 @@ func (c *tcpSocketConnection) Reader() {
 			msgData := in[4 : msgSize+4] // The message start at 4 so it end four byte after...
 			msg, err := NewMessageFromData(msgData, c)
 			if err == nil {
+				log.Println("--------> Message received ", msg.GetId())
 				GetServer().GetHub().receivedMsg <- msg
 			} else {
 				log.Println("error: ", err)
 			}
+		} else {
+			log.Panicln("-------> message to big!")
 		}
 	}
 
@@ -183,9 +186,9 @@ func (c *tcpSocketConnection) Reader() {
 
 func (c *tcpSocketConnection) Writer() {
 	for c.m_isOpen == true {
-		for message := range c.send {
+		for msg := range c.send {
 			// I will get the message here...
-			c.m_socket.Write(message)
+			c.m_socket.Write(msg)
 		}
 	}
 	c.Close()

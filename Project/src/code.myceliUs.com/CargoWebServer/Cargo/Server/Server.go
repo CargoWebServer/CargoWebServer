@@ -577,7 +577,7 @@ func (this *Server) Start() {
 	 * Init connection is call when a Server object need to be connect on the net work.
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("initConnection",
-		func(adress string, openCallback string, closeCallback string, connectionId string, caller otto.Value) otto.Value {
+		func(adress string, openCallback string, closeCallback string, connectionId string, service otto.Value, caller otto.Value) otto.Value {
 			log.Println(" init connection with : ", adress, " session id: ", connectionId)
 
 			// Get the new connection id.
@@ -606,7 +606,7 @@ func (this *Server) Start() {
 				conn.Object().Set("id", subConnectionId)
 
 				// Set the connection in the caller.
-				caller.Object().Set("conn", conn)
+				service.Object().Set("conn", conn)
 
 				// I will set the open callback.
 				_, err := vm.Run("Connection.prototype.onopen = " + openCallback)
@@ -633,15 +633,14 @@ func (this *Server) Start() {
 			params := make([]*MessageData, 0)
 			to := make([]connection, 1)
 			to[0] = subConnection
-			successCallback := func(connectionId string, conn otto.Value, caller_ otto.Value) func(rspMsg *message, caller interface{}) {
+			successCallback := func(connectionId string, conn otto.Value, service otto.Value, caller_ otto.Value) func(rspMsg *message, caller interface{}) {
 				return func(rspMsg *message, caller interface{}) {
 					src := string(rspMsg.msg.Rsp.Results[0].DataBytes)
 					JS.GetJsRuntimeManager().AppendScript(src)
 					// Call on open...
-					log.Println("-----------------> 641 on open!")
-					conn.Object().Call("onopen", caller_)
+					conn.Object().Call("onopen", service, caller_)
 				}
-			}(connectionId, conn, caller)
+			}(connectionId, conn, service, caller)
 
 			errorCallback := func(rspMsg *message, caller interface{}) {
 				log.Println("GetServicesClientCode error!!!")
@@ -660,7 +659,7 @@ func (this *Server) Start() {
 
 	// Test compile analyse...
 	JS.GetJsRuntimeManager().GetVm("").Set("server", this)
-	JS.GetJsRuntimeManager().GetVm("").Run("compileAnalyseCSP(30)")
+	JS.GetJsRuntimeManager().GetVm("").Run("TestMessageContainer(30)")
 }
 
 /**

@@ -75,6 +75,7 @@ func (this *MessageProcessor) run() {
 		case m := <-this.m_incomingChannel:
 			// Process the incomming message.
 			go this.processIncomming(m)
+			log.Println("-----------> ", len(this.m_pendingRequest))
 
 		case m := <-this.m_outgoingChannel:
 			// Process the outgoing message.
@@ -544,7 +545,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
  * Process outgoing message to be sent to the client.
  */
 func (this *MessageProcessor) processOutgoing(m *message) {
-
 	// Get the max message size.
 	maxSize := getMaxMessageSize()
 
@@ -554,6 +554,7 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 		// Request or Response.
 		if len(m.GetBytes()) < maxSize {
 			for i := 0; i < len(m.to); i++ {
+				log.Println("--------> Message sent ", m.GetId())
 				m.to[i].Send(m.GetBytes())
 			}
 		} else {

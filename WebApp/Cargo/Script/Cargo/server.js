@@ -61,10 +61,11 @@ var RpcData = function(values){
  /*
   * Open the connection with the other peer.
   */
- Server.prototype.init = function (onOpenConnectionCallback, onCloseConnectionCallback) {
+ Server.prototype.init = function (onOpenConnectionCallback, onCloseConnectionCallback, caller) {
 	var address = this.ipv4 + ":" + this.port.toString()
+
 	// The connection will be set on the sever side.
-	initConnection(address, onOpenConnectionCallback, onCloseConnectionCallback, sessionId, this)
+	initConnection(address, onOpenConnectionCallback, onCloseConnectionCallback, sessionId, this, caller)
  }
  
  /*

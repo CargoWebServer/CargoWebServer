@@ -102,18 +102,13 @@ Action::Action(const QString& id_, const QString& name_) :
     name(name_),
     id(id_)
 {
-    qDebug() << "Command " << this->name << " was received.";
 }
 
 Action::~Action(){
-    qDebug() << "Delete " << this->name << " action";
-
     // Clear the memory associated with params.
     for(int i=0; i < this->params.size(); i++){
         delete this->params.at(i);
     }
-
-    // Todo disconnect the slot/signal here...
 }
 
 void Action::appendParam(QString name, QVariant value, QString typeName){
@@ -183,7 +178,6 @@ void Action::run()
         d->set_name("result");
         if(retVal.type() == QMetaType::QStringList){
             // The type is a string list...
-            qDebug() << "The result is a string list";
             d->set_type(::com::mycelius::message::Data_DataType_JSON_STR);
             QJsonDocument doc;
             doc.setArray(::QJsonArray::fromStringList(retVal.toStringList()));
@@ -192,7 +186,6 @@ void Action::run()
             d->set_databytes(doc.toJson().toStdString());
         }else if(retVal.type() == QMetaType::QVariantList){
             // The type is a string list...
-            qDebug() << "The result is a variant list";
             d->set_type(::com::mycelius::message::Data_DataType_JSON_STR);
             QJsonDocument doc;
             doc.setArray(::QJsonArray::fromVariantList(retVal.toList()));
@@ -202,22 +195,18 @@ void Action::run()
 
         } else if(retVal.type() == QMetaType::Int){
             // The type is a integer...
-            qDebug() << "The result is an integer";
             d->set_type(::com::mycelius::message::Data_DataType_INTEGER);
             d->set_databytes(retVal.toString().toStdString());
         }else if(retVal.type() == QMetaType::Double){
             // The type is a float...
-            qDebug() << "The result is a double";
             d->set_type(::com::mycelius::message::Data_DataType_DOUBLE);
             d->set_databytes(retVal.toString().toStdString());
         }else if(retVal.canConvert(QMetaType::QString)){
             // The type is a string...
-            qDebug() << "The result is a string";
             d->set_type(::com::mycelius::message::Data_DataType_STRING);
             d->set_databytes(retVal.toString().toStdString());
         }else if(retVal.canConvert(QMetaType::QJsonObject)){
             // The type is a json object...
-            qDebug() << "The result is a json object";
             d->set_type(::com::mycelius::message::Data_DataType_JSON_STR);
             QJsonDocument doc;
             doc.setObject(retVal.toJsonObject());
@@ -227,7 +216,6 @@ void Action::run()
 
         }else if(retVal.canConvert(QMetaType::QJsonArray)){
             // The type is a json array...
-            qDebug() << "The result is a json array";
             d->set_type(::com::mycelius::message::Data_DataType_JSON_STR);
             QJsonDocument doc;
             doc.setArray(retVal.toJsonArray());

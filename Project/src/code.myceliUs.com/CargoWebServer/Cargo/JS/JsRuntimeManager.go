@@ -217,6 +217,7 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
 
 	// Set the function on the JS runtime...
 	vm := this.GetVm(sessionId).Copy()
+
 	// Set the current session id.
 	vm.Set("sessionId", sessionId)
 	vm.Set("messageId", messageId)
