@@ -379,7 +379,6 @@ func (this *Server) Start() {
 				val, _ := paramValue.Export()
 				param.Value = val
 			}
-
 			params = append(params, param)
 		}
 
@@ -587,7 +586,6 @@ func (this *Server) Start() {
 			var conn otto.Value
 
 			if err != nil {
-				log.Println("-------> connection fail: ", err)
 				return conn
 			}
 
@@ -659,7 +657,7 @@ func (this *Server) Start() {
 
 	// Test compile analyse...
 	JS.GetJsRuntimeManager().GetVm("").Set("server", this)
-	JS.GetJsRuntimeManager().GetVm("").Run("TestMessageContainer(30)")
+	JS.GetJsRuntimeManager().GetVm("").Run("TestMessageContainer(1000)")
 }
 
 /**

@@ -3,6 +3,7 @@ package Server
 import (
 	"encoding/binary"
 	"errors"
+	//	"io/ioutil"
 	"log"
 	"net"
 	"strconv"
@@ -156,27 +157,28 @@ func (c *tcpSocketConnection) Send(data []byte) {
 
 func (c *tcpSocketConnection) Reader() {
 	for c.m_isOpen == true {
-		var in []byte
 
 		// The input read the maximum message input...
-		in = make([]byte, getMaxMessageSize()+200)
+		sizeData := make([]byte, 4) // Read the first four bytes to get the message size.
 
-		if _, err := c.m_socket.Read(in); err != nil {
+		if _, err := c.m_socket.Read(sizeData); err != nil {
+			break
+		}
+		msgSize := int32(uint32(sizeData[0]) | uint32(sizeData[1])<<8 | uint32(sizeData[2])<<16 | uint32(sizeData[3])<<24)
+
+		// Now I will read the message itself.
+		msgData := make([]byte, msgSize) // Read the first four bytes to get the message size.
+		if _, err := c.m_socket.Read(msgData); err != nil {
 			break
 		}
 
-		msgSize := int32(uint32(in[0]) | uint32(in[1])<<8 | uint32(in[2])<<16 | uint32(in[3])<<24)
-		if int(msgSize+4) <= len(in) {
-			msgData := in[4 : msgSize+4] // The message start at 4 so it end four byte after...
-			msg, err := NewMessageFromData(msgData, c)
-			if err == nil {
-				log.Println("--------> Message received ", msg.GetId())
-				GetServer().GetHub().receivedMsg <- msg
-			} else {
-				log.Println("error: ", err)
-			}
+		// Now I will get the message data...
+		msg, err := NewMessageFromData(msgData, c)
+
+		if err == nil {
+			GetServer().GetHub().receivedMsg <- msg
 		} else {
-			log.Panicln("-------> message to big!")
+			log.Println("error: ", err)
 		}
 	}
 

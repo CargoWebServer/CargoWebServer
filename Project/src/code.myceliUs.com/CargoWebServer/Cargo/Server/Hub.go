@@ -37,48 +37,47 @@ func NewHub() *Hub {
 	h.receivedMsg = make(chan *message)
 	h.register = make(chan connection)
 	h.unregister = make(chan connection)
-	/*
-		// So here I will send empty message to keep socket alive
-		// and clear the session if the connection is close...
-		h.ticker = time.NewTicker(time.Millisecond * 2000)
 
-		go func() {
-			for t := range h.ticker.C {
-				for id, conn := range h.connections {
-					if conn != nil {
-						if conn.IsOpen() {
-							id := Utility.RandomUUID()
-							method := "Ping"
-							params := make([]*MessageData, 0)
-							to := make([]connection, 1)
-							to[0] = conn
-							successCallback := func(rspMsg *message, caller interface{}) {
-								//log.Println("success!!!")
-							}
+	// So here I will send empty message to keep socket alive
+	// and clear the session if the connection is close...
+	/*h.ticker = time.NewTicker(time.Millisecond * 2000)
 
-							errorCallback := func(rspMsg *message, caller interface{}) {
-								//log.Println("error!!!")
-							}
-
-							ping, err := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback)
-
-							if err != nil {
-								log.Println(err, " at time ", t)
-								conn.Close() // Here I will close the connection.
-							} else {
-								GetServer().GetProcessor().m_pendingRequestChannel <- ping
-							}
-
-						} else {
-							GetServer().GetSessionManager().removeClosedSession()
+	go func() {
+		for t := range h.ticker.C {
+			for id, conn := range h.connections {
+				if conn != nil {
+					if conn.IsOpen() {
+						id := Utility.RandomUUID()
+						method := "Ping"
+						params := make([]*MessageData, 0)
+						to := make([]connection, 1)
+						to[0] = conn
+						successCallback := func(rspMsg *message, caller interface{}) {
+							//log.Println("success!!!")
 						}
+
+						errorCallback := func(rspMsg *message, caller interface{}) {
+							//log.Println("error!!!")
+						}
+
+						ping, err := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback)
+
+						if err != nil {
+							log.Println(err, " at time ", t)
+							conn.Close() // Here I will close the connection.
+						} else {
+							GetServer().GetProcessor().m_pendingRequestChannel <- ping
+						}
+
 					} else {
-						delete(h.connections, id)
+						GetServer().GetSessionManager().removeClosedSession()
 					}
+				} else {
+					delete(h.connections, id)
 				}
 			}
-		}()
-	*/
+		}
+	}()*/
 
 	return h
 }

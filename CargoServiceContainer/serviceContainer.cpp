@@ -40,6 +40,7 @@ void ServiceContainer::loadPluginObjects(){
 #endif
     pluginsDir.cd("plugins");
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+        //qDebug() << "---------> " << pluginsDir.absoluteFilePath(fileName);
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
         QString iid =  pluginLoader.metaData().value("IID").toString();
         QJsonObject metaData = pluginLoader.metaData().value("MetaData").toObject();

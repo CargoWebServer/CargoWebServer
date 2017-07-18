@@ -188,11 +188,13 @@ func (self *Action) ExecuteJsFunction(funtionStr string, funtionParams ...interf
 
 	// If the results[0] is an error, I will return an error...
 	// The error is throw by the golang functor
-	switch goError := results[0].(type) {
-	case error:
-		return nil, goError
+	if len(results) > 0 {
+		switch goError := results[0].(type) {
+		case error:
+			return nil, goError
+		}
 	}
 
 	// Here there is no error, the functor do it's job...
-	return results, nil
+	return
 }

@@ -6,8 +6,8 @@ import (
 	"log"
 	"strconv"
 	"strings"
-
 	"sync"
+	//	"time"
 
 	"code.myceliUs.com/Utility"
 )
@@ -75,20 +75,23 @@ func (this *MessageProcessor) run() {
 		case m := <-this.m_incomingChannel:
 			// Process the incomming message.
 			go this.processIncomming(m)
-			log.Println("-----------> ", len(this.m_pendingRequest))
-
+			//log.Println("--------> receive message ", m.GetId())
 		case m := <-this.m_outgoingChannel:
 			// Process the outgoing message.
 			go this.processOutgoing(m)
-
+			//log.Println("--------> send message ", len(this.m_pendingRequest), m.GetId())
 		case m := <-this.m_pendingRequestChannel:
 			// Process the pending message.
 			go this.appendPendingRequest(m)
-
+			//log.Println("------------> append pending request: ", m.GetId())
 		case done := <-this.abortedByEnvironment:
 			if done {
 				return
 			}
+		default:
+			//time.Sleep(1 * time.Millisecond)
+
+			//log.Println("--------> number of request to be process ", len(this.m_pendingRequest))
 		}
 	}
 }
@@ -122,24 +125,10 @@ func (this *MessageProcessor) appendPendingRequest(m *message) {
 	this.Lock()
 	defer this.Unlock()
 
-	var isOpen = false
-
-	for i := 0; i < len(m.to); i++ {
-		if m.to[i] != nil {
-			if m.to[i].IsOpen() {
-				isOpen = true
-			}
-		}
-	}
-
 	// I will keep the reference to the request to be able
 	// to made the action later.
-	if isOpen {
-		//log.Println("append pending request with id ", m.GetId())
-		//log.Println("------> send message to ", m.to[0].GetAddrStr())
-		this.m_pendingRequest[*m.msg.Rqst.Id] = m
-		this.m_outgoingChannel <- m
-	}
+	this.m_pendingRequest[*m.msg.Rqst.Id] = m
+	this.m_outgoingChannel <- m
 }
 
 /**
@@ -181,20 +170,9 @@ func (this *MessageProcessor) appendResponse(m *message) {
 	this.Lock()
 	defer this.Unlock()
 
-	var isOpen = false
-
-	for i := 0; i < len(m.to); i++ {
-		if m.to[i].IsOpen() {
-			isOpen = true
-		}
-	}
-
 	// I will keep the reference to the request to be able
 	// to made the action later.
-	if isOpen {
-		this.m_outgoingChannel <- m
-	}
-
+	this.m_outgoingChannel <- m
 }
 
 ////////////////////////////// Pending message ///////////////////////////////////
@@ -287,7 +265,6 @@ func (this *MessageProcessor) popPendingMessages(id string) *message {
 			for i := 1; i < len(messages); i++ {
 				this.m_pendingMsg[id] = append(this.m_pendingMsg[id], messages[i])
 			}
-
 			return msg
 		}
 	} else {
@@ -305,7 +282,6 @@ func (this *MessageProcessor) popPendingMessages(id string) *message {
 func (this *MessageProcessor) createChunkMessages(messageId string, container [][]byte) {
 	this.Lock()
 	defer this.Unlock()
-
 	this.m_pendingMsgChunk[messageId] = container
 }
 
@@ -460,8 +436,8 @@ func (this *MessageProcessor) processIncomming(m *message) {
 		} else {
 			// Here I received a response from the client so I will process it.
 			rqst := this.getPendingRequestById(msg.Rsp.GetId())
-			//log.Println("The response for message ", rqst.GetId(), " was succefully received!")
 			if rqst != nil {
+				//log.Println("The response for message ", rqst.GetId(), " was succefully received!")
 				this.removePendingRequest(rqst)
 
 				// Here I will execute the successCallback if some is define.
@@ -469,6 +445,8 @@ func (this *MessageProcessor) processIncomming(m *message) {
 					// Call the successCallback.
 					rqst.successCallback(m, rqst.caller)
 				}
+			} else {
+				log.Panicln("-------------> no request found for response ", msg.Rsp.GetId())
 			}
 		}
 
@@ -550,12 +528,17 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 
 	// Here I will send the message to the client.
 	if *m.msg.Type == Message_REQUEST || *m.msg.Type == Message_RESPONSE {
-
-		// Request or Response.
 		if len(m.GetBytes()) < maxSize {
 			for i := 0; i < len(m.to); i++ {
-				log.Println("--------> Message sent ", m.GetId())
-				m.to[i].Send(m.GetBytes())
+				if *m.msg.Type == Message_REQUEST {
+					// Request will be put in a stack (one by connection) and
+					// send one by one...
+					m.to[i].Send(m.GetBytes())
+				} else {
+					// In case of response I will send it directly.
+					m.to[i].Send(m.GetBytes())
+				}
+
 			}
 		} else {
 			// so here I will split the message in multiple part
@@ -573,9 +556,6 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 		for i := 0; i < len(m.to); i++ {
 			if m.to[i].IsOpen() {
 				m.to[i].Send(m.GetBytes())
-			} else {
-				// I will remove the message.
-
 			}
 		}
 	}

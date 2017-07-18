@@ -4,6 +4,7 @@
 function TestMessageContainer(count) {
 	// New service object
 	service = new Server("localhost", "127.0.0.1", 9595)
+	//service = new Server("localhost", "ws:127.0.0.1", 9494)
 
 	// Initialyse the server connection.
 	service.init(
@@ -12,7 +13,8 @@ function TestMessageContainer(count) {
 			console.log("Try to Send " + caller + " message to the service container")
 			var sayHello = new com.mycelius.SayHelloInterface(service)
 
-			for (var i = 0; i < 10; i++) {
+			for (var i = 0; i < caller; i++) {
+				console.log("----------------> send message: ---> ", i)
 				// Call say hello. 
 				sayHello.sayHelloTo("message " + i,
 					// Success Callback
