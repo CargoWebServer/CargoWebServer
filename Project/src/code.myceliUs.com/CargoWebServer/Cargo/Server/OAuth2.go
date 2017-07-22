@@ -554,10 +554,10 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 				return func(rspMsg *message, caller interface{}) {
 					done <- false
 				}
-			}(done))
+			}(done), nil)
 
 		// Send the request.
-		GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AuthorizeRqst
+		GetServer().GetProcessor().m_sendRequest <- oauth2AuthorizeRqst
 
 		// So here I must block the execution of that function and wait
 		// for the authorization. To do so I will made use of channel and
@@ -569,10 +569,10 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 			params := make([]*MessageData, 0)
 			to := make([]connection, 1)
 			to[0] = GetServer().getConnectionById(sessionId)
-			oauth2AuthorizeEnd, err := NewRequestMessage(Utility.RandomUUID(), method, params, to, nil, nil, nil)
+			oauth2AuthorizeEnd, err := NewRequestMessage(Utility.RandomUUID(), method, params, to, nil, nil, nil, nil)
 			if err == nil {
 				// Send the request.
-				GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AuthorizeEnd
+				GetServer().GetProcessor().m_sendRequest <- oauth2AuthorizeEnd
 			}
 		}
 
@@ -590,10 +590,10 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 
 			to := make([]connection, 1)
 			to[0] = GetServer().getConnectionById(sessionId)
-			oauth2AuthorizeEnd, err := NewRequestMessage(Utility.RandomUUID(), method, params, to, nil, nil, nil)
+			oauth2AuthorizeEnd, err := NewRequestMessage(Utility.RandomUUID(), method, params, to, nil, nil, nil, nil)
 			if err == nil {
 				// Send the request.
-				GetServer().GetProcessor().m_pendingRequestChannel <- oauth2AuthorizeEnd
+				GetServer().GetProcessor().m_sendRequest <- oauth2AuthorizeEnd
 			}
 		}
 

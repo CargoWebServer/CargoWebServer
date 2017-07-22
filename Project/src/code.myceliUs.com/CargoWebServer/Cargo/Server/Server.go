@@ -182,10 +182,15 @@ func (this *Server) removeSubConnections(connectionId string, subConnectionId st
  * Trigger the onclose function over the js object.
  */
 func (this *Server) onClose(subConnectionId string) {
+
 	subConnection := this.subConnections[subConnectionId]
 	if subConnection.Object() != nil {
 		subConnection.Object().Call("onclose")
 	}
+
+	// Remove the JS session
+	JS.GetJsRuntimeManager().CloseSession(subConnectionId)
+
 }
 
 /**
@@ -383,8 +388,8 @@ func (this *Server) Start() {
 		}
 
 		// The success callback.
-		successCallback_ := func(successCallback string, subConnectionId string, caller otto.Value) func(*message, interface{}) {
-			return func(rspMsg *message, caller_ interface{}) {
+		successCallback_ := func(successCallback string, subConnectionId string) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
 				results := make([]interface{}, 0)
 				// So here i will get the message value...
 				for i := 0; i < len(rspMsg.msg.Rsp.Results); i++ {
@@ -479,40 +484,39 @@ func (this *Server) Start() {
 				params := make([]interface{}, 2)
 				params[0] = results
 				params[1] = caller
+
 				// run the success callback.
 				for k, v := range GetServer().subConnectionIds {
 					if Utility.Contains(v, subConnectionId) {
-						if JS.GetJsRuntimeManager().GetVm(k) != nil {
-							JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
-						}
+						JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
 					}
 				}
 
 			}
-		}(successCallback, subConnectionId, caller)
+		}(successCallback, subConnectionId)
 
 		// The error callback.
-		errorCallback_ := func(errorCallback string, subConnectionId string, caller otto.Value) func(*message, interface{}) {
+		errorCallback_ := func(errorCallback string, subConnectionId string) func(*message, interface{}) {
 			return func(errMsg *message, caller interface{}) {
 				errStr := errMsg.msg.Err.Message
 				params := make([]interface{}, 2)
 				params[0] = *errStr
 				params[1] = caller
-
 				// run the error callback.
 				for k, v := range GetServer().subConnectionIds {
 					if Utility.Contains(v, subConnectionId) {
-						if JS.GetJsRuntimeManager().GetVm(k) != nil {
-							JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
-						}
+						JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
 					}
 				}
 			}
-		}(errorCallback, subConnectionId, caller)
+		}(errorCallback, subConnectionId)
 
-		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_)
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
 
-		GetServer().GetProcessor().m_pendingRequestChannel <- rqst
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
 	})
 
 	/**
@@ -528,27 +532,26 @@ func (this *Server) Start() {
 		to[0] = GetServer().getConnectionById(subConnectionId)
 
 		// The success callback.
-		successCallback_ := func(successCallback string, subConnectionId string, caller otto.Value) func(*message, interface{}) {
-			return func(rspMsg *message, caller_ interface{}) {
+		successCallback_ := func(successCallback string, subConnectionId string) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
 
 				// So here i will get the message value...
 				result := string(rspMsg.msg.Rsp.Results[0].DataBytes)
 				params := make([]interface{}, 2)
 				params[0] = result
 				params[1] = caller
+
 				// run the success callback.
 				for k, v := range GetServer().subConnectionIds {
 					if Utility.Contains(v, subConnectionId) {
-						if JS.GetJsRuntimeManager().GetVm(k) != nil {
-							JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
-						}
+						JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
 					}
 				}
 			}
-		}(successCallback, subConnectionId, caller)
+		}(successCallback, subConnectionId)
 
 		// The error callback.
-		errorCallback_ := func(errorCallback string, subConnectionId string, caller otto.Value) func(*message, interface{}) {
+		errorCallback_ := func(errorCallback string, subConnectionId string) func(*message, interface{}) {
 			return func(errMsg *message, caller interface{}) {
 				errStr := errMsg.msg.Err.Message
 				params := make([]interface{}, 2)
@@ -558,17 +561,17 @@ func (this *Server) Start() {
 				// run the error callback.
 				for k, v := range GetServer().subConnectionIds {
 					if Utility.Contains(v, subConnectionId) {
-						if JS.GetJsRuntimeManager().GetVm(k) != nil {
-							JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
-						}
+						JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
 					}
 				}
 			}
-		}(errorCallback, subConnectionId, caller)
+		}(errorCallback, subConnectionId)
 
-		ping, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_)
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
 
-		GetServer().GetProcessor().m_pendingRequestChannel <- ping
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
 
 	})
 
@@ -591,35 +594,31 @@ func (this *Server) Start() {
 
 			subConnectionId := subConnection.GetUuid()
 
-			vm := JS.GetJsRuntimeManager().GetVm(connectionId)
-
 			// I will append the connection the session.
 			GetServer().appendSubConnectionId(connectionId, subConnectionId)
 
 			// Here I will create the connection object...
-			conn, err = vm.Run("new Connection()")
+			conn, err = JS.GetJsRuntimeManager().RunScript(connectionId, "new Connection()")
+			if err != nil {
+				log.Println("---------> error found!", err)
+			}
 
-			if err == nil {
-				// I will set the connection id.
-				conn.Object().Set("id", subConnectionId)
+			// I will set the connection id.
+			conn.Object().Set("id", subConnectionId)
 
-				// Set the connection in the caller.
-				service.Object().Set("conn", conn)
+			// Set the connection in the caller.
+			service.Object().Set("conn", conn)
 
-				// I will set the open callback.
-				_, err := vm.Run("Connection.prototype.onopen = " + openCallback)
-				if err != nil {
-					log.Println("-----> error!", err)
-				}
+			// I will set the open callback.
+			_, err = JS.GetJsRuntimeManager().RunScript(connectionId, "Connection.prototype.onopen = "+openCallback)
+			if err != nil {
+				log.Println("-----> error!", err)
+			}
 
-				// Now the close callback.
-				_, err = vm.Run("Connection.prototype.onclose = " + closeCallback)
-				if err != nil {
-					log.Println("-----> error!", err)
-				}
-
-			} else {
-				log.Println(err)
+			// Now the close callback.
+			_, err = JS.GetJsRuntimeManager().RunScript(connectionId, "Connection.prototype.onclose = "+closeCallback)
+			if err != nil {
+				log.Println("-----> error!", err)
 			}
 
 			// Keep the connection link...
@@ -631,33 +630,38 @@ func (this *Server) Start() {
 			params := make([]*MessageData, 0)
 			to := make([]connection, 1)
 			to[0] = subConnection
-			successCallback := func(connectionId string, conn otto.Value, service otto.Value, caller_ otto.Value) func(rspMsg *message, caller interface{}) {
+
+			successCallback := func(connectionId string, conn otto.Value, service otto.Value) func(rspMsg *message, caller interface{}) {
 				return func(rspMsg *message, caller interface{}) {
 					src := string(rspMsg.msg.Rsp.Results[0].DataBytes)
 					JS.GetJsRuntimeManager().AppendScript(src)
+					log.Println(src)
 					// Call on open...
-					conn.Object().Call("onopen", service, caller_)
+					conn.Object().Call("onopen", service, caller)
 				}
-			}(connectionId, conn, service, caller)
+			}(connectionId, conn, service)
 
 			errorCallback := func(rspMsg *message, caller interface{}) {
 				log.Println("GetServicesClientCode error!!!")
 			}
 
-			rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback)
-			GetServer().GetProcessor().m_pendingRequestChannel <- rqst
+			rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, caller)
+
+			go func(rqst *message) {
+				GetServer().GetProcessor().m_sendRequest <- rqst
+			}(rqst)
 
 			return conn
 
 		})
 
 	// Now I will create the empty session...
-	JS.GetJsRuntimeManager().CreateVm("")    // The anonymous session.
-	JS.GetJsRuntimeManager().InitScripts("") // Run the script for the default session.
+	JS.GetJsRuntimeManager().OpendSession("")           // The anonymous session.
+	JS.GetJsRuntimeManager().SetVar("", "server", this) // Set the server global variable.
+	JS.GetJsRuntimeManager().InitScripts("")            // Run the script for the default session.
 
 	// Test compile analyse...
-	JS.GetJsRuntimeManager().GetVm("").Set("server", this)
-	JS.GetJsRuntimeManager().GetVm("").Run("TestMessageContainer(1000)")
+	JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{500000})
 }
 
 /**

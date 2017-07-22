@@ -59,9 +59,6 @@ func (self *Action) sendResponse(result []*MessageData) {
  */
 func (self *Action) execute() {
 
-	// Remove the message from the pending message.
-	GetServer().GetProcessor().removePendingRequest(self.msg)
-
 	// That function use reflection to retreive the
 	// method to call on a given object.
 	x, errMsg := Utility.CallMethod(*self, self.Name, self.Params)
@@ -113,7 +110,6 @@ func (self *Action) RegisterListener(name string) {
 	if self.msg.from.IsOpen() {
 		listener := NewEventListener(name, self.msg.from)
 		GetServer().GetEventManager().AddEventListener(listener)
-		GetServer().GetProcessor().removePendingRequest(self.msg)
 	}
 }
 
@@ -122,14 +118,12 @@ func (self *Action) RegisterListener(name string) {
  */
 func (self *Action) UnregisterListener(name string) {
 	GetServer().GetEventManager().RemoveEventListener(self.msg.from.GetUuid(), name)
-	GetServer().GetProcessor().removePendingRequest(self.msg)
 }
 
 /**
  * The client must know it session id, it simply return it...
  */
 func (self *Action) GetSessionId() string {
-	GetServer().GetProcessor().removePendingRequest(self.msg)
 	if self.msg.from.IsOpen() {
 		return self.msg.from.GetUuid()
 	}

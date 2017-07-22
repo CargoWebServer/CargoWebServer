@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"code.myceliUs.com/Utility"
 )
 
@@ -135,9 +134,6 @@ func (this *SessionManager) removeClosedSession() {
 }
 
 func (this *SessionManager) closeSession_(session *CargoEntities.Session) *CargoEntities.Error {
-
-	// Remove the JS session
-	JS.GetJsRuntimeManager().CloseSession(session.GetId())
 
 	// Delete the session entity
 	sessionEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(session.UUID, false)

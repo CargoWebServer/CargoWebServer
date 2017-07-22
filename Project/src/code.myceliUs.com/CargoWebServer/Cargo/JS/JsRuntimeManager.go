@@ -8,12 +8,15 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"code.myceliUs.com/Utility"
 	"github.com/robertkrimen/otto"
 	_ "github.com/robertkrimen/otto/underscore"
 )
+
+/////////////////////////////////////////////////////////////////////////////
+// Structures used by channel.
+/////////////////////////////////////////////////////////////////////////////
 
 /**
  * That structure is use to manipulate Javacsript function call infromations.
@@ -30,6 +33,27 @@ type JsFunctionInfos struct {
 	m_err     error
 }
 
+/**
+ * That structure is use to put variable information inside channels.
+ */
+type JsVarInfos struct {
+	m_name string
+	m_val  interface{}
+}
+
+/**
+ * Wrap operation information...
+ */
+type OperationInfos struct {
+	m_params  map[string]interface{}
+	m_returns chan ([]interface{})
+}
+
+/**
+ * Operation chan
+ */
+type OperationChannel chan (OperationInfos)
+
 var (
 	jsRuntimeManager *JsRuntimeManager
 )
@@ -39,37 +63,119 @@ var (
  * via javascript...
  */
 type JsRuntimeManager struct {
-	/** Where the script are **/
+	/** The directory where the script is store (recursive) **/
 	m_searchDir string
 
-	/** Contain the scripts source **/
+	/** Contain all script. **/
 	m_scripts []string
 
-	/** One js interpreter by session */
+	/** Each connection has it own VM. */
 	m_sessions map[string]*otto.Otto
 
-	/** Each session has it own channel **/
-	m_channels map[string]chan (JsFunctionInfos)
-
-	/** a list of function define in cargo to inject in the VM. **/
+	/** Go function interfaced in JS. **/
 	m_functions map[string]interface{}
 
-	/**
-	 * Use to protected the entitiesMap access...
-	 */
-	sync.RWMutex
+	/**Channel use for communication with vm... **/
+
+	// Script channels
+	m_appendScript OperationChannel
+	m_initScripts  OperationChannel
+
+	// Open/Close channel.
+	m_createVm OperationChannel
+	m_closeVm  OperationChannel
+
+	// JS channel
+	m_setVariable       map[string]OperationChannel
+	m_executeJsFunction map[string]OperationChannel
+	m_stopVm            map[string]chan (bool)
 }
 
 func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
-	// assign memory...
+	// The singleton.
 	jsRuntimeManager = new(JsRuntimeManager)
+
+	// The dir where the js file are store on the server side.
 	jsRuntimeManager.m_searchDir = searchDir
+
+	// List of vm one per connection.
 	jsRuntimeManager.m_sessions = make(map[string]*otto.Otto)
+
+	// List of functions.
 	jsRuntimeManager.m_functions = make(map[string]interface{})
-	jsRuntimeManager.m_channels = make(map[string]chan (JsFunctionInfos))
+
+	// Initialisation of channel's.
+	jsRuntimeManager.m_appendScript = make(OperationChannel)
+	jsRuntimeManager.m_initScripts = make(OperationChannel)
+	jsRuntimeManager.m_closeVm = make(OperationChannel)
+	jsRuntimeManager.m_createVm = make(OperationChannel)
+
+	// Create one channel by vm to set variable.
+	jsRuntimeManager.m_setVariable = make(map[string]OperationChannel)
+	jsRuntimeManager.m_executeJsFunction = make(map[string]OperationChannel)
+	jsRuntimeManager.m_stopVm = make(map[string]chan (bool))
 
 	// Load the script from the script repository...
-	jsRuntimeManager.AppendScriptFiles()
+	jsRuntimeManager.appendScriptFiles()
+
+	// That function will process api call's
+	go func(jsRuntimeManager *JsRuntimeManager) {
+		for {
+			select {
+			case operationInfos := <-jsRuntimeManager.m_appendScript:
+				callback := operationInfos.m_returns
+				script := operationInfos.m_params["script"].(string)
+				jsRuntimeManager.appendScript(script)
+				callback <- []interface{}{true} // unblock the channel...
+			case operationInfos := <-jsRuntimeManager.m_initScripts:
+				callback := operationInfos.m_returns
+				sessionId := operationInfos.m_params["sessionId"].(string)
+				log.Println("-----> init script: ", sessionId)
+				jsRuntimeManager.initScripts(sessionId)
+				callback <- []interface{}{true} // unblock the channel...
+			case operationInfos := <-jsRuntimeManager.m_createVm:
+				callback := operationInfos.m_returns
+				sessionId := operationInfos.m_params["sessionId"].(string)
+				jsRuntimeManager.createVm(sessionId)
+				jsRuntimeManager.m_setVariable[sessionId] = make(OperationChannel)
+				jsRuntimeManager.m_executeJsFunction[sessionId] = make(OperationChannel)
+				jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
+				// The vm processing loop...
+				go func(vm *otto.Otto, setVariable OperationChannel, executeJsFunction OperationChannel, stopVm chan (bool)) {
+					for {
+						select {
+						case operationInfos := <-setVariable:
+							callback := operationInfos.m_returns
+							varInfos := operationInfos.m_params["varInfos"].(JsVarInfos)
+							vm.Set(varInfos.m_name, varInfos.m_val)
+							callback <- []interface{}{true} // unblock the channel...
+						case operationInfos := <-executeJsFunction:
+							callback := operationInfos.m_returns
+							jsFunctionInfos := operationInfos.m_params["jsFunctionInfos"].(JsFunctionInfos)
+							vm.Set("messageId", jsFunctionInfos.m_messageId)
+							jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
+							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
+						case stop := <-stopVm:
+							// clear ressource here...
+							if stop {
+								log.Println("-----> vm: ", sessionId, " is now removed!")
+								return // exit the loop.
+							}
+						}
+					}
+				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_stopVm[sessionId])
+				callback <- []interface{}{true} // unblock the channel...
+
+			case operationInfos := <-jsRuntimeManager.m_closeVm:
+				callback := operationInfos.m_returns
+				sessionId := operationInfos.m_params["sessionId"].(string)
+				log.Println("-----> remove vm: ", sessionId)
+				jsRuntimeManager.m_stopVm[sessionId] <- true // send kill
+				jsRuntimeManager.removeVm(sessionId)
+				callback <- []interface{}{true} // unblock the channel...
+			}
+		}
+	}(jsRuntimeManager)
 
 	return jsRuntimeManager
 }
@@ -78,100 +184,13 @@ func GetJsRuntimeManager() *JsRuntimeManager {
 	return jsRuntimeManager
 }
 
-/**
- * Return the current vm for a given session.
- */
-func (this *JsRuntimeManager) CreateVm(sessionId string) *otto.Otto {
-	// Protectect the map access...
-	this.Lock()
-	defer this.Unlock()
-
-	// Create a new js interpreter for the given session.
-	this.m_sessions[sessionId] = otto.New()
-	this.m_sessions[sessionId].Set("sessionId", sessionId)
-
-	this.m_channels[sessionId] = make(chan (JsFunctionInfos)) // open it channel.
-
-	// I will start a process loop here. It will run until the vm is open.
-	go func(sessionId string, channel chan (JsFunctionInfos)) {
-		// I will get the vm...
-		vm := GetJsRuntimeManager().GetVm(sessionId)
-		for vm != nil {
-			select {
-			case jsFunctionInfos := <-channel:
-				log.Println("----------> received message on channel", jsFunctionInfos.m_messageId)
-				vm := this.GetVm(sessionId)
-
-				// Set the current session id.
-				vm.Set("messageId", jsFunctionInfos.m_messageId)
-				// TODO set the answer here...
-
-				channel <- jsFunctionInfos
-			}
-		}
-
-		// remove the channel and release it ressources.
-
-	}(sessionId, this.m_channels[sessionId])
-
-	return this.m_sessions[sessionId]
-}
-
-/**
- * Init script.
- */
-func (this *JsRuntimeManager) InitScripts(sessionId string) {
-	// Compile the list of script...
-	for i := 0; i < len(this.m_scripts); i++ {
-		script, err := this.m_sessions[sessionId].Compile("", this.m_scripts[i])
-		if err == nil {
-			if this.m_sessions[sessionId] != nil {
-				this.m_sessions[sessionId].Run(script)
-				if err != nil {
-					log.Println("runtime script compilation error:", script, err)
-				} else {
-					//log.Println(sessionId, " Load: ", this.m_scripts[i])
-				}
-			}
-		} else {
-			log.Println("-------> error in script: ", this.m_scripts[i])
-			log.Println(err)
-		}
-	}
-
-	// Set the list of binded function.
-	for name, function := range this.m_functions {
-		this.m_sessions[sessionId].Set(name, function)
-	}
-}
-
-/**
- * Return the current vm for a given session.
- */
-func (this *JsRuntimeManager) GetVm(sessionId string) *otto.Otto {
-	// Protectect the map access...
-	this.Lock()
-	defer this.Unlock()
-
-	// If the vm exist, i will simply return the vm...
-	if vm, ok := this.m_sessions[sessionId]; ok {
-		return vm
-	}
-
-	return nil
-}
-
-func (this *JsRuntimeManager) CloseSession(sessionId string) {
-	// Protectect the map access...
-	this.Lock()
-	defer this.Unlock()
-
-	// simply remove the js interpreter...
-	delete(this.m_sessions, sessionId)
-}
+/////////////////////////////////////////////////////////////////////////////
+// Initialisation relatead functions
+/////////////////////////////////////////////////////////////////////////////
 
 /** Append all scripts **/
-func (this *JsRuntimeManager) AppendScriptFiles() error {
+func (this *JsRuntimeManager) appendScriptFiles() error {
+
 	fileList := []string{}
 	err := filepath.Walk(this.m_searchDir, func(path string, f os.FileInfo, err error) error {
 		fileList = append(fileList, path)
@@ -181,7 +200,7 @@ func (this *JsRuntimeManager) AppendScriptFiles() error {
 	for _, file := range fileList {
 		// Only .js are valid extension here...
 		if strings.HasSuffix(file, ".js") {
-			err = this.AppendScriptFile(file)
+			err = this.appendScriptFile(file)
 			if err != nil {
 				return err
 			}
@@ -191,17 +210,9 @@ func (this *JsRuntimeManager) AppendScriptFiles() error {
 }
 
 /**
- * Append function in the JS.
- */
-func (this *JsRuntimeManager) AppendFunction(name string, function interface{}) {
-	// I will compile the script and set it in each session...
-	this.m_functions[name] = function
-}
-
-/**
  * Compile and run a given script...
  */
-func (this *JsRuntimeManager) AppendScriptFile(filePath string) error {
+func (this *JsRuntimeManager) appendScriptFile(filePath string) error {
 	log.Println("Append script file ", filePath)
 	srcFile, err := os.Open(filePath)
 	if err != nil {
@@ -213,12 +224,16 @@ func (this *JsRuntimeManager) AppendScriptFile(filePath string) error {
 	buf := bytes.NewBuffer(nil)
 	io.Copy(buf, srcFile)
 	src := string(buf.Bytes())
-	this.AppendScript(src)
+	this.appendScript(src)
 
 	return err
 }
 
-func (this *JsRuntimeManager) AppendScript(src string) {
+/**
+ * Append a script and initialyse all vm with it.
+ */
+func (this *JsRuntimeManager) appendScript(src string) {
+
 	if Utility.Contains(this.m_scripts, src) == false {
 		this.m_scripts = append(this.m_scripts, src)
 	}
@@ -233,8 +248,63 @@ func (this *JsRuntimeManager) AppendScript(src string) {
 		} else {
 			//log.Println(sessionId, " Load: ", this.m_scripts[i])
 		}
-
 	}
+}
+
+/**
+ * Initialisation of script for a newly created session.
+ */
+func (this *JsRuntimeManager) initScripts(sessionId string) {
+	// Get the vm.
+	vm := this.m_sessions[sessionId]
+
+	// Compile the list of script...
+	for i := 0; i < len(this.m_scripts); i++ {
+		script, err := vm.Compile("", this.m_scripts[i])
+		if err == nil {
+			vm.Run(script)
+			if err != nil {
+				log.Println("runtime script compilation error:", script, err)
+			} else {
+				//log.Println(sessionId, " Load: ", this.m_scripts[i])
+			}
+
+		} else {
+			log.Println("-------> error in script: ", this.m_scripts[i])
+			log.Println(err)
+		}
+	}
+
+	// Set the list of binded function.
+	for name, function := range this.m_functions {
+		vm.Set(name, function)
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// VM
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+ *  Create a new VM for a given session id.
+ */
+func (this *JsRuntimeManager) createVm(sessionId string) {
+	// Create a new js interpreter for the given session.
+	this.m_sessions[sessionId] = otto.New()
+
+	// Put the sessionId variable on the global scope.
+	this.m_sessions[sessionId].Set("sessionId", sessionId)
+}
+
+/**
+ *  Create a new VM for a given session id.
+ */
+func (this *JsRuntimeManager) removeVm(sessionId string) {
+	// Remove vm ressources.
+	delete(this.m_sessions, sessionId)
+	delete(this.m_executeJsFunction, sessionId)
+	delete(this.m_setVariable, sessionId)
+	delete(this.m_stopVm, sessionId)
 }
 
 /**
@@ -262,12 +332,18 @@ func (this *JsRuntimeManager) executeJsFunction(vm *otto.Otto, functionStr strin
 	if endIndex != -1 {
 		functionName = strings.TrimSpace(functionStr[startIndex:endIndex])
 		if len(functionName) == 0 {
-			functionName = "fct_" + strings.Replace(Utility.RandomUUID(), "-", "_", -1)
+			functionName = "fct_" + strings.Replace(Utility.GenerateUUID(functionStr), "-", "_", -1)
 			functionStr = "function " + functionName + strings.TrimSpace(functionStr)[8:]
 		}
-		_, err = vm.Run(functionStr)
-		if err != nil {
-			log.Println("Error in code of ", functionName)
+		script, err := vm.Compile("", functionStr)
+		if err == nil {
+			_, err = vm.Run(script)
+			if err != nil {
+				log.Println("fail to run ", functionStr)
+				return nil, err
+			}
+		} else {
+			log.Println("fail to compile  ", functionStr)
 			return nil, err
 		}
 	} else {
@@ -297,22 +373,72 @@ func (this *JsRuntimeManager) executeJsFunction(vm *otto.Otto, functionStr strin
 		log.Println("Src ", functionStr)
 		return nil, err_.(error)
 	}
+
 	// Return the result if there is one...
 	val, err := result.(otto.Value).Export()
 	if err != nil {
+		log.Panicln("---------> error ", err)
 		return nil, err
 	}
 
 	// Append val to results...
 	results = append(results, val)
 
+	return
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Api
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Append function in the JS, must be call before the js is started.
+ */
+func (this *JsRuntimeManager) AppendFunction(name string, function interface{}) {
+	// I will compile the script and set it in each session...
+	this.m_functions[name] = function
+}
+
+/**
+ * Run given script for a given session. Must be call from inside the JS routine.
+ */
+func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.Value, error) {
+	results, err := this.m_sessions[sessionId].Run(script)
 	return results, err
+}
+
+/**
+ * Append a script to all VM's
+ */
+func (this *JsRuntimeManager) AppendScript(script string) {
+
+	var op OperationInfos
+	op.m_params = make(map[string]interface{})
+	op.m_params["script"] = script
+	op.m_returns = make(chan ([]interface{}))
+
+	this.m_appendScript <- op
+
+	// wait for completion
+	<-op.m_returns
+}
+
+func (this *JsRuntimeManager) InitScripts(sessionId string) {
+	var op OperationInfos
+	op.m_params = make(map[string]interface{})
+	op.m_params["sessionId"] = sessionId
+	op.m_returns = make(chan ([]interface{}))
+
+	this.m_initScripts <- op
+
+	// wait for completion
+	<-op.m_returns
 }
 
 /**
  * Append and excute a javacript function on the JS...
  */
-func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId string, functionStr string, functionParams []interface{}) (results []interface{}, err error) {
+func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId string, functionStr string, functionParams []interface{}) ([]interface{}, error) {
 	// Set the function on the JS runtime...
 
 	// Put function call information into a struct.
@@ -322,14 +448,65 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
 	jsFunctionInfos.m_functionStr = functionStr
 	jsFunctionInfos.m_functionParams = functionParams
 
-	log.Println("----------> 307")
-	this.m_channels[sessionId] <- jsFunctionInfos
+	var op OperationInfos
+	op.m_params = make(map[string]interface{})
+	op.m_params["jsFunctionInfos"] = jsFunctionInfos
+	op.m_returns = make(chan ([]interface{}))
 
-	log.Println("----------> 309")
-	jsFunctionInfos = <-this.m_channels[sessionId]
+	this.m_executeJsFunction[sessionId] <- op
 
-	// with the answer...
-	log.Println("----------> 310", jsFunctionInfos.m_messageId)
+	// wait for completion
+	results := <-op.m_returns
 
-	return
+	return results[0].(JsFunctionInfos).m_results, results[0].(JsFunctionInfos).m_err
+}
+
+/**
+ * Run given script for a given session.
+ */
+func (this *JsRuntimeManager) SetVar(sessionId string, name string, val interface{}) {
+	// Protectect the map access...
+	var info JsVarInfos
+	info.m_name = name
+	info.m_val = val
+
+	var op OperationInfos
+	op.m_params = make(map[string]interface{})
+	op.m_params["varInfos"] = info
+	op.m_returns = make(chan ([]interface{}))
+
+	this.m_setVariable[sessionId] <- op
+
+	// wait for completion
+	<-op.m_returns
+}
+
+/**
+ * Open a new session on the server.
+ */
+func (this *JsRuntimeManager) OpendSession(sessionId string) {
+	var op OperationInfos
+	op.m_params = make(map[string]interface{})
+	op.m_params["sessionId"] = sessionId
+	op.m_returns = make(chan ([]interface{}))
+
+	this.m_createVm <- op
+
+	// wait for completion
+	<-op.m_returns
+}
+
+/**
+ * Close a given session.
+ */
+func (this *JsRuntimeManager) CloseSession(sessionId string) {
+	// Send message to stop vm...
+	var op OperationInfos
+	op.m_params = make(map[string]interface{})
+	op.m_params["sessionId"] = sessionId
+	op.m_returns = make(chan ([]interface{}))
+	this.m_closeVm <- op
+
+	// wait for completion
+	<-op.m_returns
 }

@@ -6,7 +6,7 @@ var sessionId = ""
  */
 var Connection = function(){
 	this.id = "" // The connection on the server side.
-
+    console.log("-------------> create new connection!")
 	return this;
 }
 

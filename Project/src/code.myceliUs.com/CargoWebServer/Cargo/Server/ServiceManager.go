@@ -287,9 +287,9 @@ func (this *ServiceManager) registerServiceContainerActions(config *Config.Servi
 		log.Println("--------> error: 207 ", errStr)
 	}
 
-	rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_)
+	rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, nil)
 
-	GetServer().GetProcessor().m_pendingRequestChannel <- rqst
+	GetServer().GetProcessor().m_sendRequest <- rqst
 
 	// Close the connection.
 	//conn.Close()

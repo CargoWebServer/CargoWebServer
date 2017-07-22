@@ -142,7 +142,7 @@ QString ServiceContainer::GetServicesClientCode(){
                 clientCode += ", " + callbacks[i];
             }
 
-            clientCode += "){\n";
+            clientCode += ", caller){\n";
             // Now the function body...
             clientCode +=  "    var params = []\n";
             QString serverCodeFunctionCall = className + "." +(*it).toObject()["name"].toString() + "(";
@@ -204,7 +204,7 @@ QString ServiceContainer::GetServicesClientCode(){
                     caller += ",";
                 }
             }
-            caller += "}";
+            caller += ", \"caller\":caller}";
 
             if(callbacks.contains("successCallback")){
                 clientCode +=  "    , function(results, caller){ //Success Callback\n";

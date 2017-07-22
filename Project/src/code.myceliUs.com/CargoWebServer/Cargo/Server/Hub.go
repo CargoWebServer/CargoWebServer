@@ -92,12 +92,13 @@ func (this *Hub) run() {
 			// initialyse js interpreter for the new connection.
 			if c.GetPort() == GetServer().GetConfigurationManager().GetServerPort() {
 
-				vm := JS.GetJsRuntimeManager().CreateVm(c.GetUuid())
+				// Open a new session
+				JS.GetJsRuntimeManager().OpendSession(c.GetUuid())
 
-				// put server object in it context.
-				vm.Set("server", GetServer())
+				// Set the server global variable.
+				JS.GetJsRuntimeManager().SetVar(c.GetUuid(), "server", GetServer())
 
-				// Init scripts
+				// Init all scripts for the new session VM
 				JS.GetJsRuntimeManager().InitScripts(c.GetUuid())
 			}
 

@@ -24,7 +24,7 @@ function TestMessageContainer(count) {
 					// Error Callback
 					function (errObj, caller) {
 
-					}, i)
+					}, {})
 			}
 		},
 		// onCloseConnectionCallback

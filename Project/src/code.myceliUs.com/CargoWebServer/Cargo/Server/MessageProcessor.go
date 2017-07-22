@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	//	"time"
+	"time"
 
 	"code.myceliUs.com/Utility"
 )
@@ -25,19 +25,16 @@ type MessageProcessor struct {
 	// The message to be sent..
 	m_outgoingChannel chan *message
 
-	// The pending message.
-	m_pendingRequestChannel chan *message
-
 	// This map will contain chunk of message larger
 	// than the allow transfert size.
 	m_pendingMsgChunk map[string][][]byte
-
-	// The pending request will keep the request in memory
-	// before a response will be receive.
-	m_pendingRequest map[string]*message
-
 	// The message(s) that waiting for response.
 	m_pendingMsg map[string][]*message
+
+	// serialyse request sending...
+	m_sendRequest            chan *message
+	m_receiveRequestResponse chan *message
+	m_receiveRequestError    chan *message
 
 	/**
 	 * Use to protected the entitiesMap access.
@@ -57,10 +54,12 @@ func newMessageProcessor() *MessageProcessor {
 	// Outgoing message channel
 	p.m_outgoingChannel = make(chan *message)
 
-	// Pending message.
-	p.m_pendingRequest = make(map[string]*message)
-	p.m_pendingRequestChannel = make(chan *message)
+	// Request channel's
+	p.m_sendRequest = make(chan *message)
+	p.m_receiveRequestResponse = make(chan *message)
+	p.m_receiveRequestError = make(chan *message)
 
+	// Pending message.
 	p.m_pendingMsg = make(map[string][]*message)
 	p.m_pendingMsgChunk = make(map[string][][]byte)
 
@@ -70,28 +69,58 @@ func newMessageProcessor() *MessageProcessor {
 }
 
 func (this *MessageProcessor) run() {
+
+	// Request processing...
+	go func(outgoingChannel chan (*message), sendRequest chan (*message), receiveRequestResponse chan (*message), receiveRequestError chan (*message)) {
+
+		// Keep track of pending request here...
+		var pendingRequest = make(map[string]*message)
+
+		for {
+			select {
+			case m := <-sendRequest:
+				pendingRequest[*m.msg.Rqst.Id] = m
+				this.m_outgoingChannel <- m
+
+			case m := <-receiveRequestResponse:
+				// Here I will execute the successCallback if some is define.
+				rqst := pendingRequest[m.GetId()]
+				if rqst != nil {
+					// Remove the request from the list.
+					delete(pendingRequest, m.GetId())
+					if rqst.successCallback != nil {
+						// Call the success callback.
+						rqst.successCallback(m, rqst.caller)
+					}
+				}
+
+			case m := <-receiveRequestError:
+				rqst := pendingRequest[m.GetId()]
+				if rqst != nil {
+					delete(pendingRequest, m.GetId())
+					if rqst.errorCallback != nil {
+						// Call the error callback.
+						rqst.errorCallback(m, rqst.caller)
+					}
+				}
+			}
+		}
+	}(this.m_outgoingChannel, this.m_sendRequest, this.m_receiveRequestResponse, this.m_receiveRequestError)
+
 	for {
 		select {
 		case m := <-this.m_incomingChannel:
 			// Process the incomming message.
 			go this.processIncomming(m)
-			//log.Println("--------> receive message ", m.GetId())
 		case m := <-this.m_outgoingChannel:
 			// Process the outgoing message.
 			go this.processOutgoing(m)
-			//log.Println("--------> send message ", len(this.m_pendingRequest), m.GetId())
-		case m := <-this.m_pendingRequestChannel:
-			// Process the pending message.
-			go this.appendPendingRequest(m)
-			//log.Println("------------> append pending request: ", m.GetId())
 		case done := <-this.abortedByEnvironment:
 			if done {
 				return
 			}
 		default:
-			//time.Sleep(1 * time.Millisecond)
-
-			//log.Println("--------> number of request to be process ", len(this.m_pendingRequest))
+			time.Sleep(1 * time.Millisecond)
 		}
 	}
 }
@@ -107,69 +136,12 @@ func getMaxMessageSize() int {
 // Synchronize access function.
 //////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////// Request functions //////////////////////////////////
-func (this *MessageProcessor) setPendingRequest(m *message) {
-	this.Lock()
-	defer this.Unlock()
-
-	//log.Println("append pending request with id ", m.GetId())
-	this.m_pendingRequest[*m.msg.Rqst.Id] = m
-
-}
-
-/**
- * Always use that function to process a request, don't send the request
- * directly with the connection.
- */
-func (this *MessageProcessor) appendPendingRequest(m *message) {
-	this.Lock()
-	defer this.Unlock()
-
-	// I will keep the reference to the request to be able
-	// to made the action later.
-	this.m_pendingRequest[*m.msg.Rqst.Id] = m
-	this.m_outgoingChannel <- m
-}
-
-/**
- * Get the pending request with is id.
- */
-func (this *MessageProcessor) getPendingRequestById(id string) *message {
-	this.Lock()
-	defer this.Unlock()
-	return this.m_pendingRequest[id]
-}
-
-/**
- * The map of pending request. Each action is reponsible
- * to remove it pending request from that map.
- */
-func (this *MessageProcessor) isPendingRequestExist(m *message) bool {
-
-	if this.getPendingRequestById(m.GetId()) != nil {
-		return true
-	}
-	return false
-}
-
-/**
- * When the request is process the message can be remove from the pending request.
- */
-func (this *MessageProcessor) removePendingRequest(m *message) {
-	this.Lock()
-	defer this.Unlock()
-	delete(this.m_pendingRequest, m.GetId())
-}
-
 ////////////////////////////////  Response function //////////////////////////////
 /**
  * Always use that function to process a response, don't send the resonponse
  * directly with the connection.
  */
 func (this *MessageProcessor) appendResponse(m *message) {
-	this.Lock()
-	defer this.Unlock()
-
 	// I will keep the reference to the request to be able
 	// to made the action later.
 	this.m_outgoingChannel <- m
@@ -326,9 +298,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
 		// I will create the new action
 		a := newAction(msg.GetRqst().GetMethod(), m)
 
-		// append the message to the pending request.
-		this.setPendingRequest(m)
-
 		// Now the parameters.
 		for _, param := range msg.GetRqst().GetParams() {
 
@@ -425,9 +394,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
 
 		go a.execute()
 
-		// Execute in it own goroutine.
-		this.removePendingRequest(m)
-
 	} else if *msg.Type == Message_RESPONSE {
 		// If the response is in the pending message I will process the next message.
 		if this.isPending(msg.Rsp.GetId()) {
@@ -435,30 +401,14 @@ func (this *MessageProcessor) processIncomming(m *message) {
 			this.processPendingMessage(msg.Rsp.GetId())
 		} else {
 			// Here I received a response from the client so I will process it.
-			rqst := this.getPendingRequestById(msg.Rsp.GetId())
-			if rqst != nil {
-				//log.Println("The response for message ", rqst.GetId(), " was succefully received!")
-				this.removePendingRequest(rqst)
-
-				// Here I will execute the successCallback if some is define.
-				if rqst.successCallback != nil {
-					// Call the successCallback.
-					rqst.successCallback(m, rqst.caller)
-				}
-			} else {
-				log.Panicln("-------------> no request found for response ", msg.Rsp.GetId())
-			}
+			this.m_receiveRequestResponse <- m
 		}
 
 	} else if *msg.Type == Message_ERROR {
 		// An error was encounter by the client.
 		// here error was received.
-		rqst := this.getPendingRequestById(msg.Err.GetId())
-		if rqst != nil {
-			if rqst.errorCallback != nil {
-				rqst.errorCallback(m, rqst.caller)
-			}
-		}
+		this.m_receiveRequestError <- m
+
 	} else if *msg.Type == Message_EVENT {
 
 		// When the client throw an event this is the place where
@@ -530,15 +480,7 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 	if *m.msg.Type == Message_REQUEST || *m.msg.Type == Message_RESPONSE {
 		if len(m.GetBytes()) < maxSize {
 			for i := 0; i < len(m.to); i++ {
-				if *m.msg.Type == Message_REQUEST {
-					// Request will be put in a stack (one by connection) and
-					// send one by one...
-					m.to[i].Send(m.GetBytes())
-				} else {
-					// In case of response I will send it directly.
-					m.to[i].Send(m.GetBytes())
-				}
-
+				m.to[i].Send(m.GetBytes())
 			}
 		} else {
 			// so here I will split the message in multiple part
