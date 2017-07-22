@@ -655,13 +655,13 @@ func (this *Server) Start() {
 
 		})
 
-	// Now I will create the empty session...
+	// Now I will create the anonymous session...
 	JS.GetJsRuntimeManager().OpendSession("")           // The anonymous session.
 	JS.GetJsRuntimeManager().SetVar("", "server", this) // Set the server global variable.
 	JS.GetJsRuntimeManager().InitScripts("")            // Run the script for the default session.
 
 	// Test compile analyse...
-	JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{500000})
+	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{50})
 }
 
 /**

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
-	//	"code.myceliUs.com/Utility"
+	"code.myceliUs.com/Utility"
 )
 
 type Hub struct {
@@ -40,7 +40,7 @@ func NewHub() *Hub {
 
 	// So here I will send empty message to keep socket alive
 	// and clear the session if the connection is close...
-	/*h.ticker = time.NewTicker(time.Millisecond * 2000)
+	h.ticker = time.NewTicker(time.Millisecond * 2000)
 
 	go func() {
 		for t := range h.ticker.C {
@@ -60,13 +60,15 @@ func NewHub() *Hub {
 							//log.Println("error!!!")
 						}
 
-						ping, err := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback)
+						rqst, err := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
 
 						if err != nil {
 							log.Println(err, " at time ", t)
 							conn.Close() // Here I will close the connection.
 						} else {
-							GetServer().GetProcessor().m_pendingRequestChannel <- ping
+							go func(rqst *message) {
+								GetServer().GetProcessor().m_sendRequest <- rqst
+							}(rqst)
 						}
 
 					} else {
@@ -77,7 +79,7 @@ func NewHub() *Hub {
 				}
 			}
 		}
-	}()*/
+	}()
 
 	return h
 }

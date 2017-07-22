@@ -70,7 +70,7 @@ func newMessageProcessor() *MessageProcessor {
 
 func (this *MessageProcessor) run() {
 
-	// Request processing...
+	// Request processing when the server act as client to other server (service)...
 	go func(outgoingChannel chan (*message), sendRequest chan (*message), receiveRequestResponse chan (*message), receiveRequestError chan (*message)) {
 
 		// Keep track of pending request here...
@@ -107,6 +107,7 @@ func (this *MessageProcessor) run() {
 		}
 	}(this.m_outgoingChannel, this.m_sendRequest, this.m_receiveRequestResponse, this.m_receiveRequestError)
 
+	// Main message processing loop...
 	for {
 		select {
 		case m := <-this.m_incomingChannel:
@@ -120,7 +121,7 @@ func (this *MessageProcessor) run() {
 				return
 			}
 		default:
-			time.Sleep(1 * time.Millisecond)
+			time.Sleep(1 * time.Millisecond) // Cpu release...
 		}
 	}
 }
