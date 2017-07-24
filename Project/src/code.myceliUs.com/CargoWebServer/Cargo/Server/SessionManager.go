@@ -134,7 +134,6 @@ func (this *SessionManager) removeClosedSession() {
 }
 
 func (this *SessionManager) closeSession_(session *CargoEntities.Session) *CargoEntities.Error {
-
 	// Delete the session entity
 	sessionEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(session.UUID, false)
 
@@ -264,6 +263,7 @@ func (this *SessionManager) OnEvent(evt interface{}) {
 // @param {callback} errorCallback In case of error.
 func (this *SessionManager) Login(accountName string, psswd string, serverId string, messageId string, sessionId string) *CargoEntities.Session {
 
+	log.Println("---------------> session Id ", sessionId)
 	var session *CargoEntities.Session
 	accountUuid := CargoEntitiesAccountExists(accountName)
 

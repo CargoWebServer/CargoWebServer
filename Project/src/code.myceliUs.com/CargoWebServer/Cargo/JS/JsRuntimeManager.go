@@ -153,6 +153,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 							callback := operationInfos.m_returns
 							jsFunctionInfos := operationInfos.m_params["jsFunctionInfos"].(JsFunctionInfos)
 							vm.Set("messageId", jsFunctionInfos.m_messageId)
+							vm.Set("sessionId", jsFunctionInfos.m_sessionId)
 							jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
 							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
 						case stop := <-stopVm:
