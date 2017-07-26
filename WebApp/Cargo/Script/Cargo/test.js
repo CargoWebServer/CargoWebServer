@@ -9,23 +9,29 @@ function TestMessageContainer(count) {
 	// Initialyse the server connection.
 	service.init(
 		// onOpenConnectionCallback
-		function (service, caller) {
-			console.log("Try to Send " + caller + " message to the service container")
+		function (service, count) {
+			console.log("Try to Send " + count + " message to the service container")
 			var sayHello = new com.mycelius.SayHelloInterface(service)
+			var callback = function (sayHello) {
+				return function (index, count) {
+					console.log("---> send message "+ index)
+					sayHello.sayHelloTo("message " + index,
+						// Success Callback
+						function (result, caller) {
+							console.log("------> Receive message ", result)
+							var index = caller.index + 1
+							if (caller.index  < caller.count) {
+								caller.callback(index, count)
+							}
+						},
+						// Error Callback
+						function (errObj, caller) {
+						}, { "index": index, "count": count, "callback": callback })
+				}
+			} (sayHello)
 
-			for (var i = 0; i < caller; i++) {
-				console.log("----------------> send message: ---> ", i)
-				// Call say hello. 
-				sayHello.sayHelloTo("message " + i,
-					// Success Callback
-					function (result, caller) {
-						console.log("------> success!", result)
-					},
-					// Error Callback
-					function (errObj, caller) {
-
-					}, {})
-			}
+			/* Start the recursive loop... */
+			callback(0, count)
 		},
 		// onCloseConnectionCallback
 		function () {

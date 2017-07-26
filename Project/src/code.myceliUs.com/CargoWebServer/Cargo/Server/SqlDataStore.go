@@ -570,6 +570,8 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 		}
 	}
 
+	//log.Println("=----------> params: ", params)
+
 	// TODO Try to figure out why the connection is lost...
 	// Lost of connection so I will reconnect anyway...
 	//this.Connect()

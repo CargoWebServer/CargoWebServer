@@ -103,6 +103,8 @@ func (this *MessageProcessor) run() {
 						rqst.errorCallback(m, rqst.caller)
 					}
 				}
+			default:
+				time.Sleep(1 * time.Millisecond) // Cpu release...
 			}
 		}
 	}(this.m_outgoingChannel, this.m_sendRequest, this.m_receiveRequestResponse, this.m_receiveRequestError)

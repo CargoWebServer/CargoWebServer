@@ -64,6 +64,14 @@ Data_JSON_STR = 4
  */
 Data_BOOLEAN = 5
 
+/**
+ * The JSON functions...
+ */
+var JSON = {}
+
+JSON.stringify = function(obj){
+    return stringify(obj)
+}
 
 /**
  * Creates a new RpcData.
@@ -91,17 +99,12 @@ function createRpcData(variable, variableType, variableName, typeName) {
         typeName = "[]unit8"
     } else if (variableType == "JSON_STR") {
         variableType = Data_JSON_STR
-        if (variable.stringify != undefined) {
-            variableType = Data_JSON_STR
-            typeName = variable.TYPENAME
-            variable = variable.stringify()
-        } else {
-            variable = JSON.stringify(variable)
-        }
+        typeName = "Object"
     } else if (variableType == "BOOLEAN") {
         variableType = Data_BOOLEAN
         typeName = "bool"
     } else {
+        console.log("undefined type: ", variableType, "for", variable)
         return undefined
     }
 

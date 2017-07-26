@@ -15,19 +15,9 @@ QByteArray serializeToByteArray(google::protobuf::Message *msg){
 }
 
 /**
- * @brief writelen Write the len of the flowing message to be read in the buffer.
- * @param soc The socket where to write the message in
- * @param len The calculated length of the message.
- */
-void writelen(QAbstractSocket *soc,uint32_t len){
-    soc->write((char*)&len,4);
-}
-
-/**
  * @brief Session::MAX_MESSAGE_SIZE The size must be the same on both side of the socket.
  */
 int Session::MAX_MESSAGE_SIZE = 17739;
-
 
 void Session::processIncommingMessage(com::mycelius::message::Message& msg){
 
@@ -56,9 +46,6 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
             }else if(param.type() == ::com::mycelius::message::Data_DataType_BOOLEAN){
                 var = QVariant(param.databytes().c_str()).toBool();
                 action->appendParam(QString::fromStdString(param.name()), var, "bool");
-            }else if(param.type() == ::com::mycelius::message::Data_DataType_STRING){
-                var = QVariant(param.databytes().c_str());
-                action->appendParam(QString::fromStdString(param.name()), var, "QString");
             }else if(param.type() == ::com::mycelius::message::Data_DataType_BYTES){
                 var = QVariant(QByteArray(param.databytes().c_str(), param.databytes().length()));
                 action->appendParam(QString::fromStdString(param.name()), var, "QByteArray");
@@ -79,8 +66,11 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
                     //var = NULL;
                 }
 
+            }else if(param.type() == ::com::mycelius::message::Data_DataType_STRING){
+                var = QVariant(param.databytes().c_str());
+                action->appendParam(QString::fromStdString(param.name()), var, "QString");
             }
-            qDebug() << "Type name:" << var.typeName() << " value:" << var;
+            //qDebug() << "Type name:" << var.typeName() << " Param type: " << param.type() << " name " <<  QString::fromStdString(param.name()) << " value:" << var;
         }
 
         // Connect the slot whit the signal...
@@ -153,15 +143,11 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
 void Session::completeProcessMessageData(com::mycelius::message::Message * msg){
 
     if( msg->ByteSize() < Session::MAX_MESSAGE_SIZE){
+        qDebug() << "message send directly!";
         this->sendMessage(msg);
     }else{
-
+        qDebug() << "message chunk!";
         int count = int(double(msg->ByteSize() / Session::MAX_MESSAGE_SIZE) + .5f);
-
-        // Round up...
-        if(msg->ByteSize() % Session::MAX_MESSAGE_SIZE > 0){
-            count++;
-        }
 
         QByteArray messageData = serializeToByteArray(msg);
         QString messageId = QString::fromStdString(msg->rsp().id());

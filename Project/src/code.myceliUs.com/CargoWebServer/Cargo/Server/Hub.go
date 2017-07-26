@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
-	"code.myceliUs.com/Utility"
+	//	"code.myceliUs.com/Utility"
 )
 
 type Hub struct {
@@ -40,7 +40,7 @@ func NewHub() *Hub {
 
 	// So here I will send empty message to keep socket alive
 	// and clear the session if the connection is close...
-	h.ticker = time.NewTicker(time.Millisecond * 2000)
+	/*h.ticker = time.NewTicker(time.Millisecond * 2000)
 
 	go func() {
 		for t := range h.ticker.C {
@@ -80,7 +80,7 @@ func NewHub() *Hub {
 			}
 		}
 	}()
-
+	*/
 	return h
 }
 

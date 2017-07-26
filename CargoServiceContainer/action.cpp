@@ -160,8 +160,6 @@ void Action::run()
     QVariant retVal = CallMethod(obj, metaMethod, list);
 
     // TODO test retVal for error and report error instead of response in that case.
-
-
     // Wait for the answer...
     com::mycelius::message::Message* result = new com::mycelius::message::Message();
     result->set_type(com::mycelius::message::Message_MessageType_RESPONSE);
@@ -174,7 +172,7 @@ void Action::run()
 
     // So here I will create the response and send it back to the caller...
     if(retVal.isValid()){
-        com::mycelius::message::Data* d = rsp->add_results();;
+        com::mycelius::message::Data* d = rsp->add_results();
         d->set_name("result");
         if(retVal.type() == QMetaType::QStringList){
             // The type is a string list...

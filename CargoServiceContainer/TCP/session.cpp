@@ -35,7 +35,7 @@ void Session::run()
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
     // We'll have multiple clients, we want to know which is which
-    qDebug() << socketDescriptor << " Client connected";
+    //qDebug() << socketDescriptor << " Client connected";
 
     // Move the socket to the main thread so it will be accessible
     // from inside the slot...
@@ -48,17 +48,17 @@ void Session::run()
     exec();
 }
 
+
 void Session::sendMessage(com::mycelius::message::Message *msg){
-    qDebug() << QString::fromStdString(msg->mutable_id()->c_str());
-    qDebug() << QString::fromStdString(msg->mutable_rsp()->mutable_id()->c_str());
-    writelen(this->socket,msg->ByteSize());
-    this->socket->write(serializeToByteArray(msg));
+    QByteArray data =  serializeToByteArray(msg);
+    qDebug() << QString::fromStdString(*msg->mutable_id()) << " size " << data.length();
+    this->socket->write(data);
     this->socket->waitForBytesWritten();
 }
 
 void Session::readyRead()
 {
-    // get the information
+
     while(this->socket->bytesAvailable())
     {
         QByteArray buffer;
@@ -73,6 +73,7 @@ void Session::readyRead()
         }
         com::mycelius::message::Message msg;
         msg.ParseFromArray(buffer, buffer.size());
+        qDebug() << "message received!";
         this->processIncommingMessage(msg);
     }
 

@@ -122,9 +122,7 @@ QString ServiceContainer::GetServicesClientCode(){
 
             // The server side methode name.
             QString serverSideMethodName = QString(packageName + "." + className + "_" +(*it).toObject()["name"].toString()).replace(".", "_");
-
             QString serverCode = "function " + serverSideMethodName + "(";
-
 
             clientCode += packageName + "." + className + ".prototype." +(*it).toObject()["name"].toString() + "=function(";
 
@@ -173,8 +171,10 @@ QString ServiceContainer::GetServicesClientCode(){
                        serverCode += ", ";
                        serverCodeFunctionCall+= ", ";
                    }
-                   serverCodeFunctionCall += ")";
+
             }
+
+            serverCodeFunctionCall += ")";
 
             serverCode += "){\n";
             // Here Is the server side code...
@@ -241,7 +241,7 @@ QString ServiceContainer::GetServicesClientCode(){
 
         }
 
-        qDebug() << "Get client code: " << (*it).toObject()["IID"];
+       // qDebug() << "Get client code: " << (*it).toObject()["IID"];
     }
 
     return clientCode;
@@ -284,6 +284,8 @@ QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
         QMap<QString, QString>::const_iterator it = this->serverCodes.find(function);
         if(it != this->serverCodes.end()){
             function = (*it);
+        }else{
+            qDebug() << "no function found with name: " << function;
         }
     }
 
@@ -295,7 +297,7 @@ QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
     for(int i= 1; i < params.length(); i++){
         params_.append(engine.newVariant(params.at(i)));
     }
-
+    qDebug() << "Try to evaluate: " << function;
     QScriptValue result = toEvaluate.call(object, params_);
     QVariantList results;
     results.push_back(result.toVariant());

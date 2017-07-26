@@ -342,6 +342,13 @@ func (this *Server) Start() {
 		return sEnc
 	})
 
+	// JSON function...
+	JS.GetJsRuntimeManager().AppendFunction("stringify", func(object interface{}) string {
+		data, _ := json.Marshal(object)
+		str := string(data)
+		return str
+	})
+
 	/**
 	 * Made other connection side execute JS code.
 	 */
@@ -661,7 +668,8 @@ func (this *Server) Start() {
 	JS.GetJsRuntimeManager().InitScripts("")            // Run the script for the default session.
 
 	// Test compile analyse...
-	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{50})
+	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{50000})
+	JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "compileAnalyseCSP", []interface{}{30})
 }
 
 /**
