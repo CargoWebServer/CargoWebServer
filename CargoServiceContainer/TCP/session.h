@@ -7,7 +7,6 @@
 #include <QMap>
 #include <QVector>
 #include "gen/rpc.pb.h"
-
 class Session : public QThread
 {
     static int MAX_MESSAGE_SIZE;

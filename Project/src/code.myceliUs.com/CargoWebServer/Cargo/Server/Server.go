@@ -668,8 +668,8 @@ func (this *Server) Start() {
 	JS.GetJsRuntimeManager().InitScripts("")            // Run the script for the default session.
 
 	// Test compile analyse...
-	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{50000})
-	JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "compileAnalyseCSP", []interface{}{30})
+	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{100000})
+	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "compileAnalyseCSP", []interface{}{30})
 }
 
 /**

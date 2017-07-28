@@ -30,11 +30,10 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
         Action* action = new Action(QString::fromStdString(msg.rqst().id()), methodName);
 
         // Now I will append the parameters...
-        const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >& params = msg.rqst().params();
+        const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >&params = msg.rqst().params();
 
         for(::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >::const_iterator it = params.cbegin();
             it != params.cend(); it++){
-
             ::com::mycelius::message::Data param = *it;
             QVariant var;
             if(param.type() == ::com::mycelius::message::Data_DataType_DOUBLE){
@@ -103,6 +102,7 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
             array[index] = QByteArray(msg.data().c_str(), msg.data().size());
 
             if( index == total - 1){
+                // All chuck are received here...
                 QByteArray originalMessageData;
                 for(QVector<QByteArray>::iterator it = array.begin(); it != array.end(); ++it){
                     originalMessageData = originalMessageData + *it;
@@ -124,16 +124,16 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
         }
 
         // Here I will send back the response...
-        com::mycelius::message::Message* responseMsg = new com::mycelius::message::Message();
-        responseMsg->set_type(com::mycelius::message::Message_MessageType_RESPONSE);
-        responseMsg->set_id(messageId.toStdString());
-        responseMsg->set_index(-1);
-        responseMsg->set_total(1);
+        com::mycelius::message::Message responseMsg;
+        responseMsg.set_type(com::mycelius::message::Message_MessageType_RESPONSE);
+        responseMsg.set_id(messageId.toStdString());
+        responseMsg.set_index(-1);
+        responseMsg.set_total(1);
 
-        com::mycelius::message::Response* rsp = new com::mycelius::message::Response();
-        rsp->set_id(messageId.toStdString());
-        responseMsg->set_allocated_rsp(rsp);
-        this->sendMessage(responseMsg);
+        com::mycelius::message::Response rsp;
+        rsp.set_id(messageId.toStdString());
+        responseMsg.set_allocated_rsp(&rsp);
+        this->sendMessage(&responseMsg);
 
     }else if(msg.type() == com::mycelius::message::Message_MessageType_EVENT){
 
@@ -141,6 +141,8 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
 }
 
 void Session::completeProcessMessageData(com::mycelius::message::Message * msg){
+    // Now i can remove the action...
+    QString messageId = QString::fromStdString(msg->rsp().id());
 
     if( msg->ByteSize() < Session::MAX_MESSAGE_SIZE){
         qDebug() << "message send directly!";
@@ -148,10 +150,7 @@ void Session::completeProcessMessageData(com::mycelius::message::Message * msg){
     }else{
         qDebug() << "message chunk!";
         int count = int(double(msg->ByteSize() / Session::MAX_MESSAGE_SIZE) + .5f);
-
         QByteArray messageData = serializeToByteArray(msg);
-        QString messageId = QString::fromStdString(msg->rsp().id());
-
         this->pending.insert(messageId, QList<com::mycelius::message::Message*>() );
 
         for(int i=0; i<count; i++){
@@ -180,22 +179,24 @@ void Session::completeProcessMessageData(com::mycelius::message::Message * msg){
         // Start the message transfer...
         this->processPendingMessage(messageId);
     }
+    // Release the memory here.
+    delete msg;
+    msg = NULL;
 }
 
 void Session::processPendingMessage(QString messageId){
     if(this->pending.find(messageId)->length() > 0){
         // Here I will get the first message...
         com::mycelius::message::Message* msg = this->pending.find(messageId)->at(0);
+        this->pending.find(messageId)->pop_front();
+        if(this->pending.find(messageId)->length() == 0){
+             this->pending.remove(messageId);
+        }
 
         // Serialyse the message
         this->sendMessage(msg);
 
-        if(msg->type() == com::mycelius::message::Message_MessageType_RESPONSE){
-            this->pending.remove(messageId);
-        }else{
-            this->pending.find(messageId)->pop_front();
-        }
-
+        // clear buffered data
         delete msg;
         msg = NULL;
     }

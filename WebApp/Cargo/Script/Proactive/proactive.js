@@ -95,17 +95,11 @@ function compileAnalyseCSP(echantillonSize) {
 					// Les Produits
 					var machineId = machines[i][0]
 					getProduits(machineId, function (machineId, done) {
-						if (done == true) {
-							console.log("----------------------> machine done!")
-						}
 						return function (produits) {
 							for (var i = 0; i < produits.length; i++) {
 								var produitId = produits[i][0]
 								// Les cotes
 								getCotes(produitId, function (machineId, produitId, done) {
-									if (done) {
-										console.log("machine and produit done!")
-									}
 									return function (cotes) {
 										for (var i = 0; i < cotes.length; i++) {
 											// Les tolerances
@@ -125,7 +119,22 @@ function compileAnalyseCSP(echantillonSize) {
 																	//console.log(toAnalyse.length)
 																}
 																if (done) {
-																	console.log("machine produit and cotes are done.")
+																	// Now I will create analyses.
+																	var callback = function (analyser, toAnalyse) {
+																		return function () {
+																			var analyse = toAnalyse.pop()
+																			if (toAnalyse.length > 0) {
+																				AnalyseResults(analyser, analyse.items, analyse.tolzon, analyse.lowtol, analyse.uptol, analyse.toltype, function (callback, toAnalyse) {
+																					return function (result) {
+																						console.log("------> result: ", JSON.stringify(result))
+																						callback(toAnalyse)
+																					}
+																				} (callback, toAnalyse))
+																			}
+																		}
+																	} (analyser, toAnalyse)
+
+																	callback(analyser, toAnalyse)
 																}
 															}
 														} (machineId, produitId, cote, tolerances[0], echantillonSize, done))
@@ -173,9 +182,12 @@ function AnalyseResults(analyser, data, tolzon, lowtol, uptol, toltype, callback
 		// Success Callback
 		function (result, caller) {
 			console.log("------>analyse success!", JSON.stringify(result))
+			if (caller != null) {
+				callback(result, callback)
+			}
 		},
 		// Error Callback
 		function (errObj, caller) {
 
-		}, {})
+		}, callback)
 }

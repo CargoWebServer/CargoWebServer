@@ -105,6 +105,7 @@ Action::Action(const QString& id_, const QString& name_) :
 }
 
 Action::~Action(){
+    qDebug()<<"Remove the action: " << this->id;
     // Clear the memory associated with params.
     for(int i=0; i < this->params.size(); i++){
         delete this->params.at(i);
