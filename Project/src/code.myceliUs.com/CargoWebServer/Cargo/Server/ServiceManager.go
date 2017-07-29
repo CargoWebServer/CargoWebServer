@@ -307,7 +307,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 		this.m_serviceAction[service.getId()] = make([]*CargoEntities.Action, 0)
 	}
 
-	// I will use the reflection to reteive method inside the service
+	// I will use the reflection to retreive method inside the service
 	serviceType := reflect.TypeOf(service)
 
 	// Here I will get the documentation information necessary to
@@ -317,7 +317,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 	d, err := parser.ParseDir(fset, "./Cargo/Server", nil, parser.ParseComments)
 	if err != nil {
 		log.Println(err)
-		return
+		//return
 	}
 
 	for _, f := range d {
@@ -334,6 +334,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 
 	// Now I will print it list of function.
 	for i := 0; i < serviceType.NumMethod(); i++ {
+
 		// I will try to find if the action was register
 		method := serviceType.Method(i)
 		methodName := strings.Replace(serviceType.String(), "*", "", -1) + "." + method.Name
@@ -344,14 +345,15 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 		} else {
 			entity, _ := GetServer().GetEntityManager().getEntityByUuid(methodUuid, false)
 			action = entity.GetObject().(*CargoEntities.Action)
+			log.Println("---------> action exist: ", methodName)
 		}
 
-		if len(methodName) > 0 && !(strings.HasPrefix(method.Name, "New") && (strings.HasSuffix(method.Name, "Entity") || strings.HasSuffix(method.Name, "EntityFromObject"))) {
+		if len(methodUuid) == 0 && (len(methodName) > 0 && !(strings.HasPrefix(method.Name, "New") && (strings.HasSuffix(method.Name, "Entity") || strings.HasSuffix(method.Name, "EntityFromObject")))) {
 			action.SetName(methodName)
 			m := methodsDoc[methodName[strings.LastIndex(methodName, ".")+1:]]
 			if m != nil {
-				action.SetDoc(m.Doc)
 				if len(action.UUID) == 0 {
+					action.SetDoc(m.Doc)
 					if strings.Index(action.M_doc, "@api ") != -1 { // Only api action are exported...
 						// Set the uuid if is not set...
 						if len(action.UUID) == 0 {
@@ -422,9 +424,8 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 							action.SetAccessType(CargoEntities.AccessType_Restricted)
 						}
 
-						// apend it to the entities action.
-						action.SetEntitiesPtr(GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities))
-						GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetActions(action)
+						// Create the action.
+						GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_actions", "CargoEntities.Action", "", action)
 
 						// I will append the action into the admin role that has all permission.
 						adminRoleUuid := CargoEntitiesRoleExists("adminRole")
@@ -446,16 +447,13 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 						}
 					}
 				}
-
-				// Export only action with api...
-				if strings.Index(action.M_doc, "@api ") != -1 { // Only api action are exported...
-					this.m_serviceAction[service.getId()] = append(this.m_serviceAction[service.getId()], action)
-				}
 			}
 		}
+		// Export only action with api...
+		if strings.Index(action.M_doc, "@api ") != -1 { // Only api action are exported...
+			this.m_serviceAction[service.getId()] = append(this.m_serviceAction[service.getId()], action)
+		}
 	}
-
-	GetServer().GetEntityManager().getCargoEntities().SaveEntity()
 }
 
 func (this *ServiceManager) generateActionCode(serviceId string) {

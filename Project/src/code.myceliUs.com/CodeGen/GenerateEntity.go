@@ -1048,7 +1048,8 @@ func generateEntityInitAttribute(class *XML_Schemas.CMOF_OwnedMember, attribute 
 				// Now I will initalyse the value...
 				if Utility.Contains(abstractClassLst, typeName) {
 					// Here I need to cast the type to it implementation type...
-					memberStr += "			if len(uuid) > 0 && !lazy {\n"
+					memberStr += "			if !lazy {\n"
+					memberStr += "			if len(uuid) > 0 {\n"
 					memberStr += "				typeName := uuid[0:strings.Index(uuid, \"%\")]\n"
 					memberStr += "				if err!=nil{\n"
 					memberStr += "					log.Println(\"type \", typeName, \" not found!\")\n"

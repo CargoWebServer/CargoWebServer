@@ -563,13 +563,13 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 
 				if (isRef || attribute.IsComposite == "true") && classesMap[typeName_] != nil {
 					refSetter += "		for i:=0; i < len(this.m_" + attribute.Name + ref + "); i++ {\n"
-					refSetter += "			if this.m_" + attribute.Name + ref + "[i].UUID == ref.(" + typeName + ").UUID {\n"
+					refSetter += "			if this.m_" + attribute.Name + ref + "[i].GetUUID() == ref.(" + typeName + ").GetUUID() {\n"
 					refSetter += "				return\n"
 					refSetter += "			}\n"
 					refSetter += "		}\n"
 					refSetter += "		this.NeedSave = true\n"
 					refSetter += "		for i:=0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
-					refSetter += "			if this.M_" + attribute.Name + ref + "[i] == ref.(" + typeName + ").UUID {\n"
+					refSetter += "			if this.M_" + attribute.Name + ref + "[i] == ref.(" + typeName + ").GetUUID() {\n"
 					refSetter += "				this.NeedSave = false\n"
 					refSetter += "			}\n"
 					refSetter += "		}\n"
