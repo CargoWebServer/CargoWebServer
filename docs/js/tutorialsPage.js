@@ -5,7 +5,7 @@ var TutorialsPage = function (parent) {
         // english
         "en": {
             "tutorial-title": "Tutorials",
-            "tutorial-presentation": "\"Any fool can know. The point is to understand.\" </br> <span style='font-size: 10pt;'>Albert Einstein</span> \"",
+            "tutorial-presentation": "'Any fool can know. The point is to understand.'</br> <span style='font-size: 10pt;'>Albert Einstein</span>",
             "tutorial-presentation-description": "Learning a new tool can be challenging not to say frustrating. I believe true knowledge came from experience, "
             + " tutorials are there to guide you through the process of learning. They put you in context of web application programming and give you the experience you "
             + "need to take advantage of Cargo. Each tutorial are workable application. Making something usefull from start?... That's rewording!!!",
