@@ -21,16 +21,17 @@ var TutorialsPage = function (parent) {
             "tutorial-anchor-desc":"The anchor symbol are use for complementary explanation or discution that can be skip by hurry reader's.",
             "SOM-tutorial-title": "The Service Object Model (SOM)",
             "SOM-tutorial-lnk": "SOM tutorial",
-            "SOM-tutorial-content": ""
+            "SOM-tutorial-content": "Making a distant service appear like local object, that's the essence of the SOM. Object are intuitive to work with, they regroup related actions and informations."
+            + ""
         },
         //francais
         "fr": {
             "tutorial-title": "Cargo Tutorial",
             "tutorial-presentation": "Cargo Dactilogiciel",
             "tutorial-presentation-description": "",
-            "blog-tutorial-title": "",
-            "blog-tutorial-content": "",
-            "blog-tutorial-lnk": "",
+            "SOM-tutorial-title": "",
+            "SOM-tutorial-content": "",
+            "SOM-tutorial-lnk": "",
         }
     }
 
@@ -52,7 +53,7 @@ var TutorialsPage = function (parent) {
         .appendElement({ "tag": "a", "href": "#introductionTutorialDiv", "id": "introduction-tutorial-lnk" }).up()
         // The blog tutorial presentation.
         .appendElement({ "tag": "li" }).down()
-        .appendElement({ "tag": "a", "href": "#somTutorialDiv", "id": "blog-tutorial-lnk" }).up()
+        .appendElement({ "tag": "a", "href": "#somTutorialDiv", "id": "SOM-tutorial-lnk" }).up()
 
 
     // Now the introduction panel.
