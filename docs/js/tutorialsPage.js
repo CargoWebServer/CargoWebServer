@@ -19,12 +19,9 @@ var TutorialsPage = function (parent) {
             "tutorial-lifesaver-desc": "The life saver symbol is use when we want to teach you good practices or usefull techniques.",
             "tutorial-buoy-desc" :"The buoy symbol is use to warning you about common mistake or bad programming practices.",
             "tutorial-anchor-desc":"The anchor symbol are use for complementary explanation or discution that can be skip by hurry reader's.",
-            "blog-tutorial-title": "The first step, your own <a href=\"https://en.wikipedia.org/wiki/Blog\">Blog</a>!",
-            "blog-tutorial-lnk": "Blog tutorial",
-            "blog-tutorial-content": "Cargo is a generic framework, with it, you can program almost every kind of web-applications. There's a lot of frameworks specialized in blog programming, "
-            + "if your only intent is to created one, you should probably considere to get look at them. Because blog's made use of limited number of features, it reprensent "
-            + "a good starting point for us to teach you the basics of web-applications programming. In that tutorial you will learn how to work with entities and how to create dynamic "
-            +" html elements to display pages content. So let's begin."
+            "SOM-tutorial-title": "The Service Object Model (SOM)",
+            "SOM-tutorial-lnk": "SOM tutorial",
+            "SOM-tutorial-content": ""
         },
         //francais
         "fr": {
@@ -55,7 +52,7 @@ var TutorialsPage = function (parent) {
         .appendElement({ "tag": "a", "href": "#introductionTutorialDiv", "id": "introduction-tutorial-lnk" }).up()
         // The blog tutorial presentation.
         .appendElement({ "tag": "li" }).down()
-        .appendElement({ "tag": "a", "href": "#blogTutorialDiv", "id": "blog-tutorial-lnk" }).up()
+        .appendElement({ "tag": "a", "href": "#somTutorialDiv", "id": "blog-tutorial-lnk" }).up()
 
 
     // Now the introduction panel.
@@ -104,8 +101,8 @@ var TutorialsPage = function (parent) {
 
     // The blog tutorial.
     this.main
-        .appendElement({ "tag": "div", "class": "row", "id": "blogTutorialDiv" }).down()
+        .appendElement({ "tag": "div", "class": "row", "id": "SOM_TutorialDiv" }).down()
         .appendElement({ "tag": "div", "class": "col-xs-12" }).down()
-        .appendElement({ "tag": "h2", "id": "blog-tutorial-title" })
-        .appendElement({ "tag": "p", "id": "blog-tutorial-content" })
+        .appendElement({ "tag": "h2", "id": "SOM-tutorial-title" })
+        .appendElement({ "tag": "p", "id": "SOM-tutorial-content" })
 }
