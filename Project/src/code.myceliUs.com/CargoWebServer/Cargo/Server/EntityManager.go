@@ -1767,13 +1767,6 @@ func (this *EntityManager) OnEvent(evt interface{}) {
 //                    }
 //                }
 //            }
-//            // Set the entity with it id.
-//            if (entity.IsInit) {
-//                entities[id_] = entity
-//                if (entity.TYPENAME.startsWith("BPMN20")) {
-//                    server.workflowManager.bpmnElements[id_] = entity
-//                }
-//            }
 //        },
 //        function (errMsg, caller) {
 //            /** Nothing to do here. */

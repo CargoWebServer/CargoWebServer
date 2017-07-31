@@ -341,7 +341,7 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "		object.(*" + packageId + "." + className + ").TYPENAME = \"" + packageId + "." + class.Name + "\"\n"
 	entityConstructorStr += "		object.(*" + packageId + "." + className + ").ParentUuid = parentUuid\n"
 	entityConstructorStr += "	}\n"
-	entityConstructorStr += "	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(\"" + packageId + "." + className + "\",\"" + packageId_ + "\")\n"
+	entityConstructorStr += "	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(\"" + packageId + "." + class.Name + "\",\"" + packageId_ + "\")\n"
 	entityConstructorStr += "	if len(uuidStr) > 0 {\n"
 	entityConstructorStr += "		if object != nil{\n"
 	entityConstructorStr += "			object.(*" + packageId + "." + className + ").UUID = uuidStr\n"
@@ -1406,8 +1406,18 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 				entityInfoStr += "	" + class.Name + "Info = append(" + class.Name + "Info, string(" + attribute.Name + "Str))\n"
 			} else {
 				// The attribute is a reference.
-				entityInfoStr += "	" + attribute.Name + ref + "Str, _ := json.Marshal(this.object.M_" + attribute.Name + ref + ")\n"
-				entityInfoStr += "	" + class.Name + "Info = append(" + class.Name + "Info, string(" + attribute.Name + ref + "Str))\n"
+				//entityInfoStr += "	" + attribute.Name + ref + "Str, _ := json.Marshal(this.object.M_" + attribute.Name + ref + ")\n"
+				entityInfoStr += "	" + attribute.Name + ref + "Str := \"[\"\n"
+				entityInfoStr += "	if this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "()!=nil{\n"
+				entityInfoStr += "		for i:=0; i < len(this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "()); i++ {\n"
+				entityInfoStr += "			" + attribute.Name + ref + "Str += this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "()[i].GetUUID()\n"
+				entityInfoStr += "			if i < len(this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "()) - 1 {\n"
+				entityInfoStr += "			" + attribute.Name + ref + "Str += \",\"\n"
+				entityInfoStr += "			}\n"
+				entityInfoStr += "		}\n"
+				entityInfoStr += "	}\n"
+				entityInfoStr += "	" + attribute.Name + ref + "Str += \"]\"\n"
+				entityInfoStr += "	" + class.Name + "Info = append(" + class.Name + "Info, " + attribute.Name + ref + "Str)\n"
 			}
 
 		} else {
@@ -1480,7 +1490,11 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 					// The attribute is a reference.
 					log.Println(typeName)
 					if hasId(classesMap[typeName]) {
-						entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info,this.object.M_" + attribute.Name + ref + ")\n"
+						entityInfoStr += "	if this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "() != nil{\n"
+						entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info,this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "().GetUUID())\n"
+						entityInfoStr += "	}else{\n"
+						entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info,\"\")\n"
+						entityInfoStr += "	}\n"
 					} else {
 						//log.Println("------------> attribute ", typeName, " has no method GetId, must be an error here...")
 						entityInfoStr += "	/** attribute " + typeName + " has no method GetId, must be an error here...*/\n"

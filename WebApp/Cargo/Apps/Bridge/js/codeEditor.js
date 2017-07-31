@@ -95,39 +95,42 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
     }
 
     var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": diagram.M_id + "_editor" }).down()
-
     this.diagram = new SvgDiagram(filePanel, diagram)
-    this.diagram.init()
-    this.diagram.drawDiagramElements()
 
-    this.files[diagram.M_id] = diagram
-    this.filesPanel[diagram.M_id] = filePanel
-    this.setActiveFile(diagram.M_id)
-
-    // Now the resize element...
-    this.diagram.canvas.initWorkspace = function (workspace) {
+    this.diagram.init(function (codeEditor, diagram, filePanel) {
         return function () {
-            if (workspace.lastChild == undefined) {
-                return
-            }
-            if (workspace.lastChild.lastChild != undefined) {
-                for (var childId in workspace.childs) {
-                    var child = workspace.childs[childId]
-                    if (child.element.viewBox != null) {
-                        child.resize(workspace.element.offsetWidth, workspace.element.offsetHeight)
+            codeEditor.diagram.drawDiagramElements()
+
+            codeEditor.files[diagram.M_id] = diagram
+            codeEditor.filesPanel[diagram.M_id] = filePanel
+            codeEditor.setActiveFile(diagram.M_id)
+            
+            // Now the resize element...
+            codeEditor.diagram.canvas.initWorkspace = function (workspace) {
+                return function () {
+                    if (workspace.lastChild == undefined) {
+                        return
+                    }
+                    if (workspace.lastChild.lastChild != undefined) {
+                        for (var childId in workspace.childs) {
+                            var child = workspace.childs[childId]
+                            if (child.element.viewBox != null) {
+                                child.resize(workspace.element.offsetWidth, workspace.element.offsetHeight)
+                            }
+                        }
                     }
                 }
-            }
-        }
-    } (filePanel)
+            }(filePanel)
 
-    window.addEventListener("resize", function (canvas) {
-        return function () {
-            canvas.initWorkspace()
-        }
-    } (this.diagram.canvas))
+            window.addEventListener("resize", function (canvas) {
+                return function () {
+                    canvas.initWorkspace()
+                }
+            }(codeEditor.diagram.canvas))
 
-    this.diagram.canvas.initWorkspace()
+            codeEditor.diagram.canvas.initWorkspace()
+        }
+    }(this, diagram, filePanel))
 }
 
 CodeEditor.prototype.appendFile = function (file) {
@@ -168,7 +171,7 @@ CodeEditor.prototype.appendFile = function (file) {
                     codeEditor.toolbars[fileId] = []
                     codeEditor.toolbars[fileId].push(queryEditor.queryToolBar)
                 }
-            } (this, file.M_id))
+            }(this, file.M_id))
 
             // Init the query editor.
             queryEditor.init()
@@ -197,7 +200,7 @@ CodeEditor.prototype.appendFile = function (file) {
                 server.eventHandler.broadcastLocalEvent(evt)
             }
         }
-    } (file.M_id, file.UUID, this));
+    }(file.M_id, file.UUID, this));
 
     this.filesPanel[file.M_id] = filePanel
     this.setActiveFile(file.M_id)

@@ -11,6 +11,13 @@ import (
 )
 
 /**
+ * Use it to get UUID of referenceable object.
+ */
+type Referenceable interface {
+	GetUUID() string
+}
+
+/**
  * That map will contain the list of all type to be created dynamicaly
  */
 var typeRegistry = make(map[string]reflect.Type)

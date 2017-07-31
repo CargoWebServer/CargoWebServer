@@ -40,7 +40,6 @@ var BpmnExplorer = function (parent) {
 
     /** Now the list of defintions. */
     server.fileManager.getFileByPath("/Cargo/svg/filters.svg",
-        function () { },
         function (file, caller) {
             var reader = new FileReader();
             // Create a blob from the data received.

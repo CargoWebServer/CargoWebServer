@@ -64,9 +64,6 @@ function main() {
                                                     // now the prototypes...
                                                     server.entityManager.getEntityPrototypes("BPMS",
                                                         function () {
-                                                            // Initialyse the workflow manager here.
-                                                            //server.workflowManager = new WorkflowManager()
-                                                            //server.workflowManager.RegisterListener()
                                                             init()
                                                         },
                                                         // error callback

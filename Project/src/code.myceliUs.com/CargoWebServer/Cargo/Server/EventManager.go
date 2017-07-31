@@ -54,6 +54,7 @@ const (
 	LdapEvent                      = "LdapEvent"
 	OAuth2Event                    = "OAuth2Event"
 	SchemaEvent                    = "SchemaEvent"
+	WorkflowEvent                  = "WorkflowEvent"
 )
 
 ////////////////////////////////////////////////////////////////////////////////

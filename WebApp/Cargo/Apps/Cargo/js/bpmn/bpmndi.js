@@ -10,7 +10,7 @@ var SvgDiagram = function (parent, bpmnDiagram) {
 	this.svgElements = {}
 
 	/* Keep the reference to the bpmn element to... **/
-	this.bpmnElements = {}
+	this.entities = {}
 
 	/* The instances list view **/
 	this.instanceListView = null
@@ -19,10 +19,10 @@ var SvgDiagram = function (parent, bpmnDiagram) {
 	this.bpmnDiagram = bpmnDiagram
 
 	/* Now I will create the svg canvas. **/
-	this.canvas = new SVG_Canvas(this.parent, bpmnDiagram.M_id, "bpmndi_canvas", parent.element.clientWidth, parent.element.clientHeight);
+	this.canvas = new SVG_Canvas(this.parent, bpmnDiagram.UUID, "bpmndi_canvas", parent.element.clientWidth, parent.element.clientHeight);
 
 	/* Now the svg element itself **/
-	this.plane = new SVG_Group(this.canvas, bpmnDiagram.M_BPMNPlane.M_id, "bpmndi_plane", 0, 0, 0, 0)
+	this.plane = new SVG_Group(this.canvas, bpmnDiagram.M_BPMNPlane.UUID, "bpmndi_plane", 0, 0, 0, 0)
 
 	// Here I will connect the resize event of the parent with the parent.
 	parent.element.onresize = function (parent, svg) {
@@ -30,7 +30,7 @@ var SvgDiagram = function (parent, bpmnDiagram) {
 			svg.setSvgAttribute("width", parent.element.clientWidth)
 			svg.setSvgAttribute("height", parent.element.clientHeight)
 		}
-	} (this.parent, this.canvas)
+	}(this.parent, this.canvas)
 
 	// The scale factor of the diagram...
 	this.canvas.scaleFactor = 1
@@ -48,7 +48,7 @@ var SvgDiagram = function (parent, bpmnDiagram) {
 			viewBox.baseVal.width = widht * (1 / canvas.scaleFactor)
 			viewBox.baseVal.height = height * (1 / canvas.scaleFactor)
 		}
-	} (this.canvas)
+	}(this.canvas)
 
 	// Now the zoom in and out ...
 	this.canvas.element.addEventListener("wheel",
@@ -61,26 +61,39 @@ var SvgDiagram = function (parent, bpmnDiagram) {
 				}
 				canvas.initWorkspace()
 			}
-		} (this.canvas));
+		}(this.canvas));
 
 	return this
 }
 
 /*
  * Recursively draw diagram element.
+ * Use callback to initialyse diagram elements.
  */
-SvgDiagram.prototype.init = function () {
+SvgDiagram.prototype.init = function (callback) {
 	var diagramElements = this.bpmnDiagram.M_BPMNPlane.M_DiagramElement
 	for (var index = 0; index < diagramElements.length; index++) {
 		// Here I will call the same function on the next element.
 		var diagramElement = diagramElements[index]
-		// Here I will create a function to get the diagram element...
-		var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
-		bpmnElement.getDiagramElement = function (diagramElement) {
-			return function () {
-				return diagramElement
-			}
-		} (diagramElement)
+
+		server.entityManager.getEntityByUuid(diagramElement.M_bpmnElement,
+			// success callback
+			function (bpmnElement, caller) {
+				bpmnElement.getDiagramElement = function (diagramElement) {
+					return function () {
+						return diagramElement
+					}
+				}(diagramElement)
+				if (caller.callback != undefined) {
+					// init completed!
+					callback()
+				}
+			},
+			// error callback
+			function (errObj, caller) {
+
+			}, { "callback": callback })
+
 	}
 
 	this.instanceListView = new InstanceListView(this.parent, this)
@@ -95,16 +108,25 @@ SvgDiagram.prototype.drawDiagramElements = function () {
 		// Here I will call the same function on the next element.
 		var diagramElement = diagramElements[index]
 		// Here I will create a function to get the diagram element...
-		this.drawDiagramElement(diagramElement)
+		server.entityManager.getEntityByUuid(diagramElement.M_bpmnElement,
+			function (bpmnElement, caller) { 
+				caller.svgDiagram.drawDiagramElement(caller.diagramElement, bpmnElement)
+			},
+			function (errObj, caller) { 
+
+			},
+			{"svgDiagram":this, "diagramElement":diagramElement})
 	}
 }
 
 
-SvgDiagram.prototype.drawDiagramElement = function (diagramElement) {
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+SvgDiagram.prototype.drawDiagramElement = function (diagramElement, bpmnElement) {
 	var typeName = bpmnElement.TYPENAME
 	var svgElement = null
-
+	if(document.getElementById(diagramElement.UUID)!= undefined){
+		return // the element already exist...
+	}
+	
 	if (typeName == "BPMN20.ScriptTask") {
 		svgElement = this.drawScriptTask(diagramElement)
 	} else if (typeName == "BPMN20.Task") {
@@ -173,14 +195,14 @@ SvgDiagram.prototype.drawDiagramElement = function (diagramElement) {
 			return function () {
 				return svgElement
 			}
-		} (svgElement)
+		}(svgElement)
 	}
 
 	// Now if the element contain a label...
 	// Pool text are svg text element, not html tag...
 	if (diagramElement.M_BPMNLabel != undefined && typeName != "BPMN20.Participant" && typeName != "BPMN20.Lane") {
 		if (diagramElement.M_BPMNLabel.M_Bounds != null && diagramElement.M_BPMNLabel.M_Bounds != "") {
-			if (bpmnElement.M_dataObjectRef != undefined) {
+			if (bpmnElement.M_dataObjectRef != undefined && isString(bpmnElement.M_dataObjectRef)) {
 				bpmnElement["set_M_dataObjectRef_" + bpmnElement.M_dataObjectRef + "_ref"](function (diagram, diagramElement) {
 					return function (ref) {
 						var label = diagram.drawText(ref.M_name, diagramElement, diagramElement.M_BPMNLabel.M_Bounds)
@@ -188,10 +210,10 @@ SvgDiagram.prototype.drawDiagramElement = function (diagramElement) {
 							return function () {
 								return label
 							}
-						} (label)
+						}(label)
 					}
-				} (this, diagramElement))
-			} else if (bpmnElement.M_dataStoreRef != undefined) {
+				}(this, diagramElement))
+			} else if (bpmnElement.M_dataStoreRef != undefined && isString(bpmnElement.M_dataStoreRef)) {
 				bpmnElement["set_M_dataStoreRef_" + bpmnElement.M_dataStoreRef + "_ref"](function (diagram, diagramElement) {
 					return function (ref) {
 						var label = diagram.drawText(ref.M_name, diagramElement, diagramElement.M_BPMNLabel.M_Bounds)
@@ -199,16 +221,16 @@ SvgDiagram.prototype.drawDiagramElement = function (diagramElement) {
 							return function () {
 								return label
 							}
-						} (label)
+						}(label)
 					}
-				} (this, diagramElement))
+				}(this, diagramElement))
 			} else {
 				var label = this.drawText(bpmnElement.M_name, diagramElement, diagramElement.M_BPMNLabel.M_Bounds)
 				diagramElement.getLabel = function (label) {
 					return function () {
 						return label
 					}
-				} (label)
+				}(label)
 			}
 
 		}
@@ -234,7 +256,7 @@ SvgDiagram.prototype.drawDiagramElement = function (diagramElement) {
 SvgDiagram.prototype.setCollapsedElement = function () {
 
 	var diagramElements = this.bpmnDiagram.M_BPMNPlane.M_DiagramElement
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 
 	for (var index = 0; index < diagramElements.length; index++) {
 		var diagramElement = diagramElements[index]
@@ -247,7 +269,7 @@ SvgDiagram.prototype.setCollapsedElement = function () {
 			expandMarker.element.onclick = expandButton.element.onclick = function (diagramElement) {
 				return function () {
 					var diagramElements = this.bpmnDiagram.M_BPMNPlane.M_DiagramElement
-					var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+					var bpmnElement = entities[diagramElement.M_bpmnElement]
 
 					if (bpmnElement.TYPENAME == "BPMN20.SubProcess") {
 						if (diagramElement.M_isExpanded == true) {
@@ -337,7 +359,7 @@ SvgDiagram.prototype.setCollapsedElement = function () {
 						}
 					}
 				}
-			} (diagramElement)
+			}(diagramElement)
 
 			expandButton.element.onmouseout = function () {
 				this.style.cursor = "default"
@@ -355,17 +377,17 @@ SvgDiagram.prototype.setCollapsedElement = function () {
 // Task elements.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SvgDiagram.prototype.drawTask = function (diagramElement, className) {
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
-	var group = new SVG_Group(this.plane, diagramElement.M_id, "", 100, 0)
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
+	var group = new SVG_Group(this.plane, diagramElement.UUID, "", 100, 0)
 
-	var shape = new SVG_Rectangle(group, diagramElement.M_id, "bpmndi_shape " + className,
+	var shape = new SVG_Rectangle(group, diagramElement.UUID, "bpmndi_shape " + className,
 		0, 0,
 		diagramElement.M_Bounds.M_width,
 		diagramElement.M_Bounds.M_height,
 		5, 5)
 
 	// Here I will set the name with the id of the bpmn element...
-	shape.setSvgAttribute("name", bpmnElement.M_id)
+	shape.setSvgAttribute("name", bpmnElement.UUID)
 
 	this.svgElements[diagramElement.M_bpmnElement.UUID] = shape
 
@@ -376,7 +398,7 @@ SvgDiagram.prototype.drawTask = function (diagramElement, className) {
 			return function () {
 				return label
 			}
-		} (label)
+		}(label)
 	}
 
 	var position;
@@ -411,7 +433,7 @@ SvgDiagram.prototype.drawTask = function (diagramElement, className) {
 				my: (bpmnElement.M_height - 13) / bpmnElement.M_height
 			}
 		});
-		new SVG_Path(group, diagramElement.M_id + "_loop_characteristic", "marker", [markerPath])
+		new SVG_Path(group, diagramElement.UUID + "_loop_characteristic", "marker", [markerPath])
 	}
 
 	// It's ad hoc subprocess...
@@ -426,7 +448,7 @@ SvgDiagram.prototype.drawTask = function (diagramElement, className) {
 				my: (diagramElement.M_Bounds.M_height - 15) / diagramElement.M_Bounds.M_height
 			}
 		});
-		new SVG_Path(group, diagramElement.M_id + "_loop_characteristic", "marker", [markerPath])
+		new SVG_Path(group, diagramElement.UUID + "_loop_characteristic", "marker", [markerPath])
 	}
 
 	// The loop characteristics.
@@ -444,7 +466,7 @@ SvgDiagram.prototype.drawTask = function (diagramElement, className) {
 				}
 			});
 
-			new SVG_Path(group, diagramElement.M_id + "_loop_characteristic", "marker", [markerPath])
+			new SVG_Path(group, diagramElement.UUID + "_loop_characteristic", "marker", [markerPath])
 
 		}
 
@@ -459,7 +481,7 @@ SvgDiagram.prototype.drawTask = function (diagramElement, className) {
 					my: (diagramElement.M_Bounds.M_height - 20) / diagramElement.M_Bounds.M_height
 				}
 			});
-			new SVG_Path(group, diagramElement.M_id + "_loop_characteristic", "marker", [markerPath])
+			new SVG_Path(group, diagramElement.UUID + "_loop_characteristic", "marker", [markerPath])
 		}
 
 		if (loopCharacteristics.M_isSequential == false) {
@@ -473,7 +495,7 @@ SvgDiagram.prototype.drawTask = function (diagramElement, className) {
 					my: (diagramElement.M_Bounds.M_height - 19) / diagramElement.M_Bounds.M_height
 				}
 			});
-			new SVG_Path(group, diagramElement.M_id + "_loop_characteristic", "marker", [markerPath])
+			new SVG_Path(group, diagramElement.UUID + "_loop_characteristic", "marker", [markerPath])
 		}
 	}
 
@@ -500,18 +522,18 @@ SvgDiagram.prototype.drawScriptTask = function (diagramElement) {
 
 SvgDiagram.prototype.drawReceiveTask = function (diagramElement) {
 	var group = this.drawTask(diagramElement, "bpmndi_task bpmndi_receive_task")
-    pathStr = this.pathMap.getScaledPath('TASK_TYPE_SEND', {
+	pathStr = this.pathMap.getScaledPath('TASK_TYPE_SEND', {
 		xScaleFactor: 0.9,
 		yScaleFactor: 0.9,
 		containerWidth: 21,
 		containerHeight: 14,
 		position: {
-            mx: 0.3,
-            my: 0.4
+			mx: 0.3,
+			my: 0.4
 		}
 	});
 
-	var enveloppePath = new SVG_Path(group, diagramElement.M_id + "_path", "bpmndi_receive_enveloppe", [pathStr])
+	var enveloppePath = new SVG_Path(group, diagramElement.UUID + "_path", "bpmndi_receive_enveloppe", [pathStr])
 
 	enveloppePath.setSvgAttribute("fill", 'black')
 	enveloppePath.setSvgAttribute("stroke", 'white')
@@ -522,17 +544,17 @@ SvgDiagram.prototype.drawReceiveTask = function (diagramElement) {
 SvgDiagram.prototype.drawSendTask = function (diagramElement) {
 	var group = this.drawTask(diagramElement, "bpmndi_task bpmndi_send_task")
 	var pathStr = this.pathMap.getScaledPath('TASK_TYPE_SEND', {
-        xScaleFactor: 1,
-        yScaleFactor: 1,
-        containerWidth: 21,
-        containerHeight: 14,
-        position: {
+		xScaleFactor: 1,
+		yScaleFactor: 1,
+		containerWidth: 21,
+		containerHeight: 14,
+		position: {
 			mx: 0.285,
 			my: 0.357
-        }
+		}
 	});
 
-	var enveloppePath = new SVG_Path(group, diagramElement.M_id + "_path", "bpmndi_send_enveloppe", [pathStr])
+	var enveloppePath = new SVG_Path(group, diagramElement.UUID + "_path", "bpmndi_send_enveloppe", [pathStr])
 	return group
 }
 
@@ -546,31 +568,31 @@ SvgDiagram.prototype.drawServiceTask = function (diagramElement) {
 // Lane elements.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SvgDiagram.prototype.drawParticipantLane = function (diagramElement) {
-	var group = new SVG_Group(this.plane, diagramElement.M_id, "", 100, 0)
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var group = new SVG_Group(this.plane, diagramElement.UUID, "", 100, 0)
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 
 	// The externat shape...
-	var shape = new SVG_Rectangle(group, diagramElement.M_id, "bpmndi_participant",
+	var shape = new SVG_Rectangle(group, diagramElement.UUID, "bpmndi_participant",
 		0, 0,
 		diagramElement.M_Bounds.M_width,
 		diagramElement.M_Bounds.M_height,
 		0, 0)
 
 	// Here I will set the name with the id of the bpmn element...
-	shape.setSvgAttribute("name", bpmnElement.M_id)
+	shape.setSvgAttribute("name", bpmnElement.UUID)
 
 	// Only participant has header box...
 	var headerHeight = 30
 	var header = null
 	if (bpmnElement.TYPENAME == "BPMN20.Participant") {
 		if (diagramElement.M_isHorizontal == true) {
-			header = new SVG_Rectangle(group, diagramElement.M_id, "bpmndi_participant_header",
+			header = new SVG_Rectangle(group, diagramElement.UUID, "bpmndi_participant_header",
 				0, 0,
 				headerHeight,
 				diagramElement.M_Bounds.M_height,
 				0, 0)
 		} else {
-			header = new SVG_Rectangle(group, diagramElement.M_id, "bpmndi_participant_header",
+			header = new SVG_Rectangle(group, diagramElement.UUID, "bpmndi_participant_header",
 				0, 0,
 				diagramElement.M_Bounds.M_width,
 				headerHeight,
@@ -594,7 +616,7 @@ SvgDiagram.prototype.drawParticipantLane = function (diagramElement) {
 	}
 
 	// The text header...
-	var title = new SVG_Text(group, diagramElement.M_id + "_title", "bpmndi_participant_header_title", bpmnElement.M_name, 100, 100);
+	var title = new SVG_Text(group, diagramElement.UUID + "_title", "bpmndi_participant_header_title", bpmnElement.M_name, 100, 100);
 	if (diagramElement.M_isHorizontal == true) {
 		title.setSvgAttribute("transform", "rotate(-90, 0,0)")
 		title.setSvgAttribute("x", - 1 * diagramElement.M_Bounds.M_height / 2)
@@ -615,12 +637,12 @@ SvgDiagram.prototype.drawParticipantLane = function (diagramElement) {
 // Text elements.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SvgDiagram.prototype.drawTextAnnotation = function (diagramElement) {
-	var group = new SVG_Group(this.plane, diagramElement.M_id, "", 100, 0)
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var group = new SVG_Group(this.plane, diagramElement.UUID, "", 100, 0)
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 
 	var pathStr = "M 0 0 L 10 0 M 0 " + diagramElement.M_Bounds.M_height + " L 0 0 M 10 " + diagramElement.M_Bounds.M_height + " L 0 " + diagramElement.M_Bounds.M_height
-	var dtextAnnotationPath = new SVG_Path(group, diagramElement.M_id + "_path", "bpmndi_text_annotation", [pathStr])
-	dtextAnnotationPath.setSvgAttribute("name", bpmnElement.M_id)
+	var dtextAnnotationPath = new SVG_Path(group, diagramElement.UUID + "_path", "bpmndi_text_annotation", [pathStr])
+	dtextAnnotationPath.setSvgAttribute("name", bpmnElement.UUID)
 
 	group.setSvgAttribute("transform", "translate(" + diagramElement.M_Bounds.M_x + "," + diagramElement.M_Bounds.M_y + ")")
 	this.svgElements[bpmnElement.UUID] = group
@@ -633,7 +655,7 @@ SvgDiagram.prototype.drawTextAnnotation = function (diagramElement) {
 SvgDiagram.prototype.drawText = function (text, diagramElement, bounds) {
 	var htmlDiv = null
 
-	htmlDiv = new SVG_ForeignObject(this.plane, diagramElement.M_id, "",
+	htmlDiv = new SVG_ForeignObject(this.plane, diagramElement.UUID, "",
 		bounds.M_x,
 		bounds.M_y,
 		bounds.M_width,
@@ -655,10 +677,10 @@ SvgDiagram.prototype.drawText = function (text, diagramElement, bounds) {
 // Definition elements.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) {
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 	var eventDefinitionElements = bpmnElement.M_eventDefinition
 
-	var group = new SVG_Group(eventGroup, diagramElement.M_id, "", 100, 0)
+	var group = new SVG_Group(eventGroup, diagramElement.UUID, "", 100, 0)
 
 	for (var i = 0; i < eventDefinitionElements.length; i++) {
 		var def = eventDefinitionElements[0]
@@ -668,7 +690,7 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 
 		if (def.TYPENAME == "BPMN20.TimerEventDefinition") {
 			var r = diagramElement.M_Bounds.M_width / 2
-			var shape = new SVG_Circle(group, diagramElement.M_id, "", r, r, r * .70)
+			var shape = new SVG_Circle(group, diagramElement.UUID, "", r, r, r * .70)
 			shape.setSvgAttribute("stroke", "#808080")
 			shape.setSvgAttribute("fill", "none")
 			shape.setSvgAttribute("stroke-width", "1.5px")
@@ -682,7 +704,7 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 					my: 0.5
 				}
 			})
-			evtDefPath = new SVG_Path(group, def.M_id + "_path", "bpmndi_event_definition bpmndi_timer_event_definition", [pathStr])
+			evtDefPath = new SVG_Path(group, def.UUID + "_path", "bpmndi_event_definition bpmndi_timer_event_definition", [pathStr])
 
 			for (var i = 0; i < 12; i++) {
 
@@ -700,7 +722,7 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 				var width = diagramElement.M_Bounds.M_width / 2;
 				var height = diagramElement.M_Bounds.M_height / 2;
 
-				var clockMarker = new SVG_Path(group, def.M_id + "_path", "bpmndi_timer_event_clock_hour_marker", [linePathData])
+				var clockMarker = new SVG_Path(group, def.UUID + "_path", "bpmndi_timer_event_clock_hour_marker", [linePathData])
 				clockMarker.setSvgAttribute("transform", 'rotate(' + (i * 30) + ',' + height + ',' + width + ')')
 			}
 
@@ -716,7 +738,7 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 				}
 			})
 
-			evtDefPath = new SVG_Path(group, def.M_id + "_path", "bpmndi_event_definition bpmndi_message_event_definition", [pathStr])
+			evtDefPath = new SVG_Path(group, def.UUID + "_path", "bpmndi_event_definition bpmndi_message_event_definition", [pathStr])
 
 		} else if (def.TYPENAME == "BPMN20.ConditionalEventDefinition") {
 			var pathStr = this.pathMap.getScaledPath('EVENT_CONDITIONAL', {
@@ -729,7 +751,7 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 					my: 0.222
 				}
 			});
-			evtDefPath = new SVG_Path(group, def.M_id + "_path", "bpmndi_event_definition bpmndi_conditional_event_definition", [pathStr])
+			evtDefPath = new SVG_Path(group, def.UUID + "_path", "bpmndi_event_definition bpmndi_conditional_event_definition", [pathStr])
 		} else if (def.TYPENAME == "BPMN20.LinkEventDefinition") {
 			var pathStr = this.pathMap.getScaledPath('EVENT_LINK', {
 				xScaleFactor: 1,
@@ -741,7 +763,7 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 					my: 0.263
 				}
 			});
-			evtDefPath = new SVG_Path(group, def.M_id + "_path", "bpmndi_event_definition bpmndi_link_event_definition", [pathStr])
+			evtDefPath = new SVG_Path(group, def.UUID + "_path", "bpmndi_event_definition bpmndi_link_event_definition", [pathStr])
 		} else if (def.TYPENAME == "BPMN20.SignalEventDefinition") {
 			var pathStr = this.pathMap.getScaledPath('EVENT_SIGNAL', {
 				xScaleFactor: 0.9,
@@ -753,7 +775,7 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 					my: 0.2
 				}
 			});
-			evtDefPath = new SVG_Path(group, def.M_id + "_path", "bpmndi_event_definition bpmndi_signal_event_definition", [pathStr])
+			evtDefPath = new SVG_Path(group, def.UUID + "_path", "bpmndi_event_definition bpmndi_signal_event_definition", [pathStr])
 		} else if (def.TYPENAME == "BPMN20.ErrorEventDefinition") {
 			var pathStr = this.pathMap.getScaledPath('EVENT_ERROR', {
 				xScaleFactor: 1.1,
@@ -765,7 +787,7 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 					my: 0.722
 				}
 			});
-			evtDefPath = new SVG_Path(group, def.M_id + "_path", "bpmndi_event_definition bpmndi_error_event_definition", [pathStr])
+			evtDefPath = new SVG_Path(group, def.UUID + "_path", "bpmndi_event_definition bpmndi_error_event_definition", [pathStr])
 		} else if (def.TYPENAME == "BPMN20.EscalationEventDefinition") {
 			var pathStr = this.pathMap.getScaledPath('EVENT_ESCALATION', {
 				xScaleFactor: 1,
@@ -777,10 +799,10 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 					my: 0.555
 				}
 			})
-			evtDefPath = new SVG_Path(group, def.M_id + "_path", "bpmndi_event_definition bpmndi_escalation_event_definition", [pathStr])
+			evtDefPath = new SVG_Path(group, def.UUID + "_path", "bpmndi_event_definition bpmndi_escalation_event_definition", [pathStr])
 		} else if (def.TYPENAME == "BPMN20.TerminateEventDefinition") {
 			var r = diagramElement.M_Bounds.M_width / 2
-			var shape = new SVG_Circle(group, diagramElement.M_id, "", r, r, r * .75)
+			var shape = new SVG_Circle(group, diagramElement.UUID, "", r, r, r * .75)
 			shape.setSvgAttribute("stroke-width", "4px")
 			shape.setSvgAttribute("fill", "black")
 		} else if (def.TYPENAME == "BPMN20.CompensationEventDefinition") {
@@ -794,7 +816,7 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 					my: 0.5
 				}
 			});
-			evtDefPath = new SVG_Path(group, def.M_id + "_path", "bpmndi_event_definition bpmndi_compensation_event_definition", [pathStr])
+			evtDefPath = new SVG_Path(group, def.UUID + "_path", "bpmndi_event_definition bpmndi_compensation_event_definition", [pathStr])
 		} else if (def.TYPENAME == "BPMN20.CancelEventDefinition") {
 			var pathStr = this.pathMap.getScaledPath('EVENT_CANCEL_45', {
 				xScaleFactor: 1.0,
@@ -806,7 +828,7 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 					my: -0.055
 				}
 			});
-			evtDefPath = new SVG_Path(group, def.M_id + "_path", "bpmndi_event_definition bpmndi_cancel_event_definition", [pathStr])
+			evtDefPath = new SVG_Path(group, def.UUID + "_path", "bpmndi_event_definition bpmndi_cancel_event_definition", [pathStr])
 		} else if (def.TYPENAME == "BPMN20.ComplexBehaviorDefinition") {
 			var pathStr = pathMap.getScaledPath('EVENT_MULTIPLE', {
 				xScaleFactor: 1.1,
@@ -819,13 +841,13 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 				}
 			});
 
-			evtDefPath = new SVG_Path(group, def.M_id + "_path", "bpmndi_event_definition bpmndi_complex_behavior_event_definition", [pathStr])
+			evtDefPath = new SVG_Path(group, def.UUID + "_path", "bpmndi_event_definition bpmndi_complex_behavior_event_definition", [pathStr])
 
 		}
 
 		if (evtDefPath != null) {
 
-			evtDefPath.setSvgAttribute("name", def.M_id)
+			evtDefPath.setSvgAttribute("name", def.UUID)
 
 			if (isThrowing) {
 				evtDefPath.setSvgAttribute("fill", "black")
@@ -847,8 +869,8 @@ SvgDiagram.prototype.drawEventDefintion = function (diagramElement, eventGroup) 
 // Event elements.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SvgDiagram.prototype.drawEvent = function (diagramElement) {
-	var group = new SVG_Group(this.plane, diagramElement.M_id, "", 100, 0)
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var group = new SVG_Group(this.plane, diagramElement.UUID, "", 100, 0)
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 
 	// Here I will set the name with the id of the bpmn element...
 	group.setSvgAttribute("transform", "translate(" + diagramElement.M_Bounds.M_x + "," + diagramElement.M_Bounds.M_y + ")")
@@ -858,8 +880,8 @@ SvgDiagram.prototype.drawEvent = function (diagramElement) {
 	if (bpmnElement.TYPENAME == "BPMN20.BoundaryEvent") {
 		className = "bpmndi_boundary_event"
 	}
-	var shape = new SVG_Circle(group, diagramElement.M_id, className, r, r, r)
-	shape.setSvgAttribute("name", bpmnElement.M_id)
+	var shape = new SVG_Circle(group, diagramElement.UUID, className, r, r, r)
+	shape.setSvgAttribute("name", bpmnElement.UUID)
 
 	this.svgElements[bpmnElement.UUID] = group
 
@@ -873,7 +895,7 @@ SvgDiagram.prototype.drawBoundaryEvent = function (diagramElement) {
 
 	// Now the boundary event can be interupting or non interupting...
 	var r = diagramElement.M_Bounds.M_width / 2
-	var innerCircle = new SVG_Circle(group, diagramElement.M_id, "", r, r, r * .85)
+	var innerCircle = new SVG_Circle(group, diagramElement.UUID, "", r, r, r * .85)
 	innerCircle.setSvgAttribute("stroke", "black")
 	innerCircle.setSvgAttribute("fill", "none")
 
@@ -889,7 +911,7 @@ SvgDiagram.prototype.drawBoundaryEvent = function (diagramElement) {
 
 SvgDiagram.prototype.drawStartEvent = function (diagramElement) {
 	var group = this.drawEvent(diagramElement)
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 
 	if (bpmnElement.M_eventDefinition != undefined) {
 		// Here I will draw the definition element...
@@ -918,24 +940,24 @@ SvgDiagram.prototype.drawStartEvent = function (diagramElement) {
 			startMenu = popup.appendElement({ "tag": "div", "class": "popupMenuItem", "innerHtml": "Start" }).down()
 			startMenu.element.onclick = function (popup, parent, diagramElement) {
 				return function () {
-					var startEvent = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+					var startEvent = entities[diagramElement.M_bpmnElement]
 					// Remove the menu.
 					popup.element.parentNode.removeChild(popup.element)
 
 					// Create a new process instance wizard...
 					new ProcessWizard(parent, startEvent)
 				}
-			} (popup, parent, diagramElement)
+			}(popup, parent, diagramElement)
 
 		}
-	} (this.parent, diagramElement)
+	}(this.parent, diagramElement)
 
 	return group
 }
 
 SvgDiagram.prototype.drawEndEvent = function (diagramElement) {
 	var group = this.drawEvent(diagramElement)
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 	group.element.childNodes[0].className.baseVal += " bpmndi_endEvent"
 	group.element.childNodes[0].className.animVal += " bpmndi_endEvent"
 
@@ -950,9 +972,9 @@ SvgDiagram.prototype.drawEndEvent = function (diagramElement) {
 
 SvgDiagram.prototype.drawIntermediateEvent = function (diagramElement) {
 	var group = this.drawEvent(diagramElement)
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 	var r = diagramElement.M_Bounds.M_width / 2
-	var shape = new SVG_Circle(group, diagramElement.M_id, "bpmndi_inner_circle", r, r, r * .85)
+	var shape = new SVG_Circle(group, diagramElement.UUID, "bpmndi_inner_circle", r, r, r * .85)
 
 	group.element.firstElementChild.className.baseVal += " bpmndi_intermediate_event"
 	if (bpmnElement.M_eventDefinition != undefined) {
@@ -970,12 +992,12 @@ SvgDiagram.prototype.drawConnector = function (id, className, waypoints, attrs) 
 	var group = new SVG_Group(this.plane, id, "", 100, 0)
 
 	// Here I will set the name with the id of the bpmn element...
-   	var pathStr = "M"
-   	var lastPoint = null
-   	var startX = 0
-   	var startY = 0
+	var pathStr = "M"
+	var lastPoint = null
+	var startX = 0
+	var startY = 0
 
-   	for (var i = 0; i < waypoints.length; i++) {
+	for (var i = 0; i < waypoints.length; i++) {
 		var wayPoint = waypoints[i]
 		if (i == 0) {
 			startX = wayPoint.M_x
@@ -989,46 +1011,46 @@ SvgDiagram.prototype.drawConnector = function (id, className, waypoints, attrs) 
 		pathStr += " " + (wayPoint.M_x - startX)
 		pathStr += " " + (wayPoint.M_y - startY)
 		lastPoint = wayPoint
-   	}
+	}
 
-   	var sequenceFlow = new SVG_Path(group, id, className, [pathStr])
-   	sequenceFlow.setSvgAttribute("name", id)
+	var sequenceFlow = new SVG_Path(group, id, className, [pathStr])
+	sequenceFlow.setSvgAttribute("name", id)
 
-   	group.setSvgAttribute("transform", "translate(" + startX + "," + startY + ")")
-   	return group
+	group.setSvgAttribute("transform", "translate(" + startX + "," + startY + ")")
+	return group
 }
 
 SvgDiagram.prototype.drawAssociation = function (diagramElement, isInput) {
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
-   	connector = this.drawConnector(diagramElement.M_id, "bpmndi_association", diagramElement.M_waypoint)
-   	connector.setSvgAttribute("name", bpmnElement.M_id)
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
+	connector = this.drawConnector(diagramElement.UUID, "bpmndi_association", diagramElement.M_waypoint)
+	connector.setSvgAttribute("name", bpmnElement.UUID)
 
-   	if (bpmnElement.M_associationDirection == 0) {
+	if (bpmnElement.M_associationDirection == 0) {
 		/* One **/
 		connector.element.firstElementChild.className.baseVal += " bpmndi_data_association_one"
-   	} else if (bpmnElement.M_associationDirection == 1) {
+	} else if (bpmnElement.M_associationDirection == 1) {
 		/* Both **/
 		connector.element.firstElementChild.className.baseVal += " bpmndi_data_association_both"
-   	}
+	}
 
-   	return connector
+	return connector
 }
 
 SvgDiagram.prototype.drawMessageFlow = function (diagramElement) {
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
-	var connector = this.drawConnector(diagramElement.M_id, "bpmndi_association bpmndi_message_flow", diagramElement.M_waypoint)
-	connector.setSvgAttribute("name", bpmnElement.M_id)
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
+	var connector = this.drawConnector(diagramElement.UUID, "bpmndi_association bpmndi_message_flow", diagramElement.M_waypoint)
+	connector.setSvgAttribute("name", bpmnElement.UUID)
 	return connector
 }
 
 SvgDiagram.prototype.drawSequenceFlow = function (diagramElement) {
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
-   	connector = this.drawConnector(diagramElement.M_id, "bpmndi_association bpmndi_sequence_flow", diagramElement.M_waypoint)
-   	connector.setSvgAttribute("name", bpmnElement.M_id)
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
+	connector = this.drawConnector(diagramElement.UUID, "bpmndi_association bpmndi_sequence_flow", diagramElement.M_waypoint)
+	connector.setSvgAttribute("name", bpmnElement.UUID)
 
-   	// Now I will draw the marker...
-   	var source = bpmnElement.M_sourceRef
-   	var isActivityInstance = source.TYPENAME == "BPMN20.AdHocSubProcess" ||
+	// Now I will draw the marker...
+	var source = bpmnElement.M_sourceRef
+	var isActivityInstance = source.TYPENAME == "BPMN20.AdHocSubProcess" ||
 		source.TYPENAME == "BPMN20.BusinessRuleTask" ||
 		source.TYPENAME == "BPMN20.CallActivity" ||
 		source.TYPENAME == "BPMN20.ManualTask" ||
@@ -1040,24 +1062,24 @@ SvgDiagram.prototype.drawSequenceFlow = function (diagramElement) {
 		source.TYPENAME == "BPMN20.UserTask" ||
 		source.TYPENAME == "BPMN20.SubProcess"
 
-   	if (bpmnElement.M_conditionExpression != undefined && isActivityInstance) {
+	if (bpmnElement.M_conditionExpression != undefined && isActivityInstance) {
 		connector.element.firstElementChild.className.baseVal += " bpmndi_sequence_flow_condition"
-   	}
+	}
 
-   	var isGatewayInstance = source.TYPENAME == "BPMN20.ComplexGateway" ||
+	var isGatewayInstance = source.TYPENAME == "BPMN20.ComplexGateway" ||
 		source.TYPENAME == "BPMN20.EventBasedGateway" ||
 		source.TYPENAME == "BPMN20.ExclusiveGateway" ||
 		source.TYPENAME == "BPMN20.InclusiveGateway" ||
 		source.TYPENAME == "BPMN20.ParallelGateway"
 
-   	// Now the default marker...
-   	if (isObject(source.M_default) == true && (isGatewayInstance || isActivityInstance)) {
-		if (source.M_default.M_id == bpmnElement.M_id) {
+	// Now the default marker...
+	if (isObject(source.M_default) == true && (isGatewayInstance || isActivityInstance)) {
+		if (source.M_default.UUID == bpmnElement.UUID) {
 			connector.element.firstElementChild.className.baseVal += " bpmndi_sequence_flow_default"
 		}
-   	}
+	}
 
-   	return connector
+	return connector
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1065,33 +1087,33 @@ SvgDiagram.prototype.drawSequenceFlow = function (diagramElement) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SvgDiagram.prototype.drawDataStoreReference = function (diagramElement) {
 	// Data store reference...
-	var group = new SVG_Group(this.plane, diagramElement.M_id, "", 100, 0)
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var group = new SVG_Group(this.plane, diagramElement.UUID, "", 100, 0)
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 
 	// Here I will set the name with the id of the bpmn element...
-	group.setSvgAttribute("name", bpmnElement.M_id)
+	group.setSvgAttribute("name", bpmnElement.UUID)
 	group.setSvgAttribute("transform", "translate(" + diagramElement.M_Bounds.M_x + "," + diagramElement.M_Bounds.M_y + ")")
 
 	var pathStr = this.pathMap.getScaledPath('DATA_STORE', {
-        xScaleFactor: 1,
-        yScaleFactor: 1,
-        containerWidth: diagramElement.M_Bounds.M_width,
-        containerHeight: diagramElement.M_Bounds.M_height,
-        position: {
+		xScaleFactor: 1,
+		yScaleFactor: 1,
+		containerWidth: diagramElement.M_Bounds.M_width,
+		containerHeight: diagramElement.M_Bounds.M_height,
+		position: {
 			mx: 0,
 			my: 0.133
-        }
+		}
 	});
 
-	var dataStoreReferencePath = new SVG_Path(group, diagramElement.M_id + "_path", "bpmndi_shape bpmndi_data_store_reference", [pathStr])
+	var dataStoreReferencePath = new SVG_Path(group, diagramElement.UUID + "_path", "bpmndi_shape bpmndi_data_store_reference", [pathStr])
 	this.svgElements[bpmnElement.UUID] = group
 
 	return group
 }
 
 SvgDiagram.prototype.drawDataInput = function (diagramElement) {
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
-	var group = new SVG_Group(this.drawDataObjectReference(diagramElement), diagramElement.M_id, "", 100, 0) 
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
+	var group = new SVG_Group(this.drawDataObjectReference(diagramElement), diagramElement.UUID, "", 100, 0)
 
 	var pathStr = this.pathMap.getScaledPath('DATA_ARROW', {
 		xScaleFactor: 1,
@@ -1099,28 +1121,28 @@ SvgDiagram.prototype.drawDataInput = function (diagramElement) {
 		containerWidth: diagramElement.M_Bounds.M_width,
 		containerHeight: diagramElement.M_Bounds.M_height,
 		position: {
-            mx: 0,
-            my: 0
+			mx: 0,
+			my: 0
 		}
 	});
 
-	evtDefPath = new SVG_Path(group, bpmnElement.M_id + "_path", "bpmndi_data_input", [pathStr])
-	group.setSvgAttribute("name", bpmnElement.M_id)
+	evtDefPath = new SVG_Path(group, bpmnElement.UUID + "_path", "bpmndi_data_input", [pathStr])
+	group.setSvgAttribute("name", bpmnElement.UUID)
 	group.setSvgAttribute("transform", "translate(" + (diagramElement.M_Bounds.M_x - 2) + "," + diagramElement.M_Bounds.M_y + ")")
 
-   	return group
+	return group
 }
 
 SvgDiagram.prototype.drawDataInputAssociation = function (diagramElement) {
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
-   	connector = this.drawConnector(diagramElement.M_id, "bpmndi_association bpmndi_data_association bpmndi_data_association_one", diagramElement.M_waypoint)
-   	connector.setSvgAttribute("name", bpmnElement.M_id)
-   	return connector
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
+	connector = this.drawConnector(diagramElement.UUID, "bpmndi_association bpmndi_data_association bpmndi_data_association_one", diagramElement.M_waypoint)
+	connector.setSvgAttribute("name", bpmnElement.UUID)
+	return connector
 }
 
 SvgDiagram.prototype.drawDataOutput = function (diagramElement) {
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
-	var group = new SVG_Group(this.drawDataObjectReference(diagramElement), diagramElement.M_id, "", 100, 0) 
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
+	var group = new SVG_Group(this.drawDataObjectReference(diagramElement), diagramElement.UUID, "", 100, 0)
 
 	var pathStr = this.pathMap.getScaledPath('DATA_ARROW', {
 		xScaleFactor: 1,
@@ -1128,29 +1150,29 @@ SvgDiagram.prototype.drawDataOutput = function (diagramElement) {
 		containerWidth: diagramElement.M_Bounds.M_width,
 		containerHeight: diagramElement.M_Bounds.M_height,
 		position: {
-            mx: 0,
-            my: 0
+			mx: 0,
+			my: 0
 		}
 	});
 
-	evtDefPath = new SVG_Path(group, bpmnElement.M_id + "_path", "", [pathStr])
-	group.setSvgAttribute("name", bpmnElement.M_id)
+	evtDefPath = new SVG_Path(group, bpmnElement.UUID + "_path", "", [pathStr])
+	group.setSvgAttribute("name", bpmnElement.UUID)
 	group.setSvgAttribute("transform", "translate(" + (diagramElement.M_Bounds.M_x - 2) + "," + diagramElement.M_Bounds.M_y + ")")
 
-   	return group
+	return group
 }
 
 SvgDiagram.prototype.drawDataOutputAssociation = function (diagramElement) {
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
-   	connector = this.drawConnector(diagramElement.M_id, "bpmndi_association bmndi_data_association bpmndi_data_association_one", diagramElement.M_waypoint)
-   	connector.setSvgAttribute("name", bpmnElement.M_id)
-   	return connector
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
+	connector = this.drawConnector(diagramElement.UUID, "bpmndi_association bmndi_data_association bpmndi_data_association_one", diagramElement.M_waypoint)
+	connector.setSvgAttribute("name", bpmnElement.UUID)
+	return connector
 }
 
 SvgDiagram.prototype.drawDataObjectReference = function (diagramElement) {
 	// So here I will create a new group...
-	var group = new SVG_Group(this.plane, diagramElement.M_id, "", 100, 0)
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var group = new SVG_Group(this.plane, diagramElement.UUID, "", 100, 0)
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 
 	var pathStr = "M " + diagramElement.M_Bounds.M_x + " " + diagramElement.M_Bounds.M_y
 	// The first line...
@@ -1182,8 +1204,8 @@ SvgDiagram.prototype.drawDataObjectReference = function (diagramElement) {
 	pathStr += " M" + pt6_x + " " + pt6_y
 	pathStr += " L" + pt3_x + " " + pt3_y
 
-	var dataObjectRefPath = new SVG_Path(group, diagramElement.M_id + "_path", "bpmndi_shape  bpmndi_data_object_reference", [pathStr])
-	dataObjectRefPath.setSvgAttribute("name", bpmnElement.M_id)
+	var dataObjectRefPath = new SVG_Path(group, diagramElement.UUID + "_path", "bpmndi_shape  bpmndi_data_object_reference", [pathStr])
+	dataObjectRefPath.setSvgAttribute("name", bpmnElement.UUID)
 
 	this.svgElements[bpmnElement.UUID] = group
 
@@ -1194,7 +1216,7 @@ SvgDiagram.prototype.drawDataObjectReference = function (diagramElement) {
 			return function () {
 				return label
 			}
-		} (label)
+		}(label)
 	}
 	return group
 }
@@ -1204,9 +1226,9 @@ SvgDiagram.prototype.drawDataObjectReference = function (diagramElement) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SvgDiagram.prototype.drawGateway = function (diagramElement) {
 
-	var group = new SVG_Group(this.plane, diagramElement.M_id, "", 100, 0)
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
-	group.setSvgAttribute("name", bpmnElement.M_id)
+	var group = new SVG_Group(this.plane, diagramElement.UUID, "", 100, 0)
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
+	group.setSvgAttribute("name", bpmnElement.UUID)
 
 	var x = 0
 	var y = 0
@@ -1222,22 +1244,22 @@ SvgDiagram.prototype.drawGateway = function (diagramElement) {
 	pt3_x = x + (w / 2)
 	pt3_y = y
 
-   	var polygon = new SVG_Polygon(group, diagramElement.M_id, "bpmndi_shape bpmndi_gateway", [pt0_x, pt0_y, pt1_x, pt1_y, pt2_x, pt2_y, pt3_x, pt3_y])
-   	this.svgElements[bpmnElement.UUID] = polygon
-   	group.setSvgAttribute("transform", "translate(" + diagramElement.M_Bounds.M_x + "," + diagramElement.M_Bounds.M_y + ")")
+	var polygon = new SVG_Polygon(group, diagramElement.UUID, "bpmndi_shape bpmndi_gateway", [pt0_x, pt0_y, pt1_x, pt1_y, pt2_x, pt2_y, pt3_x, pt3_y])
+	this.svgElements[bpmnElement.UUID] = polygon
+	group.setSvgAttribute("transform", "translate(" + diagramElement.M_Bounds.M_x + "," + diagramElement.M_Bounds.M_y + ")")
 
-   	return group
+	return group
 }
 
 SvgDiagram.prototype.drawEventBasedGateway = function (diagramElement) {
 	var group = this.drawGateway(diagramElement)
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 
 	var r = diagramElement.M_Bounds.M_width / 2
 
 	// The tow circle...
-	var shape = new SVG_Circle(group, diagramElement.M_id, "bpmndi_inner_circle", r, r, r * .55)
-	var shape_ = new SVG_Circle(group, diagramElement.M_id, "bpmndi_inner_circle", r, r, r * .45)
+	var shape = new SVG_Circle(group, diagramElement.UUID, "bpmndi_inner_circle", r, r, r * .55)
+	var shape_ = new SVG_Circle(group, diagramElement.UUID, "bpmndi_inner_circle", r, r, r * .45)
 
 	// Now the pentagone...
 	var points = []
@@ -1254,27 +1276,27 @@ SvgDiagram.prototype.drawEventBasedGateway = function (diagramElement) {
 		points.push(y)
 	}
 
-	var polygon = new SVG_Polygon(group, diagramElement.M_id, "bpmndi_event_base_gateway_polygone", points)
-   	this.svgElements[bpmnElement.UUID] = polygon
+	var polygon = new SVG_Polygon(group, diagramElement.UUID, "bpmndi_event_base_gateway_polygone", points)
+	this.svgElements[bpmnElement.UUID] = polygon
 
-   	return group
+	return group
 }
 
 SvgDiagram.prototype.drawExclusiveGateway = function (diagramElement) {
 	var group = this.drawGateway(diagramElement)
 
 	var pathData = this.pathMap.getScaledPath('GATEWAY_EXCLUSIVE', {
-        xScaleFactor: 0.4,
-        yScaleFactor: 0.4,
-        containerWidth: diagramElement.M_Bounds.M_width,
-        containerHeight: diagramElement.M_Bounds.M_height,
-        position: {
+		xScaleFactor: 0.4,
+		yScaleFactor: 0.4,
+		containerWidth: diagramElement.M_Bounds.M_width,
+		containerHeight: diagramElement.M_Bounds.M_height,
+		position: {
 			mx: 0.32,
 			my: 0.3
-        }
+		}
 	});
 
-	var path = new SVG_Path(group, diagramElement.M_id + "_path", "bpmndi_exclusive_gateway", [pathData])
+	var path = new SVG_Path(group, diagramElement.UUID + "_path", "bpmndi_exclusive_gateway", [pathData])
 	path.setSvgAttribute("x", diagramElement.M_Bounds.M_x)
 	path.setSvgAttribute("y", diagramElement.M_Bounds.M_y)
 
@@ -1284,7 +1306,7 @@ SvgDiagram.prototype.drawExclusiveGateway = function (diagramElement) {
 SvgDiagram.prototype.drawInclusiveGateway = function (diagramElement) {
 	var group = this.drawGateway(diagramElement)
 	var r = diagramElement.M_Bounds.M_width / 2
-	var shape = new SVG_Circle(group, diagramElement.M_id, "bpmndi_inclusive_gateway", r, r, r * .55)
+	var shape = new SVG_Circle(group, diagramElement.UUID, "bpmndi_inclusive_gateway", r, r, r * .55)
 
 	return group
 }
@@ -1292,16 +1314,16 @@ SvgDiagram.prototype.drawInclusiveGateway = function (diagramElement) {
 SvgDiagram.prototype.drawParallelGateway = function (diagramElement) {
 	var group = this.drawGateway(diagramElement)
 	var pathStr = this.pathMap.getScaledPath('GATEWAY_PARALLEL', {
-        xScaleFactor: 0.6,
-        yScaleFactor: 0.6,
-        containerWidth: diagramElement.M_Bounds.M_width,
-        containerHeight: diagramElement.M_Bounds.M_height,
-        position: {
+		xScaleFactor: 0.6,
+		yScaleFactor: 0.6,
+		containerWidth: diagramElement.M_Bounds.M_width,
+		containerHeight: diagramElement.M_Bounds.M_height,
+		position: {
 			mx: 0.46,
 			my: 0.2
-        }
+		}
 	});
-	var path = new SVG_Path(group, diagramElement.M_id + "_path", "bpmndi_parallel_gateway", [pathStr])
+	var path = new SVG_Path(group, diagramElement.UUID + "_path", "bpmndi_parallel_gateway", [pathStr])
 	path.setSvgAttribute("x", diagramElement.M_Bounds.M_x)
 	path.setSvgAttribute("y", diagramElement.M_Bounds.M_y)
 	return group
@@ -1310,16 +1332,16 @@ SvgDiagram.prototype.drawParallelGateway = function (diagramElement) {
 SvgDiagram.prototype.drawComplexGateway = function (diagramElement) {
 	var group = this.drawGateway(diagramElement)
 	var pathStr = this.pathMap.getScaledPath('GATEWAY_COMPLEX', {
-        xScaleFactor: 0.5,
-        yScaleFactor: 0.5,
-        containerWidth: diagramElement.M_Bounds.M_width,
-        containerHeight: diagramElement.M_Bounds.M_height,
-        position: {
+		xScaleFactor: 0.5,
+		yScaleFactor: 0.5,
+		containerWidth: diagramElement.M_Bounds.M_width,
+		containerHeight: diagramElement.M_Bounds.M_height,
+		position: {
 			mx: 0.46,
 			my: 0.26
-        }
+		}
 	});
-	var path = new SVG_Path(group, diagramElement.M_id + "_path", "bpmndi_complex_gateway", [pathStr])
+	var path = new SVG_Path(group, diagramElement.UUID + "_path", "bpmndi_complex_gateway", [pathStr])
 	path.setSvgAttribute("x", diagramElement.M_Bounds.M_x)
 	path.setSvgAttribute("y", diagramElement.M_Bounds.M_y)
 	return group
@@ -1330,7 +1352,7 @@ SvgDiagram.prototype.drawComplexGateway = function (diagramElement) {
  * The process or call activity...
  */
 SvgDiagram.prototype.drawCallableActivity = function (diagramElement) {
-	var bpmnElement = server.workflowManager.bpmnElements[diagramElement.M_bpmnElement]
+	var bpmnElement = entities[diagramElement.M_bpmnElement]
 	var className = ""
 	if (bpmnElement.TYPENAME == "BPMN20.SubProcess") {
 		className += " bpmndi_sub_process"

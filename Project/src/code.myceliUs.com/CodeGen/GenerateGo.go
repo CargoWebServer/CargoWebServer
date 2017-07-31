@@ -642,6 +642,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				refSetter += "		this.M_" + attribute.Name + ref + " = ref.(string)\n"
 				refSetter += "	}else{\n"
 				refSetter += "		this.m_" + attribute.Name + ref + " = ref.(" + typeName + ")\n"
+
 				if classesMap[cast] != nil {
 					isInterfaceCast := Utility.Contains(abstractClassLst, cast) || Utility.Contains(superClassesLst, cast)
 					if elementPackName != packName {
@@ -651,6 +652,9 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 						cast = "*" + cast
 					}
 					refSetter += "		this.M_" + attribute.Name + ref + " = ref.(" + cast + ").GetUUID()\n"
+				} else {
+					hasUtility[packName+"."+ownerName] = true
+					refSetter += "		this.M_" + attribute.Name + ref + " = ref.(Utility.Referenceable).GetUUID()\n"
 				}
 
 				refSetter += "	}\n"
@@ -786,6 +790,9 @@ func generateGoInterfacesCode(packageId string) {
 	}
 }
 
+// If the utility package must be import...
+var hasUtility = make(map[string]bool, 0)
+
 func generateGoInterfaceCode(packageId string, class *XML_Schemas.CMOF_OwnedMember) {
 
 	// Set the pacakge here.
@@ -799,6 +806,7 @@ func generateGoInterfaceCode(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 		for j := 0; j < len(imports); j++ {
 			classStr += "\"" + imports[j] + "\"\n"
 		}
+
 		classStr += ")\n\n"
 	}
 
@@ -842,24 +850,7 @@ func generateGoClassCode(packageId string) {
 					className += "_impl"
 				}
 
-				var classStr = "package " + packageId + "\n\n"
-				imports := getClassImports(class)
-
-				// The xml code
-				xmlParserStr := generateGoXmlParser(class, packageId)
-				if len(xmlParserStr) > 0 {
-					imports = append(imports, "encoding/xml")
-				}
-
-				if len(imports) > 0 {
-					classStr += "import(\n"
-					for j := 0; j < len(imports); j++ {
-						classStr += "\"" + imports[j] + "\"\n"
-					}
-					classStr += ")\n\n"
-				}
-
-				classStr += "type " + className + " struct{\n"
+				var classStr = "type " + className + " struct{\n"
 
 				classStr += "\n	/** The entity UUID **/\n"
 				classStr += "	UUID string\n"
@@ -894,6 +885,13 @@ func generateGoClassCode(packageId string) {
 				}
 
 				classStr += "}"
+				imports := getClassImports(class)
+
+				// The xml code
+				xmlParserStr := generateGoXmlParser(class, packageId)
+				if len(xmlParserStr) > 0 {
+					imports = append(imports, "encoding/xml")
+				}
 
 				if len(xmlParserStr) > 0 {
 					classStr += "\n\n/** Xml parser for " + class.Name + " **/\n"
@@ -927,6 +925,21 @@ func generateGoClassCode(packageId string) {
 						classStr += associationsStr
 					}
 				}
+
+				var classStr_ = "package " + packageId + "\n\n"
+				if hasUtility[packageId+"."+class.Name] == true || hasUtility[packageId+"."+class.Name+"_impl"] == true {
+					imports = append(imports, "code.myceliUs.com/Utility")
+				}
+
+				if len(imports) > 0 {
+					classStr_ += "import(\n"
+					for j := 0; j < len(imports); j++ {
+						classStr_ += "	\"" + imports[j] + "\"\n"
+					}
+					classStr_ += ")\n\n"
+				}
+
+				classStr = classStr_ + classStr
 
 				// Here I will write the string in a file...
 				WriteClassFile(outputPath, packageId, className, classStr)
