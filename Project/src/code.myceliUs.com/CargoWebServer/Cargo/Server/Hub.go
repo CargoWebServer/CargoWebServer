@@ -92,17 +92,17 @@ func (this *Hub) run() {
 			this.connections[c.GetUuid()] = c
 
 			// initialyse js interpreter for the new connection.
-			if c.GetPort() == GetServer().GetConfigurationManager().GetServerPort() {
 
-				// Open a new session
-				JS.GetJsRuntimeManager().OpendSession(c.GetUuid())
+			// Open a new session
+			JS.GetJsRuntimeManager().OpendSession(c.GetUuid())
 
-				// Set the server global variable.
-				JS.GetJsRuntimeManager().SetVar(c.GetUuid(), "server", GetServer())
+			// Set the server global variable.
+			log.Println("------------->101 set server var ", c.GetUuid())
+			JS.GetJsRuntimeManager().SetVar(c.GetUuid(), "server", GetServer())
 
-				// Init all scripts for the new session VM
-				JS.GetJsRuntimeManager().InitScripts(c.GetUuid())
-			}
+			// Init all scripts for the new session VM
+			log.Println("------------->105 init scripts ", c.GetUuid())
+			JS.GetJsRuntimeManager().InitScripts(c.GetUuid())
 
 		case c := <-this.unregister:
 			log.Println("----> remove connection ", c.GetAddrStr(), c.GetPort())

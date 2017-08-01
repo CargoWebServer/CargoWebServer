@@ -141,6 +141,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				jsRuntimeManager.createVm(sessionId)
 				jsRuntimeManager.m_setVariable[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_getVariable[sessionId] = make(OperationChannel)
+				log.Println("--------------> 144")
 				jsRuntimeManager.m_executeJsFunction[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
 				// The vm processing loop...
