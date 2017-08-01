@@ -42,7 +42,8 @@
 /WebApp/Cargo/Data/
 /WebApp/Cargo/Definitions/
 /WebApp/Cargo/icons/
-/WebApp/Cargo/Scripts/
+/WebApp/Cargo/Script/
+!/WebApp/Cargo/Script/Cargo
 /WebApp/Cargo/tmp/
 
 /WebApp/Cargo/Apps/BrisOutil/
