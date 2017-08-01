@@ -1,5 +1,10 @@
 package Server
 
+// Minimal build options...
+// -i -tags "Config CargoEntities"
+// With the workflowmanager
+// -i -tags "Config CargoEntities BPMN20 BPMNDI BPMS DI DC"
+
 import (
 	b64 "encoding/base64"
 	"encoding/json"
@@ -111,8 +116,8 @@ func (this *Server) initialize() {
 	this.GetServiceManager().registerService(this.GetSchemaManager())
 
 	// BPMN stuff
-	this.GetServiceManager().registerService(this.GetWorkflowManager())
-	this.GetServiceManager().registerService(this.GetWorkflowProcessor())
+	//this.GetServiceManager().registerService(this.GetWorkflowManager())
+	//this.GetServiceManager().registerService(this.GetWorkflowProcessor())
 
 	// The other services are initialyse by the service manager.
 	this.GetServiceManager().initialize()

@@ -13,50 +13,12 @@ var languageInfo = {
 
 // Depending of the language the correct text will be set.
 server.languageManager.appendLanguageInfo(languageInfo)
-var service = null
 
 /**
  * Server side function
  */
 function SayHello(to) {
-
-    // Test service usage here...
-
-    // New service object
-    service = new Server("localhost", "127.0.0.1", 9595)
-
-    // Initialyse the server connection.
-    service.init( 
-        // on open connection callback
-        function (caller) {
-            // Test ping function.
-            caller.ping(
-                // success callback
-                function (result, caller) {
-                    // Now I will create a new interface found on the ser 
-                    var sayHello = new com.mycelius.SayHelloInterface(caller)
-                    // Call say hello. 
-                    sayHello.sayHelloTo("Cargo!!!",
-                        // Success Callback
-                        function (result, caller) {
-                            console.log("------> success!", result)
-                        },
-                        // Error Callback
-                        function (errObj, caller) {
-
-                        }, {})
-                },
-                // error callback
-                function (errObj, caller) {
-                    // Ping fail.
-                }, caller)
-        },
-        // on close callback
-        function () {
-
-        })
-
-    return "Hello " + to + "!!!"
+    return "Hello " + to + "!"
 }
 
 /**
