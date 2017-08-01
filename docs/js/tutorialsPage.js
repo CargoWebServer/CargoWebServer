@@ -17,12 +17,12 @@ var TutorialsPage = function (parent) {
             "convention-tutorial-title": "Conventions",
             "convention-tutorial-content": "Let's me now explain to you the tutorials conventions. Because of the name Cargo, we made use of nautic symbols.",
             "tutorial-lifesaver-desc": "The life saver symbol is use when we want to teach you good practices or usefull techniques.",
-            "tutorial-buoy-desc" :"The buoy symbol is use to warning you about common mistake or bad programming practices.",
-            "tutorial-anchor-desc":"The anchor symbol are use for complementary explanation or discution that can be skip by hurry reader's.",
+            "tutorial-buoy-desc": "The buoy symbol is use to warning you about common mistake or bad programming practices.",
+            "tutorial-anchor-desc": "The anchor symbol are use for complementary explanation or discution that can be skip by hurry reader's.",
             "SOM-tutorial-title": "The Service Object Model (SOM)",
             "SOM-tutorial-lnk": "SOM tutorial",
             "SOM-tutorial-content": "Making a distant service appear like local object, that's the essence of the SOM. Object are intuitive to work with, they regroup related actions and informations."
-            + ""
+            + "Let's now create a simple application to get a better view of how to work with SOM."
         },
         //francais
         "fr": {
@@ -106,4 +106,16 @@ var TutorialsPage = function (parent) {
         .appendElement({ "tag": "div", "class": "col-xs-12" }).down()
         .appendElement({ "tag": "h2", "id": "SOM-tutorial-title" })
         .appendElement({ "tag": "p", "id": "SOM-tutorial-content" })
+        // The tutorial content will be created here in english, translation will come latter.
+        .appendElement({ "tag": "h2", "innerHtml": "Create a new project" })
+        .appendElement({
+            "tag": "p", "innerHtml": "In order to create a new project in Cargo simply create a new folder inside "
+                + " CargoWebServer/WebApp/Cargo/Apps folder and put file named index.hml inside it. The index.html file is the "
+                + "entry point of your web application, it contain the title of your application and all paths to css files and javaScript "
+                + "files needed by your application. You can create html elements in it, but personnaly, I prefer to create elements dynamicaly,"
+                + "I will show you how to do so latter. In order to keep the content of the application folder clean, I create folders, one "
+                + "for each kind of ressource use by the application, css, js, svg, img... "
+        }).appendElement({"tag":"div", "style":"width: 100%; text-align: center; padding: 10px;"}).down()
+            .appendElement({"tag":"img", "src":"img/screenShot1.png", "style":""}).up()
+        
 }

@@ -1234,7 +1234,7 @@ func (this *EntityManager) InitEntity(entity Entity, lazy bool) {
  * Return the list of entity prototype for a given package...
  */
 func (this *EntityManager) getEntityPrototypes(storeId string, schemaId string) ([]*EntityPrototype, error) {
-
+	log.Println("-----------> get Entity prototypes call!")
 	if GetServer().GetDataManager().getDataStore(storeId) == nil {
 		return nil, errors.New("The dataStore with id '" + storeId + "' doesn't exist.")
 	}
