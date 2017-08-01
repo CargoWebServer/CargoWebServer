@@ -53,13 +53,16 @@ func newConfigurationManager() *ConfigurationManager {
 
 	if len(cargoRoot) == 0 {
 		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+
 		if err != nil {
 			panic(err)
 		}
-		if strings.Index(dir, "CargoWebServer") != -1 {
-			cargoRoot = dir[0:strings.Index(dir, "CargoWebServer")]
-		} else {
+
+		if stat, err := os.Stat(dir + "/WebApp"); err == nil && stat.IsDir() {
+			// path is a directory
 			cargoRoot = dir
+		} else if strings.Index(dir, "CargoWebServer") != -1 {
+			cargoRoot = dir[0:strings.Index(dir, "CargoWebServer")]
 		}
 	}
 
@@ -78,6 +81,7 @@ func newConfigurationManager() *ConfigurationManager {
 
 	// Here I will set the root...
 	configurationManager.m_filePath = dir + "WebApp/Cargo"
+	log.Println("filepath = " + configurationManager.m_filePath)
 	JS.NewJsRuntimeManager(configurationManager.m_filePath + "/Script")
 
 	// The list of registered services config

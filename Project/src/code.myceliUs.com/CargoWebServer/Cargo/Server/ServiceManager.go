@@ -76,10 +76,10 @@ func (this *ServiceManager) initialize() {
 	}
 
 	// TCP
-	this.startServiceContainer("CargoServiceContainer_TCP", GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
+	//this.startServiceContainer("CargoServiceContainer_TCP", GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
 
 	// WS
-	this.startServiceContainer("CargoServiceContainer_WS", GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
+	//this.startServiceContainer("CargoServiceContainer_WS", GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
 
 }
 
@@ -718,6 +718,7 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 	// Keep the service javaScript code in the map.
 	serviceManager.m_serviceClientSrc[serviceId] = clientSrc
 	serviceManager.m_serviceServerSrc[serviceId] = serverSrc
+
 }
 
 func (this *ServiceManager) registerAction(methodName string, parameters []interface{}, results []interface{}) (*CargoEntities.Action, error) {
