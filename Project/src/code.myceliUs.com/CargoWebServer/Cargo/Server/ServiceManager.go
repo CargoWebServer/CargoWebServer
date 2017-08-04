@@ -345,7 +345,6 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 		} else {
 			entity, _ := GetServer().GetEntityManager().getEntityByUuid(methodUuid, false)
 			action = entity.GetObject().(*CargoEntities.Action)
-			log.Println("---------> action exist: ", methodName)
 		}
 
 		if len(methodUuid) == 0 && (len(methodName) > 0 && !(strings.HasPrefix(method.Name, "New") && (strings.HasSuffix(method.Name, "Entity") || strings.HasSuffix(method.Name, "EntityFromObject")))) {

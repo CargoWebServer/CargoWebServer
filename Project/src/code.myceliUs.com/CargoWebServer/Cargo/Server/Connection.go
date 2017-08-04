@@ -342,8 +342,6 @@ func HttpHandler(ws *websocket.Conn) {
 	// Start the writing loop...
 	go c.Writer()
 
-	log.Println("------------> new connection with id: ", c.GetUuid())
-
 	// here the it stay in reader loop until the connection is close.
 	c.Reader()
 }

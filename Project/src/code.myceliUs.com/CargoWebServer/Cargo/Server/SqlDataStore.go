@@ -1284,9 +1284,7 @@ func (this *SqlDataStore) setRefs() error {
 			trg, _ := GetServer().GetEntityManager().getEntityPrototype(associations_[i][1].(*EntityPrototype).TypeName, "sql_info")
 			if !Utility.Contains(associativeTable.Fields, "M_"+refName) {
 				fieldType := trg.TypeName
-				if this.isRef(refName) {
-					fieldType = fieldType + ":Ref"
-				}
+				fieldType = fieldType + ":Ref" // Associative table contain only references.
 				if !this.isAssociative(trg) {
 					appendField(associativeTable, "M_"+refName, fieldType)
 				}
@@ -1300,10 +1298,10 @@ func (this *SqlDataStore) setRefs() error {
 						return err
 					}
 					if !this.isAssociative(trg) {
-						appendField(trg1, "M_"+refName, "[]"+trg.TypeName+":Ref")
+						appendField(trg1, "M_"+refName, "[]"+associativeTable.TypeName+":Ref")
 					}
 					if !this.isAssociative(trg1) {
-						appendField(trg, "M_"+associations_[j][0].(string), "[]"+trg1.TypeName+":Ref")
+						appendField(trg, "M_"+associations_[j][0].(string), "[]"+associativeTable.TypeName+":Ref")
 					}
 				}
 			}
@@ -1407,107 +1405,107 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 	// First of all I will sychronize create the entities information if it dosen't exist.
 	for i := 0; i < len(prototypes); i++ {
 		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
-		if !this.isAssociative(prototype) {
-			// Associative table object are not needed...
-			if len(prototype.Ids) > 1 {
-				query := "SELECT "
-				fieldsType := make([]interface{}, 0)
-				fieldsName := make([]string, 0)
-				for j := 0; j < len(prototype.Ids); j++ {
-					if strings.HasPrefix(prototype.Ids[j], "M_") {
-						query += strings.Replace(prototype.Ids[j], "M_", "", -1)
-						fieldsType = append(fieldsType, prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[j])])
-						fieldsName = append(fieldsName, prototype.Ids[j])
-						if j < len(prototype.Ids)-1 {
-							query += " ,"
-						}
+		//if !this.isAssociative(prototype) {
+		// Associative table object are not needed...
+		if len(prototype.Ids) > 1 {
+			query := "SELECT "
+			fieldsType := make([]interface{}, 0)
+			fieldsName := make([]string, 0)
+			for j := 0; j < len(prototype.Ids); j++ {
+				if strings.HasPrefix(prototype.Ids[j], "M_") {
+					query += strings.Replace(prototype.Ids[j], "M_", "", -1)
+					fieldsType = append(fieldsType, prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[j])])
+					fieldsName = append(fieldsName, prototype.Ids[j])
+					if j < len(prototype.Ids)-1 {
+						query += " ,"
 					}
 				}
+			}
 
-				// I will also append field's that are parts of relationship
-				for j := 0; j < len(prototype.Fields); j++ {
-					field := prototype.Fields[j]
-					// Not an id...
-					refInfos, err := this.getRefInfos(field[2:])
-					if err == nil {
-						// here a reference exist for that field so I will
-						// get it from sql.
-						for k := 0; k < len(refInfos); k++ {
-							if strings.HasSuffix(prototype.TypeName, refInfos[k][0]) {
-								if !Utility.Contains(fieldsName, "M_"+refInfos[k][1]) {
-									query += " ,"
-									query += refInfos[k][1]
-									fieldType := prototype.FieldsType[prototype.getFieldIndex("M_"+refInfos[k][1])]
-									fieldsType = append(fieldsType, fieldType)
-									fieldsName = append(fieldsName, "M_"+refInfos[k][1])
-								}
+			// I will also append field's that are parts of relationship
+			for j := 0; j < len(prototype.Fields); j++ {
+				field := prototype.Fields[j]
+				// Not an id...
+				refInfos, err := this.getRefInfos(field[2:])
+				if err == nil {
+					// here a reference exist for that field so I will
+					// get it from sql.
+					for k := 0; k < len(refInfos); k++ {
+						if strings.HasSuffix(prototype.TypeName, refInfos[k][0]) {
+							if !Utility.Contains(fieldsName, "M_"+refInfos[k][1]) {
+								query += " ,"
+								query += refInfos[k][1]
+								fieldType := prototype.FieldsType[prototype.getFieldIndex("M_"+refInfos[k][1])]
+								fieldsType = append(fieldsType, fieldType)
+								fieldsName = append(fieldsName, "M_"+refInfos[k][1])
 							}
 						}
 					}
 				}
+			}
 
-				// append index fields
-				for j := 0; j < len(prototype.Fields); j++ {
-					field := prototype.Fields[j]
-					// Not an id...
-					if !Utility.Contains(fieldsName, field) && strings.HasPrefix(field, "M_") && !isForeignKey(field) {
-						query += " ,"
-						query += field[2:]
-						fieldType := prototype.FieldsType[prototype.getFieldIndex(field)]
-						fieldsType = append(fieldsType, fieldType)
-						fieldsName = append(fieldsName, field)
-					}
-				}
-
-				query += " FROM " + prototype.TypeName
-				var params []interface{}
-
-				// Execute the query...
-				values, err := this.Read(query, fieldsType, params)
-				if err != nil {
-					return err
-				}
-
-				// Now I will generate a unique key for the retreive information.
-				for j := 0; j < len(values); j++ {
-					// Here I will keep entity id's information.
-					// UUID need ParentUuid before it can be generate so a second
-					// pass will be necessary.
-					entityInfo := make(map[string]interface{}, 0)
-					entityInfo["TYPENAME"] = prototype.TypeName
-
-					keyInfo := prototype.TypeName + ":"
-					// -1 the first ids is the uuid and we dont have it now.
-					for k := 0; k < len(prototype.Ids)-1; k++ {
-						keyInfo += Utility.ToString(values[j][k])
-						// Append underscore for readability in case of problem...
-						if k < len(prototype.Ids)-2 {
-							keyInfo += "_"
-						}
-					}
-
-					for k := 0; k < len(values[j]); k++ {
-						// Keep the id value in the entity field.
-						if values[j][k] != nil {
-							entityInfo[fieldsName[k]] = values[j][k] // also save entity values in the entity.
-						}
-					}
-
-					// Keep the info.
-					if entityInfos[prototype.TypeName] == nil {
-						entityInfos[prototype.TypeName] = make(map[string]map[string]interface{}, 0)
-					}
-
-					// append the entity
-					entityInfos[prototype.TypeName][keyInfo] = entityInfo
+			// append index fields
+			for j := 0; j < len(prototype.Fields); j++ {
+				field := prototype.Fields[j]
+				// Not an id...
+				if !Utility.Contains(fieldsName, field) && strings.HasPrefix(field, "M_") && !isForeignKey(field) {
+					query += " ,"
+					query += field[2:]
+					fieldType := prototype.FieldsType[prototype.getFieldIndex(field)]
+					fieldsType = append(fieldsType, fieldType)
+					fieldsName = append(fieldsName, field)
 				}
 			}
+
+			query += " FROM " + prototype.TypeName
+			var params []interface{}
+
+			// Execute the query...
+			values, err := this.Read(query, fieldsType, params)
+			if err != nil {
+				return err
+			}
+
+			// Now I will generate a unique key for the retreive information.
+			for j := 0; j < len(values); j++ {
+				// Here I will keep entity id's information.
+				// UUID need ParentUuid before it can be generate so a second
+				// pass will be necessary.
+				entityInfo := make(map[string]interface{}, 0)
+				entityInfo["TYPENAME"] = prototype.TypeName
+
+				keyInfo := prototype.TypeName + ":"
+				// -1 the first ids is the uuid and we dont have it now.
+				for k := 0; k < len(prototype.Ids)-1; k++ {
+					keyInfo += Utility.ToString(values[j][k])
+					// Append underscore for readability in case of problem...
+					if k < len(prototype.Ids)-2 {
+						keyInfo += "_"
+					}
+				}
+
+				for k := 0; k < len(values[j]); k++ {
+					// Keep the id value in the entity field.
+					if values[j][k] != nil {
+						entityInfo[fieldsName[k]] = values[j][k] // also save entity values in the entity.
+					}
+				}
+
+				// Keep the info.
+				if entityInfos[prototype.TypeName] == nil {
+					entityInfos[prototype.TypeName] = make(map[string]map[string]interface{}, 0)
+				}
+
+				// append the entity
+				entityInfos[prototype.TypeName][keyInfo] = entityInfo
+			}
 		}
+		//}
 	}
 
 	// Set the parent realationship here.
 	for i := 0; i < len(prototypes); i++ {
-		if !this.isAssociative(prototypes[i]) { // Associative table object are not needed...
+		if !this.isAssociative(prototypes[i]) { // Associative table have no parent...
 			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
 			for _, info := range entityInfos[prototypes[i].TypeName] {
 				for j := 0; j < len(prototype.FieldsType); j++ {
@@ -1552,21 +1550,19 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 	// I will generate ParentUuid and UUID for the infos.
 	for i := 0; i < len(prototypes); i++ {
-		if !this.isAssociative(prototypes[i]) {
-			// Associative table object are not needed...
-			prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
-			for key, info := range entityInfos[prototype.TypeName] {
-				uuid := generateUuid(key, info, entityInfos)
-				// Generate the uuid and the parentUuid for a given entity.
-				if toSave[uuid] == nil {
-					if !entityManager.isExist(uuid) {
-						entity := createEntityFromInfo(key, info, entityInfos)
+		// Associative table object are not needed...
+		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
+		for key, info := range entityInfos[prototype.TypeName] {
+			uuid := generateUuid(key, info, entityInfos)
+			// Generate the uuid and the parentUuid for a given entity.
+			if toSave[uuid] == nil {
+				if !entityManager.isExist(uuid) {
+					entity := createEntityFromInfo(key, info, entityInfos)
+					toSave[uuid] = entity
+				} else {
+					entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
+					if entity.NeedSave() {
 						toSave[uuid] = entity
-					} else {
-						entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
-						if entity.NeedSave() {
-							toSave[uuid] = entity
-						}
 					}
 				}
 			}

@@ -114,8 +114,7 @@ var GettingStartedPage = function (parent) {
             "script-folder-desc-li": "The <span>Script</span> folder contain sever side JavaScript files.",
             "hello-cargo-intro-p1": "With Cargo up and runing on your computer, it's time to create our first application. The application will contain one input"
             + "box and one button. The user will enter a value in the input box and when it click on the button the server will"
-            + "respond with a greeting composed from that value. You can get the code <a href=\"http://cargowebserver.com/example/HelloCargo.zip\">here</a>"
-            + " or try it <a href=\"http://54.218.110.52:9393/HelloCargo/\">here</a>.",
+            + "respond with a greeting composed from that value. You can try it <a href=\"http://54.218.110.52:9393/HelloCargo/\">here</a>.",
             "hello-cargo-intro-p2": "First of all, we will create the directory inside the <span>Apps</span> folder. Let's name it <span>HelloCargo</span>."
             + "Inside it we will create tow folders, one named <span>css</span> the other named <span>js</span>. I like to regroup"
             + "Javascript files in one folder and style sheets in other folder, but there's no rules about it. In the <span>HelloCargo</span> "
@@ -471,19 +470,10 @@ var GettingStartedPage = function (parent) {
     appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/handlers.js" }], true, "")
     appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/error.js" }], true, "")
     appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/event.js" }], true, "")
+    appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/entity.js" }], true, "")
     appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/languageManager.js" }], true, "")
     appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/server.js" }], true, "")
-    appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/security.js" }], true, "")
     appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/main.js" }], true, "")
-
-    appendHtmlComment(this.indexHtmlCode, "Listener", 2)
-    appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/session.js" }], true, "")
-    appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/account.js" }], true, "")
-    appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/file.js" }], true, "")
-    appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/entity.js" }], true, "")
-    appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/data.js" }], true, "")
-    appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/message.js" }], true, "")
-    appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/project.js" }], true, "")
 
     appendHtmlComment(this.indexHtmlCode, "GUI", 2)
     appendHtmlTag(this.indexHtmlCode, 2, "script", [{ "name": "src", "value": "/Cargo/js/element.js" }], true, "")
@@ -511,10 +501,6 @@ var GettingStartedPage = function (parent) {
 
     // So here I will get the code from the file itself...
     server.fileManager.getFileByPath("/HelloCargo/js/main.js",
-        // progress callback 
-        function () {
-            /** Nothing to do here. */
-        },
         // success callback
         function (result, caller) {
             /** here I will set the innerHtml with the file content. */

@@ -2,7 +2,7 @@
 package Server
 
 import (
-	"log"
+	//	"log"
 	"reflect"
 	"strconv"
 
@@ -172,12 +172,9 @@ func (self *Action) ExecuteVbScript(scriptName string, args []string) []string {
  */
 func (self *Action) ExecuteJsFunction(funtionStr string, funtionParams ...interface{}) (results []interface{}, jsError error) {
 
-	log.Println("------------> 174 call function: ", funtionStr, self.msg.GetId(), self.msg.from.GetUuid())
-
 	// Call the function on the Js runtime.
 	results, jsError = JS.GetJsRuntimeManager().ExecuteJsFunction(self.msg.GetId(), self.msg.from.GetUuid(), funtionStr, funtionParams)
 
-	log.Println("----------------> 180 function return ", funtionStr)
 	if jsError != nil {
 		// Here the user made an error inside is js code, i will simply report
 		// he's error...

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
-	//	"code.myceliUs.com/Utility"
+	"code.myceliUs.com/Utility"
 )
 
 type Hub struct {
@@ -40,7 +40,7 @@ func NewHub() *Hub {
 
 	// So here I will send empty message to keep socket alive
 	// and clear the session if the connection is close...
-	/*h.ticker = time.NewTicker(time.Millisecond * 2000)
+	h.ticker = time.NewTicker(time.Millisecond * 2000)
 
 	go func() {
 		for t := range h.ticker.C {
@@ -80,7 +80,7 @@ func NewHub() *Hub {
 			}
 		}
 	}()
-	*/
+
 	return h
 }
 
@@ -88,7 +88,6 @@ func (this *Hub) run() {
 	for {
 		select {
 		case c := <-this.register:
-			log.Println("------>Hub append connection ", c.GetUuid())
 			this.connections[c.GetUuid()] = c
 
 			// initialyse js interpreter for the new connection.
@@ -97,15 +96,12 @@ func (this *Hub) run() {
 			JS.GetJsRuntimeManager().OpendSession(c.GetUuid())
 
 			// Set the server global variable.
-			log.Println("------------->101 set server var ", c.GetUuid())
 			JS.GetJsRuntimeManager().SetVar(c.GetUuid(), "server", GetServer())
 
 			// Init all scripts for the new session VM
-			log.Println("------------->105 init scripts ", c.GetUuid())
 			JS.GetJsRuntimeManager().InitScripts(c.GetUuid())
 
 		case c := <-this.unregister:
-			log.Println("----> remove connection ", c.GetAddrStr(), c.GetPort())
 			delete(this.connections, c.GetUuid())
 			GetServer().GetEventManager().removeClosedListener()
 			GetServer().GetSessionManager().removeClosedSession()

@@ -287,98 +287,6 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 	return data, err
 }
 
-// Many to many relationship
-func (this *DataManager) setManyToManyEntityRelationship(tableName string, name string, fields []string, targetIdFields []string, targetType string, src *DynamicEntity, isInit bool) error {
-
-	// so here I will retreive information...
-	prototype, err := GetServer().GetEntityManager().getEntityPrototype(tableName, "sql_info")
-
-	// If the prototype is not found...
-	if err != nil {
-		return err
-	}
-
-	if isInit {
-		// In that case I want to initialyse the data from sql.
-		query := "SELECT "
-		for i := 0; i < len(fields); i++ {
-			query += fields[i]
-
-			if i < len(fields)-1 {
-				query += ", "
-			}
-		}
-
-		fieldsType := make([]interface{}, 0)
-		for i := 0; i < len(fields); i++ {
-			fieldsType = append(fieldsType, prototype.FieldsType[prototype.getFieldIndex("M_"+fields[i])])
-		}
-
-		ids := make([]string, 0)
-		for i := 1; i < len(prototype.Ids); i++ {
-			id := strings.Replace(prototype.Ids[i], "M_", "", -1)
-			if !Utility.Contains(fields, id) {
-				ids = append(ids, id)
-			}
-		}
-
-		// Params must be 1 id..
-		params := make([]interface{}, 0)
-		for i := 0; i < len(targetIdFields); i++ {
-			params = append(params, src.getValue("M_"+targetIdFields[i]))
-		}
-
-		query += " FROM " + tableName + " WHERE "
-
-		for i := 0; i < len(ids); i++ {
-			id := ids[i]
-			query += id + "=?"
-			if i < len(ids)-1 {
-				query += " AND "
-			}
-		}
-
-		storeName := tableName[0:strings.Index(tableName, ".")]
-		store := this.getDataStore(storeName)
-		if store == nil {
-			return errors.New("The datastore '" + storeName + "' does not exist.")
-		}
-
-		data, err := store.Read(query, fieldsType, params)
-		if err != nil {
-			log.Println(query)
-			log.Println(params)
-			return err
-		}
-
-		// Now I will initialyse the data.
-		for i := 0; i < len(data); i++ {
-			// TODO make multiple id search instead of id...
-			trg, err := GetServer().GetEntityManager().getEntityById("sql_info", targetType, data[i], false)
-			if err == nil {
-				// So here I will set the references.
-				refUuids := src.getValue(name)
-				if refUuids == nil {
-					refUuids = make([]string, 0)
-				}
-
-				// Here I will set the reference.
-				if !Utility.Contains(refUuids.([]string), trg.GetUuid()) {
-					refUuids = append(refUuids.([]string), trg.GetUuid())
-					src.AppendReference(trg)
-					src.setValue(name, refUuids)
-					trg.AppendReferenced(name, src)
-				}
-			}
-		}
-	} else {
-		// Here I will create the value...
-		log.Println("-------> tableName ", tableName, name, fields, fields, targetIdFields, src)
-	}
-
-	return nil
-}
-
 // One to many relationship
 func (this *DataManager) setOneToManyEntityRelationship(name string, src *DynamicEntity, dest *DynamicEntity, isRef bool) {
 	if isRef {
@@ -455,7 +363,7 @@ func (this *DataManager) setOneToOneEntityRelationship(name string, src *Dynamic
 }
 
 /**
- * Return the list of entities for a given relationship.
+ * Return the list of entities for a given relationship from db...
  */
 func (this *DataManager) getRelationshipEntities(prototype *EntityPrototype, fields []string, ids []string) ([]*DynamicEntity, error) {
 
@@ -546,24 +454,20 @@ func (this *DataManager) setEntityRelationship(storeId string, name string, ref_
 
 		if isAssociative {
 			// Many to many relationship
+			// I will get all ids from the association table.
 			fields := make([]string, 0)
-			targetIdFields := make([]string, 0)
-
-			// The relation typename.
-			fieldTypeName := storeId
-			if len(refInfos[0][4]) > 0 && store.(*SqlDataStore).m_vendor != Config.DataStoreVendor_MYSQL {
-				fieldTypeName += "." + refInfos[0][4]
-			}
-			fieldTypeName += "." + refInfos[0][2]
-
-			for i := 0; i < len(refInfos); i++ {
-				field := refInfos[i][1]
-				fields = append(fields, field)
-				targetIdField := refInfos[i][3]
-				targetIdFields = append(targetIdFields, targetIdField)
+			for i := 1; i < len(prototype.Ids); i++ {
+				fields = append(fields, prototype.Ids[i][2:])
 			}
 
-			this.setManyToManyEntityRelationship(typeName, name, fields, targetIdFields, fieldTypeName, ref_0, isInit)
+			log.Println("-------> ", name)
+			log.Println("-------> ", ref_0)
+			for i := 0; i < len(fields); i++ {
+				index := prototype.getFieldIndex("M_" + fields[i])
+				fieldType := prototype.FieldsType[index]
+				log.Println("=---> ", fields[i], ":", fieldType)
+			}
+
 		} else {
 			// The ref_0 must be the source of relationship.
 			if strings.HasSuffix(ref_0.GetTypeName(), refInfos[0][2]) {
@@ -589,6 +493,7 @@ func (this *DataManager) setEntityRelationship(storeId string, name string, ref_
 					fields = append(fields, "M_"+refInfos[0][1])
 				}
 
+				// ref entities contain the list of existing ref in the database...
 				ref_entities, err := this.getRelationshipEntities(prototype, fields, ids)
 
 				if err != nil {
@@ -665,6 +570,7 @@ func (this *DataManager) setEntityRelationship(storeId string, name string, ref_
  * will retreive the associated entity and set it inside the M_FK_field_name.
  */
 func (this *DataManager) setEntityReferences(uuid string, isInit bool, lazy bool) error {
+	log.Println("-----------> set references of entity: ", uuid)
 	entity, err := GetServer().GetEntityManager().getEntityByUuid(uuid, lazy)
 
 	if err != nil {
@@ -681,6 +587,30 @@ func (this *DataManager) setEntityReferences(uuid string, isInit bool, lazy bool
 		}
 	}
 	return nil
+}
+
+/**
+ * Save the entity reference to it sql backend.
+ */
+func (this *DataManager) saveEntityReferences(entity *DynamicEntity) {
+
+	var prototype = entity.GetPrototype()
+
+	for i := 0; i < len(prototype.Fields); i++ {
+
+		isRef := strings.HasSuffix(prototype.FieldsType[i], ":Ref")
+		isArray := strings.HasPrefix(prototype.FieldsType[i], "[]")
+		if isRef {
+			if isArray {
+				log.Println("save ref array: ", prototype.Fields[i], prototype.FieldsType[i])
+				// In that case the values will be store in indexation table.
+
+			} else {
+				log.Println("save ref: ", prototype.Fields[i], prototype.FieldsType[i])
+			}
+		}
+	}
+
 }
 
 /**

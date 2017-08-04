@@ -34,6 +34,10 @@
     transition: none;
 }
 
+#blog-categories li:hover{
+    cursor: pointer;
+}
+
 #new-blog-categories-btn{
     position: absolute;
     right: 0px;

@@ -1038,7 +1038,8 @@ func (this *DynamicEntity) saveEntity(path string) {
 	if err == nil {
 		if storeId == "sql_info" {
 			// Now I will save the references
-			dataManager.setEntityReferences(this.uuid, false, true)
+			dataManager.saveEntityReferences(this)
+			// dataManager.setEntityReferences(this.uuid, false, true)
 		}
 		// Send the event.
 		GetServer().GetEventManager().BroadcastEvent(evt)

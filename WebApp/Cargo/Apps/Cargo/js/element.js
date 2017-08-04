@@ -156,7 +156,7 @@ var Element = function (parent, params, callback, appendFront) {
                     } else {
                         this.element.setAttribute(param, params[param])
                     }
-                    
+
                 } else {
                     if (params["NS"] != undefined) {
                         this.element.setAttributeNS(param.NS, param, params[param])
@@ -166,7 +166,7 @@ var Element = function (parent, params, callback, appendFront) {
                 }
             }
 
-            if(this.element.id.length > 0){
+            if (this.element.id.length > 0) {
                 server.languageManager.setElementText(this, this.element.id)
             }
 
@@ -352,7 +352,7 @@ Element.prototype.delete = function () {
 /**
 * Find a child inside the element or inside one of the child elements, 
  * recursively with a given Id. 
- * @param {string} id The id of the element to retreive.
+ * @param {string} id The class name of the element to retreive.
 * @returns {Element}
 * @stability 2
 */
@@ -376,6 +376,36 @@ Element.prototype.getChildById = function (id) {
     }
 
     return found
+}
+
+/**
+* Find a child inside the element or inside one of the child elements, 
+ * recursively with a given class name. 
+ * @param {string} className The id of the element to retreive.
+* @returns {Element}
+* @stability 2
+*/
+Element.prototype.getChildsByClassName = function (className, childs) {
+    var keys = Object.keys(this.childs)
+        , i = 0
+        , len = keys.length
+        , found = null
+    
+    if (childs == undefined) {
+        childs = []
+    }
+
+    if (this.element.className == className) {
+        childs.push(this)
+    }
+
+    for (i = 0; i < len; i++) {
+        child = this.childs[keys[i]]
+        // push values of child...
+        childs.concat(child.getChildsByClassName(className, childs));
+    }
+
+    return childs
 }
 
 /**
@@ -562,7 +592,7 @@ Element.prototype.animate = function (keyframe, time, endAnimationCallback, tran
                 this.removeEventListener(endAnimationListenerName, animationListner, true)
             }
         }
-    } (styleSheet, animationId, " _" + animationId + "_" + className, endAnimationCallback, endAnimationListenerName)
+    }(styleSheet, animationId, " _" + animationId + "_" + className, endAnimationCallback, endAnimationListenerName)
 
     // End animation event.
     this.element.addEventListener(endAnimationListenerName, animationListner, true);
