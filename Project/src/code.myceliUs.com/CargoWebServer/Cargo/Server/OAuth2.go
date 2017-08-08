@@ -435,6 +435,40 @@ func PublicKeysHandler(w http.ResponseWriter, r *http.Request) {
 // @scope {public}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
+// @src
+//OAuth2Manager.prototype.getResource = function (clientId, scope, query, successCallback, errorCallback, caller) {
+//    // server is the client side singleton.
+//    // Account uuid are set and reset at the time of login and logout respectively.
+//    var idTokenUuid = ""
+//    if(localStorage.getItem("idTokenUuid") != undefined){
+//        idTokenUuid = localStorage.getItem("idTokenUuid")
+//    }
+//    var params = []
+//    params.push(createRpcData(clientId, "STRING", "clientId"))
+//    params.push(createRpcData(scope, "STRING", "scope"))
+//    params.push(createRpcData(query, "STRING", "query"))
+//    params.push(createRpcData(idTokenUuid, "STRING", "idTokenUuid"))
+//    // Call it on the server.
+//    server.executeJsFunction(
+//        GetResource.toString(), // The function to execute remotely on server
+//        params, // The parameters to pass to that function
+//        function (index, total, caller) { // The progress callback
+//            // Nothing special to do here.
+//        },
+//        function (results, caller) {
+//            caller.successCallback(results[0], caller.caller)
+//        },
+//        function (errMsg, caller) {
+//            // display the message in the console.
+//            console.log(errMsg)
+//            // call the immediate error callback.
+//            caller.errorCallback(errMsg, caller.caller)
+//            // dispatch the message.
+//            server.errorManager.onError(errMsg)
+//        }, // Error callback
+//        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+//    )
+//}
 func (this *OAuth2Manager) GetResource(clientId string, scope string, query string, idTokenUuid string, accessUuid string, messageId string, sessionId string) interface{} {
 	log.Println("scope: ", scope)
 

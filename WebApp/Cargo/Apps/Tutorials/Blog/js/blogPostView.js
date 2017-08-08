@@ -13,29 +13,64 @@ var BlogPostView = function (parent, post, categoryContentDiv) {
     // The list of category for that post.
     this.categoryContentDiv = categoryContentDiv
     this.categoryContentDiv.element.parentNode.style.display = ""
-    
+
     // I will uncheck all categories
     //this.categoryContentDiv.removeAllChilds()
     // the category div contain tow row...
     var categoryLnks = this.categoryContentDiv.getChildsByClassName("category_lnk")
     var inputs = {}
-    for(i=0; i < categoryLnks.length; i++){
+    for (i = 0; i < categoryLnks.length; i++) {
         var input = categoryLnks[i].element.childNodes[2]
-        input.style.display=""
+        input.style.display = ""
         input.checked = false
 
         // Now i will set the action if the input box state change...
-        input.onchange = function(post){
-            return function(){
+        input.onchange = function (post) {
+            return function () {
                 // So here I will append the category of remove it from the post...
                 var categoryUuid = this.id.replace("_checkbox", "")
-                if(this.checked){
-                    // append a new category to the post
-                    //console.log("append category ", categoryUuid, "to post ", post)
-                    post.M_fk_posts_to_categories_1.push(categoryUuid)
-                    server.entityManager.saveEntity(post, function(){}, function(){}, {})
-                }else{
+                var category = entities[categoryUuid]
+                if (this.checked) {
+                    var lnk = new Blog.blog_post_to_category()
+                    lnk.M_category_id = category.M_id
+                    lnk.setFk_posts_to_categories_1(category)
+                    lnk.M_post_id = post.M_id
+                    lnk.setFk_posts_to_categories_2(post)
+
+                    // Save the lnk entity...
+                    server.entityManager.saveEntity(lnk,
+                        // success callback
+                        function (result, caller) {
+                            // Now will set the reference inside the category and the post...
+                            caller.category.setFk_posts_to_categories_1(result)
+                            caller.post.setFk_posts_to_categories_2(result)
+                            server.entityManager.saveEntity(caller.post)
+                            server.entityManager.saveEntity(caller.category)
+                        },
+                        // error callback
+                        function (errObj, caller) {
+                            console.log("-------------> error found: ", errObj)
+                        }, { "post": post, "category": category })
+
+                } else {
                     // remove existing category from the post
+                    server.entityManager.getEntityById("Blog.blog_post_to_category", "sql_info", [category.M_id, post.M_id],
+                        // success callback
+                        function (result, caller) {
+                            server.entityManager.removeEntity(result.UUID,
+                                // success callback
+                                function (result, caller) { 
+                                    console.log("-----> delete ", result)
+                                },
+                                // error callback.
+                                function (errObj, caller) { 
+
+                                }, {})
+                        },
+                        // error callback
+                        function (errObj, caller) {
+
+                        }, {})
                 }
             }
         }(this.post)
@@ -45,9 +80,34 @@ var BlogPostView = function (parent, post, categoryContentDiv) {
     }
 
     // Now I will set the categories related to this post...
-    for (var i = 0; i < post.M_fk_posts_to_categories_1.length; i++) {
-        this.appendCategory(post.M_fk_posts_to_categories_1[i])
-        inputs[post.M_fk_posts_to_categories_1[i] + "_checkbox"].checked = true
+    for (var i = 0; i < post.M_fk_posts_to_categories_2.length; i++) {
+        // So here it's many to many relatioship so I will set the reference if not already set.
+        var refUuid
+        if (isString(post.M_fk_posts_to_categories_2[i])) {
+            refUuid = post.M_fk_posts_to_categories_2[i]
+        } else {
+            refUuid = post.M_fk_posts_to_categories_2[i].UUID
+        }
+
+        // I will set the reference here.
+        post["set_M_fk_posts_to_categories_2_" + refUuid + "_ref"](function (blogPostView, inputs) {
+            return function (ref) {
+                var refUuid
+                if (isString(ref.M_fk_posts_to_categories_1)) {
+                    refUuid = ref.M_fk_posts_to_categories_1
+                } else {
+                    refUuid = ref.M_fk_posts_to_categories_1.UUID
+                }
+
+                // Now I will set category reference.
+                ref["set_M_fk_posts_to_categories_1_" + refUuid + "_ref"](function (blogPostView, inputs) {
+                    return function (ref) {
+                        blogPostView.appendCategory(ref)
+                        inputs[ref.UUID + "_checkbox"].checked = true
+                    }
+                }(blogPostView, inputs))
+            }
+        }(this, inputs))
     }
 
     // The blog text interface elements

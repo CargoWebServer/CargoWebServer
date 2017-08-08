@@ -226,7 +226,7 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
 func (this *DynamicEntity) appendValue(field string, value interface{}) {
 	values := this.getValue(field)
 
-	if values != nil {
+	if values == nil {
 		// Here no value aready exist.
 		if reflect.TypeOf(value).Kind() == reflect.String {
 			values = make([]string, 1)
@@ -254,9 +254,14 @@ func (this *DynamicEntity) appendValue(field string, value interface{}) {
 			this.setValue(field, values)
 		} else if reflect.TypeOf(value).String() == "*Server.DynamicEntity" {
 			if strings.HasSuffix(this.prototype.FieldsType[this.prototype.getFieldIndex(field)], ":Ref") {
-				if !Utility.Contains(values.([]string), value.(Entity).GetUuid()) {
-					values = append(values.([]string), value.(Entity).GetUuid())
-					this.setValue(field, values)
+				var isExist = false
+				for i := 0; i < len(values.([]*DynamicEntity)); i++ {
+					if value.(Entity).GetUuid() == values.(*DynamicEntity).GetUuid() {
+						isExist = true
+					}
+				}
+				if !isExist {
+					values = append(values.([]*DynamicEntity), value.(*DynamicEntity))
 				}
 			} else {
 				this.AppendChild(field, value.(Entity))
@@ -1036,11 +1041,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	}
 
 	if err == nil {
-		if storeId == "sql_info" {
-			// Now I will save the references
-			dataManager.saveEntityReferences(this)
-			// dataManager.setEntityReferences(this.uuid, false, true)
-		}
+
 		// Send the event.
 		GetServer().GetEventManager().BroadcastEvent(evt)
 		// resolved reference pointing to this entity and not already append...
@@ -1049,6 +1050,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	} else {
 		log.Println(Utility.FileLine(), "Fail to save entity ", err)
 	}
+	log.Println("--------> 1056 ", this.GetObject())
 
 }
 

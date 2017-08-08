@@ -50,7 +50,7 @@ var BlogPostCommentEditor = function (parent, parentDiv) {
 
             // TODO create function 
             var query = "http://" + server.hostName + ":" + server.port + "/api/Server/AccountManager/Me?p0=" + sessionId
-            server.securityManager.getResource("1234", "openid profile email", query,
+            server.oAuth2Manager.getResource("1234", "openid profile email", query,
                 function (results, caller) {
                     if (results.TYPENAME != undefined) {
                         // In that case I have an Account object.

@@ -283,7 +283,7 @@ function setRef(owner, property, refValue, isArray) {
                         }
                     }
                 }
-            } (owner, property)
+            }(owner, property)
 
             /* The set reference fucntion **/
             owner["set_" + property + "_" + refValue + "_ref"] = function (entityUuid, propertyName, index, refValue) {
@@ -326,7 +326,7 @@ function setRef(owner, property, refValue, isArray) {
                         )
                     }
                 }
-            } (owner.UUID, property, index, refValue)
+            }(owner.UUID, property, index, refValue)
         }
     } else {
         owner[property] = refValue
@@ -336,11 +336,13 @@ function setRef(owner, property, refValue, isArray) {
             return function () {
                 var entity = entities[entityUuid]
                 // Set back the id of the reference
-                if (isObject(entity[propertyName])) {
-                    entity[propertyName] = entity[propertyName].UUID
+                if (entity != null) {
+                    if (isObject(entity[propertyName])) {
+                        entity[propertyName] = entity[propertyName].UUID
+                    }
                 }
             }
-        } (owner.UUID, property)
+        }(owner.UUID, property)
 
         /* The set fucntion **/
         owner["set_" + property + "_" + refValue + "_ref"] = function (entityUuid, propertyName, refValue) {
@@ -382,7 +384,7 @@ function setRef(owner, property, refValue, isArray) {
                     )
                 }
             }
-        } (owner.UUID, property, refValue)
+        }(owner.UUID, property, refValue)
     }
     return owner
 }
@@ -561,7 +563,7 @@ function setObjectValues(object, values) {
                                     return function (val) {
                                         entities[uuid][property] = val
                                     }
-                                } (object.UUID, property)
+                                }(object.UUID, property)
 
                                 obj.init(jsonObj)
                             } else {
@@ -575,7 +577,7 @@ function setObjectValues(object, values) {
                                             }
                                             entities[uuid][property].push(val)
                                         }
-                                    } (object.UUID, property)
+                                    }(object.UUID, property)
                                     obj.init(jsonObj_)
                                 }
                             }
@@ -634,7 +636,7 @@ function setObjectValues(object, values) {
  * Look if the given type is a list of other type.
  * @param {string} typeName The extension type name, ex. xs.string, xs.int, xs.date etc.
  */
-function isListOf (typeName) {
+function isListOf(typeName) {
     typeName = typeName.replace("[]", "").replace(":Ref", "")
     var prototype = entityPrototypes[typeName]
 
@@ -661,7 +663,7 @@ function isListOf (typeName) {
  * Return the name of the base type if the type is an extension of such a type.
  * @param {string} typeName The extension type name, ex. xs.string, xs.int, xs.date etc.
  */
-function getBaseTypeExtension (typeName, isArray) {
+function getBaseTypeExtension(typeName, isArray) {
     if (!isArray) {
         isArray = typeName.startsWith("[]")
     }

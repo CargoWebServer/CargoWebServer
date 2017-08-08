@@ -330,7 +330,6 @@ func (this *DataManager) setOneToManyEntityRelationship(name string, src *Dynami
 
 // One to one relaltionship.
 func (this *DataManager) setOneToOneEntityRelationship(name string, src *DynamicEntity, dest *DynamicEntity, isRef bool) {
-	log.Println("One to one relationship found!")
 	if isRef {
 		uuid := src.getValue(name).(string)
 		// Set the other side of relation ship.
@@ -409,8 +408,6 @@ func (this *DataManager) getRelationshipEntities(prototype *EntityPrototype, fie
 	// Retreive id's
 	data, err := store.Read(query, fieldsType, params)
 	if err != nil {
-		log.Println(query)
-		log.Println(params)
 		return entities, err
 	}
 
@@ -439,6 +436,7 @@ func (this *DataManager) setEntityRelationship(storeId string, name string, ref_
 	// Now I will retreive the relationship information from sql
 	// * remove the M_ prefix.
 	refInfos, err := store.(*SqlDataStore).getRefInfos(name[2:])
+
 	if err == nil && len(refInfos) > 0 {
 
 		// In that case the ref_0 is the source entity.
@@ -450,25 +448,82 @@ func (this *DataManager) setEntityRelationship(storeId string, name string, ref_
 
 		typeName += "." + refInfos[0][0]
 		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, "sql_info")
-		isAssociative := store.(*SqlDataStore).isAssociative(prototype)
 
-		if isAssociative {
-			// Many to many relationship
-			// I will get all ids from the association table.
+		if store.(*SqlDataStore).isAssociative(prototype) && !store.(*SqlDataStore).isAssociative(ref_0.GetPrototype()) {
+			// So here I want to get the list of associative value from the
+			// sql db and create entities for it if it dosent exist.
+			// I also want to set references in ref_0 with the associative value.
+
+			// I will get all values from the sql associative table.
 			fields := make([]string, 0)
+			fieldsType := make([]interface{}, 0)
 			for i := 1; i < len(prototype.Ids); i++ {
 				fields = append(fields, prototype.Ids[i][2:])
+				fieldsType = append(fieldsType, prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[i])])
 			}
 
-			log.Println("-------> ", name)
-			log.Println("-------> ", ref_0)
+			// In that case I want to initialyse the data from sql.
+			query := "SELECT "
 			for i := 0; i < len(fields); i++ {
-				index := prototype.getFieldIndex("M_" + fields[i])
-				fieldType := prototype.FieldsType[index]
-				log.Println("=---> ", fields[i], ":", fieldType)
+				query += fields[i]
+
+				if i < len(fields)-1 {
+					query += ", "
+				}
 			}
 
-		} else {
+			query += " FROM " + typeName + " WHERE "
+			params := make([]interface{}, 0)
+			for i := 0; i < len(refInfos); i++ {
+				query += refInfos[i][1] + "=?"
+				if strings.HasSuffix(ref_0.GetTypeName(), refInfos[i][0]) {
+					params = append(params, ref_0.getValue("M_"+refInfos[i][1]))
+				} else if strings.HasSuffix(ref_0.GetTypeName(), refInfos[i][2]) {
+					params = append(params, ref_0.getValue("M_"+refInfos[i][3]))
+				}
+				if i < len(refInfos)-1 {
+					query += " AND "
+				}
+			}
+
+			storeName := typeName[0:strings.Index(typeName, ".")]
+			store := this.getDataStore(storeName)
+			if store == nil {
+				return errors.New("The datastore '" + storeName + "' does not exist.")
+			}
+
+			data, err := store.Read(query, fieldsType, params)
+
+			if err != nil {
+				log.Println(err)
+				return err
+			}
+
+			// Now from the data I will retreive the associative entity.
+			for i := 0; i < len(data); i++ {
+				keyInfo := typeName + ":"
+				for j := 0; j < len(data[i]); j++ {
+					keyInfo += Utility.ToString(data[i][j])
+					// Append underscore for readability in case of problem...
+					if j < len(data[i])-1 {
+						keyInfo += "_"
+					}
+				}
+				uuid := typeName + "%" + Utility.GenerateUUID(keyInfo)
+				associativeEntitiy, _ := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
+				if associativeEntitiy != nil {
+					// one side of relationship
+					associativeEntitiy.(*DynamicEntity).AppendReference(ref_0)
+					associativeEntitiy.(*DynamicEntity).setValue(name, ref_0.GetUuid())
+					ref_0.AppendReferenced(name, associativeEntitiy)
+
+					// other side of the relationship
+					ref_0.AppendReference(associativeEntitiy)
+					ref_0.appendValue(name, associativeEntitiy.GetUuid())
+					associativeEntitiy.AppendReferenced(name, ref_0)
+				}
+			}
+		} else if !store.(*SqlDataStore).isAssociative(ref_0.GetPrototype()) {
 			// The ref_0 must be the source of relationship.
 			if strings.HasSuffix(ref_0.GetTypeName(), refInfos[0][2]) {
 
@@ -570,7 +625,6 @@ func (this *DataManager) setEntityRelationship(storeId string, name string, ref_
  * will retreive the associated entity and set it inside the M_FK_field_name.
  */
 func (this *DataManager) setEntityReferences(uuid string, isInit bool, lazy bool) error {
-	log.Println("-----------> set references of entity: ", uuid)
 	entity, err := GetServer().GetEntityManager().getEntityByUuid(uuid, lazy)
 
 	if err != nil {
@@ -590,36 +644,10 @@ func (this *DataManager) setEntityReferences(uuid string, isInit bool, lazy bool
 }
 
 /**
- * Save the entity reference to it sql backend.
- */
-func (this *DataManager) saveEntityReferences(entity *DynamicEntity) {
-
-	var prototype = entity.GetPrototype()
-
-	for i := 0; i < len(prototype.Fields); i++ {
-
-		isRef := strings.HasSuffix(prototype.FieldsType[i], ":Ref")
-		isArray := strings.HasPrefix(prototype.FieldsType[i], "[]")
-		if isRef {
-			if isArray {
-				log.Println("save ref array: ", prototype.Fields[i], prototype.FieldsType[i])
-				// In that case the values will be store in indexation table.
-
-			} else {
-				log.Println("save ref: ", prototype.Fields[i], prototype.FieldsType[i])
-			}
-		}
-	}
-
-}
-
-/**
  * Execute a query that create a new data. The data contains the new
  * value to insert in the DB.
  */
 func (this *DataManager) createData(storeName string, query string, d []interface{}) (lastId interface{}, err error) {
-	//log.Println("create data ", query, d)
-
 	// If the store is sql_info in that case I will need to create the information
 	// in the sql data store.
 	store := this.getDataStore(storeName)
@@ -718,8 +746,6 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 				lastId, err = this.createData(dataBaseName, query, data)
 				if err != nil {
 					log.Println("---> data insert fail with err: ", err)
-					log.Println(query)
-					log.Println(data)
 				}
 			}
 		}
@@ -787,8 +813,6 @@ func (this *DataManager) deleteData(storeName string, query string, params []int
 	err = store.Delete(query, params)
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
-	} else {
-		log.Println("-------> query execute successfully ", query, " ids ", params)
 	}
 
 	return

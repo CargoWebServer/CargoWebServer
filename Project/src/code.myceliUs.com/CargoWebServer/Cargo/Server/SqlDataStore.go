@@ -570,14 +570,14 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 		}
 	}
 
-	//log.Println("=----------> params: ", params)
-
 	// TODO Try to figure out why the connection is lost...
 	// Lost of connection so I will reconnect anyway...
 	//this.Connect()
 
 	rows, err := this.m_db.Query(query, params...)
 	if err != nil {
+		log.Println(query)
+		log.Println(params)
 		log.Println("---> sql read query error:", err)
 		return nil, err
 	}
@@ -1298,10 +1298,10 @@ func (this *SqlDataStore) setRefs() error {
 						return err
 					}
 					if !this.isAssociative(trg) {
-						appendField(trg1, "M_"+refName, "[]"+associativeTable.TypeName+":Ref")
+						appendField(trg, "M_"+refName, "[]"+associativeTable.TypeName+":Ref")
 					}
 					if !this.isAssociative(trg1) {
-						appendField(trg, "M_"+associations_[j][0].(string), "[]"+associativeTable.TypeName+":Ref")
+						appendField(trg1, "M_"+associations_[j][0].(string), "[]"+associativeTable.TypeName+":Ref")
 					}
 				}
 			}
@@ -1405,7 +1405,6 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 	// First of all I will sychronize create the entities information if it dosen't exist.
 	for i := 0; i < len(prototypes); i++ {
 		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
-		//if !this.isAssociative(prototype) {
 		// Associative table object are not needed...
 		if len(prototype.Ids) > 1 {
 			query := "SELECT "
@@ -1500,7 +1499,6 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 				entityInfos[prototype.TypeName][keyInfo] = entityInfo
 			}
 		}
-		//}
 	}
 
 	// Set the parent realationship here.
@@ -1550,7 +1548,6 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 	// I will generate ParentUuid and UUID for the infos.
 	for i := 0; i < len(prototypes); i++ {
-		// Associative table object are not needed...
 		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(prototypes[i].TypeName, "sql_info")
 		for key, info := range entityInfos[prototype.TypeName] {
 			uuid := generateUuid(key, info, entityInfos)
