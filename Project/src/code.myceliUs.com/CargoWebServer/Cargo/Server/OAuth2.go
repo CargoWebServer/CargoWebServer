@@ -450,7 +450,7 @@ func PublicKeysHandler(w http.ResponseWriter, r *http.Request) {
 //    params.push(createRpcData(idTokenUuid, "STRING", "idTokenUuid"))
 //    // Call it on the server.
 //    server.executeJsFunction(
-//        GetResource.toString(), // The function to execute remotely on server
+//        "OAuth2ManagerGetResource", // The function to execute remotely on server
 //        params, // The parameters to pass to that function
 //        function (index, total, caller) { // The progress callback
 //            // Nothing special to do here.
