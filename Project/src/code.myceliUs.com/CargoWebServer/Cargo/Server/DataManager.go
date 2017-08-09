@@ -425,7 +425,7 @@ func (this *DataManager) getRelationshipEntities(prototype *EntityPrototype, fie
 /**
  * From entity I will get references and set it.
  */
-func (this *DataManager) setEntityRelationship(storeId string, name string, ref_0 *DynamicEntity, isInit bool) error {
+func (this *DataManager) setEntityRelationship(storeId string, name string, ref_0 *DynamicEntity) error {
 
 	// First of all I will get the data store
 	store := this.m_dataStores[storeId]
@@ -624,7 +624,7 @@ func (this *DataManager) setEntityRelationship(storeId string, name string, ref_
  * instead a field that contain the reference id are save in the db. Here I
  * will retreive the associated entity and set it inside the M_FK_field_name.
  */
-func (this *DataManager) setEntityReferences(uuid string, isInit bool, lazy bool) error {
+func (this *DataManager) setEntityReferences(uuid string, lazy bool) error {
 	entity, err := GetServer().GetEntityManager().getEntityByUuid(uuid, lazy)
 
 	if err != nil {
@@ -637,7 +637,7 @@ func (this *DataManager) setEntityReferences(uuid string, isInit bool, lazy bool
 		// I need to retreive the link between for example M_post_id and M_FK_blog_comment_blog_post.
 		if isForeignKey(prototype.Fields[i]) {
 			storeId := prototype.TypeName[0:strings.Index(prototype.TypeName, ".")]
-			this.setEntityRelationship(storeId, prototype.Fields[i], entity.(*DynamicEntity), isInit)
+			this.setEntityRelationship(storeId, prototype.Fields[i], entity.(*DynamicEntity))
 		}
 	}
 	return nil

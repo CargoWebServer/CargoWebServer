@@ -49,7 +49,7 @@ var BlogPostCommentEditor = function (parent, parentDiv) {
             var sessionId = server.sessionId.replace("%", "%25")
 
             // TODO create function 
-            var query = "http://" + server.hostName + ":" + server.port + "/api/Server/AccountManager/Me?p0=" + sessionId
+            var query = "http://" + server.hostName + ":" + server.port + "/api/Server/AccountManager/Me?connectionId=" + sessionId
             server.oAuth2Manager.getResource("1234", "openid profile email", query,
                 function (results, caller) {
                     if (results.TYPENAME != undefined) {

@@ -604,7 +604,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 
 	if storeId == "sql_info" {
 		// Now I will initialyse references
-		dataManager.setEntityReferences(this.uuid, true, false)
+		dataManager.setEntityReferences(this.uuid, false)
 	}
 
 	return nil
@@ -1041,17 +1041,19 @@ func (this *DynamicEntity) saveEntity(path string) {
 	}
 
 	if err == nil {
-
+		if storeId == "sql_info" {
+			// Now I will initialyse references
+			dataManager.setEntityReferences(this.uuid, false)
+		}
 		// Send the event.
 		GetServer().GetEventManager().BroadcastEvent(evt)
 		// resolved reference pointing to this entity and not already append...
 		GetServer().GetEntityManager().saveReferenced(this)
 		GetServer().GetEntityManager().setReferences(this)
+
 	} else {
 		log.Println(Utility.FileLine(), "Fail to save entity ", err)
 	}
-	log.Println("--------> 1056 ", this.GetObject())
-
 }
 
 /**
