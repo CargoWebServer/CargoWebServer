@@ -1,0 +1,6 @@
+/**
+ * Act as a container.
+ */
+.home_page{
+    display: flex;
+}

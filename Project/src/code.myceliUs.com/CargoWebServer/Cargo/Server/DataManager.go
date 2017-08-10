@@ -70,8 +70,6 @@ func newDataManager() *DataManager {
 
 func (this *DataManager) initialize() {
 
-	//log.Println("--> Initialize DataManager")
-
 	// Create the default configurations
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
@@ -163,7 +161,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 	}
 
 	data, err := store.Read(query, fieldsType, params)
-	//log.Println(query, fieldsType, params)
+
 	if err != nil {
 		err = errors.New("Query '" + query + "' failed with error '" + err.Error() + "'.")
 		return data, err

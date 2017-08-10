@@ -104,6 +104,15 @@ var BlogPostCommentEditor = function (parent, parentDiv) {
         }
     }(this)
 
+    this.connectGooglePlus.element.onclick = function () {
+        // TODO debug it with amazone...
+        server.oAuth2Manager.getResource("1010681964660.apps.googleusercontent.com", "profile", "",
+            function (result, caller) {
+            },
+            function (errMsg, caller) {
+            }, {})
+    }
+
     // The summit comment action.
     this.submitCommentBtn.element.onclick = function (commentEditor) {
         return function () {

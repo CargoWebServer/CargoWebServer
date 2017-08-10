@@ -254,7 +254,10 @@ var MainPage = function (parent) {
         .appendElement({ "tag": "div", "class": "row" }).down()
 
     // Blog Post Content Column
-    this.blogContainer = this.container.appendElement({ "tag": "div", "class": "col-lg-8" }).down()
+    this.pageContent = this.container.appendElement({ "tag": "div", "class": "col-lg-8" }).down()
+
+    // Display general post results.
+    this.homePage = new HomePage(this.pageContent)
 
     // Blog Sidebar Widgets Column
     // The search panel.
@@ -279,7 +282,7 @@ var MainPage = function (parent) {
 
         // The side well widget.
         .appendElement({ "tag": "div", "class": "well", "style": "display: none;" }).down()
-        .appendElement({ "tag": "h4", "id":"blog-post-by-author" })
+        .appendElement({ "tag": "h4", "id": "blog-post-by-author" })
         .appendElement({ "tag": "p", "id": "side-well-widget" }).up().appendElement({ "tag": "hr" }).up()
 
         // The footer.
@@ -722,7 +725,7 @@ var MainPage = function (parent) {
                     // I will reinit the panel here...
                     if (mainPage.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
                         // Udate the author post.
-                        mainPage.activePostView = new BlogPostView(mainPage.blogContainer, entities[evt.dataMap["entity"].UUID], mainPage.categoryContentDiv)
+                        mainPage.activePostView = new BlogPostView(mainPage.pageContent, entities[evt.dataMap["entity"].UUID], mainPage.categoryContentDiv)
 
                         // Set the blog view editable.
                         mainPage.setEditable(mainPage.activePostView)
@@ -798,7 +801,7 @@ MainPage.prototype.displayAuthorPost = function () {
                     var postLnk = authorPostDiv.getChildById(post.UUID + "_lnk")
                     postLnk.element.onclick = function (post, mainPage) {
                         return function () {
-                            mainPage.activePostView = new BlogPostView(mainPage.blogContainer, post, mainPage.categoryContentDiv)
+                            mainPage.activePostView = new BlogPostView(mainPage.pageContent, post, mainPage.categoryContentDiv)
 
                             // Set the blog view editable.
                             mainPage.setEditable(caller.mainPage.activePostView)
@@ -887,7 +890,7 @@ MainPage.prototype.createNewPost = function (author) {
                         // Success callback.
                         function (post, caller) {
                             // Create a new Blog.
-                            caller.mainPage.activePostView = new BlogPostView(caller.mainPage.blogContainer, post, caller.mainPage.categoryContentDiv)
+                            caller.mainPage.activePostView = new BlogPostView(caller.mainPage.pageContent, post, caller.mainPage.categoryContentDiv)
 
                             // Set the blog view editable.
                             caller.mainPage.setEditable(caller.mainPage.activePostView)
@@ -1057,12 +1060,12 @@ MainPage.prototype.appendCategory = function (category) {
         }
 
         // I will append the category...
-        var lnk = categoryContentDiv.appendElement({ "tag": "li", "id": category.UUID + "_li", "class":"category_lnk" }).down()
+        var lnk = categoryContentDiv.appendElement({ "tag": "li", "id": category.UUID + "_li", "class": "category_lnk" }).down()
         var deleteCategoryBtn = lnk.appendElement({ "tag": "i", "id": category.UUID + "_delete_btn", "class": "fa fa-trash-o delete-button category_delete_btn", "style": "vertical-align: middle; display: none;" }).down()
-        lnk.appendElement({ "tag": "a", innerHtml: category.M_name, "style": "padding-left: 7px; padding-right: 7px;"})
+        lnk.appendElement({ "tag": "a", innerHtml: category.M_name, "style": "padding-left: 7px; padding-right: 7px;" })
 
         // I will also append the checkbox to be use latter by post view...
-        lnk.appendElement({ "tag": "input", "id":category.UUID + "_checkbox", "type":"checkbox", "style": "vertical-align: text-bottom; display: none;"})
+        lnk.appendElement({ "tag": "input", "id": category.UUID + "_checkbox", "type": "checkbox", "style": "vertical-align: text-bottom; display: none;" })
 
         // if the user is logged i will show the delete button.
         if (this.account != undefined) {

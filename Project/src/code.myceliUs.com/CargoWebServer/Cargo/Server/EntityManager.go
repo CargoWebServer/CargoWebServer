@@ -731,19 +731,20 @@ func (this *EntityManager) getEntityById(storeId string, typeName string, ids []
 			return nil, cargoError
 		}
 
+		query.Indexs = make([]string, 0)
 		for i := 1; i < len(prototype.Ids) && len(results) == 0; i++ {
 			idField := prototype.Ids[i]
-			query.Indexs = make([]string, 0)
 			query.Indexs = append(query.Indexs, idField+"="+Utility.ToString(ids[i-1]))
-			queryStr, _ := json.Marshal(query)
-
-			results, err = GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
-			if err != nil {
-				// Create the error message
-				cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err)
-				return nil, cargoError
-			}
 		}
+		queryStr, _ := json.Marshal(query)
+
+		results, err = GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
+		if err != nil {
+			// Create the error message
+			cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err)
+			return nil, cargoError
+		}
+
 	}
 
 	// In that case not information are found.

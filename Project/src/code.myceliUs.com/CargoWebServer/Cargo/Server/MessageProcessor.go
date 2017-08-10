@@ -361,7 +361,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
 							//log.Println("Error:", err)
 							// Here I will try to create a the array of object.
 							if err.Error() == "NotDynamicObject" {
-								log.Println("-------> values: ", values, "typeName: ", param.GetTypeName())
 								p, err := Utility.InitializeArray(values.([]interface{}), param.GetTypeName())
 								if err == nil {
 									if p.IsValid() {
