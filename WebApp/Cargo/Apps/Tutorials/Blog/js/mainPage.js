@@ -725,7 +725,7 @@ var MainPage = function (parent) {
                     // I will reinit the panel here...
                     if (mainPage.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
                         // Udate the author post.
-                        mainPage.activePostView = new BlogPostView(mainPage.pageContent, entities[evt.dataMap["entity"].UUID], mainPage.categoryContentDiv)
+                        mainPage.displayPost(entities[evt.dataMap["entity"].UUID])
 
                         // Set the blog view editable.
                         mainPage.setEditable(mainPage.activePostView)
@@ -764,18 +764,24 @@ MainPage.prototype.saveAuthor = function (user) {
 }
 
 /**
+ * Display a given post entity.
+ */
+MainPage.prototype.displayPost = function(post){
+    this.pageContent.removeAllChilds()
+    this.activePostView = new BlogPostView(this.pageContent, post, this.categoryContentDiv)
+}
+
+/**
  * Set the content of author post.
  */
 MainPage.prototype.displayAuthorPost = function () {
-    // The list of post by an author.
+    // The list of post by an author
     if (this.authorPostDiv == null) {
         this.authorPostDiv = this.sideWellWidget.appendElement({ "tag": "div" }).down()
-    } else {
-        // reset it content.
-        this.authorPostDiv.removeAllChilds()
-        this.authorPostDiv.element.innerHTML = ""
     }
 
+    this.pageContent.removeAllChilds()
+    this.authorPostDiv.removeAllChilds()
     this.sideWellWidget.element.parentNode.style.display = "block"
 
 
@@ -801,7 +807,7 @@ MainPage.prototype.displayAuthorPost = function () {
                     var postLnk = authorPostDiv.getChildById(post.UUID + "_lnk")
                     postLnk.element.onclick = function (post, mainPage) {
                         return function () {
-                            mainPage.activePostView = new BlogPostView(mainPage.pageContent, post, mainPage.categoryContentDiv)
+                            mainPage.displayPost(post)
 
                             // Set the blog view editable.
                             mainPage.setEditable(caller.mainPage.activePostView)
@@ -890,8 +896,7 @@ MainPage.prototype.createNewPost = function (author) {
                         // Success callback.
                         function (post, caller) {
                             // Create a new Blog.
-                            caller.mainPage.activePostView = new BlogPostView(caller.mainPage.pageContent, post, caller.mainPage.categoryContentDiv)
-
+                            caller.mainPage.displayPost(post)
                             // Set the blog view editable.
                             caller.mainPage.setEditable(caller.mainPage.activePostView)
                         },
@@ -954,8 +959,17 @@ MainPage.prototype.setEditable = function (blogView) {
                     return function (evt) {
                         // Stop event propagation so we will not return direclty here...
                         evt.stopPropagation()
+                        
+                         // Here I will remove the edit button it's not part of the 
+                        // post content itself.
+                        var edits = document.getElementsByClassName("edit-button")
+                        for(var i=0; i < edits.length; i++){
+                            edits[i].parentNode.removeChild(edits[i])
+                        }
+
                         // Here I will set back the text inside the h1 element.
                         div.element.innerText = inputTitle.element.value
+                       
                         mainPage.activePostView.post.M_title = inputTitle.element.value
                         setEditable(div, setTitleCallback)
                         mainPage.saveActivePost()
@@ -988,6 +1002,13 @@ MainPage.prototype.setEditable = function (blogView) {
                         // remove the editor.
                         $('#page-content').summernote('destroy');
 
+                        // Here I will remove the edit button it's not part of the 
+                        // post content itself.
+                        var edits = document.getElementsByClassName("edit-button")
+                        for(var i=0; i < edits.length; i++){
+                            edits[i].parentNode.removeChild(edits[i])
+                        }
+
                         // Set the inner html value to the post.
                         mainPage.activePostView.post.M_article = document.getElementById("page-content").innerHTML
 
@@ -1006,7 +1027,19 @@ MainPage.prototype.setEditable = function (blogView) {
 MainPage.prototype.saveActivePost = function () {
     // Here the post to save is in the active view.
     var post = this.activePostView.post
-    server.entityManager.saveEntity(post)
+
+    // Here I will create the thumbnail image.
+    var pageContent = document.getElementById("page-content")
+    html2canvas(pageContent, {
+        onrendered: function(post){
+            return function (canvas) {
+                // Save the canvas png image by default as data url.
+                post.M_thumbnail = canvas.toDataURL()
+                server.entityManager.saveEntity(post)
+        }}(post),
+        width: pageContent.offsetWidth,
+        height: pageContent.offsetHeigth
+    });
 }
 
 /**
@@ -1065,11 +1098,12 @@ MainPage.prototype.appendCategory = function (category) {
         lnk.appendElement({ "tag": "a", innerHtml: category.M_name, "style": "padding-left: 7px; padding-right: 7px;" })
 
         // I will also append the checkbox to be use latter by post view...
-        lnk.appendElement({ "tag": "input", "id": category.UUID + "_checkbox", "type": "checkbox", "style": "vertical-align: text-bottom; display: none;" })
+        var categoryBtn = lnk.appendElement({ "tag": "input", "id": category.UUID + "_checkbox", "type": "checkbox", "style": "vertical-align: text-bottom; display: none;" }).down()
 
         // if the user is logged i will show the delete button.
         if (this.account != undefined) {
             deleteCategoryBtn.element.style.display = ""
+            categoryBtn.element.style.display = ""
         }
 
         // Now the delete action.
