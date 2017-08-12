@@ -615,7 +615,6 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
  */
 func (this *DynamicEntity) SaveEntity() {
 	this.saveEntity("")
-	//log.Println("entity saved: ", this.object["UUID"])
 	//log.Println("After save:", toJsonStr(this.object))
 }
 

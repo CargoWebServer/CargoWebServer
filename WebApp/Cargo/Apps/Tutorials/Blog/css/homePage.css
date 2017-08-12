@@ -2,11 +2,11 @@
  * Act as a container.
  */
 .home_page{
-  width: 600px;
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   position: relative;
+  padding: 10px;
 }
 
 .post_preview{

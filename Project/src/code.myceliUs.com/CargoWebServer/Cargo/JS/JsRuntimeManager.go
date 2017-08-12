@@ -132,7 +132,6 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 			case operationInfos := <-jsRuntimeManager.m_initScripts:
 				callback := operationInfos.m_returns
 				sessionId := operationInfos.m_params["sessionId"].(string)
-				log.Println("-----> init script: ", sessionId)
 				jsRuntimeManager.initScripts(sessionId)
 				callback <- []interface{}{true} // unblock the channel...
 			case operationInfos := <-jsRuntimeManager.m_createVm:
@@ -170,7 +169,6 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 						case stop := <-stopVm:
 							// clear ressource here...
 							if stop {
-								log.Println("-----> vm: ", sessionId, " is now removed!")
 								return // exit the loop.
 							}
 						}
@@ -181,7 +179,6 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 			case operationInfos := <-jsRuntimeManager.m_closeVm:
 				callback := operationInfos.m_returns
 				sessionId := operationInfos.m_params["sessionId"].(string)
-				log.Println("-----> remove vm: ", sessionId)
 				jsRuntimeManager.m_stopVm[sessionId] <- true // send kill
 				jsRuntimeManager.removeVm(sessionId)
 				callback <- []interface{}{true} // unblock the channel...

@@ -47,60 +47,63 @@ var BlogPostCommentEditor = function (parent, parentDiv) {
     this.connectCargo.element.onclick = function (commentEditor) {
         return function () {
             var sessionId = server.sessionId.replace("%", "%25")
+            // If the user is logged as Cargo user then I will try to ge the ressource..
+            if (mainPage.account != null) {
+                var query = "http://" + server.hostName + ":" + server.port + "/api/Server/AccountManager/Me?connectionId=" + sessionId
+                server.oAuth2Manager.getResource("1234", "openid profile email", query,
+                    function (results, caller) {
+                        if (results.TYPENAME != undefined) {
+                            // In that case I have an Account object.
+                            if (results.TYPENAME == "CargoEntities.Account") {
+                                // I will made use of the entity manager to initilyse the account properly
+                                server.entityManager.getEntityByUuid(results.UUID,
+                                    // success callback
+                                    function (results, caller) {
+                                        var userUuid
+                                        if (isString(results.M_userRef)) {
+                                            userUuid = results.M_userRef
+                                        } else {
+                                            userUuid = results.M_userRef.UUID
+                                        }
 
-            // TODO create function 
-            var query = "http://" + server.hostName + ":" + server.port + "/api/Server/AccountManager/Me?connectionId=" + sessionId
-            server.oAuth2Manager.getResource("1234", "openid profile email", query,
-                function (results, caller) {
-                    if (results.TYPENAME != undefined) {
-                        // In that case I have an Account object.
-                        if (results.TYPENAME == "CargoEntities.Account") {
-                            // I will made use of the entity manager to initilyse the account properly
-                            server.entityManager.getEntityByUuid(results.UUID,
-                                // success callback
-                                function (results, caller) {
-                                    var userUuid
-                                    if (isString(results.M_userRef)) {
-                                        userUuid = results.M_userRef
-                                    } else {
-                                        userUuid = results.M_userRef.UUID
-                                    }
+                                        // Now init the user reference.
+                                        results["set_M_userRef_" + userUuid + "_ref"](
+                                            function (caller, results) {
+                                                return function (ref) {
+                                                    caller.activeUser = eval("new " + userTypeName + "()")
+                                                    caller.activeUser.M_id = results.M_id
+                                                    caller.activeUser.M_first_name = results.M_userRef.M_firstName
+                                                    caller.activeUser.M_last_name = results.M_userRef.M_lastName
+                                                    caller.activeUser.M_email = results.M_userRef.M_email
+                                                    caller.activeUser.M_website = "www.cargoWebserver.com" // Powered by cargo.
+                                                    caller.connectFacebook.element.className = caller.connectFacebook.element.className.replace(" active", "")
+                                                    caller.connectGooglePlus.element.className = caller.connectGooglePlus.element.className.replace(" active", "")
+                                                    caller.connectCargo.element.className += " active"
+                                                    caller.activeUserSpan.element.innerHTML = "Leave a Comment as " + caller.activeUser.M_first_name + " " + caller.activeUser.M_last_name
 
-                                    // Now init the user reference.
-                                    results["set_M_userRef_" + userUuid + "_ref"](
-                                        function (caller, results) {
-                                            return function (ref) {
-                                                caller.activeUser = eval("new " + userTypeName + "()")
-                                                caller.activeUser.M_id = results.M_id
-                                                caller.activeUser.M_first_name = results.M_userRef.M_firstName
-                                                caller.activeUser.M_last_name = results.M_userRef.M_lastName
-                                                caller.activeUser.M_email = results.M_userRef.M_email
-                                                caller.activeUser.M_website = "www.cargoWebserver.com" // Powered by cargo.
-                                                caller.connectFacebook.element.className = caller.connectFacebook.element.className.replace(" active", "")
-                                                caller.connectGooglePlus.element.className = caller.connectGooglePlus.element.className.replace(" active", "")
-                                                caller.connectCargo.element.className += " active"
+                                                    // here I will display the button post.
+                                                    caller.submitCommentBtn.element.style.display = ""
+                                                    // Set the text focus.
+                                                    caller.newCommentTextArea.element.focus()
+                                                }
+                                            }(caller, results)
+                                        )
 
-                                                caller.activeUserSpan.element.innerHTML = "Leave a Comment as " + caller.activeUser.M_first_name + " " + caller.activeUser.M_last_name
+                                    },
+                                    // error callback
+                                    function () {
 
-                                                // here I will display the button post.
-                                                caller.submitCommentBtn.element.style.display = ""
-                                                // Set the text focus.
-                                                caller.newCommentTextArea.element.focus()
-                                            }
-                                        }(caller, results)
-                                    )
-
-                                },
-                                // error callback
-                                function () {
-
-                                }, caller)
+                                    }, caller)
+                            }
                         }
-                    }
 
-                },
-                function (errMsg, caller) {
-                }, commentEditor)
+                    },
+                    function (errMsg, caller) {
+                    }, commentEditor)
+            }else{
+                // display the login dialog
+                mainPage.loginLnk.element.click()
+            }
         }
     }(this)
 

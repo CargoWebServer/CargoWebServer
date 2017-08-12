@@ -416,8 +416,12 @@ var MainPage = function (parent) {
     this.userInfoDropDown = this.navBar.getChildById("user-info-dropdown")
 
     // Hide the window if the mouse leave it...
-    this.userInfoDropDown.element.onmouseleave = this.registerDropDown.element.onmouseleave = this.loginDropDown.element.onmouseleave = function () {
-        this.parentNode.className = "dropdown"
+    this.userInfoDropDown.element.onmouseleave = this.registerDropDown.element.onmouseleave = this.loginDropDown.element.onmouseleave = function (evt) {
+        // Here I will test if the mouse is inside it parent area, a little workaround!
+        var coord = getCoords(this)
+        if (evt.pageX < coord.left || evt.pageX > coord.left + this.offsetWidth || evt.pageY < coord.top || evt.pageY > coord.top + this.offsetWidth) {
+            this.parentNode.className = "dropdown"
+        }
     }
 
     // Create a new blog.
@@ -533,6 +537,13 @@ var MainPage = function (parent) {
 
                         // Display the author post inside the the side well widget.
                         this.mainPage.displayAuthorPost()
+
+                        // TODO display personal author page here instead of nothing...
+                        this.mainPage.pageContent.removeAllChilds()
+                        if (this.mainPage.activePostView != null) {
+                            // redisplay the active post to unlock category edit button's.
+                            this.mainPage.displayPost(this.mainPage.activePostView.post)
+                        }
 
                     }
 
@@ -701,7 +712,7 @@ var MainPage = function (parent) {
                 if (evt.dataMap["entity"] != null && mainPage.activePostView.post != null) {
                     if (mainPage.activePostView.post.UUID == evt.dataMap["entity"].UUID) {
                         // Remove the content of the page.
-                        mainPage.blogContainer.removeAllChilds()
+                        mainPage.pageContent.removeAllChilds()
                     }
                 }
             }
@@ -766,7 +777,7 @@ MainPage.prototype.saveAuthor = function (user) {
 /**
  * Display a given post entity.
  */
-MainPage.prototype.displayPost = function(post){
+MainPage.prototype.displayPost = function (post) {
     this.pageContent.removeAllChilds()
     this.activePostView = new BlogPostView(this.pageContent, post, this.categoryContentDiv)
 }
@@ -778,12 +789,11 @@ MainPage.prototype.displayAuthorPost = function () {
     // The list of post by an author
     if (this.authorPostDiv == null) {
         this.authorPostDiv = this.sideWellWidget.appendElement({ "tag": "div" }).down()
+    } else {
+        this.authorPostDiv.removeAllChilds()
     }
 
-    this.pageContent.removeAllChilds()
-    this.authorPostDiv.removeAllChilds()
     this.sideWellWidget.element.parentNode.style.display = "block"
-
 
     // Now I will get the all post from a given author.
     if (isObject(this.account.M_userRef)) {
@@ -798,43 +808,46 @@ MainPage.prototype.displayAuthorPost = function () {
                         post = entities[post.UUID]
                         author.M_FK_blog_post_blog_author[i] = post
                     }
-                    // Here I will create the link with the title.
-                    authorPostDiv.appendElement({ "tag": "div", "class": "row" }).down()
-                        .appendElement({ "tag": "div", "class": "col-md-1" }).down()
-                        .appendElement({ "tag": "i", "id": post.UUID + "_delete_btn", "class": "fa fa-trash-o delete-button", "style": "vertical-align: middle;" }).up()
-                        .appendElement({ "tag": "a", "id": post.UUID + "_lnk", "class": "col-md-10 control-label", "innerHtml": post.M_title, "href": "#", "style": "padding-left: 5px" })
 
-                    var postLnk = authorPostDiv.getChildById(post.UUID + "_lnk")
-                    postLnk.element.onclick = function (post, mainPage) {
-                        return function () {
-                            mainPage.displayPost(post)
+                    // Here I will create the link with the title if it not already exist.
+                    if (document.getElementById(post.UUID + "_lnk") == undefined) {
+                        authorPostDiv.appendElement({ "tag": "div", "class": "row" }).down()
+                            .appendElement({ "tag": "div", "class": "col-md-1" }).down()
+                            .appendElement({ "tag": "i", "id": post.UUID + "_delete_btn", "class": "fa fa-trash-o delete-button", "style": "vertical-align: middle;" }).up()
+                            .appendElement({ "tag": "a", "id": post.UUID + "_lnk", "class": "col-md-10 control-label", "innerHtml": post.M_title, "href": "#", "style": "padding-left: 5px" })
 
-                            // Set the blog view editable.
-                            mainPage.setEditable(caller.mainPage.activePostView)
+                        var postLnk = authorPostDiv.getChildById(post.UUID + "_lnk")
+                        postLnk.element.onclick = function (post, mainPage) {
+                            return function () {
+                                mainPage.displayPost(post)
 
-                            // Here I will also display the new category button.
-                            mainPage.newCategoryBtn.element.style.display = "block"
+                                // Set the blog view editable.
+                                mainPage.setEditable(caller.mainPage.activePostView)
 
-                        }
-                    }(post, caller.mainPage)
+                                // Here I will also display the new category button.
+                                mainPage.newCategoryBtn.element.style.display = "block"
 
-                    var postDeleteBtn = authorPostDiv.getChildById(post.UUID + "_delete_btn")
-                    postDeleteBtn.element.onclick = function (post) {
-                        return function () {
-                            console.log("-------> delete post: ", post)
-                            if (post != undefined) {
-                                server.entityManager.removeEntity(post.UUID,
-                                    // Success callback 
-                                    function (results, caller) {
-                                        console.log("Entity was remove sucessfully")
-                                    },
-                                    // Error callback
-                                    function (errObj, caller) {
-                                        // Nothing to do here...
-                                    }, {/* no caller. */ })
                             }
-                        }
-                    }(post)
+                        }(post, caller.mainPage)
+
+                        var postDeleteBtn = authorPostDiv.getChildById(post.UUID + "_delete_btn")
+                        postDeleteBtn.element.onclick = function (post) {
+                            return function () {
+                                console.log("-------> delete post: ", post)
+                                if (post != undefined) {
+                                    server.entityManager.removeEntity(post.UUID,
+                                        // Success callback 
+                                        function (results, caller) {
+                                            console.log("Entity was remove sucessfully")
+                                        },
+                                        // Error callback
+                                        function (errObj, caller) {
+                                            // Nothing to do here...
+                                        }, {/* no caller. */ })
+                                }
+                            }
+                        }(post)
+                    }
                 }
             },
             // Error callback.
@@ -959,19 +972,29 @@ MainPage.prototype.setEditable = function (blogView) {
                     return function (evt) {
                         // Stop event propagation so we will not return direclty here...
                         evt.stopPropagation()
-                        
-                         // Here I will remove the edit button it's not part of the 
-                        // post content itself.
-                        var edits = document.getElementsByClassName("edit-button")
-                        for(var i=0; i < edits.length; i++){
-                            edits[i].parentNode.removeChild(edits[i])
-                        }
 
                         // Here I will set back the text inside the h1 element.
                         div.element.innerText = inputTitle.element.value
-                       
+
                         mainPage.activePostView.post.M_title = inputTitle.element.value
+
+                        // Here I will remove edit button.
+                        var editButtons = document.getElementsByClassName("edit-button")
+                        for (var i = 0; i < editButtons.length; i++) {
+                            editButtons[i].parentNode.removeChild(editButtons[i])
+                        }
+
+                        // Set the content after I remove the button.
+                        $('#page-content').summernote();
+
+                        // I will also save the post content...
+                        mainPage.activePostView.post.M_article = $('#summernote').summernote('code');
+
+
+                        $('#page-content').summernote('destroy');
+
                         setEditable(div, setTitleCallback)
+
                         mainPage.saveActivePost()
                     }
                 }(inputTitle, div, mainPage)
@@ -998,20 +1021,15 @@ MainPage.prototype.setEditable = function (blogView) {
                 // Now the save action.
                 saveBtn.element.onclick = function (mainPage) {
                     return function () {
-
-                        // remove the editor.
-                        $('#page-content').summernote('destroy');
-
-                        // Here I will remove the edit button it's not part of the 
-                        // post content itself.
-                        var edits = document.getElementsByClassName("edit-button")
-                        for(var i=0; i < edits.length; i++){
-                            edits[i].parentNode.removeChild(edits[i])
-                        }
-
                         // Set the inner html value to the post.
-                        mainPage.activePostView.post.M_article = document.getElementById("page-content").innerHTML
-
+                        // Here I will remove edit button.
+                        var editButtons = document.getElementsByClassName("edit-button")
+                        for (var i = 0; i < editButtons.length; i++) {
+                            editButtons[i].parentNode.removeChild(editButtons[i])
+                        }
+                        $('#page-content').summernote();
+                        mainPage.activePostView.post.M_article = $('#summernote').summernote('code');
+                        $('#page-content').summernote('destroy');
                         mainPage.saveActivePost()
                     }
                 }(mainPage)
@@ -1031,12 +1049,13 @@ MainPage.prototype.saveActivePost = function () {
     // Here I will create the thumbnail image.
     var pageContent = document.getElementById("page-content")
     html2canvas(pageContent, {
-        onrendered: function(post){
+        onrendered: function (post) {
             return function (canvas) {
                 // Save the canvas png image by default as data url.
                 post.M_thumbnail = canvas.toDataURL()
                 server.entityManager.saveEntity(post)
-        }}(post),
+            }
+        }(post),
         width: pageContent.offsetWidth,
         height: pageContent.offsetHeigth
     });

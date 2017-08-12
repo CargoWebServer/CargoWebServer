@@ -121,6 +121,10 @@
     background-color: #007bb7;
 }
 
+/** Display the text editor over anything else **/
+.note-editor {
+    z-index: 10;
+}
 /** I will set the font to bigger size here. **/
 .cargo {
     font-size: 30px;

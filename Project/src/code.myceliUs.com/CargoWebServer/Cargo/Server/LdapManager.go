@@ -327,7 +327,6 @@ func (this *LdapManager) synchronizeUsers(id string) error {
 			GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", user)
 
 			// The user must be save...
-			log.Println("Save user ", user.GetEmail(), "an id ", user.GetId())
 			if len(user.GetEmail()) > 0 {
 				// Create the user uuid
 				GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", user)

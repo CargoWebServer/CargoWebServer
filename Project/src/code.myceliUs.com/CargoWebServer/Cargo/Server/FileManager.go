@@ -119,7 +119,6 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 		log.Println("Dir ", filePath_, "not found!")
 		if isRoot {
 			dirEntity, _ = this.createDir("", "", "")
-			log.Println("Root Dir entity ", dirEntity.UUID)
 		} else {
 			lastIndex := strings.LastIndex(filePath_, "/")
 			dirName := ""
@@ -159,7 +158,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 		// Create the file information here...
 		filePath__ := filePath_ + "/" + f.Name()
 		fileId := Utility.CreateSha1Key([]byte(filePath__))
-		log.Println("Get file ", filePath__)
+		//log.Println("Get file ", filePath__)
 		fileEntity, err := this.getFileById(fileId)
 
 		// Remove from file to delete...
@@ -643,7 +642,6 @@ func (this *FileManager) openFile(fileId string, sessionId string) (*CargoEntiti
 func (this *FileManager) loadMimeType() {
 	this.mimeTypeMap = make(map[string]*MimeType, 0)
 	mimeTypeFilePath := GetServer().GetConfigurationManager().GetDataPath() + "/mimeType.csv"
-	log.Println("--------> load mime type from file: ", mimeTypeFilePath)
 	mimeTypeFile, _ := os.Open(mimeTypeFilePath)
 	csvReader := csv.NewReader(bufio.NewReader(mimeTypeFile))
 	for {
