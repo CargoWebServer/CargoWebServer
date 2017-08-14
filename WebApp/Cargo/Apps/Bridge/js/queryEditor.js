@@ -80,7 +80,7 @@ var QueryEditor = function (parent, file, initCallback) {
  */
 QueryEditor.prototype.init = function () {
     // Now I will get the list of datastore from the server for the given type.
-    server.entityManager.getObjectsByType("Config.DataStoreConfiguration", "Config", "",
+    server.entityManager.getEntities("Config.DataStoreConfiguration", "Config", "", 0, -1, [], true,
         // progress
         function () {
             // nothing here

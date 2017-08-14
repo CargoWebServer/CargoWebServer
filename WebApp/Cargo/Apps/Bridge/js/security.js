@@ -140,7 +140,7 @@ var RoleManager = function (parent) {
     this.roles = {}
 
     // So here I will get the list of role from the server.
-    server.entityManager.getObjectsByType("CargoEntities.Role", "CargoEntities", "",
+    server.entityManager.getEntities("CargoEntities.Role", "CargoEntities", "", 0, -1, [], true,
         // progressCallback
         function (index, total, caller) { },
         // successCallback
@@ -331,7 +331,7 @@ RoleManager.prototype.displayRole = function (role) {
     this.appendAccountBtn.element.onclick = function (roleManager, role) {
         return function () {
             // Here I will get the list of all account...
-            server.entityManager.getObjectsByType("CargoEntities.Account", "CargoEntities", "",
+            server.entityManager.getEntities("CargoEntities.Account", "CargoEntities", "", 0, -1, [], true,
                 // Progress callback
                 function (index, total, caller) { },
                 // Success callback
@@ -428,7 +428,7 @@ RoleManager.prototype.displayRole = function (role) {
 
     this.appendActionBtn.element.onclick = function (roleManager, role) {
         return function () {
-            server.entityManager.getObjectsByType("CargoEntities.Action", "CargoEntities", "",
+            server.entityManager.getEntities("CargoEntities.Action", "CargoEntities", "", 0, -1, [], true,
                 // Progress callback
                 function (index, total, caller) { },
                 // Success callback
@@ -591,7 +591,7 @@ var PermissionManager = function (parent) {
             permissionManager.resultsDiv.removeAllChilds()
             permissionManager.resultsDiv.element.innerHTML = ""
 
-            server.entityManager.getObjectsByType("CargoEntities.User", "CargoEntities", query,
+            server.entityManager.getEntities("CargoEntities.User", "CargoEntities", query, 0, -1, [], true,
                 // Progress...
                 function () {
 

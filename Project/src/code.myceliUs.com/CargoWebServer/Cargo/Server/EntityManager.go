@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -109,7 +110,7 @@ func (this *EntityManager) initialize() {
 	}
 
 	// Force complete intialysation of action.
-	this.getEntitiesByType("CargoEntities.Action", "", "CargoEntities", false)
+	this.getEntities("CargoEntities.Action", "", "CargoEntities", false)
 
 }
 
@@ -806,7 +807,7 @@ func (this *EntityManager) getDerivedEntityType(typeName string) ([]*EntityProto
 /**
  * Return the list of entities for a given type name.
  */
-func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, storeId string, lazy bool) ([]Entity, *CargoEntities.Error) {
+func (this *EntityManager) getEntities(typeName string, queryStr string, storeId string, lazy bool) ([]Entity, *CargoEntities.Error) {
 
 	var entities []Entity
 
@@ -884,12 +885,12 @@ func (this *EntityManager) getEntitiesByType(typeName string, queryStr string, s
 /**
  * Return the list of all entities for different types.
  */
-func (this *EntityManager) getEntitiesByTypes(typeNames []string, storeId string, lazy bool) ([]Entity, *CargoEntities.Error) {
+func (this *EntityManager) getEntitiesByType(typeNames []string, storeId string, lazy bool) ([]Entity, *CargoEntities.Error) {
 	entitiesMap := make(map[string]Entity)
 	var entities []Entity
 
 	for i := 0; i < len(typeNames); i++ {
-		entities_, errObj := this.getEntitiesByType(typeNames[i], "", storeId, lazy)
+		entities_, errObj := this.getEntities(typeNames[i], "", storeId, lazy)
 		if errObj != nil {
 			return entities, errObj
 		}
@@ -1455,6 +1456,61 @@ func (this *EntityManager) isExist(uuid string) bool {
 	return false
 }
 
+/**
+ * Sort an array of entities.
+ */
+func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}, startIndex int, endIndex int, asc bool) []Entity {
+	// Get the order to sort...
+	order := orderBy[0].(string)
+	// and remove it from the list...
+	orderBy = orderBy[1:]
+
+	// First of all I will sort the array
+	sort.Slice(entities[startIndex:endIndex], func(order string, asc bool) func(int, int) bool {
+		return func(i, j int) bool {
+			// I will get values to compare...
+			entity0 := entities[i]
+			entity1 := entities[j]
+			var val0, val1 interface{}
+			if reflect.TypeOf(entity0).String() == "*Server.DynamicEntity" {
+				// Dynamic entity.
+				val0 = entity0.(*DynamicEntity).getValue(order)
+				val1 = entity1.(*DynamicEntity).getValue(order)
+			} else {
+				methodName := "Get" + strings.ToUpper(order[0:1]) + order[1:]
+				params := make([]interface{}, 0)
+				val0, _ = Utility.CallMethod(entity0, methodName, params)
+				val1, _ = Utility.CallMethod(entity1, methodName, params)
+			}
+			if asc {
+				return Utility.Less(val0, val1)
+			} else {
+				return Utility.Less(val1, val0)
+			}
+		}
+	}(order, asc))
+
+	for i := 0; i < len(entities)-1; i++ {
+		entity0 := entities[i]
+		entity1 := entities[i+1]
+		var val0, val1 interface{}
+		if reflect.TypeOf(entity0).String() == "*Server.DynamicEntity" {
+			// Dynamic entity.
+			val0 = entity0.(*DynamicEntity).getValue(order)
+			val1 = entity1.(*DynamicEntity).getValue(order)
+		} else {
+			methodName := "Get" + strings.ToUpper(order[0:1]) + order[1:]
+			params := make([]interface{}, 0)
+			val0, _ = Utility.CallMethod(entity0, methodName, params)
+			val1, _ = Utility.CallMethod(entity1, methodName, params)
+		}
+
+		log.Println("--------> ", entity0.GetTypeName(), " ", order, " val0 ", val0, " val1 ", val1)
+	}
+
+	return entities
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // API
 ////////////////////////////////////////////////////////////////////////////////
@@ -2009,13 +2065,17 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 // @param {string} typeName The name of the type we looking for in the form packageName.typeName
 // @param {string} storeId The name of the store where the information is saved.
 // @param {string} queryStr It contain the code of a function to be executed by the server to filter specific values.
+// @param {int} offset	Results offset
+// @param {int} limit	The number of results to return. Can be use to create page of results.
+// @param {[]string} orderBy the list of field that specifie the result order.
+// @param {bool} asc the list of field that specifie the result order.
 // @result{[]interface{}} Return an array of object's (Entities)
 // @scope {public}
 // @param {callback} progressCallback The function is call when chunk of response is received.
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.getObjectsByType = function (typeName, storeId, queryStr, progressCallback, successCallback, errorCallback, caller) {
+//EntityManager.prototype.getEntities = function (typeName, storeId, queryStr, offset, limit, orderBy, asc, progressCallback, successCallback, errorCallback, caller) {
 //    // First of all i will get the entity prototype.
 //    server.entityManager.getEntityPrototype(typeName, storeId,
 //        // The success callback.
@@ -2033,9 +2093,13 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //            params.push(createRpcData(typeName, "STRING", "typeName"))
 //            params.push(createRpcData(storeId, "STRING", "storeId"))
 //            params.push(createRpcData(queryStr, "STRING", "queryStr"))
+//            params.push(createRpcData(offset, "INTEGER", "offset"))
+//            params.push(createRpcData(limit, "INTEGER", "limit"))
+//			  params.push(createRpcData(orderBy, "JSON_STR", "orderBy", "[]string"))
+//			  params.push(createRpcData(asc, "BOOLEAN", "asc"))
 //            // Call it on the server.
 //            server.executeJsFunction(
-//                "EntityManagerGetObjectsByType", // The function to execute remotely on server
+//                "EntityManagerGetEntities", // The function to execute remotely on server
 //                params, // The parameters to pass to that function
 //                function (index, total, caller) { // The progress callback
 //                    // Keep track of the file transfert.
@@ -2085,7 +2149,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //            server.errorManager.onError(errMsg)
 //        }, { "typeName": typeName, "storeId": storeId, "queryStr": queryStr, "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback })
 //}
-func (this *EntityManager) GetObjectsByType(typeName string, storeId string, queryStr string, messageId string, sessionId string) []interface{} {
+func (this *EntityManager) GetEntities(typeName string, storeId string, queryStr string, offset int, limit int, orderBy []interface{}, asc bool, messageId string, sessionId string) []interface{} {
 
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -2093,7 +2157,20 @@ func (this *EntityManager) GetObjectsByType(typeName string, storeId string, que
 		return nil
 	}
 
-	entities, errObj := this.getEntitiesByType(typeName, queryStr, storeId, false)
+	entities, errObj := this.getEntities(typeName, queryStr, storeId, false)
+
+	// If no order ar specified i will use the id's as order.
+	if len(orderBy) == 0 {
+		// Here I will sort by it it's without it uuid...
+		prototype, _ := this.getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+		for i := 1; i < len(prototype.Ids); i++ {
+			if !strings.HasPrefix("[]", prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[i])]) {
+				orderBy = append(orderBy, prototype.Ids[i])
+			}
+		}
+	}
+	// Sort the entities
+	this.sortEntities(entities, orderBy, 0, len(entities), asc)
 
 	var objects []interface{}
 
@@ -2102,16 +2179,22 @@ func (this *EntityManager) GetObjectsByType(typeName string, storeId string, que
 		return objects
 	}
 
-	for i := 0; i < len(entities); i++ {
+	if limit <= 0 {
+		// all results are require.
+		limit = len(entities)
+	}
+
+	for i := offset; i < limit && i < len(entities); i++ {
 		// If the entity was deleted before the time i sent it back to the
-		//
+
 		if entities[i] != nil {
 			// Init the entity
 			entities[i].InitEntity(entities[i].GetUuid(), false)
-
 			objects = append(objects, entities[i].GetObject())
 		}
 	}
+
+	//
 
 	return objects
 }

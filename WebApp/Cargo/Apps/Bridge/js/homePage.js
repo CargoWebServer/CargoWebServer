@@ -430,7 +430,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
      this.propertiesView = new PropertiesView(this.propertiesDiv)*/
 
     // I will set the configuration of the panel...
-    server.entityManager.getObjectsByType("Config.Configurations", "Config", "",
+    server.entityManager.getEntities("Config.Configurations", "Config", "", 0, -1, [], true,
         /** Progress callback */
         function () {
 

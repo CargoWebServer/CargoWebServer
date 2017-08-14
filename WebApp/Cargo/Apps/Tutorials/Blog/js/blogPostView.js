@@ -193,7 +193,7 @@ var BlogPostView = function (parent, post, categoryContentDiv) {
     this.createdDiv.element.innerHTML = " " + m.format('LLL') // Returns "February 8 2013 8:30 AM" on en-us
 
     // The page content.
-    this.pageContentDiv = this.pageContainer.getChildById("page-content")
+    this.pageContentDiv = new Element(this.pageContainer.getChildById("page-content"), {"tag":"div", "id":"article-div"})
     this.pageContentDiv.element.innerHTML = this.post.M_article
     // I will remove the 
 

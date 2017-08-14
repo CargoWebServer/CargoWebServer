@@ -5,26 +5,70 @@ var HomePage = function (parent) {
     this.div = parent.appendElement({ "tag": "div", "class": "home_page" }).down()
     this.postPreviews = {}
 
-    server.entityManager.getObjectsByType("Blog.blog_post", "Blog", "",
+    // Display newest post's
+    this.displayNewestPost()
+
+    // Display most popular post...
+
+}
+
+/**
+ * Display the newest post.
+ */
+HomePage.prototype.displayNewestPost = function () {
+
+    var newestPostDiv = this.div.appendElement({ "tag": "div", "style": "display: table;" }).down()
+        .appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+        .appendElement({ "tag": "h3", "style": "display: table-cell;", "innerHtml": "Newest post's" }).up()
+        .appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+        .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+        .appendElement({ "tag": "div", "class": "post_preview_container" }).down()
+
+    // Display the 8 last articles...
+    server.entityManager.getEntities("Blog.blog_post", "Blog", "", 0, 8, ["M_date_published"], false,
         function (index, total, caller) {
 
         },
         function (results, caller) {
             for (var i = 0; i < results.length; i++) {
-                caller.homePage.appendPostPreview(results[i])
+                caller.homePage.appendPostPreview(results[i], caller.div)
             }
         },
         function (errObj, caller) {
 
         },
-        { "homePage": this })
+        { "homePage": this, "div": newestPostDiv })
 }
 
+HomePage.prototype.displayMostViewedPost = function () {
+
+    var newestPostDiv = this.div.appendElement({ "tag": "div", "style": "display: table;" }).down()
+        .appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+        .appendElement({ "tag": "h3", "style": "display: table-cell;", "innerHtml": "Newest post's" }).up()
+        .appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+        .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+        .appendElement({ "tag": "div", "class": "post_preview_container" }).down()
+
+    // Display the 8 last articles...
+    server.entityManager.getEntities("Blog.blog_post", "Blog", "", 0, 8, ["M_date_published"], false,
+        function (index, total, caller) {
+
+        },
+        function (results, caller) {
+            for (var i = 0; i < results.length; i++) {
+                caller.homePage.appendPostPreview(results[i], caller.div)
+            }
+        },
+        function (errObj, caller) {
+
+        },
+        { "homePage": this, "div": newestPostDiv })
+}
 /**
  * Append a post previews in the home page.
  */
-HomePage.prototype.appendPostPreview = function (post) {
-    var postPreview = new PostPreview(this.div, post)
+HomePage.prototype.appendPostPreview = function (post, div) {
+    var postPreview = new PostPreview(div, post)
     this.postPreviews[post.UUID] = postPreview
 }
 

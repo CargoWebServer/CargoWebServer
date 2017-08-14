@@ -229,7 +229,7 @@ function testEntityQuery() {
 
         }, undefined)
 
-    server.entityManager.getObjectsByType("CargoEntities.User", "CargoEntities", '(CargoEntities.User.M_firstName ~= "Eric" || CargoEntities.User.M_firstName == "Louis") && CargoEntities.User.M_lastName != "Boucher"',
+    server.entityManager.getEntities("CargoEntities.User", "CargoEntities", '(CargoEntities.User.M_firstName ~= "Eric" || CargoEntities.User.M_firstName == "Louis") && CargoEntities.User.M_lastName != "Boucher"', 0, -1, [], true,
         // Progress...
         function () {
 
@@ -274,7 +274,7 @@ function entitiesDump(typeName) {
     server.entityManager.getEntityPrototypes(typeName.split(".")[0],
         function (result) {
             // Here I will initialyse the catalog...
-            server.entityManager.getObjectsByType(typeName, typeName.split(".")[0], "",
+            server.entityManager.getEntities(typeName, typeName.split(".")[0], "", 0, -1, [], true,
                 // Progress callback...
                 function () {
 

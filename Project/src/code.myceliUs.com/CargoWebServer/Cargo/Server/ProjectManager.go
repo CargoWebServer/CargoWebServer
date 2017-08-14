@@ -169,7 +169,7 @@ func (this *ProjectManager) GetAllProjects(sessionId string, messageId string) [
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return projects
 	}*/
-	entities, errObj := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Project", "", "CargoEntities", false)
+	entities, errObj := GetServer().GetEntityManager().getEntities("CargoEntities.Project", "", "CargoEntities", false)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return projects

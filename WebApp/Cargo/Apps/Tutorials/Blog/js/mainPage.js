@@ -10,6 +10,7 @@ var MainPage = function (parent) {
             // The navigation bar.
             "toggle-navigation": "Toggle navigation",
             "start-lnk": "Start Boostrap",
+            "home-lnk": "home",
             "about-lnk": "about",
             "create-lnk": "New blog",
             "contact-lnk": "Contact",
@@ -92,6 +93,8 @@ var MainPage = function (parent) {
         .appendElement({ "tag": "ul", "class": "nav navbar-nav" }).down()
         .appendElement({ "tag": "li", "id": "new-blog-lnk", "style": "display: none;" }).down()
         .appendElement({ "tag": "a", "id": "create-lnk", "href": "#" }).up()
+        .appendElement({ "tag": "li" }).down()
+        .appendElement({ "tag": "a", "id": "home-lnk", "href": "#" }).up()
         .appendElement({ "tag": "li" }).down()
         .appendElement({ "tag": "a", "id": "about-lnk", "href": "#" }).up().up()
         .appendElement({ "tag": "ul", "class": "nav navbar-nav navbar-right" }).down()
@@ -299,6 +302,7 @@ var MainPage = function (parent) {
     //////////////////////////////////////////////////////////////////////
     // login
     this.loginLnk = this.navBar.getChildById("login-lnk")
+    this.homeLnk = this.navBar.getChildById("home-lnk")
     this.registerLnk = this.navBar.getChildById("register-lnk")
     this.userInfoLnk = this.navBar.getChildById("user-info-lnk")
     this.authorPostTitle = this.container.getChildById("blog-post-by-author")
@@ -306,6 +310,14 @@ var MainPage = function (parent) {
     // The new category button...
     this.newCategoryBtn = this.container.getChildById("new-blog-categories-btn")
     this.categoryContentDiv = this.container.getChildById("blog-categories-content")
+
+    this.homeLnk.element.onclick = function(homePage){
+        return function(){
+            // Display the home page in the page content area.
+            mainPage.pageContent.removeAllChilds()
+            mainPage.pageContent.appendElement(homePage.div)
+        }
+    }(this.homePage)
 
     this.loginLnk.element.onclick = function (registerLnk, userInfoLnk) {
         return function () {
@@ -388,7 +400,7 @@ var MainPage = function (parent) {
     }(this)
 
     // Get the list of existing categories.
-    server.entityManager.getObjectsByType(categoryTypeName, "Blog", "",
+    server.entityManager.getEntities(categoryTypeName, "Blog", "", 0, -1, [], true,
         // progress callback
         function (index, total, caller) {
             // Nothing to do here.
@@ -984,14 +996,8 @@ MainPage.prototype.setEditable = function (blogView) {
                             editButtons[i].parentNode.removeChild(editButtons[i])
                         }
 
-                        // Set the content after I remove the button.
-                        $('#page-content').summernote();
-
                         // I will also save the post content...
-                        mainPage.activePostView.post.M_article = $('#summernote').summernote('code');
-
-
-                        $('#page-content').summernote('destroy');
+                        mainPage.activePostView.post.M_article = document.getElementById("article-div").innerHTML
 
                         setEditable(div, setTitleCallback)
 
@@ -1012,7 +1018,7 @@ MainPage.prototype.setEditable = function (blogView) {
         function (mainPage) {
             return function (div) {
                 // I made use of http://summernote.org/ Great work folk's
-                $('#page-content').summernote();
+                $('#article-div').summernote();
 
                 // I will append the save button to existing toolbar, it's so easy...
                 var saveBtn = new Element(document.getElementsByClassName("note-view")[0], { "tag": "button", "tabindex": -1, "type": "button", "class": "note-btn btn btn-default btn-sm btn btn-primary btn-save", "title": "save", "data-original-title": "save" })
@@ -1027,9 +1033,9 @@ MainPage.prototype.setEditable = function (blogView) {
                         for (var i = 0; i < editButtons.length; i++) {
                             editButtons[i].parentNode.removeChild(editButtons[i])
                         }
-                        $('#page-content').summernote();
-                        mainPage.activePostView.post.M_article = $('#summernote').summernote('code');
-                        $('#page-content').summernote('destroy');
+                        
+                        $('#article-div').summernote('destroy');
+                        mainPage.activePostView.post.M_article = document.getElementById("article-div").innerHTML
                         mainPage.saveActivePost()
                     }
                 }(mainPage)

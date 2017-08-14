@@ -1,7 +1,7 @@
 /**
  * Act as a container.
  */
-.home_page{
+.post_preview_container{
   display: flex;
   flex-flow: row wrap;
   justify-content: flex-start;

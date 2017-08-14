@@ -909,3 +909,30 @@ func ToString(value interface{}) string {
 	}
 	return str
 }
+
+func Less(val0 interface{}, val1 interface{}) bool {
+	if val0 == nil || val1 == nil {
+		return true
+	}
+
+	if reflect.TypeOf(val0).Kind() == reflect.String {
+		return val0.(string) < val1.(string)
+	} else if reflect.TypeOf(val0).Kind() == reflect.Int {
+		return val0.(int) < val1.(int)
+	} else if reflect.TypeOf(val0).Kind() == reflect.Int8 {
+		return val0.(int8) < val1.(int8)
+	} else if reflect.TypeOf(val0).Kind() == reflect.Int16 {
+		return val0.(int16) < val1.(int16)
+	} else if reflect.TypeOf(val0).Kind() == reflect.Int32 {
+		return val0.(int32) < val1.(int32)
+	} else if reflect.TypeOf(val0).Kind() == reflect.Int64 {
+		return val0.(int64) < val1.(int64)
+	} else if reflect.TypeOf(val0).Kind() == reflect.Float32 {
+		return val0.(float32) < val1.(float32)
+	} else if reflect.TypeOf(val0).Kind() == reflect.Float64 {
+		return val0.(float64) < val1.(float64)
+	} else {
+		log.Println("Value with type:", reflect.TypeOf(val0).String(), "cannot be compare!")
+	}
+	return false
+}

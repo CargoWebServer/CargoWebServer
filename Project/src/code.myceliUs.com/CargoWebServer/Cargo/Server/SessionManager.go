@@ -121,7 +121,7 @@ func (this *SessionManager) run() {
  */
 func (this *SessionManager) removeClosedSession() {
 
-	sessions, _ := GetServer().GetEntityManager().getEntitiesByType("CargoEntities.Session", "", CargoEntitiesDB, false)
+	sessions, _ := GetServer().GetEntityManager().getEntities("CargoEntities.Session", "", CargoEntitiesDB, false)
 
 	for i := 0; i < len(sessions); i++ {
 		sessionId := sessions[i].GetObject().(*CargoEntities.Session).GetId()

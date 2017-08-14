@@ -26,11 +26,11 @@ function entityTests() {
         "CargoEntities",
         function () {
             /*
-                        getObjectsByType_Test()
-                        getObjectsByType_typeNameError_Test()
-                        getObjectsByType_typeNameError_2_Test()
-                        getObjectsByType_storeIdError_Test()
-                        getObjectsByType_queryStrError_Test()
+                        getEntities_Test()
+                        getEntities_typeNameError_Test()
+                        getEntities_typeNameError_2_Test()
+                        getEntities_storeIdError_Test()
+                        getEntities_queryStrError_Test()
             
                         getEntityByUuid_Test()
                         getEntityByUuid_UuidError_Test()
@@ -82,21 +82,21 @@ function entityTests() {
     } (), 3000);
 }
 
-//EntityManager.prototype.getObjectsByType = function (typeName, storeId, queryStr, lazy, level, progressCallback, successCallback, errorCallback, caller)
-function getObjectsByType_Test() {
-    testsMap["getObjectsByType_Test"] = getObjectsByType_Test
-    server.entityManager.getObjectsByType(
+//EntityManager.prototype.getEntities = function (typeName, storeId, queryStr, lazy, level, progressCallback, successCallback, errorCallback, caller)
+function getEntities_Test() {
+    testsMap["getEntities_Test"] = getEntities_Test
+    server.entityManager.getEntities(
         "CargoEntities.Log",
         "CargoEntities",
         undefined,
         function () {
 
         }, function (result) {
-            QUnit.test("getObjectsByType_Test",
+            QUnit.test("getEntities_Test",
                 function (result) {
                     return function (assert) {
                         assert.ok(result[0].TYPENAME == "CargoEntities.Log");
-                        testsReturnedResultMap["getObjectsByType_Test"] = getObjectsByType_Test
+                        testsReturnedResultMap["getEntities_Test"] = getEntities_Test
                     }
                 } (result))
         },
@@ -106,9 +106,9 @@ function getObjectsByType_Test() {
         undefined)
 }
 
-function getObjectsByType_typeNameError_Test() {
-    testsMap["getObjectsByType_typeNameError_Test"] = getObjectsByType_typeNameError_Test
-    server.entityManager.getObjectsByType(
+function getEntities_typeNameError_Test() {
+    testsMap["getEntities_typeNameError_Test"] = getEntities_typeNameError_Test
+    server.entityManager.getEntities(
         "AAA.Log",
         "CargoEntities",
         undefined,
@@ -116,20 +116,20 @@ function getObjectsByType_typeNameError_Test() {
         }, function () {
         },
         function (result) {
-            QUnit.test("getObjectsByType_typeNameError_Test",
+            QUnit.test("getEntities_typeNameError_Test",
                 function (result) {
                     return function (assert) {
                         assert.ok(result.message != undefined, result.message);
-                        testsReturnedResultMap["getObjectsByType_typeNameError_Test"] = getObjectsByType_typeNameError_Test
+                        testsReturnedResultMap["getEntities_typeNameError_Test"] = getEntities_typeNameError_Test
                     }
                 } (result))
         },
         undefined)
 }
 
-function getObjectsByType_typeNameError_2_Test() {
-    testsMap["getObjectsByType_typeNameError_2_Test"] = getObjectsByType_typeNameError_2_Test
-    server.entityManager.getObjectsByType(
+function getEntities_typeNameError_2_Test() {
+    testsMap["getEntities_typeNameError_2_Test"] = getEntities_typeNameError_2_Test
+    server.entityManager.getEntities(
         "@ #$%52 3452 5235",
         "CargoEntities",
         undefined,
@@ -137,20 +137,20 @@ function getObjectsByType_typeNameError_2_Test() {
         }, function () {
         },
         function (result) {
-            QUnit.test("getObjectsByType_typeNameError_2_Test",
+            QUnit.test("getEntities_typeNameError_2_Test",
                 function (result) {
                     return function (assert) {
                         assert.ok(result.message != undefined, result.message);
-                        testsReturnedResultMap["getObjectsByType_typeNameError_2_Test"] = getObjectsByType_typeNameError_2_Test
+                        testsReturnedResultMap["getEntities_typeNameError_2_Test"] = getEntities_typeNameError_2_Test
                     }
                 } (result))
         },
         undefined)
 }
 
-function getObjectsByType_storeIdError_Test() {
-    testsMap["getObjectsByType_storeIdError_Test"] = getObjectsByType_storeIdError_Test
-    server.entityManager.getObjectsByType(
+function getEntities_storeIdError_Test() {
+    testsMap["getEntities_storeIdError_Test"] = getEntities_storeIdError_Test
+    server.entityManager.getEntities(
         "CargoEntities.Log",
         "aaa",
         undefined,
@@ -159,20 +159,20 @@ function getObjectsByType_storeIdError_Test() {
         function () {
         },
         function (result) {
-            QUnit.test("getObjectsByType_storeIdError_Test",
+            QUnit.test("getEntities_storeIdError_Test",
                 function (result) {
                     return function (assert) {
                         assert.ok(result.message != undefined, result.message);
-                        testsReturnedResultMap["getObjectsByType_storeIdError_Test"] = getObjectsByType_storeIdError_Test
+                        testsReturnedResultMap["getEntities_storeIdError_Test"] = getEntities_storeIdError_Test
                     }
                 } (result))
         },
         undefined)
 }
 
-function getObjectsByType_queryStrError_Test() {
-    testsMap["getObjectsByType_queryStrError_Test"] = getObjectsByType_queryStrError_Test
-    server.entityManager.getObjectsByType(
+function getEntities_queryStrError_Test() {
+    testsMap["getEntities_queryStrError_Test"] = getEntities_queryStrError_Test
+    server.entityManager.getEntities(
         "CargoEntities.Log",
         "CargoEntities",
         function () {
@@ -186,11 +186,11 @@ function getObjectsByType_queryStrError_Test() {
         },
         function (result) {
 
-            QUnit.test("getObjectsByType_queryStrError_Test",
+            QUnit.test("getEntities_queryStrError_Test",
                 function (result) {
                     return function (assert) {
                         assert.ok(result.message != undefined, result.message);
-                        testsReturnedResultMap["getObjectsByType_queryStrError_Test"] = getObjectsByType_queryStrError_Test
+                        testsReturnedResultMap["getEntities_queryStrError_Test"] = getEntities_queryStrError_Test
                     }
                 } (result))
         },
