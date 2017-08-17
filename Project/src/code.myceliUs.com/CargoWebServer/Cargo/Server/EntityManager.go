@@ -2163,6 +2163,8 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, queryStr
 
 	entities, errObj := this.getEntities(typeName, queryStr, storeId, false)
 
+	log.Println("-----> Number of entities found ", len(entities))
+
 	// If no order ar specified i will use the id's as order.
 	if len(orderBy) == 0 {
 		// Here I will sort by it it's without it uuid...
@@ -2199,6 +2201,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, queryStr
 	}
 
 	//
+	log.Println("-----> number of return results ", len(objects))
 
 	return objects
 }

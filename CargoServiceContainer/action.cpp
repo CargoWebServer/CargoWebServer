@@ -164,7 +164,6 @@ void Action::run()
     // TODO test retVal for error and report error instead of response in that case.
     // Wait for the answer...
     com::mycelius::message::Message* result = new com::mycelius::message::Message();
-    result->set_type(com::mycelius::message::Message_MessageType_RESPONSE);
     result->set_index(-1);
     result->set_total(1);
     result->set_id(this->id.toStdString()); // Also set the message id.
@@ -184,7 +183,8 @@ void Action::run()
             doc.setArray(::QJsonArray::fromStringList(retVal.toStringList()));
 
             // So here I will
-            d->set_databytes(doc.toJson().toStdString());
+            QString docStr = doc.toJson();
+            d->set_databytes(docStr.toStdString());
         }else if(retVal.type() == QMetaType::QVariantList){
             // The type is a string list...
             d->set_type(::com::mycelius::message::Data_DataType_JSON_STR);
@@ -192,7 +192,25 @@ void Action::run()
             doc.setArray(::QJsonArray::fromVariantList(retVal.toList()));
 
             // So here I will
-            d->set_databytes(doc.toJson().toStdString());
+            QString docStr = doc.toJson();
+            d->set_databytes(docStr.toStdString());
+
+            if(retVal.toList().size() == 1) {
+                if(retVal.toList().at(0).type() == QMetaType::QJsonObject){
+                    QJsonObject obj =  retVal.toList().at(0).toJsonObject();
+                    // Here The code enconter and error.
+                    if(obj["TYPENAME"].toString() == "CargoEntities.Error"){
+                        com::mycelius::message::Error*  err = new com::mycelius::message::Error();
+                        err->set_id(this->id.toStdString());
+                        err->set_code(0);
+                        err->set_allocated_message(new std::string(obj["M_body"].toString().toStdString()));
+                        err->set_allocated_message(new std::string(obj["M_errorPath"].toString().toStdString()));
+                        result->set_type(com::mycelius::message::Message_MessageType_ERROR);
+                        result->set_allocated_err(err);
+                        // TODO set the message error here.
+                    }
+                }
+            }
 
         } else if(retVal.type() == QMetaType::Int){
             // The type is a integer...
@@ -228,7 +246,10 @@ void Action::run()
         qDebug() << "The result is void";
     }
 
-    result->set_allocated_rsp(rsp);
+    if(!result->has_err()){
+        result->set_type(com::mycelius::message::Message_MessageType_RESPONSE);
+        result->set_allocated_rsp(rsp);
+    }
 
     // The result will be send back as a signal...
     emit done(result);

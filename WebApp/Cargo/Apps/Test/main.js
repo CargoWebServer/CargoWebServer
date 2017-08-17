@@ -184,7 +184,7 @@ function testServiceContainer() {
                     {} // The caller
                 )
             }
-        }(service),
+        } (service),
         function () {
             console.log("Service is close!")
         })
@@ -262,7 +262,7 @@ function entityDump(id, typeName) {
                         return function (panel) {
                             panel.setEntity(entity)
                         }
-                    }(result), undefined, false, result, "")
+                    } (result), undefined, false, result, "")
                 },
                 function (errObj, caller) {
                     console.log(errObj)
@@ -288,7 +288,7 @@ function entitiesDump(typeName) {
                             return function (panel) {
                                 panel.setEntity(entity)
                             }
-                        }(results[i]), undefined, false, results[i], "")
+                        } (results[i]), undefined, false, results[i], "")
                     }
                 },
                 // Error callback.
@@ -378,7 +378,7 @@ function TestWebRtc1() {
                 return function (stream) {
                     videoPanel.element.src = window.URL.createObjectURL(stream);
                 }
-            }(videoPanel),
+            } (videoPanel),
             function (err) { }
         );
     } else {
@@ -410,7 +410,7 @@ function TestWebRtc2() {
 
                 streaming = true
             }
-        }(video, canvas),
+        } (video, canvas),
             function (error) {
                 console.log("Raised an error when capturing:", error);
             });
@@ -425,7 +425,7 @@ function TestWebRtc2() {
                         context.drawImage(video, 0, 0);
                     }
                 }
-            }(canvas.element, video.element));
+            } (canvas.element, video.element));
     } else {
         alert("Sorry, your browser does not support getUserMedia.");
     }

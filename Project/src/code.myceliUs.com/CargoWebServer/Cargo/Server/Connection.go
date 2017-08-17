@@ -160,7 +160,7 @@ func (c *tcpSocketConnection) Reader() {
 	var msgData []byte
 	connbuf := bufio.NewReader(c.m_socket)
 	for c.m_isOpen == true {
-		b := make([]byte, 4096) // fix buffer size.
+		b := make([]byte, 65535) //fix buffer size to maximum size of tcp packet.
 		size, err := connbuf.Read(b)
 		if err == nil {
 			msgData = append(msgData, b[0:size]...)

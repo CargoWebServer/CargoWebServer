@@ -307,7 +307,13 @@ QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
     catch (std::exception & e) {
        // deal with it
        qDebug()<< "Script error found!!!!" << e.what();
-
+       // Here I will get the exception information.
+       QJsonObject errObj;
+       errObj["TYPENAME"] = "CargoEntities.Error";
+       errObj["M_errorPath"] = "Line 313 serviceContainer.cpp";
+       errObj["M_code"] = "EXECUTE_JS_FUNCTION_ERROR";
+       errObj["M_body"] = QString(e.what());
+       results.push_back(errObj);
     }
 
 

@@ -62,6 +62,7 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
                      QJsonObject jsonObject = jsonDoc.object();
                      var = jsonObject;
                      action->appendParam(QString::fromStdString(param.name()), var, "QJsonObject");
+
                 }else if(jsonDoc.isArray()){
                     QJsonArray jsonArray = jsonDoc.array();
                     var = jsonArray;

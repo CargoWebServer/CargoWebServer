@@ -4,8 +4,10 @@ import (
 	"log"
 	"time"
 
+	"reflect"
+
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
-	//	"code.myceliUs.com/Utility"
+	"code.myceliUs.com/Utility"
 )
 
 type Hub struct {
@@ -47,30 +49,32 @@ func NewHub() *Hub {
 			for id, conn := range h.connections {
 				if conn != nil {
 					if conn.IsOpen() {
-						id := Utility.RandomUUID()
-						method := "Ping"
-						params := make([]*MessageData, 0)
-						to := make([]connection, 1)
-						to[0] = conn
-						successCallback := func(rspMsg *message, caller interface{}) {
-							//log.Println("success!!!")
+						// Because IE close ws session after a given time I need to keep it active.
+						if reflect.TypeOf(conn).String() == "*Server.webSocketConnection" {
+							id := Utility.RandomUUID()
+							method := "Ping"
+							params := make([]*MessageData, 0)
+							to := make([]connection, 1)
+							to[0] = conn
+							successCallback := func(rspMsg *message, caller interface{}) {
+								//log.Println("success!!!")
+							}
+
+							errorCallback := func(rspMsg *message, caller interface{}) {
+								//log.Println("error!!!")
+							}
+
+							rqst, err := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+							if err != nil {
+								log.Println(err, " at time ", t)
+								conn.Close() // Here I will close the connection.
+							} else {
+								go func(rqst *message) {
+									GetServer().GetProcessor().m_sendRequest <- rqst
+								}(rqst)
+							}
 						}
-
-						errorCallback := func(rspMsg *message, caller interface{}) {
-							//log.Println("error!!!")
-						}
-
-						rqst, err := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
-
-						if err != nil {
-							log.Println(err, " at time ", t)
-							conn.Close() // Here I will close the connection.
-						} else {
-							go func(rqst *message) {
-								GetServer().GetProcessor().m_sendRequest <- rqst
-							}(rqst)
-						}
-
 					} else {
 						GetServer().GetSessionManager().removeClosedSession()
 					}
