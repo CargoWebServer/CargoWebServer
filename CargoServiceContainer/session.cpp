@@ -17,16 +17,21 @@ QByteArray serializeToByteArray(google::protobuf::Message *msg){
 /**
  * @brief Session::MAX_MESSAGE_SIZE The size must be the same on both side of the socket.
  */
-int Session::MAX_MESSAGE_SIZE = 17739;
+int Session::MAX_MESSAGE_SIZE = 17740;
 
 void Session::processIncommingMessage(com::mycelius::message::Message& msg){
 
     // Now i will determine if the message is a request, a response or an event...
     if(msg.type() == com::mycelius::message::Message_MessageType_ERROR){
         // The message is an error
+
+
     }else if(msg.type() == com::mycelius::message::Message_MessageType_REQUEST){
         // Now I will call process message from the store.
         QString methodName = QString::fromStdString(msg.rqst().method());
+
+        qDebug() << "Incomming request: " << QString::fromStdString(msg.rqst().id());
+
         Action* action = new Action(QString::fromStdString(msg.rqst().id()), methodName);
 
         // Now I will append the parameters...
@@ -85,8 +90,9 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
     }else if(msg.type() == com::mycelius::message::Message_MessageType_RESPONSE){
         // The message is a response...
         QString messageId = QString::fromStdString(msg.rsp().id());
+        qDebug() << " process pending message with id " << messageId;
         if(this->pending.contains(messageId)){
-            //qDebug() << " process next pending message, message id is " << messageId;
+             qDebug() << " number of pending message for " << messageId << " is " << this->pending.find(messageId)->size();
             this->processPendingMessage(messageId);
         }
 
@@ -133,6 +139,8 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
         com::mycelius::message::Response rsp;
         rsp.set_id(messageId.toStdString());
         responseMsg.set_allocated_rsp(&rsp);
+
+        // Response was sent to the server.
         this->sendMessage(&responseMsg);
 
     }else if(msg.type() == com::mycelius::message::Message_MessageType_EVENT){
@@ -145,18 +153,23 @@ void Session::completeProcessMessageData(com::mycelius::message::Message * msg){
     QString messageId = QString::fromStdString(msg->rsp().id());
 
     if( msg->ByteSize() < Session::MAX_MESSAGE_SIZE){
-        qDebug() << "message send directly!";
+        qDebug() << "message send directly!" << QString::fromStdString(messageId.toStdString());
         this->sendMessage(msg);
     }else{
-        qDebug() << "message chunk!";
-        int count = int(double(msg->ByteSize() / Session::MAX_MESSAGE_SIZE) + .5f);
+        qDebug() << "message chunk!" << QString::fromStdString(messageId.toStdString());
         QByteArray messageData = serializeToByteArray(msg);
-        this->pending.insert(messageId, QList<com::mycelius::message::Message*>() );
 
+        int count = int(double(msg->ByteSize() / Session::MAX_MESSAGE_SIZE));
+        if(msg->ByteSize() % Session::MAX_MESSAGE_SIZE > 0){
+            count++;
+        }
+
+        // If not fit exactly inside the message.
+        this->pending.insert(messageId, QList<com::mycelius::message::Message*>() );
         for(int i=0; i<count; i++){
             QByteArray bytesSlice;
             int startIndex = i * Session::MAX_MESSAGE_SIZE;
-            if(i<count-1){
+            if(startIndex + Session::MAX_MESSAGE_SIZE < messageData.size()){
                 bytesSlice = messageData.mid(startIndex, Session::MAX_MESSAGE_SIZE );
             } else {
                 bytesSlice = messageData.mid(startIndex);
@@ -179,7 +192,8 @@ void Session::completeProcessMessageData(com::mycelius::message::Message * msg){
         // Start the message transfer...
         this->processPendingMessage(messageId);
     }
-    // Release the memory here.
+
+    // Remove the incomming message to be process, it can be sent directly or chunked...
     delete msg;
     msg = NULL;
 }
@@ -193,10 +207,8 @@ void Session::processPendingMessage(QString messageId){
              this->pending.remove(messageId);
         }
 
-        // Serialyse the message
+        // Send the next message pending message.
         this->sendMessage(msg);
-
-        // clear buffered data
         delete msg;
         msg = NULL;
     }

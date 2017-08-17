@@ -1490,7 +1490,8 @@ func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}
 		}
 	}(order, asc))
 
-	for i := 0; i < len(entities)-1; i++ {
+	// TODO recursively sort with other fields...
+	/*for i := 0; i < len(entities)-1; i++ {
 		entity0 := entities[i]
 		entity1 := entities[i+1]
 		var val0, val1 interface{}
@@ -1505,8 +1506,8 @@ func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}
 			val1, _ = Utility.CallMethod(entity1, methodName, params)
 		}
 
-		log.Println("--------> ", entity0.GetTypeName(), " ", order, " val0 ", val0, " val1 ", val1)
-	}
+		//log.Println("--------> ", entity0.GetTypeName(), " ", order, " val0 ", val0, " val1 ", val1)
+	}*/
 
 	return entities
 }
@@ -1820,6 +1821,9 @@ func (this *EntityManager) OnEvent(evt interface{}) {
 //                        if (i < prototype.Ids.length - 1) {
 //                            id_ += "_"
 //                        }
+//						  if(i == prototype.Ids.length - 1){
+//							entities[id_] = entity
+//						  }
 //                    }
 //                }
 //            }

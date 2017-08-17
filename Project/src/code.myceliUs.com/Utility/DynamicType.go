@@ -81,6 +81,9 @@ func toInt(value interface{}) int {
  * Initialyse base type value.
  */
 func initializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
+	if value == nil {
+		return reflect.ValueOf(nil)
+	}
 
 	var v reflect.Value
 
@@ -128,7 +131,6 @@ func initializeBaseTypeValue(t reflect.Type, value interface{}) reflect.Value {
  * Create an instance of the type with it name.
  */
 func MakeInstance(typeName string, data map[string]interface{}) reflect.Value {
-
 	value := initializeStructureValue(typeName, data)
 	return value
 }

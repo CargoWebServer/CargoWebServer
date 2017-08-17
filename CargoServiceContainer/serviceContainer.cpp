@@ -1,3 +1,4 @@
+#include <exception>
 
 ServiceContainer::~ServiceContainer(){
     // close the connections.
@@ -298,9 +299,17 @@ QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
         params_.append(engine.newVariant(params.at(i)));
     }
     qDebug() << "Try to evaluate: " << function;
-    QScriptValue result = toEvaluate.call(object, params_);
     QVariantList results;
-    results.push_back(result.toVariant());
+    try {
+        QScriptValue result = toEvaluate.call(object, params_);
+        results.push_back(result.toVariant());
+    }
+    catch (std::exception & e) {
+       // deal with it
+       qDebug()<< "Script error found!!!!" << e.what();
+
+    }
+
 
     return results;
 }

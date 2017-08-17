@@ -51,18 +51,17 @@ void Session::run()
 
 void Session::sendMessage(com::mycelius::message::Message *msg){
     QByteArray data =  serializeToByteArray(msg);
-    qDebug() << QString::fromStdString(*msg->mutable_id()) << " size " << data.length();
+    qDebug()<< "Message send "<< QString::fromStdString(msg->id()) << " size " << data.length();
     this->socket->write(data);
     this->socket->waitForBytesWritten();
+    qDebug() << "Message " <<  QString::fromStdString(msg->id()) << " was sent successfully!";
 }
 
 void Session::readyRead()
 {
-
     while(this->socket->bytesAvailable())
     {
         QByteArray buffer;
-
         int dataSize;
         this->socket->read((char*)&dataSize, sizeof(int));
         buffer = this->socket->read(dataSize);
@@ -73,8 +72,9 @@ void Session::readyRead()
         }
         com::mycelius::message::Message msg;
         msg.ParseFromArray(buffer, buffer.size());
-        qDebug() << "message received!";
-        this->processIncommingMessage(msg);
+        qDebug() << "message received!" << QString::fromStdString(msg.id());
+        if(msg.id().length() > 0){
+            this->processIncommingMessage(msg);
+        }
     }
-
 }

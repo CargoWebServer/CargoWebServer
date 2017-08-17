@@ -158,7 +158,7 @@ func NewErrorMessage(id string, code int32, errMsg string, errData []byte, to []
 
 	// Set the type to error
 	m.msg = new(Message)
-
+	m.msg.Id = &id
 	m.msg.Type = new(Message_MessageType)
 	*m.msg.Type = Message_ERROR
 
@@ -193,6 +193,7 @@ func NewRequestMessage(id string, method string, params []*MessageData, to []con
 	total := int32(1)
 	m.msg.Index = &index_
 	m.msg.Total = &total
+	m.msg.Id = &id
 
 	m.msg.Type = new(Message_MessageType)
 	*m.msg.Type = Message_REQUEST
@@ -294,6 +295,7 @@ func NewResponseMessage(id string, results []*MessageData, to []connection) (*me
 
 	// Initialyse the response message...
 	m.msg.Rsp = new(Response)
+	m.msg.Id = &id
 	m.msg.Rsp.Id = &id
 	m.msg.Rsp.Results = make([]*Data, len(results))
 

@@ -111,3 +111,141 @@ function createRpcData(variable, variableType, variableName, typeName) {
     // Now I will create the rpc data.
     return new RpcData({ "name": variableName, "type": variableType, "dataBytes": variable, "typeName": typeName });
 }
+
+//////////////////////////////////// XML/SQL type ////////////////////////////////////
+
+/**
+ * Dertermine if the value is a base type.
+ */
+function isXsBaseType(fieldType) {
+    return isXsId(fieldType) || isXsRef(fieldType) || isXsInt(fieldType) || isXsString(fieldType) || isXsBinary(fieldType) || isXsNumeric(fieldType) || isXsBoolean(fieldType) || isXsDate(fieldType) || isXsTime(fieldType) || isXsMoney(fieldType)
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere integer.
+ */
+function isXsInt(fieldType) {
+    if (endsWith(fieldType, "byte")|| endsWith(fieldType, "long") || endsWith(fieldType, "int") || endsWith(fieldType, "integer") || endsWith(fieldType, "short")  // XML
+        || endsWith(fieldType, "unsignedInt") || endsWith(fieldType, "unsignedBtype") || endsWith(fieldType, "unsignedShort") || endsWith(fieldType, "unsignedLong")  // XML
+        || endsWith(fieldType, "negativeInteger") || endsWith(fieldType, "nonNegativeInteger") || endsWith(fieldType, "nonPositiveInteger") || endsWith(fieldType, "positiveInteger") // XML
+        || endsWith(fieldType, "tinyint") || endsWith(fieldType, "smallint") || endsWith(fieldType, "bigint"))// SQL
+    {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere String.
+ */
+function isXsString(fieldType) {
+    if (endsWith(fieldType, "string")
+        || endsWith(fieldType, "Name") || endsWith(fieldType, "QName") || endsWith(fieldType, "NMTOKEN")  // XML
+        || endsWith(fieldType, "gDay") || endsWith(fieldType, "gMonth") || endsWith(fieldType, "gMonthDay") || endsWith(fieldType, "gYear") // XML
+        || endsWith(fieldType, "gYearMonth") || endsWith(fieldType, "token") || endsWith(fieldType, "normalizedString") || endsWith(fieldType, "hexBinary") // XML
+        || endsWith(fieldType, "language") || endsWith(fieldType, "NMTOKENS") || endsWith(fieldType, "NOTATION")  // XML
+        || endsWith(fieldType, "char") || endsWith(fieldType, "nchar") || endsWith(fieldType, "varchar") // SQL
+        || endsWith(fieldType, "nvarchar") || endsWith(fieldType, "text") || endsWith(fieldType, "ntext") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere binary value.
+ */
+function isXsBinary(fieldType) {
+    if (endsWith(fieldType, "base64Binary") // XML
+        || endsWith(fieldType, "varbinary") || endsWith(fieldType, "binary") // SQL
+        || endsWith(fieldType, "image") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere numeric value.
+ */
+function isXsNumeric(fieldType) {
+    if (endsWith(fieldType, "double") || endsWith(fieldType, "decimal") || endsWith(fieldType, "float") // XML
+        || endsWith(fieldType, "numeric") || endsWith(fieldType, "real") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere boolean value.
+ */
+function isXsBoolean(fieldType) {
+    if (endsWith(fieldType, "boolean") // XML
+        || endsWith(fieldType, "bit")  // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere date value.
+ */
+function isXsDate(fieldType) {
+    if (endsWith(fieldType, "date") || endsWith(fieldType, "dateTime") // XML
+        || endsWith(fieldType, "datetime2") || endsWith(fieldType, "smalldatetime") || endsWith(fieldType, "datetimeoffset") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere time value.
+ */
+function isXsTime(fieldType) {
+    if (endsWith(fieldType, "time") // XML
+        || endsWith(fieldType, "timestampNumeric") || endsWith(fieldType, "timestamp") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere money value.
+ */
+function isXsMoney(fieldType) {
+    if (
+        endsWith(fieldType, "money") || endsWith(fieldType, "smallmoney") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere id value.
+ */
+function isXsId(fieldType) {
+    if (
+        endsWith(fieldType, "ID") || endsWith(fieldType, "NCName") // XML
+        || endsWith(fieldType, "uniqueidentifier") // SQL
+    ) {
+        return true
+    }
+    return false
+}
+
+/**
+ * Helper function use to dertermine if a XS type must be considere id value.
+ */
+function isXsRef(fieldType) {
+    if (
+        endsWith(fieldType, "anyURI") || endsWith(fieldType, "IDREF") // XML
+    ) {
+        return true
+    }
+    return false
+}

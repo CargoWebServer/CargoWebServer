@@ -100,12 +100,13 @@ EntityPrototype.prototype.getTitles = function () {
     return [this.Ids[1]] // The first index only...
 }
 
+
 /**
  * Create a new class form json object.
  * @param {object} object The object that regroup the prototype properties.
  */
 EntityPrototype.prototype.init = function (object) {
-	
+
     if (object == null || object.TypeName == undefined) {
         return
     }
@@ -115,7 +116,7 @@ EntityPrototype.prototype.init = function (object) {
 
     // The package will be an object on the global scope.
     this.PackageName = object.TypeName.split(".")[0]
-	
+
     // The type name.
     this.ClassName = object.TypeName.substring(object.TypeName.indexOf(".") + 1)
 
@@ -181,6 +182,9 @@ EntityPrototype.prototype.init = function (object) {
     // other standard fields.
     this.appendField("childsUuid", "[]xs.string", false, this.Fields.length)
     this.appendField("referenced", "[]Server.EntityRef", false, this.Fields.length)
+
+    // Generate the entity constructor define by the entity prototype.
+    this.generateConstructor()
 }
 
 /**
@@ -241,4 +245,147 @@ EntityPrototype.prototype.getFieldIndex = function (field) {
         }
     }
     return -1
+}
+
+
+/**
+ * This function generate the js class base on the entity prototype.
+ */
+EntityPrototype.prototype.generateConstructor = function () {
+
+    if (this.ClassName.indexOf(" ") > 0) {
+        return
+    }
+
+    var constructorSrc = this.PackageName + " || {};\n"
+
+    var packageName = this.PackageName
+    var classNames = this.ClassName.split(".")
+
+    for (var i = 0; i < classNames.length - 1; i++) {
+        packageName += "." + classNames[i]
+        constructorSrc += packageName + " = " + packageName + " || {};\n"
+    }
+
+    // I will create the object constructor from the information
+    // of the fields.
+    constructorSrc += this.PackageName + "." + this.ClassName + " = function(){\n"
+
+    // Common properties share by all entity.
+    constructorSrc += " this.__class__ = \"" + this.PackageName + "." + this.ClassName + "\"\n"
+    constructorSrc += " this.UUID = this.UUID\n"
+    constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
+    constructorSrc += " this.ParentUuid = \"\"\n"
+    constructorSrc += " this.childsUuid = []\n"
+    constructorSrc += " this.references = []\n"
+    constructorSrc += " this.NeedSave = true\n"
+    constructorSrc += " this.IsInit = false\n"
+    constructorSrc += " this.exist = false\n"
+    constructorSrc += " this.initCallback = undefined\n"
+    constructorSrc += " this.panel = null\n"
+
+    // Remove space accent '' from the field name
+    function normalizeFieldName(fieldName) {
+        // TODO make distinctive..
+        fieldName = replaceAll(fieldName, " ", "_")
+        fieldName = replaceAll(fieldName, "'", "")
+        return fieldName
+    }
+
+    // Fields.
+    for (var i = 0; i < this.Fields.length; i++) {
+        constructorSrc += " this." + normalizeFieldName(this.Fields[i])
+        if (startsWith(this.FieldsType[i], "[]")) {
+            constructorSrc += " = undefined\n"
+        } else {
+            if (isXsString(this.FieldsType[i]) || isXsRef(this.FieldsType[i]) || isXsId(this.FieldsType[i])) {
+                constructorSrc += " = \"\"\n"
+            } else if (isXsInt(this.FieldsType[i])) {
+                constructorSrc += " = 0\n"
+            } else if (isXsNumeric(this.FieldsType[i])) {
+                constructorSrc += " = 0.0\n"
+            } else if (isXsDate(this.FieldsType[i])) {
+                constructorSrc += " = new Date()\n"
+            } else if (isXsBoolean(this.FieldsType[i])) {
+                constructorSrc += " = false\n"
+            } else if (startsWith(this.FieldsType[i], "enum:")) {
+                constructorSrc += " = 1\n"
+            } else {
+                // Object here.
+                constructorSrc += " = undefined\n"
+            }
+        }
+    }
+
+    // Now the stringify function.
+    constructorSrc += " this.stringify = function(){\n"
+    constructorSrc += "       resetObjectValues(this)\n"
+    constructorSrc += "       var cache = [];\n"
+    constructorSrc += "       var entityStr = JSON.stringify(this, function(key, value) {\n"
+    constructorSrc += "           if (typeof value === 'object' && value !== null) {\n"
+    constructorSrc += "               if (cache.indexOf(value) !== -1) {\n"
+    constructorSrc += "                   // Circular reference found, discard key\n"
+    constructorSrc += "                   return;\n"
+    constructorSrc += "               }\n"
+    constructorSrc += "               // Store value in our collection\n"
+    constructorSrc += "               cache.push(value);\n"
+    constructorSrc += "           }\n"
+    constructorSrc += "           return value;\n"
+    constructorSrc += "       });\n"
+    constructorSrc += "       cache = null; // Enable garbage collection\n"
+    constructorSrc += "       setObjectValues(this)\n"
+    constructorSrc += "       return entityStr\n"
+    constructorSrc += "   }\n"
+
+    // The get parent function
+    constructorSrc += " this.getParent = function(){\n"
+    constructorSrc += "       return entities[this.ParentUuid]\n"
+    constructorSrc += "  }\n"
+
+    // The setter function.
+    for (var i = 0; i < this.Fields.length; i++) {
+        if (!startsWith(this.FieldsType[i], "xs.") && !startsWith(this.FieldsType[i], "[]xs.")) {
+            // So its not a basic type.
+            constructorSrc += " this.set" + capitalizeFirstLetter(normalizeFieldName(this.Fields[i]).replace("M_", "")) + " = function(value){\n"
+            constructorSrc += "     appendObjectValue(this,\"" + normalizeFieldName(this.Fields[i]) + "\", value)\n"
+            constructorSrc += " }\n"
+        }
+    }
+
+    // The remove function.
+    for (var i = 0; i < this.Fields.length; i++) {
+        if (!startsWith(this.FieldsType[i], "xs.") && !startsWith(this.FieldsType[i], "[]xs.")) {
+            // So its not a basic type.
+            constructorSrc += " this.remove" + capitalizeFirstLetter(normalizeFieldName(this.Fields[i]).replace("M_", "")) + " = function(value){\n"
+            constructorSrc += "     removeObjectValue(this,\"" + normalizeFieldName(this.Fields[i]) + "\", value)\n"
+            constructorSrc += " }\n"
+        }
+    }
+    // The get title default function... can be overload.
+    for (var i = 1; i < this.Ids.length; i++) {
+        var fieldIndex = this.getFieldIndex(this.Ids[i])
+        var field = this.Fields[fieldIndex]
+        if (this.FieldsVisibility[fieldIndex] == true) {
+            constructorSrc += " this.getTitles = function(){\n"
+            constructorSrc += "     return [this." + field + "]\n"
+            constructorSrc += " }\n"
+            break
+        }
+    }
+
+    // Keep the reference on the entity prototype.
+    // The class level.
+    constructorSrc += " return this\n"
+    constructorSrc += "}\n\n"
+
+    constructorSrc += this.PackageName + "." + this.ClassName + ".prototype.init = function(object){\n"
+    // First of all i will set reference in the result.
+    constructorSrc += "   this.TYPENAME = object.TYPENAME\n"
+    constructorSrc += "   this.UUID = object.UUID\n"
+    constructorSrc += "   this.IsInit = false\n"
+    constructorSrc += "   setObjectValues(this, object)\n"
+    constructorSrc += "}\n\n"
+
+    // Set the function.
+    eval(constructorSrc)
 }

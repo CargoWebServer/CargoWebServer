@@ -1268,11 +1268,14 @@ func (this *DataManager) CreateDataStore(storeId string, storeType int64, storeV
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
 	}
+	var store DataStore
+	store, errObj = this.createDataStore(storeId, Config.DataStoreType(storeType), Config.DataStoreVendor(storeVendor))
 
-	_, errObj = this.createDataStore(storeId, Config.DataStoreType(storeType), Config.DataStoreVendor(storeVendor))
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}
+
+	store.Connect()
 }
 
 // @api 1.0

@@ -122,12 +122,12 @@ var Element = function (parent, params, callback, appendFront) {
     // Keeping a reference of the lastChild. Used by the down function.
     this.lastChild = null;
 
-    if (params != null) {
+    if (params !== null) {
         // If there is no tag or params, this means the initialization is
         // made outside the constructor. See createElementFromXml for example.
         var innerHtml = "";
-        if (params["tag"] != undefined) {
-            if (params["NS"] != undefined) {
+        if (params.tag !== undefined) {
+            if (params.NS !== undefined) {
                 this.element = document.createElementNS(params.NS, params.tag);
             } else {
                 this.element = document.createElement(params.tag);

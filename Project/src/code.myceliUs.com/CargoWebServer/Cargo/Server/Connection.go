@@ -159,30 +159,19 @@ func (c *tcpSocketConnection) Reader() {
 	// Set the buffer's
 	var msgData []byte
 	connbuf := bufio.NewReader(c.m_socket)
-
 	for c.m_isOpen == true {
-		b, _ := connbuf.ReadByte() // Read the first byte...
-		if connbuf.Buffered() > 0 {
-			msgData = append(msgData, b)
-			for connbuf.Buffered() > 0 {
-				b, err := connbuf.ReadByte()
-				if err == nil {
-					msgData = append(msgData, b)
-				} else {
-					log.Println("-------> unreadable caracter...", b)
-					break
-				}
-			}
+		b := make([]byte, 4096) // fix buffer size.
+		size, err := connbuf.Read(b)
+		if err == nil {
+			msgData = append(msgData, b[0:size]...)
+		}
 
-			// Now I will trye to create the message.
-			msg, err := NewMessageFromData(msgData, c)
-
-			if err == nil {
-				// The message is created so I will renew the buffer for the
-				// next message to process.
-				msgData = make([]byte, 0) // empty the buffer...
-				GetServer().GetHub().receivedMsg <- msg
-			}
+		msg, err := NewMessageFromData(msgData, c)
+		if err == nil {
+			// The message is created so I will renew the buffer for the
+			// next message to process.
+			msgData = make([]byte, 0) // empty the buffer...
+			GetServer().GetHub().receivedMsg <- msg
 		}
 	}
 

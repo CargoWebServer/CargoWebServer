@@ -33,6 +33,8 @@ private:
     QTcpSocket *socket;
     qintptr socketDescriptor;
     QMap<QString, QList<com::mycelius::message::Message*> > pending;
+
+    // Use for incomming message
     QMap<QString, QVector<QByteArray> > pendingMsgChunk;
 
     /**

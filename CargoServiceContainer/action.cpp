@@ -102,6 +102,7 @@ Action::Action(const QString& id_, const QString& name_) :
     name(name_),
     id(id_)
 {
+
 }
 
 Action::~Action(){
@@ -166,6 +167,7 @@ void Action::run()
     result->set_type(com::mycelius::message::Message_MessageType_RESPONSE);
     result->set_index(-1);
     result->set_total(1);
+    result->set_id(this->id.toStdString()); // Also set the message id.
 
     // I will create the response...
     com::mycelius::message::Response*  rsp = new com::mycelius::message::Response();

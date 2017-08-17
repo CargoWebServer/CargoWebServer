@@ -354,6 +354,23 @@ func (this *Server) Start() {
 		return str
 	})
 
+	// String functions...
+	JS.GetJsRuntimeManager().AppendFunction("startsWith", func(str string, val string) bool {
+		return strings.HasPrefix(str, val)
+	})
+
+	JS.GetJsRuntimeManager().AppendFunction("endsWith", func(str string, val string) bool {
+		return strings.HasSuffix(str, val)
+	})
+
+	JS.GetJsRuntimeManager().AppendFunction("replaceAll", func(str string, val string, by string) string {
+		return strings.Replace(str, val, by, -1)
+	})
+
+	JS.GetJsRuntimeManager().AppendFunction("capitalizeFirstLetter", func(str string) string {
+		return strings.ToUpper(str[0:1]) + str[1:]
+	})
+
 	/**
 	 * Made other connection side execute JS code.
 	 */
@@ -674,7 +691,7 @@ func (this *Server) Start() {
 
 	// Test compile analyse...
 	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{100000})
-	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "compileAnalyseCSP", []interface{}{30})
+	JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "compileAnalyseCSP", []interface{}{30})
 }
 
 /**
