@@ -1559,14 +1559,7 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
 	}
 
 	// Save the prototype...
-	err := store.(*KeyValueDataStore).SetEntityPrototype(prototype.(*EntityPrototype))
-
-	// TODO append super type attribute into the prototype if there is not already there...
-	if err != nil {
-		cargoError := NewError(Utility.FileLine(), PROTOTYPE_CREATION_ERROR, SERVER_ERROR_CODE, errors.New("Failed to create the prototype '"+prototype.(*EntityPrototype).TypeName+"' in store '"+storeId+"'."))
-		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-		return nil
-	}
+	prototype.(*EntityPrototype).Create(storeId)
 
 	return prototype.(*EntityPrototype)
 }

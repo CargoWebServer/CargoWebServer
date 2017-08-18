@@ -211,7 +211,7 @@ func (this *EntityPrototype) Create(storeId string) {
 		}
 	}
 
-	// Regrister it to the vm...
+	// Register it to the vm...
 	JS.GetJsRuntimeManager().AppendScript(this.generateConstructor())
 
 }

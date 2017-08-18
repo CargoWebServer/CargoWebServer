@@ -394,8 +394,8 @@ func (this *Server) Start() {
 			param := new(MessageData)
 			paramName, _ := functionParams[i].Object().Get("name")
 			param.Name = paramName.String()
-
 			paramValue, _ := functionParams[i].Object().Get("dataBytes")
+
 			if paramValue.IsString() {
 				val, _ := paramValue.ToString()
 				param.Value = val
@@ -406,6 +406,7 @@ func (this *Server) Start() {
 				param.Value = nil
 			} else if paramValue.IsNumber() {
 				val, _ := paramValue.ToFloat()
+				//log.Println("=--------------> Double name ", paramName, " has value ", val)
 				param.Value = val
 			} else if paramValue.IsUndefined() {
 				param.Value = nil
@@ -691,7 +692,7 @@ func (this *Server) Start() {
 
 	// Test compile analyse...
 	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{100000})
-	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "compileAnalyseCSP", []interface{}{30})
+	JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "compileAnalyseCSP", []interface{}{30})
 }
 
 /**

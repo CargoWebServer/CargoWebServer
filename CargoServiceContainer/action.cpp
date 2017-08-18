@@ -25,12 +25,9 @@ QVariant CallMethod(QObject* object, QMetaMethod metaMethod, QVariantList args)
 
     for (int i = 0; i < methodTypes.size(); i++) {
         const QVariant& arg = args.at(i);
-
         QByteArray methodTypeName = methodTypes.at(i);
         QByteArray argTypeName = arg.typeName();
-
         QVariant::Type methodType = QVariant::nameToType(methodTypeName);
-
         QVariant copy = QVariant::fromValue(arg);
 
         // If the types are not the same, attempt a conversion. If it
@@ -136,6 +133,9 @@ void Action::run()
         // Append the function parameters here...
         QVariantList arg;
         for(int i=0; i < this->params.size(); i++){
+            qDebug() << this->params[i]->name;
+            qDebug() << this->params[i]->typeName;
+            qDebug() << this->params[i]->value;
             arg.append(this->params[i]->value);
         }
         list.push_back(arg);
@@ -216,7 +216,7 @@ void Action::run()
             // The type is a integer...
             d->set_type(::com::mycelius::message::Data_DataType_INTEGER);
             d->set_databytes(retVal.toString().toStdString());
-        }else if(retVal.type() == QMetaType::Double){
+        }else if(retVal.type() == QMetaType::Double || retVal.type() == QMetaType::Float){
             // The type is a float...
             d->set_type(::com::mycelius::message::Data_DataType_DOUBLE);
             d->set_databytes(retVal.toString().toStdString());
