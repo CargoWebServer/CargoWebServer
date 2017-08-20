@@ -2156,7 +2156,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, queryStr
 
 	entities, errObj := this.getEntities(typeName, queryStr, storeId, false)
 
-	log.Println("-----> Number of entities found ", len(entities))
+	//log.Println("-----> Number of entities found ", len(entities))
 
 	// If no order ar specified i will use the id's as order.
 	if len(orderBy) == 0 {
@@ -2192,9 +2192,6 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, queryStr
 			objects = append(objects, entities[i].GetObject())
 		}
 	}
-
-	//
-	log.Println("-----> number of return results ", len(objects))
 
 	return objects
 }

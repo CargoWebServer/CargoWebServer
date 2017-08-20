@@ -116,8 +116,8 @@ func (this *Server) initialize() {
 	this.GetServiceManager().registerService(this.GetSchemaManager())
 
 	// BPMN stuff
-	//this.GetServiceManager().registerService(this.GetWorkflowManager())
-	//this.GetServiceManager().registerService(this.GetWorkflowProcessor())
+	this.GetServiceManager().registerService(this.GetWorkflowManager())
+	this.GetServiceManager().registerService(this.GetWorkflowProcessor())
 
 	// The other services are initialyse by the service manager.
 	this.GetServiceManager().initialize()
@@ -692,7 +692,7 @@ func (this *Server) Start() {
 
 	// Test compile analyse...
 	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{100000})
-	JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "compileAnalyseCSP", []interface{}{30})
+	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "compileAnalyseCSP", []interface{}{30})
 }
 
 /**

@@ -164,6 +164,7 @@ func (this *SchemaManager) initialize() {
 		for i := 0; i < len(prototype.Fields); i++ {
 			prototype.FieldsOrder = append(prototype.FieldsOrder, i)
 		}
+
 		// Here i will save the prototype...
 		prototype.Create("")
 
@@ -517,6 +518,36 @@ func (this *SchemaManager) genereatePrototype(schema *XML_Schemas.XSD_Schema) {
 			this.createPrototypeElement(schema, e)
 		}
 	}
+
+	// Attribute group...
+	for k, g := range this.globalAttributeGroup {
+		if strings.HasPrefix(k, schema.Id) {
+			this.createPrototypeAttributeGroup(schema, g)
+		}
+	}
+
+}
+
+func (this *SchemaManager) createPrototypeAttributeGroup(schema *XML_Schemas.XSD_Schema, group *XML_Schemas.XSD_AttributeGroup) {
+	// In that case the class has no simple or complex type...
+	prototype := NewEntityPrototype()
+	prototype.TypeName = schema.Id + "." + group.Name
+
+	// Append the prototype to the map...
+	this.prototypes[prototype.TypeName] = prototype
+
+	for i := 0; i < len(group.Attributes); i++ {
+		this.appendPrototypeAttribute(schema, prototype, group.Attributes[i])
+	}
+
+	// In local group only...
+	for i := 0; i < len(group.AttributeGroups); i++ {
+		this.appendPrototypeAttributeGroup(schema, prototype, group.AttributeGroups[i])
+	}
+
+	for i := 0; i < len(group.AnyAttributes); i++ {
+		this.appendPrototypeAnyAttribute(schema, prototype, group.AnyAttributes[i])
+	}
 }
 
 func (this *SchemaManager) createPrototypeElement(schema *XML_Schemas.XSD_Schema, element *XML_Schemas.XSD_Element) *EntityPrototype {
@@ -793,10 +824,17 @@ func (this *SchemaManager) appendPrototypeAnyAttribute(schema *XML_Schemas.XSD_S
  */
 func (this *SchemaManager) appendPrototypeAttributeGroup(schema *XML_Schemas.XSD_Schema, parent *EntityPrototype, groupAttribute *XML_Schemas.XSD_AttributeGroup) {
 	// If is global...
-	if _, ok := this.globalAttributeGroup[schema.Id+"."+removeNs(groupAttribute.Name)]; ok {
-		for i := 0; i < len(groupAttribute.AnyAttributes); i++ {
-			this.appendPrototypeAnyAttribute(schema, parent, groupAttribute.AnyAttributes[i])
+	if !Utility.Contains(parent.Fields, "M_"+groupAttribute.Name) {
+		if len(groupAttribute.Name) > 0 {
+			parent.Fields = append(parent.Fields, "M_"+strings.ToLower(groupAttribute.Name[0:1])+groupAttribute.Name[1:])
+			parent.FieldsType = append(parent.FieldsType, groupAttribute.Name)
+		} else if len(groupAttribute.Ref) > 0 {
+			parent.Fields = append(parent.Fields, "M_"+strings.ToLower(groupAttribute.Ref[0:1])+groupAttribute.Ref[1:])
+			parent.FieldsType = append(parent.FieldsType, groupAttribute.Ref+":Ref")
 		}
+
+		parent.FieldsOrder = append(parent.FieldsOrder, len(parent.FieldsOrder))
+		parent.FieldsVisibility = append(parent.FieldsVisibility, true)
 	}
 }
 

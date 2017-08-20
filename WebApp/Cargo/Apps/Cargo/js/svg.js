@@ -33,7 +33,7 @@
 var SVG_Element  = function(parent, id, className, type){
 
     // Call the parent constructor.
-    Element.call(this, parent)
+    Element.call(this, parent, null)
 
     // The namespace of sgv utility.
     this.ns = "http://www.w3.org/2000/svg";
