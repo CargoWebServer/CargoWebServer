@@ -598,6 +598,7 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 								clientSrc += "						return function (entity) {\n"
 								clientSrc += "							server.entityManager.setEntity(entity)\n"
 								clientSrc += "							caller.successCallback(entities, caller.caller)\n"
+								clientSrc += "							caller.successCallback = undefined\n"
 								clientSrc += "						}\n"
 								clientSrc += "					} (caller)\n"
 								clientSrc += "				}else{\n"

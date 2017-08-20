@@ -57,7 +57,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
     this.previousConfigBtn = null
 
     server.entityManager.attach(this, DeleteEntityEvent, function (evt, configurationPanel) {
-        if (evt.dataMap["entity"] != undefined) {
+        if (evt.dataMap["entity"] !== undefined) {
             if (evt.dataMap["entity"].TYPENAME == configurationPanel.typeName) {
                 // so here i will remove the entity from the panel...
                 for (var i = 0; i < configurationPanel.contentViews.length; i++) {
@@ -82,7 +82,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
     })
 
     server.entityManager.attach(this, NewEntityEvent, function (evt, configurationPanel) {
-        if (evt.dataMap["entity"] != undefined) {
+        if (evt.dataMap["entity"] !== undefined) {
             if (evt.dataMap["entity"].TYPENAME == configurationPanel.typeName) {
                 // Hide all data panel.
                 homepage.dataExplorer.hidePanels()
@@ -107,10 +107,10 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
     // If the view already exist
     for (var i = 0; i < this.contentViews.length; i++) {
-        if (this.contentViews[i].entity != undefined) {
+        if (this.contentViews[i].entity !== undefined) {
             if (this.contentViews[i].entity.M_id == content.M_id) {
                 this.contentViews[i].setEntity(content)
-                if (this.contentViews[i].connectBtn != undefined) {
+                if (this.contentViews[i].connectBtn !== undefined) {
                     this.contentViews[i].connectBtn.status = "disconnected"
                     this.contentViews[i].connectBtn.element.click()
                 }

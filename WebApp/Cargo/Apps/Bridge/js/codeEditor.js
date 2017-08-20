@@ -33,17 +33,17 @@ var CodeEditor = function (parent) {
     // Here I will attach the file navigator to file event.
     // Open.
     server.fileManager.attach(this, OpenEntityEvent, function (evt, codeEditor) {
-        if (evt.dataMap["fileInfo"] != undefined) {
+        if (evt.dataMap["fileInfo"] !== undefined) {
             var file = entities[evt.dataMap["fileInfo"].UUID]
-            if (file != undefined) {
-                if (file.M_data != undefined && file.M_data != "") {
+            if (file !== undefined) {
+                if (file.M_data !== undefined && file.M_data !== "") {
                     // Here thats mean the file was open
                     codeEditor.appendFile(file)
                 }
             }
-        } else if (evt.dataMap["bpmnDiagramInfo"] != undefined) {
+        } else if (evt.dataMap["bpmnDiagramInfo"] !== undefined) {
             var diagram = entities[evt.dataMap["bpmnDiagramInfo"].UUID]
-            if (diagram != undefined) {
+            if (diagram !== undefined) {
                 codeEditor.appendBpmnDiagram(diagram)
             }
         }
@@ -52,9 +52,9 @@ var CodeEditor = function (parent) {
     // Attach the file close event.
     server.fileManager.attach(this, CloseEntityEvent, function (evt, codeEditor) {
         var fileId = evt.dataMap["fileId"]
-        if (fileId != undefined) {
+        if (fileId !== undefined) {
             codeEditor.removeFile(fileId)
-            if (codeEditor.toolbars[fileId] != undefined) {
+            if (codeEditor.toolbars[fileId] !== undefined) {
                 for (var i = 0; i < codeEditor.toolbars[fileId].length; i++) {
                     var toolbar = codeEditor.toolbars[fileId][i];
                     homepage.toolbarDiv.removeElement(toolbar);
@@ -69,7 +69,7 @@ var CodeEditor = function (parent) {
         if (evt.dataMap.fileInfo !== undefined) {
             var file = evt.dataMap["fileInfo"]
             var editor = codeEditor.editors[file.M_id + "_editor"]
-            if (editor != undefined) {
+            if (editor !== undefined) {
                 // Supend the change event propagation
                 codeEditor.quiet = true
                 var position = editor.getCursorPosition()
@@ -87,7 +87,7 @@ var CodeEditor = function (parent) {
 
 CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
     // Here I will set the file
-    if (this.files[diagram.M_id] != undefined) {
+    if (this.files[diagram.M_id] !== undefined) {
         // Set the tab active...
         this.setActiveFile(diagram.M_id)
         this.diagram.canvas.initWorkspace()
@@ -108,14 +108,14 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
             // Now the resize element...
             codeEditor.diagram.canvas.initWorkspace = function (workspace) {
                 return function () {
-                    if (workspace.lastChild == undefined) {
+                    if (workspace.lastChild === undefined) {
                         return
                     }
-                    if (workspace.lastChild.lastChild != undefined) {
+                    if (workspace.lastChild.lastChild !== undefined) {
                         for (var childId in workspace.childs) {
-                            var child = workspace.childs[childId]
-                            if (child.element.viewBox != null) {
-                                child.resize(workspace.element.offsetWidth, workspace.element.offsetHeight)
+                            var child = workspace.childs[childId];
+                            if (child.element.viewBox !== null) {
+                                child.resize(workspace.element.offsetWidth, workspace.element.offsetHeight);
                             }
                         }
                     }

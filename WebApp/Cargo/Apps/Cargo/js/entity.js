@@ -463,8 +463,6 @@ function setObjectValues(object, values) {
         return
     }
 
-    server.entityManager.setEntity(object)
-
     ////////////////////////////////////////////////////////////////////////
     // Set back the reference...
     if (values == undefined) {
