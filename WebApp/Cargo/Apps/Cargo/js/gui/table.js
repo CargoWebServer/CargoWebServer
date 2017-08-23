@@ -327,8 +327,10 @@ Table.prototype.sort = function () {
 	for (var s in this.sorters) {
 		var sorter = this.sorters[s]
 		sorter.childSorter = null
-		if (sorter.state != 0) {
-			sorters[sorter.order - 1] = sorter
+		if (sorter.state != undefined) {
+			if (sorter.state != 0) {
+				sorters[sorter.order - 1] = sorter
+			}
 		}
 	}
 
@@ -492,13 +494,16 @@ var TableHeader = function (table) {
 
 	// The first cell will be there to match the save button...
 	var buttonDiv = this.div.appendElement({ "tag": "div", "class": "table_header_btn_div" }).down()
+	
+	this.exportBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn" }).down()
+	this.exportBtn.appendElement({ "tag": "i", "class": "	fa fa-download", "title":"download csv file." })
 
 	this.maximizeBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style": "display: none;" }).down()
 	this.maximizeBtn.appendElement({ "tag": "i", "class": "fa fa-plus-square-o" })
 
 	this.minimizeBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn" }).down()
 	this.minimizeBtn.appendElement({ "tag": "i", "class": "fa fa-minus-square-o" })
-
+	
 	this.numberOfRowLabel = buttonDiv.appendElement({ "tag": "div", "class": "number_of_row_label", "style": "display: none;" }).down()
 
 	this.maximizeBtn.element.onclick = function (rowGroup, minimizeBtn, numberOfRowLabel) {
@@ -549,6 +554,23 @@ var TableHeader = function (table) {
 		this.table.sorters.push(sorter)
 		this.cells.push(cell)
 	}
+
+	// Expost callback will be call with data so it's possible to 
+	// do what we want at export time...
+	this.table.exportCallback = null
+
+	// The download csv action.
+	this.exportBtn.element.onclick = function(table){
+		return function(){
+			// I will create csv file from the model values.
+			var rows = table.model.values
+			if(table.exportCallback != null){
+				rows.unshift(table.model.titles)
+				table.exportCallback(rows)
+			}
+		}
+	}(this.table)
+
 	return this
 }
 
@@ -1701,8 +1723,10 @@ ColumnSorter.prototype.setOrder = function () {
 	var activeSorter = new Array()
 
 	for (var s in this.table.sorters) {
-		if (this.table.sorters[s].state != 0) {
-			activeSorter[this.table.sorters[s].order] = this.table.sorters[s]
+		if (this.table.sorters[s].state!=undefined){
+			if (this.table.sorters[s].state != 0) {
+				activeSorter[this.table.sorters[s].order] = this.table.sorters[s]
+			}
 		}
 	}
 

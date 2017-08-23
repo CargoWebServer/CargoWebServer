@@ -11,7 +11,7 @@ import (
 	"errors"
 	"log"
 	"os"
-	"os/exec"
+
 	"strconv"
 	"strings"
 
@@ -116,8 +116,8 @@ func (this *Server) initialize() {
 	this.GetServiceManager().registerService(this.GetSchemaManager())
 
 	// BPMN stuff
-	this.GetServiceManager().registerService(this.GetWorkflowManager())
-	this.GetServiceManager().registerService(this.GetWorkflowProcessor())
+	//this.GetServiceManager().registerService(this.GetWorkflowManager())
+	//this.GetServiceManager().registerService(this.GetWorkflowProcessor())
 
 	// The other services are initialyse by the service manager.
 	this.GetServiceManager().initialize()
@@ -268,45 +268,8 @@ func (this *Server) reportErrorMessage(messageId string, sessionId string, error
 }
 
 /**
- * Execute a vb script cmd.
- * * Windows only...
+ *
  */
-func (this *Server) runVbs(scriptName string, args []string) ([]string, error) {
-	path := this.GetConfigurationManager().GetScriptPath() + "/" + scriptName
-	args_ := make([]string, 0)
-	args_ = append(args_, "/Nologo") // Remove the trademark...
-	args_ = append(args_, path)
-
-	args_ = append(args_, args...)
-	//log.Println("-----> ", args_)
-	out, err := exec.Command("C:/WINDOWS/system32/cscript.exe", args_...).Output()
-	results := strings.Split(string(out), "\n")
-	results = results[0 : len(results)-1]
-	return results, err
-}
-
-//////////////////////////////////////////////////////////
-// Api
-//////////////////////////////////////////////////////////
-
-/**
- * Execute a visual basic script command.
- */
-func (this *Server) ExecuteVbScript(scriptName string, args []string, messageId string, sessionId string) []string {
-
-	// Run the given script on the server side.
-	results, err := this.runVbs(scriptName, args)
-
-	// Get the session id and the message id...
-	if err != nil {
-		// Create the error object.
-		cargoError := NewError(Utility.FileLine(), ACTION_EXECUTE_ERROR, SERVER_ERROR_CODE, err)
-		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
-		return nil
-	}
-
-	return results
-}
 
 /**
  * Get the server singleton.

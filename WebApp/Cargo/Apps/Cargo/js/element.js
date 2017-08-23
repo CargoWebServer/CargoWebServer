@@ -358,13 +358,9 @@ Element.prototype.delete = function () {
 */
 Element.prototype.getChildById = function (id) {
     var keys = Object.keys(this.childs)
-        , i = 0
-        , len = keys.length
-        , found = null
-        , child = null
-
-    for (i = 0; i < len; i++) {
-        child = this.childs[keys[i]]
+    var found = null
+    for (var i = 0; i < keys.length; i++) {
+        var child = this.childs[keys[i]]
         if (child.id == id) {
             return child
         } else {
@@ -390,7 +386,7 @@ Element.prototype.getChildsByClassName = function (className, childs) {
         , i = 0
         , len = keys.length
         , found = null
-    
+
     if (childs == undefined) {
         childs = []
     }
@@ -592,7 +588,7 @@ Element.prototype.animate = function (keyframe, time, endAnimationCallback, tran
                 this.removeEventListener(endAnimationListenerName, animationListner, true)
             }
         }
-    }(styleSheet, animationId, " _" + animationId + "_" + className, endAnimationCallback, endAnimationListenerName)
+    } (styleSheet, animationId, " _" + animationId + "_" + className, endAnimationCallback, endAnimationListenerName)
 
     // End animation event.
     this.element.addEventListener(endAnimationListenerName, animationListner, true);

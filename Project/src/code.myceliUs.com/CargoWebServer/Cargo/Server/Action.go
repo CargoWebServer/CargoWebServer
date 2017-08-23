@@ -3,8 +3,10 @@ package Server
 
 import (
 	//	"log"
+	"os/exec"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"code.myceliUs.com/Utility"
@@ -143,12 +145,30 @@ func (self *Action) GetServicesClientCode() map[string]string {
 }
 
 /**
+ * Execute a vb script cmd.
+ * * Windows only...
+ */
+func runVbs(scriptName string, args []string) ([]string, error) {
+	path := GetServer().GetConfigurationManager().GetScriptPath() + "/" + scriptName
+	args_ := make([]string, 0)
+	args_ = append(args_, "/Nologo") // Remove the trademark...
+	args_ = append(args_, path)
+
+	args_ = append(args_, args...)
+	//log.Println("-----> ", args_)
+	out, err := exec.Command("C:/WINDOWS/system32/cscript.exe", args_...).Output()
+	results := strings.Split(string(out), "\n")
+	results = results[0 : len(results)-1]
+	return results, err
+}
+
+/**
  * Execute a vb script.
  */
 func (self *Action) ExecuteVbScript(scriptName string, args []string) []string {
 
 	// Run the given script on the server side.
-	results, err := GetServer().runVbs(scriptName, args)
+	results, err := runVbs(scriptName, args)
 
 	// Get the session id and the message id...
 	if err != nil {
