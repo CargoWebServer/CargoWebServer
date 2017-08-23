@@ -20,7 +20,7 @@ func main() {
 	generate(dir+"/input", "Config", "configurations")
 	generate(dir+"/input", "CargoEntities", "entities")
 
-	// Now the runtime.
+	/*// Now the runtime.
 	initMaps()
 
 	// set the output to
@@ -64,6 +64,6 @@ func main() {
 	generateEntity("DC")
 	generateEntity("DI")
 	generateEntity("BPMNDI")
-	generateEntity("BPMN20")
+	generateEntity("BPMN20")*/
 
 }

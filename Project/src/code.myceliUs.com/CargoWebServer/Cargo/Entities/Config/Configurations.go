@@ -3,7 +3,7 @@
 package Config
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Configurations struct{
@@ -32,6 +32,7 @@ type Configurations struct{
 	M_smtpConfigs []*SmtpConfiguration
 	M_ldapConfigs []*LdapConfiguration
 	M_applicationConfigs []*ApplicationConfiguration
+	M_scheduledTasks []*ScheduledTask
 
 }
 
@@ -45,6 +46,7 @@ type XsdConfigurations struct {
 	M_dataStoreConfigs	[]*XsdDataStoreConfiguration	`xml:"dataStoreConfigs,omitempty"`
 	M_serviceConfigs	[]*XsdServiceConfiguration	`xml:"serviceConfigs,omitempty"`
 	M_oauth2Configuration	*XsdOAuth2Configuration	`xml:"oauth2Configuration,omitempty"`
+	M_scheduledTasks	[]*XsdScheduledTask	`xml:"scheduledTasks,omitempty"`
 	M_id	string	`xml:"id,attr"`
 	M_name	string	`xml:"name,attr"`
 	M_version	string	`xml:"version,attr"`
@@ -333,4 +335,42 @@ func (this *Configurations) RemoveApplicationConfigs(ref interface{}){
 		}
 	}
 	this.M_applicationConfigs = applicationConfigs_
+}
+
+/** ScheduledTasks **/
+func (this *Configurations) GetScheduledTasks() []*ScheduledTask{
+	return this.M_scheduledTasks
+}
+
+/** Init reference ScheduledTasks **/
+func (this *Configurations) SetScheduledTasks(ref interface{}){
+	this.NeedSave = true
+	isExist := false
+	var scheduledTaskss []*ScheduledTask
+	for i:=0; i<len(this.M_scheduledTasks); i++ {
+		if this.M_scheduledTasks[i].GetUUID() != ref.(*ScheduledTask).GetUUID() {
+			scheduledTaskss = append(scheduledTaskss, this.M_scheduledTasks[i])
+		} else {
+			isExist = true
+			scheduledTaskss = append(scheduledTaskss, ref.(*ScheduledTask))
+		}
+	}
+	if !isExist {
+		scheduledTaskss = append(scheduledTaskss, ref.(*ScheduledTask))
+	}
+	this.M_scheduledTasks = scheduledTaskss
+}
+
+/** Remove reference ScheduledTasks **/
+func (this *Configurations) RemoveScheduledTasks(ref interface{}){
+	toDelete := ref.(*ScheduledTask)
+	scheduledTasks_ := make([]*ScheduledTask, 0)
+	for i := 0; i < len(this.M_scheduledTasks); i++ {
+		if toDelete.GetUUID() != this.M_scheduledTasks[i].GetUUID() {
+			scheduledTasks_ = append(scheduledTasks_, this.M_scheduledTasks[i])
+		}else{
+			this.NeedSave = true
+		}
+	}
+	this.M_scheduledTasks = scheduledTasks_
 }

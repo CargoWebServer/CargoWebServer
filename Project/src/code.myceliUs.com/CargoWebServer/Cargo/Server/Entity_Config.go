@@ -17,13 +17,13 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "UUID")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "UUID")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -514,7 +514,11 @@ func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 	/** associations of SmtpConfiguration **/
 
 	/** Save parent type Configurations **/
-	SmtpConfigurationInfo = append(SmtpConfigurationInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	SmtpConfigurationInfo = append(SmtpConfigurationInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -1307,7 +1311,11 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	/** associations of DataStoreConfiguration **/
 
 	/** Save parent type Configurations **/
-	DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -2044,7 +2052,11 @@ func (this *Config_LdapConfigurationEntity) SaveEntity() {
 	/** associations of LdapConfiguration **/
 
 	/** Save parent type Configurations **/
-	LdapConfigurationInfo = append(LdapConfigurationInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		LdapConfigurationInfo = append(LdapConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		LdapConfigurationInfo = append(LdapConfigurationInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	LdapConfigurationInfo = append(LdapConfigurationInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -2687,7 +2699,11 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	/** associations of OAuth2Client **/
 
 	/** Save parent type OAuth2Configuration **/
-	OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		OAuth2ClientInfo = append(OAuth2ClientInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	OAuth2ClientInfo = append(OAuth2ClientInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -3308,14 +3324,22 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_id)
 
 	/** Save client type OAuth2Client **/
-	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_client)
+	if this.object.GetClient() != nil {
+		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.GetClient().GetUUID())
+	} else {
+		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, "")
+	}
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_expiresIn)
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_scope)
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_redirectUri)
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_state)
 
 	/** Save userData type OAuth2IdToken **/
-	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_userData)
+	if this.object.GetUserData() != nil {
+		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.GetUserData().GetUUID())
+	} else {
+		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, "")
+	}
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_createdAt)
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, string(childsUuidStr))
@@ -3975,7 +3999,11 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 	OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.M_id)
 
 	/** Save client type OAuth2Client **/
-	OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.M_client)
+	if this.object.GetClient() != nil {
+		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.GetClient().GetUUID())
+	} else {
+		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, "")
+	}
 	OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.M_expiration)
 	OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.M_issuedAt)
 	OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.M_nonce)
@@ -3989,7 +4017,11 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 	/** associations of OAuth2IdToken **/
 
 	/** Save parent type OAuth2Configuration **/
-	OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -4671,24 +4703,40 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_id)
 
 	/** Save client type OAuth2Client **/
-	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_client)
+	if this.object.GetClient() != nil {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.GetClient().GetUUID())
+	} else {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
+	}
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_authorize)
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_previous)
 
 	/** Save refreshToken type OAuth2Refresh **/
-	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_refreshToken)
+	if this.object.GetRefreshToken() != nil {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.GetRefreshToken().GetUUID())
+	} else {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
+	}
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_expiresIn)
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_scope)
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_redirectUri)
 
 	/** Save userData type OAuth2IdToken **/
-	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_userData)
+	if this.object.GetUserData() != nil {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.GetUserData().GetUUID())
+	} else {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
+	}
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_createdAt)
 
 	/** associations of OAuth2Access **/
 
 	/** Save parent type OAuth2Configuration **/
-	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	OAuth2AccessInfo = append(OAuth2AccessInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -5330,12 +5378,20 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_id)
 
 	/** Save access type OAuth2Access **/
-	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_access)
+	if this.object.GetAccess() != nil {
+		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.GetAccess().GetUUID())
+	} else {
+		OAuth2RefreshInfo = append(OAuth2RefreshInfo, "")
+	}
 
 	/** associations of OAuth2Refresh **/
 
 	/** Save parent type OAuth2Configuration **/
-	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		OAuth2RefreshInfo = append(OAuth2RefreshInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	OAuth2RefreshInfo = append(OAuth2RefreshInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -5920,7 +5976,11 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 	/** associations of OAuth2Expires **/
 
 	/** Save parent type OAuth2Configuration **/
-	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -6704,7 +6764,11 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	/** associations of OAuth2Configuration **/
 
 	/** Save parent type Configurations **/
-	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -7552,7 +7616,11 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 	/** associations of ServiceConfiguration **/
 
 	/** Save parent type Configurations **/
-	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		ServiceConfigurationInfo = append(ServiceConfigurationInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	ServiceConfigurationInfo = append(ServiceConfigurationInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -7781,6 +7849,599 @@ func (this *Config_ServiceConfigurationEntity) AppendChild(attributeName string,
 
 /** Append reference entity into parent entity. **/
 func (this *Config_ServiceConfigurationEntity) AppendReference(reference Entity) {
+
+	// Here i will append the reference uuid
+	index := -1
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid == reference.GetUuid() {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
+		this.referencesPtr = append(this.referencesPtr, reference)
+	} else if index < len(this.referencesPtr) {
+		// The reference must be update in that case.
+		this.referencesPtr[index] = reference
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//              			ScheduledTask
+////////////////////////////////////////////////////////////////////////////////
+/** local type **/
+type Config_ScheduledTaskEntity struct {
+	/** not the object id, except for the definition **/
+	uuid           string
+	parentPtr      Entity
+	parentUuid     string
+	childsPtr      []Entity
+	childsUuid     []string
+	referencesUuid []string
+	referencesPtr  []Entity
+	prototype      *EntityPrototype
+	lazyMap        map[string]interface{}
+	lazy           bool
+	referenced     []EntityRef
+	object         *Config.ScheduledTask
+}
+
+/** Constructor function **/
+func (this *EntityManager) NewConfigScheduledTaskEntity(parentUuid string, objectId string, object interface{}) *Config_ScheduledTaskEntity {
+	var uuidStr string
+	if len(objectId) > 0 {
+		if Utility.IsValidEntityReferenceName(objectId) {
+			uuidStr = objectId
+		} else {
+			uuidStr = ConfigScheduledTaskExists(objectId)
+		}
+	}
+	if object != nil {
+		object.(*Config.ScheduledTask).TYPENAME = "Config.ScheduledTask"
+		object.(*Config.ScheduledTask).ParentUuid = parentUuid
+	}
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype("Config.ScheduledTask", "Config")
+	if len(uuidStr) > 0 {
+		if object != nil {
+			object.(*Config.ScheduledTask).UUID = uuidStr
+		}
+		if val, ok := this.contain(uuidStr); ok {
+			if object != nil {
+				this.setObjectValues(val, object)
+
+				uuidStr = object.(*Config.ScheduledTask).UUID
+			}
+			return val.(*Config_ScheduledTaskEntity)
+		}
+	} else {
+		if len(prototype.Ids) == 1 {
+			// Here there is a new entity...
+			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+		} else {
+			var keyInfo string
+			if len(parentUuid) > 0 {
+				keyInfo += parentUuid + ":"
+			}
+			keyInfo += prototype.TypeName + ":"
+			for i := 1; i < len(prototype.Ids); i++ {
+				var getter = "Get" + strings.ToUpper(prototype.Ids[i][2:3]) + prototype.Ids[i][3:]
+				params := make([]interface{}, 0)
+				value, _ := Utility.CallMethod(object, getter, params)
+				keyInfo += Utility.ToString(value)
+				// Append underscore for readability in case of problem...
+				if i < len(prototype.Ids)-1 {
+					keyInfo += "_"
+				}
+			}
+
+			// The uuid is in that case a MD5 value.
+			uuidStr = prototype.TypeName + "%" + Utility.GenerateUUID(keyInfo)
+		}
+	}
+	entity := new(Config_ScheduledTaskEntity)
+	if object == nil {
+		entity.object = new(Config.ScheduledTask)
+		entity.SetNeedSave(true)
+	} else {
+		entity.object = object.(*Config.ScheduledTask)
+		entity.SetNeedSave(true)
+	}
+	entity.lazyMap = make(map[string]interface{})
+	entity.object.TYPENAME = "Config.ScheduledTask"
+
+	entity.object.UUID = uuidStr
+	entity.object.ParentUuid = parentUuid
+	entity.SetInit(false)
+	entity.uuid = uuidStr
+	this.insert(entity)
+	entity.prototype = prototype
+	return entity
+}
+
+/** Entity functions **/
+func (this *Config_ScheduledTaskEntity) GetTypeName() string {
+	return "Config.ScheduledTask"
+}
+func (this *Config_ScheduledTaskEntity) GetUuid() string {
+	return this.uuid
+}
+func (this *Config_ScheduledTaskEntity) GetParentPtr() Entity {
+	return this.parentPtr
+}
+
+func (this *Config_ScheduledTaskEntity) SetParentPtr(parentPtr Entity) {
+	this.parentPtr = parentPtr
+}
+
+func (this *Config_ScheduledTaskEntity) AppendReferenced(name string, owner Entity) {
+	if owner.GetUuid() == this.GetUuid() {
+		return
+	}
+	var ref EntityRef
+	ref.Name = name
+	ref.OwnerUuid = owner.GetUuid()
+	for i := 0; i < len(this.referenced); i++ {
+		if this.referenced[i].Name == ref.Name && this.referenced[i].OwnerUuid == ref.OwnerUuid {
+			return
+		}
+	}
+	this.referenced = append(this.referenced, ref)
+}
+
+func (this *Config_ScheduledTaskEntity) GetReferenced() []EntityRef {
+	return this.referenced
+}
+
+func (this *Config_ScheduledTaskEntity) GetSize() uint {
+	return uint(unsafe.Sizeof(*this.object))
+}
+
+func (this *Config_ScheduledTaskEntity) RemoveReferenced(name string, owner Entity) {
+	var referenced []EntityRef
+	referenced = make([]EntityRef, 0)
+	for i := 0; i < len(this.referenced); i++ {
+		ref := this.referenced[i]
+		if !(ref.Name == name && ref.OwnerUuid == owner.GetUuid()) {
+			referenced = append(referenced, ref)
+		}
+	}
+	// Set the reference.
+	this.referenced = referenced
+}
+
+func (this *Config_ScheduledTaskEntity) RemoveReference(name string, reference Entity) {
+	refsUuid := make([]string, 0)
+	refsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.referencesUuid); i++ {
+		refUuid := this.referencesUuid[i]
+		if refUuid != reference.GetUuid() {
+			refsPtr = append(refsPtr, reference)
+			refsUuid = append(refsUuid, reference.GetUuid())
+		}
+	}
+	// Set the new array...
+	this.SetReferencesUuid(refsUuid)
+	this.SetReferencesPtr(refsPtr)
+
+	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
+	params := make([]interface{}, 1)
+	params[0] = reference.GetObject()
+	Utility.CallMethod(this.GetObject(), removeMethode, params)
+}
+
+func (this *Config_ScheduledTaskEntity) GetChildsPtr() []Entity {
+	return this.childsPtr
+}
+
+func (this *Config_ScheduledTaskEntity) SetChildsPtr(childsPtr []Entity) {
+	this.childsPtr = childsPtr
+}
+
+func (this *Config_ScheduledTaskEntity) GetChildsUuid() []string {
+	return this.childsUuid
+}
+
+func (this *Config_ScheduledTaskEntity) SetChildsUuid(childsUuid []string) {
+	this.childsUuid = childsUuid
+}
+
+/**
+ * Remove a chidl uuid form the list of child in an entity.
+ */
+func (this *Config_ScheduledTaskEntity) RemoveChild(name string, uuid string) {
+	childsUuid := make([]string, 0)
+	for i := 0; i < len(this.GetChildsUuid()); i++ {
+		if this.GetChildsUuid()[i] != uuid {
+			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		}
+	}
+
+	this.childsUuid = childsUuid
+	params := make([]interface{}, 1)
+	childsPtr := make([]Entity, 0)
+	for i := 0; i < len(this.GetChildsPtr()); i++ {
+		if this.GetChildsPtr()[i].GetUuid() != uuid {
+			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
+		} else {
+			params[0] = this.GetChildsPtr()[i].GetObject()
+		}
+	}
+	this.childsPtr = childsPtr
+
+	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
+	if params[0] != nil {
+		Utility.CallMethod(this.GetObject(), removeMethode, params)
+	}
+}
+
+func (this *Config_ScheduledTaskEntity) GetReferencesUuid() []string {
+	return this.referencesUuid
+}
+
+func (this *Config_ScheduledTaskEntity) SetReferencesUuid(refsUuid []string) {
+	this.referencesUuid = refsUuid
+}
+
+func (this *Config_ScheduledTaskEntity) GetReferencesPtr() []Entity {
+	return this.referencesPtr
+}
+
+func (this *Config_ScheduledTaskEntity) SetReferencesPtr(refsPtr []Entity) {
+	this.referencesPtr = refsPtr
+}
+
+func (this *Config_ScheduledTaskEntity) GetObject() interface{} {
+	return this.object
+}
+
+func (this *Config_ScheduledTaskEntity) NeedSave() bool {
+	return this.object.NeedSave
+}
+
+func (this *Config_ScheduledTaskEntity) SetNeedSave(needSave bool) {
+	this.object.NeedSave = needSave
+}
+
+func (this *Config_ScheduledTaskEntity) IsInit() bool {
+	return this.object.IsInit
+}
+
+func (this *Config_ScheduledTaskEntity) SetInit(isInit bool) {
+	this.object.IsInit = isInit
+}
+
+func (this *Config_ScheduledTaskEntity) IsLazy() bool {
+	return this.lazy
+}
+
+func (this *Config_ScheduledTaskEntity) GetChecksum() string {
+	mapValues, _ := Utility.ToMap(this.object)
+	return Utility.GetChecksum(mapValues)
+}
+
+func (this *Config_ScheduledTaskEntity) Exist() bool {
+	var query EntityQuery
+	query.TypeName = "Config.ScheduledTask"
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Fields = append(query.Fields, "UUID")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return false
+	}
+	return len(results[0][0].(string)) > 0
+
+}
+
+/**
+* Return the entity prototype.
+ */
+func (this *Config_ScheduledTaskEntity) GetPrototype() *EntityPrototype {
+	return this.prototype
+}
+
+/** Entity Prototype creation **/
+func (this *EntityManager) create_Config_ScheduledTaskEntityPrototype() {
+
+	var scheduledTaskEntityProto EntityPrototype
+	scheduledTaskEntityProto.TypeName = "Config.ScheduledTask"
+	scheduledTaskEntityProto.Ids = append(scheduledTaskEntityProto.Ids, "UUID")
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "UUID")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.string")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 0)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
+	scheduledTaskEntityProto.Indexs = append(scheduledTaskEntityProto.Indexs, "ParentUuid")
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "ParentUuid")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.string")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 1)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
+
+	/** members of ScheduledTask **/
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 2)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_script")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.string")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 3)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_interval")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.int")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 4)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_keepAlive")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.boolean")
+
+	/** associations of ScheduledTask **/
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 5)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_parentPtr")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "Config.Configurations:Ref")
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "childsUuid")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "[]xs.string")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 6)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
+
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "referenced")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "[]EntityRef")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 7)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
+
+	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
+	store.SetEntityPrototype(&scheduledTaskEntityProto)
+
+}
+
+/** Create **/
+func (this *Config_ScheduledTaskEntity) SaveEntity() {
+	if this.object.NeedSave == false {
+		return
+	}
+
+	this.SetNeedSave(false)
+	this.SetInit(true)
+	this.object.UUID = this.uuid
+	this.object.TYPENAME = "Config.ScheduledTask"
+
+	var query EntityQuery
+	query.TypeName = "Config.ScheduledTask"
+
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
+
+	/** members of ScheduledTask **/
+	query.Fields = append(query.Fields, "M_script")
+	query.Fields = append(query.Fields, "M_interval")
+	query.Fields = append(query.Fields, "M_keepAlive")
+
+	/** associations of ScheduledTask **/
+	query.Fields = append(query.Fields, "M_parentPtr")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	var ScheduledTaskInfo []interface{}
+
+	ScheduledTaskInfo = append(ScheduledTaskInfo, this.GetUuid())
+	if this.parentPtr != nil {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, this.parentPtr.GetUuid())
+	} else {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, "")
+	}
+
+	/** members of ScheduledTask **/
+	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_script)
+	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_interval)
+	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_keepAlive)
+
+	/** associations of ScheduledTask **/
+
+	/** Save parent type Configurations **/
+	if this.object.GetParentPtr() != nil {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, "")
+	}
+	childsUuidStr, _ := json.Marshal(this.childsUuid)
+	ScheduledTaskInfo = append(ScheduledTaskInfo, string(childsUuidStr))
+	referencedStr, _ := json.Marshal(this.referenced)
+	ScheduledTaskInfo = append(ScheduledTaskInfo, string(referencedStr))
+	eventData := make([]*MessageData, 1)
+	msgData := new(MessageData)
+	msgData.Name = "entity"
+	msgData.Value = this.GetObject()
+	eventData[0] = msgData
+	var err error
+	var evt *Event
+	if this.Exist() == true {
+		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
+		var params []interface{}
+		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		queryStr, _ := json.Marshal(query)
+		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), ScheduledTaskInfo, params)
+	} else {
+		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
+		queryStr, _ := json.Marshal(query)
+		_, err = GetServer().GetDataManager().createData(ConfigDB, string(queryStr), ScheduledTaskInfo)
+	}
+	if err == nil {
+		GetServer().GetEntityManager().insert(this)
+		GetServer().GetEntityManager().setReferences(this)
+		GetServer().GetEventManager().BroadcastEvent(evt)
+	}
+}
+
+/** Read **/
+func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
+	if this.object.IsInit == true {
+		entity, err := GetServer().GetEntityManager().getEntityByUuid(id, lazy)
+		if err == nil {
+			// Return the already initialyse entity.
+			this = entity.(*Config_ScheduledTaskEntity)
+			return nil
+		}
+		// I must reinit the entity if the entity manager dosent have it.
+		this.object.IsInit = false
+	}
+	this.uuid = id
+	this.lazy = lazy
+
+	// Set the reference on the map
+	var query EntityQuery
+	query.TypeName = "Config.ScheduledTask"
+
+	query.Fields = append(query.Fields, "UUID")
+	query.Fields = append(query.Fields, "ParentUuid")
+
+	/** members of ScheduledTask **/
+	query.Fields = append(query.Fields, "M_script")
+	query.Fields = append(query.Fields, "M_interval")
+	query.Fields = append(query.Fields, "M_keepAlive")
+
+	/** associations of ScheduledTask **/
+	query.Fields = append(query.Fields, "M_parentPtr")
+
+	query.Fields = append(query.Fields, "childsUuid")
+	query.Fields = append(query.Fields, "referenced")
+	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	var results [][]interface{}
+	var err error
+	queryStr, _ := json.Marshal(query)
+
+	results, err = GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil {
+		return err
+	}
+	// Initialisation of information of ScheduledTask...
+	if len(results) > 0 {
+
+		/** initialyzation of the entity object **/
+		this.object = new(Config.ScheduledTask)
+		this.object.UUID = this.uuid
+		this.object.TYPENAME = "Config.ScheduledTask"
+
+		this.parentUuid = results[0][1].(string)
+
+		/** members of ScheduledTask **/
+
+		/** script **/
+		if results[0][2] != nil {
+			this.object.M_script = results[0][2].(string)
+		}
+
+		/** interval **/
+		if results[0][3] != nil {
+			this.object.M_interval = results[0][3].(int)
+		}
+
+		/** keepAlive **/
+		if results[0][4] != nil {
+			this.object.M_keepAlive = results[0][4].(bool)
+		}
+
+		/** associations of ScheduledTask **/
+
+		/** parentPtr **/
+		if results[0][5] != nil {
+			id := results[0][5].(string)
+			if len(id) > 0 {
+				refTypeName := "Config.Configurations"
+				id_ := refTypeName + "$$" + id
+				this.object.M_parentPtr = id
+				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
+			}
+		}
+		childsUuidStr := results[0][6].(string)
+		this.childsUuid = make([]string, 0)
+		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
+			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
+			if err != nil {
+				return err
+			}
+		}
+
+		referencedStr := results[0][7].(string)
+		this.referenced = make([]EntityRef, 0)
+		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
+			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
+			if err != nil {
+				return err
+			}
+		}
+
+	}
+
+	// set need save to false.
+	this.SetNeedSave(false)
+	// set init done.
+	this.SetInit(true)
+	// Init the references...
+	GetServer().GetEntityManager().InitEntity(this, lazy)
+	return nil
+}
+
+/** instantiate a new entity from an existing object. **/
+func (this *EntityManager) NewConfigScheduledTaskEntityFromObject(object *Config.ScheduledTask) *Config_ScheduledTaskEntity {
+	return this.NewConfigScheduledTaskEntity("", object.UUID, object)
+}
+
+/** Delete **/
+func (this *Config_ScheduledTaskEntity) DeleteEntity() {
+	GetServer().GetEntityManager().deleteEntity(this)
+}
+
+/** Exists **/
+func ConfigScheduledTaskExists(val string) string {
+	var query EntityQuery
+	query.TypeName = "Config.ScheduledTask"
+	query.Fields = append(query.Fields, "UUID")
+	var fieldsType []interface{} // not use...
+	var params []interface{}
+	queryStr, _ := json.Marshal(query)
+	results, err := GetServer().GetDataManager().readData(ConfigDB, string(queryStr), fieldsType, params)
+	if err != nil || len(results) == 0 {
+		return ""
+	}
+	return results[0][0].(string)
+}
+
+/** Append child entity into parent entity. **/
+func (this *Config_ScheduledTaskEntity) AppendChild(attributeName string, child Entity) error {
+
+	// Append child if is not there...
+	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
+		this.childsUuid = append(this.childsUuid, child.GetUuid())
+		this.childsPtr = append(this.childsPtr, child)
+	} else {
+		childsPtr := make([]Entity, 0)
+		for i := 0; i < len(this.childsPtr); i++ {
+			if this.childsPtr[i].GetUuid() != child.GetUuid() {
+				childsPtr = append(childsPtr, this.childsPtr[i])
+			}
+		}
+		childsPtr = append(childsPtr, child)
+		this.SetChildsPtr(childsPtr)
+	}
+	// Set this as parent in the child
+	child.SetParentPtr(this)
+
+	params := make([]interface{}, 1)
+	params[0] = child.GetObject()
+	attributeName = strings.Replace(attributeName, "M_", "", -1)
+	methodName := "Set" + strings.ToUpper(attributeName[0:1]) + attributeName[1:]
+	_, invalidMethod := Utility.CallMethod(this.object, methodName, params)
+	if invalidMethod != nil {
+		return invalidMethod.(error)
+	}
+	return nil
+}
+
+/** Append reference entity into parent entity. **/
+func (this *Config_ScheduledTaskEntity) AppendReference(reference Entity) {
 
 	// Here i will append the reference uuid
 	index := -1
@@ -8172,7 +8833,11 @@ func (this *Config_ApplicationConfigurationEntity) SaveEntity() {
 	/** associations of ApplicationConfiguration **/
 
 	/** Save parent type Configurations **/
-	ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -8834,7 +9499,11 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	/** associations of ServerConfiguration **/
 
 	/** Save parent type Configurations **/
-	ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_parentPtr)
+	if this.object.GetParentPtr() != nil {
+		ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	} else {
+		ServerConfigurationInfo = append(ServerConfigurationInfo, "")
+	}
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	ServerConfigurationInfo = append(ServerConfigurationInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -9462,14 +10131,18 @@ func (this *EntityManager) create_Config_ConfigurationsEntityPrototype() {
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_applicationConfigs")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.ApplicationConfiguration")
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 13)
+	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
+	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_scheduledTasks")
+	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.ScheduledTask")
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "childsUuid")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]xs.string")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 13)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 14)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, false)
 
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "referenced")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]EntityRef")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 14)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 15)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
@@ -9506,6 +10179,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_smtpConfigs")
 	query.Fields = append(query.Fields, "M_ldapConfigs")
 	query.Fields = append(query.Fields, "M_applicationConfigs")
+	query.Fields = append(query.Fields, "M_scheduledTasks")
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
@@ -9650,6 +10324,25 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	}
 	applicationConfigsStr, _ := json.Marshal(applicationConfigsIds)
 	ConfigurationsInfo = append(ConfigurationsInfo, string(applicationConfigsStr))
+
+	/** Save scheduledTasks type ScheduledTask **/
+	scheduledTasksIds := make([]string, 0)
+	lazy_scheduledTasks := this.lazyMap["M_scheduledTasks"] != nil && len(this.object.M_scheduledTasks) == 0
+	if !lazy_scheduledTasks {
+		for i := 0; i < len(this.object.M_scheduledTasks); i++ {
+			scheduledTasksEntity := GetServer().GetEntityManager().NewConfigScheduledTaskEntity(this.GetUuid(), this.object.M_scheduledTasks[i].UUID, this.object.M_scheduledTasks[i])
+			scheduledTasksIds = append(scheduledTasksIds, scheduledTasksEntity.uuid)
+			scheduledTasksEntity.AppendReferenced("scheduledTasks", this)
+			this.AppendChild("scheduledTasks", scheduledTasksEntity)
+			if scheduledTasksEntity.NeedSave() {
+				scheduledTasksEntity.SaveEntity()
+			}
+		}
+	} else {
+		scheduledTasksIds = this.lazyMap["M_scheduledTasks"].([]string)
+	}
+	scheduledTasksStr, _ := json.Marshal(scheduledTasksIds)
+	ConfigurationsInfo = append(ConfigurationsInfo, string(scheduledTasksStr))
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	ConfigurationsInfo = append(ConfigurationsInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -9713,6 +10406,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 	query.Fields = append(query.Fields, "M_smtpConfigs")
 	query.Fields = append(query.Fields, "M_ldapConfigs")
 	query.Fields = append(query.Fields, "M_applicationConfigs")
+	query.Fields = append(query.Fields, "M_scheduledTasks")
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
@@ -9933,7 +10627,35 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 				}
 			}
 		}
-		childsUuidStr := results[0][13].(string)
+
+		/** scheduledTasks **/
+		if results[0][13] != nil {
+			uuidsStr := results[0][13].(string)
+			uuids := make([]string, 0)
+			err := json.Unmarshal([]byte(uuidsStr), &uuids)
+			if err != nil {
+				return err
+			}
+			for i := 0; i < len(uuids); i++ {
+				if !lazy {
+					if len(uuids[i]) > 0 {
+						var scheduledTasksEntity *Config_ScheduledTaskEntity
+						if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+							scheduledTasksEntity = instance.(*Config_ScheduledTaskEntity)
+						} else {
+							scheduledTasksEntity = GetServer().GetEntityManager().NewConfigScheduledTaskEntity(this.GetUuid(), uuids[i], nil)
+							scheduledTasksEntity.InitEntity(uuids[i], lazy)
+							GetServer().GetEntityManager().insert(scheduledTasksEntity)
+						}
+						scheduledTasksEntity.AppendReferenced("scheduledTasks", this)
+						this.AppendChild("scheduledTasks", scheduledTasksEntity)
+					}
+				} else {
+					this.lazyMap["M_scheduledTasks"] = uuids
+				}
+			}
+		}
+		childsUuidStr := results[0][14].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -9942,7 +10664,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 			}
 		}
 
-		referencedStr := results[0][14].(string)
+		referencedStr := results[0][15].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -10053,6 +10775,7 @@ func (this *EntityManager) registerConfigObjects() {
 	Utility.RegisterType((*Config.OAuth2Expires)(nil))
 	Utility.RegisterType((*Config.OAuth2Configuration)(nil))
 	Utility.RegisterType((*Config.ServiceConfiguration)(nil))
+	Utility.RegisterType((*Config.ScheduledTask)(nil))
 	Utility.RegisterType((*Config.ApplicationConfiguration)(nil))
 	Utility.RegisterType((*Config.ServerConfiguration)(nil))
 	Utility.RegisterType((*Config.Configurations)(nil))
@@ -10072,6 +10795,7 @@ func (this *EntityManager) createConfigPrototypes() {
 	this.create_Config_OAuth2ExpiresEntityPrototype()
 	this.create_Config_OAuth2ConfigurationEntityPrototype()
 	this.create_Config_ServiceConfigurationEntityPrototype()
+	this.create_Config_ScheduledTaskEntityPrototype()
 	this.create_Config_ApplicationConfigurationEntityPrototype()
 	this.create_Config_ServerConfigurationEntityPrototype()
 	this.create_Config_ConfigurationsEntityPrototype()

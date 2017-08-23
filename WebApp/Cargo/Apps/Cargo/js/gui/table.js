@@ -495,8 +495,8 @@ var TableHeader = function (table) {
 	// The first cell will be there to match the save button...
 	var buttonDiv = this.div.appendElement({ "tag": "div", "class": "table_header_btn_div" }).down()
 	
-	this.exportBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn" }).down()
-	this.exportBtn.appendElement({ "tag": "i", "class": "	fa fa-download", "title":"download csv file." })
+	this.exportBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style" :"width: 100%;" }).down()
+	this.exportBtn.appendElement({ "tag": "i", "class": "	fa fa-download", "title":"download table data file." })
 
 	this.maximizeBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style": "display: none;" }).down()
 	this.maximizeBtn.appendElement({ "tag": "i", "class": "fa fa-plus-square-o" })

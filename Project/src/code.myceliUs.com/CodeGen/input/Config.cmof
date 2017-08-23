@@ -324,12 +324,25 @@
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
       </ownedAttribute>
 	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="ScheduledTask" name="ScheduledTask" >
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="script" name="script">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="port" name="interval">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="start" name="keepAlive">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
+      </ownedAttribute>
+	</ownedMember>
 
 	<ownedMember xmi:type="cmof:Class" xmi:id="ApplicationConfiguration" name="ApplicationConfiguration" superClass="Configuration">
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="indexPage" name="indexPage">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
 	</ownedMember>
+	
 	
 	<ownedMember xmi:type="cmof:Class" xmi:id="ServerConfiguration" name="ServerConfiguration" superClass="Configuration">
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hostName" name="hostName">
@@ -401,6 +414,10 @@
       <ownedEnd xmi:type="cmof:Property" xmi:id="A_serviceConfiguration_Configurations-Configuration" name="parent" _type="Configurations" lower="0" upper="1" owningAssociation="A_serviceConfiguration_Configurations" association="A_serviceConfiguration_Configurations"/>
     </ownedMember>
 	
+	<ownedMember xmi:type="cmof:Association" xmi:id="A_scheduledTask_Configurations" name="A_scheduledTask_Configurations" visibility="private" memberEnd="Configurations-ServiceConfiguration A_scheduledTask_Configurations-Configurations">
+      <ownedEnd xmi:type="cmof:Property" xmi:id="A_scheduledTask_Configurations-Configuration" name="parent" _type="Configurations" lower="0" upper="1" owningAssociation="A_scheduledTask_Configurations" association="A_scheduledTask_Configurations"/>
+    </ownedMember>
+	
 	<!-- Contain the list of configuration -->
 	<ownedMember xmi:type="cmof:Class" xmi:id="Configurations" name="Configurations">
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="config-id" name="id">
@@ -423,7 +440,8 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-SmtpConfiguration" name="smtpConfigs" _type="SmtpConfiguration" lower="0"  upper="*" isComposite="true" association="A_smptConfiguration_Configurations"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-LdapConfiguration" name="ldapConfigs" _type="LdapConfiguration" lower="0"  upper="*" isComposite="true" association="A_ldapConfiguration_Configurations"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-ApplicationConfiguration" name="applicationConfigs" _type="ApplicationConfiguration" lower="0"  upper="*" isComposite="true" association="A_applicationConfiguration_Configurations"/>
-	
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-ScheduledTask" name="scheduledTasks" _type="ScheduledTask" lower="0"  upper="*" isComposite="true" association="A_scheduledTask_Configurations"/>
+
 	</ownedMember>
 	
   </cmof:Package>

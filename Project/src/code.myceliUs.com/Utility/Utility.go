@@ -84,6 +84,10 @@ func StringToBytes(s string) []byte {
 	return *(*[]byte)(unsafe.Pointer(&bh))
 }
 
+func DateTimeFromString(str string, layout string) (time.Time, error) {
+	return time.Parse(layout, str)
+}
+
 /**
  * Parse and return a time object from a 8601 iso string, the time zone is
  * the UTC.

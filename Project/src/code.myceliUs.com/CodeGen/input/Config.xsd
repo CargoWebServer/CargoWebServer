@@ -235,6 +235,13 @@
 		</xsd:complexContent> 
 	</xsd:complexType>
 	
+	<xsd:element name="scheduledTask" type="tScheduledTask" />
+	<xsd:complexType name="tScheduledTask" abstract="false">
+		<xsd:attribute name="script" type="xsd:string" />
+		<xsd:attribute name="interval" type="xsd:integer" />
+		<xsd:attribute name="keepAlive" type="xsd:boolean" />
+	</xsd:complexType>
+	
 	<xsd:element name="configurations" type="tConfigurations"/>
 	<xsd:complexType name="tConfigurations">
 		<xsd:sequence>
@@ -245,6 +252,7 @@
 			<xsd:element name="dataStoreConfigs" type="tDataStoreConfiguration" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="serviceConfigs" type="tServiceConfiguration" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="oauth2Configuration" type="tOAuth2Configuration" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="scheduledTasks" type="tScheduledTask" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:attribute name="name" type="xsd:string"/>

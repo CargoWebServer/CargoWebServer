@@ -3,7 +3,7 @@
 package Config
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type OAuth2Configuration struct{

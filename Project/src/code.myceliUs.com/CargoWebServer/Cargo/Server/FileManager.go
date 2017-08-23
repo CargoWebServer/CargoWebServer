@@ -15,6 +15,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
@@ -22,6 +23,7 @@ import (
 
 	"code.myceliUs.com/Utility"
 	"github.com/polds/imgbase64"
+	"github.com/tealeg/xlsx"
 )
 
 /**
@@ -854,6 +856,11 @@ func (this *FileManager) RemoveFile(filePath string, messageId string, sessionId
 		return
 	}
 
+	if !strings.HasPrefix(filePath, "/") {
+		filePath = "/" + filePath
+	}
+	filePath = this.root + filePath
+
 	err := os.Remove(filePath)
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), FILE_DELETE_ERROR, SERVER_ERROR_CODE, err)
@@ -1211,6 +1218,123 @@ func (this *FileManager) OpenFile(fileId string, messageId string, sessionId str
 
 	// Return the file object...
 	return file
+}
+
+//////////////////// Excel Write/Read function /////////////////////////////////
+
+// @api 1.0
+// Write an array of value to an excel file.
+// @param {string} path The xlsx file path.
+// @param {string} sheetName The name of the sheet where to write the values.
+// @param {values} the double dimension values of array.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *FileManager) WriteExcelFile(filePath string, sheetName string, values [][]interface{}, messageId string, sessionId string) {
+
+	// In case of temp dir...
+	if strings.HasPrefix(filePath, "/tmp/") {
+		// Here the file must be create in the temp path.
+		filePath = GetServer().GetConfigurationManager().GetTmpPath() + "/" + filePath[len("/tmp/"):]
+	} else {
+		if !strings.HasPrefix(filePath, "/") {
+			filePath = "/" + filePath
+		}
+		filePath = this.root + filePath
+	}
+
+	xlFile, err := xlsx.OpenFile(filePath)
+	var xlSheet *xlsx.Sheet
+	if err != nil {
+		xlFile = xlsx.NewFile()
+		xlSheet, _ = xlFile.AddSheet(sheetName)
+	} else {
+		xlSheet = xlFile.Sheet[sheetName]
+		if xlSheet == nil {
+			xlSheet, _ = xlFile.AddSheet(sheetName)
+		}
+	}
+
+	// So here I got the xl file open and sheet ready to write into.
+	for i := 0; i < len(values); i++ {
+		row := xlSheet.AddRow()
+		for j := 0; j < len(values[i]); j++ {
+			if values[i][j] != nil {
+				cell := row.AddCell()
+				if reflect.TypeOf(values[i][j]).String() == "string" {
+					str := values[i][j].(string)
+					// here I will try to format the date time if it can be...
+					dateTime, err := Utility.DateTimeFromString(str, "2006-01-02 15:04:05")
+					if err != nil {
+						cell.SetString(str)
+					} else {
+						cell.SetDateTime(dateTime)
+					}
+				} else {
+					cell.SetValue(values[i][j])
+				}
+			}
+		}
+	}
+
+	// Here I will save the file at the given path...
+	err = xlFile.Save(filePath)
+
+	if err != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), FILE_WRITE_ERROR, SERVER_ERROR_CODE, err))
+	}
+
+}
+
+// @api 1.0
+// Read the content of an excel file and return it values as form of a map.
+// @param {string} filePath The file path of the file to read.
+// @param {string} sheetName The name of the page to read, if there no value the whole file is return.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {map[string][][]interface{}} The return map item represent page by name.
+// @scope {public}
+// @param {callback} progressCallback The function is call when chunk of response is received.
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *FileManager) ReadExcelFile(filePath string, sheetName string, messageId string, sessionId string) map[string][][]string {
+	values := make(map[string][][]string, 0)
+
+	xlFile, err := xlsx.OpenFile(filePath)
+	if err != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err))
+		return values
+	}
+
+	if len(sheetName) > 0 { // Only the sheet whit that name will be read.
+		xlSheet := xlFile.Sheet[sheetName]
+		if xlSheet == nil {
+			GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, errors.New("The file "+filePath+" has no sheet name "+sheetName)))
+			return values
+		}
+		for _, row := range xlSheet.Rows {
+			row_ := make([]string, 0)
+			for _, cell := range row.Cells {
+				row_ = append(row_, cell.Value)
+			}
+			values[xlSheet.Name] = append(values[xlSheet.Name], row_)
+		}
+	} else { // The whole sheet must be read in that case.
+		for _, sheet := range xlFile.Sheets {
+			values[sheet.Name] = make([][]string, 0)
+			for _, row := range sheet.Rows {
+				row_ := make([]string, 0)
+				for _, cell := range row.Cells {
+					row_ = append(row_, cell.Value)
+				}
+				values[sheet.Name] = append(values[sheet.Name], row_)
+			}
+		}
+	}
+
+	return values
 }
 
 /////////////////////////////////////////////////////////////////////////////
