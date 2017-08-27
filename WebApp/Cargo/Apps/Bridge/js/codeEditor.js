@@ -85,6 +85,24 @@ var CodeEditor = function (parent) {
             }
         }
     })
+
+    server.entityManager.attach(this, UpdateEntityEvent, function (evt, codeEditor) {
+        if (evt.dataMap.entity !== undefined) {
+            var file = evt.dataMap["entity"]
+            var editor = codeEditor.editors[file.M_id + "_editor"]
+            if (editor !== undefined) {
+                // Supend the change event propagation
+                codeEditor.quiet = true
+                var position = editor.getCursorPosition()
+                editor.setValue(decode64(file.M_data), -1)
+                editor.clearSelection()
+                editor.scrollToLine(position.row + 1, true, true, function () { });
+                editor.gotoLine(position.row + 1, position.column)
+                // Resume the chage event propagation.
+                codeEditor.quiet = false
+            }
+        }
+    })
     return this
 }
 
@@ -123,17 +141,17 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
                         }
                     }
                 }
-            } (filePanel)
+            }(filePanel)
 
             window.addEventListener("resize", function (canvas) {
                 return function () {
                     canvas.initWorkspace()
                 }
-            } (codeEditor.diagram.canvas))
+            }(codeEditor.diagram.canvas))
 
             codeEditor.diagram.canvas.initWorkspace()
         }
-    } (this, diagram, filePanel))
+    }(this, diagram, filePanel))
 }
 
 CodeEditor.prototype.appendFile = function (file) {
@@ -174,7 +192,7 @@ CodeEditor.prototype.appendFile = function (file) {
                     codeEditor.toolbars[fileId] = []
                     codeEditor.toolbars[fileId].push(queryEditor.queryToolBar)
                 }
-            } (this, file.M_id))
+            }(this, file.M_id))
 
             // Init the query editor.
             queryEditor.init()
@@ -203,7 +221,7 @@ CodeEditor.prototype.appendFile = function (file) {
                 server.eventHandler.broadcastLocalEvent(evt)
             }
         }
-    } (file.M_id, file.UUID, this));
+    }(file.M_id, file.UUID, this));
 
     this.filesPanel[file.M_id] = filePanel
     this.setActiveFile(file.M_id)

@@ -80,11 +80,12 @@ var FileNavigator = function (parent) {
             codeEditor.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn"
 
             var tab = codeEditor.tabs[fileId]
-            tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
+            if (codeEditor.toSaves[fileId] != undefined) {
+                tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
 
-            // Remove from the save map
-            delete codeEditor.toSaves[fileId]
-
+                // Remove from the save map
+                delete codeEditor.toSaves[fileId]
+            }
             // Now the file save button...
             if (Object.keys(codeEditor.toSaves).length <= 1) {
                 codeEditor.saveAllBtn.element.style.display = "none"
@@ -104,11 +105,12 @@ var FileNavigator = function (parent) {
             codeEditor.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn"
 
             var tab = codeEditor.tabs[fileId]
-            tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
+            if (codeEditor.toSaves[fileId] != undefined) {
+                tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
 
-            // Remove from the save map
-            delete codeEditor.toSaves[fileId]
-
+                // Remove from the save map
+                delete codeEditor.toSaves[fileId]
+            }
             // Now the file save button...
             if (Object.keys(codeEditor.toSaves).length <= 1) {
                 codeEditor.saveAllBtn.element.style.display = "none"
@@ -329,7 +331,7 @@ FileNavigator.prototype.saveFile = function (fileId) {
             function (result, caller) {
                 console.log("-------> file save successfully")
             },
-            function (errObj, caller) { 
+            function (errObj, caller) {
                 console.log("-------> fail to save ", errObj)
             },
             {})
