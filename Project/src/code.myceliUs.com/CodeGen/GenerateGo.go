@@ -598,6 +598,8 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 
 				if typeName == "string" {
 					refSetter += "		if this.M_" + attribute.Name + "[i] != ref.(" + typeName + ") {\n"
+				} else if typeName == "int" {
+					refSetter += "		if this.M_" + attribute.Name + "[i] != ref.(" + typeName + ") {\n"
 				} else {
 					cast := cast[strings.Index(cast, ".")+1:]
 

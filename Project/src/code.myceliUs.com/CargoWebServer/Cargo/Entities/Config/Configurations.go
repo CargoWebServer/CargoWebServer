@@ -348,7 +348,7 @@ func (this *Configurations) SetScheduledTasks(ref interface{}){
 	isExist := false
 	var scheduledTaskss []*ScheduledTask
 	for i:=0; i<len(this.M_scheduledTasks); i++ {
-		if this.M_scheduledTasks[i].GetUUID() != ref.(*ScheduledTask).GetUUID() {
+		if this.M_scheduledTasks[i].GetUUID() != ref.(Configuration).GetUUID() {
 			scheduledTaskss = append(scheduledTaskss, this.M_scheduledTasks[i])
 		} else {
 			isExist = true
@@ -363,7 +363,7 @@ func (this *Configurations) SetScheduledTasks(ref interface{}){
 
 /** Remove reference ScheduledTasks **/
 func (this *Configurations) RemoveScheduledTasks(ref interface{}){
-	toDelete := ref.(*ScheduledTask)
+	toDelete := ref.(Configuration)
 	scheduledTasks_ := make([]*ScheduledTask, 0)
 	for i := 0; i < len(this.M_scheduledTasks); i++ {
 		if toDelete.GetUUID() != this.M_scheduledTasks[i].GetUUID() {

@@ -24,7 +24,7 @@ var FileNavigator = function (parent) {
                 fileNavigator.saveFile(fileId)
             }
         }
-    } (this)
+    }(this)
 
     this.saveBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-floppy-o fileNavigationBtn", "style": "display:none" }).down()
 
@@ -36,7 +36,7 @@ var FileNavigator = function (parent) {
                 fileNavigator.saveFile(fileNavigator.activeFile.M_id)
             }
         }
-    } (this)
+    }(this)
 
     // Show the list of file that dosent fit in the file explorer...
     this.showHiddenFilesBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-down fileNavigationBtn" }).down()
@@ -50,11 +50,19 @@ var FileNavigator = function (parent) {
     // Here I will attach the file navigator to file event.
     // Open 
     server.fileManager.attach(this, OpenEntityEvent, function (evt, fileNavigator) {
-        var file
-        if (evt.dataMap.fileInfo !== undefined) {
-            file = entities[evt.dataMap["fileInfo"].UUID]
-        } else if (evt.dataMap.bpmnDiagramInfo !== undefined) {
-            file = entities[evt.dataMap["bpmnDiagramInfo"].UUID]
+        var file = entities[evt.dataMap["fileInfo"].UUID]
+        if (file == undefined) {
+            // local file here.
+            file = evt.dataMap["fileInfo"]
+        }
+
+        if (file == undefined) {
+            if (evt.dataMap.bpmnDiagramInfo !== undefined) {
+                file = entities[evt.dataMap["bpmnDiagramInfo"].UUID]
+                if (file == undefined) {
+                    file = evt.dataMap["bpmnDiagramInfo"]
+                }
+            }
         }
 
         if (file !== undefined) {
@@ -68,6 +76,30 @@ var FileNavigator = function (parent) {
     server.fileManager.attach(this, UpdateFileEvent, function (evt, codeEditor) {
         if (evt.dataMap.fileInfo !== undefined) {
             var fileId = evt.dataMap["fileInfo"].M_id
+            codeEditor.saveBtn.element.title = ""
+            codeEditor.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn"
+
+            var tab = codeEditor.tabs[fileId]
+            tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
+
+            // Remove from the save map
+            delete codeEditor.toSaves[fileId]
+
+            // Now the file save button...
+            if (Object.keys(codeEditor.toSaves).length <= 1) {
+                codeEditor.saveAllBtn.element.style.display = "none"
+            }
+
+            if (Object.keys(codeEditor.toSaves).length === 0) {
+                codeEditor.saveBtn.element.style.display = "none"
+                codeEditor.saveBtn.element.title = ""
+            }
+        }
+    })
+
+    server.entityManager.attach(this, UpdateEntityEvent, function (evt, codeEditor) {
+        if (evt.dataMap.entity !== undefined) {
+            var fileId = evt.dataMap.entity.M_id
             codeEditor.saveBtn.element.title = ""
             codeEditor.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn"
 
@@ -166,7 +198,7 @@ FileNavigator.prototype.appendFile = function (file) {
                 var evt = { "code": CloseEntityEvent, "name": FileEvent, "dataMap": { "fileId": file.M_id } }
                 server.eventHandler.broadcastLocalEvent(evt)
             }
-        } (file)
+        }(file)
     }
 
     this.setActiveTab(file.M_id)
@@ -178,7 +210,7 @@ FileNavigator.prototype.appendFile = function (file) {
                 fileNavigator.setActiveTab(file.M_id)
             }
         }
-    } (file, this)
+    }(file, this)
 }
 
 FileNavigator.prototype.setActiveTab = function (fileId) {
@@ -265,29 +297,42 @@ FileNavigator.prototype.saveFile = function (fileId) {
 
     // Now I will save the file.
     var file = entities["CargoEntities.File:" + fileId]
-    var data = [decode64(file.M_data)]
-    var f = null
-    
-    try {
-        f = new File(data, file.M_name, { type: "text/plain", lastModified: new Date(0) })
-    } catch (error) {
-        f = new Blob(data, { type: "text/plain" });
-        f.name = "test.txt"
-        f.lastModifiedDate = new Date(0);
+
+    if (file.M_type == 1) {
+        // In case of disk file.
+        var data = [decode64(file.M_data)]
+        var f = null
+        try {
+            f = new File(data, file.M_name, { type: "text/plain", lastModified: new Date(0) })
+        } catch (error) {
+            f = new Blob(data, { type: f.M_mime });
+            f.name = f.M_name
+            f.lastModifiedDate = new Date(0);
+        }
+
+        server.fileManager.createFile(file.M_name, file.M_path, f, 256, 256, false,
+            // Success callback
+            function (result, caller) {
+                server.entityManager.saveEntity(caller)
+            },
+            // Progress callback
+            function (index, total, caller) {
+            },
+            // Error callback
+            function (errMsg, caller) {
+            },
+            file)
+
+    } else {
+        // In case of db file
+        server.entityManager.saveEntity(file,
+            function (result, caller) {
+                console.log("-------> file save successfully")
+            },
+            function (errObj, caller) { 
+                console.log("-------> fail to save ", errObj)
+            },
+            {})
     }
-
-    server.fileManager.createFile(file.M_name, file.M_path, f, 256, 256, false,
-        // Success callback
-        function (result, caller) {
-
-        },
-        // Progress callback
-        function (index, total, caller) {
-        },
-        // Error callback
-        function (errMsg, caller) {
-
-        },
-        this)
 
 }

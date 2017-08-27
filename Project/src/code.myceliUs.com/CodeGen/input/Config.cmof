@@ -325,16 +325,48 @@
       </ownedAttribute>
 	</ownedMember>
 	
-	<ownedMember xmi:type="cmof:Class" xmi:id="ScheduledTask" name="ScheduledTask" >
+	
+	<ownedMember xmi:type="cmof:Enumeration" xmi:id="FrequencyType" name="FrequencyType">
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FrequencyType-ONCE" name="ONCE" classifier="FrequencyType" enumeration="FrequencyType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FrequencyType-DAILY" name="DAILY" classifier="FrequencyType" enumeration="FrequencyType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FrequencyType-WEEKELY" name="WEEKELY" classifier="FrequencyType" enumeration="FrequencyType"/>
+	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="FrequencyType-MONTHLY" name="MONTHLY" classifier="FrequencyType" enumeration="FrequencyType"/>
+	</ownedMember>
+	
+	<ownedMember xmi:type="cmof:Class" xmi:id="ScheduledTask" name="ScheduledTask" superClass="Configuration">
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="isActive" name="isActive">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
+      </ownedAttribute>
+	
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="script" name="script">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="port" name="interval">
+	
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="startTime" name="startTime">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
       </ownedAttribute>
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="start" name="keepAlive">
+	
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="expirationTime" name="expirationTime">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="frequency" name="frequency">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="ScheduledTask-FrequencyType" name="frequencyType" _type="FrequencyType"/>
+
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="offsets" name="offsets"  lower="0" upper="*" >
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="iterations" name="iterations">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+      </ownedAttribute>
+	
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="keepAlive" name="keepAlive">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
       </ownedAttribute>
+	
 	</ownedMember>
 
 	<ownedMember xmi:type="cmof:Class" xmi:id="ApplicationConfiguration" name="ApplicationConfiguration" superClass="Configuration">

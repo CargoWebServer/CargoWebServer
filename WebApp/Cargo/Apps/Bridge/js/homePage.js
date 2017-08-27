@@ -55,6 +55,9 @@ var HomePage = function () {
     this.rolePermissionManager = null
     this.rolePermissionDiv = null
 
+    /** The task scheduler */
+    this.scheduledTaskDiv = null
+
     /** The code editor */
     this.codeEditor = null
 
@@ -68,6 +71,7 @@ var HomePage = function () {
     this.ldapConfiguration = null
     this.smtpConfiguration = null
     this.oauth2Configuration = null
+    this.scheduledTasksConfiguration = null
 
     /** The propertie div a the right */
     this.propertiesDiv = null
@@ -429,6 +433,11 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     /* this.propertiesDiv = new Element(rightDiv, { "tag": "div", "class": "properties_div" })
      this.propertiesView = new PropertiesView(this.propertiesDiv)*/
 
+    this.scheduledTasksDiv = new Element(leftDiv, { "tag": "div", "class": "navigation_div", "style": "left:50px; display:none;" })
+    this.taskSchedulerContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Task scheduler" }).appendElement({ "tag": "i", "class": "fa fa-clock-o" })
+    this.scheduledTasksConfiguration = new ConfigurationPanel(this.scheduledTasksDiv, "Scheduled Tasks", "Config.ScheduledTask", "scheduledTasks")
+    setSelectAction(this.taskSchedulerContext, this.scheduledTasksDiv)
+
     // I will set the configuration of the panel...
     server.entityManager.getEntities("Config.Configurations", "Config", "", 0, -1, [], true,
         /** Progress callback */
@@ -443,6 +452,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
             caller.smtpConfiguration.setConfigurations(results)
             caller.dataConfiguration.setConfigurations(results)
             caller.oauth2Configuration.setConfigurations(results)
+            caller.scheduledTasksConfiguration.setConfigurations(results)
         },
         /** Error callback */
         function (errMsg, caller) {

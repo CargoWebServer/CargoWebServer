@@ -7,11 +7,13 @@ var languageInfo = {
         "M_hostName": "host",
         "M_applicationsPath": "applications",
         "M_dataPath": "data",
+        "FrequencyType_MINUTE": "MINUTE",
     },
     "fr": {
         "M_hostName": "hôte",
         "M_applicationsPath": "applications",
         "M_dataPath": "donnée",
+        "FrequencyType_MINUTE": "MINUTE",
     }
 }
 
@@ -144,9 +146,8 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                             // display the schemas information here...
                                             contentView.connectBtn.element.status = "disconnected"
                                             contentView.connectBtn.element.click()
-
                                         }
-                                    } (caller))
+                                    }(caller))
                                 },
                                 // Error callback
                                 function (errObj, caller) {
@@ -155,7 +156,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                             console.log("------> service configuration! ", entity)
                         }
                     }
-                } (contentView)
+                }(contentView)
 
                 contentView.deleteCallback = function (entity) {
                     // Here I will remove the folder if the entity is 
@@ -234,7 +235,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                             }
 
                         }
-                    } (contentView)
+                    }(contentView)
 
                     // The refresh action.
                     contentView.refreshBtn.element.onclick = function (contentView) {
@@ -253,7 +254,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                     caller.refreshBtn.element.style.color = "#8B0000"
                                 }, { "refreshBtn": contentView.refreshBtn })
                         }
-                    } (contentView)
+                    }(contentView)
 
                     // Set the connection status
                     server.dataManager.ping(contentView.entity.M_id,
@@ -313,7 +314,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 return false
                             }
                         }
-                    } (currentPwd), 3000)
+                    }(currentPwd), 3000)
 
                     setValidator("", newPwd, function (newPwd) {
                         return function (msgDiv) {
@@ -323,7 +324,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 return false
                             }
                         }
-                    } (newPwd), 3000)
+                    }(newPwd), 3000)
 
                     setValidator("", confirmPwd, function (newPwd) {
                         return function (msgDiv) {
@@ -333,7 +334,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 return false
                             }
                         }
-                    } (confirmPwd), 3000)
+                    }(confirmPwd), 3000)
 
                     setValidator("", confirmPwd, function (newPwd, confirmPwd) {
                         return function (msgDiv) {
@@ -348,11 +349,11 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                         newPwd.element.style.border = ""
                                         confirmPwd.element.style.border = ""
                                     }
-                                } (newPwd, confirmPwd)
+                                }(newPwd, confirmPwd)
                                 return false
                             }
                         }
-                    } (newPwd, confirmPwd), 3000)
+                    }(newPwd, confirmPwd), 3000)
 
                     changeAdminPwdBtn.element.onclick = function (currentPwd, newPwd, confirmPwd) {
                         return function () {
@@ -369,7 +370,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                     }, {})
                             }
                         }
-                    } (currentPwd, newPwd, confirmPwd)
+                    }(currentPwd, newPwd, confirmPwd)
                 } else if (content.TYPENAME == "Config.OAuth2Configuration") {
                     // So here I will append other element in the view here.
 
@@ -389,7 +390,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                     actionsDiv.element.style.top = top + "px"
                                 }
                             }
-                        } (actionsDiv), true);
+                        }(actionsDiv), true);
 
                     // Now I will get the list of action for a given services.
                     server.serviceManager.getServiceActions(content.M_id,
@@ -402,17 +403,97 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                     return function (panel) {
                                         panel.setEntity(entity)
                                     }
-                                } (result), undefined, false, result, "")
+                                }(result), undefined, false, result, "")
                             }
                         },
                         // error callback
                         function (errObj, caller) {
 
                         }, actionsDiv)
+                } else if (content.TYPENAME == "Config.ScheduledTask") {
+                    // Here I will personalise input a little.
+                    content.panel.controls["Config.ScheduledTask_M_startTime"].element.type = "datetime-local"
+                    content.panel.controls["Config.ScheduledTask_M_startTime"].element.onchange = function (entity) {
+                        return function () {
+                            entity.M_startTime = new Date(this.value).getTime() / 1000
+                        }
+                    }(content.panel.entity)
+                    if (content.panel.entity.M_startTime > 0) {
+                        content.panel.controls["Config.ScheduledTask_M_startTime"].element.valueAsNumber = content.panel.entity.M_startTime * 1000
+                    }
+
+                    content.panel.controls["Config.ScheduledTask_M_expirationTime"].element.type = "datetime-local"
+
+                    content.panel.controls["Config.ScheduledTask_M_expirationTime"].element.onchange = function (entity) {
+                        return function () {
+                            entity.M_expirationTime = new Date(this.value).getTime() / 1000
+                        }
+                    }(content.panel.entity)
+                    if (content.panel.entity.M_expirationTime > 0) {
+                        content.panel.controls["Config.ScheduledTask_M_expirationTime"].element.valueAsNumber = content.panel.entity.M_expirationTime * 1000
+                    }
+                    content.panel.controls["Config.ScheduledTask_M_frequency"].element.title = "The task must be execute n time per frequency type (once, daily, weekely, or mouthly). *Is ignore if frenquencyType is ONCE."
+
+                    // The script button must be hidden...
+                    content.panel.controls["Config.ScheduledTask_M_script"].element.style.display = "none"
+                    content.panel.controls["Config.ScheduledTask_M_script_edit"] = new Element(content.panel.controls["Config.ScheduledTask_M_script"].element.parentNode, { "tag": "i", "title": "Edit task script.", "class": "editBtn fa fa-edit" })
+
+                    content.panel.controls["Config.ScheduledTask_M_script_edit"].element.onclick = function (ScheduledTask_M_script, entity) {
+                        return function () {
+
+                            var query = {}
+                            query.TypeName = "CargoEntities.File"
+                            query.Fields = ["M_id"]
+                            query.Query = 'CargoEntities.File.M_id == "' + entity.M_id + '"'
+
+                            server.dataManager.read("CargoEntities", JSON.stringify(query), [], [],
+                                function (results, caller) {
+                                    if (results[0].length == 0) {
+                                        // here I will create an open file event to open the code editor.
+                                        var file = new CargoEntities.File()
+                                        file.M_id = caller.entity.M_id
+                                        file.M_name = caller.entity.M_id + ".js"
+                                        file.M_isDir = false
+                                        file.M_fileType = 1
+                                        file.M_mime = "application/javascript"
+                                        file.M_modeTime = Date.now()
+
+                                        server.entityManager.saveEntity(file,
+                                            function (file, caller) {
+                                                caller.entity.M_script = file.M_id
+                                                server.entityManager.saveEntity(caller.entity) // Save the entity...
+                                                evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
+                                                server.eventHandler.broadcastLocalEvent(evt)
+                                            },
+                                            function () {
+
+                                            }, caller)
+                                    } else {
+                                        server.entityManager.getEntityById("CargoEntities.File", "CargoEntities", [results[0][0][0]],
+                                            function (file, caller) {
+                                                caller.entity.M_script = file.M_id
+                                                server.entityManager.saveEntity(caller.entity) // Save the entity...
+                                                evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
+                                                server.eventHandler.broadcastLocalEvent(evt)
+                                            },
+                                            function () {
+
+                                            }, caller)
+
+                                    }
+                                },
+                                function (index, total, caller) {
+
+                                },
+                                function (errMsg, caller) {
+
+                                }, { "entity": entity })
+                        }
+                    }(content.panel.controls["Config.ScheduledTask_M_script"], content.panel.entity)
                 }
             }
 
-        } (content, this.title))
+        }(content, this.title))
 
     // Set parent entity informations.
     contentView.parentEntity = this.activeConfiguration
@@ -431,6 +512,8 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
             contentView.parentLnk = "M_applicationConfigs"
         } else if (contentView.entity.TYPENAME == "Config.OAuth2Configuration") {
             contentView.parentLnk = "M_oauth2Configuration"
+        } else if (contentView.entity.TYPENAME == "Config.ScheduledTask") {
+            contentView.parentLnk = "M_scheduledTasks"
         }
     }
 
@@ -486,7 +569,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                 idField.element.setSelectionRange(0, idField.element.value.length)
 
             }
-        } (this, configurationContent, configuration)
+        }(this, configurationContent, configuration)
 
         // In case of multiple configurations element..
         if (fieldType.startsWith("[]")) {
@@ -558,7 +641,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                     }
 
                 }
-            } (this)
+            }(this)
 
             // The previous configuration button.
             this.previousConfigBtn.element.onclick = function (configurationPanel) {
@@ -593,7 +676,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
                     }
                 }
-            } (this)
+            }(this)
 
             // Set the new configuration click handler.
             this.newConfigElementBtn.element.onclick = newConfiguration

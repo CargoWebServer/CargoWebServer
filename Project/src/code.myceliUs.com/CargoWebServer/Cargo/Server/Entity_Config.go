@@ -4,6 +4,7 @@ package Server
 
 import (
 	"encoding/json"
+	//	"log"
 	"strings"
 	"unsafe"
 
@@ -17,13 +18,14 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ScheduledTask")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "UUID")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "UUID")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -8149,6 +8151,7 @@ func (this *EntityManager) create_Config_ScheduledTaskEntityPrototype() {
 
 	var scheduledTaskEntityProto EntityPrototype
 	scheduledTaskEntityProto.TypeName = "Config.ScheduledTask"
+	scheduledTaskEntityProto.SuperTypeNames = append(scheduledTaskEntityProto.SuperTypeNames, "Config.Configuration")
 	scheduledTaskEntityProto.Ids = append(scheduledTaskEntityProto.Ids, "UUID")
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "UUID")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.string")
@@ -8160,33 +8163,64 @@ func (this *EntityManager) create_Config_ScheduledTaskEntityPrototype() {
 	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 1)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
 
-	/** members of ScheduledTask **/
+	/** members of Configuration **/
+	scheduledTaskEntityProto.Ids = append(scheduledTaskEntityProto.Ids, "M_id")
 	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 2)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_id")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.ID")
+
+	/** members of ScheduledTask **/
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 3)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_isActive")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.boolean")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 4)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_script")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.string")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 3)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 5)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
-	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_interval")
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_startTime")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.int")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 4)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 6)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_expirationTime")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.int")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 7)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_frequency")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.int")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 8)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_frequencyType")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "enum:FrequencyType_ONCE:FrequencyType_DAILY:FrequencyType_WEEKELY:FrequencyType_MONTHLY")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 9)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_offsets")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "[]xs.int")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 10)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_iterations")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.int")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 11)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_keepAlive")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.boolean")
 
 	/** associations of ScheduledTask **/
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 5)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 12)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_parentPtr")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "Config.Configurations:Ref")
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "childsUuid")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "[]xs.string")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 6)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 13)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
 
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "referenced")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "[]EntityRef")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 7)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 14)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
@@ -8211,9 +8245,18 @@ func (this *Config_ScheduledTaskEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
 
+	/** members of Configuration **/
+	query.Fields = append(query.Fields, "M_id")
+
 	/** members of ScheduledTask **/
+	query.Fields = append(query.Fields, "M_isActive")
 	query.Fields = append(query.Fields, "M_script")
-	query.Fields = append(query.Fields, "M_interval")
+	query.Fields = append(query.Fields, "M_startTime")
+	query.Fields = append(query.Fields, "M_expirationTime")
+	query.Fields = append(query.Fields, "M_frequency")
+	query.Fields = append(query.Fields, "M_frequencyType")
+	query.Fields = append(query.Fields, "M_offsets")
+	query.Fields = append(query.Fields, "M_iterations")
 	query.Fields = append(query.Fields, "M_keepAlive")
 
 	/** associations of ScheduledTask **/
@@ -8230,9 +8273,30 @@ func (this *Config_ScheduledTaskEntity) SaveEntity() {
 		ScheduledTaskInfo = append(ScheduledTaskInfo, "")
 	}
 
+	/** members of Configuration **/
+	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_id)
+
 	/** members of ScheduledTask **/
+	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_isActive)
 	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_script)
-	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_interval)
+	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_startTime)
+	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_expirationTime)
+	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_frequency)
+
+	/** Save frequencyType type FrequencyType **/
+	if this.object.M_frequencyType == Config.FrequencyType_ONCE {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, 0)
+	} else if this.object.M_frequencyType == Config.FrequencyType_DAILY {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, 1)
+	} else if this.object.M_frequencyType == Config.FrequencyType_WEEKELY {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, 2)
+	} else if this.object.M_frequencyType == Config.FrequencyType_MONTHLY {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, 3)
+	} else {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, 0)
+	}
+	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_offsets)
+	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_iterations)
 	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_keepAlive)
 
 	/** associations of ScheduledTask **/
@@ -8294,9 +8358,18 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
 
+	/** members of Configuration **/
+	query.Fields = append(query.Fields, "M_id")
+
 	/** members of ScheduledTask **/
+	query.Fields = append(query.Fields, "M_isActive")
 	query.Fields = append(query.Fields, "M_script")
-	query.Fields = append(query.Fields, "M_interval")
+	query.Fields = append(query.Fields, "M_startTime")
+	query.Fields = append(query.Fields, "M_expirationTime")
+	query.Fields = append(query.Fields, "M_frequency")
+	query.Fields = append(query.Fields, "M_frequencyType")
+	query.Fields = append(query.Fields, "M_offsets")
+	query.Fields = append(query.Fields, "M_iterations")
 	query.Fields = append(query.Fields, "M_keepAlive")
 
 	/** associations of ScheduledTask **/
@@ -8326,28 +8399,74 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 
 		this.parentUuid = results[0][1].(string)
 
-		/** members of ScheduledTask **/
+		/** members of Configuration **/
 
-		/** script **/
+		/** id **/
 		if results[0][2] != nil {
-			this.object.M_script = results[0][2].(string)
+			this.object.M_id = results[0][2].(string)
 		}
 
-		/** interval **/
+		/** members of ScheduledTask **/
+
+		/** isActive **/
 		if results[0][3] != nil {
-			this.object.M_interval = results[0][3].(int)
+			this.object.M_isActive = results[0][3].(bool)
+		}
+
+		/** script **/
+		if results[0][4] != nil {
+			this.object.M_script = results[0][4].(string)
+		}
+
+		/** startTime **/
+		if results[0][5] != nil {
+			this.object.M_startTime = results[0][5].(int)
+		}
+
+		/** expirationTime **/
+		if results[0][6] != nil {
+			this.object.M_expirationTime = results[0][6].(int)
+		}
+
+		/** frequency **/
+		if results[0][7] != nil {
+			this.object.M_frequency = results[0][7].(int)
+		}
+
+		/** frequencyType **/
+		if results[0][8] != nil {
+			enumIndex := results[0][8].(int)
+			if enumIndex == 0 {
+				this.object.M_frequencyType = Config.FrequencyType_ONCE
+			} else if enumIndex == 1 {
+				this.object.M_frequencyType = Config.FrequencyType_DAILY
+			} else if enumIndex == 2 {
+				this.object.M_frequencyType = Config.FrequencyType_WEEKELY
+			} else if enumIndex == 3 {
+				this.object.M_frequencyType = Config.FrequencyType_MONTHLY
+			}
+		}
+
+		/** offsets **/
+		if results[0][9] != nil {
+			this.object.M_offsets = append(this.object.M_offsets, results[0][9].([]int)...)
+		}
+
+		/** iterations **/
+		if results[0][10] != nil {
+			this.object.M_iterations = results[0][10].(int)
 		}
 
 		/** keepAlive **/
-		if results[0][4] != nil {
-			this.object.M_keepAlive = results[0][4].(bool)
+		if results[0][11] != nil {
+			this.object.M_keepAlive = results[0][11].(bool)
 		}
 
 		/** associations of ScheduledTask **/
 
 		/** parentPtr **/
-		if results[0][5] != nil {
-			id := results[0][5].(string)
+		if results[0][12] != nil {
+			id := results[0][12].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -8355,7 +8474,7 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][6].(string)
+		childsUuidStr := results[0][13].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -8364,7 +8483,7 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 			}
 		}
 
-		referencedStr := results[0][7].(string)
+		referencedStr := results[0][14].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -8398,6 +8517,7 @@ func (this *Config_ScheduledTaskEntity) DeleteEntity() {
 func ConfigScheduledTaskExists(val string) string {
 	var query EntityQuery
 	query.TypeName = "Config.ScheduledTask"
+	query.Indexs = append(query.Indexs, "M_id="+val)
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}

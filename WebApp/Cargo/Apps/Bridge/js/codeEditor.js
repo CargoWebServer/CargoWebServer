@@ -35,12 +35,15 @@ var CodeEditor = function (parent) {
     server.fileManager.attach(this, OpenEntityEvent, function (evt, codeEditor) {
         if (evt.dataMap["fileInfo"] !== undefined) {
             var file = entities[evt.dataMap["fileInfo"].UUID]
-            if (file !== undefined) {
-                if (file.M_data !== undefined && file.M_data !== "") {
-                    // Here thats mean the file was open
-                    codeEditor.appendFile(file)
-                }
+            if (file == undefined) {
+                file = evt.dataMap["fileInfo"]
             }
+
+            if (file.M_data !== undefined) {
+                // Here thats mean the file was open
+                codeEditor.appendFile(file)
+            }
+
         } else if (evt.dataMap["bpmnDiagramInfo"] !== undefined) {
             var diagram = entities[evt.dataMap["bpmnDiagramInfo"].UUID]
             if (diagram !== undefined) {
@@ -104,7 +107,7 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
             codeEditor.files[diagram.M_id] = diagram
             codeEditor.filesPanel[diagram.M_id] = filePanel
             codeEditor.setActiveFile(diagram.M_id)
-            
+
             // Now the resize element...
             codeEditor.diagram.canvas.initWorkspace = function (workspace) {
                 return function () {
@@ -120,17 +123,17 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
                         }
                     }
                 }
-            }(filePanel)
+            } (filePanel)
 
             window.addEventListener("resize", function (canvas) {
                 return function () {
                     canvas.initWorkspace()
                 }
-            }(codeEditor.diagram.canvas))
+            } (codeEditor.diagram.canvas))
 
             codeEditor.diagram.canvas.initWorkspace()
         }
-    }(this, diagram, filePanel))
+    } (this, diagram, filePanel))
 }
 
 CodeEditor.prototype.appendFile = function (file) {
@@ -171,7 +174,7 @@ CodeEditor.prototype.appendFile = function (file) {
                     codeEditor.toolbars[fileId] = []
                     codeEditor.toolbars[fileId].push(queryEditor.queryToolBar)
                 }
-            }(this, file.M_id))
+            } (this, file.M_id))
 
             // Init the query editor.
             queryEditor.init()
@@ -192,7 +195,7 @@ CodeEditor.prototype.appendFile = function (file) {
     // In case of file update...
     editor.getSession().on('change', function (fileId, fileUUID, codeEditor) {
         return function () {
-            if (!codeEditor.quiet) {
+            if (!codeEditor.quiet && entities[fileUUID] !== undefined) {
                 var editor = codeEditor.editors[fileId + "_editor"]
                 var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileId } }
                 var file = entities[fileUUID]
@@ -200,7 +203,7 @@ CodeEditor.prototype.appendFile = function (file) {
                 server.eventHandler.broadcastLocalEvent(evt)
             }
         }
-    }(file.M_id, file.UUID, this));
+    } (file.M_id, file.UUID, this));
 
     this.filesPanel[file.M_id] = filePanel
     this.setActiveFile(file.M_id)

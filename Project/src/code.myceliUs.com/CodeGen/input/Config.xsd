@@ -235,11 +235,30 @@
 		</xsd:complexContent> 
 	</xsd:complexType>
 	
-	<xsd:element name="scheduledTask" type="tScheduledTask" />
+	<xsd:simpleType name="tFrequencyType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ONCE"/>
+			<xsd:enumeration value="DAILY"/>
+			<xsd:enumeration value="WEEKELY"/>
+			<xsd:enumeration value="MONTHLY"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:element name="scheduledTask" type="tScheduledTask" substitutionGroup="configuration"/>
 	<xsd:complexType name="tScheduledTask" abstract="false">
-		<xsd:attribute name="script" type="xsd:string" />
-		<xsd:attribute name="interval" type="xsd:integer" />
-		<xsd:attribute name="keepAlive" type="xsd:boolean" />
+		<xsd:complexContent> 
+			<xsd:extension base="tConfiguration">
+				<xsd:attribute name="isActive" type="xsd:boolean" />
+				<xsd:attribute name="script" type="xsd:string" />
+				<xsd:attribute name="startTime" type="xsd:integer" />
+				<xsd:attribute name="expirationTime" type="xsd:integer" />
+				<xsd:attribute name="frequency" type="xsd:integer" />
+				<xsd:attribute name="frequencyType" type="tFrequencyType" />
+				<xsd:attribute name="offsets" minOccurs="0" maxOccurs="unbounded" type="xsd:integer" />
+				<xsd:attribute name="iterations" type="xsd:integer" />
+				<xsd:attribute name="keepAlive" type="xsd:boolean" />
+			</xsd:extension> 
+		</xsd:complexContent> 
 	</xsd:complexType>
 	
 	<xsd:element name="configurations" type="tConfigurations"/>
