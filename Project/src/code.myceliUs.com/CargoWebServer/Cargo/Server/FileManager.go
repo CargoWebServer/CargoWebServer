@@ -1233,7 +1233,6 @@ func (this *FileManager) OpenFile(fileId string, messageId string, sessionId str
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *FileManager) WriteExcelFile(filePath string, sheetName string, values [][]interface{}, messageId string, sessionId string) {
-
 	// In case of temp dir...
 	if strings.HasPrefix(filePath, "/tmp/") {
 		// Here the file must be create in the temp path.
@@ -1273,7 +1272,9 @@ func (this *FileManager) WriteExcelFile(filePath string, sheetName string, value
 						cell.SetDateTime(dateTime)
 					}
 				} else {
-					cell.SetValue(values[i][j])
+					if values[i][j] != nil {
+						cell.SetValue(values[i][j])
+					}
 				}
 			}
 		}

@@ -1813,6 +1813,9 @@ var ColumnFilter = function (index, table) {
 		}
 	} (this)
 
+	// if a function is define here it will be called after values will be filer...
+	this.filterCallback = null
+
 	// Apply the filter...
 	this.okBtn.element.onclick = function (filter) {
 		return function () {
@@ -1826,6 +1829,16 @@ var ColumnFilter = function (index, table) {
 
 			// Filter the values...
 			filter.table.filterValues()
+			if(filter.filterCallback != null){
+				// Call the filter callback.
+				var values = []
+				for(var i =0; i < filter.table.rows.length; i++){
+					if(filter.table.rows[i].div.element.style.display != "none"){
+						values.push(filter.table.model.getValueAt(i, filter.index))
+					}
+				}
+				filter.filterCallback(values)
+			}
 		}
 	} (this)
 
@@ -1865,6 +1878,13 @@ var ColumnFilter = function (index, table) {
 	} (this)
 
 	return this
+}
+
+/**
+ * Determine if the fileter id activated or not.
+ */
+ColumnFilter.prototype.isActive = function(){
+	return this.filterIcon.element.className.indexOf("filter-applied") != -1
 }
 
 /**
