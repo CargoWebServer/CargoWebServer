@@ -412,26 +412,6 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                         }, actionsDiv)
                 } else if (content.TYPENAME == "Config.ScheduledTask") {
                     // Here I will personalise input a little.
-                    content.panel.controls["Config.ScheduledTask_M_startTime"].element.type = "datetime-local"
-                    content.panel.controls["Config.ScheduledTask_M_startTime"].element.onchange = function (entity) {
-                        return function () {
-                            entity.M_startTime = new Date(this.value).getTime() / 1000
-                        }
-                    }(content.panel.entity)
-                    if (content.panel.entity.M_startTime > 0) {
-                        content.panel.controls["Config.ScheduledTask_M_startTime"].element.valueAsNumber = content.panel.entity.M_startTime * 1000
-                    }
-
-                    content.panel.controls["Config.ScheduledTask_M_expirationTime"].element.type = "datetime-local"
-
-                    content.panel.controls["Config.ScheduledTask_M_expirationTime"].element.onchange = function (entity) {
-                        return function () {
-                            entity.M_expirationTime = new Date(this.value).getTime() / 1000
-                        }
-                    }(content.panel.entity)
-                    if (content.panel.entity.M_expirationTime > 0) {
-                        content.panel.controls["Config.ScheduledTask_M_expirationTime"].element.valueAsNumber = content.panel.entity.M_expirationTime * 1000
-                    }
                     content.panel.controls["Config.ScheduledTask_M_frequency"].element.title = "The task must be execute n time per frequency type (once, daily, weekely, or mouthly). *Is ignore if frenquencyType is ONCE."
 
                     // The script button must be hidden...

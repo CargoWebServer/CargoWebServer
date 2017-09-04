@@ -250,12 +250,11 @@
 			<xsd:extension base="tConfiguration">
 				<xsd:attribute name="isActive" type="xsd:boolean" />
 				<xsd:attribute name="script" type="xsd:string" />
-				<xsd:attribute name="startTime" type="xsd:integer" />
-				<xsd:attribute name="expirationTime" type="xsd:integer" />
+				<xsd:attribute name="startTime" type="xsd:time" />
+				<xsd:attribute name="expirationTime" type="xsd:time" />
 				<xsd:attribute name="frequency" type="xsd:integer" />
 				<xsd:attribute name="frequencyType" type="tFrequencyType" />
 				<xsd:attribute name="offsets" minOccurs="0" maxOccurs="unbounded" type="xsd:integer" />
-				<xsd:attribute name="iterations" type="xsd:integer" />
 				<xsd:attribute name="keepAlive" type="xsd:boolean" />
 			</xsd:extension> 
 		</xsd:complexContent> 

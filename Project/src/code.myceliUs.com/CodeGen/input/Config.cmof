@@ -343,11 +343,11 @@
       </ownedAttribute>
 	
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="startTime" name="startTime">
-        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+        <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#time"/>
       </ownedAttribute>
 	
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="expirationTime" name="expirationTime">
-        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
+        <type xmi:type="cmof:PrimitiveType" href="http://www.w3.org/2001/XMLSchema#time"/>
       </ownedAttribute>
 	  
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="frequency" name="frequency">
@@ -359,10 +359,6 @@
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
       </ownedAttribute>
 
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="iterations" name="iterations">
-        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
-      </ownedAttribute>
-	
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="keepAlive" name="keepAlive">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
       </ownedAttribute>

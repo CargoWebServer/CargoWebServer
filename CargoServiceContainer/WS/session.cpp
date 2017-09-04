@@ -39,7 +39,8 @@ void Session::run()
 
 void Session::sendMessage(com::mycelius::message::Message *msg){
     // Send messsage back.
-    this->socket->sendBinaryMessage(serializeToByteArray(msg));
+    QByteArray data =  serializeToByteArray(msg);
+    this->socket->sendBinaryMessage(data);
 }
 
 void Session::processBinaryMessage(QByteArray data)

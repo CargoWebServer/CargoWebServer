@@ -547,16 +547,17 @@ EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType
 			control = appendSelect(restrictions, id, valueDiv)
 		}
 	} else {
-
 		if (isXsId(fieldType)) {
 			control = valueDiv.appendElement({ "tag": "input", "id": id }).down()
 		} else if (isXsRef(fieldType)) {
 			// Reference here... autocomplete...
 			control = valueDiv.appendElement({ "tag": "input", "id": id }).down()
-		} else if (isXsInt(fieldType) || isXsTime(fieldType)) {
+		} else if (isXsInt(fieldType)) {
 			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "1", "id": id }).down()
 		} else if (isXsDate(fieldType)) {
 			control = valueDiv.appendElement({ "tag": "input", "type": "date", "id": id }).down()
+		} else if (isXsTime(fieldType)) {
+			control = valueDiv.appendElement({ "tag": "input", "type": "datetime-local", "id": id }).down()
 		} else if (isXsString(fieldType)) {
 			if (field == "M_description") {
 				valueDiv.element.style.verticalAlign = "top"
@@ -571,8 +572,6 @@ EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType
 
 		} else if (isXsBoolean(fieldType)) {
 			control = valueDiv.appendElement({ "tag": "input", "type": "checkbox", "id": id }).down()
-		} else if (isXsTime(fieldType)) {
-
 		} else if (isXsNumeric(fieldType)) {
 			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "0.01", "id": id }).down()
 		} else if (isXsMoney(fieldType)) {
@@ -852,12 +851,18 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							entity[attribute] = parseFloat(this.value)
 							entity.NeedSave = true
 						}
-					} else if (isXsInt(fieldType) || isXsTime(fieldType)) {
+					} else if (isXsInt(fieldType)) {
 						if (entity[attribute] != parseInt(this.value)) {
 							entity[attribute] = parseInt(this.value)
 							entity.NeedSave = true
 						}
-					} else if (isXsBoolean(fieldType)) {
+					} else if (isXsTime(fieldType)) {
+						var value = moment(this.value).unix()
+						if (entity[attribute] != value) {
+							entity[attribute] = value
+							entity.NeedSave = true
+						}
+					}else if (isXsBoolean(fieldType)) {
 						if (entity[attribute] != this.checked) {
 							entity[attribute] = this.checked
 							entity.NeedSave = true
@@ -1225,7 +1230,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 			} else {
 				control.element.value = ""
 			}
-		} else if (isXsInt(fieldType) || isXsTime(fieldType)) {
+		} else if (isXsInt(fieldType)) {
 			if (value != "") {
 				control.element.value = parseInt(value)
 			} else {
@@ -1236,6 +1241,12 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 		} else if (isXsDate(fieldType)) {
 			if (value != "") {
 				control.element.value = moment(value).format('YYYY-MM-DD');
+			} else {
+				control.element.value = ""
+			}
+		} else if (isXsTime(fieldType)) {
+			if (value != "") {
+				control.element.value = moment.unix(value).format("YYYY-MM-DDThh:mm:ss")
 			} else {
 				control.element.value = ""
 			}

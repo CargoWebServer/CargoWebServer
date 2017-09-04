@@ -90,7 +90,7 @@ var CodeEditor = function (parent) {
         if (evt.dataMap.entity !== undefined) {
             var file = evt.dataMap["entity"]
             var editor = codeEditor.editors[file.M_id + "_editor"]
-            if (editor !== undefined) {
+            if (editor !== undefined && file.TYPENAME == "CargoEntities.File") {
                 // Supend the change event propagation
                 codeEditor.quiet = true
                 var position = editor.getCursorPosition()

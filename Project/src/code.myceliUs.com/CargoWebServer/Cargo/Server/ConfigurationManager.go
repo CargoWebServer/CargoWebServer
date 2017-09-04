@@ -4,7 +4,9 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
@@ -153,6 +155,26 @@ func (this *ConfigurationManager) initialize() {
 		activeConfigurations.M_serverConfig.M_hostName = "localhost"
 		activeConfigurations.M_serverConfig.M_ipv4 = "127.0.0.1"
 
+		// Here I will create the C++ service container TCP | WS
+		this.setServiceConfiguration("CargoServiceContainer_TCP", activeConfigurations.M_serverConfig.M_ws_serviceContainerPort)
+		this.setServiceConfiguration("CargoServiceContainer_WS", activeConfigurations.M_serverConfig.M_ws_serviceContainerPort)
+
+		// Scrpit to start the service container.
+		tcpServiceContainerStart := new(Config.ScheduledTask)
+		tcpServiceContainerStart.M_keepAlive = true
+		tcpServiceContainerStart.M_isActive = true
+		tcpServiceContainerStart.M_frequencyType = Config.FrequencyType_MONTHLY
+		tcpServiceContainerStart.M_frequency = 1
+		tcpServiceContainerStart.M_startTime = time.Now().Unix()
+		tcpServiceContainerStart.M_id = "tcpServiceContainerStart"
+		tcpServiceContainerStart.M_script = "tcpServiceContainerStart"
+
+		// Here the script can be an id to another file or a string.
+		tcpServiceContainerStart.M_script = "tcpServiceContainerStart"
+
+		// Append the newly create account into the cargo entities
+		activeConfigurations.M_scheduledTasks = append(activeConfigurations.M_scheduledTasks, tcpServiceContainerStart)
+
 		// Server folders...
 		activeConfigurations.M_serverConfig.M_applicationsPath = "/Apps"
 		os.MkdirAll(this.GetApplicationDirectoryPath(), 0777)
@@ -189,6 +211,19 @@ func (this *ConfigurationManager) getId() string {
 func (this *ConfigurationManager) start() {
 	log.Println("--> Start ConfigurationManager")
 
+	// First of all i will start task...
+	for i := 0; i < len(this.m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
+
+		task := this.m_activeConfigurationsEntity.object.M_scheduledTasks[i]
+		if task.M_id == "tcpServiceContainerStart" {
+			// In that case I will create the script file if is not already exist.
+			if len(CargoEntitiesFileExists("tcpServiceContainerStart")) == 0 {
+				GetServer().GetFileManager().createDbFile("tcpServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", `server.StartCmd("CargoServiceContainer_TCP", ["`+strconv.Itoa(this.GetTcpConfigurationServicePort())+`"])`)
+			}
+		}
+		this.scheduleTask(task)
+	}
+
 	// Set services configurations...
 	for i := 0; i < len(this.m_servicesConfiguration); i++ {
 		serviceUuid := ConfigServiceConfigurationExists(this.m_servicesConfiguration[i].GetId())
@@ -213,6 +248,81 @@ func (this *ConfigurationManager) start() {
 
 func (this *ConfigurationManager) stop() {
 	log.Println("--> Stop ConfigurationManager")
+}
+
+/**
+ * That function is use to schedule a task.
+ */
+func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
+	// first of all I will test if the task is active.
+	if task.IsActive() == false {
+		return // Nothing to do here.
+	}
+
+	// If the task is expired
+	if task.M_expirationTime > 0 {
+		if task.M_expirationTime < time.Now().Unix() {
+			// The task has expire!
+			task.SetIsActive(false)
+			return
+		}
+	}
+
+	startTime := time.Unix(task.M_startTime, 0)
+
+	// Now I will get the next time when the task must be executed.
+	nextTime := startTime
+	var previous time.Time
+
+	for nextTime.Sub(time.Now()) < 0 {
+		previous = nextTime
+		// I will append
+		if task.GetFrequencyType() == Config.FrequencyType_DAILY {
+			nextTime = nextTime.AddDate(0, 0, task.GetFrequency())
+		} else if task.GetFrequencyType() == Config.FrequencyType_WEEKELY {
+			nextTime = nextTime.AddDate(0, 0, 7*task.GetFrequency())
+		} else if task.GetFrequencyType() == Config.FrequencyType_MONTHLY {
+			nextTime = nextTime.AddDate(0, task.GetFrequency(), 0)
+		}
+	}
+
+	// Here I will test if the previous time combine with offset value can
+	// be use as nextTime.
+	for i := 0; i < len(task.M_offsets); i++ {
+		if task.GetFrequencyType() == Config.FrequencyType_WEEKELY || task.GetFrequencyType() == Config.FrequencyType_MONTHLY {
+			nextTime_ := previous.AddDate(0, 0, task.M_offsets[i])
+			if nextTime_.Sub(time.Now()) < 0 {
+				nextTime = nextTime_
+				break
+			}
+		} else if task.GetFrequencyType() == Config.FrequencyType_DAILY {
+			// Here the offset represent hours and not days.
+			nextTime_ := previous.Add(time.Hour * time.Duration(task.M_offsets[i]))
+			if nextTime_.Sub(time.Now()) < 0 {
+				nextTime = nextTime_
+				break
+			}
+		}
+	}
+
+	var delay time.Duration
+	if task.M_startTime > 0 {
+		delay := nextTime.Sub(time.Now())
+	}
+
+	// Here I will set the timer...
+	go func(delay time.Duration, task *Config.ScheduledTask) {
+		log.Println("-----> task scheduled in ", delay.Seconds())
+		// Here I will set the timer...
+		timer := time.NewTimer(delay)
+
+		<-timer.C
+		log.Println("-----------> time to run the task!")
+		// So here I will re-schedule the task, it will not be schedule if is it
+		// expired or it must run once.
+		GetServer().GetConfigurationManager().scheduleTask(task)
+	}(delay, task)
+
 }
 
 /**

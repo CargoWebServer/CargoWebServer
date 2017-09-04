@@ -18,6 +18,9 @@ import (
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/Utility"
 	//"github.com/skratchdot/open-golang/open"
+	"os/exec"
+	"runtime"
+
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"github.com/robertkrimen/otto"
 )
@@ -43,6 +46,9 @@ type Server struct {
 
 	// That map contain Javascript connection object.
 	subConnections map[string]otto.Value
+
+	// Contain the list of active command.
+	cmds []*exec.Cmd
 }
 
 /**
@@ -628,7 +634,6 @@ func (this *Server) Start() {
 				return func(rspMsg *message, caller interface{}) {
 					src := string(rspMsg.msg.Rsp.Results[0].DataBytes)
 					JS.GetJsRuntimeManager().AppendScript(src)
-					log.Println(src)
 					// Call on open...
 					conn.Object().Call("onopen", service, caller)
 				}
@@ -669,6 +674,13 @@ func (this *Server) Stop() {
 
 	// must be call last
 	this.GetServiceManager().stop()
+
+	//
+	for i := 0; i < len(this.cmds); i++ {
+		if this.cmds[i].Process != nil {
+			this.cmds[i].Process.Kill()
+		}
+	}
 
 	log.Println("Bye Bye :-)")
 
@@ -772,4 +784,72 @@ func (this *Server) GetLoggerById(id string) *Logger {
 
 func (this *Server) GetDefaultErrorLogger() *Logger {
 	return this.loggers["defaultErrorLogger"]
+}
+
+/////////////////////////////////////////////////////////
+// Call cmd from server.
+/////////////////////////////////////////////////////////
+
+// Run starts the specified command and waits for it to complete.
+// @param {string} name The name of the command to run.
+// @param {[]string} The list of command arguments.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (server *Server) RunCmd(name string, args []string) error {
+	// The first step will be to start the service manager.
+	path := server.GetConfigurationManager().GetBinPath() + "/" + name
+	if runtime.GOOS == "windows" {
+		path += ".exe"
+	}
+
+	// Set the command
+	cmd := exec.Command(path)
+	cmd.Args = append(cmd.Args, args...)
+
+	// Call it...
+	err := cmd.Run()
+	if err != nil {
+		log.Println("---> fail to start the service container!")
+		return err
+	}
+
+	// the command succed here.
+	server.cmds = append(server.cmds, cmd)
+
+	return nil
+}
+
+// Start starts the specified command but does not wait for it to complete.
+// @param {string} name The name of the command to run.
+// @param {[]string} The list of command arguments.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (server *Server) StartCmd(name string, args []string) error {
+	// The first step will be to start the service manager.
+	path := server.GetConfigurationManager().GetBinPath() + "/" + name
+	if runtime.GOOS == "windows" {
+		path += ".exe"
+	}
+
+	// Set the command
+	cmd := exec.Command(path)
+	cmd.Args = append(cmd.Args, args...)
+
+	// Call it...
+	err := cmd.Start()
+	if err != nil {
+		log.Println("---> fail to start the service container!")
+		return err
+	}
+
+	// the command succed here.
+	server.cmds = append(server.cmds, cmd)
+
+	return nil
 }

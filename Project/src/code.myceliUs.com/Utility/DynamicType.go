@@ -139,7 +139,6 @@ func MakeInstance(typeName string, data map[string]interface{}) reflect.Value {
  * Intialyse the struct fields with the values contain in the map.
  */
 func initializeStructureValue(typeName string, data map[string]interface{}) reflect.Value {
-	log.Println(typeName, data)
 	// Here I will create the value...
 	t := typeRegistry[typeName]
 	if t == nil {

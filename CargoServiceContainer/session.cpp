@@ -42,7 +42,6 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
             ::com::mycelius::message::Data param = *it;
             QVariant var;
             if(param.type() == ::com::mycelius::message::Data_DataType_DOUBLE){
-                qDebug() << "45 ------> " << param.databytes().c_str();
                 var = QVariant(param.databytes().c_str()).toFloat();
                 action->appendParam(QString::fromStdString(param.name()), var, "double");
             }else if(param.type() == ::com::mycelius::message::Data_DataType_INTEGER){
@@ -158,7 +157,6 @@ void Session::completeProcessMessageData(com::mycelius::message::Message * msg){
         qDebug() << "message send directly!" << QString::fromStdString(messageId.toStdString());
         this->sendMessage(msg);
     }else{
-        qDebug() << "message chunk!" << QString::fromStdString(messageId.toStdString());
         QByteArray messageData = serializeToByteArray(msg);
 
         int count = int(double(msg->ByteSize() / Session::MAX_MESSAGE_SIZE));

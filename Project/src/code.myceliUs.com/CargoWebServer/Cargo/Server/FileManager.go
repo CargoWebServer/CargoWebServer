@@ -764,6 +764,23 @@ func (this *FileManager) createThumbnail(file *os.File, thumbnailMaxHeight int, 
 	return thumbnail
 }
 
+func (this *FileManager) createDbFile(id string, name string, mimeType string, data string) *CargoEntities.File {
+	dbFile := new(CargoEntities.File)
+	dbFile.M_fileType = CargoEntities.FileType_DbFile
+	dbFile.M_data = base64.StdEncoding.EncodeToString([]byte(data))
+	dbFile.M_isDir = false
+	dbFile.TYPENAME = "CargoEntities.File"
+	dbFile.M_id = id
+	dbFile.M_name = name
+	dbFile.M_mime = mimeType
+	entities := GetServer().GetEntityManager().getCargoEntities()
+
+	// Create the file.
+	GetServer().GetEntityManager().createEntity(entities.GetUuid(), "M_entities", "CargoEntities.File", id, dbFile)
+
+	return dbFile
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // API
 ////////////////////////////////////////////////////////////////////////////////

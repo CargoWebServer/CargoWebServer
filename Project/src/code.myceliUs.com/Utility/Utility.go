@@ -69,7 +69,7 @@ func PrettyPrint(b []byte) ([]byte, error) {
 //              			Utility function...
 ////////////////////////////////////////////////////////////////////////////////
 func MakeTimestamp() int64 {
-	return time.Now().UnixNano() / int64(time.Millisecond)
+	return time.Now().Unix()
 }
 
 func BytesToString(b []byte) string {
@@ -280,7 +280,7 @@ func GetChecksum(values interface{}) string {
 		}
 	} else {
 		// here the value must be a single value...
-		checksum += reflect.ValueOf(values).String()
+		checksum += ToString(values)
 	}
 
 	//log.Println(checksum)
@@ -908,6 +908,8 @@ func ToString(value interface{}) string {
 		str += strconv.FormatFloat(float64(value.(float32)), 'f', -1, 32)
 	} else if reflect.TypeOf(value).Kind() == reflect.Float64 {
 		str += strconv.FormatFloat(value.(float64), 'f', -1, 64)
+	} else if reflect.TypeOf(value).Kind() == reflect.Bool {
+		str += strconv.FormatBool(value.(bool))
 	} else {
 		log.Panicln("Value with type:", reflect.TypeOf(value).String(), "cannot be convert to string")
 	}

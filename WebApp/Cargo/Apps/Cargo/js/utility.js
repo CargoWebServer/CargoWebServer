@@ -39,18 +39,18 @@ function fireResize() {
     }
 };
 
-Array.prototype.removeDuplicates = function (){
-  var temp=new Array();
-  label:for(i=0;i<this.length;i++){
-        for(var j=0; j<temp.length;j++ ){//check duplicates
-            if(temp[j]==this[i])//skip if already present 
-               continue label;      
+Array.prototype.removeDuplicates = function () {
+    var temp = new Array();
+    label: for (i = 0; i < this.length; i++) {
+        for (var j = 0; j < temp.length; j++) {//check duplicates
+            if (temp[j] == this[i])//skip if already present 
+                continue label;
         }
         temp[temp.length] = this[i];
-  }
-  return temp;
- } 
- 
+    }
+    return temp;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 //  Validation functions helpers
 ////////////////////////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ function isXsBaseType(fieldType) {
  * Helper function use to dertermine if a XS type must be considere integer.
  */
 function isXsInt(fieldType) {
-    if (fieldType.endsWith("byte")|| fieldType.endsWith("long") || fieldType.endsWith("int") || fieldType.endsWith("integer") || fieldType.endsWith("short")  // XML
+    if (fieldType.endsWith("byte") || fieldType.endsWith("long") || fieldType.endsWith("int") || fieldType.endsWith("integer") || fieldType.endsWith("short")  // XML
         || fieldType.endsWith("unsignedInt") || fieldType.endsWith("unsignedBtype") || fieldType.endsWith("unsignedShort") || fieldType.endsWith("unsignedLong")  // XML
         || fieldType.endsWith("negativeInteger") || fieldType.endsWith("nonNegativeInteger") || fieldType.endsWith("nonPositiveInteger") || fieldType.endsWith("positiveInteger") // XML
         || fieldType.endsWith("tinyint") || fieldType.endsWith("smallint") || fieldType.endsWith("bigint"))// SQL
@@ -359,7 +359,7 @@ function randomUUID() {
 /**
  * Deterministic value from a given value.
  */
-function generateUUID(value){
+function generateUUID(value) {
     uuid = new UUID(3, "ns:URL", value);
     return uuid.toString()
 }
@@ -681,11 +681,12 @@ var Base64 = {
 
 
     decode: function (input) {
+
         var output = "";
         var chr1, chr2, chr3;
         var enc1, enc2, enc3, enc4;
         var i = 0;
-
+        
         input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
 
         while (i < input.length) {
@@ -1500,7 +1501,7 @@ function localToGlobal(target) {
 function hasUserMedia() {
     return !!(navigator.getUserMedia || navigator.webkitGetUserMedia
         || navigator.mozGetUserMedia || navigator.msGetUserMedia);
-} 
+}
 
 /**
  * Export list of rows to csv file.
@@ -1508,42 +1509,42 @@ function hasUserMedia() {
  * @param rows A 2D array of values.
  */
 function exportToCsv(filename, rows) {
-        var processRow = function (row) {
-            var finalVal = '';
-            for (var j = 0; j < row.length; j++) {
-                var innerValue = row[j] === null ? '' : row[j].toString();
-                if (row[j] instanceof Date) {
-                    innerValue = row[j].toLocaleString();
-                };
-                var result = innerValue.replace(/"/g, '""');
-                if (result.search(/("|,|\n)/g) >= 0)
-                    result = '"' + result + '"';
-                if (j > 0)
-                    finalVal += ',';
-                finalVal += result;
-            }
-            return finalVal + '\n';
-        };
-
-        var csvFile = '';
-        for (var i = 0; i < rows.length; i++) {
-            csvFile += processRow(rows[i]);
+    var processRow = function (row) {
+        var finalVal = '';
+        for (var j = 0; j < row.length; j++) {
+            var innerValue = row[j] === null ? '' : row[j].toString();
+            if (row[j] instanceof Date) {
+                innerValue = row[j].toLocaleString();
+            };
+            var result = innerValue.replace(/"/g, '""');
+            if (result.search(/("|,|\n)/g) >= 0)
+                result = '"' + result + '"';
+            if (j > 0)
+                finalVal += ',';
+            finalVal += result;
         }
+        return finalVal + '\n';
+    };
 
-        var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
-        if (navigator.msSaveBlob) { // IE 10+
-            navigator.msSaveBlob(blob, filename);
-        } else {
-            var link = document.createElement("a");
-            if (link.download !== undefined) { // feature detection
-                // Browsers that support HTML5 download attribute
-                var url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute("download", filename);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
+    var csvFile = '';
+    for (var i = 0; i < rows.length; i++) {
+        csvFile += processRow(rows[i]);
+    }
+
+    var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+    if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, filename);
+    } else {
+        var link = document.createElement("a");
+        if (link.download !== undefined) { // feature detection
+            // Browsers that support HTML5 download attribute
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     }
+}

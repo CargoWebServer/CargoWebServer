@@ -3,8 +3,8 @@
  */
 function TestMessageContainer(count) {
 	// New service object
-	service = new Server("localhost", "127.0.0.1", 9595)
-	//service = new Server("localhost", "ws:127.0.0.1", 9494)
+	//service = new Server("localhost", "127.0.0.1", 9595)
+	service = new Server("localhost", "ws:127.0.0.1", 9494)
 
 	// Initialyse the server connection.
 	service.init(

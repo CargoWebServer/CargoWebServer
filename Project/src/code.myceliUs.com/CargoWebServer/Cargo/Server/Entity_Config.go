@@ -4,7 +4,6 @@ package Server
 
 import (
 	"encoding/json"
-	//	"log"
 	"strings"
 	"unsafe"
 
@@ -18,14 +17,14 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ScheduledTask")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "UUID")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "UUID")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -863,7 +862,6 @@ func (this *EntityManager) NewConfigDataStoreConfigurationEntity(parentUuid stri
 		if val, ok := this.contain(uuidStr); ok {
 			if object != nil {
 				this.setObjectValues(val, object)
-
 				uuidStr = object.(*Config.DataStoreConfiguration).UUID
 			}
 			return val.(*Config_DataStoreConfigurationEntity)
@@ -1177,6 +1175,7 @@ func (this *EntityManager) create_Config_DataStoreConfigurationEntityPrototype()
 
 /** Create **/
 func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
+
 	if this.object.NeedSave == false {
 		return
 	}
@@ -1311,13 +1310,13 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.object.M_port)
 
 	/** associations of DataStoreConfiguration **/
-
 	/** Save parent type Configurations **/
 	if this.object.GetParentPtr() != nil {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.object.GetParentPtr().GetUUID())
 	} else {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, "")
 	}
+
 	childsUuidStr, _ := json.Marshal(this.childsUuid)
 	DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, string(childsUuidStr))
 	referencedStr, _ := json.Marshal(this.referenced)
@@ -8182,11 +8181,11 @@ func (this *EntityManager) create_Config_ScheduledTaskEntityPrototype() {
 	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 5)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_startTime")
-	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.int")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.time")
 	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 6)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_expirationTime")
-	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.int")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.time")
 	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 7)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_frequency")
@@ -8201,26 +8200,22 @@ func (this *EntityManager) create_Config_ScheduledTaskEntityPrototype() {
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "[]xs.int")
 	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 10)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
-	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_iterations")
-	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.int")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 11)
-	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_keepAlive")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.boolean")
 
 	/** associations of ScheduledTask **/
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 12)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 11)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_parentPtr")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "Config.Configurations:Ref")
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "childsUuid")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "[]xs.string")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 13)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 12)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
 
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "referenced")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "[]EntityRef")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 14)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 13)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
 
 	store := GetServer().GetDataManager().getDataStore(ConfigDB).(*KeyValueDataStore)
@@ -8256,7 +8251,6 @@ func (this *Config_ScheduledTaskEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_frequency")
 	query.Fields = append(query.Fields, "M_frequencyType")
 	query.Fields = append(query.Fields, "M_offsets")
-	query.Fields = append(query.Fields, "M_iterations")
 	query.Fields = append(query.Fields, "M_keepAlive")
 
 	/** associations of ScheduledTask **/
@@ -8296,7 +8290,6 @@ func (this *Config_ScheduledTaskEntity) SaveEntity() {
 		ScheduledTaskInfo = append(ScheduledTaskInfo, 0)
 	}
 	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_offsets)
-	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_iterations)
 	ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_keepAlive)
 
 	/** associations of ScheduledTask **/
@@ -8369,7 +8362,6 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 	query.Fields = append(query.Fields, "M_frequency")
 	query.Fields = append(query.Fields, "M_frequencyType")
 	query.Fields = append(query.Fields, "M_offsets")
-	query.Fields = append(query.Fields, "M_iterations")
 	query.Fields = append(query.Fields, "M_keepAlive")
 
 	/** associations of ScheduledTask **/
@@ -8420,12 +8412,12 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 
 		/** startTime **/
 		if results[0][5] != nil {
-			this.object.M_startTime = results[0][5].(int)
+			this.object.M_startTime = results[0][5].(int64)
 		}
 
 		/** expirationTime **/
 		if results[0][6] != nil {
-			this.object.M_expirationTime = results[0][6].(int)
+			this.object.M_expirationTime = results[0][6].(int64)
 		}
 
 		/** frequency **/
@@ -8452,21 +8444,16 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 			this.object.M_offsets = append(this.object.M_offsets, results[0][9].([]int)...)
 		}
 
-		/** iterations **/
-		if results[0][10] != nil {
-			this.object.M_iterations = results[0][10].(int)
-		}
-
 		/** keepAlive **/
-		if results[0][11] != nil {
-			this.object.M_keepAlive = results[0][11].(bool)
+		if results[0][10] != nil {
+			this.object.M_keepAlive = results[0][10].(bool)
 		}
 
 		/** associations of ScheduledTask **/
 
 		/** parentPtr **/
-		if results[0][12] != nil {
-			id := results[0][12].(string)
+		if results[0][11] != nil {
+			id := results[0][11].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -8474,7 +8461,7 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][13].(string)
+		childsUuidStr := results[0][12].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -8483,7 +8470,7 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 			}
 		}
 
-		referencedStr := results[0][14].(string)
+		referencedStr := results[0][13].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)

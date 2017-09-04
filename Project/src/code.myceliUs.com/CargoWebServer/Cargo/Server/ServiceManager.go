@@ -7,9 +7,7 @@ import (
 	"go/parser"
 	"go/token"
 	"log"
-	"os/exec"
 	"reflect"
-	"runtime"
 	"strconv"
 	"strings"
 
@@ -20,11 +18,10 @@ import (
 
 type ServiceManager struct {
 	// info about connection on smtp server...
-	m_services             map[string]Service
-	m_servicesLst          []Service
-	m_serviceContainerCmds []*exec.Cmd
-	m_serviceClientSrc     map[string]string
-	m_serviceServerSrc     map[string]string
+	m_services         map[string]Service
+	m_servicesLst      []Service
+	m_serviceClientSrc map[string]string
+	m_serviceServerSrc map[string]string
 
 	// Keep list of action by services.
 	m_serviceAction map[string][]*CargoEntities.Action
@@ -75,43 +72,10 @@ func (this *ServiceManager) initialize() {
 		this.m_servicesLst[i].initialize()
 	}
 
-	// TCP
-	this.startServiceContainer("CargoServiceContainer_TCP", GetServer().GetConfigurationManager().GetTcpConfigurationServicePort())
-
-	// WS
-	this.startServiceContainer("CargoServiceContainer_WS", GetServer().GetConfigurationManager().GetWsConfigurationServicePort())
-
 }
 
 func (this *ServiceManager) getId() string {
 	return "ServiceManager"
-}
-
-func (this *ServiceManager) startServiceContainer(name string, port int) error {
-	// The first step will be to start the service manager.
-	serviceContainerPath := GetServer().GetConfigurationManager().GetBinPath() + "/" + name
-	if runtime.GOOS == "windows" {
-		serviceContainerPath += ".exe"
-	}
-
-	// Set the command
-	cmd := exec.Command(serviceContainerPath)
-	cmd.Args = append(cmd.Args, strconv.Itoa(port))
-
-	// Call it...
-	err := cmd.Start()
-	if err != nil {
-		log.Println("---> fail to start the service container!")
-		return err
-	}
-
-	// the command succed here.
-	serviceManager.m_serviceContainerCmds = append(serviceManager.m_serviceContainerCmds, cmd)
-
-	// Set the service container port.
-	GetServer().GetConfigurationManager().setServiceConfiguration(name, port)
-
-	return nil
 }
 
 func (this *ServiceManager) start() {
@@ -142,6 +106,7 @@ func (this *ServiceManager) start() {
 	}
 
 	// Now I will register actions for services container.
+	// Container are started by the configuration manager, here at line 103.
 	activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations)
 	for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
 		config := activeConfigurations.GetServiceConfigs()[i]
@@ -159,12 +124,6 @@ func (this *ServiceManager) stop() {
 		service.stop()
 	}
 
-	// Stop the services containers...
-	for i := 0; i < len(serviceManager.m_serviceContainerCmds); i++ {
-		if serviceManager.m_serviceContainerCmds[i].Process != nil {
-			serviceManager.m_serviceContainerCmds[i].Process.Kill()
-		}
-	}
 }
 
 /**

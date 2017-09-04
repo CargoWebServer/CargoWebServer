@@ -26,12 +26,11 @@ type ScheduledTask struct {
 	/** members of ScheduledTask **/
 	M_isActive       bool
 	M_script         string
-	M_startTime      int
-	M_expirationTime int
+	M_startTime      int64
+	M_expirationTime int64
 	M_frequency      int
 	M_frequencyType  FrequencyType
 	M_offsets        []int
-	M_iterations     int
 	M_keepAlive      bool
 
 	/** Associations **/
@@ -48,12 +47,11 @@ type XsdScheduledTask struct {
 
 	M_isActive       bool   `xml:"isActive,attr"`
 	M_script         string `xml:"script,attr"`
-	M_startTime      int    `xml:"startTime,attr"`
-	M_expirationTime int    `xml:"expirationTime,attr"`
+	M_startTime      int64  `xml:"startTime,attr"`
+	M_expirationTime int64  `xml:"expirationTime,attr"`
 	M_frequency      int    `xml:"frequency,attr"`
 	M_frequencyType  string `xml:"frequencyType,attr"`
 	M_offsets        []int  `xml:"offsets,attr"`
-	M_iterations     int    `xml:"iterations,attr"`
 	M_keepAlive      bool   `xml:"keepAlive,attr"`
 }
 
@@ -102,27 +100,27 @@ func (this *ScheduledTask) SetScript(ref interface{}) {
 /** Remove reference Script **/
 
 /** StartTime **/
-func (this *ScheduledTask) GetStartTime() int {
+func (this *ScheduledTask) GetStartTime() int64 {
 	return this.M_startTime
 }
 
 /** Init reference StartTime **/
 func (this *ScheduledTask) SetStartTime(ref interface{}) {
 	this.NeedSave = true
-	this.M_startTime = ref.(int)
+	this.M_startTime = ref.(int64)
 }
 
 /** Remove reference StartTime **/
 
 /** ExpirationTime **/
-func (this *ScheduledTask) GetExpirationTime() int {
+func (this *ScheduledTask) GetExpirationTime() int64 {
 	return this.M_expirationTime
 }
 
 /** Init reference ExpirationTime **/
 func (this *ScheduledTask) SetExpirationTime(ref interface{}) {
 	this.NeedSave = true
-	this.M_expirationTime = ref.(int)
+	this.M_expirationTime = ref.(int64)
 }
 
 /** Remove reference ExpirationTime **/
@@ -178,19 +176,6 @@ func (this *ScheduledTask) SetOffsets(ref interface{}) {
 }
 
 /** Remove reference Offsets **/
-
-/** Iterations **/
-func (this *ScheduledTask) GetIterations() int {
-	return this.M_iterations
-}
-
-/** Init reference Iterations **/
-func (this *ScheduledTask) SetIterations(ref interface{}) {
-	this.NeedSave = true
-	this.M_iterations = ref.(int)
-}
-
-/** Remove reference Iterations **/
 
 /** KeepAlive **/
 func (this *ScheduledTask) GetKeepAlive() bool {

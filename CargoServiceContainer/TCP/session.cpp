@@ -25,6 +25,7 @@ void Session::run()
     {
         // something's wrong, we just emit a signal
         emit error(socket->error());
+        qDebug() << "error encounter! session.cpp ln 28";
         return;
     }
 
@@ -51,10 +52,8 @@ void Session::run()
 
 void Session::sendMessage(com::mycelius::message::Message *msg){
     QByteArray data =  serializeToByteArray(msg);
-    qDebug()<< "Message send "<< QString::fromStdString(msg->id()) << " size " << data.length();
     this->socket->write(data);
     this->socket->waitForBytesWritten();
-    qDebug() << "Message " <<  QString::fromStdString(msg->id()) << " was sent successfully!";
 }
 
 void Session::readyRead()
@@ -72,7 +71,6 @@ void Session::readyRead()
         }
         com::mycelius::message::Message msg;
         msg.ParseFromArray(buffer, buffer.size());
-        qDebug() << "message received!" << QString::fromStdString(msg.id());
         if(msg.id().length() > 0){
             this->processIncommingMessage(msg);
         }
