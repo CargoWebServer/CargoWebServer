@@ -809,15 +809,15 @@ func (server *Server) RunCmd(name string, args []string) error {
 	cmd := exec.Command(path)
 	cmd.Args = append(cmd.Args, args...)
 
+	// the command succed here.
+	server.cmds = append(server.cmds, cmd)
+
 	// Call it...
 	err := cmd.Run()
 	if err != nil {
 		log.Println("---> fail to start the service container!")
 		return err
 	}
-
-	// the command succed here.
-	server.cmds = append(server.cmds, cmd)
 
 	return nil
 }
@@ -841,6 +841,9 @@ func (server *Server) StartCmd(name string, args []string) error {
 	cmd := exec.Command(path)
 	cmd.Args = append(cmd.Args, args...)
 
+	// the command succed here.
+	server.cmds = append(server.cmds, cmd)
+
 	// Call it...
 	err := cmd.Start()
 	if err != nil {
@@ -848,9 +851,6 @@ func (server *Server) StartCmd(name string, args []string) error {
 		log.Println("error: ", err)
 		return err
 	}
-
-	// the command succed here.
-	server.cmds = append(server.cmds, cmd)
 
 	return nil
 }
