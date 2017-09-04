@@ -8,6 +8,9 @@ import (
 	"strings"
 	"time"
 
+	b64 "encoding/base64"
+
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 )
@@ -161,11 +164,8 @@ func (this *ConfigurationManager) initialize() {
 
 		// Scrpit to start the service container.
 		tcpServiceContainerStart := new(Config.ScheduledTask)
-		tcpServiceContainerStart.M_keepAlive = true
 		tcpServiceContainerStart.M_isActive = true
-		tcpServiceContainerStart.M_frequencyType = Config.FrequencyType_MONTHLY
-		tcpServiceContainerStart.M_frequency = 1
-		tcpServiceContainerStart.M_startTime = time.Now().Unix()
+		tcpServiceContainerStart.M_frequencyType = Config.FrequencyType_ONCE
 		tcpServiceContainerStart.M_id = "tcpServiceContainerStart"
 		tcpServiceContainerStart.M_script = "tcpServiceContainerStart"
 
@@ -210,6 +210,9 @@ func (this *ConfigurationManager) getId() string {
 
 func (this *ConfigurationManager) start() {
 	log.Println("--> Start ConfigurationManager")
+	JS.GetJsRuntimeManager().OpendSession("")                  // The anonymous session.
+	JS.GetJsRuntimeManager().SetVar("", "server", GetServer()) // Set the server global variable.
+	JS.GetJsRuntimeManager().InitScripts("")                   // Run the script for the default session.
 
 	// First of all i will start task...
 	for i := 0; i < len(this.m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
@@ -218,7 +221,15 @@ func (this *ConfigurationManager) start() {
 		if task.M_id == "tcpServiceContainerStart" {
 			// In that case I will create the script file if is not already exist.
 			if len(CargoEntitiesFileExists("tcpServiceContainerStart")) == 0 {
-				GetServer().GetFileManager().createDbFile("tcpServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", `server.StartCmd("CargoServiceContainer_TCP", ["`+strconv.Itoa(this.GetTcpConfigurationServicePort())+`"])`)
+				var script string
+				script = "function tcpServiceContainerStart(){\n"
+				script += "	while(true){\n"
+				script += `		var err = server.RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"])`
+				script += "\n		console.log(err)\n"
+				script += "	}\n"
+				script += "}\n"
+				script += "tcpServiceContainerStart()\n"
+				GetServer().GetFileManager().createDbFile("tcpServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", script)
 			}
 		}
 		this.scheduleTask(task)
@@ -268,59 +279,69 @@ func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
 		}
 	}
 
-	startTime := time.Unix(task.M_startTime, 0)
+	var nextTime time.Time
+	if task.GetFrequencyType() != Config.FrequencyType_ONCE {
+		startTime := time.Unix(task.M_startTime, 0)
 
-	// Now I will get the next time when the task must be executed.
-	nextTime := startTime
-	var previous time.Time
+		// Now I will get the next time when the task must be executed.
+		nextTime = startTime
+		var previous time.Time
 
-	for nextTime.Sub(time.Now()) < 0 {
-		previous = nextTime
-		// I will append
-		if task.GetFrequencyType() == Config.FrequencyType_DAILY {
-			nextTime = nextTime.AddDate(0, 0, task.GetFrequency())
-		} else if task.GetFrequencyType() == Config.FrequencyType_WEEKELY {
-			nextTime = nextTime.AddDate(0, 0, 7*task.GetFrequency())
-		} else if task.GetFrequencyType() == Config.FrequencyType_MONTHLY {
-			nextTime = nextTime.AddDate(0, task.GetFrequency(), 0)
-		}
-	}
-
-	// Here I will test if the previous time combine with offset value can
-	// be use as nextTime.
-	for i := 0; i < len(task.M_offsets); i++ {
-		if task.GetFrequencyType() == Config.FrequencyType_WEEKELY || task.GetFrequencyType() == Config.FrequencyType_MONTHLY {
-			nextTime_ := previous.AddDate(0, 0, task.M_offsets[i])
-			if nextTime_.Sub(time.Now()) < 0 {
-				nextTime = nextTime_
-				break
+		for nextTime.Sub(time.Now()) < 0 {
+			previous = nextTime
+			// I will append
+			if task.GetFrequencyType() == Config.FrequencyType_DAILY {
+				nextTime = nextTime.AddDate(0, 0, task.GetFrequency())
+			} else if task.GetFrequencyType() == Config.FrequencyType_WEEKELY {
+				nextTime = nextTime.AddDate(0, 0, 7*task.GetFrequency())
+			} else if task.GetFrequencyType() == Config.FrequencyType_MONTHLY {
+				nextTime = nextTime.AddDate(0, task.GetFrequency(), 0)
 			}
-		} else if task.GetFrequencyType() == Config.FrequencyType_DAILY {
-			// Here the offset represent hours and not days.
-			nextTime_ := previous.Add(time.Hour * time.Duration(task.M_offsets[i]))
-			if nextTime_.Sub(time.Now()) < 0 {
-				nextTime = nextTime_
-				break
+		}
+
+		// Here I will test if the previous time combine with offset value can
+		// be use as nextTime.
+		for i := 0; i < len(task.M_offsets); i++ {
+			if task.GetFrequencyType() == Config.FrequencyType_WEEKELY || task.GetFrequencyType() == Config.FrequencyType_MONTHLY {
+				nextTime_ := previous.AddDate(0, 0, task.M_offsets[i])
+				if nextTime_.Sub(time.Now()) > 0 {
+					nextTime = nextTime_
+					break
+				}
+			} else if task.GetFrequencyType() == Config.FrequencyType_DAILY {
+				// Here the offset represent hours and not days.
+				nextTime_ := previous.Add(time.Hour * time.Duration(task.M_offsets[i]))
+				if nextTime_.Sub(time.Now()) > 0 {
+					nextTime = nextTime_
+					break
+				}
 			}
 		}
 	}
 
 	var delay time.Duration
 	if task.M_startTime > 0 {
-		delay := nextTime.Sub(time.Now())
+		delay = nextTime.Sub(time.Now())
 	}
 
 	// Here I will set the timer...
 	go func(delay time.Duration, task *Config.ScheduledTask) {
-		log.Println("-----> task scheduled in ", delay.Seconds())
+		log.Println("-----> task scheduled in ", delay.Minutes())
 		// Here I will set the timer...
 		timer := time.NewTimer(delay)
 
 		<-timer.C
-		log.Println("-----------> time to run the task!")
-		// So here I will re-schedule the task, it will not be schedule if is it
-		// expired or it must run once.
-		GetServer().GetConfigurationManager().scheduleTask(task)
+		dbFile, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", []interface{}{task.M_script}, false)
+		if err == nil {
+			script, _ := b64.StdEncoding.DecodeString(dbFile.GetObject().(*CargoEntities.File).GetData())
+			// Now I will run the script...
+			JS.GetJsRuntimeManager().RunScript("", string(script))
+		}
+		if task.GetFrequencyType() != Config.FrequencyType_ONCE {
+			// So here I will re-schedule the task, it will not be schedule if is it
+			// expired or it must run once.
+			GetServer().GetConfigurationManager().scheduleTask(task)
+		}
 	}(delay, task)
 
 }

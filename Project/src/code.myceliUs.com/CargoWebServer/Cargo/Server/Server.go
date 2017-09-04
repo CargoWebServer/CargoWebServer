@@ -654,9 +654,9 @@ func (this *Server) Start() {
 		})
 
 	// Now I will create the anonymous session...
-	JS.GetJsRuntimeManager().OpendSession("")           // The anonymous session.
-	JS.GetJsRuntimeManager().SetVar("", "server", this) // Set the server global variable.
-	JS.GetJsRuntimeManager().InitScripts("")            // Run the script for the default session.
+	//JS.GetJsRuntimeManager().OpendSession("")           // The anonymous session.
+	//JS.GetJsRuntimeManager().SetVar("", "server", this) // Set the server global variable.
+	//JS.GetJsRuntimeManager().InitScripts("")            // Run the script for the default session.
 
 	// Test compile analyse...
 	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{100000})
@@ -844,7 +844,8 @@ func (server *Server) StartCmd(name string, args []string) error {
 	// Call it...
 	err := cmd.Start()
 	if err != nil {
-		log.Println("---> fail to start the service container!")
+		log.Println("Fail to run cmd: ", name)
+		log.Println("error: ", err)
 		return err
 	}
 

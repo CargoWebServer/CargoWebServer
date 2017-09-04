@@ -255,7 +255,6 @@
 				<xsd:attribute name="frequency" type="xsd:integer" />
 				<xsd:attribute name="frequencyType" type="tFrequencyType" />
 				<xsd:attribute name="offsets" minOccurs="0" maxOccurs="unbounded" type="xsd:integer" />
-				<xsd:attribute name="keepAlive" type="xsd:boolean" />
 			</xsd:extension> 
 		</xsd:complexContent> 
 	</xsd:complexType>

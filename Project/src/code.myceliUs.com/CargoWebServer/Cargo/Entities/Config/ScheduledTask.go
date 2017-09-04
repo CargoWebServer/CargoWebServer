@@ -31,7 +31,6 @@ type ScheduledTask struct {
 	M_frequency      int
 	M_frequencyType  FrequencyType
 	M_offsets        []int
-	M_keepAlive      bool
 
 	/** Associations **/
 	m_parentPtr *Configurations
@@ -52,7 +51,6 @@ type XsdScheduledTask struct {
 	M_frequency      int    `xml:"frequency,attr"`
 	M_frequencyType  string `xml:"frequencyType,attr"`
 	M_offsets        []int  `xml:"offsets,attr"`
-	M_keepAlive      bool   `xml:"keepAlive,attr"`
 }
 
 /** UUID **/
@@ -176,19 +174,6 @@ func (this *ScheduledTask) SetOffsets(ref interface{}) {
 }
 
 /** Remove reference Offsets **/
-
-/** KeepAlive **/
-func (this *ScheduledTask) GetKeepAlive() bool {
-	return this.M_keepAlive
-}
-
-/** Init reference KeepAlive **/
-func (this *ScheduledTask) SetKeepAlive(ref interface{}) {
-	this.NeedSave = true
-	this.M_keepAlive = ref.(bool)
-}
-
-/** Remove reference KeepAlive **/
 
 /** Parent **/
 func (this *ScheduledTask) GetParentPtr() *Configurations {

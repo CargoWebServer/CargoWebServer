@@ -196,6 +196,29 @@ func (this *ConfigXmlFactory) InitConfigurations(parentUuid string, xmlElement *
 	}
 }
 
+/** inititialisation of ApplicationConfiguration **/
+func (this *ConfigXmlFactory) InitApplicationConfiguration(parentUuid string, xmlElement *Config.XsdApplicationConfiguration, object *Config.ApplicationConfiguration) {
+	log.Println("Initialize ApplicationConfiguration")
+
+	/** ApplicationConfiguration **/
+	object.M_id = xmlElement.M_id
+	if len(object.M_id) == 0 {
+		object.M_id = Utility.RandomUUID()
+	}
+	var uuidStr string
+	if len(parentUuid) > 0 {
+		uuidStr += parentUuid + ":"
+	}
+	uuidStr += "Config.ApplicationConfiguration:" + object.M_id
+	object.UUID = "Config.ApplicationConfiguration%" + Utility.GenerateUUID(uuidStr)
+
+	/** Configuration **/
+	object.M_indexPage = xmlElement.M_indexPage
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
 /** inititialisation of SmtpConfiguration **/
 func (this *ConfigXmlFactory) InitSmtpConfiguration(parentUuid string, xmlElement *Config.XsdSmtpConfiguration, object *Config.SmtpConfiguration) {
 	log.Println("Initialize SmtpConfiguration")
@@ -281,47 +304,6 @@ func (this *ConfigXmlFactory) InitSmtpConfiguration(parentUuid string, xmlElemen
 	} else if xmlElement.M_textEncoding == "##KOI8U" {
 		object.M_textEncoding = Config.Encoding_KOI8U
 	}
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** inititialisation of LdapConfiguration **/
-func (this *ConfigXmlFactory) InitLdapConfiguration(parentUuid string, xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
-	log.Println("Initialize LdapConfiguration")
-
-	/** LdapConfiguration **/
-	object.M_id = xmlElement.M_id
-	if len(object.M_id) == 0 {
-		object.M_id = Utility.RandomUUID()
-	}
-	var uuidStr string
-	if len(parentUuid) > 0 {
-		uuidStr += parentUuid + ":"
-	}
-	uuidStr += "Config.LdapConfiguration:" + object.M_id
-	object.UUID = "Config.LdapConfiguration%" + Utility.GenerateUUID(uuidStr)
-
-	/** Configuration **/
-	object.M_hostName = xmlElement.M_hostName
-
-	/** Configuration **/
-	object.M_ipv4 = xmlElement.M_ipv4
-
-	/** Configuration **/
-	object.M_port = xmlElement.M_port
-
-	/** Configuration **/
-	object.M_user = xmlElement.M_user
-
-	/** Configuration **/
-	object.M_pwd = xmlElement.M_pwd
-
-	/** Configuration **/
-	object.M_domain = xmlElement.M_domain
-
-	/** Configuration **/
-	object.M_searchBase = xmlElement.M_searchBase
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -477,9 +459,6 @@ func (this *ConfigXmlFactory) InitScheduledTask(parentUuid string, xmlElement *C
 
 	/** Configuration **/
 	object.M_offsets = xmlElement.M_offsets
-
-	/** Configuration **/
-	object.M_keepAlive = xmlElement.M_keepAlive
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -544,11 +523,11 @@ func (this *ConfigXmlFactory) InitServerConfiguration(parentUuid string, xmlElem
 	}
 }
 
-/** inititialisation of ApplicationConfiguration **/
-func (this *ConfigXmlFactory) InitApplicationConfiguration(parentUuid string, xmlElement *Config.XsdApplicationConfiguration, object *Config.ApplicationConfiguration) {
-	log.Println("Initialize ApplicationConfiguration")
+/** inititialisation of LdapConfiguration **/
+func (this *ConfigXmlFactory) InitLdapConfiguration(parentUuid string, xmlElement *Config.XsdLdapConfiguration, object *Config.LdapConfiguration) {
+	log.Println("Initialize LdapConfiguration")
 
-	/** ApplicationConfiguration **/
+	/** LdapConfiguration **/
 	object.M_id = xmlElement.M_id
 	if len(object.M_id) == 0 {
 		object.M_id = Utility.RandomUUID()
@@ -557,11 +536,29 @@ func (this *ConfigXmlFactory) InitApplicationConfiguration(parentUuid string, xm
 	if len(parentUuid) > 0 {
 		uuidStr += parentUuid + ":"
 	}
-	uuidStr += "Config.ApplicationConfiguration:" + object.M_id
-	object.UUID = "Config.ApplicationConfiguration%" + Utility.GenerateUUID(uuidStr)
+	uuidStr += "Config.LdapConfiguration:" + object.M_id
+	object.UUID = "Config.LdapConfiguration%" + Utility.GenerateUUID(uuidStr)
 
 	/** Configuration **/
-	object.M_indexPage = xmlElement.M_indexPage
+	object.M_hostName = xmlElement.M_hostName
+
+	/** Configuration **/
+	object.M_ipv4 = xmlElement.M_ipv4
+
+	/** Configuration **/
+	object.M_port = xmlElement.M_port
+
+	/** Configuration **/
+	object.M_user = xmlElement.M_user
+
+	/** Configuration **/
+	object.M_pwd = xmlElement.M_pwd
+
+	/** Configuration **/
+	object.M_domain = xmlElement.M_domain
+
+	/** Configuration **/
+	object.M_searchBase = xmlElement.M_searchBase
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -644,98 +641,6 @@ func (this *ConfigXmlFactory) InitOAuth2Configuration(parentUuid string, xmlElem
 
 	/** Configuration **/
 	object.M_privateKey = xmlElement.M_privateKey
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of ApplicationConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeApplicationConfiguration(xmlElement *Config.XsdApplicationConfiguration, object *Config.ApplicationConfiguration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** ApplicationConfiguration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_indexPage = object.M_indexPage
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of ServiceConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** ServiceConfiguration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_hostName = object.M_hostName
-
-	/** Configuration **/
-	xmlElement.M_ipv4 = object.M_ipv4
-
-	/** Configuration **/
-	xmlElement.M_port = object.M_port
-
-	/** Configuration **/
-	xmlElement.M_user = object.M_user
-
-	/** Configuration **/
-	xmlElement.M_pwd = object.M_pwd
-
-	/** Configuration **/
-	xmlElement.M_start = object.M_start
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
-/** serialysation of ScheduledTask **/
-func (this *ConfigXmlFactory) SerialyzeScheduledTask(xmlElement *Config.XsdScheduledTask, object *Config.ScheduledTask) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** ScheduledTask **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_isActive = object.M_isActive
-
-	/** Configuration **/
-	xmlElement.M_script = object.M_script
-
-	/** Configuration **/
-	xmlElement.M_startTime = object.M_startTime
-
-	/** Configuration **/
-	xmlElement.M_expirationTime = object.M_expirationTime
-
-	/** Configuration **/
-	xmlElement.M_frequency = object.M_frequency
-
-	/** FrequencyType **/
-	if object.M_frequencyType == Config.FrequencyType_ONCE {
-		xmlElement.M_frequencyType = "##ONCE"
-	} else if object.M_frequencyType == Config.FrequencyType_DAILY {
-		xmlElement.M_frequencyType = "##DAILY"
-	} else if object.M_frequencyType == Config.FrequencyType_WEEKELY {
-		xmlElement.M_frequencyType = "##WEEKELY"
-	} else if object.M_frequencyType == Config.FrequencyType_MONTHLY {
-		xmlElement.M_frequencyType = "##MONTHLY"
-	}
-
-	/** Configuration **/
-	xmlElement.M_offsets = object.M_offsets
-
-	/** Configuration **/
-	xmlElement.M_keepAlive = object.M_keepAlive
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -843,58 +748,6 @@ func (this *ConfigXmlFactory) SerialyzeConfigurations(xmlElement *Config.XsdConf
 	}
 }
 
-/** serialysation of ServerConfiguration **/
-func (this *ConfigXmlFactory) SerialyzeServerConfiguration(xmlElement *Config.XsdServerConfiguration, object *Config.ServerConfiguration) {
-	if xmlElement == nil {
-		return
-	}
-
-	/** ServerConfiguration **/
-	xmlElement.M_id = object.M_id
-
-	/** Configuration **/
-	xmlElement.M_ipv4 = object.M_ipv4
-
-	/** Configuration **/
-	xmlElement.M_hostName = object.M_hostName
-
-	/** Configuration **/
-	xmlElement.M_serverPort = object.M_serverPort
-
-	/** Configuration **/
-	xmlElement.M_ws_serviceContainerPort = object.M_ws_serviceContainerPort
-
-	/** Configuration **/
-	xmlElement.M_tcp_serviceContainerPort = object.M_tcp_serviceContainerPort
-
-	/** Configuration **/
-	xmlElement.M_applicationsPath = object.M_applicationsPath
-
-	/** Configuration **/
-	xmlElement.M_dataPath = object.M_dataPath
-
-	/** Configuration **/
-	xmlElement.M_scriptsPath = object.M_scriptsPath
-
-	/** Configuration **/
-	xmlElement.M_definitionsPath = object.M_definitionsPath
-
-	/** Configuration **/
-	xmlElement.M_schemasPath = object.M_schemasPath
-
-	/** Configuration **/
-	xmlElement.M_tmpPath = object.M_tmpPath
-
-	/** Configuration **/
-	xmlElement.M_binPath = object.M_binPath
-
-	/** Configuration **/
-	xmlElement.M_queriesPath = object.M_queriesPath
-	if len(object.M_id) > 0 {
-		this.m_references[object.M_id] = object
-	}
-}
-
 /** serialysation of SmtpConfiguration **/
 func (this *ConfigXmlFactory) SerialyzeSmtpConfiguration(xmlElement *Config.XsdSmtpConfiguration, object *Config.SmtpConfiguration) {
 	if xmlElement == nil {
@@ -973,6 +826,111 @@ func (this *ConfigXmlFactory) SerialyzeSmtpConfiguration(xmlElement *Config.XsdS
 	} else if object.M_textEncoding == Config.Encoding_KOI8U {
 		xmlElement.M_textEncoding = "##KOI8U"
 	}
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of OAuth2Configuration **/
+func (this *ConfigXmlFactory) SerialyzeOAuth2Configuration(xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** OAuth2Configuration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_authorizationExpiration = object.M_authorizationExpiration
+
+	/** Configuration **/
+	xmlElement.M_accessExpiration = object.M_accessExpiration
+
+	/** Configuration **/
+	xmlElement.M_tokenType = object.M_tokenType
+
+	/** Configuration **/
+	xmlElement.M_errorStatusCode = object.M_errorStatusCode
+
+	/** Configuration **/
+	xmlElement.M_allowClientSecretInParams = object.M_allowClientSecretInParams
+
+	/** Configuration **/
+	xmlElement.M_allowGetAccessRequest = object.M_allowGetAccessRequest
+
+	/** Configuration **/
+	xmlElement.M_redirectUriSeparator = object.M_redirectUriSeparator
+
+	/** Configuration **/
+	xmlElement.M_privateKey = object.M_privateKey
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of ServerConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeServerConfiguration(xmlElement *Config.XsdServerConfiguration, object *Config.ServerConfiguration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** ServerConfiguration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_ipv4 = object.M_ipv4
+
+	/** Configuration **/
+	xmlElement.M_hostName = object.M_hostName
+
+	/** Configuration **/
+	xmlElement.M_serverPort = object.M_serverPort
+
+	/** Configuration **/
+	xmlElement.M_ws_serviceContainerPort = object.M_ws_serviceContainerPort
+
+	/** Configuration **/
+	xmlElement.M_tcp_serviceContainerPort = object.M_tcp_serviceContainerPort
+
+	/** Configuration **/
+	xmlElement.M_applicationsPath = object.M_applicationsPath
+
+	/** Configuration **/
+	xmlElement.M_dataPath = object.M_dataPath
+
+	/** Configuration **/
+	xmlElement.M_scriptsPath = object.M_scriptsPath
+
+	/** Configuration **/
+	xmlElement.M_definitionsPath = object.M_definitionsPath
+
+	/** Configuration **/
+	xmlElement.M_schemasPath = object.M_schemasPath
+
+	/** Configuration **/
+	xmlElement.M_tmpPath = object.M_tmpPath
+
+	/** Configuration **/
+	xmlElement.M_binPath = object.M_binPath
+
+	/** Configuration **/
+	xmlElement.M_queriesPath = object.M_queriesPath
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of ApplicationConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeApplicationConfiguration(xmlElement *Config.XsdApplicationConfiguration, object *Config.ApplicationConfiguration) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** ApplicationConfiguration **/
+	xmlElement.M_id = object.M_id
+
+	/** Configuration **/
+	xmlElement.M_indexPage = object.M_indexPage
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}
@@ -1111,38 +1069,74 @@ func (this *ConfigXmlFactory) SerialyzeDataStoreConfiguration(xmlElement *Config
 	}
 }
 
-/** serialysation of OAuth2Configuration **/
-func (this *ConfigXmlFactory) SerialyzeOAuth2Configuration(xmlElement *Config.XsdOAuth2Configuration, object *Config.OAuth2Configuration) {
+/** serialysation of ServiceConfiguration **/
+func (this *ConfigXmlFactory) SerialyzeServiceConfiguration(xmlElement *Config.XsdServiceConfiguration, object *Config.ServiceConfiguration) {
 	if xmlElement == nil {
 		return
 	}
 
-	/** OAuth2Configuration **/
+	/** ServiceConfiguration **/
 	xmlElement.M_id = object.M_id
 
 	/** Configuration **/
-	xmlElement.M_authorizationExpiration = object.M_authorizationExpiration
+	xmlElement.M_hostName = object.M_hostName
 
 	/** Configuration **/
-	xmlElement.M_accessExpiration = object.M_accessExpiration
+	xmlElement.M_ipv4 = object.M_ipv4
 
 	/** Configuration **/
-	xmlElement.M_tokenType = object.M_tokenType
+	xmlElement.M_port = object.M_port
 
 	/** Configuration **/
-	xmlElement.M_errorStatusCode = object.M_errorStatusCode
+	xmlElement.M_user = object.M_user
 
 	/** Configuration **/
-	xmlElement.M_allowClientSecretInParams = object.M_allowClientSecretInParams
+	xmlElement.M_pwd = object.M_pwd
 
 	/** Configuration **/
-	xmlElement.M_allowGetAccessRequest = object.M_allowGetAccessRequest
+	xmlElement.M_start = object.M_start
+	if len(object.M_id) > 0 {
+		this.m_references[object.M_id] = object
+	}
+}
+
+/** serialysation of ScheduledTask **/
+func (this *ConfigXmlFactory) SerialyzeScheduledTask(xmlElement *Config.XsdScheduledTask, object *Config.ScheduledTask) {
+	if xmlElement == nil {
+		return
+	}
+
+	/** ScheduledTask **/
+	xmlElement.M_id = object.M_id
 
 	/** Configuration **/
-	xmlElement.M_redirectUriSeparator = object.M_redirectUriSeparator
+	xmlElement.M_isActive = object.M_isActive
 
 	/** Configuration **/
-	xmlElement.M_privateKey = object.M_privateKey
+	xmlElement.M_script = object.M_script
+
+	/** Configuration **/
+	xmlElement.M_startTime = object.M_startTime
+
+	/** Configuration **/
+	xmlElement.M_expirationTime = object.M_expirationTime
+
+	/** Configuration **/
+	xmlElement.M_frequency = object.M_frequency
+
+	/** FrequencyType **/
+	if object.M_frequencyType == Config.FrequencyType_ONCE {
+		xmlElement.M_frequencyType = "##ONCE"
+	} else if object.M_frequencyType == Config.FrequencyType_DAILY {
+		xmlElement.M_frequencyType = "##DAILY"
+	} else if object.M_frequencyType == Config.FrequencyType_WEEKELY {
+		xmlElement.M_frequencyType = "##WEEKELY"
+	} else if object.M_frequencyType == Config.FrequencyType_MONTHLY {
+		xmlElement.M_frequencyType = "##MONTHLY"
+	}
+
+	/** Configuration **/
+	xmlElement.M_offsets = object.M_offsets
 	if len(object.M_id) > 0 {
 		this.m_references[object.M_id] = object
 	}

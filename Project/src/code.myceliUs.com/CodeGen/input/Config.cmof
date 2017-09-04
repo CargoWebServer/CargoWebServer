@@ -359,10 +359,6 @@
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Integer"/>
       </ownedAttribute>
 
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="keepAlive" name="keepAlive">
-        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#Boolean"/>
-      </ownedAttribute>
-	
 	</ownedMember>
 
 	<ownedMember xmi:type="cmof:Class" xmi:id="ApplicationConfiguration" name="ApplicationConfiguration" superClass="Configuration">
