@@ -136,22 +136,24 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
                         for (var childId in workspace.childs) {
                             var child = workspace.childs[childId];
                             if (child.element.viewBox !== null) {
-                                child.resize(workspace.element.offsetWidth, workspace.element.offsetHeight);
+                                if (child != undefined) {
+                                    child.resize(workspace.element.offsetWidth, workspace.element.offsetHeight);
+                                }
                             }
                         }
                     }
                 }
-            }(filePanel)
+            } (filePanel)
 
             window.addEventListener("resize", function (canvas) {
                 return function () {
                     canvas.initWorkspace()
                 }
-            }(codeEditor.diagram.canvas))
+            } (codeEditor.diagram.canvas))
 
             codeEditor.diagram.canvas.initWorkspace()
         }
-    }(this, diagram, filePanel))
+    } (this, diagram, filePanel))
 }
 
 CodeEditor.prototype.appendFile = function (file) {
@@ -192,7 +194,7 @@ CodeEditor.prototype.appendFile = function (file) {
                     codeEditor.toolbars[fileId] = []
                     codeEditor.toolbars[fileId].push(queryEditor.queryToolBar)
                 }
-            }(this, file.M_id))
+            } (this, file.M_id))
 
             // Init the query editor.
             queryEditor.init()
@@ -221,7 +223,7 @@ CodeEditor.prototype.appendFile = function (file) {
                 server.eventHandler.broadcastLocalEvent(evt)
             }
         }
-    }(file.M_id, file.UUID, this));
+    } (file.M_id, file.UUID, this));
 
     this.filesPanel[file.M_id] = filePanel
     this.setActiveFile(file.M_id)

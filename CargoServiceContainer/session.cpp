@@ -107,14 +107,12 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
             // First I will insert the message inside the vector...
             QVector<QByteArray>& array = *this->pendingMsgChunk.find(messageId);
             array[index] = QByteArray(msg.data().c_str(), msg.data().size());
-
             if( index == total - 1){
                 // All chuck are received here...
                 QByteArray originalMessageData;
                 for(QVector<QByteArray>::iterator it = array.begin(); it != array.end(); ++it){
                     originalMessageData = originalMessageData + *it;
                 }
-
                 this->pendingMsgChunk.remove(messageId);
 
                 // Here I will recreate the original message from the assembled data array...
@@ -131,18 +129,19 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
         }
 
         // Here I will send back the response...
-        com::mycelius::message::Message responseMsg;
-        responseMsg.set_type(com::mycelius::message::Message_MessageType_RESPONSE);
-        responseMsg.set_id(messageId.toStdString());
-        responseMsg.set_index(-1);
-        responseMsg.set_total(1);
+        com::mycelius::message::Message *responseMsg = new com::mycelius::message::Message();
+        responseMsg->set_type(com::mycelius::message::Message_MessageType_RESPONSE);
+        responseMsg->set_id(messageId.toStdString());
+        responseMsg->set_index(-1);
+        responseMsg->set_total(1);
 
-        com::mycelius::message::Response rsp;
-        rsp.set_id(messageId.toStdString());
-        responseMsg.set_allocated_rsp(&rsp);
+        com::mycelius::message::Response *rsp = new com::mycelius::message::Response();
+        rsp->set_id(messageId.toStdString());
+        responseMsg->set_allocated_rsp(rsp);
 
         // Response was sent to the server.
-        this->sendMessage(&responseMsg);
+        this->sendMessage(responseMsg);
+        delete responseMsg; // Remove the response explicitely here.
 
     }else if(msg.type() == com::mycelius::message::Message_MessageType_EVENT){
 

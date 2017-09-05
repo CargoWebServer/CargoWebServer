@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 	//"github.com/skratchdot/open-golang/open"
 	"os/exec"
@@ -652,15 +653,25 @@ func (this *Server) Start() {
 			return conn
 
 		})
+	// Javacript initialisation here.
+	JS.GetJsRuntimeManager().OpendSession("")                  // Set the anonymous session.
+	JS.GetJsRuntimeManager().SetVar("", "server", GetServer()) // Set the server global variable.
+	JS.GetJsRuntimeManager().InitScripts("")                   // Run the script for the default session.
 
-	// Now I will create the anonymous session...
-	//JS.GetJsRuntimeManager().OpendSession("")           // The anonymous session.
-	//JS.GetJsRuntimeManager().SetVar("", "server", this) // Set the server global variable.
-	//JS.GetJsRuntimeManager().InitScripts("")            // Run the script for the default session.
+	// Now I will set scheduled task.
+	for i := 0; i < len(GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
+		task := GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks[i]
+		GetServer().GetConfigurationManager().scheduleTask(task)
+	}
 
-	// Test compile analyse...
-	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "TestMessageContainer", []interface{}{100000})
-	//JS.GetJsRuntimeManager().ExecuteJsFunction(Utility.RandomUUID(), "", "compileAnalyseCSP", []interface{}{30})
+	// Now I will register actions for services container.
+	activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations)
+	for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
+		config := activeConfigurations.GetServiceConfigs()[i]
+		if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
+			GetServer().GetServiceManager().registerServiceContainerActions(config)
+		}
+	}
 }
 
 /**
@@ -815,7 +826,8 @@ func (server *Server) RunCmd(name string, args []string) error {
 	// Call it...
 	err := cmd.Run()
 	if err != nil {
-		log.Println("---> fail to start the service container!")
+		log.Println("Fail to run cmd: ", name)
+		log.Println("error: ", err)
 		return err
 	}
 

@@ -13,6 +13,7 @@ import (
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
+	"code.myceliUs.com/Utility"
 )
 
 const (
@@ -169,11 +170,15 @@ func (this *ConfigurationManager) initialize() {
 		tcpServiceContainerStart.M_id = "tcpServiceContainerStart"
 		tcpServiceContainerStart.M_script = "tcpServiceContainerStart"
 
-		// Here the script can be an id to another file or a string.
-		tcpServiceContainerStart.M_script = "tcpServiceContainerStart"
+		wsServiceContainerStart := new(Config.ScheduledTask)
+		wsServiceContainerStart.M_isActive = true
+		wsServiceContainerStart.M_frequencyType = Config.FrequencyType_ONCE
+		wsServiceContainerStart.M_id = "wsServiceContainerStart"
+		wsServiceContainerStart.M_script = "wsServiceContainerStart"
 
 		// Append the newly create account into the cargo entities
 		activeConfigurations.M_scheduledTasks = append(activeConfigurations.M_scheduledTasks, tcpServiceContainerStart)
+		activeConfigurations.M_scheduledTasks = append(activeConfigurations.M_scheduledTasks, wsServiceContainerStart)
 
 		// Server folders...
 		activeConfigurations.M_serverConfig.M_applicationsPath = "/Apps"
@@ -210,16 +215,12 @@ func (this *ConfigurationManager) getId() string {
 
 func (this *ConfigurationManager) start() {
 	log.Println("--> Start ConfigurationManager")
-	JS.GetJsRuntimeManager().OpendSession("")                  // The anonymous session.
-	JS.GetJsRuntimeManager().SetVar("", "server", GetServer()) // Set the server global variable.
-	JS.GetJsRuntimeManager().InitScripts("")                   // Run the script for the default session.
 
 	// First of all i will start task...
 	for i := 0; i < len(this.m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
 
 		task := this.m_activeConfigurationsEntity.object.M_scheduledTasks[i]
 		if task.M_id == "tcpServiceContainerStart" {
-			// In that case I will create the script file if is not already exist.
 			if len(CargoEntitiesFileExists("tcpServiceContainerStart")) == 0 {
 				var script string
 				script = "function tcpServiceContainerStart(){\n"
@@ -231,8 +232,19 @@ func (this *ConfigurationManager) start() {
 				script += "tcpServiceContainerStart()\n"
 				GetServer().GetFileManager().createDbFile("tcpServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", script)
 			}
+		} else if task.M_id == "wsServiceContainerStart" {
+			if len(CargoEntitiesFileExists("wsServiceContainerStart")) == 0 {
+				var script string
+				script = "function wsServiceContainerStart(){\n"
+				script += "	while(true){\n"
+				script += `		var err = server.RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"])`
+				script += "\n		console.log(err)\n"
+				script += "	}\n"
+				script += "}\n"
+				script += "wsServiceContainerStart()\n"
+				GetServer().GetFileManager().createDbFile("wsServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", script)
+			}
 		}
-		this.scheduleTask(task)
 	}
 
 	// Set services configurations...
@@ -286,16 +298,20 @@ func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
 		// Now I will get the next time when the task must be executed.
 		nextTime = startTime
 		var previous time.Time
+		frequency := task.GetFrequency()
+		if frequency == 0 {
+			frequency = 1 // Must be one by default if not specify.
+		}
 
 		for nextTime.Sub(time.Now()) < 0 {
 			previous = nextTime
 			// I will append
 			if task.GetFrequencyType() == Config.FrequencyType_DAILY {
-				nextTime = nextTime.AddDate(0, 0, task.GetFrequency())
+				nextTime = nextTime.AddDate(0, 0, frequency)
 			} else if task.GetFrequencyType() == Config.FrequencyType_WEEKELY {
-				nextTime = nextTime.AddDate(0, 0, 7*task.GetFrequency())
+				nextTime = nextTime.AddDate(0, 0, 7*frequency)
 			} else if task.GetFrequencyType() == Config.FrequencyType_MONTHLY {
-				nextTime = nextTime.AddDate(0, task.GetFrequency(), 0)
+				nextTime = nextTime.AddDate(0, frequency, 0)
 			}
 		}
 
@@ -547,3 +563,21 @@ func (this *ConfigurationManager) getServiceConfigurationById(id string) *Config
 ////////////////////////////////////////////////////////////////////////////////
 // API
 ////////////////////////////////////////////////////////////////////////////////
+
+// @api 1.0
+// Schedule a given task.
+// @param {string} task The task to schedule.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *ConfigurationManager) ScheduleTask(task *Config.ScheduledTask, messageId string, sessionId string) {
+	var errObj *CargoEntities.Error
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+	this.scheduleTask(task)
+}

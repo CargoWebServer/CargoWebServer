@@ -283,7 +283,12 @@ Message.prototype.send = function () {
 
     // Control the size of the message.
     if ((this.total == 1 && this.index == -1) || (this.total > 1 && this.index > -1)) {
-        this.conn.send(bytes);
+        if (this.conn.readyState === this.conn.CLOSED) {
+            console.log(this.conn.url + " is close!")
+        } else {
+            this.conn.send(bytes);
+        }
+
     } else if (this.total > 1) {
         // Bytes will contain the message to send to the server,
         // because it can't be send in one pass I will get it's bytes and
@@ -396,7 +401,7 @@ Request.prototype.getRpcMessageData = function () {
     var rqst = new RpcRequest({ "id": this.id, "method": this.method, "params": this.params });
 
     // Calculate the total number of message here.
-    var msg = new RpcMessage({ "id": this.id, "type": Msg_REQUEST, "rqst": rqst, "index": 1, "total": 1 });
+    var msg = new RpcMessage({ "id": this.id, "type": Msg_REQUEST, "rqst": rqst, "index": -1, "total": 1 });
 
     var bytes = msg.toArrayBuffer();
     msg.total = Math.ceil(bytes.byteLength / MAX_MSG_SIZE)
@@ -545,7 +550,7 @@ Response.prototype.getRpcMessageData = function () {
  * Call the success callback if the response is completed.
  */
 Response.prototype.execute = function (rqst) {
-    delete pendingRequest[rqst.id]; 
+    delete pendingRequest[rqst.id];
     if (rqst.successCallback != null) {
         rqst.successCallback(this.id, this.resultsMap, rqst.caller)
     }
@@ -634,7 +639,7 @@ ErrorMsg.prototype.constructor = ErrorMsg;
 // Create the data to be sent over the network
 ErrorMsg.prototype.getRpcMessageData = function () {
     var err = new RpcError({ "code": this.code, "message": this.message, "data": this.data });
-    var msg = new RpcMessage({ "type": Msg_ERROR, "err": err, "index": 1, "total": 1 });
+    var msg = new RpcMessage({ "type": Msg_ERROR, "err": err, "index": -1, "total": 1 });
     var bytes = msg.toArrayBuffer();
     msg.total = Math.ceil(bytes.byteLength / MAX_MSG_SIZE)
     this.total = msg.total

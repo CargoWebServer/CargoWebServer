@@ -105,17 +105,6 @@ func (this *ServiceManager) start() {
 		}
 	}
 
-	// Now I will register actions for services container.
-	// Container are started by the configuration manager, here at line 103.
-	activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations)
-	for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
-		config := activeConfigurations.GetServiceConfigs()[i]
-		if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
-			this.registerServiceContainerActions(config)
-
-		}
-	}
-
 }
 
 func (this *ServiceManager) stop() {

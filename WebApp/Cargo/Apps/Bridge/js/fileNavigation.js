@@ -24,7 +24,7 @@ var FileNavigator = function (parent) {
                 fileNavigator.saveFile(fileId)
             }
         }
-    }(this)
+    } (this)
 
     this.saveBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-floppy-o fileNavigationBtn", "style": "display:none" }).down()
 
@@ -36,7 +36,7 @@ var FileNavigator = function (parent) {
                 fileNavigator.saveFile(fileNavigator.activeFile.M_id)
             }
         }
-    }(this)
+    } (this)
 
     // Show the list of file that dosent fit in the file explorer...
     this.showHiddenFilesBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-down fileNavigationBtn" }).down()
@@ -50,18 +50,20 @@ var FileNavigator = function (parent) {
     // Here I will attach the file navigator to file event.
     // Open 
     server.fileManager.attach(this, OpenEntityEvent, function (evt, fileNavigator) {
-        var file = entities[evt.dataMap["fileInfo"].UUID]
+        var uuid
+        if (evt.dataMap["fileInfo"] != undefined) {
+            uuid = evt.dataMap["fileInfo"].UUID
+        }else if(evt.dataMap["bpmnDiagramInfo"] != undefined){
+            uuid = evt.dataMap["bpmnDiagramInfo"].UUID
+        }
+
+        var file = entities[uuid]
+
         if (file == undefined) {
             // local file here.
             file = evt.dataMap["fileInfo"]
-        }
-
-        if (file == undefined) {
-            if (evt.dataMap.bpmnDiagramInfo !== undefined) {
-                file = entities[evt.dataMap["bpmnDiagramInfo"].UUID]
-                if (file == undefined) {
-                    file = evt.dataMap["bpmnDiagramInfo"]
-                }
+            if (file == undefined) {
+                file = evt.dataMap["bpmnDiagramInfo"]
             }
         }
 
@@ -200,7 +202,7 @@ FileNavigator.prototype.appendFile = function (file) {
                 var evt = { "code": CloseEntityEvent, "name": FileEvent, "dataMap": { "fileId": file.M_id } }
                 server.eventHandler.broadcastLocalEvent(evt)
             }
-        }(file)
+        } (file)
     }
 
     this.setActiveTab(file.M_id)
@@ -212,7 +214,7 @@ FileNavigator.prototype.appendFile = function (file) {
                 fileNavigator.setActiveTab(file.M_id)
             }
         }
-    }(file, this)
+    } (file, this)
 }
 
 FileNavigator.prototype.setActiveTab = function (fileId) {

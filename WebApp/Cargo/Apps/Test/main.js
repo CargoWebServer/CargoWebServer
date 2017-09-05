@@ -51,7 +51,7 @@ function main() {
 
     //entityTests()
 
-    //testDynamicEntity()
+    testDynamicEntity()
 
     // entityDump("item_1", "Test.Item")
     // entityDump("1", "dt_methode_development.dbo.DT_STATE")

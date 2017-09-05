@@ -63,7 +63,7 @@ func (this *LdapManager) start() {
 	}
 
 	// configure all information from the servers...
-	/*for _, info := range this.m_configsInfo {
+	for _, info := range this.m_configsInfo {
 
 		// Synchronize the list of user...
 		err := this.synchronizeUsers(info.M_id)
@@ -83,7 +83,7 @@ func (this *LdapManager) start() {
 			log.Println("Synchronize Computers Error ", err)
 		}
 
-	}*/
+	}
 }
 
 func (this *LdapManager) stop() {
