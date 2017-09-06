@@ -431,9 +431,11 @@ EntityPanel.prototype.initHeader = function () {
 			if (entityPanel.entity != null) {
 				// Here I will ask the user if here realy want to remove the entity...
 				var confirmDialog = new Dialog(randomUUID(), undefined, true)
+				confirmDialog.div.element.style.maxWidth = "450px"
 				confirmDialog.setCentered()
 				server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
 				confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entityPanel.entity.UUID + "?" })
+
 				confirmDialog.ok.element.onclick = function (dialog, entityPanel) {
 					return function () {
 						// I will call delete file
@@ -1427,7 +1429,8 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 					if (value != undefined) {
 						onSelect(value)
 					} else {
-						entityPanel.clear()
+						// TODO correct it...
+						//entityPanel.clear()
 					}
 				}
 			}(objMap, values, entityPanel, onSelect)

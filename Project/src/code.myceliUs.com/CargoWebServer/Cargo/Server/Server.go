@@ -123,8 +123,8 @@ func (this *Server) initialize() {
 	this.GetServiceManager().registerService(this.GetSchemaManager())
 
 	// BPMN stuff
-	//this.GetServiceManager().registerService(this.GetWorkflowManager())
-	//this.GetServiceManager().registerService(this.GetWorkflowProcessor())
+	this.GetServiceManager().registerService(this.GetWorkflowManager())
+	this.GetServiceManager().registerService(this.GetWorkflowProcessor())
 
 	// The other services are initialyse by the service manager.
 	this.GetServiceManager().initialize()
@@ -376,7 +376,6 @@ func (this *Server) Start() {
 				param.Value = nil
 			} else if paramValue.IsNumber() {
 				val, _ := paramValue.ToFloat()
-				//log.Println("=--------------> Double name ", paramName, " has value ", val)
 				param.Value = val
 			} else if paramValue.IsUndefined() {
 				param.Value = nil

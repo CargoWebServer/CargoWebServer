@@ -51,7 +51,15 @@ function main() {
 
     //entityTests()
 
-    testDynamicEntity()
+    server.sessionManager.login("admin", "adminadmin", "localhost",
+        function () {
+            // Create the dynamic entity here.
+            testDynamicEntity()
+        },
+        function () {
+            // Nothing to do here.
+        }, {})
+
 
     // entityDump("item_1", "Test.Item")
     // entityDump("1", "dt_methode_development.dbo.DT_STATE")
@@ -80,52 +88,52 @@ function main() {
 
     // Test get bmpn defintion instance...
 
-   /* server.entityManager.getEntityPrototypes("Test",
-        // Success callback.
-        function (result, caller) {
-            server.entityManager.getEntityPrototypes("BPMN20",
-                // Success callback.
-                function (result, caller) {
-                    server.entityManager.getEntityPrototypes("BPMS",
-                        // Success callback.
-                        function (result, caller) {
-                            server.entityManager.getEntityById("BPMN20.Definitions", ["_1484846640138"],
-                                // success callbacak
-                                function (result, caller) {
-                                    server.workflowManager.getDefinitionInstances(result,
-                                        // success callback
-                                        function (results, caller) {
-                                            var result = results[0]
-                                            var parent = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; width: auto; height: auto;" })
-                                            new EntityPanel(parent, result.TYPENAME, function (entity) {
-                                                return function (panel) {
-                                                    panel.setEntity(entity)
-                                                }
-                                            }(result), undefined, false, result, "")
-                                        },
-                                        // error callback 
-                                        function (errMsg, caller) {
-                                        },
-                                        {})
-                                },
-                                // Error callback 
-                                function (errMsg, caller) {
-                                }, {})
-                        },
-                        // Error callback.
-                        function () {
-                        }, {})
-                },
-                // Error callback.
-                function () {
-
-                }, {})
-        },
-        // Error callback.
-        function () {
-
-        }, {})
-*/
+    /* server.entityManager.getEntityPrototypes("Test",
+         // Success callback.
+         function (result, caller) {
+             server.entityManager.getEntityPrototypes("BPMN20",
+                 // Success callback.
+                 function (result, caller) {
+                     server.entityManager.getEntityPrototypes("BPMS",
+                         // Success callback.
+                         function (result, caller) {
+                             server.entityManager.getEntityById("BPMN20.Definitions", ["_1484846640138"],
+                                 // success callbacak
+                                 function (result, caller) {
+                                     server.workflowManager.getDefinitionInstances(result,
+                                         // success callback
+                                         function (results, caller) {
+                                             var result = results[0]
+                                             var parent = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; width: auto; height: auto;" })
+                                             new EntityPanel(parent, result.TYPENAME, function (entity) {
+                                                 return function (panel) {
+                                                     panel.setEntity(entity)
+                                                 }
+                                             }(result), undefined, false, result, "")
+                                         },
+                                         // error callback 
+                                         function (errMsg, caller) {
+                                         },
+                                         {})
+                                 },
+                                 // Error callback 
+                                 function (errMsg, caller) {
+                                 }, {})
+                         },
+                         // Error callback.
+                         function () {
+                         }, {})
+                 },
+                 // Error callback.
+                 function () {
+ 
+                 }, {})
+         },
+         // Error callback.
+         function () {
+ 
+         }, {})
+ */
 
     // Google OAuth
     /*server.securityManager.getResource("1010681964660.apps.googleusercontent.com", "profile", "", 
@@ -185,7 +193,7 @@ function testServiceContainer() {
                     {} // The caller
                 )
             }
-        }(service),
+        } (service),
         function () {
             console.log("Service is close!")
         })
@@ -263,7 +271,7 @@ function entityDump(id, typeName) {
                         return function (panel) {
                             panel.setEntity(entity)
                         }
-                    }(result), undefined, false, result, "")
+                    } (result), undefined, false, result, "")
                 },
                 function (errObj, caller) {
                     console.log(errObj)
@@ -289,7 +297,7 @@ function entitiesDump(typeName) {
                             return function (panel) {
                                 panel.setEntity(entity)
                             }
-                        }(results[i]), undefined, false, results[i], "")
+                        } (results[i]), undefined, false, results[i], "")
                     }
                 },
                 // Error callback.
@@ -379,7 +387,7 @@ function TestWebRtc1() {
                 return function (stream) {
                     videoPanel.element.src = window.URL.createObjectURL(stream);
                 }
-            }(videoPanel),
+            } (videoPanel),
             function (err) { }
         );
     } else {
@@ -411,7 +419,7 @@ function TestWebRtc2() {
 
                 streaming = true
             }
-        }(video, canvas),
+        } (video, canvas),
             function (error) {
                 console.log("Raised an error when capturing:", error);
             });
@@ -426,7 +434,7 @@ function TestWebRtc2() {
                         context.drawImage(video, 0, 0);
                     }
                 }
-            }(canvas.element, video.element));
+            } (canvas.element, video.element));
     } else {
         alert("Sorry, your browser does not support getUserMedia.");
     }

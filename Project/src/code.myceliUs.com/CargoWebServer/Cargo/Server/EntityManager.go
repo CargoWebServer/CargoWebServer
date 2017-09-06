@@ -1518,7 +1518,7 @@ func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}
 
 ////////////////////////////// Prototypes //////////////////////////////////////
 
-// api 1.0
+// @api 1.0
 // Create a new entity prototype.
 // @param {string} storeId The store id, where to create the new prototype.
 // @param {interface{}} prototype The prototype object to create.
@@ -1528,6 +1528,23 @@ func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}
 // @scope {public}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
+// @src
+//EntityManager.prototype.createEntityPrototype = function(storeId, prototype, successCallback, errorCallback, caller){
+//	var params = []
+//	params.push(createRpcData(storeId, "STRING", "storeId"))
+//	params.push(createRpcData(prototype, "JSON_STR", "prototype"))
+//	server.executeJsFunction(
+//	"EntityManagerCreateEntityPrototype",
+//	params,
+//	undefined, //progress callback
+//	function (results, caller) { // Success callback
+//      caller.successCallback(results[0], caller.caller)
+//	},
+//	function (errMsg, caller) { // Error callback
+//		caller.errorCallback(errMsg, caller.caller)
+//		server.errorManager.onError(errMsg)
+//	},{"successCallback":successCallback, "errorCallback":errorCallback, "caller": caller})
+//}
 func (this *EntityManager) CreateEntityPrototype(storeId string, prototype interface{}, messageId string, sessionId string) *EntityPrototype {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {

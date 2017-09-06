@@ -26,7 +26,7 @@ var Dialog = function (id, parent, isModal, title) {
     }
 
     /* The dialog div **/
-    this.div = new Element(this.parent, { "tag": "div", "class": "dialog modal-content", "style": "z-index:1001;" })
+    this.div = new Element(this.parent, { "tag": "div", "class": "dialog modal-content"})
 
     /* The header **/
     this.header = this.div.appendElement({ "tag": "div", "class": "dialog_header modal-header" }).down()
@@ -151,15 +151,15 @@ Dialog.prototype.close = function () {
 Dialog.prototype.setCentered = function () {
     var docEl = document.documentElement;
     var body = document.body;
-    var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
     var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
 
-    /* I will set the position of the dialog **/
+    // I will set the position of the dialog 
     this.x = (this.parent.element.offsetWidth - scrollLeft - this.div.element.offsetWidth) / 2 + scrollLeft
     this.div.element.style.left = this.x + "px"
 
-    this.y = (this.parent.element.offsetHeight - scrollTop - this.div.element.offsetHeight) / 2 + scrollTop
+    this.y = (window.innerHeight - this.div.element.offsetHeight) / 2
     this.div.element.style.top = this.y + "px"
+
 }
 
 Dialog.prototype.setPosition = function (x, y) {

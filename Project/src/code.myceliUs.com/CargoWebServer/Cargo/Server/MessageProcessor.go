@@ -307,7 +307,6 @@ func (this *MessageProcessor) processIncomming(m *message) {
 			// Set the parameter type and name
 			a.ParamTypeNames = append(a.ParamTypeNames, param.GetTypeName())
 			a.ParamNames = append(a.ParamNames, param.GetName())
-
 			if param.GetType() == Data_DOUBLE {
 				val, err := strconv.ParseFloat(string(param.GetDataBytes()), 64)
 				if err != nil {

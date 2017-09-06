@@ -44,7 +44,6 @@ BpmnDataView.prototype.init = function () {
                 return function (prototype) {
                     // Generate the entity constructor.
                     prototype.generateConstructor()
-                    prototype.generateInit()
                     entityPrototypes[prototype.TypeName] = prototype
 
                     // So here with the entity prototype i will generate the entity panel.
@@ -53,6 +52,7 @@ BpmnDataView.prototype.init = function () {
 
                     // Set an empty entity.
                     var entity = eval("new " + prototype.TypeName + "()")
+                    entity.UUID =  "BpmnsData.DataInput%" + dataView.dataInputsPanel.id
                     entities[entity.UUID] = entity
 
                     entity.onChange = function (dataView) {
@@ -75,7 +75,6 @@ BpmnDataView.prototype.init = function () {
                 return function (prototype) {
                     // Generate the entity constructor.
                     prototype.generateConstructor()
-                    prototype.generateInit()
                     entityPrototypes[prototype.TypeName] = prototype
 
                     // So here with the entity prototype i will generate the entity panel.
@@ -84,6 +83,7 @@ BpmnDataView.prototype.init = function () {
 
                     // Set an empty entity.
                     var entity = eval("new " + prototype.TypeName + "()")
+                    entity.UUID =  "BpmnsData.DataOutput%" + dataView.dataOutputsPanel.id
                     entities[entity.UUID] = entity
 
                     entity.onChange = function (dataView) {
@@ -196,7 +196,7 @@ BpmnDataView.prototype.save = function (callback) {
             }
 
             // Now I will create the itemaware element...
-            server.workflowManager.newItemAwareElementInstance(prototype.FieldsId[i], dataStr,
+            server.workflowProcessor.newItemAwareElementInstance(prototype.FieldsId[i], dataStr,
                 function (result, caller) {
                     caller.itemAwareInstances.push(result)
                     if (caller.itemAwareInstances.length == caller.count) {

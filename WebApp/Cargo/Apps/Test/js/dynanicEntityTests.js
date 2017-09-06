@@ -3,6 +3,7 @@
  * also create instance of Item.
  */
 function testDynamicEntity() {
+    
     // Create the dataStore...
     server.dataManager.createDataStore("Test", 2, 1,
         function (result, caller) {
@@ -26,6 +27,7 @@ function testDynamicEntity() {
             server.entityManager.createEntityPrototype(
                 "Test",
                 itemPrototype,
+                // success callback
                 function (result, caller) {
                     server.entityManager.getEntityPrototype("Test.Item", "Test",
                         function (result, caller) {
@@ -83,6 +85,7 @@ function testDynamicEntity() {
                         null)
                 }, null)
         },
+        // Error callback
         function (errMsg, caller) {
 
         }, undefined)

@@ -486,6 +486,8 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 						paramTypeName := param.GetType()
 						if paramTypeName == "string" {
 							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"STRING\", \"" + param.GetName() + "\"))\n"
+						} else if strings.HasPrefix(paramTypeName, "interface") {
+							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"JSON_STR\", \"" + param.GetName() + "\"))\n"
 						} else if strings.HasPrefix(paramTypeName, "int") {
 							clientSrc += "	params.push(createRpcData(" + param.GetName() + ", \"INTEGER\", \"" + param.GetName() + "\"))\n"
 						} else if paramTypeName == "bool" {

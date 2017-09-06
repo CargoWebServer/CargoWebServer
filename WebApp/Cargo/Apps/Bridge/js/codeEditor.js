@@ -136,7 +136,7 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
                         for (var childId in workspace.childs) {
                             var child = workspace.childs[childId];
                             if (child.element.viewBox !== null) {
-                                if (child != undefined) {
+                                if (child.resize != undefined) {
                                     child.resize(workspace.element.offsetWidth, workspace.element.offsetHeight);
                                 }
                             }
