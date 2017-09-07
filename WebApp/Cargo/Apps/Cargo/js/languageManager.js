@@ -73,11 +73,12 @@ LanguageManager.prototype.registerElementText = function (element, textId) {
 	if (this.textElements[textId] == undefined) {
 		this.textElements[textId] = []
 	}
+	if (isArray(this.textElements[textId])) {
+		this.textElements[textId].push(element)
+		// update the element in the array.
+		this.elements[element.id] = element
+	}
 
-	this.textElements[textId].push(element)
-
-	// update the element in the array.
-	this.elements[element.id] = element
 }
 
 /**

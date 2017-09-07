@@ -204,7 +204,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                         reader.onload = function (file) {
                             return function (e) {
                                 // Now I will load the content of the file.
-                                server.dataManager.importXsdSchema(file.name, e.target.result)
+                                server.schemaManager.importXsdSchema(file.name, e.target.result)
                             }
                         }(f);
                         reader.readAsText(f);

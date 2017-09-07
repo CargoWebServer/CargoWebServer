@@ -494,16 +494,16 @@ var TableHeader = function (table) {
 
 	// The first cell will be there to match the save button...
 	var buttonDiv = this.div.appendElement({ "tag": "div", "class": "table_header_btn_div" }).down()
-	
-	this.exportBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style" :"width: 100%;" }).down()
-	this.exportBtn.appendElement({ "tag": "i", "class": "	fa fa-download", "title":"download table data file." })
+
+	this.exportBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style": "width: 100%;" }).down()
+	this.exportBtn.appendElement({ "tag": "i", "class": "	fa fa-download", "title": "download table data file." })
 
 	this.maximizeBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style": "display: none;" }).down()
 	this.maximizeBtn.appendElement({ "tag": "i", "class": "fa fa-plus-square-o" })
 
 	this.minimizeBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn" }).down()
 	this.minimizeBtn.appendElement({ "tag": "i", "class": "fa fa-minus-square-o" })
-	
+
 	this.numberOfRowLabel = buttonDiv.appendElement({ "tag": "div", "class": "number_of_row_label", "style": "display: none;" }).down()
 
 	this.maximizeBtn.element.onclick = function (rowGroup, minimizeBtn, numberOfRowLabel) {
@@ -560,16 +560,16 @@ var TableHeader = function (table) {
 	this.table.exportCallback = null
 
 	// The download csv action.
-	this.exportBtn.element.onclick = function(table){
-		return function(){
+	this.exportBtn.element.onclick = function (table) {
+		return function () {
 			// I will create csv file from the model values.
 			var rows = table.model.values
-			if(table.exportCallback != null){
+			if (table.exportCallback != null) {
 				rows.unshift(table.model.titles)
 				table.exportCallback(rows)
 			}
 		}
-	}(this.table)
+	} (this.table)
 
 	return this
 }
@@ -991,13 +991,24 @@ TableCell.prototype.formatValue = function (value) {
 							if (entity[field] != undefined) {
 								entity[field][row.index] = row.table.model.getValueAt(row.index, 1)
 								entity.NeedSave = true
-								server.entityManager.saveEntity(entity,
-									function (result, caller) {
-										caller.style.visibility = "hidden"
-									},
-									function () {
+								if (entity.UUID != "") {
+									server.entityManager.saveEntity(entity,
+										function (result, caller) {
+											caller.style.visibility = "hidden"
+										},
+										function () {
 
-									}, this)
+										}, this)
+								} else {
+									// Here the entity dosent exist...
+									server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, "", entity,
+										function (result, caller) {
+											caller.style.visibility = "hidden"
+										},
+										function () {
+
+										}, this)
+								}
 							}
 						}
 					} (entity, field, newRow)
@@ -1085,13 +1096,26 @@ TableCell.prototype.formatValue = function (value) {
 							function (newLnkInput, entity, field, valueDiv) {
 								return function (value) {
 									// I will get the value from the entity manager...
-									value = entities[value.UUID]
+									if (value.UUID.length > 0) {
+										value = entities[value.UUID]
+									}
 									var lnkDiv = valueDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
 									createItemLnk(entity, value, field, lnkDiv)
 									newLnkInput.element.parentNode.removeChild(newLnkInput.element)
 									appendObjectValue(entity, field, value)
 									// Automatically saved...
-									server.entityManager.saveEntity(entity)
+									if (entity.UUID != "") {
+										server.entityManager.saveEntity(entity)
+									} else {
+										// Here the entity dosent exist...
+										server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, "", entity,
+											function (result, caller) {
+												caller.style.visibility = "hidden"
+											},
+											function () {
+
+											}, this)
+									}
 								}
 							} (newLnkInput, entity, field, valueDiv))
 
@@ -1414,7 +1438,9 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 								if (value != null) {
 									if (entity != undefined) {
 										// Show the save button
-										value = entities[value.UUID]
+										if (value.UUID.length > 0) {
+											value = entities[value.UUID]
+										}
 										var lnkDiv = valueDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
 										createItemLnk(entity, value, field, lnkDiv)
 										delete tableCell.row.table.cellEditors[tableCell.index]
@@ -1422,7 +1448,18 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 										valueDiv.element.style.display = ""
 										appendObjectValue(entity, field, value)
 										// Automatically saved...
-										server.entityManager.saveEntity(entity)
+										if (entity.UUID != "") {
+											server.entityManager.saveEntity(entity)
+										} else {
+											// Here the entity dosent exist...
+											server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, "", entity,
+												function (result, caller) {
+													caller.style.visibility = "hidden"
+												},
+												function () {
+
+												}, this)
+										}
 									}
 								}
 							}
@@ -1723,7 +1760,7 @@ ColumnSorter.prototype.setOrder = function () {
 	var activeSorter = new Array()
 
 	for (var s in this.table.sorters) {
-		if (this.table.sorters[s].state!=undefined){
+		if (this.table.sorters[s].state != undefined) {
 			if (this.table.sorters[s].state != 0) {
 				activeSorter[this.table.sorters[s].order] = this.table.sorters[s]
 			}
@@ -1829,11 +1866,11 @@ var ColumnFilter = function (index, table) {
 
 			// Filter the values...
 			filter.table.filterValues()
-			if(filter.filterCallback != null){
+			if (filter.filterCallback != null) {
 				// Call the filter callback.
 				var values = []
-				for(var i =0; i < filter.table.rows.length; i++){
-					if(filter.table.rows[i].div.element.style.display != "none"){
+				for (var i = 0; i < filter.table.rows.length; i++) {
+					if (filter.table.rows[i].div.element.style.display != "none") {
 						values.push(filter.table.model.getValueAt(i, filter.index))
 					}
 				}
@@ -1883,7 +1920,7 @@ var ColumnFilter = function (index, table) {
 /**
  * Determine if the fileter id activated or not.
  */
-ColumnFilter.prototype.isActive = function(){
+ColumnFilter.prototype.isActive = function () {
 	return this.filterIcon.element.className.indexOf("filter-applied") != -1
 }
 

@@ -1919,6 +1919,7 @@ func (this *EntityManager) ResetEntity(values interface{}) {
 //    )
 //}
 func (this *EntityManager) CreateEntity(parentUuid string, attributeName string, typeName string, objectId string, values interface{}, messageId string, sessionId string) interface{} {
+	log.Println("-------> create entity ", values)
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -2476,14 +2477,19 @@ func (this *EntityManager) GetEntityLnks(uuid string, messageId string, sessionI
 // @scope {public}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *EntityManager) GenerateEntityUUID(typeName string, ids []interface{}, messageId string, sessionId string) string {
+func (this *EntityManager) GenerateEntityUUID(typeName string, parentUuid string, ids []interface{}, messageId string, sessionId string) string {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return ""
 	}
+	var keyInfo string
+	if len(parentUuid) > 0 {
+		keyInfo += parentUuid + ":"
+	}
 
-	keyInfo := typeName + ":"
+	keyInfo = typeName + ":"
+
 	for i := 0; i < len(ids); i++ {
 		if reflect.TypeOf(ids[i]).Kind() == reflect.String {
 			keyInfo += ids[i].(string)

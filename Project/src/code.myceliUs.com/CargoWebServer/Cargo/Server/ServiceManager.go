@@ -531,14 +531,15 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 						// Now I will test if the type is an entity...
 						if strings.Index(typeName, ".") > -1 {
 							// Here I got an entity...
-
 							clientSrc += "		server.entityManager.getEntityPrototype(\"" + typeName + "\", \"" + typeName[0:strings.Index(typeName, ".")] + "\",\n"
 							clientSrc += "			function (prototype, caller) { // Success Callback\n"
 							// in case of an array...
 							if isArray {
 								clientSrc += "			var entities = []\n"
 								clientSrc += "			if(caller.results[0] == null){\n"
-								clientSrc += "				caller.successCallback(entities, caller.caller)\n"
+								clientSrc += "				if(caller.successCallback != undefined){\n"
+								clientSrc += "					caller.successCallback(entities, caller.caller)\n"
+								clientSrc += "				}\n"
 								clientSrc += "				return\n"
 								clientSrc += "			}\n"
 								clientSrc += "			for (var i = 0; i < caller.results[0].length; i++) {\n"
@@ -547,8 +548,10 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 								clientSrc += "					entity.initCallback = function (caller) {\n"
 								clientSrc += "						return function (entity) {\n"
 								clientSrc += "							server.entityManager.setEntity(entity)\n"
-								clientSrc += "							caller.successCallback(entities, caller.caller)\n"
-								clientSrc += "							caller.successCallback = undefined\n"
+								clientSrc += "							if(caller.successCallback != undefined){\n"
+								clientSrc += "								caller.successCallback(entities, caller.caller)\n"
+								clientSrc += "								caller.successCallback = undefined\n"
+								clientSrc += "							}\n"
 								clientSrc += "						}\n"
 								clientSrc += "					} (caller)\n"
 								clientSrc += "				}else{\n"
@@ -567,7 +570,9 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 
 								// In case of existing entity.
 								clientSrc += "			if (entities[caller.results[0].UUID] != undefined && caller.results[0].TYPENAME == caller.results[0].__class__) {\n"
-								clientSrc += "				caller.successCallback(entities[caller.results[0].UUID], caller.caller)\n"
+								clientSrc += "				if(caller.successCallback != undefined){\n"
+								clientSrc += "					caller.successCallback(entities[caller.results[0].UUID], caller.caller)\n"
+								clientSrc += "				}\n"
 								clientSrc += "				return // break it here.\n"
 								clientSrc += "			}\n\n"
 
@@ -596,7 +601,9 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 
 						} else {
 							// Here I got a regulat type.
-							clientSrc += "		caller.successCallback(results, caller.caller)\n"
+							clientSrc += "		if(caller.successCallback != undefined){\n"
+							clientSrc += "			caller.successCallback(results, caller.caller)\n"
+							clientSrc += "		}\n"
 						}
 					} else {
 						clientSrc += "		caller.successCallback(results, caller.caller)\n"
