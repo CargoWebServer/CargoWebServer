@@ -425,23 +425,25 @@ Table.prototype.appendRow = function (values, id) {
 		this.rowsId[id] = row
 
 		// Set the update listener for each row entity...
-		if (this.model.constructor === EntityTableModel) {
-			server.entityManager.attach(this, UpdateEntityEvent, function (evt, table) {
-				if (evt.dataMap["entity"] != undefined) {
-					var entity = entities[evt.dataMap["entity"].UUID]
-					if (entity != undefined) {
-						for (var i = 0; i < table.model.entities.length; i++) {
-							if (table.model.entities[i] != undefined) {
-								if (table.model.entities[i].UUID == entity.UUID) {
-									row = row.table.appendRow(entity, entity.UUID)
-									row.table.model.entities[row.index] = entity
-									row.saveBtn.element.style.visibility = "hidden"
+		if (id.length > 0) {
+			if (this.model.constructor === EntityTableModel) {
+				server.entityManager.attach(this, UpdateEntityEvent, function (evt, table) {
+					if (evt.dataMap["entity"] != undefined) {
+						var entity = entities[evt.dataMap["entity"].UUID]
+						if (entity != undefined) {
+							for (var i = 0; i < table.model.entities.length; i++) {
+								if (table.model.entities[i] != undefined) {
+									if (table.model.entities[i].UUID == entity.UUID) {
+										row = row.table.appendRow(entity, entity.UUID)
+										row.table.model.entities[row.index] = entity
+										row.saveBtn.element.style.visibility = "hidden"
+									}
 								}
 							}
 						}
 					}
-				}
-			})
+				})
+			}
 		}
 	} else {
 		// Here i will update the values...
@@ -842,7 +844,7 @@ TableCell.prototype.formatValue = function (value) {
 	fieldType = fieldType.replace("[]", "")
 
 	// if its xs type... 
-	var isBaseType = isXsBaseType(fieldType) || field == "M_valueOf" || field == "M_listOf"
+	var isBaseType = isXsBaseType(fieldType) || isXsBaseType(baseType) || field == "M_valueOf" || field == "M_listOf"
 	if (isBaseType) {
 		if (!isArray_) {
 			if (isXsDate(fieldType)) {
@@ -1077,7 +1079,7 @@ TableCell.prototype.formatValue = function (value) {
 					}
 				}
 
-				newLnkButton.element.onclick = function (valueDiv, entity, fieldType, field) {
+				newLnkButton.element.onclick = function (valueDiv, entity, fieldType, field, cell) {
 					return function () {
 						var newLnkInput = valueDiv.getChildById("new_" + field + "_input_lnk")
 
@@ -1093,7 +1095,7 @@ TableCell.prototype.formatValue = function (value) {
 
 						// Now i will set it autocompletion list...
 						attachAutoCompleteInput(newLnkInput, fieldType, field, valueDiv, entity.getTitles(),
-							function (newLnkInput, entity, field, valueDiv) {
+							function (newLnkInput, entity, field, valueDiv, cell) {
 								return function (value) {
 									// I will get the value from the entity manager...
 									if (value.UUID.length > 0) {
@@ -1103,26 +1105,16 @@ TableCell.prototype.formatValue = function (value) {
 									createItemLnk(entity, value, field, lnkDiv)
 									newLnkInput.element.parentNode.removeChild(newLnkInput.element)
 									appendObjectValue(entity, field, value)
-									// Automatically saved...
-									if (entity.UUID != "") {
-										server.entityManager.saveEntity(entity)
-									} else {
-										// Here the entity dosent exist...
-										server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, "", entity,
-											function (result, caller) {
-												caller.style.visibility = "hidden"
-											},
-											function () {
 
-											}, this)
-									}
+									cell.row.saveBtn.element.style.visibility = "visible"
+
 								}
-							} (newLnkInput, entity, field, valueDiv))
+							} (newLnkInput, entity, field, valueDiv, cell))
 
 						newLnkInput.element.focus()
 						newLnkInput.element.select();
 					}
-				} (valueDiv, entity, itemPrototype.TypeName, field)
+				} (valueDiv, entity, itemPrototype.TypeName, field, this)
 
 				return content
 			} else {
@@ -1350,8 +1342,10 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 
 	// One editor at time.
 	if (editor != undefined) {
-		if (editor.element.parentNode != undefined) {
+		try {
 			editor.element.parentNode.removeChild(editor.element)
+		} catch (err) {
+
 		}
 		delete this.row.table.cellEditors[this.index]
 		editor = null
@@ -1359,6 +1353,10 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 
 	var prototype = this.row.table.model.proto
 	var entity = null
+
+	// I will get the field...
+	var field = prototype.Fields[this.index + 2]
+	var fieldType = prototype.FieldsType[this.index + 2]
 
 	// The value...
 	if (value != null) {
@@ -1402,10 +1400,14 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 			editor.element.value = value
 		} else if (prototype != null) {
 			// get the rentity reference from the model.
-			var entity = entities[this.row.table.model.entities[this.row.index].UUID]
-			if (entity == undefined) {
+			if (this.row.table.model.entities[this.row.index].UUID.length > 0) {
+				if (entities[this.row.table.model.entities[this.row.index].UUID] != undefined) {
+					entity = entities[this.row.table.model.entities[this.row.index].UUID]
+				}
+			} else {
 				entity = this.row.table.model.entities[this.row.index]
 			}
+
 			// If is an object...
 			var isArray = type.startsWith("[]")
 			var isRef = type.endsWith(":Ref")
@@ -1413,12 +1415,11 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 
 			if (isRef) {
 				// if the field is an array it will be display by another array in the array...
-				var field = prototype.Fields[this.index + 2]
 				if (isArray) {
 					// nothing todo here...
 					//var editor = appendRefEditor(this.div, entity, type, field)
 				} else {
-					value = new Element(this.valueDiv, { "tag": "div" })
+					//value = new Element(this.valueDiv, { "tag": "div" })
 
 					// The editor will be an input box
 					var editor = this.div.appendElement({ "tag": "input", "style": "display: inline;" }).down()
@@ -1430,6 +1431,14 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 					// I will keep the reference of the new and delete button inside the editor itself.
 					editor.element.focus()
 					editor.element.select();
+
+					// Set clear function
+					editor.clear = function () {
+						return function () {
+							editor.element.value = ""
+						}
+					} (editor)
+
 					// Now i will set it autocompletion list...
 					attachAutoCompleteInput(editor, type, field, entity, [],
 						function (tableCell, entity, field, valueDiv, editor) {
@@ -1441,24 +1450,19 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 										if (value.UUID.length > 0) {
 											value = entities[value.UUID]
 										}
-										var lnkDiv = valueDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
-										createItemLnk(entity, value, field, lnkDiv)
-										delete tableCell.row.table.cellEditors[tableCell.index]
-										editor.element.parentNode.removeChild(editor.element)
-										valueDiv.element.style.display = ""
-										appendObjectValue(entity, field, value)
-										// Automatically saved...
-										if (entity.UUID != "") {
-											server.entityManager.saveEntity(entity)
-										} else {
-											// Here the entity dosent exist...
-											server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, "", entity,
-												function (result, caller) {
-													caller.style.visibility = "hidden"
-												},
-												function () {
+										if (document.getElementById(value.UUID + "_" + field + "_lnk") == undefined) {
 
-												}, this)
+											appendObjectValue(entity, field, value)
+
+											var lnkDiv = valueDiv.appendElement({ "tag": "div", "id": value.UUID + "_" + field + "_lnk", "style": "display: table-row;" }).down()
+											createItemLnk(entity, value, field, lnkDiv)
+
+											delete tableCell.row.table.cellEditors[tableCell.index]
+
+											valueDiv.element.style.display = ""
+											tableCell.row.saveBtn.element.style.visibility = "visible"
+											entity.parentLnk = tableCell.row.table.model.entities[tableCell.row.index].parentLnk
+											tableCell.row.table.model.entities[tableCell.row.index] = entity
 										}
 									}
 								}
@@ -1479,11 +1483,9 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 							}
 						}
 
-						// I will get the field...
-						var field = prototype.Fields[this.index + 2]
-						editor.entity = entity[field]
 						// Set to the current value.
 						editor.element.value = value
+
 						// Hide the value div.
 						this.valueDiv.element.style.display = "none"
 					}
@@ -1498,7 +1500,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 		this.div.appendElement(editor)
 		editor.element.value = value
 		this.valueDiv.element.style.display = "none"
-		editor.entity = entity
+
 		editor.element.focus()
 		if (editor.element.select != undefined) {
 			editor.element.select()
@@ -1513,7 +1515,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 		editor.element.style.padding = "0px"
 		editor.element.style.margin = "0px"
 
-		var onblur = function (self, editor, onblur) {
+		var onblur = function (self, editor, onblur, field, entity) {
 			// If the value change...
 			return function () {
 				var value
@@ -1524,12 +1526,12 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				}
 
 				if (self.value != value) {
-					if (editor.entity != undefined) {
-						if (editor.entity.M_valueOf != undefined) {
-							editor.entity.M_valueOf = value
-							editor.entity.NeedSave = true
-						}
-						self.setValue(editor.entity)
+					if (entity != undefined) {
+						entity[field] = value
+						entity.NeedSave = true
+						self.setValue(value)
+						// set the table entity.
+						self.row.table.model.entities[self.row.index] = entity
 					} else {
 						self.setValue(value)
 					}
@@ -1544,11 +1546,15 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				if (this.parentNode != null) {
 					this.parentNode.removeChild(this)
 				}
-
 				self.valueDiv.element.style.display = ""
-				editor.element.onblur = undefined
+				try {
+					editor.element.parentNode.removeChild(editor.element)
+				} catch (err) {
+
+				}
+
 			}
-		} (this, editor, onblur)
+		} (this, editor, onblur, field, entity)
 
 		editor.element.onblur = onblur
 	}

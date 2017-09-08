@@ -541,9 +541,10 @@ function setObjectValues(object, values) {
         if (propertyType != null) {
             // Condition...
             var isRef = propertyType.endsWith(":Ref")
+            var baseType = getBaseTypeExtension(propertyType)
 
             // M_listOf, M_valueOf field or enumeration type contain plain value.
-            var isBaseType = propertyType.startsWith("sqltypes.") && !propertyType.startsWith("[]sqltypes.") || propertyType.startsWith("[]xs.") || propertyType.startsWith("xs.") || property == "M_listOf" || property == "M_valueOf" || propertyType.startsWith("enum:")
+            var isBaseType =  isXsBaseType(baseType) || propertyType.startsWith("sqltypes.") && !propertyType.startsWith("[]sqltypes.") || propertyType.startsWith("[]xs.") || propertyType.startsWith("xs.") || property == "M_listOf" || property == "M_valueOf" || propertyType.startsWith("enum:")
 
             if (values[property] != null) {
                 if (isBaseType) {

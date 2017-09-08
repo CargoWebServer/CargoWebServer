@@ -40,8 +40,8 @@ function attachAutoComplete(control, elementLst, autoComplete) {
                     return function (user) {
                         if (isString(user)) {
                             return user.substring(0, val.length).toUpperCase() == val.toUpperCase()
-                        }else if(isInt(user) || isNumeric(user)){
-                             user.toString().substring(0, val.length).toUpperCase() == val.toUpperCase()
+                        } else if (isInt(user) || isNumeric(user)) {
+                            user.toString().substring(0, val.length).toUpperCase() == val.toUpperCase()
                         }
                     }
                 } (control.element.value))
@@ -50,20 +50,22 @@ function attachAutoComplete(control, elementLst, autoComplete) {
                     // Append the element...
                     for (var i = 0; i < values.length; i++) {
                         var value = values[i]
-                        if(!isString(value)){
+                        if (!isString(value)) {
                             value = value.toString()
                         }
                         var elementDiv = autocompleteDiv.appendElement({ "tag": "div", "innerHtml": value, "style": "display: block;", "id": i }).down()
                         // Here i will append the click event...
                         elementDiv.element.onclick = function (control, autocompleteDiv, value) {
                             return function () {
+                                if (control.element.value != value) {
+                                    control.element.value = value
+                                    if (control.element.onchange != null) {
+                                        control.element.onchange()
+                                    }
+                                }
+                                currentIndex = -1
                                 autocompleteDiv.removeAllChilds()
                                 autocompleteDiv.element.style.display = "none"
-                                control.element.value = value
-                                currentIndex = -1
-                                if (control.element.onchange != null) {
-                                    control.element.onchange()
-                                }
                             }
                         } (control, autocompleteDiv, values[i])
                     }

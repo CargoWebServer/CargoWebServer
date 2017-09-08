@@ -233,6 +233,7 @@ EntityTableModel.prototype.removeRow = function (rowIndex) {
         if (entity != null) {
             // Here I will ask the user if here realy want to remove the entity...
             var confirmDialog = new Dialog(randomUUID(), undefined, true)
+            confirmDialog.div.element.style.maxWidth = "450px"
             confirmDialog.setCentered()
             server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
             var prototype = entityPrototypes[entity.TYPENAME]

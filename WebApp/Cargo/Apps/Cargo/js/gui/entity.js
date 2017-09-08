@@ -139,7 +139,7 @@ EntityPanel.prototype.init = function (proto, initCallback) {
 	//this.panel.removeAllChilds()
 	this.panel.element.innerHTML = ""
 	this.panel.childs = {}
-	
+
 	// Init the header.
 	this.initHeader()
 
@@ -772,8 +772,6 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						if (itemPrototype != undefined) {
 							var item = eval("new " + itemPrototype.TypeName + "()")
 							item.TYPENAME = itemPrototype.TypeName
-							//item.UUID = randomUUID() // temp uuid
-							//entities[item.UUID] = item
 
 							// Set the parent uuid.
 							item.ParentUuid = entityPanel.entity.UUID
@@ -846,8 +844,6 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 					if (entityPanel.entity == null) {
 						// Here I will create a new entity.
 						var entity = eval("new " + entityPanel.typeName)
-						//entity.UUID = randomUUID() // temp uuid
-						//entities[entity.UUID] = entity
 
 						// set basic values.
 						if (entityPanel.parentEntity != null) {
@@ -1445,10 +1441,6 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 							}
 						}
 					}
-					var value = objMap[this.value]
-					if (value != undefined) {
-						onSelect(value)
-					}
 				}
 			} (entityPanel, field, input, objMap))
 
@@ -1457,6 +1449,11 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 					var value = objMap[this.value]
 					if (value != undefined) {
 						onSelect(value)
+						try {
+							this.parentNode.removeChild(this)
+						} catch (err) {
+						}
+
 					} else {
 						// TODO correct it...
 						entityPanel.clear()

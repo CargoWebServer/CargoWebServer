@@ -574,6 +574,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 										}
 									}
 								} else {
+									//log.Println("-------> plain string: ", fieldName, results[0][i])
 									// A plain string...
 									this.setValue(fieldName, results[0][i])
 								}
@@ -593,7 +594,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 	// set init done.
 	this.SetInit(true)
 	this.SetNeedSave(false)
-
+	log.Println("-------> 597: ", this.GetObject())
 	GetServer().GetEntityManager().InitEntity(this, lazy)
 
 	// if some change are found at initialysation I will update the values.
@@ -1040,6 +1041,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	}
 
 	if err == nil {
+		log.Println("---> value save: ", this.GetObject())
 		if storeId == "sql_info" {
 			// Now I will initialyse references
 			dataManager.setEntityReferences(this.uuid, false)

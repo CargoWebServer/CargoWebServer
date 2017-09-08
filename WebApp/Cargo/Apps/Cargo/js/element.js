@@ -306,7 +306,13 @@ Element.prototype.removeElement = function (e) {
 * @stability 1
 */
 Element.prototype.removeAllChilds = function () {
-    this.innerHTML = ""
+    for (var id in this.childs) {
+        if (this.childs[id].element != undefined) {
+            if (this.childs[id].element.parentNode != null) {
+                this.childs[id].element.parentNode.removeChild(this.childs[id].element)
+            }
+        }
+    }
     this.childs = {}
 }
 
