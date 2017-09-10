@@ -311,6 +311,8 @@ EntityTableModel.prototype.appendRow = function (values) {
                 objectValues[j] = []
             } else if (isRef) {
                 objectValues[j] = null
+            } else {
+                objectValues[j] = null
             }
         }
         if (j == this.titles.length - 1) {

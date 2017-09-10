@@ -309,7 +309,10 @@ Element.prototype.removeAllChilds = function () {
     for (var id in this.childs) {
         if (this.childs[id].element != undefined) {
             if (this.childs[id].element.parentNode != null) {
-                this.childs[id].element.parentNode.removeChild(this.childs[id].element)
+                try {
+                    this.childs[id].element.parentNode.removeChild(this.childs[id].element)
+                } catch (err) {
+                }
             }
         }
     }
@@ -586,7 +589,7 @@ Element.prototype.animate = function (keyframe, time, endAnimationCallback, tran
                 this.removeEventListener(endAnimationListenerName, animationListner, true)
             }
         }
-    } (styleSheet, animationId, " _" + animationId + "_" + className, endAnimationCallback, endAnimationListenerName)
+    }(styleSheet, animationId, " _" + animationId + "_" + className, endAnimationCallback, endAnimationListenerName)
 
     // End animation event.
     this.element.addEventListener(endAnimationListenerName, animationListner, true);

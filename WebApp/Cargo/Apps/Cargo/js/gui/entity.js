@@ -139,6 +139,11 @@ EntityPanel.prototype.init = function (proto, initCallback) {
 	//this.panel.removeAllChilds()
 	this.panel.element.innerHTML = ""
 	this.panel.childs = {}
+	// Also remove sub entity panel here.
+	if (this.subEntityPanel != null) {
+		this.subEntityPanel.panel.element.innerHTML = ""
+		this.subEntityPanel.panel.childs = {}
+	}
 
 	// Init the header.
 	this.initHeader()
@@ -354,7 +359,7 @@ EntityPanel.prototype.initHeader = function () {
 			minimizeBtn.element.style.display = "table-cell"
 			fireResize()
 		}
-	} (this.entitiesDiv, this.minimizeBtn)
+	}(this.entitiesDiv, this.minimizeBtn)
 
 	this.minimizeBtn.element.onclick = function (entitiesDiv, maximizeBtn) {
 		return function () {
@@ -363,7 +368,7 @@ EntityPanel.prototype.initHeader = function () {
 			maximizeBtn.element.style.display = "table-cell"
 			fireResize()
 		}
-	} (this.entitiesDiv, this.maximizeBtn)
+	}(this.entitiesDiv, this.maximizeBtn)
 	this.minimizeBtn.element.click()
 
 	// The save button.
@@ -421,7 +426,7 @@ EntityPanel.prototype.initHeader = function () {
 
 			}
 		}
-	} (this))
+	}(this))
 
 	// The remove button.
 	this.deleteBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: none;" }).down()
@@ -455,10 +460,10 @@ EntityPanel.prototype.initHeader = function () {
 							}, entityPanel)
 						dialog.close()
 					}
-				} (confirmDialog, entityPanel)
+				}(confirmDialog, entityPanel)
 			}
 		}
-	} (this)
+	}(this)
 
 	// Set the title div, the type is the default title.
 	this.header.appendElement({ "tag": "div", "class": "entity_type" }).down()
@@ -480,7 +485,7 @@ EntityPanel.prototype.initHeader = function () {
 				entityPanel.panel.element.style.display = "none"
 				entityPanel.parentEntityPanel.panel.element.style.display = ""
 			}
-		} (this)
+		}(this)
 	}
 }
 
@@ -545,8 +550,12 @@ EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType
 	}
 
 	var control = null
-
+	var isEnum = false
 	if (restrictions.length > 0) {
+		isEnum = restrictions[0].Type == 1
+	}
+
+	if (isEnum) { // The restriction represent a list of values here.
 		if (restrictions[0].Type == 1) {
 			control = appendSelect(restrictions, id, valueDiv)
 		}
@@ -626,13 +635,22 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 		restrictions = []
 	}
 
+	var baseType = getBaseTypeExtension(fieldType)
 	// If the value is simple string...
-	if (!isArray && (fieldType.startsWith("sqltypes.") || fieldType.startsWith("xs.") || fieldType.startsWith("enum:"))) {
+	if (!isArray && (isXsBaseType(baseType) || fieldType.startsWith("sqltypes.") || fieldType.startsWith("xs.") || fieldType.startsWith("enum:"))) {
 		// in case of an enum
 		if (fieldType.startsWith("enum:")) {
 			var values = fieldType.replace("enum:", "").split(":")
 			for (var i = 0; i < values.length; i++) {
 				restrictions.push({ "Type": 1, "Value": values[i] })
+			}
+		} else {
+			var fieldPrototype = entityPrototypes[fieldType]
+			if (fieldPrototype != undefined) {
+				if (fieldPrototype.Restrictions != undefined) {
+					// Set the restriction here.
+					restrictions = fieldPrototype.Restrictions
+				}
 			}
 		}
 		control = this.createXsControl(id, valueDiv, field, fieldType, restrictions)
@@ -660,7 +678,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							table.init()
 							table.refresh()
 						}
-					} (itemTable))
+					}(itemTable))
 
 				} else {
 					var tableModel = new TableModel(["index", "values"])
@@ -750,15 +768,16 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 													// Here the entity dosent exist...
 													server.entityManager.createEntity(entityPanel.entity.ParentUuid, entityPanel.entity.parentLnk, entityPanel.entity.TYPENAME, "", entityPanel.entity,
 														function (result, caller) {
-															caller.style.visibility = "hidden"
+															// Set the result inside the panel.
+															entityPanel.setEntity(result)
 														},
 														function () {
 
-														}, this)
+														}, entityPanel)
 												}
 											}
 										}
-									} (entityPanel, field))
+									}(entityPanel, field))
 
 								entityPanel.controls[id + "_new"].element.focus()
 								entityPanel.controls[id + "_new"].element.select();
@@ -803,7 +822,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 											server.entityManager.saveEntity(entity)
 										}
 									}
-								} (entityPanel.entity, field, newRow)
+								}(entityPanel.entity, field, newRow)
 
 								// The save row action
 								newRow.saveBtn.element.onclick = function (entity, field, row) {
@@ -822,7 +841,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 												}, this)
 										}
 									}
-								} (entityPanel.entity, field, newRow)
+								}(entityPanel.entity, field, newRow)
 
 								//itemTable.refresh()
 							}
@@ -830,7 +849,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 					}
 				}
-			} (this, field, fieldType, valueDiv)
+			}(this, field, fieldType, valueDiv)
 		}
 	}
 
@@ -857,7 +876,8 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 					}
 
 					/** Here it's a string **/
-					if (isXsId(fieldType) || isXsString(fieldType || isXsRef(fieldType))) {
+					var baseType = getBaseTypeExtension(fieldType)
+					if (isXsString(baseType) || isXsId(fieldType) || isXsString(fieldType || isXsRef(fieldType))) {
 						if (entity[attribute] != this.value) {
 							entity[attribute] = this.value
 							entity.NeedSave = true
@@ -905,7 +925,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						server.entityManager.setEntity(entity)
 					}
 				}
-			} (this, field, fieldType))
+			}(this, field, fieldType))
 
 			// Append the listener to display the save button.
 			control.element.addEventListener("keyup", function (entityPanel) {
@@ -916,7 +936,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						}
 					}
 				}
-			} (this))
+			}(this))
 		}
 
 		// if the field is an index key i will set the auto complete on it...
@@ -932,7 +952,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							entityPanel.setEntity(value)
 						}
 					}
-				} (this))
+				}(this))
 		}
 	}
 }
@@ -1006,7 +1026,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 							server.entityManager.saveEntity(entity)
 						}
 					}
-				} (entities[parentUuid], field, row)
+				}(entities[parentUuid], field, row)
 
 				// The save row action
 				row.saveBtn.element.onclick = function (entity, field, row) {
@@ -1036,7 +1056,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 							}
 						}
 					}
-				} (entities[parentUuid], field, row)
+				}(entities[parentUuid], field, row)
 			}
 		}
 	}
@@ -1052,7 +1072,7 @@ EntityPanel.prototype.appendObject = function (object, valueDiv, field, fieldTyp
 			return function (panel) {
 				panel.setEntity(value)
 			}
-		} (object),
+		}(object),
 		undefined, true, object, field)
 }
 
@@ -1123,7 +1143,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 							panel.setTitle(object.TYPENAME)
 
 						}
-					} (object), propertiePanel)
+					}(object), propertiePanel)
 				}
 
 				if (propertiePanel.subEntityPanel != null) {
@@ -1142,10 +1162,10 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 						entityPanel.panel.element.style.display = "none"
 						entityPanel.subEntityPanel.panel.element.style.display = ""
 					}
-				} (propertiePanel)
+				}(propertiePanel)
 
 			}
-		} (object, this)
+		}(object, this)
 
 		ref.element.onmouseover = function (object) {
 			return function () {
@@ -1165,7 +1185,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 					}
 				}
 			}
-		} (object)
+		}(object)
 
 		ref.element.onmouseout = function (object) {
 			return function () {
@@ -1186,7 +1206,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 					}
 				}
 			}
-		} (object)
+		}(object)
 
 		deleteLnkButton.element.onclick = function (entityUUID, object, field) {
 			return function () {
@@ -1205,7 +1225,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 					entity.onChange(entity)
 				}
 			}
-		} (this.entity.UUID, object, field)
+		}(this.entity.UUID, object, field)
 	}
 
 }
@@ -1246,10 +1266,11 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 
 	// Here I will see if the type is derived basetype...
 	if (!fieldType.startsWith("[]") && !isRef) {
+		var baseType = getBaseTypeExtension(fieldType)
 		if (fieldType.startsWith("enum:")) {
 			// Here the value is an enumeration...
 			control.element.selectedIndex = parseInt(value) - 1
-		} else if (isXsString(fieldType) || fieldType == "interface{}") {
+		} else if (isXsString(baseType) || isXsString(fieldType) || fieldType == "interface{}") {
 			control.element.value = value
 		} else if (isXsNumeric(fieldType)) {
 			if (value != "") {
@@ -1309,7 +1330,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 									return function (ref) {
 										panel.appendObjectRef(ref, control, field, fieldType)
 									}
-								} (this, control, field, fieldType)
+								}(this, control, field, fieldType)
 							)
 						}
 					}
@@ -1345,7 +1366,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 								return function (ref) {
 									panel.appendObjectRef(ref, control, field, fieldType)
 								}
-							} (this, control, field, fieldType)
+							}(this, control, field, fieldType)
 						)
 					}
 				} else {
@@ -1442,24 +1463,16 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 						}
 					}
 				}
-			} (entityPanel, field, input, objMap))
+			}(entityPanel, field, input, objMap))
 
 			input.element.onblur = input.element.onchange = function (objMap, values, entityPanel, onSelect) {
 				return function (evt) {
 					var value = objMap[this.value]
 					if (value != undefined) {
 						onSelect(value)
-						try {
-							this.parentNode.removeChild(this)
-						} catch (err) {
-						}
-
-					} else {
-						// TODO correct it...
-						entityPanel.clear()
 					}
 				}
-			} (objMap, values, entityPanel, onSelect)
+			}(objMap, values, entityPanel, onSelect)
 
 		},
 		function (errMsg, caller) {

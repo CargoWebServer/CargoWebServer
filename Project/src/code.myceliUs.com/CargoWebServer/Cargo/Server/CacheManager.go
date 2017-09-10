@@ -210,7 +210,6 @@ func (this *CacheManager) run() {
  */
 func (this *CacheManager) set(entity Entity) {
 	// Set the entity.
-
 	index := this.orderedItems.getItemIndex(entity.GetUuid())
 	var item *CacheItem
 

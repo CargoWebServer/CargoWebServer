@@ -97,7 +97,27 @@ var EntityPrototype = function () {
  */
 EntityPrototype.prototype.getTitles = function () {
     // The get title default function... can be overload.
-    return [this.Ids[1]] // The first index only...
+    var titles = []
+
+    // The ids
+    for (var i = 1; i < this.Ids.length; i++) {
+        var fieldIndex = this.getFieldIndex(this.Ids[i])
+        var field = this.Fields[fieldIndex]
+        if (this.FieldsVisibility[fieldIndex] == true) {
+            titles.push(this[field])
+        }
+    }
+    // The indexs
+    for (var i = 1; i < this.Indexs.length; i++) {
+        var fieldIndex = this.getFieldIndex(this.Indexs[i])
+        var field = this.Fields[fieldIndex]
+        if (this.FieldsVisibility[fieldIndex] == true) {
+            titles.push(this[field])
+        }
+    }
+
+    return titles
+
 }
 
 /**
@@ -193,10 +213,10 @@ EntityPrototype.prototype.init = function (object) {
  * This function generate the js class base on the entity prototype.
  */
 EntityPrototype.prototype.generateConstructor = function () {
-    if(this.ClassName.indexOf(" ") > 0){
+    if (this.ClassName.indexOf(" ") > 0) {
         return
     }
-    
+
     var constructorSrc = this.PackageName + " || {};\n"
 
     var packageName = this.PackageName
@@ -305,16 +325,34 @@ EntityPrototype.prototype.generateConstructor = function () {
     }
 
     // The get title default function... can be overload.
+    constructorSrc += " this.getTitles = function(){\n"
+    var fields = ""
+    // The ids
     for (var i = 1; i < this.Ids.length; i++) {
         var fieldIndex = this.getFieldIndex(this.Ids[i])
         var field = this.Fields[fieldIndex]
         if (this.FieldsVisibility[fieldIndex] == true) {
-            constructorSrc += " this.getTitles = function(){\n"
-            constructorSrc += "     return [this." + field + "]\n"
-            constructorSrc += " }\n"
-            break
+            if (fields.length > 0) {
+                fields = fields + ", this." + field
+            } else {
+                fields = "this." + field
+            }
         }
     }
+    // The indexs
+    for (var i = 1; i < this.Indexs.length; i++) {
+        var fieldIndex = this.getFieldIndex(this.Indexs[i])
+        var field = this.Fields[fieldIndex]
+        if (this.FieldsVisibility[fieldIndex] == true) {
+            if (fields.length > 0) {
+                fields = fields + ",this." + field
+            } else {
+                fields = "this." + field
+            }
+        }
+    }
+    constructorSrc += "     return [" + fields + "]\n"
+    constructorSrc += " }\n"
 
     // Keep the reference on the entity prototype.
     // The class level.

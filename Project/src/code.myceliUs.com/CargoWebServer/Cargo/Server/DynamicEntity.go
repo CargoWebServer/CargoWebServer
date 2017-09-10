@@ -126,6 +126,7 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 	if val, ok := this.contain(values["UUID"].(string)); ok {
 		if val != nil {
 			entity = val.(*DynamicEntity)
+
 			// Calculate the checksum.
 			sum0 := Utility.GetChecksum(values)
 			sum1 := entity.GetChecksum()
@@ -133,11 +134,14 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 				entity.SetObjectValues(values)
 				entity.SetNeedSave(true)
 			} else {
-				// If the value dosent exist It need to be save...
-				if entity.Exist() == false {
-					entity.SetNeedSave(true)
-				} else {
-					entity.SetNeedSave(false)
+				// If the value dosent exist It need to be save
+				// and is not already need save...
+				if !entity.NeedSave() {
+					if entity.Exist() == false {
+						entity.SetNeedSave(true)
+					} else {
+						entity.SetNeedSave(false)
+					}
 				}
 			}
 
@@ -180,7 +184,7 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 
 	// insert it into the cache.
 	this.insert(entity)
-
+	log.Println("---------> insert ", entity.GetObject())
 	return entity, nil
 }
 
@@ -566,6 +570,8 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 													dynamicEntity.AppendReferenced(fieldName, this)
 													this.AppendChild(fieldName, dynamicEntity)
 												}
+											} else {
+												log.Println("-------> 570 error ", errObj.GetBody())
 											}
 										} else {
 											staticEntity.(Entity).InitEntity(uuid, lazy)
@@ -594,7 +600,6 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 	// set init done.
 	this.SetInit(true)
 	this.SetNeedSave(false)
-	log.Println("-------> 597: ", this.GetObject())
 	GetServer().GetEntityManager().InitEntity(this, lazy)
 
 	// if some change are found at initialysation I will update the values.
@@ -608,6 +613,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 		dataManager.setEntityReferences(this.uuid, false)
 	}
 
+	//log.Println("After init:", toJsonStr(this.object))
 	return nil
 }
 
@@ -970,6 +976,8 @@ func (this *DynamicEntity) saveEntity(path string) {
 										if subEntity.NeedSave() {
 											subEntity.saveEntity(path + "|" + this.GetUuid())
 										}
+									} else {
+										log.Println("-----> 979 error  ", errObj.GetBody())
 									}
 								} else {
 									staticEntity.(Entity).AppendReferenced(fieldName, this)
@@ -1041,7 +1049,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 	}
 
 	if err == nil {
-		log.Println("---> value save: ", this.GetObject())
 		if storeId == "sql_info" {
 			// Now I will initialyse references
 			dataManager.setEntityReferences(this.uuid, false)
@@ -1055,6 +1062,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	} else {
 		log.Println(Utility.FileLine(), "Fail to save entity ", err)
 	}
+	//log.Println("After save:", toJsonStr(this.object))
 }
 
 /**
@@ -1494,12 +1502,10 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 		return
 	} else {
 		// here I will set the need save attribute.
-
 		sum0 := Utility.GetChecksum(values)
 		sum1 := entity.GetChecksum()
-
-		entity.SetNeedSave(sum0 != sum1)
 		this.setObject(entity.GetObject().(map[string]interface{}))
+		this.SetNeedSave(sum0 != sum1)
 	}
 
 	for i := 0; i < len(this.prototype.Fields); i++ {
