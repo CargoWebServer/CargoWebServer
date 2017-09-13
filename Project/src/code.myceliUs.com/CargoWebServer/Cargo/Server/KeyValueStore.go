@@ -165,13 +165,21 @@ func (this *KeyValueDataStore) setSuperTypeFields(prototype *EntityPrototype) {
 
 					// create a new index at the end...
 					if superPrototype.FieldsNillable != nil {
-						Utility.InsertBoolAt(2, superPrototype.FieldsNillable[j], &prototype.FieldsNillable)
+						isNillable := false
+						if j < len(superPrototype.FieldsNillable) {
+							isNillable = superPrototype.FieldsNillable[j]
+						}
+						Utility.InsertBoolAt(2, isNillable, &prototype.FieldsNillable)
 					} else {
 						prototype.FieldsNillable = append(prototype.FieldsNillable, true)
 					}
 
 					if superPrototype.FieldsDocumentation != nil {
-						Utility.InsertStringAt(2, superPrototype.FieldsDocumentation[j], &prototype.FieldsDocumentation)
+						documentation := ""
+						if j < len(superPrototype.FieldsDocumentation) {
+							documentation = superPrototype.FieldsDocumentation[j]
+						}
+						Utility.InsertStringAt(2, documentation, &prototype.FieldsDocumentation)
 					} else {
 						prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, "")
 					}

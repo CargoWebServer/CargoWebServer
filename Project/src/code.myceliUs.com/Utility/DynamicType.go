@@ -182,7 +182,10 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 								}
 
 							}
-							v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+
+							if fv.IsValid() {
+								v.Elem().FieldByName(name).Set(reflect.Append(v.Elem().FieldByName(name), fv))
+							}
 						}
 					} else if reflect.TypeOf(value).String() == "[]string" {
 						values := value.([]string)

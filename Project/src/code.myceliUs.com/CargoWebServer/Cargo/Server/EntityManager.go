@@ -1919,7 +1919,6 @@ func (this *EntityManager) ResetEntity(values interface{}) {
 //    )
 //}
 func (this *EntityManager) CreateEntity(parentUuid string, attributeName string, typeName string, objectId string, values interface{}, messageId string, sessionId string) interface{} {
-	log.Println("-------> create entity ", values)
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)

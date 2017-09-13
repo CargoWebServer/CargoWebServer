@@ -25,6 +25,10 @@
                                  not supported by any browser */
 }
 
+.row_button .fa-trash-o{
+	padding-left: 4px;
+}
+
 /** The entity type display **/
 .entity_type{
 	display: table-cell;

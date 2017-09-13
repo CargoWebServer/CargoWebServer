@@ -115,9 +115,7 @@ EntityPrototype.prototype.getTitles = function () {
             titles.push(this[field])
         }
     }
-
     return titles
-
 }
 
 /**
@@ -127,6 +125,20 @@ EntityPrototype.prototype.getTitles = function () {
 EntityPrototype.prototype.init = function (object) {
     if (object == null || object.TypeName == undefined) {
         return
+    }
+
+    if(object.FieldsNillable == null){
+        object.FieldsNillable = []
+        for(var i=0; i < object.Fields.length; i++){
+            object.FieldsNillable.push(false)
+        }
+    }
+
+    if(object.FieldsDocumentation == null){
+        object.FieldsDocumentation = []
+        for(var i=0; i < object.Fields.length; i++){
+            object.FieldsDocumentation.push("")
+        }
     }
 
     // The type name.
@@ -155,6 +167,8 @@ EntityPrototype.prototype.init = function (object) {
             object.Fields.unshift("ParentUuid")
             object.FieldsType.unshift("xs.string")
             object.FieldsVisibility.unshift(false)
+            object.FieldsNillable.unshift(false)
+            object.FieldsDocumentation.unshift("The parent object UUID")
             object.FieldsOrder.push(object.FieldsOrder.length)
         }
 
@@ -165,11 +179,13 @@ EntityPrototype.prototype.init = function (object) {
             object.FieldsType.unshift("xs.string")
             object.FieldsVisibility.unshift(false)
             object.FieldsOrder.push(object.FieldsOrder.length)
+            object.FieldsNillable.unshift(false)
+            object.FieldsDocumentation.unshift("The object UUID")
             object.Ids.unshift("UUID")
         }
 
         for (var i = 0; i < object.Fields.length; i++) {
-            this.appendField(object.Fields[i], object.FieldsType[i], object.FieldsVisibility[i], object.FieldsOrder[i])
+            this.appendField(object.Fields[i], object.FieldsType[i], object.FieldsVisibility[i], object.FieldsOrder[i], object.FieldsNillable[i], object.FieldsDocumentation[i])
             if (object.Fields[i] == "UUID") {
                 if (!contains(this.Ids, "UUID")) {
                     this.Ids.unshift("UUID")
@@ -201,8 +217,8 @@ EntityPrototype.prototype.init = function (object) {
     this.ListOf = object.ListOf
 
     // other standard fields.
-    this.appendField("childsUuid", "[]xs.string", false, this.Fields.length)
-    this.appendField("referenced", "[]Server.EntityRef", false, this.Fields.length)
+    this.appendField("childsUuid", "[]xs.string", false, this.Fields.length, false, "the array of child entities.")
+    this.appendField("referenced", "[]Server.EntityRef", false, this.Fields.length, false, "The field documentation.")
 
     // Generate the class code.
     this.generateConstructor()
@@ -267,7 +283,7 @@ EntityPrototype.prototype.generateConstructor = function () {
             } else if (isXsNumeric(this.FieldsType[i])) {
                 constructorSrc += " = 0.0\n"
             } else if (isXsDate(this.FieldsType[i])) {
-                constructorSrc += " = new Date()\n"
+                constructorSrc += " = moment().unix()\n"
             } else if (isXsBoolean(this.FieldsType[i])) {
                 constructorSrc += " = false\n"
             } else if (this.FieldsType[i].startsWith("enum:")) {
@@ -380,7 +396,7 @@ EntityPrototype.prototype.generateConstructor = function () {
  * @param {boolean} isVisible True, if the field is visible.
  * @param {int} order The order the field will be return, usefull to display.
  */
-EntityPrototype.prototype.appendField = function (name, typeName, isVisible, order) {
+EntityPrototype.prototype.appendField = function (name, typeName, isVisible, order, isNillable, documentation) {
     // Set the field name.
     if (!contains(this.Fields, name)) {
         this.Fields.push(name)
@@ -392,6 +408,10 @@ EntityPrototype.prototype.appendField = function (name, typeName, isVisible, ord
         this.FieldsVisibility.push(isVisible)
         // And the order (index in the list of fields.)
         this.FieldsOrder.push(parseInt(order))
+
+        this.FieldsNillable.push(isNillable)
+            
+        this.FieldsDocumentation.push(documentation)
     }
 }
 

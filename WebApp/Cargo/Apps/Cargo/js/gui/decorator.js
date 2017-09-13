@@ -4,11 +4,9 @@
  * to an existing text box...
  * @constructor
  * @param control The associated control where the message came from...
- * @param initLstCallback init callback
- * @param callback the function that is call to filter items...
- * @param finishCallback this is call when the value is retreive from the list...
+ * @param selectValue if definied that function is call when the value is selected.
  */
-function attachAutoComplete(control, elementLst, autoComplete) {
+function attachAutoComplete(control, elementLst, autoComplete, selectValue) {
     if (control.element.parentNode != undefined) {
         control.element.parentNode.style.position = "relative"
     }
@@ -23,7 +21,7 @@ function attachAutoComplete(control, elementLst, autoComplete) {
     var currentIndex = -1
 
     /* Save the key down event **/
-    control.element.addEventListener("keyup", function (control, autocompleteDiv, elementLst, autoComplete) {
+    control.element.addEventListener("keyup", function (control, autocompleteDiv, elementLst, autoComplete, selectValue) {
         return function (evt) {
 
             /* The div that contain items **/
@@ -37,11 +35,12 @@ function attachAutoComplete(control, elementLst, autoComplete) {
             if (control.element.value.length >= 1) {
                 // Filter the values...
                 values = _.select(elementLst, function (val) {
-                    return function (user) {
-                        if (isString(user)) {
-                            return user.substring(0, val.length).toUpperCase() == val.toUpperCase()
-                        } else if (isInt(user) || isNumeric(user)) {
-                            user.toString().substring(0, val.length).toUpperCase() == val.toUpperCase()
+                    return function (inputValue) {
+                        if (isString(inputValue)) {
+                            val = val.replace("[]", "")
+                            return inputValue.substring(0, val.length).toUpperCase() == val.toUpperCase()
+                        } else if (isInt(inputValue) || isNumeric(inputValue)) {
+                            inputValue.toString().substring(0, val.length).toUpperCase() == val.toUpperCase()
                         }
                     }
                 } (control.element.value))
@@ -55,26 +54,35 @@ function attachAutoComplete(control, elementLst, autoComplete) {
                         }
                         var elementDiv = autocompleteDiv.appendElement({ "tag": "div", "innerHtml": value, "style": "display: block;", "id": i }).down()
                         // Here i will append the click event...
-                        elementDiv.element.onclick = function (control, autocompleteDiv, value) {
+                        elementDiv.element.onclick = function (control, autocompleteDiv, value, selectValue) {
                             return function () {
                                 if (control.element.value != value) {
-                                    control.element.value = value
-                                    if (control.element.onchange != null) {
-                                        control.element.onchange()
+                                    if (selectValue == undefined) {
+                                        control.element.value = value
+                                    } else {
+                                        // Here the caller want to get control...
+                                        selectValue(value)
                                     }
+                                }
+                                if (control.element.onchange != null) {
+                                    control.element.onchange()
                                 }
                                 currentIndex = -1
                                 autocompleteDiv.removeAllChilds()
                                 autocompleteDiv.element.style.display = "none"
                             }
-                        } (control, autocompleteDiv, values[i])
+                        } (control, autocompleteDiv, values[i], selectValue)
                     }
 
                     // Display the list...
                     autocompleteDiv.element.style.display = "block"
                 } else if (values.length == 1) {
-                    control.element.value = values[0]
-                    control.element.select()
+                    if (selectValue == undefined) {
+                        control.element.value = values[0]
+                        control.element.select()
+                    } else {
+                        selectValue(values[0])
+                    }
                     autocompleteDiv.element.style.display = "none"
                 } else if (values.length == 0) {
                     autocompleteDiv.element.style.display = "none"
@@ -113,7 +121,7 @@ function attachAutoComplete(control, elementLst, autoComplete) {
                 }
             }
         }
-    } (control, control.autocompleteDiv, elementLst, autoComplete), true)
+    } (control, control.autocompleteDiv, elementLst, autoComplete, selectValue), true)
 
 }
 
