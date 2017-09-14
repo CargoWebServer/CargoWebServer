@@ -217,6 +217,28 @@ func (this *EntityPrototype) Create(storeId string) {
 }
 
 /**
+ * Save the new entity prototype in the data store.
+ */
+func (this *EntityPrototype) Save(storeId string) {
+
+	if len(storeId) == 0 {
+		storeId = this.TypeName[:strings.Index(this.TypeName, ".")]
+	}
+
+	store := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
+	if store != nil {
+		err := store.saveEntityPrototype(this)
+		if err != nil {
+			log.Println("Fail to save entity prototype ", this.TypeName, " in store id ", storeId)
+		}
+	}
+
+	// Register it to the vm...
+	JS.GetJsRuntimeManager().AppendScript(this.generateConstructor())
+
+}
+
+/**
  * Generate the JavaScript class defefinition.
  */
 func (this *EntityPrototype) generateConstructor() string {
