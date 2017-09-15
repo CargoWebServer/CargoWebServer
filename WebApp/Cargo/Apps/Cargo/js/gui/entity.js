@@ -135,6 +135,8 @@ EntityPanel.prototype.init = function (proto, initCallback) {
 		return
 	}
 
+	this.typeName = proto.TypeName
+
 	// First I will clear the current element.
 	//this.panel.removeAllChilds()
 	this.panel.element.innerHTML = ""
@@ -363,7 +365,7 @@ EntityPanel.prototype.initHeader = function () {
 			minimizeBtn.element.style.display = "table-cell"
 			fireResize()
 		}
-	} (this.entitiesDiv, this.minimizeBtn)
+	}(this.entitiesDiv, this.minimizeBtn)
 
 	this.minimizeBtn.element.onclick = function (entitiesDiv, maximizeBtn) {
 		return function () {
@@ -372,7 +374,7 @@ EntityPanel.prototype.initHeader = function () {
 			maximizeBtn.element.style.display = "table-cell"
 			fireResize()
 		}
-	} (this.entitiesDiv, this.maximizeBtn)
+	}(this.entitiesDiv, this.maximizeBtn)
 	this.minimizeBtn.element.click()
 
 	// The save button.
@@ -431,7 +433,7 @@ EntityPanel.prototype.initHeader = function () {
 
 			}
 		}
-	} (this))
+	}(this))
 
 	// The remove button.
 	this.deleteBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: none;" }).down()
@@ -465,14 +467,49 @@ EntityPanel.prototype.initHeader = function () {
 							}, entityPanel)
 						dialog.close()
 					}
-				} (confirmDialog, entityPanel)
+				}(confirmDialog, entityPanel)
 			}
 		}
-	} (this)
+	}(this)
 
 	// Set the title div, the type is the default title.
-	this.header.appendElement({ "tag": "div", "class": "entity_type" }).down()
-		.appendElement({ "tag": "div", "id": this.typeName, "innerHtml": this.typeName })
+	var typeDiv = this.header.appendElement({ "tag": "div", "class": "entity_type" }).down()
+	var titleDiv = typeDiv.appendElement({ "tag": "div", "style":"display: table-row;"}).down()
+	var titleSpan = titleDiv.appendElement({ "tag": "span", "style":"display: table-cell;", "id": this.typeName, "innerHtml": this.typeName }).down()
+	
+	// Now I will set the list of substitution group.
+	if (this.proto.SubstitutionGroup != undefined) {
+		var substitutionGroupSelect = titleDiv.appendElement({ "tag": "select", "style": "display: none;" }).down()
+		
+		if (this.proto.SubstitutionGroup.length > 0) {
+			var substitutionGroup = this.proto.SubstitutionGroup.sort()
+			if(substitutionGroup.indexOf("")==-1){
+				substitutionGroup.unshift("")				
+			}
+
+			// Here I will append the list of substitution group in the result...
+			for (var i = 0; i < substitutionGroup.length; i++) {
+				substitutionGroupSelect.appendElement({ "tag": "option", "value": substitutionGroup[i], "innerHtml": substitutionGroup[i] })
+			}
+
+			substitutionGroupSelect.element.style.display = "table-cell"
+			substitutionGroupSelect.element.onchange = function (entityPanel) {
+				return function () {
+					// In that case I will set the entity content with the given type.
+					server.entityManager.getEntityPrototype(this.value, this.value.split(".")[0],
+						function (proto, entityPanel) {
+							entityPanel.init(proto, function (entityPanel) {
+								entityPanel.maximizeBtn.element.click()
+							})
+						},
+						function () {
+
+						}, entityPanel)
+				}
+			}(this)
+		}
+	}
+
 
 	this.spacer = this.header.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" }).down()
 	this.moveUp = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell;" }).down()
@@ -490,7 +527,7 @@ EntityPanel.prototype.initHeader = function () {
 				entityPanel.panel.element.style.display = "none"
 				entityPanel.parentEntityPanel.panel.element.style.display = ""
 			}
-		} (this)
+		}(this)
 	}
 }
 
@@ -683,7 +720,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							table.init()
 							table.refresh()
 						}
-					} (itemTable))
+					}(itemTable))
 
 				} else {
 					var tableModel = new TableModel(["index", "values"])
@@ -782,7 +819,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 												}
 											}
 										}
-									} (entityPanel, field))
+									}(entityPanel, field))
 
 								entityPanel.controls[id + "_new"].element.focus()
 								entityPanel.controls[id + "_new"].element.select();
@@ -827,7 +864,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 											server.entityManager.saveEntity(entity)
 										}
 									}
-								} (entityPanel.entity, field, newRow)
+								}(entityPanel.entity, field, newRow)
 
 								// The save row action
 								newRow.saveBtn.element.onclick = function (entity, field, row) {
@@ -846,7 +883,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 												}, this)
 										}
 									}
-								} (entityPanel.entity, field, newRow)
+								}(entityPanel.entity, field, newRow)
 
 								//itemTable.refresh()
 							}
@@ -854,7 +891,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 					}
 				}
-			} (this, field, fieldType, valueDiv)
+			}(this, field, fieldType, valueDiv)
 		}
 	}
 
@@ -930,7 +967,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						server.entityManager.setEntity(entity)
 					}
 				}
-			} (this, field, fieldType))
+			}(this, field, fieldType))
 
 			// Append the listener to display the save button.
 			control.element.addEventListener("keyup", function (entityPanel, field) {
@@ -946,7 +983,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						}
 					}
 				}
-			} (this, field))
+			}(this, field))
 		}
 
 		// if the field is an index key i will set the auto complete on it...
@@ -962,7 +999,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							entityPanel.setEntity(value)
 						}
 					}
-				} (this))
+				}(this))
 		}
 	}
 }
@@ -1036,7 +1073,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 							server.entityManager.saveEntity(entity)
 						}
 					}
-				} (entities[parentUuid], field, row)
+				}(entities[parentUuid], field, row)
 
 				// The save row action
 				row.saveBtn.element.onclick = function (entity, field, row) {
@@ -1066,7 +1103,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 							}
 						}
 					}
-				} (entities[parentUuid], field, row)
+				}(entities[parentUuid], field, row)
 			}
 		}
 	}
@@ -1082,7 +1119,7 @@ EntityPanel.prototype.appendObject = function (object, valueDiv, field, fieldTyp
 			return function (panel) {
 				panel.setEntity(value)
 			}
-		} (object),
+		}(object),
 		undefined, true, object, field)
 }
 
@@ -1153,7 +1190,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 							panel.setTitle(object.TYPENAME)
 
 						}
-					} (object), propertiePanel)
+					}(object), propertiePanel)
 				}
 
 				if (propertiePanel.subEntityPanel != null) {
@@ -1172,10 +1209,10 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 						entityPanel.panel.element.style.display = "none"
 						entityPanel.subEntityPanel.panel.element.style.display = ""
 					}
-				} (propertiePanel)
+				}(propertiePanel)
 
 			}
-		} (object, this)
+		}(object, this)
 
 		ref.element.onmouseover = function (object) {
 			return function () {
@@ -1195,7 +1232,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 					}
 				}
 			}
-		} (object)
+		}(object)
 
 		ref.element.onmouseout = function (object) {
 			return function () {
@@ -1216,7 +1253,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 					}
 				}
 			}
-		} (object)
+		}(object)
 
 		deleteLnkButton.element.onclick = function (entityUUID, object, field) {
 			return function () {
@@ -1235,7 +1272,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 					entity.onChange(entity)
 				}
 			}
-		} (this.entity.UUID, object, field)
+		}(this.entity.UUID, object, field)
 	}
 
 }
@@ -1340,7 +1377,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 									return function (ref) {
 										panel.appendObjectRef(ref, control, field, fieldType)
 									}
-								} (this, control, field, fieldType)
+								}(this, control, field, fieldType)
 							)
 						}
 					}
@@ -1376,7 +1413,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 								return function (ref) {
 									panel.appendObjectRef(ref, control, field, fieldType)
 								}
-							} (this, control, field, fieldType)
+							}(this, control, field, fieldType)
 						)
 					}
 				} else {
@@ -1475,7 +1512,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 						}
 					}
 				}
-			} (entityPanel, field, input, objMap))
+			}(entityPanel, field, input, objMap))
 
 			input.element.onblur = input.element.onchange = function (objMap, values, entityPanel, onSelect) {
 				return function (evt) {
@@ -1485,7 +1522,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 						onSelect(entity)
 					}
 				}
-			} (objMap, values, entityPanel, onSelect)
+			}(objMap, values, entityPanel, onSelect)
 
 		},
 		function (errMsg, caller) {
@@ -1542,7 +1579,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 						}
 					}
 				}
-			} (entityPanel, field, input, objMap))
+			}(entityPanel, field, input, objMap))
 
 			input.element.onblur = input.element.onchange = function (objMap, values, entityPanel, onSelect) {
 				return function (evt) {
@@ -1552,7 +1589,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 						onSelect(entity)
 					}
 				}
-			} (objMap, values, entityPanel, onSelect)
+			}(objMap, values, entityPanel, onSelect)
 		}
 	})
 
