@@ -197,6 +197,25 @@ EntityPanel.prototype.setEntity = function (entity) {
 		return
 	}
 
+	if (this.typeName != entity.TYPENAME) {
+		server.entityManager.getEntityPrototype(entity.TYPENAME, entity.TYPENAME.split(".")[0],
+			// success callback
+			function (proto, caller) {
+				caller.entityPanel.init(proto, function (entity) {
+					return function (entityPanel) {
+						entityPanel.setEntity(entity)
+						entityPanel.setTitle(entity.TYPENAME)
+					}
+				}(caller.entity))
+			},
+			// error callback
+			function () {
+
+			},
+			{ "entityPanel": this, "entity": entity })
+		return
+	}
+
 	// Set the panel id with the entity id.
 	this.panel.element.id = entity.UUID
 
@@ -214,6 +233,10 @@ EntityPanel.prototype.setEntity = function (entity) {
 	// Set the reference to the panel inside the entity.
 	this.entity = entity
 	this.entity.panel = this
+
+	if (this.substitutionGroupSelect != undefined) {
+		this.substitutionGroupSelect.element.style.display = "none"
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////
 	// Now the event listener...
@@ -323,14 +346,24 @@ EntityPanel.prototype.setEntity = function (entity) {
  * Reset the content of the panel.
  */
 EntityPanel.prototype.clear = function () {
+	if(this.entity == null){
+		return
+	}
+	
 	this.entity = null
 	this.init(this.proto)
 	if (this.initCallback != undefined) {
 		this.initCallback(this)
 	}
+
 	this.maximizeBtn.element.click()
 	this.saveBtn.element.style.display = ""
 	this.deleteBtn.element.style.display = "none"
+
+	if (this.substitutionGroupSelect != undefined) {
+		this.substitutionGroupSelect.element.style.display = "table-cell"
+	}
+
 }
 
 /**
@@ -474,32 +507,34 @@ EntityPanel.prototype.initHeader = function () {
 
 	// Set the title div, the type is the default title.
 	var typeDiv = this.header.appendElement({ "tag": "div", "class": "entity_type" }).down()
-	var titleDiv = typeDiv.appendElement({ "tag": "div", "style":"display: table-row;"}).down()
-	var titleSpan = titleDiv.appendElement({ "tag": "span", "style":"display: table-cell;", "id": this.typeName, "innerHtml": this.typeName }).down()
-	
+	var titleDiv = typeDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+	var titleSpan = titleDiv.appendElement({ "tag": "span", "style": "display: table-cell;", "id": this.typeName }).down()
+
 	// Now I will set the list of substitution group.
 	if (this.proto.SubstitutionGroup != undefined) {
-		var substitutionGroupSelect = titleDiv.appendElement({ "tag": "select", "style": "display: none;" }).down()
-		
+		this.substitutionGroupSelect = titleDiv.appendElement({ "tag": "select", "style": "display: none;" }).down()
+
 		if (this.proto.SubstitutionGroup.length > 0) {
+
 			var substitutionGroup = this.proto.SubstitutionGroup.sort()
-			if(substitutionGroup.indexOf("")==-1){
-				substitutionGroup.unshift("")				
+			if (substitutionGroup.indexOf("") == -1) {
+				substitutionGroup.unshift("")
 			}
 
 			// Here I will append the list of substitution group in the result...
 			for (var i = 0; i < substitutionGroup.length; i++) {
-				substitutionGroupSelect.appendElement({ "tag": "option", "value": substitutionGroup[i], "innerHtml": substitutionGroup[i] })
+				this.substitutionGroupSelect.appendElement({ "tag": "option", "value": substitutionGroup[i], "innerHtml": substitutionGroup[i] })
 			}
 
-			substitutionGroupSelect.element.style.display = "table-cell"
-			substitutionGroupSelect.element.onchange = function (entityPanel) {
+			this.substitutionGroupSelect.element.style.display = "table-cell"
+			this.substitutionGroupSelect.element.onchange = function (entityPanel) {
 				return function () {
 					// In that case I will set the entity content with the given type.
 					server.entityManager.getEntityPrototype(this.value, this.value.split(".")[0],
 						function (proto, entityPanel) {
 							entityPanel.init(proto, function (entityPanel) {
 								entityPanel.maximizeBtn.element.click()
+								entityPanel.setTitle(proto.TypeName)
 							})
 						},
 						function () {
@@ -510,6 +545,28 @@ EntityPanel.prototype.initHeader = function () {
 		}
 	}
 
+	// Back to the sypertype 
+	if (this.proto.SuperTypeNames != undefined) {
+		if (this.proto.SuperTypeNames.length > 0) {
+			var backButon = titleDiv.prependElement({ "tag": "div", "class": "entities_btn" }).down()
+				.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-left entities_header_btn", "style": "padding-bottom: 3px;" }).down()
+
+			backButon.element.onclick = function (superTypeName, entityPanel) {
+				return function () {
+					server.entityManager.getEntityPrototype(superTypeName, superTypeName.split(".")[0],
+					function (proto, entityPanel) {
+						entityPanel.init(proto, function (entityPanel) {
+							entityPanel.maximizeBtn.element.click()
+							entityPanel.setTitle(proto.TypeName)
+						})
+					},
+					function () {
+
+					}, entityPanel)
+				}
+			}(this.proto.SuperTypeNames[this.proto.SuperTypeNames.length - 1], this)
+		}
+	}
 
 	this.spacer = this.header.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" }).down()
 	this.moveUp = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell;" }).down()
@@ -980,6 +1037,27 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						} else {
 							// reset the panel value.
 							entityPanel.clear()
+
+							// Set back to the most generic type.
+							if (entityPanel.proto.SuperTypeNames != undefined) {
+								if (entityPanel.proto.SuperTypeNames.length > 0) {
+									var typeName = entityPanel.proto.SuperTypeNames[0]
+									server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
+										// success callback
+										function (proto, caller) {
+											caller.entityPanel.init(proto, function (proto) {
+												return function (entityPanel) {
+													entityPanel.setTitle(proto.TypeName)
+												}
+											}(proto))
+										},
+										function () {
+
+										},
+										{ "entityPanel": entityPanel })
+								}
+							}
+
 						}
 					}
 				}

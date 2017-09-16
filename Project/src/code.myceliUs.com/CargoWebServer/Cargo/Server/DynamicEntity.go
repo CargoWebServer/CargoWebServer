@@ -184,7 +184,6 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 
 	// insert it into the cache.
 	this.insert(entity)
-	log.Println("---------> insert ", entity.GetObject())
 	return entity, nil
 }
 
@@ -479,7 +478,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 												typeName := strings.Replace(strings.Replace(fieldType, ":Ref", "", -1), "[]", "", -1)
 												values := make(map[string]interface{}, 0)
 												values["UUID"] = uuids[i]
-												values["TYPENAME"] = typeName
+												values["TYPENAME"] = uuids[i][0:strings.Index(uuids[i], "%")]
 
 												// I will try to create a static entity...
 												newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
@@ -546,7 +545,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 										typeName := strings.Replace(fieldType, ":Ref", "", -1)
 										values := make(map[string]interface{}, 0)
 										values["UUID"] = uuid
-										values["TYPENAME"] = typeName
+										values["TYPENAME"] = uuid[0:strings.Index(uuid, "%")]
 
 										// I will try to create a static entity...
 										newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
@@ -1487,6 +1486,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 
 	// Here I will clean up field inside the object that are not inside the new
 	// value.
+	log.Println("-------> incomming value: ", values)
 
 	// nothing to do if the pointer is nil...
 	if this == nil {
@@ -1762,6 +1762,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 									if reflect.TypeOf(this.getValue(k)).Kind() == reflect.TypeOf(v).Kind() {
 										this.setValue(k, v)
 									} else {
+										//log.Println("------> k : ", k, " v :", v, " kind ", reflect.TypeOf(this.getValue(k)).Kind(), " ", reflect.TypeOf(v).Kind())
 										// Here I need to convert the v type...
 										if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Float64 && reflect.TypeOf(v).Kind() == reflect.String {
 											val, _ := strconv.ParseFloat(v.(string), 64)
@@ -1790,6 +1791,10 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Int64 && reflect.TypeOf(v).Kind() == reflect.Float64 {
 											// the json parser transform all numerical value to float... that not what we want here...
 											val := int64(v.(float64))
+											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Int32 && reflect.TypeOf(v).Kind() == reflect.Float64 {
+											// the json parser transform all numerical value to float... that not what we want here...
+											val := int32(v.(float64))
 											this.setValue(k, val)
 										}
 									}
