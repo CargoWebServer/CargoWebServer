@@ -1286,6 +1286,25 @@ func (this *EntityManager) getEntityPrototype(typeName string, storeId string) (
 }
 
 /**
+ * Remove a given prototype from a store and clean up all object of it type.
+ */
+func (this *EntityManager) deleteEntityPrototype(prototype *EntityPrototype) error {
+	// TODO implement it!
+
+	// send event here.
+	var eventDatas []*MessageData
+
+	evtData := new(MessageData)
+	evtData.Name = "prototype"
+	evtData.Value = prototype
+
+	evt, _ := NewEvent(DeletePrototypeEvent, PrototypeEvent, eventDatas)
+	GetServer().GetEventManager().BroadcastEvent(evt)
+
+	return nil
+}
+
+/**
  * Create a new entity with default value and append it inside it parent...
  *
  * TODO Est que "The attributeName is the name of the entity in it's parent whitout the M_" est vrai ou on doit lui donner avec le M_?
@@ -1579,6 +1598,109 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
 	prototype.(*EntityPrototype).Create(storeId)
 
 	return prototype.(*EntityPrototype)
+}
+
+// @api 1.0
+// Save existing entity prototype.
+// @param {string} storeId The store id, where to create the new prototype.
+// @param {interface{}} prototype The prototype object to create.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @result{*EntityPrototype} Return the created entity prototype
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+// @src
+//EntityManager.prototype.saveEntityPrototype = function(storeId, prototype, successCallback, errorCallback, caller){
+//	var params = []
+//	params.push(createRpcData(storeId, "STRING", "storeId"))
+//	params.push(createRpcData(prototype, "JSON_STR", "prototype"))
+//	server.executeJsFunction(
+//	"EntityManagerCreateEntityPrototype",
+//	params,
+//	undefined, //progress callback
+//	function (results, caller) { // Success callback
+//      caller.successCallback(results[0], caller.caller)
+//	},
+//	function (errMsg, caller) { // Error callback
+//		caller.errorCallback(errMsg, caller.caller)
+//		server.errorManager.onError(errMsg)
+//	},{"successCallback":successCallback, "errorCallback":errorCallback, "caller": caller})
+//}
+func (this *EntityManager) SaveEntityPrototype(storeId string, prototype interface{}, messageId string, sessionId string) *EntityPrototype {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
+	// Cast it as needed...
+	if reflect.TypeOf(prototype).String() == "map[string]interface {}" {
+		values, err := Utility.InitializeStructure(prototype.(map[string]interface{}))
+		if err == nil {
+			prototype = values.Interface()
+		}
+	}
+
+	if reflect.TypeOf(prototype).String() != "*Server.EntityPrototype" {
+		cargoError := NewError(Utility.FileLine(), PARAMETER_TYPE_ERROR, SERVER_ERROR_CODE, errors.New("Expected '*Server.EntityPrototype' but got '"+reflect.TypeOf(prototype).String()+"' instead."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return nil
+	}
+
+	// Get the store...
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	if store == nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Datastore '"+storeId+"' dosen't exist."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return nil
+
+	}
+
+	// Save the prototype...
+	prototype.(*EntityPrototype).Save(storeId)
+
+	return prototype.(*EntityPrototype)
+}
+
+// @api 1.0
+// Delete existing entity prototype.
+// @param {string} typeName The prototype id.
+// @param {string} storeId The store id, where to create the new prototype.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @result{*EntityPrototype} Return the created entity prototype
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *EntityManager) DeleteEntityPrototype(typeName string, storeId string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
+	prototype, err := this.getEntityPrototype(typeName, storeId)
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+
+	// Get the store...
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	if store == nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Datastore '"+storeId+"' dosen't exist."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+
+	err = this.deleteEntityPrototype(prototype)
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+	}
+
 }
 
 // @api 1.0

@@ -452,3 +452,18 @@ EntityPrototype.prototype.getFieldIndex = function (field) {
     }
     return -1
 }
+
+/**
+ * That class is use to manage entity prototype event.
+ */
+var EntityPrototypeManager = function(){
+	if (server == undefined) {
+		return
+	}
+	EventHub.call(this, PrototypeEvent)
+
+	return this
+}
+
+EntityPrototypeManager.prototype = new EventHub(null);
+EntityPrototypeManager.prototype.constructor = EntityPrototypeManager;

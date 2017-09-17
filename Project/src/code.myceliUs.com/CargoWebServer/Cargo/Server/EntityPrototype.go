@@ -214,6 +214,16 @@ func (this *EntityPrototype) Create(storeId string) {
 	// Register it to the vm...
 	JS.GetJsRuntimeManager().AppendScript(this.generateConstructor())
 
+	// Send event message...
+	var eventDatas []*MessageData
+	evtData := new(MessageData)
+	evtData.Name = "prototype"
+
+	evtData.Value = this
+	eventDatas = append(eventDatas, evtData)
+	evt, _ := NewEvent(NewPrototypeEvent, PrototypeEvent, eventDatas)
+	GetServer().GetEventManager().BroadcastEvent(evt)
+
 }
 
 /**
@@ -236,6 +246,14 @@ func (this *EntityPrototype) Save(storeId string) {
 	// Register it to the vm...
 	JS.GetJsRuntimeManager().AppendScript(this.generateConstructor())
 
+	var eventDatas []*MessageData
+	evtData := new(MessageData)
+	evtData.Name = "prototype"
+
+	evtData.Value = this
+	eventDatas = append(eventDatas, evtData)
+	evt, _ := NewEvent(UpdatePrototypeEvent, PrototypeEvent, eventDatas)
+	GetServer().GetEventManager().BroadcastEvent(evt)
 }
 
 /**

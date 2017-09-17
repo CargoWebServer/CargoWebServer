@@ -55,15 +55,19 @@ SecurityEvent = "SecurityEvent"
 NewRoleEvent = 25
 DeleteRoleEvent = 26
 UpdateRoleEvent = 27
+PrototypeEvent = "PrototypeEvent"
+NewPrototypeEvent = 28
+UpdatePrototypeEvent = 29
+DeletePrototypeEvent = 30
 ProjectEvent = "ProjectEvent"
 EmailEvent = "EmailEvent"
 ServiceEvent = "ServiceEvent"
 DataEvent = "DataEvent"
 ConfigurationEvent = "ConfigurationEvent"
-EventEvent  = "EventEvent"
-LdapEvent  = "LdapEvent"
+EventEvent = "EventEvent"
+LdapEvent = "LdapEvent"
 OAuth2Event = "OAuth2Event"
-SchemaEvent  = "SchemaEvent"
+SchemaEvent = "SchemaEvent"
 WorkflowEvent = "WorkflowEvent"
 
 /**

@@ -2,7 +2,7 @@
 package Server
 
 import (
-	//	"log"
+	"log"
 	"os/exec"
 	"reflect"
 	"strconv"
@@ -111,6 +111,7 @@ func (self *Action) execute() {
  */
 func (self *Action) RegisterListener(name string) {
 	if self.msg.from.IsOpen() {
+		log.Println("--------> 114 ", name)
 		listener := NewEventListener(name, self.msg.from)
 		GetServer().GetEventManager().AddEventListener(listener)
 	}

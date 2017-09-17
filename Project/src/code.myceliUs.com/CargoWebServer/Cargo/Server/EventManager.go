@@ -45,6 +45,10 @@ const (
 	NewRoleEvent                   = 25
 	DeleteRoleEvent                = 26
 	UpdateRoleEvent                = 27
+	PrototypeEvent                 = "PrototypeEvent"
+	NewPrototypeEvent              = 28
+	UpdatePrototypeEvent           = 29
+	DeletePrototypeEvent           = 30
 	ProjectEvent                   = "ProjectEvent"
 	EmailEvent                     = "EmailEvent"
 	ServiceEvent                   = "ServiceEvent"
@@ -121,7 +125,10 @@ func (this *EventManager) appendEventData(evt *Event, dataStr string) {
 	this.Lock()
 	defer this.Unlock()
 
-	this.m_eventDataMap[evt] = dataStr
+	// No event need to be sent if the map is not initialyse...
+	if this.m_eventDataMap != nil {
+		this.m_eventDataMap[evt] = dataStr
+	}
 }
 
 /**
@@ -346,7 +353,6 @@ func (this *EventManager) BroadcastEvent(evt *Event) {
 
 	channel := this.m_channels[evt.GetName()]
 	if channel != nil {
-		//log.Println("-----> event send: ", evt)
 		channel.broadcastEvent(evt)
 	}
 	delete(this.m_eventDataMap, evt)
@@ -386,6 +392,7 @@ func (this *EventManager) AddEventListener(listener *EventListener) {
 
 	// append the listener
 	channel.m_listeners[listener.getId()] = listener
+	log.Println("---------> 395 ", this.m_channels)
 }
 
 // @api 1.0

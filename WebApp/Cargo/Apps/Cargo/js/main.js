@@ -53,45 +53,50 @@ function load() {
 
     // Open a new connection whit the web server.
     server.init(function () {
-            // Get the session id from the server.
-            server.setSessionId(function () {
+        // Get the session id from the server.
+        server.setSessionId(function () {
 
-                server.errorManager = new ErrorManager()
+            server.errorManager = new ErrorManager()
 
-                // Inject service code accessors.
-                server.getServicesClientCode(
-                    function (results, caller) {
-                        for (var key in results) {
-                            // create the listener if is not already exist.
-                            if (server[key] == undefined) {
-                                // inject the code in the client memory
-                                eval(results[key])
+            // Inject service code accessors.
+            server.getServicesClientCode(
+                function (results, caller) {
+                    for (var key in results) {
+                        // create the listener if is not already exist.
+                        if (server[key] == undefined) {
+                            // inject the code in the client memory
+                            eval(results[key])
 
-                                // Now I will create the listener
-                                var listenerName = key.charAt(0).toLowerCase() + key.slice(1);
-                                server[listenerName] = eval("new " + key + "()")
-                                server[listenerName].registerListener()
-                            }
+                            // Now I will create the listener
+                            var listenerName = key.charAt(0).toLowerCase() + key.slice(1);
+                            server[listenerName] = eval("new " + key + "()")
+                            server[listenerName].registerListener()
+
+                            // Register prototype manager as listener.
+                            server["prototypeManager"] = new EntityPrototypeManager(PrototypeEvent)
+                            server["prototypeManager"].registerListener(PrototypeEvent)
+
                         }
-                        // Go to the main entry point
-                        // Append the listener for the entity.
-                        // The session listener.
-                        server.entityManager.getEntityPrototypes("Config", function (result, caller) {
-                            server.entityManager.getEntityPrototypes("CargoEntities", function (result, initCallback) {
-                                if (main != null) {
-                                    main()
-                                }
-                            }, function () {/* Error callback */ }, null)
-                        }, function () {/* Error callback */ }, {})
-                    },
-                    function (errObj, caller) {
-                        // Here no client service code was found.
-                    }, {})
+                    }
+                    // Go to the main entry point
+                    // Append the listener for the entity.
+                    // The session listener.
+                    server.entityManager.getEntityPrototypes("Config", function (result, caller) {
+                        server.entityManager.getEntityPrototypes("CargoEntities", function (result, initCallback) {
+                            if (main != null) {
+                                main()
+                            }
+                        }, function () {/* Error callback */ }, null)
+                    }, function () {/* Error callback */ }, {})
+                },
+                function (errObj, caller) {
+                    // Here no client service code was found.
+                }, {})
 
 
-            })
+        })
 
-        },  // onOpen callback
+    },  // onOpen callback
         function () { // onClose callback
             //alert('The connection was closed!!!')
             location.reload()
