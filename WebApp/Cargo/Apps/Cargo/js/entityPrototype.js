@@ -127,16 +127,16 @@ EntityPrototype.prototype.init = function (object) {
         return
     }
 
-    if(object.FieldsNillable == null){
+    if (object.FieldsNillable == null) {
         object.FieldsNillable = []
-        for(var i=0; i < object.Fields.length; i++){
+        for (var i = 0; i < object.Fields.length; i++) {
             object.FieldsNillable.push(false)
         }
     }
 
-    if(object.FieldsDocumentation == null){
+    if (object.FieldsDocumentation == null) {
         object.FieldsDocumentation = []
-        for(var i=0; i < object.Fields.length; i++){
+        for (var i = 0; i < object.Fields.length; i++) {
             object.FieldsDocumentation.push("")
         }
     }
@@ -410,7 +410,7 @@ EntityPrototype.prototype.appendField = function (name, typeName, isVisible, ord
         this.FieldsOrder.push(parseInt(order))
 
         this.FieldsNillable.push(isNillable)
-            
+
         this.FieldsDocumentation.push(documentation)
     }
 }
@@ -456,14 +456,34 @@ EntityPrototype.prototype.getFieldIndex = function (field) {
 /**
  * That class is use to manage entity prototype event.
  */
-var EntityPrototypeManager = function(){
-	if (server == undefined) {
-		return
-	}
-	EventHub.call(this, PrototypeEvent)
+var EntityPrototypeManager = function () {
+    if (server == undefined) {
+        return
+    }
+    EventHub.call(this, PrototypeEvent)
 
-	return this
+    return this
 }
 
 EntityPrototypeManager.prototype = new EventHub(null);
 EntityPrototypeManager.prototype.constructor = EntityPrototypeManager;
+
+/**
+ * Overload the onEvent function to set the new  prototype object on the local map
+ * before propagate the event to listener.
+ */
+EntityPrototypeManager.prototype.onEvent = function (evt) {
+    if (evt.code == NewPrototypeEvent || evt.code == UpdatePrototypeEvent) {
+        // Set the prototype.
+        var prototype = new EntityPrototype()
+        prototype.init(evt.dataMap.prototype)
+        entityPrototypes[evt.dataMap.prototype.TypeName] = prototype  
+        evt.dataMap.prototype = prototype
+    }else if(evt.code == DeletePrototypeEvent){
+        // Remove it from the map
+        delete entityPrototypes[evt.dataMap.prototype.TypeName] 
+    }
+
+    // Call the regular function.
+    EventHub.prototype.onEvent.call(this, evt);
+}

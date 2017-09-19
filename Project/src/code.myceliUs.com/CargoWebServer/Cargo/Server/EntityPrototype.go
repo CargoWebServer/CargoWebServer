@@ -179,7 +179,7 @@ func (this *EntityPrototype) getFieldIndex(fieldName string) int {
 /**
  * Save the new entity prototype in the data store.
  */
-func (this *EntityPrototype) Create(storeId string) {
+func (this *EntityPrototype) Create(storeId string) error {
 
 	// Append the default fields at end...
 
@@ -208,6 +208,7 @@ func (this *EntityPrototype) Create(storeId string) {
 		err := store.SetEntityPrototype(this)
 		if err != nil {
 			log.Println("Fail to save entity prototype ", this.TypeName, " in store id ", storeId)
+			return err
 		}
 	}
 
@@ -223,13 +224,14 @@ func (this *EntityPrototype) Create(storeId string) {
 	eventDatas = append(eventDatas, evtData)
 	evt, _ := NewEvent(NewPrototypeEvent, PrototypeEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
+	return nil
 
 }
 
 /**
  * Save the new entity prototype in the data store.
  */
-func (this *EntityPrototype) Save(storeId string) {
+func (this *EntityPrototype) Save(storeId string) error {
 
 	if len(storeId) == 0 {
 		storeId = this.TypeName[:strings.Index(this.TypeName, ".")]
@@ -240,6 +242,7 @@ func (this *EntityPrototype) Save(storeId string) {
 		err := store.saveEntityPrototype(this)
 		if err != nil {
 			log.Println("Fail to save entity prototype ", this.TypeName, " in store id ", storeId)
+			return err
 		}
 	}
 
@@ -254,6 +257,8 @@ func (this *EntityPrototype) Save(storeId string) {
 	eventDatas = append(eventDatas, evtData)
 	evt, _ := NewEvent(UpdatePrototypeEvent, PrototypeEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
+
+	return nil
 }
 
 /**

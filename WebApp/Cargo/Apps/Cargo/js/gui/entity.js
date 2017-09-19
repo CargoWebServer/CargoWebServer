@@ -119,7 +119,26 @@ var EntityPanel = function (parent, typeName, initCallback, parentEntityPanel, r
 	// Finish the intialysation...
 	this.init(entityPrototypes[typeName], initCallback)
 
-	// retur the pointer to the entity panel.
+
+	// Update prototype event
+	server.prototypeManager.attach(this, UpdatePrototypeEvent, function (evt, entityPanel) {
+		// if the current item is the one with change I will reset it content.
+		if (evt.dataMap.prototype.TypeName == entityPanel.typeName) {
+			entityPanel.init(evt.dataMap.prototype, function(entityPanel){
+				entityPanel.maximizeBtn.element.click()
+				entityPanel.setTitle(entityPanel.typeName)
+			}) // Reinit the panel...
+		}
+	})
+
+	// Delete prototype event.
+	server.prototypeManager.attach(this, DeletePrototypeEvent, function (evt, entityPanel) {
+		// If the current display item is deleted I will clear the panel.
+		if (evt.dataMap.prototype.TypeName == entityPanel.typeName) {
+			
+		}
+	})
+
 	return this
 }
 
@@ -346,10 +365,10 @@ EntityPanel.prototype.setEntity = function (entity) {
  * Reset the content of the panel.
  */
 EntityPanel.prototype.clear = function () {
-	if(this.entity == null){
+	if (this.entity == null) {
 		return
 	}
-	
+
 	this.entity = null
 	this.init(this.proto)
 	if (this.initCallback != undefined) {
@@ -554,15 +573,15 @@ EntityPanel.prototype.initHeader = function () {
 			backButon.element.onclick = function (superTypeName, entityPanel) {
 				return function () {
 					server.entityManager.getEntityPrototype(superTypeName, superTypeName.split(".")[0],
-					function (proto, entityPanel) {
-						entityPanel.init(proto, function (entityPanel) {
-							entityPanel.maximizeBtn.element.click()
-							entityPanel.setTitle(proto.TypeName)
-						})
-					},
-					function () {
+						function (proto, entityPanel) {
+							entityPanel.init(proto, function (entityPanel) {
+								entityPanel.maximizeBtn.element.click()
+								entityPanel.setTitle(proto.TypeName)
+							})
+						},
+						function () {
 
-					}, entityPanel)
+						}, entityPanel)
 				}
 			}(this.proto.SuperTypeNames[this.proto.SuperTypeNames.length - 1], this)
 		}

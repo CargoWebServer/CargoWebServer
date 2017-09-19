@@ -1288,8 +1288,11 @@ func (this *EntityManager) getEntityPrototype(typeName string, storeId string) (
 /**
  * Remove a given prototype from a store and clean up all object of it type.
  */
-func (this *EntityManager) deleteEntityPrototype(prototype *EntityPrototype) error {
-	// TODO implement it!
+func (this *EntityManager) deleteEntityPrototype(storeId string, prototype *EntityPrototype) error {
+
+	// Now I will remove the prototype itself from the db.
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	store.DeleteEntityPrototype(prototype.TypeName)
 
 	// send event here.
 	var eventDatas []*MessageData
@@ -1297,6 +1300,9 @@ func (this *EntityManager) deleteEntityPrototype(prototype *EntityPrototype) err
 	evtData := new(MessageData)
 	evtData.Name = "prototype"
 	evtData.Value = prototype
+
+	// push in the data array.
+	eventDatas = append(eventDatas, evtData)
 
 	evt, _ := NewEvent(DeletePrototypeEvent, PrototypeEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
@@ -1616,7 +1622,7 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
 //	params.push(createRpcData(storeId, "STRING", "storeId"))
 //	params.push(createRpcData(prototype, "JSON_STR", "prototype"))
 //	server.executeJsFunction(
-//	"EntityManagerCreateEntityPrototype",
+//	"EntityManagerSaveEntityPrototype",
 //	params,
 //	undefined, //progress callback
 //	function (results, caller) { // Success callback
@@ -1647,7 +1653,7 @@ func (this *EntityManager) SaveEntityPrototype(storeId string, prototype interfa
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
-
+	log.Println("--------> 1651")
 	// Get the store...
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	if store == nil {
@@ -1695,7 +1701,7 @@ func (this *EntityManager) DeleteEntityPrototype(typeName string, storeId string
 		return
 	}
 
-	err = this.deleteEntityPrototype(prototype)
+	err = this.deleteEntityPrototype(storeId, prototype)
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
@@ -2294,13 +2300,20 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, queryStr
 	}
 
 	entities, errObj := this.getEntities(typeName, queryStr, storeId, false)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
 
 	//log.Println("-----> Number of entities found ", len(entities))
 
 	// If no order ar specified i will use the id's as order.
 	if len(orderBy) == 0 {
 		// Here I will sort by it it's without it uuid...
-		prototype, _ := this.getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+		prototype, err := this.getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+		if err != nil {
+			return nil // The prototype was no foud here.
+		}
 		for i := 1; i < len(prototype.Ids); i++ {
 			if !strings.HasPrefix("[]", prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[i])]) {
 				orderBy = append(orderBy, prototype.Ids[i])

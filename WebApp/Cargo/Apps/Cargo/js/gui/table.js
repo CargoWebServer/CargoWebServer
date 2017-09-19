@@ -164,6 +164,18 @@ Table.prototype.init = function () {
 		this.rowGroup = this.div.appendElement({ "tag": "div", "class": "table_body" }).down()
 	}
 
+	for (var i = 0; i < this.model.getRowCount(); i++) {
+		var data = []
+		for (var j = 0; j < this.model.getColumnCount(); j++) {
+			if (this.header == null) {
+				this.setHeader()
+			}
+			var value = this.model.getValueAt(i, j)
+			data.push(value)
+		}
+		this.rows[i] = new TableRow(this, i, data)
+		this.rowsId[data[0]] = this.rows[i]
+	}
 	// In the case of sql table I will connect the listener here...
 	// New connection of the event listeners...
 	if (this.model.constructor === EntityTableModel) {
@@ -235,18 +247,6 @@ Table.prototype.init = function () {
 		})
 
 	} else if (this.model.constructor === SqlTableModel) {
-		for (var i = 0; i < this.model.getRowCount(); i++) {
-			var data = []
-			for (var j = 0; j < this.model.getColumnCount(); j++) {
-				if (this.header == null) {
-					this.setHeader()
-				}
-				var value = this.model.getValueAt(i, j)
-				data.push(value)
-			}
-			this.rows[i] = new TableRow(this, i, data)
-			this.rowsId[data[0]] = this.rows[i]
-		}
 
 		/* The delete row event **/
 		server.dataManager.attach(this, DeleteRowEvent, function (evt, table) {

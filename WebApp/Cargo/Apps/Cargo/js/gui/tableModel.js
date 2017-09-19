@@ -147,12 +147,14 @@ TableModel.prototype.removeAllValues = function (rowIndex) {
  * @constructor
  * @param proto The entity prototype.
  */
-var EntityTableModel = function (proto) {
+var EntityTableModel = function (proto, query) {
 
     // Here i will display the 
     if (proto != undefined) {
         this.proto = proto
     }
+
+    this.query = query
 
     var titles = []
     TableModel.call(this, titles);
@@ -184,8 +186,9 @@ EntityTableModel.prototype.constructor = EntityTableModel;
  * Initialisation of the table model.
  */
 EntityTableModel.prototype.init = function (successCallback, progressCallback, errorCallback, caller) {
-    if (successCallback != undefined) {
-        successCallback(undefined, caller)
+    // typeName string, storeId string, queryStr string, offset int, limit int, orderBy []interface{}, asc bool
+    if(caller.initCallback != undefined){
+        caller.initCallback()
     }
 }
 
@@ -279,7 +282,7 @@ EntityTableModel.prototype.removeRow = function (rowIndex) {
                     model.entities = entities
 
                 }
-            } (confirmDialog, entity, this)
+            }(confirmDialog, entity, this)
         }
     }
 }

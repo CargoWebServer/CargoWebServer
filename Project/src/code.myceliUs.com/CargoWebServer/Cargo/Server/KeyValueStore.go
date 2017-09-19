@@ -252,18 +252,14 @@ func (this *KeyValueDataStore) SetEntityPrototype(prototype *EntityPrototype) er
  */
 func (this *KeyValueDataStore) saveEntityPrototype(prototype *EntityPrototype) error {
 
-	// Save it only once...
-	_, err := this.GetEntityPrototype(prototype.TypeName)
-	if err == nil {
-		// I will serialyse the prototype.
-		m := new(bytes.Buffer)
-		enc := gob.NewEncoder(m)
-		err := enc.Encode(prototype)
-		err = this.setValue([]byte("prototype:"+prototype.TypeName), m.Bytes())
-		if err != nil {
-			log.Println("Prototype encode:", err)
-			return err
-		}
+	// I will serialyse the prototype.
+	m := new(bytes.Buffer)
+	enc := gob.NewEncoder(m)
+	err := enc.Encode(prototype)
+	err = this.setValue([]byte("prototype:"+prototype.TypeName), m.Bytes())
+	if err != nil {
+		log.Println("Prototype encode:", err)
+		return err
 	}
 	return nil
 }
@@ -277,6 +273,22 @@ func (this *KeyValueDataStore) DeleteEntityPrototype(typeName string) error {
 	// The prototype does not exist.
 	if err != nil {
 		return err
+	}
+
+	// Remove substitution group from it parent.
+	for i := 0; i < len(prototype.SuperTypeNames); i++ {
+		storeId := prototype.SuperTypeNames[i][0:strings.Index(prototype.SuperTypeNames[i], ".")]
+		superPrototype, err := GetServer().GetEntityManager().getEntityPrototype(prototype.SuperTypeNames[i], storeId)
+		if err == nil {
+			substitutionGroup := make([]string, 0)
+			for j := 0; j < len(superPrototype.SubstitutionGroup); j++ {
+				if superPrototype.SubstitutionGroup[j] != typeName {
+					substitutionGroup = append(substitutionGroup, superPrototype.SubstitutionGroup[j])
+				}
+			}
+			superPrototype.SubstitutionGroup = substitutionGroup
+			superPrototype.Save(storeId)
+		}
 	}
 
 	// I will delete all entity...

@@ -17,7 +17,12 @@ function attachAutoComplete(control, elementLst, autoComplete, selectValue) {
     }
 
     // I will always append the auto complete inside the body element.
-    control.autocompleteDiv = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "autoCompleteDiv", "style": " display:none; z-index: 10;" })
+
+    if (control.autocompleteDiv != undefined) {
+        control.autocompleteDiv.removeAllChilds()
+    } else {
+        control.autocompleteDiv = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "autoCompleteDiv", "style": " display:none; z-index: 10;" })
+    }
     var currentIndex = -1
 
     /* Save the key down event **/
@@ -43,7 +48,7 @@ function attachAutoComplete(control, elementLst, autoComplete, selectValue) {
                             inputValue.toString().substring(0, val.length).toUpperCase() == val.toUpperCase()
                         }
                     }
-                } (control.element.value))
+                }(control.element.value))
 
                 if (values.length > 1 || (values.length >= 1 && !autoComplete)) {
                     // Append the element...
@@ -71,7 +76,7 @@ function attachAutoComplete(control, elementLst, autoComplete, selectValue) {
                                 autocompleteDiv.removeAllChilds()
                                 autocompleteDiv.element.style.display = "none"
                             }
-                        } (control, autocompleteDiv, values[i], selectValue)
+                        }(control, autocompleteDiv, values[i], selectValue)
                     }
 
                     // Display the list...
@@ -121,7 +126,7 @@ function attachAutoComplete(control, elementLst, autoComplete, selectValue) {
                 }
             }
         }
-    } (control, control.autocompleteDiv, elementLst, autoComplete, selectValue), true)
+    }(control, control.autocompleteDiv, elementLst, autoComplete, selectValue), true)
 
 }
 
@@ -172,7 +177,7 @@ function setValidator(msg, control, validator, delay) {
                                 return function () {
                                     control.element.style.border = ""
                                 }
-                            } (control))
+                            }(control))
 
                         // Here i will display the error message for 2 second...
                         setTimeout(function (errorDiv, control) {
@@ -184,12 +189,12 @@ function setValidator(msg, control, validator, delay) {
                                 control.element.style.border = "1px solid red"
                                 display = false
                             }
-                        } (errorDiv, control), delay)
+                        }(errorDiv, control), delay)
                     }
                 }
-            } (validator, msgDiv, errorDiv, control, delay), 200); // 200 ms wait before validating...
+            }(validator, msgDiv, errorDiv, control, delay), 200); // 200 ms wait before validating...
         }
-    } (validator, control, errorDiv, msgDiv)
+    }(validator, control, errorDiv, msgDiv)
 
     control.element.addEventListener("blur", validationCall)
 

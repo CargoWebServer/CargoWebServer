@@ -392,7 +392,6 @@ func (this *EventManager) AddEventListener(listener *EventListener) {
 
 	// append the listener
 	channel.m_listeners[listener.getId()] = listener
-	log.Println("---------> 395 ", this.m_channels)
 }
 
 // @api 1.0
