@@ -189,6 +189,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
     // typeName string, storeId string, queryStr string, offset int, limit int, orderBy []interface{}, asc bool
     if(caller.initCallback != undefined){
         caller.initCallback()
+        caller.initCallback = undefined
     }
 }
 

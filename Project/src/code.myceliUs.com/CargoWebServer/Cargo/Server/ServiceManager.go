@@ -539,6 +539,7 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 								clientSrc += "			if(caller.results[0] == null){\n"
 								clientSrc += "				if(caller.successCallback != undefined){\n"
 								clientSrc += "					caller.successCallback(entities, caller.caller)\n"
+								clientSrc += "					caller.successCallback = undefined\n"
 								clientSrc += "				}\n"
 								clientSrc += "				return\n"
 								clientSrc += "			}\n"
@@ -572,6 +573,7 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 								clientSrc += "			if (entities[caller.results[0].UUID] != undefined && caller.results[0].TYPENAME == caller.results[0].__class__) {\n"
 								clientSrc += "				if(caller.successCallback != undefined){\n"
 								clientSrc += "					caller.successCallback(entities[caller.results[0].UUID], caller.caller)\n"
+								clientSrc += "					caller.successCallback=undefined\n"
 								clientSrc += "				}\n"
 								clientSrc += "				return // break it here.\n"
 								clientSrc += "			}\n\n"
@@ -579,7 +581,10 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 								clientSrc += "			var entity = eval(\"new \" + prototype.TypeName + \"()\")\n"
 								clientSrc += "				entity.initCallback = function () {\n"
 								clientSrc += "					return function (entity) {\n"
+								clientSrc += "					if(caller.successCallback != undefined){\n"
 								clientSrc += "						caller.successCallback(entity, caller.caller)\n"
+								clientSrc += "						caller.successCallback=undefined\n"
+								clientSrc += "					}\n"
 								clientSrc += "				}\n"
 								clientSrc += "			}(caller)\n"
 								clientSrc += "			entity.init(caller.results[0])\n"
@@ -603,6 +608,7 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 							// Here I got a regulat type.
 							clientSrc += "		if(caller.successCallback != undefined){\n"
 							clientSrc += "			caller.successCallback(results, caller.caller)\n"
+							clientSrc += "			caller.successCallback=undefined\n"
 							clientSrc += "		}\n"
 						}
 					} else {

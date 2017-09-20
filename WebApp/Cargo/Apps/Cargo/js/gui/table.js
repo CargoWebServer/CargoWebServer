@@ -73,7 +73,7 @@ var Table = function (id, parent) {
 	this.parent = parent
 
 	// The div...
-	this.div = parent.appendElement({ "tag": "div", "class": "scrolltable" }).down()
+	this.div = parent.appendElement({ "tag": "div", "class": "scrolltable", id : id }).down()
 
 	// The header...
 	this.header = null
@@ -138,6 +138,7 @@ Table.prototype.setModel = function (model, initCallback) {
 			//caller.caller.init()
 			if (caller.initCallback != undefined) {
 				caller.initCallback()
+				caller.initCallback = undefined
 			}
 		},
 		// The progress callback...
@@ -148,6 +149,7 @@ Table.prototype.setModel = function (model, initCallback) {
 		function (errMsg, caller) {
 			if (caller.initCallback != undefined) {
 				caller.initCallback()
+				caller.initCallback = undefined
 			}
 		},
 		{ "caller": this, "initCallback": initCallback })

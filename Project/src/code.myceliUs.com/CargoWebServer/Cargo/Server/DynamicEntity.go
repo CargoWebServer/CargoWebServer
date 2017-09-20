@@ -1484,10 +1484,6 @@ func (this *DynamicEntity) GetObject() interface{} {
  */
 func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 
-	// Here I will clean up field inside the object that are not inside the new
-	// value.
-	log.Println("-------> incomming value: ", values)
-
 	// nothing to do if the pointer is nil...
 	if this == nil {
 		return
