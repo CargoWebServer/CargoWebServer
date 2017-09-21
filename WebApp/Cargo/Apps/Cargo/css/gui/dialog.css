@@ -49,23 +49,21 @@
 
 /** The delete button **/
 .dialog_delete_button{
-	color: black;
+	color: gainsboro;
     display: table-cell;
 	vertical-align: middle;
-    text-align: center;
+	padding-top: 2px;
+	padding-right: 2px;
 	z-index: 10;
 }
 
-.dialog_delete_button:hover{
-    transition: all .2s ease;
-}
 
 .dialog_delete_button i {
     height: 100%;
 }
 
 .dialog_delete_button i:hover {
-    color: white;
+	color: rgb(66, 139, 202);
     cursor: pointer;
     transition: all .2s ease;
 }
@@ -125,6 +123,7 @@
 .diablog_button:hover{
 	cursor: pointer;
 	border: solid 1px darkgrey;
+	color: rgb(66, 139, 202);
 }
 
 .diablog_button:active{

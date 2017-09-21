@@ -592,7 +592,11 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 
 							clientSrc += "			},\n"
 							clientSrc += "			function (errMsg, caller) { // Error Callback\n"
-							clientSrc += "				caller.errorCallback(errMsg, caller.caller)\n"
+							clientSrc += "				if(caller.errorCallback != undefined){\n"
+							clientSrc += "					caller.errorCallback(errMsg, caller.caller)\n"
+							clientSrc += "					caller.errorCallback = undefined\n"
+							clientSrc += "				}\n"
+							clientSrc += "				server.errorManager.onError(errMsg)\n"
 							clientSrc += "			},\n"
 							caller := "{ \"caller\": caller.caller"
 
@@ -624,7 +628,10 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 
 				if Utility.Contains(callbacks, "errorCallback") {
 					clientSrc += "	function (errMsg, caller) { // Error callback\n"
-					clientSrc += "		caller.errorCallback(errMsg, caller.caller)\n"
+					clientSrc += "		if(caller.errorCallback != undefined){\n"
+					clientSrc += "			caller.errorCallback(errMsg, caller.caller)\n"
+					clientSrc += "			caller.errorCallback = undefined\n"
+					clientSrc += "		}\n"
 					clientSrc += "		server.errorManager.onError(errMsg)\n"
 					clientSrc += "	},"
 					// Set the caller.

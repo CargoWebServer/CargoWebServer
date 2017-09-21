@@ -124,7 +124,7 @@ var EntityPanel = function (parent, typeName, initCallback, parentEntityPanel, r
 	server.prototypeManager.attach(this, UpdatePrototypeEvent, function (evt, entityPanel) {
 		// if the current item is the one with change I will reset it content.
 		if (evt.dataMap.prototype.TypeName == entityPanel.typeName) {
-			entityPanel.init(evt.dataMap.prototype, function(entityPanel){
+			entityPanel.init(evt.dataMap.prototype, function (entityPanel) {
 				entityPanel.maximizeBtn.element.click()
 				entityPanel.setTitle(entityPanel.typeName)
 			}) // Reinit the panel...
@@ -135,7 +135,7 @@ var EntityPanel = function (parent, typeName, initCallback, parentEntityPanel, r
 	server.prototypeManager.attach(this, DeletePrototypeEvent, function (evt, entityPanel) {
 		// If the current display item is deleted I will clear the panel.
 		if (evt.dataMap.prototype.TypeName == entityPanel.typeName) {
-			
+
 		}
 	})
 
@@ -500,7 +500,7 @@ EntityPanel.prototype.initHeader = function () {
 				confirmDialog.div.element.style.maxWidth = "450px"
 				confirmDialog.setCentered()
 				server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
-				confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entityPanel.entity.UUID + "?" })
+				confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entityPanel.entity.getTitles() + "?" })
 
 				confirmDialog.ok.element.onclick = function (dialog, entityPanel) {
 					return function () {
@@ -530,38 +530,36 @@ EntityPanel.prototype.initHeader = function () {
 	var titleSpan = titleDiv.appendElement({ "tag": "span", "style": "display: table-cell;", "id": this.typeName }).down()
 
 	// Now I will set the list of substitution group.
-	if (this.proto.SubstitutionGroup != undefined) {
+	if (this.proto.SubstitutionGroup.length > 0) {
 		this.substitutionGroupSelect = titleDiv.appendElement({ "tag": "select", "style": "display: none;" }).down()
 
-		if (this.proto.SubstitutionGroup.length > 0) {
-
-			var substitutionGroup = this.proto.SubstitutionGroup.sort()
-			if (substitutionGroup.indexOf("") == -1) {
-				substitutionGroup.unshift("")
-			}
-
-			// Here I will append the list of substitution group in the result...
-			for (var i = 0; i < substitutionGroup.length; i++) {
-				this.substitutionGroupSelect.appendElement({ "tag": "option", "value": substitutionGroup[i], "innerHtml": substitutionGroup[i] })
-			}
-
-			this.substitutionGroupSelect.element.style.display = "table-cell"
-			this.substitutionGroupSelect.element.onchange = function (entityPanel) {
-				return function () {
-					// In that case I will set the entity content with the given type.
-					server.entityManager.getEntityPrototype(this.value, this.value.split(".")[0],
-						function (proto, entityPanel) {
-							entityPanel.init(proto, function (entityPanel) {
-								entityPanel.maximizeBtn.element.click()
-								entityPanel.setTitle(proto.TypeName)
-							})
-						},
-						function () {
-
-						}, entityPanel)
-				}
-			}(this)
+		var substitutionGroup = this.proto.SubstitutionGroup.sort()
+		if (substitutionGroup.indexOf("") == -1) {
+			substitutionGroup.unshift("")
 		}
+
+		// Here I will append the list of substitution group in the result...
+		for (var i = 0; i < substitutionGroup.length; i++) {
+			this.substitutionGroupSelect.appendElement({ "tag": "option", "value": substitutionGroup[i], "innerHtml": substitutionGroup[i] })
+		}
+
+		this.substitutionGroupSelect.element.style.display = "table-cell"
+		this.substitutionGroupSelect.element.onchange = function (entityPanel) {
+			return function () {
+				// In that case I will set the entity content with the given type.
+				server.entityManager.getEntityPrototype(this.value, this.value.split(".")[0],
+					function (proto, entityPanel) {
+						entityPanel.init(proto, function (entityPanel) {
+							entityPanel.maximizeBtn.element.click()
+							entityPanel.setTitle(proto.TypeName)
+						})
+					},
+					function () {
+
+					}, entityPanel)
+			}
+		}(this)
+
 	}
 
 	// Back to the sypertype 
@@ -1445,6 +1443,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 		} else if (isXsId(fieldType)) {
 			control.element.value = value
 		} else if (isXsRef(fieldType)) {
+			alert("Ref Found!")
 			control.element.innerHTML = value.replace("#", "")
 			control.element.href = value
 		}
@@ -1591,36 +1590,36 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 			}
 
 			attachAutoComplete(input, lst, false)
-
-			input.element.addEventListener("keyup", function (entityPanel, field, input, objMap) {
-				return function (e) {
-					// If the key is escape...
-					if (e.keyCode === 27) {
-						entityPanel.resetFieldValue(field, input)
-					}
-					// Only index selection will erase the panel if the input is empty.
-					if (entityPanel.proto != undefined) {
-						if (entityPanel.proto.Indexs.indexOf(field) > -1 || entityPanel.proto.Ids.indexOf(field) > -1) {
-							if (this.value.length == 0) {
-								entityPanel.clear()
-								this.focus()
-								this.select()
+			if (entityPanel != undefined) {
+				input.element.addEventListener("keyup", function (entityPanel, field, input, objMap) {
+					return function (e) {
+						// If the key is escape...
+						if (e.keyCode === 27) {
+							entityPanel.resetFieldValue(field, input)
+						}
+						// Only index selection will erase the panel if the input is empty.
+						if (entityPanel.proto != undefined) {
+							if (entityPanel.proto.Indexs.indexOf(field) > -1 || entityPanel.proto.Ids.indexOf(field) > -1) {
+								if (this.value.length == 0) {
+									entityPanel.clear()
+									this.focus()
+									this.select()
+								}
 							}
 						}
 					}
-				}
-			}(entityPanel, field, input, objMap))
+				}(entityPanel, field, input, objMap))
 
-			input.element.onblur = input.element.onchange = function (objMap, values, entityPanel, onSelect) {
-				return function (evt) {
-					var value = objMap[this.value]
-					if (value != undefined) {
-						var entity = entities[value.UUID]
-						onSelect(entity)
+				input.element.onblur = input.element.onchange = function (objMap, values, entityPanel, onSelect) {
+					return function (evt) {
+						var value = objMap[this.value]
+						if (value != undefined) {
+							var entity = entities[value.UUID]
+							onSelect(entity)
+						}
 					}
-				}
-			}(objMap, values, entityPanel, onSelect)
-
+				}(objMap, values, entityPanel, onSelect)
+			}
 		},
 		function (errMsg, caller) {
 			// here there's no indexation... so what!
@@ -1632,6 +1631,11 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 
 	// If a new entity is created related to the autocomplete type I need to append it into the list of choice.
 	server.entityManager.attach({ "input": input, "field": field, "objMap": objMap, "values": this.values, "entityPanel": entityPanel, "onSelect": onSelect, "ids": ids }, NewEntityEvent, function (evt, caller) {
+		if (caller.entityPanel == undefined) {
+			// No panel is defined yet...
+			return
+		}
+
 		// I will reinit the panel here...
 		if (evt.dataMap["entity"].TYPENAME == caller.entityPanel.typeName) {
 			var entity = entities[evt.dataMap["entity"].UUID]

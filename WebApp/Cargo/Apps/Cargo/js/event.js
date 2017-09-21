@@ -322,13 +322,17 @@ EventHandler.prototype.appendEventFilter = function (filter, channelId, successC
             // Nothing special to do here.
         },
         function (result, caller) {
-            caller.successCallback(result[0], caller.caller)
+            if(caller.successCallback != undefined){
+                caller.successCallback(result[0], caller.caller)
+                caller.successCallback = undefined
+            }
         },
         function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
             // call the immediate error callback.
-            caller.errorCallback(errMsg, caller.caller)
+            if (caller.errorCallback != undefined) {
+                caller.errorCallback(errMsg, caller.caller)
+                caller.errorCallback = undefined
+            }
             // dispatch the message.
             server.errorManager.onError(errMsg)
         }, // Error callback
@@ -347,7 +351,6 @@ EventHandler.prototype.appendEventFilter = function (filter, channelId, successC
 EventHandler.prototype.broadcastLocalEvent = function (evt) {
     var channel = this.channels[evt.name]
     if (channel != undefined) {
-
         channel.broadcastEvent(evt)
     }
 }
@@ -378,11 +381,17 @@ EventHandler.prototype.broadcastNetworkEvent = function (evtNumber, evtName, eve
         },
         function (result, caller) {
             //console.log(result)
-            caller.successCallback(result[0], caller.caller)
+            if(caller.successCallback != undefined){
+                caller.successCallback(result[0], caller.caller)
+                caller.successCallback = undefined
+            }
         },
         function (errMsg, caller) {
             server.errorManager.onError(errMsg)
-            caller.errorCallback(errMsg, caller.caller)
+            if(caller.errorCallback != undefined){
+                caller.errorCallback(errMsg, caller.caller)
+                caller.errorCallback = undefined
+            }
         }, // Error callback
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
     )

@@ -187,7 +187,7 @@ EntityTableModel.prototype.constructor = EntityTableModel;
  */
 EntityTableModel.prototype.init = function (successCallback, progressCallback, errorCallback, caller) {
     // typeName string, storeId string, queryStr string, offset int, limit int, orderBy []interface{}, asc bool
-    if(caller.initCallback != undefined){
+    if (caller.initCallback != undefined) {
         caller.initCallback()
         caller.initCallback = undefined
     }
@@ -212,7 +212,7 @@ EntityTableModel.prototype.removeAllValues = function () {
  * Remove a row whit a given id from the model.
  * @param {string} The id of the row to remove.
  */
-EntityTableModel.prototype.removeRow = function (rowIndex) {
+EntityTableModel.prototype.removeRow = function (rowIndex, callback) {
     var entity = this.entities[rowIndex]
     if (entity == undefined) {
         return
@@ -247,13 +247,8 @@ EntityTableModel.prototype.removeRow = function (rowIndex) {
             }
 
             var index = prototype.Indexs[1] // 0 is the uuid...
-            var label = entity[index]
-            if (label == undefined) {
-                label = entity[id]
-            } else if (label.length == 0) {
-                label = entity[id]
-            }
-            confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + label + "?" })
+
+            confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entity.getTitles() + "?" })
             confirmDialog.ok.element.onclick = function (dialog, entity, model) {
                 return function () {
                     // I will call delete file
@@ -267,23 +262,8 @@ EntityTableModel.prototype.removeRow = function (rowIndex) {
 
                         }, entity)
                     dialog.close()
-
-                    // Now set the model values and entities.
-                    var values = []
-                    var entities = []
-                    for (var i = 0; i < model.entities.length; i++) {
-                        if (model.entities[i].UUID != entity.UUID) {
-                            if (this.entities != undefined) {
-                                entities.push(this.entities[i])
-                                values.push(this.values[i])
-                            }
-                        }
-                    }
-                    model.values = values
-                    model.entities = entities
-
                 }
-            }(confirmDialog, entity, this)
+            }(confirmDialog, entity, callback, this)
         }
     }
 }
@@ -423,18 +403,25 @@ SqlTableModel.prototype.init = function (successCallback, progressCallback, erro
     server.dataManager.read(this.db, this.query, this.fields, this.params,
         function (result, caller) {
             caller.tableModel.values = result[0]
-            caller.successCallback(result[0], caller.caller)
+            if (caller.successCallback != undefined) {
+                caller.successCallback(result[0], caller.caller)
+                caller.successCallback = undefined
+            }
         },
         // Progress call back
         function (index, total, caller) { // The progress callback
             // Keep track of the file transfert...
-            caller.progressCallback(index, total, caller.caller)
+            if (caller.progressCallback != undefined) {
+                caller.progressCallback(index, total, caller.caller)
+                caller.progressCallback = undefined
+            }
         },
         function (errMsg, caller) {
-            // display the message in the console.
-            console.log(errMsg)
             // call the immediate error callback...
-            caller.errorCallback(errMsg, caller.caller)
+            if (caller.errorCallback != undefined) {
+                caller.errorCallback(errMsg, caller.caller)
+                caller.errorCallback = undefined
+            }
             // dispatch the message...
             server.errorManager.onError(errMsg)
         },

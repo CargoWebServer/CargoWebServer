@@ -201,20 +201,27 @@ EntityPrototype.prototype.init = function (object) {
         console.log(object.TypeName + " has no fields!!!")
     }
 
-    // Now the restriction
-    this.Restrictions = object.Restrictions
-
     // If the object is abstract
     this.IsAbstract = object.IsAbstract
 
+    // Now the restriction
+    this.Restrictions = object.Restrictions
+
+
     // The list of substitution type.
-    this.SubstitutionGroup = object.SubstitutionGroup
+    if (object.SubstitutionGroup != undefined) {
+        this.SubstitutionGroup = object.SubstitutionGroup
+    }
 
     // The list of Supertype 
-    this.SuperTypeNames = object.SuperTypeNames
+    if (object.SuperTypeNames != undefined) {
+        this.SuperTypeNames = object.SuperTypeNames
+    }
 
     // if the type is a collection.
-    this.ListOf = object.ListOf
+    if (object.ListOf != undefined) {
+        this.ListOf = object.ListOf
+    }
 
     // other standard fields.
     this.appendField("childsUuid", "[]xs.string", false, this.Fields.length, false, "the array of child entities.")
@@ -477,11 +484,11 @@ EntityPrototypeManager.prototype.onEvent = function (evt) {
         // Set the prototype.
         var prototype = new EntityPrototype()
         prototype.init(evt.dataMap.prototype)
-        entityPrototypes[evt.dataMap.prototype.TypeName] = prototype  
+        entityPrototypes[evt.dataMap.prototype.TypeName] = prototype
         evt.dataMap.prototype = prototype
-    }else if(evt.code == DeletePrototypeEvent){
+    } else if (evt.code == DeletePrototypeEvent) {
         // Remove it from the map
-        delete entityPrototypes[evt.dataMap.prototype.TypeName] 
+        delete entityPrototypes[evt.dataMap.prototype.TypeName]
     }
 
     // Call the regular function.

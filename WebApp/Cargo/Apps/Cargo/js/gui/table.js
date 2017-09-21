@@ -73,7 +73,7 @@ var Table = function (id, parent) {
 	this.parent = parent
 
 	// The div...
-	this.div = parent.appendElement({ "tag": "div", "class": "scrolltable", id : id }).down()
+	this.div = parent.appendElement({ "tag": "div", "class": "scrolltable", id: id }).down()
 
 	// The header...
 	this.header = null
@@ -115,7 +115,7 @@ var Table = function (id, parent) {
 			return function (event) {
 				table.refresh()
 			}
-		} (this)
+		}(this)
 	);
 
 	return this
@@ -175,8 +175,15 @@ Table.prototype.init = function () {
 			var value = this.model.getValueAt(i, j)
 			data.push(value)
 		}
-		this.rows[i] = new TableRow(this, i, data)
-		this.rowsId[data[0]] = this.rows[i]
+
+		// If the model contain entities I will set the row id and set map entry.
+		if (this.model.entities != undefined) {
+			this.rows[i] = new TableRow(this, i, data, this.model.entities[i].UUID)
+			this.rowsId[this.model.entities[i].UUID] = this.rows[i]
+		} else {
+			this.rows[i] = new TableRow(this, i, data)
+			this.rowsId[data[0]] = this.rows[i]
+		}
 	}
 	// In the case of sql table I will connect the listener here...
 	// New connection of the event listeners...
@@ -186,47 +193,57 @@ Table.prototype.init = function () {
 		server.entityManager.attach(this, DeleteEntityEvent, function (evt, table) {
 			// So here I will remove the line from the table...
 			var entity = evt.dataMap["entity"]
-			if (entity.TypeName == table.model.proto.TypeName) {
-				if (entity.ParentUuid == table.model.getParentUuid()) {
-					// So here I will remove the line from the model...
-					table.model.removeRow(entity.UUID)
-					var orderedRows = []
-					for (var rowIndex in table.orderedRows) {
-						var row = table.orderedRows[rowIndex]
-						if (row.id != entity.UUID) {
-							orderedRows.push(row)
-						} else {
-							// remove from the display...
+			if (entity.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(entity.TYPENAME) != -1) {
+				// So here I will remove the line from the model...
+				var orderedRows = []
+				for (var i = 0; i < table.orderedRows.length; i++) {
+					var row = table.orderedRows[i]
+					if (row.id != entity.UUID) {
+						orderedRows.push(row)
+					} else {
+						// remove from the display...
+						row.div.element.parentNode.removeChild(row.div.element)
+					}
+				}
+
+				// Now set the model values and entities.
+				var values = []
+				var entities = []
+				for (var i = 0; i < table.model.entities.length; i++) {
+					if (table.model.entities[i].UUID != entity.UUID) {
+						entities.push(table.model.entities[i])
+						values.push(table.model.values[i])
+					}
+				}
+				// Set the values...
+				table.model.values = values
+				table.model.entities = entities
+
+				table.orderedRows = orderedRows
+
+				var rows = []
+				var rowsId = {}
+
+				for (var i = 0; i < table.rows.length; i++) {
+					if (table.header == null) {
+						table.setHeader()
+					}
+					var row = table.rows[i]
+					if (row.id != entity.UUID) {
+						row.index = rows.length
+						rows.push(row)
+						rowsId[row.id] = row
+					} else {
+						// remove from the display...
+						if (row.div.element.parentNode != null) {
 							row.div.element.parentNode.removeChild(row.div.element)
 						}
 					}
-
-					table.orderedRows = orderedRows
-
-					var rows = []
-					var rowsId = {}
-
-					for (var rowIndex in table.rows) {
-						if (table.header == null) {
-							table.setHeader()
-						}
-						var row = table.rows[rowIndex]
-						if (row.id != entity.UUID) {
-							row.index = rows.length
-							row.id = entity.UUID
-							rows.push(row)
-							rowsId[entity.UUID] = row
-						} else {
-							// remove from the display...
-							if (row.div.element.parentNode != null) {
-								row.div.element.parentNode.removeChild(row.div.element)
-							}
-						}
-					}
-					table.rowsId = rowsId
-					table.rows = rows
-					table.refresh()
 				}
+
+				table.rowsId = rowsId
+				table.rows = rows
+				table.refresh()
 			}
 		})
 
@@ -235,7 +252,25 @@ Table.prototype.init = function () {
 			if (evt.dataMap["entity"] != undefined) {
 				var entity = entities[evt.dataMap["entity"].UUID]
 				if (entity != undefined) {
-					if (entity.TYPENAME == table.model.proto.TypeName) {
+					if (entity.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(entity.TYPENAME) != -1) {
+						if (entity.ParentUuid != undefined && table.model.getParentUuid() != undefined) {
+							if (table.model.getParentUuid() == entity.ParentUuid) {
+								var row = table.appendRow(entity, entity.UUID)
+								row.table.model.entities[row.index] = entity
+								row.saveBtn.element.style.visibility = "hidden"
+							}
+						}
+					}
+				}
+			}
+		})
+
+		// The update entity event.
+		server.entityManager.attach(this, UpdateEntityEvent, function (evt, table) {
+			if (evt.dataMap["entity"] != undefined) {
+				var entity = entities[evt.dataMap["entity"].UUID]
+				if (entity != undefined) {
+					if (entity.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(entity.TYPENAME) != -1) {
 						if (entity.ParentUuid != undefined && table.model.getParentUuid() != undefined) {
 							if (table.model.getParentUuid() == entity.ParentUuid) {
 								var row = table.appendRow(entity, entity.UUID)
@@ -254,7 +289,7 @@ Table.prototype.init = function () {
 		server.dataManager.attach(this, DeleteRowEvent, function (evt, table) {
 			// So here I will remove the line from the table...
 			if (evt.dataMap.tableName == table.id) {
-				// So here I will remove the line from the model...
+				// So here I will remove the line from the model...F
 				table.model.removeRow(evt.dataMap.id_0)
 
 				var orderedRows = []
@@ -518,7 +553,7 @@ var TableHeader = function (table) {
 			minimizeBtn.element.style.display = "table-cell"
 			numberOfRowLabel.element.style.display = "none"
 		}
-	} (this.table.rowGroup, this.minimizeBtn, this.numberOfRowLabel)
+	}(this.table.rowGroup, this.minimizeBtn, this.numberOfRowLabel)
 
 	this.minimizeBtn.element.onclick = function (rowGroup, maximizeBtn, numberOfRowLabel, table) {
 		return function () {
@@ -534,7 +569,7 @@ var TableHeader = function (table) {
 				numberOfRowLabel.element.style.display = "none"
 			}
 		}
-	} (this.table.rowGroup, this.maximizeBtn, this.numberOfRowLabel, this.table)
+	}(this.table.rowGroup, this.maximizeBtn, this.numberOfRowLabel, this.table)
 
 	this.minimizeBtn.element.click()
 
@@ -574,7 +609,7 @@ var TableHeader = function (table) {
 				table.exportCallback(rows)
 			}
 		}
-	} (this.table)
+	}(this.table)
 
 	return this
 }
@@ -608,10 +643,6 @@ var TableRow = function (table, index, data, id) {
 		return
 	}
 
-	/*if (table.header == null) {
-		table.setHeader()
-	}*/
-
 	this.index = index
 	this.table = table
 	this.cells = []
@@ -625,7 +656,7 @@ var TableRow = function (table, index, data, id) {
 
 	this.div = table.rowGroup.appendElement({ "tag": "div", "class": "table_row", "id": this.id }).down()
 
-	this.saveBtn = this.div.appendElement({ "tag": "div", "class": "row_button", "style": "visibility: hidden;" }).down()
+	this.saveBtn = this.div.appendElement({ "tag": "div", "class": "row_button", "style": "visibility: hidden;", "id": id + "_delete_btn" }).down()
 		.appendElement({ "tag": "i", "class": "fa fa-floppy-o" }).down()
 
 	this.saveBtn.element.onclick = function (row) {
@@ -633,7 +664,7 @@ var TableRow = function (table, index, data, id) {
 			this.style.visibility = "hidden"
 			row.table.model.saveValue(row)
 		}
-	} (this)
+	}(this)
 
 	// I will create the header cell...
 	for (var i = 0; i < data.length; i++) {
@@ -645,7 +676,7 @@ var TableRow = function (table, index, data, id) {
 	}
 
 	// The delete button.
-	this.deleteBtn = this.div.appendElement({ "tag": "div", "class": "row_button" }).down()
+	this.deleteBtn = this.div.appendElement({ "tag": "div", "class": "row_button", "id": id + "_delete_btn" }).down()
 		.appendElement({ "tag": "i", "class": "fa fa-trash-o" }).down()
 
 	// Now the action...
@@ -653,12 +684,13 @@ var TableRow = function (table, index, data, id) {
 		return function () {
 			// here I will delete the row...
 			self.table.model.removeRow(self.index)
+
 			// Call the delete callback function...
 			if (deleteCallback != null) {
 				deleteCallback(id)
 			}
 		}
-	} (this, data[0], this.table.deleteRowCallback)
+	}(this, data[0], this.table.deleteRowCallback)
 
 	return this
 }
@@ -709,7 +741,7 @@ var TableCell = function (row, index, value) {
 			e.stopPropagation()
 			cell.appendCellEditor(this.offsetWidth, this.offsetHeight)
 		}
-	} (this)
+	}(this)
 }
 
 // create an item link...
@@ -757,7 +789,7 @@ function createItemLnk(entity, value, field, valueDiv) {
 				}
 			}
 		}
-	} (value, ref, valueDiv, field)
+	}(value, ref, valueDiv, field)
 
 	// Now the delete action...
 	deleteLnkButton.element.onclick = function (entityUuid, object, field, content) {
@@ -776,7 +808,7 @@ function createItemLnk(entity, value, field, valueDiv) {
 				},
 				content)
 		}
-	} (entity.UUID, value, field, content)
+	}(entity.UUID, value, field, content)
 	return content
 }
 
@@ -922,7 +954,7 @@ TableCell.prototype.formatValue = function (value) {
 			itemTable.setModel(tableModel, function (table, items, entity, field) {
 				return function () {
 					for (var i = 0; i < items.length; i++) {
-						row = table.appendRow([i + 1, items[i]], i)
+						row = table.appendRow([i + 1, items[i]], i /*entity.UUID*/)
 						// The delete row action...
 						row.deleteBtn.element.onclick = function (entity, field, row) {
 							return function () {
@@ -937,7 +969,7 @@ TableCell.prototype.formatValue = function (value) {
 									server.entityManager.saveEntity(entity)
 								}
 							}
-						} (entity, field, row)
+						}(entity, field, row)
 
 						// The save row action
 						row.saveBtn.element.onclick = function (entity, field, row) {
@@ -959,12 +991,12 @@ TableCell.prototype.formatValue = function (value) {
 										}, this)
 								}
 							}
-						} (entity, field, row)
+						}(entity, field, row)
 
 					}
 					table.refresh()
 				}
-			} (itemTable, value, this.row.table.model.entities[this.row.index].UUID, field))
+			}(itemTable, value, this.row.table.model.entities[this.row.index].UUID, field))
 
 			// Here the new value...
 			newLnkButton.element.onclick = function (itemTable, entity, field, fieldType) {
@@ -986,7 +1018,7 @@ TableCell.prototype.formatValue = function (value) {
 								server.entityManager.saveEntity(entity)
 							}
 						}
-					} (entity, field, newRow)
+					}(entity, field, newRow)
 
 					// The save row action
 					newRow.saveBtn.element.onclick = function (entity, field, row) {
@@ -1016,9 +1048,9 @@ TableCell.prototype.formatValue = function (value) {
 								}
 							}
 						}
-					} (entity, field, newRow)
+					}(entity, field, newRow)
 				}
-			} (itemTable, this.row.table.model.entities[this.row.index].UUID, field, fieldType)
+			}(itemTable, this.row.table.model.entities[this.row.index].UUID, field, fieldType)
 			return itemTable
 		}
 	} else {
@@ -1077,7 +1109,7 @@ TableCell.prototype.formatValue = function (value) {
 								return function (ref) {
 									createItemLnk(entity, ref, field, valueDiv)
 								}
-							} (entity, field, lnkDiv, createItemLnk)
+							}(entity, field, lnkDiv, createItemLnk)
 						)
 					}
 				}
@@ -1112,12 +1144,12 @@ TableCell.prototype.formatValue = function (value) {
 									cell.row.saveBtn.element.style.visibility = "visible"
 
 								}
-							} (newLnkInput, entity, field, valueDiv, cell))
+							}(newLnkInput, entity, field, valueDiv, cell))
 
 						newLnkInput.element.focus()
 						newLnkInput.element.select();
 					}
-				} (valueDiv, entity, itemPrototype.TypeName, field, this)
+				}(valueDiv, entity, itemPrototype.TypeName, field, this)
 
 				return content
 			} else {
@@ -1143,6 +1175,7 @@ TableCell.prototype.formatValue = function (value) {
 
 					itemTable.setModel(itemsTableModel, function (itemsTable, values, field) {
 						return function () {
+							itemsTable.init() // connect events...
 							for (var i = 0; i < values.length; i++) {
 								if (values[i].UUID != undefined) {
 									values[i].parentLnk = field
@@ -1153,7 +1186,7 @@ TableCell.prototype.formatValue = function (value) {
 								}
 							}
 						}
-					} (itemTable, value, field))
+					}(itemTable, value, field))
 				}
 
 				// Here I will append a new entity as a table row.
@@ -1171,7 +1204,7 @@ TableCell.prototype.formatValue = function (value) {
 						entity[field].push(item)
 
 						// Set the parent uuid.
-						item.parentUuid = entity.UUID
+						item.ParentUuid = entity.UUID
 						item.parentLnk = field
 
 						if (itemTable == undefined) {
@@ -1185,7 +1218,7 @@ TableCell.prototype.formatValue = function (value) {
 									newRow = itemTable.appendRow(item, item.UUID)
 									newRow.saveBtn.element.style.visibility = "visible"
 								}
-							} (itemTable, item))
+							}(itemTable, item))
 
 						} else {
 							newRow = itemTable.appendRow(item, item.UUID)
@@ -1193,7 +1226,7 @@ TableCell.prototype.formatValue = function (value) {
 						}
 
 					}
-				} (itemTable, entity, field, fieldType, content)
+				}(itemTable, entity, field, fieldType, content)
 
 				return itemTable
 			}
@@ -1236,7 +1269,7 @@ TableCell.prototype.formatValue = function (value) {
 									return function (ref) {
 										createItemLnk(entity, ref, field, valueDiv)
 									}
-								} (entity, field, content, createItemLnk)
+								}(entity, field, content, createItemLnk)
 							)
 						}
 					}
@@ -1251,7 +1284,7 @@ TableCell.prototype.formatValue = function (value) {
 						return function (panel) {
 							panel.setEntity(entity)
 						}
-					} (value),
+					}(value),
 					undefined, true, undefined, "")
 			}
 		}
@@ -1282,6 +1315,11 @@ TableCell.prototype.getValue = function () {
  * @param {} value The value to set.
  */
 TableCell.prototype.setValue = function (value) {
+	if (this.valueDiv.element.innerHTML == value) {
+		// if the value is the same I dont need to change it.
+		return
+	}
+
 	// Display in the div...
 	if (isObject(value)) {
 		this.valueDiv.removeAllChilds()
@@ -1358,17 +1396,20 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 	}
 
 	var prototype = this.row.table.model.proto
+
 	var entity = null
 
-	// I will get the field...
-	var field = prototype.Fields[this.index + 2]
-	var fieldType = prototype.FieldsType[this.index + 2]
+	if (prototype != null) {
+		// I will get the field...
+		var field = prototype.Fields[this.index + 2]
+		var fieldType = prototype.FieldsType[this.index + 2]
 
-	// The value...
-	if (value != null) {
-		if (value.M_valueOf != undefined) {
-			entity = value
-			value = value.M_valueOf
+		// The value...
+		if (value != null) {
+			if (value.M_valueOf != undefined) {
+				entity = value
+				value = value.M_valueOf
+			}
 		}
 	}
 
@@ -1442,7 +1483,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 						return function () {
 							editor.element.value = ""
 						}
-					} (editor)
+					}(editor)
 
 					// Now i will set it autocompletion list...
 					attachAutoCompleteInput(editor, type, field, entity, [],
@@ -1476,7 +1517,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 									}
 								}
 							}
-						} (this, entity, field, this.valueDiv, editor))
+						}(this, entity, field, this.valueDiv, editor))
 				}
 			} else {
 				// Here I will get the prototype for the field type
@@ -1523,7 +1564,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 							panel.maximizeBtn.element.click()
 							panel.header.element.style.display = "none"
 						}
-					} (entity, field, fieldPrototype.TypeName)).panel
+					}(entity, field, fieldPrototype.TypeName)).panel
 				}
 			}
 		}
@@ -1537,7 +1578,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 			return function () {
 				row.saveBtn.element.style.visibility = "visible"
 			}
-		} (this.row)
+		}(this.row)
 
 		this.div.appendElement(editor)
 		this.valueDiv.element.style.display = "none"
@@ -1595,22 +1636,24 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				}
 
 			}
-		} (this, editor, onblur, field, entity)
+		}(this, editor, onblur, field, entity)
 		editor.element.onblur = onblur
 
 		// If the editor is the entity panel I will
 		if (editor.element.tagName == "DIV") {
-			editor.element.onmouseleave = function (editor, cell, entity, field, fieldType) {
+			editor.element.addEventListener("keyup", function (editor, cell, entity, field, fieldType) {
 				return function (evt) {
 					evt.stopPropagation()
-					editor.element.style.display = "none"
-					if(entity[field] == undefined){
-						entity[field] = eval("new " + fieldType + "()")
+					if (evt.keyCode == 27) {
+						editor.element.style.display = "none"
+						if (entity[field] == undefined) {
+							entity[field] = eval("new " + fieldType + "()")
+						}
+						cell.setValue(entity[field]) // Set the value.
+						cell.valueDiv.element.style.display = ""
 					}
-					cell.setValue(entity[field]) // Set the value.
-					cell.valueDiv.element.style.display = ""
 				}
-			} (editor, this, entity, field, fieldPrototype.TypeName)
+			}(editor, this, entity, field, fieldPrototype.TypeName))
 		}
 	}
 }
@@ -1724,7 +1767,7 @@ var ColumnSorter = function (index, table) {
 			sorter.state = 2
 			sorter.setOrder()
 		}
-	} (this)
+	}(this)
 
 	this.sortAsc.element.onclick = function (sorter) {
 		return function () {
@@ -1734,7 +1777,7 @@ var ColumnSorter = function (index, table) {
 			sorter.state = 1
 			sorter.setOrder()
 		}
-	} (this)
+	}(this)
 
 	this.sortDesc.element.onclick = function (sorter) {
 		return function () {
@@ -1744,7 +1787,7 @@ var ColumnSorter = function (index, table) {
 			sorter.state = 0
 			sorter.setOrder()
 		}
-	} (this)
+	}(this)
 }
 
 /**
@@ -1784,7 +1827,7 @@ ColumnSorter.prototype.sortValues = function (values) {
 			}
 		}
 
-	} (this))
+	}(this))
 
 	// find same values and make it filter by the child sorter...
 	if (this.childSorter != null) {
@@ -1909,7 +1952,7 @@ var ColumnFilter = function (index, table) {
 
 			filter.checkboxs[0].element.checked = checkSelectAll
 		}
-	} (this)
+	}(this)
 
 	// if a function is define here it will be called after values will be filer...
 	this.filterCallback = null
@@ -1938,7 +1981,7 @@ var ColumnFilter = function (index, table) {
 				filter.filterCallback(values)
 			}
 		}
-	} (this)
+	}(this)
 
 	var selectAll = this.appendFilter("(Sélectionner tout)")
 
@@ -1952,7 +1995,7 @@ var ColumnFilter = function (index, table) {
 				}
 			}
 		}
-	} (this)
+	}(this)
 
 	// Init the filer panel...
 	this.initFilterPanel()
@@ -1973,7 +2016,7 @@ var ColumnFilter = function (index, table) {
 				filter.filterPanelDiv.element.style.display = "none"
 			}
 		}
-	} (this)
+	}(this)
 
 	return this
 }
@@ -2109,7 +2152,7 @@ ColumnFilter.prototype.initFilterPanel = function () {
 					}
 					monthsIsShow = !monthsIsShow
 				}
-			} (months, ymaximizeBtn, monthsIsShow)
+			}(months, ymaximizeBtn, monthsIsShow)
 
 			for (var m in years[y].months) {
 				var mid = randomUUID()
@@ -2139,7 +2182,7 @@ ColumnFilter.prototype.initFilterPanel = function () {
 						}
 						daysIsShow = !daysIsShow
 					}
-				} (days, mmaximizeBtn, daysIsShow)
+				}(days, mmaximizeBtn, daysIsShow)
 
 				mcheckbox.daysCheckBox = []
 
@@ -2173,7 +2216,7 @@ ColumnFilter.prototype.initFilterPanel = function () {
 								}
 							}
 						}
-					} (dcheckbox)
+					}(dcheckbox)
 				}
 
 				mcheckbox.element.onclick = function (mcheckbox) {
@@ -2195,7 +2238,7 @@ ColumnFilter.prototype.initFilterPanel = function () {
 							}
 						}
 					}
-				} (mcheckbox)
+				}(mcheckbox)
 			}
 
 			ycheckbox.element.onclick = function (ycheckbox) {
@@ -2207,7 +2250,7 @@ ColumnFilter.prototype.initFilterPanel = function () {
 						}
 					}
 				}
-			} (ycheckbox)
+			}(ycheckbox)
 
 		}
 	}
@@ -2233,7 +2276,7 @@ ColumnFilter.prototype.appendFilter = function (value) {
 					filter.checkboxs[0].element.checked = true
 				}
 			}
-		} (this)
+		}(this)
 
 		return checkbox
 	}

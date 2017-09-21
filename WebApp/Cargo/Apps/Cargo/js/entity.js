@@ -438,7 +438,7 @@ function setSubObject(parent, property, values, isArray) {
             }
 
             object.ParentUuid = parent.UUID
-
+            object.parentLnk = property
             server.entityManager.setEntity(object)
 
         },

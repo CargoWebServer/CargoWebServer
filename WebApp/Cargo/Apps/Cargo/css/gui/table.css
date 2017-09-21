@@ -201,6 +201,10 @@
     transition: all .2s ease;
 }
 
+.row_button .fa-floppy-o {
+    color: #428bca;
+}
+
 .new_row_button{
     vertical-align: top;
 }
