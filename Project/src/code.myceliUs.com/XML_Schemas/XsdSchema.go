@@ -1345,14 +1345,14 @@ type XSD_Any struct {
 /**
  * Dertermine if the value is a base type.
  */
-func isXsBaseType(fieldType string) bool {
-	return isXsId(fieldType) || isXsRef(fieldType) || isXsInt(fieldType) || isXsString(fieldType) || isXsBinary(fieldType) || isXsNumeric(fieldType) || isXsBoolean(fieldType) || isXsDate(fieldType) || isXsTime(fieldType) || isXsMoney(fieldType)
+func IsXsBaseType(fieldType string) bool {
+	return IsXsId(fieldType) || IsXsRef(fieldType) || IsXsInt(fieldType) || IsXsString(fieldType) || IsXsBinary(fieldType) || IsXsNumeric(fieldType) || IsXsBoolean(fieldType) || IsXsDate(fieldType) || IsXsTime(fieldType) || IsXsMoney(fieldType)
 }
 
 /**
  * Helper function use to dertermine if a XS type must be considere integer.
  */
-func isXsInt(fieldType string) bool {
+func IsXsInt(fieldType string) bool {
 	if strings.HasSuffix(fieldType, "byte") || strings.HasSuffix(fieldType, "int") || strings.HasSuffix(fieldType, "integer") || strings.HasSuffix(fieldType, "short") || strings.HasSuffix(fieldType, "unsignedInt") || strings.HasSuffix(fieldType, "unsignedBtype") || strings.HasSuffix(fieldType, "unsignedShort") || strings.HasSuffix(fieldType, "unsignedLong") || strings.HasSuffix(fieldType, "negativeInteger") || strings.HasSuffix(fieldType, "nonNegativeInteger") || strings.HasSuffix(fieldType, "nonPositiveInteger") || strings.HasSuffix(fieldType, "positiveInteger") || strings.HasSuffix(fieldType, "tinyint") || strings.HasSuffix(fieldType, "smallint") || strings.HasSuffix(fieldType, "bigint") {
 		return true
 	}
@@ -1362,7 +1362,7 @@ func isXsInt(fieldType string) bool {
 /**
  * Helper function use to dertermine if a XS type must be considere String.
  */
-func isXsString(fieldType string) bool {
+func IsXsString(fieldType string) bool {
 	if strings.HasSuffix(fieldType, "string") || strings.HasSuffix(fieldType, "Name") || strings.HasSuffix(fieldType, "QName") || strings.HasSuffix(fieldType, "NMTOKEN") || strings.HasSuffix(fieldType, "gDay") || strings.HasSuffix(fieldType, "gMonth") || strings.HasSuffix(fieldType, "gMonthDay") || strings.HasSuffix(fieldType, "gYear") || strings.HasSuffix(fieldType, "gYearMonth") || strings.HasSuffix(fieldType, "token") || strings.HasSuffix(fieldType, "normalizedString") || strings.HasSuffix(fieldType, "hexBinary") || strings.HasSuffix(fieldType, "language") || strings.HasSuffix(fieldType, "NMTOKENS") || strings.HasSuffix(fieldType, "NOTATION") || strings.HasSuffix(fieldType, "char") || strings.HasSuffix(fieldType, "nchar") || strings.HasSuffix(fieldType, "varchar") || strings.HasSuffix(fieldType, "nvarchar") || strings.HasSuffix(fieldType, "text") || strings.HasSuffix(fieldType, "ntext") {
 		return true
 	}
@@ -1372,7 +1372,7 @@ func isXsString(fieldType string) bool {
 /**
  * Helper function use to dertermine if a XS type must be considere binary value.
  */
-func isXsBinary(fieldType string) bool {
+func IsXsBinary(fieldType string) bool {
 	if strings.HasSuffix(fieldType, "base64Binary") || strings.HasSuffix(fieldType, "varbinary") || strings.HasSuffix(fieldType, "binary") || strings.HasSuffix(fieldType, "image") || strings.HasSuffix(fieldType, "timestamp") {
 		return true
 	}
@@ -1382,7 +1382,7 @@ func isXsBinary(fieldType string) bool {
 /**
  * Helper function use to dertermine if a XS type must be considere numeric value.
  */
-func isXsNumeric(fieldType string) bool {
+func IsXsNumeric(fieldType string) bool {
 	if strings.HasSuffix(fieldType, "double") || strings.HasSuffix(fieldType, "decimal") || strings.HasSuffix(fieldType, "float") || strings.HasSuffix(fieldType, "numeric") || strings.HasSuffix(fieldType, "real") {
 		return true
 	}
@@ -1392,7 +1392,7 @@ func isXsNumeric(fieldType string) bool {
 /**
  * Helper function use to dertermine if a XS type must be considere boolean value.
  */
-func isXsBoolean(fieldType string) bool {
+func IsXsBoolean(fieldType string) bool {
 	if strings.HasSuffix(fieldType, "boolean") || strings.HasSuffix(fieldType, "bit") {
 		return true
 	}
@@ -1402,7 +1402,7 @@ func isXsBoolean(fieldType string) bool {
 /**
  * Helper function use to dertermine if a XS type must be considere date value.
  */
-func isXsDate(fieldType string) bool {
+func IsXsDate(fieldType string) bool {
 	if strings.HasSuffix(fieldType, "date") || strings.HasSuffix(fieldType, "datetime") || strings.HasSuffix(fieldType, "datetime2") || strings.HasSuffix(fieldType, "smalldatetime") || strings.HasSuffix(fieldType, "datetimeoffset") {
 		return true
 	}
@@ -1412,7 +1412,7 @@ func isXsDate(fieldType string) bool {
 /**
  * Helper function use to dertermine if a XS type must be considere time value.
  */
-func isXsTime(fieldType string) bool {
+func IsXsTime(fieldType string) bool {
 	if strings.HasSuffix(fieldType, "time") || strings.HasSuffix(fieldType, "timestampNumeric") || strings.HasSuffix(fieldType, "timestamp") {
 		return true
 	}
@@ -1422,7 +1422,7 @@ func isXsTime(fieldType string) bool {
 /**
  * Helper function use to dertermine if a XS type must be considere money value.
  */
-func isXsMoney(fieldType string) bool {
+func IsXsMoney(fieldType string) bool {
 	if strings.HasSuffix(fieldType, "money") || strings.HasSuffix(fieldType, "smallmoney") {
 		return true
 	}
@@ -1432,7 +1432,7 @@ func isXsMoney(fieldType string) bool {
 /**
  * Helper function use to dertermine if a XS type must be considere id value.
  */
-func isXsId(fieldType string) bool {
+func IsXsId(fieldType string) bool {
 	if strings.HasSuffix(fieldType, "ID") || strings.HasSuffix(fieldType, "NCName") || strings.HasSuffix(fieldType, "uniqueidentifier") {
 		return true
 	}
@@ -1442,7 +1442,7 @@ func isXsId(fieldType string) bool {
 /**
  * Helper function use to dertermine if a XS type must be considere id value.
  */
-func isXsRef(fieldType string) bool {
+func IsXsRef(fieldType string) bool {
 	if strings.HasSuffix(fieldType, "anyURI") || strings.HasSuffix(fieldType, "IDREF") {
 		return true
 	}

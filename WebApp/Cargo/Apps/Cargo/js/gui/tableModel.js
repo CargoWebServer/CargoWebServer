@@ -334,7 +334,7 @@ EntityTableModel.prototype.setValueAt = function (value, row, column) {
  */
 EntityTableModel.prototype.saveValue = function (row) {
     var entity = row.table.model.entities[row.index]
-
+    
     // Here I will save the entity...
     if (entity != null) {
         entity.NeedSave = true

@@ -1555,11 +1555,13 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 								server.entityManager.createEntity(parent.UUID, field, entity.TYPENAME, "", entity,
 									function (result, caller) {
 										// Set the newly created entity.
-										caller.setEntity(result)
+										caller.entityPanel.setEntity(result)
+										caller.parent[caller.field] = result
+										entitie[caller.parent.UUID] = caller.parent
 									},
 									function () {
 
-									}, panel)
+									}, {"entityPanel":panel, "parent":parent, "field":field})
 							}
 							panel.maximizeBtn.element.click()
 							panel.header.element.style.display = "none"

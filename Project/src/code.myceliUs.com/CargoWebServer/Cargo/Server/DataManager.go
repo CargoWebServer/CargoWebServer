@@ -13,6 +13,7 @@ import (
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
+	"code.myceliUs.com/XML_Schemas"
 )
 
 const (
@@ -712,11 +713,11 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 							}
 
 							// Here I will convert the data
-							if isXsBoolean(fieldType) && reflect.TypeOf(d[i]).String() == "float64" {
+							if XML_Schemas.IsXsBoolean(fieldType) && reflect.TypeOf(d[i]).String() == "float64" {
 								data = append(data, int8(d[i].(float64)))
-							} else if isXsInt(fieldType) && reflect.TypeOf(d[i]).String() == "float64" {
+							} else if XML_Schemas.IsXsInt(fieldType) && reflect.TypeOf(d[i]).String() == "float64" {
 								data = append(data, int32(d[i].(float64)))
-							} else if isXsDate(fieldType) {
+							} else if XML_Schemas.IsXsDate(fieldType) {
 								dateTime, err := Utility.MatchISO8601_DateTime(d[i].(string))
 								if err == nil {
 									data = append(data, dateTime.Format(createdFormat))
@@ -863,11 +864,11 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 								idsFieldsName = append(idsFieldsName, entityQuery.Fields[i][2:])
 							} else {
 								fieldsName = append(fieldsName, entityQuery.Fields[i][2:])
-								if isXsBoolean(fieldType) && reflect.TypeOf(fields[i]).String() == "float64" {
+								if XML_Schemas.IsXsBoolean(fieldType) && reflect.TypeOf(fields[i]).String() == "float64" {
 									data = append(data, int8(fields[i].(float64)))
-								} else if isXsInt(fieldType) && reflect.TypeOf(fields[i]).String() == "float64" {
+								} else if XML_Schemas.IsXsInt(fieldType) && reflect.TypeOf(fields[i]).String() == "float64" {
 									data = append(data, int32(fields[i].(float64)))
-								} else if isXsDate(fieldType) {
+								} else if XML_Schemas.IsXsDate(fieldType) {
 									if reflect.TypeOf(fields[i]).String() == "time.Time" {
 										data = append(data, fields[i].(time.Time).Format(createdFormat))
 									} else {

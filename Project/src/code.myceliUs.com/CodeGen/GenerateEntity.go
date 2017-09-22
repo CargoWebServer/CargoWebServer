@@ -571,6 +571,7 @@ func generateEntityAttribute(attribute *XML_Schemas.CMOF_OwnedAttribute, packNam
 
 	if IsRef(attribute) {
 		memberTypeName += ":Ref"
+		memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"undefined\")\n"
 	}
 
 	if isPrimitive {
@@ -607,6 +608,25 @@ func generateEntityAttribute(attribute *XML_Schemas.CMOF_OwnedAttribute, packNam
 		}
 
 		memberStr += "	" + prototypeName + ".FieldsType = append(" + prototypeName + ".FieldsType,\"" + memberTypeName + "\")\n"
+
+		// Set the default attribute value here.
+		if attribute.Upper == "*" {
+			memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"[]\")\n"
+		} else if XML_Schemas.IsXsString(memberTypeName) || XML_Schemas.IsXsId(memberTypeName) || XML_Schemas.IsXsRef(memberTypeName) {
+			memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"\")\n"
+		} else if XML_Schemas.IsXsInt(memberTypeName) || XML_Schemas.IsXsTime(memberTypeName) {
+			memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"0\")\n"
+		} else if XML_Schemas.IsXsNumeric(memberTypeName) {
+			memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"0.0\")\n"
+		} else if XML_Schemas.IsXsDate(memberTypeName) {
+			memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"new Date()\")\n"
+		} else if XML_Schemas.IsXsBoolean(memberTypeName) {
+			memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"false\")\n"
+		} else {
+			// Object here.
+			memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"undefined\")\n"
+		}
+
 	} else if simpleTypesMap[typeName] != nil {
 		// Here the type is an enum...
 		enumStr := "enum:"
@@ -619,14 +639,20 @@ func generateEntityAttribute(attribute *XML_Schemas.CMOF_OwnedAttribute, packNam
 			if i < len(enum.Litterals)-1 && len(enum.Litterals) > 1 {
 				enumStr += ":"
 			}
+			if i == 0 {
+				memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"" + typeName + "_" + enumValue + "\")\n"
+			}
 		}
 		memberStr += "	" + prototypeName + ".FieldsType = append(" + prototypeName + ".FieldsType,\"" + enumStr + "\")\n"
+
 	} else {
 		// Here the type is another type...
 		if attribute.Upper == "*" {
 			memberTypeName = "[]" + packName + "." + memberTypeName
+			memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"[]\")\n"
 		} else {
 			memberTypeName = packName + "." + memberTypeName
+			memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"undefined\")\n"
 		}
 		memberStr += "	" + prototypeName + ".FieldsType = append(" + prototypeName + ".FieldsType,\"" + memberTypeName + "\")\n"
 	}
@@ -724,6 +750,7 @@ func generateEntityPrototypeFunc(packageId string, class *XML_Schemas.CMOF_Owned
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsType = append(" + prototypeVar + ".FieldsType,\"xs.string\")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsOrder = append(" + prototypeVar + ".FieldsOrder," + strconv.Itoa(index) + ")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsVisibility = append(" + prototypeVar + ".FieldsVisibility,false)\n"
+	entityPrototypeStr += "	" + prototypeVar + ".FieldsDefaultValue = append(" + prototypeVar + ".FieldsDefaultValue,\"\")\n"
 
 	index++
 
@@ -733,6 +760,7 @@ func generateEntityPrototypeFunc(packageId string, class *XML_Schemas.CMOF_Owned
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsType = append(" + prototypeVar + ".FieldsType,\"xs.string\")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsOrder = append(" + prototypeVar + ".FieldsOrder," + strconv.Itoa(index) + ")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsVisibility = append(" + prototypeVar + ".FieldsVisibility,false)\n"
+	entityPrototypeStr += "	" + prototypeVar + ".FieldsDefaultValue = append(" + prototypeVar + ".FieldsDefaultValue,\"\")\n"
 
 	index++
 
@@ -747,6 +775,7 @@ func generateEntityPrototypeFunc(packageId string, class *XML_Schemas.CMOF_Owned
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsType = append(" + prototypeVar + ".FieldsType,\"[]xs.string\")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsOrder = append(" + prototypeVar + ".FieldsOrder," + strconv.Itoa(index) + ")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsVisibility = append(" + prototypeVar + ".FieldsVisibility,false)\n\n"
+	entityPrototypeStr += "	" + prototypeVar + ".FieldsDefaultValue = append(" + prototypeVar + ".FieldsDefaultValue,\"[]\")\n"
 
 	index++
 
@@ -755,6 +784,7 @@ func generateEntityPrototypeFunc(packageId string, class *XML_Schemas.CMOF_Owned
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsType = append(" + prototypeVar + ".FieldsType,\"[]EntityRef\")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsOrder = append(" + prototypeVar + ".FieldsOrder," + strconv.Itoa(index) + ")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsVisibility = append(" + prototypeVar + ".FieldsVisibility,false)\n"
+	entityPrototypeStr += "	" + prototypeVar + ".FieldsDefaultValue = append(" + prototypeVar + ".FieldsDefaultValue,\"[]\")\n"
 
 	entityPrototypeStr += "\n	store := GetServer().GetDataManager().getDataStore(" + packageId + "DB).(*KeyValueDataStore)\n"
 	entityPrototypeStr += "	store.SetEntityPrototype(&" + prototypeVar + ")\n"

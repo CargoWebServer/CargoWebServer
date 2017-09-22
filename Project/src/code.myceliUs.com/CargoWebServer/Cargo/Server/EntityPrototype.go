@@ -5,6 +5,7 @@ import "strings"
 import "log"
 import "code.myceliUs.com/Utility"
 import "code.myceliUs.com/CargoWebServer/Cargo/JS"
+import "code.myceliUs.com/XML_Schemas"
 
 /**
  * Restrictions for Datatypes
@@ -126,6 +127,9 @@ type EntityPrototype struct {
 	// The order of the field, use to display in tabular form...
 	FieldsOrder []int
 
+	// The fields default value.
+	FieldsDefaultValue []string
+
 	// The prototype version.
 	Version string
 }
@@ -144,6 +148,7 @@ func NewEntityPrototype() *EntityPrototype {
 	prototype.Restrictions = make([]*Restriction, 0)
 	prototype.Indexs = make([]string, 0)
 	prototype.Ids = make([]string, 0)
+	prototype.FieldsDefaultValue = make([]string, 0)
 
 	// Append the default fields at begin...
 	prototype.Fields = append(prototype.Fields, "UUID")
@@ -189,6 +194,7 @@ func (this *EntityPrototype) Create(storeId string) error {
 		this.FieldsOrder = append(this.FieldsOrder, len(this.FieldsOrder))
 		this.FieldsType = append(this.FieldsType, "[]xs.string")
 		this.FieldsVisibility = append(this.FieldsVisibility, false)
+		this.FieldsDefaultValue = append(this.FieldsDefaultValue, "[]")
 	}
 
 	// The list of entity referenced by this entity
@@ -197,6 +203,7 @@ func (this *EntityPrototype) Create(storeId string) error {
 		this.FieldsOrder = append(this.FieldsOrder, len(this.FieldsOrder))
 		this.FieldsType = append(this.FieldsType, "[]EntityRef")
 		this.FieldsVisibility = append(this.FieldsVisibility, false)
+		this.FieldsDefaultValue = append(this.FieldsDefaultValue, "[]")
 	}
 
 	if len(storeId) == 0 {
@@ -281,6 +288,8 @@ func (this *EntityPrototype) generateConstructor() string {
 
 	constructorSrc += this.TypeName + " = function(){\n"
 
+	log.Println("--------> generate type: ", this.TypeName)
+
 	// Common properties share by all entity.
 	constructorSrc += " this.__class__ = \"" + this.TypeName + "\"\n"
 	constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
@@ -299,15 +308,17 @@ func (this *EntityPrototype) generateConstructor() string {
 		if strings.HasPrefix(this.FieldsType[i], "[]") {
 			constructorSrc += " = undefined\n"
 		} else {
-			if this.FieldsType[i] == "xs.string" || this.FieldsType[i] == "xs.ID" || this.FieldsType[i] == "xs.NCName" {
+			if len(this.FieldsDefaultValue[i]) != 0 { // If a default value is set...
+				constructorSrc += " = " + this.FieldsDefaultValue[i] + "\n"
+			} else if XML_Schemas.IsXsString(this.FieldsType[i]) {
 				constructorSrc += " = \"\"\n"
-			} else if this.FieldsType[i] == "xs.int" || this.FieldsType[i] == "xs.double" {
+			} else if XML_Schemas.IsXsInt(this.FieldsType[i]) || XML_Schemas.IsXsTime(this.FieldsType[i]) {
 				constructorSrc += " = 0\n"
-			} else if this.FieldsType[i] == "xs.float64" || this.FieldsType[i] == "xs.double" {
+			} else if XML_Schemas.IsXsNumeric(this.FieldsType[i]) {
 				constructorSrc += " = 0.0\n"
-			} else if this.FieldsType[i] == "xs.date" || this.FieldsType[i] == "xs.dateTime" {
+			} else if XML_Schemas.IsXsDate(this.FieldsType[i]) {
 				constructorSrc += " = new Date()\n"
-			} else if this.FieldsType[i] == "xs.boolean" {
+			} else if XML_Schemas.IsXsBoolean(this.FieldsType[i]) {
 				constructorSrc += " = false\n"
 			} else {
 				// Object here.

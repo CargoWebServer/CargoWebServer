@@ -150,6 +150,13 @@ func (this *SchemaManager) initialize() {
 		}
 	}
 
+	for _, prototype := range this.prototypes {
+		// Set the super type fields...
+		for i := 0; i < len(prototype.FieldsType); i++ {
+			setDefaultFieldValue(prototype, prototype.FieldsType[i])
+		}
+	}
+
 	// Before i create the prototy I will expand supertypes,
 	// that mean I will copy fields of super type into the
 	// prototype itself...
@@ -178,6 +185,26 @@ func (this *SchemaManager) initialize() {
 			log.Println("import file: ", GetServer().GetConfigurationManager().GetSchemasPath()+"/"+f.Name())
 			this.importXmlFile(GetServer().GetConfigurationManager().GetSchemasPath() + "/" + f.Name())
 		}
+	}
+}
+
+func setDefaultFieldValue(prototype *EntityPrototype, fieldType string) {
+	// Set the default field value.
+	if strings.HasPrefix(fieldType, "[]") {
+		prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "[]")
+	} else if XML_Schemas.IsXsString(fieldType) || XML_Schemas.IsXsId(fieldType) || XML_Schemas.IsXsRef(fieldType) {
+		prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
+	} else if XML_Schemas.IsXsInt(fieldType) || XML_Schemas.IsXsTime(fieldType) {
+		prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "0")
+	} else if XML_Schemas.IsXsNumeric(fieldType) {
+		prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "0.0")
+	} else if XML_Schemas.IsXsDate(fieldType) {
+		prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "new Date()")
+	} else if XML_Schemas.IsXsBoolean(fieldType) {
+		prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "false")
+	} else {
+		// Object here.
+		prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "undefined")
 	}
 }
 
@@ -266,48 +293,57 @@ func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Er
 /**
  * Return the list of fields including parent fields
  */
-func (this *SchemaManager) getFieldsFieldsType(prototype *EntityPrototype, path *[]string) ([]string, []string) {
+func (this *SchemaManager) getFieldsFieldsType(prototype *EntityPrototype, path *[]string) ([]string, []string, []string) {
 
 	var fields []string
 	var fieldsType []string
+	var fieldsDefaultValue []string
 
 	if Utility.Contains(*path, prototype.TypeName) {
-		return fields, fieldsType
+		return fields, fieldsType, fieldsDefaultValue
 	}
 
 	*path = append(*path, prototype.TypeName)
-
+	log.Println("----> ", prototype)
 	for i := 0; i < len(prototype.Fields); i++ {
 		if prototype.Fields[i] != "UUID" && prototype.Fields[i] != "ParentUuid" && prototype.Fields[i] != "childsUuid" && prototype.Fields[i] != "referenced" {
 			fields = append(fields, prototype.Fields[i])
 			fieldsType = append(fieldsType, prototype.FieldsType[i])
+			fieldsDefaultValue = append(fieldsDefaultValue, prototype.FieldsDefaultValue[i])
 		}
 	}
 
 	for i := 0; i < len(prototype.SuperTypeNames); i++ {
 		p := this.prototypes[prototype.SuperTypeNames[i]]
 
-		fields_, fieldsType_ := this.getFieldsFieldsType(p, path)
+		fields_, fieldsType_, fieldsDefaultValue_ := this.getFieldsFieldsType(p, path)
 		for j := 0; j < len(fields_); j++ {
 			if Utility.Contains(fields, fields_[j]) == false {
 				fields = append(fields, fields_[j])
 				fieldsType = append(fieldsType, fieldsType_[j])
+				fieldsDefaultValue = append(fieldsDefaultValue, fieldsDefaultValue_[j])
 			}
 		}
 	}
 
 	// Return the list of fields...
-	return fields, fieldsType
+	return fields, fieldsType, fieldsDefaultValue
 }
 
 //Append the super type fields...
 func (this *SchemaManager) setSuperTypeField(prototype *EntityPrototype) {
 	path := make([]string, 0)
-	fields, fieldsType := this.getFieldsFieldsType(prototype, &path)
+	fields, fieldsType, fieldsDefaultValue := this.getFieldsFieldsType(prototype, &path)
 	for i := 0; i < len(fields); i++ {
 		if Utility.Contains(prototype.Fields, fields[i]) == false {
+
+			/*prototype.Fields = Utility.InsertStringAt(i, fields[i], prototype.Fields)
+			prototype.FieldsType = Utility.InsertStringAt(i, fieldsType[i], prototype.FieldsType)
+			prototype.FieldsDefaultValue = Utility.InsertStringAt(i, fieldsDefaultValue[i], prototype.FieldsDefaultValue)
+			prototype.FieldsVisibility = Utility.InsertBoolAt(i, true, prototype.FieldsVisibility)*/
 			prototype.Fields = append(prototype.Fields, fields[i])
 			prototype.FieldsType = append(prototype.FieldsType, fieldsType[i])
+			prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, fieldsDefaultValue[i])
 			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
 		}
 	}
@@ -801,6 +837,7 @@ func (this *SchemaManager) appendPrototypeAttribute(schema *XML_Schemas.XSD_Sche
 			prototype.FieldsType = append(prototype.FieldsType, p.TypeName)
 			prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+
 		}
 	}
 }
@@ -901,8 +938,10 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 					} else {
 						prototype.FieldsType = append(prototype.FieldsType, p.TypeName)
 					}
+
 					prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 					prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+
 					this.setLastPrototypeFieldCardinality(prototype, minOccurs, maxOccurs)
 				}
 				return
@@ -920,6 +959,7 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 
 						prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 						prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+
 						this.setLastPrototypeFieldCardinality(prototype, minOccurs, maxOccurs)
 					}
 				} else {
@@ -965,6 +1005,7 @@ func (this *SchemaManager) appendPrototypeElement(schema *XML_Schemas.XSD_Schema
 				prototype.FieldsType = append(prototype.FieldsType, schema.Id+"."+element.Type)
 				prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 				prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+
 				this.setLastPrototypeFieldCardinality(prototype, minOccurs, maxOccurs)
 			}
 		} else {

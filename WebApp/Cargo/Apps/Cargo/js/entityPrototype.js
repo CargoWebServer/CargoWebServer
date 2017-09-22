@@ -85,9 +85,14 @@ var EntityPrototype = function () {
     this.FieldsNillable = [] // bool
 
     /**
-     * @property FieldsOrder The field order
+     * @property The fields default value. Use to initialyse a new object with a given value.
      */
-    this.FieldsOrder = [] // int
+    this.FieldsOrder = []
+
+    /**
+     * @property FieldsOrder The field order
+    */
+    this.FieldsDefaultValue = [] // int
 
     return this
 }
@@ -170,6 +175,7 @@ EntityPrototype.prototype.init = function (object) {
             object.FieldsNillable.unshift(false)
             object.FieldsDocumentation.unshift("The parent object UUID")
             object.FieldsOrder.push(object.FieldsOrder.length)
+            object.FieldsDefaultValue.unshift("")
         }
 
         // Append the uuid if none is define.
@@ -181,11 +187,12 @@ EntityPrototype.prototype.init = function (object) {
             object.FieldsOrder.push(object.FieldsOrder.length)
             object.FieldsNillable.unshift(false)
             object.FieldsDocumentation.unshift("The object UUID")
+            object.FieldsDefaultValue.unshift("")
             object.Ids.unshift("UUID")
         }
 
         for (var i = 0; i < object.Fields.length; i++) {
-            this.appendField(object.Fields[i], object.FieldsType[i], object.FieldsVisibility[i], object.FieldsOrder[i], object.FieldsNillable[i], object.FieldsDocumentation[i])
+            this.appendField(object.Fields[i], object.FieldsType[i], object.FieldsVisibility[i], object.FieldsOrder[i], object.FieldsNillable[i], object.FieldsDocumentation[i], object.FieldsDefaultValue[i])
             if (object.Fields[i] == "UUID") {
                 if (!contains(this.Ids, "UUID")) {
                     this.Ids.unshift("UUID")
@@ -223,10 +230,14 @@ EntityPrototype.prototype.init = function (object) {
         this.ListOf = object.ListOf
     }
 
-    // other standard fields.
-    this.appendField("childsUuid", "[]xs.string", false, this.Fields.length, false, "the array of child entities.")
-    this.appendField("referenced", "[]Server.EntityRef", false, this.Fields.length, false, "The field documentation.")
+    if (object.FieldsDefaultValue != undefined) {
+        this.FieldsDefaultValue = object.FieldsDefaultValue
+    }
 
+    // other standard fields.
+    this.appendField("childsUuid", "[]xs.string", false, this.Fields.length, false, "the array of child entities.", "")
+    this.appendField("referenced", "[]Server.EntityRef", false, this.Fields.length, false, "The field documentation.", "")
+    
     // Generate the class code.
     this.generateConstructor()
 }
@@ -403,7 +414,7 @@ EntityPrototype.prototype.generateConstructor = function () {
  * @param {boolean} isVisible True, if the field is visible.
  * @param {int} order The order the field will be return, usefull to display.
  */
-EntityPrototype.prototype.appendField = function (name, typeName, isVisible, order, isNillable, documentation) {
+EntityPrototype.prototype.appendField = function (name, typeName, isVisible, order, isNillable, documentation, defaultValue) {
     // Set the field name.
     if (!contains(this.Fields, name)) {
         this.Fields.push(name)
@@ -419,6 +430,8 @@ EntityPrototype.prototype.appendField = function (name, typeName, isVisible, ord
         this.FieldsNillable.push(isNillable)
 
         this.FieldsDocumentation.push(documentation)
+
+        this.FieldsDefaultValue.push(defaultValue)
     }
 }
 

@@ -320,6 +320,8 @@ EntityPanel.prototype.setEntity = function (entity) {
 			var value = this.entity[field]
 			if (control != null) {
 				if (control.constructor.name == "EntityPanel") {
+					// Set the newly created entity.
+					control.panel.element.style.display = ""
 					control.parentEntity = entity
 				}
 			}
@@ -342,6 +344,20 @@ EntityPanel.prototype.setEntity = function (entity) {
 				console.log("No control found for display value " + value + " with type name " + fieldType)
 			} else if (value == null || value == "") {
 				console.log("The value is null or empty.")
+				// Here the entity dosent already exist so I will create it...
+				if (control.constructor.name == "EntityPanel") {
+					var entity = eval("new " + fieldType + "()")
+					entity.parentLnk = field
+					server.entityManager.createEntity(this.entity.UUID, field, entity.TYPENAME, "", entity,
+						function (result, caller) {
+							caller.control.setEntity(result)
+							caller.parent[caller.field] = result
+							entities[caller.parent.UUID] = caller.parent
+						},
+						function () {
+
+						}, {"control":control, "field": field, "parent":this.entity})
+				}
 			}
 		}
 
@@ -770,6 +786,19 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 			}
 		}
 		control = this.createXsControl(id, valueDiv, field, fieldType, restrictions)
+		if (control == null) {
+			// In that case I will create an entity panel...
+			// Here I will creat a new value...
+			if (!fieldType.startsWith("[]")) {
+				var subentityPanel = new EntityPanel(valueDiv, fieldType, function (panel) {
+					panel.maximizeBtn.element.click()
+					panel.header.element.style.display = "none"
+					panel.panel.element.style.display = "none"
+				}, undefined, true)
+				// The control will be the sub-entity panel.
+				this.controls[id] = subentityPanel
+			}
+		}
 	} else if (!isArray && (fieldType == "interface{}")) {
 		// Here it can be plain text or xml text... 
 		control = valueDiv.appendElement({ "tag": "textarea", "id": id }).down()
