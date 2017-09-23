@@ -208,12 +208,30 @@ EntityPanel.prototype.show = function () {
 }
 
 /**
+ * Return the entity currently display by the entity panel.
+ */
+EntityPanel.prototype.getEntity = function () {
+	if(this.entity == null){
+		return null
+	}
+	if(entities[this.entity.UUID] != undefined){
+		return entities[this.entity.UUID]
+	}
+	return this.entity
+}
+
+/**
  * Set the entity to display in the panel.
  * @param {Entity} entity The entity to display.
  */
 EntityPanel.prototype.setEntity = function (entity) {
 	if (entity == undefined) {
 		return
+	}
+
+	// Point to the entities map.
+	if(entities[entity.UUID]!=undefined){
+		entity = entities[entity.UUID]
 	}
 
 	if (this.typeName != entity.TYPENAME) {
@@ -239,19 +257,20 @@ EntityPanel.prototype.setEntity = function (entity) {
 	this.panel.element.id = entity.UUID
 
 	// Here I will associate the panel and the entity.
-	if (this.entity != null) {
+	if (this.getEntity() != null) {
 
 		server.entityManager.detach(this, NewEntityEvent)
 		server.entityManager.detach(this, UpdateEntityEvent)
 		server.entityManager.detach(this, DeleteEntityEvent)
 
-		this.entity.panel = null
+		this.getEntity().panel = null
 		this.clear()
 	}
 
 	// Set the reference to the panel inside the entity.
 	this.entity = entity
-	this.entity.panel = this
+
+	this.getEntity().panel = this
 
 	if (this.substitutionGroupSelect != undefined) {
 		this.substitutionGroupSelect.element.style.display = "none"
@@ -264,8 +283,8 @@ EntityPanel.prototype.setEntity = function (entity) {
 	// The delete entity event.
 	server.entityManager.attach(this, DeleteEntityEvent, function (evt, entityPanel) {
 		if (evt.dataMap["entity"].TYPENAME == entityPanel.typeName) {
-			if (evt.dataMap["entity"] != undefined && entityPanel.entity != null) {
-				if (evt.dataMap["entity"].UUID == entityPanel.entity.UUID) {
+			if (evt.dataMap["entity"] != undefined && entityPanel.getEntity() != null) {
+				if (evt.dataMap["entity"].UUID == entityPanel.getEntity().UUID) {
 					// so here i will remove the panel from it parent.
 					if (entityPanel.removeOnDelete) {
 						try {
@@ -286,10 +305,10 @@ EntityPanel.prototype.setEntity = function (entity) {
 	server.entityManager.attach(this, NewEntityEvent, function (evt, entityPanel) {
 		// I will reinit the panel here...
 		if (evt.dataMap["entity"].TYPENAME == entityPanel.typeName) {
-			if (evt.dataMap["entity"] && entityPanel.entity != null) {
-				if (entityPanel.entity.UUID == evt.dataMap["entity"].UUID) {
+			if (evt.dataMap["entity"] && entityPanel.getEntity() != null) {
+				if (entityPanel.getEntity().UUID == evt.dataMap["entity"].UUID) {
 					entityPanel.init(entityPanel.proto)
-					entityPanel.setEntity(entities[evt.dataMap["entity"].UUID])
+					entityPanel.setEntity(evt.dataMap["entity"])
 				}
 			}
 		}
@@ -298,10 +317,10 @@ EntityPanel.prototype.setEntity = function (entity) {
 	// The update entity event.
 	server.entityManager.attach(this, UpdateEntityEvent, function (evt, entityPanel) {
 		if (evt.dataMap["entity"].TYPENAME == entityPanel.typeName) {
-			if (evt.dataMap["entity"] && entityPanel.entity != null) {
+			if (evt.dataMap["entity"] && entityPanel.getEntity() != null) {
 				// I will reinit the panel here...
-				if (entityPanel.entity.UUID == evt.dataMap["entity"].UUID) {
-					entityPanel.setEntity(entities[evt.dataMap["entity"].UUID])
+				if (entityPanel.getEntity().UUID == evt.dataMap["entity"].UUID) {
+					entityPanel.setEntity(evt.dataMap["entity"])
 				}
 			}
 		}
@@ -317,7 +336,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 
 		if (fieldVisibility == true) {
 			var control = this.controls[this.proto.TypeName + "_" + field]
-			var value = this.entity[field]
+			var value = this.getEntity()[field]
 			if (control != null) {
 				if (control.constructor.name == "EntityPanel") {
 					// Set the newly created entity.
@@ -348,7 +367,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 				if (control.constructor.name == "EntityPanel") {
 					var entity = eval("new " + fieldType + "()")
 					entity.parentLnk = field
-					server.entityManager.createEntity(this.entity.UUID, field, entity.TYPENAME, "", entity,
+					server.entityManager.createEntity(this.getEntity().UUID, field, entity.TYPENAME, "", entity,
 						function (result, caller) {
 							caller.control.setEntity(result)
 							caller.parent[caller.field] = result
@@ -356,7 +375,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 						},
 						function () {
 
-						}, {"control":control, "field": field, "parent":this.entity})
+						}, { "control": control, "field": field, "parent": this.getEntity() })
 				}
 			}
 		}
@@ -375,17 +394,21 @@ EntityPanel.prototype.setEntity = function (entity) {
 	this.saveBtn.element.id = entity.UUID + "_save_btn"
 	this.saveBtn.element.style.display = ""
 	this.deleteBtn.element.style.display = "table-cell"
+
+	// Display the panel.
+	this.show()
 }
 
 /**
  * Reset the content of the panel.
  */
 EntityPanel.prototype.clear = function () {
-	if (this.entity == null) {
+	if (this.getEntity() == null) {
 		return
 	}
 
 	this.entity = null
+	
 	this.init(this.proto)
 	if (this.initCallback != undefined) {
 		this.initCallback(this)
@@ -405,7 +428,7 @@ EntityPanel.prototype.clear = function () {
  * return true if the panel not display an entity.
  */
 EntityPanel.prototype.isEmpty = function () {
-	return this.entity == null
+	return this.getEntity() == null
 }
 
 /**
@@ -452,13 +475,13 @@ EntityPanel.prototype.initHeader = function () {
 	this.saveBtn.element.addEventListener("click", function (entityPanel) {
 		return function () {
 			this.style.display = "none"
-			// Here I will save the entity...
-			entityPanel.entity.NeedSave = true
-			if (entityPanel.entity != null) {
-				entityPanel.saveBtn.element.id = entityPanel.entity.UUID + "_save_btn"
-				if (entityPanel.entity.exist == false && entityPanel.parentEntity != null) {
+			if (entityPanel.getEntity() != null) {
+				var entity = entityPanel.getEntity()
+				entity.NeedSave = true
+				entityPanel.saveBtn.element.id = entity.UUID + "_save_btn"
+				if (entity.exist == false && entityPanel.parentEntity != null) {
 					// The parent entity is know and the entity does not exist.
-					server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.parentLnk, entityPanel.entity.TYPENAME, entityPanel.entity.UUID, entityPanel.entity,
+					server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.parentLnk, entity.TYPENAME, entity.UUID, entity,
 						// Success callback
 						function (entity, entityPanel) {
 							entityPanel.setEntity(entity)
@@ -479,7 +502,7 @@ EntityPanel.prototype.initHeader = function () {
 						}, entityPanel)
 				} else {
 					// Here the entity will be created of save...
-					server.entityManager.saveEntity(entityPanel.entity,
+					server.entityManager.saveEntity(entity,
 						// Success callback
 						function (entity, entityPanel) {
 							if (entityPanel.saveCallback != undefined) {
@@ -510,18 +533,18 @@ EntityPanel.prototype.initHeader = function () {
 	this.deleteBtn.element.onclick = function (entityPanel) {
 		return function () {
 			// Here I will save the entity...
-			if (entityPanel.entity != null) {
+			if (entityPanel.getEntity() != null) {
 				// Here I will ask the user if here realy want to remove the entity...
 				var confirmDialog = new Dialog(randomUUID(), undefined, true)
 				confirmDialog.div.element.style.maxWidth = "450px"
 				confirmDialog.setCentered()
 				server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
-				confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entityPanel.entity.getTitles() + "?" })
+				confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entityPanel.getEntity().getTitles() + "?" })
 
 				confirmDialog.ok.element.onclick = function (dialog, entityPanel) {
 					return function () {
 						// I will call delete file
-						server.entityManager.removeEntity(entityPanel.entity.UUID,
+						server.entityManager.removeEntity(entityPanel.getEntity().UUID,
 							// Success callback 
 							function (result, caller) {
 								/** The action will be done in the event listener */
@@ -796,6 +819,8 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 					panel.panel.element.style.display = "none"
 				}, undefined, true)
 				// The control will be the sub-entity panel.
+				this.subEntityPanel = subentityPanel
+				subentityPanel.parentEntityPanel = this
 				this.controls[id] = subentityPanel
 			}
 		}
@@ -851,9 +876,9 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 				control = valueDiv.appendElement({ "tag": "div", "id": id }).down()
 			} else {
 				// Here I have a item inside another item...
-				var subentityPanel = new EntityPanel(valueDiv, fieldType, function () { }, undefined, true, this.entity, field)
+				var subentityPanel = new EntityPanel(valueDiv, fieldType, function () { }, undefined, true, this.getEntity().UUID, field)
 				// The control will be the sub-entity panel.
-				this.controls[id] = subentityPanel
+				this.controls[id] = control = subentityPanel
 			}
 		}
 
@@ -903,15 +928,17 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 									function (entityPanel, field, fieldsType) {
 										return function (value) {
 											// Here I will set the field of the entity...
-											if (entityPanel.entity != undefined) {
+											var entity = entityPanel.getEntity()
+		
+											if (entity != undefined) {
 												// Set the new object value.
-												appendObjectValue(entityPanel.entity, field, value)
-												if (entityPanel.entity.UUID != "") {
+												appendObjectValue(entity, field, value)
+												if (entity.UUID != "") {
 													// Automatically saved...
-													server.entityManager.saveEntity(entityPanel.entity)
+													server.entityManager.saveEntity(entity)
 												} else {
 													// Here the entity dosent exist...
-													server.entityManager.createEntity(entityPanel.entity.ParentUuid, entityPanel.entity.parentLnk, entityPanel.entity.TYPENAME, "", entityPanel.entity,
+													server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, "", entity,
 														function (result, caller) {
 															// Set the result inside the panel.
 															entityPanel.setEntity(result)
@@ -938,7 +965,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							item.TYPENAME = itemPrototype.TypeName
 
 							// Set the parent uuid.
-							item.ParentUuid = entityPanel.entity.UUID
+							item.ParentUuid = entityPanel.getEntity().UUID
 							item.parentLnk = field
 
 							if (isArray) {
@@ -952,10 +979,10 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							// Here I will try to append a new value inside the table...
 							if (isArray) {
 								var itemTable = entityPanel.controls[id]
-								var newRow = itemTable.appendRow([entityPanel.entity[field].length + 1, "0"], entityPanel.entity[field].length)
+								var newRow = itemTable.appendRow([entityPanel.getEntity()[field].length + 1, "0"], entityPanel.getEntity()[field].length)
 								newRow.saveBtn.element.style.visibility = "visible"
 
-								simulate(newRow.cells[entityPanel.entity[field].length, 1].div.element, "dblclick");
+								simulate(newRow.cells[entityPanel.getEntity()[field].length, 1].div.element, "dblclick");
 
 								newRow.deleteBtn.element.onclick = function (entity, field, row) {
 									return function () {
@@ -967,11 +994,16 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 											server.entityManager.saveEntity(entity)
 										}
 									}
-								}(entityPanel.entity, field, newRow)
+								}(entityPanel.getEntity(), field, newRow)
 
 								// The save row action
 								newRow.saveBtn.element.onclick = function (entity, field, row) {
 									return function () {
+										// Point to the entities map.
+										if (entities[entity.UUID] != undefined) {
+											entity = entities[entity.UUID]
+										}
+										
 										// Here I will simply remove the element 
 										// The entity must contain a list of field...
 										if (entity[field] != undefined) {
@@ -986,7 +1018,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 												}, this)
 										}
 									}
-								}(entityPanel.entity, field, newRow)
+								}(entityPanel.getEntity(), field, newRow)
 
 								//itemTable.refresh()
 							}
@@ -1005,7 +1037,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 			control.element.addEventListener("change", function (entityPanel, attribute, fieldType) {
 				return function () {
 					var entity = null
-					if (entityPanel.entity == null) {
+					if (entityPanel.getEntity() == null) {
 						// Here I will create a new entity.
 						var entity = eval("new " + entityPanel.typeName)
 
@@ -1015,9 +1047,11 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							entity.parentLnk = entityPanel.parentLnk
 						}
 
+						entityPanel.setEntity(entity)
+
 					} else {
 						// Get the existing entity.
-						entity = entityPanel.entity
+						entity = entityPanel.getEntity()
 					}
 
 					/** Here it's a string **/
@@ -1060,14 +1094,11 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 					// Display the save button if the entity has changed.
 					if (entity.NeedSave) {
-						entityPanel.saveBtn.element.style.display = "table-cell"
-					}
-
-					// Set the entity in that case.
-					if (entityPanel.entity == null) {
-						entityPanel.setEntity(entity)
-						// Keep on the entity manager.
-						server.entityManager.setEntity(entity)
+						if(entityPanel.parentEntityPanel != null){
+							entityPanel.parentEntityPanel.saveBtn.element.style.display = "table-cell"
+						}else{
+							entityPanel.saveBtn.element.style.display = "table-cell"
+						}
 					}
 				}
 			}(this, field, fieldType))
@@ -1075,10 +1106,14 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 			// Append the listener to display the save button.
 			control.element.addEventListener("keyup", function (entityPanel, field) {
 				return function () {
-					if (entityPanel.entity != null) {
+					if (entityPanel.getEntity() != null) {
 						if (this.value.length > 0) {
-							if (entityPanel.entity[field] != this.value) {
-								entityPanel.saveBtn.element.style.display = "table-cell"
+							if (entityPanel.getEntity()[field] != this.value) {
+								if(entityPanel.parentEntityPanel != null){
+									entityPanel.parentEntityPanel.saveBtn.element.style.display = "table-cell"
+								}else{
+									entityPanel.saveBtn.element.style.display = "table-cell"
+								}
 							}
 						} else {
 							// reset the panel value.
@@ -1115,12 +1150,17 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 			attachAutoCompleteInput(control, this.typeName, field, this, [],
 				function (entityPanel) {
 					return function (value) {
-						if (entityPanel.entity != undefined) {
-							if (entityPanel.entity.UUID != value.UUID) {
-								entityPanel.setEntity(value)
+						var entity = value
+						if(entities[value.UUID] != undefined){
+							entity = entities[value.UUID]
+						}
+
+						if (entityPanel.getEntity() != undefined) {
+							if (entityPanel.getEntity().UUID != entity.UUID) {
+								entityPanel.setEntity(entity)
 							}
 						} else {
-							entityPanel.setEntity(value)
+							entityPanel.setEntity(entity)
 						}
 					}
 				}(this))
@@ -1178,7 +1218,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 		itemsTable.clear()
 		for (var i = 0; i < values.length; i++) {
 			// keep information about the parent entity...
-			values[i].ParentUuid = this.entity.UUID
+			values[i].ParentUuid = this.getEntity().UUID
 			values[i].parentLnk = field
 			if (values[i].UUID != undefined) {
 				var row = itemsTable.appendRow(values[i], values[i].UUID)
@@ -1191,6 +1231,10 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 					return function () {
 						// Here I will simply remove the element 
 						// The entity must contain a list of field...
+						if(entities[entity.UUID] != undefined){
+							entity = entities[entity.UUID]
+						}
+
 						if (entity[field] != undefined) {
 							entity[field].splice(row.index, 1)
 							entity.NeedSave = true
@@ -1204,6 +1248,10 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 					return function () {
 						// Here I will simply remove the element 
 						// The entity must contain a list of field...
+						if(entities[entity.UUID] != undefined){
+							entity = entities[entity.UUID]
+						}
+
 						if (entity[field] != undefined) {
 							entity[field][row.index] = row.table.model.getValueAt(row.index, 1)
 							entity.NeedSave = true
@@ -1396,7 +1444,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 					entity.onChange(entity)
 				}
 			}
-		}(this.entity.UUID, object, field)
+		}(this.getEntity().UUID, object, field)
 	}
 
 }
@@ -1405,7 +1453,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
  * Exit edit mode for a given field.
  */
 EntityPanel.prototype.resetFieldValue = function (field, input) {
-	if (!isArray(this.entity[field])) {
+	if (!isArray(this.getEntity()[field])) {
 		input.element.parentNode.firstChild.style.display = ""
 	}
 	input.element.parentNode.removeChild(input.element)
@@ -1494,10 +1542,10 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 							uuid = value[i]
 						}
 						if (uuid.length > 0 && isObjectReference(uuid)) {
-							if (this.entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
-								setRef(this.entity, field, uuid, true)
+							if (this.getEntity()["set_" + field + "_" + uuid + "_ref"] == undefined) {
+								setRef(this.getEntity(), field, uuid, true)
 							}
-							this.entity["set_" + field + "_" + uuid + "_ref"](
+							this.getEntity()["set_" + field + "_" + uuid + "_ref"](
 								function (panel, control, field, fieldType) {
 									return function (ref) {
 										panel.appendObjectRef(ref, control, field, fieldType)
@@ -1530,10 +1578,10 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 						uuid = value
 					}
 					if (uuid.length > 0 && isObjectReference(uuid)) {
-						if (this.entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
-							setRef(this.entity, field, uuid, false)
+						if (this.getEntity()["set_" + field + "_" + uuid + "_ref"] == undefined) {
+							setRef(this.getEntity(), field, uuid, false)
 						}
-						this.entity["set_" + field + "_" + uuid + "_ref"](
+						this.getEntity()["set_" + field + "_" + uuid + "_ref"](
 							function (panel, control, field, fieldType) {
 								return function (ref) {
 									panel.appendObjectRef(ref, control, field, fieldType)

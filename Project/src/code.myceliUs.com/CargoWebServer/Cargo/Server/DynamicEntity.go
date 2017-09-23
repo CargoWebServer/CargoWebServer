@@ -1792,6 +1792,12 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 											// the json parser transform all numerical value to float... that not what we want here...
 											val := int32(v.(float64))
 											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.String && reflect.TypeOf(v).Kind() == reflect.Float64 {
+											// the json parser transform all numerical value to float... that not what we want here...
+											val := Utility.ToString(v)
+											this.setValue(k, val)
+										} else {
+											log.Panicln("---------> Convertion error: from ", reflect.TypeOf(this.getValue(k)).Kind(), " to ", reflect.TypeOf(v).Kind())
 										}
 									}
 

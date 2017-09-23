@@ -413,7 +413,6 @@ function setSubObject(parent, property, values, isArray) {
                 object = eval("new " + values.TYPENAME + "()")
                 // Keep track of the parent uuid in the child.
                 object.UUID = values.UUID
-                server.entityManager.setEntity(object)
             }
 
             // Keep track of the child uuid inside the parent.
@@ -544,7 +543,7 @@ function setObjectValues(object, values) {
             var baseType = getBaseTypeExtension(propertyType)
 
             // M_listOf, M_valueOf field or enumeration type contain plain value.
-            var isBaseType =  isXsBaseType(baseType) || propertyType.startsWith("sqltypes.") && !propertyType.startsWith("[]sqltypes.") || propertyType.startsWith("[]xs.") || propertyType.startsWith("xs.") || property == "M_listOf" || property == "M_valueOf" || propertyType.startsWith("enum:")
+            var isBaseType = isXsBaseType(baseType) || propertyType.startsWith("sqltypes.") && !propertyType.startsWith("[]sqltypes.") || propertyType.startsWith("[]xs.") || propertyType.startsWith("xs.") || property == "M_listOf" || property == "M_valueOf" || propertyType.startsWith("enum:")
 
             if (values[property] != null) {
                 if (isBaseType) {
@@ -586,6 +585,10 @@ function setObjectValues(object, values) {
                         }
                     } else {
                         object[property] = values[property]
+                        // If the object is a simple derived type.
+                        if (object[property].UUID != undefined) {
+                            server.entityManager.setEntity(object[property])
+                        }
                     }
                 } else {
                     // Set object ref or values... only property begenin with M_ will be set here...

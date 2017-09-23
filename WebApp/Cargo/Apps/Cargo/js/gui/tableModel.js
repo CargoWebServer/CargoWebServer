@@ -319,12 +319,16 @@ EntityTableModel.prototype.appendRow = function (values) {
  * @param {int} column The column index.
  */
 EntityTableModel.prototype.setValueAt = function (value, row, column) {
+    var entity = this.entities[row]
+    if(entities[entity.UUID]!=undefined){
+        entity = this.entities[row] = entities[entity.UUID]
+    }
     var field = "M_" + this.titles[column]
     if (value[field] != undefined) {
-        this.entities[row][field] = value[field]
+        entity[field] = value[field]
         this.values[row][column] = value[field]
     } else {
-        this.entities[row][field] = value
+        entity[field] = value
         this.values[row][column] = value
     }
 }
@@ -334,9 +338,14 @@ EntityTableModel.prototype.setValueAt = function (value, row, column) {
  */
 EntityTableModel.prototype.saveValue = function (row) {
     var entity = row.table.model.entities[row.index]
-    
     // Here I will save the entity...
     if (entity != null) {
+        // Always use the entity from the enities map it contain
+        // the valid data of the entity.
+        if(entities[entity.UUID] != null){
+            entity = row.table.model.entities[row.index] = entities[entity.UUID]
+        }
+
         entity.NeedSave = true
         if (entity.exist == false) {
             // Remove the tmp entity...
