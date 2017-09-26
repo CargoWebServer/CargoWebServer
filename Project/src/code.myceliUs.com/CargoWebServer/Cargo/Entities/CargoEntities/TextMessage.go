@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type TextMessage struct{
@@ -72,7 +72,6 @@ func (this *TextMessage) GetId() string{
 
 /** Init reference Id **/
 func (this *TextMessage) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -85,7 +84,6 @@ func (this *TextMessage) GetBody() string{
 
 /** Init reference Body **/
 func (this *TextMessage) SetBody(ref interface{}){
-	this.NeedSave = true
 	this.M_body = ref.(string)
 }
 
@@ -98,7 +96,6 @@ func (this *TextMessage) GetCreationTime() int64{
 
 /** Init reference CreationTime **/
 func (this *TextMessage) SetCreationTime(ref interface{}){
-	this.NeedSave = true
 	this.M_creationTime = ref.(int64)
 }
 
@@ -111,12 +108,11 @@ func (this *TextMessage) GetFromRef() *Account{
 
 /** Init reference FromRef **/
 func (this *TextMessage) SetFromRef(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_fromRef = ref.(string)
 	}else{
-		this.m_fromRef = ref.(*Account)
 		this.M_fromRef = ref.(Entity).GetUUID()
+		this.m_fromRef = ref.(*Account)
 	}
 }
 
@@ -127,8 +123,6 @@ func (this *TextMessage) RemoveFromRef(ref interface{}){
 		if toDelete.GetUUID() == this.m_fromRef.GetUUID() {
 			this.m_fromRef = nil
 			this.M_fromRef = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -140,12 +134,11 @@ func (this *TextMessage) GetToRef() *Account{
 
 /** Init reference ToRef **/
 func (this *TextMessage) SetToRef(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_toRef = ref.(string)
 	}else{
-		this.m_toRef = ref.(*Account)
 		this.M_toRef = ref.(Entity).GetUUID()
+		this.m_toRef = ref.(*Account)
 	}
 }
 
@@ -156,8 +149,6 @@ func (this *TextMessage) RemoveToRef(ref interface{}){
 		if toDelete.GetUUID() == this.m_toRef.GetUUID() {
 			this.m_toRef = nil
 			this.M_toRef = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -169,7 +160,6 @@ func (this *TextMessage) GetTitle() string{
 
 /** Init reference Title **/
 func (this *TextMessage) SetTitle(ref interface{}){
-	this.NeedSave = true
 	this.M_title = ref.(string)
 }
 
@@ -182,12 +172,11 @@ func (this *TextMessage) GetEntitiesPtr() *Entities{
 
 /** Init reference Entities **/
 func (this *TextMessage) SetEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
 	}else{
-		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
 
@@ -198,8 +187,6 @@ func (this *TextMessage) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Project struct{
@@ -59,7 +59,6 @@ func (this *Project) GetId() string{
 
 /** Init reference Id **/
 func (this *Project) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -72,7 +71,6 @@ func (this *Project) GetName() string{
 
 /** Init reference Name **/
 func (this *Project) SetName(ref interface{}){
-	this.NeedSave = true
 	this.M_name = ref.(string)
 }
 
@@ -85,7 +83,6 @@ func (this *Project) GetFilesRef() []*File{
 
 /** Init reference FilesRef **/
 func (this *Project) SetFilesRef(ref interface{}){
-	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
 		for i:=0; i < len(this.M_filesRef); i++ {
 			if this.M_filesRef[i] == refStr {
@@ -95,18 +92,18 @@ func (this *Project) SetFilesRef(ref interface{}){
 		this.M_filesRef = append(this.M_filesRef, ref.(string))
 	}else{
 		for i:=0; i < len(this.m_filesRef); i++ {
-			if this.m_filesRef[i].UUID == ref.(*File).UUID {
+			if this.m_filesRef[i].GetUUID() == ref.(*File).GetUUID() {
 				return
 			}
 		}
-		this.NeedSave = true
+		isExist := false
 		for i:=0; i < len(this.M_filesRef); i++ {
-			if this.M_filesRef[i] == ref.(*File).UUID {
-				this.NeedSave = false
+			if this.M_filesRef[i] == ref.(*File).GetUUID() {
+				isExist = true
 			}
 		}
 		this.m_filesRef = append(this.m_filesRef, ref.(*File))
-	if this.NeedSave {
+	if !isExist {
 		this.M_filesRef = append(this.M_filesRef, ref.(Entity).GetUUID())
 	}
 	}
@@ -121,8 +118,6 @@ func (this *Project) RemoveFilesRef(ref interface{}){
 		if toDelete.GetUUID() != this.m_filesRef[i].GetUUID() {
 			filesRef_ = append(filesRef_, this.m_filesRef[i])
 			filesRefUuid = append(filesRefUuid, this.M_filesRef[i])
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.m_filesRef = filesRef_
@@ -136,12 +131,11 @@ func (this *Project) GetEntitiesPtr() *Entities{
 
 /** Init reference Entities **/
 func (this *Project) SetEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
 	}else{
-		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
 
@@ -152,8 +146,6 @@ func (this *Project) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

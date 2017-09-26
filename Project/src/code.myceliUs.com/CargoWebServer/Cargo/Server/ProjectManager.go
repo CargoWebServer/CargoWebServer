@@ -81,22 +81,23 @@ func (this *ProjectManager) synchronize() {
 				projectUUID := CargoEntitiesProjectExists(f.Name())
 				var project *CargoEntities.Project
 				if len(projectUUID) == 0 {
+
 					project = new(CargoEntities.Project)
 					project.SetName(f.Name())
 					project.SetId(f.Name())
 					cargoEntities := server.GetEntityManager().getCargoEntities()
 
 					// first of all i will see if the project exist...
-					GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(cargoEntities.GetUuid(), "", project)
+					_, err := GetServer().GetEntityManager().createEntity(cargoEntities.GetUuid(), "M_entities", "CargoEntities.Project", f.Name(), project)
 
 					// Here I will synchronyse the project...
-					this.synchronizeProject(project, this.root+"/"+f.Name())
-
-					cargoEntities.GetObject().(*CargoEntities.Entities).SetEntities(project)
-					cargoEntities.SaveEntity()
+					if err == nil {
+						this.synchronizeProject(project, this.root+"/"+f.Name())
+					}
 				} else {
 					projectEntity, _ := GetServer().GetEntityManager().getEntityByUuid(projectUUID, false)
 					this.synchronizeProject(projectEntity.GetObject().(*CargoEntities.Project), this.root+"/"+f.Name())
+					// Save as needed.
 					projectEntity.SaveEntity()
 				}
 			}
@@ -115,7 +116,10 @@ func (this *ProjectManager) synchronizeProject(project *CargoEntities.Project, p
 	// I will keep reference to the project directory only...
 	file, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", ids, false) // get the first file level only...
 	if err == nil {
-		project.SetFilesRef(file.GetObject().(*CargoEntities.File))
+		project.SetFilesRef(file.GetObject())
+		for i := 0; i < len(file.GetObject().(*CargoEntities.File).M_files); i++ {
+			log.Println("-----> ", file.GetObject().(*CargoEntities.File).M_files[i].M_name)
+		}
 	}
 }
 

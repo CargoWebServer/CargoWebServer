@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Account struct{
@@ -75,7 +75,6 @@ func (this *Account) GetId() string{
 
 /** Init reference Id **/
 func (this *Account) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -88,7 +87,6 @@ func (this *Account) GetName() string{
 
 /** Init reference Name **/
 func (this *Account) SetName(ref interface{}){
-	this.NeedSave = true
 	this.M_name = ref.(string)
 }
 
@@ -101,7 +99,6 @@ func (this *Account) GetPassword() string{
 
 /** Init reference Password **/
 func (this *Account) SetPassword(ref interface{}){
-	this.NeedSave = true
 	this.M_password = ref.(string)
 }
 
@@ -114,7 +111,6 @@ func (this *Account) GetEmail() string{
 
 /** Init reference Email **/
 func (this *Account) SetEmail(ref interface{}){
-	this.NeedSave = true
 	this.M_email = ref.(string)
 }
 
@@ -127,7 +123,6 @@ func (this *Account) GetSessions() []*Session{
 
 /** Init reference Sessions **/
 func (this *Account) SetSessions(ref interface{}){
-	this.NeedSave = true
 	isExist := false
 	var sessionss []*Session
 	for i:=0; i<len(this.M_sessions); i++ {
@@ -151,8 +146,6 @@ func (this *Account) RemoveSessions(ref interface{}){
 	for i := 0; i < len(this.M_sessions); i++ {
 		if toDelete.GetUUID() != this.M_sessions[i].GetUUID() {
 			sessions_ = append(sessions_, this.M_sessions[i])
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_sessions = sessions_
@@ -165,7 +158,6 @@ func (this *Account) GetMessages() []Message{
 
 /** Init reference Messages **/
 func (this *Account) SetMessages(ref interface{}){
-	this.NeedSave = true
 	isExist := false
 	var messagess []Message
 	for i:=0; i<len(this.M_messages); i++ {
@@ -189,8 +181,6 @@ func (this *Account) RemoveMessages(ref interface{}){
 	for i := 0; i < len(this.M_messages); i++ {
 		if toDelete.GetUUID() != this.M_messages[i].(Entity).GetUUID() {
 			messages_ = append(messages_, this.M_messages[i])
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_messages = messages_
@@ -203,12 +193,11 @@ func (this *Account) GetUserRef() *User{
 
 /** Init reference UserRef **/
 func (this *Account) SetUserRef(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_userRef = ref.(string)
 	}else{
-		this.m_userRef = ref.(*User)
 		this.M_userRef = ref.(Entity).GetUUID()
+		this.m_userRef = ref.(*User)
 	}
 }
 
@@ -219,8 +208,6 @@ func (this *Account) RemoveUserRef(ref interface{}){
 		if toDelete.GetUUID() == this.m_userRef.GetUUID() {
 			this.m_userRef = nil
 			this.M_userRef = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -232,7 +219,6 @@ func (this *Account) GetRolesRef() []*Role{
 
 /** Init reference RolesRef **/
 func (this *Account) SetRolesRef(ref interface{}){
-	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
 		for i:=0; i < len(this.M_rolesRef); i++ {
 			if this.M_rolesRef[i] == refStr {
@@ -242,18 +228,18 @@ func (this *Account) SetRolesRef(ref interface{}){
 		this.M_rolesRef = append(this.M_rolesRef, ref.(string))
 	}else{
 		for i:=0; i < len(this.m_rolesRef); i++ {
-			if this.m_rolesRef[i].UUID == ref.(*Role).UUID {
+			if this.m_rolesRef[i].GetUUID() == ref.(*Role).GetUUID() {
 				return
 			}
 		}
-		this.NeedSave = true
+		isExist := false
 		for i:=0; i < len(this.M_rolesRef); i++ {
-			if this.M_rolesRef[i] == ref.(*Role).UUID {
-				this.NeedSave = false
+			if this.M_rolesRef[i] == ref.(*Role).GetUUID() {
+				isExist = true
 			}
 		}
 		this.m_rolesRef = append(this.m_rolesRef, ref.(*Role))
-	if this.NeedSave {
+	if !isExist {
 		this.M_rolesRef = append(this.M_rolesRef, ref.(*Role).GetUUID())
 	}
 	}
@@ -268,8 +254,6 @@ func (this *Account) RemoveRolesRef(ref interface{}){
 		if toDelete.GetUUID() != this.m_rolesRef[i].GetUUID() {
 			rolesRef_ = append(rolesRef_, this.m_rolesRef[i])
 			rolesRefUuid = append(rolesRefUuid, this.M_rolesRef[i])
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.m_rolesRef = rolesRef_
@@ -283,7 +267,6 @@ func (this *Account) GetPermissionsRef() []*Permission{
 
 /** Init reference PermissionsRef **/
 func (this *Account) SetPermissionsRef(ref interface{}){
-	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
 		for i:=0; i < len(this.M_permissionsRef); i++ {
 			if this.M_permissionsRef[i] == refStr {
@@ -293,18 +276,18 @@ func (this *Account) SetPermissionsRef(ref interface{}){
 		this.M_permissionsRef = append(this.M_permissionsRef, ref.(string))
 	}else{
 		for i:=0; i < len(this.m_permissionsRef); i++ {
-			if this.m_permissionsRef[i].UUID == ref.(*Permission).UUID {
+			if this.m_permissionsRef[i].GetUUID() == ref.(*Permission).GetUUID() {
 				return
 			}
 		}
-		this.NeedSave = true
+		isExist := false
 		for i:=0; i < len(this.M_permissionsRef); i++ {
-			if this.M_permissionsRef[i] == ref.(*Permission).UUID {
-				this.NeedSave = false
+			if this.M_permissionsRef[i] == ref.(*Permission).GetUUID() {
+				isExist = true
 			}
 		}
 		this.m_permissionsRef = append(this.m_permissionsRef, ref.(*Permission))
-	if this.NeedSave {
+	if !isExist {
 		this.M_permissionsRef = append(this.M_permissionsRef, ref.(*Permission).GetUUID())
 	}
 	}
@@ -319,8 +302,6 @@ func (this *Account) RemovePermissionsRef(ref interface{}){
 		if toDelete.GetUUID() != this.m_permissionsRef[i].GetUUID() {
 			permissionsRef_ = append(permissionsRef_, this.m_permissionsRef[i])
 			permissionsRefUuid = append(permissionsRefUuid, this.M_permissionsRef[i])
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.m_permissionsRef = permissionsRef_
@@ -334,12 +315,11 @@ func (this *Account) GetEntitiesPtr() *Entities{
 
 /** Init reference Entities **/
 func (this *Account) SetEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
 	}else{
-		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
 
@@ -350,8 +330,6 @@ func (this *Account) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

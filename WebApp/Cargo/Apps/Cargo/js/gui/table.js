@@ -1579,7 +1579,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 										// Set the newly created entity.
 										caller.entityPanel.setEntity(result)
 										caller.parent[caller.field] = result
-										entitie[caller.parent.UUID] = caller.parent
+										entities[caller.parent.UUID] = caller.parent
 									},
 									function () {
 

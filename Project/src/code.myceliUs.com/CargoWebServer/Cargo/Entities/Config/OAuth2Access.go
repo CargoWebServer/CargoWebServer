@@ -71,7 +71,6 @@ func (this *OAuth2Access) GetId() string{
 
 /** Init reference Id **/
 func (this *OAuth2Access) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -84,12 +83,11 @@ func (this *OAuth2Access) GetClient() *OAuth2Client{
 
 /** Init reference Client **/
 func (this *OAuth2Access) SetClient(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_client = ref.(string)
 	}else{
-		this.m_client = ref.(*OAuth2Client)
 		this.M_client = ref.(*OAuth2Client).GetUUID()
+		this.m_client = ref.(*OAuth2Client)
 	}
 }
 
@@ -100,8 +98,6 @@ func (this *OAuth2Access) RemoveClient(ref interface{}){
 		if toDelete.GetUUID() == this.m_client.GetUUID() {
 			this.m_client = nil
 			this.M_client = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -113,7 +109,6 @@ func (this *OAuth2Access) GetAuthorize() string{
 
 /** Init reference Authorize **/
 func (this *OAuth2Access) SetAuthorize(ref interface{}){
-	this.NeedSave = true
 	this.M_authorize = ref.(string)
 }
 
@@ -126,7 +121,6 @@ func (this *OAuth2Access) GetPrevious() string{
 
 /** Init reference Previous **/
 func (this *OAuth2Access) SetPrevious(ref interface{}){
-	this.NeedSave = true
 	this.M_previous = ref.(string)
 }
 
@@ -139,12 +133,11 @@ func (this *OAuth2Access) GetRefreshToken() *OAuth2Refresh{
 
 /** Init reference RefreshToken **/
 func (this *OAuth2Access) SetRefreshToken(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_refreshToken = ref.(string)
 	}else{
-		this.m_refreshToken = ref.(*OAuth2Refresh)
 		this.M_refreshToken = ref.(*OAuth2Refresh).GetUUID()
+		this.m_refreshToken = ref.(*OAuth2Refresh)
 	}
 }
 
@@ -155,8 +148,6 @@ func (this *OAuth2Access) RemoveRefreshToken(ref interface{}){
 		if toDelete.GetUUID() == this.m_refreshToken.GetUUID() {
 			this.m_refreshToken = nil
 			this.M_refreshToken = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -168,7 +159,6 @@ func (this *OAuth2Access) GetExpiresIn() int64{
 
 /** Init reference ExpiresIn **/
 func (this *OAuth2Access) SetExpiresIn(ref interface{}){
-	this.NeedSave = true
 	this.M_expiresIn = ref.(int64)
 }
 
@@ -181,7 +171,6 @@ func (this *OAuth2Access) GetScope() string{
 
 /** Init reference Scope **/
 func (this *OAuth2Access) SetScope(ref interface{}){
-	this.NeedSave = true
 	this.M_scope = ref.(string)
 }
 
@@ -194,7 +183,6 @@ func (this *OAuth2Access) GetRedirectUri() string{
 
 /** Init reference RedirectUri **/
 func (this *OAuth2Access) SetRedirectUri(ref interface{}){
-	this.NeedSave = true
 	this.M_redirectUri = ref.(string)
 }
 
@@ -207,12 +195,11 @@ func (this *OAuth2Access) GetUserData() *OAuth2IdToken{
 
 /** Init reference UserData **/
 func (this *OAuth2Access) SetUserData(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_userData = ref.(string)
 	}else{
-		this.m_userData = ref.(*OAuth2IdToken)
 		this.M_userData = ref.(*OAuth2IdToken).GetUUID()
+		this.m_userData = ref.(*OAuth2IdToken)
 	}
 }
 
@@ -223,8 +210,6 @@ func (this *OAuth2Access) RemoveUserData(ref interface{}){
 		if toDelete.GetUUID() == this.m_userData.GetUUID() {
 			this.m_userData = nil
 			this.M_userData = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -236,7 +221,6 @@ func (this *OAuth2Access) GetCreatedAt() int64{
 
 /** Init reference CreatedAt **/
 func (this *OAuth2Access) SetCreatedAt(ref interface{}){
-	this.NeedSave = true
 	this.M_createdAt = ref.(int64)
 }
 
@@ -249,12 +233,11 @@ func (this *OAuth2Access) GetParentPtr() *OAuth2Configuration{
 
 /** Init reference Parent **/
 func (this *OAuth2Access) SetParentPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_parentPtr = ref.(string)
 	}else{
-		this.m_parentPtr = ref.(*OAuth2Configuration)
 		this.M_parentPtr = ref.(Configuration).GetUUID()
+		this.m_parentPtr = ref.(*OAuth2Configuration)
 	}
 }
 
@@ -265,8 +248,6 @@ func (this *OAuth2Access) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

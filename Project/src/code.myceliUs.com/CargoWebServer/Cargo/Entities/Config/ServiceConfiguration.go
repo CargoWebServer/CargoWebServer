@@ -65,7 +65,6 @@ func (this *ServiceConfiguration) GetId() string{
 
 /** Init reference Id **/
 func (this *ServiceConfiguration) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -78,7 +77,6 @@ func (this *ServiceConfiguration) GetHostName() string{
 
 /** Init reference HostName **/
 func (this *ServiceConfiguration) SetHostName(ref interface{}){
-	this.NeedSave = true
 	this.M_hostName = ref.(string)
 }
 
@@ -91,7 +89,6 @@ func (this *ServiceConfiguration) GetIpv4() string{
 
 /** Init reference Ipv4 **/
 func (this *ServiceConfiguration) SetIpv4(ref interface{}){
-	this.NeedSave = true
 	this.M_ipv4 = ref.(string)
 }
 
@@ -104,7 +101,6 @@ func (this *ServiceConfiguration) GetPort() int{
 
 /** Init reference Port **/
 func (this *ServiceConfiguration) SetPort(ref interface{}){
-	this.NeedSave = true
 	this.M_port = ref.(int)
 }
 
@@ -117,7 +113,6 @@ func (this *ServiceConfiguration) GetUser() string{
 
 /** Init reference User **/
 func (this *ServiceConfiguration) SetUser(ref interface{}){
-	this.NeedSave = true
 	this.M_user = ref.(string)
 }
 
@@ -130,7 +125,6 @@ func (this *ServiceConfiguration) GetPwd() string{
 
 /** Init reference Pwd **/
 func (this *ServiceConfiguration) SetPwd(ref interface{}){
-	this.NeedSave = true
 	this.M_pwd = ref.(string)
 }
 
@@ -143,7 +137,6 @@ func (this *ServiceConfiguration) GetStart() bool{
 
 /** Init reference Start **/
 func (this *ServiceConfiguration) SetStart(ref interface{}){
-	this.NeedSave = true
 	this.M_start = ref.(bool)
 }
 
@@ -156,12 +149,11 @@ func (this *ServiceConfiguration) GetParentPtr() *Configurations{
 
 /** Init reference Parent **/
 func (this *ServiceConfiguration) SetParentPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_parentPtr = ref.(string)
 	}else{
-		this.m_parentPtr = ref.(*Configurations)
 		this.M_parentPtr = ref.(*Configurations).GetUUID()
+		this.m_parentPtr = ref.(*Configurations)
 	}
 }
 
@@ -172,8 +164,6 @@ func (this *ServiceConfiguration) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

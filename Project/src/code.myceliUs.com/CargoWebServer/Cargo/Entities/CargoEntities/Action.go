@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Action struct{
@@ -53,7 +53,6 @@ func (this *Action) GetName() string{
 
 /** Init reference Name **/
 func (this *Action) SetName(ref interface{}){
-	this.NeedSave = true
 	this.M_name = ref.(string)
 }
 
@@ -66,7 +65,6 @@ func (this *Action) GetDoc() string{
 
 /** Init reference Doc **/
 func (this *Action) SetDoc(ref interface{}){
-	this.NeedSave = true
 	this.M_doc = ref.(string)
 }
 
@@ -79,7 +77,6 @@ func (this *Action) GetParameters() []*Parameter{
 
 /** Init reference Parameters **/
 func (this *Action) SetParameters(ref interface{}){
-	this.NeedSave = true
 	isExist := false
 	var parameterss []*Parameter
 	for i:=0; i<len(this.M_parameters); i++ {
@@ -103,8 +100,6 @@ func (this *Action) RemoveParameters(ref interface{}){
 	for i := 0; i < len(this.M_parameters); i++ {
 		if toDelete.GetUUID() != this.M_parameters[i].GetUUID() {
 			parameters_ = append(parameters_, this.M_parameters[i])
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_parameters = parameters_
@@ -117,7 +112,6 @@ func (this *Action) GetResults() []*Parameter{
 
 /** Init reference Results **/
 func (this *Action) SetResults(ref interface{}){
-	this.NeedSave = true
 	isExist := false
 	var resultss []*Parameter
 	for i:=0; i<len(this.M_results); i++ {
@@ -141,8 +135,6 @@ func (this *Action) RemoveResults(ref interface{}){
 	for i := 0; i < len(this.M_results); i++ {
 		if toDelete.GetUUID() != this.M_results[i].GetUUID() {
 			results_ = append(results_, this.M_results[i])
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_results = results_
@@ -155,7 +147,6 @@ func (this *Action) GetAccessType() AccessType{
 
 /** Init reference AccessType **/
 func (this *Action) SetAccessType(ref interface{}){
-	this.NeedSave = true
 	this.M_accessType = ref.(AccessType)
 }
 
@@ -168,12 +159,11 @@ func (this *Action) GetEntitiesPtr() *Entities{
 
 /** Init reference Entities **/
 func (this *Action) SetEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
 	}else{
-		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
 
@@ -184,8 +174,6 @@ func (this *Action) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

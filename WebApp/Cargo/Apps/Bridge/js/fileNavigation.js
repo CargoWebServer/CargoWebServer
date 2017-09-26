@@ -302,7 +302,7 @@ FileNavigator.prototype.saveFile = function (fileId) {
     // Now I will save the file.
     var file = entities["CargoEntities.File:" + fileId]
 
-    if (file.M_type == 1) {
+    if (file.M_fileType == 2) {
         // In case of disk file.
         var data = [decode64(file.M_data)]
         var f = null

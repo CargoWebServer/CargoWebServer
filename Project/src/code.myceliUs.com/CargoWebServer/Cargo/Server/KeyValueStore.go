@@ -1271,20 +1271,22 @@ func (this *KeyValueDataStore) Update(queryStr string, fields []interface{}, par
 		for j := 0; j < len(fields); j++ {
 			field := query.Fields[j]
 			value := fields[j] // The new value to insert...
-
+			//log.Println("--------->1274 field ", field, ":", value)
 			// Now I will replace the value of the field...
 			index := prototype.getFieldIndex(field)
 			if index != -1 {
-				entity[index] = value
+				if len(entity) < index {
+					entity[index] = value
+				} else {
+					entity = append(entity, value)
+				}
 			}
 		}
-
 		// Create the new indexations.
 		new_indexationKeys := this.getIndexationKeys(prototype, entity)
 		for j := 0; j < len(new_indexationKeys); j++ {
 			this.appendIndexation(new_indexationKeys[j], uuid)
 		}
-
 		// And save the entity data..
 		var data bytes.Buffer
 		enc := gob.NewEncoder(&data)

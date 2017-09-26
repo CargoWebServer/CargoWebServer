@@ -79,7 +79,6 @@ func (this *ServerConfiguration) GetId() string{
 
 /** Init reference Id **/
 func (this *ServerConfiguration) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -92,7 +91,6 @@ func (this *ServerConfiguration) GetHostName() string{
 
 /** Init reference HostName **/
 func (this *ServerConfiguration) SetHostName(ref interface{}){
-	this.NeedSave = true
 	this.M_hostName = ref.(string)
 }
 
@@ -105,7 +103,6 @@ func (this *ServerConfiguration) GetIpv4() string{
 
 /** Init reference Ipv4 **/
 func (this *ServerConfiguration) SetIpv4(ref interface{}){
-	this.NeedSave = true
 	this.M_ipv4 = ref.(string)
 }
 
@@ -118,7 +115,6 @@ func (this *ServerConfiguration) GetServerPort() int{
 
 /** Init reference ServerPort **/
 func (this *ServerConfiguration) SetServerPort(ref interface{}){
-	this.NeedSave = true
 	this.M_serverPort = ref.(int)
 }
 
@@ -131,7 +127,6 @@ func (this *ServerConfiguration) GetWs_serviceContainerPort() int{
 
 /** Init reference Ws_serviceContainerPort **/
 func (this *ServerConfiguration) SetWs_serviceContainerPort(ref interface{}){
-	this.NeedSave = true
 	this.M_ws_serviceContainerPort = ref.(int)
 }
 
@@ -144,7 +139,6 @@ func (this *ServerConfiguration) GetTcp_serviceContainerPort() int{
 
 /** Init reference Tcp_serviceContainerPort **/
 func (this *ServerConfiguration) SetTcp_serviceContainerPort(ref interface{}){
-	this.NeedSave = true
 	this.M_tcp_serviceContainerPort = ref.(int)
 }
 
@@ -157,7 +151,6 @@ func (this *ServerConfiguration) GetApplicationsPath() string{
 
 /** Init reference ApplicationsPath **/
 func (this *ServerConfiguration) SetApplicationsPath(ref interface{}){
-	this.NeedSave = true
 	this.M_applicationsPath = ref.(string)
 }
 
@@ -170,7 +163,6 @@ func (this *ServerConfiguration) GetDataPath() string{
 
 /** Init reference DataPath **/
 func (this *ServerConfiguration) SetDataPath(ref interface{}){
-	this.NeedSave = true
 	this.M_dataPath = ref.(string)
 }
 
@@ -183,7 +175,6 @@ func (this *ServerConfiguration) GetScriptsPath() string{
 
 /** Init reference ScriptsPath **/
 func (this *ServerConfiguration) SetScriptsPath(ref interface{}){
-	this.NeedSave = true
 	this.M_scriptsPath = ref.(string)
 }
 
@@ -196,7 +187,6 @@ func (this *ServerConfiguration) GetDefinitionsPath() string{
 
 /** Init reference DefinitionsPath **/
 func (this *ServerConfiguration) SetDefinitionsPath(ref interface{}){
-	this.NeedSave = true
 	this.M_definitionsPath = ref.(string)
 }
 
@@ -209,7 +199,6 @@ func (this *ServerConfiguration) GetSchemasPath() string{
 
 /** Init reference SchemasPath **/
 func (this *ServerConfiguration) SetSchemasPath(ref interface{}){
-	this.NeedSave = true
 	this.M_schemasPath = ref.(string)
 }
 
@@ -222,7 +211,6 @@ func (this *ServerConfiguration) GetTmpPath() string{
 
 /** Init reference TmpPath **/
 func (this *ServerConfiguration) SetTmpPath(ref interface{}){
-	this.NeedSave = true
 	this.M_tmpPath = ref.(string)
 }
 
@@ -235,7 +223,6 @@ func (this *ServerConfiguration) GetBinPath() string{
 
 /** Init reference BinPath **/
 func (this *ServerConfiguration) SetBinPath(ref interface{}){
-	this.NeedSave = true
 	this.M_binPath = ref.(string)
 }
 
@@ -248,7 +235,6 @@ func (this *ServerConfiguration) GetQueriesPath() string{
 
 /** Init reference QueriesPath **/
 func (this *ServerConfiguration) SetQueriesPath(ref interface{}){
-	this.NeedSave = true
 	this.M_queriesPath = ref.(string)
 }
 
@@ -261,12 +247,11 @@ func (this *ServerConfiguration) GetParentPtr() *Configurations{
 
 /** Init reference Parent **/
 func (this *ServerConfiguration) SetParentPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_parentPtr = ref.(string)
 	}else{
-		this.m_parentPtr = ref.(*Configurations)
 		this.M_parentPtr = ref.(*Configurations).GetUUID()
+		this.m_parentPtr = ref.(*Configurations)
 	}
 }
 
@@ -277,8 +262,6 @@ func (this *ServerConfiguration) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

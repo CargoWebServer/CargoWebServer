@@ -551,7 +551,6 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 
 		if attribute.Upper == "*" {
 			if isRef {
-				refSetter += "	this.NeedSave = true\n"
 				refSetter += "	if refStr, ok := ref.(string); ok {\n"
 				refSetter += "		for i:=0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
 				refSetter += "			if this.M_" + attribute.Name + ref + "[i] == refStr {\n"
@@ -567,10 +566,10 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					refSetter += "				return\n"
 					refSetter += "			}\n"
 					refSetter += "		}\n"
-					refSetter += "		this.NeedSave = true\n"
+					refSetter += "		isExist := false\n"
 					refSetter += "		for i:=0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
 					refSetter += "			if this.M_" + attribute.Name + ref + "[i] == ref.(" + typeName + ").GetUUID() {\n"
-					refSetter += "				this.NeedSave = false\n"
+					refSetter += "				isExist = true\n"
 					refSetter += "			}\n"
 					refSetter += "		}\n"
 				}
@@ -585,13 +584,12 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					if isPointer && !isInterfaceCast {
 						cast = "*" + cast
 					}
-					refSetter += "	if this.NeedSave {\n"
+					refSetter += "	if !isExist {\n"
 					refSetter += "		this.M_" + attribute.Name + ref + " = append(this.M_" + attribute.Name + ref + ", ref.(" + cast + ").GetUUID())\n"
 					refSetter += "	}\n"
 				}
 				refSetter += "	}\n"
 			} else {
-				refSetter += "	this.NeedSave = true\n"
 				refSetter += "	isExist := false\n"
 				refSetter += "	var " + attribute.Name + "s []" + typeName + "\n"
 				refSetter += "	for i:=0; i<len(this.M_" + attribute.Name + "); i++ {\n"
@@ -639,11 +637,9 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 			}
 		} else {
 			if isRef {
-				refSetter += "	this.NeedSave = true\n"
 				refSetter += "	if _, ok := ref.(string); ok {\n"
 				refSetter += "		this.M_" + attribute.Name + ref + " = ref.(string)\n"
 				refSetter += "	}else{\n"
-				refSetter += "		this.m_" + attribute.Name + ref + " = ref.(" + typeName + ")\n"
 
 				if classesMap[cast] != nil {
 					isInterfaceCast := Utility.Contains(abstractClassLst, cast) || Utility.Contains(superClassesLst, cast)
@@ -659,9 +655,10 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					refSetter += "		this.M_" + attribute.Name + ref + " = ref.(Utility.Referenceable).GetUUID()\n"
 				}
 
+				refSetter += "		this.m_" + attribute.Name + ref + " = ref.(" + typeName + ")\n"
+
 				refSetter += "	}\n"
 			} else {
-				refSetter += "	this.NeedSave = true\n"
 				refSetter += "	this.M_" + attribute.Name + ref + " = ref.(" + typeName + ")\n"
 			}
 		}
@@ -706,8 +703,6 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 						refRemover += "		if toDelete.GetUUID() != this.M_" + attribute.Name + ref + "[i].GetUUID() {\n"
 					}
 					refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.M_" + attribute.Name + ref + "[i])\n"
-					refRemover += "		}else{\n"
-					refRemover += "			this.NeedSave = true\n"
 					refRemover += "		}\n"
 					refRemover += "	}\n"
 
@@ -724,8 +719,6 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 
 					refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.m_" + attribute.Name + ref + "[i])\n"
 					refRemover += "			" + attribute.Name + ref + "Uuid = append(" + attribute.Name + ref + "Uuid, this.M_" + attribute.Name + ref + "[i])\n"
-					refRemover += "		}else{\n"
-					refRemover += "			this.NeedSave = true\n"
 					refRemover += "		}\n"
 					refRemover += "	}\n"
 
@@ -753,8 +746,6 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					}
 					refRemover += "			this.m_" + attribute.Name + ref + " = nil\n"
 					refRemover += "			this.M_" + attribute.Name + ref + " = \"\"\n"
-					refRemover += "		}else{\n"
-					refRemover += "			this.NeedSave = true\n"
 					refRemover += "		}\n"
 				}
 				refRemover += "	}\n"

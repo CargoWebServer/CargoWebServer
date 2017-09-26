@@ -206,12 +206,23 @@ func (this *DynamicEntity) getValue(field string) interface{} {
 }
 
 /**
- * Thread safe function
+ * Thread safe function, apply only on none array field...
  */
 func (this *DynamicEntity) deleteValue(field string) {
 	this.Lock()
 	defer this.Unlock()
-	delete(this.object, field)
+	fieldType := this.prototype.FieldsType[this.prototype.getFieldIndex(field)]
+	if !strings.HasPrefix(fieldType, "[]") {
+		if strings.HasSuffix(fieldType, ":Ref") {
+			refUuid := this.object[field].(string)
+			ref, err := GetServer().GetEntityManager().getEntityByUuid(refUuid, false)
+			if err == nil {
+				this.RemoveReference(field, ref)
+			}
+		}
+		// Remove the field itself.
+		delete(this.object, field)
+	}
 }
 
 /**
@@ -374,6 +385,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 
 	// Initialisation of information of Interface...
 	if len(results) > 0 {
+		log.Println("-----> ", results)
 		if len(results[0]) == 0 {
 			return errors.New("No value found for entity " + this.uuid)
 		}
@@ -1061,7 +1073,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	} else {
 		log.Println(Utility.FileLine(), "Fail to save entity ", err)
 	}
-	//log.Println("After save:", toJsonStr(this.object))
+
 }
 
 /**
@@ -1793,7 +1805,6 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 											val := int32(v.(float64))
 											this.setValue(k, val)
 										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.String && reflect.TypeOf(v).Kind() == reflect.Float64 {
-											// the json parser transform all numerical value to float... that not what we want here...
 											val := Utility.ToString(v)
 											this.setValue(k, val)
 										} else {

@@ -44,7 +44,6 @@ func (this *AccountManager) initialize() {
 
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
-	entities := GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities)
 	// Create the admin account if it doesn't exist
 	adminUuid := CargoEntitiesAccountExists("admin")
 	if len(adminUuid) == 0 {
@@ -55,16 +54,7 @@ func (this *AccountManager) initialize() {
 		account.M_name = "admin"
 		account.NeedSave = true
 		account.M_email = ""
-
-		// Set it uuid
-		GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", account)
-
-		// Append the newly create account into the cargo entities
-		entities.SetEntities(account)
-		account.SetEntitiesPtr(entities)
-
-		// Save the account
-		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+		GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_entities", "CargoEntities.Account", "admin", account)
 	}
 
 	// Create the guest account if it doesn't exist
@@ -77,14 +67,7 @@ func (this *AccountManager) initialize() {
 		account.M_name = "guest"
 		account.M_email = ""
 		account.NeedSave = true
-
-		GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", account)
-
-		// Append the newly create account into the cargo entities
-		entities.SetEntities(account)
-		account.SetEntitiesPtr(entities)
-		// Save the account
-		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+		GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_entities", "CargoEntities.Account", "guest", account)
 	}
 
 }
@@ -149,13 +132,7 @@ func (this *AccountManager) Register(name string, password string, email string,
 		account.NeedSave = true
 
 		// Append the newly create account into the cargo entities
-		entities := GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities)
-		entities.SetEntities(account)
-		account.SetEntitiesPtr(entities)
-
-		// Save the account
-		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
-
+		GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_entities", "CargoEntities.Account", name, account)
 		return account
 	} else {
 		// Create the error message

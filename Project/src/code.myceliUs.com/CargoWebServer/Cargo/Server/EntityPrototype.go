@@ -6,6 +6,7 @@ import "log"
 import "code.myceliUs.com/Utility"
 import "code.myceliUs.com/CargoWebServer/Cargo/JS"
 import "code.myceliUs.com/XML_Schemas"
+import "strconv"
 
 /**
  * Restrictions for Datatypes
@@ -132,6 +133,10 @@ type EntityPrototype struct {
 
 	// The prototype version.
 	Version string
+
+	// Temporary container that old information about fields modifiaction.
+	FieldsToDelete []int
+	FieldsToUpdate []string
 }
 
 func NewEntityPrototype() *EntityPrototype {
@@ -244,6 +249,90 @@ func (this *EntityPrototype) Save(storeId string) error {
 		storeId = this.TypeName[:strings.Index(this.TypeName, ".")]
 	}
 
+	// Get information of the previous entity prototype.
+	prototype, err := GetServer().GetEntityManager().getEntityPrototype(this.TypeName, storeId)
+	if err != nil {
+		return err
+	}
+
+	entities, _ := GetServer().GetEntityManager().getEntities(prototype.TypeName, "", storeId, false)
+
+	// Remove the fields
+	for i := 0; i < len(entities); i++ {
+		entity := entities[i].(*DynamicEntity) // Must be a dynamic entity.
+
+		// remove it...
+		for j := 0; j < len(this.FieldsToDelete); j++ {
+			field := prototype.Fields[this.FieldsToDelete[j]]
+			entity.deleteValue(field)
+		}
+
+		for j := 0; j < len(this.FieldsToUpdate); j++ {
+			values := strings.Split(this.FieldsToUpdate[j], ":")
+			if len(values) == 2 {
+				indexFrom := prototype.getFieldIndex(values[0])
+				indexTo := this.getFieldIndex(values[1])
+				if indexFrom > -1 && indexTo > -1 {
+					if values[0] != values[1] {
+						// Set the new value with the old one
+						entity.setValue(values[1], entity.getValue(values[0]))
+						// Delete the old one.
+						entity.deleteValue(values[0])
+					}
+					var fieldTypeTo = prototype.FieldsType[indexTo]
+					var fieldTypeFrom = this.FieldsType[indexFrom]
+					if fieldTypeFrom != fieldTypeTo {
+						log.Println("------> change field type from ", fieldTypeFrom, "with", fieldTypeTo)
+
+					}
+				}
+			}
+		}
+
+		// Set the new entity prototype
+		entity.prototype = this
+
+		// Now set new fields value inside existing entities with their default
+		// value.
+		for j := 0; j < len(this.Fields); j++ {
+			if !Utility.Contains(prototype.Fields, this.Fields[j]) {
+				// I that case I will set the new field value inside the prototype.
+				var value interface{}
+				if strings.HasPrefix(this.FieldsType[j], "[]") {
+					value = "undefined"
+				} else {
+					if XML_Schemas.IsXsString(this.FieldsType[j]) {
+						value = this.FieldsDefaultValue[j]
+					} else if XML_Schemas.IsXsInt(this.FieldsType[j]) || XML_Schemas.IsXsTime(this.FieldsType[j]) {
+						value, _ = strconv.ParseInt(this.FieldsDefaultValue[j], 10, 64)
+					} else if XML_Schemas.IsXsNumeric(this.FieldsType[j]) {
+						value, _ = strconv.ParseFloat(this.FieldsDefaultValue[j], 64)
+					} else if XML_Schemas.IsXsDate(this.FieldsType[j]) {
+						value = Utility.MakeTimestamp()
+					} else if XML_Schemas.IsXsBoolean(this.FieldsType[j]) {
+						if this.FieldsDefaultValue[j] == "false" {
+							value = false
+						} else {
+							value = true
+						}
+					} else {
+						// Object here.
+						value = "undefined"
+					}
+				}
+
+				log.Println("----> set field ", this.Fields[j], value)
+				entity.SetNeedSave(true)
+				entity.setValue(this.Fields[j], value)
+				log.Println("----> values ", entity.GetObject())
+			}
+		}
+
+		// Save the entity.
+		entity.SaveEntity()
+
+	}
+
 	store := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
 	if store != nil {
 		err := store.saveEntityPrototype(this)
@@ -265,6 +354,7 @@ func (this *EntityPrototype) Save(storeId string) error {
 	evt, _ := NewEvent(UpdatePrototypeEvent, PrototypeEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
 
+	log.Println("-----> prototype: ", this)
 	return nil
 }
 

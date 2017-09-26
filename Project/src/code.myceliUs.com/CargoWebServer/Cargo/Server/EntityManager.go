@@ -140,6 +140,7 @@ func (this *EntityManager) getCargoEntities() *CargoEntities_EntitiesEntity {
  * Determines if the entity exists in the cacheManager map.
  */
 func (this *EntityManager) contain(uuid string) (Entity, bool) {
+	// Set the cache...
 	return server.GetCacheManager().contains(uuid)
 }
 
@@ -150,7 +151,6 @@ func (this *EntityManager) contain(uuid string) (Entity, bool) {
  */
 func (this *EntityManager) insert(entity Entity) {
 	if entity.GetObject() != nil {
-		// Set the cache...
 		server.GetCacheManager().setEntity(entity)
 	}
 }
@@ -440,13 +440,12 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 	// The need save evaluation...
 	mapValues, _ := Utility.ToMap(source)
 	needSave := target.GetChecksum() != Utility.GetChecksum(mapValues)
+	target.SetNeedSave(needSave)
 
 	// in case of dynamic object...
 	if reflect.TypeOf(source).String() == "map[string]interface {}" {
 		target.(*DynamicEntity).SetObjectValues(source.(map[string]interface{}))
 	}
-
-	target.SetNeedSave(needSave)
 
 	// I will get the target object.
 	targetReflexObject := reflect.ValueOf(target.GetObject())
@@ -691,7 +690,6 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 			}
 		}
 	}
-
 }
 
 /**
@@ -1657,6 +1655,11 @@ func (this *EntityManager) SaveEntityPrototype(storeId string, prototype interfa
 		values, err := Utility.InitializeStructure(prototype.(map[string]interface{}))
 		if err == nil {
 			prototype = values.Interface()
+		} else {
+			log.Println("fail to initialyse EntityPrototype from map[string]interface {} ", err)
+			cargoError := NewError(Utility.FileLine(), PARAMETER_TYPE_ERROR, SERVER_ERROR_CODE, err)
+			GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+			return nil
 		}
 	}
 
@@ -1665,7 +1668,7 @@ func (this *EntityManager) SaveEntityPrototype(storeId string, prototype interfa
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
-	log.Println("--------> 1651")
+
 	// Get the store...
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	if store == nil {

@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Log struct{
@@ -56,7 +56,6 @@ func (this *Log) GetId() string{
 
 /** Init reference Id **/
 func (this *Log) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -69,7 +68,6 @@ func (this *Log) GetEntries() []*LogEntry{
 
 /** Init reference Entries **/
 func (this *Log) SetEntries(ref interface{}){
-	this.NeedSave = true
 	isExist := false
 	var entriess []*LogEntry
 	for i:=0; i<len(this.M_entries); i++ {
@@ -93,8 +91,6 @@ func (this *Log) RemoveEntries(ref interface{}){
 	for i := 0; i < len(this.M_entries); i++ {
 		if toDelete.GetUUID() != this.M_entries[i].GetUUID() {
 			entries_ = append(entries_, this.M_entries[i])
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.M_entries = entries_
@@ -107,12 +103,11 @@ func (this *Log) GetEntitiesPtr() *Entities{
 
 /** Init reference Entities **/
 func (this *Log) SetEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
 	}else{
-		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
 
@@ -123,8 +118,6 @@ func (this *Log) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

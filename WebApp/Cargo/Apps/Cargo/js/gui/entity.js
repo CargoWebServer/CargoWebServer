@@ -874,9 +874,13 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 				newLnkButton = label.appendElement({ "tag": "div", "class": "entities_btn", "style": "display: none;", "id": this.proto.TypeName + "_" + fieldType + "_" + field + "_plus_btn" }).down()
 				newLnkButton.appendElement({ "tag": "i", "class": "fa fa-pencil-square-o" }).down()
 				control = valueDiv.appendElement({ "tag": "div", "id": id }).down()
-			} else {
+			} else  {
 				// Here I have a item inside another item...
-				var subentityPanel = new EntityPanel(valueDiv, fieldType, function () { }, undefined, true, this.getEntity().UUID, field)
+				var uuid = ""
+				if(this.getEntity() != null){
+					uuid = this.getEntity().UUID
+				}
+				var subentityPanel = new EntityPanel(valueDiv, fieldType, function () { }, undefined, true, uuid, field)
 				// The control will be the sub-entity panel.
 				this.controls[id] = control = subentityPanel
 			}

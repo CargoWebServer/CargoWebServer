@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Computer struct{
@@ -61,7 +61,6 @@ func (this *Computer) GetId() string{
 
 /** Init reference Id **/
 func (this *Computer) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -74,7 +73,6 @@ func (this *Computer) GetName() string{
 
 /** Init reference Name **/
 func (this *Computer) SetName(ref interface{}){
-	this.NeedSave = true
 	this.M_name = ref.(string)
 }
 
@@ -87,7 +85,6 @@ func (this *Computer) GetIpv4() string{
 
 /** Init reference Ipv4 **/
 func (this *Computer) SetIpv4(ref interface{}){
-	this.NeedSave = true
 	this.M_ipv4 = ref.(string)
 }
 
@@ -100,7 +97,6 @@ func (this *Computer) GetOsType() OsType{
 
 /** Init reference OsType **/
 func (this *Computer) SetOsType(ref interface{}){
-	this.NeedSave = true
 	this.M_osType = ref.(OsType)
 }
 
@@ -113,7 +109,6 @@ func (this *Computer) GetPlatformType() PlatformType{
 
 /** Init reference PlatformType **/
 func (this *Computer) SetPlatformType(ref interface{}){
-	this.NeedSave = true
 	this.M_platformType = ref.(PlatformType)
 }
 
@@ -126,12 +121,11 @@ func (this *Computer) GetEntitiesPtr() *Entities{
 
 /** Init reference Entities **/
 func (this *Computer) SetEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
 	}else{
-		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
 
@@ -142,8 +136,6 @@ func (this *Computer) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

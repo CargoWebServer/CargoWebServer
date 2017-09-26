@@ -1,7 +1,7 @@
 package Server
 
 import (
-	//"log"
+	"log"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/Utility"
@@ -21,14 +21,17 @@ func NewLogger(id string) *Logger {
 		entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
 		logger.logEntity = entity.(*CargoEntities_LogEntity)
 	} else {
-
-		log := new(CargoEntities.Log)
-		log.SetId(id)
+		logObject := new(CargoEntities.Log)
+		logObject.SetId(id)
+		entities := server.GetEntityManager().getCargoEntities()
 
 		// Set the log entity.
-		logger.logEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(server.GetEntityManager().getCargoEntities().GetUuid(), "", log)
-		server.GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetEntities(logger.logEntity.GetObject())
-		server.GetEntityManager().getCargoEntities().SaveEntity()
+		logEntity, err := GetServer().GetEntityManager().createEntity(entities.GetUuid(), "M_entities", "CargoEntities.Log", id, logObject)
+		if err == nil {
+			logger.logEntity = logEntity.(*CargoEntities_LogEntity)
+		} else {
+			log.Panicln("-----> error ", err)
+		}
 	}
 
 	return logger

@@ -234,6 +234,8 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 			return dirEntity.GetObject().(*CargoEntities.File), nil
 		}
 		return nil, errObj
+	} else {
+		log.Println("-----------> the dir ", dirName, " dose not exist!")
 	}
 
 	// If the dir is the root dir
@@ -356,10 +358,6 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 	} else {
 		file = new(CargoEntities.File)
 		file.SetId(fileId)
-		// Set the basic information.
-		// Set the file uuid.
-		GetServer().GetEntityManager().NewCargoEntitiesFileEntity(parentDirEntity.GetUuid(), "", file)
-		log.Println("Create entity for file: ", filepath+"/"+filename)
 	}
 
 	// Disk file.
@@ -499,6 +497,11 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 		GetServer().GetEventManager().BroadcastEvent(evt)
 	}
 
+	if len(fileUuid) == 0 {
+		GetServer().GetEntityManager().createEntity(parentDirEntity.GetUuid(), "M_files", "CargoEntities.File", fileId, file)
+		log.Println("Create entity for file: ", filepath+"/"+filename)
+	}
+
 	// Save the file.
 	parentDirEntity.SaveEntity()
 
@@ -560,13 +563,14 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 		}
 		file.SetChecksum(checksum)
 		fileEntity.SaveEntity()
+		log.Println("---------> save file ", file.GetName())
 	} else {
 		file.NeedSave = false // Not need to be save...
+		return nil
 	}
 
 	if err == nil {
 		eventData := make([]*MessageData, 1)
-
 		fileInfo := new(MessageData)
 		fileInfo.Name = "fileInfo"
 		fileInfo.Value = file
@@ -586,10 +590,8 @@ func (this *FileManager) deleteFile(uuid string) error {
 	fileEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity("", uuid, nil)
 	fileEntity.InitEntity(uuid, false)
 	file := fileEntity.GetObject().(*CargoEntities.File)
-
 	if file.GetFileType() == CargoEntities.FileType_DiskFile {
 		filePath := this.root + file.GetPath() + "/" + file.GetName()
-
 		if !file.IsDir() {
 			// Remove the file from the disck
 			os.Remove(filePath) // The file can be already remove...

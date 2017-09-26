@@ -55,7 +55,6 @@ func (this *ApplicationConfiguration) GetId() string{
 
 /** Init reference Id **/
 func (this *ApplicationConfiguration) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -68,7 +67,6 @@ func (this *ApplicationConfiguration) GetIndexPage() string{
 
 /** Init reference IndexPage **/
 func (this *ApplicationConfiguration) SetIndexPage(ref interface{}){
-	this.NeedSave = true
 	this.M_indexPage = ref.(string)
 }
 
@@ -81,12 +79,11 @@ func (this *ApplicationConfiguration) GetParentPtr() *Configurations{
 
 /** Init reference Parent **/
 func (this *ApplicationConfiguration) SetParentPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_parentPtr = ref.(string)
 	}else{
-		this.m_parentPtr = ref.(*Configurations)
 		this.M_parentPtr = ref.(*Configurations).GetUUID()
+		this.m_parentPtr = ref.(*Configurations)
 	}
 }
 
@@ -97,8 +94,6 @@ func (this *ApplicationConfiguration) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

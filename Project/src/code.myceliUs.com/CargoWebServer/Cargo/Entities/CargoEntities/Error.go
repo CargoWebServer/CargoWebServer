@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Error struct{
@@ -67,7 +67,6 @@ func (this *Error) GetId() string{
 
 /** Init reference Id **/
 func (this *Error) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -80,7 +79,6 @@ func (this *Error) GetBody() string{
 
 /** Init reference Body **/
 func (this *Error) SetBody(ref interface{}){
-	this.NeedSave = true
 	this.M_body = ref.(string)
 }
 
@@ -93,7 +91,6 @@ func (this *Error) GetErrorPath() string{
 
 /** Init reference ErrorPath **/
 func (this *Error) SetErrorPath(ref interface{}){
-	this.NeedSave = true
 	this.M_errorPath = ref.(string)
 }
 
@@ -106,7 +103,6 @@ func (this *Error) GetCode() int{
 
 /** Init reference Code **/
 func (this *Error) SetCode(ref interface{}){
-	this.NeedSave = true
 	this.M_code = ref.(int)
 }
 
@@ -119,12 +115,11 @@ func (this *Error) GetAccountRef() *Account{
 
 /** Init reference AccountRef **/
 func (this *Error) SetAccountRef(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_accountRef = ref.(string)
 	}else{
-		this.m_accountRef = ref.(*Account)
 		this.M_accountRef = ref.(Entity).GetUUID()
+		this.m_accountRef = ref.(*Account)
 	}
 }
 
@@ -135,8 +130,6 @@ func (this *Error) RemoveAccountRef(ref interface{}){
 		if toDelete.GetUUID() == this.m_accountRef.GetUUID() {
 			this.m_accountRef = nil
 			this.M_accountRef = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -148,12 +141,11 @@ func (this *Error) GetEntitiesPtr() *Entities{
 
 /** Init reference Entities **/
 func (this *Error) SetEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
 	}else{
-		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
 
@@ -164,8 +156,6 @@ func (this *Error) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

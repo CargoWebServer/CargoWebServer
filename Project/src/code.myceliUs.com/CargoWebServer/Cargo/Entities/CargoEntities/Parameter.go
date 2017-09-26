@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Parameter struct{
@@ -52,7 +52,6 @@ func (this *Parameter) GetName() string{
 
 /** Init reference Name **/
 func (this *Parameter) SetName(ref interface{}){
-	this.NeedSave = true
 	this.M_name = ref.(string)
 }
 
@@ -65,7 +64,6 @@ func (this *Parameter) GetType() string{
 
 /** Init reference Type **/
 func (this *Parameter) SetType(ref interface{}){
-	this.NeedSave = true
 	this.M_type = ref.(string)
 }
 
@@ -78,7 +76,6 @@ func (this *Parameter) IsArray() bool{
 
 /** Init reference IsArray **/
 func (this *Parameter) SetIsArray(ref interface{}){
-	this.NeedSave = true
 	this.M_isArray = ref.(bool)
 }
 
@@ -91,12 +88,11 @@ func (this *Parameter) GetParametersPtr() *Parameter{
 
 /** Init reference Parameters **/
 func (this *Parameter) SetParametersPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_parametersPtr = ref.(string)
 	}else{
-		this.m_parametersPtr = ref.(*Parameter)
 		this.M_parametersPtr = ref.(*Parameter).GetUUID()
+		this.m_parametersPtr = ref.(*Parameter)
 	}
 }
 
@@ -107,8 +103,6 @@ func (this *Parameter) RemoveParametersPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parametersPtr.GetUUID() {
 			this.m_parametersPtr = nil
 			this.M_parametersPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

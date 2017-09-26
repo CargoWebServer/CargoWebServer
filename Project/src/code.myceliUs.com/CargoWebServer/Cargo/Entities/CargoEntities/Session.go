@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Session struct{
@@ -60,7 +60,6 @@ func (this *Session) GetId() string{
 
 /** Init reference Id **/
 func (this *Session) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -73,7 +72,6 @@ func (this *Session) GetStartTime() int64{
 
 /** Init reference StartTime **/
 func (this *Session) SetStartTime(ref interface{}){
-	this.NeedSave = true
 	this.M_startTime = ref.(int64)
 }
 
@@ -86,7 +84,6 @@ func (this *Session) GetEndTime() int64{
 
 /** Init reference EndTime **/
 func (this *Session) SetEndTime(ref interface{}){
-	this.NeedSave = true
 	this.M_endTime = ref.(int64)
 }
 
@@ -99,7 +96,6 @@ func (this *Session) GetStatusTime() int64{
 
 /** Init reference StatusTime **/
 func (this *Session) SetStatusTime(ref interface{}){
-	this.NeedSave = true
 	this.M_statusTime = ref.(int64)
 }
 
@@ -112,7 +108,6 @@ func (this *Session) GetSessionState() SessionState{
 
 /** Init reference SessionState **/
 func (this *Session) SetSessionState(ref interface{}){
-	this.NeedSave = true
 	this.M_sessionState = ref.(SessionState)
 }
 
@@ -125,12 +120,11 @@ func (this *Session) GetComputerRef() *Computer{
 
 /** Init reference ComputerRef **/
 func (this *Session) SetComputerRef(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_computerRef = ref.(string)
 	}else{
-		this.m_computerRef = ref.(*Computer)
 		this.M_computerRef = ref.(Entity).GetUUID()
+		this.m_computerRef = ref.(*Computer)
 	}
 }
 
@@ -141,8 +135,6 @@ func (this *Session) RemoveComputerRef(ref interface{}){
 		if toDelete.GetUUID() == this.m_computerRef.GetUUID() {
 			this.m_computerRef = nil
 			this.M_computerRef = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -154,12 +146,11 @@ func (this *Session) GetAccountPtr() *Account{
 
 /** Init reference Account **/
 func (this *Session) SetAccountPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_accountPtr = ref.(string)
 	}else{
-		this.m_accountPtr = ref.(*Account)
 		this.M_accountPtr = ref.(Entity).GetUUID()
+		this.m_accountPtr = ref.(*Account)
 	}
 }
 
@@ -170,8 +161,6 @@ func (this *Session) RemoveAccountPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_accountPtr.GetUUID() {
 			this.m_accountPtr = nil
 			this.M_accountPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

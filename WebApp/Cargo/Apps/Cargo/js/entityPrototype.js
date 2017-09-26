@@ -94,6 +94,16 @@ var EntityPrototype = function () {
     */
     this.FieldsDefaultValue = [] // int
 
+    /**
+     * @property Contain the list of fields to delete
+    */
+    this.FieldsToDelete = [] // int
+
+    /**
+     * @property Contain the list of fields to rename
+    */
+    this.FieldsToUpdate = [] // int
+
     return this
 }
 

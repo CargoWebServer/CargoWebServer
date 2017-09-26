@@ -50,7 +50,6 @@ func (this *OAuth2Expires) GetId() string{
 
 /** Init reference Id **/
 func (this *OAuth2Expires) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -63,7 +62,6 @@ func (this *OAuth2Expires) GetExpiresAt() int64{
 
 /** Init reference ExpiresAt **/
 func (this *OAuth2Expires) SetExpiresAt(ref interface{}){
-	this.NeedSave = true
 	this.M_expiresAt = ref.(int64)
 }
 
@@ -76,12 +74,11 @@ func (this *OAuth2Expires) GetParentPtr() *OAuth2Configuration{
 
 /** Init reference Parent **/
 func (this *OAuth2Expires) SetParentPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_parentPtr = ref.(string)
 	}else{
-		this.m_parentPtr = ref.(*OAuth2Configuration)
 		this.M_parentPtr = ref.(Configuration).GetUUID()
+		this.m_parentPtr = ref.(*OAuth2Configuration)
 	}
 }
 
@@ -92,8 +89,6 @@ func (this *OAuth2Expires) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

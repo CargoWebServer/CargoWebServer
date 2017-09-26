@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type LogEntry struct{
@@ -62,7 +62,6 @@ func (this *LogEntry) GetId() string{
 
 /** Init reference Id **/
 func (this *LogEntry) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -75,7 +74,6 @@ func (this *LogEntry) GetCreationTime() int64{
 
 /** Init reference CreationTime **/
 func (this *LogEntry) SetCreationTime(ref interface{}){
-	this.NeedSave = true
 	this.M_creationTime = ref.(int64)
 }
 
@@ -88,12 +86,11 @@ func (this *LogEntry) GetEntityRef() Entity{
 
 /** Init reference EntityRef **/
 func (this *LogEntry) SetEntityRef(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entityRef = ref.(string)
 	}else{
-		this.m_entityRef = ref.(Entity)
 		this.M_entityRef = ref.(Entity).GetUUID()
+		this.m_entityRef = ref.(Entity)
 	}
 }
 
@@ -104,8 +101,6 @@ func (this *LogEntry) RemoveEntityRef(ref interface{}){
 		if toDelete.GetUUID() == this.m_entityRef.(Entity).GetUUID() {
 			this.m_entityRef = nil
 			this.M_entityRef = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -117,12 +112,11 @@ func (this *LogEntry) GetLoggerPtr() *Log{
 
 /** Init reference Logger **/
 func (this *LogEntry) SetLoggerPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_loggerPtr = ref.(string)
 	}else{
-		this.m_loggerPtr = ref.(*Log)
 		this.M_loggerPtr = ref.(Entity).GetUUID()
+		this.m_loggerPtr = ref.(*Log)
 	}
 }
 
@@ -133,8 +127,6 @@ func (this *LogEntry) RemoveLoggerPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_loggerPtr.GetUUID() {
 			this.m_loggerPtr = nil
 			this.M_loggerPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -146,12 +138,11 @@ func (this *LogEntry) GetEntitiesPtr() *Entities{
 
 /** Init reference Entities **/
 func (this *LogEntry) SetEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
 	}else{
-		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
 
@@ -162,8 +153,6 @@ func (this *LogEntry) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

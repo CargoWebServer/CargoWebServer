@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Permission struct{
@@ -53,7 +53,6 @@ func (this *Permission) GetId() string{
 
 /** Init reference Id **/
 func (this *Permission) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -66,7 +65,6 @@ func (this *Permission) GetTypes() int{
 
 /** Init reference Types **/
 func (this *Permission) SetTypes(ref interface{}){
-	this.NeedSave = true
 	this.M_types = ref.(int)
 }
 
@@ -79,7 +77,6 @@ func (this *Permission) GetAccountsRef() []*Account{
 
 /** Init reference AccountsRef **/
 func (this *Permission) SetAccountsRef(ref interface{}){
-	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
 		for i:=0; i < len(this.M_accountsRef); i++ {
 			if this.M_accountsRef[i] == refStr {
@@ -89,18 +86,18 @@ func (this *Permission) SetAccountsRef(ref interface{}){
 		this.M_accountsRef = append(this.M_accountsRef, ref.(string))
 	}else{
 		for i:=0; i < len(this.m_accountsRef); i++ {
-			if this.m_accountsRef[i].UUID == ref.(*Account).UUID {
+			if this.m_accountsRef[i].GetUUID() == ref.(*Account).GetUUID() {
 				return
 			}
 		}
-		this.NeedSave = true
+		isExist := false
 		for i:=0; i < len(this.M_accountsRef); i++ {
-			if this.M_accountsRef[i] == ref.(*Account).UUID {
-				this.NeedSave = false
+			if this.M_accountsRef[i] == ref.(*Account).GetUUID() {
+				isExist = true
 			}
 		}
 		this.m_accountsRef = append(this.m_accountsRef, ref.(*Account))
-	if this.NeedSave {
+	if !isExist {
 		this.M_accountsRef = append(this.M_accountsRef, ref.(Entity).GetUUID())
 	}
 	}
@@ -115,8 +112,6 @@ func (this *Permission) RemoveAccountsRef(ref interface{}){
 		if toDelete.GetUUID() != this.m_accountsRef[i].GetUUID() {
 			accountsRef_ = append(accountsRef_, this.m_accountsRef[i])
 			accountsRefUuid = append(accountsRefUuid, this.M_accountsRef[i])
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.m_accountsRef = accountsRef_
@@ -130,12 +125,11 @@ func (this *Permission) GetEntitiesPtr() *Entities{
 
 /** Init reference Entities **/
 func (this *Permission) SetEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
 	}else{
-		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
 
@@ -146,8 +140,6 @@ func (this *Permission) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Notification struct{
@@ -72,7 +72,6 @@ func (this *Notification) GetId() string{
 
 /** Init reference Id **/
 func (this *Notification) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -85,7 +84,6 @@ func (this *Notification) GetBody() string{
 
 /** Init reference Body **/
 func (this *Notification) SetBody(ref interface{}){
-	this.NeedSave = true
 	this.M_body = ref.(string)
 }
 
@@ -98,12 +96,11 @@ func (this *Notification) GetFromRef() *Account{
 
 /** Init reference FromRef **/
 func (this *Notification) SetFromRef(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_fromRef = ref.(string)
 	}else{
-		this.m_fromRef = ref.(*Account)
 		this.M_fromRef = ref.(Entity).GetUUID()
+		this.m_fromRef = ref.(*Account)
 	}
 }
 
@@ -114,8 +111,6 @@ func (this *Notification) RemoveFromRef(ref interface{}){
 		if toDelete.GetUUID() == this.m_fromRef.GetUUID() {
 			this.m_fromRef = nil
 			this.M_fromRef = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -127,12 +122,11 @@ func (this *Notification) GetToRef() *Account{
 
 /** Init reference ToRef **/
 func (this *Notification) SetToRef(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_toRef = ref.(string)
 	}else{
-		this.m_toRef = ref.(*Account)
 		this.M_toRef = ref.(Entity).GetUUID()
+		this.m_toRef = ref.(*Account)
 	}
 }
 
@@ -143,8 +137,6 @@ func (this *Notification) RemoveToRef(ref interface{}){
 		if toDelete.GetUUID() == this.m_toRef.GetUUID() {
 			this.m_toRef = nil
 			this.M_toRef = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -156,7 +148,6 @@ func (this *Notification) GetType() string{
 
 /** Init reference Type **/
 func (this *Notification) SetType(ref interface{}){
-	this.NeedSave = true
 	this.M_type = ref.(string)
 }
 
@@ -169,7 +160,6 @@ func (this *Notification) GetCode() int{
 
 /** Init reference Code **/
 func (this *Notification) SetCode(ref interface{}){
-	this.NeedSave = true
 	this.M_code = ref.(int)
 }
 
@@ -182,12 +172,11 @@ func (this *Notification) GetEntitiesPtr() *Entities{
 
 /** Init reference Entities **/
 func (this *Notification) SetEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
 	}else{
-		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
 
@@ -198,8 +187,6 @@ func (this *Notification) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

@@ -51,7 +51,6 @@ func (this *OAuth2Refresh) GetId() string{
 
 /** Init reference Id **/
 func (this *OAuth2Refresh) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -64,12 +63,11 @@ func (this *OAuth2Refresh) GetAccess() *OAuth2Access{
 
 /** Init reference Access **/
 func (this *OAuth2Refresh) SetAccess(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_access = ref.(string)
 	}else{
-		this.m_access = ref.(*OAuth2Access)
 		this.M_access = ref.(*OAuth2Access).GetUUID()
+		this.m_access = ref.(*OAuth2Access)
 	}
 }
 
@@ -80,8 +78,6 @@ func (this *OAuth2Refresh) RemoveAccess(ref interface{}){
 		if toDelete.GetUUID() == this.m_access.GetUUID() {
 			this.m_access = nil
 			this.M_access = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -93,12 +89,11 @@ func (this *OAuth2Refresh) GetParentPtr() *OAuth2Configuration{
 
 /** Init reference Parent **/
 func (this *OAuth2Refresh) SetParentPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_parentPtr = ref.(string)
 	}else{
-		this.m_parentPtr = ref.(*OAuth2Configuration)
 		this.M_parentPtr = ref.(Configuration).GetUUID()
+		this.m_parentPtr = ref.(*OAuth2Configuration)
 	}
 }
 
@@ -109,8 +104,6 @@ func (this *OAuth2Refresh) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

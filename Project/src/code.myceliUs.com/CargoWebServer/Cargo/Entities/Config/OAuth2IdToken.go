@@ -71,7 +71,6 @@ func (this *OAuth2IdToken) GetIssuer() string{
 
 /** Init reference Issuer **/
 func (this *OAuth2IdToken) SetIssuer(ref interface{}){
-	this.NeedSave = true
 	this.M_issuer = ref.(string)
 }
 
@@ -84,7 +83,6 @@ func (this *OAuth2IdToken) GetId() string{
 
 /** Init reference Id **/
 func (this *OAuth2IdToken) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -97,12 +95,11 @@ func (this *OAuth2IdToken) GetClient() *OAuth2Client{
 
 /** Init reference Client **/
 func (this *OAuth2IdToken) SetClient(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_client = ref.(string)
 	}else{
-		this.m_client = ref.(*OAuth2Client)
 		this.M_client = ref.(*OAuth2Client).GetUUID()
+		this.m_client = ref.(*OAuth2Client)
 	}
 }
 
@@ -113,8 +110,6 @@ func (this *OAuth2IdToken) RemoveClient(ref interface{}){
 		if toDelete.GetUUID() == this.m_client.GetUUID() {
 			this.m_client = nil
 			this.M_client = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }
@@ -126,7 +121,6 @@ func (this *OAuth2IdToken) GetExpiration() int64{
 
 /** Init reference Expiration **/
 func (this *OAuth2IdToken) SetExpiration(ref interface{}){
-	this.NeedSave = true
 	this.M_expiration = ref.(int64)
 }
 
@@ -139,7 +133,6 @@ func (this *OAuth2IdToken) GetIssuedAt() int64{
 
 /** Init reference IssuedAt **/
 func (this *OAuth2IdToken) SetIssuedAt(ref interface{}){
-	this.NeedSave = true
 	this.M_issuedAt = ref.(int64)
 }
 
@@ -152,7 +145,6 @@ func (this *OAuth2IdToken) GetNonce() string{
 
 /** Init reference Nonce **/
 func (this *OAuth2IdToken) SetNonce(ref interface{}){
-	this.NeedSave = true
 	this.M_nonce = ref.(string)
 }
 
@@ -165,7 +157,6 @@ func (this *OAuth2IdToken) GetEmail() string{
 
 /** Init reference Email **/
 func (this *OAuth2IdToken) SetEmail(ref interface{}){
-	this.NeedSave = true
 	this.M_email = ref.(string)
 }
 
@@ -178,7 +169,6 @@ func (this *OAuth2IdToken) GetEmailVerified() bool{
 
 /** Init reference EmailVerified **/
 func (this *OAuth2IdToken) SetEmailVerified(ref interface{}){
-	this.NeedSave = true
 	this.M_emailVerified = ref.(bool)
 }
 
@@ -191,7 +181,6 @@ func (this *OAuth2IdToken) GetName() string{
 
 /** Init reference Name **/
 func (this *OAuth2IdToken) SetName(ref interface{}){
-	this.NeedSave = true
 	this.M_name = ref.(string)
 }
 
@@ -204,7 +193,6 @@ func (this *OAuth2IdToken) GetFamilyName() string{
 
 /** Init reference FamilyName **/
 func (this *OAuth2IdToken) SetFamilyName(ref interface{}){
-	this.NeedSave = true
 	this.M_familyName = ref.(string)
 }
 
@@ -217,7 +205,6 @@ func (this *OAuth2IdToken) GetGivenName() string{
 
 /** Init reference GivenName **/
 func (this *OAuth2IdToken) SetGivenName(ref interface{}){
-	this.NeedSave = true
 	this.M_givenName = ref.(string)
 }
 
@@ -230,7 +217,6 @@ func (this *OAuth2IdToken) GetLocal() string{
 
 /** Init reference Local **/
 func (this *OAuth2IdToken) SetLocal(ref interface{}){
-	this.NeedSave = true
 	this.M_local = ref.(string)
 }
 
@@ -243,12 +229,11 @@ func (this *OAuth2IdToken) GetParentPtr() *OAuth2Configuration{
 
 /** Init reference Parent **/
 func (this *OAuth2IdToken) SetParentPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_parentPtr = ref.(string)
 	}else{
-		this.m_parentPtr = ref.(*OAuth2Configuration)
 		this.M_parentPtr = ref.(Configuration).GetUUID()
+		this.m_parentPtr = ref.(*OAuth2Configuration)
 	}
 }
 
@@ -259,8 +244,6 @@ func (this *OAuth2IdToken) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

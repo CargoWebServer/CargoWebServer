@@ -3,7 +3,7 @@
 package CargoEntities
 
 import(
-"encoding/xml"
+	"encoding/xml"
 )
 
 type Group struct{
@@ -59,7 +59,6 @@ func (this *Group) GetId() string{
 
 /** Init reference Id **/
 func (this *Group) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -72,7 +71,6 @@ func (this *Group) GetName() string{
 
 /** Init reference Name **/
 func (this *Group) SetName(ref interface{}){
-	this.NeedSave = true
 	this.M_name = ref.(string)
 }
 
@@ -85,7 +83,6 @@ func (this *Group) GetMembersRef() []*User{
 
 /** Init reference MembersRef **/
 func (this *Group) SetMembersRef(ref interface{}){
-	this.NeedSave = true
 	if refStr, ok := ref.(string); ok {
 		for i:=0; i < len(this.M_membersRef); i++ {
 			if this.M_membersRef[i] == refStr {
@@ -95,18 +92,18 @@ func (this *Group) SetMembersRef(ref interface{}){
 		this.M_membersRef = append(this.M_membersRef, ref.(string))
 	}else{
 		for i:=0; i < len(this.m_membersRef); i++ {
-			if this.m_membersRef[i].UUID == ref.(*User).UUID {
+			if this.m_membersRef[i].GetUUID() == ref.(*User).GetUUID() {
 				return
 			}
 		}
-		this.NeedSave = true
+		isExist := false
 		for i:=0; i < len(this.M_membersRef); i++ {
-			if this.M_membersRef[i] == ref.(*User).UUID {
-				this.NeedSave = false
+			if this.M_membersRef[i] == ref.(*User).GetUUID() {
+				isExist = true
 			}
 		}
 		this.m_membersRef = append(this.m_membersRef, ref.(*User))
-	if this.NeedSave {
+	if !isExist {
 		this.M_membersRef = append(this.M_membersRef, ref.(Entity).GetUUID())
 	}
 	}
@@ -121,8 +118,6 @@ func (this *Group) RemoveMembersRef(ref interface{}){
 		if toDelete.GetUUID() != this.m_membersRef[i].GetUUID() {
 			membersRef_ = append(membersRef_, this.m_membersRef[i])
 			membersRefUuid = append(membersRefUuid, this.M_membersRef[i])
-		}else{
-			this.NeedSave = true
 		}
 	}
 	this.m_membersRef = membersRef_
@@ -136,12 +131,11 @@ func (this *Group) GetEntitiesPtr() *Entities{
 
 /** Init reference Entities **/
 func (this *Group) SetEntitiesPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_entitiesPtr = ref.(string)
 	}else{
-		this.m_entitiesPtr = ref.(*Entities)
 		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
 
@@ -152,8 +146,6 @@ func (this *Group) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

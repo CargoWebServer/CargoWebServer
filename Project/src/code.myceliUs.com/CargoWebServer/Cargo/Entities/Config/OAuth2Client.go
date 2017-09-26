@@ -56,7 +56,6 @@ func (this *OAuth2Client) GetId() string{
 
 /** Init reference Id **/
 func (this *OAuth2Client) SetId(ref interface{}){
-	this.NeedSave = true
 	this.M_id = ref.(string)
 }
 
@@ -69,7 +68,6 @@ func (this *OAuth2Client) GetSecret() string{
 
 /** Init reference Secret **/
 func (this *OAuth2Client) SetSecret(ref interface{}){
-	this.NeedSave = true
 	this.M_secret = ref.(string)
 }
 
@@ -82,7 +80,6 @@ func (this *OAuth2Client) GetRedirectUri() string{
 
 /** Init reference RedirectUri **/
 func (this *OAuth2Client) SetRedirectUri(ref interface{}){
-	this.NeedSave = true
 	this.M_redirectUri = ref.(string)
 }
 
@@ -95,7 +92,6 @@ func (this *OAuth2Client) GetTokenUri() string{
 
 /** Init reference TokenUri **/
 func (this *OAuth2Client) SetTokenUri(ref interface{}){
-	this.NeedSave = true
 	this.M_tokenUri = ref.(string)
 }
 
@@ -108,7 +104,6 @@ func (this *OAuth2Client) GetAuthorizationUri() string{
 
 /** Init reference AuthorizationUri **/
 func (this *OAuth2Client) SetAuthorizationUri(ref interface{}){
-	this.NeedSave = true
 	this.M_authorizationUri = ref.(string)
 }
 
@@ -121,7 +116,6 @@ func (this *OAuth2Client) GetExtra() []uint8{
 
 /** Init reference Extra **/
 func (this *OAuth2Client) SetExtra(ref interface{}){
-	this.NeedSave = true
 	this.M_extra = ref.([]uint8)
 }
 
@@ -134,12 +128,11 @@ func (this *OAuth2Client) GetParentPtr() *OAuth2Configuration{
 
 /** Init reference Parent **/
 func (this *OAuth2Client) SetParentPtr(ref interface{}){
-	this.NeedSave = true
 	if _, ok := ref.(string); ok {
 		this.M_parentPtr = ref.(string)
 	}else{
-		this.m_parentPtr = ref.(*OAuth2Configuration)
 		this.M_parentPtr = ref.(Configuration).GetUUID()
+		this.m_parentPtr = ref.(*OAuth2Configuration)
 	}
 }
 
@@ -150,8 +143,6 @@ func (this *OAuth2Client) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
-		}else{
-			this.NeedSave = true
 		}
 	}
 }

@@ -1,6 +1,5 @@
 var applicationName = document.getElementsByTagName("title")[0].text
-
-
+// Fichier contenant les différents test..
 var languageInfo = {
     "en": {
     }
