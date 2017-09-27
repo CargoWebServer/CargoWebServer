@@ -1,5 +1,5 @@
 var applicationName = document.getElementsByTagName("title")[0].text
-// Fichier contenant les différents test..
+// Fichier contenant les différents test...
 var languageInfo = {
     "en": {
     }
@@ -76,7 +76,7 @@ function main() {
     //testSayHello("Dave")
     //entityDump( "CARGO_ENTITIES", "CargoEntities.Entities")
     //entitiesDump("XPDMXML.ProcessStructureType")
-    //entitiesDump("DT3_informations.Workpoint")
+    entitiesDump("CatalogSchema.CatalogType")
 
     //testEntityQuery()
 

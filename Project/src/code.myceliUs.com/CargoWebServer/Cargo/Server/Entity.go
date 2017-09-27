@@ -39,6 +39,17 @@ type Entity interface {
 	GetUuid() string
 
 	/**
+	 * Get an entity's parent UUID if it have a parent.
+	 */
+	GetParentUuid() string
+
+	/**
+	 * The name of the relation with it parent.
+	 */
+	GetParentLnk() string
+	SetParentLnk(string)
+
+	/**
 	 * If the entity is created by a parent entity.
 	 */
 	GetParentPtr() Entity

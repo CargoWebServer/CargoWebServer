@@ -14,6 +14,8 @@ type Session struct{
 	TYPENAME string
 	/** The parent uuid if there is some. **/
 	ParentUuid string
+	/** The relation name with the parent. **/
+	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
 

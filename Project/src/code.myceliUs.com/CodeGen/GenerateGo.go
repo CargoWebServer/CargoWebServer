@@ -851,7 +851,8 @@ func generateGoClassCode(packageId string) {
 				classStr += "	TYPENAME string\n"
 				classStr += "	/** The parent uuid if there is some. **/\n"
 				classStr += "	ParentUuid string\n"
-
+				classStr += "	/** The relation name with the parent. **/\n"
+				classStr += "	ParentLnk string\n"
 				classStr += "	/** If the entity value has change... **/\n"
 				classStr += "	NeedSave bool\n\n"
 				classStr += "	/** If the entity is fully initialyse **/\n"

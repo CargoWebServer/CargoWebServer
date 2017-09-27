@@ -45,9 +45,7 @@ func generateEntity(packageId string) {
 				classStr += "/** local type **/\n"
 				classStr += "type " + packageId + "_" + class.Name + "Entity struct{\n"
 				classStr += "	/** not the object id, except for the definition **/\n"
-				classStr += "	uuid string\n"
 				classStr += "	parentPtr 			Entity\n"
-				classStr += "	parentUuid 			string\n"
 				classStr += "	childsPtr  			[]Entity\n"
 				classStr += "	childsUuid  		[]string\n"
 				classStr += "	referencesUuid  	[]string\n"
@@ -72,12 +70,24 @@ func generateEntity(packageId string) {
 				classStr += "}\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetUuid()string{\n"
-				classStr += "	return this.uuid\n"
+				classStr += "	return this.object.UUID\n"
+				classStr += "}\n"
+
+				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetParentUuid()string{\n"
+				classStr += "	return this.object.ParentUuid\n"
 				classStr += "}\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetParentPtr()Entity{\n"
 				classStr += "	return this.parentPtr\n"
 				classStr += "}\n\n"
+
+				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) SetParentLnk(lnk string){\n"
+				classStr += "	this.object.ParentLnk = lnk\n"
+				classStr += "}\n\n"
+
+				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetParentLnk()string{\n"
+				classStr += "	return this.object.ParentLnk\n"
+				classStr += "}\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) SetParentPtr(parentPtr Entity){\n"
 				classStr += "	this.parentPtr=parentPtr\n"
@@ -236,7 +246,7 @@ func generateEntity(packageId string) {
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) Exist() bool{\n"
 				classStr += "	var query EntityQuery\n"
 				classStr += "	query.TypeName = \"" + packageId + "." + class.Name + "\"\n"
-				classStr += "	query.Indexs = append(query.Indexs, \"UUID=\"+this.uuid)\n"
+				classStr += "	query.Indexs = append(query.Indexs, \"UUID=\"+this.GetUuid())\n"
 				classStr += "	query.Fields = append(query.Fields, \"UUID\")\n"
 				classStr += "	var fieldsType []interface {} // not use...\n"
 				classStr += "	var params []interface{}\n"
@@ -392,7 +402,6 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "	entity.object.UUID = uuidStr\n"
 	entityConstructorStr += "	entity.object.ParentUuid = parentUuid\n"
 	entityConstructorStr += "	entity.SetInit(false)\n"
-	entityConstructorStr += "	entity.uuid = uuidStr\n"
 	entityConstructorStr += "	this.insert(entity)\n"
 
 	if strings.HasSuffix(className, "_impl") {
@@ -510,6 +519,7 @@ func generateAppendChildFunc(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 
 	functionStr += "	// Set this as parent in the child\n"
 	functionStr += "	child.SetParentPtr(this)\n\n"
+	functionStr += "	child.SetParentLnk(attributeName)\n\n"
 	functionStr += "	params := make([]interface{}, 1)\n"
 	functionStr += "	params[0] = child.GetObject()\n"
 	functionStr += "	attributeName = strings.Replace(attributeName,\"M_\", \"\", -1)\n"
@@ -757,6 +767,14 @@ func generateEntityPrototypeFunc(packageId string, class *XML_Schemas.CMOF_Owned
 	// The parent uuid
 	entityPrototypeStr += "	" + prototypeVar + ".Indexs = append(" + prototypeVar + ".Indexs,\"ParentUuid\")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".Fields = append(" + prototypeVar + ".Fields,\"ParentUuid\")\n"
+	entityPrototypeStr += "	" + prototypeVar + ".FieldsType = append(" + prototypeVar + ".FieldsType,\"xs.string\")\n"
+	entityPrototypeStr += "	" + prototypeVar + ".FieldsOrder = append(" + prototypeVar + ".FieldsOrder," + strconv.Itoa(index) + ")\n"
+	entityPrototypeStr += "	" + prototypeVar + ".FieldsVisibility = append(" + prototypeVar + ".FieldsVisibility,false)\n"
+	entityPrototypeStr += "	" + prototypeVar + ".FieldsDefaultValue = append(" + prototypeVar + ".FieldsDefaultValue,\"\")\n"
+
+	index++
+
+	entityPrototypeStr += "	" + prototypeVar + ".Fields = append(" + prototypeVar + ".Fields,\"ParentLnk\")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsType = append(" + prototypeVar + ".FieldsType,\"xs.string\")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsOrder = append(" + prototypeVar + ".FieldsOrder," + strconv.Itoa(index) + ")\n"
 	entityPrototypeStr += "	" + prototypeVar + ".FieldsVisibility = append(" + prototypeVar + ".FieldsVisibility,false)\n"
@@ -1239,9 +1257,6 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	entityInitStr += "		this.object.IsInit = false\n"
 	entityInitStr += "	}\n"
 
-	// Here If the entity already exist I will it...
-	entityInitStr += "	this.uuid = id\n"
-
 	// Set the lazy initialysation property.
 	entityInitStr += "	this.lazy = lazy\n"
 
@@ -1252,6 +1267,7 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	entityInitStr += "	query.TypeName = \"" + packageId + "." + class.Name + "\"\n\n"
 	entityInitStr += "	query.Fields = append(query.Fields, \"UUID\")\n"
 	entityInitStr += "	query.Fields = append(query.Fields, \"ParentUuid\")\n"
+	entityInitStr += "	query.Fields = append(query.Fields, \"ParentLnk\")\n"
 
 	// Now the fields...
 	entityInitStr += generateEntityQueryFields(class, packageId)
@@ -1263,7 +1279,7 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	entityInitStr += "	query.Fields = append(query.Fields, \"referenced\")\n"
 
 	// The indexation...
-	entityInitStr += "	query.Indexs = append(query.Indexs, \"UUID=\"+this.uuid)\n"
+	entityInitStr += "	query.Indexs = append(query.Indexs, \"UUID=\"+this.GetUuid())\n"
 
 	// In the proto...
 	entityInitStr += "\n	var fieldsType []interface{} // not use...\n"
@@ -1287,16 +1303,15 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 
 	entityInitStr += "\n	/** initialyzation of the entity object **/\n"
 	entityInitStr += "		this.object = new(" + packageId + "." + class.Name + impl + ")\n"
-	entityInitStr += "		this.object.UUID = this.uuid\n"
 	entityInitStr += "		this.object.TYPENAME = \"" + packageId + "." + class.Name + "\"\n\n"
 
 	// Initialisation here...
-	//entityInitStr += "		log.Println(\"initialyzation of " + class.Name + " uuid: \", results[0][0])\n"
+	entityInitStr += "		this.object.UUID = results[0][0].(string)\n"
+	entityInitStr += "		this.object.ParentUuid = results[0][1].(string)\n"
+	entityInitStr += "		this.object.ParentLnk = results[0][2].(string)\n"
 
-	entityInitStr += "		this.parentUuid = results[0][1].(string)\n"
-
-	// 0:uuid 1:parentUuid
-	index := 2
+	// 0:uuid 1:parentUuid 2:parentLnk
+	index := 3
 
 	prototypeVar := strings.ToLower(class.Name[0:1]) + class.Name[1:] + "EntityProto"
 
@@ -1408,7 +1423,7 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 						}
 						entityInfoStr += "			case *" + elementPackName + "." + implementations[i] + impl + ":\n"
 						entityInfoStr += "			" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), v.UUID, v)\n"
-						entityInfoStr += "			" + attribute.Name + "Ids=append(" + attribute.Name + "Ids," + attribute.Name + "Entity.uuid)\n"
+						entityInfoStr += "			" + attribute.Name + "Ids=append(" + attribute.Name + "Ids," + attribute.Name + "Entity.GetUuid())\n"
 						entityInfoStr += "			" + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
 						entityInfoStr += "			this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"
 						entityInfoStr += "			if " + attribute.Name + "Entity.NeedSave() {\n"
@@ -1420,7 +1435,7 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 				} else {
 					elementPackName := membersPackage[typeName]
 					entityInfoStr += "			" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.GetUuid(), this.object.M_" + attribute.Name + "[i].UUID,this.object.M_" + attribute.Name + "[i])\n"
-					entityInfoStr += "			" + attribute.Name + "Ids=append(" + attribute.Name + "Ids," + attribute.Name + "Entity.uuid)\n"
+					entityInfoStr += "			" + attribute.Name + "Ids=append(" + attribute.Name + "Ids," + attribute.Name + "Entity.GetUuid())\n"
 					entityInfoStr += "			" + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
 					entityInfoStr += "			this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"
 					entityInfoStr += "			if " + attribute.Name + "Entity.NeedSave() {\n"
@@ -1491,7 +1506,7 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 
 							entityInfoStr += "		case *" + elementPackName + "." + implementations[i] + impl + ":\n"
 							entityInfoStr += "			" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + implementations[i] + "Entity(this.GetUuid(), v.UUID, v)\n"
-							entityInfoStr += "			" + class.Name + "Info = append(" + class.Name + "Info, " + attribute.Name + "Entity.uuid)\n"
+							entityInfoStr += "			" + class.Name + "Info = append(" + class.Name + "Info, " + attribute.Name + "Entity.GetUuid())\n"
 							entityInfoStr += "		    " + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
 							entityInfoStr += "			this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"
 							entityInfoStr += "			if " + attribute.Name + "Entity.NeedSave() {\n"
@@ -1503,7 +1518,7 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 					} else {
 						elementPackName := membersPackage[typeName]
 						entityInfoStr += "		" + attribute.Name + "Entity:= GetServer().GetEntityManager().New" + elementPackName + typeName + "Entity(this.GetUuid(), this.object.M_" + attribute.Name + ".UUID, this.object.M_" + attribute.Name + ")\n"
-						entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info, " + attribute.Name + "Entity.uuid)\n"
+						entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info, " + attribute.Name + "Entity.GetUuid())\n"
 						entityInfoStr += "		" + attribute.Name + "Entity.AppendReferenced(\"" + attribute.Name + "\", this)\n"
 						entityInfoStr += "		this.AppendChild(\"" + attribute.Name + "\"," + attribute.Name + "Entity)\n"
 						entityInfoStr += "		if " + attribute.Name + "Entity.NeedSave() {\n"
@@ -1550,16 +1565,13 @@ func generateEntitySaveFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	entitySaveStr += "	this.SetNeedSave(false)\n"
 	entitySaveStr += "	this.SetInit(true)\n"
 
-	// So here I will save the entity data...
-	entitySaveStr += "	this.object.UUID = this.uuid\n"
-	entitySaveStr += "	this.object.TYPENAME = \"" + packageId + "." + class.Name + "\"\n\n"
-
 	// Here i will create the user information in the database...
 	entitySaveStr += "	var query EntityQuery\n"
 	entitySaveStr += "	query.TypeName = \"" + packageId + "." + class.Name + "\"\n\n"
 
 	entitySaveStr += "	query.Fields = append(query.Fields, \"UUID\")\n"
 	entitySaveStr += "	query.Fields = append(query.Fields, \"ParentUuid\")\n"
+	entitySaveStr += "	query.Fields = append(query.Fields, \"ParentLnk\")\n"
 
 	// Now the fields...
 	entitySaveStr += generateEntityQueryFields(class, packageId)
@@ -1579,7 +1591,9 @@ func generateEntitySaveFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	// Save it parent uuid
 	entitySaveStr += "	if this.parentPtr != nil {\n"
 	entitySaveStr += "		" + class.Name + "Info = append(" + class.Name + "Info, this.parentPtr.GetUuid())\n"
+	entitySaveStr += "		" + class.Name + "Info = append(" + class.Name + "Info, this.GetParentLnk())\n"
 	entitySaveStr += "	}else{\n"
+	entitySaveStr += "		" + class.Name + "Info = append(" + class.Name + "Info, \"\")\n"
 	entitySaveStr += "		" + class.Name + "Info = append(" + class.Name + "Info, \"\")\n"
 	entitySaveStr += "	}\n"
 
@@ -1638,7 +1652,7 @@ func generateEntitySaveFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	entitySaveStr += "	if this.Exist() == true {\n"
 	entitySaveStr += "		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)\n"
 	entitySaveStr += "		var params []interface{}\n"
-	entitySaveStr += "		query.Indexs = append(query.Indexs, \"UUID=\"+this.uuid)\n"
+	entitySaveStr += "		query.Indexs = append(query.Indexs, \"UUID=\"+this.GetUuid())\n"
 	entitySaveStr += "		queryStr, _ := json.Marshal(query)\n"
 	entitySaveStr += "		err = GetServer().GetDataManager().updateData(" + packageId + "DB, string(queryStr), " + class.Name + "Info, params)\n"
 	entitySaveStr += "	} else {\n"

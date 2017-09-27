@@ -46,6 +46,7 @@ func (this *AccountManager) initialize() {
 
 	// Create the admin account if it doesn't exist
 	adminUuid := CargoEntitiesAccountExists("admin")
+	entities := GetServer().GetEntityManager().getCargoEntities()
 	if len(adminUuid) == 0 {
 		// Create the account in memory.
 		account := new(CargoEntities.Account)
@@ -54,7 +55,7 @@ func (this *AccountManager) initialize() {
 		account.M_name = "admin"
 		account.NeedSave = true
 		account.M_email = ""
-		GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_entities", "CargoEntities.Account", "admin", account)
+		GetServer().GetEntityManager().createEntity(entities.GetUuid(), "M_entities", "CargoEntities.Account", "admin", account)
 	}
 
 	// Create the guest account if it doesn't exist
@@ -67,7 +68,7 @@ func (this *AccountManager) initialize() {
 		account.M_name = "guest"
 		account.M_email = ""
 		account.NeedSave = true
-		GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_entities", "CargoEntities.Account", "guest", account)
+		GetServer().GetEntityManager().createEntity(entities.GetUuid(), "M_entities", "CargoEntities.Account", "guest", account)
 	}
 
 }

@@ -23,12 +23,8 @@ import (
  */
 type DynamicEntity struct {
 
-	// The entity uuid.
-	uuid string
-
 	// Hard link parent->[]childs
 	parentPtr  Entity
-	parentUuid string
 	childsPtr  []Entity
 	childsUuid []string
 
@@ -151,10 +147,10 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 
 	// Here if the enity is nil I will create a new instance.
 	if entity == nil {
+		// Create a new dynamic entity it that case.
 		entity = new(DynamicEntity)
-
 		// If the object contain an id...
-		entity.uuid = values["UUID"].(string)
+		entity.setValue("UUID", values["UUID"].(string))
 
 		// keep the reference to the prototype.
 		entity.prototype = prototype
@@ -193,6 +189,9 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 func (this *DynamicEntity) setValue(field string, value interface{}) {
 	this.Lock()
 	defer this.Unlock()
+	if this.object == nil {
+		this.object = make(map[string]interface{}, 0)
+	}
 	this.object[field] = value
 }
 
@@ -354,7 +353,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 	}
 
 	// I will set the id, (must be a uuid...)
-	this.uuid = id
+	this.setValue("UUID", id)
 
 	typeName := id[0:strings.Index(id, "%")]
 	packageName := typeName[0:strings.Index(typeName, ".")]
@@ -367,7 +366,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 	query.Fields = append(query.Fields, this.prototype.Fields...)
 
 	// The index of search...
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	var fieldsType []interface{} // not use...
 	var params []interface{}
 
@@ -385,17 +384,19 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 
 	// Initialisation of information of Interface...
 	if len(results) > 0 {
-		log.Println("-----> ", results)
+
 		if len(results[0]) == 0 {
-			return errors.New("No value found for entity " + this.uuid)
+			return errors.New("No value found for entity " + this.GetUuid())
 		}
 		// Set the common values...
-		this.setValue("UUID", results[0][0].(string))
 		this.setValue("TYPENAME", typeName) // Set the typeName
 
+		this.setValue("UUID", results[0][0].(string))
+
 		// Set the parent uuid...
-		this.parentUuid = results[0][1].(string)
-		this.setValue("ParentUuid", this.parentUuid) // Set the parent uuid.
+		this.setValue("ParentUuid", results[0][1].(string)) // Set the parent uuid.
+
+		this.setValue("ParentLnk", results[0][2].(string)) // Set the parent relation.
 
 		//init the child...
 		childsUuidStr := results[0][this.prototype.getFieldIndex("childsUuid")].(string)
@@ -403,7 +404,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 		if len(childsUuidStr) > 0 {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
 			if err != nil {
-				log.Println(Utility.FileLine(), " unable to read child uuid! for entity ", this.uuid, " ", childsUuidStr)
+				log.Println(Utility.FileLine(), " unable to read child uuid! for entity ", this.GetUuid(), " ", childsUuidStr)
 				return err
 			}
 		}
@@ -421,7 +422,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 		// Now The value from the prototype...
 		// The first tow field are uuid and parentUuid
 		// and the last tow fields are childsuuid and referenced...
-		for i := 2; i < len(results[0])-2; i++ {
+		for i := 3; i < len(results[0])-2; i++ {
 			fieldName := this.prototype.Fields[i]
 			fieldType := this.prototype.FieldsType[i]
 			isNull := false
@@ -476,6 +477,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 
 							// Only uuid's are accepted value's here.
 							if len(uuids) > 0 {
+								log.Println("---------> uuids found! ", uuids)
 								// Set an empty array here...
 								if Utility.IsValidEntityReferenceName(uuids[0]) && !lazy {
 									this.setValue(fieldName, make([]map[string]interface{}, 0))
@@ -621,10 +623,8 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 
 	if storeId == "sql_info" {
 		// Now I will initialyse references
-		dataManager.setEntityReferences(this.uuid, false)
+		dataManager.setEntityReferences(this.GetUuid(), false)
 	}
-
-	//log.Println("After init:", toJsonStr(this.object))
 	return nil
 }
 
@@ -639,6 +639,7 @@ func (this *DynamicEntity) SaveEntity() {
 func (this *DynamicEntity) saveEntity(path string) {
 	// Do not save if is nt necessary...
 	if !this.NeedSave() || strings.Index(path, this.GetUuid()) != -1 {
+		log.Println("Entity ", this.GetUuid(), " Not need to be save.", this.NeedSave())
 		return
 	}
 
@@ -656,21 +657,20 @@ func (this *DynamicEntity) saveEntity(path string) {
 	DynamicEntityInfo = append(DynamicEntityInfo, this.GetUuid())
 
 	query.Fields = append(query.Fields, "ParentUuid")
-	if len(this.parentUuid) > 0 {
-		DynamicEntityInfo = append(DynamicEntityInfo, this.parentUuid)
-		this.setValue("ParentUuid", this.parentUuid)
-	} else if this.getValue("ParentUuid") != nil {
-		DynamicEntityInfo = append(DynamicEntityInfo, this.getValue("ParentUuid"))
-		this.setValue("ParentUuid", this.getValue("ParentUuid"))
+	query.Fields = append(query.Fields, "ParentLnk")
+
+	if len(this.GetParentUuid()) > 0 {
+		DynamicEntityInfo = append(DynamicEntityInfo, this.GetParentUuid())
+		DynamicEntityInfo = append(DynamicEntityInfo, this.GetParentLnk())
 	} else {
 		DynamicEntityInfo = append(DynamicEntityInfo, "")
-		this.setValue("ParentUuid", "")
+		DynamicEntityInfo = append(DynamicEntityInfo, "")
 	}
 
 	// Now the fields of the object, from the prototype...
 	// The first tow field are uuid and parentUuid
 	// and the last tow fields are childsuuid and referenced...
-	for i := 2; i < len(this.prototype.Fields)-2; i++ {
+	for i := 3; i < len(this.prototype.Fields)-2; i++ {
 		fieldName := this.prototype.Fields[i]
 		fieldType := this.prototype.FieldsType[i]
 
@@ -763,8 +763,10 @@ func (this *DynamicEntity) saveEntity(path string) {
 							// Append the referenced...
 							GetServer().GetEntityManager().appendReferenced(fieldName, this.GetUuid(), id)
 						}
+
 						refUuidsStr, _ := json.Marshal(refUuids)
 						DynamicEntityInfo = append(DynamicEntityInfo, string(refUuidsStr))
+
 					} else {
 						// In the case of object.
 						if reflect.TypeOf(this.getValue(fieldName)).String() == "[]map[string]interface {}" {
@@ -786,11 +788,11 @@ func (this *DynamicEntity) saveEntity(path string) {
 								if err != nil {
 									// In that case I will try with dynamic entity.
 									// I will create the sub value...
-									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.uuid, subValues)
+									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.GetUuid(), subValues)
 									if errObj == nil {
 										subEntity.AppendReferenced(fieldName, this)
 										this.AppendChild(fieldName, subEntity)
-										subEntityIds = append(subEntityIds, subEntity.uuid)
+										subEntityIds = append(subEntityIds, subEntity.GetUuid())
 										if subEntity.NeedSave() {
 											subEntity.saveEntity(path + "|" + this.GetUuid())
 										}
@@ -807,7 +809,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 							}
 							subEntityIdsStr, _ := json.Marshal(subEntityIds)
 							DynamicEntityInfo = append(DynamicEntityInfo, string(subEntityIdsStr))
-
 						} else if reflect.TypeOf(this.getValue(fieldName)).String() == "[]interface {}" {
 							subEntityIds := make([]string, 0)
 							for j := 0; j < len(this.getValue(fieldName).([]interface{})); j++ {
@@ -829,11 +830,11 @@ func (this *DynamicEntity) saveEntity(path string) {
 									if err != nil {
 										// In that case I will try with dynamic entity.
 										// I will create the sub value...
-										subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.uuid, subValues)
+										subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.GetUuid(), subValues)
 										if errObj == nil {
 											subEntity.AppendReferenced(fieldName, this)
 											this.AppendChild(fieldName, subEntity)
-											subEntityIds = append(subEntityIds, subEntity.uuid)
+											subEntityIds = append(subEntityIds, subEntity.GetUuid())
 											if subEntity.NeedSave() {
 												subEntity.saveEntity(path + "|" + this.GetUuid())
 											}
@@ -979,11 +980,11 @@ func (this *DynamicEntity) saveEntity(path string) {
 								if err != nil {
 									// In that case I will try with dynamic entity.
 									// I will create the sub value...
-									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.uuid, subValues)
+									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.GetUuid(), subValues)
 									if errObj == nil {
 										subEntity.AppendReferenced(fieldName, this)
 										this.AppendChild(fieldName, subEntity)
-										DynamicEntityInfo = append(DynamicEntityInfo, subEntity.uuid)
+										DynamicEntityInfo = append(DynamicEntityInfo, subEntity.GetUuid())
 										if subEntity.NeedSave() {
 											subEntity.saveEntity(path + "|" + this.GetUuid())
 										}
@@ -1048,11 +1049,11 @@ func (this *DynamicEntity) saveEntity(path string) {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(storeId, string(queryStr), DynamicEntityInfo, params)
 	} else {
-		log.Println("-----> ", this.uuid, " not exist!")
+		log.Println("-----> ", this.GetUuid(), " not exist!")
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 		// Save the values for that entity.
 		queryStr, _ := json.Marshal(query)
@@ -1062,7 +1063,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	if err == nil {
 		if storeId == "sql_info" {
 			// Now I will initialyse references
-			dataManager.setEntityReferences(this.uuid, false)
+			dataManager.setEntityReferences(this.GetUuid(), false)
 		}
 		// Send the event.
 		GetServer().GetEventManager().BroadcastEvent(evt)
@@ -1150,7 +1151,22 @@ func (this *DynamicEntity) GetPackageName() string {
  * Each entity must have one uuid.
  */
 func (this *DynamicEntity) GetUuid() string {
-	return this.uuid
+	return this.getValue("UUID").(string)
+}
+
+func (this *DynamicEntity) GetParentUuid() string {
+	return this.getValue("ParentUuid").(string)
+}
+
+/**
+ * The name of the relation with it parent.
+ */
+func (this *DynamicEntity) GetParentLnk() string {
+	return this.getValue("ParentLnk").(string)
+}
+
+func (this *DynamicEntity) SetParentLnk(lnk string) {
+	this.setValue("ParentLnk", lnk)
 }
 
 /**
@@ -1161,7 +1177,7 @@ func (this *DynamicEntity) GetParentPtr() Entity {
 }
 
 func (this *DynamicEntity) SetParentPtr(parent Entity) {
-	this.parentUuid = parent.GetUuid()
+	this.setValue("ParentUuid", parent.GetUuid())
 	this.parentPtr = parent
 }
 
@@ -1276,6 +1292,9 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 
 	// Append referenced.
 	child.AppendReferenced(attributeName, this)
+
+	// Set the parent Lnk.
+	child.(*DynamicEntity).setValue("ParentLnk", attributeName)
 
 	// I will retreive the field type.
 	fieldTypeIndex := this.prototype.getFieldIndex(attributeName)
@@ -1664,7 +1683,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 									subEntity.(*DynamicEntity).SetObjectValues(subValues)
 								} else {
 									var errObj *CargoEntities.Error
-									subEntity, errObj = GetServer().GetEntityManager().newDynamicEntity(this.uuid, subValues)
+									subEntity, errObj = GetServer().GetEntityManager().newDynamicEntity(this.GetUuid(), subValues)
 									if errObj == nil {
 										this.setValue(k, subEntity.GetObject())
 									}
@@ -1804,6 +1823,14 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 											// the json parser transform all numerical value to float... that not what we want here...
 											val := int32(v.(float64))
 											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Int16 && reflect.TypeOf(v).Kind() == reflect.Float64 {
+											// the json parser transform all numerical value to float... that not what we want here...
+											val := int16(v.(float64))
+											this.setValue(k, val)
+										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.Int8 && reflect.TypeOf(v).Kind() == reflect.Float64 {
+											// the json parser transform all numerical value to float... that not what we want here...
+											val := int8(v.(float64))
+											this.setValue(k, val)
 										} else if reflect.TypeOf(this.getValue(k)).Kind() == reflect.String && reflect.TypeOf(v).Kind() == reflect.Float64 {
 											val := Utility.ToString(v)
 											this.setValue(k, val)
@@ -1894,7 +1921,7 @@ func (this *DynamicEntity) Exist() bool {
 
 	var query EntityQuery
 	query.TypeName = this.GetTypeName()
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, this.prototype.Ids...) // Get all it ids...
 	var fieldsType []interface{}                               // not use...
 	var params []interface{}
@@ -1908,7 +1935,7 @@ func (this *DynamicEntity) Exist() bool {
 
 	results, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
 	if err != nil || len(results) == 0 {
-		log.Println("--------------------> Not exist: ", this.uuid)
+		log.Println("--------------------> Not exist: ", this.GetUuid())
 		return false
 	}
 

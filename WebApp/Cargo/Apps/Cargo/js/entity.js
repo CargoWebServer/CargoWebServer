@@ -437,7 +437,7 @@ function setSubObject(parent, property, values, isArray) {
             }
 
             object.ParentUuid = parent.UUID
-            object.parentLnk = property
+            object.ParentLnk = property
             server.entityManager.setEntity(object)
 
         },
@@ -623,7 +623,8 @@ function setObjectValues(object, values) {
     object.exist = true
     object.IsInit = true // The object part only and not the refs...
     object.ParentUuid = values.ParentUuid // set the parent uuid.
-
+    object.ParentLnk = values.ParentLnk
+    
     // Set the initialyse object.
     server.entityManager.setEntity(object)
 

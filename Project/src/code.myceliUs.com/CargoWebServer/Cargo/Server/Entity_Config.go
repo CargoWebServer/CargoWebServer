@@ -4,12 +4,12 @@ package Server
 
 import (
 	"encoding/json"
-	//	"log"
-	"strings"
-	"unsafe"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
+	//"log"
+	"strings"
+	"unsafe"
 )
 
 /** Entity Prototype creation **/
@@ -18,14 +18,14 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ScheduledTask")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "UUID")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "UUID")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -38,23 +38,28 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	configurationEntityProto.FieldsOrder = append(configurationEntityProto.FieldsOrder, 1)
 	configurationEntityProto.FieldsVisibility = append(configurationEntityProto.FieldsVisibility, false)
 	configurationEntityProto.FieldsDefaultValue = append(configurationEntityProto.FieldsDefaultValue, "")
+	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "ParentLnk")
+	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
+	configurationEntityProto.FieldsOrder = append(configurationEntityProto.FieldsOrder, 2)
+	configurationEntityProto.FieldsVisibility = append(configurationEntityProto.FieldsVisibility, false)
+	configurationEntityProto.FieldsDefaultValue = append(configurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of Configuration **/
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "M_id")
-	configurationEntityProto.FieldsOrder = append(configurationEntityProto.FieldsOrder, 2)
+	configurationEntityProto.FieldsOrder = append(configurationEntityProto.FieldsOrder, 3)
 	configurationEntityProto.FieldsVisibility = append(configurationEntityProto.FieldsVisibility, true)
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "M_id")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.ID")
 	configurationEntityProto.FieldsDefaultValue = append(configurationEntityProto.FieldsDefaultValue, "")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "childsUuid")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "[]xs.string")
-	configurationEntityProto.FieldsOrder = append(configurationEntityProto.FieldsOrder, 3)
+	configurationEntityProto.FieldsOrder = append(configurationEntityProto.FieldsOrder, 4)
 	configurationEntityProto.FieldsVisibility = append(configurationEntityProto.FieldsVisibility, false)
 
 	configurationEntityProto.FieldsDefaultValue = append(configurationEntityProto.FieldsDefaultValue, "[]")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "referenced")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "[]EntityRef")
-	configurationEntityProto.FieldsOrder = append(configurationEntityProto.FieldsOrder, 4)
+	configurationEntityProto.FieldsOrder = append(configurationEntityProto.FieldsOrder, 5)
 	configurationEntityProto.FieldsVisibility = append(configurationEntityProto.FieldsVisibility, false)
 	configurationEntityProto.FieldsDefaultValue = append(configurationEntityProto.FieldsDefaultValue, "[]")
 
@@ -69,9 +74,7 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 /** local type **/
 type Config_SmtpConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -149,7 +152,6 @@ func (this *EntityManager) NewConfigSmtpConfigurationEntity(parentUuid string, o
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -160,12 +162,22 @@ func (this *Config_SmtpConfigurationEntity) GetTypeName() string {
 	return "Config.SmtpConfiguration"
 }
 func (this *Config_SmtpConfigurationEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_SmtpConfigurationEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_SmtpConfigurationEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_SmtpConfigurationEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_SmtpConfigurationEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_SmtpConfigurationEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -319,7 +331,7 @@ func (this *Config_SmtpConfigurationEntity) GetChecksum() string {
 func (this *Config_SmtpConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.SmtpConfiguration"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -357,49 +369,54 @@ func (this *EntityManager) create_Config_SmtpConfigurationEntityPrototype() {
 	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 1)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, false)
 	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "")
+	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "ParentLnk")
+	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "xs.string")
+	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 2)
+	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, false)
+	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of Configuration **/
 	smtpConfigurationEntityProto.Ids = append(smtpConfigurationEntityProto.Ids, "M_id")
-	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 2)
+	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 3)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, true)
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "M_id")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "xs.ID")
 	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of SmtpConfiguration **/
-	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 3)
+	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 4)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, true)
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "M_textEncoding")
 	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "Encoding_UTF8")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "enum:Encoding_UTF8:Encoding_WINDOWS_1250:Encoding_WINDOWS_1251:Encoding_WINDOWS_1252:Encoding_WINDOWS_1253:Encoding_WINDOWS_1254:Encoding_WINDOWS_1255:Encoding_WINDOWS_1256:Encoding_WINDOWS_1257:Encoding_WINDOWS_1258:Encoding_ISO8859_1:Encoding_ISO8859_2:Encoding_ISO8859_3:Encoding_ISO8859_4:Encoding_ISO8859_5:Encoding_ISO8859_6:Encoding_ISO8859_7:Encoding_ISO8859_8:Encoding_ISO8859_9:Encoding_ISO8859_10:Encoding_ISO8859_13:Encoding_ISO8859_14:Encoding_ISO8859_15:Encoding_ISO8859_16:Encoding_KOI8R:Encoding_KOI8U")
-	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 4)
+	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 5)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, true)
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "M_hostName")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "xs.string")
 	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "")
-	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 5)
+	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 6)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, true)
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "M_ipv4")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "xs.string")
 	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "")
-	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 6)
+	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 7)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, true)
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "M_port")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "xs.int")
 	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "0")
-	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 7)
+	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 8)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, true)
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "M_user")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "xs.string")
 	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "")
-	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 8)
+	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 9)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, true)
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "M_pwd")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "xs.string")
 	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** associations of SmtpConfiguration **/
-	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 9)
+	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 10)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, false)
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "M_parentPtr")
 	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "undefined")
@@ -407,13 +424,13 @@ func (this *EntityManager) create_Config_SmtpConfigurationEntityPrototype() {
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "childsUuid")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "[]xs.string")
-	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 10)
+	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 11)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, false)
 
 	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "[]")
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "referenced")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "[]EntityRef")
-	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 11)
+	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 12)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, false)
 	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "[]")
 
@@ -430,14 +447,12 @@ func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.SmtpConfiguration"
-
 	var query EntityQuery
 	query.TypeName = "Config.SmtpConfiguration"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -460,7 +475,9 @@ func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 	SmtpConfigurationInfo = append(SmtpConfigurationInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		SmtpConfigurationInfo = append(SmtpConfigurationInfo, this.parentPtr.GetUuid())
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, this.GetParentLnk())
 	} else {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, "")
 		SmtpConfigurationInfo = append(SmtpConfigurationInfo, "")
 	}
 
@@ -553,7 +570,7 @@ func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), SmtpConfigurationInfo, params)
 	} else {
@@ -580,7 +597,6 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string, lazy bool) err
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -589,6 +605,7 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string, lazy bool) err
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -606,7 +623,7 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string, lazy bool) err
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -623,23 +640,24 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string, lazy bool) err
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.SmtpConfiguration)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.SmtpConfiguration"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of Configuration **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** members of SmtpConfiguration **/
 
 		/** textEncoding **/
-		if results[0][3] != nil {
-			enumIndex := results[0][3].(int)
+		if results[0][4] != nil {
+			enumIndex := results[0][4].(int)
 			if enumIndex == 0 {
 				this.object.M_textEncoding = Config.Encoding_UTF8
 			} else if enumIndex == 1 {
@@ -696,35 +714,35 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string, lazy bool) err
 		}
 
 		/** hostName **/
-		if results[0][4] != nil {
-			this.object.M_hostName = results[0][4].(string)
+		if results[0][5] != nil {
+			this.object.M_hostName = results[0][5].(string)
 		}
 
 		/** ipv4 **/
-		if results[0][5] != nil {
-			this.object.M_ipv4 = results[0][5].(string)
+		if results[0][6] != nil {
+			this.object.M_ipv4 = results[0][6].(string)
 		}
 
 		/** port **/
-		if results[0][6] != nil {
-			this.object.M_port = results[0][6].(int)
+		if results[0][7] != nil {
+			this.object.M_port = results[0][7].(int)
 		}
 
 		/** user **/
-		if results[0][7] != nil {
-			this.object.M_user = results[0][7].(string)
+		if results[0][8] != nil {
+			this.object.M_user = results[0][8].(string)
 		}
 
 		/** pwd **/
-		if results[0][8] != nil {
-			this.object.M_pwd = results[0][8].(string)
+		if results[0][9] != nil {
+			this.object.M_pwd = results[0][9].(string)
 		}
 
 		/** associations of SmtpConfiguration **/
 
 		/** parentPtr **/
-		if results[0][9] != nil {
-			id := results[0][9].(string)
+		if results[0][10] != nil {
+			id := results[0][10].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -732,7 +750,7 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string, lazy bool) err
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][10].(string)
+		childsUuidStr := results[0][11].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -741,7 +759,7 @@ func (this *Config_SmtpConfigurationEntity) InitEntity(id string, lazy bool) err
 			}
 		}
 
-		referencedStr := results[0][11].(string)
+		referencedStr := results[0][12].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -807,6 +825,8 @@ func (this *Config_SmtpConfigurationEntity) AppendChild(attributeName string, ch
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -845,9 +865,7 @@ func (this *Config_SmtpConfigurationEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_DataStoreConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -925,7 +943,6 @@ func (this *EntityManager) NewConfigDataStoreConfigurationEntity(parentUuid stri
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -936,12 +953,22 @@ func (this *Config_DataStoreConfigurationEntity) GetTypeName() string {
 	return "Config.DataStoreConfiguration"
 }
 func (this *Config_DataStoreConfigurationEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_DataStoreConfigurationEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_DataStoreConfigurationEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_DataStoreConfigurationEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_DataStoreConfigurationEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_DataStoreConfigurationEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -1095,7 +1122,7 @@ func (this *Config_DataStoreConfigurationEntity) GetChecksum() string {
 func (this *Config_DataStoreConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.DataStoreConfiguration"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -1133,59 +1160,64 @@ func (this *EntityManager) create_Config_DataStoreConfigurationEntityPrototype()
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 1)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, false)
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
+	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "ParentLnk")
+	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 2)
+	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, false)
+	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of Configuration **/
 	dataStoreConfigurationEntityProto.Ids = append(dataStoreConfigurationEntityProto.Ids, "M_id")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 2)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 3)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_id")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.ID")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of DataStoreConfiguration **/
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 3)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 4)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_dataStoreType")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "DataStoreType_SQL_STORE")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "enum:DataStoreType_SQL_STORE:DataStoreType_KEY_VALUE_STORE")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 4)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 5)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_dataStoreVendor")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "DataStoreVendor_MYCELIUS")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "enum:DataStoreVendor_MYCELIUS:DataStoreVendor_MYSQL:DataStoreVendor_MSSQL:DataStoreVendor_ODBC:DataStoreVendor_KNOWLEDGEBASE")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 5)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 6)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_textEncoding")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "Encoding_UTF8")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "enum:Encoding_UTF8:Encoding_WINDOWS_1250:Encoding_WINDOWS_1251:Encoding_WINDOWS_1252:Encoding_WINDOWS_1253:Encoding_WINDOWS_1254:Encoding_WINDOWS_1255:Encoding_WINDOWS_1256:Encoding_WINDOWS_1257:Encoding_WINDOWS_1258:Encoding_ISO8859_1:Encoding_ISO8859_2:Encoding_ISO8859_3:Encoding_ISO8859_4:Encoding_ISO8859_5:Encoding_ISO8859_6:Encoding_ISO8859_7:Encoding_ISO8859_8:Encoding_ISO8859_9:Encoding_ISO8859_10:Encoding_ISO8859_13:Encoding_ISO8859_14:Encoding_ISO8859_15:Encoding_ISO8859_16:Encoding_KOI8R:Encoding_KOI8U")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 6)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 7)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_hostName")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 7)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 8)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_ipv4")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 8)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 9)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_user")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 9)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 10)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_pwd")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 10)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 11)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_port")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.int")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "0")
 
 	/** associations of DataStoreConfiguration **/
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 11)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 12)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, false)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_parentPtr")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "undefined")
@@ -1193,13 +1225,13 @@ func (this *EntityManager) create_Config_DataStoreConfigurationEntityPrototype()
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "childsUuid")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "[]xs.string")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 12)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 13)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, false)
 
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "[]")
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "referenced")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "[]EntityRef")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 13)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 14)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, false)
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "[]")
 
@@ -1216,14 +1248,12 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.DataStoreConfiguration"
-
 	var query EntityQuery
 	query.TypeName = "Config.DataStoreConfiguration"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -1248,7 +1278,9 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.parentPtr.GetUuid())
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.GetParentLnk())
 	} else {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, "")
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, "")
 	}
 
@@ -1365,7 +1397,7 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), DataStoreConfigurationInfo, params)
 	} else {
@@ -1392,7 +1424,6 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -1401,6 +1432,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -1420,7 +1452,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -1437,23 +1469,24 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.DataStoreConfiguration)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.DataStoreConfiguration"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of Configuration **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** members of DataStoreConfiguration **/
 
 		/** dataStoreType **/
-		if results[0][3] != nil {
-			enumIndex := results[0][3].(int)
+		if results[0][4] != nil {
+			enumIndex := results[0][4].(int)
 			if enumIndex == 0 {
 				this.object.M_dataStoreType = Config.DataStoreType_SQL_STORE
 			} else if enumIndex == 1 {
@@ -1462,8 +1495,8 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 		}
 
 		/** dataStoreVendor **/
-		if results[0][4] != nil {
-			enumIndex := results[0][4].(int)
+		if results[0][5] != nil {
+			enumIndex := results[0][5].(int)
 			if enumIndex == 0 {
 				this.object.M_dataStoreVendor = Config.DataStoreVendor_MYCELIUS
 			} else if enumIndex == 1 {
@@ -1478,8 +1511,8 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 		}
 
 		/** textEncoding **/
-		if results[0][5] != nil {
-			enumIndex := results[0][5].(int)
+		if results[0][6] != nil {
+			enumIndex := results[0][6].(int)
 			if enumIndex == 0 {
 				this.object.M_textEncoding = Config.Encoding_UTF8
 			} else if enumIndex == 1 {
@@ -1536,35 +1569,35 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 		}
 
 		/** hostName **/
-		if results[0][6] != nil {
-			this.object.M_hostName = results[0][6].(string)
+		if results[0][7] != nil {
+			this.object.M_hostName = results[0][7].(string)
 		}
 
 		/** ipv4 **/
-		if results[0][7] != nil {
-			this.object.M_ipv4 = results[0][7].(string)
+		if results[0][8] != nil {
+			this.object.M_ipv4 = results[0][8].(string)
 		}
 
 		/** user **/
-		if results[0][8] != nil {
-			this.object.M_user = results[0][8].(string)
+		if results[0][9] != nil {
+			this.object.M_user = results[0][9].(string)
 		}
 
 		/** pwd **/
-		if results[0][9] != nil {
-			this.object.M_pwd = results[0][9].(string)
+		if results[0][10] != nil {
+			this.object.M_pwd = results[0][10].(string)
 		}
 
 		/** port **/
-		if results[0][10] != nil {
-			this.object.M_port = results[0][10].(int)
+		if results[0][11] != nil {
+			this.object.M_port = results[0][11].(int)
 		}
 
 		/** associations of DataStoreConfiguration **/
 
 		/** parentPtr **/
-		if results[0][11] != nil {
-			id := results[0][11].(string)
+		if results[0][12] != nil {
+			id := results[0][12].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -1572,7 +1605,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][12].(string)
+		childsUuidStr := results[0][13].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -1581,7 +1614,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 			}
 		}
 
-		referencedStr := results[0][13].(string)
+		referencedStr := results[0][14].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -1647,6 +1680,8 @@ func (this *Config_DataStoreConfigurationEntity) AppendChild(attributeName strin
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -1685,9 +1720,7 @@ func (this *Config_DataStoreConfigurationEntity) AppendReference(reference Entit
 /** local type **/
 type Config_LdapConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -1765,7 +1798,6 @@ func (this *EntityManager) NewConfigLdapConfigurationEntity(parentUuid string, o
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -1776,12 +1808,22 @@ func (this *Config_LdapConfigurationEntity) GetTypeName() string {
 	return "Config.LdapConfiguration"
 }
 func (this *Config_LdapConfigurationEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_LdapConfigurationEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_LdapConfigurationEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_LdapConfigurationEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_LdapConfigurationEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_LdapConfigurationEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -1935,7 +1977,7 @@ func (this *Config_LdapConfigurationEntity) GetChecksum() string {
 func (this *Config_LdapConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.LdapConfiguration"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -1973,54 +2015,59 @@ func (this *EntityManager) create_Config_LdapConfigurationEntityPrototype() {
 	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 1)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, false)
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "")
+	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "ParentLnk")
+	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "xs.string")
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 2)
+	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, false)
+	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of Configuration **/
 	ldapConfigurationEntityProto.Ids = append(ldapConfigurationEntityProto.Ids, "M_id")
-	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 2)
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 3)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, true)
 	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "M_id")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "xs.ID")
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of LdapConfiguration **/
-	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 3)
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 4)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, true)
 	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "M_hostName")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "xs.string")
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "")
-	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 4)
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 5)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, true)
 	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "M_ipv4")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "xs.string")
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "")
-	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 5)
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 6)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, true)
 	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "M_port")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "xs.int")
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "0")
-	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 6)
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 7)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, true)
 	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "M_user")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "xs.string")
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "")
-	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 7)
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 8)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, true)
 	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "M_pwd")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "xs.string")
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "")
-	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 8)
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 9)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, true)
 	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "M_domain")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "xs.string")
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "")
-	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 9)
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 10)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, true)
 	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "M_searchBase")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "xs.string")
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** associations of LdapConfiguration **/
-	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 10)
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 11)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, false)
 	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "M_parentPtr")
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "undefined")
@@ -2028,13 +2075,13 @@ func (this *EntityManager) create_Config_LdapConfigurationEntityPrototype() {
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "childsUuid")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "[]xs.string")
-	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 11)
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 12)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, false)
 
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "[]")
 	ldapConfigurationEntityProto.Fields = append(ldapConfigurationEntityProto.Fields, "referenced")
 	ldapConfigurationEntityProto.FieldsType = append(ldapConfigurationEntityProto.FieldsType, "[]EntityRef")
-	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 12)
+	ldapConfigurationEntityProto.FieldsOrder = append(ldapConfigurationEntityProto.FieldsOrder, 13)
 	ldapConfigurationEntityProto.FieldsVisibility = append(ldapConfigurationEntityProto.FieldsVisibility, false)
 	ldapConfigurationEntityProto.FieldsDefaultValue = append(ldapConfigurationEntityProto.FieldsDefaultValue, "[]")
 
@@ -2051,14 +2098,12 @@ func (this *Config_LdapConfigurationEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.LdapConfiguration"
-
 	var query EntityQuery
 	query.TypeName = "Config.LdapConfiguration"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2082,7 +2127,9 @@ func (this *Config_LdapConfigurationEntity) SaveEntity() {
 	LdapConfigurationInfo = append(LdapConfigurationInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		LdapConfigurationInfo = append(LdapConfigurationInfo, this.parentPtr.GetUuid())
+		LdapConfigurationInfo = append(LdapConfigurationInfo, this.GetParentLnk())
 	} else {
+		LdapConfigurationInfo = append(LdapConfigurationInfo, "")
 		LdapConfigurationInfo = append(LdapConfigurationInfo, "")
 	}
 
@@ -2120,7 +2167,7 @@ func (this *Config_LdapConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), LdapConfigurationInfo, params)
 	} else {
@@ -2147,7 +2194,6 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string, lazy bool) err
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -2156,6 +2202,7 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string, lazy bool) err
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2174,7 +2221,7 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string, lazy bool) err
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -2191,60 +2238,61 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string, lazy bool) err
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.LdapConfiguration)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.LdapConfiguration"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of Configuration **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** members of LdapConfiguration **/
 
 		/** hostName **/
-		if results[0][3] != nil {
-			this.object.M_hostName = results[0][3].(string)
+		if results[0][4] != nil {
+			this.object.M_hostName = results[0][4].(string)
 		}
 
 		/** ipv4 **/
-		if results[0][4] != nil {
-			this.object.M_ipv4 = results[0][4].(string)
+		if results[0][5] != nil {
+			this.object.M_ipv4 = results[0][5].(string)
 		}
 
 		/** port **/
-		if results[0][5] != nil {
-			this.object.M_port = results[0][5].(int)
+		if results[0][6] != nil {
+			this.object.M_port = results[0][6].(int)
 		}
 
 		/** user **/
-		if results[0][6] != nil {
-			this.object.M_user = results[0][6].(string)
+		if results[0][7] != nil {
+			this.object.M_user = results[0][7].(string)
 		}
 
 		/** pwd **/
-		if results[0][7] != nil {
-			this.object.M_pwd = results[0][7].(string)
+		if results[0][8] != nil {
+			this.object.M_pwd = results[0][8].(string)
 		}
 
 		/** domain **/
-		if results[0][8] != nil {
-			this.object.M_domain = results[0][8].(string)
+		if results[0][9] != nil {
+			this.object.M_domain = results[0][9].(string)
 		}
 
 		/** searchBase **/
-		if results[0][9] != nil {
-			this.object.M_searchBase = results[0][9].(string)
+		if results[0][10] != nil {
+			this.object.M_searchBase = results[0][10].(string)
 		}
 
 		/** associations of LdapConfiguration **/
 
 		/** parentPtr **/
-		if results[0][10] != nil {
-			id := results[0][10].(string)
+		if results[0][11] != nil {
+			id := results[0][11].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -2252,7 +2300,7 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string, lazy bool) err
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][11].(string)
+		childsUuidStr := results[0][12].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -2261,7 +2309,7 @@ func (this *Config_LdapConfigurationEntity) InitEntity(id string, lazy bool) err
 			}
 		}
 
-		referencedStr := results[0][12].(string)
+		referencedStr := results[0][13].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -2327,6 +2375,8 @@ func (this *Config_LdapConfigurationEntity) AppendChild(attributeName string, ch
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -2365,9 +2415,7 @@ func (this *Config_LdapConfigurationEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2ClientEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -2445,7 +2493,6 @@ func (this *EntityManager) NewConfigOAuth2ClientEntity(parentUuid string, object
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -2456,12 +2503,22 @@ func (this *Config_OAuth2ClientEntity) GetTypeName() string {
 	return "Config.OAuth2Client"
 }
 func (this *Config_OAuth2ClientEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_OAuth2ClientEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_OAuth2ClientEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_OAuth2ClientEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_OAuth2ClientEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_OAuth2ClientEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -2615,7 +2672,7 @@ func (this *Config_OAuth2ClientEntity) GetChecksum() string {
 func (this *Config_OAuth2ClientEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Client"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -2652,42 +2709,47 @@ func (this *EntityManager) create_Config_OAuth2ClientEntityPrototype() {
 	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 1)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, false)
 	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "")
+	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "ParentLnk")
+	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 2)
+	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, false)
+	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "")
 
 	/** members of OAuth2Client **/
 	oAuth2ClientEntityProto.Ids = append(oAuth2ClientEntityProto.Ids, "M_id")
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 2)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 3)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_id")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.ID")
 	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "")
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 3)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 4)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_secret")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
 	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "")
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 4)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 5)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_redirectUri")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
 	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "")
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 5)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 6)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_tokenUri")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
 	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "")
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 6)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 7)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_authorizationUri")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.string")
 	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "")
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 7)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 8)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, true)
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_extra")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "xs.[]uint8")
 	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "undefined")
 
 	/** associations of OAuth2Client **/
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 8)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 9)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, false)
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "M_parentPtr")
 	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "undefined")
@@ -2695,13 +2757,13 @@ func (this *EntityManager) create_Config_OAuth2ClientEntityPrototype() {
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "Config.OAuth2Configuration:Ref")
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "childsUuid")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "[]xs.string")
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 9)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 10)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, false)
 
 	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "[]")
 	oAuth2ClientEntityProto.Fields = append(oAuth2ClientEntityProto.Fields, "referenced")
 	oAuth2ClientEntityProto.FieldsType = append(oAuth2ClientEntityProto.FieldsType, "[]EntityRef")
-	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 10)
+	oAuth2ClientEntityProto.FieldsOrder = append(oAuth2ClientEntityProto.FieldsOrder, 11)
 	oAuth2ClientEntityProto.FieldsVisibility = append(oAuth2ClientEntityProto.FieldsVisibility, false)
 	oAuth2ClientEntityProto.FieldsDefaultValue = append(oAuth2ClientEntityProto.FieldsDefaultValue, "[]")
 
@@ -2718,14 +2780,12 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.OAuth2Client"
-
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Client"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2Client **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2745,7 +2805,9 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	OAuth2ClientInfo = append(OAuth2ClientInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		OAuth2ClientInfo = append(OAuth2ClientInfo, this.parentPtr.GetUuid())
+		OAuth2ClientInfo = append(OAuth2ClientInfo, this.GetParentLnk())
 	} else {
+		OAuth2ClientInfo = append(OAuth2ClientInfo, "")
 		OAuth2ClientInfo = append(OAuth2ClientInfo, "")
 	}
 
@@ -2779,7 +2841,7 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2ClientInfo, params)
 	} else {
@@ -2806,7 +2868,6 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string, lazy bool) error {
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -2815,6 +2876,7 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2Client **/
 	query.Fields = append(query.Fields, "M_id")
@@ -2829,7 +2891,7 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -2846,48 +2908,49 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string, lazy bool) error {
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.OAuth2Client)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.OAuth2Client"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of OAuth2Client **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** secret **/
-		if results[0][3] != nil {
-			this.object.M_secret = results[0][3].(string)
+		if results[0][4] != nil {
+			this.object.M_secret = results[0][4].(string)
 		}
 
 		/** redirectUri **/
-		if results[0][4] != nil {
-			this.object.M_redirectUri = results[0][4].(string)
+		if results[0][5] != nil {
+			this.object.M_redirectUri = results[0][5].(string)
 		}
 
 		/** tokenUri **/
-		if results[0][5] != nil {
-			this.object.M_tokenUri = results[0][5].(string)
+		if results[0][6] != nil {
+			this.object.M_tokenUri = results[0][6].(string)
 		}
 
 		/** authorizationUri **/
-		if results[0][6] != nil {
-			this.object.M_authorizationUri = results[0][6].(string)
+		if results[0][7] != nil {
+			this.object.M_authorizationUri = results[0][7].(string)
 		}
 
 		/** extra **/
-		if results[0][7] != nil {
-			this.object.M_extra = results[0][7].([]uint8)
+		if results[0][8] != nil {
+			this.object.M_extra = results[0][8].([]uint8)
 		}
 
 		/** associations of OAuth2Client **/
 
 		/** parentPtr **/
-		if results[0][8] != nil {
-			id := results[0][8].(string)
+		if results[0][9] != nil {
+			id := results[0][9].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Configuration"
 				id_ := refTypeName + "$$" + id
@@ -2895,7 +2958,7 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][9].(string)
+		childsUuidStr := results[0][10].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -2904,7 +2967,7 @@ func (this *Config_OAuth2ClientEntity) InitEntity(id string, lazy bool) error {
 			}
 		}
 
-		referencedStr := results[0][10].(string)
+		referencedStr := results[0][11].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -2970,6 +3033,8 @@ func (this *Config_OAuth2ClientEntity) AppendChild(attributeName string, child E
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -3008,9 +3073,7 @@ func (this *Config_OAuth2ClientEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2AuthorizeEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -3088,7 +3151,6 @@ func (this *EntityManager) NewConfigOAuth2AuthorizeEntity(parentUuid string, obj
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -3099,12 +3161,22 @@ func (this *Config_OAuth2AuthorizeEntity) GetTypeName() string {
 	return "Config.OAuth2Authorize"
 }
 func (this *Config_OAuth2AuthorizeEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_OAuth2AuthorizeEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_OAuth2AuthorizeEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_OAuth2AuthorizeEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_OAuth2AuthorizeEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_OAuth2AuthorizeEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -3258,7 +3330,7 @@ func (this *Config_OAuth2AuthorizeEntity) GetChecksum() string {
 func (this *Config_OAuth2AuthorizeEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Authorize"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -3295,60 +3367,65 @@ func (this *EntityManager) create_Config_OAuth2AuthorizeEntityPrototype() {
 	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 1)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, false)
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "")
+	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "ParentLnk")
+	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 2)
+	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, false)
+	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "")
 
 	/** members of OAuth2Authorize **/
 	oAuth2AuthorizeEntityProto.Ids = append(oAuth2AuthorizeEntityProto.Ids, "M_id")
-	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 2)
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 3)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_id")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.ID")
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "")
-	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 3)
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 4)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_client")
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "Config.OAuth2Client:Ref")
-	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 4)
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 5)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_expiresIn")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.time")
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "0")
-	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 5)
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 6)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_scope")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "")
-	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 6)
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 7)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_redirectUri")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "")
-	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 7)
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 8)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_state")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.string")
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "")
-	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 8)
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 9)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_userData")
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "Config.OAuth2IdToken:Ref")
-	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 9)
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 10)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, true)
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "M_createdAt")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "xs.date")
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "new Date()")
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "childsUuid")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "[]xs.string")
-	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 10)
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 11)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, false)
 
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "[]")
 	oAuth2AuthorizeEntityProto.Fields = append(oAuth2AuthorizeEntityProto.Fields, "referenced")
 	oAuth2AuthorizeEntityProto.FieldsType = append(oAuth2AuthorizeEntityProto.FieldsType, "[]EntityRef")
-	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 11)
+	oAuth2AuthorizeEntityProto.FieldsOrder = append(oAuth2AuthorizeEntityProto.FieldsOrder, 12)
 	oAuth2AuthorizeEntityProto.FieldsVisibility = append(oAuth2AuthorizeEntityProto.FieldsVisibility, false)
 	oAuth2AuthorizeEntityProto.FieldsDefaultValue = append(oAuth2AuthorizeEntityProto.FieldsDefaultValue, "[]")
 
@@ -3365,14 +3442,12 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.OAuth2Authorize"
-
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Authorize"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2Authorize **/
 	query.Fields = append(query.Fields, "M_id")
@@ -3391,7 +3466,9 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.parentPtr.GetUuid())
+		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.GetParentLnk())
 	} else {
+		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, "")
 		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, "")
 	}
 
@@ -3430,7 +3507,7 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2AuthorizeInfo, params)
 	} else {
@@ -3457,7 +3534,6 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string, lazy bool) error
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -3466,6 +3542,7 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string, lazy bool) error
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2Authorize **/
 	query.Fields = append(query.Fields, "M_id")
@@ -3479,7 +3556,7 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string, lazy bool) error
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -3496,21 +3573,22 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string, lazy bool) error
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.OAuth2Authorize)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.OAuth2Authorize"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of OAuth2Authorize **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** client **/
-		if results[0][3] != nil {
-			id := results[0][3].(string)
+		if results[0][4] != nil {
+			id := results[0][4].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Client"
 				id_ := refTypeName + "$$" + id
@@ -3520,28 +3598,28 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string, lazy bool) error
 		}
 
 		/** expiresIn **/
-		if results[0][4] != nil {
-			this.object.M_expiresIn = results[0][4].(int64)
+		if results[0][5] != nil {
+			this.object.M_expiresIn = results[0][5].(int64)
 		}
 
 		/** scope **/
-		if results[0][5] != nil {
-			this.object.M_scope = results[0][5].(string)
+		if results[0][6] != nil {
+			this.object.M_scope = results[0][6].(string)
 		}
 
 		/** redirectUri **/
-		if results[0][6] != nil {
-			this.object.M_redirectUri = results[0][6].(string)
+		if results[0][7] != nil {
+			this.object.M_redirectUri = results[0][7].(string)
 		}
 
 		/** state **/
-		if results[0][7] != nil {
-			this.object.M_state = results[0][7].(string)
+		if results[0][8] != nil {
+			this.object.M_state = results[0][8].(string)
 		}
 
 		/** userData **/
-		if results[0][8] != nil {
-			id := results[0][8].(string)
+		if results[0][9] != nil {
+			id := results[0][9].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2IdToken"
 				id_ := refTypeName + "$$" + id
@@ -3551,10 +3629,10 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string, lazy bool) error
 		}
 
 		/** createdAt **/
-		if results[0][9] != nil {
-			this.object.M_createdAt = results[0][9].(int64)
+		if results[0][10] != nil {
+			this.object.M_createdAt = results[0][10].(int64)
 		}
-		childsUuidStr := results[0][10].(string)
+		childsUuidStr := results[0][11].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -3563,7 +3641,7 @@ func (this *Config_OAuth2AuthorizeEntity) InitEntity(id string, lazy bool) error
 			}
 		}
 
-		referencedStr := results[0][11].(string)
+		referencedStr := results[0][12].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -3629,6 +3707,8 @@ func (this *Config_OAuth2AuthorizeEntity) AppendChild(attributeName string, chil
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -3667,9 +3747,7 @@ func (this *Config_OAuth2AuthorizeEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2IdTokenEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -3747,7 +3825,6 @@ func (this *EntityManager) NewConfigOAuth2IdTokenEntity(parentUuid string, objec
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -3758,12 +3835,22 @@ func (this *Config_OAuth2IdTokenEntity) GetTypeName() string {
 	return "Config.OAuth2IdToken"
 }
 func (this *Config_OAuth2IdTokenEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_OAuth2IdTokenEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_OAuth2IdTokenEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_OAuth2IdTokenEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_OAuth2IdTokenEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_OAuth2IdTokenEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -3917,7 +4004,7 @@ func (this *Config_OAuth2IdTokenEntity) GetChecksum() string {
 func (this *Config_OAuth2IdTokenEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2IdToken"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -3954,73 +4041,78 @@ func (this *EntityManager) create_Config_OAuth2IdTokenEntityPrototype() {
 	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 1)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, false)
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "")
+	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "ParentLnk")
+	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.string")
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 2)
+	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, false)
+	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "")
 
 	/** members of OAuth2IdToken **/
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 2)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 3)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_issuer")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.string")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "")
 	oAuth2IdTokenEntityProto.Ids = append(oAuth2IdTokenEntityProto.Ids, "M_id")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 3)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 4)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_id")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.ID")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 4)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 5)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_client")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "Config.OAuth2Client:Ref")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 5)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 6)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_expiration")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.date")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "new Date()")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 6)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 7)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_issuedAt")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.date")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "new Date()")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 7)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 8)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_nonce")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.string")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 8)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 9)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_email")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.string")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 9)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 10)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_emailVerified")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.boolean")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "false")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 10)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 11)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_name")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.string")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 11)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 12)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_familyName")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.string")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 12)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 13)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_givenName")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.string")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 13)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 14)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, true)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_local")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "xs.string")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "")
 
 	/** associations of OAuth2IdToken **/
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 14)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 15)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, false)
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "M_parentPtr")
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "undefined")
@@ -4028,13 +4120,13 @@ func (this *EntityManager) create_Config_OAuth2IdTokenEntityPrototype() {
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "Config.OAuth2Configuration:Ref")
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "childsUuid")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "[]xs.string")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 15)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 16)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, false)
 
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "[]")
 	oAuth2IdTokenEntityProto.Fields = append(oAuth2IdTokenEntityProto.Fields, "referenced")
 	oAuth2IdTokenEntityProto.FieldsType = append(oAuth2IdTokenEntityProto.FieldsType, "[]EntityRef")
-	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 16)
+	oAuth2IdTokenEntityProto.FieldsOrder = append(oAuth2IdTokenEntityProto.FieldsOrder, 17)
 	oAuth2IdTokenEntityProto.FieldsVisibility = append(oAuth2IdTokenEntityProto.FieldsVisibility, false)
 	oAuth2IdTokenEntityProto.FieldsDefaultValue = append(oAuth2IdTokenEntityProto.FieldsDefaultValue, "[]")
 
@@ -4051,14 +4143,12 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.OAuth2IdToken"
-
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2IdToken"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2IdToken **/
 	query.Fields = append(query.Fields, "M_issuer")
@@ -4084,7 +4174,9 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 	OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.parentPtr.GetUuid())
+		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.GetParentLnk())
 	} else {
+		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, "")
 		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, "")
 	}
 
@@ -4130,7 +4222,7 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2IdTokenInfo, params)
 	} else {
@@ -4157,7 +4249,6 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string, lazy bool) error {
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -4166,6 +4257,7 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2IdToken **/
 	query.Fields = append(query.Fields, "M_issuer")
@@ -4186,7 +4278,7 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -4203,26 +4295,27 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string, lazy bool) error {
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.OAuth2IdToken)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.OAuth2IdToken"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of OAuth2IdToken **/
 
 		/** issuer **/
-		if results[0][2] != nil {
-			this.object.M_issuer = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_issuer = results[0][3].(string)
 		}
 
 		/** id **/
-		if results[0][3] != nil {
-			this.object.M_id = results[0][3].(string)
+		if results[0][4] != nil {
+			this.object.M_id = results[0][4].(string)
 		}
 
 		/** client **/
-		if results[0][4] != nil {
-			id := results[0][4].(string)
+		if results[0][5] != nil {
+			id := results[0][5].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Client"
 				id_ := refTypeName + "$$" + id
@@ -4232,55 +4325,55 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string, lazy bool) error {
 		}
 
 		/** expiration **/
-		if results[0][5] != nil {
-			this.object.M_expiration = results[0][5].(int64)
+		if results[0][6] != nil {
+			this.object.M_expiration = results[0][6].(int64)
 		}
 
 		/** issuedAt **/
-		if results[0][6] != nil {
-			this.object.M_issuedAt = results[0][6].(int64)
+		if results[0][7] != nil {
+			this.object.M_issuedAt = results[0][7].(int64)
 		}
 
 		/** nonce **/
-		if results[0][7] != nil {
-			this.object.M_nonce = results[0][7].(string)
+		if results[0][8] != nil {
+			this.object.M_nonce = results[0][8].(string)
 		}
 
 		/** email **/
-		if results[0][8] != nil {
-			this.object.M_email = results[0][8].(string)
+		if results[0][9] != nil {
+			this.object.M_email = results[0][9].(string)
 		}
 
 		/** emailVerified **/
-		if results[0][9] != nil {
-			this.object.M_emailVerified = results[0][9].(bool)
+		if results[0][10] != nil {
+			this.object.M_emailVerified = results[0][10].(bool)
 		}
 
 		/** name **/
-		if results[0][10] != nil {
-			this.object.M_name = results[0][10].(string)
+		if results[0][11] != nil {
+			this.object.M_name = results[0][11].(string)
 		}
 
 		/** familyName **/
-		if results[0][11] != nil {
-			this.object.M_familyName = results[0][11].(string)
+		if results[0][12] != nil {
+			this.object.M_familyName = results[0][12].(string)
 		}
 
 		/** givenName **/
-		if results[0][12] != nil {
-			this.object.M_givenName = results[0][12].(string)
+		if results[0][13] != nil {
+			this.object.M_givenName = results[0][13].(string)
 		}
 
 		/** local **/
-		if results[0][13] != nil {
-			this.object.M_local = results[0][13].(string)
+		if results[0][14] != nil {
+			this.object.M_local = results[0][14].(string)
 		}
 
 		/** associations of OAuth2IdToken **/
 
 		/** parentPtr **/
-		if results[0][14] != nil {
-			id := results[0][14].(string)
+		if results[0][15] != nil {
+			id := results[0][15].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Configuration"
 				id_ := refTypeName + "$$" + id
@@ -4288,7 +4381,7 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][15].(string)
+		childsUuidStr := results[0][16].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -4297,7 +4390,7 @@ func (this *Config_OAuth2IdTokenEntity) InitEntity(id string, lazy bool) error {
 			}
 		}
 
-		referencedStr := results[0][16].(string)
+		referencedStr := results[0][17].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -4363,6 +4456,8 @@ func (this *Config_OAuth2IdTokenEntity) AppendChild(attributeName string, child 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -4401,9 +4496,7 @@ func (this *Config_OAuth2IdTokenEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2AccessEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -4481,7 +4574,6 @@ func (this *EntityManager) NewConfigOAuth2AccessEntity(parentUuid string, object
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -4492,12 +4584,22 @@ func (this *Config_OAuth2AccessEntity) GetTypeName() string {
 	return "Config.OAuth2Access"
 }
 func (this *Config_OAuth2AccessEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_OAuth2AccessEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_OAuth2AccessEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_OAuth2AccessEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_OAuth2AccessEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_OAuth2AccessEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -4651,7 +4753,7 @@ func (this *Config_OAuth2AccessEntity) GetChecksum() string {
 func (this *Config_OAuth2AccessEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Access"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -4688,65 +4790,70 @@ func (this *EntityManager) create_Config_OAuth2AccessEntityPrototype() {
 	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 1)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "")
+	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "ParentLnk")
+	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 2)
+	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
+	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "")
 
 	/** members of OAuth2Access **/
 	oAuth2AccessEntityProto.Ids = append(oAuth2AccessEntityProto.Ids, "M_id")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 2)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 3)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_id")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.ID")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 3)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 4)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_client")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "Config.OAuth2Client:Ref")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 4)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 5)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_authorize")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 5)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 6)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_previous")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 6)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 7)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_refreshToken")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "Config.OAuth2Refresh:Ref")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 7)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 8)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_expiresIn")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.time")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "0")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 8)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 9)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_scope")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 9)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 10)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_redirectUri")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.string")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 10)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 11)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_userData")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "undefined")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "Config.OAuth2IdToken:Ref")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 11)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 12)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, true)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_createdAt")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "xs.date")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "new Date()")
 
 	/** associations of OAuth2Access **/
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 12)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 13)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "M_parentPtr")
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "undefined")
@@ -4754,13 +4861,13 @@ func (this *EntityManager) create_Config_OAuth2AccessEntityPrototype() {
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "Config.OAuth2Configuration:Ref")
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "childsUuid")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "[]xs.string")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 13)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 14)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
 
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "[]")
 	oAuth2AccessEntityProto.Fields = append(oAuth2AccessEntityProto.Fields, "referenced")
 	oAuth2AccessEntityProto.FieldsType = append(oAuth2AccessEntityProto.FieldsType, "[]EntityRef")
-	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 14)
+	oAuth2AccessEntityProto.FieldsOrder = append(oAuth2AccessEntityProto.FieldsOrder, 15)
 	oAuth2AccessEntityProto.FieldsVisibility = append(oAuth2AccessEntityProto.FieldsVisibility, false)
 	oAuth2AccessEntityProto.FieldsDefaultValue = append(oAuth2AccessEntityProto.FieldsDefaultValue, "[]")
 
@@ -4777,14 +4884,12 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.OAuth2Access"
-
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Access"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2Access **/
 	query.Fields = append(query.Fields, "M_id")
@@ -4808,7 +4913,9 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		OAuth2AccessInfo = append(OAuth2AccessInfo, this.parentPtr.GetUuid())
+		OAuth2AccessInfo = append(OAuth2AccessInfo, this.GetParentLnk())
 	} else {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
 		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
 	}
 
@@ -4864,7 +4971,7 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2AccessInfo, params)
 	} else {
@@ -4891,7 +4998,6 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string, lazy bool) error {
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -4900,6 +5006,7 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2Access **/
 	query.Fields = append(query.Fields, "M_id")
@@ -4918,7 +5025,7 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -4935,21 +5042,22 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string, lazy bool) error {
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.OAuth2Access)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.OAuth2Access"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of OAuth2Access **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** client **/
-		if results[0][3] != nil {
-			id := results[0][3].(string)
+		if results[0][4] != nil {
+			id := results[0][4].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Client"
 				id_ := refTypeName + "$$" + id
@@ -4959,18 +5067,18 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string, lazy bool) error {
 		}
 
 		/** authorize **/
-		if results[0][4] != nil {
-			this.object.M_authorize = results[0][4].(string)
+		if results[0][5] != nil {
+			this.object.M_authorize = results[0][5].(string)
 		}
 
 		/** previous **/
-		if results[0][5] != nil {
-			this.object.M_previous = results[0][5].(string)
+		if results[0][6] != nil {
+			this.object.M_previous = results[0][6].(string)
 		}
 
 		/** refreshToken **/
-		if results[0][6] != nil {
-			id := results[0][6].(string)
+		if results[0][7] != nil {
+			id := results[0][7].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Refresh"
 				id_ := refTypeName + "$$" + id
@@ -4980,23 +5088,23 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string, lazy bool) error {
 		}
 
 		/** expiresIn **/
-		if results[0][7] != nil {
-			this.object.M_expiresIn = results[0][7].(int64)
+		if results[0][8] != nil {
+			this.object.M_expiresIn = results[0][8].(int64)
 		}
 
 		/** scope **/
-		if results[0][8] != nil {
-			this.object.M_scope = results[0][8].(string)
+		if results[0][9] != nil {
+			this.object.M_scope = results[0][9].(string)
 		}
 
 		/** redirectUri **/
-		if results[0][9] != nil {
-			this.object.M_redirectUri = results[0][9].(string)
+		if results[0][10] != nil {
+			this.object.M_redirectUri = results[0][10].(string)
 		}
 
 		/** userData **/
-		if results[0][10] != nil {
-			id := results[0][10].(string)
+		if results[0][11] != nil {
+			id := results[0][11].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2IdToken"
 				id_ := refTypeName + "$$" + id
@@ -5006,15 +5114,15 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string, lazy bool) error {
 		}
 
 		/** createdAt **/
-		if results[0][11] != nil {
-			this.object.M_createdAt = results[0][11].(int64)
+		if results[0][12] != nil {
+			this.object.M_createdAt = results[0][12].(int64)
 		}
 
 		/** associations of OAuth2Access **/
 
 		/** parentPtr **/
-		if results[0][12] != nil {
-			id := results[0][12].(string)
+		if results[0][13] != nil {
+			id := results[0][13].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Configuration"
 				id_ := refTypeName + "$$" + id
@@ -5022,7 +5130,7 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][13].(string)
+		childsUuidStr := results[0][14].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -5031,7 +5139,7 @@ func (this *Config_OAuth2AccessEntity) InitEntity(id string, lazy bool) error {
 			}
 		}
 
-		referencedStr := results[0][14].(string)
+		referencedStr := results[0][15].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -5097,6 +5205,8 @@ func (this *Config_OAuth2AccessEntity) AppendChild(attributeName string, child E
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -5135,9 +5245,7 @@ func (this *Config_OAuth2AccessEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2RefreshEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -5215,7 +5323,6 @@ func (this *EntityManager) NewConfigOAuth2RefreshEntity(parentUuid string, objec
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -5226,12 +5333,22 @@ func (this *Config_OAuth2RefreshEntity) GetTypeName() string {
 	return "Config.OAuth2Refresh"
 }
 func (this *Config_OAuth2RefreshEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_OAuth2RefreshEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_OAuth2RefreshEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_OAuth2RefreshEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_OAuth2RefreshEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_OAuth2RefreshEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -5385,7 +5502,7 @@ func (this *Config_OAuth2RefreshEntity) GetChecksum() string {
 func (this *Config_OAuth2RefreshEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Refresh"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -5422,15 +5539,20 @@ func (this *EntityManager) create_Config_OAuth2RefreshEntityPrototype() {
 	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 1)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
 	oAuth2RefreshEntityProto.FieldsDefaultValue = append(oAuth2RefreshEntityProto.FieldsDefaultValue, "")
+	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "ParentLnk")
+	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "xs.string")
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 2)
+	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
+	oAuth2RefreshEntityProto.FieldsDefaultValue = append(oAuth2RefreshEntityProto.FieldsDefaultValue, "")
 
 	/** members of OAuth2Refresh **/
 	oAuth2RefreshEntityProto.Ids = append(oAuth2RefreshEntityProto.Ids, "M_id")
-	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 2)
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 3)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, true)
 	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "M_id")
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "xs.ID")
 	oAuth2RefreshEntityProto.FieldsDefaultValue = append(oAuth2RefreshEntityProto.FieldsDefaultValue, "")
-	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 3)
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 4)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, true)
 	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "M_access")
 	oAuth2RefreshEntityProto.FieldsDefaultValue = append(oAuth2RefreshEntityProto.FieldsDefaultValue, "undefined")
@@ -5438,7 +5560,7 @@ func (this *EntityManager) create_Config_OAuth2RefreshEntityPrototype() {
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "Config.OAuth2Access:Ref")
 
 	/** associations of OAuth2Refresh **/
-	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 4)
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 5)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
 	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "M_parentPtr")
 	oAuth2RefreshEntityProto.FieldsDefaultValue = append(oAuth2RefreshEntityProto.FieldsDefaultValue, "undefined")
@@ -5446,13 +5568,13 @@ func (this *EntityManager) create_Config_OAuth2RefreshEntityPrototype() {
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "Config.OAuth2Configuration:Ref")
 	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "childsUuid")
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "[]xs.string")
-	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 5)
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 6)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
 
 	oAuth2RefreshEntityProto.FieldsDefaultValue = append(oAuth2RefreshEntityProto.FieldsDefaultValue, "[]")
 	oAuth2RefreshEntityProto.Fields = append(oAuth2RefreshEntityProto.Fields, "referenced")
 	oAuth2RefreshEntityProto.FieldsType = append(oAuth2RefreshEntityProto.FieldsType, "[]EntityRef")
-	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 6)
+	oAuth2RefreshEntityProto.FieldsOrder = append(oAuth2RefreshEntityProto.FieldsOrder, 7)
 	oAuth2RefreshEntityProto.FieldsVisibility = append(oAuth2RefreshEntityProto.FieldsVisibility, false)
 	oAuth2RefreshEntityProto.FieldsDefaultValue = append(oAuth2RefreshEntityProto.FieldsDefaultValue, "[]")
 
@@ -5469,14 +5591,12 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.OAuth2Refresh"
-
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Refresh"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2Refresh **/
 	query.Fields = append(query.Fields, "M_id")
@@ -5492,7 +5612,9 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.parentPtr.GetUuid())
+		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.GetParentLnk())
 	} else {
+		OAuth2RefreshInfo = append(OAuth2RefreshInfo, "")
 		OAuth2RefreshInfo = append(OAuth2RefreshInfo, "")
 	}
 
@@ -5528,7 +5650,7 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2RefreshInfo, params)
 	} else {
@@ -5555,7 +5677,6 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string, lazy bool) error {
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -5564,6 +5685,7 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2Refresh **/
 	query.Fields = append(query.Fields, "M_id")
@@ -5574,7 +5696,7 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -5591,21 +5713,22 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string, lazy bool) error {
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.OAuth2Refresh)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.OAuth2Refresh"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of OAuth2Refresh **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** access **/
-		if results[0][3] != nil {
-			id := results[0][3].(string)
+		if results[0][4] != nil {
+			id := results[0][4].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Access"
 				id_ := refTypeName + "$$" + id
@@ -5617,8 +5740,8 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string, lazy bool) error {
 		/** associations of OAuth2Refresh **/
 
 		/** parentPtr **/
-		if results[0][4] != nil {
-			id := results[0][4].(string)
+		if results[0][5] != nil {
+			id := results[0][5].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Configuration"
 				id_ := refTypeName + "$$" + id
@@ -5626,7 +5749,7 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][5].(string)
+		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -5635,7 +5758,7 @@ func (this *Config_OAuth2RefreshEntity) InitEntity(id string, lazy bool) error {
 			}
 		}
 
-		referencedStr := results[0][6].(string)
+		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -5701,6 +5824,8 @@ func (this *Config_OAuth2RefreshEntity) AppendChild(attributeName string, child 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -5739,9 +5864,7 @@ func (this *Config_OAuth2RefreshEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2ExpiresEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -5819,7 +5942,6 @@ func (this *EntityManager) NewConfigOAuth2ExpiresEntity(parentUuid string, objec
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -5830,12 +5952,22 @@ func (this *Config_OAuth2ExpiresEntity) GetTypeName() string {
 	return "Config.OAuth2Expires"
 }
 func (this *Config_OAuth2ExpiresEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_OAuth2ExpiresEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_OAuth2ExpiresEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_OAuth2ExpiresEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_OAuth2ExpiresEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_OAuth2ExpiresEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -5989,7 +6121,7 @@ func (this *Config_OAuth2ExpiresEntity) GetChecksum() string {
 func (this *Config_OAuth2ExpiresEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Expires"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -6026,22 +6158,27 @@ func (this *EntityManager) create_Config_OAuth2ExpiresEntityPrototype() {
 	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 1)
 	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
 	oAuth2ExpiresEntityProto.FieldsDefaultValue = append(oAuth2ExpiresEntityProto.FieldsDefaultValue, "")
+	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "ParentLnk")
+	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.string")
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 2)
+	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
+	oAuth2ExpiresEntityProto.FieldsDefaultValue = append(oAuth2ExpiresEntityProto.FieldsDefaultValue, "")
 
 	/** members of OAuth2Expires **/
 	oAuth2ExpiresEntityProto.Ids = append(oAuth2ExpiresEntityProto.Ids, "M_id")
-	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 2)
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 3)
 	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, true)
 	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "M_id")
 	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.ID")
 	oAuth2ExpiresEntityProto.FieldsDefaultValue = append(oAuth2ExpiresEntityProto.FieldsDefaultValue, "")
-	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 3)
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 4)
 	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, true)
 	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "M_expiresAt")
 	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "xs.date")
 	oAuth2ExpiresEntityProto.FieldsDefaultValue = append(oAuth2ExpiresEntityProto.FieldsDefaultValue, "new Date()")
 
 	/** associations of OAuth2Expires **/
-	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 4)
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 5)
 	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
 	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "M_parentPtr")
 	oAuth2ExpiresEntityProto.FieldsDefaultValue = append(oAuth2ExpiresEntityProto.FieldsDefaultValue, "undefined")
@@ -6049,13 +6186,13 @@ func (this *EntityManager) create_Config_OAuth2ExpiresEntityPrototype() {
 	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "Config.OAuth2Configuration:Ref")
 	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "childsUuid")
 	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "[]xs.string")
-	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 5)
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 6)
 	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
 
 	oAuth2ExpiresEntityProto.FieldsDefaultValue = append(oAuth2ExpiresEntityProto.FieldsDefaultValue, "[]")
 	oAuth2ExpiresEntityProto.Fields = append(oAuth2ExpiresEntityProto.Fields, "referenced")
 	oAuth2ExpiresEntityProto.FieldsType = append(oAuth2ExpiresEntityProto.FieldsType, "[]EntityRef")
-	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 6)
+	oAuth2ExpiresEntityProto.FieldsOrder = append(oAuth2ExpiresEntityProto.FieldsOrder, 7)
 	oAuth2ExpiresEntityProto.FieldsVisibility = append(oAuth2ExpiresEntityProto.FieldsVisibility, false)
 	oAuth2ExpiresEntityProto.FieldsDefaultValue = append(oAuth2ExpiresEntityProto.FieldsDefaultValue, "[]")
 
@@ -6072,14 +6209,12 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.OAuth2Expires"
-
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Expires"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2Expires **/
 	query.Fields = append(query.Fields, "M_id")
@@ -6095,7 +6230,9 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.parentPtr.GetUuid())
+		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.GetParentLnk())
 	} else {
+		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, "")
 		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, "")
 	}
 
@@ -6125,7 +6262,7 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2ExpiresInfo, params)
 	} else {
@@ -6152,7 +6289,6 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string, lazy bool) error {
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -6161,6 +6297,7 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of OAuth2Expires **/
 	query.Fields = append(query.Fields, "M_id")
@@ -6171,7 +6308,7 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -6188,28 +6325,29 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string, lazy bool) error {
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.OAuth2Expires)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.OAuth2Expires"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of OAuth2Expires **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** expiresAt **/
-		if results[0][3] != nil {
-			this.object.M_expiresAt = results[0][3].(int64)
+		if results[0][4] != nil {
+			this.object.M_expiresAt = results[0][4].(int64)
 		}
 
 		/** associations of OAuth2Expires **/
 
 		/** parentPtr **/
-		if results[0][4] != nil {
-			id := results[0][4].(string)
+		if results[0][5] != nil {
+			id := results[0][5].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.OAuth2Configuration"
 				id_ := refTypeName + "$$" + id
@@ -6217,7 +6355,7 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][5].(string)
+		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -6226,7 +6364,7 @@ func (this *Config_OAuth2ExpiresEntity) InitEntity(id string, lazy bool) error {
 			}
 		}
 
-		referencedStr := results[0][6].(string)
+		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -6292,6 +6430,8 @@ func (this *Config_OAuth2ExpiresEntity) AppendChild(attributeName string, child 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -6330,9 +6470,7 @@ func (this *Config_OAuth2ExpiresEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2ConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -6410,7 +6548,6 @@ func (this *EntityManager) NewConfigOAuth2ConfigurationEntity(parentUuid string,
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -6421,12 +6558,22 @@ func (this *Config_OAuth2ConfigurationEntity) GetTypeName() string {
 	return "Config.OAuth2Configuration"
 }
 func (this *Config_OAuth2ConfigurationEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_OAuth2ConfigurationEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_OAuth2ConfigurationEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_OAuth2ConfigurationEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_OAuth2ConfigurationEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_OAuth2ConfigurationEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -6580,7 +6727,7 @@ func (this *Config_OAuth2ConfigurationEntity) GetChecksum() string {
 func (this *Config_OAuth2ConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Configuration"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -6618,99 +6765,104 @@ func (this *EntityManager) create_Config_OAuth2ConfigurationEntityPrototype() {
 	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 1)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "")
+	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "ParentLnk")
+	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.string")
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 2)
+	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
+	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of Configuration **/
 	oAuth2ConfigurationEntityProto.Ids = append(oAuth2ConfigurationEntityProto.Ids, "M_id")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 2)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 3)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_id")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.ID")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of OAuth2Configuration **/
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 3)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 4)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_authorizationExpiration")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.int")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "0")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 4)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 5)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_accessExpiration")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.time")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "0")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 5)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 6)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_tokenType")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.string")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 6)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 7)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_errorStatusCode")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.int")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "0")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 7)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 8)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_allowClientSecretInParams")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.boolean")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "false")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 8)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 9)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_allowGetAccessRequest")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.boolean")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "false")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 9)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 10)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_redirectUriSeparator")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.string")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 10)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 11)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_privateKey")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "xs.string")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 11)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 12)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_allowedAuthorizeTypes")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]xs.string")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "[]")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 12)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 13)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_allowedAccessTypes")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]xs.string")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "[]")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 13)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 14)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_clients")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "[]")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Client")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 14)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 15)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_authorize")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "[]")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Authorize")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 15)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 16)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_access")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "[]")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Access")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 16)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 17)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_ids")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "[]")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2IdToken")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 17)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 18)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_refresh")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "[]")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Refresh")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 18)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 19)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, true)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_expire")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "[]")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]Config.OAuth2Expires")
 
 	/** associations of OAuth2Configuration **/
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 19)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 20)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "M_parentPtr")
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "undefined")
@@ -6718,13 +6870,13 @@ func (this *EntityManager) create_Config_OAuth2ConfigurationEntityPrototype() {
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "childsUuid")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]xs.string")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 20)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 21)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
 
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "[]")
 	oAuth2ConfigurationEntityProto.Fields = append(oAuth2ConfigurationEntityProto.Fields, "referenced")
 	oAuth2ConfigurationEntityProto.FieldsType = append(oAuth2ConfigurationEntityProto.FieldsType, "[]EntityRef")
-	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 21)
+	oAuth2ConfigurationEntityProto.FieldsOrder = append(oAuth2ConfigurationEntityProto.FieldsOrder, 22)
 	oAuth2ConfigurationEntityProto.FieldsVisibility = append(oAuth2ConfigurationEntityProto.FieldsVisibility, false)
 	oAuth2ConfigurationEntityProto.FieldsDefaultValue = append(oAuth2ConfigurationEntityProto.FieldsDefaultValue, "[]")
 
@@ -6741,14 +6893,12 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.OAuth2Configuration"
-
 	var query EntityQuery
 	query.TypeName = "Config.OAuth2Configuration"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -6781,7 +6931,9 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.parentPtr.GetUuid())
+		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.GetParentLnk())
 	} else {
+		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, "")
 		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, "")
 	}
 
@@ -6806,7 +6958,7 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	if !lazy_clients {
 		for i := 0; i < len(this.object.M_clients); i++ {
 			clientsEntity := GetServer().GetEntityManager().NewConfigOAuth2ClientEntity(this.GetUuid(), this.object.M_clients[i].UUID, this.object.M_clients[i])
-			clientsIds = append(clientsIds, clientsEntity.uuid)
+			clientsIds = append(clientsIds, clientsEntity.GetUuid())
 			clientsEntity.AppendReferenced("clients", this)
 			this.AppendChild("clients", clientsEntity)
 			if clientsEntity.NeedSave() {
@@ -6825,7 +6977,7 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	if !lazy_authorize {
 		for i := 0; i < len(this.object.M_authorize); i++ {
 			authorizeEntity := GetServer().GetEntityManager().NewConfigOAuth2AuthorizeEntity(this.GetUuid(), this.object.M_authorize[i].UUID, this.object.M_authorize[i])
-			authorizeIds = append(authorizeIds, authorizeEntity.uuid)
+			authorizeIds = append(authorizeIds, authorizeEntity.GetUuid())
 			authorizeEntity.AppendReferenced("authorize", this)
 			this.AppendChild("authorize", authorizeEntity)
 			if authorizeEntity.NeedSave() {
@@ -6844,7 +6996,7 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	if !lazy_access {
 		for i := 0; i < len(this.object.M_access); i++ {
 			accessEntity := GetServer().GetEntityManager().NewConfigOAuth2AccessEntity(this.GetUuid(), this.object.M_access[i].UUID, this.object.M_access[i])
-			accessIds = append(accessIds, accessEntity.uuid)
+			accessIds = append(accessIds, accessEntity.GetUuid())
 			accessEntity.AppendReferenced("access", this)
 			this.AppendChild("access", accessEntity)
 			if accessEntity.NeedSave() {
@@ -6863,7 +7015,7 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	if !lazy_ids {
 		for i := 0; i < len(this.object.M_ids); i++ {
 			idsEntity := GetServer().GetEntityManager().NewConfigOAuth2IdTokenEntity(this.GetUuid(), this.object.M_ids[i].UUID, this.object.M_ids[i])
-			idsIds = append(idsIds, idsEntity.uuid)
+			idsIds = append(idsIds, idsEntity.GetUuid())
 			idsEntity.AppendReferenced("ids", this)
 			this.AppendChild("ids", idsEntity)
 			if idsEntity.NeedSave() {
@@ -6882,7 +7034,7 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	if !lazy_refresh {
 		for i := 0; i < len(this.object.M_refresh); i++ {
 			refreshEntity := GetServer().GetEntityManager().NewConfigOAuth2RefreshEntity(this.GetUuid(), this.object.M_refresh[i].UUID, this.object.M_refresh[i])
-			refreshIds = append(refreshIds, refreshEntity.uuid)
+			refreshIds = append(refreshIds, refreshEntity.GetUuid())
 			refreshEntity.AppendReferenced("refresh", this)
 			this.AppendChild("refresh", refreshEntity)
 			if refreshEntity.NeedSave() {
@@ -6901,7 +7053,7 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	if !lazy_expire {
 		for i := 0; i < len(this.object.M_expire); i++ {
 			expireEntity := GetServer().GetEntityManager().NewConfigOAuth2ExpiresEntity(this.GetUuid(), this.object.M_expire[i].UUID, this.object.M_expire[i])
-			expireIds = append(expireIds, expireEntity.uuid)
+			expireIds = append(expireIds, expireEntity.GetUuid())
 			expireEntity.AppendReferenced("expire", this)
 			this.AppendChild("expire", expireEntity)
 			if expireEntity.NeedSave() {
@@ -6936,7 +7088,7 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), OAuth2ConfigurationInfo, params)
 	} else {
@@ -6963,7 +7115,6 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -6972,6 +7123,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -6999,7 +7151,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -7016,73 +7168,74 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.OAuth2Configuration)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.OAuth2Configuration"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of Configuration **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** members of OAuth2Configuration **/
 
 		/** authorizationExpiration **/
-		if results[0][3] != nil {
-			this.object.M_authorizationExpiration = results[0][3].(int)
+		if results[0][4] != nil {
+			this.object.M_authorizationExpiration = results[0][4].(int)
 		}
 
 		/** accessExpiration **/
-		if results[0][4] != nil {
-			this.object.M_accessExpiration = results[0][4].(int64)
+		if results[0][5] != nil {
+			this.object.M_accessExpiration = results[0][5].(int64)
 		}
 
 		/** tokenType **/
-		if results[0][5] != nil {
-			this.object.M_tokenType = results[0][5].(string)
+		if results[0][6] != nil {
+			this.object.M_tokenType = results[0][6].(string)
 		}
 
 		/** errorStatusCode **/
-		if results[0][6] != nil {
-			this.object.M_errorStatusCode = results[0][6].(int)
+		if results[0][7] != nil {
+			this.object.M_errorStatusCode = results[0][7].(int)
 		}
 
 		/** allowClientSecretInParams **/
-		if results[0][7] != nil {
-			this.object.M_allowClientSecretInParams = results[0][7].(bool)
+		if results[0][8] != nil {
+			this.object.M_allowClientSecretInParams = results[0][8].(bool)
 		}
 
 		/** allowGetAccessRequest **/
-		if results[0][8] != nil {
-			this.object.M_allowGetAccessRequest = results[0][8].(bool)
+		if results[0][9] != nil {
+			this.object.M_allowGetAccessRequest = results[0][9].(bool)
 		}
 
 		/** redirectUriSeparator **/
-		if results[0][9] != nil {
-			this.object.M_redirectUriSeparator = results[0][9].(string)
+		if results[0][10] != nil {
+			this.object.M_redirectUriSeparator = results[0][10].(string)
 		}
 
 		/** privateKey **/
-		if results[0][10] != nil {
-			this.object.M_privateKey = results[0][10].(string)
+		if results[0][11] != nil {
+			this.object.M_privateKey = results[0][11].(string)
 		}
 
 		/** allowedAuthorizeTypes **/
-		if results[0][11] != nil {
-			this.object.M_allowedAuthorizeTypes = append(this.object.M_allowedAuthorizeTypes, results[0][11].([]string)...)
+		if results[0][12] != nil {
+			this.object.M_allowedAuthorizeTypes = append(this.object.M_allowedAuthorizeTypes, results[0][12].([]string)...)
 		}
 
 		/** allowedAccessTypes **/
-		if results[0][12] != nil {
-			this.object.M_allowedAccessTypes = append(this.object.M_allowedAccessTypes, results[0][12].([]string)...)
+		if results[0][13] != nil {
+			this.object.M_allowedAccessTypes = append(this.object.M_allowedAccessTypes, results[0][13].([]string)...)
 		}
 
 		/** clients **/
-		if results[0][13] != nil {
-			uuidsStr := results[0][13].(string)
+		if results[0][14] != nil {
+			uuidsStr := results[0][14].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -7109,8 +7262,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 		}
 
 		/** authorize **/
-		if results[0][14] != nil {
-			uuidsStr := results[0][14].(string)
+		if results[0][15] != nil {
+			uuidsStr := results[0][15].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -7137,8 +7290,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 		}
 
 		/** access **/
-		if results[0][15] != nil {
-			uuidsStr := results[0][15].(string)
+		if results[0][16] != nil {
+			uuidsStr := results[0][16].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -7165,8 +7318,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 		}
 
 		/** ids **/
-		if results[0][16] != nil {
-			uuidsStr := results[0][16].(string)
+		if results[0][17] != nil {
+			uuidsStr := results[0][17].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -7193,8 +7346,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 		}
 
 		/** refresh **/
-		if results[0][17] != nil {
-			uuidsStr := results[0][17].(string)
+		if results[0][18] != nil {
+			uuidsStr := results[0][18].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -7221,8 +7374,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 		}
 
 		/** expire **/
-		if results[0][18] != nil {
-			uuidsStr := results[0][18].(string)
+		if results[0][19] != nil {
+			uuidsStr := results[0][19].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -7251,8 +7404,8 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 		/** associations of OAuth2Configuration **/
 
 		/** parentPtr **/
-		if results[0][19] != nil {
-			id := results[0][19].(string)
+		if results[0][20] != nil {
+			id := results[0][20].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -7260,7 +7413,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][20].(string)
+		childsUuidStr := results[0][21].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -7269,7 +7422,7 @@ func (this *Config_OAuth2ConfigurationEntity) InitEntity(id string, lazy bool) e
 			}
 		}
 
-		referencedStr := results[0][21].(string)
+		referencedStr := results[0][22].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -7335,6 +7488,8 @@ func (this *Config_OAuth2ConfigurationEntity) AppendChild(attributeName string, 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -7373,9 +7528,7 @@ func (this *Config_OAuth2ConfigurationEntity) AppendReference(reference Entity) 
 /** local type **/
 type Config_ServiceConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -7453,7 +7606,6 @@ func (this *EntityManager) NewConfigServiceConfigurationEntity(parentUuid string
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -7464,12 +7616,22 @@ func (this *Config_ServiceConfigurationEntity) GetTypeName() string {
 	return "Config.ServiceConfiguration"
 }
 func (this *Config_ServiceConfigurationEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_ServiceConfigurationEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_ServiceConfigurationEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_ServiceConfigurationEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_ServiceConfigurationEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_ServiceConfigurationEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -7623,7 +7785,7 @@ func (this *Config_ServiceConfigurationEntity) GetChecksum() string {
 func (this *Config_ServiceConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.ServiceConfiguration"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -7661,49 +7823,54 @@ func (this *EntityManager) create_Config_ServiceConfigurationEntityPrototype() {
 	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 1)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
 	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "")
+	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "ParentLnk")
+	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 2)
+	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
+	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of Configuration **/
 	serviceConfigurationEntityProto.Ids = append(serviceConfigurationEntityProto.Ids, "M_id")
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 2)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 3)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_id")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.ID")
 	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of ServiceConfiguration **/
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 3)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 4)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_hostName")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
 	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "")
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 4)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 5)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_ipv4")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
 	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "")
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 5)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 6)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_port")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.int")
 	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "0")
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 6)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 7)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_user")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
 	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "")
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 7)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 8)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_pwd")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.string")
 	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "")
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 8)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 9)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, true)
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_start")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "xs.boolean")
 	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "false")
 
 	/** associations of ServiceConfiguration **/
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 9)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 10)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "M_parentPtr")
 	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "undefined")
@@ -7711,13 +7878,13 @@ func (this *EntityManager) create_Config_ServiceConfigurationEntityPrototype() {
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "childsUuid")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "[]xs.string")
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 10)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 11)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
 
 	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "[]")
 	serviceConfigurationEntityProto.Fields = append(serviceConfigurationEntityProto.Fields, "referenced")
 	serviceConfigurationEntityProto.FieldsType = append(serviceConfigurationEntityProto.FieldsType, "[]EntityRef")
-	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 11)
+	serviceConfigurationEntityProto.FieldsOrder = append(serviceConfigurationEntityProto.FieldsOrder, 12)
 	serviceConfigurationEntityProto.FieldsVisibility = append(serviceConfigurationEntityProto.FieldsVisibility, false)
 	serviceConfigurationEntityProto.FieldsDefaultValue = append(serviceConfigurationEntityProto.FieldsDefaultValue, "[]")
 
@@ -7734,14 +7901,12 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.ServiceConfiguration"
-
 	var query EntityQuery
 	query.TypeName = "Config.ServiceConfiguration"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -7764,7 +7929,9 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.parentPtr.GetUuid())
+		ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.GetParentLnk())
 	} else {
+		ServiceConfigurationInfo = append(ServiceConfigurationInfo, "")
 		ServiceConfigurationInfo = append(ServiceConfigurationInfo, "")
 	}
 
@@ -7801,7 +7968,7 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), ServiceConfigurationInfo, params)
 	} else {
@@ -7828,7 +7995,6 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string, lazy bool) 
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -7837,6 +8003,7 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string, lazy bool) 
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -7854,7 +8021,7 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string, lazy bool) 
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -7871,55 +8038,56 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string, lazy bool) 
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.ServiceConfiguration)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.ServiceConfiguration"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of Configuration **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** members of ServiceConfiguration **/
 
 		/** hostName **/
-		if results[0][3] != nil {
-			this.object.M_hostName = results[0][3].(string)
+		if results[0][4] != nil {
+			this.object.M_hostName = results[0][4].(string)
 		}
 
 		/** ipv4 **/
-		if results[0][4] != nil {
-			this.object.M_ipv4 = results[0][4].(string)
+		if results[0][5] != nil {
+			this.object.M_ipv4 = results[0][5].(string)
 		}
 
 		/** port **/
-		if results[0][5] != nil {
-			this.object.M_port = results[0][5].(int)
+		if results[0][6] != nil {
+			this.object.M_port = results[0][6].(int)
 		}
 
 		/** user **/
-		if results[0][6] != nil {
-			this.object.M_user = results[0][6].(string)
+		if results[0][7] != nil {
+			this.object.M_user = results[0][7].(string)
 		}
 
 		/** pwd **/
-		if results[0][7] != nil {
-			this.object.M_pwd = results[0][7].(string)
+		if results[0][8] != nil {
+			this.object.M_pwd = results[0][8].(string)
 		}
 
 		/** start **/
-		if results[0][8] != nil {
-			this.object.M_start = results[0][8].(bool)
+		if results[0][9] != nil {
+			this.object.M_start = results[0][9].(bool)
 		}
 
 		/** associations of ServiceConfiguration **/
 
 		/** parentPtr **/
-		if results[0][9] != nil {
-			id := results[0][9].(string)
+		if results[0][10] != nil {
+			id := results[0][10].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -7927,7 +8095,7 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string, lazy bool) 
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][10].(string)
+		childsUuidStr := results[0][11].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -7936,7 +8104,7 @@ func (this *Config_ServiceConfigurationEntity) InitEntity(id string, lazy bool) 
 			}
 		}
 
-		referencedStr := results[0][11].(string)
+		referencedStr := results[0][12].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -8002,6 +8170,8 @@ func (this *Config_ServiceConfigurationEntity) AppendChild(attributeName string,
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -8040,9 +8210,7 @@ func (this *Config_ServiceConfigurationEntity) AppendReference(reference Entity)
 /** local type **/
 type Config_ScheduledTaskEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -8120,7 +8288,6 @@ func (this *EntityManager) NewConfigScheduledTaskEntity(parentUuid string, objec
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -8131,12 +8298,22 @@ func (this *Config_ScheduledTaskEntity) GetTypeName() string {
 	return "Config.ScheduledTask"
 }
 func (this *Config_ScheduledTaskEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_ScheduledTaskEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_ScheduledTaskEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_ScheduledTaskEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_ScheduledTaskEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_ScheduledTaskEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -8290,7 +8467,7 @@ func (this *Config_ScheduledTaskEntity) GetChecksum() string {
 func (this *Config_ScheduledTaskEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.ScheduledTask"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -8328,54 +8505,59 @@ func (this *EntityManager) create_Config_ScheduledTaskEntityPrototype() {
 	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 1)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "")
+	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "ParentLnk")
+	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.string")
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 2)
+	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
+	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "")
 
 	/** members of Configuration **/
 	scheduledTaskEntityProto.Ids = append(scheduledTaskEntityProto.Ids, "M_id")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 2)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 3)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_id")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.ID")
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "")
 
 	/** members of ScheduledTask **/
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 3)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 4)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_isActive")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.boolean")
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "false")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 4)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 5)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_script")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.string")
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 5)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 6)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_startTime")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.time")
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "0")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 6)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 7)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_expirationTime")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.time")
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "0")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 7)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 8)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_frequency")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "xs.int")
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "0")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 8)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 9)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_frequencyType")
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "FrequencyType_ONCE")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "enum:FrequencyType_ONCE:FrequencyType_DAILY:FrequencyType_WEEKELY:FrequencyType_MONTHLY")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 9)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 10)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_offsets")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "[]xs.int")
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "[]")
 
 	/** associations of ScheduledTask **/
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 10)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 11)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_parentPtr")
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "undefined")
@@ -8383,13 +8565,13 @@ func (this *EntityManager) create_Config_ScheduledTaskEntityPrototype() {
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "Config.Configurations:Ref")
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "childsUuid")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "[]xs.string")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 11)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 12)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
 
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "[]")
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "referenced")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "[]EntityRef")
-	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 12)
+	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 13)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, false)
 	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "[]")
 
@@ -8406,14 +8588,12 @@ func (this *Config_ScheduledTaskEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.ScheduledTask"
-
 	var query EntityQuery
 	query.TypeName = "Config.ScheduledTask"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -8437,7 +8617,9 @@ func (this *Config_ScheduledTaskEntity) SaveEntity() {
 	ScheduledTaskInfo = append(ScheduledTaskInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		ScheduledTaskInfo = append(ScheduledTaskInfo, this.parentPtr.GetUuid())
+		ScheduledTaskInfo = append(ScheduledTaskInfo, this.GetParentLnk())
 	} else {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, "")
 		ScheduledTaskInfo = append(ScheduledTaskInfo, "")
 	}
 
@@ -8487,7 +8669,7 @@ func (this *Config_ScheduledTaskEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), ScheduledTaskInfo, params)
 	} else {
@@ -8514,7 +8696,6 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -8523,6 +8704,7 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -8541,7 +8723,7 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -8558,48 +8740,49 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.ScheduledTask)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.ScheduledTask"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of Configuration **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** members of ScheduledTask **/
 
 		/** isActive **/
-		if results[0][3] != nil {
-			this.object.M_isActive = results[0][3].(bool)
+		if results[0][4] != nil {
+			this.object.M_isActive = results[0][4].(bool)
 		}
 
 		/** script **/
-		if results[0][4] != nil {
-			this.object.M_script = results[0][4].(string)
+		if results[0][5] != nil {
+			this.object.M_script = results[0][5].(string)
 		}
 
 		/** startTime **/
-		if results[0][5] != nil {
-			this.object.M_startTime = results[0][5].(int64)
+		if results[0][6] != nil {
+			this.object.M_startTime = results[0][6].(int64)
 		}
 
 		/** expirationTime **/
-		if results[0][6] != nil {
-			this.object.M_expirationTime = results[0][6].(int64)
+		if results[0][7] != nil {
+			this.object.M_expirationTime = results[0][7].(int64)
 		}
 
 		/** frequency **/
-		if results[0][7] != nil {
-			this.object.M_frequency = results[0][7].(int)
+		if results[0][8] != nil {
+			this.object.M_frequency = results[0][8].(int)
 		}
 
 		/** frequencyType **/
-		if results[0][8] != nil {
-			enumIndex := results[0][8].(int)
+		if results[0][9] != nil {
+			enumIndex := results[0][9].(int)
 			if enumIndex == 0 {
 				this.object.M_frequencyType = Config.FrequencyType_ONCE
 			} else if enumIndex == 1 {
@@ -8612,15 +8795,15 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 		}
 
 		/** offsets **/
-		if results[0][9] != nil {
-			this.object.M_offsets = append(this.object.M_offsets, results[0][9].([]int)...)
+		if results[0][10] != nil {
+			this.object.M_offsets = append(this.object.M_offsets, results[0][10].([]int)...)
 		}
 
 		/** associations of ScheduledTask **/
 
 		/** parentPtr **/
-		if results[0][10] != nil {
-			id := results[0][10].(string)
+		if results[0][11] != nil {
+			id := results[0][11].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -8628,7 +8811,7 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][11].(string)
+		childsUuidStr := results[0][12].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -8637,7 +8820,7 @@ func (this *Config_ScheduledTaskEntity) InitEntity(id string, lazy bool) error {
 			}
 		}
 
-		referencedStr := results[0][12].(string)
+		referencedStr := results[0][13].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -8703,6 +8886,8 @@ func (this *Config_ScheduledTaskEntity) AppendChild(attributeName string, child 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -8741,9 +8926,7 @@ func (this *Config_ScheduledTaskEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_ApplicationConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -8821,7 +9004,6 @@ func (this *EntityManager) NewConfigApplicationConfigurationEntity(parentUuid st
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -8832,12 +9014,22 @@ func (this *Config_ApplicationConfigurationEntity) GetTypeName() string {
 	return "Config.ApplicationConfiguration"
 }
 func (this *Config_ApplicationConfigurationEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_ApplicationConfigurationEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_ApplicationConfigurationEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_ApplicationConfigurationEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_ApplicationConfigurationEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_ApplicationConfigurationEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -8991,7 +9183,7 @@ func (this *Config_ApplicationConfigurationEntity) GetChecksum() string {
 func (this *Config_ApplicationConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.ApplicationConfiguration"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -9029,24 +9221,29 @@ func (this *EntityManager) create_Config_ApplicationConfigurationEntityPrototype
 	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 1)
 	applicationConfigurationEntityProto.FieldsVisibility = append(applicationConfigurationEntityProto.FieldsVisibility, false)
 	applicationConfigurationEntityProto.FieldsDefaultValue = append(applicationConfigurationEntityProto.FieldsDefaultValue, "")
+	applicationConfigurationEntityProto.Fields = append(applicationConfigurationEntityProto.Fields, "ParentLnk")
+	applicationConfigurationEntityProto.FieldsType = append(applicationConfigurationEntityProto.FieldsType, "xs.string")
+	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 2)
+	applicationConfigurationEntityProto.FieldsVisibility = append(applicationConfigurationEntityProto.FieldsVisibility, false)
+	applicationConfigurationEntityProto.FieldsDefaultValue = append(applicationConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of Configuration **/
 	applicationConfigurationEntityProto.Ids = append(applicationConfigurationEntityProto.Ids, "M_id")
-	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 2)
+	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 3)
 	applicationConfigurationEntityProto.FieldsVisibility = append(applicationConfigurationEntityProto.FieldsVisibility, true)
 	applicationConfigurationEntityProto.Fields = append(applicationConfigurationEntityProto.Fields, "M_id")
 	applicationConfigurationEntityProto.FieldsType = append(applicationConfigurationEntityProto.FieldsType, "xs.ID")
 	applicationConfigurationEntityProto.FieldsDefaultValue = append(applicationConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of ApplicationConfiguration **/
-	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 3)
+	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 4)
 	applicationConfigurationEntityProto.FieldsVisibility = append(applicationConfigurationEntityProto.FieldsVisibility, true)
 	applicationConfigurationEntityProto.Fields = append(applicationConfigurationEntityProto.Fields, "M_indexPage")
 	applicationConfigurationEntityProto.FieldsType = append(applicationConfigurationEntityProto.FieldsType, "xs.string")
 	applicationConfigurationEntityProto.FieldsDefaultValue = append(applicationConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** associations of ApplicationConfiguration **/
-	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 4)
+	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 5)
 	applicationConfigurationEntityProto.FieldsVisibility = append(applicationConfigurationEntityProto.FieldsVisibility, false)
 	applicationConfigurationEntityProto.Fields = append(applicationConfigurationEntityProto.Fields, "M_parentPtr")
 	applicationConfigurationEntityProto.FieldsDefaultValue = append(applicationConfigurationEntityProto.FieldsDefaultValue, "undefined")
@@ -9054,13 +9251,13 @@ func (this *EntityManager) create_Config_ApplicationConfigurationEntityPrototype
 	applicationConfigurationEntityProto.FieldsType = append(applicationConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	applicationConfigurationEntityProto.Fields = append(applicationConfigurationEntityProto.Fields, "childsUuid")
 	applicationConfigurationEntityProto.FieldsType = append(applicationConfigurationEntityProto.FieldsType, "[]xs.string")
-	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 5)
+	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 6)
 	applicationConfigurationEntityProto.FieldsVisibility = append(applicationConfigurationEntityProto.FieldsVisibility, false)
 
 	applicationConfigurationEntityProto.FieldsDefaultValue = append(applicationConfigurationEntityProto.FieldsDefaultValue, "[]")
 	applicationConfigurationEntityProto.Fields = append(applicationConfigurationEntityProto.Fields, "referenced")
 	applicationConfigurationEntityProto.FieldsType = append(applicationConfigurationEntityProto.FieldsType, "[]EntityRef")
-	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 6)
+	applicationConfigurationEntityProto.FieldsOrder = append(applicationConfigurationEntityProto.FieldsOrder, 7)
 	applicationConfigurationEntityProto.FieldsVisibility = append(applicationConfigurationEntityProto.FieldsVisibility, false)
 	applicationConfigurationEntityProto.FieldsDefaultValue = append(applicationConfigurationEntityProto.FieldsDefaultValue, "[]")
 
@@ -9077,14 +9274,12 @@ func (this *Config_ApplicationConfigurationEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.ApplicationConfiguration"
-
 	var query EntityQuery
 	query.TypeName = "Config.ApplicationConfiguration"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -9102,7 +9297,9 @@ func (this *Config_ApplicationConfigurationEntity) SaveEntity() {
 	ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, this.parentPtr.GetUuid())
+		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, this.GetParentLnk())
 	} else {
+		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, "")
 		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, "")
 	}
 
@@ -9134,7 +9331,7 @@ func (this *Config_ApplicationConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), ApplicationConfigurationInfo, params)
 	} else {
@@ -9161,7 +9358,6 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string, lazy bo
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -9170,6 +9366,7 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string, lazy bo
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -9182,7 +9379,7 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string, lazy bo
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -9199,30 +9396,31 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string, lazy bo
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.ApplicationConfiguration)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.ApplicationConfiguration"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of Configuration **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** members of ApplicationConfiguration **/
 
 		/** indexPage **/
-		if results[0][3] != nil {
-			this.object.M_indexPage = results[0][3].(string)
+		if results[0][4] != nil {
+			this.object.M_indexPage = results[0][4].(string)
 		}
 
 		/** associations of ApplicationConfiguration **/
 
 		/** parentPtr **/
-		if results[0][4] != nil {
-			id := results[0][4].(string)
+		if results[0][5] != nil {
+			id := results[0][5].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -9230,7 +9428,7 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string, lazy bo
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][5].(string)
+		childsUuidStr := results[0][6].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -9239,7 +9437,7 @@ func (this *Config_ApplicationConfigurationEntity) InitEntity(id string, lazy bo
 			}
 		}
 
-		referencedStr := results[0][6].(string)
+		referencedStr := results[0][7].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -9305,6 +9503,8 @@ func (this *Config_ApplicationConfigurationEntity) AppendChild(attributeName str
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -9343,9 +9543,7 @@ func (this *Config_ApplicationConfigurationEntity) AppendReference(reference Ent
 /** local type **/
 type Config_ServerConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -9423,7 +9621,6 @@ func (this *EntityManager) NewConfigServerConfigurationEntity(parentUuid string,
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -9434,12 +9631,22 @@ func (this *Config_ServerConfigurationEntity) GetTypeName() string {
 	return "Config.ServerConfiguration"
 }
 func (this *Config_ServerConfigurationEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_ServerConfigurationEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_ServerConfigurationEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_ServerConfigurationEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_ServerConfigurationEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_ServerConfigurationEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -9593,7 +9800,7 @@ func (this *Config_ServerConfigurationEntity) GetChecksum() string {
 func (this *Config_ServerConfigurationEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.ServerConfiguration"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -9631,84 +9838,89 @@ func (this *EntityManager) create_Config_ServerConfigurationEntityPrototype() {
 	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 1)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
+	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "ParentLnk")
+	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 2)
+	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
+	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of Configuration **/
 	serverConfigurationEntityProto.Ids = append(serverConfigurationEntityProto.Ids, "M_id")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 2)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 3)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_id")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.ID")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** members of ServerConfiguration **/
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 3)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 4)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_hostName")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 4)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 5)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_ipv4")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 5)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 6)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_serverPort")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.int")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "0")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 6)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 7)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_ws_serviceContainerPort")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.int")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "0")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 7)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 8)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_tcp_serviceContainerPort")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.int")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "0")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 8)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 9)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_applicationsPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 9)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 10)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_dataPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 10)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 11)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_scriptsPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 11)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 12)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_definitionsPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 12)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 13)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_schemasPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 13)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 14)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_tmpPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 14)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 15)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_binPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 15)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 16)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, true)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_queriesPath")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "xs.string")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "")
 
 	/** associations of ServerConfiguration **/
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 16)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 17)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "M_parentPtr")
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "undefined")
@@ -9716,13 +9928,13 @@ func (this *EntityManager) create_Config_ServerConfigurationEntityPrototype() {
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "childsUuid")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "[]xs.string")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 17)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 18)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "[]")
 	serverConfigurationEntityProto.Fields = append(serverConfigurationEntityProto.Fields, "referenced")
 	serverConfigurationEntityProto.FieldsType = append(serverConfigurationEntityProto.FieldsType, "[]EntityRef")
-	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 18)
+	serverConfigurationEntityProto.FieldsOrder = append(serverConfigurationEntityProto.FieldsOrder, 19)
 	serverConfigurationEntityProto.FieldsVisibility = append(serverConfigurationEntityProto.FieldsVisibility, false)
 	serverConfigurationEntityProto.FieldsDefaultValue = append(serverConfigurationEntityProto.FieldsDefaultValue, "[]")
 
@@ -9739,14 +9951,12 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.ServerConfiguration"
-
 	var query EntityQuery
 	query.TypeName = "Config.ServerConfiguration"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -9776,7 +9986,9 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		ServerConfigurationInfo = append(ServerConfigurationInfo, this.parentPtr.GetUuid())
+		ServerConfigurationInfo = append(ServerConfigurationInfo, this.GetParentLnk())
 	} else {
+		ServerConfigurationInfo = append(ServerConfigurationInfo, "")
 		ServerConfigurationInfo = append(ServerConfigurationInfo, "")
 	}
 
@@ -9820,7 +10032,7 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), ServerConfigurationInfo, params)
 	} else {
@@ -9847,7 +10059,6 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string, lazy bool) e
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -9856,6 +10067,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string, lazy bool) e
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configuration **/
 	query.Fields = append(query.Fields, "M_id")
@@ -9880,7 +10092,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string, lazy bool) e
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -9897,90 +10109,91 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string, lazy bool) e
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.ServerConfiguration)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.ServerConfiguration"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of Configuration **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** members of ServerConfiguration **/
 
 		/** hostName **/
-		if results[0][3] != nil {
-			this.object.M_hostName = results[0][3].(string)
+		if results[0][4] != nil {
+			this.object.M_hostName = results[0][4].(string)
 		}
 
 		/** ipv4 **/
-		if results[0][4] != nil {
-			this.object.M_ipv4 = results[0][4].(string)
+		if results[0][5] != nil {
+			this.object.M_ipv4 = results[0][5].(string)
 		}
 
 		/** serverPort **/
-		if results[0][5] != nil {
-			this.object.M_serverPort = results[0][5].(int)
+		if results[0][6] != nil {
+			this.object.M_serverPort = results[0][6].(int)
 		}
 
 		/** ws_serviceContainerPort **/
-		if results[0][6] != nil {
-			this.object.M_ws_serviceContainerPort = results[0][6].(int)
+		if results[0][7] != nil {
+			this.object.M_ws_serviceContainerPort = results[0][7].(int)
 		}
 
 		/** tcp_serviceContainerPort **/
-		if results[0][7] != nil {
-			this.object.M_tcp_serviceContainerPort = results[0][7].(int)
+		if results[0][8] != nil {
+			this.object.M_tcp_serviceContainerPort = results[0][8].(int)
 		}
 
 		/** applicationsPath **/
-		if results[0][8] != nil {
-			this.object.M_applicationsPath = results[0][8].(string)
+		if results[0][9] != nil {
+			this.object.M_applicationsPath = results[0][9].(string)
 		}
 
 		/** dataPath **/
-		if results[0][9] != nil {
-			this.object.M_dataPath = results[0][9].(string)
+		if results[0][10] != nil {
+			this.object.M_dataPath = results[0][10].(string)
 		}
 
 		/** scriptsPath **/
-		if results[0][10] != nil {
-			this.object.M_scriptsPath = results[0][10].(string)
+		if results[0][11] != nil {
+			this.object.M_scriptsPath = results[0][11].(string)
 		}
 
 		/** definitionsPath **/
-		if results[0][11] != nil {
-			this.object.M_definitionsPath = results[0][11].(string)
+		if results[0][12] != nil {
+			this.object.M_definitionsPath = results[0][12].(string)
 		}
 
 		/** schemasPath **/
-		if results[0][12] != nil {
-			this.object.M_schemasPath = results[0][12].(string)
+		if results[0][13] != nil {
+			this.object.M_schemasPath = results[0][13].(string)
 		}
 
 		/** tmpPath **/
-		if results[0][13] != nil {
-			this.object.M_tmpPath = results[0][13].(string)
+		if results[0][14] != nil {
+			this.object.M_tmpPath = results[0][14].(string)
 		}
 
 		/** binPath **/
-		if results[0][14] != nil {
-			this.object.M_binPath = results[0][14].(string)
+		if results[0][15] != nil {
+			this.object.M_binPath = results[0][15].(string)
 		}
 
 		/** queriesPath **/
-		if results[0][15] != nil {
-			this.object.M_queriesPath = results[0][15].(string)
+		if results[0][16] != nil {
+			this.object.M_queriesPath = results[0][16].(string)
 		}
 
 		/** associations of ServerConfiguration **/
 
 		/** parentPtr **/
-		if results[0][16] != nil {
-			id := results[0][16].(string)
+		if results[0][17] != nil {
+			id := results[0][17].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -9988,7 +10201,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string, lazy bool) e
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][17].(string)
+		childsUuidStr := results[0][18].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -9997,7 +10210,7 @@ func (this *Config_ServerConfigurationEntity) InitEntity(id string, lazy bool) e
 			}
 		}
 
-		referencedStr := results[0][18].(string)
+		referencedStr := results[0][19].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -10063,6 +10276,8 @@ func (this *Config_ServerConfigurationEntity) AppendChild(attributeName string, 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
+	child.SetParentLnk(attributeName)
+
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
 	attributeName = strings.Replace(attributeName, "M_", "", -1)
@@ -10101,9 +10316,7 @@ func (this *Config_ServerConfigurationEntity) AppendReference(reference Entity) 
 /** local type **/
 type Config_ConfigurationsEntity struct {
 	/** not the object id, except for the definition **/
-	uuid           string
 	parentPtr      Entity
-	parentUuid     string
 	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
@@ -10181,7 +10394,6 @@ func (this *EntityManager) NewConfigConfigurationsEntity(parentUuid string, obje
 	entity.object.UUID = uuidStr
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
-	entity.uuid = uuidStr
 	this.insert(entity)
 	entity.prototype = prototype
 	return entity
@@ -10192,12 +10404,22 @@ func (this *Config_ConfigurationsEntity) GetTypeName() string {
 	return "Config.Configurations"
 }
 func (this *Config_ConfigurationsEntity) GetUuid() string {
-	return this.uuid
+	return this.object.UUID
+}
+func (this *Config_ConfigurationsEntity) GetParentUuid() string {
+	return this.object.ParentUuid
 }
 func (this *Config_ConfigurationsEntity) GetParentPtr() Entity {
 	return this.parentPtr
 }
 
+func (this *Config_ConfigurationsEntity) SetParentLnk(lnk string) {
+	this.object.ParentLnk = lnk
+}
+
+func (this *Config_ConfigurationsEntity) GetParentLnk() string {
+	return this.object.ParentLnk
+}
 func (this *Config_ConfigurationsEntity) SetParentPtr(parentPtr Entity) {
 	this.parentPtr = parentPtr
 }
@@ -10351,7 +10573,7 @@ func (this *Config_ConfigurationsEntity) GetChecksum() string {
 func (this *Config_ConfigurationsEntity) Exist() bool {
 	var query EntityQuery
 	query.TypeName = "Config.Configurations"
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 	query.Fields = append(query.Fields, "UUID")
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -10388,78 +10610,83 @@ func (this *EntityManager) create_Config_ConfigurationsEntityPrototype() {
 	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 1)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, false)
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "")
+	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "ParentLnk")
+	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "xs.string")
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 2)
+	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, false)
+	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "")
 
 	/** members of Configurations **/
 	configurationsEntityProto.Ids = append(configurationsEntityProto.Ids, "M_id")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 2)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 3)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_id")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "xs.ID")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 3)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 4)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_name")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "xs.string")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 4)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 5)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_version")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "xs.string")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 5)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 6)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_filePath")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "xs.string")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 6)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 7)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_serverConfig")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "undefined")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "Config.ServerConfiguration")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 7)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 8)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_oauth2Configuration")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "undefined")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "Config.OAuth2Configuration")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 8)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 9)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_serviceConfigs")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "[]")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.ServiceConfiguration")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 9)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 10)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_dataStoreConfigs")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "[]")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.DataStoreConfiguration")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 10)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 11)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_smtpConfigs")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "[]")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.SmtpConfiguration")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 11)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 12)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_ldapConfigs")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "[]")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.LdapConfiguration")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 12)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 13)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_applicationConfigs")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "[]")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.ApplicationConfiguration")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 13)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 14)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, true)
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "M_scheduledTasks")
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "[]")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]Config.ScheduledTask")
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "childsUuid")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]xs.string")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 14)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 15)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, false)
 
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "[]")
 	configurationsEntityProto.Fields = append(configurationsEntityProto.Fields, "referenced")
 	configurationsEntityProto.FieldsType = append(configurationsEntityProto.FieldsType, "[]EntityRef")
-	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 15)
+	configurationsEntityProto.FieldsOrder = append(configurationsEntityProto.FieldsOrder, 16)
 	configurationsEntityProto.FieldsVisibility = append(configurationsEntityProto.FieldsVisibility, false)
 	configurationsEntityProto.FieldsDefaultValue = append(configurationsEntityProto.FieldsDefaultValue, "[]")
 
@@ -10476,14 +10703,12 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 
 	this.SetNeedSave(false)
 	this.SetInit(true)
-	this.object.UUID = this.uuid
-	this.object.TYPENAME = "Config.Configurations"
-
 	var query EntityQuery
 	query.TypeName = "Config.Configurations"
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configurations **/
 	query.Fields = append(query.Fields, "M_id")
@@ -10506,7 +10731,9 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	ConfigurationsInfo = append(ConfigurationsInfo, this.GetUuid())
 	if this.parentPtr != nil {
 		ConfigurationsInfo = append(ConfigurationsInfo, this.parentPtr.GetUuid())
+		ConfigurationsInfo = append(ConfigurationsInfo, this.GetParentLnk())
 	} else {
+		ConfigurationsInfo = append(ConfigurationsInfo, "")
 		ConfigurationsInfo = append(ConfigurationsInfo, "")
 	}
 
@@ -10520,7 +10747,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	lazy_serverConfig := this.lazyMap["M_serverConfig"] != nil && this.object.M_serverConfig == nil
 	if this.object.M_serverConfig != nil && !lazy_serverConfig {
 		serverConfigEntity := GetServer().GetEntityManager().NewConfigServerConfigurationEntity(this.GetUuid(), this.object.M_serverConfig.UUID, this.object.M_serverConfig)
-		ConfigurationsInfo = append(ConfigurationsInfo, serverConfigEntity.uuid)
+		ConfigurationsInfo = append(ConfigurationsInfo, serverConfigEntity.GetUuid())
 		serverConfigEntity.AppendReferenced("serverConfig", this)
 		this.AppendChild("serverConfig", serverConfigEntity)
 		if serverConfigEntity.NeedSave() {
@@ -10536,7 +10763,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	lazy_oauth2Configuration := this.lazyMap["M_oauth2Configuration"] != nil && this.object.M_oauth2Configuration == nil
 	if this.object.M_oauth2Configuration != nil && !lazy_oauth2Configuration {
 		oauth2ConfigurationEntity := GetServer().GetEntityManager().NewConfigOAuth2ConfigurationEntity(this.GetUuid(), this.object.M_oauth2Configuration.UUID, this.object.M_oauth2Configuration)
-		ConfigurationsInfo = append(ConfigurationsInfo, oauth2ConfigurationEntity.uuid)
+		ConfigurationsInfo = append(ConfigurationsInfo, oauth2ConfigurationEntity.GetUuid())
 		oauth2ConfigurationEntity.AppendReferenced("oauth2Configuration", this)
 		this.AppendChild("oauth2Configuration", oauth2ConfigurationEntity)
 		if oauth2ConfigurationEntity.NeedSave() {
@@ -10554,7 +10781,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	if !lazy_serviceConfigs {
 		for i := 0; i < len(this.object.M_serviceConfigs); i++ {
 			serviceConfigsEntity := GetServer().GetEntityManager().NewConfigServiceConfigurationEntity(this.GetUuid(), this.object.M_serviceConfigs[i].UUID, this.object.M_serviceConfigs[i])
-			serviceConfigsIds = append(serviceConfigsIds, serviceConfigsEntity.uuid)
+			serviceConfigsIds = append(serviceConfigsIds, serviceConfigsEntity.GetUuid())
 			serviceConfigsEntity.AppendReferenced("serviceConfigs", this)
 			this.AppendChild("serviceConfigs", serviceConfigsEntity)
 			if serviceConfigsEntity.NeedSave() {
@@ -10573,7 +10800,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	if !lazy_dataStoreConfigs {
 		for i := 0; i < len(this.object.M_dataStoreConfigs); i++ {
 			dataStoreConfigsEntity := GetServer().GetEntityManager().NewConfigDataStoreConfigurationEntity(this.GetUuid(), this.object.M_dataStoreConfigs[i].UUID, this.object.M_dataStoreConfigs[i])
-			dataStoreConfigsIds = append(dataStoreConfigsIds, dataStoreConfigsEntity.uuid)
+			dataStoreConfigsIds = append(dataStoreConfigsIds, dataStoreConfigsEntity.GetUuid())
 			dataStoreConfigsEntity.AppendReferenced("dataStoreConfigs", this)
 			this.AppendChild("dataStoreConfigs", dataStoreConfigsEntity)
 			if dataStoreConfigsEntity.NeedSave() {
@@ -10592,7 +10819,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	if !lazy_smtpConfigs {
 		for i := 0; i < len(this.object.M_smtpConfigs); i++ {
 			smtpConfigsEntity := GetServer().GetEntityManager().NewConfigSmtpConfigurationEntity(this.GetUuid(), this.object.M_smtpConfigs[i].UUID, this.object.M_smtpConfigs[i])
-			smtpConfigsIds = append(smtpConfigsIds, smtpConfigsEntity.uuid)
+			smtpConfigsIds = append(smtpConfigsIds, smtpConfigsEntity.GetUuid())
 			smtpConfigsEntity.AppendReferenced("smtpConfigs", this)
 			this.AppendChild("smtpConfigs", smtpConfigsEntity)
 			if smtpConfigsEntity.NeedSave() {
@@ -10611,7 +10838,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	if !lazy_ldapConfigs {
 		for i := 0; i < len(this.object.M_ldapConfigs); i++ {
 			ldapConfigsEntity := GetServer().GetEntityManager().NewConfigLdapConfigurationEntity(this.GetUuid(), this.object.M_ldapConfigs[i].UUID, this.object.M_ldapConfigs[i])
-			ldapConfigsIds = append(ldapConfigsIds, ldapConfigsEntity.uuid)
+			ldapConfigsIds = append(ldapConfigsIds, ldapConfigsEntity.GetUuid())
 			ldapConfigsEntity.AppendReferenced("ldapConfigs", this)
 			this.AppendChild("ldapConfigs", ldapConfigsEntity)
 			if ldapConfigsEntity.NeedSave() {
@@ -10630,7 +10857,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	if !lazy_applicationConfigs {
 		for i := 0; i < len(this.object.M_applicationConfigs); i++ {
 			applicationConfigsEntity := GetServer().GetEntityManager().NewConfigApplicationConfigurationEntity(this.GetUuid(), this.object.M_applicationConfigs[i].UUID, this.object.M_applicationConfigs[i])
-			applicationConfigsIds = append(applicationConfigsIds, applicationConfigsEntity.uuid)
+			applicationConfigsIds = append(applicationConfigsIds, applicationConfigsEntity.GetUuid())
 			applicationConfigsEntity.AppendReferenced("applicationConfigs", this)
 			this.AppendChild("applicationConfigs", applicationConfigsEntity)
 			if applicationConfigsEntity.NeedSave() {
@@ -10649,7 +10876,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	if !lazy_scheduledTasks {
 		for i := 0; i < len(this.object.M_scheduledTasks); i++ {
 			scheduledTasksEntity := GetServer().GetEntityManager().NewConfigScheduledTaskEntity(this.GetUuid(), this.object.M_scheduledTasks[i].UUID, this.object.M_scheduledTasks[i])
-			scheduledTasksIds = append(scheduledTasksIds, scheduledTasksEntity.uuid)
+			scheduledTasksIds = append(scheduledTasksIds, scheduledTasksEntity.GetUuid())
 			scheduledTasksEntity.AppendReferenced("scheduledTasks", this)
 			this.AppendChild("scheduledTasks", scheduledTasksEntity)
 			if scheduledTasksEntity.NeedSave() {
@@ -10675,7 +10902,7 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	if this.Exist() == true {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
-		query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(ConfigDB, string(queryStr), ConfigurationsInfo, params)
 	} else {
@@ -10702,7 +10929,6 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 		// I must reinit the entity if the entity manager dosent have it.
 		this.object.IsInit = false
 	}
-	this.uuid = id
 	this.lazy = lazy
 
 	// Set the reference on the map
@@ -10711,6 +10937,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 
 	query.Fields = append(query.Fields, "UUID")
 	query.Fields = append(query.Fields, "ParentUuid")
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	/** members of Configurations **/
 	query.Fields = append(query.Fields, "M_id")
@@ -10728,7 +10955,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 
 	query.Fields = append(query.Fields, "childsUuid")
 	query.Fields = append(query.Fields, "referenced")
-	query.Indexs = append(query.Indexs, "UUID="+this.uuid)
+	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
 	var params []interface{}
@@ -10745,36 +10972,37 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 
 		/** initialyzation of the entity object **/
 		this.object = new(Config.Configurations)
-		this.object.UUID = this.uuid
 		this.object.TYPENAME = "Config.Configurations"
 
-		this.parentUuid = results[0][1].(string)
+		this.object.UUID = results[0][0].(string)
+		this.object.ParentUuid = results[0][1].(string)
+		this.object.ParentLnk = results[0][2].(string)
 
 		/** members of Configurations **/
 
 		/** id **/
-		if results[0][2] != nil {
-			this.object.M_id = results[0][2].(string)
+		if results[0][3] != nil {
+			this.object.M_id = results[0][3].(string)
 		}
 
 		/** name **/
-		if results[0][3] != nil {
-			this.object.M_name = results[0][3].(string)
+		if results[0][4] != nil {
+			this.object.M_name = results[0][4].(string)
 		}
 
 		/** version **/
-		if results[0][4] != nil {
-			this.object.M_version = results[0][4].(string)
+		if results[0][5] != nil {
+			this.object.M_version = results[0][5].(string)
 		}
 
 		/** filePath **/
-		if results[0][5] != nil {
-			this.object.M_filePath = results[0][5].(string)
+		if results[0][6] != nil {
+			this.object.M_filePath = results[0][6].(string)
 		}
 
 		/** serverConfig **/
-		if results[0][6] != nil {
-			uuid := results[0][6].(string)
+		if results[0][7] != nil {
+			uuid := results[0][7].(string)
 			if len(uuid) > 0 {
 				var serverConfigEntity *Config_ServerConfigurationEntity
 				if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
@@ -10790,8 +11018,8 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 		}
 
 		/** oauth2Configuration **/
-		if results[0][7] != nil {
-			uuid := results[0][7].(string)
+		if results[0][8] != nil {
+			uuid := results[0][8].(string)
 			if len(uuid) > 0 {
 				var oauth2ConfigurationEntity *Config_OAuth2ConfigurationEntity
 				if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
@@ -10807,8 +11035,8 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 		}
 
 		/** serviceConfigs **/
-		if results[0][8] != nil {
-			uuidsStr := results[0][8].(string)
+		if results[0][9] != nil {
+			uuidsStr := results[0][9].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -10835,8 +11063,8 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 		}
 
 		/** dataStoreConfigs **/
-		if results[0][9] != nil {
-			uuidsStr := results[0][9].(string)
+		if results[0][10] != nil {
+			uuidsStr := results[0][10].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -10863,8 +11091,8 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 		}
 
 		/** smtpConfigs **/
-		if results[0][10] != nil {
-			uuidsStr := results[0][10].(string)
+		if results[0][11] != nil {
+			uuidsStr := results[0][11].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -10891,8 +11119,8 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 		}
 
 		/** ldapConfigs **/
-		if results[0][11] != nil {
-			uuidsStr := results[0][11].(string)
+		if results[0][12] != nil {
+			uuidsStr := results[0][12].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -10919,8 +11147,8 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 		}
 
 		/** applicationConfigs **/
-		if results[0][12] != nil {
-			uuidsStr := results[0][12].(string)
+		if results[0][13] != nil {
+			uuidsStr := results[0][13].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -10947,8 +11175,8 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 		}
 
 		/** scheduledTasks **/
-		if results[0][13] != nil {
-			uuidsStr := results[0][13].(string)
+		if results[0][14] != nil {
+			uuidsStr := results[0][14].(string)
 			uuids := make([]string, 0)
 			err := json.Unmarshal([]byte(uuidsStr), &uuids)
 			if err != nil {
@@ -10973,7 +11201,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 				}
 			}
 		}
-		childsUuidStr := results[0][14].(string)
+		childsUuidStr := results[0][15].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -10982,7 +11210,7 @@ func (this *Config_ConfigurationsEntity) InitEntity(id string, lazy bool) error 
 			}
 		}
 
-		referencedStr := results[0][15].(string)
+		referencedStr := results[0][16].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -11047,6 +11275,8 @@ func (this *Config_ConfigurationsEntity) AppendChild(attributeName string, child
 	}
 	// Set this as parent in the child
 	child.SetParentPtr(this)
+
+	child.SetParentLnk(attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()

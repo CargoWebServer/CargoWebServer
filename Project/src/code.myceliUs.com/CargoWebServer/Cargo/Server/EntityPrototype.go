@@ -161,12 +161,20 @@ func NewEntityPrototype() *EntityPrototype {
 	prototype.FieldsOrder = append(prototype.FieldsOrder, 0)
 	prototype.FieldsType = append(prototype.FieldsType, "xs.string")
 	prototype.FieldsVisibility = append(prototype.FieldsVisibility, false)
+	prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
 
 	prototype.Fields = append(prototype.Fields, "ParentUuid")
 	prototype.Indexs = append(prototype.Indexs, "ParentUuid")
 	prototype.FieldsOrder = append(prototype.FieldsOrder, 1)
 	prototype.FieldsType = append(prototype.FieldsType, "xs.string")
 	prototype.FieldsVisibility = append(prototype.FieldsVisibility, false)
+	prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
+
+	prototype.Fields = append(prototype.Fields, "ParentLnk")
+	prototype.FieldsOrder = append(prototype.FieldsOrder, 3)
+	prototype.FieldsType = append(prototype.FieldsType, "xs.string")
+	prototype.FieldsVisibility = append(prototype.FieldsVisibility, false)
+	prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
 
 	return prototype
 }
@@ -236,6 +244,7 @@ func (this *EntityPrototype) Create(storeId string) error {
 	eventDatas = append(eventDatas, evtData)
 	evt, _ := NewEvent(NewPrototypeEvent, PrototypeEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
+
 	return nil
 
 }
@@ -255,106 +264,105 @@ func (this *EntityPrototype) Save(storeId string) error {
 		return err
 	}
 
-	entities, _ := GetServer().GetEntityManager().getEntities(prototype.TypeName, "", storeId, false)
-
-	// Remove the fields
-	for i := 0; i < len(entities); i++ {
-		entity := entities[i].(*DynamicEntity) // Must be a dynamic entity.
-
-		// remove it...
-		for j := 0; j < len(this.FieldsToDelete); j++ {
-			field := prototype.Fields[this.FieldsToDelete[j]]
-			entity.deleteValue(field)
-		}
-
-		for j := 0; j < len(this.FieldsToUpdate); j++ {
-			values := strings.Split(this.FieldsToUpdate[j], ":")
-			if len(values) == 2 {
-				indexFrom := prototype.getFieldIndex(values[0])
-				indexTo := this.getFieldIndex(values[1])
-				if indexFrom > -1 && indexTo > -1 {
-					if values[0] != values[1] {
-						// Set the new value with the old one
-						entity.setValue(values[1], entity.getValue(values[0]))
-						// Delete the old one.
-						entity.deleteValue(values[0])
-					}
-					var fieldTypeTo = prototype.FieldsType[indexTo]
-					var fieldTypeFrom = this.FieldsType[indexFrom]
-					if fieldTypeFrom != fieldTypeTo {
-						log.Println("------> change field type from ", fieldTypeFrom, "with", fieldTypeTo)
-
-					}
-				}
-			}
-		}
-
-		// Set the new entity prototype
-		entity.prototype = this
-
-		// Now set new fields value inside existing entities with their default
-		// value.
-		for j := 0; j < len(this.Fields); j++ {
-			if !Utility.Contains(prototype.Fields, this.Fields[j]) {
-				// I that case I will set the new field value inside the prototype.
-				var value interface{}
-				if strings.HasPrefix(this.FieldsType[j], "[]") {
-					value = "undefined"
-				} else {
-					if XML_Schemas.IsXsString(this.FieldsType[j]) {
-						value = this.FieldsDefaultValue[j]
-					} else if XML_Schemas.IsXsInt(this.FieldsType[j]) || XML_Schemas.IsXsTime(this.FieldsType[j]) {
-						value, _ = strconv.ParseInt(this.FieldsDefaultValue[j], 10, 64)
-					} else if XML_Schemas.IsXsNumeric(this.FieldsType[j]) {
-						value, _ = strconv.ParseFloat(this.FieldsDefaultValue[j], 64)
-					} else if XML_Schemas.IsXsDate(this.FieldsType[j]) {
-						value = Utility.MakeTimestamp()
-					} else if XML_Schemas.IsXsBoolean(this.FieldsType[j]) {
-						if this.FieldsDefaultValue[j] == "false" {
-							value = false
-						} else {
-							value = true
-						}
-					} else {
-						// Object here.
-						value = "undefined"
-					}
-				}
-
-				log.Println("----> set field ", this.Fields[j], value)
-				entity.SetNeedSave(true)
-				entity.setValue(this.Fields[j], value)
-				log.Println("----> values ", entity.GetObject())
-			}
-		}
-
-		// Save the entity.
-		entity.SaveEntity()
-
-	}
-
 	store := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
 	if store != nil {
 		err := store.saveEntityPrototype(this)
 		if err != nil {
 			log.Println("Fail to save entity prototype ", this.TypeName, " in store id ", storeId)
 			return err
+		} else {
+
+			// Register it to the vm...
+			JS.GetJsRuntimeManager().AppendScript(this.generateConstructor())
+
+			var eventDatas []*MessageData
+			evtData := new(MessageData)
+			evtData.Name = "prototype"
+
+			evtData.Value = this
+			eventDatas = append(eventDatas, evtData)
+			evt, _ := NewEvent(UpdatePrototypeEvent, PrototypeEvent, eventDatas)
+			GetServer().GetEventManager().BroadcastEvent(evt)
+
+			entities, _ := GetServer().GetEntityManager().getEntities(prototype.TypeName, "", storeId, false)
+
+			// Remove the fields
+			for i := 0; i < len(entities); i++ {
+				entity := entities[i].(*DynamicEntity) // Must be a dynamic entity.
+
+				// remove it...
+				for j := 0; j < len(this.FieldsToDelete); j++ {
+					field := prototype.Fields[this.FieldsToDelete[j]]
+					entity.deleteValue(field)
+				}
+
+				for j := 0; j < len(this.FieldsToUpdate); j++ {
+					values := strings.Split(this.FieldsToUpdate[j], ":")
+					if len(values) == 2 {
+						indexFrom := prototype.getFieldIndex(values[0])
+						indexTo := this.getFieldIndex(values[1])
+						if indexFrom > -1 && indexTo > -1 {
+							if values[0] != values[1] {
+								// Set the new value with the old one
+								log.Println("-----------> set Value ", values[1], " with value ", entity.getValue(values[0]))
+								entity.setValue(values[1], entity.getValue(values[0]))
+								// Delete the old one.
+								entity.deleteValue(values[0])
+								entity.SetNeedSave(true)
+								prototype.Fields[indexFrom] = values[1]
+							}
+							var fieldTypeTo = prototype.FieldsType[indexTo]
+							var fieldTypeFrom = this.FieldsType[indexFrom]
+							if fieldTypeFrom != fieldTypeTo {
+								log.Println("------> change field type from ", fieldTypeFrom, "with", fieldTypeTo)
+							}
+						}
+					}
+				}
+
+				// Set the new entity prototype
+				entity.prototype = this
+
+				// Now set new fields value inside existing entities with their default
+				// value.
+				for j := 0; j < len(this.Fields); j++ {
+					if !Utility.Contains(prototype.Fields, this.Fields[j]) {
+						// I that case I will set the new field value inside the prototype.
+						var value interface{}
+						if strings.HasPrefix(this.FieldsType[j], "[]") {
+							value = "undefined"
+						} else {
+							if XML_Schemas.IsXsString(this.FieldsType[j]) {
+								value = this.FieldsDefaultValue[j]
+							} else if XML_Schemas.IsXsInt(this.FieldsType[j]) || XML_Schemas.IsXsTime(this.FieldsType[j]) {
+								value, _ = strconv.ParseInt(this.FieldsDefaultValue[j], 10, 64)
+							} else if XML_Schemas.IsXsNumeric(this.FieldsType[j]) {
+								value, _ = strconv.ParseFloat(this.FieldsDefaultValue[j], 64)
+							} else if XML_Schemas.IsXsDate(this.FieldsType[j]) {
+								value = Utility.MakeTimestamp()
+							} else if XML_Schemas.IsXsBoolean(this.FieldsType[j]) {
+								if this.FieldsDefaultValue[j] == "false" {
+									value = false
+								} else {
+									value = true
+								}
+							} else {
+								// Object here.
+								value = "undefined"
+							}
+						}
+						entity.SetNeedSave(true)
+						entity.setValue(this.Fields[j], value)
+					}
+				}
+
+				// Save the entity.
+				entity.SaveEntity()
+
+			}
 		}
 	}
 
-	// Register it to the vm...
-	JS.GetJsRuntimeManager().AppendScript(this.generateConstructor())
-
-	var eventDatas []*MessageData
-	evtData := new(MessageData)
-	evtData.Name = "prototype"
-
-	evtData.Value = this
-	eventDatas = append(eventDatas, evtData)
-	evt, _ := NewEvent(UpdatePrototypeEvent, PrototypeEvent, eventDatas)
-	GetServer().GetEventManager().BroadcastEvent(evt)
-
-	log.Println("-----> prototype: ", this)
 	return nil
 }
 
@@ -385,6 +393,7 @@ func (this *EntityPrototype) generateConstructor() string {
 	constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
 	constructorSrc += " this.UUID = \"\"\n"
 	constructorSrc += " this.ParentUuid = \"\"\n"
+	constructorSrc += " this.ParentLnk = \"\"\n"
 	constructorSrc += " this.childsUuid = []\n"
 	constructorSrc += " this.references = []\n"
 	constructorSrc += " this.NeedSave = true\n"

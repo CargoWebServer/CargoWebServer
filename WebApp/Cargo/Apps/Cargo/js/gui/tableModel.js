@@ -223,7 +223,7 @@ EntityTableModel.prototype.removeRow = function (rowIndex, callback) {
 
     // Now I will get the data type for that type.
     var parentPrototype = entityPrototypes[parentEntity.TYPENAME]
-    var field = entity.parentLnk
+    var field = entity.ParentLnk
     var fieldType = parentPrototype.FieldsType[parentPrototype.getFieldIndex(field)]
 
     var isRef = fieldType.endsWith(":Ref")
@@ -349,7 +349,7 @@ EntityTableModel.prototype.saveValue = function (row) {
         entity.NeedSave = true
         if (entity.exist == false) {
             // Remove the tmp entity...
-            server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, entity.M_id, entity,
+            server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity.TYPENAME, entity.M_id, entity,
                 // Success callback
                 function (entity, table) {
 

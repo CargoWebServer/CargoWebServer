@@ -105,7 +105,6 @@ func (this *EntityManager) initialize() {
 		cargoEntities.object.M_name = "Cargo entities"
 		cargoEntities.object.M_version = "1.0"
 		cargoEntities.object.NeedSave = true
-
 		cargoEntities.SaveEntity()
 	}
 
@@ -736,7 +735,6 @@ func (this *EntityManager) getEntityById(storeId string, typeName string, ids []
 			query.Indexs = append(query.Indexs, idField+"="+Utility.ToString(ids[i-1]))
 		}
 		queryStr, _ := json.Marshal(query)
-
 		results, err = GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
 		if err != nil {
 			// Create the error message
@@ -821,7 +819,6 @@ func (this *EntityManager) getEntities(typeName string, queryStr string, storeId
 
 	if len(queryStr) == 0 {
 		values, err := dataStore.(*KeyValueDataStore).getIndexation(typeName)
-
 		if err != nil {
 			errObj := NewError(Utility.FileLine(), DATASTORE_INDEXATION_ERROR, SERVER_ERROR_CODE, errors.New("No indexation for type '"+typeName+"'."))
 			return entities, errObj
@@ -1383,6 +1380,8 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		} else {
 			// Append the child into it parent and save it.
 			parentPtr.AppendChild(attributeName, entity.(Entity))
+
+			log.Println("---------> append child ", entity.(Entity).GetUuid(), " to ", parentPtr.GetUuid())
 			// Set need save at true.
 			parentPtr.SetNeedSave(true)
 			parentPtr.SaveEntity()
@@ -1562,7 +1561,9 @@ func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}
 //	undefined, //progress callback
 //	function (results, caller) { // Success callback
 // 	   if(caller.successCallback!=undefined){
-//      	caller.successCallback(results[0], caller.caller)
+// 			var prototype = new EntityPrototype()
+//			prototype.init(results[0])
+//      	caller.successCallback(prototype, caller.caller)
 //          caller.successCallback = undefined
 //		}
 //	},
@@ -1631,7 +1632,9 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
 //	undefined, //progress callback
 //	function (results, caller) { // Success callback
 // 	   if(caller.successCallback!=undefined){
-//      		caller.successCallback(results[0], caller.caller)
+// 			 var prototype = new EntityPrototype()
+//			 prototype.init(results[0])
+//      	 caller.successCallback(prototype, caller.caller)
 //           caller.successCallback = undefined
 //		}
 //	},

@@ -480,7 +480,7 @@ Table.prototype.appendRow = function (values, id) {
 								if (table.model.entities[i] != undefined) {
 									if (table.model.entities[i].UUID == entity.UUID) {
 										row = row.table.appendRow(entity, entity.UUID)
-										entity.parentLnk = row.table.model.entities[row.index].parentLnk
+										entity.ParentLnk = row.table.model.entities[row.index].ParentLnk
 										row.table.model.entities[row.index] = entity
 										row.saveBtn.element.style.visibility = "hidden"
 									}
@@ -1055,7 +1055,7 @@ TableCell.prototype.formatValue = function (value) {
 										}, this)
 								} else {
 									// Here the entity dosent exist...
-									server.entityManager.createEntity(entity.ParentUuid, entity.parentLnk, entity.TYPENAME, "", entity,
+									server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity.TYPENAME, "", entity,
 										function (result, caller) {
 											caller.style.visibility = "hidden"
 										},
@@ -1200,7 +1200,7 @@ TableCell.prototype.formatValue = function (value) {
 							itemsTable.init() // connect events...
 							for (var i = 0; i < values.length; i++) {
 								if (values[i].UUID != undefined) {
-									values[i].parentLnk = field
+									values[i].ParentLnk = field
 									itemsTable.appendRow(values[i], values[i].UUID)
 								} else {
 									itemsTable.model.fields[0] = fieldType
@@ -1227,7 +1227,7 @@ TableCell.prototype.formatValue = function (value) {
 
 						// Set the parent uuid.
 						item.ParentUuid = entity.UUID
-						item.parentLnk = field
+						item.ParentLnk = field
 
 						if (itemTable == undefined) {
 							itemTable = entity[field + "_table"]
@@ -1529,7 +1529,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 
 											valueDiv.element.style.display = ""
 											tableCell.row.saveBtn.element.style.visibility = "visible"
-											entity.parentLnk = tableCell.row.table.model.entities[tableCell.row.index].parentLnk
+											entity.ParentLnk = tableCell.row.table.model.entities[tableCell.row.index].ParentLnk
 											tableCell.row.table.model.entities[tableCell.row.index] = entity
 											try {
 												editor.element.parentNode.removeChild(editor.element)
@@ -1573,7 +1573,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 							} else {
 								// Here the entity dosent already exist so I will create it...
 								var entity = eval("new " + typeName + "()")
-								entity.parentLnk = field
+								entity.ParentLnk = field
 								server.entityManager.createEntity(parent.UUID, field, entity.TYPENAME, "", entity,
 									function (result, caller) {
 										// Set the newly created entity.

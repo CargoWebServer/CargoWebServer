@@ -280,6 +280,7 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += " this.UUID = this.UUID\n"
     constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
     constructorSrc += " this.ParentUuid = \"\"\n"
+    constructorSrc += " this.ParentLnk = \"\"\n"
     constructorSrc += " this.childsUuid = []\n"
     constructorSrc += " this.references = []\n"
     constructorSrc += " this.NeedSave = true\n"
