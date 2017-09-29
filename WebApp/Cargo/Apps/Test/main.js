@@ -50,14 +50,14 @@ function main() {
 
     //entityTests()
 
-    server.sessionManager.login("admin", "adminadmin", "localhost",
+    /*server.sessionManager.login("admin", "adminadmin", "localhost",
         function () {
             // Create the dynamic entity here.
             testDynamicEntity()
         },
         function () {
             // Nothing to do here.
-        }, {})
+        }, {})*/
 
 
     // entityDump("item_1", "Test.Item")
@@ -76,7 +76,7 @@ function main() {
     //testSayHello("Dave")
     //entityDump( "CARGO_ENTITIES", "CargoEntities.Entities")
     //entitiesDump("XPDMXML.ProcessStructureType")
-    entitiesDump("CatalogSchema.CatalogType")
+    // entitiesDump("CatalogSchema.CatalogType")
 
     //testEntityQuery()
 
@@ -86,6 +86,67 @@ function main() {
     // TestUploadFile()
 
     // Test get bmpn defintion instance...
+
+    // Test read directory content.
+    var dir = "\\\\mon-filer-01\\data\\Departement Commun\\Buffer\\Pierre-Olivier\\15-SQL Proactiv\\02-Documentations\\SILMA_Export-Sample"
+    server.fileManager.readDir(dir,
+        function (results, caller) {
+            var paths = results[0]
+            for (var i = 0; i < paths.length; i++) {
+                var path = paths[i]
+                if (path != undefined) {
+                    if (path.endsWith(".XLS") || path.endsWith(".xls") || path.endsWith(".XLSX") || path.endsWith(".xlsx")) {
+                        console.log("Excel file path: ", caller.dir + "\\" + path)
+                        // Now I will read the excel content.
+
+                        // Not working with old file format.
+                        /*server.fileManager.readExcelFile(caller.dir + "/" + path, "01",
+                            // Progress callback
+                            function () {
+                                // nothing to do here.
+                            },
+                            // Sucess callback
+                            function (results, caller) {
+                                console.log(results)
+                            },
+                            // Error callback
+                            function (errObj, caller) {
+                                console.log(errObj)
+                            }, {})*/
+
+                        // Here I will use vb script to convert xls to csv.
+                        var excelPath = caller.dir + "\\" + path
+                        var csvPath = "C:\\Temp\\" + path.replace("XLS", "csv").replace("xls", "csv").replace("XLSX", "csv").replace("xlsx", "csv")
+                        server.executeVbSrcript("xlsx2csv.vbs", [excelPath, csvPath],
+                            function(csvPath){
+                                return function (results, caller) {
+                                        // So here I will read the csv file.
+                                        server.fileManager.readCsvFile(csvPath,
+                                            function(csvPath){
+                                            return function (results, caller) {
+                                                console.log(results)
+                                                // TODO Process the result here...
+                                                
+                                                // Remove the file...
+                                                server.fileManager.removeFile(csvPath)
+                                            }}(csvPath),
+                                            function (errObj, caller) {
+                                                console.log(errObj)
+                                            },
+                                            {})
+                                    }
+                            }(csvPath)
+                           ,
+                            function (errObj, caller) {
+
+                            }, {})
+                    }
+                }
+            }
+        },
+        function (errObj, caller) {
+
+        }, { "dir": dir })
 
     /* server.entityManager.getEntityPrototypes("Test",
          // Success callback.
@@ -192,7 +253,7 @@ function testServiceContainer() {
                     {} // The caller
                 )
             }
-        } (service),
+        }(service),
         function () {
             console.log("Service is close!")
         })
@@ -270,7 +331,7 @@ function entityDump(id, typeName) {
                         return function (panel) {
                             panel.setEntity(entity)
                         }
-                    } (result), undefined, false, result, "")
+                    }(result), undefined, false, result, "")
                 },
                 function (errObj, caller) {
                     console.log(errObj)
@@ -296,7 +357,7 @@ function entitiesDump(typeName) {
                             return function (panel) {
                                 panel.setEntity(entity)
                             }
-                        } (results[i]), undefined, false, results[i], "")
+                        }(results[i]), undefined, false, results[i], "")
                     }
                 },
                 // Error callback.
@@ -386,7 +447,7 @@ function TestWebRtc1() {
                 return function (stream) {
                     videoPanel.element.src = window.URL.createObjectURL(stream);
                 }
-            } (videoPanel),
+            }(videoPanel),
             function (err) { }
         );
     } else {
@@ -418,7 +479,7 @@ function TestWebRtc2() {
 
                 streaming = true
             }
-        } (video, canvas),
+        }(video, canvas),
             function (error) {
                 console.log("Raised an error when capturing:", error);
             });
@@ -433,7 +494,7 @@ function TestWebRtc2() {
                         context.drawImage(video, 0, 0);
                     }
                 }
-            } (canvas.element, video.element));
+            }(canvas.element, video.element));
     } else {
         alert("Sorry, your browser does not support getUserMedia.");
     }

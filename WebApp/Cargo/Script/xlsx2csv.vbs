@@ -11,7 +11,7 @@ xlPath = WScript.Arguments(0)
 csvPath = WScript.Arguments(1)
 
 set xlWb = xlApp.Workbooks.Open(xlPath,,1)
-xlApp.DisplayAlerts = False
+xlApp.DisplayAlerts = false
 call xlWb.saveas(csvPath, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, local)
 xlApp.Quit
 

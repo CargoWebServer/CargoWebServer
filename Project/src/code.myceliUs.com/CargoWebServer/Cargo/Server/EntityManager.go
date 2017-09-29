@@ -1380,8 +1380,6 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		} else {
 			// Append the child into it parent and save it.
 			parentPtr.AppendChild(attributeName, entity.(Entity))
-
-			log.Println("---------> append child ", entity.(Entity).GetUuid(), " to ", parentPtr.GetUuid())
 			// Set need save at true.
 			parentPtr.SetNeedSave(true)
 			parentPtr.SaveEntity()

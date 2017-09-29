@@ -271,7 +271,6 @@ func (this *EntityPrototype) Save(storeId string) error {
 			log.Println("Fail to save entity prototype ", this.TypeName, " in store id ", storeId)
 			return err
 		} else {
-
 			// Register it to the vm...
 			JS.GetJsRuntimeManager().AppendScript(this.generateConstructor())
 
@@ -294,6 +293,8 @@ func (this *EntityPrototype) Save(storeId string) error {
 				for j := 0; j < len(this.FieldsToDelete); j++ {
 					field := prototype.Fields[this.FieldsToDelete[j]]
 					entity.deleteValue(field)
+					entity.SetNeedSave(true)
+					entity.SaveEntity() // Must be save before doing something else.
 				}
 
 				for j := 0; j < len(this.FieldsToUpdate); j++ {
@@ -304,7 +305,6 @@ func (this *EntityPrototype) Save(storeId string) error {
 						if indexFrom > -1 && indexTo > -1 {
 							if values[0] != values[1] {
 								// Set the new value with the old one
-								log.Println("-----------> set Value ", values[1], " with value ", entity.getValue(values[0]))
 								entity.setValue(values[1], entity.getValue(values[0]))
 								// Delete the old one.
 								entity.deleteValue(values[0])
@@ -315,6 +315,7 @@ func (this *EntityPrototype) Save(storeId string) error {
 							var fieldTypeFrom = this.FieldsType[indexFrom]
 							if fieldTypeFrom != fieldTypeTo {
 								log.Println("------> change field type from ", fieldTypeFrom, "with", fieldTypeTo)
+								// TODO set conversion rules here for each possible types.
 							}
 						}
 					}
@@ -358,7 +359,6 @@ func (this *EntityPrototype) Save(storeId string) error {
 
 				// Save the entity.
 				entity.SaveEntity()
-
 			}
 		}
 	}

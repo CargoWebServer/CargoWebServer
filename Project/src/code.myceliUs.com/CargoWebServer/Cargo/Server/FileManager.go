@@ -1321,7 +1321,6 @@ func (this *FileManager) WriteExcelFile(filePath string, sheetName string, value
 // @param {callback} errorCallback In case of error.
 func (this *FileManager) ReadExcelFile(filePath string, sheetName string, messageId string, sessionId string) map[string][][]string {
 	values := make(map[string][][]string, 0)
-
 	xlFile, err := xlsx.OpenFile(filePath)
 	if err != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err))
@@ -1355,6 +1354,31 @@ func (this *FileManager) ReadExcelFile(filePath string, sheetName string, messag
 	}
 
 	return values
+}
+
+// @api 1.0
+// Return the list of file/directory contain in a directory at given path.
+// @param {string} path The file path of the file to read.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {[]string} The list of files.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this FileManager) ReadDir(path string, messageId string, sessionId string) []string {
+	var lst []string
+	files, err := ioutil.ReadDir(path)
+
+	if err != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, NewError(Utility.FileLine(), FILE_READ_ERROR, SERVER_ERROR_CODE, err))
+		return nil
+	}
+
+	for _, f := range files {
+		lst = append(lst, f.Name())
+	}
+
+	return lst
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -211,10 +211,10 @@ EntityPanel.prototype.show = function () {
  * Return the entity currently display by the entity panel.
  */
 EntityPanel.prototype.getEntity = function () {
-	if(this.entity == null){
+	if (this.entity == null) {
 		return null
 	}
-	if(entities[this.entity.UUID] != undefined){
+	if (entities[this.entity.UUID] != undefined) {
 		return entities[this.entity.UUID]
 	}
 	return this.entity
@@ -230,7 +230,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 	}
 
 	// Point to the entities map.
-	if(entities[entity.UUID]!=undefined){
+	if (entities[entity.UUID] != undefined) {
 		entity = entities[entity.UUID]
 	}
 
@@ -408,7 +408,7 @@ EntityPanel.prototype.clear = function () {
 	}
 
 	this.entity = null
-	
+
 	this.init(this.proto)
 	if (this.initCallback != undefined) {
 		this.initCallback(this)
@@ -719,7 +719,7 @@ EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType
 			control = valueDiv.appendElement({ "tag": "input", "id": id }).down()
 		} else if (isXsRef(fieldType)) {
 			// Reference here... autocomplete...
-			control = valueDiv.appendElement({ "tag": "input", "id": id }).down()
+			control = valueDiv.appendElement({ "tag": "input", "id": id, "type":"url" }).down()
 		} else if (isXsInt(fieldType)) {
 			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "1", "id": id }).down()
 		} else if (isXsDate(fieldType)) {
@@ -874,10 +874,10 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 				newLnkButton = label.appendElement({ "tag": "div", "class": "entities_btn", "style": "display: none;", "id": this.proto.TypeName + "_" + fieldType + "_" + field + "_plus_btn" }).down()
 				newLnkButton.appendElement({ "tag": "i", "class": "fa fa-pencil-square-o" }).down()
 				control = valueDiv.appendElement({ "tag": "div", "id": id }).down()
-			} else  {
+			} else {
 				// Here I have a item inside another item...
 				var uuid = ""
-				if(this.getEntity() != null){
+				if (this.getEntity() != null) {
 					uuid = this.getEntity().UUID
 				}
 				var subentityPanel = new EntityPanel(valueDiv, fieldType, function () { }, undefined, true, uuid, field)
@@ -933,7 +933,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 										return function (value) {
 											// Here I will set the field of the entity...
 											var entity = entityPanel.getEntity()
-		
+
 											if (entity != undefined) {
 												// Set the new object value.
 												appendObjectValue(entity, field, value)
@@ -1007,7 +1007,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 										if (entities[entity.UUID] != undefined) {
 											entity = entities[entity.UUID]
 										}
-										
+
 										// Here I will simply remove the element 
 										// The entity must contain a list of field...
 										if (entity[field] != undefined) {
@@ -1098,9 +1098,9 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 					// Display the save button if the entity has changed.
 					if (entity.NeedSave) {
-						if(entityPanel.parentEntityPanel != null){
+						if (entityPanel.parentEntityPanel != null) {
 							entityPanel.parentEntityPanel.saveBtn.element.style.display = "table-cell"
-						}else{
+						} else {
 							entityPanel.saveBtn.element.style.display = "table-cell"
 						}
 					}
@@ -1113,9 +1113,9 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 					if (entityPanel.getEntity() != null) {
 						if (this.value.length > 0) {
 							if (entityPanel.getEntity()[field] != this.value) {
-								if(entityPanel.parentEntityPanel != null){
+								if (entityPanel.parentEntityPanel != null) {
 									entityPanel.parentEntityPanel.saveBtn.element.style.display = "table-cell"
-								}else{
+								} else {
 									entityPanel.saveBtn.element.style.display = "table-cell"
 								}
 							}
@@ -1155,7 +1155,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 				function (entityPanel) {
 					return function (value) {
 						var entity = value
-						if(entities[value.UUID] != undefined){
+						if (entities[value.UUID] != undefined) {
 							entity = entities[value.UUID]
 						}
 
@@ -1235,7 +1235,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 					return function () {
 						// Here I will simply remove the element 
 						// The entity must contain a list of field...
-						if(entities[entity.UUID] != undefined){
+						if (entities[entity.UUID] != undefined) {
 							entity = entities[entity.UUID]
 						}
 
@@ -1252,7 +1252,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 					return function () {
 						// Here I will simply remove the element 
 						// The entity must contain a list of field...
-						if(entities[entity.UUID] != undefined){
+						if (entities[entity.UUID] != undefined) {
 							entity = entities[entity.UUID]
 						}
 
@@ -1327,7 +1327,6 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 		// Now the action...
 		ref.element.onclick = function (object, propertiePanel) {
 			return function () {
-				// alert(object.UUID)
 				// so here I will get the entity value and display it on the server...
 				propertiePanel.panel.element.style.display = "none"
 
@@ -1524,7 +1523,6 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 		} else if (isXsId(fieldType)) {
 			control.element.value = value
 		} else if (isXsRef(fieldType)) {
-			alert("Ref Found!")
 			control.element.innerHTML = value.replace("#", "")
 			control.element.href = value
 		}
