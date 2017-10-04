@@ -291,7 +291,7 @@ EntityPrototype.prototype.generateConstructor = function () {
 
     // Common properties share by all entity.
     constructorSrc += " this.__class__ = \"" + this.PackageName + "." + this.ClassName + "\"\n"
-    constructorSrc += " this.UUID = this.UUID\n"
+    constructorSrc += " this.UUID = \"\"\n"
     constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
     constructorSrc += " this.ParentUuid = \"\"\n"
     constructorSrc += " this.ParentLnk = \"\"\n"
@@ -350,7 +350,7 @@ EntityPrototype.prototype.generateConstructor = function () {
             } else if (isXsBoolean(this.FieldsType[i])) {
                 constructorSrc += " = false\n"
             } else if (this.FieldsType[i].startsWith("enum:")) {
-                constructorSrc += " = 1\n"
+                constructorSrc += " = 0\n"
             } else {
                 // Object here.
                 if(this.FieldsType[i].startsWith("xs.")){
@@ -359,7 +359,7 @@ EntityPrototype.prototype.generateConstructor = function () {
                     if(this.FieldsType[i].endsWith(":Ref")){
                         constructorSrc += " = null\n"
                     }else if(this.FieldsType[i].startsWith("enum:") ){
-                        constructorSrc += " = 1\n"
+                        constructorSrc += " = 0\n"
                     }else{
                         // Create a new entity.
                         constructorSrc += " = eval(\"new \" + "+ this.FieldsType[i] +" + \"()\")\n"
