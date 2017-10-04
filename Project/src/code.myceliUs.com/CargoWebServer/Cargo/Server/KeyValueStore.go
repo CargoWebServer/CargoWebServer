@@ -150,19 +150,20 @@ func (this *KeyValueDataStore) deleteValue(key string) error {
  * That function is use to create an extension of a given prototype.
  */
 func (this *KeyValueDataStore) setSuperTypeFields(prototype *EntityPrototype) {
-	var index = 2 // The start index is after the uuid and parentUuid.
+	var index = 3 // The start index is after the uuid and parentUuid and the parent lnk.
 	for i := 0; i < len(prototype.SuperTypeNames); i++ {
 		superTypeName := prototype.SuperTypeNames[i]
 		superPrototype, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
 		if err == nil {
 			// I will merge the fields
-			// The first to fields are always the uuid and parentUuid and the last is the childUuids and referenced
-			for j := 2; j < len(superPrototype.Fields)-2; j++ {
+			// The first to fields are always the uuid, parentUuid, parentLnk and the last is the childUuids and referenced
+			for j := 3; j < len(superPrototype.Fields)-2; j++ {
 				if !Utility.Contains(prototype.Fields, superPrototype.Fields[j]) {
 					Utility.InsertStringAt(index, superPrototype.Fields[j], &prototype.Fields)
 					Utility.InsertStringAt(index, superPrototype.FieldsType[j], &prototype.FieldsType)
 					Utility.InsertBoolAt(index, superPrototype.FieldsVisibility[j], &prototype.FieldsVisibility)
 					Utility.InsertStringAt(index, superPrototype.FieldsDefaultValue[j], &prototype.FieldsDefaultValue)
+
 					// create a new index at the end...
 					if superPrototype.FieldsNillable != nil {
 						isNillable := false
@@ -202,12 +203,14 @@ func (this *KeyValueDataStore) setSuperTypeFields(prototype *EntityPrototype) {
 
 			// Now I will append the new prototype to the list of substitution group of the super type.
 			if !Utility.Contains(superPrototype.SubstitutionGroup, prototype.TypeName) {
-				superPrototype.SubstitutionGroup = append(superPrototype.SubstitutionGroup, prototype.TypeName)
-				// save it to it store...
-				superPrototype.Save(superPrototype.TypeName[0:strings.Index(superPrototype.TypeName, ".")])
+				if !Utility.Contains(superPrototype.SubstitutionGroup, prototype.TypeName) {
+					superPrototype.SubstitutionGroup = append(superPrototype.SubstitutionGroup, prototype.TypeName)
+					// save it to it store...
+					superPrototype.Save(superPrototype.TypeName[0:strings.Index(superPrototype.TypeName, ".")])
+				}
 			}
 		} else {
-			log.Println("-----> error ", err)
+			log.Println("error ", err)
 		}
 	}
 

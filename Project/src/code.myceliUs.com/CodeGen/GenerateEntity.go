@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"strconv"
 	"strings"
 
@@ -519,7 +518,7 @@ func generateAppendChildFunc(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 
 	functionStr += "	// Set this as parent in the child\n"
 	functionStr += "	child.SetParentPtr(this)\n\n"
-	functionStr += "	child.SetParentLnk(attributeName)\n\n"
+	functionStr += "	child.SetParentLnk(\"M_\" + attributeName)\n\n"
 	functionStr += "	params := make([]interface{}, 1)\n"
 	functionStr += "	params[0] = child.GetObject()\n"
 	functionStr += "	attributeName = strings.Replace(attributeName,\"M_\", \"\", -1)\n"
@@ -650,7 +649,8 @@ func generateEntityAttribute(attribute *XML_Schemas.CMOF_OwnedAttribute, packNam
 				enumStr += ":"
 			}
 			if i == 0 {
-				memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"" + typeName + "_" + enumValue + "\")\n"
+				//memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"" + typeName + "_" + enumValue + "\")\n"
+				memberStr += "	" + prototypeName + ".FieldsDefaultValue = append(" + prototypeName + ".FieldsDefaultValue,\"" + strconv.Itoa(i+1) + "\")\n"
 			}
 		}
 		memberStr += "	" + prototypeName + ".FieldsType = append(" + prototypeName + ".FieldsType,\"" + enumStr + "\")\n"
@@ -1451,18 +1451,8 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 				entityInfoStr += "	" + class.Name + "Info = append(" + class.Name + "Info, string(" + attribute.Name + "Str))\n"
 			} else {
 				// The attribute is a reference.
-				//entityInfoStr += "	" + attribute.Name + ref + "Str, _ := json.Marshal(this.object.M_" + attribute.Name + ref + ")\n"
-				entityInfoStr += "	" + attribute.Name + ref + "Str := \"[\"\n"
-				entityInfoStr += "	if this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "()!=nil{\n"
-				entityInfoStr += "		for i:=0; i < len(this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "()); i++ {\n"
-				entityInfoStr += "			" + attribute.Name + ref + "Str += this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "()[i].GetUUID()\n"
-				entityInfoStr += "			if i < len(this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "()) - 1 {\n"
-				entityInfoStr += "			" + attribute.Name + ref + "Str += \",\"\n"
-				entityInfoStr += "			}\n"
-				entityInfoStr += "		}\n"
-				entityInfoStr += "	}\n"
-				entityInfoStr += "	" + attribute.Name + ref + "Str += \"]\"\n"
-				entityInfoStr += "	" + class.Name + "Info = append(" + class.Name + "Info, " + attribute.Name + ref + "Str)\n"
+				entityInfoStr += "	" + attribute.Name + ref + "Str, _ := json.Marshal(this.object.M_" + attribute.Name + ref + ")\n"
+				entityInfoStr += "	" + class.Name + "Info = append(" + class.Name + "Info, string(" + attribute.Name + ref + "Str))\n"
 			}
 
 		} else {
@@ -1533,10 +1523,9 @@ func generateEntitySaveEntityInfo(class *XML_Schemas.CMOF_OwnedMember, attribute
 					entityInfoStr += "	}\n"
 				} else {
 					// The attribute is a reference.
-					log.Println(typeName)
 					if hasId(classesMap[typeName]) {
-						entityInfoStr += "	if this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "() != nil{\n"
-						entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info,this.object.Get" + strings.ToUpper(attribute.Name[0:1]) + attribute.Name[1:] + ref + "().GetUUID())\n"
+						entityInfoStr += "	if len(this.object.M_" + attribute.Name + ref + ") > 0 {\n"
+						entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info,this.object.M_" + attribute.Name + ref + ")\n"
 						entityInfoStr += "	}else{\n"
 						entityInfoStr += "		" + class.Name + "Info = append(" + class.Name + "Info,\"\")\n"
 						entityInfoStr += "	}\n"
@@ -1560,6 +1549,10 @@ func generateEntitySaveFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	entitySaveStr += "func (this *" + packageId + "_" + class.Name + "Entity) SaveEntity() {\n"
 	entitySaveStr += "	if this.object.NeedSave == false {\n"
 	entitySaveStr += "		return\n"
+	entitySaveStr += "	}\n\n"
+
+	entitySaveStr += "	if this.lazy == true {\n"
+	entitySaveStr += "		this.InitEntity(this.GetUuid(), false)\n"
 	entitySaveStr += "	}\n\n"
 
 	entitySaveStr += "	this.SetNeedSave(false)\n"

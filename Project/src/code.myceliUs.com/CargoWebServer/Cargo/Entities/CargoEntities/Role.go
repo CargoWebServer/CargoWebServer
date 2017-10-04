@@ -56,7 +56,11 @@ func (this *Role) GetId() string{
 
 /** Init reference Id **/
 func (this *Role) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -75,6 +79,8 @@ func (this *Role) SetAccounts(ref interface{}){
 			}
 		}
 		this.M_accounts = append(this.M_accounts, ref.(string))
+		if this.IsInit == true {			this.NeedSave = true
+		}
 	}else{
 		for i:=0; i < len(this.m_accounts); i++ {
 			if this.m_accounts[i].GetUUID() == ref.(*Account).GetUUID() {
@@ -90,6 +96,8 @@ func (this *Role) SetAccounts(ref interface{}){
 		this.m_accounts = append(this.m_accounts, ref.(*Account))
 	if !isExist {
 		this.M_accounts = append(this.M_accounts, ref.(Entity).GetUUID())
+		if this.IsInit == true {			this.NeedSave = true
+		}
 	}
 	}
 }
@@ -103,6 +111,8 @@ func (this *Role) RemoveAccounts(ref interface{}){
 		if toDelete.GetUUID() != this.m_accounts[i].GetUUID() {
 			accounts_ = append(accounts_, this.m_accounts[i])
 			accountsUuid = append(accountsUuid, this.M_accounts[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.m_accounts = accounts_
@@ -123,6 +133,8 @@ func (this *Role) SetActions(ref interface{}){
 			}
 		}
 		this.M_actions = append(this.M_actions, ref.(string))
+		if this.IsInit == true {			this.NeedSave = true
+		}
 	}else{
 		for i:=0; i < len(this.m_actions); i++ {
 			if this.m_actions[i].GetUUID() == ref.(*Action).GetUUID() {
@@ -138,6 +150,8 @@ func (this *Role) SetActions(ref interface{}){
 		this.m_actions = append(this.m_actions, ref.(*Action))
 	if !isExist {
 		this.M_actions = append(this.M_actions, ref.(*Action).GetUUID())
+		if this.IsInit == true {			this.NeedSave = true
+		}
 	}
 	}
 }
@@ -151,6 +165,8 @@ func (this *Role) RemoveActions(ref interface{}){
 		if toDelete.GetUUID() != this.m_actions[i].GetUUID() {
 			actions_ = append(actions_, this.m_actions[i])
 			actionsUuid = append(actionsUuid, this.M_actions[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.m_actions = actions_
@@ -165,9 +181,17 @@ func (this *Role) GetEntitiesPtr() *Entities{
 /** Init reference Entities **/
 func (this *Role) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_entitiesPtr = ref.(string)
+		if this.M_entitiesPtr != ref.(string) {
+			this.M_entitiesPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
+			this.M_entitiesPtr = ref.(*Entities).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
@@ -179,6 +203,7 @@ func (this *Role) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

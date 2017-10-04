@@ -65,7 +65,11 @@ func (this *Entities) GetId() string{
 
 /** Init reference Id **/
 func (this *Entities) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -77,7 +81,11 @@ func (this *Entities) GetName() string{
 
 /** Init reference Name **/
 func (this *Entities) SetName(ref interface{}){
-	this.M_name = ref.(string)
+	if this.M_name != ref.(string) {
+		this.M_name = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Name **/
@@ -89,7 +97,11 @@ func (this *Entities) GetVersion() string{
 
 /** Init reference Version **/
 func (this *Entities) SetVersion(ref interface{}){
-	this.M_version = ref.(string)
+	if this.M_version != ref.(string) {
+		this.M_version = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Version **/
@@ -113,8 +125,10 @@ func (this *Entities) SetEntities(ref interface{}){
 	}
 	if !isExist {
 		entitiess = append(entitiess, ref.(Entity))
+		if this.IsInit == true {			this.NeedSave = true
+		}
+		this.M_entities = entitiess
 	}
-	this.M_entities = entitiess
 }
 
 /** Remove reference Entities **/
@@ -124,6 +138,8 @@ func (this *Entities) RemoveEntities(ref interface{}){
 	for i := 0; i < len(this.M_entities); i++ {
 		if toDelete.GetUUID() != this.M_entities[i].(Entity).GetUUID() {
 			entities_ = append(entities_, this.M_entities[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_entities = entities_
@@ -148,8 +164,10 @@ func (this *Entities) SetRoles(ref interface{}){
 	}
 	if !isExist {
 		roless = append(roless, ref.(*Role))
+		if this.IsInit == true {			this.NeedSave = true
+		}
+		this.M_roles = roless
 	}
-	this.M_roles = roless
 }
 
 /** Remove reference Roles **/
@@ -159,6 +177,8 @@ func (this *Entities) RemoveRoles(ref interface{}){
 	for i := 0; i < len(this.M_roles); i++ {
 		if toDelete.GetUUID() != this.M_roles[i].GetUUID() {
 			roles_ = append(roles_, this.M_roles[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_roles = roles_
@@ -183,8 +203,10 @@ func (this *Entities) SetPermissions(ref interface{}){
 	}
 	if !isExist {
 		permissionss = append(permissionss, ref.(*Permission))
+		if this.IsInit == true {			this.NeedSave = true
+		}
+		this.M_permissions = permissionss
 	}
-	this.M_permissions = permissionss
 }
 
 /** Remove reference Permissions **/
@@ -194,6 +216,8 @@ func (this *Entities) RemovePermissions(ref interface{}){
 	for i := 0; i < len(this.M_permissions); i++ {
 		if toDelete.GetUUID() != this.M_permissions[i].GetUUID() {
 			permissions_ = append(permissions_, this.M_permissions[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_permissions = permissions_
@@ -218,8 +242,10 @@ func (this *Entities) SetActions(ref interface{}){
 	}
 	if !isExist {
 		actionss = append(actionss, ref.(*Action))
+		if this.IsInit == true {			this.NeedSave = true
+		}
+		this.M_actions = actionss
 	}
-	this.M_actions = actionss
 }
 
 /** Remove reference Actions **/
@@ -229,6 +255,8 @@ func (this *Entities) RemoveActions(ref interface{}){
 	for i := 0; i < len(this.M_actions); i++ {
 		if toDelete.GetUUID() != this.M_actions[i].GetUUID() {
 			actions_ = append(actions_, this.M_actions[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_actions = actions_

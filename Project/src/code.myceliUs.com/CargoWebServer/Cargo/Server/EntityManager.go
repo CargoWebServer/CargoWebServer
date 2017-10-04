@@ -237,13 +237,7 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 	if toDelete.GetParentPtr() != nil {
 		// First I will remove it from parent childs...
 		parent := toDelete.GetParentPtr()
-		parent.GetPrototype()
-		for i := 0; i < len(parent.GetPrototype().FieldsType); i++ {
-			if strings.Index(parent.GetPrototype().FieldsType[i], toDelete.GetTypeName()) != -1 {
-				// Potential property...
-				parent.RemoveChild(parent.GetPrototype().Fields[i], toDelete.GetUuid())
-			}
-		}
+		parent.RemoveChild(toDelete.GetParentLnk(), toDelete.GetUuid())
 		toSaves = append(toSaves, parent)
 	}
 
@@ -1347,7 +1341,6 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	entity, invalidMethod := Utility.CallMethod(this, methodName, params)
 
 	if invalidMethod != nil {
-		log.Println("--------> invalid method name:", methodName)
 		// Try to create a dynamic entity...
 		if reflect.TypeOf(values).String() == "map[string]interface {}" {
 			values.(map[string]interface{})["ParentUuid"] = parentUuid
@@ -1357,20 +1350,23 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 				return nil, errObj
 			}
 		} else {
+			log.Println("--------> invalid method name:", methodName)
 			cargoError := NewError(Utility.FileLine(), TYPENAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The typeName '"+typeName+"' is does not exist."))
 			return nil, cargoError
 		}
 	}
 
+	// Set the relation name with it parent.
+	entity.(Entity).SetParentLnk(attributeName)
+
 	// Save the entity...
 	entity.(Entity).SetNeedSave(true)
-	entity.(Entity).SaveEntity()
 
 	// Now I will save it parent if there one.
 	if parentPtr != nil {
 		// Set it parent.
 		entity.(Entity).SetParentPtr(parentPtr)
-
+		entity.(Entity).SaveEntity()
 		parentPtrTypeName := parentPtr.GetTypeName()
 		parentPtrStoreId := parentPtrTypeName[:strings.Index(parentPtrTypeName, ".")]
 		parentPrtPrototype, _ := this.getEntityPrototype(parentPtrTypeName, parentPtrStoreId)
@@ -1380,10 +1376,13 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		} else {
 			// Append the child into it parent and save it.
 			parentPtr.AppendChild(attributeName, entity.(Entity))
+
 			// Set need save at true.
 			parentPtr.SetNeedSave(true)
 			parentPtr.SaveEntity()
 		}
+	} else {
+		entity.(Entity).SaveEntity()
 	}
 
 	// Return the object.
@@ -1988,7 +1987,7 @@ func (this *EntityManager) OnEvent(evt interface{}) {
 //                var id = prototype.Ids[i]
 //                if (id == "UUID") {
 //					  if(entities[entity.UUID] != undefined){
-//						entity.parentLnk = entities[entity.UUID].parentLnk
+//						entity.ParentLnk = entities[entity.UUID].ParentLnk
 //					  }
 //                    entities[entity.UUID] = entity
 //                } else {
@@ -1999,7 +1998,7 @@ func (this *EntityManager) OnEvent(evt interface{}) {
 //                        }
 //						  if(i == prototype.Ids.length - 1){
 //					  		if(entities[id_] != undefined){
-//								entity.parentLnk = entities[id_].parentLnk
+//								entity.ParentLnk = entities[id_].ParentLnk
 //					  		}
 //							entities[id_] = entity
 //						  }
@@ -2096,7 +2095,7 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-
+	log.Println("-------> create entity: ", parentUuid, attributeName, typeName, objectId, values)
 	result, errObj := this.createEntity(parentUuid, attributeName, typeName, objectId, values)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)

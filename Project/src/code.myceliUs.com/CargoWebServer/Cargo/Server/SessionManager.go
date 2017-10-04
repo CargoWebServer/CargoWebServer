@@ -160,6 +160,7 @@ func (this *SessionManager) closeSession_(session *CargoEntities.Session) *Cargo
 
 	// Remove the session from active session
 	delete(this.activeSessions, session.GetId())
+
 	sessionEntity.DeleteEntity()
 
 	// Send the event
@@ -314,11 +315,9 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 			session.M_startTime = int64(time.Now().Unix())
 			session.M_statusTime = int64(time.Now().Unix())
 			session.M_sessionState = CargoEntities.SessionState_Online
+			session.ParentLnk = "M_sessions"
 
-			// Set the account holding this session
-			session.SetAccountPtr(account)
-
-			// Get the session by id.
+			//Set the computer reference.
 			connection := GetServer().getConnectionById(sessionId)
 			if connection != nil {
 				addr := connection.GetAddrStr()
@@ -328,12 +327,10 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 				}
 			}
 
-			// Append the session in the account entity
-			account.SetSessions(session)
-			account.NeedSave = true
+			// Set the account ptr.
+			session.SetAccountPtr(account)
 
-			// Save it
-			accountEntity.SaveEntity()
+			GetServer().GetEntityManager().createEntity(account.GetUUID(), "M_sessions", "CargoEntities.Session", session.GetId(), session)
 			this.activeSessions[session.GetId()] = session
 
 			// Send session close event

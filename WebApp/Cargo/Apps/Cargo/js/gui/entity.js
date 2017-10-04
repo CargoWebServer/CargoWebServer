@@ -363,19 +363,18 @@ EntityPanel.prototype.setEntity = function (entity) {
 				console.log("No control found for display value " + value + " with type name " + fieldType)
 			} else if (value == null || value == "") {
 				console.log("The value is null or empty.")
-				// Here the entity dosent already exist so I will create it...
+				// Here the entity dosent already exist so I will create localy and set it in the unsafe entity...
 				if (control.constructor.name == "EntityPanel") {
-					var entity = eval("new " + fieldType + "()")
-					entity.parentLnk = field
-					server.entityManager.createEntity(this.getEntity().UUID, field, entity.TYPENAME, "", entity,
-						function (result, caller) {
-							caller.control.setEntity(result)
-							caller.parent[caller.field] = result
-							entities[caller.parent.UUID] = caller.parent
-						},
-						function () {
-
-						}, { "control": control, "field": field, "parent": this.getEntity() })
+					if (this.getEntity()[field] == null) {
+						// In case of entity panel.
+						var entity = eval("new " + fieldType + "()")
+						entity.ParentUuid = this.getEntity().UUID
+						entity.ParentLnk = field
+						this.getEntity()[field] = entity
+						control.setEntity(entity)
+					} else {
+						control.setEntity(this.getEntity()[field])
+					}
 				}
 			}
 		}
@@ -719,7 +718,7 @@ EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType
 			control = valueDiv.appendElement({ "tag": "input", "id": id }).down()
 		} else if (isXsRef(fieldType)) {
 			// Reference here... autocomplete...
-			control = valueDiv.appendElement({ "tag": "input", "id": id, "type":"url" }).down()
+			control = valueDiv.appendElement({ "tag": "input", "id": id, "type": "url" }).down()
 		} else if (isXsInt(fieldType)) {
 			control = valueDiv.appendElement({ "tag": "input", "type": "number", "min": "0", "step": "1", "id": id }).down()
 		} else if (isXsDate(fieldType)) {
@@ -1048,7 +1047,6 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 						// set basic values.
 						if (entityPanel.parentEntity != null) {
 							entity.ParentUuid = entityPanel.parentEntity.UUID
-							entity.parentLnk = entityPanel.parentLnk
 						}
 
 						entityPanel.setEntity(entity)

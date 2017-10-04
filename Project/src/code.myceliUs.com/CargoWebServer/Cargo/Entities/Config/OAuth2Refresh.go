@@ -53,7 +53,11 @@ func (this *OAuth2Refresh) GetId() string{
 
 /** Init reference Id **/
 func (this *OAuth2Refresh) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -66,9 +70,17 @@ func (this *OAuth2Refresh) GetAccess() *OAuth2Access{
 /** Init reference Access **/
 func (this *OAuth2Refresh) SetAccess(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_access = ref.(string)
+		if this.M_access != ref.(string) {
+			this.M_access = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_access = ref.(*OAuth2Access).GetUUID()
+		if this.M_access != ref.(*OAuth2Access).GetUUID() {
+			this.M_access = ref.(*OAuth2Access).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_access = ref.(*OAuth2Access)
 	}
 }
@@ -80,6 +92,7 @@ func (this *OAuth2Refresh) RemoveAccess(ref interface{}){
 		if toDelete.GetUUID() == this.m_access.GetUUID() {
 			this.m_access = nil
 			this.M_access = ""
+			this.NeedSave = true
 		}
 	}
 }
@@ -92,9 +105,17 @@ func (this *OAuth2Refresh) GetParentPtr() *OAuth2Configuration{
 /** Init reference Parent **/
 func (this *OAuth2Refresh) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_parentPtr = ref.(string)
+		if this.M_parentPtr != ref.(string) {
+			this.M_parentPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_parentPtr = ref.(Configuration).GetUUID()
+		if this.M_parentPtr != ref.(Configuration).GetUUID() {
+			this.M_parentPtr = ref.(Configuration).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_parentPtr = ref.(*OAuth2Configuration)
 	}
 }
@@ -106,6 +127,7 @@ func (this *OAuth2Refresh) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

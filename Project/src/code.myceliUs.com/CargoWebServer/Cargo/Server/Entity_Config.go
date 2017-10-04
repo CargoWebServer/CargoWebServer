@@ -7,7 +7,7 @@ import (
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
-	//"log"
+
 	"strings"
 	"unsafe"
 )
@@ -18,14 +18,14 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ScheduledTask")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ScheduledTask")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "UUID")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "UUID")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -387,7 +387,7 @@ func (this *EntityManager) create_Config_SmtpConfigurationEntityPrototype() {
 	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 4)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, true)
 	smtpConfigurationEntityProto.Fields = append(smtpConfigurationEntityProto.Fields, "M_textEncoding")
-	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "Encoding_UTF8")
+	smtpConfigurationEntityProto.FieldsDefaultValue = append(smtpConfigurationEntityProto.FieldsDefaultValue, "1")
 	smtpConfigurationEntityProto.FieldsType = append(smtpConfigurationEntityProto.FieldsType, "enum:Encoding_UTF8:Encoding_WINDOWS_1250:Encoding_WINDOWS_1251:Encoding_WINDOWS_1252:Encoding_WINDOWS_1253:Encoding_WINDOWS_1254:Encoding_WINDOWS_1255:Encoding_WINDOWS_1256:Encoding_WINDOWS_1257:Encoding_WINDOWS_1258:Encoding_ISO8859_1:Encoding_ISO8859_2:Encoding_ISO8859_3:Encoding_ISO8859_4:Encoding_ISO8859_5:Encoding_ISO8859_6:Encoding_ISO8859_7:Encoding_ISO8859_8:Encoding_ISO8859_9:Encoding_ISO8859_10:Encoding_ISO8859_13:Encoding_ISO8859_14:Encoding_ISO8859_15:Encoding_ISO8859_16:Encoding_KOI8R:Encoding_KOI8U")
 	smtpConfigurationEntityProto.FieldsOrder = append(smtpConfigurationEntityProto.FieldsOrder, 5)
 	smtpConfigurationEntityProto.FieldsVisibility = append(smtpConfigurationEntityProto.FieldsVisibility, true)
@@ -443,6 +443,10 @@ func (this *EntityManager) create_Config_SmtpConfigurationEntityPrototype() {
 func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 	if this.object.NeedSave == false {
 		return
+	}
+
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
 	}
 
 	this.SetNeedSave(false)
@@ -551,8 +555,8 @@ func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 	/** associations of SmtpConfiguration **/
 
 	/** Save parent type Configurations **/
-	if this.object.GetParentPtr() != nil {
-		SmtpConfigurationInfo = append(SmtpConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, this.object.M_parentPtr)
 	} else {
 		SmtpConfigurationInfo = append(SmtpConfigurationInfo, "")
 	}
@@ -825,7 +829,7 @@ func (this *Config_SmtpConfigurationEntity) AppendChild(attributeName string, ch
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -1178,17 +1182,17 @@ func (this *EntityManager) create_Config_DataStoreConfigurationEntityPrototype()
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 4)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_dataStoreType")
-	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "DataStoreType_SQL_STORE")
+	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "1")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "enum:DataStoreType_SQL_STORE:DataStoreType_KEY_VALUE_STORE")
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 5)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_dataStoreVendor")
-	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "DataStoreVendor_MYCELIUS")
+	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "1")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "enum:DataStoreVendor_MYCELIUS:DataStoreVendor_MYSQL:DataStoreVendor_MSSQL:DataStoreVendor_ODBC:DataStoreVendor_KNOWLEDGEBASE")
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 6)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_textEncoding")
-	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "Encoding_UTF8")
+	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "1")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "enum:Encoding_UTF8:Encoding_WINDOWS_1250:Encoding_WINDOWS_1251:Encoding_WINDOWS_1252:Encoding_WINDOWS_1253:Encoding_WINDOWS_1254:Encoding_WINDOWS_1255:Encoding_WINDOWS_1256:Encoding_WINDOWS_1257:Encoding_WINDOWS_1258:Encoding_ISO8859_1:Encoding_ISO8859_2:Encoding_ISO8859_3:Encoding_ISO8859_4:Encoding_ISO8859_5:Encoding_ISO8859_6:Encoding_ISO8859_7:Encoding_ISO8859_8:Encoding_ISO8859_9:Encoding_ISO8859_10:Encoding_ISO8859_13:Encoding_ISO8859_14:Encoding_ISO8859_15:Encoding_ISO8859_16:Encoding_KOI8R:Encoding_KOI8U")
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 7)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
@@ -1244,6 +1248,10 @@ func (this *EntityManager) create_Config_DataStoreConfigurationEntityPrototype()
 func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	if this.object.NeedSave == false {
 		return
+	}
+
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
 	}
 
 	this.SetNeedSave(false)
@@ -1378,8 +1386,8 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	/** associations of DataStoreConfiguration **/
 
 	/** Save parent type Configurations **/
-	if this.object.GetParentPtr() != nil {
-		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.object.M_parentPtr)
 	} else {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, "")
 	}
@@ -1680,7 +1688,7 @@ func (this *Config_DataStoreConfigurationEntity) AppendChild(attributeName strin
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -2096,6 +2104,10 @@ func (this *Config_LdapConfigurationEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -2148,8 +2160,8 @@ func (this *Config_LdapConfigurationEntity) SaveEntity() {
 	/** associations of LdapConfiguration **/
 
 	/** Save parent type Configurations **/
-	if this.object.GetParentPtr() != nil {
-		LdapConfigurationInfo = append(LdapConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		LdapConfigurationInfo = append(LdapConfigurationInfo, this.object.M_parentPtr)
 	} else {
 		LdapConfigurationInfo = append(LdapConfigurationInfo, "")
 	}
@@ -2375,7 +2387,7 @@ func (this *Config_LdapConfigurationEntity) AppendChild(attributeName string, ch
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -2778,6 +2790,10 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -2822,8 +2838,8 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	/** associations of OAuth2Client **/
 
 	/** Save parent type OAuth2Configuration **/
-	if this.object.GetParentPtr() != nil {
-		OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		OAuth2ClientInfo = append(OAuth2ClientInfo, this.object.M_parentPtr)
 	} else {
 		OAuth2ClientInfo = append(OAuth2ClientInfo, "")
 	}
@@ -3033,7 +3049,7 @@ func (this *Config_OAuth2ClientEntity) AppendChild(attributeName string, child E
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -3440,6 +3456,10 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -3476,8 +3496,8 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_id)
 
 	/** Save client type OAuth2Client **/
-	if this.object.GetClient() != nil {
-		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.GetClient().GetUUID())
+	if len(this.object.M_client) > 0 {
+		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_client)
 	} else {
 		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, "")
 	}
@@ -3487,8 +3507,8 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_state)
 
 	/** Save userData type OAuth2IdToken **/
-	if this.object.GetUserData() != nil {
-		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.GetUserData().GetUUID())
+	if len(this.object.M_userData) > 0 {
+		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_userData)
 	} else {
 		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, "")
 	}
@@ -3707,7 +3727,7 @@ func (this *Config_OAuth2AuthorizeEntity) AppendChild(attributeName string, chil
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -4141,6 +4161,10 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -4185,8 +4209,8 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 	OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.M_id)
 
 	/** Save client type OAuth2Client **/
-	if this.object.GetClient() != nil {
-		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.GetClient().GetUUID())
+	if len(this.object.M_client) > 0 {
+		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.M_client)
 	} else {
 		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, "")
 	}
@@ -4203,8 +4227,8 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 	/** associations of OAuth2IdToken **/
 
 	/** Save parent type OAuth2Configuration **/
-	if this.object.GetParentPtr() != nil {
-		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.object.M_parentPtr)
 	} else {
 		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, "")
 	}
@@ -4456,7 +4480,7 @@ func (this *Config_OAuth2IdTokenEntity) AppendChild(attributeName string, child 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -4882,6 +4906,10 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -4923,8 +4951,8 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_id)
 
 	/** Save client type OAuth2Client **/
-	if this.object.GetClient() != nil {
-		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.GetClient().GetUUID())
+	if len(this.object.M_client) > 0 {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_client)
 	} else {
 		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
 	}
@@ -4932,8 +4960,8 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_previous)
 
 	/** Save refreshToken type OAuth2Refresh **/
-	if this.object.GetRefreshToken() != nil {
-		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.GetRefreshToken().GetUUID())
+	if len(this.object.M_refreshToken) > 0 {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_refreshToken)
 	} else {
 		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
 	}
@@ -4942,8 +4970,8 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_redirectUri)
 
 	/** Save userData type OAuth2IdToken **/
-	if this.object.GetUserData() != nil {
-		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.GetUserData().GetUUID())
+	if len(this.object.M_userData) > 0 {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_userData)
 	} else {
 		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
 	}
@@ -4952,8 +4980,8 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	/** associations of OAuth2Access **/
 
 	/** Save parent type OAuth2Configuration **/
-	if this.object.GetParentPtr() != nil {
-		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, this.object.M_parentPtr)
 	} else {
 		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
 	}
@@ -5205,7 +5233,7 @@ func (this *Config_OAuth2AccessEntity) AppendChild(attributeName string, child E
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -5589,6 +5617,10 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -5622,8 +5654,8 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_id)
 
 	/** Save access type OAuth2Access **/
-	if this.object.GetAccess() != nil {
-		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.GetAccess().GetUUID())
+	if len(this.object.M_access) > 0 {
+		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_access)
 	} else {
 		OAuth2RefreshInfo = append(OAuth2RefreshInfo, "")
 	}
@@ -5631,8 +5663,8 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	/** associations of OAuth2Refresh **/
 
 	/** Save parent type OAuth2Configuration **/
-	if this.object.GetParentPtr() != nil {
-		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.object.M_parentPtr)
 	} else {
 		OAuth2RefreshInfo = append(OAuth2RefreshInfo, "")
 	}
@@ -5824,7 +5856,7 @@ func (this *Config_OAuth2RefreshEntity) AppendChild(attributeName string, child 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -6207,6 +6239,10 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -6243,8 +6279,8 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 	/** associations of OAuth2Expires **/
 
 	/** Save parent type OAuth2Configuration **/
-	if this.object.GetParentPtr() != nil {
-		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.object.M_parentPtr)
 	} else {
 		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, "")
 	}
@@ -6430,7 +6466,7 @@ func (this *Config_OAuth2ExpiresEntity) AppendChild(attributeName string, child 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -6891,6 +6927,10 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -7069,8 +7109,8 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	/** associations of OAuth2Configuration **/
 
 	/** Save parent type Configurations **/
-	if this.object.GetParentPtr() != nil {
-		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.object.M_parentPtr)
 	} else {
 		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, "")
 	}
@@ -7488,7 +7528,7 @@ func (this *Config_OAuth2ConfigurationEntity) AppendChild(attributeName string, 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -7899,6 +7939,10 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -7949,8 +7993,8 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 	/** associations of ServiceConfiguration **/
 
 	/** Save parent type Configurations **/
-	if this.object.GetParentPtr() != nil {
-		ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.object.M_parentPtr)
 	} else {
 		ServiceConfigurationInfo = append(ServiceConfigurationInfo, "")
 	}
@@ -8170,7 +8214,7 @@ func (this *Config_ServiceConfigurationEntity) AppendChild(attributeName string,
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -8548,7 +8592,7 @@ func (this *EntityManager) create_Config_ScheduledTaskEntityPrototype() {
 	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 9)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
 	scheduledTaskEntityProto.Fields = append(scheduledTaskEntityProto.Fields, "M_frequencyType")
-	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "FrequencyType_ONCE")
+	scheduledTaskEntityProto.FieldsDefaultValue = append(scheduledTaskEntityProto.FieldsDefaultValue, "1")
 	scheduledTaskEntityProto.FieldsType = append(scheduledTaskEntityProto.FieldsType, "enum:FrequencyType_ONCE:FrequencyType_DAILY:FrequencyType_WEEKELY:FrequencyType_MONTHLY")
 	scheduledTaskEntityProto.FieldsOrder = append(scheduledTaskEntityProto.FieldsOrder, 10)
 	scheduledTaskEntityProto.FieldsVisibility = append(scheduledTaskEntityProto.FieldsVisibility, true)
@@ -8584,6 +8628,10 @@ func (this *EntityManager) create_Config_ScheduledTaskEntityPrototype() {
 func (this *Config_ScheduledTaskEntity) SaveEntity() {
 	if this.object.NeedSave == false {
 		return
+	}
+
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
 	}
 
 	this.SetNeedSave(false)
@@ -8650,8 +8698,8 @@ func (this *Config_ScheduledTaskEntity) SaveEntity() {
 	/** associations of ScheduledTask **/
 
 	/** Save parent type Configurations **/
-	if this.object.GetParentPtr() != nil {
-		ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, this.object.M_parentPtr)
 	} else {
 		ScheduledTaskInfo = append(ScheduledTaskInfo, "")
 	}
@@ -8886,7 +8934,7 @@ func (this *Config_ScheduledTaskEntity) AppendChild(attributeName string, child 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -9272,6 +9320,10 @@ func (this *Config_ApplicationConfigurationEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -9312,8 +9364,8 @@ func (this *Config_ApplicationConfigurationEntity) SaveEntity() {
 	/** associations of ApplicationConfiguration **/
 
 	/** Save parent type Configurations **/
-	if this.object.GetParentPtr() != nil {
-		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, this.object.M_parentPtr)
 	} else {
 		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, "")
 	}
@@ -9503,7 +9555,7 @@ func (this *Config_ApplicationConfigurationEntity) AppendChild(attributeName str
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -9949,6 +10001,10 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -10013,8 +10069,8 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	/** associations of ServerConfiguration **/
 
 	/** Save parent type Configurations **/
-	if this.object.GetParentPtr() != nil {
-		ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.GetParentPtr().GetUUID())
+	if len(this.object.M_parentPtr) > 0 {
+		ServerConfigurationInfo = append(ServerConfigurationInfo, this.object.M_parentPtr)
 	} else {
 		ServerConfigurationInfo = append(ServerConfigurationInfo, "")
 	}
@@ -10276,7 +10332,7 @@ func (this *Config_ServerConfigurationEntity) AppendChild(attributeName string, 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -10699,6 +10755,10 @@ func (this *EntityManager) create_Config_ConfigurationsEntityPrototype() {
 func (this *Config_ConfigurationsEntity) SaveEntity() {
 	if this.object.NeedSave == false {
 		return
+	}
+
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
 	}
 
 	this.SetNeedSave(false)
@@ -11276,7 +11336,7 @@ func (this *Config_ConfigurationsEntity) AppendChild(attributeName string, child
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()

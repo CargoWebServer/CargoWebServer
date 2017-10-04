@@ -18,17 +18,17 @@ func (this *EntityManager) create_CargoEntities_EntityEntityPrototype() {
 	var entityEntityProto EntityPrototype
 	entityEntityProto.TypeName = "CargoEntities.Entity"
 	entityEntityProto.IsAbstract = true
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
 	entityEntityProto.Ids = append(entityEntityProto.Ids, "UUID")
 	entityEntityProto.Fields = append(entityEntityProto.Fields, "UUID")
 	entityEntityProto.FieldsType = append(entityEntityProto.FieldsType, "xs.string")
@@ -432,6 +432,10 @@ func (this *CargoEntities_ParameterEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -660,7 +664,7 @@ func (this *CargoEntities_ParameterEntity) AppendChild(attributeName string, chi
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -1025,7 +1029,7 @@ func (this *EntityManager) create_CargoEntities_ActionEntityPrototype() {
 	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 7)
 	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, true)
 	actionEntityProto.Fields = append(actionEntityProto.Fields, "M_accessType")
-	actionEntityProto.FieldsDefaultValue = append(actionEntityProto.FieldsDefaultValue, "AccessType_Hidden")
+	actionEntityProto.FieldsDefaultValue = append(actionEntityProto.FieldsDefaultValue, "1")
 	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "enum:AccessType_Hidden:AccessType_Public:AccessType_Restricted")
 
 	/** associations of Action **/
@@ -1056,6 +1060,10 @@ func (this *EntityManager) create_CargoEntities_ActionEntityPrototype() {
 func (this *CargoEntities_ActionEntity) SaveEntity() {
 	if this.object.NeedSave == false {
 		return
+	}
+
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
 	}
 
 	this.SetNeedSave(false)
@@ -1146,8 +1154,8 @@ func (this *CargoEntities_ActionEntity) SaveEntity() {
 	/** associations of Action **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		ActionInfo = append(ActionInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		ActionInfo = append(ActionInfo, this.object.M_entitiesPtr)
 	} else {
 		ActionInfo = append(ActionInfo, "")
 	}
@@ -1404,7 +1412,7 @@ func (this *CargoEntities_ActionEntity) AppendChild(attributeName string, child 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -1809,6 +1817,10 @@ func (this *CargoEntities_ErrorEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -1856,8 +1868,8 @@ func (this *CargoEntities_ErrorEntity) SaveEntity() {
 	ErrorInfo = append(ErrorInfo, this.object.M_code)
 
 	/** Save accountRef type Account **/
-	if this.object.GetAccountRef() != nil {
-		ErrorInfo = append(ErrorInfo, this.object.GetAccountRef().GetUUID())
+	if len(this.object.M_accountRef) > 0 {
+		ErrorInfo = append(ErrorInfo, this.object.M_accountRef)
 	} else {
 		ErrorInfo = append(ErrorInfo, "")
 	}
@@ -1865,8 +1877,8 @@ func (this *CargoEntities_ErrorEntity) SaveEntity() {
 	/** associations of Error **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		ErrorInfo = append(ErrorInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		ErrorInfo = append(ErrorInfo, this.object.M_entitiesPtr)
 	} else {
 		ErrorInfo = append(ErrorInfo, "")
 	}
@@ -2084,7 +2096,7 @@ func (this *CargoEntities_ErrorEntity) AppendChild(attributeName string, child E
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -2482,6 +2494,10 @@ func (this *CargoEntities_LogEntryEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -2522,8 +2538,8 @@ func (this *CargoEntities_LogEntryEntity) SaveEntity() {
 	LogEntryInfo = append(LogEntryInfo, this.object.M_creationTime)
 
 	/** Save entityRef type Entity **/
-	if this.object.GetEntityRef() != nil {
-		LogEntryInfo = append(LogEntryInfo, this.object.GetEntityRef().GetUUID())
+	if len(this.object.M_entityRef) > 0 {
+		LogEntryInfo = append(LogEntryInfo, this.object.M_entityRef)
 	} else {
 		LogEntryInfo = append(LogEntryInfo, "")
 	}
@@ -2531,15 +2547,15 @@ func (this *CargoEntities_LogEntryEntity) SaveEntity() {
 	/** associations of LogEntry **/
 
 	/** Save logger type Log **/
-	if this.object.GetLoggerPtr() != nil {
-		LogEntryInfo = append(LogEntryInfo, this.object.GetLoggerPtr().GetUUID())
+	if len(this.object.M_loggerPtr) > 0 {
+		LogEntryInfo = append(LogEntryInfo, this.object.M_loggerPtr)
 	} else {
 		LogEntryInfo = append(LogEntryInfo, "")
 	}
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		LogEntryInfo = append(LogEntryInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		LogEntryInfo = append(LogEntryInfo, this.object.M_entitiesPtr)
 	} else {
 		LogEntryInfo = append(LogEntryInfo, "")
 	}
@@ -2753,7 +2769,7 @@ func (this *CargoEntities_LogEntryEntity) AppendChild(attributeName string, chil
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -3139,6 +3155,10 @@ func (this *CargoEntities_LogEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -3197,8 +3217,8 @@ func (this *CargoEntities_LogEntity) SaveEntity() {
 	/** associations of Log **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		LogInfo = append(LogInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		LogInfo = append(LogInfo, this.object.M_entitiesPtr)
 	} else {
 		LogInfo = append(LogInfo, "")
 	}
@@ -3411,7 +3431,7 @@ func (this *CargoEntities_LogEntity) AppendChild(attributeName string, child Ent
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -3804,6 +3824,10 @@ func (this *CargoEntities_ProjectEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -3843,23 +3867,14 @@ func (this *CargoEntities_ProjectEntity) SaveEntity() {
 	ProjectInfo = append(ProjectInfo, this.object.M_name)
 
 	/** Save filesRef type File **/
-	filesRefStr := "["
-	if this.object.GetFilesRef() != nil {
-		for i := 0; i < len(this.object.GetFilesRef()); i++ {
-			filesRefStr += this.object.GetFilesRef()[i].GetUUID()
-			if i < len(this.object.GetFilesRef())-1 {
-				filesRefStr += ","
-			}
-		}
-	}
-	filesRefStr += "]"
-	ProjectInfo = append(ProjectInfo, filesRefStr)
+	filesRefStr, _ := json.Marshal(this.object.M_filesRef)
+	ProjectInfo = append(ProjectInfo, string(filesRefStr))
 
 	/** associations of Project **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		ProjectInfo = append(ProjectInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		ProjectInfo = append(ProjectInfo, this.object.M_entitiesPtr)
 	} else {
 		ProjectInfo = append(ProjectInfo, "")
 	}
@@ -4068,7 +4083,7 @@ func (this *CargoEntities_ProjectEntity) AppendChild(attributeName string, child
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -4109,9 +4124,9 @@ func (this *EntityManager) create_CargoEntities_MessageEntityPrototype() {
 	messageEntityProto.TypeName = "CargoEntities.Message"
 	messageEntityProto.IsAbstract = true
 	messageEntityProto.SuperTypeNames = append(messageEntityProto.SuperTypeNames, "CargoEntities.Entity")
+	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Error")
 	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Notification")
-	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	messageEntityProto.Ids = append(messageEntityProto.Ids, "UUID")
 	messageEntityProto.Fields = append(messageEntityProto.Fields, "UUID")
 	messageEntityProto.FieldsType = append(messageEntityProto.FieldsType, "xs.string")
@@ -4546,6 +4561,10 @@ func (this *CargoEntities_NotificationEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -4592,15 +4611,15 @@ func (this *CargoEntities_NotificationEntity) SaveEntity() {
 	/** members of Notification **/
 
 	/** Save fromRef type Account **/
-	if this.object.GetFromRef() != nil {
-		NotificationInfo = append(NotificationInfo, this.object.GetFromRef().GetUUID())
+	if len(this.object.M_fromRef) > 0 {
+		NotificationInfo = append(NotificationInfo, this.object.M_fromRef)
 	} else {
 		NotificationInfo = append(NotificationInfo, "")
 	}
 
 	/** Save toRef type Account **/
-	if this.object.GetToRef() != nil {
-		NotificationInfo = append(NotificationInfo, this.object.GetToRef().GetUUID())
+	if len(this.object.M_toRef) > 0 {
+		NotificationInfo = append(NotificationInfo, this.object.M_toRef)
 	} else {
 		NotificationInfo = append(NotificationInfo, "")
 	}
@@ -4610,8 +4629,8 @@ func (this *CargoEntities_NotificationEntity) SaveEntity() {
 	/** associations of Notification **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		NotificationInfo = append(NotificationInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		NotificationInfo = append(NotificationInfo, this.object.M_entitiesPtr)
 	} else {
 		NotificationInfo = append(NotificationInfo, "")
 	}
@@ -4841,7 +4860,7 @@ func (this *CargoEntities_NotificationEntity) AppendChild(attributeName string, 
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -5252,6 +5271,10 @@ func (this *CargoEntities_TextMessageEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -5299,15 +5322,15 @@ func (this *CargoEntities_TextMessageEntity) SaveEntity() {
 	TextMessageInfo = append(TextMessageInfo, this.object.M_creationTime)
 
 	/** Save fromRef type Account **/
-	if this.object.GetFromRef() != nil {
-		TextMessageInfo = append(TextMessageInfo, this.object.GetFromRef().GetUUID())
+	if len(this.object.M_fromRef) > 0 {
+		TextMessageInfo = append(TextMessageInfo, this.object.M_fromRef)
 	} else {
 		TextMessageInfo = append(TextMessageInfo, "")
 	}
 
 	/** Save toRef type Account **/
-	if this.object.GetToRef() != nil {
-		TextMessageInfo = append(TextMessageInfo, this.object.GetToRef().GetUUID())
+	if len(this.object.M_toRef) > 0 {
+		TextMessageInfo = append(TextMessageInfo, this.object.M_toRef)
 	} else {
 		TextMessageInfo = append(TextMessageInfo, "")
 	}
@@ -5316,8 +5339,8 @@ func (this *CargoEntities_TextMessageEntity) SaveEntity() {
 	/** associations of TextMessage **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		TextMessageInfo = append(TextMessageInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		TextMessageInfo = append(TextMessageInfo, this.object.M_entitiesPtr)
 	} else {
 		TextMessageInfo = append(TextMessageInfo, "")
 	}
@@ -5547,7 +5570,7 @@ func (this *CargoEntities_TextMessageEntity) AppendChild(attributeName string, c
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -5912,7 +5935,7 @@ func (this *EntityManager) create_CargoEntities_SessionEntityPrototype() {
 	sessionEntityProto.FieldsOrder = append(sessionEntityProto.FieldsOrder, 7)
 	sessionEntityProto.FieldsVisibility = append(sessionEntityProto.FieldsVisibility, true)
 	sessionEntityProto.Fields = append(sessionEntityProto.Fields, "M_sessionState")
-	sessionEntityProto.FieldsDefaultValue = append(sessionEntityProto.FieldsDefaultValue, "SessionState_Online")
+	sessionEntityProto.FieldsDefaultValue = append(sessionEntityProto.FieldsDefaultValue, "1")
 	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "enum:SessionState_Online:SessionState_Away:SessionState_Offline")
 	sessionEntityProto.FieldsOrder = append(sessionEntityProto.FieldsOrder, 8)
 	sessionEntityProto.FieldsVisibility = append(sessionEntityProto.FieldsVisibility, true)
@@ -5949,6 +5972,10 @@ func (this *EntityManager) create_CargoEntities_SessionEntityPrototype() {
 func (this *CargoEntities_SessionEntity) SaveEntity() {
 	if this.object.NeedSave == false {
 		return
+	}
+
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
 	}
 
 	this.SetNeedSave(false)
@@ -6002,8 +6029,8 @@ func (this *CargoEntities_SessionEntity) SaveEntity() {
 	}
 
 	/** Save computerRef type Computer **/
-	if this.object.GetComputerRef() != nil {
-		SessionInfo = append(SessionInfo, this.object.GetComputerRef().GetUUID())
+	if len(this.object.M_computerRef) > 0 {
+		SessionInfo = append(SessionInfo, this.object.M_computerRef)
 	} else {
 		SessionInfo = append(SessionInfo, "")
 	}
@@ -6011,8 +6038,8 @@ func (this *CargoEntities_SessionEntity) SaveEntity() {
 	/** associations of Session **/
 
 	/** Save account type Account **/
-	if this.object.GetAccountPtr() != nil {
-		SessionInfo = append(SessionInfo, this.object.GetAccountPtr().GetUUID())
+	if len(this.object.M_accountPtr) > 0 {
+		SessionInfo = append(SessionInfo, this.object.M_accountPtr)
 	} else {
 		SessionInfo = append(SessionInfo, "")
 	}
@@ -6235,7 +6262,7 @@ func (this *CargoEntities_SessionEntity) AppendChild(attributeName string, child
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -6625,6 +6652,10 @@ func (this *CargoEntities_RoleEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -6659,36 +6690,18 @@ func (this *CargoEntities_RoleEntity) SaveEntity() {
 	RoleInfo = append(RoleInfo, this.object.M_id)
 
 	/** Save accounts type Account **/
-	accountsStr := "["
-	if this.object.GetAccounts() != nil {
-		for i := 0; i < len(this.object.GetAccounts()); i++ {
-			accountsStr += this.object.GetAccounts()[i].GetUUID()
-			if i < len(this.object.GetAccounts())-1 {
-				accountsStr += ","
-			}
-		}
-	}
-	accountsStr += "]"
-	RoleInfo = append(RoleInfo, accountsStr)
+	accountsStr, _ := json.Marshal(this.object.M_accounts)
+	RoleInfo = append(RoleInfo, string(accountsStr))
 
 	/** Save actions type Action **/
-	actionsStr := "["
-	if this.object.GetActions() != nil {
-		for i := 0; i < len(this.object.GetActions()); i++ {
-			actionsStr += this.object.GetActions()[i].GetUUID()
-			if i < len(this.object.GetActions())-1 {
-				actionsStr += ","
-			}
-		}
-	}
-	actionsStr += "]"
-	RoleInfo = append(RoleInfo, actionsStr)
+	actionsStr, _ := json.Marshal(this.object.M_actions)
+	RoleInfo = append(RoleInfo, string(actionsStr))
 
 	/** associations of Role **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		RoleInfo = append(RoleInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		RoleInfo = append(RoleInfo, this.object.M_entitiesPtr)
 	} else {
 		RoleInfo = append(RoleInfo, "")
 	}
@@ -6906,7 +6919,7 @@ func (this *CargoEntities_RoleEntity) AppendChild(attributeName string, child En
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -7331,6 +7344,10 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -7402,6 +7419,14 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	if !lazy_messages {
 		for i := 0; i < len(this.object.M_messages); i++ {
 			switch v := this.object.M_messages[i].(type) {
+			case *CargoEntities.TextMessage:
+				messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
+				messagesIds = append(messagesIds, messagesEntity.GetUuid())
+				messagesEntity.AppendReferenced("messages", this)
+				this.AppendChild("messages", messagesEntity)
+				if messagesEntity.NeedSave() {
+					messagesEntity.SaveEntity()
+				}
 			case *CargoEntities.Error:
 				messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
 				messagesIds = append(messagesIds, messagesEntity.GetUuid())
@@ -7418,14 +7443,6 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 				if messagesEntity.NeedSave() {
 					messagesEntity.SaveEntity()
 				}
-			case *CargoEntities.TextMessage:
-				messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
-				messagesIds = append(messagesIds, messagesEntity.GetUuid())
-				messagesEntity.AppendReferenced("messages", this)
-				this.AppendChild("messages", messagesEntity)
-				if messagesEntity.NeedSave() {
-					messagesEntity.SaveEntity()
-				}
 			}
 		}
 	} else {
@@ -7435,43 +7452,25 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	AccountInfo = append(AccountInfo, string(messagesStr))
 
 	/** Save userRef type User **/
-	if this.object.GetUserRef() != nil {
-		AccountInfo = append(AccountInfo, this.object.GetUserRef().GetUUID())
+	if len(this.object.M_userRef) > 0 {
+		AccountInfo = append(AccountInfo, this.object.M_userRef)
 	} else {
 		AccountInfo = append(AccountInfo, "")
 	}
 
 	/** Save rolesRef type Role **/
-	rolesRefStr := "["
-	if this.object.GetRolesRef() != nil {
-		for i := 0; i < len(this.object.GetRolesRef()); i++ {
-			rolesRefStr += this.object.GetRolesRef()[i].GetUUID()
-			if i < len(this.object.GetRolesRef())-1 {
-				rolesRefStr += ","
-			}
-		}
-	}
-	rolesRefStr += "]"
-	AccountInfo = append(AccountInfo, rolesRefStr)
+	rolesRefStr, _ := json.Marshal(this.object.M_rolesRef)
+	AccountInfo = append(AccountInfo, string(rolesRefStr))
 
 	/** Save permissionsRef type Permission **/
-	permissionsRefStr := "["
-	if this.object.GetPermissionsRef() != nil {
-		for i := 0; i < len(this.object.GetPermissionsRef()); i++ {
-			permissionsRefStr += this.object.GetPermissionsRef()[i].GetUUID()
-			if i < len(this.object.GetPermissionsRef())-1 {
-				permissionsRefStr += ","
-			}
-		}
-	}
-	permissionsRefStr += "]"
-	AccountInfo = append(AccountInfo, permissionsRefStr)
+	permissionsRefStr, _ := json.Marshal(this.object.M_permissionsRef)
+	AccountInfo = append(AccountInfo, string(permissionsRefStr))
 
 	/** associations of Account **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		AccountInfo = append(AccountInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		AccountInfo = append(AccountInfo, this.object.M_entitiesPtr)
 	} else {
 		AccountInfo = append(AccountInfo, "")
 	}
@@ -7814,7 +7813,7 @@ func (this *CargoEntities_AccountEntity) AppendChild(attributeName string, child
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -8178,12 +8177,12 @@ func (this *EntityManager) create_CargoEntities_ComputerEntityPrototype() {
 	computerEntityProto.FieldsOrder = append(computerEntityProto.FieldsOrder, 6)
 	computerEntityProto.FieldsVisibility = append(computerEntityProto.FieldsVisibility, true)
 	computerEntityProto.Fields = append(computerEntityProto.Fields, "M_osType")
-	computerEntityProto.FieldsDefaultValue = append(computerEntityProto.FieldsDefaultValue, "OsType_Unknown")
+	computerEntityProto.FieldsDefaultValue = append(computerEntityProto.FieldsDefaultValue, "1")
 	computerEntityProto.FieldsType = append(computerEntityProto.FieldsType, "enum:OsType_Unknown:OsType_Linux:OsType_Windows7:OsType_Windows8:OsType_Windows10:OsType_OSX:OsType_IOS")
 	computerEntityProto.FieldsOrder = append(computerEntityProto.FieldsOrder, 7)
 	computerEntityProto.FieldsVisibility = append(computerEntityProto.FieldsVisibility, true)
 	computerEntityProto.Fields = append(computerEntityProto.Fields, "M_platformType")
-	computerEntityProto.FieldsDefaultValue = append(computerEntityProto.FieldsDefaultValue, "PlatformType_Unknown")
+	computerEntityProto.FieldsDefaultValue = append(computerEntityProto.FieldsDefaultValue, "1")
 	computerEntityProto.FieldsType = append(computerEntityProto.FieldsType, "enum:PlatformType_Unknown:PlatformType_Tablet:PlatformType_Phone:PlatformType_Desktop:PlatformType_Laptop")
 
 	/** associations of Computer **/
@@ -8214,6 +8213,10 @@ func (this *EntityManager) create_CargoEntities_ComputerEntityPrototype() {
 func (this *CargoEntities_ComputerEntity) SaveEntity() {
 	if this.object.NeedSave == false {
 		return
+	}
+
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
 	}
 
 	this.SetNeedSave(false)
@@ -8294,8 +8297,8 @@ func (this *CargoEntities_ComputerEntity) SaveEntity() {
 	/** associations of Computer **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		ComputerInfo = append(ComputerInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		ComputerInfo = append(ComputerInfo, this.object.M_entitiesPtr)
 	} else {
 		ComputerInfo = append(ComputerInfo, "")
 	}
@@ -8529,7 +8532,7 @@ func (this *CargoEntities_ComputerEntity) AppendChild(attributeName string, chil
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -8918,6 +8921,10 @@ func (this *CargoEntities_PermissionEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -8953,23 +8960,14 @@ func (this *CargoEntities_PermissionEntity) SaveEntity() {
 	PermissionInfo = append(PermissionInfo, this.object.M_types)
 
 	/** Save accountsRef type Account **/
-	accountsRefStr := "["
-	if this.object.GetAccountsRef() != nil {
-		for i := 0; i < len(this.object.GetAccountsRef()); i++ {
-			accountsRefStr += this.object.GetAccountsRef()[i].GetUUID()
-			if i < len(this.object.GetAccountsRef())-1 {
-				accountsRefStr += ","
-			}
-		}
-	}
-	accountsRefStr += "]"
-	PermissionInfo = append(PermissionInfo, accountsRefStr)
+	accountsRefStr, _ := json.Marshal(this.object.M_accountsRef)
+	PermissionInfo = append(PermissionInfo, string(accountsRefStr))
 
 	/** associations of Permission **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		PermissionInfo = append(PermissionInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		PermissionInfo = append(PermissionInfo, this.object.M_entitiesPtr)
 	} else {
 		PermissionInfo = append(PermissionInfo, "")
 	}
@@ -9174,7 +9172,7 @@ func (this *CargoEntities_PermissionEntity) AppendChild(attributeName string, ch
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -9578,7 +9576,7 @@ func (this *EntityManager) create_CargoEntities_FileEntityPrototype() {
 	fileEntityProto.FieldsOrder = append(fileEntityProto.FieldsOrder, 14)
 	fileEntityProto.FieldsVisibility = append(fileEntityProto.FieldsVisibility, true)
 	fileEntityProto.Fields = append(fileEntityProto.Fields, "M_fileType")
-	fileEntityProto.FieldsDefaultValue = append(fileEntityProto.FieldsDefaultValue, "FileType_DbFile")
+	fileEntityProto.FieldsDefaultValue = append(fileEntityProto.FieldsDefaultValue, "1")
 	fileEntityProto.FieldsType = append(fileEntityProto.FieldsType, "enum:FileType_DbFile:FileType_DiskFile")
 
 	/** associations of File **/
@@ -9615,6 +9613,10 @@ func (this *EntityManager) create_CargoEntities_FileEntityPrototype() {
 func (this *CargoEntities_FileEntity) SaveEntity() {
 	if this.object.NeedSave == false {
 		return
+	}
+
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
 	}
 
 	this.SetNeedSave(false)
@@ -9704,15 +9706,15 @@ func (this *CargoEntities_FileEntity) SaveEntity() {
 	/** associations of File **/
 
 	/** Save parentDir type File **/
-	if this.object.GetParentDirPtr() != nil {
-		FileInfo = append(FileInfo, this.object.GetParentDirPtr().GetUUID())
+	if len(this.object.M_parentDirPtr) > 0 {
+		FileInfo = append(FileInfo, this.object.M_parentDirPtr)
 	} else {
 		FileInfo = append(FileInfo, "")
 	}
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		FileInfo = append(FileInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		FileInfo = append(FileInfo, this.object.M_entitiesPtr)
 	} else {
 		FileInfo = append(FileInfo, "")
 	}
@@ -10002,7 +10004,7 @@ func (this *CargoEntities_FileEntity) AppendChild(attributeName string, child En
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -10420,6 +10422,10 @@ func (this *CargoEntities_UserEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -10468,36 +10474,18 @@ func (this *CargoEntities_UserEntity) SaveEntity() {
 	UserInfo = append(UserInfo, this.object.M_email)
 
 	/** Save memberOfRef type Group **/
-	memberOfRefStr := "["
-	if this.object.GetMemberOfRef() != nil {
-		for i := 0; i < len(this.object.GetMemberOfRef()); i++ {
-			memberOfRefStr += this.object.GetMemberOfRef()[i].GetUUID()
-			if i < len(this.object.GetMemberOfRef())-1 {
-				memberOfRefStr += ","
-			}
-		}
-	}
-	memberOfRefStr += "]"
-	UserInfo = append(UserInfo, memberOfRefStr)
+	memberOfRefStr, _ := json.Marshal(this.object.M_memberOfRef)
+	UserInfo = append(UserInfo, string(memberOfRefStr))
 
 	/** Save accounts type Account **/
-	accountsStr := "["
-	if this.object.GetAccounts() != nil {
-		for i := 0; i < len(this.object.GetAccounts()); i++ {
-			accountsStr += this.object.GetAccounts()[i].GetUUID()
-			if i < len(this.object.GetAccounts())-1 {
-				accountsStr += ","
-			}
-		}
-	}
-	accountsStr += "]"
-	UserInfo = append(UserInfo, accountsStr)
+	accountsStr, _ := json.Marshal(this.object.M_accounts)
+	UserInfo = append(UserInfo, string(accountsStr))
 
 	/** associations of User **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		UserInfo = append(UserInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		UserInfo = append(UserInfo, this.object.M_entitiesPtr)
 	} else {
 		UserInfo = append(UserInfo, "")
 	}
@@ -10749,7 +10737,7 @@ func (this *CargoEntities_UserEntity) AppendChild(attributeName string, child En
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -11142,6 +11130,10 @@ func (this *CargoEntities_GroupEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -11181,23 +11173,14 @@ func (this *CargoEntities_GroupEntity) SaveEntity() {
 	GroupInfo = append(GroupInfo, this.object.M_name)
 
 	/** Save membersRef type User **/
-	membersRefStr := "["
-	if this.object.GetMembersRef() != nil {
-		for i := 0; i < len(this.object.GetMembersRef()); i++ {
-			membersRefStr += this.object.GetMembersRef()[i].GetUUID()
-			if i < len(this.object.GetMembersRef())-1 {
-				membersRefStr += ","
-			}
-		}
-	}
-	membersRefStr += "]"
-	GroupInfo = append(GroupInfo, membersRefStr)
+	membersRefStr, _ := json.Marshal(this.object.M_membersRef)
+	GroupInfo = append(GroupInfo, string(membersRefStr))
 
 	/** associations of Group **/
 
 	/** Save entities type Entities **/
-	if this.object.GetEntitiesPtr() != nil {
-		GroupInfo = append(GroupInfo, this.object.GetEntitiesPtr().GetUUID())
+	if len(this.object.M_entitiesPtr) > 0 {
+		GroupInfo = append(GroupInfo, this.object.M_entitiesPtr)
 	} else {
 		GroupInfo = append(GroupInfo, "")
 	}
@@ -11406,7 +11389,7 @@ func (this *CargoEntities_GroupEntity) AppendChild(attributeName string, child E
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()
@@ -11806,6 +11789,10 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 		return
 	}
 
+	if this.lazy == true {
+		this.InitEntity(this.GetUuid(), false)
+	}
+
 	this.SetNeedSave(false)
 	this.SetInit(true)
 	var query EntityQuery
@@ -11848,8 +11835,32 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	if !lazy_entities {
 		for i := 0; i < len(this.object.M_entities); i++ {
 			switch v := this.object.M_entities[i].(type) {
+			case *CargoEntities.Account:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.Computer:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
 			case *CargoEntities.User:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.File:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -11866,38 +11877,6 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				}
 			case *CargoEntities.LogEntry:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.TextMessage:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.Account:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.File:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.Group:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -11928,8 +11907,16 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				if entitiesEntity.NeedSave() {
 					entitiesEntity.SaveEntity()
 				}
-			case *CargoEntities.Computer:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), v.UUID, v)
+			case *CargoEntities.TextMessage:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.Group:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -12130,19 +12117,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 							entitiesEntity.AppendReferenced("entities", this)
 							this.AppendChild("entities", entitiesEntity)
 						}
-					} else if typeName == "CargoEntities.User" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_UserEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_UserEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
 					} else if typeName == "CargoEntities.Error" {
 						if len(uuids[i]) > 0 {
 							var entitiesEntity *CargoEntities_ErrorEntity
@@ -12163,58 +12137,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 								entitiesEntity = instance.(*CargoEntities_LogEntryEntity)
 							} else {
 								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.TextMessage" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_TextMessageEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_TextMessageEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.Account" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_AccountEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_AccountEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.Computer" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_ComputerEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_ComputerEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.Group" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_GroupEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_GroupEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
 								entitiesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(entitiesEntity)
 							}
@@ -12254,6 +12176,71 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 								entitiesEntity = instance.(*CargoEntities_NotificationEntity)
 							} else {
 								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.TextMessage" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_TextMessageEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_TextMessageEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.Group" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_GroupEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_GroupEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.Account" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_AccountEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_AccountEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.Computer" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_ComputerEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_ComputerEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.User" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_UserEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_UserEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
 								entitiesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(entitiesEntity)
 							}
@@ -12425,7 +12412,7 @@ func (this *CargoEntities_EntitiesEntity) AppendChild(attributeName string, chil
 	// Set this as parent in the child
 	child.SetParentPtr(this)
 
-	child.SetParentLnk(attributeName)
+	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
 	params[0] = child.GetObject()

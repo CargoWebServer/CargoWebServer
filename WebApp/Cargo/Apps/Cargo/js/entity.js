@@ -158,9 +158,7 @@ function removeObjectValue(object, field, value) {
  */
 function resetObjectValues(object) {
     // Remove the object panel...
-    delete object["panel"]
     var prototype = entityPrototypes[object.TYPENAME]
-
     for (var propertyId in object) {
         var propretyType = prototype.FieldsType[prototype.getFieldIndex(propertyId)]
         if (propretyType != undefined && object[propertyId] != null) {
@@ -170,7 +168,7 @@ function resetObjectValues(object) {
             if (isArray) {
                 for (var i = 0; i < object[propertyId].length; i++) {
                     if (isObject(object[propertyId][i])) {
-                        if (object[propertyId][i]["UUID"] != undefined) {
+                        if (object[propertyId][i]["TYPENAME"] != undefined) {
                             // Reset it's sub-objects.
                             if (!isRef && !isBaseType) {
                                 resetObjectValues(object[propertyId][i])
@@ -179,7 +177,7 @@ function resetObjectValues(object) {
                     }
                 }
             } else if (isObject(object[propertyId])) {
-                if (object[propertyId]["UUID"] != undefined) {
+                if (object[propertyId]["TYPENAME"] != undefined) {
                     if (!isRef && !isBaseType) {
                         resetObjectValues(object[propertyId])
                     }
@@ -192,7 +190,13 @@ function resetObjectValues(object) {
             // Call the reset function.
             object[propertyId]()
         }
+
+        // Remove unwanted property before send it to the server-side.
+        if (prototype.Fields.indexOf(propertyId) == -1 && propertyId != "__class__" && propertyId != "TYPENAME") {
+            delete object[propertyId]
+        }
     }
+
 }
 
 /**
@@ -624,7 +628,7 @@ function setObjectValues(object, values) {
     object.IsInit = true // The object part only and not the refs...
     object.ParentUuid = values.ParentUuid // set the parent uuid.
     object.ParentLnk = values.ParentLnk
-    
+
     // Set the initialyse object.
     server.entityManager.setEntity(object)
 

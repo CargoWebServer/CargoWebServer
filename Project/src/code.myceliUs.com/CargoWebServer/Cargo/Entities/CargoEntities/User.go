@@ -72,7 +72,11 @@ func (this *User) GetId() string{
 
 /** Init reference Id **/
 func (this *User) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -84,7 +88,11 @@ func (this *User) GetFirstName() string{
 
 /** Init reference FirstName **/
 func (this *User) SetFirstName(ref interface{}){
-	this.M_firstName = ref.(string)
+	if this.M_firstName != ref.(string) {
+		this.M_firstName = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference FirstName **/
@@ -96,7 +104,11 @@ func (this *User) GetLastName() string{
 
 /** Init reference LastName **/
 func (this *User) SetLastName(ref interface{}){
-	this.M_lastName = ref.(string)
+	if this.M_lastName != ref.(string) {
+		this.M_lastName = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference LastName **/
@@ -108,7 +120,11 @@ func (this *User) GetMiddle() string{
 
 /** Init reference Middle **/
 func (this *User) SetMiddle(ref interface{}){
-	this.M_middle = ref.(string)
+	if this.M_middle != ref.(string) {
+		this.M_middle = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Middle **/
@@ -120,7 +136,11 @@ func (this *User) GetPhone() string{
 
 /** Init reference Phone **/
 func (this *User) SetPhone(ref interface{}){
-	this.M_phone = ref.(string)
+	if this.M_phone != ref.(string) {
+		this.M_phone = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Phone **/
@@ -132,7 +152,11 @@ func (this *User) GetEmail() string{
 
 /** Init reference Email **/
 func (this *User) SetEmail(ref interface{}){
-	this.M_email = ref.(string)
+	if this.M_email != ref.(string) {
+		this.M_email = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Email **/
@@ -151,6 +175,8 @@ func (this *User) SetMemberOfRef(ref interface{}){
 			}
 		}
 		this.M_memberOfRef = append(this.M_memberOfRef, ref.(string))
+		if this.IsInit == true {			this.NeedSave = true
+		}
 	}else{
 		for i:=0; i < len(this.m_memberOfRef); i++ {
 			if this.m_memberOfRef[i].GetUUID() == ref.(*Group).GetUUID() {
@@ -166,6 +192,8 @@ func (this *User) SetMemberOfRef(ref interface{}){
 		this.m_memberOfRef = append(this.m_memberOfRef, ref.(*Group))
 	if !isExist {
 		this.M_memberOfRef = append(this.M_memberOfRef, ref.(Entity).GetUUID())
+		if this.IsInit == true {			this.NeedSave = true
+		}
 	}
 	}
 }
@@ -179,6 +207,8 @@ func (this *User) RemoveMemberOfRef(ref interface{}){
 		if toDelete.GetUUID() != this.m_memberOfRef[i].GetUUID() {
 			memberOfRef_ = append(memberOfRef_, this.m_memberOfRef[i])
 			memberOfRefUuid = append(memberOfRefUuid, this.M_memberOfRef[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.m_memberOfRef = memberOfRef_
@@ -199,6 +229,8 @@ func (this *User) SetAccounts(ref interface{}){
 			}
 		}
 		this.M_accounts = append(this.M_accounts, ref.(string))
+		if this.IsInit == true {			this.NeedSave = true
+		}
 	}else{
 		for i:=0; i < len(this.m_accounts); i++ {
 			if this.m_accounts[i].GetUUID() == ref.(*Account).GetUUID() {
@@ -214,6 +246,8 @@ func (this *User) SetAccounts(ref interface{}){
 		this.m_accounts = append(this.m_accounts, ref.(*Account))
 	if !isExist {
 		this.M_accounts = append(this.M_accounts, ref.(Entity).GetUUID())
+		if this.IsInit == true {			this.NeedSave = true
+		}
 	}
 	}
 }
@@ -227,6 +261,8 @@ func (this *User) RemoveAccounts(ref interface{}){
 		if toDelete.GetUUID() != this.m_accounts[i].GetUUID() {
 			accounts_ = append(accounts_, this.m_accounts[i])
 			accountsUuid = append(accountsUuid, this.M_accounts[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.m_accounts = accounts_
@@ -241,9 +277,17 @@ func (this *User) GetEntitiesPtr() *Entities{
 /** Init reference Entities **/
 func (this *User) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_entitiesPtr = ref.(string)
+		if this.M_entitiesPtr != ref.(string) {
+			this.M_entitiesPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
+			this.M_entitiesPtr = ref.(*Entities).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
@@ -255,6 +299,7 @@ func (this *User) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

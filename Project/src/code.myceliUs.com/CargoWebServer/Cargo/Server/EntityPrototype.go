@@ -162,6 +162,7 @@ func NewEntityPrototype() *EntityPrototype {
 	prototype.FieldsType = append(prototype.FieldsType, "xs.string")
 	prototype.FieldsVisibility = append(prototype.FieldsVisibility, false)
 	prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
+	prototype.FieldsNillable = append(prototype.FieldsNillable, false)
 
 	prototype.Fields = append(prototype.Fields, "ParentUuid")
 	prototype.Indexs = append(prototype.Indexs, "ParentUuid")
@@ -169,12 +170,14 @@ func NewEntityPrototype() *EntityPrototype {
 	prototype.FieldsType = append(prototype.FieldsType, "xs.string")
 	prototype.FieldsVisibility = append(prototype.FieldsVisibility, false)
 	prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
+	prototype.FieldsNillable = append(prototype.FieldsNillable, true)
 
 	prototype.Fields = append(prototype.Fields, "ParentLnk")
-	prototype.FieldsOrder = append(prototype.FieldsOrder, 3)
+	prototype.FieldsOrder = append(prototype.FieldsOrder, 2)
 	prototype.FieldsType = append(prototype.FieldsType, "xs.string")
 	prototype.FieldsVisibility = append(prototype.FieldsVisibility, false)
 	prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
+	prototype.FieldsNillable = append(prototype.FieldsNillable, true)
 
 	return prototype
 }
@@ -253,7 +256,6 @@ func (this *EntityPrototype) Create(storeId string) error {
  * Save the new entity prototype in the data store.
  */
 func (this *EntityPrototype) Save(storeId string) error {
-
 	if len(storeId) == 0 {
 		storeId = this.TypeName[:strings.Index(this.TypeName, ".")]
 	}
@@ -386,8 +388,6 @@ func (this *EntityPrototype) generateConstructor() string {
 
 	constructorSrc += this.TypeName + " = function(){\n"
 
-	log.Println("--------> generate type: ", this.TypeName)
-
 	// Common properties share by all entity.
 	constructorSrc += " this.__class__ = \"" + this.TypeName + "\"\n"
 	constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
@@ -402,14 +402,14 @@ func (this *EntityPrototype) generateConstructor() string {
 	constructorSrc += " this.initCallback = undefined\n"
 
 	// Fields.
-	for i := 0; i < len(this.Fields); i++ {
+	for i := 3; i < len(this.Fields)-2; i++ {
 		constructorSrc += " this." + this.Fields[i]
 		if strings.HasPrefix(this.FieldsType[i], "[]") {
 			constructorSrc += " = undefined\n"
 		} else {
-			if len(this.FieldsDefaultValue[i]) != 0 { // If a default value is set...
+			/*if len(this.FieldsDefaultValue[i]) != 0 { // If a default value is set...
 				constructorSrc += " = " + this.FieldsDefaultValue[i] + "\n"
-			} else if XML_Schemas.IsXsString(this.FieldsType[i]) {
+			} else*/if XML_Schemas.IsXsString(this.FieldsType[i]) {
 				constructorSrc += " = \"\"\n"
 			} else if XML_Schemas.IsXsInt(this.FieldsType[i]) || XML_Schemas.IsXsTime(this.FieldsType[i]) {
 				constructorSrc += " = 0\n"

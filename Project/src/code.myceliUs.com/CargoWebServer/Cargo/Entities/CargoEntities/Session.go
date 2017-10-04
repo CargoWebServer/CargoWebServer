@@ -62,7 +62,11 @@ func (this *Session) GetId() string{
 
 /** Init reference Id **/
 func (this *Session) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -74,7 +78,11 @@ func (this *Session) GetStartTime() int64{
 
 /** Init reference StartTime **/
 func (this *Session) SetStartTime(ref interface{}){
-	this.M_startTime = ref.(int64)
+	if this.M_startTime != ref.(int64) {
+		this.M_startTime = ref.(int64)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference StartTime **/
@@ -86,7 +94,11 @@ func (this *Session) GetEndTime() int64{
 
 /** Init reference EndTime **/
 func (this *Session) SetEndTime(ref interface{}){
-	this.M_endTime = ref.(int64)
+	if this.M_endTime != ref.(int64) {
+		this.M_endTime = ref.(int64)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference EndTime **/
@@ -98,7 +110,11 @@ func (this *Session) GetStatusTime() int64{
 
 /** Init reference StatusTime **/
 func (this *Session) SetStatusTime(ref interface{}){
-	this.M_statusTime = ref.(int64)
+	if this.M_statusTime != ref.(int64) {
+		this.M_statusTime = ref.(int64)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference StatusTime **/
@@ -110,7 +126,11 @@ func (this *Session) GetSessionState() SessionState{
 
 /** Init reference SessionState **/
 func (this *Session) SetSessionState(ref interface{}){
-	this.M_sessionState = ref.(SessionState)
+	if this.M_sessionState != ref.(SessionState) {
+		this.M_sessionState = ref.(SessionState)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference SessionState **/
@@ -123,9 +143,17 @@ func (this *Session) GetComputerRef() *Computer{
 /** Init reference ComputerRef **/
 func (this *Session) SetComputerRef(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_computerRef = ref.(string)
+		if this.M_computerRef != ref.(string) {
+			this.M_computerRef = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_computerRef = ref.(Entity).GetUUID()
+		if this.M_computerRef != ref.(Entity).GetUUID() {
+			this.M_computerRef = ref.(Entity).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_computerRef = ref.(*Computer)
 	}
 }
@@ -137,6 +165,7 @@ func (this *Session) RemoveComputerRef(ref interface{}){
 		if toDelete.GetUUID() == this.m_computerRef.GetUUID() {
 			this.m_computerRef = nil
 			this.M_computerRef = ""
+			this.NeedSave = true
 		}
 	}
 }
@@ -149,9 +178,17 @@ func (this *Session) GetAccountPtr() *Account{
 /** Init reference Account **/
 func (this *Session) SetAccountPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_accountPtr = ref.(string)
+		if this.M_accountPtr != ref.(string) {
+			this.M_accountPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_accountPtr = ref.(Entity).GetUUID()
+		if this.M_accountPtr != ref.(Entity).GetUUID() {
+			this.M_accountPtr = ref.(Entity).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_accountPtr = ref.(*Account)
 	}
 }
@@ -163,6 +200,7 @@ func (this *Session) RemoveAccountPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_accountPtr.GetUUID() {
 			this.m_accountPtr = nil
 			this.M_accountPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

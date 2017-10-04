@@ -67,7 +67,11 @@ func (this *ServiceConfiguration) GetId() string{
 
 /** Init reference Id **/
 func (this *ServiceConfiguration) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -79,7 +83,11 @@ func (this *ServiceConfiguration) GetHostName() string{
 
 /** Init reference HostName **/
 func (this *ServiceConfiguration) SetHostName(ref interface{}){
-	this.M_hostName = ref.(string)
+	if this.M_hostName != ref.(string) {
+		this.M_hostName = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference HostName **/
@@ -91,7 +99,11 @@ func (this *ServiceConfiguration) GetIpv4() string{
 
 /** Init reference Ipv4 **/
 func (this *ServiceConfiguration) SetIpv4(ref interface{}){
-	this.M_ipv4 = ref.(string)
+	if this.M_ipv4 != ref.(string) {
+		this.M_ipv4 = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Ipv4 **/
@@ -103,7 +115,11 @@ func (this *ServiceConfiguration) GetPort() int{
 
 /** Init reference Port **/
 func (this *ServiceConfiguration) SetPort(ref interface{}){
-	this.M_port = ref.(int)
+	if this.M_port != ref.(int) {
+		this.M_port = ref.(int)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Port **/
@@ -115,7 +131,11 @@ func (this *ServiceConfiguration) GetUser() string{
 
 /** Init reference User **/
 func (this *ServiceConfiguration) SetUser(ref interface{}){
-	this.M_user = ref.(string)
+	if this.M_user != ref.(string) {
+		this.M_user = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference User **/
@@ -127,7 +147,11 @@ func (this *ServiceConfiguration) GetPwd() string{
 
 /** Init reference Pwd **/
 func (this *ServiceConfiguration) SetPwd(ref interface{}){
-	this.M_pwd = ref.(string)
+	if this.M_pwd != ref.(string) {
+		this.M_pwd = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Pwd **/
@@ -139,7 +163,11 @@ func (this *ServiceConfiguration) GetStart() bool{
 
 /** Init reference Start **/
 func (this *ServiceConfiguration) SetStart(ref interface{}){
-	this.M_start = ref.(bool)
+	if this.M_start != ref.(bool) {
+		this.M_start = ref.(bool)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Start **/
@@ -152,9 +180,17 @@ func (this *ServiceConfiguration) GetParentPtr() *Configurations{
 /** Init reference Parent **/
 func (this *ServiceConfiguration) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_parentPtr = ref.(string)
+		if this.M_parentPtr != ref.(string) {
+			this.M_parentPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_parentPtr = ref.(*Configurations).GetUUID()
+		if this.M_parentPtr != ref.(*Configurations).GetUUID() {
+			this.M_parentPtr = ref.(*Configurations).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_parentPtr = ref.(*Configurations)
 	}
 }
@@ -166,6 +202,7 @@ func (this *ServiceConfiguration) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

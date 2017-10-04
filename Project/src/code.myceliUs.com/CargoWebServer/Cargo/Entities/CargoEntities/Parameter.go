@@ -54,7 +54,11 @@ func (this *Parameter) GetName() string{
 
 /** Init reference Name **/
 func (this *Parameter) SetName(ref interface{}){
-	this.M_name = ref.(string)
+	if this.M_name != ref.(string) {
+		this.M_name = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Name **/
@@ -66,7 +70,11 @@ func (this *Parameter) GetType() string{
 
 /** Init reference Type **/
 func (this *Parameter) SetType(ref interface{}){
-	this.M_type = ref.(string)
+	if this.M_type != ref.(string) {
+		this.M_type = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Type **/
@@ -78,7 +86,11 @@ func (this *Parameter) IsArray() bool{
 
 /** Init reference IsArray **/
 func (this *Parameter) SetIsArray(ref interface{}){
-	this.M_isArray = ref.(bool)
+	if this.M_isArray != ref.(bool) {
+		this.M_isArray = ref.(bool)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference IsArray **/
@@ -91,9 +103,17 @@ func (this *Parameter) GetParametersPtr() *Parameter{
 /** Init reference Parameters **/
 func (this *Parameter) SetParametersPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_parametersPtr = ref.(string)
+		if this.M_parametersPtr != ref.(string) {
+			this.M_parametersPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_parametersPtr = ref.(*Parameter).GetUUID()
+		if this.M_parametersPtr != ref.(*Parameter).GetUUID() {
+			this.M_parametersPtr = ref.(*Parameter).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_parametersPtr = ref.(*Parameter)
 	}
 }
@@ -105,6 +125,7 @@ func (this *Parameter) RemoveParametersPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parametersPtr.GetUUID() {
 			this.m_parametersPtr = nil
 			this.M_parametersPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

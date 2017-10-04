@@ -75,7 +75,7 @@ BpmnDataView.prototype.init = function () {
                 return function (prototype) {
                     // Generate the entity constructor.
                     prototype.generateConstructor()
-                    entityPrototypes[prototype.TypeName] = prototype
+                    setEntityPrototype(prototype)
 
                     // So here with the entity prototype i will generate the entity panel.
                     dataView.dataOutputsPanel = new EntityPanel(dataView.panel, prototype.TypeName, function () { }, null, true, null, "")

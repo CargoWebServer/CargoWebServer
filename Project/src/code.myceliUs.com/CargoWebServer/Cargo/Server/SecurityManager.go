@@ -48,7 +48,6 @@ func (this *SecurityManager) initialize() {
 
 	// Create the admin role if it doesn't exist
 	adminRoleUuid := CargoEntitiesRoleExists("adminRole")
-	cargoEntities := server.GetEntityManager().getCargoEntities()
 
 	if len(adminRoleUuid) == 0 {
 		ids := []interface{}{"admin"}
@@ -61,14 +60,12 @@ func (this *SecurityManager) initialize() {
 		// Create adminRole
 		this.adminRole, _ = this.createRole("adminRole")
 		this.adminRole.SetAccounts(adminAccount)
-
-		//adminAccountEntity.SaveEntity()
+		adminRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.adminRole.GetUUID(), false)
+		adminRoleEntity.SetNeedSave(true)
+		adminRoleEntity.SaveEntity()
 		adminAccount.SetRolesRef(this.adminRole)
-
-		// Setting adminRole to admin account
-		cargoEntities.GetObject().(*CargoEntities.Entities).SetRoles(this.adminRole)
-		cargoEntities.SaveEntity()
-
+		adminAccountEntity.SetNeedSave(true)
+		adminAccountEntity.SaveEntity()
 	}
 
 	// Create the guest role if it doesn't exist
@@ -84,13 +81,14 @@ func (this *SecurityManager) initialize() {
 		// Create guestRole
 		this.guestRole, _ = this.createRole("guestRole")
 		this.guestRole.SetAccounts(guestAccount)
+		guestRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.guestRole.GetUUID(), false)
+		guestRoleEntity.SetNeedSave(true)
+		guestRoleEntity.SaveEntity()
 
 		// Setting guestRole to guest account
-		cargoEntities.GetObject().(*CargoEntities.Entities).SetRoles(this.guestRole)
 		guestAccount.SetRolesRef(this.guestRole)
-		//guestAccountEntity.SaveEntity()
-
-		cargoEntities.SaveEntity()
+		guestAccountEntity.SetNeedSave(true)
+		guestAccountEntity.SaveEntity()
 	}
 
 }
@@ -198,7 +196,7 @@ func (this *SecurityManager) appendAccount(roleId string, accountId string) *Car
 				// Set the account to the role
 				role.SetAccounts(account)
 				account.SetRolesRef(role)
-
+				roleEntity.SetNeedSave(true)
 				roleEntity.SaveEntity()
 				accountEntity.SaveEntity()
 			} else {

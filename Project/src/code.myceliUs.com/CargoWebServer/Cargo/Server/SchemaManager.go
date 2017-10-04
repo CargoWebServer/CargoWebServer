@@ -152,7 +152,9 @@ func (this *SchemaManager) initialize() {
 
 	for _, prototype := range this.prototypes {
 		// Set the super type fields...
-		for i := 0; i < len(prototype.FieldsType); i++ {
+		// The last tow fields (childUuid and referenced) will
+		// be set a the prototype creation.
+		for i := 3; i < len(prototype.FieldsType); i++ {
 			setDefaultFieldValue(prototype, prototype.FieldsType[i])
 		}
 	}
@@ -204,7 +206,7 @@ func setDefaultFieldValue(prototype *EntityPrototype, fieldType string) {
 		prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "false")
 	} else {
 		// Object here.
-		prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "undefined")
+		prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "null")
 	}
 }
 
@@ -304,7 +306,7 @@ func (this *SchemaManager) getFieldsFieldsType(prototype *EntityPrototype, path 
 	}
 
 	*path = append(*path, prototype.TypeName)
-	for i := 0; i < len(prototype.Fields); i++ {
+	for i := 3; i < len(prototype.Fields)-2; i++ {
 		if prototype.Fields[i] != "UUID" && prototype.Fields[i] != "ParentUuid" && prototype.Fields[i] != "childsUuid" && prototype.Fields[i] != "referenced" {
 			fields = append(fields, prototype.Fields[i])
 			fieldsType = append(fieldsType, prototype.FieldsType[i])
@@ -314,7 +316,6 @@ func (this *SchemaManager) getFieldsFieldsType(prototype *EntityPrototype, path 
 
 	for i := 0; i < len(prototype.SuperTypeNames); i++ {
 		p := this.prototypes[prototype.SuperTypeNames[i]]
-
 		fields_, fieldsType_, fieldsDefaultValue_ := this.getFieldsFieldsType(p, path)
 		for j := 0; j < len(fields_); j++ {
 			if Utility.Contains(fields, fields_[j]) == false {
@@ -335,11 +336,6 @@ func (this *SchemaManager) setSuperTypeField(prototype *EntityPrototype) {
 	fields, fieldsType, fieldsDefaultValue := this.getFieldsFieldsType(prototype, &path)
 	for i := 0; i < len(fields); i++ {
 		if Utility.Contains(prototype.Fields, fields[i]) == false {
-
-			/*prototype.Fields = Utility.InsertStringAt(i, fields[i], prototype.Fields)
-			prototype.FieldsType = Utility.InsertStringAt(i, fieldsType[i], prototype.FieldsType)
-			prototype.FieldsDefaultValue = Utility.InsertStringAt(i, fieldsDefaultValue[i], prototype.FieldsDefaultValue)
-			prototype.FieldsVisibility = Utility.InsertBoolAt(i, true, prototype.FieldsVisibility)*/
 			prototype.Fields = append(prototype.Fields, fields[i])
 			prototype.FieldsType = append(prototype.FieldsType, fieldsType[i])
 			prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, fieldsDefaultValue[i])
@@ -535,6 +531,7 @@ func (this *SchemaManager) genereatePrototype(schema *XML_Schemas.XSD_Schema) {
 					prototype.FieldsType = append(prototype.FieldsType, prototype.TypeName)
 					prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 					prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+					prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
 				}
 			}
 		}

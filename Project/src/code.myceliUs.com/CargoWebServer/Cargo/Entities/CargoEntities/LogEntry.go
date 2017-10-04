@@ -64,7 +64,11 @@ func (this *LogEntry) GetId() string{
 
 /** Init reference Id **/
 func (this *LogEntry) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -76,7 +80,11 @@ func (this *LogEntry) GetCreationTime() int64{
 
 /** Init reference CreationTime **/
 func (this *LogEntry) SetCreationTime(ref interface{}){
-	this.M_creationTime = ref.(int64)
+	if this.M_creationTime != ref.(int64) {
+		this.M_creationTime = ref.(int64)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference CreationTime **/
@@ -89,9 +97,17 @@ func (this *LogEntry) GetEntityRef() Entity{
 /** Init reference EntityRef **/
 func (this *LogEntry) SetEntityRef(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_entityRef = ref.(string)
+		if this.M_entityRef != ref.(string) {
+			this.M_entityRef = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_entityRef = ref.(Entity).GetUUID()
+		if this.M_entityRef != ref.(Entity).GetUUID() {
+			this.M_entityRef = ref.(Entity).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_entityRef = ref.(Entity)
 	}
 }
@@ -103,6 +119,7 @@ func (this *LogEntry) RemoveEntityRef(ref interface{}){
 		if toDelete.GetUUID() == this.m_entityRef.(Entity).GetUUID() {
 			this.m_entityRef = nil
 			this.M_entityRef = ""
+			this.NeedSave = true
 		}
 	}
 }
@@ -115,9 +132,17 @@ func (this *LogEntry) GetLoggerPtr() *Log{
 /** Init reference Logger **/
 func (this *LogEntry) SetLoggerPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_loggerPtr = ref.(string)
+		if this.M_loggerPtr != ref.(string) {
+			this.M_loggerPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_loggerPtr = ref.(Entity).GetUUID()
+		if this.M_loggerPtr != ref.(Entity).GetUUID() {
+			this.M_loggerPtr = ref.(Entity).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_loggerPtr = ref.(*Log)
 	}
 }
@@ -129,6 +154,7 @@ func (this *LogEntry) RemoveLoggerPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_loggerPtr.GetUUID() {
 			this.m_loggerPtr = nil
 			this.M_loggerPtr = ""
+			this.NeedSave = true
 		}
 	}
 }
@@ -141,9 +167,17 @@ func (this *LogEntry) GetEntitiesPtr() *Entities{
 /** Init reference Entities **/
 func (this *LogEntry) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_entitiesPtr = ref.(string)
+		if this.M_entitiesPtr != ref.(string) {
+			this.M_entitiesPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
+			this.M_entitiesPtr = ref.(*Entities).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
@@ -155,6 +189,7 @@ func (this *LogEntry) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

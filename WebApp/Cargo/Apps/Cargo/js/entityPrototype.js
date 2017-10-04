@@ -177,6 +177,16 @@ EntityPrototype.prototype.init = function (object) {
     // Now the fields.
     if (object.Fields != null && object.FieldsType != null && object.FieldsVisibility != null && object.FieldsOrder != null) {
 
+        if (!contains(object.Fields, "ParentLnk")) {
+            object.Fields.unshift("ParentLnk")
+            object.FieldsType.unshift("xs.string")
+            object.FieldsVisibility.unshift(false)
+            object.FieldsNillable.unshift(false)
+            object.FieldsDocumentation.unshift("Relation with it parent.")
+            object.FieldsOrder.push(object.FieldsOrder.length)
+            object.FieldsDefaultValue.unshift("")
+        }
+
         // Append parent uuid if none is define.
         if (!contains(object.Fields, "ParentUuid")) {
             object.Fields.unshift("ParentUuid")
@@ -210,6 +220,10 @@ EntityPrototype.prototype.init = function (object) {
             } else if (object.Fields[i] == "ParentUuid") {
                 if (!contains(this.Indexs, "ParentUuid")) {
                     this.Indexs.unshift("ParentUuid")
+                }
+            } else if (object.Fields[i] == "ParentLnk") {
+                if (!contains(this.Indexs, "ParentLnk")) {
+                    this.Indexs.unshift("ParentLnk")
                 }
             }
         }
@@ -245,9 +259,9 @@ EntityPrototype.prototype.init = function (object) {
     }
 
     // other standard fields.
-    this.appendField("childsUuid", "[]xs.string", false, this.Fields.length, false, "the array of child entities.", "")
-    this.appendField("referenced", "[]Server.EntityRef", false, this.Fields.length, false, "The field documentation.", "")
-    
+    this.appendField("childsUuid", "[]xs.string", false, this.Fields.length, false, "the array of child entities.", "[]")
+    this.appendField("referenced", "[]Server.EntityRef", false, this.Fields.length, false, "The field documentation.", "[]")
+
     // Generate the class code.
     this.generateConstructor()
 }
@@ -298,12 +312,24 @@ EntityPrototype.prototype.generateConstructor = function () {
     }
 
     // Fields.
-    for (var i = 0; i < this.Fields.length; i++) {
+    for (var i = 3; i < this.Fields.length - 2; i++) {
 
         constructorSrc += " this." + normalizeFieldName(this.Fields[i])
-
-        if (this.FieldsType[i].startsWith("[]")) {
-            constructorSrc += " = undefined\n"
+        if (this.FieldsDefaultValue[i] != undefined) {
+            // In case of default values...
+            if (this.FieldsType[i].startsWith("[]")) {
+                constructorSrc += " = []\n"
+            } else if (isXsString(this.FieldsType[i]) || isXsRef(this.FieldsType[i]) || isXsId(this.FieldsType[i])) {
+                constructorSrc += " = \"" + this.FieldsDefaultValue[i] + "\"\n"
+            } else {
+                if(this.FieldsType[i].startsWith("xs.")){
+                    constructorSrc += " = " + this.FieldsDefaultValue[i] + "\n"
+                }else{
+                    constructorSrc += " = null\n"
+                }
+            }
+        } else if (this.FieldsType[i].startsWith("[]")) {
+            constructorSrc += " = []\n"
         } else {
             if (isXsString(this.FieldsType[i]) || isXsRef(this.FieldsType[i]) || isXsId(this.FieldsType[i])) {
                 constructorSrc += " = \"\"\n"
@@ -508,7 +534,7 @@ EntityPrototypeManager.prototype.onEvent = function (evt) {
         // Set the prototype.
         var prototype = new EntityPrototype()
         prototype.init(evt.dataMap.prototype)
-        entityPrototypes[evt.dataMap.prototype.TypeName] = prototype
+        setEntityPrototype(prototype)
         evt.dataMap.prototype = prototype
     } else if (evt.code == DeletePrototypeEvent) {
         // Remove it from the map
@@ -517,4 +543,13 @@ EntityPrototypeManager.prototype.onEvent = function (evt) {
 
     // Call the regular function.
     EventHub.prototype.onEvent.call(this, evt);
+}
+
+/**
+ * Use that function to set value of the global map.
+ * @param {*} prototype 
+ */
+function setEntityPrototype(prototype){
+    console.log("------> set entity prototype: ", prototype)
+    entityPrototypes[prototype.TypeName] = prototype
 }

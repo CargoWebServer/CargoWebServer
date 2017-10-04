@@ -52,7 +52,11 @@ func (this *OAuth2Expires) GetId() string{
 
 /** Init reference Id **/
 func (this *OAuth2Expires) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -64,7 +68,11 @@ func (this *OAuth2Expires) GetExpiresAt() int64{
 
 /** Init reference ExpiresAt **/
 func (this *OAuth2Expires) SetExpiresAt(ref interface{}){
-	this.M_expiresAt = ref.(int64)
+	if this.M_expiresAt != ref.(int64) {
+		this.M_expiresAt = ref.(int64)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference ExpiresAt **/
@@ -77,9 +85,17 @@ func (this *OAuth2Expires) GetParentPtr() *OAuth2Configuration{
 /** Init reference Parent **/
 func (this *OAuth2Expires) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_parentPtr = ref.(string)
+		if this.M_parentPtr != ref.(string) {
+			this.M_parentPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_parentPtr = ref.(Configuration).GetUUID()
+		if this.M_parentPtr != ref.(Configuration).GetUUID() {
+			this.M_parentPtr = ref.(Configuration).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_parentPtr = ref.(*OAuth2Configuration)
 	}
 }
@@ -91,6 +107,7 @@ func (this *OAuth2Expires) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

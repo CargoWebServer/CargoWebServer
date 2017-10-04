@@ -61,7 +61,11 @@ func (this *OAuth2Authorize) GetId() string{
 
 /** Init reference Id **/
 func (this *OAuth2Authorize) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -74,9 +78,17 @@ func (this *OAuth2Authorize) GetClient() *OAuth2Client{
 /** Init reference Client **/
 func (this *OAuth2Authorize) SetClient(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_client = ref.(string)
+		if this.M_client != ref.(string) {
+			this.M_client = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_client = ref.(*OAuth2Client).GetUUID()
+		if this.M_client != ref.(*OAuth2Client).GetUUID() {
+			this.M_client = ref.(*OAuth2Client).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_client = ref.(*OAuth2Client)
 	}
 }
@@ -88,6 +100,7 @@ func (this *OAuth2Authorize) RemoveClient(ref interface{}){
 		if toDelete.GetUUID() == this.m_client.GetUUID() {
 			this.m_client = nil
 			this.M_client = ""
+			this.NeedSave = true
 		}
 	}
 }
@@ -99,7 +112,11 @@ func (this *OAuth2Authorize) GetExpiresIn() int64{
 
 /** Init reference ExpiresIn **/
 func (this *OAuth2Authorize) SetExpiresIn(ref interface{}){
-	this.M_expiresIn = ref.(int64)
+	if this.M_expiresIn != ref.(int64) {
+		this.M_expiresIn = ref.(int64)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference ExpiresIn **/
@@ -111,7 +128,11 @@ func (this *OAuth2Authorize) GetScope() string{
 
 /** Init reference Scope **/
 func (this *OAuth2Authorize) SetScope(ref interface{}){
-	this.M_scope = ref.(string)
+	if this.M_scope != ref.(string) {
+		this.M_scope = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Scope **/
@@ -123,7 +144,11 @@ func (this *OAuth2Authorize) GetRedirectUri() string{
 
 /** Init reference RedirectUri **/
 func (this *OAuth2Authorize) SetRedirectUri(ref interface{}){
-	this.M_redirectUri = ref.(string)
+	if this.M_redirectUri != ref.(string) {
+		this.M_redirectUri = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference RedirectUri **/
@@ -135,7 +160,11 @@ func (this *OAuth2Authorize) GetState() string{
 
 /** Init reference State **/
 func (this *OAuth2Authorize) SetState(ref interface{}){
-	this.M_state = ref.(string)
+	if this.M_state != ref.(string) {
+		this.M_state = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference State **/
@@ -148,9 +177,17 @@ func (this *OAuth2Authorize) GetUserData() *OAuth2IdToken{
 /** Init reference UserData **/
 func (this *OAuth2Authorize) SetUserData(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_userData = ref.(string)
+		if this.M_userData != ref.(string) {
+			this.M_userData = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_userData = ref.(*OAuth2IdToken).GetUUID()
+		if this.M_userData != ref.(*OAuth2IdToken).GetUUID() {
+			this.M_userData = ref.(*OAuth2IdToken).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_userData = ref.(*OAuth2IdToken)
 	}
 }
@@ -162,6 +199,7 @@ func (this *OAuth2Authorize) RemoveUserData(ref interface{}){
 		if toDelete.GetUUID() == this.m_userData.GetUUID() {
 			this.m_userData = nil
 			this.M_userData = ""
+			this.NeedSave = true
 		}
 	}
 }
@@ -173,7 +211,11 @@ func (this *OAuth2Authorize) GetCreatedAt() int64{
 
 /** Init reference CreatedAt **/
 func (this *OAuth2Authorize) SetCreatedAt(ref interface{}){
-	this.M_createdAt = ref.(int64)
+	if this.M_createdAt != ref.(int64) {
+		this.M_createdAt = ref.(int64)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference CreatedAt **/

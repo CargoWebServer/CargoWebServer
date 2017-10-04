@@ -69,7 +69,11 @@ func (this *LdapConfiguration) GetId() string{
 
 /** Init reference Id **/
 func (this *LdapConfiguration) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -81,7 +85,11 @@ func (this *LdapConfiguration) GetHostName() string{
 
 /** Init reference HostName **/
 func (this *LdapConfiguration) SetHostName(ref interface{}){
-	this.M_hostName = ref.(string)
+	if this.M_hostName != ref.(string) {
+		this.M_hostName = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference HostName **/
@@ -93,7 +101,11 @@ func (this *LdapConfiguration) GetIpv4() string{
 
 /** Init reference Ipv4 **/
 func (this *LdapConfiguration) SetIpv4(ref interface{}){
-	this.M_ipv4 = ref.(string)
+	if this.M_ipv4 != ref.(string) {
+		this.M_ipv4 = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Ipv4 **/
@@ -105,7 +117,11 @@ func (this *LdapConfiguration) GetPort() int{
 
 /** Init reference Port **/
 func (this *LdapConfiguration) SetPort(ref interface{}){
-	this.M_port = ref.(int)
+	if this.M_port != ref.(int) {
+		this.M_port = ref.(int)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Port **/
@@ -117,7 +133,11 @@ func (this *LdapConfiguration) GetUser() string{
 
 /** Init reference User **/
 func (this *LdapConfiguration) SetUser(ref interface{}){
-	this.M_user = ref.(string)
+	if this.M_user != ref.(string) {
+		this.M_user = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference User **/
@@ -129,7 +149,11 @@ func (this *LdapConfiguration) GetPwd() string{
 
 /** Init reference Pwd **/
 func (this *LdapConfiguration) SetPwd(ref interface{}){
-	this.M_pwd = ref.(string)
+	if this.M_pwd != ref.(string) {
+		this.M_pwd = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Pwd **/
@@ -141,7 +165,11 @@ func (this *LdapConfiguration) GetDomain() string{
 
 /** Init reference Domain **/
 func (this *LdapConfiguration) SetDomain(ref interface{}){
-	this.M_domain = ref.(string)
+	if this.M_domain != ref.(string) {
+		this.M_domain = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Domain **/
@@ -153,7 +181,11 @@ func (this *LdapConfiguration) GetSearchBase() string{
 
 /** Init reference SearchBase **/
 func (this *LdapConfiguration) SetSearchBase(ref interface{}){
-	this.M_searchBase = ref.(string)
+	if this.M_searchBase != ref.(string) {
+		this.M_searchBase = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference SearchBase **/
@@ -166,9 +198,17 @@ func (this *LdapConfiguration) GetParentPtr() *Configurations{
 /** Init reference Parent **/
 func (this *LdapConfiguration) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_parentPtr = ref.(string)
+		if this.M_parentPtr != ref.(string) {
+			this.M_parentPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_parentPtr = ref.(*Configurations).GetUUID()
+		if this.M_parentPtr != ref.(*Configurations).GetUUID() {
+			this.M_parentPtr = ref.(*Configurations).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_parentPtr = ref.(*Configurations)
 	}
 }
@@ -180,6 +220,7 @@ func (this *LdapConfiguration) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

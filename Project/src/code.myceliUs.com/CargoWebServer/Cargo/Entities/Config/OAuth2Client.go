@@ -2,11 +2,11 @@
 
 package Config
 
-import(
+import (
 	"encoding/xml"
 )
 
-type OAuth2Client struct{
+type OAuth2Client struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -20,16 +20,15 @@ type OAuth2Client struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of OAuth2Client **/
-	M_id string
-	M_secret string
-	M_redirectUri string
-	M_tokenUri string
+	M_id               string
+	M_secret           string
+	M_redirectUri      string
+	M_tokenUri         string
 	M_authorizationUri string
-	M_extra []uint8
-
+	M_extra            []uint8
 
 	/** Associations **/
 	m_parentPtr *OAuth2Configuration
@@ -39,112 +38,153 @@ type OAuth2Client struct{
 
 /** Xml parser for OAuth2Client **/
 type XsdOAuth2Client struct {
-	XMLName xml.Name	`xml:"oauth2Client"`
-	M_id	string	`xml:"id,attr"`
-	M_secret	string	`xml:"secret,attr"`
-	M_redirectUri	string	`xml:"redirectUri,attr"`
-	M_extra	[]uint8	`xml:"extra,attr"`
-
+	XMLName       xml.Name `xml:"oauth2Client"`
+	M_id          string   `xml:"id,attr"`
+	M_secret      string   `xml:"secret,attr"`
+	M_redirectUri string   `xml:"redirectUri,attr"`
+	M_extra       []uint8  `xml:"extra,attr"`
 }
+
 /** UUID **/
-func (this *OAuth2Client) GetUUID() string{
+func (this *OAuth2Client) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *OAuth2Client) GetId() string{
+func (this *OAuth2Client) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *OAuth2Client) SetId(ref interface{}){
-	this.M_id = ref.(string)
+func (this *OAuth2Client) SetId(ref interface{}) {
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {
+			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
 
 /** Secret **/
-func (this *OAuth2Client) GetSecret() string{
+func (this *OAuth2Client) GetSecret() string {
 	return this.M_secret
 }
 
 /** Init reference Secret **/
-func (this *OAuth2Client) SetSecret(ref interface{}){
-	this.M_secret = ref.(string)
+func (this *OAuth2Client) SetSecret(ref interface{}) {
+	if this.M_secret != ref.(string) {
+		this.M_secret = ref.(string)
+		if this.IsInit == true {
+			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Secret **/
 
 /** RedirectUri **/
-func (this *OAuth2Client) GetRedirectUri() string{
+func (this *OAuth2Client) GetRedirectUri() string {
 	return this.M_redirectUri
 }
 
 /** Init reference RedirectUri **/
-func (this *OAuth2Client) SetRedirectUri(ref interface{}){
-	this.M_redirectUri = ref.(string)
+func (this *OAuth2Client) SetRedirectUri(ref interface{}) {
+	if this.M_redirectUri != ref.(string) {
+		this.M_redirectUri = ref.(string)
+		if this.IsInit == true {
+			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference RedirectUri **/
 
 /** TokenUri **/
-func (this *OAuth2Client) GetTokenUri() string{
+func (this *OAuth2Client) GetTokenUri() string {
 	return this.M_tokenUri
 }
 
 /** Init reference TokenUri **/
-func (this *OAuth2Client) SetTokenUri(ref interface{}){
-	this.M_tokenUri = ref.(string)
+func (this *OAuth2Client) SetTokenUri(ref interface{}) {
+	if this.M_tokenUri != ref.(string) {
+		this.M_tokenUri = ref.(string)
+		if this.IsInit == true {
+			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference TokenUri **/
 
 /** AuthorizationUri **/
-func (this *OAuth2Client) GetAuthorizationUri() string{
+func (this *OAuth2Client) GetAuthorizationUri() string {
 	return this.M_authorizationUri
 }
 
 /** Init reference AuthorizationUri **/
-func (this *OAuth2Client) SetAuthorizationUri(ref interface{}){
-	this.M_authorizationUri = ref.(string)
+func (this *OAuth2Client) SetAuthorizationUri(ref interface{}) {
+	if this.M_authorizationUri != ref.(string) {
+		this.M_authorizationUri = ref.(string)
+		if this.IsInit == true {
+			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference AuthorizationUri **/
 
 /** Extra **/
-func (this *OAuth2Client) GetExtra() []uint8{
+func (this *OAuth2Client) GetExtra() []uint8 {
 	return this.M_extra
 }
 
 /** Init reference Extra **/
-func (this *OAuth2Client) SetExtra(ref interface{}){
+func (this *OAuth2Client) SetExtra(ref interface{}) {
+	//if this.M_extra != ref.([]uint8) {
 	this.M_extra = ref.([]uint8)
+	if this.IsInit == true {
+		this.NeedSave = true
+	}
+	//}
 }
 
 /** Remove reference Extra **/
 
 /** Parent **/
-func (this *OAuth2Client) GetParentPtr() *OAuth2Configuration{
+func (this *OAuth2Client) GetParentPtr() *OAuth2Configuration {
 	return this.m_parentPtr
 }
 
 /** Init reference Parent **/
-func (this *OAuth2Client) SetParentPtr(ref interface{}){
+func (this *OAuth2Client) SetParentPtr(ref interface{}) {
 	if _, ok := ref.(string); ok {
-		this.M_parentPtr = ref.(string)
-	}else{
-		this.M_parentPtr = ref.(Configuration).GetUUID()
+		if this.M_parentPtr != ref.(string) {
+			this.M_parentPtr = ref.(string)
+			if this.IsInit == true {
+				this.NeedSave = true
+			}
+		}
+	} else {
+		if this.M_parentPtr != ref.(Configuration).GetUUID() {
+			this.M_parentPtr = ref.(Configuration).GetUUID()
+			if this.IsInit == true {
+				this.NeedSave = true
+			}
+		}
 		this.m_parentPtr = ref.(*OAuth2Configuration)
 	}
 }
 
 /** Remove reference Parent **/
-func (this *OAuth2Client) RemoveParentPtr(ref interface{}){
+func (this *OAuth2Client) RemoveParentPtr(ref interface{}) {
 	toDelete := ref.(Configuration)
-	if this.m_parentPtr!= nil {
+	if this.m_parentPtr != nil {
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

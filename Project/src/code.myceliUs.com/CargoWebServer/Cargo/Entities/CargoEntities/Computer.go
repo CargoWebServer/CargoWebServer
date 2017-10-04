@@ -63,7 +63,11 @@ func (this *Computer) GetId() string{
 
 /** Init reference Id **/
 func (this *Computer) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -75,7 +79,11 @@ func (this *Computer) GetName() string{
 
 /** Init reference Name **/
 func (this *Computer) SetName(ref interface{}){
-	this.M_name = ref.(string)
+	if this.M_name != ref.(string) {
+		this.M_name = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Name **/
@@ -87,7 +95,11 @@ func (this *Computer) GetIpv4() string{
 
 /** Init reference Ipv4 **/
 func (this *Computer) SetIpv4(ref interface{}){
-	this.M_ipv4 = ref.(string)
+	if this.M_ipv4 != ref.(string) {
+		this.M_ipv4 = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Ipv4 **/
@@ -99,7 +111,11 @@ func (this *Computer) GetOsType() OsType{
 
 /** Init reference OsType **/
 func (this *Computer) SetOsType(ref interface{}){
-	this.M_osType = ref.(OsType)
+	if this.M_osType != ref.(OsType) {
+		this.M_osType = ref.(OsType)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference OsType **/
@@ -111,7 +127,11 @@ func (this *Computer) GetPlatformType() PlatformType{
 
 /** Init reference PlatformType **/
 func (this *Computer) SetPlatformType(ref interface{}){
-	this.M_platformType = ref.(PlatformType)
+	if this.M_platformType != ref.(PlatformType) {
+		this.M_platformType = ref.(PlatformType)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference PlatformType **/
@@ -124,9 +144,17 @@ func (this *Computer) GetEntitiesPtr() *Entities{
 /** Init reference Entities **/
 func (this *Computer) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_entitiesPtr = ref.(string)
+		if this.M_entitiesPtr != ref.(string) {
+			this.M_entitiesPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_entitiesPtr = ref.(*Entities).GetUUID()
+		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
+			this.M_entitiesPtr = ref.(*Entities).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
 }
@@ -138,6 +166,7 @@ func (this *Computer) RemoveEntitiesPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

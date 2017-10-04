@@ -67,7 +67,11 @@ func (this *SmtpConfiguration) GetId() string{
 
 /** Init reference Id **/
 func (this *SmtpConfiguration) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -79,7 +83,11 @@ func (this *SmtpConfiguration) GetTextEncoding() Encoding{
 
 /** Init reference TextEncoding **/
 func (this *SmtpConfiguration) SetTextEncoding(ref interface{}){
-	this.M_textEncoding = ref.(Encoding)
+	if this.M_textEncoding != ref.(Encoding) {
+		this.M_textEncoding = ref.(Encoding)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference TextEncoding **/
@@ -91,7 +99,11 @@ func (this *SmtpConfiguration) GetHostName() string{
 
 /** Init reference HostName **/
 func (this *SmtpConfiguration) SetHostName(ref interface{}){
-	this.M_hostName = ref.(string)
+	if this.M_hostName != ref.(string) {
+		this.M_hostName = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference HostName **/
@@ -103,7 +115,11 @@ func (this *SmtpConfiguration) GetIpv4() string{
 
 /** Init reference Ipv4 **/
 func (this *SmtpConfiguration) SetIpv4(ref interface{}){
-	this.M_ipv4 = ref.(string)
+	if this.M_ipv4 != ref.(string) {
+		this.M_ipv4 = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Ipv4 **/
@@ -115,7 +131,11 @@ func (this *SmtpConfiguration) GetPort() int{
 
 /** Init reference Port **/
 func (this *SmtpConfiguration) SetPort(ref interface{}){
-	this.M_port = ref.(int)
+	if this.M_port != ref.(int) {
+		this.M_port = ref.(int)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Port **/
@@ -127,7 +147,11 @@ func (this *SmtpConfiguration) GetUser() string{
 
 /** Init reference User **/
 func (this *SmtpConfiguration) SetUser(ref interface{}){
-	this.M_user = ref.(string)
+	if this.M_user != ref.(string) {
+		this.M_user = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference User **/
@@ -139,7 +163,11 @@ func (this *SmtpConfiguration) GetPwd() string{
 
 /** Init reference Pwd **/
 func (this *SmtpConfiguration) SetPwd(ref interface{}){
-	this.M_pwd = ref.(string)
+	if this.M_pwd != ref.(string) {
+		this.M_pwd = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Pwd **/
@@ -152,9 +180,17 @@ func (this *SmtpConfiguration) GetParentPtr() *Configurations{
 /** Init reference Parent **/
 func (this *SmtpConfiguration) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_parentPtr = ref.(string)
+		if this.M_parentPtr != ref.(string) {
+			this.M_parentPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_parentPtr = ref.(*Configurations).GetUUID()
+		if this.M_parentPtr != ref.(*Configurations).GetUUID() {
+			this.M_parentPtr = ref.(*Configurations).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_parentPtr = ref.(*Configurations)
 	}
 }
@@ -166,6 +202,7 @@ func (this *SmtpConfiguration) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

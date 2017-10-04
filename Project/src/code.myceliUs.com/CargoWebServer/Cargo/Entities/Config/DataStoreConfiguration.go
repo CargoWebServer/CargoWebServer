@@ -71,7 +71,11 @@ func (this *DataStoreConfiguration) GetId() string{
 
 /** Init reference Id **/
 func (this *DataStoreConfiguration) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -83,7 +87,11 @@ func (this *DataStoreConfiguration) GetDataStoreType() DataStoreType{
 
 /** Init reference DataStoreType **/
 func (this *DataStoreConfiguration) SetDataStoreType(ref interface{}){
-	this.M_dataStoreType = ref.(DataStoreType)
+	if this.M_dataStoreType != ref.(DataStoreType) {
+		this.M_dataStoreType = ref.(DataStoreType)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference DataStoreType **/
@@ -95,7 +103,11 @@ func (this *DataStoreConfiguration) GetDataStoreVendor() DataStoreVendor{
 
 /** Init reference DataStoreVendor **/
 func (this *DataStoreConfiguration) SetDataStoreVendor(ref interface{}){
-	this.M_dataStoreVendor = ref.(DataStoreVendor)
+	if this.M_dataStoreVendor != ref.(DataStoreVendor) {
+		this.M_dataStoreVendor = ref.(DataStoreVendor)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference DataStoreVendor **/
@@ -107,7 +119,11 @@ func (this *DataStoreConfiguration) GetTextEncoding() Encoding{
 
 /** Init reference TextEncoding **/
 func (this *DataStoreConfiguration) SetTextEncoding(ref interface{}){
-	this.M_textEncoding = ref.(Encoding)
+	if this.M_textEncoding != ref.(Encoding) {
+		this.M_textEncoding = ref.(Encoding)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference TextEncoding **/
@@ -119,7 +135,11 @@ func (this *DataStoreConfiguration) GetHostName() string{
 
 /** Init reference HostName **/
 func (this *DataStoreConfiguration) SetHostName(ref interface{}){
-	this.M_hostName = ref.(string)
+	if this.M_hostName != ref.(string) {
+		this.M_hostName = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference HostName **/
@@ -131,7 +151,11 @@ func (this *DataStoreConfiguration) GetIpv4() string{
 
 /** Init reference Ipv4 **/
 func (this *DataStoreConfiguration) SetIpv4(ref interface{}){
-	this.M_ipv4 = ref.(string)
+	if this.M_ipv4 != ref.(string) {
+		this.M_ipv4 = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Ipv4 **/
@@ -143,7 +167,11 @@ func (this *DataStoreConfiguration) GetUser() string{
 
 /** Init reference User **/
 func (this *DataStoreConfiguration) SetUser(ref interface{}){
-	this.M_user = ref.(string)
+	if this.M_user != ref.(string) {
+		this.M_user = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference User **/
@@ -155,7 +183,11 @@ func (this *DataStoreConfiguration) GetPwd() string{
 
 /** Init reference Pwd **/
 func (this *DataStoreConfiguration) SetPwd(ref interface{}){
-	this.M_pwd = ref.(string)
+	if this.M_pwd != ref.(string) {
+		this.M_pwd = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Pwd **/
@@ -167,7 +199,11 @@ func (this *DataStoreConfiguration) GetPort() int{
 
 /** Init reference Port **/
 func (this *DataStoreConfiguration) SetPort(ref interface{}){
-	this.M_port = ref.(int)
+	if this.M_port != ref.(int) {
+		this.M_port = ref.(int)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Port **/
@@ -180,9 +216,17 @@ func (this *DataStoreConfiguration) GetParentPtr() *Configurations{
 /** Init reference Parent **/
 func (this *DataStoreConfiguration) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
-		this.M_parentPtr = ref.(string)
+		if this.M_parentPtr != ref.(string) {
+			this.M_parentPtr = ref.(string)
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 	}else{
-		this.M_parentPtr = ref.(*Configurations).GetUUID()
+		if this.M_parentPtr != ref.(*Configurations).GetUUID() {
+			this.M_parentPtr = ref.(*Configurations).GetUUID()
+			if this.IsInit == true {				this.NeedSave = true
+			}
+		}
 		this.m_parentPtr = ref.(*Configurations)
 	}
 }
@@ -194,6 +238,7 @@ func (this *DataStoreConfiguration) RemoveParentPtr(ref interface{}){
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
+			this.NeedSave = true
 		}
 	}
 }

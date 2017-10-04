@@ -66,7 +66,11 @@ func (this *Configurations) GetId() string{
 
 /** Init reference Id **/
 func (this *Configurations) SetId(ref interface{}){
-	this.M_id = ref.(string)
+	if this.M_id != ref.(string) {
+		this.M_id = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Id **/
@@ -78,7 +82,11 @@ func (this *Configurations) GetName() string{
 
 /** Init reference Name **/
 func (this *Configurations) SetName(ref interface{}){
-	this.M_name = ref.(string)
+	if this.M_name != ref.(string) {
+		this.M_name = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Name **/
@@ -90,7 +98,11 @@ func (this *Configurations) GetVersion() string{
 
 /** Init reference Version **/
 func (this *Configurations) SetVersion(ref interface{}){
-	this.M_version = ref.(string)
+	if this.M_version != ref.(string) {
+		this.M_version = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Version **/
@@ -102,7 +114,11 @@ func (this *Configurations) GetFilePath() string{
 
 /** Init reference FilePath **/
 func (this *Configurations) SetFilePath(ref interface{}){
-	this.M_filePath = ref.(string)
+	if this.M_filePath != ref.(string) {
+		this.M_filePath = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference FilePath **/
@@ -114,7 +130,11 @@ func (this *Configurations) GetServerConfig() *ServerConfiguration{
 
 /** Init reference ServerConfig **/
 func (this *Configurations) SetServerConfig(ref interface{}){
-	this.M_serverConfig = ref.(*ServerConfiguration)
+	if this.M_serverConfig != ref.(*ServerConfiguration) {
+		this.M_serverConfig = ref.(*ServerConfiguration)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference ServerConfig **/
@@ -122,6 +142,7 @@ func (this *Configurations) RemoveServerConfig(ref interface{}){
 	toDelete := ref.(Configuration)
 	if toDelete.GetUUID() == this.M_serverConfig.GetUUID() {
 		this.M_serverConfig = nil
+		this.NeedSave = true
 	}
 }
 
@@ -132,7 +153,11 @@ func (this *Configurations) GetOauth2Configuration() *OAuth2Configuration{
 
 /** Init reference Oauth2Configuration **/
 func (this *Configurations) SetOauth2Configuration(ref interface{}){
-	this.M_oauth2Configuration = ref.(*OAuth2Configuration)
+	if this.M_oauth2Configuration != ref.(*OAuth2Configuration) {
+		this.M_oauth2Configuration = ref.(*OAuth2Configuration)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
 }
 
 /** Remove reference Oauth2Configuration **/
@@ -140,6 +165,7 @@ func (this *Configurations) RemoveOauth2Configuration(ref interface{}){
 	toDelete := ref.(Configuration)
 	if toDelete.GetUUID() == this.M_oauth2Configuration.GetUUID() {
 		this.M_oauth2Configuration = nil
+		this.NeedSave = true
 	}
 }
 
@@ -162,8 +188,10 @@ func (this *Configurations) SetServiceConfigs(ref interface{}){
 	}
 	if !isExist {
 		serviceConfigss = append(serviceConfigss, ref.(*ServiceConfiguration))
+		if this.IsInit == true {			this.NeedSave = true
+		}
+		this.M_serviceConfigs = serviceConfigss
 	}
-	this.M_serviceConfigs = serviceConfigss
 }
 
 /** Remove reference ServiceConfigs **/
@@ -173,6 +201,8 @@ func (this *Configurations) RemoveServiceConfigs(ref interface{}){
 	for i := 0; i < len(this.M_serviceConfigs); i++ {
 		if toDelete.GetUUID() != this.M_serviceConfigs[i].GetUUID() {
 			serviceConfigs_ = append(serviceConfigs_, this.M_serviceConfigs[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_serviceConfigs = serviceConfigs_
@@ -197,8 +227,10 @@ func (this *Configurations) SetDataStoreConfigs(ref interface{}){
 	}
 	if !isExist {
 		dataStoreConfigss = append(dataStoreConfigss, ref.(*DataStoreConfiguration))
+		if this.IsInit == true {			this.NeedSave = true
+		}
+		this.M_dataStoreConfigs = dataStoreConfigss
 	}
-	this.M_dataStoreConfigs = dataStoreConfigss
 }
 
 /** Remove reference DataStoreConfigs **/
@@ -208,6 +240,8 @@ func (this *Configurations) RemoveDataStoreConfigs(ref interface{}){
 	for i := 0; i < len(this.M_dataStoreConfigs); i++ {
 		if toDelete.GetUUID() != this.M_dataStoreConfigs[i].GetUUID() {
 			dataStoreConfigs_ = append(dataStoreConfigs_, this.M_dataStoreConfigs[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_dataStoreConfigs = dataStoreConfigs_
@@ -232,8 +266,10 @@ func (this *Configurations) SetSmtpConfigs(ref interface{}){
 	}
 	if !isExist {
 		smtpConfigss = append(smtpConfigss, ref.(*SmtpConfiguration))
+		if this.IsInit == true {			this.NeedSave = true
+		}
+		this.M_smtpConfigs = smtpConfigss
 	}
-	this.M_smtpConfigs = smtpConfigss
 }
 
 /** Remove reference SmtpConfigs **/
@@ -243,6 +279,8 @@ func (this *Configurations) RemoveSmtpConfigs(ref interface{}){
 	for i := 0; i < len(this.M_smtpConfigs); i++ {
 		if toDelete.GetUUID() != this.M_smtpConfigs[i].GetUUID() {
 			smtpConfigs_ = append(smtpConfigs_, this.M_smtpConfigs[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_smtpConfigs = smtpConfigs_
@@ -267,8 +305,10 @@ func (this *Configurations) SetLdapConfigs(ref interface{}){
 	}
 	if !isExist {
 		ldapConfigss = append(ldapConfigss, ref.(*LdapConfiguration))
+		if this.IsInit == true {			this.NeedSave = true
+		}
+		this.M_ldapConfigs = ldapConfigss
 	}
-	this.M_ldapConfigs = ldapConfigss
 }
 
 /** Remove reference LdapConfigs **/
@@ -278,6 +318,8 @@ func (this *Configurations) RemoveLdapConfigs(ref interface{}){
 	for i := 0; i < len(this.M_ldapConfigs); i++ {
 		if toDelete.GetUUID() != this.M_ldapConfigs[i].GetUUID() {
 			ldapConfigs_ = append(ldapConfigs_, this.M_ldapConfigs[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_ldapConfigs = ldapConfigs_
@@ -302,8 +344,10 @@ func (this *Configurations) SetApplicationConfigs(ref interface{}){
 	}
 	if !isExist {
 		applicationConfigss = append(applicationConfigss, ref.(*ApplicationConfiguration))
+		if this.IsInit == true {			this.NeedSave = true
+		}
+		this.M_applicationConfigs = applicationConfigss
 	}
-	this.M_applicationConfigs = applicationConfigss
 }
 
 /** Remove reference ApplicationConfigs **/
@@ -313,6 +357,8 @@ func (this *Configurations) RemoveApplicationConfigs(ref interface{}){
 	for i := 0; i < len(this.M_applicationConfigs); i++ {
 		if toDelete.GetUUID() != this.M_applicationConfigs[i].GetUUID() {
 			applicationConfigs_ = append(applicationConfigs_, this.M_applicationConfigs[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_applicationConfigs = applicationConfigs_
@@ -337,8 +383,10 @@ func (this *Configurations) SetScheduledTasks(ref interface{}){
 	}
 	if !isExist {
 		scheduledTaskss = append(scheduledTaskss, ref.(*ScheduledTask))
+		if this.IsInit == true {			this.NeedSave = true
+		}
+		this.M_scheduledTasks = scheduledTaskss
 	}
-	this.M_scheduledTasks = scheduledTaskss
 }
 
 /** Remove reference ScheduledTasks **/
@@ -348,6 +396,8 @@ func (this *Configurations) RemoveScheduledTasks(ref interface{}){
 	for i := 0; i < len(this.M_scheduledTasks); i++ {
 		if toDelete.GetUUID() != this.M_scheduledTasks[i].GetUUID() {
 			scheduledTasks_ = append(scheduledTasks_, this.M_scheduledTasks[i])
+		}else{
+			this.NeedSave = true
 		}
 	}
 	this.M_scheduledTasks = scheduledTasks_

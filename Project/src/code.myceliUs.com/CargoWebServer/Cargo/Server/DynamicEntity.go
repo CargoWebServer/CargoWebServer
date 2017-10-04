@@ -72,6 +72,7 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 
 	var parentPtr Entity
 
+	log.Println(values)
 	// Set the parent uuid in that case.
 	if len(parentUuid) == 0 && values["ParentUuid"] != nil {
 		parentUuid = values["ParentUuid"].(string)
@@ -89,6 +90,10 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 		// Create the error message
 		cargoError := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Prototype not found for type '"+values["TYPENAME"].(string)+"'."))
 		return nil, cargoError
+	}
+
+	if values["UUID"] == nil {
+		values["UUID"] = ""
 	}
 
 	// Keep track of the perent uuid inside the object.
@@ -967,7 +972,10 @@ func (this *DynamicEntity) saveEntity(path string) {
 
 								// I will create the sub value...
 								typeName := strings.Replace(strings.Replace(fieldType, ":Ref", "", -1), "[]", "", -1)
-								uuid := subValues["UUID"].(string)
+								var uuid string
+								if subValues["UUID"] != nil {
+									uuid = subValues["UUID"].(string)
+								}
 
 								// I will try to create a static entity...
 								newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
