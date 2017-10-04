@@ -313,7 +313,6 @@ EntityPrototype.prototype.generateConstructor = function () {
 
     // Fields.
     for (var i = 3; i < this.Fields.length - 2; i++) {
-
         constructorSrc += " this." + normalizeFieldName(this.Fields[i])
         if (this.FieldsDefaultValue[i] != undefined) {
             // In case of default values...
@@ -325,7 +324,16 @@ EntityPrototype.prototype.generateConstructor = function () {
                 if(this.FieldsType[i].startsWith("xs.")){
                     constructorSrc += " = " + this.FieldsDefaultValue[i] + "\n"
                 }else{
-                    constructorSrc += " = null\n"
+                    if(this.FieldsType[i].endsWith(":Ref")){
+                        constructorSrc += " = null\n"
+                    }else if(this.FieldsType[i].startsWith("enum:") ){
+                        constructorSrc += " = 1\n"
+                    }else{
+                        // Create a new entity.
+                        constructorSrc += " = eval(\"new \" + "+ this.FieldsType[i] +" + \"()\")\n"
+                        constructorSrc +=  "this." + this.Fields[i] + ".ParentUuid = this.UUID\n"
+						constructorSrc +=  "this." + this.Fields[i] + ".ParentLnk = \"" + this.Fields[i] + "\"\n"
+                    }
                 }
             }
         } else if (this.FieldsType[i].startsWith("[]")) {
@@ -345,7 +353,20 @@ EntityPrototype.prototype.generateConstructor = function () {
                 constructorSrc += " = 1\n"
             } else {
                 // Object here.
-                constructorSrc += " = undefined\n"
+                if(this.FieldsType[i].startsWith("xs.")){
+                    constructorSrc += " = " + this.FieldsDefaultValue[i] + "\n"
+                }else{
+                    if(this.FieldsType[i].endsWith(":Ref")){
+                        constructorSrc += " = null\n"
+                    }else if(this.FieldsType[i].startsWith("enum:") ){
+                        constructorSrc += " = 1\n"
+                    }else{
+                        // Create a new entity.
+                        constructorSrc += " = eval(\"new \" + "+ this.FieldsType[i] +" + \"()\")\n"
+                        constructorSrc +=  "this." + this.Fields[i] + ".ParentUuid = this.UUID\n"
+						constructorSrc +=  "this." + this.Fields[i] + ".ParentLnk = \"" + this.Fields[i] + "\"\n"
+                    }
+                }
             }
         }
     }

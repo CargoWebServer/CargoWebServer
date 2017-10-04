@@ -363,19 +363,6 @@ EntityPanel.prototype.setEntity = function (entity) {
 				console.log("No control found for display value " + value + " with type name " + fieldType)
 			} else if (value == null || value == "") {
 				console.log("The value is null or empty.")
-				// Here the entity dosent already exist so I will create localy and set it in the unsafe entity...
-				if (control.constructor.name == "EntityPanel") {
-					if (this.getEntity()[field] == null) {
-						// In case of entity panel.
-						var entity = eval("new " + fieldType + "()")
-						entity.ParentUuid = this.getEntity().UUID
-						entity.ParentLnk = field
-						this.getEntity()[field] = entity
-						control.setEntity(entity)
-					} else {
-						control.setEntity(this.getEntity()[field])
-					}
-				}
 			}
 		}
 
