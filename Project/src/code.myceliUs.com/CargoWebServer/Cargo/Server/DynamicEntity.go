@@ -44,7 +44,6 @@ type DynamicEntity struct {
 }
 
 func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error) {
-
 	if !Utility.IsValidPackageName(values["TYPENAME"].(string)) {
 		return nil, errors.New("Package name '" + values["TYPENAME"].(string) + "' is not valid.")
 	}

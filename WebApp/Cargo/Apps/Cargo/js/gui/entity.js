@@ -214,8 +214,10 @@ EntityPanel.prototype.getEntity = function () {
 	if (this.entity == null) {
 		return null
 	}
-	if (entities[this.entity.UUID] != undefined) {
-		return entities[this.entity.UUID]
+	if (this.entity.UUID != undefined) {
+		if (entities[this.entity.UUID] != undefined) {
+			return entities[this.entity.UUID]
+		}
 	}
 	return this.entity
 }
@@ -230,8 +232,10 @@ EntityPanel.prototype.setEntity = function (entity) {
 	}
 
 	// Point to the entities map.
-	if (entities[entity.UUID] != undefined) {
-		entity = entities[entity.UUID]
+	if (entity.UUID != undefined) {
+		if (entities[entity.UUID] != undefined) {
+			entity = entities[entity.UUID]
+		}
 	}
 
 	if (this.typeName != entity.TYPENAME) {
@@ -363,6 +367,7 @@ EntityPanel.prototype.setEntity = function (entity) {
 				console.log("No control found for display value " + value + " with type name " + fieldType)
 			} else if (value == null || value == "") {
 				console.log("The value is null or empty.")
+
 			}
 		}
 
@@ -684,7 +689,7 @@ EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType
 				if (control == undefined) {
 					control = valueDiv.appendElement({ "tag": "select", "id": id }).down()
 				}
-				control.appendElement({ "tag": "option", "value": restriction.Value, "innerHtml": restriction.Value })
+				control.appendElement({ "tag": "option", "value": /*restriction.Value*/ i + 1, "innerHtml": restriction.Value })
 			}
 		}
 		return control
@@ -1474,9 +1479,15 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 	// Here I will see if the type is derived basetype...
 	if (!fieldType.startsWith("[]") && !isRef) {
 		var baseType = getBaseTypeExtension(fieldType)
-		if (fieldType.startsWith("enum:")) {
+		if (fieldType.startsWith("enum:") || control.element.tagName == "SELECT") {
 			// Here the value is an enumeration...
-			control.element.selectedIndex = parseInt(value) - 1
+			if(value.M_valueOf!=undefined){
+				control.element.selectedIndex = parseInt(value.M_valueOf) - 1
+			}else if(value[field].M_valueOf != undefined){
+				control.element.selectedIndex = parseInt(value[field].M_valueOf) - 1
+			}else{
+				control.element.selectedIndex = parseInt(value) - 1
+			}
 		} else if (isXsString(baseType) || isXsString(fieldType) || fieldType == "interface{}") {
 			control.element.value = value
 		} else if (isXsNumeric(fieldType)) {

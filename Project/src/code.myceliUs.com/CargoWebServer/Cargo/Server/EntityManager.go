@@ -2095,7 +2095,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
-	log.Println("-------> create entity: ", parentUuid, attributeName, typeName, objectId, values)
 	result, errObj := this.createEntity(parentUuid, attributeName, typeName, objectId, values)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
