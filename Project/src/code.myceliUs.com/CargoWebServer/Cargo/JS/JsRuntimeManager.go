@@ -54,6 +54,22 @@ type OperationInfos struct {
  */
 type OperationChannel chan (OperationInfos)
 
+/**
+ * Channel to use to access session.
+ */
+type SessionInfos struct {
+	m_sessionId string
+	m_return    chan (*otto.Otto)
+}
+
+/**
+ * Channel use to set funtion.
+ */
+type FunctionInfos struct {
+	m_functionId string
+	m_function   interface{}
+}
+
 var (
 	jsRuntimeManager *JsRuntimeManager
 )
@@ -86,6 +102,8 @@ type JsRuntimeManager struct {
 	m_closeVm  OperationChannel
 
 	// JS channel
+	m_setFunction       chan (FunctionInfos)
+	m_getSession        chan (SessionInfos)
 	m_setVariable       map[string]OperationChannel
 	m_getVariable       map[string]OperationChannel
 	m_executeJsFunction map[string]OperationChannel
@@ -112,6 +130,8 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	jsRuntimeManager.m_createVm = make(OperationChannel)
 
 	// Create one channel by vm to set variable.
+	jsRuntimeManager.m_setFunction = make(chan (FunctionInfos))
+	jsRuntimeManager.m_getSession = make(chan (SessionInfos))
 	jsRuntimeManager.m_setVariable = make(map[string]OperationChannel)
 	jsRuntimeManager.m_getVariable = make(map[string]OperationChannel)
 	jsRuntimeManager.m_executeJsFunction = make(map[string]OperationChannel)
@@ -124,6 +144,10 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	go func(jsRuntimeManager *JsRuntimeManager) {
 		for {
 			select {
+			case functionInfo := <-jsRuntimeManager.m_setFunction:
+				jsRuntimeManager.m_functions[functionInfo.m_functionId] = functionInfo.m_function
+			case sessionInfo := <-jsRuntimeManager.m_getSession:
+				sessionInfo.m_return <- jsRuntimeManager.m_sessions[sessionInfo.m_sessionId]
 			case operationInfos := <-jsRuntimeManager.m_appendScript:
 				callback := operationInfos.m_returns
 				script := operationInfos.m_params["script"].(string)
@@ -405,14 +429,18 @@ func (this *JsRuntimeManager) executeJsFunction(vm *otto.Otto, functionStr strin
  */
 func (this *JsRuntimeManager) AppendFunction(name string, function interface{}) {
 	// I will compile the script and set it in each session...
-	this.m_functions[name] = function
+	var functionInfo FunctionInfos
+	functionInfo.m_functionId = name
+	functionInfo.m_function = function
+	// Set the function via the channel
+	this.m_setFunction <- functionInfo
 }
 
 /**
  * Run given script for a given session. Must be call from inside the JS routine.
  */
 func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.Value, error) {
-	results, err := this.m_sessions[sessionId].Run(script)
+	results, err := this.getSession(sessionId).Run(script)
 	return results, err
 }
 
@@ -508,6 +536,20 @@ func (this *JsRuntimeManager) GetVar(sessionId string, name string) interface{} 
 	// wait for completion
 	results := <-op.m_returns
 	return results[0].(JsVarInfos).m_val
+}
+
+/**
+ * Run given script for a given session.
+ */
+func (this *JsRuntimeManager) getSession(sessionId string) *otto.Otto {
+	// Protectect the map access...
+	var sessionInfo SessionInfos
+	sessionInfo.m_return = make(chan (*otto.Otto))
+	sessionInfo.m_sessionId = sessionId
+	this.m_getSession <- sessionInfo
+	session := <-sessionInfo.m_return
+
+	return session
 }
 
 /**

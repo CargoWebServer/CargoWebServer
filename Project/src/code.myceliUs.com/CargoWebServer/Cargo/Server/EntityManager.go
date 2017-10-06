@@ -1986,10 +1986,12 @@ func (this *EntityManager) OnEvent(evt interface{}) {
 //            for (var i = 0; i < prototype.Ids.length; i++) {
 //                var id = prototype.Ids[i]
 //                if (id == "UUID") {
-//					  if(entities[entity.UUID] != undefined){
-//						entity.ParentLnk = entities[entity.UUID].ParentLnk
+//					  if(entity.UUID != undefined){
+//					  	if(entities[entity.UUID] != undefined && entity.UUID.length > 0){
+//							entity.ParentLnk = entities[entity.UUID].ParentLnk
+//					  	}
+//					  	entities[entity.UUID] = entity
 //					  }
-//                    entities[entity.UUID] = entity
 //                } else {
 //                    if (entity[id].length > 0) {
 //                        id_ += entity[id]
@@ -2415,6 +2417,10 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, queryStr
 // @param {callback} errorCallback In case of error.
 // @src
 //EntityManager.prototype.getEntityByUuid = function (uuid, successCallback, errorCallback, caller) {
+//    if(uuid.length == 0){
+//		console.log("No uuid to found!")
+//		return
+//	  }
 //    var entity = entities[uuid]
 //    if (entity != undefined) {
 //        if (entity.TYPENAME == entity.__class__ && entity.IsInit == true) {

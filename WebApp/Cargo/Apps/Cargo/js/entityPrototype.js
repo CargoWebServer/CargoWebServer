@@ -331,11 +331,11 @@ EntityPrototype.prototype.generateConstructor = function () {
                         constructorSrc += " =  eval(\"new " + this.FieldsType[i] + "()\")\n"
                         constructorSrc += "this." + this.Fields[i] + ".ParentUuid = this.UUID\n"
                         constructorSrc += "this." + this.Fields[i] + ".ParentLnk = \"" + this.FieldsType[i] + "\"\n"
-                        if (this.FieldsDefaultValue[i] != "null") {
+                        if (this.FieldsDefaultValue[i] != "null" && this.FieldsDefaultValue[i] != "undefined") {
                             constructorSrc += " var obj = JSON.parse('" + this.FieldsDefaultValue[i] + "')\n"
-                            constructorSrc += "obj." + this.Fields[i] + ".ParentUuid = this.UUID\n"
-                            constructorSrc += "obj." + this.Fields[i] + ".ParentLnk = \"" + this.FieldsType[i] + "\"\n"
-                            constructorSrc += " this." + this.Fields[i] + ".init(obj." + this.Fields[i] + ")\n"
+                            constructorSrc += "obj.ParentUuid = this.UUID\n"
+                            constructorSrc += "obj.ParentLnk = \"" + this.FieldsType[i] + "\"\n"
+                            constructorSrc += "this." + this.Fields[i] + ".init(obj)\n"
                         }
                     } else {
                         constructorSrc += " = null\n"
@@ -363,11 +363,11 @@ EntityPrototype.prototype.generateConstructor = function () {
                     constructorSrc += " =  eval(\"new " + this.FieldsType[i] + "()\")\n"
                     constructorSrc += "this." + this.Fields[i] + ".ParentUuid = this.UUID\n"
                     constructorSrc += "this." + this.Fields[i] + ".ParentLnk = \"" + this.FieldsType[i] + "\"\n"
-                    if (this.FieldsDefaultValue[i] != "null") {
+                    if (this.FieldsDefaultValue[i] != "null" && this.FieldsDefaultValue[i] != "undefined") {
                         constructorSrc += " var obj = JSON.parse('" + this.FieldsDefaultValue[i] + "')\n"
-                        constructorSrc += "obj." + this.Fields[i] + ".ParentUuid = this.UUID\n"
-                        constructorSrc += "obj." + this.Fields[i] + ".ParentLnk = \"" + this.FieldsType[i] + "\"\n"
-                        constructorSrc += " this." + this.Fields[i] + ".init(obj." + this.Fields[i] + ")\n"
+                        constructorSrc += "obj.ParentUuid = this.UUID\n"
+                        constructorSrc += "obj.ParentLnk = \"" + this.FieldsType[i] + "\"\n"
+                        constructorSrc += "this." + this.Fields[i] + ".init(obj)\n"
                     }
                 } else if (this.FieldsType[i].startsWith("enum:")) {
                     constructorSrc += " = 0\n"
@@ -467,7 +467,7 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += "}\n\n"
 
     // Set the function.
-    //console.log(constructorSrc)
+    console.log(constructorSrc)
     eval(constructorSrc)
 
 }

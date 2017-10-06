@@ -1483,8 +1483,6 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 			// Here the value is an enumeration...
 			if(value.M_valueOf!=undefined){
 				control.element.selectedIndex = parseInt(value.M_valueOf) - 1
-			}else if(value[field].M_valueOf != undefined){
-				control.element.selectedIndex = parseInt(value[field].M_valueOf) - 1
 			}else{
 				control.element.selectedIndex = parseInt(value) - 1
 			}

@@ -178,7 +178,7 @@ func (this *SchemaManager) initialize() {
 		prototype.Create("")
 
 		// Print the list of prototypes...
-		//prototype.Print()
+		prototype.Print()
 	}
 
 	// Now I will import the xml file from the schema directory...
@@ -540,7 +540,16 @@ func (this *SchemaManager) genereatePrototype(schema *XML_Schemas.XSD_Schema) {
 	//Global Complex type...
 	for k, c := range this.globalComplexTypes {
 		if strings.HasPrefix(k, schema.Id) {
-			this.createPrototypeComplexType(schema, c)
+			prototype := this.createPrototypeComplexType(schema, c)
+			if strings.HasPrefix(prototype.TypeName, "xs.") {
+				if Utility.Contains(prototype.Fields, "M_valueOf") == false {
+					prototype.Fields = append(prototype.Fields, "M_valueOf")
+					prototype.FieldsType = append(prototype.FieldsType, prototype.TypeName)
+					prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
+					prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+					prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
+				}
+			}
 		}
 	}
 
@@ -1331,7 +1340,6 @@ func (this *SchemaManager) appendPrototypeExtention(schema *XML_Schemas.XSD_Sche
 	} else if simpleContent != nil {
 		if len(extension.Base) > 0 {
 			// The base extention...
-
 			if val, ok := this.globalComplexTypes[schema.Id+"."+removeNs(extension.Base)]; ok {
 				this.createPrototypeComplexType(schema, val)
 				this.appendPrototypeSuperBaseType(schema.Id+"."+extension.Base, prototype)

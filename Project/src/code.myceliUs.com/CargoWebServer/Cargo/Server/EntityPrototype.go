@@ -482,8 +482,6 @@ func (this *EntityPrototype) Print() {
 	// Now the fields...
 	fmt.Println("	Fields:")
 	for i := 0; i < len(this.Fields); i++ {
-		if this.FieldsVisibility[i] == true {
-			fmt.Println("	-->", this.Fields[i], ":", this.FieldsType[i])
-		}
+		fmt.Println("	-->", this.Fields[i], ":", this.FieldsType[i])
 	}
 }
