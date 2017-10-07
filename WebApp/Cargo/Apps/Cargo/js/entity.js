@@ -147,7 +147,7 @@ function removeObjectValue(object, field, value) {
                 delete object["reset_" + field + "_" + uuid + "_ref"]
                 delete object["set_" + field + "_" + uuid + "_ref"]
             }
-            delete object[field]
+            object[field] = ""
         }
     }
     object["NeedSave"] = true
@@ -192,8 +192,10 @@ function resetObjectValues(object) {
         }
 
         // Remove unwanted property before send it to the server-side.
-        if (prototype.Fields.indexOf(propertyId) == -1 && propertyId != "__class__" && propertyId != "TYPENAME") {
-            delete object[propertyId]
+        if (prototype.Fields.indexOf(propertyId) == -1 && propertyId != "__class__" && propertyId != "TYPENAME" && propertyId != "ParentUuid" && propertyId != "ParentLnk" && propertyId != "childsUuid" && propertyId != "references" && propertyId != "NeedSave" && propertyId != "IsInit") {
+            if (!isFunction(object[propertyId])) { // Keep object attached function.
+                delete object[propertyId]
+            }
         }
     }
 

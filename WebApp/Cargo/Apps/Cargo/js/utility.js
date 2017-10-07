@@ -150,6 +150,11 @@ function isArray(o) {
     }
 }
 
+function isFunction(functionToCheck) {
+    var getType = {};
+    return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+}
+
 function objectEquals(x, y) {
     'use strict';
 
@@ -686,7 +691,7 @@ var Base64 = {
         var chr1, chr2, chr3;
         var enc1, enc2, enc3, enc4;
         var i = 0;
-        
+
         input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
 
         while (i < input.length) {

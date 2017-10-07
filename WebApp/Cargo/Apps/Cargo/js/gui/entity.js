@@ -1109,7 +1109,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 									entityPanel.saveBtn.element.style.display = "table-cell"
 								}
 							}
-						} else {
+						} else if(entityPanel.proto.Ids.indexOf(field) != -1){
 							// reset the panel value.
 							entityPanel.clear()
 
@@ -1670,9 +1670,9 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 						if (e.keyCode === 27) {
 							entityPanel.resetFieldValue(field, input)
 						}
-						// Only index selection will erase the panel if the input is empty.
+						// Only Ids selection will erase the panel if the input is empty.
 						if (entityPanel.proto != undefined) {
-							if (entityPanel.proto.Indexs.indexOf(field) > -1 || entityPanel.proto.Ids.indexOf(field) > -1) {
+							if (/*entityPanel.proto.Indexs.indexOf(field) > -1 ||*/ entityPanel.proto.Ids.indexOf(field) > -1) {
 								if (this.value.length == 0) {
 									entityPanel.clear()
 									this.focus()
