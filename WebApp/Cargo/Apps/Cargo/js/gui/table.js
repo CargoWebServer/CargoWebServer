@@ -193,7 +193,7 @@ Table.prototype.init = function () {
 		server.entityManager.attach(this, DeleteEntityEvent, function (evt, table) {
 			// So here I will remove the line from the table...
 			var entity = evt.dataMap["entity"]
-			if(entities[entity.UUID]!=undefined){
+			if (entities[entity.UUID] != undefined) {
 				entity = entities[entity.UUID]
 			}
 
@@ -216,8 +216,8 @@ Table.prototype.init = function () {
 				for (var i = 0; i < table.model.entities.length; i++) {
 					if (table.model.entities[i].UUID != entity.UUID) {
 						var entity = table.model.entities[i]
-						if(entities[entity.UUID]!=undefined){
-							entity = table.model.entities[i]= entities[entity.UUID]
+						if (entities[entity.UUID] != undefined) {
+							entity = table.model.entities[i] = entities[entity.UUID]
 						}
 						entities_.push(entity)
 						values.push(table.model.values[i])
@@ -755,7 +755,7 @@ var TableCell = function (row, index, value) {
 // create an item link...
 function createItemLnk(entity, value, field, valueDiv) {
 	// Be sure we point to the map entity
-	if(entities[entity.UUID]!=undefined){
+	if (entities[entity.UUID] != undefined) {
 		entity = entities[entity.UUID]
 	}
 
@@ -920,7 +920,7 @@ TableCell.prototype.formatValue = function (value) {
 					server.entityManager.getEntityByUuid(entity.UUID,
 						function (result, caller) {
 							var entity = caller.entity
-							if(entities[entity.UUID] != undefined){
+							if (entities[entity.UUID] != undefined) {
 								entity = entities[entity.UUID]
 							}
 							caller.createItemLnk(entity, result, caller.field, caller.valueDiv)
@@ -1157,7 +1157,7 @@ TableCell.prototype.formatValue = function (value) {
 									if (entities[entity.UUID] != undefined) {
 										entity = entities[entity.UUID]
 									}
-									
+
 									var lnkDiv = valueDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
 									createItemLnk(entity, value, field, lnkDiv)
 									newLnkInput.element.parentNode.removeChild(newLnkInput.element)
@@ -1420,17 +1420,21 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 	var prototype = this.row.table.model.proto
 
 	var entity = null
+	var field
+	var fieldType
 
 	if (prototype != null) {
 		// I will get the field...
-		var field = prototype.Fields[this.index + 2]
-		var fieldType = prototype.FieldsType[this.index + 2]
+		var field = prototype.Fields[this.index + 3]
+		var fieldType = prototype.FieldsType[this.index + 3]
 
 		// The value...
 		if (value != null) {
 			if (value.M_valueOf != undefined) {
 				entity = value
 				value = value.M_valueOf
+				field = "M_valueOf"
+				fieldType = getBaseTypeExtension(entity.TYPENAME)
 			}
 		}
 	}
@@ -1469,12 +1473,14 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 			editor.element.value = value
 		} else if (prototype != null) {
 			// get the rentity reference from the model.
-			if (this.row.table.model.entities[this.row.index].UUID.length > 0) {
-				if (entities[this.row.table.model.entities[this.row.index].UUID] != undefined) {
-					entity = entities[this.row.table.model.entities[this.row.index].UUID]
+			if (entity == null) {
+				if (this.row.table.model.entities[this.row.index].UUID.length > 0) {
+					if (entities[this.row.table.model.entities[this.row.index].UUID] != undefined) {
+						entity = entities[this.row.table.model.entities[this.row.index].UUID]
+					}
+				} else {
+					entity = this.row.table.model.entities[this.row.index]
 				}
-			} else {
-				entity = this.row.table.model.entities[this.row.index]
 			}
 
 			// If is an object...
@@ -1583,7 +1589,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 									},
 									function () {
 
-									}, {"entityPanel":panel, "parent":parent, "field":field})
+									}, { "entityPanel": panel, "parent": parent, "field": field })
 							}
 							panel.maximizeBtn.element.click()
 							panel.header.element.style.display = "none"
@@ -1637,7 +1643,11 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 						entity.NeedSave = true
 						self.setValue(value)
 						// set the table entity.
-						self.row.table.model.entities[self.row.index] = entity
+						if(self.row.table.model.entities[self.row.index].TYPENAME == entity.TYPENAME){
+							self.row.table.model.entities[self.row.index] = entity
+						}else if(entity.ParentUuid == self.row.table.model.entities[self.row.index].UUID){
+							self.row.table.model.entities[self.row.index][entity.ParentLnk] = entity
+						}
 					} else {
 						self.setValue(value)
 					}

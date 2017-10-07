@@ -178,7 +178,7 @@ func (this *SchemaManager) initialize() {
 		prototype.Create("")
 
 		// Print the list of prototypes...
-		prototype.Print()
+		//prototype.Print()
 	}
 
 	// Now I will import the xml file from the schema directory...

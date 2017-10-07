@@ -313,7 +313,6 @@ EntityPrototype.prototype.generateConstructor = function () {
 
     // Fields.
     for (var i = 3; i < this.Fields.length - 2; i++) {
-
         constructorSrc += " this." + normalizeFieldName(this.Fields[i])
         if (this.FieldsDefaultValue[i] != undefined) {
             // In case of default values...
