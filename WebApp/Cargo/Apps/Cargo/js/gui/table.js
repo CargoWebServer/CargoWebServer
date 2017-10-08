@@ -1082,7 +1082,7 @@ TableCell.prototype.formatValue = function (value) {
 
 				// In that case the array contain a list of reference.
 				// An entity table...
-				var itemPrototype = entityPrototypes[fieldType.replace("[]", "").replace(":Ref", "")]
+				var prototype = entityPrototypes[fieldType.replace("[]", "").replace(":Ref", "")]
 				var field = "M_" + this.row.table.model.titles[this.index]
 
 				var content = this.valueDiv.getChildById(field + "_content")
@@ -1171,7 +1171,7 @@ TableCell.prototype.formatValue = function (value) {
 						newLnkInput.element.focus()
 						newLnkInput.element.select();
 					}
-				}(valueDiv, entity, itemPrototype.TypeName, field, this)
+				}(valueDiv, entity, prototype.TypeName, field, this)
 
 				return content
 			} else {
@@ -1185,11 +1185,11 @@ TableCell.prototype.formatValue = function (value) {
 				content = new Element(this.valueDiv, { "tag": "div", "style": "display: table-row;", "id": field + "_content" })
 				var newLnkButton = content.appendElement({ "tag": "div", "class": "new_row_button row_button", "id": field + "_plus_btn" }).down()
 				newLnkButton.appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
-				var itemPrototype = entityPrototypes[fieldType.replace("[]", "")]
+				var prototype = entityPrototypes[fieldType.replace("[]", "")]
 
 				if (value.length > 0) {
 					// An entity table...
-					var itemsTableModel = new EntityTableModel(itemPrototype)
+					var itemsTableModel = new EntityTableModel(prototype)
 					var itemTable = new Table(randomUUID(), content)
 
 					// Keep the table reference in the entity.

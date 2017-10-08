@@ -11,8 +11,8 @@ function testDynamicEntity() {
             // information on the server side.
             // The information is indexed and can be queried  one the sever side 
             // via other libraries like  underscore.js or link.js as example.
-            var itemPrototype = new EntityPrototype()
-            itemPrototype.init(
+            var prototype = new EntityPrototype()
+            prototype.init(
                 {
                     "TypeName": "Test.Item",
                     "Ids": ["M_id"],
@@ -26,7 +26,7 @@ function testDynamicEntity() {
             // Create the prototype on the server...
             server.entityManager.createEntityPrototype(
                 "Test",
-                itemPrototype,
+                prototype,
                 // success callback
                 function (result, caller) {
                     server.entityManager.getEntityPrototype("Test.Item", "Test",
@@ -53,8 +53,8 @@ function testDynamicEntity() {
                                     server.entityManager.getEntityPrototype("Test.User", "Test",
                                         function (result, caller) {
                                             // i will create the derived item prototype now...
-                                            var derivedItemPrototype = new EntityPrototype()
-                                            derivedItemPrototype.init(
+                                            var derivedprototype = new EntityPrototype()
+                                            derivedprototype.init(
                                                 {
                                                     "TypeName": "Test.DerivedItem",
                                                     "Ids": [],
@@ -69,7 +69,7 @@ function testDynamicEntity() {
 
                                             server.entityManager.createEntityPrototype(
                                                 "Test",
-                                                derivedItemPrototype,
+                                                derivedprototype,
                                                 function (result, caller) {
                                                     server.entityManager.getEntityPrototype("Test.DerivedItem", "Test",
                                                         function (result, caller) {

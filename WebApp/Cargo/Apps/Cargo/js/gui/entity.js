@@ -830,8 +830,8 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 				var itemTable = undefined
 				if (field != "M_listOf" && !fieldType.startsWith("xs.")) {
 					// I will create the entity table.
-					var itemPrototype = entityPrototypes[fieldType.replace("[]", "")]
-					var itemsTableModel = new EntityTableModel(itemPrototype)
+					var prototype = entityPrototypes[fieldType.replace("[]", "")]
+					var itemsTableModel = new EntityTableModel(prototype)
 					var itemTable = new Table(randomUUID(), valueDiv)
 
 					itemTable.setModel(itemsTableModel, function (table) {
@@ -955,9 +955,9 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 					} else {
 						// In that case I will create a new entity
-						if (itemPrototype != undefined) {
-							var item = eval("new " + itemPrototype.TypeName + "()")
-							item.TYPENAME = itemPrototype.TypeName
+						if (prototype != undefined) {
+							var item = eval("new " + prototype.TypeName + "()")
+							item.TYPENAME = prototype.TypeName
 
 							// Set the parent uuid.
 							item.ParentUuid = entityPanel.getEntity().UUID

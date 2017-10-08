@@ -690,8 +690,8 @@ function createEntityPrototype_Test_Part_2() {
         1,
         function () {
 
-            var itemPrototype = new EntityPrototype()
-            itemPrototype.init(
+            var prototype = new EntityPrototype()
+            prototype.init(
                 {
                     "TypeName": "createEntityPrototype_Test.Item",
                     "Ids": ["M_id"],
@@ -706,7 +706,7 @@ function createEntityPrototype_Test_Part_2() {
 
             server.entityManager.createEntityPrototype(
                 "createEntityPrototype_Test",
-                itemPrototype,
+                prototype,
                 function (result) {
 
 
@@ -736,8 +736,8 @@ function createEntityPrototype_storeIdError_Test() {
         1,
         function () {
 
-            var itemPrototype = new EntityPrototype()
-            itemPrototype.init(
+            var prototype = new EntityPrototype()
+            prototype.init(
                 {
                     "TypeName": "createEntityPrototype_storeIdError_Test.Item",
                     "Ids": ["M_id"],
@@ -752,7 +752,7 @@ function createEntityPrototype_storeIdError_Test() {
 
             server.entityManager.createEntityPrototype(
                 "rrr",
-                itemPrototype,
+                prototype,
                 function () {
 
                 },
