@@ -150,7 +150,7 @@ func (this *MessageProcessor) appendResponse(m *message) {
 	this.m_outgoingChannel <- m
 }
 
-////////////////////////////// Pending message ///////////////////////////////////
+////////////////////////////// Pending message ///////////////////////////////////z
 func (this *MessageProcessor) createPendingMessages(m *message) {
 	this.Lock()
 

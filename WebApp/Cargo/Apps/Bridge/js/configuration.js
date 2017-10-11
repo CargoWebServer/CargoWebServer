@@ -143,7 +143,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                     // Init the schema informations.
                                     homepage.dataExplorer.initDataSchema(caller.entity, function (contentView) {
                                         return function () {
-                                            // display the schemas information here...
+                                            // display the imports information here...
                                             contentView.connectBtn.element.status = "disconnected"
                                             contentView.connectBtn.element.click()
                                         }

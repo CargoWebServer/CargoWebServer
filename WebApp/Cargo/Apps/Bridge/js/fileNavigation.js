@@ -24,7 +24,7 @@ var FileNavigator = function (parent) {
                 fileNavigator.saveFile(fileId)
             }
         }
-    } (this)
+    }(this)
 
     this.saveBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-floppy-o fileNavigationBtn", "style": "display:none" }).down()
 
@@ -36,7 +36,7 @@ var FileNavigator = function (parent) {
                 fileNavigator.saveFile(fileNavigator.activeFile.M_id)
             }
         }
-    } (this)
+    }(this)
 
     // Show the list of file that dosent fit in the file explorer...
     this.showHiddenFilesBtn = this.panel.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-down fileNavigationBtn" }).down()
@@ -53,7 +53,7 @@ var FileNavigator = function (parent) {
         var uuid
         if (evt.dataMap["fileInfo"] != undefined) {
             uuid = evt.dataMap["fileInfo"].UUID
-        }else if(evt.dataMap["bpmnDiagramInfo"] != undefined){
+        } else if (evt.dataMap["bpmnDiagramInfo"] != undefined) {
             uuid = evt.dataMap["bpmnDiagramInfo"].UUID
         }
 
@@ -64,6 +64,11 @@ var FileNavigator = function (parent) {
             file = evt.dataMap["fileInfo"]
             if (file == undefined) {
                 file = evt.dataMap["bpmnDiagramInfo"]
+            }
+            if (evt.dataMap["prototypeInfo"]!=undefined) {
+                file = {}
+                file.M_id = evt.dataMap["prototypeInfo"].TypeName
+                file.M_name = evt.dataMap["prototypeInfo"].TypeName
             }
         }
 
@@ -202,7 +207,7 @@ FileNavigator.prototype.appendFile = function (file) {
                 var evt = { "code": CloseEntityEvent, "name": FileEvent, "dataMap": { "fileId": file.M_id } }
                 server.eventHandler.broadcastLocalEvent(evt)
             }
-        } (file)
+        }(file)
     }
 
     this.setActiveTab(file.M_id)
@@ -214,7 +219,7 @@ FileNavigator.prototype.appendFile = function (file) {
                 fileNavigator.setActiveTab(file.M_id)
             }
         }
-    } (file, this)
+    }(file, this)
 }
 
 FileNavigator.prototype.setActiveTab = function (fileId) {

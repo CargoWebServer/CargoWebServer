@@ -150,7 +150,6 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                     // Success callback.
                     function (result, caller) {
                         // Here is the new file...
-                        console.log(result)
                     },
                     // Progress callback
                     function () {

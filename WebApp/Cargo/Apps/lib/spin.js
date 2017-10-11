@@ -294,7 +294,7 @@
 
     /* Utility function to create a VML tag */
     function vml (tag, attr) {
-      return createEl('<' + tag + ' xmlns="urn:schemas-microsoft.com:vml" class="spin-vml">', attr)
+      return createEl('<' + tag + ' xmlns="urn:imports-microsoft.com:vml" class="spin-vml">', attr)
     }
 
     // No CSS transforms but VML support, add a CSS rule for VML elements:

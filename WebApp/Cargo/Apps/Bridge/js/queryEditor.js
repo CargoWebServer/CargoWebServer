@@ -469,7 +469,6 @@ QueryEditor.prototype.runQuery = function () {
                 }, { "prototypes": prototypes, "type": type, "fields": fields, "query": query, "queryEditor": this })
 
         }
-        console.log(ast)
     }
 }
 

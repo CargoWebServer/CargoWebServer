@@ -466,7 +466,6 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += "}\n\n"
 
     // Set the function.
-    console.log(constructorSrc)
     eval(constructorSrc)
 
 }
@@ -577,6 +576,5 @@ EntityPrototypeManager.prototype.onEvent = function (evt) {
  * @param {*} prototype 
  */
 function setEntityPrototype(prototype) {
-    console.log("------> set entity prototype: ", prototype)
     entityPrototypes[prototype.TypeName] = prototype
 }

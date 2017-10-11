@@ -9,7 +9,6 @@ var InstanceListView = function (parent, svgDiagram) {
 	this.svgDiagram = svgDiagram
 
 	/** So here I will get the list of instance for the process */
-	console.log()
 	//this.svgDiagram.bpmnDiagram.M_BPMNPlane.M_bpmnElement
 	var definitions = this.svgDiagram.bpmnDiagram.getParentDefinitions()
 	var bpmnProcess = null

@@ -49,6 +49,11 @@ var CodeEditor = function (parent) {
             if (diagram !== undefined) {
                 codeEditor.appendBpmnDiagram(diagram)
             }
+        } else if (evt.dataMap["prototypeInfo"] != undefined){
+            var prototype = evt.dataMap["prototypeInfo"]
+            if (prototype !== undefined) {
+                codeEditor.appendPrototypeEditor(prototype)
+            }
         }
     })
 
@@ -104,6 +109,27 @@ var CodeEditor = function (parent) {
         }
     })
     return this
+}
+
+/**
+ * Here I will display the prototype editor.
+ */
+CodeEditor.prototype.appendPrototypeEditor = function (prototype) {
+    // Here I will set the prototype editor.
+    if (this.files[prototype.TypeName] !== undefined) {
+        // Set the tab active...
+        this.setActiveFile(prototype.TypeName)
+        return
+    }
+
+    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": prototype.TypeName + "_editor" }).down()
+    var entityEditor =  new EntityPrototypeEditor(filePanel, ["CatalogSchema", "xs"], undefined, function(entityEditor){
+        entityEditor.typeNameInput.element.value = prototype.TypeName
+        entityEditor.setCurrentPrototype(prototype)
+        entityEditor.space.element.style.display = ""
+    })
+    
+
 }
 
 CodeEditor.prototype.appendBpmnDiagram = function (diagram) {

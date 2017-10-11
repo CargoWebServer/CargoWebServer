@@ -14,7 +14,7 @@ var DataExplorer = function (parent) {
             return function () {
                 dataExplorer.resize()
             }
-        } (this), true);
+        }(this), true);
 
     // That contain the map of data aready loaded.
     this.shemasView = {}
@@ -57,7 +57,7 @@ DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
                 for (var i = 0; i < results.length; i++) {
                     caller.dataExplorer.generatePrototypesView(caller.storeId, results)
                 }
-                if(caller.initCallback != undefined){
+                if (caller.initCallback != undefined) {
                     caller.initCallback()
                 }
             },
@@ -65,7 +65,7 @@ DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
             function (errMsg, caller) {
 
             },
-            { "dataExplorer": this, "storeId": storeConfig.M_id, "initCallback":initCallback })
+            { "dataExplorer": this, "storeId": storeConfig.M_id, "initCallback": initCallback })
 
     } else if (storeConfig.M_dataStoreType == 2) {
         // Entity data store.
@@ -137,15 +137,15 @@ DataExplorer.prototype.hidePanel = function (storeId) {
  * Show a given data panel.
  */
 DataExplorer.prototype.showPanel = function (storeId) {
-    if(this.shemasView[storeId]!= undefined){
+    if (this.shemasView[storeId] != undefined) {
         this.shemasView[storeId].element.style.display = ""
-    }else{
+    } else {
         // I will get the list of prototypes and 
-       this.initDataSchema(storeId, function(dataExplorer, storeId){
-           return function(){
-               dataExplorer.setDataSchema(storeId)
-           }
-       }(this, storeId))
+        this.initDataSchema(storeId, function (dataExplorer, storeId) {
+            return function () {
+                dataExplorer.setDataSchema(storeId)
+            }
+        }(this, storeId))
     }
 }
 
@@ -173,7 +173,7 @@ var PrototypeTreeView = function (parent, prototype) {
     this.panel = new Element(parent, { "tag": "div", "class": "data_prototype_tree_view" })
     this.fieldsView = {}
 
-    // The type name without the schemas name.
+    // The type name without the imports name.
     var typeName = prototype.TypeName.substring(prototype.TypeName.indexOf(".") + 1) //.split(".")[1]
 
     // Display the type name and the expand shrink button.
@@ -185,7 +185,25 @@ var PrototypeTreeView = function (parent, prototype) {
 
     /** The shrink button */
     this.shrinkBtn = header.appendElement({ "tag": "i", "class": "fa fa-caret-down", "style": "display:none;" }).down()
-    header.appendElement({ "tag": "span", "innerHtml": typeName }).down()
+    this.editLnk = header.appendElement({ "tag": "span", "innerHtml": typeName }).down()
+
+    this.editLnk.element.onmouseover = function () {
+        this.style.cursor = "pointer"
+        this.style.textDecoration = "underline"
+    }
+
+    this.editLnk.element.onmouseout = function () {
+        this.style.cursor = "default"
+        this.style.textDecoration = ""
+    }
+
+    this.editLnk.element.onclick = function (typeName) {
+        return function () {
+            // So here I will generate an even...
+            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "prototypeInfo": entityPrototypes[typeName] } }
+            server.eventHandler.broadcastLocalEvent(evt)
+        }
+    }(prototype.TypeName)
 
     this.fieldsPanel = this.panel.appendElement({ "tag": "div", "class": "data_prototype_tree_view_fields" }).down()
 
@@ -196,7 +214,7 @@ var PrototypeTreeView = function (parent, prototype) {
             this.style.display = "none"
             view.shrinkBtn.element.style.display = ""
         }
-    } (this)
+    }(this)
 
     this.shrinkBtn.element.onclick = function (view) {
         return function () {
@@ -204,12 +222,11 @@ var PrototypeTreeView = function (parent, prototype) {
             this.style.display = "none"
             view.expandBtn.element.style.display = ""
         }
-    } (this)
+    }(this)
 
     // Now the fields.
     for (var i = 0; i < prototype.Fields.length; i++) {
         if (prototype.Fields[i].startsWith("M_")) {
-
             this.fieldsView[prototype.Fields[i]] = new PrototypeTreeViewField(this.fieldsPanel, prototype, prototype.Fields[i], prototype.FieldsType[i], prototype.FieldsVisibility[i], prototype.FieldsNillable[i])
         }
     }
