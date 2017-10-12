@@ -31,7 +31,7 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
         .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" }).down()
         .appendElement({ "tag": "div", "style": "display: inline-block; padding-right: 5px;", "innerHtml": "Type Name" })
         .appendElement({ "tag": "div", "style": "display: inline-block" }).down()
-        .appendElement({ "tag": "input", "id": "dynamicItemName", "style": "display: inline-block;" }).up().up()
+        .appendElement({ "tag": "input", "id": "dynamicItemName", "style": "display: inline-block; width: 250px;" }).up().up()
         .appendElement({ "tag": "div", "id": "delete_entity_prototype", "class": "entities_btn", "style": "display: none; margin-left: 8px;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-trash-o" })
 
@@ -45,8 +45,8 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
     // Here i will display the base type.
     this.panel.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "innerHtml": "Base Type" })
         .appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
-        .appendElement({ "tag": "div", "id": "allSuperTypes", "style": "display: table-cell; width: 50%; height: 150px; border: 1px solid grey;" })
-        .appendElement({ "tag": "div", "id": "superTypes", "style": "display: table-cell; width: 50%; height: 150px;  border: 1px solid grey;" })
+        .appendElement({ "tag": "div", "id": "allSuperTypes", "style": "display: table-cell; width: 50%; height: 150px; overflow-y: auto; border: 1px solid grey;" })
+        .appendElement({ "tag": "div", "id": "superTypes", "style": "display: table-cell; width: 50%; height: 150px; overflow-y: auto; border: 1px solid grey;" })
 
     this.allSuperTypes = this.panel.getChildById("allSuperTypes")
     this.superTypes = this.panel.getChildById("superTypes")
@@ -309,8 +309,8 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
             prototype.SuperTypeNames = []
         }
         for (var i = 0; i < prototype.SuperTypeNames.length; i++) {
-            if (document.getElementById("superType_" + prototype.SuperTypeNames[i] + "_row") == undefined) {
-                var superType = superTypes.appendElement({ "tag": "div", "style": "display: table-row;width: 100%;", "id": "superType_" + prototype.SuperTypeNames[i] + "_row" }).down()
+            if (document.getElementById("superType_" + prototype.SuperTypeNames[i] + "_" + prototype.TypeName + "_row") == undefined) {
+                var superType = superTypes.appendElement({ "tag": "div", "style": "display: table-row;width: 100%;", "id": "superType_" + prototype.SuperTypeNames[i]+ "_" + prototype.TypeName + "_row" }).down()
                 var removeSupertypeBtn = superType.appendElement({ "tag": "div", "style": "display: table-cell;width: 100%;", "innerHtml": prototype.SuperTypeNames[i] })
                     .appendElement({ "tag": "div", "class": "entities_btn" }).down()
                     .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
@@ -339,15 +339,15 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
         }
 
         // Now the list of other super type not used by this one.
-        var allSuperTypes = editor.allSuperTypes.appendElement({ "tag": "div", "style": "display: table; width: 100%;" }).down()
+        var allSuperTypes = editor.allSuperTypes.appendElement({ "tag": "div", "style": "width: 100%; height: 200px;" }).down()
 
         for (var i = 0; i < results.length; i++) {
-            if (document.getElementById("allSuperTypes_" + results[i].TypeName + "_row") == undefined) {
+            if (document.getElementById("allSuperTypes_" + results[i].TypeName + "_" + prototype.TypeName + "_row") == undefined) {
                 // display only if the supertype is not already present in the list of supertype 
                 if (prototype.SuperTypeNames.indexOf(results[i].TypeName) == -1) {
                     // The type must not have actual type as supertype.
                     if (results[i].SuperTypeNames.indexOf(prototype.TypeName) == -1 && results[i].TypeName != prototype.TypeName && prototype.SuperTypeNames.indexOf(results[i].TypeName) == -1) {
-                        var superType = allSuperTypes.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id": "allSuperTypes_" + results[i].TypeName + "_row" }).down()
+                        var superType = allSuperTypes.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id": "allSuperTypes_" + results[i].TypeName + "_" + prototype.TypeName + "_row" }).down()
                         var appendSupertypeBtn = superType.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;", "innerHtml": results[i].TypeName })
                             .appendElement({ "tag": "div", "class": "entities_btn" }).down()
                             .appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
@@ -541,10 +541,8 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
  * Display single propertie.
  */
 EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype, propertieName, propertieTypeName, parent, isEditable, index) {
-    if (document.getElementById(propertieName + "_row") != undefined) {
-        return // nothing to do if the propertie is already displayed.
-    }
-    var propertieRow = parent.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id": propertieName + "_row" }).down()
+
+    var propertieRow = parent.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id":prototype.TypeName + "_"+ propertieName + "_row" }).down()
     var saveBtn = propertieRow.appendElement({ "tag": "div", "class": "entities_btn", "style": "display: none;" }).down().appendElement({ "tag": "i", "class": "fa fa-floppy-o" }).down()
     var editBtn = propertieRow.appendElement({ "tag": "div", "class": "entities_btn", "style": "vertical-align: text-top;" }).down().appendElement({ "tag": "i", "class": "fa fa-pencil-square-o" }).down()
 

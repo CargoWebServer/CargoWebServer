@@ -177,9 +177,11 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                 }
                 if (content.TYPENAME == "Config.DataStoreConfiguration") {
                     // So here I will set the schema view for the releated store.
-                    if (content.UUID.length != 0) {
-                        // Set only if is not a new.
-                        homepage.dataExplorer.initDataSchema(content)
+                    if (content.UUID != undefined) {
+                        if (content.UUID.length != 0) {
+                            // Set only if is not a new.
+                            homepage.dataExplorer.initDataSchema(content)
+                        }
                     }
 
                     // Here I will append the connection button...

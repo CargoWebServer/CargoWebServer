@@ -15,7 +15,6 @@ func NewDataStore(info *Config.DataStoreConfiguration) (DataStore, error) {
 		dataStore, err := NewSqlDataStore(info)
 		return dataStore, err
 	} else if info.M_dataStoreType == Config.DataStoreType_KEY_VALUE_STORE {
-
 		dataStore, err := NewKeyValueDataStore(info)
 		return dataStore, err
 	}

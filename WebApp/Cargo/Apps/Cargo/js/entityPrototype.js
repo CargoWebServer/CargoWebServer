@@ -467,7 +467,7 @@ EntityPrototype.prototype.generateConstructor = function () {
 
     // Set the function.
     eval(constructorSrc)
-
+    //console.log(constructorSrc)
 }
 
 /**

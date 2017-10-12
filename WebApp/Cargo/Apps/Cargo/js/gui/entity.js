@@ -689,7 +689,7 @@ EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType
 				if (control == undefined) {
 					control = valueDiv.appendElement({ "tag": "select", "id": id }).down()
 				}
-				control.appendElement({ "tag": "option", "value": /*restriction.Value*/ i + 1, "innerHtml": restriction.Value })
+				control.appendElement({ "tag": "option", "value": i + 1, "innerHtml": restriction.Value })
 			}
 		}
 		return control
@@ -955,7 +955,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 					} else {
 						// In that case I will create a new entity
-						if (prototype != undefined) {
+					if (/*prototype != undefined*/ prototype.PackageName != "xs") {
 							var item = eval("new " + prototype.TypeName + "()")
 							item.TYPENAME = prototype.TypeName
 
@@ -974,7 +974,9 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							// Here I will try to append a new value inside the table...
 							if (isArray) {
 								var itemTable = entityPanel.controls[id]
-								var newRow = itemTable.appendRow([entityPanel.getEntity()[field].length + 1, "0"], entityPanel.getEntity()[field].length)
+								var val = ""
+								// TODO set the default value...
+								var newRow = itemTable.appendRow([entityPanel.getEntity()[field].length + 1, val], entityPanel.getEntity()[field].length)
 								newRow.saveBtn.element.style.visibility = "visible"
 
 								simulate(newRow.cells[entityPanel.getEntity()[field].length, 1].div.element, "dblclick");

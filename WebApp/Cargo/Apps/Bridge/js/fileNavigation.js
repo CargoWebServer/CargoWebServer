@@ -241,8 +241,10 @@ FileNavigator.prototype.setActiveTab = function (fileId) {
         var evt
         if (this.activeFile.TYPENAME == "BPMNDI.BPMNDiagram") {
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "bpmnDiagramInfo": this.activeFile } }
-        } else {
+        } else if(this.activeFile.TYPENAME == "CargoEntities.File"){
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": this.activeFile } }
+        }else {
+            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "prototypeInfo": entityPrototypes[this.activeFile.M_id] } }
         }
         server.eventHandler.broadcastLocalEvent(evt)
 

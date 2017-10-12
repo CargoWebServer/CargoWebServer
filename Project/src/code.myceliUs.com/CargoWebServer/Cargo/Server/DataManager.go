@@ -940,7 +940,6 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 
 	// Create the new store here.
 	if err_ != nil {
-
 		storeConfig = new(Config.DataStoreConfiguration)
 		storeConfig.M_id = storeId
 		storeConfig.M_dataStoreVendor = storeVendor
@@ -955,6 +954,7 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 		storeConfig = storeConfigEntity.GetObject().(*Config.DataStoreConfiguration)
 	}
 
+	log.Println("---------> store config: ", storeConfig)
 	// Create the store here.
 	store, err := NewDataStore(storeConfig)
 	if err == nil {

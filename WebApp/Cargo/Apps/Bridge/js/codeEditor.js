@@ -122,14 +122,30 @@ CodeEditor.prototype.appendPrototypeEditor = function (prototype) {
         return
     }
 
-    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": prototype.TypeName + "_editor" }).down()
-    var entityEditor =  new EntityPrototypeEditor(filePanel, ["CatalogSchema", "xs"], undefined, function(entityEditor){
-        entityEditor.typeNameInput.element.value = prototype.TypeName
-        entityEditor.setCurrentPrototype(prototype)
-        entityEditor.space.element.style.display = ""
-    })
-    
+    server.configurationManager.getActiveConfigurations(
+        function(results, caller){
+            console.log(results)
+            var namespaces = []
+            for(var i=0; i < results.M_dataStoreConfigs.length; i++){
+                namespaces.push(results.M_dataStoreConfigs[i].M_id)
+            }
+            var codeEditor = caller.codeEditor
+            var prototype = caller.prototype
+            var entityEditor =  new EntityPrototypeEditor(filePanel, namespaces, undefined, function(entityEditor){
+                entityEditor.typeNameInput.element.value = prototype.TypeName
+                entityEditor.setCurrentPrototype(prototype)
+                entityEditor.space.element.style.display = ""
+            })
+        },
+        function(errObj, caller){
 
+        },
+        {"codeEditor":this, "prototype":prototype})
+
+        var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": prototype.TypeName + "_editor" }).down()
+        this.files[prototype.TypeName] = prototype
+        this.filesPanel[prototype.TypeName] = filePanel
+        this.setActiveFile(prototype.TypeName)
 }
 
 CodeEditor.prototype.appendBpmnDiagram = function (diagram) {

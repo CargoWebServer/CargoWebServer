@@ -581,3 +581,15 @@ func (this *ConfigurationManager) ScheduleTask(task *Config.ScheduledTask, messa
 	}
 	this.scheduleTask(task)
 }
+
+// @api 1.0
+// Return the current configurations object.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @return {*Config.Configurations}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *ConfigurationManager) GetActiveConfigurations(messageId string, sessionId string) *Config.Configurations {
+	return this.m_activeConfigurationsEntity.GetObject().(*Config.Configurations)
+}
