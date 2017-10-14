@@ -86,67 +86,70 @@ function main() {
     // TestUploadFile()
 
     // Test get bmpn defintion instance...
+    /*server.runCmd("cmd", ["/K","dir /Q C:\\Temp\\Erreur.txt"],
+    // Success callback
+    function(results, caller){
+        console.log(results)
+    },
+    // Error callback.
+    function(){
 
-    // Test read directory content.
-    var dir = "\\\\mon-filer-01\\data\\Departement Commun\\Buffer\\Pierre-Olivier\\15-SQL Proactiv\\02-Documentations\\SILMA_Export-Sample"
-    server.fileManager.readDir(dir,
-        function (results, caller) {
-            var paths = results[0]
-            for (var i = 0; i < paths.length; i++) {
-                var path = paths[i]
-                if (path != undefined) {
-                    if (path.endsWith(".XLS") || path.endsWith(".xls") || path.endsWith(".XLSX") || path.endsWith(".xlsx")) {
-                        console.log("Excel file path: ", caller.dir + "\\" + path)
-                        // Now I will read the excel content.
+    });
 
-                        // Not working with old file format.
-                        /*server.fileManager.readExcelFile(caller.dir + "/" + path, "01",
-                            // Progress callback
-                            function () {
-                                // nothing to do here.
-                            },
-                            // Sucess callback
-                            function (results, caller) {
-                                console.log(results)
-                            },
-                            // Error callback
-                            function (errObj, caller) {
-                                console.log(errObj)
-                            }, {})*/
+    server.runCmd("cmd", ["/K","wmic datafile where name='c:\\\\windows\\\\system32\\\\notepad.exe' list full"],
+    // Success callback
+    function(results, caller){
+        console.log(results)
+    },
+    // Error callback.
+    function(){
 
-                        // Here I will use vb script to convert xls to csv.
-                        var excelPath = caller.dir + "\\" + path
-                        var csvPath = "C:\\Temp\\" + path.replace("XLS", "csv").replace("xls", "csv").replace("XLSX", "csv").replace("xlsx", "csv")
-                        server.executeVbSrcript("xlsx2csv.vbs", [excelPath, csvPath],
-                            function(csvPath){
-                                return function (results, caller) {
-                                        // So here I will read the csv file.
-                                        server.fileManager.readCsvFile(csvPath,
-                                            function(csvPath){
-                                            return function (results, caller) {
-                                                console.log(results)
-                                                // TODO Process the result here...
-                                                
-                                                // Remove the file...
-                                                server.fileManager.removeFile(csvPath)
-                                            }}(csvPath),
-                                            function (errObj, caller) {
-                                                console.log(errObj)
-                                            },
-                                            {})
-                                    }
-                            }(csvPath)
-                           ,
-                            function (errObj, caller) {
+    });*/
 
-                            }, {})
-                    }
-                }
-            }
-        },
-        function (errObj, caller) {
 
-        }, { "dir": dir })
+    function getFileInfos(path, callback) {
+        server.runCmd("cmd", ["/K", "dir /Q " + path],
+            // Success callback
+            function (results, caller) {
+                var values = results["result"].split(/\s+/);
+                var author = values[23]
+                var path = caller.path.replaceAll("\\", "\\\\")
+                server.runCmd("cmd", ["/K", "wmic datafile where name='" + path + "' list full"],
+                    // Success callback
+                    function (results, caller) {
+                        var values = results["result"].split(/\s+/);
+                        var fileInfos = {}
+                        for (var i = 0; i < values.length; i++) {
+                            if (values[i].indexOf("=") != -1) {
+                                var infos = values[i].split("=")
+                                var propertie = infos[0]
+                                var value = infos[1]
+                                if (propertie ==  "LastAccessed" || propertie == "LastModified" || propertie == "CreationDate" || propertie == "InstallDate") {
+                                    
+                                    value = moment(value, "YYYYMMDDHHmmSSSS").toDate();
+                                }
+                                fileInfos[propertie] = value
+                            }
+                        }
+                        fileInfos["Author"] = author
+                        caller.callback(fileInfos)
+                    },
+                    // Error callback.
+                    function () {
+
+                    }, { "callback": caller.callback, "author": author });
+            },
+            // Error callback.
+            function () {
+
+            }, { "path": path, "callback": callback });
+    }
+
+    getFileInfos("C:\\Temp\\Erreur.txt", function (fileInfos) {
+        console.log(fileInfos)
+
+    })
+
 
     /* server.entityManager.getEntityPrototypes("Test",
          // Success callback.

@@ -319,6 +319,31 @@ Server.prototype.executeVbSrcript = function (scriptName, args, successCallback,
     rqst.send();
 }
 
+
+/**
+ * Run and executable command on the server and get the results.
+ */
+Server.prototype.runCmd = function (name, args, successCallback, errorCallback, caller) {
+    var params = new Array();
+    params.push(createRpcData(name, "STRING", "name"))
+    params.push(createRpcData(args, "JSON_STR", "args"))
+
+    // Register this listener to the server.
+    var rqst = new Request(randomUUID(), this.conn, "RunCmd", params,
+        // Progress callback
+        function () { },
+        // Success callback
+        function (id, results, caller) {
+            // Keep the session id...
+            caller.successCallback(results, caller.caller)
+        },
+        // Error callback...
+        function (errorMsg, caller) {
+            caller.errorCallback(errorMsg, caller.caller)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
+    rqst.send();
+}
+
 /**
  * Get the list of services and their respective source code. The code
  * permit to get access to service remote actions.

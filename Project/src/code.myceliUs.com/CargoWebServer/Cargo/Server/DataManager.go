@@ -1262,6 +1262,14 @@ func (this *DataManager) HasDataStore(storeName string, messageId string, sessio
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *DataManager) CreateDataStore(storeId string, storeType int64, storeVendor int64, messageId string, sessionId string) {
+	if storeType == 0 {
+		storeType = 1
+	}
+
+	if storeVendor == 0 {
+		storeVendor = 1
+	}
+
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {

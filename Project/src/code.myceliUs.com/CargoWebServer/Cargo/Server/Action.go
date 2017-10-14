@@ -213,3 +213,7 @@ func (self *Action) ExecuteJsFunction(funtionStr string, funtionParams ...interf
 	// Here there is no error, the functor do it's job...
 	return
 }
+
+func (server *Action) RunCmd(name string, args []string) (result string, err error) {
+	return GetServer().RunCmd(name, args)
+}

@@ -808,10 +808,17 @@ func (this *Server) GetDefaultErrorLogger() *Logger {
 // @scope {restricted}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (server *Server) RunCmd(name string, args []string) error {
+func (server *Server) RunCmd(name string, args []string) (string, error) {
 	// The first step will be to start the service manager.
 	path := server.GetConfigurationManager().GetBinPath() + "/" + name
-	if runtime.GOOS == "windows" {
+
+	// In the case that the command is not in the bin path I will
+	// try to run it from the system path.
+	if !Utility.Exists(path) {
+		path = name
+	}
+
+	if runtime.GOOS == "windows" && !strings.HasSuffix(path, ".exe") {
 		path += ".exe"
 	}
 
@@ -823,14 +830,14 @@ func (server *Server) RunCmd(name string, args []string) error {
 	server.cmds = append(server.cmds, cmd)
 
 	// Call it...
-	err := cmd.Run()
+	output, err := cmd.Output()
 	if err != nil {
 		log.Println("Fail to run cmd: ", name)
 		log.Println("error: ", err)
-		return err
+		return "", err
 	}
 
-	return nil
+	return string(output), err
 }
 
 // Start starts the specified command but does not wait for it to complete.
@@ -844,7 +851,13 @@ func (server *Server) RunCmd(name string, args []string) error {
 func (server *Server) StartCmd(name string, args []string) error {
 	// The first step will be to start the service manager.
 	path := server.GetConfigurationManager().GetBinPath() + "/" + name
-	if runtime.GOOS == "windows" {
+	// In the case that the command is not in the bin path I will
+	// try to run it from the system path.
+	if !Utility.Exists(path) {
+		path = name
+	}
+
+	if runtime.GOOS == "windows" && !strings.HasSuffix(path, ".exe") {
 		path += ".exe"
 	}
 
