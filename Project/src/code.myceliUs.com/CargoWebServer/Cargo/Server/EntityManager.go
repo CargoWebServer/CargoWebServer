@@ -1772,6 +1772,7 @@ func (this *EntityManager) DeleteEntityPrototype(typeName string, storeId string
 //    )
 //}
 func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string, sessionId string) []*EntityPrototype {
+
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -1789,6 +1790,7 @@ func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string,
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
+
 	return protos
 }
 

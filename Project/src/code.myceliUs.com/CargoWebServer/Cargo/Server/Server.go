@@ -341,6 +341,10 @@ func (this *Server) Start() {
 		return strings.ToUpper(str[0:1]) + str[1:]
 	})
 
+	JS.GetJsRuntimeManager().AppendFunction("GetServer", func() *Server {
+		return GetServer()
+	})
+
 	/**
 	 * Made other connection side execute JS code.
 	 */
@@ -391,6 +395,7 @@ func (this *Server) Start() {
 			return func(rspMsg *message, caller interface{}) {
 				results := make([]interface{}, 0)
 				// So here i will get the message value...
+				log.Println("--------> number of return results: ", len(rspMsg.msg.Rsp.Results))
 				for i := 0; i < len(rspMsg.msg.Rsp.Results); i++ {
 
 					param := rspMsg.msg.Rsp.Results[i]
@@ -419,6 +424,7 @@ func (this *Server) Start() {
 					} else if param.GetType() == Data_BYTES {
 						results = append(results, param.GetDataBytes())
 					} else if param.GetType() == Data_JSON_STR {
+
 						val := string(param.GetDataBytes())
 						val_, err := b64.StdEncoding.DecodeString(val)
 						if err == nil {
@@ -437,26 +443,13 @@ func (this *Server) Start() {
 							}
 
 							err = json.Unmarshal([]byte(val), &values)
-
 							if err == nil {
 								p, err := Utility.InitializeStructures(values.([]interface{}), param.GetTypeName())
 								if err == nil {
-
 									results = append(results, p.Interface())
 								} else {
-									//log.Println("Error:", err)
-									// Here I will try to create a the array of object.
-									if err.Error() == "NotDynamicObject" {
-										p, err := Utility.InitializeArray(values.([]interface{}), param.GetTypeName())
-										if err == nil {
-											if p.IsValid() {
-												results = append(results, p.Interface())
-											} else {
-												// here i will set an empty generic array.
-												results = append(results, make([]interface{}, 0))
-											}
-										}
-									}
+									// I will set unmarshal values in that case.
+									results = values.([]interface{})
 								}
 							}
 
@@ -484,10 +477,16 @@ func (this *Server) Start() {
 				params[0] = results
 				params[1] = caller
 
-				// run the success callback.
-				for k, v := range GetServer().subConnectionIds {
-					if Utility.Contains(v, subConnectionId) {
-						JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
+				if rspMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), "", successCallback, params)
+				} else {
+					// run the success callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							// Todo test if the subconnection id is equal to (to)
+							JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
+						}
 					}
 				}
 
@@ -625,6 +624,7 @@ func (this *Server) Start() {
 
 			// I will get the client code and inject it in the vm.
 			id := Utility.RandomUUID()
+
 			method := "GetServicesClientCode"
 			params := make([]*MessageData, 0)
 			to := make([]connection, 1)
@@ -653,9 +653,25 @@ func (this *Server) Start() {
 
 		})
 	// Javacript initialisation here.
-	JS.GetJsRuntimeManager().OpendSession("")                  // Set the anonymous session.
-	JS.GetJsRuntimeManager().SetVar("", "server", GetServer()) // Set the server global variable.
-	JS.GetJsRuntimeManager().InitScripts("")                   // Run the script for the default session.
+	JS.GetJsRuntimeManager().OpendSession("") // Set the anonymous session.
+	for _, src := range GetServer().GetServiceManager().m_serviceClientSrc {
+		JS.GetJsRuntimeManager().AppendScript(src)
+	}
+
+	JS.GetJsRuntimeManager().InitScripts("") // Run the script for the default session.
+
+	// Initialyse the server object here.
+	JS.GetJsRuntimeManager().RunScript("", `var entityPrototypes = {};`)
+	JS.GetJsRuntimeManager().RunScript("", `var entities = {};`)
+	JS.GetJsRuntimeManager().RunScript("", `var server = new Server("localhost", "127.0.0.1", 9393);`)
+	JS.GetJsRuntimeManager().RunScript("", `server.conn = new Connection()`)
+	JS.GetJsRuntimeManager().RunScript("", `server.conn.id = "127.0.0.1"`)
+	for serviceName, _ := range GetServer().GetServiceManager().m_serviceClientSrc {
+		JS.GetJsRuntimeManager().RunScript("", "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();")
+	}
+
+	// Asynchronous script test.
+	//JS.GetJsRuntimeManager().RunScript("", `server.entityManager.getEntityPrototypes("CargoEntities", function(results, caller){console.log(results.length)}, function(){"-----> Error found"}, {})`)
 
 	// Now I will set scheduled task.
 	for i := 0; i < len(GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {

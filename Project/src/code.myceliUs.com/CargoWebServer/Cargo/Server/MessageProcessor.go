@@ -481,7 +481,15 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 	if *m.msg.Type == Message_REQUEST || *m.msg.Type == Message_RESPONSE {
 		if len(m.GetBytes()) < maxSize {
 			for i := 0; i < len(m.to); i++ {
-				m.to[i].Send(m.GetBytes())
+				if m.to[i] == nil {
+					if *m.msg.Type == Message_RESPONSE {
+						this.m_receiveRequestResponse <- m
+					} else if *m.msg.Type == Message_REQUEST {
+						this.m_incomingChannel <- m
+					}
+				} else {
+					m.to[i].Send(m.GetBytes())
+				}
 			}
 		} else {
 			// so here I will split the message in multiple part

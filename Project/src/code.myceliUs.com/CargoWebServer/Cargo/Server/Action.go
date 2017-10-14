@@ -2,7 +2,7 @@
 package Server
 
 import (
-	//"log"
+	//	"log"
 	"os/exec"
 	"reflect"
 	"strconv"
@@ -67,7 +67,11 @@ func (self *Action) execute() {
 	x, errMsg := Utility.CallMethod(*self, self.Name, self.Params)
 
 	// Get the session id and the message id...
-	sessionId := self.msg.from.GetUuid()
+	var sessionId string
+	if self.msg.from != nil {
+		sessionId = self.msg.from.GetUuid()
+	}
+
 	messageId := self.msg.GetId()
 
 	if errMsg != nil {
@@ -191,9 +195,13 @@ func (self *Action) ExecuteVbScript(scriptName string, args []string) []string {
  * That function is the most important function of the framework. It use
  */
 func (self *Action) ExecuteJsFunction(funtionStr string, funtionParams ...interface{}) (results []interface{}, jsError error) {
+	var sessionId string
+	if self.msg.from != nil {
+		sessionId = self.msg.from.GetUuid()
+	}
 
 	// Call the function on the Js runtime.
-	results, jsError = JS.GetJsRuntimeManager().ExecuteJsFunction(self.msg.GetId(), self.msg.from.GetUuid(), funtionStr, funtionParams)
+	results, jsError = JS.GetJsRuntimeManager().ExecuteJsFunction(self.msg.GetId(), sessionId, funtionStr, funtionParams)
 
 	if jsError != nil {
 		// Here the user made an error inside is js code, i will simply report

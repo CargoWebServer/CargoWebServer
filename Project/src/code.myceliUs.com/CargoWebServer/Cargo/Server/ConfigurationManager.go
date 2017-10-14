@@ -225,7 +225,7 @@ func (this *ConfigurationManager) start() {
 				var script string
 				script = "function tcpServiceContainerStart(){\n"
 				script += "	while(true){\n"
-				script += `		var err = server.RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"])`
+				script += `		var err = GetServer().RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"])`
 				script += "\n		console.log(err)\n"
 				script += "	}\n"
 				script += "}\n"
@@ -237,7 +237,7 @@ func (this *ConfigurationManager) start() {
 				var script string
 				script = "function wsServiceContainerStart(){\n"
 				script += "	while(true){\n"
-				script += `		var err = server.RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"])`
+				script += `		var err = GetServer().RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"])`
 				script += "\n		console.log(err)\n"
 				script += "	}\n"
 				script += "}\n"
@@ -345,7 +345,6 @@ func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
 		log.Println("-----> task scheduled in ", delay.Minutes())
 		// Here I will set the timer...
 		timer := time.NewTimer(delay)
-
 		<-timer.C
 		dbFile, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", []interface{}{task.M_script}, false)
 		if err == nil {

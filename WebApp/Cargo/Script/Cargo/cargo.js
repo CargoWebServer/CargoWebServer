@@ -1,15 +1,15 @@
 ////////////////////////////////// Server //////////////////////////
 function SetRootPath(path) {
     // Call set root path on the server...
-    server.SetRootPath(path)
+    GetServer().SetRootPath(path)
 }
 
 function Connect(address) {
-    server.Connect(address)
+    GetServer().Connect(address)
 }
 
 function Stop() {
-    server.Stop()
+    GetServer().Stop()
 }
 
 /////////////////////////////////////// Other script /////////////////////////////////////////
@@ -19,13 +19,13 @@ function Stop() {
 function ExcelToCsv(filePath) {
     var val = filePath.split("\\")
     var fileName = val[val.length - 1].split(".")[0]
-    var outputFile = server.GetConfigurationManager().GetTmpPath() + "/" + fileName + ".csv"
+    var outputFile = GetServer().GetConfigurationManager().GetTmpPath() + "/" + fileName + ".csv"
     // C:\\ instead of C:/
     outputFile = outputFile.replace("/", "\\", -1)
-    server.ExecuteVbScript("xlsx2csv.vbs", [filePath, outputFile], messageId, sessionId)
+    GetServer().ExecuteVbScript("xlsx2csv.vbs", [filePath, outputFile], messageId, sessionId)
 
     // I will read the file content.
-    var results = {"data" : server.GetFileManager().ReadCsvFile(outputFile, messageId, sessionId), "outputFile":outputFile}
+    var results = {"data" : GetServer().GetFileManager().ReadCsvFile(outputFile, messageId, sessionId), "outputFile":outputFile}
 
     return results
 }

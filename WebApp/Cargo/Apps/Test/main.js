@@ -106,97 +106,105 @@ function main() {
 
     });*/
 
-
-    function getFileInfos(path, callback) {
-        server.runCmd("cmd", ["/K", "dir /Q " + path],
-            // Success callback
-            function (results, caller) {
-                var values = results["result"].split(/\s+/);
-                var author = values[23]
-                var path = caller.path.replaceAll("\\", "\\\\")
-                server.runCmd("cmd", ["/K", "wmic datafile where name='" + path + "' list full"],
-                    // Success callback
-                    function (results, caller) {
-                        var values = results["result"].split(/\s+/);
-                        var fileInfos = {}
-                        for (var i = 0; i < values.length; i++) {
-                            if (values[i].indexOf("=") != -1) {
-                                var infos = values[i].split("=")
-                                var propertie = infos[0]
-                                var value = infos[1]
-                                if (propertie ==  "LastAccessed" || propertie == "LastModified" || propertie == "CreationDate" || propertie == "InstallDate") {
-                                    
-                                    value = moment(value, "YYYYMMDDHHmmSSSS").toDate();
+    /*
+        function getFileInfos(path, callback) {
+            server.runCmd("cmd", ["/K", "dir /Q " + path],
+                // Success callback
+                function (results, caller) {
+                    var values = results["result"].split(/\s+/);
+                    var author = values[23]
+                    var path = caller.path.replaceAll("\\", "\\\\")
+                    server.runCmd("cmd", ["/K", "wmic datafile where name='" + path + "' list full"],
+                        // Success callback
+                        function (results, caller) {
+                            var values = results["result"].split(/\s+/);
+                            var fileInfos = {}
+                            for (var i = 0; i < values.length; i++) {
+                                if (values[i].indexOf("=") != -1) {
+                                    var infos = values[i].split("=")
+                                    var propertie = infos[0]
+                                    var value = infos[1]
+                                    if (propertie ==  "LastAccessed" || propertie == "LastModified" || propertie == "CreationDate" || propertie == "InstallDate") {
+                                        
+                                        value = moment(value, "YYYYMMDDHHmmSSSS").toDate();
+                                    }
+                                    fileInfos[propertie] = value
                                 }
-                                fileInfos[propertie] = value
                             }
-                        }
-                        fileInfos["Author"] = author
-                        caller.callback(fileInfos)
-                    },
-                    // Error callback.
-                    function () {
-
-                    }, { "callback": caller.callback, "author": author });
-            },
-            // Error callback.
-            function () {
-
-            }, { "path": path, "callback": callback });
-    }
-
-    getFileInfos("C:\\Temp\\Erreur.txt", function (fileInfos) {
-        console.log(fileInfos)
-
-    })
-
-
-    /* server.entityManager.getEntityPrototypes("Test",
-         // Success callback.
-         function (result, caller) {
-             server.entityManager.getEntityPrototypes("BPMN20",
-                 // Success callback.
-                 function (result, caller) {
-                     server.entityManager.getEntityPrototypes("BPMS",
-                         // Success callback.
-                         function (result, caller) {
-                             server.entityManager.getEntityById("BPMN20.Definitions", ["_1484846640138"],
-                                 // success callbacak
-                                 function (result, caller) {
-                                     server.workflowManager.getDefinitionInstances(result,
-                                         // success callback
-                                         function (results, caller) {
-                                             var result = results[0]
-                                             var parent = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; width: auto; height: auto;" })
-                                             new EntityPanel(parent, result.TYPENAME, function (entity) {
-                                                 return function (panel) {
-                                                     panel.setEntity(entity)
-                                                 }
-                                             }(result), undefined, false, result, "")
-                                         },
-                                         // error callback 
-                                         function (errMsg, caller) {
-                                         },
-                                         {})
-                                 },
-                                 // Error callback 
-                                 function (errMsg, caller) {
-                                 }, {})
-                         },
-                         // Error callback.
-                         function () {
-                         }, {})
-                 },
-                 // Error callback.
-                 function () {
- 
-                 }, {})
-         },
-         // Error callback.
-         function () {
- 
-         }, {})
- */
+                            fileInfos["Author"] = author
+                            caller.callback(fileInfos)
+                        },
+                        // Error callback.
+                        function () {
+    
+                        }, { "callback": caller.callback, "author": author });
+                },
+                // Error callback.
+                function () {
+    
+                }, { "path": path, "callback": callback });
+        }
+    
+        getFileInfos("C:\\Temp\\Erreur.txt", function (fileInfos) {
+            console.log(fileInfos)
+    
+        })
+    */
+    server.entityManager.getEntityPrototypes("CargoEntities",
+        function (results, caller) { 
+            console.log(results.length) 
+        },
+        function () { 
+            "-----> Error found" 
+        }, {}
+    )
+    /*
+         server.entityManager.getEntityPrototypes("Test",
+             // Success callback.
+             function (result, caller) {
+                 server.entityManager.getEntityPrototypes("BPMN20",
+                     // Success callback.
+                     function (result, caller) {
+                         server.entityManager.getEntityPrototypes("BPMS",
+                             // Success callback.
+                             function (result, caller) {
+                                 server.entityManager.getEntityById("BPMN20.Definitions", ["_1484846640138"],
+                                     // success callbacak
+                                     function (result, caller) {
+                                         server.workflowManager.getDefinitionInstances(result,
+                                             // success callback
+                                             function (results, caller) {
+                                                 var result = results[0]
+                                                 var parent = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; width: auto; height: auto;" })
+                                                 new EntityPanel(parent, result.TYPENAME, function (entity) {
+                                                     return function (panel) {
+                                                         panel.setEntity(entity)
+                                                     }
+                                                 }(result), undefined, false, result, "")
+                                             },
+                                             // error callback 
+                                             function (errMsg, caller) {
+                                             },
+                                             {})
+                                     },
+                                     // Error callback 
+                                     function (errMsg, caller) {
+                                     }, {})
+                             },
+                             // Error callback.
+                             function () {
+                             }, {})
+                     },
+                     // Error callback.
+                     function () {
+     
+                     }, {})
+             },
+             // Error callback.
+             function () {
+     
+             }, {})
+     */
 
     // Google OAuth
     /*server.securityManager.getResource("1010681964660.apps.googleusercontent.com", "profile", "", 
