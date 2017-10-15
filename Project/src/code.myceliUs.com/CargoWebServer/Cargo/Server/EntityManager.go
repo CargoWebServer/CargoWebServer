@@ -1573,6 +1573,7 @@ func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}
 //	},{"successCallback":successCallback, "errorCallback":errorCallback, "caller": caller})
 //}
 func (this *EntityManager) CreateEntityPrototype(storeId string, prototype interface{}, messageId string, sessionId string) *EntityPrototype {
+	log.Println("--------> try to create entity prototype in store: ", storeId)
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)

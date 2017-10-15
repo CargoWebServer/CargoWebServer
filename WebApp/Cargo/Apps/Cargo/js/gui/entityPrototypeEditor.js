@@ -58,7 +58,7 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
 
     // So here for each base type I will get the base type propertie...
     function setAutocompleteDynamicType(panel) {
-    
+
         // Now I will create the list of derived class name...
         var objMap = {}
 
@@ -157,7 +157,7 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
             }
         }(panel, input))
 
-        if(panel.initCallback != undefined){
+        if (panel.initCallback != undefined) {
             panel.initCallback(panel)
         }
     }
@@ -310,7 +310,7 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
         }
         for (var i = 0; i < prototype.SuperTypeNames.length; i++) {
             if (document.getElementById("superType_" + prototype.SuperTypeNames[i] + "_" + prototype.TypeName + "_row") == undefined) {
-                var superType = superTypes.appendElement({ "tag": "div", "style": "display: table-row;width: 100%;", "id": "superType_" + prototype.SuperTypeNames[i]+ "_" + prototype.TypeName + "_row" }).down()
+                var superType = superTypes.appendElement({ "tag": "div", "style": "display: table-row;width: 100%;", "id": "superType_" + prototype.SuperTypeNames[i] + "_" + prototype.TypeName + "_row" }).down()
                 var removeSupertypeBtn = superType.appendElement({ "tag": "div", "style": "display: table-cell;width: 100%;", "innerHtml": prototype.SuperTypeNames[i] })
                     .appendElement({ "tag": "div", "class": "entities_btn" }).down()
                     .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
@@ -339,56 +339,57 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
         }
 
         // Now the list of other super type not used by this one.
-        var allSuperTypes = editor.allSuperTypes.appendElement({ "tag": "div", "style": "width: 100%; height: 200px;" }).down()
+        if (document.getElementById("allSuperTypes_"+ prototype.TypeName) == undefined) {
+            var allSuperTypes = editor.allSuperTypes.appendElement({ "tag": "div", "style": "width: 100%; height: 200px;", "id": "allSuperTypes_"  + prototype.TypeName }).down()
+            for (var i = 0; i < results.length; i++) {
+                if (document.getElementById("allSuperTypes_" + results[i].TypeName + "_" + prototype.TypeName + "_row") == undefined) {
+                    // display only if the supertype is not already present in the list of supertype 
+                    if (prototype.SuperTypeNames.indexOf(results[i].TypeName) == -1) {
+                        // The type must not have actual type as supertype.
+                        if (results[i].SuperTypeNames.indexOf(prototype.TypeName) == -1 && results[i].TypeName != prototype.TypeName && prototype.SuperTypeNames.indexOf(results[i].TypeName) == -1) {
+                            var superType = allSuperTypes.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id": "allSuperTypes_" + results[i].TypeName + "_" + prototype.TypeName + "_row" }).down()
+                            var appendSupertypeBtn = superType.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;", "innerHtml": results[i].TypeName })
+                                .appendElement({ "tag": "div", "class": "entities_btn" }).down()
+                                .appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
 
-        for (var i = 0; i < results.length; i++) {
-            if (document.getElementById("allSuperTypes_" + results[i].TypeName + "_" + prototype.TypeName + "_row") == undefined) {
-                // display only if the supertype is not already present in the list of supertype 
-                if (prototype.SuperTypeNames.indexOf(results[i].TypeName) == -1) {
-                    // The type must not have actual type as supertype.
-                    if (results[i].SuperTypeNames.indexOf(prototype.TypeName) == -1 && results[i].TypeName != prototype.TypeName && prototype.SuperTypeNames.indexOf(results[i].TypeName) == -1) {
-                        var superType = allSuperTypes.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id": "allSuperTypes_" + results[i].TypeName + "_" + prototype.TypeName + "_row" }).down()
-                        var appendSupertypeBtn = superType.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;", "innerHtml": results[i].TypeName })
-                            .appendElement({ "tag": "div", "class": "entities_btn" }).down()
-                            .appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
+                            // Here I will append a new supertype to the prototype.
+                            appendSupertypeBtn.element.onclick = function (editor, prototype, superPrototype) {
+                                return function () {
+                                    // Recursively append all surpertype to a given prototype.
+                                    function appendSuperPrototype(prototype, superPrototype, callback) {
 
-                        // Here I will append a new supertype to the prototype.
-                        appendSupertypeBtn.element.onclick = function (editor, prototype, superPrototype) {
-                            return function () {
-                                // Recursively append all surpertype to a given prototype.
-                                function appendSuperPrototype(prototype, superPrototype, callback) {
+                                        for (var i = superPrototype.SuperTypeNames.length - 1; i >= 0; i--) {
+                                            server.entityManager.getEntityPrototype(superPrototype.SuperTypeNames[i], superPrototype.SuperTypeNames[i].split(".")[0],
+                                                function (result, caller) {
+                                                    // recursively append the prototype.
+                                                    if (caller.prototype.SuperTypeNames.indexOf(result.TypeName) == -1 && caller.prototype.TypeName != result.TypeName) {
+                                                        appendSuperPrototype(caller.prototype, result, caller.callback, caller.done)
+                                                    }
+                                                    if (caller.done) {
+                                                        caller.callback(caller.prototype)
+                                                    }
+                                                },
+                                                function (errObj, caller) {
 
-                                    for (var i = superPrototype.SuperTypeNames.length - 1; i >= 0; i--) {
-                                        server.entityManager.getEntityPrototype(superPrototype.SuperTypeNames[i], superPrototype.SuperTypeNames[i].split(".")[0],
-                                            function (result, caller) {
-                                                // recursively append the prototype.
-                                                if (caller.prototype.SuperTypeNames.indexOf(result.TypeName) == -1 && caller.prototype.TypeName != result.TypeName) {
-                                                    appendSuperPrototype(caller.prototype, result, caller.callback, caller.done)
-                                                }
-                                                if (caller.done) {
-                                                    caller.callback(caller.prototype)
-                                                }
-                                            },
-                                            function (errObj, caller) {
+                                                }, { "prototype": prototype, "callback": callback, "done": i == superPrototype.SuperTypeNames.length - 1 })
+                                        }
 
-                                            }, { "prototype": prototype, "callback": callback, "done": i == superPrototype.SuperTypeNames.length - 1 })
+                                        if (prototype.SuperTypeNames.indexOf(superPrototype.TypeName) == -1) {
+                                            prototype.SuperTypeNames.push(superPrototype.TypeName)
+                                        }
+
                                     }
 
-                                    if (prototype.SuperTypeNames.indexOf(superPrototype.TypeName) == -1) {
-                                        prototype.SuperTypeNames.push(superPrototype.TypeName)
-                                    }
+                                    appendSuperPrototype(prototype, superPrototype, function (prototype, editor) {
+                                        return function (prototype) {
+                                            editor.setCurrentPrototype(prototype)
+                                        }
+                                    }(prototype, editor))
+
 
                                 }
-
-                                appendSuperPrototype(prototype, superPrototype, function (prototype, editor) {
-                                    return function (prototype) {
-                                        editor.setCurrentPrototype(prototype)
-                                    }
-                                }(prototype, editor))
-
-
-                            }
-                        }(editor, prototype, results[i])
+                            }(editor, prototype, results[i])
+                        }
                     }
                 }
             }
@@ -403,15 +404,15 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
     }
 
     // In case of a given a base type name is given...
-    if(this.baseType != undefined){
-    server.entityManager.getDerivedEntityPrototypes(this.baseType,
-        /** Success callback */
-        successCallback,
-        /** Error callback */
-        function (errObj, caller) {
+    if (this.baseType != undefined) {
+        server.entityManager.getDerivedEntityPrototypes(this.baseType,
+            /** Success callback */
+            successCallback,
+            /** Error callback */
+            function (errObj, caller) {
 
-        }, { "callback": callback, "prototype": prototype, "editor": this })
-    }else{
+            }, { "callback": callback, "prototype": prototype, "editor": this })
+    } else {
         // In the other case i will use all prototypes from imports.
         var results = []
         for (var i = 0; i < this.typeNameLst.length; i++) {
@@ -542,7 +543,7 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
  */
 EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype, propertieName, propertieTypeName, parent, isEditable, index) {
 
-    var propertieRow = parent.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id":prototype.TypeName + "_"+ propertieName + "_row" }).down()
+    var propertieRow = parent.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id": prototype.TypeName + "_" + propertieName + "_row" }).down()
     var saveBtn = propertieRow.appendElement({ "tag": "div", "class": "entities_btn", "style": "display: none;" }).down().appendElement({ "tag": "i", "class": "fa fa-floppy-o" }).down()
     var editBtn = propertieRow.appendElement({ "tag": "div", "class": "entities_btn", "style": "vertical-align: text-top;" }).down().appendElement({ "tag": "i", "class": "fa fa-pencil-square-o" }).down()
 
@@ -689,10 +690,10 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
 EntityPrototypeEditor.prototype.saveprototype = function () {
     // Set the default fields values before saving it.
     this.setDefaultFieldsValue()
-    var schmema = this.getCurrentEntityPrototype().TypeName.split(".")[0]
+    var storeId = this.getCurrentEntityPrototype().TypeName.split(".")[0]
     if (this.getCurrentEntityPrototype().notExist != undefined) {
         // create entity prototype.
-        server.entityManager.createEntityPrototype(schema, this.getCurrentEntityPrototype(),
+        server.entityManager.createEntityPrototype(storeId, this.getCurrentEntityPrototype(),
             // The success callback
             function (result, caller) {
                 caller.panel.setCurrentPrototype(result)
@@ -702,14 +703,14 @@ EntityPrototypeEditor.prototype.saveprototype = function () {
             }, { "panel": this })
     } else {
         // Save entity prototype here.
-        server.entityManager.saveEntityPrototype(schema, this.getCurrentEntityPrototype(),
+        server.entityManager.saveEntityPrototype(storeId, this.getCurrentEntityPrototype(),
             // The success callback
             function (result, caller) {
                 caller.panel.setCurrentPrototype(result)
             },
             function () {
 
-            }, { "panel": this })
+            }, { "panel": this})
     }
 }
 
