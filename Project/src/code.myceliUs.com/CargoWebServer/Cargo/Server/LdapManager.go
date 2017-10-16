@@ -331,9 +331,6 @@ func (this *LdapManager) synchronizeUsers(id string) error {
 				// Create the user uuid
 				GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", user)
 
-				// Append the newly create account into the cargo entities
-				entities := cargoEntities.GetObject().(*CargoEntities.Entities)
-
 				// Create the account in memory...
 				account := new(CargoEntities.Account)
 				account.M_id = accountId
@@ -342,24 +339,24 @@ func (this *LdapManager) synchronizeUsers(id string) error {
 				account.M_email = user.GetEmail()
 
 				// Set the account uuid.
-				GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(cargoEntities.GetUuid(), "", account)
-
-				entities.SetEntities(account)
-				account.SetEntitiesPtr(entities)
+				accontEntity, err := GetServer().GetEntityManager().createEntity(cargoEntities.GetUuid(), "M_entities", "CargoEntities.Account", accountId, account)
 
 				// Link the account and the user...
-				account.SetUserRef(user)
-				account.NeedSave = true
-				user.SetAccounts(account)
-
-				entities.SetEntities(user)
-				user.SetEntitiesPtr(entities)
+				if err == nil {
+					userEntity, err := GetServer().GetEntityManager().createEntity(cargoEntities.GetUuid(), "M_entities", "CargoEntities.User", user.GetId(), user)
+					if err == nil {
+						log.Printf("--> Create user: ", user.GetId())
+						account.SetUserRef(user)
+						user.SetAccounts(account)
+						// Save both entity...
+						accontEntity.SaveEntity()
+						userEntity.SaveEntity()
+					}
+				}
 			}
 		}
 
 	}
-	// Call save on Entities...
-	cargoEntities.SaveEntity()
 
 	// No error...
 	return nil
@@ -410,9 +407,9 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 						groupUuid := CargoEntitiesGroupExists(group.M_id)
 						if len(groupUuid) == 0 {
 							// Here i will save the group...
-							entities := GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities)
-							entities.SetEntities(group)
-							group.SetEntitiesPtr(entities)
+							entities := GetServer().GetEntityManager().getCargoEntities()
+							GetServer().GetEntityManager().createEntity(entities.GetUuid(), "M_entities", "CargoEntities.Group", group.GetId(), group)
+							log.Println("--> create group ", group.GetId())
 						}
 					}
 				}
@@ -590,11 +587,12 @@ func (this *LdapManager) synchronizeComputers(id string) error {
 				log.Println("Save computer", computer.GetName(), computer.GetIpv4())
 			}*/
 
-			entities := GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities)
+			entities := GetServer().GetEntityManager().getCargoEntities()
 			// Set the computer uuid.
 			GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", computer)
-			entities.SetEntities(computer)
-			computer.SetEntitiesPtr(entities)
+
+			GetServer().GetEntityManager().createEntity(entities.GetUuid(), "M_entities", "CargoEntities.Computer", computer.GetId(), computer)
+			log.Println("--> create computer ", computer.GetId())
 		}
 	}
 	// Call save on Entities...

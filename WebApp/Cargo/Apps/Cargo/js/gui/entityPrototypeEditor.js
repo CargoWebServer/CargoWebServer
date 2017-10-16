@@ -100,8 +100,10 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
                         })
 
                         prototype.notExist = true
-                        if (panel.baseType.length > 0) {
-                            prototype.SuperTypeNames.push(panel.baseType)
+                        if (panel.baseType != undefined) {
+                            if (panel.baseType.length > 0) {
+                                prototype.SuperTypeNames.push(panel.baseType)
+                            }
                         }
 
                         panel.setCurrentPrototype(prototype)
@@ -245,8 +247,10 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
         // If the current display item is deleted I will clear the panel.
         if (evt.dataMap.prototype.TypeName == EntityPrototypeEditor.getCurrentEntityPrototype().TypeName) {
             EntityPrototypeEditor.clear()
-            if (EntityPrototypeEditor.typeName.element.value == evt.dataMap.prototype.TypeName) {
-                EntityPrototypeEditor.typeName.element.value = ""
+            if (EntityPrototypeEditor.typeName != null) {
+                if (EntityPrototypeEditor.typeName.element.value == evt.dataMap.prototype.TypeName) {
+                    EntityPrototypeEditor.typeName.element.value = ""
+                }
             }
         }
 
@@ -339,56 +343,61 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
         }
 
         // Now the list of other super type not used by this one.
-        if (document.getElementById("allSuperTypes_"+ prototype.TypeName) == undefined) {
-            var allSuperTypes = editor.allSuperTypes.appendElement({ "tag": "div", "style": "width: 100%; height: 200px;", "id": "allSuperTypes_"  + prototype.TypeName }).down()
+        if (document.getElementById("allSuperTypes_" + prototype.TypeName) == undefined) {
+            var allSuperTypes = editor.allSuperTypes.appendElement({ "tag": "div", "style": "width: 100%; height: 200px;", "id": "allSuperTypes_" + prototype.TypeName }).down()
             for (var i = 0; i < results.length; i++) {
-                if (document.getElementById("allSuperTypes_" + results[i].TypeName + "_" + prototype.TypeName + "_row") == undefined) {
-                    // display only if the supertype is not already present in the list of supertype 
-                    if (prototype.SuperTypeNames.indexOf(results[i].TypeName) == -1) {
-                        // The type must not have actual type as supertype.
-                        if (results[i].SuperTypeNames.indexOf(prototype.TypeName) == -1 && results[i].TypeName != prototype.TypeName && prototype.SuperTypeNames.indexOf(results[i].TypeName) == -1) {
-                            var superType = allSuperTypes.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id": "allSuperTypes_" + results[i].TypeName + "_" + prototype.TypeName + "_row" }).down()
-                            var appendSupertypeBtn = superType.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;", "innerHtml": results[i].TypeName })
-                                .appendElement({ "tag": "div", "class": "entities_btn" }).down()
-                                .appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
+                if (results[i] != undefined) {
+                    if (document.getElementById("allSuperTypes_" + results[i].TypeName + "_" + prototype.TypeName + "_row") == undefined) {
+                        // display only if the supertype is not already present in the list of supertype 
+                        if (prototype.SuperTypeNames.indexOf(results[i].TypeName) == -1) {
+                            // The type must not have actual type as supertype.
+                            if (results[i].SuperTypeNames.indexOf(prototype.TypeName) == -1 && results[i].TypeName != prototype.TypeName && prototype.SuperTypeNames.indexOf(results[i].TypeName) == -1) {
+                                var superType = allSuperTypes.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "id": "allSuperTypes_" + results[i].TypeName + "_" + prototype.TypeName + "_row" }).down()
+                                var appendSupertypeBtn = superType.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;", "innerHtml": results[i].TypeName })
+                                    .appendElement({ "tag": "div", "class": "entities_btn" }).down()
+                                    .appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
 
-                            // Here I will append a new supertype to the prototype.
-                            appendSupertypeBtn.element.onclick = function (editor, prototype, superPrototype) {
-                                return function () {
-                                    // Recursively append all surpertype to a given prototype.
-                                    function appendSuperPrototype(prototype, superPrototype, callback) {
+                                // Here I will append a new supertype to the prototype.
+                                appendSupertypeBtn.element.onclick = function (editor, prototype, superPrototype) {
+                                    return function () {
+                                        // Recursively append all surpertype to a given prototype.
+                                        function appendSuperPrototype(prototype, superPrototype, callback) {
 
-                                        for (var i = superPrototype.SuperTypeNames.length - 1; i >= 0; i--) {
-                                            server.entityManager.getEntityPrototype(superPrototype.SuperTypeNames[i], superPrototype.SuperTypeNames[i].split(".")[0],
-                                                function (result, caller) {
-                                                    // recursively append the prototype.
-                                                    if (caller.prototype.SuperTypeNames.indexOf(result.TypeName) == -1 && caller.prototype.TypeName != result.TypeName) {
-                                                        appendSuperPrototype(caller.prototype, result, caller.callback, caller.done)
-                                                    }
-                                                    if (caller.done) {
-                                                        caller.callback(caller.prototype)
-                                                    }
-                                                },
-                                                function (errObj, caller) {
+                                            for (var i = superPrototype.SuperTypeNames.length - 1; i >= 0; i--) {
+                                                server.entityManager.getEntityPrototype(superPrototype.SuperTypeNames[i], superPrototype.SuperTypeNames[i].split(".")[0],
+                                                    function (result, caller) {
+                                                        // recursively append the prototype.
+                                                        if (caller.prototype.SuperTypeNames.indexOf(result.TypeName) == -1 && caller.prototype.TypeName != result.TypeName) {
+                                                            appendSuperPrototype(caller.prototype, result, caller.callback, caller.done)
+                                                        }
+                                                        if (caller.done) {
+                                                            if (caller.prototype.SuperTypeNames.indexOf(caller.superPrototype.TypeName) == -1) {
+                                                                caller.prototype.SuperTypeNames.push(caller.superPrototype.TypeName)
+                                                            }
+                                                            caller.callback(caller.prototype)
+                                                        }
+                                                    },
+                                                    function (errObj, caller) {
 
-                                                }, { "prototype": prototype, "callback": callback, "done": i == superPrototype.SuperTypeNames.length - 1 })
+                                                    }, { "prototype": prototype, "callback": callback, "superPrototype": superPrototype, "done": i == superPrototype.SuperTypeNames.length - 1 })
+                                            }
+
+                                            if (prototype.SuperTypeNames.indexOf(superPrototype.TypeName) == -1) {
+                                                prototype.SuperTypeNames.push(superPrototype.TypeName)
+                                            }
+
                                         }
 
-                                        if (prototype.SuperTypeNames.indexOf(superPrototype.TypeName) == -1) {
-                                            prototype.SuperTypeNames.push(superPrototype.TypeName)
-                                        }
+                                        appendSuperPrototype(prototype, superPrototype, function (prototype, editor) {
+                                            return function (prototype) {
+                                                editor.setCurrentPrototype(prototype)
+                                            }
+                                        }(prototype, editor))
+
 
                                     }
-
-                                    appendSuperPrototype(prototype, superPrototype, function (prototype, editor) {
-                                        return function (prototype) {
-                                            editor.setCurrentPrototype(prototype)
-                                        }
-                                    }(prototype, editor))
-
-
-                                }
-                            }(editor, prototype, results[i])
+                                }(editor, prototype, results[i])
+                            }
                         }
                     }
                 }
@@ -547,8 +556,11 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
     var saveBtn = propertieRow.appendElement({ "tag": "div", "class": "entities_btn", "style": "display: none;" }).down().appendElement({ "tag": "i", "class": "fa fa-floppy-o" }).down()
     var editBtn = propertieRow.appendElement({ "tag": "div", "class": "entities_btn", "style": "vertical-align: text-top;" }).down().appendElement({ "tag": "i", "class": "fa fa-pencil-square-o" }).down()
 
+    // The propertie name
     var nameDiv = propertieRow.appendElement({ "tag": "div", "style": "display: table-cell" }).down()
     var nameSpan = nameDiv.appendElement({ "tag": "span", "innerHtml": propertieName.replace("M_", "") }).down()
+    var nameEditDiv = nameDiv.appendElement({ "tag": "div", "style": "display: none;" }).down()
+    var typeNameLabel = nameEditDiv.appendElement({ "tag": "div", "id": "type_name_label", "innerHtml": "name" }).down()
     var nameInput = nameDiv.appendElement({ "tag": "input", "style": "display: none", "value": propertieName.replace("M_", "") }).down()
 
     // Now I will append 
@@ -562,10 +574,47 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
         nameInput.element.style.color = "green"
     }
 
+    // The propertie type name.
     var typeNameDiv = propertieRow.appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
     var typeNameSpan = typeNameDiv.appendElement({ "tag": "span", "innerHtml": propertieTypeName }).down()
-    var typeNameInput = typeNameDiv.appendElement({ "tag": "input", "style": "display: none", "value": propertieTypeName }).down()
+    var typeNameEditDiv = typeNameDiv.appendElement({ "tag": "div", "style": "display: none;" }).down()
+    var typeNameLabel = typeNameEditDiv.appendElement({ "tag": "div", "id": "type_name_label", "innerHtml": "type" }).down()
+    var typeNameInput = typeNameEditDiv.appendElement({ "tag": "input", "style": "display: none", "value": propertieTypeName }).down()
+
     var defaultValueDiv = propertieRow.appendElement({ "tag": "div", "id": propertieName + "_" + index, "style": "display: none;" }).down()
+
+    // The identity is id or not
+    var identityEditDiv = propertieRow.appendElement({ "tag": "div", "style": "display: none;text-align: center;" }).down()
+    identityEditDiv.appendElement({ "tag": "div", "innerHtml": "Id" }).down()
+    var indentityInput = identityEditDiv.appendElement({ "tag": "input", "type": "checkbox" }).down()
+
+    if (prototype.Ids.indexOf(propertieName) != -1) {
+        indentityInput.element.checked = true
+    }
+
+    // if the property is use as index.
+    var indexEditDiv = propertieRow.appendElement({ "tag": "div", "style": "display: none;text-align: center;" }).down()
+    indexEditDiv.appendElement({ "tag": "div", "innerHtml": "index" }).down()
+    var indexInput = indexEditDiv.appendElement({ "tag": "input", "type": "checkbox" }).down()
+    if (prototype.Indexs.indexOf(propertieName) != -1) {
+        indexInput.element.checked = true
+    }
+
+    // if the property can be null or not.
+    var nullEditDiv = propertieRow.appendElement({ "tag": "div", "style": "display: none;text-align: center;" }).down()
+    nullEditDiv.appendElement({ "tag": "div", "innerHtml": "null" }).down()
+    var nullInput = nullEditDiv.appendElement({ "tag": "input", "type": "checkbox" }).down()
+
+    if (prototype.FieldsNillable[index] == true) {
+        nullInput.element.checked = true
+    }
+
+    var visibleEditDiv = propertieRow.appendElement({ "tag": "div", "style": "display: none; text-align: center;" }).down()
+    visibleEditDiv.appendElement({ "tag": "div", "innerHtml": "visible" }).down()
+    var visibleInput = visibleEditDiv.appendElement({ "tag": "input", "type": "checkbox" }).down()
+    if (prototype.FieldsVisibility[index] == true) {
+        visibleInput.element.checked = true
+    }
 
     attachAutoComplete(typeNameInput, this.typeNameLst.sort(), false, function (input) {
         return function (value) {
@@ -577,6 +626,55 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
         }
     }(typeNameInput))
 
+    // Append the propertie as identity.
+    indentityInput.element.onclick = function (editor, index, nullInput) {
+        return function () {
+            if (this.checked) {
+                var propertieName = editor.getCurrentEntityPrototype().Fields[index]
+                if (editor.getCurrentEntityPrototype().Ids.indexOf(propertieName) == -1) {
+                    editor.getCurrentEntityPrototype().Ids.push(propertieName)
+                    editor.getCurrentEntityPrototype().FieldsToUpdate.push(editor.getCurrentEntityPrototype().Fields[index])
+                }
+                nullInput.element.checked = false
+            } else {
+                editor.getCurrentEntityPrototype().Ids.splice(index, 1)
+                editor.getCurrentEntityPrototype().FieldsToUpdate.push(editor.getCurrentEntityPrototype().Fields[index])
+            }
+            editor.saveBtn.element.style.display = "table-cell"
+        }
+    }(this, index, nullInput)
+
+    // Append the propertie as indexation value.
+    indexInput.element.onclick = function (editor, index) {
+        return function () {
+            if (this.checked) {
+                var propertieName = editor.getCurrentEntityPrototype().Fields[index]
+                if (editor.getCurrentEntityPrototype().Indexs.indexOf(propertieName) == -1) {
+                    editor.getCurrentEntityPrototype().Indexs.push(propertieName)
+                    editor.getCurrentEntityPrototype().FieldsToUpdate.push(editor.getCurrentEntityPrototype().Fields[index])
+                }
+            } else {
+                editor.getCurrentEntityPrototype().Indexs.splice(index, 1)
+                editor.getCurrentEntityPrototype().FieldsToUpdate.push(editor.getCurrentEntityPrototype().Fields[index])
+            }
+            editor.saveBtn.element.style.display = "table-cell"
+        }
+    }(this, index)
+
+    nullInput.element.onclick = function (editor, index) {
+        return function () {
+            editor.getCurrentEntityPrototype().FieldsNillable[index] = this.checked
+            editor.saveBtn.element.style.display = "table-cell"
+        }
+    }(this, index)
+
+    visibleInput.element.onclick = function (editor, index) {
+        return function () {
+            editor.getCurrentEntityPrototype().FieldsVisibility[index] = this.checked
+            editor.saveBtn.element.style.display = "table-cell"
+        }
+    }(this, index)
+
     // Edit attributes.
     var deleteBtn = propertieRow.appendElement({ "tag": "div", "class": "entities_btn" }).down().appendElement({ "tag": "i", "class": "fa fa-trash-o" }).down()
 
@@ -585,17 +683,29 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
         deleteBtn.element.style.display = "none"
     } else {
         // Edit button action...
-        editBtn.element.onclick = function (nameDiv, typeNameDiv, nameInput, typeNameInput, typeNameSpan, nameSpan, defaultValueDiv) {
+        editBtn.element.onclick = function (nameEditDiv, typeNameEditDiv, identityEditDiv, indexEditDiv, nullEditDiv, visibleEditDiv, nameInput, typeNameInput, typeNameSpan, nameSpan, defaultValueDiv) {
             return function () {
                 if (nameInput.element.style.display == "none") {
+                    nullEditDiv.element.style.display = "table-cell"
+                    visibleEditDiv.element.style.display = "table-cell"
+                    indexEditDiv.element.style.display = "table-cell"
+                    identityEditDiv.element.style.display = "table-cell"
+                    nameEditDiv.element.style.display = "inline"
                     nameInput.element.style.display = "inline"
+                    typeNameEditDiv.element.style.display = "inline"
                     typeNameInput.element.style.display = "inline"
                     nameSpan.element.style.display = "none"
                     typeNameSpan.element.style.display = "none"
                     defaultValueDiv.element.style.display = "table-cell"
                     this.style.color = "green"
                 } else {
+                    nullEditDiv.element.style.display = "none"
+                    visibleEditDiv.element.style.display = "none"
+                    indexEditDiv.element.style.display = "none"
+                    identityEditDiv.element.style.display = "none"
+                    nameEditDiv.element.style.display = "none"
                     nameInput.element.style.display = "none"
+                    typeNameEditDiv.element.style.display = "none"
                     typeNameInput.element.style.display = "none"
                     nameSpan.element.style.display = "inline"
                     typeNameSpan.element.style.display = "inline"
@@ -607,7 +717,7 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
                     this.style.color = ""
                 }
             }
-        }(nameDiv, typeNameDiv, nameInput, typeNameInput, typeNameSpan, nameSpan, defaultValueDiv)
+        }(nameEditDiv, typeNameEditDiv, identityEditDiv, indexEditDiv, nullEditDiv, visibleEditDiv, nameInput, typeNameInput, typeNameSpan, nameSpan, defaultValueDiv)
 
         // delete propertie button.
         deleteBtn.element.onclick = function (panel, propertieRow, propertieName, index) {
@@ -710,7 +820,7 @@ EntityPrototypeEditor.prototype.saveprototype = function () {
             },
             function () {
 
-            }, { "panel": this})
+            }, { "panel": this })
     }
 }
 
@@ -720,6 +830,11 @@ EntityPrototypeEditor.prototype.saveprototype = function () {
 EntityPrototypeEditor.prototype.setDefaultValueEditor = function (defaultValueDiv, prototype, index, level, defaultValue) {
     if (prototype == undefined) {
         return // nothing to do in that case.
+    }
+
+    // Set the title at level 0 only.
+    if (level == 0) {
+        defaultValueDiv.appendElement({ "tag": "div", "innerHtml": "default value" })
     }
 
     // Cleanup the default value div at first to be sure nothing was present.

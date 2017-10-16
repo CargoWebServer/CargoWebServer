@@ -84,3 +84,14 @@
 .field_visibility.visible{
     color:  #428bca;
 }
+
+.popup_div{
+    position: absolute; 
+    background-color: white;
+	-webkit-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
+	-moz-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
+	box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
+	border: 1px solid darkgrey;
+    color: #657383;
+    padding: 5px;
+}

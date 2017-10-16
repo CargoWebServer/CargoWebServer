@@ -74,7 +74,7 @@ function main() {
     //entitiesDump("CargoEntities.Action")
 
     //testSayHello("Dave")
-    //entityDump( "CARGO_ENTITIES", "CargoEntities.Entities")
+    entityDump( "CARGO_ENTITIES", "CargoEntities.User")
     //entitiesDump("XPDMXML.ProcessStructureType")
     // entitiesDump("CatalogSchema.CatalogType")
 

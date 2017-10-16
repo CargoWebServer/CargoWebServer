@@ -122,6 +122,7 @@ EntityPrototype.prototype.getTitles = function () {
             titles.push(this[field])
         }
     }
+    
     // The indexs
     for (var i = 1; i < this.Indexs.length; i++) {
         var fieldIndex = this.getFieldIndex(this.Indexs[i])

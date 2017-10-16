@@ -82,5 +82,102 @@ var RpcData = function(values){
 	executeJsFunction(functionSrc, functionParams, progressCallback, successCallback, errorCallback, caller, this.conn.id)
  }
 
+/**
+ * Run a visual basic script with a given name on the server side.
+ */
+Server.prototype.executeVbSrcript = function (scriptName, args, successCallback, errorCallback, caller) {
+    var params = new Array();
+    params.push(createRpcData(scriptName, "STRING", "scriptName"))
+    params.push(createRpcData(args, "JSON_STR", "args"))
 
+    // Register this listener to the server.
+    var rqst = new Request(randomUUID(), this.conn, "ExecuteVbScript", params,
+        // Progress callback
+        function () { },
+        // Success callback
+        function (id, results, caller) {
+            // Keep the session id...
+            caller.successCallback(results, caller.caller)
+        },
+        // Error callback...
+        function (errorMsg, caller) {
+            caller.errorCallback(errorMsg, caller.caller)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
+    rqst.send();
+}
 
+/**
+ * Run and executable command on the server and get the results.
+ */
+Server.prototype.runCmd = function (name, args, successCallback, errorCallback, caller) {
+    var params = new Array();
+    params.push(createRpcData(name, "STRING", "name"))
+    params.push(createRpcData(args, "JSON_STR", "args"))
+
+    // Register this listener to the server.
+    var rqst = new Request(randomUUID(), this.conn, "RunCmd", params,
+        // Progress callback
+        function () { },
+        // Success callback
+        function (id, results, caller) {
+            // Keep the session id...
+            caller.successCallback(results, caller.caller)
+        },
+        // Error callback...
+        function (errorMsg, caller) {
+            caller.errorCallback(errorMsg, caller.caller)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
+    rqst.send();
+}
+
+/**
+ * Get the list of services and their respective source code. The code
+ * permit to get access to service remote actions.
+ * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+ * @param {function} errorCallback In case of error.
+ * @param {object} caller A place to store object from the request context and get it back from the response context.
+ */
+Server.prototype.getServicesClientCode = function (successCallback, errorCallback, caller) {
+    // server is the client side singleton.
+    var params = new Array();
+
+    // Register this listener to the server.
+    var rqst = new Request(randomUUID(), this.conn, "GetServicesClientCode", params,
+        // Progress callback
+        function () { },
+        // Success callback
+        function (id, results, caller) {
+            // Keep the session id...
+            caller.successCallback(results["result"], caller.caller)
+        },
+        // Error callback...
+        function (errorMsg, caller) {
+            caller.errorCallback(errorMsg, caller.caller)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
+    rqst.send();
+}
+
+/**
+ * Close the server.
+ */
+Server.prototype.stop = function (successCallback, errorCallback, caller) {
+    // server is the client side singleton...
+    var params = []
+    // Call it on the server.
+    server.executeJsFunction(
+        "Stop", // The function to execute remotely on server
+        params, // The parameters to pass to that function
+        function (index, total, caller) { // The progress callback
+            // Nothing special to do here.
+        },
+        function (result, caller) {
+            //console.log(result)
+            caller.successCallback(result[0], caller.caller)
+        },
+        function (errMsg, caller) {
+            caller.server.errorManager.onError(errMsg)
+            caller.errorCallback(errMsg, caller.caller)
+        }, // Error callback
+        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "server": this } // The caller
+    )
+}

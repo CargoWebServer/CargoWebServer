@@ -7788,7 +7788,18 @@ func CargoEntitiesAccountExists(val string) string {
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(CargoEntitiesDB, string(queryStr), fieldsType, params)
 	if err != nil || len(results) == 0 {
-		return ""
+		var query EntityQuery
+		query.TypeName = "CargoEntities.Account"
+		query.Indexs = append(query.Indexs, "M_name="+val)
+		query.Fields = append(query.Fields, "UUID")
+		var fieldsType []interface{} // not use...
+		var params []interface{}
+		queryStr, _ := json.Marshal(query)
+		results, err := GetServer().GetDataManager().readData(CargoEntitiesDB, string(queryStr), fieldsType, params)
+		if err != nil || len(results) == 0 {
+			return ""
+		}
+		return results[0][0].(string)
 	}
 	return results[0][0].(string)
 }
@@ -10357,11 +10368,13 @@ func (this *EntityManager) create_CargoEntities_UserEntityPrototype() {
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 4)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
 	userEntityProto.Fields = append(userEntityProto.Fields, "M_firstName")
+	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_firstName")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 5)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
 	userEntityProto.Fields = append(userEntityProto.Fields, "M_lastName")
+	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_lastName")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 6)
@@ -10377,6 +10390,7 @@ func (this *EntityManager) create_CargoEntities_UserEntityPrototype() {
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 8)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
 	userEntityProto.Fields = append(userEntityProto.Fields, "M_email")
+	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_email")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 9)

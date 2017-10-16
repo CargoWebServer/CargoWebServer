@@ -20,6 +20,26 @@ var DataExplorer = function (parent) {
     this.shemasView = {}
     this.prototypesView = {}
     this.configs = {}
+    this.newPrototypeBtn = null
+    this.storeId = ""
+
+    // I will connect the view to the events.
+    // New prototype event
+    server.prototypeManager.attach(this, NewPrototypeEvent, function (evt, dataExplorer) {
+       // generatePrototypesView = function (storeId, prototypes)
+        if (evt.dataMap.prototype.TypeName.startsWith(dataExplorer.storeId)) {
+            dataExplorer.prototypesView[evt.dataMap.prototype.TypeName] = new PrototypeTreeView(dataExplorer.shemasView[dataExplorer.storeId], evt.dataMap.prototype)
+        }
+    })
+
+    // Delete prototype event.
+    server.prototypeManager.attach(this, DeletePrototypeEvent, function (evt, dataExplorer) {
+        if (evt.dataMap.prototype.TypeName.startsWith(dataExplorer.storeId)) {
+            var treeView = dataExplorer.prototypesView[evt.dataMap.prototype.TypeName]
+            treeView.panel.element.parentNode.removeChild(treeView.panel.element)
+            delete dataExplorer.prototypesView[evt.dataMap.prototype.TypeName]
+        }
+    })
 
     return this
 }
@@ -38,6 +58,7 @@ DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
         return
     }
 
+    this.storeId = storeConfig.M_id
     this.configs[storeConfig.M_id] = storeConfig
     this.shemasView[storeConfig.M_id] = new Element(this.panel, { "tag": "div", "class": "shemas_view" })
 
@@ -88,6 +109,77 @@ DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
  * Generate the prototypes view.
  */
 DataExplorer.prototype.generatePrototypesView = function (storeId, prototypes) {
+    // I will append the append prototype...
+    this.newPrototypeBtn = this.shemasView[storeId].appendElement({ "tag": "div", "class": "", "style": "display:block; color: #657383; position: absolute; top:0px;  top: 5px; right: 10px;" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
+
+    // Mouse enter and leave actions...
+    this.newPrototypeBtn.element.onmouseenter = function () {
+        this.style.color = "#428bca";
+        this.style.cursor = "pointer"
+    }
+
+    this.newPrototypeBtn.element.onmouseout = function () {
+        this.style.color = "#657383";
+        this.style.cursor = "default"
+    }
+
+    // Now the onclick event.
+    this.newPrototypeBtn.element.onclick = function (storeId) {
+        return function () {
+            // Here I will create the entity prototy editor
+            // Here I will create a dialog to enter the new prototype name.
+            if (document.getElementById("new_prototype_popup") != null) {
+                document.getElementById("new_prototype_popup_input").focus()
+                return
+            }
+
+            var coord = getCoords(this)
+            var dialog = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "popup_div", "id": "new_prototype_popup", "style": "top:" + (coord.top + 15) + "px; left:" + (coord.left + 15) + "px;" })
+            var input = dialog.appendElement({ "tag": "div", "style": "display: table; border-spacing:2px 2px;" }).down()
+                .appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+                .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": "Enter the new protype name" }).up()
+                .appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+                .appendElement({ "tag": "input", "id": "new_prototype_popup_input", "style": "display: table-cell;" }).down()
+
+            input.element.focus()
+            input.element.onkeyup = function (dialog, storeId) {
+                return function (evt) {
+                    if (evt.keyCode == 13) {
+                        // enter key...
+                        var prototype = new EntityPrototype()
+                        prototype.init({
+                            "TypeName": storeId + "." + this.value,
+                            "Fields": [],
+                            "FieldsType": [],
+                            "FieldsVisibility": [],
+                            "FieldsOrder": [],
+                            "Ids": [],
+                            "Index": [],
+                            "SuperTypeNames": [],
+                            "Restrictions": [],
+                            "IsAbstract": false,
+                            "SubstitutionGroup": [],
+                            "FieldsNillable": [],
+                            "FieldsDocumentation": [],
+                            "FieldsDefaultValue": [],
+                            "ListOf": ""
+                        })
+                        prototype.notExist = true
+                        setEntityPrototype(prototype)
+
+                        evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "prototypeInfo": prototype } }
+                        server.eventHandler.broadcastLocalEvent(evt)
+                        dialog.element.parentNode.removeChild(dialog.element)
+                    } else if (evt.keyCode == 27) {
+                        dialog.element.parentNode.removeChild(dialog.element)
+                    }
+                }
+            }(dialog, storeId)
+
+        }
+    }(storeId)
+
     this.panel.element.style.borderTop = "1px solid grey"
     // Here I will create the prototype views...
     for (var i = 0; i < prototypes.length; i++) {
@@ -172,9 +264,10 @@ var PrototypeTreeView = function (parent, prototype) {
     this.parent = parent
     this.panel = new Element(parent, { "tag": "div", "class": "data_prototype_tree_view" })
     this.fieldsView = {}
+    this.prototype = prototype // Keep the prototype reference here.
 
     // The type name without the imports name.
-    var typeName = prototype.TypeName.substring(prototype.TypeName.indexOf(".") + 1) //.split(".")[1]
+    var typeName = prototype.TypeName.substring(prototype.TypeName.indexOf(".") + 1)
 
     // Display the type name and the expand shrink button.
     var header = this.panel.appendElement({ "tag": "div", "class": "data_prototype_tree_view" }).down().appendElement({ "tag": "div", "class": "data_prototype_tree_view_header" }).down()
@@ -230,6 +323,21 @@ var PrototypeTreeView = function (parent, prototype) {
             this.fieldsView[prototype.Fields[i]] = new PrototypeTreeViewField(this.fieldsPanel, prototype, prototype.Fields[i], prototype.FieldsType[i], prototype.FieldsVisibility[i], prototype.FieldsNillable[i])
         }
     }
+
+    // Update prototype event
+    server.prototypeManager.attach(this, UpdatePrototypeEvent, function (evt, prototypeTreeView) {
+        // if the current item is the one with change I will reset it content.
+        if (evt.dataMap.prototype.TypeName == prototypeTreeView.prototype.TypeName) {
+            prototypeTreeView.fieldsView = {}
+            prototypeTreeView.fieldsPanel.removeAllChilds()
+            prototypeTreeView.prototype = evt.dataMap.prototype // Set the updated prototype version.
+            for (var i = 0; i < prototypeTreeView.prototype.Fields.length; i++) {
+                if (prototypeTreeView.prototype.Fields[i].startsWith("M_")) {
+                    prototypeTreeView.fieldsView[prototypeTreeView.prototype.Fields[i]] = new PrototypeTreeViewField(prototypeTreeView.fieldsPanel, prototypeTreeView.prototype, prototypeTreeView.prototype.Fields[i], prototypeTreeView.prototype.FieldsType[i], prototypeTreeView.prototype.FieldsVisibility[i], prototypeTreeView.prototype.FieldsNillable[i])
+                }
+            }
+        }
+    })
 
     return this
 }

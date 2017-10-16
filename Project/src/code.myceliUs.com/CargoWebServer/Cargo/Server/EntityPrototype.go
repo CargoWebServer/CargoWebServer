@@ -7,6 +7,7 @@ import "code.myceliUs.com/Utility"
 import "code.myceliUs.com/CargoWebServer/Cargo/JS"
 import "code.myceliUs.com/XML_Schemas"
 import "strconv"
+import "reflect"
 
 /**
  * Restrictions for Datatypes
@@ -289,12 +290,16 @@ func (this *EntityPrototype) Save(storeId string) error {
 
 			// Remove the fields
 			for i := 0; i < len(entities); i++ {
-				entity := entities[i].(*DynamicEntity) // Must be a dynamic entity.
+				entity := entities[i] // Must be a dynamic entity.
 
 				// remove it...
 				for j := 0; j < len(this.FieldsToDelete); j++ {
 					field := prototype.Fields[this.FieldsToDelete[j]]
-					entity.deleteValue(field)
+					if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+						// Dynamic entity.
+						entity.(*DynamicEntity).deleteValue(field)
+					}
+
 					entity.SetNeedSave(true)
 					entity.SaveEntity() // Must be save before doing something else.
 				}
@@ -306,10 +311,13 @@ func (this *EntityPrototype) Save(storeId string) error {
 						indexTo := this.getFieldIndex(values[1])
 						if indexFrom > -1 && indexTo > -1 {
 							if values[0] != values[1] {
-								// Set the new value with the old one
-								entity.setValue(values[1], entity.getValue(values[0]))
-								// Delete the old one.
-								entity.deleteValue(values[0])
+								if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+									// Set the new value with the old one
+									entity.(*DynamicEntity).setValue(values[1], entity.(*DynamicEntity).getValue(values[0]))
+									// Delete the old one.
+									entity.(*DynamicEntity).deleteValue(values[0])
+								}
+
 								entity.SetNeedSave(true)
 								prototype.Fields[indexFrom] = values[1]
 							}
@@ -324,8 +332,9 @@ func (this *EntityPrototype) Save(storeId string) error {
 				}
 
 				// Set the new entity prototype
-				entity.prototype = this
-
+				if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+					entity.(*DynamicEntity).prototype = this
+				}
 				// Now set new fields value inside existing entities with their default
 				// value.
 				for j := 0; j < len(this.Fields); j++ {
@@ -355,7 +364,9 @@ func (this *EntityPrototype) Save(storeId string) error {
 							}
 						}
 						entity.SetNeedSave(true)
-						entity.setValue(this.Fields[j], value)
+						if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+							entity.(*DynamicEntity).setValue(this.Fields[j], value)
+						}
 					}
 				}
 

@@ -652,20 +652,28 @@ func (this *Server) Start() {
 			return conn
 
 		})
+
 	// Javacript initialisation here.
 	JS.GetJsRuntimeManager().OpendSession("") // Set the anonymous session.
+
+	// Append services scripts.
 	for _, src := range GetServer().GetServiceManager().m_serviceClientSrc {
 		JS.GetJsRuntimeManager().AppendScript(src)
 	}
 
+	//
 	JS.GetJsRuntimeManager().InitScripts("") // Run the script for the default session.
 
 	// Initialyse the server object here.
 	JS.GetJsRuntimeManager().RunScript("", `var entityPrototypes = {};`)
 	JS.GetJsRuntimeManager().RunScript("", `var entities = {};`)
+
 	JS.GetJsRuntimeManager().RunScript("", `var server = new Server("localhost", "127.0.0.1", 9393);`)
+	// Create an empty connection (loopback)
 	JS.GetJsRuntimeManager().RunScript("", `server.conn = new Connection()`)
 	JS.GetJsRuntimeManager().RunScript("", `server.conn.id = "127.0.0.1"`)
+
+	// Set service in the server object.
 	for serviceName, _ := range GetServer().GetServiceManager().m_serviceClientSrc {
 		JS.GetJsRuntimeManager().RunScript("", "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();")
 	}
