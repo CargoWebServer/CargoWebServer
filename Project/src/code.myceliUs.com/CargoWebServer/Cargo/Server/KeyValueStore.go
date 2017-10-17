@@ -348,25 +348,6 @@ func (this *KeyValueDataStore) DeleteEntityPrototypes() error {
 }
 
 /**
- * This function is use to retreive an existing entity prototype...
- */
-func (this *KeyValueDataStore) GetEntityPrototype(id string) (*EntityPrototype, error) {
-	prototype := new(EntityPrototype)
-	id = "prototype:" + id
-
-	// Retreive the data from level db...
-	data, err := this.getValue(id)
-	if err != nil {
-		return nil, err
-	} else {
-		dec := gob.NewDecoder(bytes.NewReader(data))
-		dec.Decode(prototype)
-	}
-
-	return prototype, nil
-}
-
-/**
  * In case of multiple id value i will generate a unique key to be
  * use in the key value store. So The key can be regenerated as needed
  */
@@ -1038,6 +1019,99 @@ func (this *KeyValueDataStore) executeSearchQuery(query string, fields []string)
 ////////////////////////////////////////////////////////////////////////////////
 //                              DataStore function
 ////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This function is use to retreive an existing entity prototype...
+ */
+func (this *KeyValueDataStore) GetEntityPrototype(id string) (*EntityPrototype, error) {
+
+	// Here the store is not a local, so I will use a remote call to get the
+	// list of it entity prototypes.
+	if this.m_ipv4 != "127.0.0.1" {
+		// I will use execute JS function to get the list of entity prototypes.
+		id := Utility.RandomUUID()
+		method := "ExecuteJsFunction"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = this.m_conn
+
+		param0 := new(MessageData)
+		param0.Name = "functionSrc"
+		param0.Value = `function GetEntityPrototype(typeName, storeId){ return GetServer().GetEntityManager().GetEntityPrototype(typeName, storeId, sessionId, messageId) }`
+
+		param1 := new(MessageData)
+		param1.Name = "typeName"
+		param1.Value = id
+
+		param2 := new(MessageData)
+		param2.Name = "storeId"
+		param2.Value = this.m_id
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+		params = append(params, param2)
+
+		// The channel will be use to wait for results.
+		resultsChan := make(chan interface{})
+
+		// The success callback.
+		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+				// So here I will marchal the values from a json string and
+				// initialyse the entity values from the values the contain.
+				var results []map[string]interface{}
+				json.Unmarshal(rspMsg.msg.Rsp.Results[0].DataBytes, &results)
+
+				// Set the TYPENAME property here.
+				results[0]["TYPENAME"] = "Server.EntityPrototype"
+				value, err := Utility.InitializeStructure(results[0])
+				if err != nil {
+					resultsChan <- err
+				} else {
+					resultsChan <- value.Interface().(*EntityPrototype)
+				}
+			}
+		}(resultsChan)
+
+		// The error callback.
+		errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				resultsChan <- errMsg.msg.Err.Message
+			}
+		}(resultsChan)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+		// wait for result here.
+		results := <-resultsChan
+		if reflect.TypeOf(results).String() == "*Server.EntityPrototype" {
+			return results.(*EntityPrototype), nil
+		}
+
+		return nil, results.(error) // return an error message instead.
+	}
+
+	// Local store stuff...
+	prototype := new(EntityPrototype)
+
+	id = "prototype:" + id
+	// Retreive the data from level db...
+	data, err := this.getValue(id)
+	if err != nil {
+		return nil, err
+	} else {
+		dec := gob.NewDecoder(bytes.NewReader(data))
+		dec.Decode(prototype)
+	}
+
+	return prototype, nil
+}
 
 /**
  * Retreive the list of all entity prototype in a given store.
