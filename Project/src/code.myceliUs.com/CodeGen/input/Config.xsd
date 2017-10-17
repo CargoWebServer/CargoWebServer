@@ -194,6 +194,7 @@
 	<xsd:complexType name="tDataStoreConfiguration" abstract="false">
 		<xsd:complexContent> 
 			<xsd:extension base="tConfiguration"> 
+				<xsd:attribute name="storeName" type="xsd:string" />
 				<xsd:attribute name="hostName" type="xsd:string" />
 				<xsd:attribute name="ipv4" type="xsd:string" />
 				<xsd:attribute name="port" type="xsd:integer" />

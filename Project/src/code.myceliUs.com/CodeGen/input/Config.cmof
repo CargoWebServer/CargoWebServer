@@ -78,7 +78,9 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="DataStoreConfiguration-DataStoreType" name="dataStoreType" _type="DataStoreType"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="DataStoreConfiguration-DataStoreVendor" name="dataStoreVendor" _type="DataStoreVendor"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="DataStoreConfiguration-Encoding" name="textEncoding" _type="Encoding"/>
-
+	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hostName" name="storeName">
+        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
+      </ownedAttribute>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="hostName" name="hostName">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>

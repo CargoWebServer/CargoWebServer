@@ -2,7 +2,7 @@
 package Server
 
 import (
-	//	"log"
+	//"log"
 	"os/exec"
 	"reflect"
 	"strconv"
@@ -222,6 +222,16 @@ func (self *Action) ExecuteJsFunction(funtionStr string, funtionParams ...interf
 	return
 }
 
-func (server *Action) RunCmd(name string, args []string) (result string, err error) {
+/**
+ * Return the pong message to keep connection alive.
+ */
+func (self *Action) Ping() (string, error) {
+	return "pong", nil
+}
+
+/**
+ * Simply call RunCmd on the server.
+ */
+func (self *Action) RunCmd(name string, args []string) (result string, err error) {
 	return GetServer().RunCmd(name, args)
 }

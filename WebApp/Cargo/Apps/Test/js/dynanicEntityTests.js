@@ -5,7 +5,7 @@
 function testDynamicEntity() {
     
     // Create the dataStore...
-    server.dataManager.createDataStore("Test", 2, 1,
+    server.dataManager.createDataStore("Test","Test", "localhost", "127.0.0.1", 9393, 2, 1,
         function (result, caller) {
             // The prototype define a JSON object schema that hold 
             // information on the server side.

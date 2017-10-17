@@ -137,7 +137,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     return function (entity) {
                         // So here I will create the new dataStore.
                         if (entity.TYPENAME == "Config.DataStoreConfiguration") {
-                            server.dataManager.createDataStore(entity.M_id, entity.M_dataStoreType, entity.M_dataStoreVendor,
+                            server.dataManager.createDataStore(entity.M_id, entity.M_storeName, entity.M_hostName, entity.M_ipv4, entity.M_port, entity.M_dataStoreType, entity.M_dataStoreVendor,
                                 // Success callback
                                 function (success, caller) {
                                     // Init the schema informations.

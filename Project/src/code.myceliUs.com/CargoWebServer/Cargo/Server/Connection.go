@@ -244,8 +244,8 @@ func (c *webSocketConnection) GetUuid() string {
 func (c *webSocketConnection) Open(host string, port int) (err error) {
 
 	// Open the socket...
-	url := "http://" + host + ":" + strconv.Itoa(port)
-	origin := "ws://" + host + ":" + strconv.Itoa(port)
+	url := "http://" + host + ":" + strconv.Itoa(port) + "/ws"
+	origin := "ws://" + host + ":" + strconv.Itoa(port) + "/ws"
 
 	c.m_socket, err = websocket.Dial(origin, "", url)
 

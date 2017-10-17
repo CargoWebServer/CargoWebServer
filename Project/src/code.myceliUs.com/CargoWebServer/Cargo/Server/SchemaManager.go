@@ -139,7 +139,11 @@ func (this *SchemaManager) initialize() {
 		if store == nil {
 			// I will create the new store here...
 			var errObj *CargoEntities.Error
-			store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
+			serverConfig := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetServerConfig()
+			hostName := serverConfig.GetHostName()
+			ipv4 := serverConfig.GetIpv4()
+			port := serverConfig.GetServerPort()
+			store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
 			if errObj != nil {
 				log.Println(errObj.GetBody())
 			}
@@ -258,7 +262,11 @@ func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Er
 	if store == nil {
 		// I will create the new store here...
 		var errObj *CargoEntities.Error
-		store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
+		serverConfig := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetServerConfig()
+		hostName := serverConfig.GetHostName()
+		ipv4 := serverConfig.GetIpv4()
+		port := serverConfig.GetServerPort()
+		store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
 		if errObj != nil {
 			return errObj
 		}

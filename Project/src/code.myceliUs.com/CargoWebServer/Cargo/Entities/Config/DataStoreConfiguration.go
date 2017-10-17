@@ -29,6 +29,7 @@ type DataStoreConfiguration struct{
 	M_dataStoreType DataStoreType
 	M_dataStoreVendor DataStoreVendor
 	M_textEncoding Encoding
+	M_storeName string
 	M_hostName string
 	M_ipv4 string
 	M_user string
@@ -49,6 +50,7 @@ type XsdDataStoreConfiguration struct {
 	M_id	string	`xml:"id,attr"`
 
 
+	M_storeName	string	`xml:"storeName,attr"`
 	M_hostName	string	`xml:"hostName,attr"`
 	M_ipv4	string	`xml:"ipv4,attr"`
 	M_port	int	`xml:"port,attr"`
@@ -127,6 +129,22 @@ func (this *DataStoreConfiguration) SetTextEncoding(ref interface{}){
 }
 
 /** Remove reference TextEncoding **/
+
+/** StoreName **/
+func (this *DataStoreConfiguration) GetStoreName() string{
+	return this.M_storeName
+}
+
+/** Init reference StoreName **/
+func (this *DataStoreConfiguration) SetStoreName(ref interface{}){
+	if this.M_storeName != ref.(string) {
+		this.M_storeName = ref.(string)
+		if this.IsInit == true {			this.NeedSave = true
+		}
+	}
+}
+
+/** Remove reference StoreName **/
 
 /** HostName **/
 func (this *DataStoreConfiguration) GetHostName() string{

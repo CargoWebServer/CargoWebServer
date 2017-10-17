@@ -88,11 +88,7 @@ func (this *DataManager) initialize() {
 			this.m_dataStores[store.GetId()] = store
 
 			// Call get entity prototype once to initialyse entity prototypes.
-			store.GetEntityPrototypes()
-
-			// Open connection.
-			store.Connect()
-
+			//store.GetEntityPrototypes()
 		}
 	}
 }
@@ -114,6 +110,12 @@ func (this *DataManager) stop() {
 // private function
 ////////////////////////////////////////////////////////////////////////////////
 
+func (this *DataManager) openConnections() {
+	for _, store := range this.m_dataStores {
+		store.Connect()
+	}
+}
+
 func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfiguration) {
 	store, err := NewDataStore(config)
 	if err != nil {
@@ -126,39 +128,39 @@ func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfigur
 /**
  * Access a store with here given name...
  */
-func (this *DataManager) getDataStore(name string) DataStore {
+func (this *DataManager) getDataStore(id string) DataStore {
 	this.Lock()
 	defer this.Unlock()
-	store := this.m_dataStores[name]
+	store := this.m_dataStores[id]
 	return store
 }
 
 /**
  * Remove a dataStore from the map
  */
-func (this *DataManager) removeDataStore(name string) {
+func (this *DataManager) removeDataStore(id string) {
 	this.Lock()
 	defer this.Unlock()
 
 	// Close the connection.
-	this.m_dataStores[name].Close()
+	this.m_dataStores[id].Close()
 
 	// Remove data. Deadlock error.
 	// this.m_dataStores[name].DeleteEntityPrototypes()
 
 	// Delete the reference from the map.
-	delete(this.m_dataStores, name)
+	delete(this.m_dataStores, id)
 }
 
 /**
  * Execute a query that read information from the store and
  * return the result and an array of interface...
  */
-func (this *DataManager) readData(storeName string, query string, fieldsType []interface{}, params []interface{}) ([][]interface{}, error) {
+func (this *DataManager) readData(storeId string, query string, fieldsType []interface{}, params []interface{}) ([][]interface{}, error) {
 
-	store := this.getDataStore(storeName)
+	store := this.getDataStore(storeId)
 	if store == nil {
-		return nil, errors.New("The datastore '" + storeName + "' does not exist.")
+		return nil, errors.New("The datastore '" + storeId + "' does not exist.")
 	}
 
 	data, err := store.Read(query, fieldsType, params)
@@ -170,7 +172,7 @@ func (this *DataManager) readData(storeName string, query string, fieldsType []i
 
 	// In case of SQL data, the data we found will be use to get
 	// sql data in a second pass.
-	if storeName == "sql_info" && err == nil {
+	if storeId == "sql_info" && err == nil {
 		if len(data) > 0 {
 			if len(data[0]) > 0 {
 				dataIndex := make([]int, 0)
@@ -922,7 +924,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 	return
 }
 
-func (this *DataManager) createDataStore(storeId string, storeType Config.DataStoreType, storeVendor Config.DataStoreVendor) (DataStore, *CargoEntities.Error) {
+func (this *DataManager) createDataStore(storeId string, storeName string, hostName string, ipv4 string, port int, storeType Config.DataStoreType, storeVendor Config.DataStoreVendor) (DataStore, *CargoEntities.Error) {
 
 	if !Utility.IsValidVariableName(storeId) {
 		cargoError := NewError(Utility.FileLine(), INVALID_VARIABLE_NAME_ERROR, SERVER_ERROR_CODE, errors.New("The storeId '"+storeId+"' is not valid."))
@@ -942,8 +944,13 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 	if err_ != nil {
 		storeConfig = new(Config.DataStoreConfiguration)
 		storeConfig.M_id = storeId
+		storeConfig.M_storeName = storeName
 		storeConfig.M_dataStoreVendor = storeVendor
 		storeConfig.M_dataStoreType = storeType
+		storeConfig.M_ipv4 = ipv4
+		storeConfig.M_hostName = hostName
+		storeConfig.M_port = port
+
 		configEntity := GetServer().GetConfigurationManager().m_activeConfigurationsEntity
 		storeConfigEntity, err_ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_dataStoreConfigs", "Config.DataStoreConfiguration", storeId, storeConfig)
 		if err_ != nil {
@@ -962,6 +969,7 @@ func (this *DataManager) createDataStore(storeId string, storeType Config.DataSt
 		this.Lock()
 		this.m_dataStores[storeId] = store
 		this.Unlock()
+
 		// Create entity prototypes.
 		store.GetEntityPrototypes()
 	} else {
@@ -1253,7 +1261,11 @@ func (this *DataManager) HasDataStore(storeName string, messageId string, sessio
 
 // @api 1.0
 // Create a dataStore
-// @param {string} storeId The id of the dataStore to create
+// @param {string} storeId The id of the datastore to create (can also be see as connection id)
+// @param {string} storeName The name of the dataStore to create
+// @param {string} hostName The name host where the store is
+// @param {string} ipv4 The ip address of the host where the store is.
+// @param {int} port The port where the server listen at.
 // @param {int} storeType The type of the store to create. SQL: 1; KEY_VALUE: 3
 // @param {int} storeVendor The store vendor. DataStoreVendor_MYCELIUS: 1; 	DataStoreVendor_MYSQL: 2; DataStoreVendor_MSSQL:3; DataStoreVendor_ODBC
 // @param {string} messageId The request id that need to access this method.
@@ -1261,7 +1273,7 @@ func (this *DataManager) HasDataStore(storeName string, messageId string, sessio
 // @scope {restricted}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *DataManager) CreateDataStore(storeId string, storeType int64, storeVendor int64, messageId string, sessionId string) {
+func (this *DataManager) CreateDataStore(storeId string, storeName string, hostName string, ipv4 string, port int64, storeType int64, storeVendor int64, messageId string, sessionId string) {
 	if storeType == 0 {
 		storeType = 1
 	}
@@ -1277,7 +1289,7 @@ func (this *DataManager) CreateDataStore(storeId string, storeType int64, storeV
 		return
 	}
 	var store DataStore
-	store, errObj = this.createDataStore(storeId, Config.DataStoreType(storeType), Config.DataStoreVendor(storeVendor))
+	store, errObj = this.createDataStore(storeId, storeName, hostName, ipv4, int(port), Config.DataStoreType(storeType), Config.DataStoreVendor(storeVendor))
 
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)

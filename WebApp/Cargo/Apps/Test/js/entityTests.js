@@ -686,6 +686,10 @@ function createEntityPrototype_Test() {
 function createEntityPrototype_Test_Part_2() {
     server.dataManager.createDataStore(
         "createEntityPrototype_Test",
+        "createEntityPrototype_Test",
+        "localhost",
+        "127.0.0.1",
+        9393,
         3,
         1,
         function () {
@@ -698,6 +702,7 @@ function createEntityPrototype_Test_Part_2() {
                     "Indexs": ["M_name"], // put here field that you want to use as search key...
                     "Fields": ["M_id", "M_name", "M_description", "M_equivalent", "M_subitem"],
                     "FieldsType": ["xs.string", "xs.string", "xs.string", "[]createEntityPrototype_Test.Item:Ref", "[]createEntityPrototype_Test.Item"], // A reference to another item here..
+                    "FieldsDefaultValue": ["", "", "", "", "[]", "[]"],
                     "FieldsVisibility": [true, true, true, true, true],
                     "FieldsOrder": [0, 1, 2, 3, 4]
                 }
@@ -732,6 +737,10 @@ function createEntityPrototype_Test_Part_2() {
 function createEntityPrototype_storeIdError_Test() {
     server.dataManager.createDataStore(
         "createEntityPrototype_storeIdError_Test",
+        "createEntityPrototype_storeIdError_Test",
+        "localhost",
+        "127.0.0.1",
+        9393,
         3,
         1,
         function () {
@@ -744,6 +753,7 @@ function createEntityPrototype_storeIdError_Test() {
                     "Indexs": ["M_name"], // put here field that you want to use as search key...
                     "Fields": ["M_id", "M_name", "M_description", "M_equivalent", "M_subitem"],
                     "FieldsType": ["xs.string", "xs.string", "xs.string", "[]createEntityPrototype_storeIdError_Test.Item:Ref", "[]createEntityPrototype_storeIdError_Test.Item"], // A reference to another item here..
+                    "FieldsDefaultValue": ["", "", "", "[]", "[]"],
                     "FieldsVisibility": [true, true, true, true, true],
                     "FieldsOrder": [0, 1, 2, 3, 4]
                 }

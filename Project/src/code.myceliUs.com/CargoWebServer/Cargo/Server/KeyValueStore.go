@@ -75,6 +75,18 @@ type KeyValueDataStore struct {
 	/** The store name **/
 	m_id string
 
+	// In case of remote store
+	m_conn connection
+
+	m_port int
+
+	m_ipv4 string
+
+	m_pwd string
+
+	m_user string
+
+	// In case of local sotre
 	/** The store path **/
 	m_path string
 
@@ -91,9 +103,17 @@ func NewKeyValueDataStore(info *Config.DataStoreConfiguration) (store *KeyValueD
 	store = new(KeyValueDataStore)
 	store.m_id = info.M_id
 
-	// Create the datastore if is not already exist and open it...
-	store.m_path = GetServer().GetConfigurationManager().GetDataPath() + "/" + store.m_id
-	store.m_db, err = leveldb.OpenFile(store.m_path, nil)
+	// Connection information.
+	store.m_ipv4 = info.M_ipv4
+	store.m_port = info.M_port
+	store.m_user = info.M_user
+	store.m_pwd = info.M_pwd
+
+	// if the store is a local store.
+	if store.m_ipv4 == "127.0.0.1" {
+		store.m_path = GetServer().GetConfigurationManager().GetDataPath() + "/" + store.m_id
+		store.m_db, err = leveldb.OpenFile(store.m_path, nil)
+	}
 
 	if err != nil {
 		log.Println("open:", err)
@@ -441,40 +461,6 @@ func (this *KeyValueDataStore) getIndexationKeys(prototype *EntityPrototype, ent
 		}
 	}
 	return indexationKeys
-}
-
-/**
- * Retreive the list of all entity prototype in a given store.
- */
-func (this *KeyValueDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
-
-	var prototypes []*EntityPrototype
-
-	// Retreive values...
-	this.Lock()
-	iter := this.m_db.NewIterator(util.BytesPrefix([]byte("prototype:")), nil)
-	this.Unlock()
-
-	for iter.Next() {
-		// Use key/value.
-		value := iter.Value()
-
-		// I will decode the prototype.
-		prototype := new(EntityPrototype)
-		dec := gob.NewDecoder(bytes.NewReader(value))
-		dec.Decode(prototype)
-
-		p, err := this.GetEntityPrototype(prototype.TypeName)
-		if err != nil {
-			return nil, err
-		}
-
-		// Append to the list of prototype
-		prototypes = append(prototypes, p)
-	}
-	iter.Release()
-	err := iter.Error()
-	return prototypes, err
 }
 
 func (this *KeyValueDataStore) GetEntityByType(typeName string, storeId string) ([][]interface{}, error) {
@@ -1054,6 +1040,107 @@ func (this *KeyValueDataStore) executeSearchQuery(query string, fields []string)
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Retreive the list of all entity prototype in a given store.
+ */
+func (this *KeyValueDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
+
+	var prototypes []*EntityPrototype
+
+	// Here the store is not a local, so I will use a remote call to get the
+	// list of it entity prototypes.
+	if this.m_ipv4 != "127.0.0.1" {
+		// I will use execute JS function to get the list of entity prototypes.
+		id := Utility.RandomUUID()
+		method := "ExecuteJsFunction"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = this.m_conn
+
+		param0 := new(MessageData)
+		param0.Name = "functionSrc"
+		param0.Value = `function GetEntityPrototypes(storeId){ return GetServer().GetEntityManager().GetEntityPrototypes(storeId, sessionId, messageId) }`
+
+		param1 := new(MessageData)
+		param1.Name = "storeId"
+		param1.Value = this.m_id
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+
+		// The channel will be use to wait for results.
+		resultsChan := make(chan interface{})
+
+		// The success callback.
+		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+				// So here I will marchal the values from a json string and
+				// initialyse the entity values from the values the contain.
+				var results [][]map[string]interface{}
+				var prototypes []*EntityPrototype
+				json.Unmarshal(rspMsg.msg.Rsp.Results[0].DataBytes, &results)
+				for i := 0; i < len(results[0]); i++ {
+					// Set the TYPENAME property here.
+					results[0][i]["TYPENAME"] = "Server.EntityPrototype"
+					values, err := Utility.InitializeStructure(results[0][i])
+					if err == nil {
+						prototypes = append(prototypes, values.Interface().(*EntityPrototype))
+					}
+				}
+				resultsChan <- prototypes
+			}
+		}(resultsChan)
+
+		// The error callback.
+		errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				resultsChan <- errMsg.msg.Err.Message
+			}
+		}(resultsChan)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+		// wait for result here.
+		results := <-resultsChan
+		if reflect.TypeOf(results).String() == "[]*Server.EntityPrototype" {
+			return results.([]*EntityPrototype), nil
+		}
+		return prototypes, errors.New(results.(string)) // return an error message instead.
+	}
+
+	// Retreive values...
+	this.Lock()
+	iter := this.m_db.NewIterator(util.BytesPrefix([]byte("prototype:")), nil)
+	this.Unlock()
+
+	for iter.Next() {
+		// Use key/value.
+		value := iter.Value()
+
+		// I will decode the prototype.
+		prototype := new(EntityPrototype)
+		dec := gob.NewDecoder(bytes.NewReader(value))
+		dec.Decode(prototype)
+
+		p, err := this.GetEntityPrototype(prototype.TypeName)
+		if err != nil {
+			return nil, err
+		}
+
+		// Append to the list of prototype
+		prototypes = append(prototypes, p)
+	}
+	iter.Release()
+	err := iter.Error()
+	return prototypes, err
+}
+
+/**
  * Return the name of a store.
  */
 func (this *KeyValueDataStore) GetId() string {
@@ -1062,6 +1149,21 @@ func (this *KeyValueDataStore) GetId() string {
 
 // TODO validate the user and password here...
 func (this *KeyValueDataStore) Connect() error {
+
+	if this.m_ipv4 != "127.0.0.1" {
+		// Here I will connect to a remote server.
+		var err error
+		this.m_conn, err = GetServer().connect("ws://" + this.m_ipv4 + ":" + strconv.Itoa(this.m_port))
+
+		if err != nil {
+			return err
+		}
+
+		// Here I will use the user and password in the connection to validate
+		// that the user can get data from the store.
+
+	}
+
 	// Here I will register all class in the vm.
 	prototypes, err := this.GetEntityPrototypes()
 	if err == nil {
@@ -1077,6 +1179,10 @@ func (this *KeyValueDataStore) Connect() error {
  * Help to know if a store is connect or existing...
  */
 func (this *KeyValueDataStore) Ping() error {
+	if this.m_ipv4 != "127.0.0.1" {
+		return nil
+	}
+
 	path := GetServer().GetConfigurationManager().GetDataPath() + "/" + this.GetId()
 	_, err := os.Stat(path)
 	return err
@@ -1086,6 +1192,10 @@ func (this *KeyValueDataStore) Ping() error {
  * Create a new entry in the database.
  */
 func (this *KeyValueDataStore) Create(queryStr string, entity []interface{}) (lastId interface{}, err error) {
+	if this.m_ipv4 != "127.0.0.1" {
+		return 0, err
+	}
+
 	// First of all i will init the query...
 	var query EntityQuery
 	json.Unmarshal([]byte(queryStr), &query)
@@ -1129,6 +1239,9 @@ func (this *KeyValueDataStore) Create(queryStr string, entity []interface{}) (la
  * Get the value list...
  */
 func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, params []interface{}) (results [][]interface{}, err error) {
+	if this.m_ipv4 != "127.0.0.1" {
+		return results, err
+	}
 
 	// First of all i will init the query...
 	var query EntityQuery
@@ -1224,6 +1337,10 @@ func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, p
  * Update a entity value.
  */
 func (this *KeyValueDataStore) Update(queryStr string, fields []interface{}, params []interface{}) (err error) {
+	// Remote server.
+	if this.m_ipv4 != "127.0.0.1" {
+		return err
+	}
 
 	var query EntityQuery
 	json.Unmarshal([]byte(queryStr), &query)
@@ -1310,6 +1427,11 @@ func (this *KeyValueDataStore) Update(queryStr string, fields []interface{}, par
  * Delete entity from the store...
  */
 func (this *KeyValueDataStore) Delete(queryStr string, params []interface{}) (err error) {
+	// Remote server.
+	if this.m_ipv4 != "127.0.0.1" {
+		return err
+	}
+
 	// First of all i will init the query...
 	var query EntityQuery
 	json.Unmarshal([]byte(queryStr), &query)
@@ -1373,6 +1495,11 @@ func (this *KeyValueDataStore) Delete(queryStr string, params []interface{}) (er
  * Close the backend store.
  */
 func (this *KeyValueDataStore) Close() error {
+	// Remote server.
+	if this.m_ipv4 != "127.0.0.1" {
+		return nil
+	}
+
 	this.Lock()
 	defer this.Unlock()
 	// Close the datastore.

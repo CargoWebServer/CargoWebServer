@@ -7,7 +7,7 @@ import (
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
-
+	//"log"
 	"strings"
 	"unsafe"
 )
@@ -18,14 +18,14 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ScheduledTask")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "UUID")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "UUID")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -1196,32 +1196,37 @@ func (this *EntityManager) create_Config_DataStoreConfigurationEntityPrototype()
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "enum:Encoding_UTF8:Encoding_WINDOWS_1250:Encoding_WINDOWS_1251:Encoding_WINDOWS_1252:Encoding_WINDOWS_1253:Encoding_WINDOWS_1254:Encoding_WINDOWS_1255:Encoding_WINDOWS_1256:Encoding_WINDOWS_1257:Encoding_WINDOWS_1258:Encoding_ISO8859_1:Encoding_ISO8859_2:Encoding_ISO8859_3:Encoding_ISO8859_4:Encoding_ISO8859_5:Encoding_ISO8859_6:Encoding_ISO8859_7:Encoding_ISO8859_8:Encoding_ISO8859_9:Encoding_ISO8859_10:Encoding_ISO8859_13:Encoding_ISO8859_14:Encoding_ISO8859_15:Encoding_ISO8859_16:Encoding_KOI8R:Encoding_KOI8U")
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 7)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
-	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_hostName")
+	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_storeName")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 8)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
-	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_ipv4")
+	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_hostName")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 9)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
-	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_user")
+	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_ipv4")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 10)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
-	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_pwd")
+	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_user")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
 	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 11)
+	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
+	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_pwd")
+	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.string")
+	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "")
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 12)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, true)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_port")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "xs.int")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "0")
 
 	/** associations of DataStoreConfiguration **/
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 12)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 13)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, false)
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "M_parentPtr")
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "undefined")
@@ -1229,13 +1234,13 @@ func (this *EntityManager) create_Config_DataStoreConfigurationEntityPrototype()
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "Config.Configurations:Ref")
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "childsUuid")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "[]xs.string")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 13)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 14)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, false)
 
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "[]")
 	dataStoreConfigurationEntityProto.Fields = append(dataStoreConfigurationEntityProto.Fields, "referenced")
 	dataStoreConfigurationEntityProto.FieldsType = append(dataStoreConfigurationEntityProto.FieldsType, "[]EntityRef")
-	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 14)
+	dataStoreConfigurationEntityProto.FieldsOrder = append(dataStoreConfigurationEntityProto.FieldsOrder, 15)
 	dataStoreConfigurationEntityProto.FieldsVisibility = append(dataStoreConfigurationEntityProto.FieldsVisibility, false)
 	dataStoreConfigurationEntityProto.FieldsDefaultValue = append(dataStoreConfigurationEntityProto.FieldsDefaultValue, "[]")
 
@@ -1270,6 +1275,7 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_dataStoreType")
 	query.Fields = append(query.Fields, "M_dataStoreVendor")
 	query.Fields = append(query.Fields, "M_textEncoding")
+	query.Fields = append(query.Fields, "M_storeName")
 	query.Fields = append(query.Fields, "M_hostName")
 	query.Fields = append(query.Fields, "M_ipv4")
 	query.Fields = append(query.Fields, "M_user")
@@ -1377,6 +1383,7 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	} else {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, 0)
 	}
+	DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.object.M_storeName)
 	DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.object.M_hostName)
 	DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.object.M_ipv4)
 	DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.object.M_user)
@@ -1449,6 +1456,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 	query.Fields = append(query.Fields, "M_dataStoreType")
 	query.Fields = append(query.Fields, "M_dataStoreVendor")
 	query.Fields = append(query.Fields, "M_textEncoding")
+	query.Fields = append(query.Fields, "M_storeName")
 	query.Fields = append(query.Fields, "M_hostName")
 	query.Fields = append(query.Fields, "M_ipv4")
 	query.Fields = append(query.Fields, "M_user")
@@ -1576,36 +1584,41 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 			}
 		}
 
-		/** hostName **/
+		/** storeName **/
 		if results[0][7] != nil {
-			this.object.M_hostName = results[0][7].(string)
+			this.object.M_storeName = results[0][7].(string)
+		}
+
+		/** hostName **/
+		if results[0][8] != nil {
+			this.object.M_hostName = results[0][8].(string)
 		}
 
 		/** ipv4 **/
-		if results[0][8] != nil {
-			this.object.M_ipv4 = results[0][8].(string)
+		if results[0][9] != nil {
+			this.object.M_ipv4 = results[0][9].(string)
 		}
 
 		/** user **/
-		if results[0][9] != nil {
-			this.object.M_user = results[0][9].(string)
+		if results[0][10] != nil {
+			this.object.M_user = results[0][10].(string)
 		}
 
 		/** pwd **/
-		if results[0][10] != nil {
-			this.object.M_pwd = results[0][10].(string)
+		if results[0][11] != nil {
+			this.object.M_pwd = results[0][11].(string)
 		}
 
 		/** port **/
-		if results[0][11] != nil {
-			this.object.M_port = results[0][11].(int)
+		if results[0][12] != nil {
+			this.object.M_port = results[0][12].(int)
 		}
 
 		/** associations of DataStoreConfiguration **/
 
 		/** parentPtr **/
-		if results[0][12] != nil {
-			id := results[0][12].(string)
+		if results[0][13] != nil {
+			id := results[0][13].(string)
 			if len(id) > 0 {
 				refTypeName := "Config.Configurations"
 				id_ := refTypeName + "$$" + id
@@ -1613,7 +1626,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 				GetServer().GetEntityManager().appendReference("parentPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][13].(string)
+		childsUuidStr := results[0][14].(string)
 		this.childsUuid = make([]string, 0)
 		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -1622,7 +1635,7 @@ func (this *Config_DataStoreConfigurationEntity) InitEntity(id string, lazy bool
 			}
 		}
 
-		referencedStr := results[0][14].(string)
+		referencedStr := results[0][15].(string)
 		this.referenced = make([]EntityRef, 0)
 		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)

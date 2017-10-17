@@ -95,10 +95,18 @@ func newConfigurationManager() *ConfigurationManager {
 
 	// The list of default datastore.
 	configurationManager.m_datastoreConfiguration = make([]*Config.DataStoreConfiguration, 0)
+	//serverConfig := configurationManager.m_activeConfigurationsEntity.GetObject().(*Config.Configurations).GetServerConfig()
+	hostName := "localhost" //serverConfig.GetHostName()
+	ipv4 := "127.0.0.1"     //serverConfig.GetIpv4()
+	port := 9393            //serverConfig.GetServerPort()
 
 	// Configuration db itself.
 	cargoConfigDB := new(Config.DataStoreConfiguration)
 	cargoConfigDB.M_id = ConfigDB
+	cargoConfigDB.M_storeName = ConfigDB
+	cargoConfigDB.M_hostName = hostName
+	cargoConfigDB.M_ipv4 = ipv4
+	cargoConfigDB.M_port = port
 	cargoConfigDB.M_dataStoreVendor = Config.DataStoreVendor_MYCELIUS
 	cargoConfigDB.M_dataStoreType = Config.DataStoreType_KEY_VALUE_STORE
 	cargoConfigDB.NeedSave = true
@@ -107,6 +115,10 @@ func newConfigurationManager() *ConfigurationManager {
 	// The cargo entities store config
 	cargoEntitiesDB := new(Config.DataStoreConfiguration)
 	cargoEntitiesDB.M_id = CargoEntitiesDB
+	cargoEntitiesDB.M_storeName = CargoEntitiesDB
+	cargoEntitiesDB.M_hostName = hostName
+	cargoEntitiesDB.M_ipv4 = ipv4
+	cargoEntitiesDB.M_port = port
 	cargoEntitiesDB.M_dataStoreVendor = Config.DataStoreVendor_MYCELIUS
 	cargoEntitiesDB.M_dataStoreType = Config.DataStoreType_KEY_VALUE_STORE
 	cargoEntitiesDB.NeedSave = true
@@ -115,6 +127,10 @@ func newConfigurationManager() *ConfigurationManager {
 	// The sql info data store.
 	sqlInfoDB := new(Config.DataStoreConfiguration)
 	sqlInfoDB.M_id = "sql_info"
+	sqlInfoDB.M_storeName = "sql_info"
+	sqlInfoDB.M_hostName = hostName
+	sqlInfoDB.M_ipv4 = ipv4
+	sqlInfoDB.M_port = port
 	sqlInfoDB.M_dataStoreVendor = Config.DataStoreVendor_MYCELIUS
 	sqlInfoDB.M_dataStoreType = Config.DataStoreType_KEY_VALUE_STORE
 	sqlInfoDB.NeedSave = true
@@ -348,9 +364,14 @@ func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
 		<-timer.C
 		dbFile, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", []interface{}{task.M_script}, false)
 		if err == nil {
-			script, _ := b64.StdEncoding.DecodeString(dbFile.GetObject().(*CargoEntities.File).GetData())
+			script, err := b64.StdEncoding.DecodeString(dbFile.GetObject().(*CargoEntities.File).GetData())
 			// Now I will run the script...
-			JS.GetJsRuntimeManager().RunScript("", string(script))
+			if err == nil {
+				log.Println("---> run script: ", string(script))
+				JS.GetJsRuntimeManager().RunScript("", string(script))
+			} else {
+				log.Println("---> fail to get script: ", err)
+			}
 		}
 		if task.GetFrequencyType() != Config.FrequencyType_ONCE {
 			// So here I will re-schedule the task, it will not be schedule if is it

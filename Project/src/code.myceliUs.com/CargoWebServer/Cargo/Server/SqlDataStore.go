@@ -26,8 +26,11 @@ import (
 //              			Sql Data Store
 ////////////////////////////////////////////////////////////////////////////////
 type SqlDataStore struct {
-	/** The name of the store... **/
+	/** The id of the store... **/
 	m_id string
+
+	/** The name of the store **/
+	m_name string
 
 	/** The name of the drivers use **/
 	m_vendor Config.DataStoreVendor
@@ -67,6 +70,7 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 	store.m_id = info.M_id
 
 	// Keep this info...
+	store.m_name = info.M_storeName
 	store.m_vendor = info.M_dataStoreVendor
 	store.m_host = info.M_hostName
 	store.m_user = info.M_user
@@ -94,7 +98,7 @@ func (this *SqlDataStore) Connect() error {
 		connectionString += "user=" + this.m_user + ";"
 		connectionString += "password=" + this.m_password + ";"
 		connectionString += "port=" + strconv.Itoa(this.m_port) + ";"
-		connectionString += "database=" + this.m_id + ";"
+		connectionString += "database=" + this.m_name + ";"
 		connectionString += "driver=mssql"
 		//connectionString += "encrypt=false;"
 		driver = "mssql"
@@ -104,7 +108,7 @@ func (this *SqlDataStore) Connect() error {
 		connectionString += this.m_user + ":"
 		connectionString += this.m_password + "@tcp("
 		connectionString += this.m_host + ":" + strconv.Itoa(this.m_port) + ")"
-		connectionString += "/" + this.m_id
+		connectionString += "/" + this.m_name
 		//connectionString += "encrypt=false;"
 		connectionString += "?"
 		// The encoding
@@ -171,7 +175,7 @@ func (this *SqlDataStore) Connect() error {
 			connectionString += "driver=freetds;"
 		}
 		connectionString += "server=" + this.m_host + ";"
-		connectionString += "database=" + this.m_id + ";"
+		connectionString += "database=" + this.m_name + ";"
 		connectionString += "uid=" + this.m_user + ";"
 		connectionString += "pwd=" + this.m_password + ";"
 		connectionString += "port=" + strconv.Itoa(this.m_port) + ";"
@@ -253,7 +257,7 @@ func (this *SqlDataStore) GetId() string {
 /** Open a new Connection with the data store **/
 func (this *SqlDataStore) Ping() (err error) {
 	if this.m_db == nil {
-		err = errors.New("No connection was found for datastore " + this.m_id)
+		err = errors.New("No connection was found for datastore " + this.m_name)
 		return err
 	}
 
@@ -755,7 +759,7 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 		query += "WHERE sobjects.xtype = 'U'"
 
 	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
-		query = "SELECT table_name FROM information_schema.tables where table_schema='" + this.m_id + "'"
+		query = "SELECT table_name FROM information_schema.tables where table_schema='" + this.m_name + "'"
 	}
 
 	fieldsType = append(fieldsType, "nvarchar")
@@ -805,7 +809,11 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 	// If the data store is not found.
 	store := GetServer().GetDataManager().m_dataStores["sql_info"]
 	if store == nil {
-		store, _ = GetServer().GetDataManager().createDataStore("sql_info", Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
+		serverConfig := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetServerConfig()
+		hostName := serverConfig.GetHostName()
+		ipv4 := serverConfig.GetIpv4()
+		port := serverConfig.GetServerPort()
+		store, _ = GetServer().GetDataManager().createDataStore("sql_info", "sql_info", hostName, ipv4, port, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
 	} else {
 		prototype, err = store.GetEntityPrototype(schemaId + "." + id)
 		if err == nil {
@@ -957,12 +965,12 @@ func (this *SqlDataStore) getSchemaId(name string) (string, error) {
 		}
 		if len(values) > 0 {
 			if values[0][0] != nil {
-				return this.m_id + "." + values[0][0].(string), nil
+				return this.m_name + "." + values[0][0].(string), nil
 			}
 		}
 	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
 		// with mysql the schema id is the id of the database.
-		return this.m_id, nil
+		return this.m_name, nil
 	}
 
 	return "", errors.New("No schema found for table " + name)
@@ -1175,7 +1183,7 @@ func (this *SqlDataStore) setRefs() error {
 		query += "	information_schema.key_column_usage "
 		query += "where "
 		query += "	referenced_table_name is not null "
-		query += "	and table_schema = '" + this.m_id + "'"
+		query += "	and table_schema = '" + this.m_name + "'"
 	}
 
 	fieldsType := make([]interface{}, 6)
@@ -1215,13 +1223,13 @@ func (this *SqlDataStore) setRefs() error {
 			// Target.
 			targetTableName := values[i][4].(string)
 
-			src, err := GetServer().GetEntityManager().getEntityPrototype(this.m_id+"."+schemasName+sourceTableName, "sql_info")
+			src, err := GetServer().GetEntityManager().getEntityPrototype(this.m_name+"."+schemasName+sourceTableName, "sql_info")
 			if err != nil {
 				log.Println("----------------> src not found: ", err)
 				return err
 			}
 
-			trg, err := GetServer().GetEntityManager().getEntityPrototype(this.m_id+"."+schemasName+targetTableName, "sql_info")
+			trg, err := GetServer().GetEntityManager().getEntityPrototype(this.m_name+"."+schemasName+targetTableName, "sql_info")
 			if err != nil {
 				log.Println("----------------> trg not found: ", err)
 				return err
@@ -1238,7 +1246,7 @@ func (this *SqlDataStore) setRefs() error {
 
 					// Now the rule to determine the cardinality.
 					var fieldType string
-					fieldType = this.m_id + "." + schemasName + targetTableName + ":Ref"
+					fieldType = this.m_name + "." + schemasName + targetTableName + ":Ref"
 
 					if !targetField_isId {
 						// one to one relationship in that case.
@@ -1251,7 +1259,7 @@ func (this *SqlDataStore) setRefs() error {
 				if !Utility.Contains(trg.Fields, "M_"+refName) {
 					// Now the rule to determine the cardinality.
 					var fieldType string
-					fieldType = this.m_id + "." + schemasName + sourceTableName
+					fieldType = this.m_name + "." + schemasName + sourceTableName
 
 					if this.isRef(refName) {
 						fieldType = fieldType + ":Ref"

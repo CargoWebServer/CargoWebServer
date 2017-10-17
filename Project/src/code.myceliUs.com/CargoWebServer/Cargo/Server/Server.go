@@ -395,7 +395,7 @@ func (this *Server) Start() {
 			return func(rspMsg *message, caller interface{}) {
 				results := make([]interface{}, 0)
 				// So here i will get the message value...
-				log.Println("--------> number of return results: ", len(rspMsg.msg.Rsp.Results))
+				//log.Println("--------> number of return results: ", len(rspMsg.msg.Rsp.Results))
 				for i := 0; i < len(rspMsg.msg.Rsp.Results); i++ {
 
 					param := rspMsg.msg.Rsp.Results[i]
@@ -661,7 +661,7 @@ func (this *Server) Start() {
 		JS.GetJsRuntimeManager().AppendScript(src)
 	}
 
-	//
+	// Initialyse the script for the default session.
 	JS.GetJsRuntimeManager().InitScripts("") // Run the script for the default session.
 
 	// Initialyse the server object here.
@@ -678,9 +678,6 @@ func (this *Server) Start() {
 		JS.GetJsRuntimeManager().RunScript("", "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();")
 	}
 
-	// Asynchronous script test.
-	//JS.GetJsRuntimeManager().RunScript("", `server.entityManager.getEntityPrototypes("CargoEntities", function(results, caller){console.log(results.length)}, function(){"-----> Error found"}, {})`)
-
 	// Now I will set scheduled task.
 	for i := 0; i < len(GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
 		task := GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks[i]
@@ -695,6 +692,10 @@ func (this *Server) Start() {
 			GetServer().GetServiceManager().registerServiceContainerActions(config)
 		}
 	}
+
+	// Now after all initialisation are done I will open connection with
+	// other servers.
+	this.GetDataManager().openConnections()
 }
 
 /**
@@ -782,7 +783,6 @@ func (this *Server) connect(address string) (connection, error) {
 	// Open the a new connection with the server.
 	log.Println("---> try to open ", host, port)
 	err := conn.Open(host, port)
-
 	if err != nil {
 		log.Println("--------------> connection fail! ", host, port, err)
 		return nil, err // The connection fail...
@@ -833,17 +833,19 @@ func (this *Server) GetDefaultErrorLogger() *Logger {
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (server *Server) RunCmd(name string, args []string) (string, error) {
+
+	if runtime.GOOS == "windows" && !strings.HasSuffix(name, ".exe") {
+		name += ".exe"
+	}
+
 	// The first step will be to start the service manager.
 	path := server.GetConfigurationManager().GetBinPath() + "/" + name
 
 	// In the case that the command is not in the bin path I will
 	// try to run it from the system path.
 	if !Utility.Exists(path) {
+		log.Println("--> file not found: ", path)
 		path = name
-	}
-
-	if runtime.GOOS == "windows" && !strings.HasSuffix(path, ".exe") {
-		path += ".exe"
 	}
 
 	// Set the command

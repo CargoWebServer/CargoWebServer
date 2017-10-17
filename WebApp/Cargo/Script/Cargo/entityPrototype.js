@@ -157,15 +157,13 @@ EntityPrototype.prototype.init = function (object) {
             object.FieldsDocumentation.push("")
         }
     }
+	
 
     // The type name.
     this.TypeName = object.TypeName
 
     // The package will be an object on the global scope.
     this.PackageName = object.TypeName.split(".")[0]
-    if (window[this.PackageName] == undefined) {
-        window[this.PackageName] = eval(this.PackageName + " = {}")
-    }
 
     // The type name.
     this.ClassName = object.TypeName.substring(object.TypeName.indexOf(".") + 1)
@@ -178,7 +176,6 @@ EntityPrototype.prototype.init = function (object) {
 
     // Now the fields.
     if (object.Fields != null && object.FieldsType != null && object.FieldsVisibility != null && object.FieldsOrder != null) {
-
         if (!contains(object.Fields, "ParentLnk")) {
             object.Fields.unshift("ParentLnk")
             object.FieldsType.unshift("xs.string")
@@ -214,6 +211,8 @@ EntityPrototype.prototype.init = function (object) {
         }
 
         for (var i = 0; i < object.Fields.length; i++) {
+			console.log("-------> 214 prototype")
+	
             this.appendField(object.Fields[i], object.FieldsType[i], object.FieldsVisibility[i], object.FieldsOrder[i], object.FieldsNillable[i], object.FieldsDocumentation[i], object.FieldsDefaultValue[i])
             if (object.Fields[i] == "UUID") {
                 if (!contains(this.Ids, "UUID")) {
