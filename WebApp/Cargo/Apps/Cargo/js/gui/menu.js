@@ -186,16 +186,21 @@ VerticalMenu.prototype.appendItem = function (item) {
 /*
  * That class create a popup menu.
  */
-var PopUpMenu = function (parent, items) {
+var PopUpMenu = function (parent, items, e) {
+    // Only one menu must be display at any time.
+    var popups = document.getElementsByClassName("popup_menu")
+    for (var i = 0; i < popups.length; i++) {
+        popups[i].parentNode.removeChild(popups[i])
+    }
 
     // The menu panel.
     this.parent = parent
 
-    this.panel = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class":"popup_menu", "style": "position: absolute; z-index: 10;" })
+    this.panel = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "popup_menu", "style": "position: absolute; z-index: 10;" })
     var coord = getCoords(parent.element)
 
-    this.panel.element.style.top = coord.top + parent.element.offsetHeight + "px"
-    this.panel.element.style.left = coord.left + "px"
+    this.panel.element.style.top = coord.top + 19 + "px"
+    this.panel.element.style.left = coord.left + 20 + "px"
 
     this.subItemPanel = null
     this.currentItem = null
@@ -209,6 +214,23 @@ var PopUpMenu = function (parent, items) {
     for (var i = 0; i < this.items.length; i++) {
         this.appendItem(this.items[i])
     }
+
+    this.displayed = false
+
+    document.getElementsByTagName("body")[0].oncontextmenu = function (popup) {
+        return function () {
+            if (popup.displayed == true) {
+                try{
+                    popup.panel.element.parentNode.removeChild(popup.panel.element)
+                }catch(err){
+                    /** nothing to do here. */
+                }
+            } else {
+                popup.displayed = true
+            }
+            return false
+        }
+    }(this)
 
     return this
 }

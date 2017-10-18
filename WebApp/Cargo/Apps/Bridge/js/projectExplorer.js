@@ -122,13 +122,14 @@ ProjectView.prototype.initFilesView = function (parent, dir, level) {
         function (folderDiv) {
             return function (ev) {
                 ev.preventDefault();
+                ev.stopPropagation();
 
                 // So here I will display the rigth menu...
                 var renameMenuItem = new MenuItem("rename_menu", "Rename", {}, 0)               
                 var deleteMenuItem = new MenuItem("delete_menu", "Delete", {}, 0)
 
                 // The main menu will be display in the body element, so nothing will be over it.
-                var contextMenu = new PopUpMenu(folderDiv, [renameMenuItem, deleteMenuItem])
+                var contextMenu = new PopUpMenu(folderDiv, [renameMenuItem, deleteMenuItem], ev)
 
                 return false;
             }
