@@ -74,7 +74,7 @@ function main() {
     //entitiesDump("CargoEntities.Action")
 
     //testSayHello("Dave")
-    entityDump( "CARGO_ENTITIES", "CargoEntities.User")
+    // entityDump( "CARGO_ENTITIES", "CargoEntities.User")
     //entitiesDump("XPDMXML.ProcessStructureType")
     // entitiesDump("CatalogSchema.CatalogType")
 
@@ -96,6 +96,7 @@ function main() {
 
     });
 
+
     server.runCmd("cmd", ["/K","wmic datafile where name='c:\\\\windows\\\\system32\\\\notepad.exe' list full"],
     // Success callback
     function(results, caller){
@@ -105,7 +106,7 @@ function main() {
     function(){
 
     });*/
-
+    
     /*
         function getFileInfos(path, callback) {
             server.runCmd("cmd", ["/K", "dir /Q " + path],
@@ -228,6 +229,17 @@ function main() {
      function(errMsg, caller){
      }, {})*/
 
+     var query = {}
+     query.TypeName = "Proactive.AnalyseResult"
+     query.Fields = ["M_NoTol", "M_NoFeat", "M_NoModele"]
+     query.Query = ''
+ 
+     server.dataManager.read("Proactive", JSON.stringify(query), [], [],
+     function (results, caller) {
+         console.log("-------> results: ", results)
+     }, function (errMsg, caller) {
+
+     }, undefined)
 }
 
 function testServiceContainer() {

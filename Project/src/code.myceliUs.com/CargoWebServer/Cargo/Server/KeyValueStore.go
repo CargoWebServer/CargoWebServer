@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"code.myceliUs.com/CargoWebServer/Cargo/QueryParser/ast"
@@ -82,6 +83,10 @@ type KeyValueDataStore struct {
 
 	m_ipv4 string
 
+	m_hostName string
+
+	m_storeName string
+
 	m_pwd string
 
 	m_user string
@@ -108,6 +113,8 @@ func NewKeyValueDataStore(info *Config.DataStoreConfiguration) (store *KeyValueD
 	store.m_port = info.M_port
 	store.m_user = info.M_user
 	store.m_pwd = info.M_pwd
+	store.m_hostName = info.M_hostName
+	store.m_storeName = info.M_storeName
 
 	// if the store is a local store.
 	if store.m_ipv4 == "127.0.0.1" {
@@ -248,6 +255,75 @@ func (this *KeyValueDataStore) setSuperTypeFields(prototype *EntityPrototype) {
  * It must be create once per type
  */
 func (this *KeyValueDataStore) SetEntityPrototype(prototype *EntityPrototype) error {
+	if this.m_ipv4 != "127.0.0.1" {
+		// I will use execute JS function to get the list of entity prototypes.
+		id := Utility.RandomUUID()
+		method := "ExecuteJsFunction"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = this.m_conn
+
+		param0 := new(MessageData)
+		param0.Name = "functionSrc"
+		param0.Value = `function GetEntityPrototype(storeId, prototype){ return GetServer().GetEntityManager().CreateEntityPrototype(storeId, prototype, sessionId, messageId) }`
+
+		param1 := new(MessageData)
+		param1.Name = "storeId"
+		param1.Value = this.m_id
+
+		param2 := new(MessageData)
+		param2.Name = "prototype"
+		param2.Value = prototype
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+		params = append(params, param2)
+
+		// The channel will be use to wait for results.
+		resultsChan := make(chan interface{})
+
+		// The success callback.
+		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+				// So here I will marchal the values from a json string and
+				// initialyse the entity values from the values the contain.
+				var results []map[string]interface{}
+				json.Unmarshal(rspMsg.msg.Rsp.Results[0].DataBytes, &results)
+
+				// Set the TYPENAME property here.
+				results[0]["TYPENAME"] = "Server.EntityPrototype"
+				value, err := Utility.InitializeStructure(results[0])
+				if err != nil {
+					resultsChan <- err
+				} else {
+					resultsChan <- value.Interface().(*EntityPrototype)
+				}
+			}
+		}(resultsChan)
+
+		// The error callback.
+		errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				resultsChan <- errMsg.msg.Err.Message
+			}
+		}(resultsChan)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+		// wait for result here.
+		results := <-resultsChan
+		if reflect.TypeOf(results).String() == "*Server.EntityPrototype" {
+			return nil
+		}
+
+		return results.(error) // return an error message instead.
+	}
 
 	// Save it only once...
 	_, err := this.GetEntityPrototype(prototype.TypeName)
@@ -275,6 +351,76 @@ func (this *KeyValueDataStore) SetEntityPrototype(prototype *EntityPrototype) er
  */
 func (this *KeyValueDataStore) saveEntityPrototype(prototype *EntityPrototype) error {
 
+	if this.m_ipv4 != "127.0.0.1" {
+		// I will use execute JS function to get the list of entity prototypes.
+		id := Utility.RandomUUID()
+		method := "ExecuteJsFunction"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = this.m_conn
+
+		param0 := new(MessageData)
+		param0.Name = "functionSrc"
+		param0.Value = `function SaveEntityPrototype(storeId, prototype){ return GetServer().GetEntityManager().SaveEntityPrototype(storeId, prototype, sessionId, messageId) }`
+
+		param1 := new(MessageData)
+		param1.Name = "storeId"
+		param1.Value = this.m_id
+
+		param2 := new(MessageData)
+		param2.Name = "prototype"
+		param2.Value = prototype
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+		params = append(params, param2)
+
+		// The channel will be use to wait for results.
+		resultsChan := make(chan interface{})
+
+		// The success callback.
+		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+				// So here I will marchal the values from a json string and
+				// initialyse the entity values from the values the contain.
+				var results []map[string]interface{}
+				json.Unmarshal(rspMsg.msg.Rsp.Results[0].DataBytes, &results)
+
+				// Set the TYPENAME property here.
+				results[0]["TYPENAME"] = "Server.EntityPrototype"
+				value, err := Utility.InitializeStructure(results[0])
+				if err != nil {
+					resultsChan <- err
+				} else {
+					resultsChan <- value.Interface().(*EntityPrototype)
+				}
+			}
+		}(resultsChan)
+
+		// The error callback.
+		errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				resultsChan <- errMsg.msg.Err.Message
+			}
+		}(resultsChan)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+		// wait for result here.
+		results := <-resultsChan
+		if reflect.TypeOf(results).String() == "*Server.EntityPrototype" {
+			return nil
+		}
+
+		return results.(error) // return an error message instead.
+	}
+
 	// I will serialyse the prototype.
 	m := new(bytes.Buffer)
 	enc := gob.NewEncoder(m)
@@ -291,6 +437,70 @@ func (this *KeyValueDataStore) saveEntityPrototype(prototype *EntityPrototype) e
  * Remove an entity prototype and all it releated values.
  */
 func (this *KeyValueDataStore) DeleteEntityPrototype(typeName string) error {
+	// In case of remote data store.
+	if this.m_ipv4 != "127.0.0.1" {
+		// I will use execute JS function to get the list of entity prototypes.
+		id := Utility.RandomUUID()
+		method := "ExecuteJsFunction"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = this.m_conn
+
+		param0 := new(MessageData)
+		param0.Name = "functionSrc"
+		param0.Value = `function DeleteEntityPrototype(typeName, storeId){ GetServer().GetEntityManager().DeleteEntityPrototype(typeName, storeId, sessionId, messageId) }`
+
+		param1 := new(MessageData)
+		param1.Name = "typeName"
+		param1.Value = typeName
+
+		param2 := new(MessageData)
+		param2.Name = "storeId"
+		param2.Value = this.m_id
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+		params = append(params, param2)
+
+		// The channel will be use to wait for results.
+		resultsChan := make(chan interface{})
+
+		// The success callback.
+		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+				log.Println("---------> entity protoype deleted!")
+				// update success
+				resultsChan <- nil
+			}
+		}(resultsChan)
+
+		// The error callback.
+		errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				resultsChan <- errMsg.msg.Err.Message
+			}
+		}(resultsChan)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+		// wait for result here.
+		results := <-resultsChan
+
+		// in case of error
+		if results != nil {
+			if reflect.TypeOf(results).String() == "*string" {
+				return errors.New(*results.(*string))
+			}
+		}
+
+		return nil
+	}
 
 	prototype, err := this.GetEntityPrototype(typeName)
 	// The prototype does not exist.
@@ -324,7 +534,7 @@ func (this *KeyValueDataStore) DeleteEntityPrototype(typeName string) error {
 
 	// remove the prototype itself...
 	this.deleteValue("prototype:" + prototype.TypeName)
-
+	log.Println("----> prototype: " + prototype.TypeName + "was deleted!")
 	return nil
 }
 
@@ -442,31 +652,6 @@ func (this *KeyValueDataStore) getIndexationKeys(prototype *EntityPrototype, ent
 		}
 	}
 	return indexationKeys
-}
-
-func (this *KeyValueDataStore) GetEntityByType(typeName string, storeId string) ([][]interface{}, error) {
-
-	var entities [][]interface{}
-
-	// Use key/value.
-	// I will decode the prototype.
-	ids, err := this.getIndexation(typeName)
-	if err != nil {
-		return nil, err
-	}
-
-	for i := 0; i < len(ids); i++ {
-		id := ids[i].(string)
-		var data []interface{}
-		values, _ := this.getValue(id)
-		dec := gob.NewDecoder(bytes.NewReader(values))
-		dec.Decode(&data)
-
-		// Append to the list of prototype
-		entities = append(entities, data)
-	}
-
-	return entities, err
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1023,11 +1208,12 @@ func (this *KeyValueDataStore) executeSearchQuery(query string, fields []string)
 /**
  * This function is use to retreive an existing entity prototype...
  */
-func (this *KeyValueDataStore) GetEntityPrototype(id string) (*EntityPrototype, error) {
+func (this *KeyValueDataStore) GetEntityPrototype(typeName string) (*EntityPrototype, error) {
 
 	// Here the store is not a local, so I will use a remote call to get the
 	// list of it entity prototypes.
 	if this.m_ipv4 != "127.0.0.1" {
+
 		// I will use execute JS function to get the list of entity prototypes.
 		id := Utility.RandomUUID()
 		method := "ExecuteJsFunction"
@@ -1042,7 +1228,7 @@ func (this *KeyValueDataStore) GetEntityPrototype(id string) (*EntityPrototype, 
 
 		param1 := new(MessageData)
 		param1.Name = "typeName"
-		param1.Value = id
+		param1.Value = typeName
 
 		param2 := new(MessageData)
 		param2.Name = "storeId"
@@ -1100,9 +1286,8 @@ func (this *KeyValueDataStore) GetEntityPrototype(id string) (*EntityPrototype, 
 	// Local store stuff...
 	prototype := new(EntityPrototype)
 
-	id = "prototype:" + id
 	// Retreive the data from level db...
-	data, err := this.getValue(id)
+	data, err := this.getValue("prototype:" + typeName)
 	if err != nil {
 		return nil, err
 	} else {
@@ -1184,7 +1369,7 @@ func (this *KeyValueDataStore) GetEntityPrototypes() ([]*EntityPrototype, error)
 		if reflect.TypeOf(results).String() == "[]*Server.EntityPrototype" {
 			return results.([]*EntityPrototype), nil
 		}
-		return prototypes, errors.New(results.(string)) // return an error message instead.
+		return prototypes, errors.New(*results.(*string)) // return an error message instead.
 	}
 
 	// Retreive values...
@@ -1236,6 +1421,80 @@ func (this *KeyValueDataStore) Connect() error {
 		// Here I will use the user and password in the connection to validate
 		// that the user can get data from the store.
 
+		// I will use execute JS function to get the list of entity prototypes.
+		id := Utility.RandomUUID()
+		method := "ExecuteJsFunction"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = this.m_conn
+
+		param0 := new(MessageData)
+		param0.Name = "functionSrc"
+		param0.Value = `function Login(accountName, psswd, serverId){ return GetServer().GetSessionManager().Login(accountName, psswd, serverId, sessionId, messageId) }`
+
+		param1 := new(MessageData)
+		param1.Name = "accountName"
+		param1.Value = this.m_user
+
+		param2 := new(MessageData)
+		param2.Name = "psswd"
+		param2.Value = this.m_pwd
+
+		param3 := new(MessageData)
+		param3.Name = "serverId"
+		param3.Value = this.m_hostName
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+		params = append(params, param2)
+		params = append(params, param3)
+
+		// The channel will be use to wait for results.
+		resultsChan := make(chan interface{})
+
+		// The success callback.
+		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+				// So here I will marchal the values from a json string and
+				// initialyse the entity values from the values the contain.
+
+				var results []map[string]interface{}
+				json.Unmarshal(rspMsg.msg.Rsp.Results[0].DataBytes, &results)
+				if results[0] == nil {
+					resultsChan <- "Fail to open session!"
+					return
+				}
+				results[0]["TYPENAME"] = "CargoEntities.Session"
+				values, err := Utility.InitializeStructure(results[0])
+
+				if err == nil {
+					resultsChan <- values.Interface().(*CargoEntities.Session)
+				} else {
+					resultsChan <- err.Error() // send the error instead...
+				}
+			}
+		}(resultsChan)
+
+		// The error callback.
+		errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				resultsChan <- errMsg.msg.Err.Message
+			}
+		}(resultsChan)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+		// wait for result here.
+		results := <-resultsChan
+		if reflect.TypeOf(results).String() != "*CargoEntities.Session" {
+			return errors.New(*results.(*string)) // return an error message instead.
+		}
 	}
 
 	// Here I will register all class in the vm.
@@ -1254,9 +1513,49 @@ func (this *KeyValueDataStore) Connect() error {
  */
 func (this *KeyValueDataStore) Ping() error {
 	if this.m_ipv4 != "127.0.0.1" {
+		// Call ping on the distant server.
+		id := Utility.RandomUUID()
+		method := "Ping"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = this.m_conn
+
+		// The channel will be use to wait for results.
+		resultsChan := make(chan interface{})
+
+		// The success callback.
+		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+				// So here I will marchal the values from a json string and
+				// initialyse the entity values from the values the contain.
+				resultsChan <- string(rspMsg.msg.Rsp.Results[0].DataBytes)
+			}
+		}(resultsChan)
+
+		// The error callback.
+		errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				resultsChan <- errMsg.msg.Err.Message
+			}
+		}(resultsChan)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+		// wait for result here.
+		results := <-resultsChan
+		if reflect.TypeOf(results).String() != "string" {
+			return errors.New(*results.(*string)) // return an error message instead.
+		}
+
 		return nil
 	}
 
+	// Local store ping...
 	path := GetServer().GetConfigurationManager().GetDataPath() + "/" + this.GetId()
 	_, err := os.Stat(path)
 	return err
@@ -1267,7 +1566,69 @@ func (this *KeyValueDataStore) Ping() error {
  */
 func (this *KeyValueDataStore) Create(queryStr string, entity []interface{}) (lastId interface{}, err error) {
 	if this.m_ipv4 != "127.0.0.1" {
-		return 0, err
+		// I will use execute JS function to get the list of entity prototypes.
+		id := Utility.RandomUUID()
+		method := "ExecuteJsFunction"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = this.m_conn
+
+		param0 := new(MessageData)
+		param0.Name = "functionSrc"
+		param0.Value = `function CreateData(storeId, query, data){ return GetServer().GetDataManager().Create(storeId, query, data, sessionId, messageId) }`
+
+		param1 := new(MessageData)
+		param1.Name = "storeId"
+		param1.Value = this.m_id
+
+		param2 := new(MessageData)
+		param2.Name = "query"
+		param2.Value = queryStr
+
+		param3 := new(MessageData)
+		param3.Name = "data"
+		param3.Value = entity
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+		params = append(params, param2)
+		params = append(params, param3)
+
+		// The channel will be use to wait for results.
+		resultsChan := make(chan interface{})
+
+		// The success callback.
+		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+				// So here I will marchal the values from a json string and
+				resultsChan <- string(rspMsg.msg.Rsp.Results[0].DataBytes) // Return the last created id if there is some.
+			}
+		}(resultsChan)
+
+		// The error callback.
+		errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				resultsChan <- errMsg.msg.Err.Message
+			}
+		}(resultsChan)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+		// wait for result here.
+		results := <-resultsChan
+
+		// in case of error
+		if reflect.TypeOf(results).String() == "*string" {
+			return -1, errors.New(*results.(*string))
+		}
+
+		return results, nil
 	}
 
 	// First of all i will init the query...
@@ -1314,7 +1675,83 @@ func (this *KeyValueDataStore) Create(queryStr string, entity []interface{}) (la
  */
 func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, params []interface{}) (results [][]interface{}, err error) {
 	if this.m_ipv4 != "127.0.0.1" {
-		return results, err
+		// I will use execute JS function to get the list of entity prototypes.
+		id := Utility.RandomUUID()
+		method := "ExecuteJsFunction"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = this.m_conn
+
+		param0 := new(MessageData)
+		param0.Name = "functionSrc"
+		param0.Value = `function ReadData(storeId, query, fieldsType, parameters){ return GetServer().GetDataManager().Read(storeId, query, fieldsType, parameters, sessionId, messageId) }`
+
+		param1 := new(MessageData)
+		param1.Name = "storeId"
+		param1.Value = this.m_id
+
+		param2 := new(MessageData)
+		param2.Name = "query"
+		param2.Value = queryStr
+
+		param3 := new(MessageData)
+		param3.Name = "fieldsType"
+		param3.Value = fieldsType
+
+		param4 := new(MessageData)
+		param4.Name = "parameters"
+		param4.Value = params
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+		params = append(params, param2)
+		params = append(params, param3)
+		params = append(params, param4)
+
+		// The channel will be use to wait for results.
+		resultsChan := make(chan interface{})
+
+		// The success callback.
+		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+				// So here I will marchal the values from a json string and
+				// initialyse the entity values from the values the contain.
+				var results [][][]interface{} // Tree dimension array of values
+				err := json.Unmarshal(rspMsg.msg.Rsp.Results[0].DataBytes, &results)
+				if err != nil {
+					resultsChan <- err
+					return
+				}
+				resultsChan <- results[0] // the first element contain the results.
+			}
+		}(resultsChan)
+
+		// The error callback.
+		errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				resultsChan <- errMsg.msg.Err.Message
+			}
+		}(resultsChan)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+		// wait for result here.
+		results := <-resultsChan
+
+		// in case of error
+		if reflect.TypeOf(results).String() == "error" {
+			return nil, results.(error) // return an error message instead.
+		} else if reflect.TypeOf(results).String() == "*string" {
+			return nil, errors.New(*results.(*string))
+		}
+
+		return results.([][]interface{}), nil
 	}
 
 	// First of all i will init the query...
@@ -1413,7 +1850,76 @@ func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, p
 func (this *KeyValueDataStore) Update(queryStr string, fields []interface{}, params []interface{}) (err error) {
 	// Remote server.
 	if this.m_ipv4 != "127.0.0.1" {
-		return err
+		// I will use execute JS function to get the list of entity prototypes.
+		id := Utility.RandomUUID()
+		method := "ExecuteJsFunction"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = this.m_conn
+
+		param0 := new(MessageData)
+		param0.Name = "functionSrc"
+		param0.Value = `function UpdateData(storeId, query, fields, parameters){ return GetServer().GetDataManager().Update(storeId, query, fields, parameters, sessionId, messageId) }`
+
+		param1 := new(MessageData)
+		param1.Name = "storeId"
+		param1.Value = this.m_id
+
+		param2 := new(MessageData)
+		param2.Name = "query"
+		param2.Value = queryStr
+
+		param3 := new(MessageData)
+		param3.Name = "fields"
+		param3.Value = fields
+
+		param4 := new(MessageData)
+		param4.Name = "parameters"
+		param4.Value = params
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+		params = append(params, param2)
+		params = append(params, param3)
+		params = append(params, param4)
+
+		// The channel will be use to wait for results.
+		resultsChan := make(chan interface{})
+
+		// The success callback.
+		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+				// update success
+				resultsChan <- nil
+			}
+		}(resultsChan)
+
+		// The error callback.
+		errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				resultsChan <- errMsg.msg.Err.Message
+			}
+		}(resultsChan)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+		// wait for result here.
+		results := <-resultsChan
+
+		// in case of error
+		if results != nil {
+			if reflect.TypeOf(results).String() == "*string" {
+				return errors.New(*results.(*string))
+			}
+		}
+
+		return nil
 	}
 
 	var query EntityQuery
@@ -1503,7 +2009,71 @@ func (this *KeyValueDataStore) Update(queryStr string, fields []interface{}, par
 func (this *KeyValueDataStore) Delete(queryStr string, params []interface{}) (err error) {
 	// Remote server.
 	if this.m_ipv4 != "127.0.0.1" {
-		return err
+		// I will use execute JS function to get the list of entity prototypes.
+		id := Utility.RandomUUID()
+		method := "ExecuteJsFunction"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = this.m_conn
+
+		param0 := new(MessageData)
+		param0.Name = "functionSrc"
+		param0.Value = `function UpdateData(storeId, query, parameters){ return GetServer().GetDataManager().Delete(storeId, query, parameters, sessionId, messageId) }`
+
+		param1 := new(MessageData)
+		param1.Name = "storeId"
+		param1.Value = this.m_id
+
+		param2 := new(MessageData)
+		param2.Name = "query"
+		param2.Value = queryStr
+
+		param3 := new(MessageData)
+		param3.Name = "parameters"
+		param3.Value = params
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+		params = append(params, param2)
+		params = append(params, param3)
+
+		// The channel will be use to wait for results.
+		resultsChan := make(chan interface{})
+
+		// The success callback.
+		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+				// update success
+				resultsChan <- nil
+			}
+		}(resultsChan)
+
+		// The error callback.
+		errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				resultsChan <- errMsg.msg.Err.Message
+			}
+		}(resultsChan)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+		// wait for result here.
+		results := <-resultsChan
+
+		// in case of error
+		if results != nil {
+			if reflect.TypeOf(results).String() == "*string" {
+				return errors.New(*results.(*string))
+			}
+		}
+
+		return nil
 	}
 
 	// First of all i will init the query...
@@ -1536,7 +2106,6 @@ func (this *KeyValueDataStore) Delete(queryStr string, params []interface{}) (er
 	results, err := this.Read(string(queryStr_), fieldsType, params)
 
 	for i := 0; i < len(results); i++ {
-
 		// I will get the entity and remove it...
 		uuid := this.getKey(prototype, results[i])
 
@@ -1571,6 +2140,8 @@ func (this *KeyValueDataStore) Delete(queryStr string, params []interface{}) (er
 func (this *KeyValueDataStore) Close() error {
 	// Remote server.
 	if this.m_ipv4 != "127.0.0.1" {
+		// Close the connection.
+		this.m_conn.Close()
 		return nil
 	}
 

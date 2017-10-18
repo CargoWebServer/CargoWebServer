@@ -45,7 +45,7 @@ var ProjectView = function (parent, project) {
                     return function (ref) {
                         panel.initFilesView(panel.panel, project.M_filesRef[0], 0)
                     }
-                } (this, project)
+                }(this, project)
             )
         }
     }
@@ -58,7 +58,7 @@ var ProjectView = function (parent, project) {
 ProjectView.prototype.initFilesView = function (parent, dir, level) {
 
     var folderDiv = parent.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
-        .appendElement({ "tag": "div", "class": "project_folder" }).down()
+        .appendElement({ "tag": "div", "class": "project_folder", "id": dir.M_name + "_div" }).down()
 
     /** The expend button */
     folderDiv.expandBtn = folderDiv.appendElement({ "tag": "i", "class": "fa fa-caret-right", "style": "display:inline;" }).down()
@@ -85,7 +85,7 @@ ProjectView.prototype.initFilesView = function (parent, dir, level) {
             } else {
                 // Here I will append the file...
                 var fileDiv = parent.appendElement({ "tag": "div", "style": "display: table-row; width: 100%" }).down()
-                    .appendElement({ "tag": "div", "class": "project_file", "style":"display: none;" }).down()
+                    .appendElement({ "tag": "div", "class": "project_file", "style": "display: none;" }).down()
 
                 // Set the file title
                 fileDiv.appendElement({ "tag": "div", "innerHtml": file.M_name, "style": "display:inline;" })
@@ -101,22 +101,38 @@ ProjectView.prototype.initFilesView = function (parent, dir, level) {
                         server.fileManager.openFile(file.M_id,
                             // Progress callback.
                             function (index, totatl, caller) {
-                                
+
                             },
                             // Success callback
                             function (result, caller) {
-                                
+
                             },
                             // Error callback
                             function (errMsg, caller) {
 
                             }, this)
                     }
-                } (file)
+                }(file)
                 folderDiv.childsDiv.push(fileDiv)
             }
         }
     }
+
+    folderDiv.element.addEventListener('contextmenu',
+        function (folderDiv) {
+            return function (ev) {
+                ev.preventDefault();
+
+                // So here I will display the rigth menu...
+                var renameMenuItem = new MenuItem("rename_menu", "Rename", {}, 0)               
+                var deleteMenuItem = new MenuItem("delete_menu", "Delete", {}, 0)
+
+                // The main menu will be display in the body element, so nothing will be over it.
+                var contextMenu = new PopUpMenu(folderDiv, [renameMenuItem, deleteMenuItem])
+
+                return false;
+            }
+        }(folderDiv), false);
 
     folderDiv.element.onclick = function (folderDiv, expandBtn, shrinkBtn) {
         return function (evt) {
@@ -148,7 +164,7 @@ ProjectView.prototype.initFilesView = function (parent, dir, level) {
             }
 
         }
-    } (folderDiv, folderDiv.expandBtn, folderDiv.shrinkBtn)
+    }(folderDiv, folderDiv.expandBtn, folderDiv.shrinkBtn)
 
     return folderDiv
 }

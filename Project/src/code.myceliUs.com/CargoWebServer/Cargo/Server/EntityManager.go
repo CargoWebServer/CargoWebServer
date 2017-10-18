@@ -1582,6 +1582,7 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
 
 	// Cast it as needed...
 	if reflect.TypeOf(prototype).String() == "map[string]interface {}" {
+		prototype.(map[string]interface{})["TYPENAME"] = "Server.EntityPrototype"
 		values, err := Utility.InitializeStructure(prototype.(map[string]interface{}))
 		if err == nil {
 			prototype = values.Interface()
@@ -1653,6 +1654,7 @@ func (this *EntityManager) SaveEntityPrototype(storeId string, prototype interfa
 
 	// Cast it as needed...
 	if reflect.TypeOf(prototype).String() == "map[string]interface {}" {
+		prototype.(map[string]interface{})["TYPENAME"] = "Server.EntityPrototype"
 		values, err := Utility.InitializeStructure(prototype.(map[string]interface{}))
 		if err == nil {
 			prototype = values.Interface()

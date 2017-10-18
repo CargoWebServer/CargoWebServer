@@ -116,10 +116,6 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     function createQuery(extension) {
         // So here I will create a new query file.
         server.fileManager.getFileByPath("/queries",
-            // Progress...
-            function () {
-
-            },
             // Success
             function (results, caller) {
                 var extension = caller.extension
@@ -151,10 +147,6 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                     function (result, caller) {
                         // Here is the new file...
                     },
-                    // Progress callback
-                    function () {
-
-                    },
                     // Error callback.
                     function () {
 
@@ -168,10 +160,11 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     // Create a new Entity Query File.
 
-
     // Entity Query Language File.
     var newEqlQueryMenuItem = new MenuItem("new_eql_query_menu_item", "EQL Query", {}, 1, function (extension) {
-        return function () { createQuery(extension) }
+        return function () { 
+            createQuery(extension) 
+        }
     }(".eql"), "fa fa-file-o")
 
     // Structured Query Language Query Language File.

@@ -44,7 +44,7 @@ var MenuItem = function (id, name, subItems, level, action, icon) {
 var VerticalMenu = function (parent, items) {
 
     this.parent = parent
-    this.panel = this.parent.appendElement({ "tag": "div", "style":"relative;"}).down()
+    this.panel = this.parent.appendElement({ "tag": "div", "style": "relative;" }).down()
     this.subItemPanel = null
     this.currentItem = null
 
@@ -81,27 +81,27 @@ VerticalMenu.prototype.appendItem = function (item) {
             return function () {
                 subMenuPanel.element.style.border = "1px solid lightgrey"
             }
-        } (subMenuPanel)
+        }(subMenuPanel)
 
         iconPanel.element.onmouseleave = function (subMenuPanel) {
             return function () {
                 subMenuPanel.element.style.border = ""
             }
-        } (subMenuPanel)
+        }(subMenuPanel)
 
         subMenuPanel.element.onmouseenter = function (iconPanel) {
             return function () {
                 iconPanel.element.style.color = "white"
                 iconPanel.element.style.backgroundColor = "#657383"
             }
-        } (iconPanel)
+        }(iconPanel)
 
         subMenuPanel.element.onmouseleave = function (iconPanel) {
             return function () {
                 iconPanel.element.style.color = ""
                 iconPanel.element.style.backgroundColor = ""
             }
-        } (iconPanel)
+        }(iconPanel)
     }
 
     // Append the subitem panel.
@@ -137,7 +137,7 @@ VerticalMenu.prototype.appendItem = function (item) {
                 setVisible(item)
             }
         }
-    } (currentPanel, this.subItemPanel, item, this)
+    }(currentPanel, this.subItemPanel, item, this)
 
     // Create sub items...
     var subItems = []
@@ -179,7 +179,159 @@ VerticalMenu.prototype.appendItem = function (item) {
                 setInvisible(item)
             }
         }
-    } (currentPanel, this.subItemPanel, item)
+    }(currentPanel, this.subItemPanel, item)
+
+}
+
+/*
+ * That class create a popup menu.
+ */
+var PopUpMenu = function (parent, items) {
+
+    // The menu panel.
+    this.parent = parent
+
+    this.panel = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class":"popup_menu", "style": "position: absolute; z-index: 10;" })
+    var coord = getCoords(parent.element)
+
+    this.panel.element.style.top = coord.top + parent.element.offsetHeight + "px"
+    this.panel.element.style.left = coord.left + "px"
+
+    this.subItemPanel = null
+    this.currentItem = null
+
+    this.items = items
+    if (this.items == undefined) {
+        this.items = []
+    }
+
+    // I will now initialyse the items...
+    for (var i = 0; i < this.items.length; i++) {
+        this.appendItem(this.items[i])
+    }
+
+    return this
+}
+
+/*
+ * Append a new Item in the menu panel...
+ */
+PopUpMenu.prototype.appendItem = function (item) {
+
+    var currentPanel = null
+    if (item.level == 0) {
+        // Here the menu is show in row...
+        currentPanel = this.panel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu", "innerHtml": item.name }).down()
+    } else {
+        // Here the menu is 
+        currentPanel = this.panel.appendElement({ "tag": "div", "class": "menu_row", "style": "display: table-row; width: 100%" }).down()
+
+        var iconPanel = currentPanel.appendElement({ "tag": "i", "class": item.icon + " menu_icon", "style": "display: table-cell;" }).down()
+        var subMenuPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu", "innerHtml": item.name }).down()
+
+        iconPanel.element.onmouseenter = function (subMenuPanel) {
+            return function () {
+                subMenuPanel.element.style.border = "1px solid lightgrey"
+            }
+        }(subMenuPanel)
+
+        iconPanel.element.onmouseleave = function (subMenuPanel) {
+            return function () {
+                subMenuPanel.element.style.border = ""
+            }
+        }(subMenuPanel)
+
+        subMenuPanel.element.onmouseenter = function (iconPanel) {
+            return function () {
+                iconPanel.element.style.color = "white"
+                iconPanel.element.style.backgroundColor = "#657383"
+            }
+        }(iconPanel)
+
+        subMenuPanel.element.onmouseleave = function (iconPanel) {
+            return function () {
+                iconPanel.element.style.color = ""
+                iconPanel.element.style.backgroundColor = ""
+            }
+        }(iconPanel)
+    }
+
+    // Append the subitem panel.
+    this.subItemPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu_items" }).down()
+    item.panel = this.subItemPanel
+
+    // Display the menu automatically...
+    currentPanel.element.onmouseenter = function (menuPanel, subItemPanel, item, menu) {
+        return function () {
+            var subItemPanels = document.getElementsByClassName("vertical_submenu_items")
+            for (var i = 0; i < subItemPanels.length; i++) {
+                subItemPanels[i].style.display = "none"
+            }
+
+            if (item.level > 0) {
+                // Now I will offset the menu...
+                menu.currentItem = item
+                function setVisible(item) {
+
+                    item.panel.element.style.display = "block"
+                    if (item.parent != undefined) {
+                        setVisible(item.parent)
+                    }
+                    if (item.level > 0) {
+                        item.panel.element.style.left = item.panel.element.parentNode.offsetWidth + "px"
+                        item.panel.element.style.top = "0px"
+                    }
+                    if (Object.keys(item.panel.childs).length == 0) {
+                        item.panel.element.style.display = "none"
+                    }
+                }
+                // Set the item menu visibility...
+                setVisible(item)
+            }
+        }
+    }(currentPanel, this.subItemPanel, item, this)
+
+    // Create sub items...
+    var subItems = []
+    if (item.subItems != undefined) {
+        for (var key in item.subItems) {
+            subItems.push(item.subItems[key])
+        }
+        if (subItems.length > 0) {
+            new VerticalMenu(this.subItemPanel, subItems)
+        }
+    }
+
+    // Now the actions...
+    currentPanel.element.onclick = function (menuPanel, subItemPanel) {
+        return function (evt) {
+            evt.stopPropagation()
+
+            if (subItemPanel.element.style.display == "block") {
+                subItemPanel.element.style.display = "none"
+            } else {
+                subItemPanel.element.style.display = "block"
+                if (item.level >= 1) {
+                    // Now I will offset the menu...
+                    subItemPanel.element.style.left = menuPanel.element.offsetWidth + "px"
+                    subItemPanel.element.style.top = "0px"
+                }
+            }
+            if (Object.keys(subItemPanel.childs).length == 0) {
+                subItemPanel.element.style.display = "none"
+            }
+            if (item.action != undefined) {
+                item.action()
+                function setInvisible(item) {
+                    item.panel.element.style.display = "none"
+                    if (item.parent != undefined) {
+                        setInvisible(item.parent)
+                    }
+                }
+                setInvisible(item)
+            }
+        }
+    }(currentPanel, this.subItemPanel, item)
 
 }
 
@@ -230,13 +382,13 @@ HorizontalMenu.prototype.appendItem = function (item) {
         return function () {
             this.style.cursor = "pointer"
         }
-    } (this)
+    }(this)
 
     item.panel.element.onmouseleave = function (menu) {
         return function () {
             this.style.cursor = "default"
         }
-    } (this)
+    }(this)
 
     item.panel.element.onclick = function (menu, item_) {
         return function (evt) {
@@ -268,7 +420,7 @@ HorizontalMenu.prototype.appendItem = function (item) {
                 item_.action()
             }
         }
-    } (this, item)
+    }(this, item)
 }
 
 HorizontalMenu.prototype.setItem = function (item) {
@@ -310,20 +462,20 @@ HorizontalMenu.prototype.setItem = function (item) {
                         item.action()
                     }
                 }
-            } (this, subItem)
+            }(this, subItem)
 
             // Mouse action...
             subItem.panel.element.onmouseover = function (menu) {
                 return function () {
                     this.style.cursor = "pointer"
                 }
-            } (this)
+            }(this)
 
             subItem.panel.element.onmouseleave = function (menu) {
                 return function () {
                     this.style.cursor = "default"
                 }
-            } (this)
+            }(this)
 
         }
 

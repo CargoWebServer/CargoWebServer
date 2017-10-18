@@ -764,6 +764,17 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
 
                 // So here I will set the value of the propertie.
                 var fieldType = typeNameInput.element.value
+
+                // Set in indexs...
+                if(panel.getCurrentEntityPrototype().Indexs.indexOf(panel.getCurrentEntityPrototype().Fields[index]) != -1){
+                    panel.getCurrentEntityPrototype().Indexs[panel.getCurrentEntityPrototype().Indexs.indexOf(panel.getCurrentEntityPrototype().Fields[index])] = "M_" + nameInput.element.value
+                }
+
+                // Set in ids...
+                if(panel.getCurrentEntityPrototype().Ids.indexOf(panel.getCurrentEntityPrototype().Fields[index]) != -1){
+                    panel.getCurrentEntityPrototype().Ids[panel.getCurrentEntityPrototype().Ids.indexOf(panel.getCurrentEntityPrototype().Fields[index])] = "M_" + nameInput.element.value
+                }
+
                 panel.getCurrentEntityPrototype().Fields[index] = "M_" + nameInput.element.value
                 panel.getCurrentEntityPrototype().FieldsType[index] = fieldType
 

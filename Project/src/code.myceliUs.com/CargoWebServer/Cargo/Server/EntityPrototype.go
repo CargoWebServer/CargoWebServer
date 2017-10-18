@@ -262,6 +262,7 @@ func (this *EntityPrototype) Save(storeId string) error {
 	}
 
 	// Get information of the previous entity prototype.
+	log.Println(this)
 	prototype, err := GetServer().GetEntityManager().getEntityPrototype(this.TypeName, storeId)
 	if err != nil {
 		return err
@@ -269,6 +270,7 @@ func (this *EntityPrototype) Save(storeId string) error {
 
 	store := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
 	if store != nil {
+
 		err := store.saveEntityPrototype(this)
 		if err != nil {
 			log.Println("Fail to save entity prototype ", this.TypeName, " in store id ", storeId)
@@ -286,92 +288,113 @@ func (this *EntityPrototype) Save(storeId string) error {
 			evt, _ := NewEvent(UpdatePrototypeEvent, PrototypeEvent, eventDatas)
 			GetServer().GetEventManager().BroadcastEvent(evt)
 
-			entities, _ := GetServer().GetEntityManager().getEntities(prototype.TypeName, "", storeId, false)
+			// Update local entities if the store is local.
+			if store.m_ipv4 == "127.0.0.1" { // save if is local entity prototype only.
+				entities, _ := GetServer().GetEntityManager().getEntities(prototype.TypeName, "", storeId, false)
 
-			// Remove the fields
-			for i := 0; i < len(entities); i++ {
-				entity := entities[i] // Must be a dynamic entity.
+				// Remove the fields
+				for i := 0; i < len(entities); i++ {
+					entity := entities[i] // Must be a dynamic entity.
 
-				// remove it...
-				for j := 0; j < len(this.FieldsToDelete); j++ {
-					field := prototype.Fields[this.FieldsToDelete[j]]
-					if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-						// Dynamic entity.
-						entity.(*DynamicEntity).deleteValue(field)
-					}
-
-					entity.SetNeedSave(true)
-					entity.SaveEntity() // Must be save before doing something else.
-				}
-
-				for j := 0; j < len(this.FieldsToUpdate); j++ {
-					values := strings.Split(this.FieldsToUpdate[j], ":")
-					if len(values) == 2 {
-						indexFrom := prototype.getFieldIndex(values[0])
-						indexTo := this.getFieldIndex(values[1])
-						if indexFrom > -1 && indexTo > -1 {
-							if values[0] != values[1] {
-								if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-									// Set the new value with the old one
-									entity.(*DynamicEntity).setValue(values[1], entity.(*DynamicEntity).getValue(values[0]))
-									// Delete the old one.
-									entity.(*DynamicEntity).deleteValue(values[0])
-								}
-
-								entity.SetNeedSave(true)
-								prototype.Fields[indexFrom] = values[1]
-							}
-							var fieldTypeTo = prototype.FieldsType[indexTo]
-							var fieldTypeFrom = this.FieldsType[indexFrom]
-							if fieldTypeFrom != fieldTypeTo {
-								log.Println("------> change field type from ", fieldTypeFrom, "with", fieldTypeTo)
-								// TODO set conversion rules here for each possible types.
-							}
-						}
-					}
-				}
-
-				// Set the new entity prototype
-				if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-					entity.(*DynamicEntity).prototype = this
-				}
-				// Now set new fields value inside existing entities with their default
-				// value.
-				for j := 0; j < len(this.Fields); j++ {
-					if !Utility.Contains(prototype.Fields, this.Fields[j]) {
-						// I that case I will set the new field value inside the prototype.
-						var value interface{}
-						if strings.HasPrefix(this.FieldsType[j], "[]") {
-							value = "undefined"
-						} else {
-							if XML_Schemas.IsXsString(this.FieldsType[j]) {
-								value = this.FieldsDefaultValue[j]
-							} else if XML_Schemas.IsXsInt(this.FieldsType[j]) || XML_Schemas.IsXsTime(this.FieldsType[j]) {
-								value, _ = strconv.ParseInt(this.FieldsDefaultValue[j], 10, 64)
-							} else if XML_Schemas.IsXsNumeric(this.FieldsType[j]) {
-								value, _ = strconv.ParseFloat(this.FieldsDefaultValue[j], 64)
-							} else if XML_Schemas.IsXsDate(this.FieldsType[j]) {
-								value = Utility.MakeTimestamp()
-							} else if XML_Schemas.IsXsBoolean(this.FieldsType[j]) {
-								if this.FieldsDefaultValue[j] == "false" {
-									value = false
-								} else {
-									value = true
-								}
-							} else {
-								// Object here.
-								value = "undefined"
-							}
-						}
-						entity.SetNeedSave(true)
+					// remove it...
+					for j := 0; j < len(this.FieldsToDelete); j++ {
+						field := prototype.Fields[this.FieldsToDelete[j]]
 						if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-							entity.(*DynamicEntity).setValue(this.Fields[j], value)
+							// Dynamic entity.
+							entity.(*DynamicEntity).deleteValue(field)
+						}
+
+						entity.SetNeedSave(true)
+						entity.SaveEntity() // Must be save before doing something else.
+					}
+
+					// update it...
+					for j := 0; j < len(this.FieldsToUpdate); j++ {
+						values := strings.Split(this.FieldsToUpdate[j], ":")
+						if len(values) == 2 {
+							indexFrom := prototype.getFieldIndex(values[0])
+							indexTo := this.getFieldIndex(values[1])
+							if indexFrom > -1 && indexTo > -1 {
+								if values[0] != values[1] {
+									if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+										// Set the new value with the old one
+										entity.(*DynamicEntity).setValue(values[1], entity.(*DynamicEntity).getValue(values[0]))
+										// Delete the old one.
+										entity.(*DynamicEntity).deleteValue(values[0])
+									}
+
+									entity.SetNeedSave(true)
+									prototype.Fields[indexFrom] = values[1]
+								}
+								var fieldTypeTo = prototype.FieldsType[indexTo]
+								var fieldTypeFrom = this.FieldsType[indexFrom]
+								if fieldTypeFrom != fieldTypeTo {
+									log.Println("------> change field type from ", fieldTypeFrom, "with", fieldTypeTo)
+									// TODO set conversion rules here for each possible types.
+								}
+							}
+						}
+					}
+
+					// Set the new entity prototype
+					if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+						entity.(*DynamicEntity).prototype = this
+					}
+					// Now set new fields value inside existing entities with their default
+					// value.
+					for j := 0; j < len(this.Fields); j++ {
+						if !Utility.Contains(prototype.Fields, this.Fields[j]) {
+							// I that case I will set the new field value inside the prototype.
+							var value interface{}
+							if strings.HasPrefix(this.FieldsType[j], "[]") {
+								value = "undefined"
+							} else {
+								if XML_Schemas.IsXsString(this.FieldsType[j]) {
+									value = this.FieldsDefaultValue[j]
+								} else if XML_Schemas.IsXsInt(this.FieldsType[j]) || XML_Schemas.IsXsTime(this.FieldsType[j]) {
+									value, _ = strconv.ParseInt(this.FieldsDefaultValue[j], 10, 64)
+								} else if XML_Schemas.IsXsNumeric(this.FieldsType[j]) {
+									value, _ = strconv.ParseFloat(this.FieldsDefaultValue[j], 64)
+								} else if XML_Schemas.IsXsDate(this.FieldsType[j]) {
+									value = Utility.MakeTimestamp()
+								} else if XML_Schemas.IsXsBoolean(this.FieldsType[j]) {
+									if this.FieldsDefaultValue[j] == "false" {
+										value = false
+									} else {
+										value = true
+									}
+								} else {
+									// Object here.
+									value = "undefined"
+								}
+							}
+							entity.SetNeedSave(true)
+							if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+								entity.(*DynamicEntity).setValue(this.Fields[j], value)
+							}
+						}
+					}
+
+					// Save the entity.
+					entity.SaveEntity()
+				}
+
+				// Now the indexation key for ids and indexs...
+				for i := 0; i < len(this.FieldsToUpdate); i++ {
+					values := strings.Split(this.FieldsToUpdate[i], ":")
+					if len(values) == 2 {
+						if Utility.Contains(this.Indexs, values[1]) || Utility.Contains(this.Ids, values[1]) {
+							oldKey := this.TypeName + ":" + values[0]
+							newKey := this.TypeName + ":" + values[1]
+							indexations, err := store.getValue(oldKey)
+							if err == nil {
+								// Here I will remove the oldKey...
+								store.deleteValue(oldKey)
+								store.setValue([]byte(newKey), indexations)
+							}
 						}
 					}
 				}
-
-				// Save the entity.
-				entity.SaveEntity()
 			}
 		}
 	}

@@ -82,7 +82,6 @@ func (this *LdapManager) start() {
 		if err != nil {
 			log.Println("Synchronize Computers Error ", err)
 		}
-
 	}
 }
 

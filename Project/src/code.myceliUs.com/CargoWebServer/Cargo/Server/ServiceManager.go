@@ -79,7 +79,6 @@ func (this *ServiceManager) getId() string {
 }
 
 func (this *ServiceManager) start() {
-
 	log.Println("--> Start ServiceManager")
 
 	// I will create new action if there one's...
@@ -104,7 +103,6 @@ func (this *ServiceManager) start() {
 			}
 		}
 	}
-
 }
 
 func (this *ServiceManager) stop() {
