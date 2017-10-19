@@ -147,6 +147,9 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                     function (result, caller) {
                         // Here is the new file...
                     },
+                    function () {
+                        
+                    },
                     // Error callback.
                     function () {
 

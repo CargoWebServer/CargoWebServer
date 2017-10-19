@@ -65,7 +65,12 @@ var VerticalMenu = function (parent, items) {
  * Append a new Item in the menu panel...
  */
 VerticalMenu.prototype.appendItem = function (item) {
-
+    if(isString(item)){
+        // In that case I will append a separator.
+        this.appendSeparator()
+        return
+    }
+    
     var currentPanel = null
     if (item.level == 0) {
         // Here the menu is show in row...
@@ -217,12 +222,14 @@ var PopUpMenu = function (parent, items, e) {
 
     this.displayed = false
 
-    document.getElementsByTagName("body")[0].oncontextmenu = function (popup) {
+    // Body events, used to remove the context menu.
+    var listener0 = function (popup, listener) {
         return function () {
             if (popup.displayed == true) {
-                try{
+                try {
                     popup.panel.element.parentNode.removeChild(popup.panel.element)
-                }catch(err){
+                    document.getElementsByTagName("body")[0].removeEventListener("contextmenu", listener)
+                } catch (err) {
                     /** nothing to do here. */
                 }
             } else {
@@ -230,53 +237,85 @@ var PopUpMenu = function (parent, items, e) {
             }
             return false
         }
-    }(this)
+    }(this, listener0)
+
+    document.getElementsByTagName("body")[0].addEventListener("contextmenu", listener0);
+
+    var listener1 = function (listener) {
+        return function (evt) {
+            var popups = document.getElementsByClassName("popup_menu")
+            for (var i = 0; i < popups.length; i++) {
+                popups[i].parentNode.removeChild(popups[i])
+            }
+            document.getElementsByTagName("body")[0].removeEventListener("click", listener)
+        }
+    }(listener1)
+    document.getElementsByTagName("body")[0].addEventListener("click", listener1);
+
+    var listener2 = function (popup, listener) {
+        return function (evt) {
+            if (evt.keyCode == 27) {
+                try {
+                    popup.panel.element.parentNode.removeChild(popup.panel.element)
+                    document.getElementsByTagName("body")[0].removeEventListener("keyup", listener)
+                } catch (err) {
+                    /** nothing to do here. */
+                }
+            }
+        }
+    }(this, listener2)
+    document.getElementsByTagName("body")[0].addEventListener("keyup", listener2);
 
     return this
+}
+
+PopUpMenu.prototype.appendSeparator = function (item) {
+    this.panel.appendElement({ "tag": "div","class":"menu_separator"}).down()
 }
 
 /*
  * Append a new Item in the menu panel...
  */
 PopUpMenu.prototype.appendItem = function (item) {
+    if(isString(item)){
+        // In that case I will append a separator.
+        this.appendSeparator()
+        return
+    }
 
     var currentPanel = null
-    if (item.level == 0) {
-        // Here the menu is show in row...
-        currentPanel = this.panel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu", "innerHtml": item.name }).down()
-    } else {
-        // Here the menu is 
-        currentPanel = this.panel.appendElement({ "tag": "div", "class": "menu_row", "style": "display: table-row; width: 100%" }).down()
 
-        var iconPanel = currentPanel.appendElement({ "tag": "i", "class": item.icon + " menu_icon", "style": "display: table-cell;" }).down()
-        var subMenuPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu", "innerHtml": item.name }).down()
+    // Here the menu is 
+    currentPanel = this.panel.appendElement({ "tag": "div", "class": "menu_row", "style": "display: table-row; width: 100%" }).down()
 
-        iconPanel.element.onmouseenter = function (subMenuPanel) {
-            return function () {
-                subMenuPanel.element.style.border = "1px solid lightgrey"
-            }
-        }(subMenuPanel)
+    var iconPanel = currentPanel.appendElement({ "tag": "i", "class": item.icon + " menu_icon", "style": "display: table-cell;" }).down()
+    var subMenuPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu", "innerHtml": item.name }).down()
 
-        iconPanel.element.onmouseleave = function (subMenuPanel) {
-            return function () {
-                subMenuPanel.element.style.border = ""
-            }
-        }(subMenuPanel)
+    iconPanel.element.onmouseenter = function (subMenuPanel) {
+        return function () {
+            subMenuPanel.element.style.border = "1px solid lightgrey"
+        }
+    }(subMenuPanel)
 
-        subMenuPanel.element.onmouseenter = function (iconPanel) {
-            return function () {
-                iconPanel.element.style.color = "white"
-                iconPanel.element.style.backgroundColor = "#657383"
-            }
-        }(iconPanel)
+    iconPanel.element.onmouseleave = function (subMenuPanel) {
+        return function () {
+            subMenuPanel.element.style.border = ""
+        }
+    }(subMenuPanel)
 
-        subMenuPanel.element.onmouseleave = function (iconPanel) {
-            return function () {
-                iconPanel.element.style.color = ""
-                iconPanel.element.style.backgroundColor = ""
-            }
-        }(iconPanel)
-    }
+    subMenuPanel.element.onmouseenter = function (iconPanel) {
+        return function () {
+            iconPanel.element.style.color = "white"
+            iconPanel.element.style.backgroundColor = "#657383"
+        }
+    }(iconPanel)
+
+    subMenuPanel.element.onmouseleave = function (iconPanel) {
+        return function () {
+            iconPanel.element.style.color = ""
+            iconPanel.element.style.backgroundColor = ""
+        }
+    }(iconPanel)
 
     // Append the subitem panel.
     this.subItemPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu_items" }).down()
@@ -325,7 +364,7 @@ PopUpMenu.prototype.appendItem = function (item) {
     }
 
     // Now the actions...
-    currentPanel.element.onclick = function (menuPanel, subItemPanel) {
+    currentPanel.element.onclick = function (menu, menuPanel, subItemPanel) {
         return function (evt) {
             evt.stopPropagation()
 
@@ -344,6 +383,7 @@ PopUpMenu.prototype.appendItem = function (item) {
             }
             if (item.action != undefined) {
                 item.action()
+                menu.panel.element.parentNode.removeChild(menu.panel.element)
                 function setInvisible(item) {
                     item.panel.element.style.display = "none"
                     if (item.parent != undefined) {
@@ -353,7 +393,7 @@ PopUpMenu.prototype.appendItem = function (item) {
                 setInvisible(item)
             }
         }
-    }(currentPanel, this.subItemPanel, item)
+    }(this, currentPanel, this.subItemPanel, item)
 
 }
 

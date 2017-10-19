@@ -149,11 +149,11 @@ func (this *ProjectManager) OnEvent(evt interface{}) {
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *ProjectManager) Synchronize(sessionId string, messageId string) {
-	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	/*errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
-	}
+	}*/
 	// Synchronize the content of project.
 	this.synchronize()
 }

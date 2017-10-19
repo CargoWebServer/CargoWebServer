@@ -31,11 +31,6 @@ function init() {
     )
     // the main page...
     mainPage = new MainPage(mainLayout, loginPage)
-
-    // Rememove the default context menu
-    document.getElementsByTagName("body")[0].oncontextmenu = function(){
-        return false
-    }
 }
 
 /**
