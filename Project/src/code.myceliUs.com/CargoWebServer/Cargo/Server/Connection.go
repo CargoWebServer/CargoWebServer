@@ -111,12 +111,12 @@ func (c *tcpSocketConnection) Open(host string, port int) (err error) {
 		return err
 	}
 
-	if c.m_socket == nil && c.m_try < 10 {
+	if c.m_socket == nil && c.m_try < 3 {
 		c.m_try += 1
 		time.Sleep(100 * time.Millisecond)
 		c.Open(host, port)
 
-	} else if c.m_try == 10 {
+	} else if c.m_try == 3 {
 		return errors.New("fail to connect with " + connectionId)
 	} else {
 		c.m_isOpen = true
@@ -246,17 +246,15 @@ func (c *webSocketConnection) Open(host string, port int) (err error) {
 	// Open the socket...
 	url := "http://" + host + ":" + strconv.Itoa(port) + "/ws"
 	origin := "ws://" + host + ":" + strconv.Itoa(port) + "/ws"
-
 	c.m_socket, err = websocket.Dial(origin, "", url)
 
-	if err != nil && c.m_try < 10 {
+	if err != nil && c.m_try < 3 {
 		time.Sleep(100 * time.Millisecond)
 		c.m_try += 1
 		c.Open(host, port)
-	} else if c.m_try == 10 {
+	} else if c.m_try == 3 {
 		return errors.New("fail to connect with " + origin)
 	} else if c.m_socket != nil {
-		log.Println("--------> connection whit ", host, " at port ", port, " is now open!")
 		c.m_isOpen = true
 		GetServer().GetHub().register <- c
 

@@ -8,6 +8,14 @@
  * @constructor 
  */
 var EntityPrototype = function () {
+    /**
+     * Uniquely indentify entity prototype.
+     */
+    this.UUID = randomUUID()
+
+    /**
+     * The typename of the prototype itself.
+     */
     this.TYPENAME = "Server.EntityPrototype"
 
     /**
@@ -122,7 +130,7 @@ EntityPrototype.prototype.getTitles = function () {
             titles.push(this[field])
         }
     }
-    
+
     // The indexs
     for (var i = 1; i < this.Indexs.length; i++) {
         var fieldIndex = this.getFieldIndex(this.Indexs[i])
@@ -403,6 +411,15 @@ EntityPrototype.prototype.generateConstructor = function () {
     constructorSrc += "       return entities[this.ParentUuid]\n"
     constructorSrc += "  }\n"
 
+    // The get parent function
+    constructorSrc += " this.getTypeName = function(){\n"
+    constructorSrc += "       return getEntityPrototype(this.TYPENAME).TypeName\n"
+    constructorSrc += "  }\n"
+
+    constructorSrc += " this.getPrototype = function(){\n"
+    constructorSrc += "       return getEntityPrototype(this.TYPENAME)\n"
+    constructorSrc += "  }\n"
+
     // The setter function.
     for (var i = 0; i < this.Fields.length; i++) {
         if (!this.FieldsType[i].startsWith("xs.") && !this.FieldsType[i].startsWith("[]xs.")) {
@@ -565,7 +582,7 @@ EntityPrototypeManager.prototype.onEvent = function (evt) {
         evt.dataMap.prototype = prototype
     } else if (evt.code == DeletePrototypeEvent) {
         // Remove it from the map
-        delete entityPrototypes[evt.dataMap.prototype.TypeName]
+        deleteEntityPrototype(evt.dataMap.prototype.TypeName)
     }
 
     // Call the regular function.
@@ -578,4 +595,20 @@ EntityPrototypeManager.prototype.onEvent = function (evt) {
  */
 function setEntityPrototype(prototype) {
     entityPrototypes[prototype.TypeName] = prototype
+}
+
+/**
+ * Use that function to set value of the global map.
+ * @param {*} prototype 
+ */
+function getEntityPrototype(typeName) {
+    return entityPrototypes[typeName]
+}
+
+/**
+ * Use that function to set value of the global map.
+ * @param {*} prototype 
+ */
+function deleteEntityPrototype(typeName) {
+    delete entityPrototypes[typeName]
 }

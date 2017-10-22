@@ -222,7 +222,7 @@ EntityTableModel.prototype.removeRow = function (rowIndex, callback) {
 
 
     // Now I will get the data type for that type.
-    var parentPrototype = entityPrototypes[parentEntity.TYPENAME]
+    var parentPrototype = getEntityPrototype(parentEntity.getTypeName())
     var field = entity.ParentLnk
     var fieldType = parentPrototype.FieldsType[parentPrototype.getFieldIndex(field)]
 
@@ -240,7 +240,7 @@ EntityTableModel.prototype.removeRow = function (rowIndex, callback) {
             confirmDialog.div.element.style.maxWidth = "450px"
             confirmDialog.setCentered()
             server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
-            var prototype = entityPrototypes[entity.TYPENAME]
+            var prototype = getEntityPrototype(entity.getTypeName())
             var id = prototype.Ids[1] // 0 is the uuid...
             if (id == undefined) {
                 id = "uuid"
@@ -280,7 +280,7 @@ EntityTableModel.prototype.appendRow = function (values) {
     this.entities.push(values)
     var isListOf_ = isListOf(this.proto.TypeName)
     var objectValues = []
-    var prototype = entityPrototypes[values.TYPENAME]
+    var prototype = values.getPrototype()
 
     for (var j = 0; j < this.titles.length; j++) {
         var field = "M_" + this.titles[j]
@@ -349,7 +349,7 @@ EntityTableModel.prototype.saveValue = function (row) {
         entity.NeedSave = true
         if (entity.exist == false) {
             // Remove the tmp entity...
-            server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity.TYPENAME, entity.M_id, entity,
+            server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity.getTypeName(), entity.M_id, entity,
                 // Success callback
                 function (entity, table) {
 

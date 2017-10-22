@@ -95,7 +95,7 @@ var CodeEditor = function (parent) {
         if (evt.dataMap.entity !== undefined) {
             var file = evt.dataMap["entity"]
             var editor = codeEditor.editors[file.M_id + "_editor"]
-            if (editor !== undefined && file.TYPENAME == "CargoEntities.File") {
+            if (editor !== undefined && file.getTypeName() == "CargoEntities.File") {
                 // Supend the change event propagation
                 codeEditor.quiet = true
                 var position = editor.getCursorPosition()
@@ -252,6 +252,12 @@ CodeEditor.prototype.appendFile = function (file) {
     var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
     var editor = ace.edit(file.M_id + "_editor");
     editor.getSession().setMode(fileMode);
+    editor.setTheme("ace/theme/tomorrow");
+    editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: false
+    });
     this.editors[file.M_id + "_editor"] = editor
 
     // In case of file update...

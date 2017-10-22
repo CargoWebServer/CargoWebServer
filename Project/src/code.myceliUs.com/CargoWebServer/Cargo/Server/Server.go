@@ -678,6 +678,10 @@ func (this *Server) Start() {
 		JS.GetJsRuntimeManager().RunScript("", "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();")
 	}
 
+	// Now after all initialisation are done I will open connection with
+	// other servers.
+	this.GetDataManager().openConnections()
+
 	// Now I will set scheduled task.
 	for i := 0; i < len(GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
 		task := GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks[i]
@@ -693,9 +697,6 @@ func (this *Server) Start() {
 		}
 	}
 
-	// Now after all initialisation are done I will open connection with
-	// other servers.
-	this.GetDataManager().openConnections()
 }
 
 /**
@@ -763,6 +764,7 @@ func (this *Server) connect(address string) (connection, error) {
 	var host string
 	var socket string
 	var port int
+
 	if len(values) == 3 {
 		socket = values[0]
 		host = strings.Replace(values[1], "//", "", -1)
@@ -773,6 +775,11 @@ func (this *Server) connect(address string) (connection, error) {
 		port, _ = strconv.Atoi(values[1])
 	}
 
+	// Open the a new connection with the server.
+	if host == this.GetConfigurationManager().GetHostName() && this.GetConfigurationManager().GetServerPort() == port {
+		return nil, errors.New("Loopback connection!")
+	}
+
 	// Create the new connection.
 	if socket == "ws" {
 		conn = NewWebSocketConnection()
@@ -780,11 +787,8 @@ func (this *Server) connect(address string) (connection, error) {
 		conn = NewTcpSocketConnection()
 	}
 
-	// Open the a new connection with the server.
-	log.Println("---> try to open ", host, port)
 	err := conn.Open(host, port)
 	if err != nil {
-		log.Println("--------------> connection fail! ", host, port, err)
 		return nil, err // The connection fail...
 	}
 
@@ -792,6 +796,8 @@ func (this *Server) connect(address string) (connection, error) {
 	if !conn.IsOpen() {
 		return nil, errors.New("Fail to open connection with socket " + host + " at port " + strconv.Itoa(port))
 	}
+
+	log.Println("--------> connection whit ", host, " at port ", port, " is now open!")
 
 	return conn, nil
 }

@@ -272,14 +272,12 @@ func (this *JsRuntimeManager) appendScript(src string) {
 	}
 
 	// I will compile the script and set it in each session...
-	for _, vm := range this.m_sessions {
+	for scriptName, vm := range this.m_sessions {
 		script, err := vm.Compile("", src)
-		vm.Run(script)
-
 		if err != nil {
-			log.Println("runtime script compilation error:", script, err)
+			log.Println("runtime script compilation error:", scriptName, err)
 		} else {
-			//log.Println(sessionId, " Load: ", this.m_scripts[i])
+			vm.Run(script)
 		}
 	}
 }

@@ -1143,19 +1143,38 @@ func (this *FileManager) RenameFile(uuid string, filename string, messageId stri
 
 	// Change the file id and the fileName.
 	file := fileEntity.GetObject().(*CargoEntities.File)
-	oldFilePath := fileManager.root + file.GetPath() + "/" + file.GetName()
-	newFilePath := fileManager.root + file.GetPath() + "/" + filename
 
-	err := os.Rename(oldFilePath, newFilePath)
-	if err == nil {
-		fileId := Utility.CreateSha1Key([]byte(file.GetPath() + "/" + filename))
-		file.SetId(fileId)
-		file.SetName(filename)
-		fileEntity.SaveEntity()
+	var path string
+	if file.GetParentDirPtr() != nil {
+		path = file.GetParentDirPtr().GetPath() + "/" + file.GetParentDirPtr().GetName()
 	} else {
-		cargoError := NewError(Utility.FileLine(), FILE_MANAGER_ERROR, SERVER_ERROR_CODE, err)
-		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		path = file.GetPath()
 	}
+
+	if file.GetName() != filename {
+		oldFilePath := fileManager.root + file.GetPath() + "/" + file.GetName()
+		newFilePath := fileManager.root + path + "/" + filename
+		err := os.Rename(oldFilePath, newFilePath)
+		if err != nil {
+			cargoError := NewError(Utility.FileLine(), FILE_MANAGER_ERROR, SERVER_ERROR_CODE, err)
+			GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+			return
+		}
+	}
+
+	fileId := Utility.CreateSha1Key([]byte(file.GetPath() + "/" + filename))
+	file.SetPath(path)
+	file.SetId(fileId)
+	file.SetName(filename)
+	fileEntity.SaveEntity()
+
+	// Here If the file is a directory I must change all it child path to...
+	if file.IsDir() {
+		for i := 0; i < len(file.GetFiles()); i++ {
+			this.RenameFile(file.GetFiles()[i].GetUUID(), file.GetFiles()[i].GetName(), messageId, sessionId)
+		}
+	}
+
 }
 
 // @api 1.0

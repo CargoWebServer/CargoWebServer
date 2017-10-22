@@ -40,7 +40,7 @@ server.languageManager.appendLanguageInfo(languageInfo)
  */
 var EntityPanel = function (parent, typeName, initCallback, parentEntityPanel, removeOnDelete, parentEntity, parentLnk) {
 	// Only know enity can have an panel.
-	if (entityPrototypes[typeName] == undefined) {
+	if (getEntityPrototype(typeName) == undefined) {
 		return
 	}
 
@@ -117,7 +117,7 @@ var EntityPanel = function (parent, typeName, initCallback, parentEntityPanel, r
 	this.initCallback = initCallback
 
 	// Finish the intialysation...
-	this.init(entityPrototypes[typeName], initCallback)
+	this.init(getEntityPrototype(typeName), initCallback)
 
 
 	// Update prototype event
@@ -774,7 +774,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 	var isRef = fieldType.endsWith(":Ref")
 
 	fieldType = fieldType.replace("[]", "").replace(":Ref", "")
-	var prototype = entityPrototypes[fieldType]
+	var prototype = getEntityPrototype(fieldType)
 
 	// if there is no restriction
 	if (restrictions == undefined) {
@@ -791,7 +791,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 				restrictions.push({ "Type": 1, "Value": values[i] })
 			}
 		} else {
-			var fieldPrototype = entityPrototypes[fieldType]
+			var fieldPrototype = getEntityPrototype(fieldType)
 			if (fieldPrototype != undefined) {
 				if (fieldPrototype.Restrictions != undefined) {
 					// Set the restriction here.
@@ -830,7 +830,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 				var itemTable = undefined
 				if (field != "M_listOf" && !fieldType.startsWith("xs.")) {
 					// I will create the entity table.
-					var prototype = entityPrototypes[fieldType.replace("[]", "")]
+					var prototype = getEntityPrototype(fieldType.replace("[]", ""))
 					var itemsTableModel = new EntityTableModel(prototype)
 					var itemTable = new Table(randomUUID(), valueDiv)
 
@@ -916,7 +916,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 								var entityPanel = caller.entityPanel
 								var id = caller.id
 								var field = caller.field
-								var prototype = entityPrototypes[caller.typeName]
+								var prototype = getEntityPrototype(caller.typeName)
 
 								// Now i will set it autocompletion list...
 								attachAutoCompleteInput(entityPanel.controls[id + "_new"], fieldType, field, entityPanel, prototype.getTitles(),
@@ -1297,7 +1297,7 @@ EntityPanel.prototype.appendObject = function (object, valueDiv, field, fieldTyp
  */
 EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, fieldType) {
 
-	var prototype = entityPrototypes[object.TYPENAME]
+	var prototype = getEntityPrototype(object.TYPENAME)
 	var titles = object.getTitles()
 	var refName = ""
 	for (var j = 0; j < titles.length; j++) {
@@ -1645,7 +1645,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 			input.element.style.cursor = "default"
 
 			if (results.length > 0) {
-				var prototype = entityPrototypes[results[0].TYPENAME]
+				var prototype =getEntityPrototype(results[0].TYPENAME)
 				// get title display a readable name for the end user
 				// or the first entity id.
 				for (var i = 0; i < results.length; i++) {

@@ -113,7 +113,15 @@ function main() {
                 // Success callback
                 function (results, caller) {
                     var values = results["result"].split(/\s+/);
-                    var author = values[23]
+
+                    var author = ""
+                    for(var i=0; i < values.length; i++){
+                        if(values[i].startsWith("UD6")){
+                            author = values[i]
+                            break
+                        }
+                    }
+
                     var path = caller.path.replaceAll("\\", "\\\\")
                     server.runCmd("cmd", ["/K", "wmic datafile where name='" + path + "' list full"],
                         // Success callback
@@ -146,19 +154,13 @@ function main() {
                 }, { "path": path, "callback": callback });
         }
     
-        getFileInfos("C:\\Temp\\Erreur.txt", function (fileInfos) {
+        getFileInfos("\\\\mon-util-01\\Demande_Travail_2\\1\\toto.txt", function (fileInfos) {
             console.log(fileInfos)
     
-        })
-    */
-    server.entityManager.getEntityPrototypes("CargoEntities",
-        function (results, caller) { 
-            console.log(results.length) 
-        },
-        function () { 
-            "-----> Error found" 
-        }, {}
-    )
+        })*/
+    
+    LaunchImportNewSQLData_Process()
+
     /*
          server.entityManager.getEntityPrototypes("Test",
              // Success callback.

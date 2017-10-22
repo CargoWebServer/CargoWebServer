@@ -64,8 +64,8 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
 
         for (var i = 0; i < panel.typeNameLst.length; i++) {
             var typeName = panel.typeNameLst[i]
-            objMap[typeName] = entityPrototypes[typeName]
-            objMap[typeName.split(".")[1]] = entityPrototypes[typeName]
+            objMap[typeName] = getEntityPrototype(typeName)
+            objMap[typeName.split(".")[1]] = getEntityPrototype(typeName)
         }
 
         // Now I will create the auto-complete text-box.
@@ -425,7 +425,7 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
         // In the other case i will use all prototypes from imports.
         var results = []
         for (var i = 0; i < this.typeNameLst.length; i++) {
-            results.push(entityPrototypes[this.typeNameLst[i]])
+            results.push(getEntityPrototype(this.typeNameLst[i]))
         }
         var caller = { "callback": callback, "prototype": prototype, "editor": this }
         successCallback(results, caller)
@@ -495,7 +495,7 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
         getSuperTypesFields(prototype.SuperTypeNames, superTypesFields,
             function (EntityPrototypeEditor, prototype, properties, isEditable) {
                 return function (superTypesFields) {
-                    for (var i = 2; i < prototype.Fields.length - 2; i++) {
+                    for (var i = 3; i < prototype.Fields.length - 3; i++) {
                         // display attributes
                         if (superTypesFields.indexOf(prototype.Fields[i]) == -1) {
                             // Here only if the propertie is part of the entity itself and not of one of it parent.
@@ -505,7 +505,7 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
                 }
             }(this, prototype, properties, isEditable))
     } else {
-        for (var i = 2; i < prototype.Fields.length - 2; i++) {
+        for (var i = 3; i < prototype.Fields.length - 2; i++) {
             // display attributes
             if (superTypesFields.indexOf(prototype.Fields[i]) == -1) {
                 // Here only if the propertie is part of the entity itself and not of one of it parent.
@@ -922,7 +922,7 @@ EntityPrototypeEditor.prototype.setDefaultValueEditor = function (defaultValueDi
             // Here I will try to see if the fieldType is a base type.
             if (!fieldType.endsWith(":Ref") && !fieldType.startsWith("[]")) {
                 // Here the field type is not xs basic type...
-                var fieldPrototype = entityPrototypes[fieldType]
+                var fieldPrototype = getEntityPrototype(fieldType)
                 // Display field name for level superior to 0 ...
                 if (level > 0) {
                     defaultValueDiv = defaultValueDiv.appendElement({ "tag": "div", "style": "display: table; width: 100%; padding-left: 4px;" }).down()
@@ -975,7 +975,7 @@ EntityPrototypeEditor.prototype.setDefaultFieldsValue = function () {
         } else {
             // Here the value will be a strcture.
             if (!fieldType.endsWith(":Ref") && !fieldType.startsWith("[]")) {
-                this.getCurrentEntityPrototype().FieldsDefaultValue[i] = JSON.stringify(this.getDefaultFieldValue(entityPrototypes[fieldType]))
+                this.getCurrentEntityPrototype().FieldsDefaultValue[i] = JSON.stringify(this.getDefaultFieldValue(getEntityPrototype(fieldType)))
             }
         }
     }
@@ -995,7 +995,7 @@ EntityPrototypeEditor.prototype.getDefaultFieldValue = function (prototype) {
             }
         } else {
             if (!fieldType.endsWith(":Ref") && !fieldType.startsWith("[]")) {
-                values[prototype.Fields[i]] = this.getDefaultFieldValue(entityPrototypes[fieldType])
+                values[prototype.Fields[i]] = this.getDefaultFieldValue(getEntityPrototype(fieldType))
             }
         }
     }

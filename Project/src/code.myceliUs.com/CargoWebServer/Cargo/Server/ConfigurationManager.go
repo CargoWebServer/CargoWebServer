@@ -176,7 +176,7 @@ func (this *ConfigurationManager) initialize() {
 		activeConfigurations.M_serverConfig.M_ipv4 = "127.0.0.1"
 
 		// Here I will create the C++ service container TCP | WS
-		this.setServiceConfiguration("CargoServiceContainer_TCP", activeConfigurations.M_serverConfig.M_ws_serviceContainerPort)
+		this.setServiceConfiguration("CargoServiceContainer_TCP", activeConfigurations.M_serverConfig.M_tcp_serviceContainerPort)
 		this.setServiceConfiguration("CargoServiceContainer_WS", activeConfigurations.M_serverConfig.M_ws_serviceContainerPort)
 
 		// Scrpit to start the service container.
@@ -367,7 +367,6 @@ func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
 			script, err := b64.StdEncoding.DecodeString(dbFile.GetObject().(*CargoEntities.File).GetData())
 			// Now I will run the script...
 			if err == nil {
-				log.Println("---> run script: ", string(script))
 				JS.GetJsRuntimeManager().RunScript("", string(script))
 			} else {
 				log.Println("---> fail to get script: ", err)

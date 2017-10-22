@@ -44,7 +44,7 @@ BpmnDataView.prototype.init = function () {
                 return function (prototype) {
                     // Generate the entity constructor.
                     prototype.generateConstructor()
-                    entityPrototypes[prototype.TypeName] = prototype
+                    setEntityPrototype(prototype)
 
                     // So here with the entity prototype i will generate the entity panel.
                     dataView.dataInputsPanel = new EntityPanel(dataView.panel, prototype.TypeName, function () { }, null, true, null, "")
@@ -168,7 +168,7 @@ BpmnDataView.prototype.save = function (callback) {
 
     // Save the entity data.
     function saveData(entity, callback) {
-        var prototype = entityPrototypes[entity.TYPENAME]
+        var prototype = entity.getPrototype()
         var itemAwareInstances = []
         for (var i = 0; i < prototype.Fields.length; i++) {
             var data = entity[prototype.Fields[i]]

@@ -526,7 +526,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
 
         var configurationContent = this.panel.appendElement({ "tag": "div", "id": "configurationContent", "style": "display: table;" }).down()
         var content = configuration["M_" + this.propertyName]
-        var prototype = entityPrototypes[configuration.TYPENAME]
+        var prototype = configuration.getPrototype()
         var fieldType = prototype.FieldsType[prototype.getFieldIndex("M_" + this.propertyName)]
 
         var newConfiguration = function (configurationPanel, configurationContent, configuration) {

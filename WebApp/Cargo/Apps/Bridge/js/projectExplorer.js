@@ -55,7 +55,7 @@ var ProjectView = function (parent, project) {
     // Now I will connect the events...
     server.entityManager.attach(this, UpdateEntityEvent, function (evt, projectView) {
         // generatePrototypesView = function (storeId, prototypes)
-        if (evt.dataMap.entity.TYPENAME == "CargoEntities.File") {
+        if (evt.dataMap.entity.getTypeName() == "CargoEntities.File") {
             var parentFolderDiv = projectView.panel.getChildById(evt.dataMap.entity.ParentUuid)
             if (parentFolderDiv != null) {
                 // Here I will append the new create folder/file...
@@ -66,7 +66,7 @@ var ProjectView = function (parent, project) {
 
     server.entityManager.attach(this, NewEntityEvent, function (evt, projectView) {
         // generatePrototypesView = function (storeId, prototypes)
-        if (evt.dataMap.entity.TYPENAME == "CargoEntities.File") {
+        if (evt.dataMap.entity.getTypeName() == "CargoEntities.File") {
             if (evt.dataMap.entity.M_isDir == false) {
                 var parentFolderDiv = projectView.panel.getChildById(evt.dataMap.entity.ParentUuid)
                 if (parentFolderDiv != null) {
@@ -79,7 +79,7 @@ var ProjectView = function (parent, project) {
 
     server.entityManager.attach(this, DeleteEntityEvent, function (evt, projectView) {
         // generatePrototypesView = function (storeId, prototypes)
-        if (evt.dataMap.entity.TYPENAME == "CargoEntities.File") {
+        if (evt.dataMap.entity.getTypeName() == "CargoEntities.File") {
             var folderDiv = projectView.panel.getChildById(evt.dataMap.entity.UUID)
             if (folderDiv != undefined) {
                 folderDiv.element.parentNode.removeChild(folderDiv.element)
@@ -119,6 +119,7 @@ ProjectView.prototype.createDirView = function (parent, dir, level) {
         parent.childsDiv.push(folderDiv)
     } else {
         folderDiv.getChildById("folderName").element.innerHTML = dir.M_name
+        folderDiv.getChildById("folderName").element.style.display = "inline"
     }
 
     if (dir.M_files != null) {
@@ -261,9 +262,46 @@ ProjectView.prototype.createDirView = function (parent, dir, level) {
                 }(dir), "fa fa-file-o")
 
                 // Rename existing folder in the project.
-                var renameMenuItem = new MenuItem("rename_menu", "Rename", {}, 0, function () {
+                var renameMenuItem = new MenuItem("rename_menu", "Rename", {}, 0, function (folderDiv, dir) {
+                    return function () {
+                        // Now I will hide the fileDiv...
+                        var text = folderDiv.element.childNodes[2].innerText
+                        folderDiv.element.childNodes[2].style.display = "none"
+                        var renameDirInput =  new Element(null, { "tag": "input", "value": text })
+                        
+                        // Insert at position 3
+                        folderDiv.element.insertBefore(renameDirInput.element, folderDiv.element.childNodes[3])
 
-                }, "fa fa-edit")
+                        renameDirInput.element.onclick = function (evt) {
+                            evt.stopPropagation()
+                            // nothing todo here.
+                        }
+
+                        renameDirInput.element.onkeyup = function (renameDirInput, folderDiv, text) {
+                            return function (evt) {
+                                evt.stopPropagation()
+                                if (evt.keyCode == 27) {
+                                    // escape key
+                                    renameDirInput.element.parentNode.removeChild(renameDirInput.element)
+                                    folderDiv.element.childNodes[2].style.display = "inline"
+                                } else if (evt.keyCode == 13) {
+                                    // Rename the file here.
+                                    server.fileManager.renameFile(dir.UUID, this.value,
+                                        // Success callback
+                                        function (result, renameDirInput) {
+                                            renameDirInput.element.parentNode.removeChild(renameDirInput.element)
+                                        },
+                                        // Error callback
+                                        function () {
+
+                                        }, renameDirInput)
+                                }
+                            }
+                        }(renameDirInput, folderDiv, text)
+                        renameDirInput.element.setSelectionRange(0, text.length)
+                        renameDirInput.element.focus()
+                    }
+                }(folderDiv, dir), "fa fa-edit")
 
                 // Delete a file from a project.
                 var deleteMenuItem = new MenuItem("delete_menu", "Delete", {}, 0, function (dir) {
@@ -381,7 +419,7 @@ ProjectView.prototype.createFileView = function (parent, file) {
                 var renameMenuItem = new MenuItem("rename_menu", "Rename", {}, 0, function (fileDiv, file) {
                     return function () {
                         // Now I will hide the fileDiv...
-                        var text = fileDiv.element.innerText
+                        var text = fileDiv.element.firstChild.innerText
                         fileDiv.element.firstChild.style.display = "none"
                         var renameFileInput = new Element(fileDiv, { "tag": "input", "value": text })
                         renameFileInput.element.onclick = function (evt) {

@@ -75,6 +75,9 @@ type Restriction struct {
  */
 type EntityPrototype struct {
 
+	// Uniquely identify the entity prototype.
+	UUID string
+
 	// The name of the entity
 	// The type name is compose of the package name, a comma and
 	// the type name itself.
@@ -143,6 +146,9 @@ type EntityPrototype struct {
 func NewEntityPrototype() *EntityPrototype {
 
 	prototype := new(EntityPrototype)
+
+	// Uniquely identify entity prototype.
+	prototype.UUID = Utility.RandomUUID()
 
 	prototype.Fields = make([]string, 0)
 	prototype.FieldsOrder = make([]int, 0)
@@ -262,7 +268,6 @@ func (this *EntityPrototype) Save(storeId string) error {
 	}
 
 	// Get information of the previous entity prototype.
-	log.Println(this)
 	prototype, err := GetServer().GetEntityManager().getEntityPrototype(this.TypeName, storeId)
 	if err != nil {
 		return err

@@ -761,7 +761,7 @@ function createItemLnk(entity, value, field, valueDiv) {
 
 	// Remove the content if any...
 	valueDiv.element.innerHTML = ""
-	var prototype = entityPrototypes[value.TYPENAME]
+	var prototype = getEntityPrototype(value.TYPENAME)
 
 	var titles = []
 	if (value.getTitles != undefined) {
@@ -913,7 +913,7 @@ TableCell.prototype.formatValue = function (value) {
 					entity = this.row.table.model.entities[this.row.index]
 				}
 				var entityType = entity.__class__
-				var entityPrototype = entityPrototypes[entityType]
+				var entityPrototype = getEntityPrototype(entityType)
 				if (entityPrototype.IsAbstract) {
 					// Here I will treat it as a reference.
 					var field = "M_" + this.row.table.model.titles[this.index]
@@ -1082,7 +1082,7 @@ TableCell.prototype.formatValue = function (value) {
 
 				// In that case the array contain a list of reference.
 				// An entity table...
-				var prototype = entityPrototypes[fieldType.replace("[]", "").replace(":Ref", "")]
+				var prototype = getEntityPrototype(fieldType.replace("[]", "").replace(":Ref", ""))
 				var field = "M_" + this.row.table.model.titles[this.index]
 
 				var content = this.valueDiv.getChildById(field + "_content")
@@ -1185,7 +1185,7 @@ TableCell.prototype.formatValue = function (value) {
 				content = new Element(this.valueDiv, { "tag": "div", "style": "display: table-row;", "id": field + "_content" })
 				var newLnkButton = content.appendElement({ "tag": "div", "class": "new_row_button row_button", "id": field + "_plus_btn" }).down()
 				newLnkButton.appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
-				var prototype = entityPrototypes[fieldType.replace("[]", "")]
+				var prototype = getEntityPrototype(fieldType.replace("[]", ""))
 
 				if (value.length > 0) {
 					// An entity table...
@@ -1234,7 +1234,7 @@ TableCell.prototype.formatValue = function (value) {
 						}
 						if (itemTable == undefined) {
 							var itemTable = new Table(randomUUID(), content)
-							var itemsTableModel = new EntityTableModel(entityPrototypes[fieldType])
+							var itemsTableModel = new EntityTableModel(getEntityPrototype(fieldType))
 							itemTable.setModel(itemsTableModel, function (table, item) {
 								return function () {
 									newRow = itemTable.appendRow(item, item.UUID)
@@ -1549,7 +1549,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				}
 			} else {
 				// Here I will get the prototype for the field type
-				var fieldPrototype = entityPrototypes[type]
+				var fieldPrototype = getEntityPrototype(type)
 
 				// Here it's an enumeration of value.
 				if (fieldPrototype.Restrictions != undefined) {

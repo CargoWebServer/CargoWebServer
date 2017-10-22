@@ -26,7 +26,7 @@ var DataExplorer = function (parent) {
     // I will connect the view to the events.
     // New prototype event
     server.prototypeManager.attach(this, NewPrototypeEvent, function (evt, dataExplorer) {
-       // generatePrototypesView = function (storeId, prototypes)
+        // generatePrototypesView = function (storeId, prototypes)
         if (evt.dataMap.prototype.TypeName.startsWith(dataExplorer.storeId)) {
             dataExplorer.prototypesView[evt.dataMap.prototype.TypeName] = new PrototypeTreeView(dataExplorer.shemasView[dataExplorer.storeId], evt.dataMap.prototype)
         }
@@ -293,10 +293,99 @@ var PrototypeTreeView = function (parent, prototype) {
     this.editLnk.element.onclick = function (typeName) {
         return function () {
             // So here I will generate an even...
-            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "prototypeInfo": entityPrototypes[typeName] } }
+            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "prototypeInfo": getEntityPrototypes(typeName) } }
             server.eventHandler.broadcastLocalEvent(evt)
         }
     }(prototype.TypeName)
+
+    // Here I will append the contextual menu...
+    this.editLnk.element.addEventListener('contextmenu', function (editLnk) {
+        return function (evt) {
+            // Rename existing folder in the project.
+            var renameMenuItem = new MenuItem("rename_menu", "Rename", {}, 0, function (editLnk, dir) {
+                return function () {
+                    // Now I will hide the fileDiv...
+                    var text = editLnk.element.innerText
+                    var parent = editLnk.element.parentNode
+                    var renameDirInput = new Element(null, { "tag": "input", "value": text })
+                    editLnk.element.style.display = "none"
+
+                    // Insert at position 3
+                    parent.insertBefore(renameDirInput.element, parent.childNodes[3])
+
+                    renameDirInput.element.onclick = function (evt) {
+                        evt.stopPropagation()
+                        // nothing todo here.
+                    }
+
+                    renameDirInput.element.onkeyup = function (renameDirInput, editLnk, text, prototype) {
+                        return function (evt) {
+                            evt.stopPropagation()
+                            if (evt.keyCode == 27) {
+                                // escape key
+                                renameDirInput.element.parentNode.removeChild(renameDirInput.element)
+                                editLnk.element.style.display = "inline"
+                            } else if (evt.keyCode == 13) {
+                                // Rename the file here.
+                                storeId = prototype.TypeName.split(".")[0]
+                                server.entityManager.renameEntityPrototype(storeId + "." + this.value, prototype, storeId,
+                                    // Success callback
+                                    function (result, renameDirInput) {
+                                        // Remove the rename dir input.
+                                        renameDirInput.element.parentNode.removeChild(renameDirInput.element)
+                                    },
+                                    // Error callback
+                                    function () {
+
+                                    }, renameDirInput)
+                            }
+                        }
+                    }(renameDirInput, editLnk, text, prototype)
+
+                    renameDirInput.element.setSelectionRange(0, text.length)
+                    renameDirInput.element.focus()
+                }
+            }(editLnk, prototype), "fa fa-edit")
+
+            // Delete a file from a project.
+            var deleteMenuItem = new MenuItem("delete_menu", "Delete", {}, 0, function (prototype) {
+                return function () {
+                    var confirmDialog = new Dialog(randomUUID(), undefined, true)
+                    confirmDialog.div.element.style.maxWidth = "450px"
+                    confirmDialog.setCentered()
+                    server.languageManager.setElementText(confirmDialog.title, "Delete file")
+                    confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete prototype " + prototype.TypeName  + "?" })
+                    confirmDialog.ok.element.onclick = function (dialog, prototype) {
+                        return function () {
+                            // Remove the folder.
+                            var typeName = prototype.TypeName
+                            server.entityManager.deleteEntityPrototype(typeName, typeName.split(".")[0],
+                                function (result, caller) {
+                                },
+                                function () {
+        
+                                }, undefined)
+                            dialog.close()
+                        }
+                    }(confirmDialog, prototype)
+                }
+            }(prototype), "fa fa-trash-o")
+
+            var dumpDataMenuItem = new MenuItem("dump_data_menu", "Display Data", {}, 0, function (prototype) {
+                return function () {
+                    // In that case I will create a local query file and open it with the query...
+                    
+                }
+            }(prototype), "fa fa-search")
+
+            // The main menu will be display in the body element, so nothing will be over it.
+            if(!prototype.TypeName.startsWith("xs.") && !prototype.TypeName.startsWith("Config.")&& !prototype.TypeName.startsWith("CargoEntities.")&& !prototype.TypeName.startsWith("sqltypes.")&& !prototype.TypeName.startsWith("XMI_types.")&& !prototype.TypeName.startsWith("sql_info.")){
+                var contextMenu = new PopUpMenu(editLnk, [ dumpDataMenuItem, "|",renameMenuItem, deleteMenuItem], evt)
+            }else{
+                var contextMenu = new PopUpMenu(editLnk, [ dumpDataMenuItem], evt)
+            }
+        }
+    }(this.editLnk), false)
 
     this.fieldsPanel = this.panel.appendElement({ "tag": "div", "class": "data_prototype_tree_view_fields" }).down()
 
@@ -327,7 +416,7 @@ var PrototypeTreeView = function (parent, prototype) {
     // Update prototype event
     server.prototypeManager.attach(this, UpdatePrototypeEvent, function (evt, prototypeTreeView) {
         // if the current item is the one with change I will reset it content.
-        if (evt.dataMap.prototype.TypeName == prototypeTreeView.prototype.TypeName) {
+        if (evt.dataMap.prototype.UUID == prototypeTreeView.prototype.UUID) {
             prototypeTreeView.fieldsView = {}
             prototypeTreeView.fieldsPanel.removeAllChilds()
             prototypeTreeView.prototype = evt.dataMap.prototype // Set the updated prototype version.

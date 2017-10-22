@@ -31,6 +31,10 @@ function init() {
     )
     // the main page...
     mainPage = new MainPage(mainLayout, loginPage)
+
+    bodyElement.element.oncontextmenu = function(){
+        return false;
+    }
 }
 
 /**

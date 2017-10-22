@@ -28,7 +28,7 @@ var PropertiesView = function (parent) {
 PropertiesView.prototype.displayProperties = function (entity) {
     if (this.propertiesPanel[entity.UUID] == undefined) {
         // Here I will display the propertie panel...
-        var entityView = new EntityPanel(this.panel, entity.TYPENAME, function (entity, propertiesView) {
+        var entityView = new EntityPanel(this.panel, entity.getTypeName(), function (entity, propertiesView) {
             return function (panel) {
                 
                 // First I will hide all other panel
@@ -37,7 +37,7 @@ PropertiesView.prototype.displayProperties = function (entity) {
                 }
 
                 // Here I will set the entity
-                panel.setTitle(entity.TYPENAME)
+                panel.setTitle(entity.getTypeName())
                 panel.setEntity(entity)
                 panel.show()
             }

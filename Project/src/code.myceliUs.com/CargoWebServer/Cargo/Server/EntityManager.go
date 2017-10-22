@@ -1616,7 +1616,7 @@ func (this *EntityManager) CreateEntityPrototype(storeId string, prototype inter
 // @param {interface{}} prototype The prototype object to create.
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
-// @result{*EntityPrototype} Return the created entity prototype
+// @result{*EntityPrototype} Return the saved entity prototype
 // @scope {public}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
@@ -1693,7 +1693,6 @@ func (this *EntityManager) SaveEntityPrototype(storeId string, prototype interfa
 // @param {string} storeId The store id, where to create the new prototype.
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
-// @result{*EntityPrototype} Return the created entity prototype
 // @scope {public}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
@@ -1724,6 +1723,177 @@ func (this *EntityManager) DeleteEntityPrototype(typeName string, storeId string
 		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 	}
+
+}
+
+// @api 1.0
+// Rename existing entity prototype.
+// @param {string} typeName The new prototype name.
+// @param {string} prototype The prototype to rename.
+// @param {string} storeId The store id, where to create the new prototype.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @result{*EntityPrototype} Return the renamed entity prototype
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+// @src
+//EntityManager.prototype.renameEntityPrototype = function(typeName, prototype, storeId, successCallback, errorCallback, caller){
+//	var params = []
+//	params.push(createRpcData(typeName, "STRING", "typeName"))
+//	params.push(createRpcData(prototype, "JSON_STR", "prototype"))
+//	params.push(createRpcData(storeId, "STRING", "storeId"))
+//	server.executeJsFunction(
+//	"EntityManagerRenameEntityPrototype",
+//	params,
+//	undefined, //progress callback
+//	function (results, caller) { // Success callback
+// 	   if(caller.successCallback!=undefined){
+// 			 var prototype = new EntityPrototype()
+//			 prototype.init(results[0])
+//      	 caller.successCallback(prototype, caller.caller)
+//           caller.successCallback = undefined
+//		}
+//	},
+//	function (errMsg, caller) { // Error callback
+//          server.errorManager.onError(errMsg)
+//         	if( caller.errorCallback != undefined){
+//          	caller.errorCallback(errMsg, caller.caller)
+//				caller.errorCallback = undefined
+//			}
+//	},{"successCallback":successCallback, "errorCallback":errorCallback, "caller": caller})
+//}
+func (this *EntityManager) RenameEntityPrototype(typeName string, prototype interface{}, storeId string, messageId string, sessionId string) *EntityPrototype {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
+	// Cast it as needed...
+	if reflect.TypeOf(prototype).String() == "map[string]interface {}" {
+		prototype.(map[string]interface{})["TYPENAME"] = "Server.EntityPrototype"
+		values, err := Utility.InitializeStructure(prototype.(map[string]interface{}))
+		if err == nil {
+			prototype = values.Interface()
+		} else {
+			log.Println("fail to initialyse EntityPrototype from map[string]interface {} ", err)
+			cargoError := NewError(Utility.FileLine(), PARAMETER_TYPE_ERROR, SERVER_ERROR_CODE, err)
+			GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+			return nil
+		}
+	}
+
+	if reflect.TypeOf(prototype).String() != "*Server.EntityPrototype" {
+		cargoError := NewError(Utility.FileLine(), PARAMETER_TYPE_ERROR, SERVER_ERROR_CODE, errors.New("Expected '*Server.EntityPrototype' but got '"+reflect.TypeOf(prototype).String()+"' instead."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return nil
+	}
+
+	// Get the store...
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	if store == nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Datastore '"+storeId+"' dosen't exist."))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return nil
+	}
+
+	oldName := prototype.(*EntityPrototype).TypeName
+	// Those types can not be rename.
+	if strings.HasPrefix(oldName, "xs.") || strings.HasPrefix(oldName, "sqltypes.") || strings.HasPrefix(oldName, "XMI_types.") || strings.HasPrefix(oldName, "Config.") || strings.HasPrefix(oldName, "CargoEntities.") || strings.HasPrefix(oldName, "sql_infos.") {
+		cargoError := NewError(Utility.FileLine(), PROTOTYPE_UPDATE_ERROR, SERVER_ERROR_CODE, errors.New("Prototype "+oldName+" cannot be rename!"))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return nil
+	}
+
+	// So here I will get the list of all entities for that type.
+	entities, _ := this.getEntities(oldName, "", storeId, false)
+
+	// Now I will change the prototype name
+	prototype.(*EntityPrototype).TypeName = typeName
+
+	// Save info in substitution groups...
+	for i := 0; i < len(prototype.(*EntityPrototype).SubstitutionGroup); i++ {
+		subTypeName := prototype.(*EntityPrototype).SubstitutionGroup[i]
+		subType, err := this.getEntityPrototype(subTypeName, subTypeName[0:strings.Index(subTypeName, ".")])
+		if err == nil {
+			for j := 0; j < len(subType.SuperTypeNames); j++ {
+				if subType.SuperTypeNames[j] == oldName {
+					subType.SuperTypeNames[j] = typeName
+				}
+			}
+			// Save it...
+			subType.Save(subTypeName[0:strings.Index(subTypeName, ".")])
+		}
+
+	}
+
+	// Save info in supertypes
+	for i := 0; i < len(prototype.(*EntityPrototype).SuperTypeNames); i++ {
+		superTypeName := prototype.(*EntityPrototype).SuperTypeNames[i]
+		superType, err := this.getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
+		if err == nil {
+			for j := 0; j < len(superType.SubstitutionGroup); j++ {
+				if superType.SubstitutionGroup[j] == oldName {
+					superType.SubstitutionGroup[j] = typeName
+				}
+			}
+			superType.Save(superTypeName[0:strings.Index(superTypeName, ".")])
+		}
+	}
+
+	// Now I must make tour of all prototypes in the data store and replace
+	// field that made use of that prototype with it new typename.
+	prototypes, err := this.getEntityPrototypes(storeId, typeName[0:strings.Index(typeName, ".")])
+	if err == nil {
+		for i := 0; i < len(prototypes); i++ {
+			p := prototypes[i]
+			needSave := false
+			for j := 0; j < len(p.FieldsType); j++ {
+				if strings.Index(p.FieldsType[j], oldName) > 0 {
+					needSave = true
+					strings.Replace(p.FieldsType[j], oldName, typeName, -1)
+				}
+			}
+			if needSave == true {
+				// save the prototype.
+				p.Save(storeId)
+			}
+		}
+	} else {
+		cargoError := NewError(Utility.FileLine(), PROTOTYPE_UPDATE_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return nil
+	}
+
+	prototype.(*EntityPrototype).TypeName = typeName
+	store.(*KeyValueDataStore).DeleteEntityPrototype(oldName)
+	store.(*KeyValueDataStore).saveEntityPrototype(prototype.(*EntityPrototype))
+
+	// Now I must update entities...
+	for i := 0; i < len(entities); i++ {
+		if reflect.TypeOf(entities[i]).String() == "*Server.DynamicEntity" {
+			//
+			entity := entities[i].(*DynamicEntity)
+			ids := make([]interface{}, 0)
+			p, _ := this.getEntityPrototype(entity.GetTypeName(), entity.GetTypeName()[0:strings.Index(entity.GetTypeName(), ".")])
+			for j := 0; j < len(p.Ids); j++ {
+				ids = append(ids, entity.getValue(p.Ids[j]))
+			}
+
+			// Here I will delete the existing entity from the db...
+			entity.setValue("UUID", nil)          // Set it uuid to nil
+			entity.setValue("TYPENAME", typeName) // Set it new typeName
+			// Recreate it with it new type
+			newEntity, errObj := this.newDynamicEntity(entity.GetParentUuid(), entity.GetObject().(map[string]interface{}))
+			if errObj != nil {
+				newEntity.SaveEntity() // Save the new entity
+			}
+		}
+
+	}
+
+	return prototype.(*EntityPrototype)
 
 }
 

@@ -66,8 +66,8 @@ function entityTests() {
             getDerivedEntityPrototypes_Test()
             getDerivedEntityPrototypes_typeNameError_Test()
 
-            getEntityPrototypes_Test()
-            getEntityPrototypes_storeIdError_Test()
+            getEntityPrototype_Test()
+            getEntityPrototype_storeIdError_Test()
              */
 
         }, function () {
@@ -921,18 +921,18 @@ function getDerivedEntityPrototypes_typeNameError_Test() {
         undefined)
 }
 
-// EntityManager.prototype.getEntityPrototypes = function (storeId, successCallback, errorCallback, caller) 
-function getEntityPrototypes_Test() {
-    testsMap["getEntityPrototypes_Test"] = getEntityPrototypes_Test
+// EntityManager.prototype.getEntityPrototype = function (storeId, successCallback, errorCallback, caller) 
+function getEntityPrototype_Test() {
+    testsMap["getEntityPrototype_Test"] = getEntityPrototype_Test
 
     server.entityManager.getEntityPrototypes(
         "CargoEntities",
         function (result) {
-            QUnit.test("getEntityPrototypes_Test",
+            QUnit.test("getEntityPrototype_Test",
                 function (result) {
                     return function (assert) {
                         assert.ok(result.length > 0);
-                        testsReturnedResultMap["getEntityPrototypes_Test"] = getEntityPrototypes_Test
+                        testsReturnedResultMap["getEntityPrototype_Test"] = getEntityPrototype_Test
                     }
                 } (result))
         },
@@ -942,8 +942,8 @@ function getEntityPrototypes_Test() {
         undefined)
 }
 
-function getEntityPrototypes_storeIdError_Test() {
-    testsMap["getEntityPrototypes_storeIdError_Test"] = getEntityPrototypes_storeIdError_Test
+function getEntityPrototype_storeIdError_Test() {
+    testsMap["getEntityPrototype_storeIdError_Test"] = getEntityPrototype_storeIdError_Test
 
     server.entityManager.getEntityPrototypes(
         "ppp",
@@ -951,11 +951,11 @@ function getEntityPrototypes_storeIdError_Test() {
 
         },
         function (result) {
-            QUnit.test("getEntityPrototypes_storeIdError_Test",
+            QUnit.test("getEntityPrototype_storeIdError_Test",
                 function (result) {
                     return function (assert) {
                         assert.ok(result.message != undefined, result.message);
-                        testsReturnedResultMap["getEntityPrototypes_storeIdError_Test"] = getEntityPrototypes_storeIdError_Test
+                        testsReturnedResultMap["getEntityPrototype_storeIdError_Test"] = getEntityPrototype_storeIdError_Test
                     }
                 } (result))
         },

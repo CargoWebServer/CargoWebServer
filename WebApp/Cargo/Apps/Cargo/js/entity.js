@@ -51,9 +51,8 @@ var Restriction = function () {
  * Append a new object value into an entity.
  */
 function appendObjectValue(object, field, value) {
-    var prototype = entityPrototypes[object.TYPENAME]
     var fieldIndex = prototype.getFieldIndex(field)
-    var prototype = entityPrototypes[object.TYPENAME]
+    var prototype = getEntityPrototype(object.TYPENAME)
     var fieldType = prototype.FieldsType[fieldIndex]
     var isArray = fieldType.startsWith("[]")
     var isRef = fieldType.endsWith(":Ref")
@@ -110,7 +109,7 @@ function appendObjectValue(object, field, value) {
  * Remove an object from a given object.
  */
 function removeObjectValue(object, field, value) {
-    var prototype = entityPrototypes[object.TYPENAME]
+    var prototype = getEntityPrototype(object.TYPENAME)
     var index = prototype.getFieldIndex(field)
     if (index > -1) {
         var fieldType = prototype.FieldsType[index]
@@ -158,7 +157,7 @@ function removeObjectValue(object, field, value) {
  */
 function resetObjectValues(object) {
     // Remove the object panel...
-    var prototype = entityPrototypes[object.TYPENAME]
+    var prototype = getEntityPrototype(object.TYPENAME)
     for (var propertyId in object) {
         var propretyType = prototype.FieldsType[prototype.getFieldIndex(propertyId)]
         if (propretyType != undefined && object[propertyId] != null) {
@@ -205,7 +204,7 @@ function resetObjectValues(object) {
  * Return a property field type for a given field for a given type name.
  */
 function getPropertyType(typeName, property) {
-    var prototype = entityPrototypes[typeName]
+    var prototype = getEntityPrototype(typeName)
     var propertyType = null
     for (var i = 0; i < prototype.Fields.length; i++) {
         if (prototype.Fields[i] == property) {
@@ -463,7 +462,7 @@ function setSubObject(parent, property, values, isArray) {
 function setObjectValues(object, values) {
 
     // Get the entity prototype.
-    var prototype = entityPrototypes[object["TYPENAME"]]
+    var prototype = getEntityPrototype(object["TYPENAME"])
     if (prototype == undefined) {
         return
     }
@@ -647,7 +646,7 @@ function setObjectValues(object, values) {
  */
 function isListOf(typeName) {
     typeName = typeName.replace("[]", "").replace(":Ref", "")
-    var prototype = entityPrototypes[typeName]
+    var prototype = getEntityPrototype(typeName)
 
     if (prototype != null) {
         if (prototype.ListOf != null) {
@@ -677,7 +676,7 @@ function getBaseTypeExtension(typeName, isArray) {
         isArray = typeName.startsWith("[]")
     }
     typeName = typeName.replace("[]", "").replace(":Ref", "")
-    var prototype = entityPrototypes[typeName]
+    var prototype = getEntityPrototype(typeName)
 
     if (prototype != null) {
         if (prototype.SuperTypeNames != null) {
