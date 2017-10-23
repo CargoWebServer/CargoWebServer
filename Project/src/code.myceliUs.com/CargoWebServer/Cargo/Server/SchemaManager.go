@@ -1453,6 +1453,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 		// Here I will set the prototype restriction...
 		for i := 0; i < len(restriction.MaxExclusive); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_MaxExclusive
 			facet.Value = restriction.MaxExclusive[i].Value
 			facets = append(facets, facet)
@@ -1460,6 +1461,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 
 		for i := 0; i < len(restriction.MinExclusive); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_MinExclusive
 			facet.Value = restriction.MaxExclusive[i].Value
 			facets = append(facets, facet)
@@ -1467,6 +1469,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 
 		for i := 0; i < len(restriction.MaxInclusive); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_MaxInclusive
 			facet.Value = restriction.MaxInclusive[i].Value
 			facets = append(facets, facet)
@@ -1474,6 +1477,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 
 		for i := 0; i < len(restriction.MinInclusive); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_MinInclusive
 			facet.Value = restriction.MinInclusive[i].Value
 			facets = append(facets, facet)
@@ -1481,6 +1485,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 
 		for i := 0; i < len(restriction.MaxLength); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_MaxLength
 			facet.Value = restriction.MaxLength[i].Value
 			facets = append(facets, facet)
@@ -1488,6 +1493,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 
 		for i := 0; i < len(restriction.MinLength); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_MinLength
 			facet.Value = restriction.MinLength[i].Value
 			facets = append(facets, facet)
@@ -1495,6 +1501,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 
 		for i := 0; i < len(restriction.Length); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_Length
 			facet.Value = restriction.Length[i].Value
 			facets = append(facets, facet)
@@ -1502,6 +1509,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 
 		for i := 0; i < len(restriction.FractionDigits); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_FractionDigits
 			facet.Value = restriction.FractionDigits[i].Value
 			facets = append(facets, facet)
@@ -1509,6 +1517,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 
 		for i := 0; i < len(restriction.TotalDigits); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_TotalDigits
 			facet.Value = restriction.TotalDigits[i].Value
 			facets = append(facets, facet)
@@ -1516,6 +1525,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 
 		for i := 0; i < len(restriction.WhiteSpace); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_WhiteSpace
 			facet.Value = restriction.WhiteSpace[i].Value
 			facets = append(facets, facet)
@@ -1523,6 +1533,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 
 		for i := 0; i < len(restriction.Pattern); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_Pattern
 			facet.Value = restriction.Pattern[i].Value
 			facets = append(facets, facet)
@@ -1530,6 +1541,7 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 
 		for i := 0; i < len(restriction.Enumeration); i++ {
 			facet := new(Restriction)
+			facet.TYPENAME = "Server.Restriction"
 			facet.Type = RestrictionType_Enumeration
 			facet.Value = restriction.Enumeration[i].Value
 			facets = append(facets, facet)

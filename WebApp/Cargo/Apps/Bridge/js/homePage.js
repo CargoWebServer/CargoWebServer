@@ -88,6 +88,7 @@ var HomePage = function () {
     return this
 }
 
+
 HomePage.prototype.init = function (parent, sessionInfo) {
     this.parent = parent
     this.parent.removeAllChilds()
@@ -112,67 +113,18 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     // Now I will create the session panel...
     this.sessionPanel = new SessionPanel(menuRow.appendElement({ "tag": "div", "style": "width:100%; display: table-cell; height:30px" }).down(), sessionInfo)
 
-    // That funtion create a new file with a query in it.
-    function createQuery(extension) {
-        // So here I will create a new query file.
-        server.fileManager.getFileByPath("/queries",
-            // Success
-            function (results, caller) {
-                var extension = caller.extension
-                // query file will have a name like q1, q2... qx by default...
-                var lastIndex = 0
-                for (var i = 0; i < results.M_files.length; i++) {
-                    var f = results.M_files[i]
-                    if (f.M_name.match(/q[0-9]+/)) {
-                        if (parseInt(f.M_name.replace("q", "").replace(extension, "")) > lastIndex) {
-                            lastIndex = parseInt((f.M_name).replace("q", "").replace(extension, ""))
-                        }
-                    }
-                }
-                lastIndex++
-
-                // Here I will create an empty text file.
-                var f = null
-                try {
-                    var f = new File([""], "q" + lastIndex + extension, { type: "text/plain", lastModified: new Date(0) })
-                } catch (error) {
-                    f = new Blob([""], { type: "text/plain" });
-                    f.name = "test.txt"
-                    f.lastModifiedDate = new Date(0);
-                }
-
-                // Now I will create the new file...
-                server.fileManager.createFile("q" + lastIndex + extension, "/queries", f, 256, 256, false,
-                    // Success callback.
-                    function (result, caller) {
-                        // Here is the new file...
-                    },
-                    function () {
-                        
-                    },
-                    // Error callback.
-                    function () {
-
-                    }, caller)
-            },
-            // Error
-            function () {
-
-            }, { "extension": extension })
-    }
-
     // Create a new Entity Query File.
 
     // Entity Query Language File.
     var newEqlQueryMenuItem = new MenuItem("new_eql_query_menu_item", "EQL Query", {}, 1, function (extension) {
-        return function () { 
-            createQuery(extension) 
+        return function () {
+            createQuery(extension, "/** Eql query **/\n")
         }
     }(".eql"), "fa fa-file-o")
 
     // Structured Query Language Query Language File.
     var newSqlQueryMenuItem = new MenuItem("new_sql_query_menu_item", "SQL Query", {}, 1, function (extension) {
-        return function () { createQuery(extension) }
+        return function () { createQuery(extension, "/** Sql query **/\n") }
     }(".sql"), "fa fa-file-o")
 
     var newProjectMenuItem = new MenuItem("new_project_menu_item", "New Project...", {}, 1,
@@ -341,11 +293,11 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                 if (this.firstChild.id == "workflowImg") {
                     this.firstChild.src = "img/workflow_blue.svg"
                 }
-                
+
                 // Set the size of absolute panel.
                 fireResize()
             }
-            
+
         }(div, leftDiv)
     }
 

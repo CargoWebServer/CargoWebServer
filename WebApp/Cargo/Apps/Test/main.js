@@ -18,24 +18,24 @@ function main() {
          "CargoEntities.",
          "EntityEvent",
          function () {
-             entitiesDump("CargoEntities", "CargoEntities.User")
+             entitiesDump("CargoEntities.User")
          },
          function () { },
          undefined
      )
  
-
+*/
     server.eventHandler.appendEventFilter(
          "COLLADASchema.",
          "EntityEvent",
          function () {
-             entitiesDump("COLLADASchema", "COLLADASchema.COLLADA")
+             entitiesDump("COLLADASchema.COLLADA")
          },
          function () { },
          undefined
      )
-    */
-
+    
+/*
 
     // utilityTests()
     //serverTests()
@@ -78,7 +78,7 @@ function main() {
     //entitiesDump("XPDMXML.ProcessStructureType")
     // entitiesDump("CatalogSchema.CatalogType")
 
-    //testEntityQuery()
+    testEntityQuery()
 
     //TestWebRtc2()
 
@@ -106,7 +106,7 @@ function main() {
     function(){
 
     });*/
-    
+
     /*
         function getFileInfos(path, callback) {
             server.runCmd("cmd", ["/K", "dir /Q " + path],
@@ -158,8 +158,8 @@ function main() {
             console.log(fileInfos)
     
         })*/
-    
-    LaunchImportNewSQLData_Process()
+
+    //LaunchImportNewSQLData_Process()
 
     /*
          server.entityManager.getEntityPrototypes("Test",
@@ -230,18 +230,20 @@ function main() {
      },
      function(errMsg, caller){
      }, {})*/
-
-     var query = {}
-     query.TypeName = "Proactive.AnalyseResult"
-     query.Fields = ["M_NoTol", "M_NoFeat", "M_NoModele"]
-     query.Query = ''
- 
-     server.dataManager.read("Proactive", JSON.stringify(query), [], [],
-     function (results, caller) {
-         console.log("-------> results: ", results)
-     }, function (errMsg, caller) {
-
-     }, undefined)
+    /*
+         var query = {}
+         query.TypeName = "Proactive.AnalyseResult"
+         query.Fields = ["M_NoTol", "M_NoFeat", "M_NoModele"]
+         query.Query = ''
+     
+         server.dataManager.read("Proactive", JSON.stringify(query), [], [],
+         function(){},
+         function (results, caller) {
+             console.log("-------> results: ", results)
+         }, function (errMsg, caller) {
+    
+         }, undefined)
+         */
 }
 
 function testServiceContainer() {
@@ -319,18 +321,22 @@ function testEntityQuery() {
     server.dataManager.read("CargoEntities", JSON.stringify(query), [], [],
         function (results, caller) {
             console.log("-------> results: ", results)
-        }, function (errMsg, caller) {
+        },
+        function (index, total, caller) {
+
+        },
+        function (errMsg, caller) {
 
         }, undefined)
 
     server.entityManager.getEntities("CargoEntities.User", "CargoEntities", '(CargoEntities.User.M_firstName ~= "Eric" || CargoEntities.User.M_firstName == "Louis") && CargoEntities.User.M_lastName != "Boucher"', 0, -1, [], true,
-        // Progress...
-        function () {
-
-        },
         // Sucess...
         function (results, caller) {
             console.log(results)
+        },
+        // Progress...
+        function (index, total) {
+
         },
         function () {
 

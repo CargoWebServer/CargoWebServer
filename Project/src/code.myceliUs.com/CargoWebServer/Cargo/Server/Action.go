@@ -86,6 +86,7 @@ func (self *Action) execute() {
 	xt := reflect.TypeOf(x).Kind()
 	// Create the data element...
 	r := new(MessageData)
+	r.TYPENAME = "Server.MessageData"
 	r.Name = "result"
 
 	if xt == reflect.Int || xt == reflect.Int64 {

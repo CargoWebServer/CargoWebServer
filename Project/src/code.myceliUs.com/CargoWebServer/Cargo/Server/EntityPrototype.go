@@ -64,6 +64,8 @@ const (
 // so the range of string restrict by a pattern became the range of
 // email.
 type Restriction struct {
+	TYPENAME string
+
 	// The the of the restriction (Facet)
 	Type RestrictionType
 	// The value...
@@ -248,6 +250,7 @@ func (this *EntityPrototype) Create(storeId string) error {
 	// Send event message...
 	var eventDatas []*MessageData
 	evtData := new(MessageData)
+	evtData.TYPENAME = "Server.MessageData"
 	evtData.Name = "prototype"
 
 	evtData.Value = this
@@ -286,6 +289,7 @@ func (this *EntityPrototype) Save(storeId string) error {
 
 			var eventDatas []*MessageData
 			evtData := new(MessageData)
+			evtData.TYPENAME = "Server.MessageData"
 			evtData.Name = "prototype"
 
 			evtData.Value = this

@@ -2,7 +2,7 @@
  * The query editor is use to edit query in EQL and SQL language.
  * It also contain a table to display it results.
  */
- 
+
 var QueryEditor = function (parent, file, initCallback) {
 
     this.initCallback = initCallback
@@ -61,17 +61,21 @@ var QueryEditor = function (parent, file, initCallback) {
     // In case of sql query..
     if (this.isSql) {
         this.editor.getSession().setMode("ace/mode/sql");
-        this.editor.getSession().on('change', function (fileId, fileUUID, editor) {
-            return function () {
-                var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileId } }
-                var file = entities[fileUUID]
-                file.M_data = encode64(editor.getSession().getValue())
-                server.eventHandler.broadcastLocalEvent(evt)
-            }
-        } (file.M_id, file.UUID, this.editor));
+
     } else if (this.isEql) {
-        // TODO implement the syntax highlight for EQL...
+        // The file mode of the edior is simple javascript.
+        this.editor.getSession().setMode("ace/mode/javascript");
     }
+
+    this.editor.getSession().on('change', function (fileId, fileUUID, editor) {
+        return function () {
+            var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileId } }
+            var file = entities[fileUUID]
+            file.M_data = encode64(editor.getSession().getValue())
+            server.eventHandler.broadcastLocalEvent(evt)
+        }
+    }(file.M_id, file.UUID, this.editor));
+
     return this
 }
 
@@ -118,7 +122,7 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
     }
 
     // So here I will create the tool bar for the query editor.
-    this.queryToolBar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar", "id": randomUUID() })
+    this.queryToolBar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar", "id": this.file.M_id + "_toolbar" })
 
     // The datasource selection.
     this.dataSelect = this.queryToolBar.appendElement({ "tag": "div", "style": "display: table-cell; height: 100%; vertical-align: middle;" }).down()
@@ -136,7 +140,7 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
         return function () {
             queryEditor.setActiveDataConfig(this.value)
         }
-    } (this)
+    }(this)
 
     // The query button.
     var playQueryBtn = this.queryToolBar.appendElement({ "tag": "div", "class": "toolbarButton" }).down()
@@ -147,7 +151,7 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
             // Here I will call the query.
             queryEditor.runQuery()
         }
-    } (this)
+    }(this)
 
     // Now the pages navigation button to use in case of query that contain limits
     this.queryToolBar.appendElement({ "tag": "div", "class": "toolbarButton", "id": "moveFirstBtn", "style": "display: none;" }).down()
@@ -185,7 +189,7 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
 
             queryEditor.runQuery()
         }
-    } (this)
+    }(this)
 
     // The move last button.
     this.moveLastBtn.element.onclick = function (queryEditor) {
@@ -204,7 +208,7 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
 
             queryEditor.runQuery()
         }
-    } (this)
+    }(this)
 
     // The move right button.
     this.moveRightBtn.element.onclick = function (queryEditor) {
@@ -223,7 +227,7 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
 
             queryEditor.runQuery()
         }
-    } (this)
+    }(this)
 
     // Move left.
     this.moveLeftBtn.element.onclick = function (queryEditor) {
@@ -242,7 +246,7 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
 
             queryEditor.runQuery()
         }
-    } (this)
+    }(this)
 
     // Call the init callback.
     this.initCallback(this)
@@ -306,7 +310,7 @@ QueryEditor.prototype.runQuery = function () {
     // Keep ref to the data configuration.
     if (this.isSql) {
         // Here I will execute sql query...
-        var query = this.editor.getSession().getValue().replaceAll("[", "").replaceAll("]", "")
+        var query = this.editor.getSession().getValue().replaceAll("[", "").replaceAll("]", "").replaceAll(";", "")
 
         var ast = simpleSqlParser.sql2ast(query)
         // in case of where
@@ -469,6 +473,21 @@ QueryEditor.prototype.runQuery = function () {
                 }, { "prototypes": prototypes, "type": type, "fields": fields, "query": query, "queryEditor": this })
 
         }
+    } else if (this.isEql) {
+        // The code cotain the query to execute.
+        var querySrc = this.editor.getSession().getValue()
+        var queryVal = "query"
+
+        // (variable name).TypeName must be given by each query...
+        for (var i = 0; i < querySrc.split("\n").length; i++) {
+            if (querySrc.split("\n")[i].indexOf(".TypeName") != -1) {
+                queryVal = querySrc.split("\n")[i].split(".")[0] // The 
+                break
+            }
+        }
+
+        eval(querySrc)
+        this.setResult(JSON.stringify(eval(queryVal)), eval(queryVal + ".Fields"), eval(queryVal + ".FieldsType"), [],"READ")
     }
 }
 
@@ -497,6 +516,11 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                     // copy another header etc...
                     var widths = []
                     // Now I will wrote the code for the layout...
+
+                    var w = table.header.buttonDiv.element.offsetWidth
+                    table.header.buttonDiv.element.style.width = w + "px"
+                    table.header.buttonDiv.element.style.minWidth = w + "px"
+
                     for (var i = 0; i < table.header.cells.length; i++) {
                         var w = table.header.cells[i].element.offsetWidth
                         table.header.cells[i].element.style.width = w + "px"
@@ -521,10 +545,11 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                     table.rowGroup.element.style.position = "absolute"
                     table.rowGroup.element.style.overflowX = "hidden"
                     table.rowGroup.element.style.overflowY = "auto"
+                    table.rowGroup.element.style.left = "10px"
                     table.rowGroup.element.style.top = table.header.div.element.offsetHeight + 2 + "px"
 
                     // Now the height of the panel...
-                    table.rowGroup.element.style.height = (queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight) -15 + "px"
+                    table.rowGroup.element.style.height = (queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight) - 15 + "px"
 
                     // Here the scrolling event.
                     table.rowGroup.element.onscroll = function (header) {
@@ -536,17 +561,31 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                                 header.className = "table_header"
                             }
                         }
-                    } (table.header.div.element)
+                    }(table.header.div.element)
 
                     // Now the resize event.
                     window.addEventListener('resize',
                         function (queryEditor, table) {
                             return function () {
-                                table.rowGroup.element.style.height = (queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight) -15 + "px"
+                                table.rowGroup.element.style.height = (queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight) - 15 + "px"
                             }
-                        } (queryEditor, table), true);
+                        }(queryEditor, table), true);
                 }
-            } (table, this))
+            }(table, this))
+        }
+    } else if (this.isEql) {
+        // In that case 
+        if (type == "READ") {
+            this.resultQueryPanel.removeAllChilds()
+            var table = new Table(this.activeDataConfig.M_id, this.resultQueryPanel)
+            var model = new SqlTableModel(this.activeDataConfig.M_id, query, fieldsType, [], fields)
+            table.setModel(model, function (table, queryEditor) {
+                return function () {
+                    // init the table.
+                    table.init()
+                    table.header.maximizeBtn.element.click()
+                }
+            }(table, this))
         }
     }
 }

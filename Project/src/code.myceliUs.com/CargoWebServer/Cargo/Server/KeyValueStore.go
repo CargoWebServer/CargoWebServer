@@ -207,7 +207,11 @@ func (this *KeyValueDataStore) setSuperTypeFields(prototype *EntityPrototype) {
 						if j < len(superPrototype.FieldsDocumentation) {
 							documentation = superPrototype.FieldsDocumentation[j]
 						}
-						Utility.InsertStringAt(index, documentation, &prototype.FieldsDocumentation)
+						if index < len(prototype.FieldsDocumentation) {
+							Utility.InsertStringAt(index, documentation, &prototype.FieldsDocumentation)
+						} else {
+							prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, documentation)
+						}
 					} else {
 						prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, "")
 					}
@@ -265,14 +269,17 @@ func (this *KeyValueDataStore) SetEntityPrototype(prototype *EntityPrototype) er
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
+		param0.TYPENAME = "Server.MessageData"
 		param0.Name = "functionSrc"
 		param0.Value = `function GetEntityPrototype(storeId, prototype){ return GetServer().GetEntityManager().CreateEntityPrototype(storeId, prototype, sessionId, messageId) }`
 
 		param1 := new(MessageData)
+		param1.TYPENAME = "Server.MessageData"
 		param1.Name = "storeId"
 		param1.Value = this.m_id
 
 		param2 := new(MessageData)
+		param2.TYPENAME = "Server.MessageData"
 		param2.Name = "prototype"
 		param2.Value = prototype
 
@@ -361,14 +368,17 @@ func (this *KeyValueDataStore) saveEntityPrototype(prototype *EntityPrototype) e
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
+		param0.TYPENAME = "Server.MessageData"
 		param0.Name = "functionSrc"
 		param0.Value = `function SaveEntityPrototype(storeId, prototype){ return GetServer().GetEntityManager().SaveEntityPrototype(storeId, prototype, sessionId, messageId) }`
 
 		param1 := new(MessageData)
+		param1.TYPENAME = "Server.MessageData"
 		param1.Name = "storeId"
 		param1.Value = this.m_id
 
 		param2 := new(MessageData)
+		param2.TYPENAME = "Server.MessageData"
 		param2.Name = "prototype"
 		param2.Value = prototype
 
@@ -448,14 +458,17 @@ func (this *KeyValueDataStore) DeleteEntityPrototype(typeName string) error {
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
+		param0.TYPENAME = "Server.MessageData"
 		param0.Name = "functionSrc"
 		param0.Value = `function DeleteEntityPrototype(typeName, storeId){ GetServer().GetEntityManager().DeleteEntityPrototype(typeName, storeId, sessionId, messageId) }`
 
 		param1 := new(MessageData)
+		param1.TYPENAME = "Server.MessageData"
 		param1.Name = "typeName"
 		param1.Value = typeName
 
 		param2 := new(MessageData)
+		param2.TYPENAME = "Server.MessageData"
 		param2.Name = "storeId"
 		param2.Value = this.m_id
 
@@ -1223,14 +1236,17 @@ func (this *KeyValueDataStore) GetEntityPrototype(typeName string) (*EntityProto
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
+		param0.TYPENAME = "Server.MessageData"
 		param0.Name = "functionSrc"
 		param0.Value = `function GetEntityPrototype(typeName, storeId){ return GetServer().GetEntityManager().GetEntityPrototype(typeName, storeId, sessionId, messageId) }`
 
 		param1 := new(MessageData)
+		param1.TYPENAME = "Server.MessageData"
 		param1.Name = "typeName"
 		param1.Value = typeName
 
 		param2 := new(MessageData)
+		param2.TYPENAME = "Server.MessageData"
 		param2.Name = "storeId"
 		param2.Value = this.m_id
 
@@ -1317,10 +1333,12 @@ func (this *KeyValueDataStore) GetEntityPrototypes() ([]*EntityPrototype, error)
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
+		param0.TYPENAME = "Server.MessageData"
 		param0.Name = "functionSrc"
 		param0.Value = `function GetEntityPrototypes(storeId){ return GetServer().GetEntityManager().GetEntityPrototypes(storeId, sessionId, messageId) }`
 
 		param1 := new(MessageData)
+		param1.TYPENAME = "Server.MessageData"
 		param1.Name = "storeId"
 		param1.Value = this.m_id
 
@@ -1430,18 +1448,22 @@ func (this *KeyValueDataStore) Connect() error {
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
+		param0.TYPENAME = "Server.MessageData"
 		param0.Name = "functionSrc"
 		param0.Value = `function Login(accountName, psswd, serverId){ return GetServer().GetSessionManager().Login(accountName, psswd, serverId, sessionId, messageId) }`
 
 		param1 := new(MessageData)
+		param1.TYPENAME = "Server.MessageData"
 		param1.Name = "accountName"
 		param1.Value = this.m_user
 
 		param2 := new(MessageData)
+		param2.TYPENAME = "Server.MessageData"
 		param2.Name = "psswd"
 		param2.Value = this.m_pwd
 
 		param3 := new(MessageData)
+		param3.TYPENAME = "Server.MessageData"
 		param3.Name = "serverId"
 		param3.Value = this.m_hostName
 
@@ -1575,18 +1597,22 @@ func (this *KeyValueDataStore) Create(queryStr string, entity []interface{}) (la
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
+		param0.TYPENAME = "Server.MessageData"
 		param0.Name = "functionSrc"
 		param0.Value = `function CreateData(storeId, query, data){ return GetServer().GetDataManager().Create(storeId, query, data, sessionId, messageId) }`
 
 		param1 := new(MessageData)
+		param1.TYPENAME = "Server.MessageData"
 		param1.Name = "storeId"
 		param1.Value = this.m_id
 
 		param2 := new(MessageData)
+		param2.TYPENAME = "Server.MessageData"
 		param2.Name = "query"
 		param2.Value = queryStr
 
 		param3 := new(MessageData)
+		param3.TYPENAME = "Server.MessageData"
 		param3.Name = "data"
 		param3.Value = entity
 
@@ -1684,22 +1710,27 @@ func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, p
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
+		param0.TYPENAME = "Server.MessageData"
 		param0.Name = "functionSrc"
 		param0.Value = `function ReadData(storeId, query, fieldsType, parameters){ return GetServer().GetDataManager().Read(storeId, query, fieldsType, parameters, sessionId, messageId) }`
 
 		param1 := new(MessageData)
+		param1.TYPENAME = "Server.MessageData"
 		param1.Name = "storeId"
 		param1.Value = this.m_id
 
 		param2 := new(MessageData)
+		param2.TYPENAME = "Server.MessageData"
 		param2.Name = "query"
 		param2.Value = queryStr
 
 		param3 := new(MessageData)
+		param3.TYPENAME = "Server.MessageData"
 		param3.Name = "fieldsType"
 		param3.Value = fieldsType
 
 		param4 := new(MessageData)
+		param4.TYPENAME = "Server.MessageData"
 		param4.Name = "parameters"
 		param4.Value = params
 
@@ -1859,22 +1890,27 @@ func (this *KeyValueDataStore) Update(queryStr string, fields []interface{}, par
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
+		param0.TYPENAME = "Server.MessageData"
 		param0.Name = "functionSrc"
 		param0.Value = `function UpdateData(storeId, query, fields, parameters){ return GetServer().GetDataManager().Update(storeId, query, fields, parameters, sessionId, messageId) }`
 
 		param1 := new(MessageData)
+		param1.TYPENAME = "Server.MessageData"
 		param1.Name = "storeId"
 		param1.Value = this.m_id
 
 		param2 := new(MessageData)
+		param2.TYPENAME = "Server.MessageData"
 		param2.Name = "query"
 		param2.Value = queryStr
 
 		param3 := new(MessageData)
+		param3.TYPENAME = "Server.MessageData"
 		param3.Name = "fields"
 		param3.Value = fields
 
 		param4 := new(MessageData)
+		param4.TYPENAME = "Server.MessageData"
 		param4.Name = "parameters"
 		param4.Value = params
 
@@ -2018,18 +2054,22 @@ func (this *KeyValueDataStore) Delete(queryStr string, params []interface{}) (er
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
+		param0.TYPENAME = "Server.MessageData"
 		param0.Name = "functionSrc"
 		param0.Value = `function UpdateData(storeId, query, parameters){ return GetServer().GetDataManager().Delete(storeId, query, parameters, sessionId, messageId) }`
 
 		param1 := new(MessageData)
+		param1.TYPENAME = "Server.MessageData"
 		param1.Name = "storeId"
 		param1.Value = this.m_id
 
 		param2 := new(MessageData)
+		param2.TYPENAME = "Server.MessageData"
 		param2.Name = "query"
 		param2.Value = queryStr
 
 		param3 := new(MessageData)
+		param3.TYPENAME = "Server.MessageData"
 		param3.Name = "parameters"
 		param3.Value = params
 

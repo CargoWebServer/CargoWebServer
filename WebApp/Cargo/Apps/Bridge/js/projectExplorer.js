@@ -55,7 +55,7 @@ var ProjectView = function (parent, project) {
     // Now I will connect the events...
     server.entityManager.attach(this, UpdateEntityEvent, function (evt, projectView) {
         // generatePrototypesView = function (storeId, prototypes)
-        if (evt.dataMap.entity.getTypeName() == "CargoEntities.File") {
+        if (evt.dataMap.entity.TYPENAME == "CargoEntities.File") {
             var parentFolderDiv = projectView.panel.getChildById(evt.dataMap.entity.ParentUuid)
             if (parentFolderDiv != null) {
                 // Here I will append the new create folder/file...
@@ -66,7 +66,7 @@ var ProjectView = function (parent, project) {
 
     server.entityManager.attach(this, NewEntityEvent, function (evt, projectView) {
         // generatePrototypesView = function (storeId, prototypes)
-        if (evt.dataMap.entity.getTypeName() == "CargoEntities.File") {
+        if (evt.dataMap.entity.TYPENAME == "CargoEntities.File") {
             if (evt.dataMap.entity.M_isDir == false) {
                 var parentFolderDiv = projectView.panel.getChildById(evt.dataMap.entity.ParentUuid)
                 if (parentFolderDiv != null) {
@@ -79,7 +79,7 @@ var ProjectView = function (parent, project) {
 
     server.entityManager.attach(this, DeleteEntityEvent, function (evt, projectView) {
         // generatePrototypesView = function (storeId, prototypes)
-        if (evt.dataMap.entity.getTypeName() == "CargoEntities.File") {
+        if (evt.dataMap.entity.TYPENAME == "CargoEntities.File") {
             var folderDiv = projectView.panel.getChildById(evt.dataMap.entity.UUID)
             if (folderDiv != undefined) {
                 folderDiv.element.parentNode.removeChild(folderDiv.element)

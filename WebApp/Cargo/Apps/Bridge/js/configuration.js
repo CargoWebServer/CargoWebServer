@@ -472,6 +472,29 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 }, { "entity": entity })
                         }
                     }(content.panel.controls["Config.ScheduledTask_M_script"], content.panel.entity)
+                } else if (content.TYPENAME == "Config.LdapConfiguration") {
+                    // Here I will append in case of sql datasotre the synchornize button.
+                    contentView.refreshBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell; color: lightgrey;" }).down()
+                    contentView.refreshBtn.appendElement({ "tag": "i", "class": "fa fa-refresh" })
+
+                    // The refresh action.
+                    contentView.refreshBtn.element.onclick = function (contentView) {
+                        return function () {
+                            var entity = entities[contentView.entity.UUID]
+                            this.style.color = "#428bca"
+                            server.ldapManager.synchronize(entity.M_id,
+                                // success callback
+                                function (results, caller) {
+                                    console.log("synchronization success!")
+                                    caller.refreshBtn.element.style.color = "#4CAF50"
+                                },
+                                // error callback
+                                function (errObj, caller) {
+                                    console.log("synchronization fail!", error)
+                                    caller.refreshBtn.element.style.color = "#8B0000"
+                                }, { "refreshBtn": contentView.refreshBtn })
+                        }
+                    }(contentView)
                 }
             }
 

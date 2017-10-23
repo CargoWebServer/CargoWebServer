@@ -220,8 +220,7 @@
 }
 
 .table_header_btn_div {
-    display: table; 
-    width: 100%;
+    display: table-cell; 
     background-color: transparent; 
     vertical-align: middle;
 }

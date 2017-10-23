@@ -43,13 +43,22 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
 
     // I will get the list of type derived from item...
     // Here i will display the base type.
-    this.panel.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "innerHtml": "Base Type" })
-        .appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
-        .appendElement({ "tag": "div", "id": "allSuperTypes", "style": "display: table-cell; width: 50%; height: 150px; overflow-y: auto; border: 1px solid grey;" })
-        .appendElement({ "tag": "div", "id": "superTypes", "style": "display: table-cell; width: 50%; height: 150px; overflow-y: auto; border: 1px solid grey;" })
+    this.panel.appendElement({ "tag": "div", "style": "display: table; width: 100%;", "innerHtml": "Base Type" })
+        .appendElement({ "tag": "div", "style": "display: table; width: 100%;" }).down()
+        .appendElement({ "tag": "div", "id": "allSuperTypes", "style": "display: table-cell; width: 50%; min-width: 200px; height: 150px; overflow-y: auto; border: 1px solid grey;" })
+        .appendElement({ "tag": "div", "id": "superTypes", "style": "display: table-cell; width: 50%; min-width: 200px; height: 150px; overflow-y: auto; border: 1px solid grey;" })
 
     this.allSuperTypes = this.panel.getChildById("allSuperTypes")
     this.superTypes = this.panel.getChildById("superTypes")
+
+    this.restrictions = this.panel
+        .appendElement({ "tag": "div", "style": "display: table;" }).down()
+        .appendElement({ "tag": "span", "innerHtml": "Restrictions" })
+        .appendElement({ "tag": "div", "class": "entities_btn", "style": "diplay: inline;" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-plus" }).up().up()
+        .appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
+        .appendElement({ "tag": "div", "style": "display: block; width: 100%;height: 150px;min-width: 200px; overflow-y: auto; border: 1px solid grey;" }).down()
+        .appendElement({ "tag": "div", "style": "display: table; width: 100%; " }).down()
 
     // The propetie panel.
     this.properties = this.panel.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "innerHtml": "Properties" })
@@ -291,6 +300,8 @@ EntityPrototypeEditor.prototype.setCurrentPrototype = function (prototype) {
             EntityPrototypeEditor.proto = prototype
             EntityPrototypeEditor.deleteBtn.element.style.display = "table-cell"
 
+            // Now I will display the item restrictions.
+            EntityPrototypeEditor.displayPrototypeRestrictions(prototype)
         }
     }(this))
 }
@@ -766,12 +777,12 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
                 var fieldType = typeNameInput.element.value
 
                 // Set in indexs...
-                if(panel.getCurrentEntityPrototype().Indexs.indexOf(panel.getCurrentEntityPrototype().Fields[index]) != -1){
+                if (panel.getCurrentEntityPrototype().Indexs.indexOf(panel.getCurrentEntityPrototype().Fields[index]) != -1) {
                     panel.getCurrentEntityPrototype().Indexs[panel.getCurrentEntityPrototype().Indexs.indexOf(panel.getCurrentEntityPrototype().Fields[index])] = "M_" + nameInput.element.value
                 }
 
                 // Set in ids...
-                if(panel.getCurrentEntityPrototype().Ids.indexOf(panel.getCurrentEntityPrototype().Fields[index]) != -1){
+                if (panel.getCurrentEntityPrototype().Ids.indexOf(panel.getCurrentEntityPrototype().Fields[index]) != -1) {
                     panel.getCurrentEntityPrototype().Ids[panel.getCurrentEntityPrototype().Ids.indexOf(panel.getCurrentEntityPrototype().Fields[index])] = "M_" + nameInput.element.value
                 }
 
@@ -803,6 +814,75 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
         this.setDefaultFieldValue(prototype, index)
     }
     return { "editBtn": editBtn, "nameInput": nameInput }
+}
+
+/**
+ * Display the prototype restrictions if there's one...
+ */
+EntityPrototypeEditor.prototype.displayPrototypeRestrictions = function (prototype) {
+    if (prototype.Restrictions != null) {
+        for (var i = 0; i < prototype.Restrictions.length; i++) {
+            var restriction = prototype.Restrictions[i]
+            // Enumeration restriction.
+            var restrictionType = ""
+            if (restriction.Type == 1) {
+                restrictionType = "enumeration"
+            } else if (restriction.Type == 2) {
+                restrictionType = "fraction digits"
+            } else if (restriction.Type == 3) {
+                restrictionType = "length"
+            } else if (restriction.Type == 4) {
+                restrictionType = "max exclusive"
+            } else if (restriction.Type == 5) {
+                restrictionType = "max inclusive"
+            } else if (restriction.Type == 6) {
+                restrictionType = "max length"
+            } else if (restriction.Type == 7) {
+                restrictionType = "min exclusive"
+            } else if (restriction.Type == 8) {
+                restrictionType = "min inclusive"
+            } else if (restriction.Type == 9) {
+                restrictionType = "min length"
+            } else if (restriction.Type == 10) {
+                restrictionType = "pattern"
+            } else if (restriction.Type == 11) {
+                restrictionType = "total digits"
+            } else if (restriction.Type == 12) {
+                restrictionType = "white space"
+            }
+
+            // The restriction row.
+            var restrictionPanel = this.restrictions.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+            var removeRestrictionBtn = restrictionPanel
+                .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": restriction.Value })
+                .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": restrictionType })
+                .appendElement({ "tag": "div", "class": "entities_btn", "style": "text-align: right;" }).down()
+                .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
+
+            // The remove restriction button.
+            removeRestrictionBtn.element.onclick = function (prototype, restriction, restrictionPanel, saveBtn) {
+                return function () {
+                    var restrictions = []
+                    var needSave = false
+                    for(var i=0; i < prototype.Restrictions.length; i++){
+                        if(prototype.Restrictions[i].Value != restriction.Value){
+                            restrictions.push(prototype.Restrictions[i])
+                        }else{
+                            needSave = true
+                        }
+                    }
+
+                    if(needSave){
+                        saveBtn.element.style.display = "table-cell"
+                        prototype.Restrictions = restrictions
+                        restrictionPanel.element.parentNode.removeChild(restrictionPanel.element)
+                    }
+                    console.log("Remove " + restriction.Value + " from " + prototype.TypeName)
+                }
+            }(prototype, restriction, restrictionPanel, this.saveBtn)
+
+        }
+    }
 }
 
 /**

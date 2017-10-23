@@ -227,7 +227,13 @@ EntityPanel.prototype.getEntity = function () {
  * @param {Entity} entity The entity to display.
  */
 EntityPanel.prototype.setEntity = function (entity) {
+	// Nothing to do if no entity is defined.
 	if (entity == undefined) {
+		return
+	}
+
+	// If is not an object... nothing to do!
+	if (!isObject(entity)) {
 		return
 	}
 

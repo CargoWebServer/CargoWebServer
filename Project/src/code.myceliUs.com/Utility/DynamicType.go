@@ -159,8 +159,9 @@ func initializeStructureValue(typeName string, data map[string]interface{}) refl
 							switch v_ := values[i].(type) {
 							// Here i have a sub-value.
 							case map[string]interface{}:
-								fv = initializeStructureValue(v_["TYPENAME"].(string), v_)
-
+								if v_["TYPENAME"] != nil {
+									fv = initializeStructureValue(v_["TYPENAME"].(string), v_)
+								}
 							default:
 								// A base type...
 								// Here I will try to convert the base type to the one I have in

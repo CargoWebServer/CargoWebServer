@@ -14,8 +14,9 @@ import (
  * Simple data representation use to exange data between participants.
  */
 type MessageData struct {
-	Name  string      /* The name of the parameter... **/
-	Value interface{} /** Can be string, double, integer, bytes, or JSON structure **/
+	TYPENAME string
+	Name     string      /* The name of the parameter... **/
+	Value    interface{} /** Can be string, double, integer, bytes, or JSON structure **/
 }
 
 /**

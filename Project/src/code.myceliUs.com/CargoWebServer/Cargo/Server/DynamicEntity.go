@@ -111,7 +111,11 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 
 			keyInfo += prototype.TypeName + ":"
 			for i := 1; i < len(prototype.Ids); i++ {
-				keyInfo += Utility.ToString(values[prototype.Ids[i]])
+				if values[prototype.Ids[i]] != nil {
+					keyInfo += Utility.ToString(values[prototype.Ids[i]])
+				} else {
+					keyInfo += "undefined" // undefined is the default value here.
+				}
 				// Append underscore for readability in case of problem...
 				if i < len(prototype.Ids)-1 {
 					keyInfo += "_"
@@ -821,7 +825,11 @@ func (this *DynamicEntity) saveEntity(path string) {
 									subValues := this.getValue(fieldName).([]interface{})[j].(map[string]interface{})
 									// I will create the sub value...
 									typeName := strings.Replace(strings.Replace(fieldType, ":Ref", "", -1), "[]", "", -1)
-									uuid := subValues["UUID"].(string)
+
+									var uuid string
+									if subValues["UUID"] != nil {
+										uuid = subValues["UUID"].(string)
+									}
 
 									// I will try to create a static entity...
 									newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
@@ -1041,6 +1049,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	// The event data...
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
+	msgData.TYPENAME = "Server.MessageData"
 	msgData.Name = "entity"
 	msgData.Value = this.GetObject()
 	eventData[0] = msgData
@@ -1162,14 +1171,20 @@ func (this *DynamicEntity) GetUuid() string {
 }
 
 func (this *DynamicEntity) GetParentUuid() string {
-	return this.getValue("ParentUuid").(string)
+	if this.getValue("ParentUuid") != nil {
+		return this.getValue("ParentUuid").(string)
+	}
+	return ""
 }
 
 /**
  * The name of the relation with it parent.
  */
 func (this *DynamicEntity) GetParentLnk() string {
-	return this.getValue("ParentLnk").(string)
+	if this.getValue("ParentLnk") != nil {
+		return this.getValue("ParentLnk").(string)
+	}
+	return ""
 }
 
 func (this *DynamicEntity) SetParentLnk(lnk string) {
@@ -1372,7 +1387,11 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 					objects_ := make([]interface{}, 0)
 					isExist := false
 					for i := 0; i < len(objects); i++ {
-						if objects[i].(map[string]interface{})["UUID"].(string) != child.GetUuid() {
+						var uuid string
+						if objects[i].(map[string]interface{})["UUID"] != nil {
+							uuid = objects[i].(map[string]interface{})["UUID"].(string)
+						}
+						if uuid != child.GetUuid() {
 							objects_ = append(objects_, objects[i].(map[string]interface{}))
 						} else {
 							if reflect.TypeOf(child.GetObject()).String() == "map[string]interface {}" {

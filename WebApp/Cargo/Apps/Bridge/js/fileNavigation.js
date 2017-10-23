@@ -239,12 +239,12 @@ FileNavigator.prototype.setActiveTab = function (fileId) {
     if (this.files[fileId] != undefined) {
         // local event.
         var evt
-        if (this.activeFile.getTypeName() == "BPMNDI.BPMNDiagram") {
+        if (this.activeFile.TYPENAME == "BPMNDI.BPMNDiagram") {
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "bpmnDiagramInfo": this.activeFile } }
-        } else if(this.activeFile.getTypeName() == "CargoEntities.File"){
+        } else if(this.activeFile.TYPENAME == "CargoEntities.File"){
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": this.activeFile } }
         }else {
-            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "prototypeInfo": this.activeFile.getPrototype() } }
+            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "prototypeInfo": getEntityPrototype(this.activeFile.M_name) } }
         }
         server.eventHandler.broadcastLocalEvent(evt)
 

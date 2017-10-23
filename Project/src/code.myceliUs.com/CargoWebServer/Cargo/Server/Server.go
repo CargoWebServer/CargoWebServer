@@ -368,6 +368,7 @@ func (this *Server) Start() {
 			param := new(MessageData)
 			paramName, _ := functionParams[i].Object().Get("name")
 			param.Name = paramName.String()
+			param.TYPENAME = "Server.MessageData"
 			paramValue, _ := functionParams[i].Object().Get("dataBytes")
 
 			if paramValue.IsString() {

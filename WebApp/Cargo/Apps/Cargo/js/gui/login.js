@@ -91,7 +91,7 @@ var LoginPage = function (loginCallback, serverId) {
 	// The login success event...
 	server.sessionManager.attach(this, LoginEvent, function (evt, loginPanel) {
 		// I will reinit the panel here...
-		/*if (evt.dataMap["entity"].getTypeName() == entityPanel.typeName) {
+		/*if (evt.dataMap["entity"].TYPENAME == entityPanel.typeName) {
 			if (evt.dataMap["entity"] && entityPanel.entity != null) {
 				if (entityPanel.entity.UUID == evt.dataMap["entity"].UUID) {
 					entityPanel.init(entityPanel.proto)

@@ -52,9 +52,9 @@ var BlogPostCommentEditor = function (parent, parentDiv) {
                 var query = "http://" + server.hostName + ":" + server.port + "/api/Server/AccountManager/Me?connectionId=" + sessionId
                 server.oAuth2Manager.getResource("1234", "openid profile email", query,
                     function (results, caller) {
-                        if (results.getTypeName() != undefined) {
+                        if (results.TYPENAME != undefined) {
                             // In that case I have an Account object.
-                            if (results.getTypeName() == "CargoEntities.Account") {
+                            if (results.TYPENAME == "CargoEntities.Account") {
                                 // I will made use of the entity manager to initilyse the account properly
                                 server.entityManager.getEntityByUuid(results.UUID,
                                     // success callback

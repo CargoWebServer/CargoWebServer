@@ -102,10 +102,9 @@ var RolePermissionManager = function (parent) {
         if (evt.dataMap["entity"] != undefined) {
             var entity = entities[evt.dataMap["entity"].UUID]
             if (entity != undefined) {
-                console.log("new role ", entity)
-                if (entity.getTypeName() == "CargoEntities.Role") {
+                if (entity.TYPENAME == "CargoEntities.Role") {
                     rolePermissionManager.roleManager.displayRole(entity)
-                } else if (entity.getTypeName() == "CargoEntities.Permission") {
+                } else if (entity.TYPENAME == "CargoEntities.Permission") {
 
                 }
             }
@@ -116,9 +115,9 @@ var RolePermissionManager = function (parent) {
     server.entityManager.attach(this, DeleteEntityEvent, function (evt, rolePermissionManager) {
         // So here I will remove the line from the table...
         var entity = evt.dataMap["entity"]
-        if (entity.getTypeName() == "CargoEntities.Role") {
+        if (entity.TYPENAME == "CargoEntities.Role") {
             rolePermissionManager.roleManager.removeRole(entity)
-        } else if (entity.getTypeName() == "CargoEntities.Permission") {
+        } else if (entity.TYPENAME == "CargoEntities.Permission") {
 
         }
     })
@@ -164,14 +163,14 @@ var RoleManager = function (parent) {
         if (evt.dataMap["entity"] != undefined) {
             var entity = entities[evt.dataMap["entity"].UUID]
             if (entity != undefined) {
-                if (entity.getTypeName() == "CargoEntities.Role") {
+                if (entity.TYPENAME == "CargoEntities.Role") {
                     // Romove the role if it already exist...
                     if (roleManager.roles[entity.UUID] != undefined) {
                         delete roleManager.roles[entity.UUID]
                     }
                     // display the role.
                     roleManager.displayRole(entity)
-                } else if (entity.getTypeName() == "CargoEntities.Permission") {
+                } else if (entity.TYPENAME == "CargoEntities.Permission") {
 
                 }
             }

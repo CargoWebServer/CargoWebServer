@@ -330,6 +330,7 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
 		eventData := make([]*MessageData, 3)
 
 		tableName_ := new(MessageData)
+		tableName_.TYPENAME = "Server.MessageData"
 		tableName_.Name = "tableName"
 		tableName_.Value = tableName
 		eventData[0] = tableName_
@@ -660,11 +661,13 @@ func (this *SqlDataStore) Update(query string, fields []interface{}, params []in
 		eventData := make([]*MessageData, 2)
 
 		tableName_ := new(MessageData)
+		tableName_.TYPENAME = "Server.MessageData"
 		tableName_.Name = "tableName"
 		tableName_.Value = tableName
 		eventData[0] = tableName_
 
 		id := new(MessageData)
+		id.TYPENAME = "Server.MessageData"
 		id.Name = "id"
 		id.Value = Utility.ToString(params[0])
 		eventData[1] = id

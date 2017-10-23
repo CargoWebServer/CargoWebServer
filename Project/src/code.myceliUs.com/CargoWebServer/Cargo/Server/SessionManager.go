@@ -146,12 +146,14 @@ func (this *SessionManager) closeSession_(session *CargoEntities.Session) *Cargo
 
 	// The closed session
 	sessionInfo := new(MessageData)
+	sessionInfo.TYPENAME = "Server.MessageData"
 	sessionInfo.Name = "sessionInfo"
 	sessionInfo.Value = session
 	eventData[0] = sessionInfo
 
 	// The active session
 	sessionsInfo := new(MessageData)
+	sessionsInfo.TYPENAME = "Server.MessageData"
 	sessionsInfo.Name = "sessionsInfo"
 	sessionsInfo.Value = this.getActiveSessionByAccountId(session.M_accountPtr)
 	eventData[1] = sessionsInfo
@@ -337,6 +339,7 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 			eventData := make([]*MessageData, 2)
 
 			sessionInfo := new(MessageData)
+			sessionInfo.TYPENAME = "Server.MessageData"
 			sessionInfo.Name = "sessionInfo"
 			sessionInfo.Value = session
 			eventData[0] = sessionInfo
@@ -446,6 +449,7 @@ func (this *SessionManager) UpdateSessionState(state int64, messageId string, se
 
 	// Append the user data
 	sessionInfo := new(MessageData)
+	sessionInfo.TYPENAME = "Server.MessageData"
 	sessionInfo.Name = "sessionInfo"
 	sessionInfo.Value = session
 	eventData[0] = sessionInfo

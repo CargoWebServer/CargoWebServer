@@ -95,7 +95,7 @@ var CodeEditor = function (parent) {
         if (evt.dataMap.entity !== undefined) {
             var file = evt.dataMap["entity"]
             var editor = codeEditor.editors[file.M_id + "_editor"]
-            if (editor !== undefined && file.getTypeName() == "CargoEntities.File") {
+            if (editor !== undefined && file.TYPENAME == "CargoEntities.File") {
                 // Supend the change event propagation
                 codeEditor.quiet = true
                 var position = editor.getCursorPosition()
@@ -124,7 +124,6 @@ CodeEditor.prototype.appendPrototypeEditor = function (prototype) {
 
     server.configurationManager.getActiveConfigurations(
         function(results, caller){
-            console.log(results)
             var namespaces = []
             for(var i=0; i < results.M_dataStoreConfigs.length; i++){
                 namespaces.push(results.M_dataStoreConfigs[i].M_id)
@@ -241,6 +240,7 @@ CodeEditor.prototype.appendFile = function (file) {
             // Init the query editor.
             queryEditor.init()
 
+            this.editors[file.M_id + "_editor"] = queryEditor
             this.filesPanel[file.M_id] = filePanel
             this.setActiveFile(file.M_id)
         }
@@ -252,7 +252,7 @@ CodeEditor.prototype.appendFile = function (file) {
     var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
     var editor = ace.edit(file.M_id + "_editor");
     editor.getSession().setMode(fileMode);
-    editor.setTheme("ace/theme/tomorrow");
+    /*editor.setTheme("ace/theme/tomorrow");*/
     editor.setOptions({
         enableBasicAutocompletion: true,
         enableSnippets: true,
@@ -304,4 +304,14 @@ CodeEditor.prototype.setActiveFile = function (fileId) {
         this.filesPanel[fileId].element.style.display = ""
     }
     this.activeFile = this.files[fileId]
+
+    // Now the toolbar...
+    var toolbars = document.getElementsByClassName("toolbar")
+    for(var i=0; i < toolbars.length; i++){
+        toolbars[i].style.display = "none" // hide toolbar.
+    }
+
+    if(document.getElementById(fileId + "_toolbar") != undefined){
+        document.getElementById(fileId + "_toolbar").style.display = ""
+    }
 }

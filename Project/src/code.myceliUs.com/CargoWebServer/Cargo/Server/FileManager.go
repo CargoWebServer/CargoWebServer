@@ -478,6 +478,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 	if err == nil {
 		eventData := make([]*MessageData, 1)
 		fileInfo := new(MessageData)
+		fileInfo.TYPENAME = "Server.MessageData"
 		fileInfo.Name = "fileInfo"
 		if !isNew {
 			file.SetData(base64.StdEncoding.EncodeToString(filedata))
@@ -570,6 +571,7 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 	if err == nil {
 		eventData := make([]*MessageData, 1)
 		fileInfo := new(MessageData)
+		fileInfo.TYPENAME = "Server.MessageData"
 		fileInfo.Name = "fileInfo"
 		fileInfo.Value = file
 		eventData[0] = fileInfo
@@ -622,6 +624,7 @@ func (this *FileManager) deleteFile(uuid string) error {
 
 	eventData := make([]*MessageData, 1)
 	fileInfo := new(MessageData)
+	fileInfo.TYPENAME = "Server.MessageData"
 	fileInfo.Name = "fileInfo"
 	fileInfo.Value = file
 	eventData[0] = fileInfo

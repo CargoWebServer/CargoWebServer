@@ -136,9 +136,73 @@ Table.prototype.setModel = function (model, initCallback) {
 		// Success callback...
 		function (results, caller) {
 			//caller.caller.init()
+			var table = caller.caller
+
 			if (caller.initCallback != undefined) {
 				caller.initCallback()
 				caller.initCallback = undefined
+				// Because html table suck with the header position vs scroll 
+				// I do some little hack to fix it without weird stuff like 
+				// copy another header etc...
+				var widths = []
+				// Now I will wrote the code for the layout...
+				if (table.header != null && table.parent.element.style.position == "relative") {
+					var w = table.header.buttonDiv.element.offsetWidth
+					table.header.buttonDiv.element.style.width = w + "px"
+					table.header.buttonDiv.element.style.minWidth = w + "px"
+
+					for (var i = 0; i < table.header.cells.length; i++) {
+						var w = table.header.cells[i].element.offsetWidth
+						table.header.cells[i].element.style.width = w + "px"
+						table.header.cells[i].element.style.minWidth = w + "px"
+						widths.push(w)
+					}
+
+					// Now the table body...
+					for (var i = 0; i < table.rows.length; i++) {
+						for (var j = 0; j < table.rows[i].cells.length; j++) {
+							var cell = table.rows[i].cells[j]
+							cell.div.element.style.width = widths[j] + "px"
+							cell.div.element.style.minWidth = widths[j] + "px"
+						}
+					}
+
+					// The table header.
+					table.header.div.element.style.position = "absolute"
+					table.header.div.element.style.left = "2px"
+
+					// Now the table body
+					table.rowGroup.element.style.position = "absolute"
+					table.rowGroup.element.style.overflowX = "hidden"
+					table.rowGroup.element.style.overflowY = "auto"
+					table.rowGroup.element.style.left = "10px"
+					table.rowGroup.element.style.top = table.header.div.element.offsetHeight + 2 + "px"
+
+					// Now the height of the panel...
+					table.rowGroup.element.style.height = (table.parent.element.offsetHeight - table.header.div.element.offsetHeight) - 15 + "px"
+
+					// Here the scrolling event.
+					table.rowGroup.element.onscroll = function (header) {
+						return function () {
+							var position = this.scrollTop;
+							if (this.scrollTop > 0) {
+								header.className = "table_header scrolling"
+							} else {
+								header.className = "table_header"
+							}
+						}
+					}(table.header.div.element)
+
+					// Now the resize event.
+					window.addEventListener('resize',
+						function (table) {
+							return function () {
+
+								table.rowGroup.element.style.height = (table.parent.element.offsetHeight - table.header.div.element.offsetHeight) - 15 + "px"
+							}
+						}(table), true);
+				}
+
 			}
 		},
 		// The progress callback...
@@ -454,7 +518,10 @@ Table.prototype.getRow = function (id) {
  * Append a new row inside the table. If the row already exist it update it value.
  */
 Table.prototype.appendRow = function (values, id) {
-
+	if(id == undefined){
+		id = 0
+	}
+	
 	if (this.rowGroup == null) {
 		//this.init()
 		this.rowGroup = this.div.appendElement({ "tag": "div", "class": "table_body" }).down()
@@ -541,18 +608,18 @@ var TableHeader = function (table) {
 		.prependElement({ "tag": "div", "class": "table_header", "style": "" }).down()
 
 	// The first cell will be there to match the save button...
-	var buttonDiv = this.div.appendElement({ "tag": "div", "class": "table_header_btn_div" }).down()
+	this.buttonDiv = this.div.appendElement({ "tag": "div", "class": "table_header_btn_div" }).down()
 
-	this.exportBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style": "width: 100%;" }).down()
+	this.exportBtn = this.buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style": "width: 100%;" }).down()
 	this.exportBtn.appendElement({ "tag": "i", "class": "	fa fa-download", "title": "download table data file." })
 
-	this.maximizeBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style": "display: none;" }).down()
+	this.maximizeBtn = this.buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn", "style": "display: none;" }).down()
 	this.maximizeBtn.appendElement({ "tag": "i", "class": "fa fa-plus-square-o" })
 
-	this.minimizeBtn = buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn" }).down()
+	this.minimizeBtn = this.buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn" }).down()
 	this.minimizeBtn.appendElement({ "tag": "i", "class": "fa fa-minus-square-o" })
 
-	this.numberOfRowLabel = buttonDiv.appendElement({ "tag": "div", "class": "number_of_row_label", "style": "display: none;" }).down()
+	this.numberOfRowLabel = this.buttonDiv.appendElement({ "tag": "div", "class": "number_of_row_label", "style": "display: none;" }).down()
 
 	this.maximizeBtn.element.onclick = function (rowGroup, minimizeBtn, numberOfRowLabel) {
 		return function () {
@@ -838,7 +905,7 @@ TableCell.prototype.formatValue = function (value) {
 	}
 
 	// In case of a reference string...
-	if (fieldType.endsWith("string")) {
+	if (fieldType.endsWith("string") && this.row.table.model.constructor === EntityTableModel) {
 		if (isObjectReference(value)) {
 			// In that case I will create the link object to reach the 
 			// reference...
@@ -1643,9 +1710,9 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 						entity.NeedSave = true
 						self.setValue(value)
 						// set the table entity.
-						if(self.row.table.model.entities[self.row.index].TYPENAME == entity.TYPENAME){
+						if (self.row.table.model.entities[self.row.index].TYPENAME == entity.TYPENAME) {
 							self.row.table.model.entities[self.row.index] = entity
-						}else if(entity.ParentUuid == self.row.table.model.entities[self.row.index].UUID){
+						} else if (entity.ParentUuid == self.row.table.model.entities[self.row.index].UUID) {
 							self.row.table.model.entities[self.row.index][entity.ParentLnk] = entity
 						}
 					} else {

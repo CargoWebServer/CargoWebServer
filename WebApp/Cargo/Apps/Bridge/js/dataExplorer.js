@@ -185,7 +185,7 @@ DataExplorer.prototype.generatePrototypesView = function (storeId, prototypes) {
     for (var i = 0; i < prototypes.length; i++) {
         // Here I will append the prototype name...
         if (this.prototypesView[prototypes[i].TypeName] == undefined) {
-            this.prototypesView[prototypes[i].TypeName] = new PrototypeTreeView(this.shemasView[storeId], prototypes[i])
+            this.prototypesView[prototypes[i].TypeName] = new PrototypeTreeView(this.shemasView[storeId], prototypes[i], this.configs[storeId].M_dataStoreType)
         }
     }
 }
@@ -260,7 +260,7 @@ DataExplorer.prototype.removeDataSchema = function (storeId) {
 /**
  * That view is use to display prototype structures
  */
-var PrototypeTreeView = function (parent, prototype) {
+var PrototypeTreeView = function (parent, prototype, storeType) {
     this.parent = parent
     this.panel = new Element(parent, { "tag": "div", "class": "data_prototype_tree_view" })
     this.fieldsView = {}
@@ -293,16 +293,16 @@ var PrototypeTreeView = function (parent, prototype) {
     this.editLnk.element.onclick = function (typeName) {
         return function () {
             // So here I will generate an even...
-            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "prototypeInfo": getEntityPrototypes(typeName) } }
+            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "prototypeInfo": getEntityPrototype(typeName) } }
             server.eventHandler.broadcastLocalEvent(evt)
         }
     }(prototype.TypeName)
 
     // Here I will append the contextual menu...
-    this.editLnk.element.addEventListener('contextmenu', function (editLnk) {
+    this.editLnk.element.addEventListener('contextmenu', function (editLnk, prototype, storeType) {
         return function (evt) {
             // Rename existing folder in the project.
-            var renameMenuItem = new MenuItem("rename_menu", "Rename", {}, 0, function (editLnk, dir) {
+            var renameMenuItem = new MenuItem("rename_menu", "Rename", {}, 0, function (editLnk, prototype) {
                 return function () {
                     // Now I will hide the fileDiv...
                     var text = editLnk.element.innerText
@@ -340,12 +340,12 @@ var PrototypeTreeView = function (parent, prototype) {
                                     }, renameDirInput)
                             }
                         }
-                    }(renameDirInput, editLnk, text, prototype)
+                    }(renameDirInput, editLnk, text)
 
                     renameDirInput.element.setSelectionRange(0, text.length)
                     renameDirInput.element.focus()
                 }
-            }(editLnk, prototype), "fa fa-edit")
+            }(editLnk, prototype, storeType), "fa fa-edit")
 
             // Delete a file from a project.
             var deleteMenuItem = new MenuItem("delete_menu", "Delete", {}, 0, function (prototype) {
@@ -354,7 +354,7 @@ var PrototypeTreeView = function (parent, prototype) {
                     confirmDialog.div.element.style.maxWidth = "450px"
                     confirmDialog.setCentered()
                     server.languageManager.setElementText(confirmDialog.title, "Delete file")
-                    confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete prototype " + prototype.TypeName  + "?" })
+                    confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete prototype " + prototype.TypeName + "?" })
                     confirmDialog.ok.element.onclick = function (dialog, prototype) {
                         return function () {
                             // Remove the folder.
@@ -363,7 +363,7 @@ var PrototypeTreeView = function (parent, prototype) {
                                 function (result, caller) {
                                 },
                                 function () {
-        
+
                                 }, undefined)
                             dialog.close()
                         }
@@ -371,21 +371,59 @@ var PrototypeTreeView = function (parent, prototype) {
                 }
             }(prototype), "fa fa-trash-o")
 
-            var dumpDataMenuItem = new MenuItem("dump_data_menu", "Display Data", {}, 0, function (prototype) {
+            var dumpDataMenuItem = new MenuItem("dump_data_menu", "Display Data", {}, 0, function (prototype, storeType) {
                 return function () {
                     // In that case I will create a local query file and open it with the query...
-                    
+                    if (storeType == 1) {
+                        // Sql dump
+                        createQuery(".sql", "/** Sql query **/\n", function () {
+                            return function (file) {
+                                server.fileManager.openFile(file.M_id,
+                                    // Progress callback.
+                                    function (index, totatl, caller) {
+
+                                    },
+                                    // Success callback
+                                    function (result, caller) {
+
+                                    },
+                                    // Error callback
+                                    function (errMsg, caller) {
+
+                                    }, this)
+                            }
+                        }())
+                    } else if (storeType == 2) {
+                        // Entities dump
+                        createQuery(".eql", "/** Eql query **/\n", function () {
+                            return function (file) {
+                                server.fileManager.openFile(file.M_id,
+                                    // Progress callback.
+                                    function (index, totatl, caller) {
+
+                                    },
+                                    // Success callback
+                                    function (result, caller) {
+                                        // Here The file is open...
+                                    },
+                                    // Error callback
+                                    function (errMsg, caller) {
+
+                                    }, this)
+                            }
+                        }())
+                    }
                 }
-            }(prototype), "fa fa-search")
+            }(prototype, storeType), "fa fa-search")
 
             // The main menu will be display in the body element, so nothing will be over it.
-            if(!prototype.TypeName.startsWith("xs.") && !prototype.TypeName.startsWith("Config.")&& !prototype.TypeName.startsWith("CargoEntities.")&& !prototype.TypeName.startsWith("sqltypes.")&& !prototype.TypeName.startsWith("XMI_types.")&& !prototype.TypeName.startsWith("sql_info.")){
-                var contextMenu = new PopUpMenu(editLnk, [ dumpDataMenuItem, "|",renameMenuItem, deleteMenuItem], evt)
-            }else{
-                var contextMenu = new PopUpMenu(editLnk, [ dumpDataMenuItem], evt)
+            if (storeType == 2 && !prototype.TypeName.startsWith("xs.") && !prototype.TypeName.startsWith("Config.") && !prototype.TypeName.startsWith("CargoEntities.") && !prototype.TypeName.startsWith("sqltypes.") && !prototype.TypeName.startsWith("XMI_types.") && !prototype.TypeName.startsWith("sql_info.")) {
+                var contextMenu = new PopUpMenu(editLnk, [dumpDataMenuItem, "|", renameMenuItem, deleteMenuItem], evt)
+            } else {
+                var contextMenu = new PopUpMenu(editLnk, [dumpDataMenuItem], evt)
             }
         }
-    }(this.editLnk), false)
+    }(this.editLnk, prototype, storeType), false)
 
     this.fieldsPanel = this.panel.appendElement({ "tag": "div", "class": "data_prototype_tree_view_fields" }).down()
 
@@ -469,4 +507,58 @@ var PrototypeTreeViewField = function (parent, prototype, fieldName, fieldType, 
     // Now the typename 
     this.panel.appendElement({ "tag": "span", "innerHtml": fieldType }).down()
 
+}
+
+
+// That funtion create a new file with a query in it.
+function createQuery(extension, query, callback) {
+    // So here I will create a new query file.
+    server.fileManager.getFileByPath("/queries",
+        // Success
+        function (results, caller) {
+            var extension = caller.extension
+
+            // query file will have a name like q1, q2... qx by default...
+            var lastIndex = 0
+            for (var i = 0; i < results.M_files.length; i++) {
+                var f = results.M_files[i]
+                if (f.M_name.match(/q[0-9]+/)) {
+                    if (parseInt(f.M_name.replace("q", "").replace(extension, "")) > lastIndex) {
+                        lastIndex = parseInt((f.M_name).replace("q", "").replace(extension, ""))
+                    }
+                }
+            }
+            lastIndex++
+
+            // Here I will create an empty text file.
+            var f = null
+            try {
+                var f = new File([query], "q" + lastIndex + extension, { type: "text/plain", lastModified: new Date(0) })
+            } catch (error) {
+                /** Nothing todo here. */
+            }
+
+            // Now I will create the new file...
+            server.fileManager.createFile("q" + lastIndex + extension, "/queries", f, 256, 256, false,
+                // Success callback.
+                function (result, caller) {
+                    // Here is the new file...
+                    if (caller.callback != undefined) {
+                        // Call the callback function with the 
+                        // newly create file as it first argument.
+                        caller.callback(result)
+                    }
+                },
+                function () {
+
+                },
+                // Error callback.
+                function () {
+
+                }, caller)
+        },
+        // Error
+        function () {
+
+        }, { "extension": extension, "callback": callback })
 }

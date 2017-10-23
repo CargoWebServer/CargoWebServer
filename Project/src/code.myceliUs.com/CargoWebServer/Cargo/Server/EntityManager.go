@@ -69,6 +69,7 @@ func newEntityManager() *EntityManager {
 	entityManager.registerCargoEntitiesObjects()
 
 	// Entity prototype is a dynamic type.
+	// ** Dynamic type must have the TYPENAME property!
 	Utility.RegisterType((*EntityPrototype)(nil))
 	Utility.RegisterType((*Restriction)(nil))
 	Utility.RegisterType((*DynamicEntity)(nil))
@@ -253,6 +254,7 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 	// Send event message...
 	var eventDatas []*MessageData
 	evtData := new(MessageData)
+	evtData.TYPENAME = "Server.MessageData"
 	evtData.Name = "entity"
 
 	evtData.Value = toDelete.GetObject()
@@ -1287,6 +1289,7 @@ func (this *EntityManager) deleteEntityPrototype(storeId string, prototype *Enti
 	var eventDatas []*MessageData
 
 	evtData := new(MessageData)
+	evtData.TYPENAME = "Server.MessageData"
 	evtData.Name = "prototype"
 	evtData.Value = prototype
 
@@ -1479,36 +1482,37 @@ func (this *EntityManager) isExist(uuid string) bool {
  * Sort an array of entities.
  */
 func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}, startIndex int, endIndex int, asc bool) []Entity {
+
 	// Get the order to sort...
-	order := orderBy[0].(string)
-	// and remove it from the list...
-	orderBy = orderBy[1:]
-
-	// First of all I will sort the array
-	sort.Slice(entities[startIndex:endIndex], func(order string, asc bool) func(int, int) bool {
-		return func(i, j int) bool {
-			// I will get values to compare...
-			entity0 := entities[i]
-			entity1 := entities[j]
-			var val0, val1 interface{}
-			if reflect.TypeOf(entity0).String() == "*Server.DynamicEntity" {
-				// Dynamic entity.
-				val0 = entity0.(*DynamicEntity).getValue(order)
-				val1 = entity1.(*DynamicEntity).getValue(order)
-			} else {
-				methodName := "Get" + strings.ToUpper(order[0:1]) + order[1:]
-				params := make([]interface{}, 0)
-				val0, _ = Utility.CallMethod(entity0, methodName, params)
-				val1, _ = Utility.CallMethod(entity1, methodName, params)
+	if len(orderBy) > 0 {
+		order := orderBy[0].(string)
+		// and remove it from the list...
+		orderBy = orderBy[1:]
+		// First of all I will sort the array
+		sort.Slice(entities[startIndex:endIndex], func(order string, asc bool) func(int, int) bool {
+			return func(i, j int) bool {
+				// I will get values to compare...
+				entity0 := entities[i]
+				entity1 := entities[j]
+				var val0, val1 interface{}
+				if reflect.TypeOf(entity0).String() == "*Server.DynamicEntity" {
+					// Dynamic entity.
+					val0 = entity0.(*DynamicEntity).getValue(order)
+					val1 = entity1.(*DynamicEntity).getValue(order)
+				} else {
+					methodName := "Get" + strings.ToUpper(order[0:1]) + order[1:]
+					params := make([]interface{}, 0)
+					val0, _ = Utility.CallMethod(entity0, methodName, params)
+					val1, _ = Utility.CallMethod(entity1, methodName, params)
+				}
+				if asc {
+					return Utility.Less(val0, val1)
+				} else {
+					return Utility.Less(val1, val0)
+				}
 			}
-			if asc {
-				return Utility.Less(val0, val1)
-			} else {
-				return Utility.Less(val1, val0)
-			}
-		}
-	}(order, asc))
-
+		}(order, asc))
+	}
 	// TODO recursively sort with other fields...
 	/*for i := 0; i < len(entities)-1; i++ {
 		entity0 := entities[i]

@@ -556,6 +556,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 		method = "OAuth2Authorization"
 		params := make([]*MessageData, 1)
 		data := new(MessageData)
+		data.TYPENAME = "Server.MessageData"
 		data.Name = "authorizationLnk"
 		data.Value = authorizationLnk
 		params[0] = data
@@ -1371,6 +1372,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		// Here I will create a response for the authorization.
 		results := make([]*MessageData, 1)
 		data := new(MessageData)
+		data.TYPENAME = "Server.MessageData"
 		data.Name = "code"
 		data.Value = resp.Output["code"]
 		results[0] = data
@@ -1541,12 +1543,14 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 			results := make([]*MessageData, 2)
 			// The access uuid
 			data0 := new(MessageData)
+			data0.TYPENAME = "Server.MessageData"
 			data0.Name = "accessUuid"
 			data0.Value = access.GetUUID()
 			results[0] = data0
 
 			// The id token uuid.
 			data1 := new(MessageData)
+			data1.TYPENAME = "Server.MessageData"
 			data1.Name = "idTokenUuid"
 			data1.Value = idTokenUuid
 			results[1] = data1
