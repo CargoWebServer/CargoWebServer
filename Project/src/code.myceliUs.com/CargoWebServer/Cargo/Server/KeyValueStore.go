@@ -1324,6 +1324,12 @@ func (this *KeyValueDataStore) GetEntityPrototypes() ([]*EntityPrototype, error)
 	// Here the store is not a local, so I will use a remote call to get the
 	// list of it entity prototypes.
 	if this.m_ipv4 != "127.0.0.1" {
+		if !this.m_conn.IsOpen() {
+			err := this.Connect()
+			if err != nil {
+				return nil, err
+			}
+		}
 		// I will use execute JS function to get the list of entity prototypes.
 		id := Utility.RandomUUID()
 		method := "ExecuteJsFunction"
@@ -1387,6 +1393,7 @@ func (this *KeyValueDataStore) GetEntityPrototypes() ([]*EntityPrototype, error)
 		if reflect.TypeOf(results).String() == "[]*Server.EntityPrototype" {
 			return results.([]*EntityPrototype), nil
 		}
+
 		return prototypes, errors.New(*results.(*string)) // return an error message instead.
 	}
 
@@ -1428,6 +1435,14 @@ func (this *KeyValueDataStore) GetId() string {
 func (this *KeyValueDataStore) Connect() error {
 
 	if this.m_ipv4 != "127.0.0.1" {
+		// I will not try to connect if a connection already exist.
+		if this.m_conn != nil {
+			if this.m_conn.IsOpen() {
+				log.Println(this.m_conn)
+				return nil
+			}
+		}
+
 		// Here I will connect to a remote server.
 		var err error
 		this.m_conn, err = GetServer().connect("ws://" + this.m_ipv4 + ":" + strconv.Itoa(this.m_port))
@@ -1535,6 +1550,15 @@ func (this *KeyValueDataStore) Connect() error {
  */
 func (this *KeyValueDataStore) Ping() error {
 	if this.m_ipv4 != "127.0.0.1" {
+		if this.m_conn != nil {
+			if !this.m_conn.IsOpen() {
+				err := this.Connect()
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		// Call ping on the distant server.
 		id := Utility.RandomUUID()
 		method := "Ping"
@@ -1588,6 +1612,14 @@ func (this *KeyValueDataStore) Ping() error {
  */
 func (this *KeyValueDataStore) Create(queryStr string, entity []interface{}) (lastId interface{}, err error) {
 	if this.m_ipv4 != "127.0.0.1" {
+		if this.m_conn != nil {
+			if !this.m_conn.IsOpen() {
+				err := this.Connect()
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
 		// I will use execute JS function to get the list of entity prototypes.
 		id := Utility.RandomUUID()
 		method := "ExecuteJsFunction"
@@ -1701,6 +1733,14 @@ func (this *KeyValueDataStore) Create(queryStr string, entity []interface{}) (la
  */
 func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, params []interface{}) (results [][]interface{}, err error) {
 	if this.m_ipv4 != "127.0.0.1" {
+		if this.m_conn != nil {
+			if !this.m_conn.IsOpen() {
+				err := this.Connect()
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
 		// I will use execute JS function to get the list of entity prototypes.
 		id := Utility.RandomUUID()
 		method := "ExecuteJsFunction"
@@ -1881,6 +1921,14 @@ func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, p
 func (this *KeyValueDataStore) Update(queryStr string, fields []interface{}, params []interface{}) (err error) {
 	// Remote server.
 	if this.m_ipv4 != "127.0.0.1" {
+		if this.m_conn != nil {
+			if !this.m_conn.IsOpen() {
+				err := this.Connect()
+				if err != nil {
+					return err
+				}
+			}
+		}
 		// I will use execute JS function to get the list of entity prototypes.
 		id := Utility.RandomUUID()
 		method := "ExecuteJsFunction"
@@ -2045,6 +2093,14 @@ func (this *KeyValueDataStore) Update(queryStr string, fields []interface{}, par
 func (this *KeyValueDataStore) Delete(queryStr string, params []interface{}) (err error) {
 	// Remote server.
 	if this.m_ipv4 != "127.0.0.1" {
+		if this.m_conn != nil {
+			if !this.m_conn.IsOpen() {
+				err := this.Connect()
+				if err != nil {
+					return err
+				}
+			}
+		}
 		// I will use execute JS function to get the list of entity prototypes.
 		id := Utility.RandomUUID()
 		method := "ExecuteJsFunction"
@@ -2181,7 +2237,9 @@ func (this *KeyValueDataStore) Close() error {
 	// Remote server.
 	if this.m_ipv4 != "127.0.0.1" {
 		// Close the connection.
-		this.m_conn.Close()
+		if this.m_conn != nil {
+			this.m_conn.Close()
+		}
 		return nil
 	}
 

@@ -217,6 +217,8 @@ func NewWebSocketConnection() *webSocketConnection {
 	var conn = new(webSocketConnection)
 	conn.send = make(chan []byte /*, connection_channel_size*/)
 	conn.m_uuid = Utility.RandomUUID()
+	conn.m_isOpen = false
+
 	return conn
 }
 
@@ -316,19 +318,20 @@ func HttpHandler(ws *websocket.Conn) {
 	c.m_socket = ws
 	c.m_isOpen = true
 	c.send = make(chan []byte)
-	c.m_uuid = Utility.RandomUUID()
+
+	// Register the connection with the hub.
 	GetServer().GetHub().register <- c
 
-	defer func() {
+	defer func(c *webSocketConnection) {
 		//  I will remove all sub-connection associated with the connection
 		GetServer().removeAllOpenSubConnections(c.GetUuid())
-
 		c.Close()
-	}()
+		log.Println("--> connection ", c.GetUuid(), "is close!")
+	}(c)
 
 	// Start the writing loop...
 	go c.Writer()
 
-	// here the it stay in reader loop until the connection is close.
+	// we stay it stay in reader loop until the connection is close.
 	c.Reader()
 }

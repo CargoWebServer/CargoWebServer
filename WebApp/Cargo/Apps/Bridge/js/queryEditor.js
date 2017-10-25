@@ -509,67 +509,6 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                 return function () {
                     // init the table.
                     table.init()
-                    table.header.maximizeBtn.element.click()
-
-                    // Because html table suck with the header position vs scroll 
-                    // I do some little hack to fix it without weird stuff like 
-                    // copy another header etc...
-                    var widths = []
-                    // Now I will wrote the code for the layout...
-
-                    var w = table.header.buttonDiv.element.offsetWidth
-                    table.header.buttonDiv.element.style.width = w + "px"
-                    table.header.buttonDiv.element.style.minWidth = w + "px"
-
-                    for (var i = 0; i < table.header.cells.length; i++) {
-                        var w = table.header.cells[i].element.offsetWidth
-                        table.header.cells[i].element.style.width = w + "px"
-                        table.header.cells[i].element.style.minWidth = w + "px"
-                        widths.push(w)
-                    }
-
-                    // Now the table body...
-                    for (var i = 0; i < table.rows.length; i++) {
-                        for (var j = 0; j < table.rows[i].cells.length; j++) {
-                            var cell = table.rows[i].cells[j]
-                            cell.div.element.style.width = widths[j] + "px"
-                            cell.div.element.style.minWidth = widths[j] + "px"
-                        }
-                    }
-
-                    // The table header.
-                    table.header.div.element.style.position = "absolute"
-                    table.header.div.element.style.left = "2px"
-
-                    // Now the table body
-                    table.rowGroup.element.style.position = "absolute"
-                    table.rowGroup.element.style.overflowX = "hidden"
-                    table.rowGroup.element.style.overflowY = "auto"
-                    table.rowGroup.element.style.left = "10px"
-                    table.rowGroup.element.style.top = table.header.div.element.offsetHeight + 2 + "px"
-
-                    // Now the height of the panel...
-                    table.rowGroup.element.style.height = (queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight) - 15 + "px"
-
-                    // Here the scrolling event.
-                    table.rowGroup.element.onscroll = function (header) {
-                        return function () {
-                            var position = this.scrollTop;
-                            if (this.scrollTop > 0) {
-                                header.className = "table_header scrolling"
-                            } else {
-                                header.className = "table_header"
-                            }
-                        }
-                    }(table.header.div.element)
-
-                    // Now the resize event.
-                    window.addEventListener('resize',
-                        function (queryEditor, table) {
-                            return function () {
-                                table.rowGroup.element.style.height = (queryEditor.resultQueryPanel.element.offsetHeight - table.header.div.element.offsetHeight) - 15 + "px"
-                            }
-                        }(queryEditor, table), true);
                 }
             }(table, this))
         }
@@ -583,7 +522,6 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                 return function () {
                     // init the table.
                     table.init()
-                    table.header.maximizeBtn.element.click()
                 }
             }(table, this))
         }

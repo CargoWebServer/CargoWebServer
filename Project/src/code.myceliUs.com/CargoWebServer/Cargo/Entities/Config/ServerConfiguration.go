@@ -38,7 +38,6 @@ type ServerConfiguration struct{
 	M_schemasPath string
 	M_tmpPath string
 	M_binPath string
-	M_queriesPath string
 
 
 	/** Associations **/
@@ -66,7 +65,6 @@ type XsdServerConfiguration struct {
 	M_schemasPath	string	`xml:"schemasPath,attr"`
 	M_tmpPath	string	`xml:"tmpPath,attr"`
 	M_binPath	string	`xml:"binPath,attr"`
-	M_queriesPath	string	`xml:"queriesPath,attr"`
 
 }
 /** UUID **/
@@ -281,22 +279,6 @@ func (this *ServerConfiguration) SetBinPath(ref interface{}){
 }
 
 /** Remove reference BinPath **/
-
-/** QueriesPath **/
-func (this *ServerConfiguration) GetQueriesPath() string{
-	return this.M_queriesPath
-}
-
-/** Init reference QueriesPath **/
-func (this *ServerConfiguration) SetQueriesPath(ref interface{}){
-	if this.M_queriesPath != ref.(string) {
-		this.M_queriesPath = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
-	}
-}
-
-/** Remove reference QueriesPath **/
 
 /** Parent **/
 func (this *ServerConfiguration) GetParentPtr() *Configurations{

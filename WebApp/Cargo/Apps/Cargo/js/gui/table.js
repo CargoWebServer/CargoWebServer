@@ -146,7 +146,11 @@ Table.prototype.setModel = function (model, initCallback) {
 				// copy another header etc...
 				var widths = []
 				// Now I will wrote the code for the layout...
-				if (table.header != null && table.parent.element.style.position == "relative") {
+				if(table.header != null){
+					table.header.maximizeBtn.element.click()
+				}
+				
+				if (table.parent.element.style.position == "relative") {
 					var w = table.header.buttonDiv.element.offsetWidth
 					table.header.buttonDiv.element.style.width = w + "px"
 					table.header.buttonDiv.element.style.minWidth = w + "px"

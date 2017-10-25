@@ -282,7 +282,7 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 		account := accountEntity.GetObject().(*CargoEntities.Account)
 
 		// Verify if the password is correct
-		if _, ok := GetServer().GetLdapManager().m_configsInfo[serverId]; ok {
+		if _, ok := GetServer().GetLdapManager().getConfigsInfo()[serverId]; ok {
 			if GetServer().GetLdapManager().authenticate(serverId, account.M_id, psswd) == false {
 				if account.M_password != psswd {
 

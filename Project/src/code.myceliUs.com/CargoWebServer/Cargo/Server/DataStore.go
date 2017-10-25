@@ -1,6 +1,8 @@
 package Server
 
 import (
+	"errors"
+
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 )
 
@@ -17,6 +19,8 @@ func NewDataStore(info *Config.DataStoreConfiguration) (DataStore, error) {
 	} else if info.M_dataStoreType == Config.DataStoreType_KEY_VALUE_STORE {
 		dataStore, err := NewKeyValueDataStore(info)
 		return dataStore, err
+	} else {
+		return nil, errors.New("No data store type was given")
 	}
 	return nil, err
 }

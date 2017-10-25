@@ -407,9 +407,6 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="binPath" name="binPath">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="queriesPath" name="queriesPath">
-        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
-      </ownedAttribute>
 	</ownedMember>
 	
 	<ownedMember xmi:type="cmof:Association" xmi:id="A_serverConfiguration_Configurations" name="A_serverConfiguration_Configurations" visibility="private" memberEnd="Configurations-ServerConfiguration A_serverConfiguration_Configurations-Configurations">
@@ -455,10 +452,7 @@
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="config-version" name="version" visibility="public">
         <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
       </ownedAttribute>
-	  <ownedAttribute xmi:type="cmof:Property" xmi:id="config-version" name="filePath" visibility="public">
-        <type xmi:type="cmof:PrimitiveType" href="http://schema.omg.org/spec/MOF/2.0/cmof.xml#String"/>
-      </ownedAttribute>
-	
+
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-ServerConfiguration" name="serverConfig" _type="ServerConfiguration" lower="1"  upper="1" isComposite="true" association="A_serverConfiguration_Configurations"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-ServerConfiguration" name="oauth2Configuration" _type="OAuth2Configuration" lower="0"  upper="1" isComposite="true" association="A_oauth2Configuration_Configurations"/>
 	  <ownedAttribute xmi:type="cmof:Property" xmi:id="Configurations-ServiceConfiguration" name="serviceConfigs" _type="ServiceConfiguration" lower="0"  upper="*" isComposite="true" association="A_serviceConfiguration_Configurations"/>

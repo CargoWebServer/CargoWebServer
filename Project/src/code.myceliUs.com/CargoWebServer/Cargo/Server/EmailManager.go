@@ -72,7 +72,13 @@ func (this *EmailManager) initialize() {
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	this.m_infos = make(map[string]*Config.SmtpConfiguration, 0)
-	smtpConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetSmtpConfigs()
+
+	activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	smtpConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetSmtpConfigs()
 
 	// Smtp server configuration...
 	for i := 0; i < len(smtpConfigurations); i++ {

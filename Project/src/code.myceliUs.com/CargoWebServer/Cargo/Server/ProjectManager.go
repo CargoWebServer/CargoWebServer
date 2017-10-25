@@ -75,7 +75,7 @@ func (this *ProjectManager) synchronize() {
 
 	for _, f := range files {
 		if f.IsDir() {
-			log.Println("Synchronize project ", f.Name())
+			log.Println("--> Synchronize project ", f.Name())
 			if !strings.HasPrefix(".", f.Name()) {
 
 				projectUUID := CargoEntitiesProjectExists(f.Name())
@@ -117,9 +117,6 @@ func (this *ProjectManager) synchronizeProject(project *CargoEntities.Project, p
 	file, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", ids, false) // get the first file level only...
 	if err == nil {
 		project.SetFilesRef(file.GetObject())
-		for i := 0; i < len(file.GetObject().(*CargoEntities.File).M_files); i++ {
-			log.Println("-----> ", file.GetObject().(*CargoEntities.File).M_files[i].M_name)
-		}
 	}
 }
 
@@ -149,11 +146,11 @@ func (this *ProjectManager) OnEvent(evt interface{}) {
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *ProjectManager) Synchronize(sessionId string, messageId string) {
-	/*errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
-	}*/
+	}
 	// Synchronize the content of project.
 	this.synchronize()
 }

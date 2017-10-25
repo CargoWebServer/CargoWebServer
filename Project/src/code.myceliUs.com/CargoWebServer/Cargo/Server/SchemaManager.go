@@ -138,8 +138,12 @@ func (this *SchemaManager) initialize() {
 		store := GetServer().GetDataManager().getDataStore(schema.Id)
 		if store == nil {
 			// I will create the new store here...
+			activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+			if err != nil {
+				log.Panicln(err)
+			}
 			var errObj *CargoEntities.Error
-			serverConfig := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetServerConfig()
+			serverConfig := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetServerConfig()
 			hostName := serverConfig.GetHostName()
 			ipv4 := serverConfig.GetIpv4()
 			port := serverConfig.GetServerPort()
@@ -187,8 +191,8 @@ func (this *SchemaManager) initialize() {
 
 	// Now I will import the xml file from the schema directory...
 	for _, f := range schemasDir {
-		if strings.HasSuffix(strings.ToUpper(f.Name()), ".XSD") == false {
-			log.Println("import file: ", GetServer().GetConfigurationManager().GetSchemasPath()+"/"+f.Name())
+		if strings.HasSuffix(strings.ToUpper(f.Name()), ".XSD") == false && strings.HasSuffix(strings.ToLower(f.Name()), ".gitignore") == false {
+			log.Println("--> import xml data: ", GetServer().GetConfigurationManager().GetSchemasPath()+"/"+f.Name())
 			this.importXmlFile(GetServer().GetConfigurationManager().GetSchemasPath() + "/" + f.Name())
 		}
 	}
@@ -261,8 +265,12 @@ func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Er
 	store := GetServer().GetDataManager().getDataStore(schema.Id)
 	if store == nil {
 		// I will create the new store here...
+		activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+		if err != nil {
+			log.Panicln(err)
+		}
 		var errObj *CargoEntities.Error
-		serverConfig := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetServerConfig()
+		serverConfig := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetServerConfig()
 		hostName := serverConfig.GetHostName()
 		ipv4 := serverConfig.GetIpv4()
 		port := serverConfig.GetServerPort()

@@ -333,7 +333,7 @@ EntityPrototype.prototype.generateConstructor = function () {
                 if (this.FieldsType[i].startsWith("xs.")) {
                     constructorSrc += " = " + this.FieldsDefaultValue[i] + "\n"
                 } else if (this.FieldsType[i].startsWith("enum:")) {
-                    constructorSrc += " = 0\n"
+                    constructorSrc += " = 1\n"
                 } else {
                     if (!this.FieldsType[i].endsWith(":Ref")) {
                         constructorSrc += " =  eval(\"new " + this.FieldsType[i] + "()\")\n"

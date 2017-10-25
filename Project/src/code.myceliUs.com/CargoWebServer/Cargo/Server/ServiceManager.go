@@ -89,7 +89,6 @@ func (this *ServiceManager) start() {
 		this.generateActionCode(this.m_servicesLst[i].getId())
 
 	}
-
 	// register itself as service.
 	this.registerServiceActions(this)
 	this.generateActionCode(this.getId())
@@ -173,28 +172,27 @@ func (this *ServiceManager) registerServiceContainerActions(config *Config.Servi
 							action = new(CargoEntities.Action)
 							action.TYPENAME = "CargoEntities.Action"
 							action.SetName(actionId)
+							action.SetAccessType(CargoEntities.AccessType_Public)
 
 							// Now the documentation.
 							var doc string
 							for l := 0; l < len(actionInfos[k].(map[string]interface{})["doc"].([]interface{})); l++ {
 								doc += actionInfos[k].(map[string]interface{})["doc"].([]interface{})[l].(string) + "\n"
 							}
-							action.SetDoc(doc)
 
-							if len(action.UUID) == 0 {
-								GetServer().GetEntityManager().NewCargoEntitiesActionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", action)
-							}
+							action.SetDoc(doc)
+							actionEntity, _ := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_actions", "CargoEntities.Action", "", action)
 
 							// Now the parameters.
 							parameterInfos := actionInfos[k].(map[string]interface{})["parameters"].([]interface{})
 							for l := 0; l < len(parameterInfos); l++ {
 								parameterInfo := parameterInfos[l]
 								parameter := new(CargoEntities.Parameter)
-								parameter.UUID = Utility.RandomUUID()
 								parameter.SetName(parameterInfo.(map[string]interface{})["name"].(string))
 								isArray, _ := strconv.ParseBool(parameterInfo.(map[string]interface{})["isArray"].(string))
 								parameter.SetIsArray(isArray)
 								parameter.SetType(parameterInfo.(map[string]interface{})["type"].(string))
+								GetServer().GetEntityManager().createEntity(action.GetUUID(), "M_parameters", "CargoEntities.Parameter", "", parameter)
 								action.SetParameters(parameter)
 							}
 
@@ -208,17 +206,16 @@ func (this *ServiceManager) registerServiceContainerActions(config *Config.Servi
 								isArray, _ := strconv.ParseBool(resultInfo.(map[string]interface{})["isArray"].(string))
 								result.SetIsArray(isArray)
 								result.SetType(resultInfo.(map[string]interface{})["type"].(string))
+								GetServer().GetEntityManager().createEntity(action.GetUUID(), "M_results", "CargoEntities.Parameter", "", result)
 								action.SetResults(result)
 							}
 
-							action.SetAccessType(CargoEntities.AccessType_Public)
-
-							action.SetEntitiesPtr(GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities))
-							GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities).SetActions(action)
-
+							actionEntity.SaveEntity() // Save the entity
+							log.Println("service container action ", action.GetName(), "was created susscessfully with uuid ", action.UUID)
 						} else {
 							entity, _ := GetServer().GetEntityManager().getEntityByUuid(actionUuid, false)
 							action = entity.GetObject().(*CargoEntities.Action)
+							log.Println("-->Load service container action ", action.GetName(), " informations.")
 						}
 						this.m_serviceAction[config.GetId()] = append(this.m_serviceAction[config.GetId()], action)
 					}
@@ -226,7 +223,7 @@ func (this *ServiceManager) registerServiceContainerActions(config *Config.Servi
 			}
 		}
 	}
-	GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+
 	// The error callback.
 	errorCallback_ := func(errMsg *message, caller interface{}) {
 		errStr := errMsg.msg.Err.Message
@@ -243,7 +240,8 @@ func (this *ServiceManager) registerServiceContainerActions(config *Config.Servi
 
 /**
  * That function use reflection to create the actions information contain in a
- * given service. The information will be use by role.
+ * given service. The information will be use by role. It must be run at least once
+ * the results will by action information in CargoEntities.
  */
 func (this *ServiceManager) registerServiceActions(service Service) {
 
@@ -262,8 +260,15 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 	fset := token.NewFileSet() // positions are relative to fset
 	d, err := parser.ParseDir(fset, "./Cargo/Server", nil, parser.ParseComments)
 	if err != nil {
-		log.Println(err)
-		//return
+		// In that case i dont have access to the server code so i will get
+		// action form information in the db.
+		actions, _ := GetServer().GetEntityManager().getEntities("CargoEntities.Action", `CargoEntities.Action.M_name == /Server.`+service.getId()+`/`, "CargoEntities", false)
+		for i := 0; i < len(actions); i++ {
+			action := actions[i].GetObject().(*CargoEntities.Action)
+			this.m_serviceAction[service.getId()] = append(this.m_serviceAction[service.getId()], action)
+			log.Println("-->Load service ", service.getId(), " action ", action.GetName(), " informations.")
+		}
+		return // Nothing todo in that case.
 	}
 
 	for _, f := range d {
@@ -301,9 +306,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 					action.SetDoc(m.Doc)
 					if strings.Index(action.M_doc, "@api ") != -1 { // Only api action are exported...
 						// Set the uuid if is not set...
-						if len(action.UUID) == 0 {
-							GetServer().GetEntityManager().NewCargoEntitiesActionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", action)
-						}
+						actionEntity, _ := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_actions", "CargoEntities.Action", "", action)
 
 						// The input
 						for j := 0; j < method.Type.NumIn(); j++ {
@@ -329,8 +332,9 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 
 								parameterId := action.GetName() + ":" + parameter.GetName() + ":" + parameter.GetType()
 								parameter.UUID = "CargoEntities.Parameter%" + Utility.GenerateUUID(parameterId) // Ok must be random
-
+								GetServer().GetEntityManager().createEntity(action.GetUUID(), "M_parameters", "CargoEntities.Parameter", "", parameter)
 								action.SetParameters(parameter)
+
 							}
 						}
 
@@ -350,7 +354,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 
 							parameterId := action.GetName() + ":" + parameter.GetName() + ":" + parameter.GetType()
 							parameter.UUID = "CargoEntities.Parameter%" + Utility.GenerateUUID(parameterId) // Ok must be random
-
+							GetServer().GetEntityManager().createEntity(action.GetUUID(), "M_results", "CargoEntities.Parameter", "", parameter)
 							action.SetResults(parameter)
 						}
 
@@ -368,9 +372,6 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 						if strings.Index(action.M_doc, "@scope {restricted}") != -1 {
 							action.SetAccessType(CargoEntities.AccessType_Restricted)
 						}
-
-						// Create the action.
-						GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_actions", "CargoEntities.Action", "", action)
 
 						// I will append the action into the admin role that has all permission.
 						adminRoleUuid := CargoEntitiesRoleExists("adminRole")
@@ -390,6 +391,9 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 								guestRoleEntity.SaveEntity()
 							}
 						}
+
+						actionEntity.SaveEntity() // Save the entity
+						log.Println("service action ", action.GetName(), "was created susscessfully with uuid ", action.UUID)
 					}
 				}
 			}
@@ -397,6 +401,7 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 		// Export only action with api...
 		if strings.Index(action.M_doc, "@api ") != -1 { // Only api action are exported...
 			this.m_serviceAction[service.getId()] = append(this.m_serviceAction[service.getId()], action)
+			log.Println("-->Load service action ", action.GetName(), " informations.")
 		}
 	}
 }

@@ -1117,7 +1117,35 @@ func (this *FileManager) DeleteFile(uuid string, messageId string, sessionId str
 // @scope {public}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *FileManager) IsFileExist(filename string, filepath string) bool {
+// @src
+//FileManager.prototype.isFileExist = function (filename, filepath, successCallback, errorCallback, caller) {
+//    var params = []
+//    params.push(createRpcData(filename, "STRING", "filename"))
+//    params.push(createRpcData(filepath, "STRING", "filepath"))
+//    // Call it on the server.
+//    server.executeJsFunction(
+//        "FileManagerIsFileExist", // The function to execute remotely on server
+//        params, // The parameters to pass to that function
+//        function (index, total, caller) { // The progress callback
+//            // Nothing special to do here.
+//        },
+//        function (result, caller) {
+//        	if (caller.successCallback != undefined) {
+//        		caller.successCallback(result[0], caller.caller)
+//          	caller.successCallback = undefined
+//          }
+//        },
+//        function (errMsg, caller) {
+//          server.errorManager.onError(errMsg)
+//         	if( caller.errorCallback != undefined){
+//          	caller.errorCallback(errMsg, caller.caller)
+//				caller.errorCallback = undefined
+//			}
+//        }, // Error callback
+//        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+//    )
+//}
+func (this *FileManager) IsFileExist(filename string, filepath string, messageId string, sessionId string) bool {
 
 	fileId := Utility.CreateSha1Key([]byte(filepath + "/" + filename))
 	fileUuid := CargoEntitiesFileExists(fileId)

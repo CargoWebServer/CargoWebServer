@@ -26,7 +26,6 @@ type Configurations struct{
 	M_id string
 	M_name string
 	M_version string
-	M_filePath string
 	M_serverConfig *ServerConfiguration
 	M_oauth2Configuration *OAuth2Configuration
 	M_serviceConfigs []*ServiceConfiguration
@@ -106,22 +105,6 @@ func (this *Configurations) SetVersion(ref interface{}){
 }
 
 /** Remove reference Version **/
-
-/** FilePath **/
-func (this *Configurations) GetFilePath() string{
-	return this.M_filePath
-}
-
-/** Init reference FilePath **/
-func (this *Configurations) SetFilePath(ref interface{}){
-	if this.M_filePath != ref.(string) {
-		this.M_filePath = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
-	}
-}
-
-/** Remove reference FilePath **/
 
 /** ServerConfig **/
 func (this *Configurations) GetServerConfig() *ServerConfiguration{

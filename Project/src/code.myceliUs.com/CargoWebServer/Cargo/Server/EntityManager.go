@@ -264,7 +264,7 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 
 	// Remove the ownership if there is one.
 	this.removeEntityOwner(toDelete)
-	log.Println("----------> entity ", toDelete.GetUuid(), " is remove ", !this.isExist(toDelete.GetUuid()))
+	log.Println("--> entity ", toDelete.GetUuid(), " is remove ", !this.isExist(toDelete.GetUuid()))
 }
 
 /**
@@ -364,7 +364,6 @@ func (this *EntityManager) setReferences(owner Entity) {
 				s := ps.Elem()
 
 				if s.Kind() == reflect.Struct {
-
 					if strings.HasPrefix(fieldName, "M_") {
 						fieldName = "m_" + fieldName[2:]
 					}
@@ -417,7 +416,6 @@ func (this *EntityManager) setReferences(owner Entity) {
 			}
 		}
 	}
-
 }
 
 /**
@@ -429,7 +427,7 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 	// here we have a static object...
 	prototype := target.GetPrototype()
 	if prototype == nil {
-		log.Println("No prototype found for ----> ", target)
+		log.Println("No prototype found for ---> ", target)
 	}
 
 	// The need save evaluation...
@@ -553,7 +551,6 @@ func (this *EntityManager) setObjectValues(target Entity, source interface{}) {
 						}
 					}
 				}
-
 			}
 		}
 	}

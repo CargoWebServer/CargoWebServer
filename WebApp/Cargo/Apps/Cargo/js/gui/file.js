@@ -440,9 +440,6 @@ FilesPanel.prototype.readFiles = function (name, path, callback) {
     // First of all I will clear the files...
     this.clearFiles()
     server.fileManager.getFileByPath(path + "/" + name,
-        function (index, total, caller) {
-            // Nothing todo here...
-        },
         function (dir, caller) {
             var callback = caller.callback
             var caller = caller.caller
@@ -485,8 +482,6 @@ FilesPanel.prototype.uploadFiles = function (name, path, successCallback) {
 
             }
         },
-        // Progress callback
-        function () { },
         // Error callback
         function () {
             // Error management here...

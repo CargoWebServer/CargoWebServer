@@ -82,6 +82,10 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 	store.m_associations = make(map[string]bool, 0)
 	store.m_refInfos = make(map[string][][]string, 0)
 
+	if store.m_vendor == Config.DataStoreVendor_MYCELIUS {
+		return nil, errors.New("Mycelius is a Key value store not sql.")
+	}
+
 	return store, nil
 }
 
@@ -268,13 +272,13 @@ func (this *SqlDataStore) Ping() (err error) {
 /** Crud interface **/
 func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId interface{}, err error) {
 
-	err = this.Ping()
+	/*err = this.Ping()
 	if err != nil {
 		err = this.Connect()
 		if err != nil {
 			return nil, err
 		}
-	}
+	}*/
 
 	lastId = int64(0)
 	stmt, err := this.m_db.Prepare(query)
@@ -566,15 +570,6 @@ func isForeignKey(val string) bool {
  */
 func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []interface{}) ([][]interface{}, error) {
 
-	err := this.Ping()
-	if err != nil {
-		err = this.Connect()
-		if err != nil {
-			log.Println("---> sql connection error:", err)
-			return nil, err
-		}
-	}
-
 	// TODO Try to figure out why the connection is lost...
 	// Lost of connection so I will reconnect anyway...
 	//this.Connect()
@@ -683,13 +678,6 @@ func (this *SqlDataStore) Update(query string, fields []interface{}, params []in
  * Delete data that match a given pattern.
  */
 func (this *SqlDataStore) Delete(query string, params []interface{}) (err error) {
-	err = this.Ping()
-	if err != nil {
-		err = this.Connect()
-		if err != nil {
-			return err
-		}
-	}
 
 	stmt, err := this.m_db.Prepare(query)
 	if err != nil {
@@ -736,7 +724,10 @@ func (this *SqlDataStore) Delete(query string, params []interface{}) (err error)
  * Close the backend store.
  */
 func (this *SqlDataStore) Close() error {
-	return this.m_db.Close()
+	if this.m_db != nil {
+		return this.m_db.Close()
+	}
+	return nil
 }
 
 /**
@@ -744,14 +735,7 @@ func (this *SqlDataStore) Close() error {
  */
 func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 	var prototypes []*EntityPrototype
-	// Try to ping the sql server.
-	err := this.Ping()
-	if err != nil {
-		err = this.Connect()
-		if err != nil {
-			return prototypes, err
-		}
-	}
+
 	var query string
 
 	fieldsType := make([]interface{}, 0)
@@ -776,10 +760,9 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 
 	for i := 0; i < len(values); i++ {
 		prototype, err := this.GetEntityPrototype(values[i][0].(string))
-		if err != nil {
-			return prototypes, err
+		if err == nil {
+			prototypes = append(prototypes, prototype)
 		}
-		prototypes = append(prototypes, prototype)
 	}
 
 	// Complete the reference information.
@@ -792,6 +775,10 @@ func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
  * Return the prototype of a given table.
  */
 func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error) {
+
+	if !Utility.IsValidVariableName(id) {
+		return nil, errors.New("Wrong type name " + id + "!")
+	}
 
 	var prototype *EntityPrototype
 	err := this.Ping()
@@ -812,7 +799,11 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 	// If the data store is not found.
 	store := GetServer().GetDataManager().m_dataStores["sql_info"]
 	if store == nil {
-		serverConfig := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetServerConfig()
+		activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+		if err != nil {
+			log.Panicln(err)
+		}
+		serverConfig := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetServerConfig()
 		hostName := serverConfig.GetHostName()
 		ipv4 := serverConfig.GetIpv4()
 		port := serverConfig.GetServerPort()
@@ -886,7 +877,8 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 		isId := values[i][3].(bool)
 		// So here I will create new field...
 		if fieldType != nil {
-			if !Utility.Contains(prototype.Fields, "M_"+fieldName) {
+
+			if !Utility.Contains(prototype.Fields, "M_"+fieldName) && Utility.IsValidVariableName(fieldName) {
 				prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 				prototype.Fields = append(prototype.Fields, "M_"+fieldName)
 				prototype.FieldsType = append(prototype.FieldsType, fieldType.TypeName)
@@ -982,7 +974,7 @@ func (this *SqlDataStore) getSchemaId(name string) (string, error) {
 
 func appendField(prototype *EntityPrototype, fieldName string, fieldType string) {
 
-	if !Utility.Contains(prototype.Fields, fieldName) {
+	if !Utility.Contains(prototype.Fields, fieldName) && Utility.IsValidVariableName(fieldName) {
 
 		prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 		prototype.FieldsNillable = append(prototype.FieldsVisibility, true)
@@ -990,7 +982,7 @@ func appendField(prototype *EntityPrototype, fieldName string, fieldType string)
 		fields := prototype.Fields
 		fieldsType := prototype.FieldsType
 		fieldsVisibility := prototype.FieldsVisibility
-		//fieldsDocumentation := prototype.FieldsDocumentation
+		fieldsDocumentation := prototype.FieldsDocumentation
 
 		// Set empty array...
 		prototype.Fields = make([]string, len(prototype.FieldsOrder))
@@ -1002,26 +994,39 @@ func appendField(prototype *EntityPrototype, fieldName string, fieldType string)
 			prototype.Fields[i] = fields[i]
 			prototype.FieldsType[i] = fieldsType[i]
 			prototype.FieldsVisibility[i] = fieldsVisibility[i]
-			//prototype.FieldsDocumentation[i] = fieldsDocumentation[i]
+			if len(fieldsDocumentation) > i {
+				prototype.FieldsDocumentation[i] = fieldsDocumentation[i]
+			} else {
+				prototype.FieldsDocumentation[i] = ""
+			}
 		}
 
 		lastIndex := len(prototype.FieldsOrder) - 1
 		prototype.Fields[lastIndex-2] = fieldName
 		prototype.FieldsType[lastIndex-2] = fieldType
 		prototype.FieldsVisibility[lastIndex-2] = true
-		//prototype.FieldsDocumentation[lastIndex-2] = ""
+		prototype.FieldsDocumentation[lastIndex-2] = ""
 
 		// childsUuid
 		prototype.Fields[lastIndex-1] = fields[len(fields)-2]
 		prototype.FieldsType[lastIndex-1] = fieldsType[len(fields)-2]
 		prototype.FieldsVisibility[lastIndex-1] = fieldsVisibility[len(fields)-2]
-		//prototype.FieldsDocumentation[lastIndex-1] = fieldsDocumentation[len(fields)-2]
+		if len(fieldsDocumentation) > len(fields)-2 {
+			prototype.FieldsDocumentation[lastIndex-1] = fieldsDocumentation[len(fields)-2]
+		} else {
+			prototype.FieldsDocumentation[lastIndex-1] = ""
+		}
 
 		// referenced
 		prototype.Fields[lastIndex] = fields[len(fields)-1]
 		prototype.FieldsType[lastIndex] = fieldsType[len(fields)-1]
 		prototype.FieldsVisibility[lastIndex] = fieldsVisibility[len(fields)-1]
-		//prototype.FieldsDocumentation[lastIndex] = fieldsDocumentation[len(fields)-1]
+
+		if len(fieldsDocumentation) > len(fields)-1 {
+			prototype.FieldsDocumentation[lastIndex] = fieldsDocumentation[len(fields)-1]
+		} else {
+			prototype.FieldsDocumentation[lastIndex] = ""
+		}
 
 		// Save it back.
 		GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(prototype)

@@ -71,7 +71,6 @@
 				<xsd:attribute name="schemasPath" type="xsd:string" />
 				<xsd:attribute name="tmpPath" type="xsd:string" />
 				<xsd:attribute name="binPath" type="xsd:string" />
-				<xsd:attribute name="queriesPath" type="xsd:string" />
 			</xsd:extension> 
 		</xsd:complexContent> 
 	</xsd:complexType>

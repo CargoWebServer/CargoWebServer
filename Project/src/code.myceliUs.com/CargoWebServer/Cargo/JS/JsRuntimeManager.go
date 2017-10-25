@@ -246,7 +246,7 @@ func (this *JsRuntimeManager) appendScriptFiles() error {
  * Compile and run a given script...
  */
 func (this *JsRuntimeManager) appendScriptFile(filePath string) error {
-	log.Println("Append script file ", filePath)
+	log.Println("--> Load script file ", filePath)
 	srcFile, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal("Read JS src file:", err)
@@ -438,7 +438,8 @@ func (this *JsRuntimeManager) AppendFunction(name string, function interface{}) 
  * Run given script for a given session. Must be call from inside the JS routine.
  */
 func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.Value, error) {
-	results, err := this.getSession(sessionId).Run(script)
+	vm := this.getSession(sessionId)
+	results, err := vm.Run(script)
 	return results, err
 }
 

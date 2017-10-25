@@ -17,7 +17,6 @@ import (
 
 type LdapManager struct {
 	// Contain the list of avalable ldap servers...
-	m_configsInfo map[string]*Config.LdapConfiguration
 }
 
 var ldapManager *LdapManager
@@ -31,7 +30,6 @@ func (this *Server) GetLdapManager() *LdapManager {
 
 func newLdapManager() *LdapManager {
 	ldapManager := new(LdapManager)
-	ldapManager.m_configsInfo = make(map[string]*Config.LdapConfiguration)
 	return ldapManager
 }
 
@@ -54,16 +52,26 @@ func (this *LdapManager) getId() string {
 	return "LdapManager"
 }
 
-func (this *LdapManager) start() {
-	log.Println("--> Start LdapManager")
-	ldapConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetLdapConfigs()
+func (this *LdapManager) getConfigsInfo() map[string]*Config.LdapConfiguration {
+	configsInfo := make(map[string]*Config.LdapConfiguration, 0)
 
-	for i := 0; i < len(ldapConfigurations); i++ {
-		this.m_configsInfo[ldapConfigurations[i].M_id] = ldapConfigurations[i]
+	activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+	if err != nil {
+		log.Panicln(err)
 	}
 
+	ldapConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetLdapConfigs()
+	for i := 0; i < len(ldapConfigurations); i++ {
+		configsInfo[ldapConfigurations[i].M_id] = ldapConfigurations[i]
+	}
+	return configsInfo
+}
+
+func (this *LdapManager) start() {
+	log.Println("--> Start LdapManager")
+
 	// configure all information from the servers...
-	for _, info := range this.m_configsInfo {
+	for _, info := range this.getConfigsInfo() {
 
 		// Synchronize the list of user...
 		err := this.synchronizeUsers(info.M_id)
@@ -92,9 +100,7 @@ func (this *LdapManager) stop() {
 /**
  * Get the list of group for a user...
  */
-func (this *LdapManager) getLdapUserMemberOf(id string, userId string) ([]string, error) {
-
-	var base_dn string = "OU=MON,OU=CA,DC=UD6,DC=UF6"
+func (this *LdapManager) getLdapUserMemberOf(id string, userId string, base_dn string) ([]string, error) {
 
 	var filter string = "(&(objectClass=group)(objectcategory=Group)(member=" + userId + "))"
 	var attributes []string = []string{"sAMAccountName"}
@@ -122,8 +128,7 @@ func (this *LdapManager) getLdapUserMemberOf(id string, userId string) ([]string
 }
 
 func (this *LdapManager) getLdapGroupMembers(id string, groupId string) ([]string, error) {
-	var base_dn string = "OU=MON,OU=CA,DC=UD6,DC=UF6"
-
+	var base_dn = this.getConfigsInfo()[id].M_searchBase
 	var filter string = "(&(objectClass=user)(objectcategory=Person)(memberOf=" + groupId + "))"
 	var attributes []string = []string{"sAMAccountName"}
 	results, err := this.search(id, "", "", base_dn, filter, attributes)
@@ -158,7 +163,7 @@ func (this *LdapManager) getLdapGroupMembers(id string, groupId string) ([]strin
  */
 func (this *LdapManager) connect(id string, userId string, psswd string) (*LDAP.LDAPConnection, error) {
 
-	ldapConfigInfo := this.m_configsInfo[id]
+	ldapConfigInfo := this.getConfigsInfo()[id]
 
 	conn := LDAP.NewLDAPConnection(ldapConfigInfo.M_ipv4, uint16(ldapConfigInfo.M_port))
 	err := conn.Connect()
@@ -182,7 +187,7 @@ func (this *LdapManager) connect(id string, userId string, psswd string) (*LDAP.
  * be interpret as a tow dimensional array.
  */
 func (this *LdapManager) search(id string, login string, psswd string, base_dn string, filter string, attributes []string) ([][]interface{}, error) {
-	ldapConfigInfo := this.m_configsInfo[id]
+	ldapConfigInfo := this.getConfigsInfo()[id]
 	// Try to connect to the ldap server...
 	var err error
 	var conn *LDAP.LDAPConnection
@@ -240,7 +245,7 @@ func (this *LdapManager) search(id string, login string, psswd string, base_dn s
 
 func (this *LdapManager) authenticate(id string, login string, psswd string) bool {
 
-	ldapConfigInfo := this.m_configsInfo[id]
+	ldapConfigInfo := this.getConfigsInfo()[id]
 	// Now I will try to make a simple query if it fail that's mean the user
 	// does have the permission...
 	var filter string = "(objectClass=user)"
@@ -261,7 +266,7 @@ func (this *LdapManager) authenticate(id string, login string, psswd string) boo
 func (this *LdapManager) synchronizeUsers(id string) error {
 
 	// Now i will create the user entry found in the ldap server...
-	var base_dn string = "OU=Users,OU=MON,OU=CA,DC=UD6,DC=UF6"
+	var base_dn string = "OU=Users," + this.getConfigsInfo()[id].M_searchBase
 	var filter string = "(objectClass=user)"
 	var accountId string
 
@@ -369,7 +374,8 @@ func (this *LdapManager) synchronizeUsers(id string) error {
  * This Get the LDAP groups from the DB...
  */
 func (this *LdapManager) synchronizeGroups(id string) error {
-	var base_dn string = "OU=Groups,OU=MON,OU=CA,DC=UD6,DC=UF6"
+
+	var base_dn string = "OU=Groups," + this.getConfigsInfo()[id].M_searchBase
 	var filter string = "(objectClass=group)"
 	var attributes []string = []string{"name", "distinguishedName"}
 
@@ -384,6 +390,7 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 	for i := 0; i < len(results); i++ {
 		// Here I will get the user in the group...
 		row := results[i]
+		var groupEntity *CargoEntities_GroupEntity
 		group := new(CargoEntities.Group)
 		for j := 0; j < len(row); j++ {
 			// Print the result...
@@ -407,8 +414,18 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 						if len(groupUuid) == 0 {
 							// Here i will save the group...
 							entities := GetServer().GetEntityManager().getCargoEntities()
-							GetServer().GetEntityManager().createEntity(entities.GetUuid(), "M_entities", "CargoEntities.Group", group.GetId(), group)
-							log.Println("--> create group ", group.GetId())
+							entity, err := GetServer().GetEntityManager().createEntity(entities.GetUuid(), "M_entities", "CargoEntities.Group", group.GetId(), group)
+							if err == nil {
+								groupEntity = entity.(*CargoEntities_GroupEntity)
+								log.Println("--> create group ", group.GetId())
+							}
+						} else {
+
+							entity, err := GetServer().GetEntityManager().getEntityByUuid(groupUuid, false)
+							if err == nil {
+								groupEntity = entity.(*CargoEntities_GroupEntity)
+								group = groupEntity.GetObject().(*CargoEntities.Group)
+							}
 						}
 					}
 				}
@@ -417,14 +434,13 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 				// Now I will retrive user inside this group...
 				group.SetId(row[j].(string))
 				group.SetName(row[j].(string))
-				// Set the uuid of the group.
-				GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(server.GetEntityManager().getCargoEntities().GetUuid(), "", group)
 			}
+		}
+		if groupEntity != nil {
+			groupEntity.SaveEntity()
 		}
 	}
 
-	// Call save on Entities...
-	GetServer().GetEntityManager().getCargoEntities().SaveEntity()
 	return nil
 }
 
@@ -513,7 +529,7 @@ func (this *LdapManager) getComputerByIp(ip string) (*CargoEntities.Computer, *C
  */
 func (this *LdapManager) synchronizeComputers(id string) error {
 	// This is the list of computer.
-	var base_dn string = "OU=Computers,OU=MON,OU=CA,DC=UD6,DC=UF6"
+	var base_dn string = "OU=Computers," + this.getConfigsInfo()[id].M_searchBase
 	var filter string = "(objectClass=computer)"
 	var attributes []string = []string{"dNSHostName", "distinguishedName"}
 

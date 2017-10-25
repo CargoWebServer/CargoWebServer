@@ -51,7 +51,7 @@ var RpcData = function(values){
 	/**
 	 * @property {string} The socket connection.
 	 */
-	 this.conn = null
+	this.conn = null
 	 
 	 
 	return this

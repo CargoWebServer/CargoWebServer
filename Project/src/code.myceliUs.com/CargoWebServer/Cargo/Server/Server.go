@@ -292,8 +292,8 @@ func GetServer() *Server {
  * Start the server.
  */
 func (this *Server) Start() {
-
 	log.Println("Start the server...")
+
 	// Start the server...
 	server.startMessageProcessor()
 	server.startHub()
@@ -303,13 +303,14 @@ func (this *Server) Start() {
 	this.GetServiceManager().start()
 
 	// Here I will set the services code...
-	apiSrc := ""
 	for _, src := range this.GetServiceManager().m_serviceServerSrc {
-		apiSrc += src + "\n"
+		// Server side binded functions.
+		JS.GetJsRuntimeManager().AppendScript(src)
 	}
 
-	// Server side binded functions.
-	JS.GetJsRuntimeManager().AppendScript(apiSrc)
+	////////////////////////////////////////////////////////////////////////////
+	// Javascript std function.
+	////////////////////////////////////////////////////////////////////////////
 
 	// Convert a utf8 string to a base 64 string
 	JS.GetJsRuntimeManager().AppendFunction("utf8_to_b64", func(data string) string {
@@ -341,6 +342,9 @@ func (this *Server) Start() {
 		return strings.ToUpper(str[0:1]) + str[1:]
 	})
 
+	////////////////////////////////////////////////////////////////////////////
+	// SOM function.
+	////////////////////////////////////////////////////////////////////////////
 	JS.GetJsRuntimeManager().AppendFunction("GetServer", func() *Server {
 		return GetServer()
 	})
@@ -396,7 +400,6 @@ func (this *Server) Start() {
 			return func(rspMsg *message, caller interface{}) {
 				results := make([]interface{}, 0)
 				// So here i will get the message value...
-				//log.Println("--------> number of return results: ", len(rspMsg.msg.Rsp.Results))
 				for i := 0; i < len(rspMsg.msg.Rsp.Results); i++ {
 
 					param := rspMsg.msg.Rsp.Results[i]
@@ -473,7 +476,6 @@ func (this *Server) Start() {
 						}
 					}
 				}
-
 				params := make([]interface{}, 2)
 				params[0] = results
 				params[1] = caller
@@ -579,7 +581,7 @@ func (this *Server) Start() {
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("initConnection",
 		func(adress string, openCallback string, closeCallback string, connectionId string, service otto.Value, caller otto.Value) otto.Value {
-			log.Println(" init connection with : ", adress, " session id: ", connectionId)
+			log.Println("--> init connection with : ", adress, " session id: ", connectionId)
 
 			// Get the new connection id.
 			subConnection, err := GetServer().connect(adress)
@@ -654,6 +656,10 @@ func (this *Server) Start() {
 
 		})
 
+	////////////////////////////////////////////////////////////////////////////
+	// Js runtime initialisation.
+	////////////////////////////////////////////////////////////////////////////
+
 	// Javacript initialisation here.
 	JS.GetJsRuntimeManager().OpendSession("") // Set the anonymous session.
 
@@ -668,16 +674,24 @@ func (this *Server) Start() {
 	// Initialyse the server object here.
 	JS.GetJsRuntimeManager().RunScript("", `var entityPrototypes = {};`)
 	JS.GetJsRuntimeManager().RunScript("", `var entities = {};`)
-
 	JS.GetJsRuntimeManager().RunScript("", `var server = new Server("localhost", "127.0.0.1", 9393);`)
+
 	// Create an empty connection (loopback)
 	JS.GetJsRuntimeManager().RunScript("", `server.conn = new Connection()`)
 	JS.GetJsRuntimeManager().RunScript("", `server.conn.id = "127.0.0.1"`)
 
 	// Set service in the server object.
 	for serviceName, _ := range GetServer().GetServiceManager().m_serviceClientSrc {
-		JS.GetJsRuntimeManager().RunScript("", "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();")
+		log.Println("--> Load", serviceName, "service script")
+		_, err := JS.GetJsRuntimeManager().RunScript("", "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+
+	////////////////////////////////////////////////////////////////////////////
+	// Services intialisation.
+	////////////////////////////////////////////////////////////////////////////
 
 	// Now after all initialisation are done I will open connection with
 	// other servers.
@@ -690,14 +704,17 @@ func (this *Server) Start() {
 	}
 
 	// Now I will register actions for services container.
-	activeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations)
+	activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+	if err != nil {
+		log.Panicln(err)
+	}
+	activeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations)
 	for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
 		config := activeConfigurations.GetServiceConfigs()[i]
 		if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
 			GetServer().GetServiceManager().registerServiceContainerActions(config)
 		}
 	}
-
 }
 
 /**
@@ -798,7 +815,7 @@ func (this *Server) connect(address string) (connection, error) {
 		return nil, errors.New("Fail to open connection with socket " + host + " at port " + strconv.Itoa(port))
 	}
 
-	log.Println("--------> connection whit ", host, " at port ", port, " is now open!")
+	log.Println("--> connection whit ", host, " at port ", port, " is now open!")
 
 	return conn, nil
 }

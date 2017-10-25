@@ -75,20 +75,21 @@ func (this *DataManager) initialize() {
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	// Here I will get the datastore configuration...
-	storeConfigurations := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetDataStoreConfigs()
+	activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	storeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetDataStoreConfigs()
 
 	log.Println("--> initialyze DataManager")
 	for i := 0; i < len(storeConfigurations); i++ {
 		if this.m_dataStores[storeConfigurations[i].GetId()] == nil {
 			store, err := NewDataStore(storeConfigurations[i])
 			if err != nil {
-				log.Println(err)
+			} else {
+				this.m_dataStores[store.GetId()] = store
 			}
-
-			this.m_dataStores[store.GetId()] = store
-
-			// Call get entity prototype once to initialyse entity prototypes.
-			//store.GetEntityPrototypes()
 		}
 	}
 }
@@ -112,7 +113,11 @@ func (this *DataManager) stop() {
 
 func (this *DataManager) openConnections() {
 	for _, store := range this.m_dataStores {
-		store.Connect()
+		err := store.Connect()
+		// Call get entity prototype once to initialyse entity prototypes.
+		if err == nil {
+			store.GetEntityPrototypes()
+		}
 	}
 }
 
@@ -926,6 +931,7 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 
 func (this *DataManager) createDataStore(storeId string, storeName string, hostName string, ipv4 string, port int, storeType Config.DataStoreType, storeVendor Config.DataStoreVendor) (DataStore, *CargoEntities.Error) {
 
+	log.Println("------> create store id:", storeId, "name:", storeName, "host:", hostName, "ipv4:", ipv4, "port:", port, "type:", storeType, "vendor:", storeVendor)
 	if !Utility.IsValidVariableName(storeId) {
 		cargoError := NewError(Utility.FileLine(), INVALID_VARIABLE_NAME_ERROR, SERVER_ERROR_CODE, errors.New("The storeId '"+storeId+"' is not valid."))
 		return nil, cargoError
@@ -953,15 +959,23 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 
 		configEntity := GetServer().GetConfigurationManager().m_activeConfigurationsEntity
 		storeConfigEntity, err_ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_dataStoreConfigs", "Config.DataStoreConfiguration", storeId, storeConfig)
+
 		if err_ != nil {
 			return nil, err_
 		}
 
 	} else {
 		storeConfig = storeConfigEntity.GetObject().(*Config.DataStoreConfiguration)
+		storeConfig.M_id = storeId
+		storeConfig.M_storeName = storeName
+		storeConfig.M_dataStoreVendor = storeVendor
+		storeConfig.M_dataStoreType = storeType
+		storeConfig.M_ipv4 = ipv4
+		storeConfig.M_hostName = hostName
+		storeConfig.M_port = port
+		storeConfigEntity.SaveEntity()
 	}
 
-	log.Println("---------> store config: ", storeConfig)
 	// Create the store here.
 	store, err := NewDataStore(storeConfig)
 	if err == nil {
@@ -969,9 +983,14 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 		this.Lock()
 		this.m_dataStores[storeId] = store
 		this.Unlock()
+		err := store.Connect()
 
 		// Create entity prototypes.
-		store.GetEntityPrototypes()
+		if err == nil {
+			store.GetEntityPrototypes()
+		} else {
+			log.Println("---> fail to connect to ", hostName, err)
+		}
 	} else {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Failed to create dataStore with id '"+storeId+"' and with error '"+err.Error()+"'."))
 		return nil, cargoError
@@ -1199,7 +1218,7 @@ func (this *DataManager) Create(storeName string, query string, d []interface{},
 	return lastId
 }
 
-// api 1.0
+// @api 1.0
 // Update existing database values.
 // @param {string} connectionId The data server connection (configuration) id
 // @param {string} query The query string to execute.

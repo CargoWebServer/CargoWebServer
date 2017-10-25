@@ -16,8 +16,6 @@ func main() {
 	root := Server.GetServer().GetConfigurationManager().GetApplicationDirectoryPath()
 	port := Server.GetServer().GetConfigurationManager().GetServerPort()
 
-	log.Println("Start serve files from ", root)
-
 	// Start the web socket handler
 	http.Handle("/ws", websocket.Handler(Server.HttpHandler))
 
@@ -56,8 +54,9 @@ func main() {
 	Server.GetServer().Start()
 
 	//open.Run("http://127.0.0.1:9393/Bridge")
-	log.Println("------> server is ready and listen at port ", port)
+	log.Println("--> server is ready and listen at port ", port)
 	err := http.ListenAndServe(":"+strconv.Itoa(port), nil)
+
 	if err != nil {
 		panic("ListenAndServe: " + err.Error())
 	}

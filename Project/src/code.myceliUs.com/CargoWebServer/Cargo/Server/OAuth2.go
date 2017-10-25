@@ -150,10 +150,12 @@ func (this *OAuth2Manager) getId() string {
 
 func (this *OAuth2Manager) start() {
 	log.Println("--> Start OAuth2Manager")
+	activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+	if err != nil {
+		log.Panicln(err)
+	}
 
-	// Here I will intialyse configurations.
-	configEntity := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
-	cfg := configEntity.GetObject().(*Config.Configurations).GetOauth2Configuration()
+	cfg := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetOauth2Configuration()
 	var sconfig *osin.ServerConfig
 	if cfg == nil {
 		// Get the default configuration.
@@ -218,7 +220,7 @@ func (this *OAuth2Manager) start() {
 		cfg.SetPrivateKey(fileName)
 
 		// Create the new configuration entity.
-		GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_oauth2Configuration", "Config.OAuth2Configuration", cfg.GetId(), cfg)
+		GetServer().GetEntityManager().createEntity(activeConfigurationsEntity.GetUuid(), "M_oauth2Configuration", "Config.OAuth2Configuration", cfg.GetId(), cfg)
 
 	} else {
 		sconfig = osin.NewServerConfig()
@@ -313,7 +315,13 @@ func (this *OAuth2Manager) stop() {
  * if refresh exist.
  */
 func (this *OAuth2Manager) cleanup() {
-	config := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetOauth2Configuration()
+	activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	config := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetOauth2Configuration()
+
 	// First of all I will renew the access...
 	for i := 0; i < len(config.GetAccess()); i++ {
 		access := config.GetAccess()[i]
@@ -487,7 +495,11 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 		// Try to find the access...
 
 		// Get the config.
-		config := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations).GetOauth2Configuration()
+		activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+		if err != nil {
+			log.Panicln(err)
+		}
+		config := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetOauth2Configuration()
 
 		// Get the accesses
 		accesses := config.GetAccess()
@@ -2130,7 +2142,11 @@ func (this *OAuth2Store) LoadAccess(code string) (*osin.AccessData, error) {
 		}
 
 		// Get the configuration object.
-		config := GetServer().GetConfigurationManager().getActiveConfigurationsEntity().GetObject().(*Config.Configurations)
+		activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+		if err != nil {
+			log.Panicln(err)
+		}
+		config := activeConfigurationsEntity.GetObject().(*Config.Configurations)
 
 		// So here The refresh token is valid i will create a new authorization
 		authorizeData := new(osin.AuthorizeData)
