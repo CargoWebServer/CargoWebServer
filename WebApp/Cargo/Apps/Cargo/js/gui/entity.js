@@ -273,14 +273,18 @@ EntityPanel.prototype.setEntity = function (entity) {
 		server.entityManager.detach(this, UpdateEntityEvent)
 		server.entityManager.detach(this, DeleteEntityEvent)
 
-		this.getEntity().panel = null
+		this.getEntity().getPanel = null
 		this.clear()
 	}
 
 	// Set the reference to the panel inside the entity.
 	this.entity = entity
 
-	this.getEntity().panel = this
+	this.getEntity().getPanel = function(panel){
+		return function(){
+			return panel
+		}
+	}(this)
 
 	if (this.substitutionGroupSelect != undefined) {
 		this.substitutionGroupSelect.element.style.display = "none"
@@ -485,9 +489,9 @@ EntityPanel.prototype.initHeader = function () {
 							if (entityPanel.saveCallback != undefined) {
 								entityPanel.saveCallback(entity)
 								if (entityPanel.parentEntity != null) {
-									if (entityPanel.parentEntity.panel != null) {
-										if (entityPanel.parentEntity.panel.saveCallback != undefined) {
-											entityPanel.parentEntity.panel.saveCallback(entityPanel.parentEntity)
+									if (entityPanel.parentEntity.getPanel != null) {
+										if (entityPanel.parentEntity.getPanel().saveCallback != undefined) {
+											entityPanel.parentEntity.getPanel().saveCallback(entityPanel.parentEntity)
 										}
 									}
 								}
@@ -505,9 +509,9 @@ EntityPanel.prototype.initHeader = function () {
 							if (entityPanel.saveCallback != undefined) {
 								entityPanel.saveCallback(entity)
 								if (entityPanel.parentEntity != null) {
-									if (entityPanel.parentEntity.panel != null) {
-										if (entityPanel.parentEntity.panel.saveCallback != undefined) {
-											entityPanel.parentEntity.panel.saveCallback(entityPanel.parentEntity)
+									if (entityPanel.parentEntity.getPanel != null) {
+										if (entityPanel.parentEntity.getPanel().saveCallback != undefined) {
+											entityPanel.parentEntity.getPanel().saveCallback(entityPanel.parentEntity)
 										}
 									}
 								}

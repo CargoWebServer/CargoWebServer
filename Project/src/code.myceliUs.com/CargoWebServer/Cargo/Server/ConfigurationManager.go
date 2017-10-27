@@ -41,6 +41,10 @@ type ConfigurationManager struct {
 
 	// The list of data configurations...
 	m_datastoreConfiguration []*Config.DataStoreConfiguration
+
+	// synchronize task...
+	m_setScheduledTasksChan    chan *Config.ScheduledTask
+	m_cancelScheduledTasksChan chan *Config.ScheduledTask
 }
 
 var configurationManager *ConfigurationManager
@@ -141,6 +145,10 @@ func newConfigurationManager() *ConfigurationManager {
 	// Create the default configurations
 	configurationManager.setServiceConfiguration(configurationManager.getId(), -1)
 
+	// Open the channel.
+	configurationManager.m_setScheduledTasksChan = make(chan *Config.ScheduledTask)
+	configurationManager.m_cancelScheduledTasksChan = make(chan *Config.ScheduledTask)
+
 	return configurationManager
 }
 
@@ -229,17 +237,15 @@ func (this *ConfigurationManager) getId() string {
 func (this *ConfigurationManager) start() {
 	log.Println("--> Start ConfigurationManager")
 
-	// First of all i will start task...
+	// First of all i will create task if they not exist...
 	for i := 0; i < len(this.m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
-
 		task := this.m_activeConfigurationsEntity.object.M_scheduledTasks[i]
 		if task.M_id == "tcpServiceContainerStart" {
 			if len(CargoEntitiesFileExists("tcpServiceContainerStart")) == 0 {
 				var script string
 				script = "function tcpServiceContainerStart(){\n"
-				script += "	while(true){\n"
-				script += `		GetServer().RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"])`
-				script += "	}\n"
+				script += `	GetServer().RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"])` + "\n"
+				script += `	setInterval(function(){ GetServer().RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"])}, 1000)` + "\n"
 				script += "}\n"
 				script += "tcpServiceContainerStart()\n"
 				GetServer().GetFileManager().createDbFile("tcpServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", script)
@@ -248,9 +254,8 @@ func (this *ConfigurationManager) start() {
 			if len(CargoEntitiesFileExists("wsServiceContainerStart")) == 0 {
 				var script string
 				script = "function wsServiceContainerStart(){\n"
-				script += "	while(true){\n"
-				script += `		GetServer().RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"])`
-				script += "	}\n"
+				script += `	GetServer().RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"])` + "\n"
+				script += `	setInterval(function(){GetServer().RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"])}, 1000)` + "\n"
 				script += "}\n"
 				script += "wsServiceContainerStart()\n"
 				GetServer().GetFileManager().createDbFile("wsServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", script)
@@ -290,6 +295,43 @@ func (this *ConfigurationManager) start() {
 		}
 	}
 
+	////////////////////////////////////////////////////////////////////////////
+	// Scheduled Task.
+	////////////////////////////////////////////////////////////////////////////
+	// Task processing function.
+	go func() {
+		tasks := make(map[string]*time.Timer, 0)
+		for {
+			select {
+			// set the task.
+			case task := <-GetServer().GetConfigurationManager().m_setScheduledTasksChan:
+				// Set the timer.
+				if tasks[task.GetId()] != nil {
+					// Stop previous instance if there is one.
+					tasks[task.GetId()].Stop()
+				}
+				// Plan the next instance.
+				startTime := time.Unix(task.GetStartTime(), 0)
+				delay := startTime.Sub(time.Now())
+				timer := time.NewTimer(delay)
+				tasks[task.GetId()] = timer
+
+				go func(task *Config.ScheduledTask, timer *time.Timer) {
+					<-timer.C                                           // wait util the delay expire...
+					GetServer().GetConfigurationManager().runTask(task) // run the task.
+				}(task, timer)
+
+			// reset the task.
+			case task := <-GetServer().GetConfigurationManager().m_cancelScheduledTasksChan:
+				tasks[task.GetId()].Stop()
+				delete(tasks, task.GetId())
+
+			default:
+				time.Sleep(1 * time.Millisecond)
+			}
+		}
+	}()
+
 }
 
 func (this *ConfigurationManager) stop() {
@@ -297,9 +339,61 @@ func (this *ConfigurationManager) stop() {
 }
 
 /**
+ * Run a task.
+ */
+func (this *ConfigurationManager) runTask(task *Config.ScheduledTask) {
+	// first of all I will test if the task is active.
+	if task.IsActive() == false {
+		return // Nothing to do here.
+	}
+
+	dbFile, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", []interface{}{task.M_script}, false)
+	if err == nil {
+		script, err := b64.StdEncoding.DecodeString(dbFile.GetObject().(*CargoEntities.File).GetData())
+		// Now I will run the script...
+		if err == nil {
+			go func(task *Config.ScheduledTask, script string) {
+				_, err := JS.GetJsRuntimeManager().RunScript("", script)
+				if err != nil {
+					log.Println("---> fail to run task ", task.GetId(), " with error: ", err)
+				} else {
+					log.Println("--> task ", task.GetId(), "run successfully!")
+				}
+			}(task, string(script))
+		} else {
+			log.Println("---> fail to get script for task ", task.GetId(), err)
+		}
+
+		if task.GetFrequencyType() != Config.FrequencyType_ONCE {
+			// So here I will re-schedule the task, it will not be schedule if is it
+			// expired or it must run once.
+			GetServer().GetConfigurationManager().scheduleTask(task)
+		} else {
+			if task.GetStartTime() > 0 {
+				GetServer().GetConfigurationManager().scheduleTask(task)
+			}
+		}
+
+	} else {
+		log.Println("---> fail to get db file for task ", task.GetId(), err)
+	}
+
+}
+
+// daysIn returns the number of days in a month for a given year.
+func daysIn(m time.Month, year int) int {
+	// This is equivalent to time.daysIn(m, year).
+	return time.Date(year, m+1, 0, 0, 0, 0, 0, time.UTC).Day()
+}
+
+/**
  * That function is use to schedule a task.
  */
 func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
+
+	// Here I will get the entity for the task.
+	entity := GetServer().GetEntityManager().NewConfigScheduledTaskEntityFromObject(task)
+
 	// first of all I will test if the task is active.
 	if task.IsActive() == false {
 		return // Nothing to do here.
@@ -309,7 +403,7 @@ func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
 	if task.M_expirationTime > 0 {
 		if task.M_expirationTime < time.Now().Unix() {
 			// The task has expire!
-			task.SetIsActive(false)
+			entity.GetObject().(*Config.ScheduledTask).SetIsActive(false)
 			return
 		}
 	}
@@ -330,11 +424,15 @@ func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
 			previous = nextTime
 			// I will append
 			if task.GetFrequencyType() == Config.FrequencyType_DAILY {
-				nextTime = nextTime.AddDate(0, 0, frequency)
+				f := time.Duration((24 * 60 * 60 * 1000) / frequency)
+				nextTime = nextTime.Add(f * time.Millisecond)
 			} else if task.GetFrequencyType() == Config.FrequencyType_WEEKELY {
-				nextTime = nextTime.AddDate(0, 0, 7*frequency)
+				f := time.Duration((7 * 24 * 60 * 60 * 1000) / frequency)
+				nextTime = nextTime.Add(f * time.Millisecond)
 			} else if task.GetFrequencyType() == Config.FrequencyType_MONTHLY {
-				nextTime = nextTime.AddDate(0, frequency, 0)
+				numberOfDay := daysIn(nextTime.Month(), nextTime.Year())
+				f := time.Duration((numberOfDay * 24 * 60 * 60 * 1000) / frequency)
+				nextTime = nextTime.Add(f * time.Millisecond)
 			}
 		}
 
@@ -342,66 +440,49 @@ func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
 		// be use as nextTime.
 		for i := 0; i < len(task.M_offsets); i++ {
 			if task.GetFrequencyType() == Config.FrequencyType_WEEKELY || task.GetFrequencyType() == Config.FrequencyType_MONTHLY {
-				nextTime_ := previous.AddDate(0, 0, task.M_offsets[i])
+				offset := time.Duration(task.M_offsets[i] * 24 * 60 * 60 * 1000) // in hours
+				nextTime_ := previous.Add(offset * time.Millisecond)
 				if nextTime_.Sub(time.Now()) > 0 {
 					nextTime = nextTime_
 					break
 				}
 			} else if task.GetFrequencyType() == Config.FrequencyType_DAILY {
 				// Here the offset represent hours and not days.
-				nextTime_ := previous.Add(time.Hour * time.Duration(task.M_offsets[i]))
+				offset := time.Duration(task.M_offsets[i] * 60 * 60 * 1000) // in hours
+				nextTime_ := previous.Add(offset * time.Millisecond)
 				if nextTime_.Sub(time.Now()) > 0 {
 					nextTime = nextTime_
 					break
 				}
 			}
 		}
-	}
 
-	var delay time.Duration
-	if task.M_startTime > 0 {
-		delay = nextTime.Sub(time.Now())
+		// Set it start time...
+		entity.GetObject().(*Config.ScheduledTask).SetStartTime(nextTime.Unix())
+
 	} else {
-		delay = 0
-	}
-
-	// Here I will set the timer...
-	go func(delay time.Duration, task *Config.ScheduledTask) {
-		log.Println("--> task", task.GetId(), "is scheduled in", delay.Minutes(), "minutes")
-		// Here I will set the timer...
-		if delay.Minutes() >= 0 {
-			timer := time.NewTimer(delay)
-			<-timer.C // wait util the delay expire...
-			dbFile, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", []interface{}{task.M_script}, false)
-			if err == nil {
-				script, err := b64.StdEncoding.DecodeString(dbFile.GetObject().(*CargoEntities.File).GetData())
-				// Now I will run the script...
-				if err == nil {
-					_, err := JS.GetJsRuntimeManager().RunScript("", string(script))
-					if err != nil {
-						log.Println("---> fail to run task ", task.GetId(), " with error: ", err)
-					} else {
-						log.Println("--> task ", task.GetId(), "run successfully!")
-					}
-				} else {
-					log.Println("---> fail to get script for task ", task.GetId(), err)
-				}
-				if task.GetFrequencyType() != Config.FrequencyType_ONCE {
-					// So here I will re-schedule the task, it will not be schedule if is it
-					// expired or it must run once.
-					GetServer().GetConfigurationManager().scheduleTask(task)
-				} else {
-					if delay < 0 {
-						task.SetIsActive(false)
-					}
-				}
-			} else {
-				log.Println("---> fail to get db file for task ", task.GetId(), err)
+		if entity.GetObject().(*Config.ScheduledTask).GetStartTime() == 0 {
+			// Run the task directly in that case.
+			this.runTask(task)
+			return // nothing more to do...
+		} else {
+			startTime := time.Unix(entity.GetObject().(*Config.ScheduledTask).GetStartTime(), 0)
+			if startTime.Sub(time.Now()) < 0 {
+				task.NeedSave = true
+				// innactivate the task in that case.
+				entity.GetObject().(*Config.ScheduledTask).SetIsActive(false)
 			}
 		}
+	}
 
-	}(delay, task)
+	// Save modification.
+	entity.SaveEntity()
 
+	// Process the task.
+	startTime := time.Unix(entity.GetObject().(*Config.ScheduledTask).GetStartTime(), 0)
+	if startTime.Sub(time.Now()) >= 0 {
+		this.m_setScheduledTasksChan <- entity.GetObject().(*Config.ScheduledTask)
+	}
 }
 
 /**
@@ -629,6 +710,27 @@ func (this *ConfigurationManager) ScheduleTask(task *Config.ScheduledTask, messa
 		return
 	}
 	this.scheduleTask(task)
+}
+
+// @api 1.0
+// Cancel the next task instance.
+// @param {string} task The task to cancel.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *ConfigurationManager) CancelTask(task *Config.ScheduledTask, messageId string, sessionId string) {
+	var errObj *CargoEntities.Error
+	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
+	// Cancel the task.
+	this.m_cancelScheduledTasksChan <- task
+
 }
 
 // @api 1.0

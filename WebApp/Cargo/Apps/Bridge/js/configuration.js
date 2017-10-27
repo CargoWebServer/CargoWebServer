@@ -378,7 +378,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
                 } else if (content.TYPENAME == "Config.ServiceConfiguration") {
                     // Here I have a service configuration.
-                    var parent = content.panel.panel //.parentElement.parentElement
+                    var parent = content.getPanel().panel //.parentElement.parentElement
                     // Keep the reference in the content.
                     var actionsDiv = parent.appendElement({ "tag": "div", "id": content.UUID + "_actions_div", "style": "position:absolute; left: 0px; bottom: 0px; overflow: auto;" }).down()
                     window.addEventListener('resize',
@@ -414,13 +414,29 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                         }, actionsDiv)
                 } else if (content.TYPENAME == "Config.ScheduledTask") {
                     // Here I will personalise input a little.
-                    content.panel.controls["Config.ScheduledTask_M_frequency"].element.title = "The task must be execute n time per frequency type (once, daily, weekely, or mouthly). *Is ignore if frenquencyType is ONCE."
+                    content.getPanel().controls["Config.ScheduledTask_M_frequency"].element.title = "The task must be execute n time per frequency type (once, daily, weekely, or mouthly). *Is ignore if frenquencyType is ONCE."
 
                     // The script button must be hidden...
-                    content.panel.controls["Config.ScheduledTask_M_script"].element.style.display = "none"
-                    content.panel.controls["Config.ScheduledTask_M_script_edit"] = new Element(content.panel.controls["Config.ScheduledTask_M_script"].element.parentNode, { "tag": "i", "title": "Edit task script.", "class": "editBtn fa fa-edit" })
+                    content.getPanel().controls["Config.ScheduledTask_M_script"].element.style.display = "none"
+                    content.getPanel().controls["Config.ScheduledTask_M_script_edit"] = new Element(content.getPanel().controls["Config.ScheduledTask_M_script"].element.parentNode, { "tag": "i", "title": "Edit task script.", "class": "editBtn fa fa-edit" })
 
-                    content.panel.controls["Config.ScheduledTask_M_script_edit"].element.onclick = function (ScheduledTask_M_script, entity) {
+                    // The save bnt...
+                    content.getPanel().saveCallback = function () {
+                        return function (task) {
+                            // Now I will schedule the task.
+                            server.configurationManager.scheduleTask(task,
+                                // Success Callback
+                                function (results, caller) {
+                                    /** Nothing to do here */
+                                },
+                                // Error Callback
+                                function (errObj, caller) {
+                                    console.log(errObj)
+                                }, {})
+                        }
+                    }()
+
+                    content.getPanel().controls["Config.ScheduledTask_M_script_edit"].element.onclick = function (ScheduledTask_M_script, entity) {
                         return function () {
 
                             var query = {}
@@ -471,7 +487,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
                                 }, { "entity": entity })
                         }
-                    }(content.panel.controls["Config.ScheduledTask_M_script"], content.panel.entity)
+                    }(content.getPanel().controls["Config.ScheduledTask_M_script"], content.getPanel().entity)
                 } else if (content.TYPENAME == "Config.LdapConfiguration") {
                     // Here I will append in case of sql datasotre the synchornize button.
                     contentView.refreshBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell; color: lightgrey;" }).down()

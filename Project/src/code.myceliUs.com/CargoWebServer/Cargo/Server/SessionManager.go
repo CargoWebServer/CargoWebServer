@@ -112,6 +112,8 @@ func (this *SessionManager) run() {
 			activeSessionsChannel_.activeSessionsChan <- this.getActiveSessions()
 		case sessionToClose := <-this.sessionToCloseChannel:
 			sessionToClose.err <- this.closeSession_(sessionToClose.session)
+		default:
+			time.Sleep(1 * time.Millisecond)
 		}
 	}
 }

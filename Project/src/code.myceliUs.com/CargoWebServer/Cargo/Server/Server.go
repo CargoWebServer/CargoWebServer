@@ -14,6 +14,7 @@ import (
 
 	"strconv"
 	"strings"
+	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
@@ -29,6 +30,16 @@ import (
 var (
 	server *Server
 )
+
+/**
+ * Interval information, used by JS function setInterval to repeatedly execute
+ * a function until it ends by clearInterval
+ */
+type IntervalInfo struct {
+	uuid     string
+	callback string
+	ticker   *time.Ticker
+}
 
 type Server struct {
 
@@ -50,6 +61,11 @@ type Server struct {
 
 	// Contain the list of active command.
 	cmds []*exec.Cmd
+
+	// Contain the list of active interval JS function.
+	intervals     map[string]*IntervalInfo
+	setInterval   chan *IntervalInfo
+	clearInterval chan string
 }
 
 /**
@@ -86,6 +102,11 @@ func newServer() *Server {
 
 	server.subConnectionIds = make(map[string][]string, 0)
 	server.subConnections = make(map[string]otto.Value, 0)
+
+	// Interval functions stuff.
+	server.intervals = make(map[string]*IntervalInfo, 0)
+	server.setInterval = make(chan *IntervalInfo, 0)
+	server.clearInterval = make(chan string, 0)
 
 	return server
 }
@@ -340,6 +361,23 @@ func (this *Server) Start() {
 
 	JS.GetJsRuntimeManager().AppendFunction("capitalizeFirstLetter", func(str string) string {
 		return strings.ToUpper(str[0:1]) + str[1:]
+	})
+
+	JS.GetJsRuntimeManager().AppendFunction("setInterval", func(callback string, interval int64) string {
+		// The intetifier of the function.
+		intervalInfo := new(IntervalInfo)
+		intervalInfo.uuid = Utility.RandomUUID()
+		intervalInfo.callback = callback
+		intervalInfo.ticker = time.NewTicker(time.Duration(interval) * time.Millisecond)
+
+		// Set the interval info.
+		GetServer().setInterval <- intervalInfo
+
+		return intervalInfo.uuid
+	})
+
+	JS.GetJsRuntimeManager().AppendFunction("clearInterval", func(interval string) {
+		GetServer().clearInterval <- interval
 	})
 
 	////////////////////////////////////////////////////////////////////////////
@@ -689,6 +727,41 @@ func (this *Server) Start() {
 		}
 	}
 
+	// Now I will start the interval processing loop...
+	go func() {
+		for {
+			select {
+			case intervalInfo := <-GetServer().setInterval:
+				// Wait util the timer ends...
+				go func(intervalInfo *IntervalInfo) {
+					// Set the variable as function.
+					functionName := "callback_" + strings.Replace(intervalInfo.uuid, "-", "_", -1)
+					_, err := JS.GetJsRuntimeManager().RunScript("", "var "+functionName+"="+intervalInfo.callback)
+					// I must run the script one and at interval after it...
+					if err == nil {
+						for t := range intervalInfo.ticker.C {
+							// So here I will call the callback.
+							// The callback contain unamed function...
+							_, err := JS.GetJsRuntimeManager().RunScript("", functionName+"()")
+							if err != nil {
+								log.Println("---> Run interval callback error: ", err, t)
+							}
+						}
+					} else {
+						log.Println("---> Run interval callback error: ", "var "+functionName+"="+intervalInfo.callback, err)
+					}
+
+				}(intervalInfo)
+
+			case uuid := <-GetServer().clearInterval:
+				intervalInfo := GetServer().intervals[uuid]
+				intervalInfo.ticker.Stop()
+			default:
+				time.Sleep(1 * time.Millisecond)
+			}
+		}
+	}()
+
 	////////////////////////////////////////////////////////////////////////////
 	// Services intialisation.
 	////////////////////////////////////////////////////////////////////////////
@@ -697,17 +770,18 @@ func (this *Server) Start() {
 	// other servers.
 	this.GetDataManager().openConnections()
 
+	// Now I will register actions for services container.
+	activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+	if err != nil {
+		log.Panicln(err)
+	}
+
 	// Now I will set scheduled task.
 	for i := 0; i < len(GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
 		task := GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks[i]
 		GetServer().GetConfigurationManager().scheduleTask(task)
 	}
 
-	// Now I will register actions for services container.
-	activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
-	if err != nil {
-		log.Panicln(err)
-	}
 	activeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations)
 	for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
 		config := activeConfigurations.GetServiceConfigs()[i]
@@ -715,6 +789,7 @@ func (this *Server) Start() {
 			GetServer().GetServiceManager().registerServiceContainerActions(config)
 		}
 	}
+
 }
 
 /**
