@@ -598,7 +598,16 @@ func (this *FileManager) deleteFile(uuid string) error {
 	}
 
 	if file.GetFileType() == CargoEntities.FileType_DiskFile {
-		filePath := this.root + file.GetPath() + "/" + file.GetName()
+		var filePath string
+		if _, err := os.Stat(this.root + file.GetPath() + "/" + file.GetName()); err != nil {
+			// TODO Throw an error if err != nil ?
+			if os.IsNotExist(err) {
+				filePath = file.GetPath() + "/" + file.GetName()
+			}
+		} else {
+			filePath = this.root + file.GetPath() + "/" + file.GetName()
+		}
+
 		if !file.IsDir() {
 			// Remove the file from the disck
 			err := os.Remove(filePath) // The file can be already remove...
@@ -889,10 +898,13 @@ func (this *FileManager) RemoveFile(filePath string, messageId string, sessionId
 		return
 	}
 
-	if !strings.HasPrefix(filePath, "/") {
-		filePath = "/" + filePath
+	// if the file exist in the root...
+	if _, err := os.Stat(this.root + "/" + filePath); err == nil {
+		// TODO Throw an error if err != nil ?
+		if os.IsNotExist(err) {
+			filePath = this.root + "/" + filePath
+		}
 	}
-	filePath = this.root + filePath
 
 	err := os.Remove(filePath)
 	if err != nil {

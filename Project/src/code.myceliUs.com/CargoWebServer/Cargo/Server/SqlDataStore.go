@@ -296,6 +296,9 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
 	startIndex := strings.Index(strings.ToUpper(query), " INTO ") + 5 // 5 is the len of INTO and one space...
 	endIndex := strings.Index(query, "(")
 	tableName := strings.TrimSpace(query[startIndex:endIndex])
+	if strings.LastIndex(tableName, ".") != -1 {
+		tableName = tableName[strings.LastIndex(tableName, ".")+1:]
+	}
 
 	var colKeyQuery string
 	if this.m_vendor == Config.DataStoreVendor_MSSQL || this.m_vendor == Config.DataStoreVendor_MYSQL {
@@ -309,25 +312,33 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
 
 	params := make([]interface{}, 1, 1)
 	params[0] = tableName
-	results, _ := GetServer().GetDataManager().readData(this.GetId(), colKeyQuery, fieldType, params)
+	results, err := GetServer().GetDataManager().readData(this.GetId(), colKeyQuery, fieldType, params)
 	// Work for one column...
-	if len(results) != 0 {
-		if colKey, ok := results[0][0].(string); ok {
-			// Now the second query...
-			var lastIndexQuery string
-			if this.m_vendor == Config.DataStoreVendor_MYSQL {
-				lastIndexQuery = "SELECT " + colKey + " FROM " + tableName + " ORDER BY " + colKey + " DESC LIMIT 1"
-			} else {
-				lastIndexQuery = "SELECT TOP 1 " + colKey + " FROM " + tableName + " ORDER BY " + colKey + " DESC"
-			}
+	if err == nil {
+		if len(results) != 0 {
+			if colKey, ok := results[0][0].(string); ok {
+				// Now the second query...
+				var lastIndexQuery string
+				if this.m_vendor == Config.DataStoreVendor_MYSQL {
+					lastIndexQuery = "SELECT " + colKey + " FROM " + tableName + " ORDER BY " + colKey + " DESC LIMIT 1"
+				} else {
+					lastIndexQuery = "SELECT TOP 1 " + colKey + " FROM " + tableName + " ORDER BY " + colKey + " DESC"
+				}
 
-			params = make([]interface{}, 0, 0)
-			fieldType[0] = "int"
-			results, _ = GetServer().GetDataManager().readData(this.GetId(), lastIndexQuery, fieldType, params)
-			if len(results) > 0 {
-				lastId = int64(results[0][0].(int))
+				params = make([]interface{}, 0, 0)
+				fieldType[0] = "int"
+				results, err = GetServer().GetDataManager().readData(this.GetId(), lastIndexQuery, fieldType, params)
+				if err == nil {
+					if len(results) > 0 {
+						lastId = int64(results[0][0].(int))
+					}
+				} else {
+					log.Println("-------> fail to execute query ", lastIndexQuery, err)
+				}
 			}
 		}
+	} else {
+		log.Println("-------> fail to execute query ", colKeyQuery, " table Name ", tableName, err)
 	}
 
 	if err == nil {

@@ -202,7 +202,7 @@ func (this *CacheManager) run() {
 				return
 			}
 		default:
-			time.Sleep(1 * time.Millisecond)
+			time.Sleep(1 * time.Microsecond)
 		}
 	}
 }

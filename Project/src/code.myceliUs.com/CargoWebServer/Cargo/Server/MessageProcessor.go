@@ -104,7 +104,7 @@ func (this *MessageProcessor) run() {
 					}
 				}
 			default:
-				time.Sleep(1 * time.Millisecond) // Cpu release...
+				time.Sleep(1 * time.Microsecond) // Cpu release...
 			}
 		}
 	}(this.m_outgoingChannel, this.m_sendRequest, this.m_receiveRequestResponse, this.m_receiveRequestError)
@@ -123,7 +123,7 @@ func (this *MessageProcessor) run() {
 				return
 			}
 		default:
-			time.Sleep(1 * time.Millisecond) // Cpu release...
+			time.Sleep(1 * time.Microsecond) // Cpu release...
 		}
 	}
 }
@@ -360,6 +360,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 							//log.Println("Error:", err)
 							// Here I will try to create a the array of object.
 							if err.Error() == "NotDynamicObject" {
+								log.Println("-----> value: ", values, "type name: ", param.GetTypeName())
 								p, err := Utility.InitializeArray(values.([]interface{}), param.GetTypeName())
 								if err == nil {
 									if p.IsValid() {
@@ -479,23 +480,26 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 
 	// Here I will send the message to the client.
 	if *m.msg.Type == Message_REQUEST || *m.msg.Type == Message_RESPONSE {
-		if len(m.GetBytes()) < maxSize {
-			for i := 0; i < len(m.to); i++ {
-				if m.to[i] == nil {
-					if *m.msg.Type == Message_RESPONSE {
-						this.m_receiveRequestResponse <- m
-					} else if *m.msg.Type == Message_REQUEST {
-						this.m_incomingChannel <- m
-					}
-				} else {
+
+		for i := 0; i < len(m.to); i++ {
+			if m.to[i] == nil {
+				// Local message here no need to send over socket.
+				if *m.msg.Type == Message_RESPONSE {
+					this.m_receiveRequestResponse <- m
+				} else if *m.msg.Type == Message_REQUEST {
+					this.m_incomingChannel <- m
+				}
+			} else {
+				if len(m.GetBytes()) < maxSize {
 					m.to[i].Send(m.GetBytes())
+				} else {
+					// so here I will split the message in multiple part
+					// and send it.
+					this.createPendingMessages(m)
 				}
 			}
-		} else {
-			// so here I will split the message in multiple part
-			// and send it.
-			this.createPendingMessages(m)
 		}
+
 	} else if *m.msg.Type == Message_EVENT {
 		// Event
 		log.Println("----------------------------------> ln 541 message processor want to send event message!")
@@ -505,8 +509,10 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 	} else if *m.msg.Type == Message_TRANSFER {
 		// Transfer
 		for i := 0; i < len(m.to); i++ {
-			if m.to[i].IsOpen() {
-				m.to[i].Send(m.GetBytes())
+			if m.to[i] != nil {
+				if m.to[i].IsOpen() {
+					m.to[i].Send(m.GetBytes())
+				}
 			}
 		}
 	}

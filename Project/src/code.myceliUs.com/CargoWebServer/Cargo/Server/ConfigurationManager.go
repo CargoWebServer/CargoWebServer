@@ -327,7 +327,7 @@ func (this *ConfigurationManager) start() {
 				delete(tasks, task.GetId())
 
 			default:
-				time.Sleep(1 * time.Millisecond)
+				time.Sleep(1 * time.Microsecond)
 			}
 		}
 	}()

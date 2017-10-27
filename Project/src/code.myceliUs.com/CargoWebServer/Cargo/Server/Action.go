@@ -2,7 +2,7 @@
 package Server
 
 import (
-	//"log"
+	"log"
 	"os/exec"
 	"reflect"
 	"strconv"
@@ -158,9 +158,8 @@ func runVbs(scriptName string, args []string) ([]string, error) {
 	args_ := make([]string, 0)
 	args_ = append(args_, "/Nologo") // Remove the trademark...
 	args_ = append(args_, path)
-
 	args_ = append(args_, args...)
-	//log.Println("-----> ", args_)
+
 	out, err := exec.Command("C:/WINDOWS/system32/cscript.exe", args_...).Output()
 	results := strings.Split(string(out), "\n")
 	results = results[0 : len(results)-1]
@@ -183,9 +182,9 @@ func (self *Action) ExecuteVbScript(scriptName string, args []string) []string {
 		// Create the error object.
 		cargoError := NewError(Utility.FileLine(), ACTION_EXECUTE_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		log.Println("Execute vb script error: ", err)
 		return nil
 	}
-
 	return results
 }
 
@@ -231,8 +230,15 @@ func (self *Action) Ping() (string, error) {
 }
 
 /**
- * Simply call RunCmd on the server.
+ * Run a command on the server.
  */
 func (self *Action) RunCmd(name string, args []string) (result string, err error) {
 	return GetServer().RunCmd(name, args)
+}
+
+/**
+ * Stop the server.
+ */
+func (self *Action) Stop() {
+	GetServer().Stop()
 }

@@ -78,7 +78,7 @@ function main() {
     //entitiesDump("XPDMXML.ProcessStructureType")
     // entitiesDump("CatalogSchema.CatalogType")
 
-    testEntityQuery()
+    //testEntityQuery()
 
     //TestWebRtc2()
 
@@ -159,7 +159,7 @@ function main() {
     
         })*/
 
-    //LaunchImportNewSQLData_Process()
+    LaunchImportNewSQLData_Process()
 
     /*
          server.entityManager.getEntityPrototypes("Test",

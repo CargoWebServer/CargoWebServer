@@ -129,7 +129,6 @@ function ProcessAnalyseImportation(ExistigFilePath, sqlFilePaths) {
 
             newFileInfo = [1, fPath, workOrder, operation, aircraft, partnumber, partType, fileAuthors, fModifiedDateTime];
 
-            var fileToExport_Caller = { "fileInfo": newFileInfo, "fileData": newFilesData };
 
 
             //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -142,7 +141,8 @@ function ProcessAnalyseImportation(ExistigFilePath, sqlFilePaths) {
                 // Here I will use vb script to convert xls to csv.
                 var excelPath = fPath
                 var csvPath = fPath.replace("XLS", "csv").replace("xls", "csv").replace("XLSX", "csv").replace("xlsx", "csv")
-
+                var fileToExport_Caller = { "fileInfo": newFileInfo, "fileData": newFilesData, "csvPath":csvPath};
+                
                 /*getFileInfos(fPath,
                     function () {
                         return function (fileInfos) {
@@ -153,163 +153,155 @@ function ProcessAnalyseImportation(ExistigFilePath, sqlFilePaths) {
 
                 //@param(dirPath, exeParam, SuccesCallBack,errorCallBack, caller)    
                 server.executeVbSrcript("xlsx2csv.vbs", [excelPath, csvPath],
-
-                    //SUCESS:
+                    //SUCCESS:
                     //La conversion a été un succes et on obtient le chemin du CSV créé.
-                    function (csvPath) {
-                        return function (results, caller) {
-                            // So here I will read the csv file.
-                            server.fileManager.readCsvFile(csvPath,
+                    function (results, caller) {
+                        // So here I will read the csv file.
+                        server.fileManager.readCsvFile(caller.csvPath,
 
-                                //SUCESS:
-                                function (csvPath) {
-                                    return function (results, caller) {
+                            //SUCCESS:
+                            function (results, caller) {
 
-                                        // TODO Process the result here...
-                                        var fRawData = results[0]; //Data brute contenu dans le fichier Excel
+                                // TODO Process the result here...
+                                var fRawData = results[0]; //Data brute contenu dans le fichier Excel
 
-                                        //------------------------------
-                                        //Transforme le data Brute en contenu compact et plus clair: enlève espace supperflu
-                                        //------------------------------
-                                        var bIsLineEmpty = true;
-                                        var feature, tolName, entryName, actual, nominal, minTol, maxTol, dev, out;
+                                //------------------------------
+                                //Transforme le data Brute en contenu compact et plus clair: enlève espace supperflu
+                                //------------------------------
+                                var bIsLineEmpty = true;
+                                var feature, tolName, entryName, actual, nominal, minTol, maxTol, dev, out;
 
-                                        //Loop au travers de chaque ligne pour savoir si elle est completement vide
-                                        for (var rID = 0; rID < fRawData.length; rID++) {
+                                //Loop au travers de chaque ligne pour savoir si elle est completement vide
+                                for (var rID = 0; rID < fRawData.length; rID++) {
 
+                                    lineData = fRawData[rID]; //.split(";");
+
+                                    if (lineData.length > 0) {
+
+                                        //Use Regex to know if LIKE "Feature"
+                                        if (/FEATURE.*/.test(lineData[0].toUpperCase())) {
+
+                                            feature = lineData[1];     //Obtient le nom du feature dans 2ere Colonne
+
+                                            //Obtient le nom de la tolérance (identification) qui sur la ligne du dessous
+                                            rID++;
                                             lineData = fRawData[rID]; //.split(";");
+                                            var myRe = new RegExp('.+\\.\\d+', 'g');  //Obtient le nom avant les ".###"
+                                            var myArray = myRe.exec(lineData[1]);   //2e Colonne
+                                            tolName = myArray[0];
 
-                                            if (lineData.length > 0) {
+                                            //Va chercher les valeurs associées à cette tolérance
+                                            //= actuanl, nominal, min, max, dev, out
+                                            rID++;
+                                            var limit = rID;
+                                            for (; rID <= limit + 5; rID++) {
 
-                                                //Use Regex to know if LIKE "Feature"
-                                                if (/FEATURE.*/.test(lineData[0].toUpperCase())) {
-
-                                                    feature = lineData[1];     //Obtient le nom du feature dans 2ere Colonne
-
-                                                    //Obtient le nom de la tolérance (identification) qui sur la ligne du dessous
-                                                    rID++;
-                                                    lineData = fRawData[rID]; //.split(";");
-                                                    var myRe = new RegExp('.+\\.\\d+', 'g');  //Obtient le nom avant les ".###"
-                                                    var myArray = myRe.exec(lineData[1]);   //2e Colonne
-                                                    tolName = myArray[0];
-
-                                                    //Va chercher les valeurs associées à cette tolérance
-                                                    //= actuanl, nominal, min, max, dev, out
-                                                    rID++;
-                                                    var limit = rID;
-                                                    for (; rID <= limit + 5; rID++) {
-
-                                                        lineData = fRawData[rID]; //.split(";");
-                                                        entryName = tolName
-                                                        var typeCote = ""
-                                                        if (lineData[2] != " ") {
-                                                            entryName = entryName + "_" + lineData[2];
-                                                            typeCote = lineData[2];
-                                                        }
-
-                                                        if (lineData[3] != " ") {
-                                                            actual = parseFloat(lineData[3]);
-                                                        } else {
-                                                            actual = 0.0;
-                                                        }
-                                                        if (lineData[4] != " ") {
-                                                            nominal = parseFloat(lineData[4]);
-                                                        } else {
-                                                            nominal = 0.0;
-                                                        }
-                                                        if (lineData[5] != " ") {
-                                                            minTol = parseFloat(lineData[5]);
-                                                        } else {
-                                                            minTol = 0.0;
-                                                        }
-                                                        if (lineData[6] != " ") {
-                                                            maxTol = parseFloat(lineData[6]);
-                                                        } else {
-                                                            maxTol = 0.0;
-                                                        }
-                                                        if (lineData[7] != " ") {
-                                                            dev = parseFloat(lineData[7]);
-                                                        } else {
-                                                            dev = 0.0;
-                                                        }
-                                                        if (lineData[8] != " ") {
-                                                            out = parseFloat(lineData[8]);
-                                                        } else {
-                                                            out = 0.0;
-                                                        }
-
-                                                        if (lineData[3] != " ") {
-                                                            var tolData = [entryName, feature, actual, nominal, minTol, maxTol, dev, out];
-                                                            caller.fileData.push(tolData);
-                                                        } else {
-                                                            break
-                                                        }
-                                                    }
-
-                                                }   //END: Feature Line Detected
-                                            }   //END: C'est une ligne aux colonnes Valides
-                                        }   //END: Finish Reading the CSV File
-
-                                        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                                        //INSERT les données sur le Fichier Excel
-                                        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                                        var query = "INSERT INTO Eng_Dwg_Features.dbo.ProActiv_Files (ID_Machine,[FilePath],[WorkOrder],"
-                                            + "[Operation],[Aircraft_Product],[PartNumber],[PartType],[File_Author],[File_ModifiedDateTime]) VALUES (?,?,?,?,?,?,?,?,?)";
-
-                                        server.dataManager.create("Eng_Dwg_Features", query, caller.fileInfo,
-
-                                            //SUCCESS: File Added
-                                            function (results, caller) {
-                                                //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                                                //INSERT les données contenues dans le fichier Excel
-                                                //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                                                var fileID = results[0];
-                                                var fileData = caller.fileData
-
-                                                var dataToExport = [fileID, "my name is TolName"];
-                                                for (var i = 0; i < fileData.length; i++) {
-                                                    fileData[i].unshift(fileID)
-                                                    /* append this values ,[AddedDate],[LastModifiedDate], [Type_Cote]*/
-                                                    query = "INSERT INTO Eng_Dwg_Features.dbo.ProActiv_Entry ([ID_File],[Entry_Name],[Entry_Feature],[Cote_Actual],[Cote_Nominal],[Cote_Tol_Min],[Cote_Tol_Max],[Cote_Dev],[Cote_Out] ) VALUES (?,?,?,?,?,?,?,?,?)";
-                                                    server.dataManager.create("Eng_Dwg_Features", query, fileData[i],
-                                                        //SUCCESS: Tolerance Added
-                                                        function (results, caller) {
-                                                            var newTolID = results[0];
-                                                            console.log("newTolID Added = " + newTolID)
-                                                        },
-                                                        // Error callback here...
-                                                        function (errorMsg, caller) {
-
-                                                        },
-                                                        {});
+                                                lineData = fRawData[rID]; //.split(";");
+                                                entryName = tolName
+                                                var typeCote = ""
+                                                if (lineData[2] != " ") {
+                                                    entryName = entryName + "_" + lineData[2];
+                                                    typeCote = lineData[2];
                                                 }
 
-                                            },
-                                            // Error callback here...
-                                            function (errorMsg, caller) {
+                                                if (lineData[3] != " ") {
+                                                    actual = parseFloat(lineData[3]);
+                                                } else {
+                                                    actual = 0.0;
+                                                }
+                                                if (lineData[4] != " ") {
+                                                    nominal = parseFloat(lineData[4]);
+                                                } else {
+                                                    nominal = 0.0;
+                                                }
+                                                if (lineData[5] != " ") {
+                                                    minTol = parseFloat(lineData[5]);
+                                                } else {
+                                                    minTol = 0.0;
+                                                }
+                                                if (lineData[6] != " ") {
+                                                    maxTol = parseFloat(lineData[6]);
+                                                } else {
+                                                    maxTol = 0.0;
+                                                }
+                                                if (lineData[7] != " ") {
+                                                    dev = parseFloat(lineData[7]);
+                                                } else {
+                                                    dev = 0.0;
+                                                }
+                                                if (lineData[8] != " ") {
+                                                    out = parseFloat(lineData[8]);
+                                                } else {
+                                                    out = 0.0;
+                                                }
 
-                                            },
+                                                if (lineData[3] != " ") {
+                                                    var tolData = [entryName, feature, actual, nominal, minTol, maxTol, dev, out];
+                                                    caller.fileData.push(tolData);
+                                                } else {
+                                                    break
+                                                }
+                                            }
 
-                                            //CALLER:
-                                            caller)
+                                        }   //END: Feature Line Detected
+                                    }   //END: C'est une ligne aux colonnes Valides
+                                }   //END: Finish Reading the CSV File
 
-                                        // Remove the temp CSV File
-                                        //------------------------------
-                                        server.fileManager.removeFile(csvPath)
-                                    } //END: Succes Function Reading CSV File
+                                //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                //INSERT les données sur le Fichier Excel
+                                //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                var query = "INSERT INTO Eng_Dwg_Features.dbo.ProActiv_Files (ID_Machine,[FilePath],[WorkOrder],"
+                                    + "[Operation],[Aircraft_Product],[PartNumber],[PartType],[File_Author],[File_ModifiedDateTime]) VALUES (?,?,?,?,?,?,?,?,?)";
 
-                                }(csvPath)
-                                ,
+                                server.dataManager.create("Eng_Dwg_Features", query, caller.fileInfo,
 
-                                //FAILED
-                                function (errObj, caller) {
-                                    console.log(errObj)
-                                },
+                                    //SUCCESS: File Added
+                                    function (results, caller) {
+                                        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                        //INSERT les données contenues dans le fichier Excel
+                                        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                        var fileID = results[0];
+                                        var fileData = caller.fileData
+                                        for (var i = 0; i < fileData.length; i++) {
+                                            fileData[i].unshift(fileID)
+                                            console.log("=====> file id " , fileID)
+                                            /* append this values ,[AddedDate],[LastModifiedDate], [Type_Cote]*/
+                                            query = "INSERT INTO Eng_Dwg_Features.dbo.ProActiv_Entry ([ID_File],[Entry_Name],[Entry_Feature],[Cote_Actual],[Cote_Nominal],[Cote_Tol_Min],[Cote_Tol_Max],[Cote_Dev],[Cote_Out] ) VALUES (?,?,?,?,?,?,?,?,?)";
+                                            server.dataManager.create("Eng_Dwg_Features", query, fileData[i],
+                                                //SUCCESS: Tolerance Added
+                                                function (results, caller) {
+                                                    var newTolID = results[0];
+                                                    console.log("newTolID Added = " + newTolID)
+                                                },
+                                                // Error callback here...
+                                                function (errorMsg, caller) {
 
-                                //CALLER:
-                                caller)//Autre méthode: {"path":csvPath})
-                        }
-                    }(csvPath)
+                                                },
+                                                {});
+                                        }
+
+                                    },
+                                    // Error callback here...
+                                    function (errorMsg, caller) {
+
+                                    },
+
+                                    //CALLER:
+                                    caller)
+
+                                // Remove the temp CSV File
+                                //------------------------------
+                                server.fileManager.removeFile(caller.csvPath)
+                            } //END: Succes Function Reading CSV File
+                            ,
+
+                            //FAILED
+                            function (errObj, caller) {
+                                console.log(errObj)
+                            },
+                            //CALLER:
+                            caller)
+                    }
                     ,
 
                     //FAILED/ERROR CALLBACK:

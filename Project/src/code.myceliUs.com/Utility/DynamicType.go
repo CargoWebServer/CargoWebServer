@@ -370,11 +370,23 @@ func InitializeArray(data []interface{}, typeName string) (reflect.Value, error)
 		values = reflect.ValueOf(emptyInterfaceArray)
 	}
 
+	sameType := true
+	if len(data) > 1 {
+		for i := 1; i < len(data); i++ {
+			if data[i] != nil {
+				sameType = reflect.TypeOf(data[i]) == reflect.TypeOf(data[i-1])
+			}
+		}
+	}
+
 	for i := 0; i < len(data); i++ {
 		if data[i] != nil {
 			if i == 0 {
-				if len(typeName) == 0 {
+				if len(typeName) == 0 && sameType {
 					values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(data[i])), 0, 0)
+				} else {
+					emptyInterfaceArray := make([]interface{}, 0, 0)
+					values = reflect.ValueOf(emptyInterfaceArray)
 				}
 			}
 			values = reflect.Append(values, reflect.ValueOf(data[i]))

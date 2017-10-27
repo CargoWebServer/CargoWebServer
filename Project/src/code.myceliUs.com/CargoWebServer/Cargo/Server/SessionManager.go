@@ -113,7 +113,7 @@ func (this *SessionManager) run() {
 		case sessionToClose := <-this.sessionToCloseChannel:
 			sessionToClose.err <- this.closeSession_(sessionToClose.session)
 		default:
-			time.Sleep(1 * time.Millisecond)
+			time.Sleep(1 * time.Microsecond)
 		}
 	}
 }

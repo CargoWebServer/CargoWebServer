@@ -39,6 +39,7 @@ type IntervalInfo struct {
 	uuid     string
 	callback string
 	ticker   *time.Ticker
+	timer    *time.Timer
 }
 
 type Server struct {
@@ -339,14 +340,18 @@ func (this *Server) Start() {
 		return sEnc
 	})
 
+	////////////////////////////////////////////////////////////////////////////
 	// JSON function...
+	////////////////////////////////////////////////////////////////////////////
 	JS.GetJsRuntimeManager().AppendFunction("stringify", func(object interface{}) string {
 		data, _ := json.Marshal(object)
 		str := string(data)
 		return str
 	})
 
+	////////////////////////////////////////////////////////////////////////////
 	// String functions...
+	////////////////////////////////////////////////////////////////////////////
 	JS.GetJsRuntimeManager().AppendFunction("startsWith", func(str string, val string) bool {
 		return strings.HasPrefix(str, val)
 	})
@@ -363,6 +368,9 @@ func (this *Server) Start() {
 		return strings.ToUpper(str[0:1]) + str[1:]
 	})
 
+	////////////////////////////////////////////////////////////////////////////
+	// Timeout/Interval
+	////////////////////////////////////////////////////////////////////////////
 	JS.GetJsRuntimeManager().AppendFunction("setInterval", func(callback string, interval int64) string {
 		// The intetifier of the function.
 		intervalInfo := new(IntervalInfo)
@@ -376,8 +384,25 @@ func (this *Server) Start() {
 		return intervalInfo.uuid
 	})
 
-	JS.GetJsRuntimeManager().AppendFunction("clearInterval", func(interval string) {
-		GetServer().clearInterval <- interval
+	JS.GetJsRuntimeManager().AppendFunction("clearInterval", func(uuid string) {
+		GetServer().clearInterval <- uuid
+	})
+
+	JS.GetJsRuntimeManager().AppendFunction("setTimeout", func(callback string, timeout int64) string {
+		// The intetifier of the function.
+		intervalInfo := new(IntervalInfo)
+		intervalInfo.uuid = Utility.RandomUUID()
+		intervalInfo.callback = callback
+		intervalInfo.timer = time.NewTimer(time.Duration(timeout) * time.Millisecond)
+
+		// Set the interval info.
+		GetServer().setInterval <- intervalInfo
+
+		return intervalInfo.uuid
+	})
+
+	JS.GetJsRuntimeManager().AppendFunction("clearTimeout", func(uuid string) {
+		GetServer().clearInterval <- uuid
 	})
 
 	////////////////////////////////////////////////////////////////////////////
@@ -542,9 +567,15 @@ func (this *Server) Start() {
 				params[0] = *errStr
 				params[1] = caller
 				// run the error callback.
-				for k, v := range GetServer().subConnectionIds {
-					if Utility.Contains(v, subConnectionId) {
-						JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
+				if errMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), "", errorCallback, params)
+				} else {
+					// run the error callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
+						}
 					}
 				}
 			}
@@ -581,9 +612,16 @@ func (this *Server) Start() {
 				params[1] = caller
 
 				// run the success callback.
-				for k, v := range GetServer().subConnectionIds {
-					if Utility.Contains(v, subConnectionId) {
-						JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
+				if rspMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), "", successCallback, params)
+				} else {
+					// run the success callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							// Todo test if the subconnection id is equal to (to)
+							JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
+						}
 					}
 				}
 			}
@@ -598,9 +636,15 @@ func (this *Server) Start() {
 				params[1] = caller
 
 				// run the error callback.
-				for k, v := range GetServer().subConnectionIds {
-					if Utility.Contains(v, subConnectionId) {
-						JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
+				if errMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), "", errorCallback, params)
+				} else {
+					// run the error callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
+						}
 					}
 				}
 			}
@@ -612,6 +656,303 @@ func (this *Server) Start() {
 			GetServer().GetProcessor().m_sendRequest <- rqst
 		}(rqst)
 
+	})
+
+	/**
+	 * Set a executeVbSrcript message to the other end connection...
+	 */
+	JS.GetJsRuntimeManager().AppendFunction("executeVbSrcript", func(scriptName string, args []string, successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
+		id := Utility.RandomUUID()
+		method := "ExecuteVbScript"
+		params := make([]*MessageData, 0)
+
+		param0 := new(MessageData)
+		param0.Name = "scriptName"
+		param0.Value = scriptName
+
+		param1 := new(MessageData)
+		param1.Name = "args"
+		param1.TYPENAME = "[]string"
+		param1.Value = args
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+
+		to := make([]connection, 1)
+		to[0] = GetServer().getConnectionById(subConnectionId)
+
+		// The success callback.
+		successCallback_ := func(successCallback string, subConnectionId string) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+
+				// So here i will get the message value...
+				result := string(rspMsg.msg.Rsp.Results[0].DataBytes)
+				params := make([]interface{}, 2)
+				params[0] = result
+				params[1] = caller
+				log.Println("---------> success: ", result)
+				// run the success callback.
+				if rspMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), "", successCallback, params)
+				} else {
+					// run the success callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							// Todo test if the subconnection id is equal to (to)
+							JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
+						}
+					}
+				}
+			}
+		}(successCallback, subConnectionId)
+
+		// The error callback.
+		errorCallback_ := func(errorCallback string, subConnectionId string) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				errStr := errMsg.msg.Err.Message
+				params := make([]interface{}, 2)
+				params[0] = *errStr
+				params[1] = caller
+
+				// run the error callback.
+				if errMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), "", errorCallback, params)
+				} else {
+					// run the error callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
+						}
+					}
+				}
+			}
+		}(errorCallback, subConnectionId)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+	})
+
+	/**
+	 * Execute external command on the server.
+	 */
+	JS.GetJsRuntimeManager().AppendFunction("runCmd", func(scriptName string, args []string, successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
+		id := Utility.RandomUUID()
+		method := "RunCmd"
+		params := make([]*MessageData, 0)
+
+		param0 := new(MessageData)
+		param0.Name = "scriptName"
+		param0.Value = scriptName
+
+		param1 := new(MessageData)
+		param1.Name = "args"
+		param1.Value = args
+
+		// Append the params.
+		params = append(params, param0)
+		params = append(params, param1)
+
+		to := make([]connection, 1)
+		to[0] = GetServer().getConnectionById(subConnectionId)
+
+		// The success callback.
+		successCallback_ := func(successCallback string, subConnectionId string) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+
+				// So here i will get the message value...
+				result := string(rspMsg.msg.Rsp.Results[0].DataBytes)
+				params := make([]interface{}, 2)
+				params[0] = result
+				params[1] = caller
+
+				// run the success callback.
+				if rspMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), "", successCallback, params)
+				} else {
+					// run the success callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							// Todo test if the subconnection id is equal to (to)
+							JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
+						}
+					}
+				}
+			}
+		}(successCallback, subConnectionId)
+
+		// The error callback.
+		errorCallback_ := func(errorCallback string, subConnectionId string) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				errStr := errMsg.msg.Err.Message
+				params := make([]interface{}, 2)
+				params[0] = *errStr
+				params[1] = caller
+
+				// run the error callback.
+				if errMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), "", errorCallback, params)
+				} else {
+					// run the error callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
+						}
+					}
+				}
+			}
+		}(errorCallback, subConnectionId)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+	})
+
+	/**
+	 * Get the list of services and their respective source code. The code
+	 * permit to get access to service remote actions.
+	 * @param {function} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+	 * @param {function} errorCallback In case of error.
+	 * @param {object} caller A place to store object from the request context and get it back from the response context.
+	 */
+	JS.GetJsRuntimeManager().AppendFunction("getServicesClientCode", func(successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
+		id := Utility.RandomUUID()
+		method := "GetServicesClientCode"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = GetServer().getConnectionById(subConnectionId)
+
+		// The success callback.
+		successCallback_ := func(successCallback string, subConnectionId string) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+
+				// So here i will get the message value...
+				result := string(rspMsg.msg.Rsp.Results[0].DataBytes)
+				params := make([]interface{}, 2)
+				params[0] = result
+				params[1] = caller
+
+				// run the success callback.
+				if rspMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), "", successCallback, params)
+				} else {
+					// run the success callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							// Todo test if the subconnection id is equal to (to)
+							JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
+						}
+					}
+				}
+			}
+		}(successCallback, subConnectionId)
+
+		// The error callback.
+		errorCallback_ := func(errorCallback string, subConnectionId string) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				errStr := errMsg.msg.Err.Message
+				params := make([]interface{}, 2)
+				params[0] = *errStr
+				params[1] = caller
+
+				// run the error callback.
+				if errMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), "", errorCallback, params)
+				} else {
+					// run the error callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
+						}
+					}
+				}
+			}
+		}(errorCallback, subConnectionId)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
+
+	})
+
+	JS.GetJsRuntimeManager().AppendFunction("stop", func(successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
+		id := Utility.RandomUUID()
+		method := "Stop"
+		params := make([]*MessageData, 0)
+
+		to := make([]connection, 1)
+		to[0] = GetServer().getConnectionById(subConnectionId)
+
+		// The success callback.
+		successCallback_ := func(successCallback string, subConnectionId string) func(*message, interface{}) {
+			return func(rspMsg *message, caller interface{}) {
+
+				// So here i will get the message value...
+				result := string(rspMsg.msg.Rsp.Results[0].DataBytes)
+				params := make([]interface{}, 2)
+				params[0] = result
+				params[1] = caller
+
+				// run the success callback.
+				if rspMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), "", successCallback, params)
+				} else {
+					// run the success callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							// Todo test if the subconnection id is equal to (to)
+							JS.GetJsRuntimeManager().ExecuteJsFunction(rspMsg.GetId(), k, successCallback, params)
+						}
+					}
+				}
+			}
+		}(successCallback, subConnectionId)
+
+		// The error callback.
+		errorCallback_ := func(errorCallback string, subConnectionId string) func(*message, interface{}) {
+			return func(errMsg *message, caller interface{}) {
+				errStr := errMsg.msg.Err.Message
+				params := make([]interface{}, 2)
+				params[0] = *errStr
+				params[1] = caller
+
+				// run the error callback.
+				if errMsg.from == nil {
+					// Here it's a request from a local JS script.
+					JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), "", errorCallback, params)
+				} else {
+					// run the error callback.
+					for k, v := range GetServer().subConnectionIds {
+						if Utility.Contains(v, subConnectionId) {
+							JS.GetJsRuntimeManager().ExecuteJsFunction(errMsg.GetId(), k, errorCallback, params)
+						}
+					}
+				}
+			}
+		}(errorCallback, subConnectionId)
+
+		rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, caller)
+
+		go func(rqst *message) {
+			GetServer().GetProcessor().m_sendRequest <- rqst
+		}(rqst)
 	})
 
 	/**
@@ -739,12 +1080,22 @@ func (this *Server) Start() {
 					_, err := JS.GetJsRuntimeManager().RunScript("", "var "+functionName+"="+intervalInfo.callback)
 					// I must run the script one and at interval after it...
 					if err == nil {
-						for t := range intervalInfo.ticker.C {
-							// So here I will call the callback.
-							// The callback contain unamed function...
+						if intervalInfo.ticker != nil {
+							// setInterval function.
+							for t := range intervalInfo.ticker.C {
+								// So here I will call the callback.
+								// The callback contain unamed function...
+								_, err := JS.GetJsRuntimeManager().RunScript("", functionName+"()")
+								if err != nil {
+									log.Println("---> Run interval callback error: ", err, t)
+								}
+							}
+						} else if intervalInfo.timer != nil {
+							// setTimeout function
+							<-intervalInfo.timer.C
 							_, err := JS.GetJsRuntimeManager().RunScript("", functionName+"()")
 							if err != nil {
-								log.Println("---> Run interval callback error: ", err, t)
+								log.Println("---> Run timeout callback error: ", err)
 							}
 						}
 					} else {
@@ -755,9 +1106,15 @@ func (this *Server) Start() {
 
 			case uuid := <-GetServer().clearInterval:
 				intervalInfo := GetServer().intervals[uuid]
-				intervalInfo.ticker.Stop()
+				if intervalInfo.ticker != nil {
+					intervalInfo.ticker.Stop()
+				} else if intervalInfo.timer != nil {
+					intervalInfo.timer.Stop()
+				}
+				// Remove the interval/timeout information.
+				delete(GetServer().intervals, uuid)
 			default:
-				time.Sleep(1 * time.Millisecond)
+				time.Sleep(1 * time.Microsecond)
 			}
 		}
 	}()
