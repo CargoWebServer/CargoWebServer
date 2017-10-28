@@ -52,13 +52,15 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
     this.superTypes = this.panel.getChildById("superTypes")
 
     this.restrictions = this.panel
-        .appendElement({ "tag": "div", "style": "display: table;" }).down()
+        .appendElement({ "tag": "div", "style": "display: none;", "id": "append_restriction_panel" }).down()
         .appendElement({ "tag": "span", "innerHtml": "Restrictions" })
         .appendElement({ "tag": "div", "class": "entities_btn", "style": "diplay: inline;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-plus" }).up().up()
         .appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
-        .appendElement({ "tag": "div", "style": "display: block; width: 100%;height: 150px;min-width: 200px; overflow-y: auto; border: 1px solid grey;" }).down()
+        .appendElement({ "tag": "div", "style": "display: none; width: 100%;height: 150px;min-width: 200px; overflow-y: auto; border: 1px solid grey;" }).down()
         .appendElement({ "tag": "div", "style": "display: table; width: 100%; " }).down()
+
+    this.appendRestrictionPanel = this.panel.getChildById("append_restriction_panel")
 
     // The propetie panel.
     this.properties = this.panel.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "innerHtml": "Properties" })
@@ -174,27 +176,31 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
     }
 
     function setTypeNameInputAutocomplete(panel) {
-        for (var i = 0; i < panel.imports.length; i++) {
-            var lst = []
-            server.entityManager.getEntityPrototypes(panel.imports[i],
+
+        var callback = function (panel, lst, index, total, callback) {
+            server.entityManager.getEntityPrototypes(panel.imports[index],
                 function (results, caller) {
                     // Now I will create the list of possible type...
-                    var lst = caller.lst
-
-                    for (var i = 0; i < results.length; i++) {
-                        lst.push(results[i].TypeName)
+                    for (var i = 0; i < results.length - 1; i++) {
+                        caller.lst.push(results[i].TypeName)
                     }
 
                     // Now I will set the autocomplete box.
-                    if (caller.isDone) {
+                    if (caller.index == caller.total - 1) {
+                        caller.lst.sort()
                         setAutocompleteDynamicType(caller.panel)
+                    } else {
+                        caller.callback(caller.panel, caller.lst, caller.index + 1, caller.total, caller.callback)
                     }
                 },
                 function (errObj, caller) {
 
                 },
-                { "panel": panel, "lst": panel.typeNameLst, "isDone": i == panel.imports.length - 1 })
+                { "panel": panel, "lst": lst, "index": index, "total": total, "callback": callback })
         }
+
+        // recusively append data type until all is done.
+        callback(panel, panel.typeNameLst, 0, panel.imports.length, callback)
     }
 
     setTypeNameInputAutocomplete(this)
@@ -301,7 +307,12 @@ EntityPrototypeEditor.prototype.setCurrentPrototype = function (prototype) {
             EntityPrototypeEditor.deleteBtn.element.style.display = "table-cell"
 
             // Now I will display the item restrictions.
-            EntityPrototypeEditor.displayPrototypeRestrictions(prototype)
+            var baseType = getBaseTypeExtension(prototype.TypeName)
+            // Only base type derived prototype can have restrictions.
+            if (isXsBaseType(baseType)) {
+                EntityPrototypeEditor.appendRestrictionPanel.element.style.display = "table"
+                EntityPrototypeEditor.displayPrototypeRestrictions(prototype)
+            }
         }
     }(this))
 }
@@ -373,25 +384,28 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
                                     return function () {
                                         // Recursively append all surpertype to a given prototype.
                                         function appendSuperPrototype(prototype, superPrototype, callback) {
-
-                                            for (var i = superPrototype.SuperTypeNames.length - 1; i >= 0; i--) {
-                                                server.entityManager.getEntityPrototype(superPrototype.SuperTypeNames[i], superPrototype.SuperTypeNames[i].split(".")[0],
+                                            var callback_ = function (prototype, superPrototype, index, total, callback, callback_) {
+                                                server.entityManager.getEntityPrototype(superPrototype.SuperTypeNames[index], superPrototype.SuperTypeNames[index].split(".")[0],
                                                     function (result, caller) {
                                                         // recursively append the prototype.
                                                         if (caller.prototype.SuperTypeNames.indexOf(result.TypeName) == -1 && caller.prototype.TypeName != result.TypeName) {
                                                             appendSuperPrototype(caller.prototype, result, caller.callback, caller.done)
                                                         }
-                                                        if (caller.done) {
+                                                        if (caller.index == caller.total - 1) {
                                                             if (caller.prototype.SuperTypeNames.indexOf(caller.superPrototype.TypeName) == -1) {
                                                                 caller.prototype.SuperTypeNames.push(caller.superPrototype.TypeName)
                                                             }
                                                             caller.callback(caller.prototype)
+                                                        }else{
+                                                            caller.callback_(caller.prototype, caller.superPrototype, caller.index + 1, caller.total, caller.callback, caller.callback_)
                                                         }
                                                     },
                                                     function (errObj, caller) {
 
-                                                    }, { "prototype": prototype, "callback": callback, "superPrototype": superPrototype, "done": i == superPrototype.SuperTypeNames.length - 1 })
+                                                    }, { "prototype": prototype, "superPrototype": superPrototype, "index": index, "total": superPrototype.SuperTypeNames.length, "callback":callback, "callback_":callback_})
                                             }
+                                            // call for each super
+                                            callback_(prototype, superPrototype, 0, callback, callback_)
 
                                             if (prototype.SuperTypeNames.indexOf(superPrototype.TypeName) == -1) {
                                                 prototype.SuperTypeNames.push(superPrototype.TypeName)
@@ -416,7 +430,6 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
         }
 
         // In the case of no surpertype exist...
-
         if (prototype.SuperTypeNames.length == 0) {
             callback(prototype)
         }
@@ -820,8 +833,11 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
  * Display the prototype restrictions if there's one...
  */
 EntityPrototypeEditor.prototype.displayPrototypeRestrictions = function (prototype) {
+
     if (prototype.Restrictions != null) {
+        this.restrictions.removeAllChilds()
         for (var i = 0; i < prototype.Restrictions.length; i++) {
+            this.restrictions.element.parentNode.style.display = "block"
             var restriction = prototype.Restrictions[i]
             // Enumeration restriction.
             var restrictionType = ""
@@ -852,7 +868,7 @@ EntityPrototypeEditor.prototype.displayPrototypeRestrictions = function (prototy
             }
 
             // The restriction row.
-            var restrictionPanel = this.restrictions.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+            var restrictionPanel = this.restrictions.appendElement({ "tag": "div", "style": "display: table-row;", "id": prototype.TypeName + "_restriction_" + restriction.Value }).down()
             var removeRestrictionBtn = restrictionPanel
                 .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": restriction.Value })
                 .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": restrictionType })
@@ -864,15 +880,15 @@ EntityPrototypeEditor.prototype.displayPrototypeRestrictions = function (prototy
                 return function () {
                     var restrictions = []
                     var needSave = false
-                    for(var i=0; i < prototype.Restrictions.length; i++){
-                        if(prototype.Restrictions[i].Value != restriction.Value){
+                    for (var i = 0; i < prototype.Restrictions.length; i++) {
+                        if (prototype.Restrictions[i].Value != restriction.Value) {
                             restrictions.push(prototype.Restrictions[i])
-                        }else{
+                        } else {
                             needSave = true
                         }
                     }
 
-                    if(needSave){
+                    if (needSave) {
                         saveBtn.element.style.display = "table-cell"
                         prototype.Restrictions = restrictions
                         restrictionPanel.element.parentNode.removeChild(restrictionPanel.element)
@@ -882,6 +898,8 @@ EntityPrototypeEditor.prototype.displayPrototypeRestrictions = function (prototy
             }(prototype, restriction, restrictionPanel, this.saveBtn)
 
         }
+    } else {
+        this.restrictions.element.parentNode.style.display = "none"
     }
 }
 

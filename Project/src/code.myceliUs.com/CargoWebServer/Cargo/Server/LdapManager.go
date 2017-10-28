@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 
 	"code.myceliUs.com/Utility"
 
@@ -72,7 +73,6 @@ func (this *LdapManager) start() {
 
 	// configure all information from the servers...
 	for _, info := range this.getConfigsInfo() {
-
 		// Synchronize the list of user...
 		err := this.synchronizeUsers(info.M_id)
 		if err != nil {
@@ -148,10 +148,8 @@ func (this *LdapManager) getLdapGroupMembers(id string, groupId string) ([]strin
 
 			if attributes[j] == "sAMAccountName" {
 				userId := row[j].(string)
-				//if strings.HasPrefix(userId, "mm") == true || strings.HasPrefix(userId, "mtmx") == true || strings.HasPrefix(userId, "mrmfct") == true {
 				// Save user from ldap directory to the database...
 				members = append(members, userId)
-				//}
 			}
 		}
 	}
@@ -166,10 +164,14 @@ func (this *LdapManager) connect(id string, userId string, psswd string) (*LDAP.
 	ldapConfigInfo := this.getConfigsInfo()[id]
 
 	conn := LDAP.NewLDAPConnection(ldapConfigInfo.M_ipv4, uint16(ldapConfigInfo.M_port))
+	conn.NetworkConnectTimeout = time.Duration(3 * time.Second)
+	conn.AbandonMessageOnReadTimeout = true
 	err := conn.Connect()
+
 	if err != nil {
 		// handle error
-		log.Println("Cannot open the connection: ", ldapConfigInfo.M_hostName)
+		log.Println("---> Cannot open the connection: ", ldapConfigInfo.M_hostName, err)
+		return nil, err
 	}
 
 	// Connect with the default user...
@@ -206,7 +208,7 @@ func (this *LdapManager) search(id string, login string, psswd string, base_dn s
 	}
 
 	// The connection will be close latter...
-	defer conn.Close()
+	defer conn.Close() // Close the connection after the request.
 
 	if len(base_dn) == 0 {
 		// Set to default base here...
