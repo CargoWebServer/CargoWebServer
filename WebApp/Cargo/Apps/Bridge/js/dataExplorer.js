@@ -17,24 +17,24 @@ var DataExplorer = function (parent) {
         }(this), true);
 
     // That contain the map of data aready loaded.
-    this.shemasView = {}
+    this.schemasView = {}
     this.prototypesView = {}
     this.configs = {}
     this.newPrototypeBtn = null
-    this.storeId = ""
-
+   
     // I will connect the view to the events.
     // New prototype event
     server.prototypeManager.attach(this, NewPrototypeEvent, function (evt, dataExplorer) {
-        // generatePrototypesView = function (storeId, prototypes)
-        if (evt.dataMap.prototype.TypeName.startsWith(dataExplorer.storeId)) {
-            dataExplorer.prototypesView[evt.dataMap.prototype.TypeName] = new PrototypeTreeView(dataExplorer.shemasView[dataExplorer.storeId], evt.dataMap.prototype)
+        var storeId = evt.dataMap.prototype.TypeName.split(".")[0]
+        if (dataExplorer.schemasView[storeId] != undefined) {
+            dataExplorer.prototypesView[evt.dataMap.prototype.TypeName] = new PrototypeTreeView(dataExplorer.schemasView[storeId], evt.dataMap.prototype)
         }
     })
 
     // Delete prototype event.
     server.prototypeManager.attach(this, DeletePrototypeEvent, function (evt, dataExplorer) {
-        if (evt.dataMap.prototype.TypeName.startsWith(dataExplorer.storeId)) {
+        var storeId = evt.dataMap.prototype.TypeName.split(".")[0]
+        if (dataExplorer.schemasView[storeId] != undefined) {
             var treeView = dataExplorer.prototypesView[evt.dataMap.prototype.TypeName]
             treeView.panel.element.parentNode.removeChild(treeView.panel.element)
             delete dataExplorer.prototypesView[evt.dataMap.prototype.TypeName]
@@ -60,11 +60,11 @@ DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
 
     this.storeId = storeConfig.M_id
     this.configs[storeConfig.M_id] = storeConfig
-    this.shemasView[storeConfig.M_id] = new Element(this.panel, { "tag": "div", "class": "shemas_view" })
+    this.schemasView[storeConfig.M_id] = new Element(this.panel, { "tag": "div", "class": "shemas_view" })
 
     // Only display the first panel at first.
-    if (Object.keys(this.shemasView).length > 1) {
-        this.shemasView[storeConfig.M_id].element.style.display = "none"
+    if (Object.keys(this.schemasView).length > 1) {
+        this.schemasView[storeConfig.M_id].element.style.display = "none"
     }
 
     // So here I will get the list of all prototype from a give store and
@@ -110,7 +110,7 @@ DataExplorer.prototype.initDataSchema = function (storeConfig, initCallback) {
  */
 DataExplorer.prototype.generatePrototypesView = function (storeId, prototypes) {
     // I will append the append prototype...
-    this.newPrototypeBtn = this.shemasView[storeId].appendElement({ "tag": "div", "class": "", "style": "display:block; color: #657383; position: absolute; top:0px;  top: 5px; right: 10px;" }).down()
+    this.newPrototypeBtn = this.schemasView[storeId].appendElement({ "tag": "div", "class": "", "style": "display:block; color: #657383; position: absolute; top:0px;  top: 5px; right: 10px;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
 
     // Mouse enter and leave actions...
@@ -185,7 +185,7 @@ DataExplorer.prototype.generatePrototypesView = function (storeId, prototypes) {
     for (var i = 0; i < prototypes.length; i++) {
         // Here I will append the prototype name...
         if (this.prototypesView[prototypes[i].TypeName] == undefined) {
-            this.prototypesView[prototypes[i].TypeName] = new PrototypeTreeView(this.shemasView[storeId], prototypes[i], this.configs[storeId].M_dataStoreType)
+            this.prototypesView[prototypes[i].TypeName] = new PrototypeTreeView(this.schemasView[storeId], prototypes[i], this.configs[storeId].M_dataStoreType)
         }
     }
 }
@@ -198,11 +198,11 @@ DataExplorer.prototype.setDataSchema = function (storeId) {
     // here I will calculate the height...
     this.resize()
 
-    for (var id in this.shemasView) {
-        this.shemasView[id].element.style.display = "none"
+    for (var id in this.schemasView) {
+        this.schemasView[id].element.style.display = "none"
     }
-    if (this.shemasView[storeId] != undefined) {
-        this.shemasView[storeId].element.style.display = ""
+    if (this.schemasView[storeId] != undefined) {
+        this.schemasView[storeId].element.style.display = ""
     }
 }
 
@@ -212,8 +212,8 @@ DataExplorer.prototype.setDataSchema = function (storeId) {
 DataExplorer.prototype.hidePanels = function (storeId) {
 
     // here I will calculate the height...
-    for (var id in this.shemasView) {
-        this.shemasView[id].element.style.display = "none"
+    for (var id in this.schemasView) {
+        this.schemasView[id].element.style.display = "none"
     }
 }
 
@@ -222,15 +222,15 @@ DataExplorer.prototype.hidePanels = function (storeId) {
  */
 DataExplorer.prototype.hidePanel = function (storeId) {
     // here I will calculate the height...
-    this.shemasView[storeId].element.style.display = "none"
+    this.schemasView[storeId].element.style.display = "none"
 }
 
 /**
  * Show a given data panel.
  */
 DataExplorer.prototype.showPanel = function (storeId) {
-    if (this.shemasView[storeId] != undefined) {
-        this.shemasView[storeId].element.style.display = ""
+    if (this.schemasView[storeId] != undefined) {
+        this.schemasView[storeId].element.style.display = ""
     } else {
         // I will get the list of prototypes and 
         this.initDataSchema(storeId, function (dataExplorer, storeId) {
@@ -247,11 +247,11 @@ DataExplorer.prototype.showPanel = function (storeId) {
 DataExplorer.prototype.removeDataSchema = function (storeId) {
 
     // here I will calculate the height...
-    for (var id in this.shemasView) {
-        this.shemasView[id].element.style.display = "none"
-        if (this.shemasView[id] == storeId) {
-            this.shemasView[storeId].element.parentNode.removeChild(this.shemasView[storeId].element)
-            delete this.shemasView[storeId]
+    for (var id in this.schemasView) {
+        this.schemasView[id].element.style.display = "none"
+        if (this.schemasView[id] == storeId) {
+            this.schemasView[storeId].element.parentNode.removeChild(this.schemasView[storeId].element)
+            delete this.schemasView[storeId]
         }
     }
 

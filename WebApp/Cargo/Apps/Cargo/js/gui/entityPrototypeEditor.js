@@ -53,14 +53,26 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
 
     this.restrictions = this.panel
         .appendElement({ "tag": "div", "style": "display: none;", "id": "append_restriction_panel" }).down()
-        .appendElement({ "tag": "span", "innerHtml": "Restrictions" })
-        .appendElement({ "tag": "div", "class": "entities_btn", "style": "diplay: inline;" }).down()
-        .appendElement({ "tag": "i", "class": "fa fa-plus" }).up().up()
+        .appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;" }).down()
+        .appendElement({ "tag": "span", "innerHtml": "Restrictions" }).up()
+        .appendElement({ "tag": "div", "class": "entities_btn", "style": "diplay: table-cell;" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-plus", "id": "append_restiction_btn" }).up()
+        .appendElement({ "tag": "div", "style": "display: table;", "id": "restriction_edit_panel" }).up()
         .appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
         .appendElement({ "tag": "div", "style": "display: none; width: 100%;height: 150px;min-width: 200px; overflow-y: auto; border: 1px solid grey;" }).down()
         .appendElement({ "tag": "div", "style": "display: table; width: 100%; " }).down()
 
+    this.restrictionEditPanel = this.panel.getChildById("restriction_edit_panel")
+
     this.appendRestrictionPanel = this.panel.getChildById("append_restriction_panel")
+    this.appendRestrictionBtn = this.panel.getChildById("append_restiction_btn")
+
+    this.appendRestrictionBtn.element.onclick = function (entityPrototypeEditor) {
+        return function () {
+            this.style.display = "none" // one restriction at time.
+            entityPrototypeEditor.appendRestriction()
+        }
+    }(this)
 
     // The propetie panel.
     this.properties = this.panel.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;", "innerHtml": "Properties" })
@@ -178,25 +190,30 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
     function setTypeNameInputAutocomplete(panel) {
 
         var callback = function (panel, lst, index, total, callback) {
-            server.entityManager.getEntityPrototypes(panel.imports[index],
-                function (results, caller) {
-                    // Now I will create the list of possible type...
-                    for (var i = 0; i < results.length - 1; i++) {
-                        caller.lst.push(results[i].TypeName)
-                    }
+            if (total > 0) {
+                server.entityManager.getEntityPrototypes(panel.imports[index],
+                    function (results, caller) {
+                        // Now I will create the list of possible type...
+                        for (var i = 0; i < results.length - 1; i++) {
+                            caller.lst.push(results[i].TypeName)
+                        }
 
-                    // Now I will set the autocomplete box.
-                    if (caller.index == caller.total - 1) {
-                        caller.lst.sort()
-                        setAutocompleteDynamicType(caller.panel)
-                    } else {
-                        caller.callback(caller.panel, caller.lst, caller.index + 1, caller.total, caller.callback)
-                    }
-                },
-                function (errObj, caller) {
+                        // Now I will set the autocomplete box.
+                        if (caller.index == caller.total - 1) {
+                            caller.lst.sort()
+                            setAutocompleteDynamicType(caller.panel)
+                        } else {
+                            caller.callback(caller.panel, caller.lst, caller.index + 1, caller.total, caller.callback)
+                        }
+                    },
+                    function (errObj, caller) {
 
-                },
-                { "panel": panel, "lst": lst, "index": index, "total": total, "callback": callback })
+                    },
+                    { "panel": panel, "lst": lst, "index": index, "total": total, "callback": callback })
+            } else {
+                // Call the callback.
+                callback(panel)
+            }
         }
 
         // recusively append data type until all is done.
@@ -311,6 +328,7 @@ EntityPrototypeEditor.prototype.setCurrentPrototype = function (prototype) {
             // Only base type derived prototype can have restrictions.
             if (isXsBaseType(baseType)) {
                 EntityPrototypeEditor.appendRestrictionPanel.element.style.display = "table"
+                EntityPrototypeEditor.restrictions.removeAllChilds()
                 EntityPrototypeEditor.displayPrototypeRestrictions(prototype)
             }
         }
@@ -385,32 +403,33 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
                                         // Recursively append all surpertype to a given prototype.
                                         function appendSuperPrototype(prototype, superPrototype, callback) {
                                             var callback_ = function (prototype, superPrototype, index, total, callback, callback_) {
-                                                server.entityManager.getEntityPrototype(superPrototype.SuperTypeNames[index], superPrototype.SuperTypeNames[index].split(".")[0],
-                                                    function (result, caller) {
-                                                        // recursively append the prototype.
-                                                        if (caller.prototype.SuperTypeNames.indexOf(result.TypeName) == -1 && caller.prototype.TypeName != result.TypeName) {
-                                                            appendSuperPrototype(caller.prototype, result, caller.callback, caller.done)
-                                                        }
-                                                        if (caller.index == caller.total - 1) {
-                                                            if (caller.prototype.SuperTypeNames.indexOf(caller.superPrototype.TypeName) == -1) {
-                                                                caller.prototype.SuperTypeNames.push(caller.superPrototype.TypeName)
+                                                if (superPrototype.SuperTypeNames.length > 0) {
+                                                    server.entityManager.getEntityPrototype(superPrototype.SuperTypeNames[index], superPrototype.SuperTypeNames[index].split(".")[0],
+                                                        function (result, caller) {
+                                                            // recursively append the prototype.
+                                                            if (caller.prototype.SuperTypeNames.indexOf(result.TypeName) == -1 && caller.prototype.TypeName != result.TypeName) {
+                                                                appendSuperPrototype(caller.prototype, result, caller.callback, caller.done)
                                                             }
-                                                            caller.callback(caller.prototype)
-                                                        }else{
-                                                            caller.callback_(caller.prototype, caller.superPrototype, caller.index + 1, caller.total, caller.callback, caller.callback_)
-                                                        }
-                                                    },
-                                                    function (errObj, caller) {
-
-                                                    }, { "prototype": prototype, "superPrototype": superPrototype, "index": index, "total": superPrototype.SuperTypeNames.length, "callback":callback, "callback_":callback_})
+                                                            if (caller.index == caller.total - 1) {
+                                                                if (caller.prototype.SuperTypeNames.indexOf(caller.superPrototype.TypeName) == -1) {
+                                                                    caller.prototype.SuperTypeNames.push(caller.superPrototype.TypeName)
+                                                                }
+                                                                caller.callback(caller.prototype)
+                                                            } else {
+                                                                caller.callback_(caller.prototype, caller.superPrototype, caller.index + 1, caller.total, caller.callback_, caller.callback)
+                                                            }
+                                                        },
+                                                        function (errObj, caller) {
+                                                        }, { "prototype": prototype, "superPrototype": superPrototype, "index": index, "total": superPrototype.SuperTypeNames.length, "callback": callback, "callback_": callback_ })
+                                                } else {
+                                                    if (prototype.SuperTypeNames.indexOf(superPrototype.TypeName) == -1) {
+                                                        prototype.SuperTypeNames.push(superPrototype.TypeName)
+                                                    }
+                                                    callback(prototype)
+                                                }
                                             }
                                             // call for each super
-                                            callback_(prototype, superPrototype, 0, callback, callback_)
-
-                                            if (prototype.SuperTypeNames.indexOf(superPrototype.TypeName) == -1) {
-                                                prototype.SuperTypeNames.push(superPrototype.TypeName)
-                                            }
-
+                                            callback_(prototype, superPrototype, 0, callback_, callback)
                                         }
 
                                         appendSuperPrototype(prototype, superPrototype, function (prototype, editor) {
@@ -492,22 +511,31 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
 
     // So here I will get the list of all supertype field.
     function getSuperTypesFields(superTypeNames, fields, callback) {
-        for (var i = 0; i < superTypeNames.length; i++) {
-            server.entityManager.getEntityPrototype(superTypeNames[i], superTypeNames[i].split(".")[0],
-                // success callback
-                function (result, caller) {
-                    caller.fields = caller.fields.concat(result.Fields)
-                    if (caller.done) {
-                        caller.callback(caller.fields)
-                    }
-                },
-                // error callback
-                function () {
+        var callback_ = function (superTypeNames, fields, index, total, callback, callback_) {
+            if (total > 0) {
+                server.entityManager.getEntityPrototype(superTypeNames[index], superTypeNames[index].split(".")[0],
+                    // success callback
+                    function (result, caller) {
+                        caller.fields = caller.fields.concat(result.Fields)
+                        if (caller.index == caller.total - 1) {
+                            caller.callback(caller.fields)
+                        } else {
+                            caller.callback_(caller.superTypeNames, caller.fields, caller.index + 1, caller.total, caller.callback, caller.callback_)
+                        }
+                    },
+                    // error callback
+                    function () {
 
-                },
-                // nothing to do here.
-                { "fields": fields, "callback": callback, "done": i == superTypeNames.length - 1 })
+                    },
+                    // nothing to do here.
+                    { "superTypeNames": superTypeNames, "fields": fields, "index": index, "total": total, "callback": callback, "callback_": callback_ })
+            } else {
+                fields = fields.concat(result.Fields)
+                callback(fields)
+            }
         }
+
+        callback_(superTypeNames, fields, 0, superTypeNames.length, callback, callback_)
     }
 
 
@@ -519,7 +547,7 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
         getSuperTypesFields(prototype.SuperTypeNames, superTypesFields,
             function (EntityPrototypeEditor, prototype, properties, isEditable) {
                 return function (superTypesFields) {
-                    for (var i = 3; i < prototype.Fields.length - 3; i++) {
+                    for (var i = 3; i < prototype.Fields.length - 2; i++) {
                         // display attributes
                         if (superTypesFields.indexOf(prototype.Fields[i]) == -1) {
                             // Here only if the propertie is part of the entity itself and not of one of it parent.
@@ -833,9 +861,13 @@ EntityPrototypeEditor.prototype.displayPrototypePropertie = function (prototype,
  * Display the prototype restrictions if there's one...
  */
 EntityPrototypeEditor.prototype.displayPrototypeRestrictions = function (prototype) {
-
+    for (var i = 0; i < prototype.SuperTypeNames.length; i++) {
+        // Also display parent restrictions.
+        var superType = getEntityPrototype(prototype.SuperTypeNames[i])
+        this.displayPrototypeRestrictions(superType)
+    }
+    // Here I will display the list of restriction.
     if (prototype.Restrictions != null) {
-        this.restrictions.removeAllChilds()
         for (var i = 0; i < prototype.Restrictions.length; i++) {
             this.restrictions.element.parentNode.style.display = "block"
             var restriction = prototype.Restrictions[i]
@@ -868,38 +900,115 @@ EntityPrototypeEditor.prototype.displayPrototypeRestrictions = function (prototy
             }
 
             // The restriction row.
-            var restrictionPanel = this.restrictions.appendElement({ "tag": "div", "style": "display: table-row;", "id": prototype.TypeName + "_restriction_" + restriction.Value }).down()
-            var removeRestrictionBtn = restrictionPanel
-                .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": restriction.Value })
-                .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": restrictionType })
-                .appendElement({ "tag": "div", "class": "entities_btn", "style": "text-align: right;" }).down()
-                .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
+            var restrictionPanel = this.restrictions.getChildById(prototype.TypeName + "_restriction_" + restriction.Value)
+            if (this.restrictions.getChildById(prototype.TypeName + "_restriction_" + restriction.Value) == undefined) {
+                restrictionPanel = this.restrictions.appendElement({ "tag": "div", "style": "display: table-row;", "id": prototype.TypeName + "_restriction_" + restriction.Value }).down()
 
-            // The remove restriction button.
-            removeRestrictionBtn.element.onclick = function (prototype, restriction, restrictionPanel, saveBtn) {
-                return function () {
-                    var restrictions = []
-                    var needSave = false
-                    for (var i = 0; i < prototype.Restrictions.length; i++) {
-                        if (prototype.Restrictions[i].Value != restriction.Value) {
-                            restrictions.push(prototype.Restrictions[i])
-                        } else {
-                            needSave = true
+                var removeRestrictionBtn = restrictionPanel
+                    .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": restriction.Value })
+                    .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": restrictionType })
+                    .appendElement({ "tag": "div", "class": "entities_btn", "style": "text-align: right;" }).down()
+                    .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
+
+                // The remove restriction button.
+                removeRestrictionBtn.element.onclick = function (prototype, restriction, restrictionPanel, saveBtn) {
+                    return function () {
+                        var restrictions = []
+                        var needSave = false
+                        for (var i = 0; i < prototype.Restrictions.length; i++) {
+                            if (prototype.Restrictions[i].Value != restriction.Value) {
+                                restrictions.push(prototype.Restrictions[i])
+                            } else {
+                                needSave = true
+                            }
                         }
-                    }
 
-                    if (needSave) {
-                        saveBtn.element.style.display = "table-cell"
-                        prototype.Restrictions = restrictions
-                        restrictionPanel.element.parentNode.removeChild(restrictionPanel.element)
+                        if (needSave) {
+                            saveBtn.element.style.display = "table-cell"
+                            prototype.Restrictions = restrictions
+                            restrictionPanel.element.parentNode.removeChild(restrictionPanel.element)
+                        }
+                        console.log("Remove " + restriction.Value + " from " + prototype.TypeName)
                     }
-                    console.log("Remove " + restriction.Value + " from " + prototype.TypeName)
-                }
-            }(prototype, restriction, restrictionPanel, this.saveBtn)
+                }(prototype, restriction, restrictionPanel, this.saveBtn)
+            }
 
         }
     } else {
         this.restrictions.element.parentNode.style.display = "none"
+    }
+}
+
+/**
+ * Append a new restriction in the list of restriction.
+ */
+EntityPrototypeEditor.prototype.appendRestriction = function () {
+    var prototype = this.getCurrentEntityPrototype()
+    this.displayPrototypeRestrictions(prototype)
+    if (prototype.Restrictions != null) {
+        this.restrictions.element.parentNode.style.display = "block"
+
+        // Now I will append the restriction value input.
+        var restrictionsValueInput = this.restrictionEditPanel.appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;" }).down()
+            .appendElement({ "tag": "input" }).down()
+
+        // Now the restriction type selector.
+        var restrictionsTypeSelect = this.restrictionEditPanel.appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;" }).down()
+            .appendElement({ "tag": "select" }).down()
+
+        // Now the buttons.
+        var restrictionBtns = this.restrictionEditPanel.appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+
+        var appendRestrictionBtn = restrictionBtns.appendElement({ "tag": "div", "class": "entities_btn" }).down()
+            .appendElement({ "tag": "i", "class": "fa fa-check" }).down()
+
+        var cancelRestrictionBtn = restrictionBtns.appendElement({ "tag": "div", "class": "entities_btn" }).down()
+            .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
+
+
+        // Now I will appdend the restriction type options.
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 1, "innerHtml": "enumeration" })
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 2, "innerHtml": "fraction digits" })
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 3, "innerHtml": "length" })
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 4, "innerHtml": "max exclusive" })
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 5, "innerHtml": "max inclusive" })
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 6, "innerHtml": "max length" })
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 7, "innerHtml": "min exclusive" })
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 8, "innerHtml": "min inclusive" })
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 9, "innerHtml": "min length" })
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 10, "innerHtml": "pattern" })
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 11, "innerHtml": "total digits" })
+        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 12, "innerHtml": "white space" })
+
+        // Set the focus to the input.
+        restrictionsValueInput.element.focus()
+
+        // Now the action...
+        cancelRestrictionBtn.element.onclick = function (restrictionEditPanel, appendRestrictionBtn) {
+            return function () {
+                restrictionEditPanel.removeAllChilds()
+                appendRestrictionBtn.element.style.display = ""
+            }
+        }(this.restrictionEditPanel, this.appendRestrictionBtn)
+
+        appendRestrictionBtn.element.onclick = function (prototype, value, type, restrictionEditPanel, appendRestrictionBtn, entityPrototypeEditor) {
+            return function () {
+                // create the new resctriction.
+                var restriction = { "TYPENAME": "Server.Restriction", "Type": type.element.value, "Value": value.element.value }
+                if (prototype.Restrictions == undefined) {
+                    prototype.Restrictions = []
+                }
+                prototype.Restrictions.push(restriction)
+
+                // Refresh the restriction.
+                entityPrototypeEditor.displayPrototypeRestrictions(prototype)
+                entityPrototypeEditor.saveBtn.element.style.display = "block"
+
+                // So here I will append the new restriction.
+                restrictionEditPanel.removeAllChilds()
+                appendRestrictionBtn.element.style.display = ""
+            }
+        }(prototype, restrictionsValueInput, restrictionsTypeSelect, this.restrictionEditPanel, this.appendRestrictionBtn, this)
     }
 }
 

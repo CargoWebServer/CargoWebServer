@@ -1123,26 +1123,31 @@ func (this *DynamicEntity) RemoveChild(name string, uuid string) {
 	this.childsPtr = childsPtr
 
 	// Now I will remove it's value in the object...
-	filedType := this.prototype.FieldsType[this.prototype.getFieldIndex(name)]
-	isArray := strings.HasPrefix(filedType, "[]")
-	if isArray {
-		childs := make([]map[string]interface{}, 0)
-		if reflect.TypeOf(this.getValue(name)).String() == "[]map[string]interface {}" {
-			for i := 0; i < len(this.getValue(name).([]map[string]interface{})); i++ {
-				if uuid != this.getValue(name).([]map[string]interface{})[i]["UUID"] {
-					childs = append(childs, this.getValue(name).([]map[string]interface{})[i])
+	fieldIndex := this.prototype.getFieldIndex(name)
+	if fieldIndex > -1 {
+		filedType := this.prototype.FieldsType[this.prototype.getFieldIndex(name)]
+		isArray := strings.HasPrefix(filedType, "[]")
+		if isArray {
+			childs := make([]map[string]interface{}, 0)
+			if reflect.TypeOf(this.getValue(name)).String() == "[]map[string]interface {}" {
+				for i := 0; i < len(this.getValue(name).([]map[string]interface{})); i++ {
+					if uuid != this.getValue(name).([]map[string]interface{})[i]["UUID"] {
+						childs = append(childs, this.getValue(name).([]map[string]interface{})[i])
+					}
+				}
+			} else if reflect.TypeOf(this.getValue(name)).String() == "[]interface {}" {
+				for i := 0; i < len(this.getValue(name).([]interface{})); i++ {
+					if uuid != this.getValue(name).([]interface{})[i].(map[string]interface{})["UUID"] {
+						childs = append(childs, this.getValue(name).([]interface{})[i].(map[string]interface{}))
+					}
 				}
 			}
-		} else if reflect.TypeOf(this.getValue(name)).String() == "[]interface {}" {
-			for i := 0; i < len(this.getValue(name).([]interface{})); i++ {
-				if uuid != this.getValue(name).([]interface{})[i].(map[string]interface{})["UUID"] {
-					childs = append(childs, this.getValue(name).([]interface{})[i].(map[string]interface{}))
-				}
-			}
+			this.setValue(name, childs)
+		} else {
+			this.deleteValue(name)
 		}
-		this.setValue(name, childs)
 	} else {
-		this.deleteValue(name)
+		log.Println("--> "+this.prototype.TypeName+" dosent have field name ", name)
 	}
 
 }

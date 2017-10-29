@@ -278,6 +278,48 @@ func (this *EntityPrototype) Save(storeId string) error {
 
 	store := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
 	if store != nil {
+		// Save it inside it supertype.
+		for i := 0; i < len(this.SuperTypeNames); i++ {
+			superTypeName := this.SuperTypeNames[i]
+			superType, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
+			if err == nil {
+				if !Utility.Contains(superType.SubstitutionGroup, this.TypeName) {
+					superType.SubstitutionGroup = append(superType.SubstitutionGroup, this.TypeName)
+					// Save the superType.
+					err := superType.Save(superTypeName[0:strings.Index(superTypeName, ".")])
+					if err != nil {
+						return err
+					}
+				}
+			} else {
+				return err
+			}
+		}
+
+		// I will remove it from substitution group as neeeded...
+		for i := 0; i < len(prototype.SuperTypeNames); i++ {
+			if !Utility.Contains(this.SuperTypeNames, prototype.SuperTypeNames[i]) {
+				// Here I will remove the prototype from superType substitution group.
+				superTypeName := prototype.SuperTypeNames[i]
+				superType, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
+				if err != nil {
+					return err
+				}
+
+				substitutionGroup := make([]string, 0)
+				for j := 0; j < len(superType.SubstitutionGroup); j++ {
+					if superType.SubstitutionGroup[j] != prototype.TypeName {
+						substitutionGroup = append(substitutionGroup, superType.SubstitutionGroup[j])
+					}
+				}
+				superType.SubstitutionGroup = substitutionGroup
+				err = superType.Save(superTypeName[0:strings.Index(superTypeName, ".")])
+				if err != nil {
+					return err
+				}
+
+			}
+		}
 
 		err := store.saveEntityPrototype(this)
 		if err != nil {
