@@ -22,6 +22,11 @@ const (
 	ConfigDB = "Config"
 )
 
+type TaskInstanceInfo struct {
+	taskId    string
+	startTime int64
+}
+
 /**
  * The configuration manager is use to keep all
  * internal settings and all external services settings
@@ -45,6 +50,7 @@ type ConfigurationManager struct {
 	// synchronize task...
 	m_setScheduledTasksChan    chan *Config.ScheduledTask
 	m_cancelScheduledTasksChan chan *Config.ScheduledTask
+	m_getTaskInstancesInfo     chan chan []TaskInstanceInfo
 }
 
 var configurationManager *ConfigurationManager
@@ -148,6 +154,7 @@ func newConfigurationManager() *ConfigurationManager {
 	// Open the channel.
 	configurationManager.m_setScheduledTasksChan = make(chan *Config.ScheduledTask)
 	configurationManager.m_cancelScheduledTasksChan = make(chan *Config.ScheduledTask)
+	configurationManager.m_getTaskInstancesInfo = make(chan chan []TaskInstanceInfo)
 
 	return configurationManager
 }
@@ -300,7 +307,11 @@ func (this *ConfigurationManager) start() {
 	////////////////////////////////////////////////////////////////////////////
 	// Task processing function.
 	go func() {
+		// Keep timers by task id to be able to cancel it latter.
 		tasks := make(map[string]*time.Timer, 0)
+		// Keep info of task instances since the server started.
+		instancesInfos := make([]TaskInstanceInfo, 0)
+
 		for {
 			select {
 			// set the task.
@@ -316,6 +327,12 @@ func (this *ConfigurationManager) start() {
 				timer := time.NewTimer(delay)
 				tasks[task.GetId()] = timer
 
+				// Keep task info here.
+				var instanceInfos TaskInstanceInfo
+				instanceInfos.taskId = task.GetId()
+				instanceInfos.startTime = task.GetStartTime()
+				instancesInfos = append(instancesInfos, instanceInfos)
+
 				go func(task *Config.ScheduledTask, timer *time.Timer) {
 					<-timer.C                                           // wait util the delay expire...
 					GetServer().GetConfigurationManager().runTask(task) // run the task.
@@ -325,6 +342,15 @@ func (this *ConfigurationManager) start() {
 			case task := <-GetServer().GetConfigurationManager().m_cancelScheduledTasksChan:
 				tasks[task.GetId()].Stop()
 				delete(tasks, task.GetId())
+				for i := 0; i < len(instancesInfos); i++ {
+					if instancesInfos[i].taskId != task.GetId() {
+						instancesInfos[i].startTime = -1 // -1 means cancelled
+					}
+				}
+
+			// Return the list of scheduled task.
+			case getTasksChan := <-GetServer().GetConfigurationManager().m_getTaskInstancesInfo:
+				getTasksChan <- instancesInfos
 
 			default:
 				time.Sleep(1 * time.Microsecond)

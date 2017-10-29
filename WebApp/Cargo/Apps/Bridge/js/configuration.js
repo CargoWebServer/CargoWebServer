@@ -488,6 +488,13 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 }, { "entity": entity })
                         }
                     }(content.getPanel().controls["Config.ScheduledTask_M_script"], content.getPanel().entity)
+                    if (document.getElementById(content.ParentUuid + "_active_task_div") == undefined) {
+                        // Display the list of active task for the current configuration.
+                        var activeTasksDiv = configurationContent.parentElement.parentElement.appendElement({ "tag": "div", "id": content.ParentUuid + "_active_task_div", "style": "display: block; height: 100%; width: 100%; overflow-y: auto;" }).down()
+                        
+                        // Here I will get the list of active task on the server and display it in the list.
+                        server.configurationManager.get
+                    }
                 } else if (content.TYPENAME == "Config.LdapConfiguration") {
                     // Here I will append in case of sql datasotre the synchornize button.
                     contentView.refreshBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell; color: lightgrey;" }).down()
