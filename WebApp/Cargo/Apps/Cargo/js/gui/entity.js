@@ -1522,7 +1522,7 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 			}
 		} else if (isXsTime(fieldType)) {
 			if (value != "") {
-				control.element.value = moment.unix(value).format("YYYY-MM-DDThh:mm:ss")
+				control.element.value = moment.unix(value).format("YYYY-MM-DDTHH:mm:ss")
 			} else {
 				control.element.value = ""
 			}

@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"code.myceliUs.com/Utility"
 )
@@ -103,8 +102,6 @@ func (this *MessageProcessor) run() {
 						rqst.errorCallback(m, rqst.caller)
 					}
 				}
-			default:
-				time.Sleep(1 * time.Microsecond) // Cpu release...
 			}
 		}
 	}(this.m_outgoingChannel, this.m_sendRequest, this.m_receiveRequestResponse, this.m_receiveRequestError)
@@ -122,8 +119,6 @@ func (this *MessageProcessor) run() {
 			if done {
 				return
 			}
-		default:
-			time.Sleep(1 * time.Microsecond) // Cpu release...
 		}
 	}
 }
@@ -361,7 +356,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 							// Here I will try to create a the array of object.
 							if err.Error() == "NotDynamicObject" {
 								//log.Println("-----> value: ", values, "type name: ", param.GetTypeName())
-								p, err := Utility.InitializeArray(values.([]interface{}), param.GetTypeName())
+								p, err := Utility.InitializeArray(values.([]interface{}))
 								if err == nil {
 									if p.IsValid() {
 										a.Params = append(a.Params, p.Interface())

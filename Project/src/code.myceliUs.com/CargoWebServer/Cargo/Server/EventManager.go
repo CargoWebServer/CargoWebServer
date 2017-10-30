@@ -54,6 +54,9 @@ const (
 	ServiceEvent                   = "ServiceEvent"
 	DataEvent                      = "DataEvent"
 	ConfigurationEvent             = "ConfigurationEvent"
+	NewTaskEvent                   = 31
+	CancelTaskEvent                = 32
+	EndTaskEvent                   = 33
 	EventEvent                     = "EventEvent"
 	LdapEvent                      = "LdapEvent"
 	OAuth2Event                    = "OAuth2Event"

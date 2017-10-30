@@ -1113,8 +1113,6 @@ func (this *Server) Start() {
 				}
 				// Remove the interval/timeout information.
 				delete(GetServer().intervals, uuid)
-			default:
-				time.Sleep(1 * time.Microsecond)
 			}
 		}
 	}()

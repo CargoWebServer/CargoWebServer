@@ -362,19 +362,14 @@ func InitializeStructure(data map[string]interface{}) (reflect.Value, error) {
 /**
  * Initialyse an array of values other than structure...
  */
-func InitializeArray(data []interface{}, typeName string) (reflect.Value, error) {
+func InitializeArray(data []interface{}) (reflect.Value, error) {
 	var values reflect.Value
-
-	if strings.HasPrefix(typeName, "[]") {
-		emptyInterfaceArray := make([]interface{}, 0, 0)
-		values = reflect.ValueOf(emptyInterfaceArray)
-	}
 
 	sameType := true
 	if len(data) > 1 {
-		for i := 1; i < len(data); i++ {
+		for i := 1; i < len(data) && sameType; i++ {
 			if data[i] != nil {
-				sameType = reflect.TypeOf(data[i]) == reflect.TypeOf(data[i-1])
+				sameType = reflect.TypeOf(data[i]).String() == reflect.TypeOf(data[i-1]).String()
 			}
 		}
 	}
@@ -382,7 +377,7 @@ func InitializeArray(data []interface{}, typeName string) (reflect.Value, error)
 	for i := 0; i < len(data); i++ {
 		if data[i] != nil {
 			if i == 0 {
-				if len(typeName) == 0 && sameType {
+				if sameType {
 					values = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(data[i])), 0, 0)
 				} else {
 					emptyInterfaceArray := make([]interface{}, 0, 0)

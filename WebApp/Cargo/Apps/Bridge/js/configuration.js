@@ -489,11 +489,157 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                         }
                     }(content.getPanel().controls["Config.ScheduledTask_M_script"], content.getPanel().entity)
                     if (document.getElementById(content.ParentUuid + "_active_task_div") == undefined) {
+
+                        function setTaskTimer(row, countdown, startTime, intervals, index) {
+                            // Get todays date and time
+                            var now = new Date().getTime();
+                            // Find the distance between now an the count down date
+                            var distance = startTime - now;
+                            // Time calculations for days, hours, minutes and seconds
+                            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                            // Display the result in the element with id="demo"
+                            var delay = ""
+                            if (days > 0) {
+                                delay += days + "d "
+                            }
+                            if (hours > 0) {
+                                delay += hours + "h "
+                            }
+                            if (minutes > 0) {
+                                delay += minutes + "m "
+                            }
+                            if (seconds > 0) {
+                                delay += seconds + "s "
+                            }
+                            countdown.element.innerHTML = delay
+                            // If the count down is finished, write some text 
+                            if (distance < 0) {
+                                clearInterval(intervals[index]);
+                                row.element.parentNode.removeChild(row.element)
+                            }
+                        }
+
                         // Display the list of active task for the current configuration.
-                        var activeTasksDiv = configurationContent.parentElement.parentElement.appendElement({ "tag": "div", "id": content.ParentUuid + "_active_task_div", "style": "display: block; height: 100%; width: 100%; overflow-y: auto;" }).down()
-                        
+                        var activeTasksDiv = configurationContent.parentElement.parentElement.appendElement({ "tag": "div", "class": "panel", "id": content.ParentUuid + "_active_task_div", "style": "display: block; height: 100%; width: 100%; overflow-y: auto;" }).down()
+                        var intervals = []
+                        var intervalsMap = {}
+
+                        // Here I will connect the listeners... cancel and new, end will be manage by the setTaskTimer function...
+                        server.configurationManager.attach(activeTasksDiv, NewTaskEvent, function (intervals, intervalsMap) {
+                            return function (evt, activeTasksDiv) {
+                                var instanceInfos = evt.dataMap.taskInfos
+                                if (instanceInfos.StartTime != 0) {
+                                    // In case that the task instance has a start time.
+                                    var startTime = new Date(instanceInfos.StartTime * 1000).getTime()
+                                    var now = new Date().getTime();
+                                    var intervals = []
+                                    if (startTime - now > 0) {
+                                        var row = activeTasksDiv.appendElement({ "id": instanceInfos.TaskId + "_task_instance", "tag": "div", "style": "display: table; width: 100%;", "class": "entity" }).down();
+                                        row.appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": instanceInfos.TaskId })
+
+                                        var countdown = row.appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+
+                                        var cancelTaskBtn = row.appendElement({ "tag": "div", "class": "entities_btn" }).down()
+                                            .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
+
+                                        cancelTaskBtn.element.onclick = function (instanceInfos) {
+                                            return function () {
+                                                // Cancel the task...
+                                                server.configurationManager.cancelTask(instanceInfos.UUID,
+                                                    /** The success callbacak */
+                                                    function () {
+
+                                                    },
+                                                    /** The error callback */
+                                                    function () {
+
+                                                    }, {})
+                                            }
+                                        }(instanceInfos)
+
+                                        var i = intervals.length
+                                        intervals[i] = setInterval(function (row, countdown, startTime, intervals, index) {
+                                            return function () {
+                                                setTaskTimer(row, countdown, startTime, intervals, index)
+                                            }
+                                        }(row, countdown, startTime, intervals, i), 1000);
+
+                                        // keep the interval...
+                                        intervalsMap[instanceInfos.UUID] = intervals[i]
+                                    }
+                                }
+                            }
+                        }(intervals, intervalsMap))
+
+                        // Cancel the task...
+                        server.configurationManager.attach(activeTasksDiv, CancelTaskEvent,
+                            function (intervalsMap) {
+                                return function (evt, activeTasksDiv) {
+                                    var instanceInfos = evt.dataMap.taskInfos
+                                    var row = document.getElementById(instanceInfos.TaskId + "_task_instance")
+                                    if(row != undefined){
+                                        clearInterval(intervalsMap[instanceInfos.TaskId]);
+                                        row.parentNode.removeChild(row)
+                                    }
+                                }
+                            }(intervalsMap))
+
                         // Here I will get the list of active task on the server and display it in the list.
-                        server.configurationManager.get
+                        server.configurationManager.getTaskInstancesInfos(
+                            /** Success callback */
+                            function (results, caller) {
+
+                                // Here I will set the list of active task...
+                                for (var i = 0; i < results.length; i++) {
+                                    var instanceInfos = results[i]
+                                    if (instanceInfos.StartTime != 0) {
+                                        // In case that the task instance has a start time.
+                                        var startTime = new Date(instanceInfos.StartTime * 1000).getTime()
+                                        var now = new Date().getTime();
+                                        if (startTime - now > 0) {
+                                            var row = activeTasksDiv.appendElement({ "id": instanceInfos.TaskId + "_task_instance", "tag": "div", "style": "display: table; width: 100%;", "class": "entity" }).down();
+                                            row.appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": instanceInfos.TaskId })
+                                            var countdown = row.appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+
+                                            var cancelTaskBtn = row.appendElement({ "tag": "div", "class": "entities_btn" }).down()
+                                                .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
+
+                                            cancelTaskBtn.element.onclick = function (instanceInfos) {
+                                                return function () {
+                                                    // Cancel the task...
+                                                    server.configurationManager.cancelTask(instanceInfos.UUID,
+                                                        /** The success callbacak */
+                                                        function () {
+
+                                                        },
+                                                        /** The error callback */
+                                                        function () {
+
+                                                        }, {})
+                                                }
+                                            }(instanceInfos)
+
+                                            caller.intervals[i] = setInterval(function (row, countdown, startTime, intervals, index) {
+                                                return function () {
+                                                    setTaskTimer(row, countdown, startTime, intervals, index)
+                                                }
+                                            }(row, countdown, startTime, caller.intervals, i), 1000);
+
+                                            // keep the interval...
+                                            caller.intervalsMap[instanceInfos.UUID] = intervals[i]
+                                        }
+                                    }
+                                }
+
+                            },
+                            /** Error callback */
+                            function (errObj, caller) { },
+                            /** caller */
+                            { "activeTasksDiv": activeTasksDiv, "intervals": intervals, "intervalsMap": intervalsMap })
                     }
                 } else if (content.TYPENAME == "Config.LdapConfiguration") {
                     // Here I will append in case of sql datasotre the synchornize button.
@@ -518,6 +664,8 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 }, { "refreshBtn": contentView.refreshBtn })
                         }
                     }(contentView)
+
+                    // TODO display users, groups and computers here...
                 }
             }
 

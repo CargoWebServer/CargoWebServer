@@ -74,6 +74,7 @@ func newEntityManager() *EntityManager {
 	Utility.RegisterType((*Restriction)(nil))
 	Utility.RegisterType((*DynamicEntity)(nil))
 	Utility.RegisterType((*MessageData)(nil))
+	Utility.RegisterType((*TaskInstanceInfo)(nil))
 
 	// References
 	entityManager.referenced = make(map[string][]EntityRef, 0)

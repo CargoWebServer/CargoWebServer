@@ -23,8 +23,11 @@ const (
 )
 
 type TaskInstanceInfo struct {
-	taskId    string
-	startTime int64
+	TYPENAME     string
+	UUID         string
+	TaskId       string
+	StartTime    int64
+	CreationTime int64
 }
 
 /**
@@ -50,7 +53,7 @@ type ConfigurationManager struct {
 	// synchronize task...
 	m_setScheduledTasksChan    chan *Config.ScheduledTask
 	m_cancelScheduledTasksChan chan *Config.ScheduledTask
-	m_getTaskInstancesInfo     chan chan []TaskInstanceInfo
+	m_getTaskInstancesInfo     chan chan []*TaskInstanceInfo
 }
 
 var configurationManager *ConfigurationManager
@@ -154,7 +157,7 @@ func newConfigurationManager() *ConfigurationManager {
 	// Open the channel.
 	configurationManager.m_setScheduledTasksChan = make(chan *Config.ScheduledTask)
 	configurationManager.m_cancelScheduledTasksChan = make(chan *Config.ScheduledTask)
-	configurationManager.m_getTaskInstancesInfo = make(chan chan []TaskInstanceInfo)
+	configurationManager.m_getTaskInstancesInfo = make(chan chan []*TaskInstanceInfo)
 
 	return configurationManager
 }
@@ -310,7 +313,7 @@ func (this *ConfigurationManager) start() {
 		// Keep timers by task id to be able to cancel it latter.
 		tasks := make(map[string]*time.Timer, 0)
 		// Keep info of task instances since the server started.
-		instancesInfos := make([]TaskInstanceInfo, 0)
+		instancesInfos := make([]*TaskInstanceInfo, 0)
 
 		for {
 			select {
@@ -321,6 +324,7 @@ func (this *ConfigurationManager) start() {
 					// Stop previous instance if there is one.
 					tasks[task.GetId()].Stop()
 				}
+
 				// Plan the next instance.
 				startTime := time.Unix(task.GetStartTime(), 0)
 				delay := startTime.Sub(time.Now())
@@ -328,36 +332,85 @@ func (this *ConfigurationManager) start() {
 				tasks[task.GetId()] = timer
 
 				// Keep task info here.
-				var instanceInfos TaskInstanceInfo
-				instanceInfos.taskId = task.GetId()
-				instanceInfos.startTime = task.GetStartTime()
+				instanceInfos := new(TaskInstanceInfo)
+				instanceInfos.TYPENAME = "Server.TaskInstanceInfo"
+				instanceInfos.UUID = task.GetUUID()
+				instanceInfos.TaskId = task.GetId()
+				instanceInfos.StartTime = task.GetStartTime()  // When the task is planed to start
+				instanceInfos.CreationTime = time.Now().Unix() // Time of task creation.
+
+				// append to the list of task.
 				instancesInfos = append(instancesInfos, instanceInfos)
 
-				go func(task *Config.ScheduledTask, timer *time.Timer) {
+				// Send event message...
+				var eventDatas []*MessageData
+				evtData := new(MessageData)
+				evtData.TYPENAME = "Server.MessageData"
+				evtData.Name = "taskInfos"
+				evtData.Value = instanceInfos
+
+				eventDatas = append(eventDatas, evtData)
+				evt, _ := NewEvent(NewTaskEvent, ConfigurationEvent, eventDatas)
+				GetServer().GetEventManager().BroadcastEvent(evt)
+
+				go func(task *Config.ScheduledTask, timer *time.Timer, instanceInfos *TaskInstanceInfo) {
 					<-timer.C                                           // wait util the delay expire...
 					GetServer().GetConfigurationManager().runTask(task) // run the task.
-				}(task, timer)
+
+					// Send event message...
+					var eventDatas []*MessageData
+					evtData := new(MessageData)
+					evtData.TYPENAME = "Server.MessageData"
+					evtData.Name = "taskInfos"
+					evtData.Value = instanceInfos
+					eventDatas = append(eventDatas, evtData)
+					evt, _ := NewEvent(EndTaskEvent, ConfigurationEvent, eventDatas)
+					GetServer().GetEventManager().BroadcastEvent(evt)
+
+				}(task, timer, instanceInfos)
 
 			// reset the task.
 			case task := <-GetServer().GetConfigurationManager().m_cancelScheduledTasksChan:
-				tasks[task.GetId()].Stop()
-				delete(tasks, task.GetId())
-				for i := 0; i < len(instancesInfos); i++ {
-					if instancesInfos[i].taskId != task.GetId() {
-						instancesInfos[i].startTime = -1 // -1 means cancelled
+				if tasks[task.GetId()] != nil {
+					tasks[task.GetId()].Stop()
+					delete(tasks, task.GetId())
+					for i := 0; i < len(instancesInfos); i++ {
+						if instancesInfos[i].UUID == task.GetUUID() {
+							instancesInfos[i].StartTime = -1 // -1 means cancelled
+
+							// Send event message...
+							var eventDatas []*MessageData
+							evtData := new(MessageData)
+							evtData.TYPENAME = "Server.MessageData"
+							evtData.Name = "taskInfos"
+							evtData.Value = instancesInfos[i]
+
+							eventDatas = append(eventDatas, evtData)
+							evt, _ := NewEvent(CancelTaskEvent, ConfigurationEvent, eventDatas)
+							GetServer().GetEventManager().BroadcastEvent(evt)
+						}
 					}
 				}
 
 			// Return the list of scheduled task.
 			case getTasksChan := <-GetServer().GetConfigurationManager().m_getTaskInstancesInfo:
 				getTasksChan <- instancesInfos
-
-			default:
-				time.Sleep(1 * time.Microsecond)
 			}
 		}
 	}()
 
+}
+
+/**
+ * That function retun the list of task instances.
+ */
+func (this *ConfigurationManager) getTaskInstancesInfos() []*TaskInstanceInfo {
+	taskInfosChan := make(chan []*TaskInstanceInfo)
+	this.m_getTaskInstancesInfo <- taskInfosChan
+
+	taskInfos := <-taskInfosChan
+
+	return taskInfos
 }
 
 func (this *ConfigurationManager) stop() {
@@ -419,6 +472,7 @@ func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
 
 	// Here I will get the entity for the task.
 	entity := GetServer().GetEntityManager().NewConfigScheduledTaskEntityFromObject(task)
+	entity.GetObject().(*Config.ScheduledTask).SetIsActive(task.M_isActive)
 
 	// first of all I will test if the task is active.
 	if task.IsActive() == false {
@@ -489,7 +543,7 @@ func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
 	} else {
 		if entity.GetObject().(*Config.ScheduledTask).GetStartTime() == 0 {
 			// Run the task directly in that case.
-			this.runTask(task)
+			this.m_setScheduledTasksChan <- task
 			return // nothing more to do...
 		} else {
 			startTime := time.Unix(entity.GetObject().(*Config.ScheduledTask).GetStartTime(), 0)
@@ -746,7 +800,8 @@ func (this *ConfigurationManager) ScheduleTask(task *Config.ScheduledTask, messa
 // @scope {restricted}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *ConfigurationManager) CancelTask(task *Config.ScheduledTask, messageId string, sessionId string) {
+func (this *ConfigurationManager) CancelTask(taskUuid string, messageId string, sessionId string) {
+
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -754,8 +809,15 @@ func (this *ConfigurationManager) CancelTask(task *Config.ScheduledTask, message
 		return
 	}
 
+	var entity Entity
+	entity, errObj = GetServer().GetEntityManager().getEntityByUuid(taskUuid, false)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
 	// Cancel the task.
-	this.m_cancelScheduledTasksChan <- task
+	this.m_cancelScheduledTasksChan <- entity.GetObject().(*Config.ScheduledTask)
 
 }
 
@@ -769,4 +831,43 @@ func (this *ConfigurationManager) CancelTask(task *Config.ScheduledTask, message
 // @param {callback} errorCallback In case of error.
 func (this *ConfigurationManager) GetActiveConfigurations(messageId string, sessionId string) *Config.Configurations {
 	return this.m_activeConfigurationsEntity.GetObject().(*Config.Configurations)
+}
+
+// @api 1.0
+// Return the list of task intance in the server memory.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @return {*Config.Configurations}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+// @src
+// ConfigurationManager.prototype.getTaskInstancesInfos = function (successCallback, errorCallback, caller) {
+//    var params = []
+//    // Call it on the server.
+//    server.executeJsFunction(
+//        "ConfigurationManagerGetTaskInstancesInfos", // The function to execute remotely on server
+//        params, // The parameters to pass to that function
+//        function (index, total, caller) { // The progress callback
+//            // Nothing special to do here.
+//        },
+//        function (results, caller) {
+//        	if (caller.successCallback != undefined) {
+//        		caller.successCallback(results[0], caller.caller)
+//          	caller.successCallback = undefined
+//          }
+//        },
+//        function (errMsg, caller) {
+//          server.errorManager.onError(errMsg)
+//         	if( caller.errorCallback != undefined){
+//          	caller.errorCallback(errMsg, caller.caller)
+//				caller.errorCallback = undefined
+//			}
+//        }, // Error callback
+//        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback } // The caller
+//    )
+//}
+func (this *ConfigurationManager) GetTaskInstancesInfos(messageId string, sessionId string) []*TaskInstanceInfo {
+
+	return this.getTaskInstancesInfos()
 }

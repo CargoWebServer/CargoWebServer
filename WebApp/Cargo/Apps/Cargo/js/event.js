@@ -64,11 +64,15 @@ EmailEvent = "EmailEvent"
 ServiceEvent = "ServiceEvent"
 DataEvent = "DataEvent"
 ConfigurationEvent = "ConfigurationEvent"
+NewTaskEvent = 31
+CancelTaskEvent = 32
+EndTaskEvent = 33
 EventEvent = "EventEvent"
 LdapEvent = "LdapEvent"
 OAuth2Event = "OAuth2Event"
 SchemaEvent = "SchemaEvent"
 WorkflowEvent = "WorkflowEvent"
+
 
 /**
 * EventHub contructor
@@ -322,7 +326,7 @@ EventHandler.prototype.appendEventFilter = function (filter, channelId, successC
             // Nothing special to do here.
         },
         function (result, caller) {
-            if(caller.successCallback != undefined){
+            if (caller.successCallback != undefined) {
                 caller.successCallback(result[0], caller.caller)
                 caller.successCallback = undefined
             }
@@ -381,14 +385,14 @@ EventHandler.prototype.broadcastNetworkEvent = function (evtNumber, evtName, eve
         },
         function (result, caller) {
             //console.log(result)
-            if(caller.successCallback != undefined){
+            if (caller.successCallback != undefined) {
                 caller.successCallback(result[0], caller.caller)
                 caller.successCallback = undefined
             }
         },
         function (errMsg, caller) {
             server.errorManager.onError(errMsg)
-            if(caller.errorCallback != undefined){
+            if (caller.errorCallback != undefined) {
                 caller.errorCallback(errMsg, caller.caller)
                 caller.errorCallback = undefined
             }

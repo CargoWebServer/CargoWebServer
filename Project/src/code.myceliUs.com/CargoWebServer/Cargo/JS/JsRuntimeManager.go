@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
+	//"time"
 
 	"code.myceliUs.com/Utility"
 	"github.com/robertkrimen/otto"
@@ -196,8 +196,6 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 							if stop {
 								return // exit the loop.
 							}
-						default:
-							time.Sleep(1 * time.Microsecond)
 						}
 					}
 				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_stopVm[sessionId])
@@ -209,9 +207,6 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				jsRuntimeManager.m_stopVm[sessionId] <- true // send kill
 				jsRuntimeManager.removeVm(sessionId)
 				callback <- []interface{}{true} // unblock the channel...
-
-			default:
-				time.Sleep(1 * time.Microsecond)
 			}
 		}
 	}(jsRuntimeManager)

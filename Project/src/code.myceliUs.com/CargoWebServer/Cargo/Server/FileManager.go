@@ -382,8 +382,10 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 		}
 
 		f_.Write(filedata)
-		defer f_.Close()
 		checksum_ := Utility.CreateFileChecksum(f_)
+
+		defer f_.Close()
+		defer os.Remove(f_.Name())
 
 		// Open it
 		f, err = os.Open(this.root + filepath + "/" + filename)
@@ -530,17 +532,19 @@ func (this *FileManager) getFileById(id string) (*CargoEntities.File, *CargoEnti
 func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string, thumbnailMaxHeight int, thumbnailMaxWidth int, dbFile bool) error {
 
 	// Create a temporary file object from the data...
-	f, err := ioutil.TempFile(os.TempDir(), uuid)
+	f_, err := ioutil.TempFile(os.TempDir(), uuid)
 	if err != nil {
 		log.Println("Fail to open _cargo_tmp_file_ for file ", uuid, " ", err)
 		return err
 	}
 
-	f.Write(filedata)
+	f_.Write(filedata)
 
-	checksum := Utility.CreateFileChecksum(f)
+	checksum := Utility.CreateFileChecksum(f_)
 
-	defer os.Remove(f.Name())
+	// close the file and remove it.
+	f_.Close()
+	os.Remove(f_.Name())
 
 	// I will retreive the file, the uuid must exist in that case.
 	fileEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity("", uuid, nil)

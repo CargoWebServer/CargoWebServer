@@ -17,7 +17,7 @@ import (
 )
 
 type LdapManager struct {
-	// Contain the list of avalable ldap servers...
+	// Nothing here.
 }
 
 var ldapManager *LdapManager
