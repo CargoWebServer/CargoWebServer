@@ -177,10 +177,23 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                 }
                 if (content.TYPENAME == "Config.DataStoreConfiguration") {
                     // So here I will set the schema view for the releated store.
+                    // Here I have a service configuration.
                     if (content.UUID != undefined) {
                         if (content.UUID.length != 0) {
                             // Set only if is not a new.
                             homepage.dataExplorer.initDataSchema(content)
+
+                            // set the scrolling shadow...
+                            homepage.dataExplorer.panel.element.onscroll = function (header) {
+                                return function () {
+                                    var position = this.scrollTop;
+                                    if (this.scrollTop > 0) {
+                                        header.className = "scrolling"
+                                    } else {
+                                        header.className = ""
+                                    }
+                                }
+                            }(homepage.dataExplorer.parent.element.firstChild)
                         }
                     }
 
@@ -381,6 +394,19 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     var parent = content.getPanel().panel //.parentElement.parentElement
                     // Keep the reference in the content.
                     var actionsDiv = parent.appendElement({ "tag": "div", "id": content.UUID + "_actions_div", "style": "position:absolute; left: 0px; bottom: 0px; overflow: auto;" }).down()
+
+                    // set the scrolling shadow...
+                    actionsDiv.element.onscroll = function (header) {
+                        return function () {
+                            var position = this.scrollTop;
+                            if (this.scrollTop > 0) {
+                                header.className = "scrolling"
+                            } else {
+                                header.className = ""
+                            }
+                        }
+                    }(actionsDiv.parentElement.parentElement.parentElement.element)
+
                     window.addEventListener('resize',
                         function (actionsDiv) {
                             return function () {
@@ -404,6 +430,39 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 new EntityPanel(parent, result.TYPENAME, function (entity) {
                                     return function (panel) {
                                         panel.setEntity(entity)
+                                        // Now I will display the action documentation correctly...
+                                        var documentationInput = CargoEntities.Action_M_doc
+                                        panel.controls["CargoEntities.Action_M_doc"].element.style.display = "none"
+                                        var doc = panel.controls["CargoEntities.Action_M_doc"].element.value
+                                        if (doc.indexOf("@src") != -1) {
+                                            doc = doc.split("@src")[0]
+                                        }
+
+                                        var values = doc.split("@")
+                                        doc = ""
+                                        for (var i = 0; i < values.length; i++) {
+                                            doc += "<div>"
+                                            if (values[i].startsWith("api")) {
+                                                doc += values[i].replaceAll("api 1.0", "<span style='color: green;'>api 1.0</span>")
+                                            } else if (values[i].startsWith("param") && values[i].indexOf("{callback}") == -1) {
+                                                var values_ = values[i].split("param")[1].split(" ")
+                                                doc += "<span class='doc_tag' style='vertical-align: top;'>param</span><span>"
+                                                for (var j = 1; j < values_.length; j++) {
+                                                    if (j == 1) {
+                                                        // The type:
+                                                        doc += "<span style='color: darkgreen'>" + values_[j] + "</span>"
+                                                    } else if (j == 2) {
+                                                        // The name
+                                                        doc += "<span style='color: color: #657383; font-weight:bold;'>" + values_[j] + "</span>"
+                                                    } else {
+                                                        doc += "<span>" + values_[j] + "</span>"
+                                                    }
+                                                }
+                                                doc += "</span>"
+                                            }
+                                            doc += "</div>"
+                                        }
+                                        panel.controls["CargoEntities.Action_M_doc"].parentElement.appendElement({ "tag": "div", "innerHtml": doc })
                                     }
                                 }(result), undefined, false, result, "")
                             }
@@ -436,61 +495,82 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                         }
                     }()
 
-                    content.getPanel().controls["Config.ScheduledTask_M_script_edit"].element.onclick = function (ScheduledTask_M_script, entity) {
+                    content.getPanel().controls["Config.ScheduledTask_M_script_edit"].element.onclick = function (ScheduledTask_M_script, entityPanel) {
                         return function () {
+                            var entity = entityPanel.entity
+                            if (entity.UUID != undefined) {
+                                var query = {}
+                                query.TypeName = "CargoEntities.File"
+                                query.Fields = ["M_id"]
+                                query.Query = 'CargoEntities.File.M_id == "' + entity.M_id + '"'
 
-                            var query = {}
-                            query.TypeName = "CargoEntities.File"
-                            query.Fields = ["M_id"]
-                            query.Query = 'CargoEntities.File.M_id == "' + entity.M_id + '"'
+                                server.dataManager.read("CargoEntities", JSON.stringify(query), [], [],
+                                    function (results, caller) {
+                                        if (results[0].length == 0) {
+                                            // here I will create an open file event to open the code editor.
+                                            var file = new CargoEntities.File()
+                                            file.M_id = caller.entity.M_id
+                                            file.M_name = caller.entity.M_id + ".js"
+                                            file.M_isDir = false
+                                            file.M_fileType = 1
+                                            file.M_mime = "application/javascript"
+                                            file.M_modeTime = Date.now()
 
-                            server.dataManager.read("CargoEntities", JSON.stringify(query), [], [],
-                                function (results, caller) {
-                                    if (results[0].length == 0) {
-                                        // here I will create an open file event to open the code editor.
-                                        var file = new CargoEntities.File()
-                                        file.M_id = caller.entity.M_id
-                                        file.M_name = caller.entity.M_id + ".js"
-                                        file.M_isDir = false
-                                        file.M_fileType = 1
-                                        file.M_mime = "application/javascript"
-                                        file.M_modeTime = Date.now()
+                                            server.entityManager.saveEntity(file,
+                                                function (file, caller) {
+                                                    caller.entity.M_script = file.M_id
+                                                    server.entityManager.saveEntity(caller.entity) // Save the entity...
+                                                    evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
+                                                    server.eventHandler.broadcastLocalEvent(evt)
+                                                },
+                                                function () {
 
-                                        server.entityManager.saveEntity(file,
-                                            function (file, caller) {
-                                                caller.entity.M_script = file.M_id
-                                                server.entityManager.saveEntity(caller.entity) // Save the entity...
-                                                evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
-                                                server.eventHandler.broadcastLocalEvent(evt)
-                                            },
-                                            function () {
+                                                }, caller)
+                                        } else {
+                                            server.entityManager.getEntityById("CargoEntities.File", "CargoEntities", [results[0][0][0]],
+                                                function (file, caller) {
+                                                    caller.entity.M_script = file.M_id
+                                                    server.entityManager.saveEntity(caller.entity) // Save the entity...
+                                                    evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
+                                                    server.eventHandler.broadcastLocalEvent(evt)
+                                                },
+                                                function () {
 
-                                            }, caller)
-                                    } else {
-                                        server.entityManager.getEntityById("CargoEntities.File", "CargoEntities", [results[0][0][0]],
-                                            function (file, caller) {
-                                                caller.entity.M_script = file.M_id
-                                                server.entityManager.saveEntity(caller.entity) // Save the entity...
-                                                evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
-                                                server.eventHandler.broadcastLocalEvent(evt)
-                                            },
-                                            function () {
+                                                }, caller)
 
-                                            }, caller)
+                                        }
+                                    },
+                                    function (index, total, caller) {
 
-                                    }
-                                },
-                                function (index, total, caller) {
+                                    },
+                                    function (errMsg, caller) {
 
-                                },
-                                function (errMsg, caller) {
+                                    }, { "entity": entity })
+                            } else {
+                                // In that case the script must be save...
+                                server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.parentLnk, entity.TYPENAME, entity.UUID, entity,
+                                    function (entity, caller) {
+                                        // Set the entity.
+                                        entityPanel.setEntity(entity)
+                                        caller.editBtn.click()
+                                    },
+                                    function () {
 
-                                }, { "entity": entity })
+                                    }, { "editBtn": this, "entityPanel": entityPanel })
+                            }
                         }
-                    }(content.getPanel().controls["Config.ScheduledTask_M_script"], content.getPanel().entity)
-                    if (document.getElementById(content.ParentUuid + "_active_task_div") == undefined) {
+                    }(content.getPanel().controls["Config.ScheduledTask_M_script"], content.getPanel())
 
-                        function setTaskTimer(row, countdown, startTime, intervals, index) {
+                    if (document.getElementById(content.ParentUuid + "_active_task_div") == undefined) {
+                        /**
+                         * Set the timer function.
+                         * @param {*} row 
+                         * @param {*} countdown 
+                         * @param {*} startTime 
+                         * @param {*} intervals 
+                         * @param {*} index 
+                         */
+                        function setTaskTimer(instanceInfos, row, countdown, startTime, intervals, intervalsMap, index) {
                             // Get todays date and time
                             var now = new Date().getTime();
                             // Find the distance between now an the count down date
@@ -519,127 +599,162 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                             // If the count down is finished, write some text 
                             if (distance < 0) {
                                 clearInterval(intervals[index]);
+                                intervals = intervals.splice(index, 1)
+                                delete intervalsMap[instanceInfos.TaskId]
                                 row.element.parentNode.removeChild(row.element)
+                                // Set it back with it new status and delete callback.
+                                instanceInfos.EndTime = new Date().getTime() / 1000;
+                                setTask(instanceInfos, intervals, intervalsMap, intervals.length)
+                            }
+                        }
+
+                        /**
+                         * Set task information.
+                         * @param {*} instanceInfos 
+                         * @param {*} intervals 
+                         * @param {*} intervalsMap 
+                         * @param {*} index 
+                         */
+                        function setTask(instanceInfos, intervals, intervalsMap, index) {
+                            var row = activeTasksDiv.appendElement({ "id": instanceInfos.TaskId + "_task_instance", "tag": "div", "style": "display: table-row; width: 100%;", "class": "entity" }).down();
+                            row.appendElement({ "tag": "div", "style": "display: table-cell; padding: 2px;", "innerHtml": instanceInfos.TaskId })
+                            var countdown = row.appendElement({ "tag": "div", "style": "display: table-cell; padding: 2px 2px 2px 10px; width: 100%;" }).down()
+                            var cancelTaskBtn = row.appendElement({ "tag": "div", "class": "entities_btn" }).down()
+                                .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
+
+                            if (instanceInfos.StartTime != 0) {
+                                // In case that the task instance has a start time.
+                                // In case that the task in not already running
+                                var startTime = new Date(instanceInfos.StartTime * 1000).getTime()
+                                var now = new Date().getTime();
+                                if (startTime - now > 0 && instanceInfos.CancelTime == 0) {
+                                    // Here if the user click the button it will cancel the task.
+                                    cancelTaskBtn.element.onclick = function (instanceInfos) {
+                                        return function () {
+                                            // Cancel the task...
+                                            server.configurationManager.cancelTask(instanceInfos.UUID,
+                                                /** The success callbacak */
+                                                function () {
+
+                                                },
+                                                /** The error callback */
+                                                function () {
+
+                                                }, {})
+                                        }
+                                    }(instanceInfos)
+
+                                    intervals[index] = setInterval(function (instanceInfos, row, countdown, startTime, intervals, intervalsMap, index) {
+                                        return function () {
+                                            setTaskTimer(instanceInfos, row, countdown, startTime, intervals, intervalsMap, index)
+                                        }
+                                    }(instanceInfos, row, countdown, startTime, intervals, intervalsMap, i), 1000);
+
+                                    // keep the interval...
+                                    intervalsMap[instanceInfos.UUID] = intervals[index]
+                                } else {
+                                    if (instanceInfos.EndTime != 0) {
+                                        countdown.element.title = new Date(instanceInfos.EndTime * 1000).toISOString()
+                                        countdown.element.innerHTML = "completed"
+                                        cancelTaskBtn.element.onclick = function (row) {
+                                            return function () {
+                                                row.element.parentNode.removeChild(row.element)
+                                            }
+                                        }(row)
+                                    } else if (instanceInfos.CancelTime != 0) {
+                                        countdown.element.title = new Date(instanceInfos.CancelTime * 1000).toISOString()
+                                        countdown.element.innerHTML = "canceled"
+                                        cancelTaskBtn.element.onclick = function (row) {
+                                            return function () {
+                                                row.element.parentNode.removeChild(row.element)
+                                            }
+                                        }(row)
+                                    }
+                                }
+                            } else {
+                                countdown.element.innerHTML = "running"
+                                // Here If the user click the button it will stop the task.
+                                cancelTaskBtn.element.onclick = function (instanceInfos) {
+                                    return function () {
+                                        alert("Stop me!")
+                                    }
+                                }(instanceInfos)
                             }
                         }
 
                         // Display the list of active task for the current configuration.
-                        var activeTasksDiv = configurationContent.parentElement.parentElement.appendElement({ "tag": "div", "class": "panel", "id": content.ParentUuid + "_active_task_div", "style": "display: block; height: 100%; width: 100%; overflow-y: auto;" }).down()
+                        var parent = content.getPanel().panel
+                        
+                        // Keep the reference in the content.
+                        var activeTasksDiv = parent.appendElement({ "tag": "div", "id": content.UUID + "_actions_div", "style": "position:absolute; left: 0px; bottom: 0px; overflow: auto; width:100%;" }).down()
+                        activeTasksDiv.parentElement.parentElement.parentElement.element.style.borderBottom = "1px solid gray"
+
+                        // set the scrolling shadow...
+                        activeTasksDiv.element.onscroll = function (header) {
+                            return function () {
+                                var position = this.scrollTop;
+                                if (this.scrollTop > 0) {
+                                    header.className = "scrolling"
+                                } else {
+                                    header.className = ""
+                                }
+                            }
+                        }(activeTasksDiv.parentElement.parentElement.parentElement.element)
+
+                        window.addEventListener('resize',
+                            function (activeTasksDiv) {
+                                return function () {
+                                    var parent = activeTasksDiv.parentElement.parentElement.parentElement.parentElement
+                                    var top = parent.element.firstChild.offsetHeight
+                                    var right = parent.element.clientWidth;
+                                    if (top > 0 && right > 0) {
+                                        activeTasksDiv.element.style.width = right + "px"
+                                        activeTasksDiv.element.style.top = top + "px"
+                                    }
+                                }
+                            }(activeTasksDiv), true);
+
                         var intervals = []
                         var intervalsMap = {}
 
                         // Here I will connect the listeners... cancel and new, end will be manage by the setTaskTimer function...
                         server.configurationManager.attach(activeTasksDiv, NewTaskEvent, function (intervals, intervalsMap) {
                             return function (evt, activeTasksDiv) {
-                                var instanceInfos = evt.dataMap.taskInfos
-                                if (instanceInfos.StartTime != 0) {
-                                    // In case that the task instance has a start time.
-                                    var startTime = new Date(instanceInfos.StartTime * 1000).getTime()
-                                    var now = new Date().getTime();
-                                    var intervals = []
-                                    if (startTime - now > 0) {
-                                        var row = activeTasksDiv.appendElement({ "id": instanceInfos.TaskId + "_task_instance", "tag": "div", "style": "display: table; width: 100%;", "class": "entity" }).down();
-                                        row.appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": instanceInfos.TaskId })
-
-                                        var countdown = row.appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
-
-                                        var cancelTaskBtn = row.appendElement({ "tag": "div", "class": "entities_btn" }).down()
-                                            .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
-
-                                        cancelTaskBtn.element.onclick = function (instanceInfos) {
-                                            return function () {
-                                                // Cancel the task...
-                                                server.configurationManager.cancelTask(instanceInfos.UUID,
-                                                    /** The success callbacak */
-                                                    function () {
-
-                                                    },
-                                                    /** The error callback */
-                                                    function () {
-
-                                                    }, {})
-                                            }
-                                        }(instanceInfos)
-
-                                        var i = intervals.length
-                                        intervals[i] = setInterval(function (row, countdown, startTime, intervals, index) {
-                                            return function () {
-                                                setTaskTimer(row, countdown, startTime, intervals, index)
-                                            }
-                                        }(row, countdown, startTime, intervals, i), 1000);
-
-                                        // keep the interval...
-                                        intervalsMap[instanceInfos.UUID] = intervals[i]
-                                    }
-                                }
+                                // The task information to display.
+                                setTask(evt.dataMap.taskInfos, intervals, intervalsMap, intervals.length)
                             }
                         }(intervals, intervalsMap))
 
                         // Cancel the task...
                         server.configurationManager.attach(activeTasksDiv, CancelTaskEvent,
-                            function (intervalsMap) {
+                            function (intervals, intervalsMap) {
                                 return function (evt, activeTasksDiv) {
                                     var instanceInfos = evt.dataMap.taskInfos
                                     var row = document.getElementById(instanceInfos.TaskId + "_task_instance")
-                                    if(row != undefined){
+                                    if (row != undefined) {
                                         clearInterval(intervalsMap[instanceInfos.TaskId]);
+                                        intervals = intervals.splice(intervalsMap[instanceInfos.TaskId], 1)
+                                        delete intervalsMap[instanceInfos.TaskId]
                                         row.parentNode.removeChild(row)
+                                        setTask(instanceInfos, intervals, intervalsMap, intervals.length)
                                     }
                                 }
-                            }(intervalsMap))
+                            }(intervals, intervalsMap))
 
                         // Here I will get the list of active task on the server and display it in the list.
                         server.configurationManager.getTaskInstancesInfos(
                             /** Success callback */
                             function (results, caller) {
-
                                 // Here I will set the list of active task...
                                 for (var i = 0; i < results.length; i++) {
-                                    var instanceInfos = results[i]
-                                    if (instanceInfos.StartTime != 0) {
-                                        // In case that the task instance has a start time.
-                                        var startTime = new Date(instanceInfos.StartTime * 1000).getTime()
-                                        var now = new Date().getTime();
-                                        if (startTime - now > 0) {
-                                            var row = activeTasksDiv.appendElement({ "id": instanceInfos.TaskId + "_task_instance", "tag": "div", "style": "display: table; width: 100%;", "class": "entity" }).down();
-                                            row.appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": instanceInfos.TaskId })
-                                            var countdown = row.appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
-
-                                            var cancelTaskBtn = row.appendElement({ "tag": "div", "class": "entities_btn" }).down()
-                                                .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
-
-                                            cancelTaskBtn.element.onclick = function (instanceInfos) {
-                                                return function () {
-                                                    // Cancel the task...
-                                                    server.configurationManager.cancelTask(instanceInfos.UUID,
-                                                        /** The success callbacak */
-                                                        function () {
-
-                                                        },
-                                                        /** The error callback */
-                                                        function () {
-
-                                                        }, {})
-                                                }
-                                            }(instanceInfos)
-
-                                            caller.intervals[i] = setInterval(function (row, countdown, startTime, intervals, index) {
-                                                return function () {
-                                                    setTaskTimer(row, countdown, startTime, intervals, index)
-                                                }
-                                            }(row, countdown, startTime, caller.intervals, i), 1000);
-
-                                            // keep the interval...
-                                            caller.intervalsMap[instanceInfos.UUID] = intervals[i]
-                                        }
-                                    }
+                                    setTask(results[i], caller.intervals, caller.intervalsMap, i)
                                 }
 
                             },
                             /** Error callback */
                             function (errObj, caller) { },
                             /** caller */
-                            { "activeTasksDiv": activeTasksDiv, "intervals": intervals, "intervalsMap": intervalsMap })
+                            { "activeTasksDiv": activeTasksDiv.appendElement({ "tag": "div", "style": "display: table;" }).down(), "intervals": intervals, "intervalsMap": intervalsMap })
                     }
                 } else if (content.TYPENAME == "Config.LdapConfiguration") {
                     // Here I will append in case of sql datasotre the synchornize button.

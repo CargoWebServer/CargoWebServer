@@ -1,27 +1,15 @@
 
 .data_explorer{
-    border-top: 1px solid grey;
     position: relative;
-    width: 100%;
     padding: 5px;
-
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none;   /* Chrome/Safari/Opera */
-    -khtml-user-select: none;    /* Konqueror */
-    -moz-user-select: none;      /* Firefox */
-    -ms-user-select: none;       /* Internet Explorer/Edge */
-    user-select: none;           /* Non-prefixed version, currently
-                                 not supported by any browser */
-
     /** color font **/
     color: #657383;
     font-size: 10pt;
     transition: all .2s ease;
-
+    overflow: auto;
 }
 
 .shemas_view {
-    overflow: auto;
     position: absolute;
     top:0px;
     bottom: 0px;

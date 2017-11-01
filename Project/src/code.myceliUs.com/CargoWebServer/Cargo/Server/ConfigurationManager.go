@@ -28,6 +28,8 @@ type TaskInstanceInfo struct {
 	TaskId       string
 	StartTime    int64
 	CreationTime int64
+	EndTime      int64
+	CancelTime   int64
 }
 
 /**
@@ -356,7 +358,7 @@ func (this *ConfigurationManager) start() {
 				go func(task *Config.ScheduledTask, timer *time.Timer, instanceInfos *TaskInstanceInfo) {
 					<-timer.C                                           // wait util the delay expire...
 					GetServer().GetConfigurationManager().runTask(task) // run the task.
-
+					instanceInfos.EndTime = time.Now().Unix()
 					// Send event message...
 					var eventDatas []*MessageData
 					evtData := new(MessageData)
@@ -376,8 +378,7 @@ func (this *ConfigurationManager) start() {
 					delete(tasks, task.GetId())
 					for i := 0; i < len(instancesInfos); i++ {
 						if instancesInfos[i].UUID == task.GetUUID() {
-							instancesInfos[i].StartTime = -1 // -1 means cancelled
-
+							instancesInfos[i].CancelTime = time.Now().Unix()
 							// Send event message...
 							var eventDatas []*MessageData
 							evtData := new(MessageData)

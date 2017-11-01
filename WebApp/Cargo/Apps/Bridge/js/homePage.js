@@ -361,6 +361,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     setSelectAction(this.datasourceSettingContext, this.datasourceSettingDiv)
     this.dataConfiguration = new ConfigurationPanel(this.datasourceSettingDiv, "Data configuration", "Config.DataStoreConfiguration", "dataStoreConfigs")
 
+    
     // So here I will append panel to display more information about data inside the store. **/
     this.dataExplorer = new DataExplorer(this.datasourceSettingDiv)
 

@@ -21,7 +21,7 @@ var DataExplorer = function (parent) {
     this.prototypesView = {}
     this.configs = {}
     this.newPrototypeBtn = null
-   
+
     // I will connect the view to the events.
     // New prototype event
     server.prototypeManager.attach(this, NewPrototypeEvent, function (evt, dataExplorer) {

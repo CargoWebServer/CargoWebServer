@@ -1298,7 +1298,6 @@ func (server *Server) RunCmd(name string, args []string) (string, error) {
 	// In the case that the command is not in the bin path I will
 	// try to run it from the system path.
 	if !Utility.Exists(path) {
-		log.Println("--> file not found: ", path)
 		path = name
 	}
 
