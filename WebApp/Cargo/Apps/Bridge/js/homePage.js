@@ -48,6 +48,9 @@ var HomePage = function () {
     /** Use to display the content of data store. */
     this.dataExplorer = null
 
+    /** Display the list of task instance since the server started */
+    this.taskInstancesExplorer = null
+
     /** The file navigation  */
     this.fileNavigator = null
 
@@ -385,6 +388,8 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     this.taskSchedulerContext = new Element(this.contextSelector, { "tag": "div", "class": "navigation_btn", "title": "Task scheduler" }).appendElement({ "tag": "i", "class": "fa fa-clock-o" })
     this.scheduledTasksConfiguration = new ConfigurationPanel(this.scheduledTasksDiv, "Scheduled Tasks", "Config.ScheduledTask", "scheduledTasks")
     setSelectAction(this.taskSchedulerContext, this.scheduledTasksDiv)
+
+    this.taskInstancesExplorer = new TaskInstancesExplorer(this.scheduledTasksDiv)
 
     // I will set the configuration of the panel...
     server.entityManager.getEntities("Config.Configurations", "Config", "", 0, -1, [], true,

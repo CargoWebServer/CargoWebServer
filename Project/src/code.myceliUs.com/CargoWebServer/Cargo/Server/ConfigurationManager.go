@@ -26,8 +26,8 @@ type TaskInstanceInfo struct {
 	TYPENAME     string
 	UUID         string
 	TaskId       string
-	StartTime    int64
 	CreationTime int64
+	StartTime    int64
 	EndTime      int64
 	CancelTime   int64
 }
@@ -54,7 +54,7 @@ type ConfigurationManager struct {
 
 	// synchronize task...
 	m_setScheduledTasksChan    chan *Config.ScheduledTask
-	m_cancelScheduledTasksChan chan *Config.ScheduledTask
+	m_cancelScheduledTasksChan chan string
 	m_getTaskInstancesInfo     chan chan []*TaskInstanceInfo
 }
 
@@ -158,7 +158,7 @@ func newConfigurationManager() *ConfigurationManager {
 
 	// Open the channel.
 	configurationManager.m_setScheduledTasksChan = make(chan *Config.ScheduledTask)
-	configurationManager.m_cancelScheduledTasksChan = make(chan *Config.ScheduledTask)
+	configurationManager.m_cancelScheduledTasksChan = make(chan string)
 	configurationManager.m_getTaskInstancesInfo = make(chan chan []*TaskInstanceInfo)
 
 	return configurationManager
@@ -321,11 +321,31 @@ func (this *ConfigurationManager) start() {
 			select {
 			// set the task.
 			case task := <-GetServer().GetConfigurationManager().m_setScheduledTasksChan:
-				// Set the timer.
-				if tasks[task.GetId()] != nil {
-					// Stop previous instance if there is one.
-					tasks[task.GetId()].Stop()
+
+				// Only one instance at time can running at any time...
+				for i := 0; i < len(instancesInfos); i++ {
+					if task.GetId() == instancesInfos[i].TaskId {
+						if tasks[instancesInfos[i].TaskId] != nil {
+							// Stop and remove the timer from the map.
+							instancesInfos[i].CancelTime = time.Now().Unix()
+							tasks[instancesInfos[i].TaskId].Stop()
+							delete(tasks, instancesInfos[i].TaskId)
+							// Send event message...
+							var eventDatas []*MessageData
+							evtData := new(MessageData)
+							evtData.TYPENAME = "Server.MessageData"
+							evtData.Name = "taskInfos"
+							evtData.Value = instancesInfos[i]
+
+							eventDatas = append(eventDatas, evtData)
+							evt, _ := NewEvent(CancelTaskEvent, ConfigurationEvent, eventDatas)
+							GetServer().GetEventManager().BroadcastEvent(evt)
+						}
+					}
 				}
+
+				// Set the timer.
+				var instanceInfos *TaskInstanceInfo
 
 				// Plan the next instance.
 				startTime := time.Unix(task.GetStartTime(), 0)
@@ -334,15 +354,15 @@ func (this *ConfigurationManager) start() {
 				tasks[task.GetId()] = timer
 
 				// Keep task info here.
-				instanceInfos := new(TaskInstanceInfo)
-				instanceInfos.TYPENAME = "Server.TaskInstanceInfo"
-				instanceInfos.UUID = task.GetUUID()
-				instanceInfos.TaskId = task.GetId()
-				instanceInfos.StartTime = task.GetStartTime()  // When the task is planed to start
+				instanceInfos = new(TaskInstanceInfo)
+				instanceInfos.UUID = Utility.RandomUUID()
 				instanceInfos.CreationTime = time.Now().Unix() // Time of task creation.
-
 				// append to the list of task.
 				instancesInfos = append(instancesInfos, instanceInfos)
+
+				instanceInfos.TYPENAME = "Server.TaskInstanceInfo"
+				instanceInfos.TaskId = task.GetId()
+				instanceInfos.StartTime = task.GetStartTime() // When the task is planed to start
 
 				// Send event message...
 				var eventDatas []*MessageData
@@ -372,13 +392,14 @@ func (this *ConfigurationManager) start() {
 				}(task, timer, instanceInfos)
 
 			// reset the task.
-			case task := <-GetServer().GetConfigurationManager().m_cancelScheduledTasksChan:
-				if tasks[task.GetId()] != nil {
-					tasks[task.GetId()].Stop()
-					delete(tasks, task.GetId())
-					for i := 0; i < len(instancesInfos); i++ {
-						if instancesInfos[i].UUID == task.GetUUID() {
-							instancesInfos[i].CancelTime = time.Now().Unix()
+			case uuid := <-GetServer().GetConfigurationManager().m_cancelScheduledTasksChan:
+				for i := 0; i < len(instancesInfos); i++ {
+					if instancesInfos[i].UUID == uuid {
+						instancesInfos[i].CancelTime = time.Now().Unix()
+						if tasks[instancesInfos[i].TaskId] != nil {
+							// Stop and remove the timer from the map.
+							tasks[instancesInfos[i].TaskId].Stop()
+							delete(tasks, instancesInfos[i].TaskId)
 							// Send event message...
 							var eventDatas []*MessageData
 							evtData := new(MessageData)
@@ -389,6 +410,8 @@ func (this *ConfigurationManager) start() {
 							eventDatas = append(eventDatas, evtData)
 							evt, _ := NewEvent(CancelTaskEvent, ConfigurationEvent, eventDatas)
 							GetServer().GetEventManager().BroadcastEvent(evt)
+
+							break
 						}
 					}
 				}
@@ -795,13 +818,13 @@ func (this *ConfigurationManager) ScheduleTask(task *Config.ScheduledTask, messa
 
 // @api 1.0
 // Cancel the next task instance.
-// @param {string} task The task to cancel.
+// @param {string} uuid The instance to cancel.
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
 // @scope {restricted}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *ConfigurationManager) CancelTask(taskUuid string, messageId string, sessionId string) {
+func (this *ConfigurationManager) CancelTask(uuid string, messageId string, sessionId string) {
 
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
@@ -810,15 +833,8 @@ func (this *ConfigurationManager) CancelTask(taskUuid string, messageId string, 
 		return
 	}
 
-	var entity Entity
-	entity, errObj = GetServer().GetEntityManager().getEntityByUuid(taskUuid, false)
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return
-	}
-
 	// Cancel the task.
-	this.m_cancelScheduledTasksChan <- entity.GetObject().(*Config.ScheduledTask)
+	this.m_cancelScheduledTasksChan <- uuid
 
 }
 

@@ -273,7 +273,7 @@ func (this *LdapManager) synchronizeUsers(id string) error {
 	var accountId string
 
 	// a configuration file...
-	var attributes []string = []string{"sAMAccountName", "name", "mail", "telephoneNumber", "userPrincipalName", "distinguishedName"}
+	var attributes []string = []string{"sAMAccountName", "givenName", "mail", "telephoneNumber", "userPrincipalName", "distinguishedName"}
 
 	results, err := this.search(id, "", "", base_dn, filter, attributes)
 
@@ -291,27 +291,29 @@ func (this *LdapManager) synchronizeUsers(id string) error {
 
 		for j := 0; j < len(row); j++ {
 			// Print the result...
-			if attributes[j] == "name" {
+			if attributes[j] == "givenName" {
 				// Here I will split the name to get the first name, last name
 				// and middle letter as needed...
-				values := strings.Split(row[j].(string), ",")
+				values := strings.Split(row[j].(string), " ")
 				if len(values) > 0 {
-					user.SetLastName(strings.TrimSpace(values[0]))
-				}
-				if len(values) > 1 {
-					values_ := strings.Split(values[1], " ")
-					if len(values_) > 1 {
-						if len(values_[1]) > 2 {
-							user.SetFirstName(strings.TrimSpace(values[1]))
-						} else {
-							user.SetFirstName(strings.TrimSpace(values_[0]))
-							user.SetMiddle(strings.TrimSpace(values_[1]))
-						}
-					} else {
-						user.SetFirstName(strings.TrimSpace(values[1]))
+					if len(values) == 1 {
+						user.SetFirstName(strings.TrimSpace(values[0]))
+					} else if len(values) == 2 {
+						user.SetFirstName(strings.TrimSpace(values[0]))
+						user.SetMiddle(strings.TrimSpace(values[1]))
 					}
 				}
-
+			} else if attributes[j] == "distinguishedName" {
+				index := strings.Index(row[j].(string), "\\")
+				if index == -1 {
+					index = strings.Index(row[j].(string), ",")
+				}
+				if index > 3 {
+					lastName := strings.TrimSpace(strings.TrimSpace(row[j].(string)[3:index]))
+					lastName = strings.ToUpper(lastName[0:1]) + strings.ToLower(lastName[1:])
+					log.Println(lastName)
+					user.SetLastName(lastName)
+				}
 			} else if attributes[j] == "mail" {
 				user.SetEmail(row[j].(string))
 			} else if attributes[j] == "telephoneNumber" {

@@ -384,8 +384,8 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 		f_.Write(filedata)
 		checksum_ := Utility.CreateFileChecksum(f_)
 
-		defer f_.Close()
-		defer os.Remove(f_.Name())
+		f_.Close()
+		os.Remove(f_.Name())
 
 		// Open it
 		f, err = os.Open(this.root + filepath + "/" + filename)
@@ -413,20 +413,24 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 		// The file data will be saved in the database without physical file.
 		// The id will be a uuid.
 		file.SetFileType(CargoEntities.FileType_DbFile)
-		f, err = ioutil.TempFile("", "_cargo_tmp_file_")
+		f_, err := ioutil.TempFile("", "_cargo_tmp_file_")
 		if err != nil {
 			// Create the error message
 			cargoError := NewError(Utility.FileLine(), FILE_OPEN_ERROR, SERVER_ERROR_CODE, errors.New("Failed to open _cargo_tmp_file_ for file '"+filename+"'. "))
 			return nil, cargoError
 
 		}
-		f.Write(filedata)
+		f_.Write(filedata)
 
 		// Create the checksum
-		checksum = Utility.CreateFileChecksum(f)
+		checksum = Utility.CreateFileChecksum(f_)
 
 		// Keep the data into the data base as a base 64 string
 		file.SetData(base64.StdEncoding.EncodeToString(filedata))
+
+		// delete temporary file now.
+		f_.Close()
+		os.Remove(f_.Name())
 	}
 
 	// Set general information.
@@ -674,6 +678,7 @@ func (this *FileManager) loadMimeType() {
 	this.mimeTypeMap = make(map[string]*MimeType, 0)
 	mimeTypeFilePath := GetServer().GetConfigurationManager().GetDataPath() + "/mimeType.csv"
 	mimeTypeFile, _ := os.Open(mimeTypeFilePath)
+	defer mimeTypeFile.Close()
 	csvReader := csv.NewReader(bufio.NewReader(mimeTypeFile))
 	for {
 		record, err := csvReader.Read()
@@ -711,10 +716,13 @@ func (this *FileManager) loadMimeType() {
 		}
 
 		file, err := os.Open(GetServer().GetConfigurationManager().GetDataPath() + "/MimeTypeIcon/" + ext + ".png")
+
 		if err != nil {
 			// The file extension has no image so i will get the unknow image...
 			file, _ = os.Open(GetServer().GetConfigurationManager().GetDataPath() + "/MimeTypeIcon/unknown.png")
 		}
+
+		defer file.Close()
 
 		// Set the image as thumbnail...
 		if file != nil {
@@ -873,6 +881,8 @@ func (this *FileManager) ReadCsvFile(filePath string, messageId string, sessionI
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
+
+	defer csvfile.Close()
 
 	reader := csv.NewReader(csvfile)
 	reader.FieldsPerRecord = -1 // see the Reader struct information below

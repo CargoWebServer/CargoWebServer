@@ -7,6 +7,19 @@ var DataExplorer = function (parent) {
     // Keep reference to the parent.
     this.parent = parent
     this.panel = parent.appendElement({ "tag": "div", "class": "data_explorer" }).down()
+    
+    this.panel.element.onscroll = function (header) {
+        return function () {
+            var position = this.scrollTop;
+            if (this.scrollTop > 0) {
+                if (header.className.indexOf(" scrolling") == -1) {
+                    header.className += " scrolling"
+                }
+            } else {
+                header.className = header.className.replaceAll(" scrolling", "")
+            }
+        }
+    }(this.parent.element.firstChild)
 
     // Set the resize event.
     window.addEventListener('resize',

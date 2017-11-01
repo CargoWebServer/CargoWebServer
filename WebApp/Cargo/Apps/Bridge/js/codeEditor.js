@@ -49,7 +49,7 @@ var CodeEditor = function (parent) {
             if (diagram !== undefined) {
                 codeEditor.appendBpmnDiagram(diagram)
             }
-        } else if (evt.dataMap["prototypeInfo"] != undefined){
+        } else if (evt.dataMap["prototypeInfo"] != undefined) {
             var prototype = evt.dataMap["prototypeInfo"]
             if (prototype !== undefined) {
                 codeEditor.appendPrototypeEditor(prototype)
@@ -123,28 +123,28 @@ CodeEditor.prototype.appendPrototypeEditor = function (prototype) {
     }
 
     server.configurationManager.getActiveConfigurations(
-        function(results, caller){
+        function (results, caller) {
             var namespaces = []
-            for(var i=0; i < results.M_dataStoreConfigs.length; i++){
+            for (var i = 0; i < results.M_dataStoreConfigs.length; i++) {
                 namespaces.push(results.M_dataStoreConfigs[i].M_id)
             }
             var codeEditor = caller.codeEditor
             var prototype = caller.prototype
-            var entityEditor =  new EntityPrototypeEditor(filePanel, namespaces, undefined, function(entityEditor){
+            var entityEditor = new EntityPrototypeEditor(filePanel, namespaces, undefined, function (entityEditor) {
                 entityEditor.typeNameInput.element.value = prototype.TypeName
                 entityEditor.setCurrentPrototype(prototype)
                 entityEditor.space.element.style.display = ""
             })
         },
-        function(errObj, caller){
+        function (errObj, caller) {
 
         },
-        {"codeEditor":this, "prototype":prototype})
+        { "codeEditor": this, "prototype": prototype })
 
-        var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": prototype.TypeName + "_editor" }).down()
-        this.files[prototype.TypeName] = prototype
-        this.filesPanel[prototype.TypeName] = filePanel
-        this.setActiveFile(prototype.TypeName)
+    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": prototype.TypeName + "_editor" }).down()
+    this.files[prototype.TypeName] = prototype
+    this.filesPanel[prototype.TypeName] = filePanel
+    this.setActiveFile(prototype.TypeName)
 }
 
 CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
@@ -184,17 +184,17 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
                         }
                     }
                 }
-            } (filePanel)
+            }(filePanel)
 
             window.addEventListener("resize", function (canvas) {
                 return function () {
                     canvas.initWorkspace()
                 }
-            } (codeEditor.diagram.canvas))
+            }(codeEditor.diagram.canvas))
 
             codeEditor.diagram.canvas.initWorkspace()
         }
-    } (this, diagram, filePanel))
+    }(this, diagram, filePanel))
 }
 
 CodeEditor.prototype.appendFile = function (file) {
@@ -235,7 +235,7 @@ CodeEditor.prototype.appendFile = function (file) {
                     codeEditor.toolbars[fileId] = []
                     codeEditor.toolbars[fileId].push(queryEditor.queryToolBar)
                 }
-            } (this, file.M_id))
+            }(this, file.M_id))
 
             // Init the query editor.
             queryEditor.init()
@@ -271,7 +271,7 @@ CodeEditor.prototype.appendFile = function (file) {
                 server.eventHandler.broadcastLocalEvent(evt)
             }
         }
-    } (file.M_id, file.UUID, this));
+    }(file.M_id, file.UUID, this));
 
     this.filesPanel[file.M_id] = filePanel
     this.setActiveFile(file.M_id)
@@ -307,11 +307,11 @@ CodeEditor.prototype.setActiveFile = function (fileId) {
 
     // Now the toolbar...
     var toolbars = document.getElementsByClassName("toolbar")
-    for(var i=0; i < toolbars.length; i++){
+    for (var i = 0; i < toolbars.length; i++) {
         toolbars[i].style.display = "none" // hide toolbar.
     }
 
-    if(document.getElementById(fileId + "_toolbar") != undefined){
+    if (document.getElementById(fileId + "_toolbar") != undefined) {
         document.getElementById(fileId + "_toolbar").style.display = ""
     }
 }
