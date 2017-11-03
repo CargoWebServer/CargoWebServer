@@ -311,7 +311,6 @@ func (this *LdapManager) synchronizeUsers(id string) error {
 				if index > 3 {
 					lastName := strings.TrimSpace(strings.TrimSpace(row[j].(string)[3:index]))
 					lastName = strings.ToUpper(lastName[0:1]) + strings.ToLower(lastName[1:])
-					log.Println(lastName)
 					user.SetLastName(lastName)
 				}
 			} else if attributes[j] == "mail" {

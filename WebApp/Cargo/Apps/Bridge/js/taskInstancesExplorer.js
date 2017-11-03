@@ -39,16 +39,18 @@ var TaskInstancesExplorer = function (parent) {
         taskInstancesExplorer.setTask(evt.dataMap.taskInfos, intervals, intervalsMap, intervals.length)
     })
 
-    // Cancel the task...
-    server.configurationManager.attach(this, CancelTaskEvent,
+    // Update the task informations...
+    server.configurationManager.attach(this, UpdateTaskEvent,
         function (evt, taskInstancesExplorer) {
             var instanceInfos = evt.dataMap.taskInfos
             var row = document.getElementById(instanceInfos.UUID + "_task_instance")
             if (row != undefined) {
-                if (intervalsMap[instanceInfos.TaskId] != undefined) {
-                    clearInterval(intervalsMap[instanceInfos.TaskId]);
-                    intervals = intervals.splice(intervalsMap[instanceInfos.TaskId], 1)
-                    delete intervalsMap[instanceInfos.TaskId]
+                if (instanceInfos.EndTime != undefined || instanceInfos.CancelTime != undefined) {
+                    if (intervalsMap[instanceInfos.TaskId] != undefined) {
+                        clearInterval(intervalsMap[instanceInfos.TaskId]);
+                        intervals = intervals.splice(intervalsMap[instanceInfos.TaskId], 1)
+                        delete intervalsMap[instanceInfos.TaskId]
+                    }
                 }
                 row.parentNode.removeChild(row)
                 taskInstancesExplorer.setTask(instanceInfos, intervals, intervalsMap, intervals.length)
@@ -138,6 +140,8 @@ TaskInstancesExplorer.prototype.setTask = function (instanceInfos, intervals, in
     var cancelTaskBtn = row.appendElement({ "tag": "div", "class": "entities_btn" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
 
+    countdown.element.innerHTML = instanceInfos.Status
+    
     if (instanceInfos.StartTime != 0) {
         // In case that the task instance has a start time.
         // In case that the task in not already running
@@ -173,11 +177,9 @@ TaskInstancesExplorer.prototype.setTask = function (instanceInfos, intervals, in
             if (instanceInfos.EndTime == 0) {
                 if (instanceInfos.Error != null) {
                     countdown.element.title = new Date(instanceInfos.EndTime * 1000).toISOString()
-                    countdown.element.innerHTML = "completed"
                 } else {
                     // If the task failed.
                     countdown.element.title = instanceInfos.Error
-                    countdown.element.innerHTML = "failed"
                 }
                 cancelTaskBtn.element.onclick = function (row) {
                     return function () {
@@ -186,7 +188,6 @@ TaskInstancesExplorer.prototype.setTask = function (instanceInfos, intervals, in
                 }(row)
             } else if (instanceInfos.CancelTime != 0) {
                 countdown.element.title = new Date(instanceInfos.CancelTime * 1000).toISOString()
-                countdown.element.innerHTML = "canceled"
                 cancelTaskBtn.element.onclick = function (row) {
                     return function () {
                         row.element.parentNode.removeChild(row.element)
@@ -197,7 +198,6 @@ TaskInstancesExplorer.prototype.setTask = function (instanceInfos, intervals, in
     } else {
         if (instanceInfos.CancelTime != 0) {
             countdown.element.title = new Date(instanceInfos.CancelTime * 1000).toISOString()
-            countdown.element.innerHTML = "canceled"
             cancelTaskBtn.element.onclick = function (row) {
                 return function () {
                     row.element.parentNode.removeChild(row.element)
@@ -209,7 +209,6 @@ TaskInstancesExplorer.prototype.setTask = function (instanceInfos, intervals, in
                 }
             }(row)
         } else {
-            countdown.element.innerHTML = "running"
             // Here If the user click the button it will stop the task.
             cancelTaskBtn.element.onclick = function (instanceInfos) {
                 return function () {

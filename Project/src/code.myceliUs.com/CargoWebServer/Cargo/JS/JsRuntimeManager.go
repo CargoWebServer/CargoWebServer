@@ -355,7 +355,7 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 }
 
 /**
- *  Create a new VM for a given session id.
+ *  Close and remove VM for a given session id.
  */
 func (this *JsRuntimeManager) removeVm(sessionId string) {
 	// Remove vm ressources.

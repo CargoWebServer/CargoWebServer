@@ -16,7 +16,7 @@ func CallMethod(i interface{}, methodName string, params []interface{}) (interfa
 		return "", errors.New("Nil pointer!")
 	}
 
-	//	log.Println("Call method ", methodName, " with params ", params)
+	//log.Println("Call method ", methodName, " with params ", params)
 	var ptr reflect.Value
 	var value reflect.Value
 	var finalMethod reflect.Value

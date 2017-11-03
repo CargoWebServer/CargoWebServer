@@ -249,7 +249,7 @@ func (this *Server) onClose(subConnectionId string) {
 	// Remove the JS session
 	JS.GetJsRuntimeManager().CloseSession(subConnectionId, callback)
 
-	// I will also kill running cmd for the connection.
+	// I will also kill running cmd started by this (connection/session).
 	cmds := this.sessionCmds[subConnectionId]
 
 	// Remove command.
@@ -1063,6 +1063,18 @@ func (this *Server) Start() {
 
 			successCallback := func(connectionId string, conn otto.Value, service otto.Value) func(rspMsg *message, caller interface{}) {
 				return func(rspMsg *message, caller interface{}) {
+					defer func() {
+						// Stahp mean the VM was kill by the admin.
+						if caught := recover(); caught != nil {
+							if caught.(error).Error() == "Stahp" {
+								// Here the task was cancel.
+								return
+							} else {
+								panic(caught) // Something else happened, repanic!
+							}
+						}
+					}()
+
 					src := string(rspMsg.msg.Rsp.Results[0].DataBytes)
 					JS.GetJsRuntimeManager().AppendScript(src)
 					// Call on open...
@@ -1200,7 +1212,7 @@ func (this *Server) Start() {
 		// Now I will set scheduled task.
 		for i := 0; i < len(GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
 			task := GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks[i]
-			GetServer().GetConfigurationManager().scheduleTask(task)
+			GetTaskManager().scheduleTask(task)
 		}
 
 		activeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations)
@@ -1403,6 +1415,7 @@ func (server *Server) RunCmd(name string, args []string, sessionId string) inter
 
 	// Call it...
 	output, err := cmd.Output()
+
 	if err != nil {
 		log.Println("Fail to run cmd: ", name)
 		log.Println("error: ", err)

@@ -76,7 +76,7 @@ func NewTcpSocketConnection() *tcpSocketConnection {
 	conn.m_try = 0
 
 	// init members...
-	conn.send = make(chan []byte /*, connection_channel_size*/)
+	conn.send = make(chan []byte)
 	conn.m_uuid = Utility.RandomUUID()
 
 	return conn
@@ -100,7 +100,6 @@ func (c *tcpSocketConnection) GetUuid() string {
 }
 
 func (c *tcpSocketConnection) Open(host string, port int) (err error) {
-
 	connectionId := host + ":" + strconv.Itoa(port)
 
 	// Open the socket...
@@ -164,6 +163,13 @@ func (c *tcpSocketConnection) Reader() {
 		size, err := connbuf.Read(b)
 		if err == nil {
 			msgData = append(msgData, b[0:size]...)
+		} else {
+			// In case of the connection was closed I will stop the loop.
+			//log.Println("------------> ", err)
+			if strings.Index(err.Error(), "wsarecv") != -1 || strings.Index(err.Error(), "EOF") != -1 {
+				// Connection with host is close...
+				c.Close()
+			}
 		}
 
 		msg, err := NewMessageFromData(msgData, c)
@@ -173,11 +179,10 @@ func (c *tcpSocketConnection) Reader() {
 			msgData = make([]byte, 0) // empty the buffer...
 			GetServer().GetHub().receivedMsg <- msg
 		}
+		time.Sleep(1 * time.Millisecond)
 	}
-
 	// End the connection...
 	c.Close()
-
 }
 
 func (c *tcpSocketConnection) Writer() {
@@ -186,6 +191,7 @@ func (c *tcpSocketConnection) Writer() {
 			// I will get the message here...
 			c.m_socket.Write(msg)
 		}
+		time.Sleep(1 * time.Millisecond)
 	}
 	c.Close()
 }
@@ -218,7 +224,6 @@ func NewWebSocketConnection() *webSocketConnection {
 	conn.send = make(chan []byte /*, connection_channel_size*/)
 	conn.m_uuid = Utility.RandomUUID()
 	conn.m_isOpen = false
-
 	return conn
 }
 
@@ -292,12 +297,14 @@ func (c *webSocketConnection) Reader() {
 	for c.m_isOpen == true {
 		var in []byte
 		if err := websocket.Message.Receive(c.m_socket, &in); err != nil {
-			break
+			c.Close()
+			break // Exit the reading loop.
 		}
 		msg, err := NewMessageFromData(in, c)
 		if err == nil {
 			GetServer().GetHub().receivedMsg <- msg
 		}
+		time.Sleep(1 * time.Millisecond)
 	}
 }
 
@@ -307,6 +314,7 @@ func (c *webSocketConnection) Writer() {
 			// I will get the message here...
 			websocket.Message.Send(c.m_socket, message)
 		}
+		time.Sleep(1 * time.Millisecond)
 	}
 }
 
