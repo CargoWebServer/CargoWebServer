@@ -171,6 +171,7 @@ func (this *SessionManager) closeSession_(session *CargoEntities.Session) *Cargo
 	// Delete the session
 	connection := GetServer().getConnectionById(session.GetId())
 	if connection != nil {
+		// Remove the vm for the session.
 		connection.Close()
 	}
 

@@ -97,7 +97,7 @@ func (this *Hub) run() {
 			// initialyse js interpreter for the new connection.
 
 			// Open a new session
-			JS.GetJsRuntimeManager().OpendSession(c.GetUuid())
+			JS.GetJsRuntimeManager().OpenSession(c.GetUuid())
 
 			// Set the server global variable.
 			JS.GetJsRuntimeManager().SetVar(c.GetUuid(), "server", GetServer())

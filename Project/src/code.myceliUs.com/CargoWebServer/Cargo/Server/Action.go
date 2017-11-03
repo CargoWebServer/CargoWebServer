@@ -231,9 +231,14 @@ func (self *Action) Ping() (string, error) {
 
 /**
  * Run a command on the server.
+ * Interface can be an error or a string with the result in it...
  */
-func (self *Action) RunCmd(name string, args []string) (result string, err error) {
-	return GetServer().RunCmd(name, args)
+func (self *Action) RunCmd(name string, args []string) interface{} {
+	var sessionId string
+	if self.msg.from != nil {
+		sessionId = self.msg.from.GetUuid()
+	}
+	return GetServer().RunCmd(name, args, sessionId)
 }
 
 /**

@@ -7,7 +7,7 @@ var TaskInstancesExplorer = function (parent) {
 
     this.parent = parent
     this.panel = parent.appendElement({ "tag": "div", "class": "data_explorer" }).down()
-    
+
     // set the scrolling shadow...
     this.panel.element.onscroll = function (header) {
         return function () {
@@ -49,9 +49,9 @@ var TaskInstancesExplorer = function (parent) {
                     clearInterval(intervalsMap[instanceInfos.TaskId]);
                     intervals = intervals.splice(intervalsMap[instanceInfos.TaskId], 1)
                     delete intervalsMap[instanceInfos.TaskId]
-                    row.parentNode.removeChild(row)
-                    taskInstancesExplorer.setTask(instanceInfos, intervals, intervalsMap, intervals.length)
                 }
+                row.parentNode.removeChild(row)
+                taskInstancesExplorer.setTask(instanceInfos, intervals, intervalsMap, intervals.length)
             }
         })
 
@@ -170,9 +170,15 @@ TaskInstancesExplorer.prototype.setTask = function (instanceInfos, intervals, in
             intervalsMap[instanceInfos.TaskId] = intervals[index]
 
         } else {
-            if (instanceInfos.EndTime != 0) {
-                countdown.element.title = new Date(instanceInfos.EndTime * 1000).toISOString()
-                countdown.element.innerHTML = "completed"
+            if (instanceInfos.EndTime == 0) {
+                if (instanceInfos.Error != null) {
+                    countdown.element.title = new Date(instanceInfos.EndTime * 1000).toISOString()
+                    countdown.element.innerHTML = "completed"
+                } else {
+                    // If the task failed.
+                    countdown.element.title = instanceInfos.Error
+                    countdown.element.innerHTML = "failed"
+                }
                 cancelTaskBtn.element.onclick = function (row) {
                     return function () {
                         row.element.parentNode.removeChild(row.element)
@@ -189,12 +195,35 @@ TaskInstancesExplorer.prototype.setTask = function (instanceInfos, intervals, in
             }
         }
     } else {
-        countdown.element.innerHTML = "running"
-        // Here If the user click the button it will stop the task.
-        cancelTaskBtn.element.onclick = function (instanceInfos) {
-            return function () {
-                alert("Stop me!")
-            }
-        }(instanceInfos)
+        if (instanceInfos.CancelTime != 0) {
+            countdown.element.title = new Date(instanceInfos.CancelTime * 1000).toISOString()
+            countdown.element.innerHTML = "canceled"
+            cancelTaskBtn.element.onclick = function (row) {
+                return function () {
+                    row.element.parentNode.removeChild(row.element)
+                }
+            }(row)
+            cancelTaskBtn.element.onclick = function (row) {
+                return function () {
+                    row.element.parentNode.removeChild(row.element)
+                }
+            }(row)
+        } else {
+            countdown.element.innerHTML = "running"
+            // Here If the user click the button it will stop the task.
+            cancelTaskBtn.element.onclick = function (instanceInfos) {
+                return function () {
+                    server.configurationManager.cancelTask(instanceInfos.UUID,
+                        /** The success callbacak */
+                        function () {
+
+                        },
+                        /** The error callback */
+                        function () {
+
+                        }, {})
+                }
+            }(instanceInfos)
+        }
     }
 }

@@ -30,6 +30,7 @@ type TaskInstanceInfo struct {
 	StartTime    int64
 	EndTime      int64
 	CancelTime   int64
+	Error        string
 }
 
 /**
@@ -256,8 +257,8 @@ func (this *ConfigurationManager) start() {
 			if len(CargoEntitiesFileExists("tcpServiceContainerStart")) == 0 {
 				var script string
 				script = "function tcpServiceContainerStart(){\n"
-				script += `	GetServer().RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"])` + "\n"
-				script += `	setInterval(function(){ GetServer().RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"])}, 1000)` + "\n"
+				script += `	GetServer().RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"], sessionId)` + "\n"
+				script += `	setInterval(function(){ GetServer().RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"], sessionId)}, 1000)` + "\n"
 				script += "}\n"
 				script += "tcpServiceContainerStart()\n"
 				GetServer().GetFileManager().createDbFile("tcpServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", script)
@@ -266,8 +267,8 @@ func (this *ConfigurationManager) start() {
 			if len(CargoEntitiesFileExists("wsServiceContainerStart")) == 0 {
 				var script string
 				script = "function wsServiceContainerStart(){\n"
-				script += `	GetServer().RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"])` + "\n"
-				script += `	setInterval(function(){GetServer().RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"])}, 1000)` + "\n"
+				script += `	GetServer().RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"], sessionId)` + "\n"
+				script += `	setInterval(function(){GetServer().RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"], sessionId)}, 1000)` + "\n"
 				script += "}\n"
 				script += "wsServiceContainerStart()\n"
 				GetServer().GetFileManager().createDbFile("wsServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", script)
@@ -376,9 +377,13 @@ func (this *ConfigurationManager) start() {
 				GetServer().GetEventManager().BroadcastEvent(evt)
 
 				go func(task *Config.ScheduledTask, timer *time.Timer, instanceInfos *TaskInstanceInfo) {
-					<-timer.C                                           // wait util the delay expire...
-					GetServer().GetConfigurationManager().runTask(task) // run the task.
+					<-timer.C                                                  // wait util the delay expire...
+					err := GetServer().GetConfigurationManager().runTask(task) // run the task.
 					instanceInfos.EndTime = time.Now().Unix()
+					if err != nil {
+						instanceInfos.Error = err.Error()
+					}
+
 					// Send event message...
 					var eventDatas []*MessageData
 					evtData := new(MessageData)
@@ -400,6 +405,25 @@ func (this *ConfigurationManager) start() {
 							// Stop and remove the timer from the map.
 							tasks[instancesInfos[i].TaskId].Stop()
 							delete(tasks, instancesInfos[i].TaskId)
+
+							// I will stop the vm that run that task.
+							JS.GetJsRuntimeManager().CloseSession(instancesInfos[i].TaskId,
+								func(taskId string) func() {
+									return func() {
+										log.Println("--> task with id " + taskId + " is now stop!")
+										// Now I will kill it commands.
+										cmds := GetServer().sessionCmds[taskId]
+										for i := 0; i < len(cmds); i++ {
+											// Remove the command
+											GetServer().removeCmd(cmds[i])
+										}
+
+										// I will also clear intervals for the
+										// the session.
+										GetServer().clearInterval <- taskId
+									}
+								}(instancesInfos[i].TaskId))
+
 							// Send event message...
 							var eventDatas []*MessageData
 							evtData := new(MessageData)
@@ -444,10 +468,24 @@ func (this *ConfigurationManager) stop() {
 /**
  * Run a task.
  */
-func (this *ConfigurationManager) runTask(task *Config.ScheduledTask) {
+func (this *ConfigurationManager) runTask(task *Config.ScheduledTask) error {
+
+	// Error handler.
+	defer func() {
+		// Stahp mean the VM was kill by the admin.
+		if caught := recover(); caught != nil {
+			if caught.(error).Error() == "Stahp" {
+				// Here the task was cancel.
+				return
+			} else {
+				panic(caught) // Something else happened, repanic!
+			}
+		}
+	}()
+
 	// first of all I will test if the task is active.
 	if task.IsActive() == false {
-		return // Nothing to do here.
+		return nil // Nothing to do here.
 	}
 
 	dbFile, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", []interface{}{task.M_script}, false)
@@ -455,18 +493,16 @@ func (this *ConfigurationManager) runTask(task *Config.ScheduledTask) {
 		script, err := b64.StdEncoding.DecodeString(dbFile.GetObject().(*CargoEntities.File).GetData())
 		// Now I will run the script...
 		if err == nil {
-			go func(task *Config.ScheduledTask, script string) {
-				_, err := JS.GetJsRuntimeManager().RunScript("", script)
-				if err != nil {
-					log.Println("---> fail to run task ", task.GetId(), " with error: ", err)
-				} else {
-					log.Println("--> task ", task.GetId(), "run successfully!")
-				}
-			}(task, string(script))
-		} else {
-			log.Println("---> fail to get script for task ", task.GetId(), err)
-		}
+			_, err := JS.GetJsRuntimeManager().RunScript(task.GetId(), string(script))
+			if err != nil {
+				log.Println("--> script error: ", err)
+				return err
+			}
 
+		} else {
+			log.Println("--> script error: ", err)
+			return err
+		}
 		if task.GetFrequencyType() != Config.FrequencyType_ONCE {
 			// So here I will re-schedule the task, it will not be schedule if is it
 			// expired or it must run once.
@@ -476,11 +512,13 @@ func (this *ConfigurationManager) runTask(task *Config.ScheduledTask) {
 				GetServer().GetConfigurationManager().scheduleTask(task)
 			}
 		}
-
 	} else {
-		log.Println("---> fail to get db file for task ", task.GetId(), err)
+		log.Println("--> script error: ", err.GetBody())
+		return errors.New(err.GetBody())
 	}
 
+	log.Println("--> task ", task.GetId(), "run successfully!")
+	return nil
 }
 
 // daysIn returns the number of days in a month for a given year.
@@ -511,6 +549,9 @@ func (this *ConfigurationManager) scheduleTask(task *Config.ScheduledTask) {
 			return
 		}
 	}
+
+	// Open a new session if none exist.
+	JS.GetJsRuntimeManager().OpenSession(task.GetId())
 
 	var nextTime time.Time
 	if task.GetFrequencyType() != Config.FrequencyType_ONCE {

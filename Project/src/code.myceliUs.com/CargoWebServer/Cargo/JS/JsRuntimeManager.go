@@ -168,7 +168,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				jsRuntimeManager.m_executeJsFunction[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
 				// The vm processing loop...
-				go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, stopVm chan (bool)) {
+				go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, stopVm chan (bool), sessionId string) {
 					for {
 						select {
 						case operationInfos := <-setVariable:
@@ -192,19 +192,33 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 							jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
 							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
 						case stop := <-stopVm:
-							// clear ressource here...
 							if stop {
+								// Wait until the vm is stop
+								wait := make(chan string, 1)
+								vm.Interrupt <- func(sessionId string, wait chan string) func() {
+									return func() {
+										// Continue the processing.
+										wait <- "--> Interrupt execution of VM with id " + sessionId
+										// The panic error will actually kill the vm
+										panic(errors.New("Stahp"))
+									}
+								}(sessionId, wait)
+
+								// Synchronyse exec of interuption here.
+								log.Println(<-wait)
+
 								return // exit the loop.
 							}
 						}
 					}
-				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_stopVm[sessionId])
+				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
 				callback <- []interface{}{true} // unblock the channel...
 
 			case operationInfos := <-jsRuntimeManager.m_closeVm:
 				callback := operationInfos.m_returns
 				sessionId := operationInfos.m_params["sessionId"].(string)
 				jsRuntimeManager.m_stopVm[sessionId] <- true // send kill
+
 				jsRuntimeManager.removeVm(sessionId)
 				callback <- []interface{}{true} // unblock the channel...
 			}
@@ -321,8 +335,20 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
  *  Create a new VM for a given session id.
  */
 func (this *JsRuntimeManager) createVm(sessionId string) {
+	if this.m_sessions[sessionId] != nil {
+		return // Nothing to do if the session already exist.
+	}
 	// Create a new js interpreter for the given session.
-	this.m_sessions[sessionId] = otto.New()
+	if sessionId == "" {
+		this.m_sessions[sessionId] = otto.New()
+	} else {
+		// The runtime will be the base cargo runtime for each session.
+		this.m_sessions[sessionId] = this.m_sessions[""].Copy()
+	}
+
+	// That channel is use to interrupt vm machine, it must be created before
+	// the vm start.
+	this.m_sessions[sessionId].Interrupt = make(chan func(), 1) // The buffer prevents blocking
 
 	// Put the sessionId variable on the global scope.
 	this.m_sessions[sessionId].Set("sessionId", sessionId)
@@ -555,22 +581,23 @@ func (this *JsRuntimeManager) getSession(sessionId string) *otto.Otto {
 /**
  * Open a new session on the server.
  */
-func (this *JsRuntimeManager) OpendSession(sessionId string) {
+func (this *JsRuntimeManager) OpenSession(sessionId string) {
+
 	var op OperationInfos
 	op.m_params = make(map[string]interface{})
 	op.m_params["sessionId"] = sessionId
 	op.m_returns = make(chan ([]interface{}))
-
 	this.m_createVm <- op
 
 	// wait for completion
 	<-op.m_returns
+	log.Println("--> vm with id", sessionId, "is now open!")
 }
 
 /**
  * Close a given session.
  */
-func (this *JsRuntimeManager) CloseSession(sessionId string) {
+func (this *JsRuntimeManager) CloseSession(sessionId string, callback func()) {
 	// Send message to stop vm...
 	var op OperationInfos
 	op.m_params = make(map[string]interface{})
@@ -580,4 +607,7 @@ func (this *JsRuntimeManager) CloseSession(sessionId string) {
 
 	// wait for completion
 	<-op.m_returns
+
+	// Call the close callback
+	callback()
 }

@@ -36,10 +36,11 @@ var (
  * a function until it ends by clearInterval
  */
 type IntervalInfo struct {
-	uuid     string
-	callback string
-	ticker   *time.Ticker
-	timer    *time.Timer
+	sessionId string
+	uuid      string
+	callback  string
+	ticker    *time.Ticker
+	timer     *time.Timer
 }
 
 type Server struct {
@@ -62,6 +63,9 @@ type Server struct {
 
 	// Contain the list of active command.
 	cmds []*exec.Cmd
+
+	// Contain the list of active command and their calling session.
+	sessionCmds map[string][]*exec.Cmd
 
 	// Contain the list of active interval JS function.
 	intervals     map[string]*IntervalInfo
@@ -103,6 +107,9 @@ func newServer() *Server {
 
 	server.subConnectionIds = make(map[string][]string, 0)
 	server.subConnections = make(map[string]otto.Value, 0)
+
+	// Active commands by session.
+	server.sessionCmds = make(map[string][]*exec.Cmd, 0)
 
 	// Interval functions stuff.
 	server.intervals = make(map[string]*IntervalInfo, 0)
@@ -222,8 +229,34 @@ func (this *Server) onClose(subConnectionId string) {
 		subConnection.Object().Call("onclose")
 	}
 
+	// Remove ressource use by scripts.
+	callback := func(sessionId string) func() {
+		return func() {
+			log.Println("--> session " + sessionId + " is now close!")
+			// Now I will kill it commands.
+			cmds := GetServer().sessionCmds[sessionId]
+			for i := 0; i < len(cmds); i++ {
+				// Remove the command
+				GetServer().removeCmd(cmds[i])
+			}
+
+			// I will also clear intervals for the
+			// the session.
+			GetServer().clearInterval <- sessionId
+		}
+	}(subConnectionId)
+
 	// Remove the JS session
-	JS.GetJsRuntimeManager().CloseSession(subConnectionId)
+	JS.GetJsRuntimeManager().CloseSession(subConnectionId, callback)
+
+	// I will also kill running cmd for the connection.
+	cmds := this.sessionCmds[subConnectionId]
+
+	// Remove command.
+	for i := 0; i < len(cmds); i++ {
+		// Remove the command
+		this.removeCmd(cmds[i])
+	}
 
 }
 
@@ -334,10 +367,24 @@ func (this *Server) Start() {
 	// Javascript std function.
 	////////////////////////////////////////////////////////////////////////////
 
+	// Base 64 encoding and decoding.
 	// Convert a utf8 string to a base 64 string
 	JS.GetJsRuntimeManager().AppendFunction("utf8_to_b64", func(data string) string {
 		sEnc := b64.StdEncoding.EncodeToString([]byte(data))
 		return sEnc
+	})
+
+	JS.GetJsRuntimeManager().AppendFunction("atob", func(data []byte) string {
+		str, err := b64.StdEncoding.DecodeString(string(data))
+		if err == nil {
+			return string(str)
+		} else {
+			return string(data)
+		}
+	})
+
+	JS.GetJsRuntimeManager().AppendFunction("btoa", func(str string) string {
+		return b64.StdEncoding.EncodeToString([]byte(str))
 	})
 
 	////////////////////////////////////////////////////////////////////////////
@@ -371,9 +418,10 @@ func (this *Server) Start() {
 	////////////////////////////////////////////////////////////////////////////
 	// Timeout/Interval
 	////////////////////////////////////////////////////////////////////////////
-	JS.GetJsRuntimeManager().AppendFunction("setInterval", func(callback string, interval int64) string {
+	JS.GetJsRuntimeManager().AppendFunction("setInterval", func(callback string, interval int64, sessionId string) string {
 		// The intetifier of the function.
 		intervalInfo := new(IntervalInfo)
+		intervalInfo.sessionId = sessionId
 		intervalInfo.uuid = Utility.RandomUUID()
 		intervalInfo.callback = callback
 		intervalInfo.ticker = time.NewTicker(time.Duration(interval) * time.Millisecond)
@@ -388,9 +436,10 @@ func (this *Server) Start() {
 		GetServer().clearInterval <- uuid
 	})
 
-	JS.GetJsRuntimeManager().AppendFunction("setTimeout", func(callback string, timeout int64) string {
+	JS.GetJsRuntimeManager().AppendFunction("setTimeout", func(callback string, timeout int64, sessionId string) string {
 		// The intetifier of the function.
 		intervalInfo := new(IntervalInfo)
+		intervalInfo.sessionId = sessionId
 		intervalInfo.uuid = Utility.RandomUUID()
 		intervalInfo.callback = callback
 		intervalInfo.timer = time.NewTimer(time.Duration(timeout) * time.Millisecond)
@@ -1040,7 +1089,7 @@ func (this *Server) Start() {
 	////////////////////////////////////////////////////////////////////////////
 
 	// Javacript initialisation here.
-	JS.GetJsRuntimeManager().OpendSession("") // Set the anonymous session.
+	JS.GetJsRuntimeManager().OpenSession("") // Set the anonymous session.
 
 	// Append services scripts.
 	for _, src := range GetServer().GetServiceManager().m_serviceClientSrc {
@@ -1073,6 +1122,8 @@ func (this *Server) Start() {
 		for {
 			select {
 			case intervalInfo := <-GetServer().setInterval:
+				// Keep the intervals info in the map.
+				GetServer().intervals[intervalInfo.uuid] = intervalInfo
 				// Wait util the timer ends...
 				go func(intervalInfo *IntervalInfo) {
 					// Set the variable as function.
@@ -1106,13 +1157,28 @@ func (this *Server) Start() {
 
 			case uuid := <-GetServer().clearInterval:
 				intervalInfo := GetServer().intervals[uuid]
-				if intervalInfo.ticker != nil {
-					intervalInfo.ticker.Stop()
-				} else if intervalInfo.timer != nil {
-					intervalInfo.timer.Stop()
+				if intervalInfo != nil {
+					if intervalInfo.ticker != nil {
+						intervalInfo.ticker.Stop()
+					} else if intervalInfo.timer != nil {
+						intervalInfo.timer.Stop()
+					}
+					// Remove the interval/timeout information.
+					delete(GetServer().intervals, uuid)
+				} else {
+					// In that case the uuid is a session id and not an interval id.
+					for _, intervalInfo_ := range GetServer().intervals {
+						if intervalInfo_.sessionId == uuid {
+							if intervalInfo_.ticker != nil {
+								intervalInfo_.ticker.Stop()
+							} else if intervalInfo_.timer != nil {
+								intervalInfo_.timer.Stop()
+							}
+							// Remove the interval/timeout information.
+							delete(GetServer().intervals, intervalInfo_.uuid)
+						}
+					}
 				}
-				// Remove the interval/timeout information.
-				delete(GetServer().intervals, uuid)
 			}
 		}
 	}()
@@ -1120,31 +1186,31 @@ func (this *Server) Start() {
 	////////////////////////////////////////////////////////////////////////////
 	// Services intialisation.
 	////////////////////////////////////////////////////////////////////////////
+	defer func() {
+		// Now after all initialisation are done I will open connection with
+		// other servers.
+		this.GetDataManager().openConnections()
 
-	// Now after all initialisation are done I will open connection with
-	// other servers.
-	this.GetDataManager().openConnections()
-
-	// Now I will register actions for services container.
-	activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
-	if err != nil {
-		log.Panicln(err)
-	}
-
-	// Now I will set scheduled task.
-	for i := 0; i < len(GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
-		task := GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks[i]
-		GetServer().GetConfigurationManager().scheduleTask(task)
-	}
-
-	activeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations)
-	for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
-		config := activeConfigurations.GetServiceConfigs()[i]
-		if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
-			GetServer().GetServiceManager().registerServiceContainerActions(config)
+		// Now I will register actions for services container.
+		activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+		if err != nil {
+			log.Panicln(err)
 		}
-	}
 
+		// Now I will set scheduled task.
+		for i := 0; i < len(GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
+			task := GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks[i]
+			GetServer().GetConfigurationManager().scheduleTask(task)
+		}
+
+		activeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations)
+		for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
+			config := activeConfigurations.GetServiceConfigs()[i]
+			if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
+				GetServer().GetServiceManager().registerServiceContainerActions(config)
+			}
+		}
+	}()
 }
 
 /**
@@ -1159,7 +1225,7 @@ func (this *Server) Stop() {
 	// must be call last
 	this.GetServiceManager().stop()
 
-	//
+	// Kill the running command if there so...
 	for i := 0; i < len(this.cmds); i++ {
 		if this.cmds[i].Process != nil {
 			this.cmds[i].Process.Kill()
@@ -1278,16 +1344,40 @@ func (this *Server) GetDefaultErrorLogger() *Logger {
 // Call cmd from server.
 /////////////////////////////////////////////////////////
 
+/**
+ * Remove a command from list of running command.
+ */
+func (server *Server) removeCmd(cmd *exec.Cmd) {
+	var cmds []*exec.Cmd
+	for i := 0; i < len(server.cmds); i++ {
+		if server.cmds[i] != cmd {
+			cmds = append(cmds, cmd)
+		}
+	}
+	server.cmds = cmds
+
+	for sessionId, cmds_ := range server.sessionCmds {
+		var cmds []*exec.Cmd
+		for i := 0; i < len(cmds_); i++ {
+			if cmds_[i] != cmd {
+				cmds = append(cmds, cmds_[i])
+			}
+		}
+		server.sessionCmds[sessionId] = cmds
+	}
+
+	// Kill it process.
+	err := cmd.Process.Kill()
+	if err != nil {
+		log.Println("Fail to kill command ", err)
+	}
+}
+
 // Run starts the specified command and waits for it to complete.
 // @param {string} name The name of the command to run.
 // @param {[]string} The list of command arguments.
-// @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
-// @scope {restricted}
-// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
-// @param {callback} errorCallback In case of error.
-func (server *Server) RunCmd(name string, args []string) (string, error) {
-
+func (server *Server) RunCmd(name string, args []string, sessionId string) interface{} {
 	if runtime.GOOS == "windows" && !strings.HasSuffix(name, ".exe") {
 		name += ".exe"
 	}
@@ -1308,52 +1398,16 @@ func (server *Server) RunCmd(name string, args []string) (string, error) {
 	// the command succed here.
 	server.cmds = append(server.cmds, cmd)
 
+	// Now I will register the command with the session.
+	server.sessionCmds[sessionId] = append(server.sessionCmds[sessionId], cmd)
+
 	// Call it...
 	output, err := cmd.Output()
-	if err != nil {
-		log.Println("Fail to run cmd: ", name)
-		log.Println("error: ", err)
-		return "", err
-	}
-
-	return string(output), err
-}
-
-// Start starts the specified command but does not wait for it to complete.
-// @param {string} name The name of the command to run.
-// @param {[]string} The list of command arguments.
-// @param {string} messageId The request id that need to access this method.
-// @param {string} sessionId The user session.
-// @scope {restricted}
-// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
-// @param {callback} errorCallback In case of error.
-func (server *Server) StartCmd(name string, args []string) error {
-	// The first step will be to start the service manager.
-	path := server.GetConfigurationManager().GetBinPath() + "/" + name
-	// In the case that the command is not in the bin path I will
-	// try to run it from the system path.
-	if !Utility.Exists(path) {
-		path = name
-	}
-
-	if runtime.GOOS == "windows" && !strings.HasSuffix(path, ".exe") {
-		path += ".exe"
-	}
-
-	// Set the command
-	cmd := exec.Command(path)
-	cmd.Args = append(cmd.Args, args...)
-
-	// the command succed here.
-	server.cmds = append(server.cmds, cmd)
-
-	// Call it...
-	err := cmd.Start()
 	if err != nil {
 		log.Println("Fail to run cmd: ", name)
 		log.Println("error: ", err)
 		return err
 	}
 
-	return nil
+	return string(output)
 }

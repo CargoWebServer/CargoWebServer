@@ -3,7 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Server"
 	//	"github.com/skratchdot/open-golang/open"
@@ -47,8 +50,20 @@ func main() {
 	http.HandleFunc("/.well-known/openid-configuration", Server.DiscoveryHandler)
 	http.HandleFunc("/publickeys", Server.PublicKeysHandler)
 
-	// stop the server...
-	defer Server.GetServer().Stop()
+	// In case of interuption of the program i will
+	// stop service before return.
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		Server.GetServer().Stop()
+		os.Exit(1)
+	}()
+
+	// Print the error message in the console in case of panic.
+	defer func() {
+		log.Println(recover()) // 1
+	}()
 
 	// Start the server...
 	Server.GetServer().Start()
