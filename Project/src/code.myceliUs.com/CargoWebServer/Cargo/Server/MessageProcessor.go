@@ -87,6 +87,7 @@ func (this *MessageProcessor) run() {
 				if rqst != nil {
 					// Remove the request from the list.
 					delete(pendingRequest, m.GetId())
+					//log.Println("---> pendingRequest", len(pendingRequest))
 					if rqst.successCallback != nil {
 						// Call the success callback.
 						rqst.successCallback(m, rqst.caller)
@@ -97,11 +98,13 @@ func (this *MessageProcessor) run() {
 				rqst := pendingRequest[m.GetId()]
 				if rqst != nil {
 					delete(pendingRequest, m.GetId())
+					//log.Println("---> pendingRequest", len(pendingRequest))
 					if rqst.errorCallback != nil {
 						// Call the error callback.
 						rqst.errorCallback(m, rqst.caller)
 					}
 				}
+
 			}
 		}
 	}(this.m_outgoingChannel, this.m_sendRequest, this.m_receiveRequestResponse, this.m_receiveRequestError)
