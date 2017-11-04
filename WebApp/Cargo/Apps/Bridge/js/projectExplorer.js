@@ -21,6 +21,20 @@ var ProjectExplorer = function (parent) {
 
         }, this)
 
+    // That function is use to change the theme in the project explorer.
+    server.fileManager.attach(this, ChangeThemeEvent, function (evt, projectExplorer) {
+        var background = propertyFromStylesheet( "." + evt.dataMap.themeClass, "background")
+        if(background == undefined){
+            background = propertyFromStylesheet( "." + evt.dataMap.themeClass, "background-color")
+        }
+        if(background != undefined){
+            projectExplorer.parent.element.style.backgroundColor = background
+        }
+
+        // Set the text color here.
+        projectExplorer.panel.element.style.color = propertyFromStylesheet( "." + evt.dataMap.themeClass, "color")
+    })
+    
     return this
 }
 
@@ -267,8 +281,8 @@ ProjectView.prototype.createDirView = function (parent, dir, level) {
                         // Now I will hide the fileDiv...
                         var text = folderDiv.element.childNodes[2].innerText
                         folderDiv.element.childNodes[2].style.display = "none"
-                        var renameDirInput =  new Element(null, { "tag": "input", "value": text })
-                        
+                        var renameDirInput = new Element(null, { "tag": "input", "value": text })
+
                         // Insert at position 3
                         folderDiv.element.insertBefore(renameDirInput.element, folderDiv.element.childNodes[3])
 

@@ -19,6 +19,6 @@ var MainPage = function(parent, loginPage){
     this.loginPage.usernameInput.element.value = ""
     this.loginPage.passwordInput.element.value = ""
     this.loginPage.usernameInput.element.focus()
-
+  
 	return this
 }

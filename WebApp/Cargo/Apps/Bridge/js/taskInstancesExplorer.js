@@ -88,7 +88,7 @@ TaskInstancesExplorer.prototype.resize = function () {
   * @param {*} intervals 
   * @param {*} index 
   */
-function setTaskTimer(instanceInfos, row, countdown, startTime, intervals, intervalsMap, index) {
+TaskInstancesExplorer.prototype.setTaskTimer = function(instanceInfos, row, countdown, startTime, intervals, intervalsMap, index) {
     // Get todays date and time
     var now = new Date().getTime();
     // Find the distance between now an the count down date
@@ -164,11 +164,11 @@ TaskInstancesExplorer.prototype.setTask = function (instanceInfos, intervals, in
                 }
             }(instanceInfos)
 
-            intervals[index] = setInterval(function (instanceInfos, row, countdown, startTime, index) {
+            intervals[index] = setInterval(function (instanceInfos, row, countdown, startTime, index, taskExplorer) {
                 return function () {
-                    setTaskTimer(instanceInfos, row, countdown, startTime, intervals, intervalsMap, index)
+                    taskExplorer.setTaskTimer(instanceInfos, row, countdown, startTime, intervals, intervalsMap, index)
                 }
-            }(instanceInfos, row, countdown, startTime, index), 1000);
+            }(instanceInfos, row, countdown, startTime, index, this), 1000);
 
             // keep the interval...
             intervalsMap[instanceInfos.TaskId] = intervals[index]

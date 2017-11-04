@@ -6,6 +6,7 @@ var applicationName = document.getElementsByTagName("title")[0].text
 
 // Local event...
 var ChangeFileEvent = 100
+var ChangeThemeEvent = 101
 
 // Set the address here
 var mainPage = null
@@ -41,6 +42,7 @@ function init() {
  * This function is the entry point of the application...
  */
 function main() {
+    
     server.eventHandler.appendEventFilter(
         "CargoEntities.",
         "EntityEvent",
@@ -99,5 +101,4 @@ function main() {
         function () { },
         undefined
     )
-
 }

@@ -87,7 +87,7 @@ var HomePage = function () {
     this.toolbarDiv = null
 
     homepage = this
-
+    
     return this
 }
 
@@ -201,9 +201,15 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     // The new menu in the data Menu
     var newDataMenuItem = new MenuItem("new_data_menu_item", "New", { "new_eql_query_menu_item": newEqlQueryMenuItem, "new_sql_query_menu_item": newSqlQueryMenuItem }, 1)
 
+    // The preference edition menu.
+    var preferencesServerItem = new MenuItem("preferences_server_menu_item", "Preferences", {}, 1,
+        function () {
+            // 
+        }, "fa fa-wrench")
+
     var closeServerItem = new MenuItem("close_server_menu_item", "Close server", {}, 1, function () { server.stop() }, "fa fa-power-off")
 
-    var fileMenuItem = new MenuItem("file_menu", "File", { "new_file_menu_item": newFileMenuItem, "close_server_menu_item": closeServerItem }, 0)
+    var fileMenuItem = new MenuItem("file_menu", "File", { "new_file_menu_item": newFileMenuItem,"preferences_server_menu_item":preferencesServerItem, "close_server_menu_item": closeServerItem }, 0)
 
     var editMenuItem = new MenuItem("edit_menu", "Edit", {}, 0)
 
@@ -364,7 +370,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     setSelectAction(this.datasourceSettingContext, this.datasourceSettingDiv)
     this.dataConfiguration = new ConfigurationPanel(this.datasourceSettingDiv, "Data configuration", "Config.DataStoreConfiguration", "dataStoreConfigs")
 
-    
+
     // So here I will append panel to display more information about data inside the store. **/
     this.dataExplorer = new DataExplorer(this.datasourceSettingDiv)
 

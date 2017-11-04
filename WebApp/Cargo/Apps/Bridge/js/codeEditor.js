@@ -29,6 +29,8 @@ var CodeEditor = function (parent) {
 
     // Here I will create the file toolbar...
     //this.fileToolbar = new Element(null, { "tag": "div", "class": "toolbar" })
+    this.theme = "ace/theme/chrome"
+    this.themeClass = ""
 
     // Here I will attach the file navigator to file event.
     // Open.
@@ -91,6 +93,13 @@ var CodeEditor = function (parent) {
         }
     })
 
+    server.fileManager.attach(this, ChangeThemeEvent, function (evt, codeEditor) {
+        codeEditor.theme = evt.dataMap.theme
+        for (var editorUuid in codeEditor.editors) {
+            codeEditor.editors[editorUuid].setTheme(evt.dataMap.theme);
+        }
+    })
+
     server.entityManager.attach(this, UpdateEntityEvent, function (evt, codeEditor) {
         if (evt.dataMap.entity !== undefined) {
             var file = evt.dataMap["entity"]
@@ -108,6 +117,7 @@ var CodeEditor = function (parent) {
             }
         }
     })
+
     return this
 }
 
@@ -157,6 +167,8 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
     }
 
     var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": diagram.M_id + "_editor" }).down()
+
+
     this.diagram = new SvgDiagram(filePanel, diagram)
 
     this.diagram.init(function (codeEditor, diagram, filePanel) {
@@ -249,16 +261,55 @@ CodeEditor.prototype.appendFile = function (file) {
 
 
     // Now I will create the file editor.
-    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
+    var filePanel = this.panel.appendElement({ "tag": "xmp", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
+    var observer = new MutationObserver(function (codeEditor) {
+        return function (multiRecord) {
+            var record = multiRecord.pop()
+            var themeClass = record.target.classList[2]
+            if (themeClass != codeEditor.themeClass) {
+                codeEditor.themeClass = themeClass
+                evt = { "code": ChangeThemeEvent, "name": FileEvent, "dataMap": {"theme": codeEditor.theme, "themeClass" : codeEditor.themeClass } }
+                server.eventHandler.broadcastLocalEvent(evt)
+            }
+        }
+    }(this))
+
+    observer.observe(filePanel.element, {
+        attributes: true,
+        attributeFilter: ['class'],
+        childList: false,
+        characterData: false
+    })
+
+    ace.require("ace/ext/language_tools");
     var editor = ace.edit(file.M_id + "_editor");
+    ace.require('ace/ext/settings_menu').init(editor);
     editor.getSession().setMode(fileMode);
-    /*editor.setTheme("ace/theme/tomorrow");*/
+    editor.setTheme(this.theme);
     editor.setOptions({
         enableBasicAutocompletion: true,
         enableSnippets: true,
-        enableLiveAutocompletion: false
+        enableLiveAutocompletion: true
     });
+
     this.editors[file.M_id + "_editor"] = editor
+
+    // Editor command here.
+    editor.commands.addCommands([{
+        name: "showSettingsMenu",
+        bindKey: { win: "Ctrl-q", mac: "Ctrl-q" },
+        exec: function (codeEditor) {
+            return function (editor) {
+                editor.showSettingsMenu();
+                var themeSelect = document.getElementById('setTheme');
+                themeSelect.addEventListener("change", function () {
+                    // Here I will throw a change theme event.
+                    codeEditor.theme = this.value
+                });
+            }
+        }(this),
+        readOnly: true
+    }]);
 
     // In case of file update...
     editor.getSession().on('change', function (fileId, fileUUID, codeEditor) {

@@ -133,7 +133,7 @@ func (this *CacheManager) set(entity Entity) {
 
 	// Lifespan of entity in the cache manager is 30 second.
 	go func(uuid string, removeEntityChannel chan string) {
-		timer := time.NewTimer(30 * time.Second)
+		timer := time.NewTimer(1 * time.Minute)
 		<-timer.C
 		removeEntityChannel <- uuid
 	}(entity.GetUuid(), this.removeEntityChannel)

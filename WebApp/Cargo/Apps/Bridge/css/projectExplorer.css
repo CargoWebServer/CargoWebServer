@@ -10,13 +10,13 @@
     -ms-user-select: none;       /* Internet Explorer/Edge */
     user-select: none;           /* Non-prefixed version, currently
                                  not supported by any browser */
+    color: #657383;
 }
 
 /** The view of a single project **/ 
 .project_view{
     display: table;
     width: 100%;
-    color: #657383;
 }
 
 .project_title{
