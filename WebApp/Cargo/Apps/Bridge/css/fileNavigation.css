@@ -19,8 +19,6 @@
 
 .fileNavigationBtn {
     display: inline;
-   /* height: 30px;
-    width: 20px;*/
     vertical-align: middle;
     font-size: 12pt;
 }
@@ -45,7 +43,6 @@
     min-width: 75px;
     max-height: 30px;
     transition: all .1s ease;
-    margin-left: 5px;
 }
 
 .file_tab:hover{

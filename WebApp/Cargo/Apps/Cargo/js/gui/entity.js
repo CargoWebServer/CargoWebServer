@@ -605,7 +605,7 @@ EntityPanel.prototype.initHeader = function () {
 	// Back to the sypertype 
 	if (this.proto.SuperTypeNames != undefined) {
 		if (this.proto.SuperTypeNames.length > 0) {
-			var backButon = titleDiv.prependElement({ "tag": "div", "class": "entities_btn" }).down()
+			var backButon = titleDiv.prependElement({ "tag": "div", "class": "entities_btn heritage_btn" }).down()
 				.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-left entities_header_btn", "style": "padding-bottom: 3px;" }).down()
 
 			backButon.element.onclick = function (superTypeName, entityPanel) {

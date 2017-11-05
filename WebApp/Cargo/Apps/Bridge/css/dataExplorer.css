@@ -72,10 +72,14 @@
 .popup_div{
     position: absolute; 
     background-color: white;
-	-webkit-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
-	-moz-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
-	box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
-	border: 1px solid darkgrey;
+	-webkit-box-shadow: 5px 5px 12px -4px;
+	-moz-box-shadow: 5px 5px 12px -4px;
+	box-shadow: 5px 5px 12px -4px;
     color: #657383;
     padding: 5px;
+    z-index: 10;
+}
+
+.popup_div input{ 
+    background-color: transparent;
 }

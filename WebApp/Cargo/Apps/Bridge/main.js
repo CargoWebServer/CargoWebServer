@@ -14,6 +14,18 @@ var catalog = null
 var homePage = null
 
 function init() {
+    
+    // Set style informations
+    cargoThemeInfos = JSON.parse(localStorage.getItem("bridge_theme_infos"))
+    if (cargoThemeInfos != undefined) {
+        for (var ruleName in cargoThemeInfos) {
+            var rule = getCSSRule(ruleName)
+            for (property in cargoThemeInfos[ruleName]) {
+                rule.style[property] = cargoThemeInfos[ruleName][property]
+            }
+        }
+    }
+
     var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "height: 100%; width: 100%;" });
 
     // The body element....
@@ -27,7 +39,7 @@ function init() {
         return function (sessionsInfo) {
             homePage.init(mainLayout, sessionsInfo)
         }
-    } (mainLayout, homePage),
+    }(mainLayout, homePage),
         "safranLdap" // Put the ldap sever id here
     )
     // the main page...
@@ -42,7 +54,7 @@ function init() {
  * This function is the entry point of the application...
  */
 function main() {
-    
+
     server.eventHandler.appendEventFilter(
         "CargoEntities.",
         "EntityEvent",

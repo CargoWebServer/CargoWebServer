@@ -5,21 +5,17 @@
 	background-color: white;
 	top: 0px;
 	left: 0px;
-	border: 1px solid darkgrey;
-
 	min-width: 200px;
 
-	-webkit-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
-	-moz-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
-	box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.75);
-	border: 1px solid darkgrey;
+	-webkit-box-shadow: 5px 5px 12px -4px;
+	-moz-box-shadow: 5px 5px 12px -4px;
+	box-shadow: 5px 5px 12px -4px;
 	color: #657383;
 }
 
 .dialog_header{
 	width: 100%;
 	display: table;
-	border-bottom: 1px solid darkgrey;
 }
 
 /** The title **/
@@ -90,8 +86,6 @@
 	display: table;
 	width: 100%;
 	min-height: 50px;
-	font-size: 10pt;
-	font-family: Arial, Helvetica, sans-serif;
     color: black;
     text-align: center;
 	overflow: hidden;
@@ -122,7 +116,6 @@
 
 .diablog_button:hover{
 	cursor: pointer;
-	border: solid 1px darkgrey;
 	color: rgb(66, 139, 202);
 }
 

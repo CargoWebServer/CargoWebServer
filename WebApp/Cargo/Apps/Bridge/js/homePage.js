@@ -99,8 +99,25 @@ var HomePage = function () {
                 if (propertie_ == undefined) {
                     propertie_ = propertie
                 }
+                if(rule == undefined){
+                    console.log(className, "not defined!!!")
+                }
                 rule.style[propertie_] = propertyFromStylesheet(themeClass, propertie)
             }
+
+            // Here I will keep the style information in the local storage.
+            cargoThemeInfos = JSON.parse(localStorage.getItem("bridge_theme_infos"))
+            if (cargoThemeInfos == undefined) {
+                cargoThemeInfos = {}
+            }
+
+            if (cargoThemeInfos[className] == undefined) {
+                cargoThemeInfos[className] = {}
+            }
+
+            // Here I will save the value.
+            cargoThemeInfos[className][propertie_] = rule.style[propertie_]
+            localStorage.setItem("bridge_theme_infos", JSON.stringify(cargoThemeInfos))
         }
 
         // I will set class values with theme class value
@@ -118,17 +135,17 @@ var HomePage = function () {
         changePropertyByClassName("background", ".menu_separator", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background-color", ".home_page", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".home_page", "." + evt.dataMap.themeClass)
-        
+
         changePropertyByClassName("background-color", ".file_tab", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".file_tab", "." + evt.dataMap.themeClass)
-        
+
 
         // I will use the gutter color for the background color of the workspace div.
         changePropertyByClassName("background-color", ".workspace_div", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".workspace_div", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("color", ".fileNavigationBtn", "." + evt.dataMap.themeClass + " .ace_gutter")
-        
-        if(evt.dataMap.isDark){
+
+        if (evt.dataMap.isDark) {
             changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".navigation_div", "." + evt.dataMap.themeClass)
@@ -142,11 +159,22 @@ var HomePage = function () {
             changePropertyByClassName("color", ".entity_panel", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".entity", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".entity input", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".admin_table input", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".popup_div input", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".toolbar select", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("background-color", ".toolbar option", "." + evt.dataMap.themeClass+ " .ace_gutter")
+            changePropertyByClassName("background", ".toolbar option", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".project_explorer input", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".permission_panel input", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".entity select", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("background-color", ".entity option", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("background", ".entity option", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".entity textarea", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".body_cell", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".data_explorer", "." + evt.dataMap.themeClass)
-        }else{
+            changePropertyByClassName("color", ".security_manager_content", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass)
+        } else {
             changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass)
             changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".navigation_div", "." + evt.dataMap.themeClass + " .ace_gutter")
@@ -160,12 +188,21 @@ var HomePage = function () {
             changePropertyByClassName("color", ".entity_panel", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".entity", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".entity input", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".admin_table input", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".popup_div input", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".toolbar select", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".project_explorer input", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".permission_panel input", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".entity select", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".entity textarea", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".body_cell", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".data_explorer", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".security_manager_content", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("background-color", ".entity option", "." + evt.dataMap.themeClass+ " .ace_gutter")
+            changePropertyByClassName("background", ".entity option", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass + " .ace_gutter")
         }
-        
+
         changePropertyByClassName("background-color", "#rightDiv", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background", "#rightDiv", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background-color", "#leftDiv", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
@@ -174,27 +211,69 @@ var HomePage = function () {
         changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background-color", ".splitter", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background", ".splitter", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
-        
-        changePropertyByClassName("color", ".severConfiguration", "." + evt.dataMap.themeClass + " .ace_gutter")
-        changePropertyByClassName("background-color", ".panel", "." + evt.dataMap.themeClass)
-        changePropertyByClassName("background", ".panel", "." + evt.dataMap.themeClass)
 
+        changePropertyByClassName("color", ".severConfiguration", "." + evt.dataMap.themeClass + " .ace_gutter")
+ 
         changePropertyByClassName("background-color", ".entities_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".entities_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("color", ".entities_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("color", ".entities_header_btn.enabled", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background-color", ".result_query_panel", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".result_query_panel", "." + evt.dataMap.themeClass)
-        
-        changePropertyByClassName("background-color", ".table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
-        changePropertyByClassName("background", ".table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+
+        changePropertyByClassName("color", ".role_table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".role_table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".role_table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+
         changePropertyByClassName("color", ".table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background-color", ".header_cell", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".header_cell", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("color", ".header_cell", "." + evt.dataMap.themeClass + " .ace_gutter")
-
+        changePropertyByClassName("background", ".header_cell", "." + evt.dataMap.themeClass, "border-color")
+        changePropertyByClassName("background-color", ".header_cell", "." + evt.dataMap.themeClass, "border-color")
+        changePropertyByClassName("background", ".body_cell", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
+        changePropertyByClassName("background-color", ".body_cell", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
+        changePropertyByClassName("background", "::-webkit-scrollbar-thumb", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
+        changePropertyByClassName("background-color", "::-webkit-scrollbar-thumb", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
         
+        changePropertyByClassName("color", ".permissions_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".permissions_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".permissions_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".permissions_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".permissions_panel_header", "." + evt.dataMap.themeClass, "border-color")
+        changePropertyByClassName("background-color", ".permissions_panel_header", "." + evt.dataMap.themeClass, "border-color")
+        changePropertyByClassName("background-color", ".permission_panel", "." + evt.dataMap.themeClass, "border-color")
+        
+        changePropertyByClassName("background-color", ".role_permission_manager", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".role_permission_manager", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".security_manager_content", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".security_manager_content", "." + evt.dataMap.themeClass)
+
+        changePropertyByClassName("background-color", ".dialog_content", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".dialog_content", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".dialog_content", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background-color", ".dialog_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".dialog_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".dialog_footer", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".dialog_footer", "." + evt.dataMap.themeClass )
+        changePropertyByClassName("color", ".dialog_footer", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background-color", ".admin_table", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".admin_table", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".admin_table", "." + evt.dataMap.themeClass)
+        
+        changePropertyByClassName("background-color", ".popup_div", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".popup_div", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".popup_div", "." + evt.dataMap.themeClass)
+        
+        changePropertyByClassName("background-color", ".login-form", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".login-form", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".login-form", "." + evt.dataMap.themeClass)
+        
+        changePropertyByClassName("background-color", ".main_page", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".main_page", "." + evt.dataMap.themeClass + " .ace_gutter")
     })
+
+
     return this
 }
 

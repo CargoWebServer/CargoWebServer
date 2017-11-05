@@ -12,6 +12,14 @@ function Stop() {
     GetServer().Stop()
 }
 
+function setInterval(callback, interval) {
+    setInterval_(callback, interval, sessionId)
+}
+
+function setTimeout(callback, timeout) {
+    setTimeout_(callback, timeout, sessionId)
+}
+
 /////////////////////////////////////// Other script /////////////////////////////////////////
 /**
  * Read excel file and get it content as comma separated values.

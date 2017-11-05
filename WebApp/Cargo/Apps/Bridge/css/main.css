@@ -12,11 +12,9 @@ body {
   scrollbar-track-color: #EBEBEB; 
   scrollbar-arrow-color: black; 
   scrollbar-shadow-color: #C0C0C0; 
-  scrollbar-dark-shadow-color: #C0C0C0; 
-
   /*-ms-overflow-style: -ms-autohiding-scrollbar;*/
-  
 }
+
 
 /** Here I will set the scroll bar style **/
 ::-webkit-scrollbar
@@ -32,7 +30,7 @@ body {
 
 ::-webkit-scrollbar-thumb
 {
-  background: #657383;;
+  background: #657383;
 }
 
 ::-webkit-scrollbar-thumb:active
@@ -43,26 +41,6 @@ body {
 ::-webkit-scrollbar-thumb:hover
 {
   cursor: pointer;
-}
-
-/** The splitters **/
-.splitter_v{
-	border-right: 1px solid #657383;
-  border-left: 	1px solid grey;
-}
-
-.splitter_v:hover{
-	cursor: ew-resize;
-}
-
-.splitter_h{
-	border-top: 1px solid #657383;
-	border-bottom: 1px solid grey;
-	background-color: lightgrey;
-}
-
-.splitter_h:hover{
-	cursor: ns-resize;
 }
 
 .scrolltable th{
@@ -76,4 +54,8 @@ body {
 
 .dialog_delete_button:hover{
     background: linear-gradient(to bottom, rgba(204,0,0,1) 0%,rgba(204,0,0,1) 100%);
+}
+
+.heritage_btn i{
+  display: none;
 }

@@ -11,14 +11,14 @@
 }
 
 .toolbar select{
-    color: #657383;
+    background-color: transparent;
     vertical-align: middle;
     text-align: center;
     border: 1px solid transparent;
 }
 
-.toolbar select:hover{
-    border: 1px solid lightgrey;
+.toolbar option{
+    background-color: transparent;
 }
 
 /** Toolbar button **/

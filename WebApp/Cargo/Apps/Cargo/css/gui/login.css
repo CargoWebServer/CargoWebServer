@@ -9,16 +9,15 @@ body {
 }
 
 .login_page{
-
   /** The login background color **/
   background-color: rgba(0,0,0,.65);
 }
 
 .login-form {
   opacity: 1;
-  background: #fff;
-  border-radius: 1px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
+  color: black;
+  background-color: #fff;
+  box-shadow: 0 0 2px, 0 2px 4px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -29,17 +28,21 @@ body {
   text-align: center;
 }
 
+.login-form input{
+  background-color: transparent;
+}
+
 .input-container {
   text-align: center;
   position: relative;
   display: inline-block;
+  background-color: transparent;
 }
 
 .placeholder {
   position: absolute;
   bottom: 7px;
   left: 2px;
-  color: #bbb;
   transition: all .2s ease;
   z-index: 0;
 }
@@ -62,7 +65,7 @@ body {
   width: 0;
   height: 2px;
   transition: all .2s ease;
-  box-shadow: 0 2px 0 #428bca;
+  box-shadow: 0 2px 0;
 }
 .line:before {
   left: 50%;
@@ -75,7 +78,7 @@ input.fancy {
   margin: 0;
   margin-top: 50px;
   border: none;
-  border-bottom: 1px solid #bbb;
+  border-bottom: 1px solid;
   position: relative;
   background: transparent;
   padding: 3px;
@@ -96,7 +99,6 @@ input.fancy:focus ~ .placeholder, input.fancy.used ~ .placeholder, input.fancy:v
 
 .button {
   display: block;
-  border-radius: 3px;
   padding: 10px;
   color: #646464;
   cursor: pointer;

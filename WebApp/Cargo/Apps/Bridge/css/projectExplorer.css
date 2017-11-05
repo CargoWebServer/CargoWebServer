@@ -12,6 +12,10 @@
                                  not supported by any browser */
 }
 
+.project_explorer input {
+    background-color: transparent;
+}
+
 /** The view of a single project **/ 
 .project_view{
     display: table;

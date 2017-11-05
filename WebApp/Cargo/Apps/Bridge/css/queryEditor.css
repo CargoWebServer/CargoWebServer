@@ -6,6 +6,7 @@
     left: 0px;
     right: 0px;
     background-color: transparent;
+    font: 14px Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
 }
 
 .edit_query_panel{

@@ -2,7 +2,7 @@ package Server
 
 import (
 	"log"
-	"time"
+	//"time"
 )
 
 /**
@@ -132,11 +132,11 @@ func (this *CacheManager) set(entity Entity) {
 	this.entities[entity.GetUuid()] = entity
 
 	// Lifespan of entity in the cache manager is one minute.
-	go func(uuid string, removeEntityChannel chan string) {
+	/*go func(uuid string, removeEntityChannel chan string) {
 		timer := time.NewTimer(1 * time.Minute)
 		<-timer.C
 		removeEntityChannel <- uuid
-	}(entity.GetUuid(), this.removeEntityChannel)
+	}(entity.GetUuid(), this.removeEntityChannel)*/
 
 }
 

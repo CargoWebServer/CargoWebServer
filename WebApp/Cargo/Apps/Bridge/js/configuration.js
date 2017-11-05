@@ -99,7 +99,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
         }
     })
 
-    
+
     return this
 }
 
@@ -276,30 +276,28 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                 } else if (content.TYPENAME == "Config.ServerConfiguration") {
                     // If the content is server configuration I will also append the change admin password option.
                     // That pannel will be use to change admin password.
-                    configurationContent.appendElement({ "tag": "div", "style": "display:table; border-top: 1px solid grey; padding: 5px 0px 5px 2px; width: 100%;" }).down()
+                    configurationContent.appendElement({ "tag": "div", "class": "panel" }).down()
+                        .appendElement({ "tag": "div", "class": "entities_panel_header" }).down()
+                        .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": "Change admin password" }).up()
                         .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;" }).down()
-                        .appendElement({ "tag": "div", "style": "display: table-cell; padding: 2px;color: white; background-color: #bbbbbb;", "innerHtml": "Change admin password" }).up()
-                        .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;" }).down()
-                        .appendElement({ "tag": "div", "id": "adminPasswordChange" }).down()
-                        .appendElement({ "tag": "div", "style": "display:table-row; width:100%;" }).down()
+                        .appendElement({ "tag": "div", "id": "adminPasswordChange", "class": "entity_panel" }).down()
+                        .appendElement({ "tag": "div", "class": "entity" }).down()
                         .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
                         .appendElement({ "tag": "span", "innerHtml": "current password:" }).up()
                         .appendElement({ "tag": "div", "style": "display: table-cell; position: relative;" }).down()
                         .appendElement({ "tag": "input", "type": "password", "style": "width: 100%;", "id": "currentPwd" }).up().up()
-                        .appendElement({ "tag": "div", "style": "display:table-row; width:100%;" }).down()
+                        .appendElement({ "tag": "div", "class": "entity" }).down()
                         .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
                         .appendElement({ "tag": "span", "type": "password", "innerHtml": "new password:" }).up()
                         .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
                         .appendElement({ "tag": "input", "type": "password", "style": "width: 100%;", "id": "newPwd" }).up().up()
-                        .appendElement({ "tag": "div", "style": "display:table-row; width:100%;" }).down()
+                        .appendElement({ "tag": "div", "class": "entity" }).down()
                         .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
                         .appendElement({ "tag": "span", "innerHtml": "confirm password:" }).up()
                         .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
                         .appendElement({ "tag": "input", "type": "password", "style": "width: 100%;", "id": "confirmPwd" }).up().up().up().up()
-                        .appendElement({ "tag": "div", "style": "display:table; width: 100%;" }).down()
-                        .appendElement({ "tag": "div", "style": "display:table-row; width: 100%;" }).down()
-                        .appendElement({ "tag": "div", "style": "display: table-cell; width:100%;" })
-                        .appendElement({ "tag": "div", "id": "changeAdminPwdBtn", "style": "display: table-cell; with: 50px", "innerHtml": "ok" })
+                        .appendElement({ "tag": "div", "class": "entity", "style": "text-align: right;" }).down()
+                        .appendElement({ "tag": "div", "id": "changeAdminPwdBtn", "innerHtml": "ok" })
 
                     var currentPwd = configurationContent.getChildById("currentPwd")
                     var newPwd = configurationContent.getChildById("newPwd")
@@ -381,8 +379,10 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                 } else if (content.TYPENAME == "Config.ServiceConfiguration") {
                     // Here I have a service configuration.
                     var parent = content.getPanel().panel //.parentElement.parentElement
+
                     // Keep the reference in the content.
-                    var actionsDiv = parent.appendElement({ "tag": "div", "id": content.UUID + "_actions_div", "style": "position:absolute; left: 0px; bottom: 0px; overflow: auto;" }).down()
+                    var actionsDiv = parent
+                        .appendElement({ "tag": "div", "id": content.UUID + "_actions_div", "style": "position:absolute; left: 0px; bottom: 0px; overflow-y: auto; overflow-x: hidden;"}).down()
 
                     // set the scrolling shadow...
                     actionsDiv.element.onscroll = function (header) {
@@ -438,17 +438,19 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                             } else if (values[i].startsWith("param") && values[i].indexOf("{callback}") == -1) {
                                                 var values_ = values[i].split("param")[1].split(" ")
                                                 doc += "<span class='doc_tag' style='vertical-align: top;'>param</span><span>"
+                                                var description = ""
                                                 for (var j = 1; j < values_.length; j++) {
                                                     if (j == 1) {
                                                         // The type:
-                                                        doc += "<span style='color: darkgreen'>" + values_[j] + "</span>"
+                                                        doc += "<span style='color: darkgreen; vertical-align: text-top'>" + values_[j] + "</span>"
                                                     } else if (j == 2) {
                                                         // The name
-                                                        doc += "<span style='color: color: #657383; font-weight:bold;'>" + values_[j] + "</span>"
+                                                        doc += "<span style='color: color: #657383; font-weight:bold; vertical-align: text-top'>" + values_[j] + "</span>"
                                                     } else {
-                                                        doc += "<span>" + values_[j] + "</span>"
+                                                        description = description + " " + values_[j]
                                                     }
                                                 }
+                                                doc += "<span style='vertical-align: text-top'>" + description + "</span>"
                                                 doc += "</span>"
                                             }
                                             doc += "</div>"
@@ -617,8 +619,9 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 ConfigurationPanel.prototype.setConfigurations = function (configurations) {
 
     // So here I will create the configuration selector...
-    this.header = this.panel.appendElement({ "tag": "div", "style": "display: table; margin-top: 2px; margin-bottom: 4px; width: 100%;" }).down()
-    this.configurationSelect = this.header.appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;", "innerHtml": "Configurations" })
+    this.header = this.panel.appendElement({ "tag": "div", "class":"panel entity" }).down()
+    this.configurationSelect = this.header
+        .appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;", "innerHtml": "Configurations" })
         .appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;" }).down()
         .appendElement({ "tag": "select", "style": "margin-left: 5px;" }).down()
 

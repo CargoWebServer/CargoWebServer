@@ -5,6 +5,7 @@
 	height: auto;
 	display: table;
 	border-spacing:2px 2px;
+	background-color: transparent;
 }
 
 /** The entity panel **/
@@ -20,7 +21,8 @@
     -moz-user-select: none;      /* Firefox */
     -ms-user-select: none;       /* Internet Explorer/Edge */
     user-select: none;           /* Non-prefixed version, currently
-                                 not supported by any browser */
+								 not supported by any browser */
+	 background-color: transparent;
 }
 
 .row_button .fa-trash-o{
@@ -88,6 +90,11 @@
 
 .entity select  {
 	background-color: transparent;
+	border: 1px solid transparent;
+	transition: all .2s ease;
+}
+
+.entity option  {
 	border: 1px solid transparent;
 	transition: all .2s ease;
 }

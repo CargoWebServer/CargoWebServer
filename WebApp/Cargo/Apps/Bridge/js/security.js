@@ -13,10 +13,10 @@ var RolePermissionManager = function (parent) {
     this.content = this.panel.appendElement({ "tag": "div", "style": "display:table;" }).down()
         .appendElement({ "tag": "div", "id": "role_tab", "class": "file_tab active", "style": "display: table-cell;", "innerHtml": "Roles" })
         .appendElement({ "tag": "div", "id": "permission_tab", "class": "file_tab", "style": "display: table-cell;", "innerHtml": "Permissions" })
-        .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%; background-color: #f0f0f0;" })
-        .appendElement({ "tag": "div", "class": "row_button", "style": "display: table-cell; background-color: #f0f0f0;" }).down()
+        .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" })
+        .appendElement({ "tag": "div", "class": "row_button", "style": "display: table-cell;" }).down()
         .appendElement({ "tag": "i", "id": "append_item_button", "class": "fa fa-plus" }).up().up()
-        .appendElement({ "tag": "div", "style": "display:block; height: 100%;border-top: 1px splid grey; overflow-y: auto;" }).down()
+        .appendElement({ "tag": "div", "class":"security_manager_content"}).down()
 
     this.roleTab = this.panel.getChildById("role_tab")
     this.permissionTab = this.panel.getChildById("permission_tab")
@@ -211,12 +211,12 @@ RoleManager.prototype.displayRole = function (role) {
         .appendElement({ "tag": "i", "class": "fa fa-trash" })
 
     // Now the role panel...
-    this.rolePanel = this.panel.getChildById(role.M_id + "_table_row").appendElement({ "tag": "div", "id": role.M_id + "_role_panel", "style": "display: none; width: 95%; margin-left: 15px;" }).down()
+    this.rolePanel = this.panel.getChildById(role.M_id + "_table_row").appendElement({ "tag": "div", "id": role.M_id + "_role_panel","class":"role_panel" }).down()
 
     // Here I will create tow colunm, the first will contain the accounts
-    this.accountsCol = this.rolePanel.appendElement({ "tag": "div", "style": "display: table-cell; width: 50%; border-bottom: 1px solid #f0f0f0;" }).down()
+    this.accountsCol = this.rolePanel.appendElement({ "tag": "div", "class":"role_table" }).down()
 
-    this.accountsDiv = this.accountsCol.appendElement({ "tag": "div", "id": role.M_id + "account_table_header", "style": "width: 100%; background-color: #bbb; color: white; /*padding: 2px;*/" }).down()
+    this.accountsDiv = this.accountsCol.appendElement({ "tag": "div", "id": role.M_id + "account_table_header", "class":"role_table_header" }).down()
         .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;", "innerHtml": "Accounts" })
         .appendElement({ "tag": "div", "id": "add_account_" + role.M_id + "_btn", "class": "row_button", "style": "display: table-cell;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-plus" }).up().up()
@@ -228,8 +228,8 @@ RoleManager.prototype.displayRole = function (role) {
             function (roleManager, accountsDiv, role) {
                 return function (ref) {
                     // i will append the account reference.
-                    var row = accountsDiv.appendElement({ "tag": "div", "id": ref.M_id + "_table", "style": "display: table-row; margin-left: 24px;  width: 100%;" }).down()
-                    row.appendElement({ "tag": "div", "id": "accountId", "style": "display: table-cell;", "innerHtml": ref.M_name })
+                    var row = accountsDiv.appendElement({ "tag": "div", "id": ref.M_id + "_table", "class":"role_table_row", "style": "display: table-row; margin-left: 24px;  width: 100%;" }).down()
+                    row.appendElement({ "tag": "div", "id": "accountId", "class":"role_table_cell", "innerHtml": ref.M_name })
                         .appendElement({ "tag": "div", "id": "delete_" + ref.M_id + "_btn", "class": "row_button", "style": "display: table-cell; padding-left: 4px;" }).down()
                         .appendElement({ "tag": "i", "class": "fa fa-trash" })
 
@@ -271,9 +271,9 @@ RoleManager.prototype.displayRole = function (role) {
         )
     }
 
-    this.actionsCol = this.rolePanel.appendElement({ "tag": "div", "style": "display: table-cell; width: 50%; border-left: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0;" }).down()
+    this.actionsCol = this.rolePanel.appendElement({ "tag": "div", "class":"role_table"  }).down()
 
-    this.actionsDiv = this.actionsCol.appendElement({ "tag": "div", "id": role.M_id + "_actions_table_header", "style": "width: 100%; background-color: #bbb; color: white; /*padding: 2px;*/" }).down()
+    this.actionsDiv = this.actionsCol.appendElement({ "tag": "div", "id": role.M_id + "_actions_table_header", "class":"role_table_header" }).down()
         .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;", "innerHtml": "Actions" })
         .appendElement({ "tag": "div", "id": "add_action_" + role.M_id + "_btn", "class": "row_button", "style": "display: table-cell;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-plus" }).up().up()
@@ -285,8 +285,8 @@ RoleManager.prototype.displayRole = function (role) {
             function (roleManager, actionsDiv, role) {
                 return function (ref) {
                     // i will append the account reference.
-                    actionsDiv.appendElement({ "tag": "div", "id": ref.M_id + "_table", "style": "display: table-row; margin-left: 24px;  width: 100%;" }).down()
-                        .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": ref.M_name })
+                    actionsDiv.appendElement({ "tag": "div", "id": ref.M_id + "_table", "class":"role_table_row" }).down()
+                        .appendElement({ "tag": "div", "class":"role_table_cell", "innerHtml": ref.M_name })
                         .appendElement({ "tag": "div", "id": "delete_" + ref.M_id + "_btn", "class": "row_button", "style": "display: table-cell; padding-left: 4px;" }).down()
                         .appendElement({ "tag": "i", "class": "fa fa-trash" })
 
@@ -342,6 +342,7 @@ RoleManager.prototype.displayRole = function (role) {
                     dialog.content.element.style.display = "block"
                     dialog.content.element.style.height = "350px"
                     dialog.content.element.style.overflowY = "auto"
+                    dialog.div.element.style.maxWidth = "300px"
                     // Keep the account to append to the role.
                     dialog.toAppend = {}
 
@@ -439,7 +440,7 @@ RoleManager.prototype.displayRole = function (role) {
                     dialog.content.element.style.display = "block"
                     dialog.content.element.style.height = "350px"
                     dialog.content.element.style.overflowY = "auto"
-
+                    dialog.div.element.style.maxWidth = "350px"
                     // Keep the account to append to the role.
                     dialog.toAppend = {}
 
@@ -565,7 +566,7 @@ var PermissionManager = function (parent) {
     // The search panel...
     this.panel.appendElement({ "tag": "div", "style": "display: table; width: 99%; padding: 5px;" }).down()
         .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" })
-        .appendElement({ "tag": "input", "id": "search_permission_input", "type": "text", "style": "display: table-cell;" })
+        .appendElement({ "tag": "input", "id": "search_permission_input", "type": "text", "style": "display: table-cell;", "placeholder":"Search" })
         .appendElement({ "tag": "div", "id": "search_permission_button", "class": "row_button", "style": "display: table-cell;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-search" })
 
@@ -654,9 +655,9 @@ PermissionManager.prototype.displayPermissions = function (account, user) {
         .appendElement({ "tag": "div", "style": "display: table-cell;width: 100%;", "innerHtml": userName + " (" + account.M_name + ")" })
 
     // The permission panel.
-    var permissionPanel = row.appendElement({ "tag": "div", "style": "display: none; width: 95%; margin-left: 15px;" }).down()
+    var permissionPanel = row.appendElement({ "tag": "div", "class":"permissions_panel" }).down()
     // The header.
-    permissionPanel.appendElement({ "tag": "div", "style": "display: table; width:100%; background-color: #bbb; color: white;" }).down()
+    permissionPanel.appendElement({ "tag": "div", "class":"permissions_panel_header" }).down()
         .appendElement({ "tag": "div", "style": "display: table-cell; width: 100%; padding: 3px 0px 2px 4px; vertical-align: middle;", "innerHtml": "Permissions" })
         .appendElement({ "tag": "div", "id": "new_permission_" + user.M_id + "_btn", "class": "row_button", "style": "display: table-cell; padding: 3px 0px 2px 4px;vertical-align: middle;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-plus" }).up()
@@ -721,7 +722,7 @@ PermissionManager.prototype.displayPermission = function (parent, permission, ac
         return
     }
 
-    var panel = parent.appendElement({ "tag": "div", "id": "permission_" + permission.M_id + "_panel", "style": "display: table; width: 100%; border-spacing:2px 2px; padding: 5px 0px 5px 0px; border-bottom: 1px solid lightgray;" }).down()
+    var panel = parent.appendElement({ "tag": "div","class":"permission_panel", "id": "permission_" + permission.M_id + "_panel"}).down()
     panel.appendElement({ "tag": "table", "style": "display: table; width: 100%;" }).down()
         .appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
         .appendElement({ "tag": "label", "for": "permission_id_" + permission.UUID + "_input", "innerHtml": "Filter " })

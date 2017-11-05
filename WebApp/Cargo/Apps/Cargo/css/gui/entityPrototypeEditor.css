@@ -1,8 +1,11 @@
 .admin_table{
 	background-color: white;
-	font-family: Ubuntu,'Open Sans',Roboto;
 	color: #657383;
-	font-size: 12pt;
 	padding: 10px;
 	overflow-y: auto;
+}
+
+.admin_table input{
+	border: none;
+	background-color: transparent;
 }

@@ -418,7 +418,7 @@ func (this *Server) Start() {
 	////////////////////////////////////////////////////////////////////////////
 	// Timeout/Interval
 	////////////////////////////////////////////////////////////////////////////
-	JS.GetJsRuntimeManager().AppendFunction("setInterval", func(callback string, interval int64, sessionId string) string {
+	JS.GetJsRuntimeManager().AppendFunction("setInterval_", func(callback string, interval int64, sessionId string) string {
 		// The intetifier of the function.
 		intervalInfo := new(IntervalInfo)
 		intervalInfo.sessionId = sessionId
@@ -436,7 +436,7 @@ func (this *Server) Start() {
 		GetServer().clearInterval <- uuid
 	})
 
-	JS.GetJsRuntimeManager().AppendFunction("setTimeout", func(callback string, timeout int64, sessionId string) string {
+	JS.GetJsRuntimeManager().AppendFunction("setTimeout_", func(callback string, timeout int64, sessionId string) string {
 		// The intetifier of the function.
 		intervalInfo := new(IntervalInfo)
 		intervalInfo.sessionId = sessionId
@@ -740,7 +740,6 @@ func (this *Server) Start() {
 				params := make([]interface{}, 2)
 				params[0] = result
 				params[1] = caller
-				log.Println("---------> success: ", result)
 				// run the success callback.
 				if rspMsg.from == nil {
 					// Here it's a request from a local JS script.
@@ -1379,9 +1378,13 @@ func (server *Server) removeCmd(cmd *exec.Cmd) {
 	}
 
 	// Kill it process.
-	err := cmd.Process.Kill()
-	if err != nil {
-		log.Println("Fail to kill command ", err)
+	if cmd != nil {
+		if cmd.Process != nil {
+			err := cmd.Process.Kill()
+			if err != nil {
+				log.Println("Fail to kill command ", err)
+			}
+		}
 	}
 }
 

@@ -130,17 +130,17 @@ var CodeEditor = function (parent) {
     })
 
     /** Always display the license. */
-    server.fileManager.getFileByPath("/LICENSE",
-        /** Success callback */
+    /*server.fileManager.getFileByPath("/LICENSE",
+        // Success callback 
         function (result, caller) {
             result.M_mime = "text/plain"
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": result } }
             server.eventHandler.broadcastLocalEvent(evt)
         },
-        /** Error callback */
+        // Error callback
         function (errObj, caller) {
 
-        }, {})
+        }, {})*/
 
     return this
 }
@@ -288,12 +288,13 @@ CodeEditor.prototype.appendFile = function (file) {
 
     // Now I will create the file editor.
     var filePanel = this.panel.appendElement({ "tag": "xmp", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
+    
     var observer = new MutationObserver(function (codeEditor) {
         return function (multiRecord) {
             var record = multiRecord.pop()
             var themeClass = record.target.classList[record.target.classList.length - 1]
             var isDark = record.target.className.indexOf("ace_dark") != -1
-            if (themeClass != codeEditor.themeClass) {
+            if (themeClass != codeEditor.themeClass && themeClass != "ace-tm") {
                 // Keep it in the local storage.
                 localStorage.setItem("bridge_editor_theme_class", themeClass)
                 localStorage.setItem("bridge_editor_theme", codeEditor.theme)
@@ -314,8 +315,9 @@ CodeEditor.prototype.appendFile = function (file) {
     ace.require("ace/ext/language_tools");
     var editor = ace.edit(file.M_id + "_editor");
     ace.require('ace/ext/settings_menu').init(editor);
-    editor.getSession().setMode(fileMode);
     editor.setTheme(this.theme);
+    editor.getSession().setMode(fileMode);
+
     editor.setOptions({
         enableBasicAutocompletion: true,
         enableSnippets: true,

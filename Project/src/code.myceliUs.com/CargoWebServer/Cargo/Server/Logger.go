@@ -62,4 +62,5 @@ func (this *Logger) AppendLogEntry(toLog CargoEntities.Entity) {
 
 	// Save the logEntry.
 	this.logEntity.SaveEntity()
+	
 }

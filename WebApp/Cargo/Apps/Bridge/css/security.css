@@ -1,23 +1,92 @@
+.permission_manager input{
+    color: lightgrey;
+    background-color: transparent;
+    border: 1px solid;
+}
 
 .role_permission_manager {
     width: 100%;
     height: 100%;
-    background-color: white;
 }
 
 .role_manager{
-    color: #657383;
-    font-size: 12pt;
-    background-color: white;
     width: 100%;
     display: table;
     border-spacing:2px 2px;
 }
 
 .permission_manager{
-    color: #657383;
-    font-size: 12pt;
-    background-color: white;
     width: 100%;
     height: 100%;
+}
+
+.security_manager_content {
+    color: #657383;
+    background-color: white;
+    display:block; height: 100%;
+    overflow-y: auto;
+}
+
+
+.permissions_panel{
+    display: none; width: 95%; 
+    margin-left: 15px;
+    padding: 2px;
+}
+
+.permissions_panel_header {
+    display: table; 
+    width:100%; 
+    background-color: #bbb; 
+    color: white;
+}
+
+.permission_panel{
+    display: table; 
+    width: 100%; 
+    border-spacing:2px 2px; 
+    padding: 5px 0px 5px 0px; 
+    border-bottom: 1px solid;
+}
+
+.permission_panel label{
+    vertical-align: middle;
+}
+
+.permission_panel input{
+    border: none;
+    background-color: transparent;
+    transition: all .2s ease;
+    vertical-align: middle;
+}
+
+.permission_panel input:hover{
+    border: 1px solid steelblue;
+}
+
+.role_panel{
+    display: none; 
+    width: 95%; 
+    margin-left: 15px;
+}
+
+.role_table{
+    display: table-cell; 
+    width: 50%;
+}
+
+.role_table_header {
+    width: 100%; 
+    background-color: #bbb; 
+    color: white;
+}
+
+.role_table_row{
+    display: table-row; 
+    margin-left: 24px; 
+    width: 100%;
+}
+
+.role_table_cell{
+    display: table-cell;
 }

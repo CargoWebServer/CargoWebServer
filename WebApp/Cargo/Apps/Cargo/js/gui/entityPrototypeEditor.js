@@ -505,7 +505,7 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
         .appendElement({ "tag": "div" }).down()
         .appendElement({ "tag": "div", "class": "entities_btn", "style": "display: table-cell" }).down()
         .appendElement({ "tag": "i", "id": "new_prototype_propertie_" + prototype.TypeName + "_btn", "class": "fa fa-plus" }).up()
-        .appendElement({ "tag": "div", "style": "display: table-cell; color: darkslategray;", "innerHtml": prototype.TypeName })
+        .appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": prototype.TypeName })
 
     var properties = this.properties.appendElement({ "tag": "div", "style": "display: table; width: 100%;  padding-left: 18px;" }).down()
 

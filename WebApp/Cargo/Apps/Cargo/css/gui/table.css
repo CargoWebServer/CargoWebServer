@@ -5,10 +5,6 @@
     margin-bottom: 2px;
 }
 
-.table_header{
-    display: table-header-group;
-}
-
 .table_body{
   display: table-row-group;
 }
@@ -20,6 +16,10 @@
     color: white;
     padding: 2px;
     display: table-cell
+}
+
+.table_header{
+    display: table-header-group;
 }
 
 .body_cell{
@@ -96,7 +96,8 @@
 
 /** The sorter **/
 .column_sorter {
-     display: table-cell;
+    color: lightgrey;
+    display: table-cell;
 }
 
 .column_sorter:hover {
@@ -115,6 +116,7 @@
 
 /** The column filter **/
 .column_filter{
+   color: lightgrey;
    display: table-cell;
 }
 
@@ -174,10 +176,6 @@
 .filter-applied{
     color: white;
     text-shadow: -1px 1px 8px #ade9ff, 1px -1px 8px #fff
-}
-
-.filter{
-    color: lightgrey;
 }
 
 .line{
