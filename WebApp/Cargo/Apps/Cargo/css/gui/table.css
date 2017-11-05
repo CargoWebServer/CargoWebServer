@@ -15,19 +15,18 @@
 
 .header_cell{
     background-color:  #bbb;
-    border-right: 1px solid white;
+    border-right: 1px solid;
+    border-left: 1px solid;
     color: white;
     padding: 2px;
     display: table-cell
 }
 
-.header_cell:first-child{
-    border-left: 1px solid white;
-}
-
 .body_cell{
+    background-color: transparent;
     display: table-cell;
     border-right: 1px solid;
+    border-left: 1px solid;
     border-bottom: 1px solid;
     text-align: left;
     height: 100%;

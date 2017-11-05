@@ -19,23 +19,21 @@
 }
 
 .splitter.vertical{
-    border-left: 1px solid grey;
-    border-right: 1px solid grey;
+    border-right: 1px solid;
     width: 5px;
     height: 100%;
 }
 
-.splitter.vertical:active {
+.splitter.vertical:hover {
     cursor: col-resize;
 }
 
 .splitter.horizontal{
-    border-top: 1px solid grey;
-    border-bottom: 1px solid grey;
+    border-top: 1px solid;
     width: 100%;
     height: 5px;
 }
 
-.splitter.horizontal:active {
+.splitter.horizontal:hover {
     cursor: row-resize;
 }

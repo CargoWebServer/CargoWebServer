@@ -66,6 +66,14 @@ var QueryEditor = function (parent, file, initCallback) {
         // The file mode of the edior is simple javascript.
         this.editor.getSession().setMode("ace/mode/javascript");
     }
+    
+    this.theme = localStorage.getItem("bridge_editor_theme")
+    if (this.theme == undefined) {
+        this.theme = "ace/theme/chrome"
+    }
+    
+    // Set the theme of the editor.
+    this.editor.setTheme(this.theme);
 
     this.editor.getSession().on('change', function (fileId, fileUUID, editor) {
         return function () {

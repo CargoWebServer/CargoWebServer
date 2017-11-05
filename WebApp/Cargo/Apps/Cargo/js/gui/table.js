@@ -749,9 +749,6 @@ var TableRow = function (table, index, data, id) {
 	for (var i = 0; i < data.length; i++) {
 		var cell = new TableCell(this, i, data[i])
 		this.cells.push(cell)
-		if (i == 0) {
-			cell.div.element.style.borderLeft = "1px solid lightgrey"
-		}
 	}
 
 	// The delete button.

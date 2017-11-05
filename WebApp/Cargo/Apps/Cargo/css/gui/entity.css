@@ -83,19 +83,21 @@
 	max-width: 300px;
 	max-height: 50px;
 	width: 20em;
+	background-color: transparent;
 }
 
 .entity select  {
+	background-color: transparent;
 	border: 1px solid transparent;
 	transition: all .2s ease;
 }
 
 .entity input:hover{
-	border: 1px solid #bbb;
+	border: 1px solid;
 }
 
 .entity select:hover{
-	border: 1px solid #bbb;
+	border: 1px solid;
 	cursor: pointer;
 }
 

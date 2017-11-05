@@ -103,7 +103,11 @@ var CodeEditor = function (parent) {
     server.fileManager.attach(this, ChangeThemeEvent, function (evt, codeEditor) {
         codeEditor.theme = evt.dataMap.theme
         for (var editorUuid in codeEditor.editors) {
-            codeEditor.editors[editorUuid].setTheme(evt.dataMap.theme);
+            if(codeEditor.editors[editorUuid].setTheme !== undefined){
+                codeEditor.editors[editorUuid].setTheme(evt.dataMap.theme);
+            }else if(codeEditor.editors[editorUuid].editor.setTheme !== undefined){
+                codeEditor.editors[editorUuid].editor.setTheme(evt.dataMap.theme);
+            }
         }
     })
 
