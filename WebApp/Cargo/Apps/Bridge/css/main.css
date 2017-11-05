@@ -55,7 +55,6 @@ body {
 	cursor: ew-resize;
 }
 
-
 .splitter_h{
 	border-top: 1px solid #657383;
 	border-bottom: 1px solid grey;
@@ -64,10 +63,6 @@ body {
 
 .splitter_h:hover{
 	cursor: ns-resize;
-}
-
-.scrolltable > .table_header{
-  background-color: rgb(101, 115, 131);
 }
 
 .scrolltable th{

@@ -99,6 +99,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
         }
     })
 
+    
     return this
 }
 

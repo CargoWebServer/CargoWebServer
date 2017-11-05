@@ -87,7 +87,84 @@ var HomePage = function () {
     this.toolbarDiv = null
 
     homepage = this
+
+    // That function is use to change the theme in the project explorer.
+    server.fileManager.attach(this, ChangeThemeEvent, function (evt, homepage) {
+
+        // Change the propertie in the class iteself.
+        function changePropertyByClassName(propertie, className, themeClass, propertie_) {
+            var rule = getCSSRule(className)
+            var newValue = propertyFromStylesheet(themeClass, propertie)
+            if (newValue != undefined) {
+                if (propertie_ == undefined) {
+                    propertie_ = propertie
+                }
+                rule.style[propertie_] = propertyFromStylesheet(themeClass, propertie)
+            }
+        }
+
+        // I will set class values with theme class value
+        changePropertyByClassName("color", ".navigation_div", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background-color", ".navigation_div", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".navigation_div", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background-color", ".header", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".header", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".vertical_menu", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".vertical_submenu", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background-color", ".vertical_submenu", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".vertical_submenu", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".vertical_submenu_items", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".popup_menu", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background-color", ".menu_row", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".menu_row", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background-color", ".splitter", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".splitter", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".menu_separator", "." + evt.dataMap.themeClass)
+        
+        changePropertyByClassName("background-color", ".file_tab", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".file_tab", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".file_tab", "." + evt.dataMap.themeClass)
+
+        // I will use the gutter color for the background color of the workspace div.
+        changePropertyByClassName("background-color", ".workspace_div", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".workspace_div", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".fileNavigationBtn", "." + evt.dataMap.themeClass + " .ace_gutter")
+        if(evt.dataMap.isDark){
+            changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter")
+        }else{
+            changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass)
+        }
+
+        changePropertyByClassName("background-color", ".panel", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".panel", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".panel", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".entity_panel", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".entity", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".entity input", "." + evt.dataMap.themeClass)
+
+        changePropertyByClassName("background-color", ".entities_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".entities_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".entities_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".entities_header_btn.enabled", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".result_query_panel", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".result_query_panel", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".result_query_panel", "." + evt.dataMap.themeClass + " .ace_gutter")
+        
     
+        changePropertyByClassName("background-color", ".table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".table_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".header_cell", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".header_cell", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".header_cell", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".body_cell", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".body_cell", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".body_cell", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".data_explorer", "." + evt.dataMap.themeClass)
+        
+    })
     return this
 }
 
@@ -209,7 +286,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     var closeServerItem = new MenuItem("close_server_menu_item", "Close server", {}, 1, function () { server.stop() }, "fa fa-power-off")
 
-    var fileMenuItem = new MenuItem("file_menu", "File", { "new_file_menu_item": newFileMenuItem,"preferences_server_menu_item":preferencesServerItem, "close_server_menu_item": closeServerItem }, 0)
+    var fileMenuItem = new MenuItem("file_menu", "File", { "new_file_menu_item": newFileMenuItem, "preferences_server_menu_item": preferencesServerItem, "close_server_menu_item": closeServerItem }, 0)
 
     var editMenuItem = new MenuItem("edit_menu", "Edit", {}, 0)
 

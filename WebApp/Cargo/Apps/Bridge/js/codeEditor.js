@@ -29,8 +29,15 @@ var CodeEditor = function (parent) {
 
     // Here I will create the file toolbar...
     //this.fileToolbar = new Element(null, { "tag": "div", "class": "toolbar" })
-    this.theme = "ace/theme/chrome"
-    this.themeClass = ""
+    this.theme = localStorage.getItem("bridge_editor_theme")
+    if (this.theme == undefined) {
+        this.theme = "ace/theme/chrome"
+    }
+
+    this.themeClass = localStorage.getItem("bridge_editor_theme_class")
+    if (this.themeClass == undefined) {
+        this.themeClass = "ace-chrome"
+    }
 
     // Here I will attach the file navigator to file event.
     // Open.
@@ -117,6 +124,19 @@ var CodeEditor = function (parent) {
             }
         }
     })
+
+    /** Always display the license. */
+    server.fileManager.getFileByPath("/LICENSE",
+        /** Success callback */
+        function (result, caller) {
+            result.M_mime = "text/plain"
+            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": result } }
+            server.eventHandler.broadcastLocalEvent(evt)
+        },
+        /** Error callback */
+        function (errObj, caller) {
+
+        }, {})
 
     return this
 }
@@ -220,6 +240,8 @@ CodeEditor.prototype.appendFile = function (file) {
         fileMode = "ace/mode/html"
     } else if (file.M_mime == "text/json") {
         fileMode = "ace/mode/json"
+    } else if (file.M_mime == "text/plain") {
+        fileMode = "ace/mode/text"
     }
 
 
@@ -265,10 +287,14 @@ CodeEditor.prototype.appendFile = function (file) {
     var observer = new MutationObserver(function (codeEditor) {
         return function (multiRecord) {
             var record = multiRecord.pop()
-            var themeClass = record.target.classList[2]
+            var themeClass = record.target.classList[record.target.classList.length - 1]
+            var isDark = record.target.className.indexOf("ace_dark") != -1
             if (themeClass != codeEditor.themeClass) {
+                // Keep it in the local storage.
+                localStorage.setItem("bridge_editor_theme_class", themeClass)
+                localStorage.setItem("bridge_editor_theme", codeEditor.theme)
                 codeEditor.themeClass = themeClass
-                evt = { "code": ChangeThemeEvent, "name": FileEvent, "dataMap": {"theme": codeEditor.theme, "themeClass" : codeEditor.themeClass } }
+                evt = { "code": ChangeThemeEvent, "name": FileEvent, "dataMap": { "theme": codeEditor.theme, "themeClass": codeEditor.themeClass, "isDark" : isDark} }
                 server.eventHandler.broadcastLocalEvent(evt)
             }
         }

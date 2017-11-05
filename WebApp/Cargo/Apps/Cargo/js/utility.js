@@ -605,6 +605,21 @@ function addStyleString(id, rule) {
     document.body.appendChild(node);
 }
 
+function getCSSRule(ruleName) {
+    ruleName = ruleName.toLowerCase();
+    var result = null;
+    var find = Array.prototype.find;
+
+    find.call(document.styleSheets, styleSheet => {
+        result = find.call(styleSheet.cssRules, cssRule => {
+            return cssRule instanceof CSSStyleRule 
+                && cssRule.selectorText.toLowerCase() == ruleName;
+        });
+        return result != null;
+    });
+    return result;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Array buffer conversion stuff
 //////////////////////////////////////////////////////////////////////////

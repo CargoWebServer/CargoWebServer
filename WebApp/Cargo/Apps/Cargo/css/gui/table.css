@@ -27,8 +27,8 @@
 
 .body_cell{
     display: table-cell;
-    border-right: 1px solid lightgray;
-    border-bottom: 1px solid lightgray;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
     text-align: left;
     height: 100%;
     padding: 2px;
@@ -134,9 +134,9 @@
     background-color: white;
     border: 1px solid lightgrey;
     z-index: 4;
-    -webkit-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.50);
-    -moz-box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.50);
-    box-shadow: 5px 5px 12px -4px rgba(0,0,0,0.50);
+    -webkit-box-shadow: 5px 5px 12px -4px;
+    -moz-box-shadow: 5px 5px 12px -4px;
+    box-shadow: 5px 5px 12px -4px;
     overflow: hidden;
     width: 200px;
 }
@@ -212,7 +212,7 @@
 .number_of_row_label{
     color: white;
     background-color:#428bca;
-    border: 1px solid white;
+    border: 1px solid;
     font-size: 8pt;
     width: 1em;
     text-align: center; 
@@ -227,7 +227,6 @@
 
 .table_header_size_btn{
     display: table-cell;
-    color: #bbb;
     padding-right: 5px;
     text-align: right;
 }

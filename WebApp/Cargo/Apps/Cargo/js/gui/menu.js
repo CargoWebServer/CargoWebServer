@@ -78,35 +78,8 @@ VerticalMenu.prototype.appendItem = function (item) {
     } else {
         // Here the menu is 
         currentPanel = this.panel.appendElement({ "tag": "div", "class": "menu_row", "style": "display: table-row; width: 100%" }).down()
-
         var iconPanel = currentPanel.appendElement({ "tag": "i", "class": item.icon + " menu_icon", "style": "display: table-cell;" }).down()
         var subMenuPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu", "innerHtml": item.name }).down()
-
-        iconPanel.element.onmouseenter = function (subMenuPanel) {
-            return function () {
-                subMenuPanel.element.style.border = "1px solid lightgrey"
-            }
-        }(subMenuPanel)
-
-        iconPanel.element.onmouseleave = function (subMenuPanel) {
-            return function () {
-                subMenuPanel.element.style.border = ""
-            }
-        }(subMenuPanel)
-
-        subMenuPanel.element.onmouseenter = function (iconPanel) {
-            return function () {
-                iconPanel.element.style.color = "white"
-                iconPanel.element.style.backgroundColor = "#657383"
-            }
-        }(iconPanel)
-
-        subMenuPanel.element.onmouseleave = function (iconPanel) {
-            return function () {
-                iconPanel.element.style.color = ""
-                iconPanel.element.style.backgroundColor = ""
-            }
-        }(iconPanel)
     }
 
     // Append the subitem panel.
@@ -290,32 +263,6 @@ PopUpMenu.prototype.appendItem = function (item) {
 
     var iconPanel = currentPanel.appendElement({ "tag": "i", "class": item.icon + " menu_icon", "style": "display: table-cell;" }).down()
     var subMenuPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu", "innerHtml": item.name }).down()
-
-    iconPanel.element.onmouseenter = function (subMenuPanel) {
-        return function () {
-            subMenuPanel.element.style.border = "1px solid lightgrey"
-        }
-    }(subMenuPanel)
-
-    iconPanel.element.onmouseleave = function (subMenuPanel) {
-        return function () {
-            subMenuPanel.element.style.border = ""
-        }
-    }(subMenuPanel)
-
-    subMenuPanel.element.onmouseenter = function (iconPanel) {
-        return function () {
-            iconPanel.element.style.color = "white"
-            iconPanel.element.style.backgroundColor = "#657383"
-        }
-    }(iconPanel)
-
-    subMenuPanel.element.onmouseleave = function (iconPanel) {
-        return function () {
-            iconPanel.element.style.color = ""
-            iconPanel.element.style.backgroundColor = ""
-        }
-    }(iconPanel)
 
     // Append the subitem panel.
     this.subItemPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu_items" }).down()

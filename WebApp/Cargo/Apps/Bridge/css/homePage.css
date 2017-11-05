@@ -9,6 +9,8 @@
 	min-width: 50px;
   	height: 100%;
 	overflow: hidden;
+	color: #657383;
+    font: 14px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 }
 
 .properties_div{
@@ -37,14 +39,14 @@
                                  not supported by any browser */
 }
 
-
 /** */
 #rightDiv{
+	color: grey;
 	position: relative;
 	width: 100%;
 	height: 100%;
 	background-color: white; 
-	border-top: 1px solid grey;
+	border-top: 1px solid;
 	overflow-x: auto;
 }
 
@@ -67,9 +69,7 @@
 }
 
 .panel{
-	background-color: white;
 	display: table;
-	width: 100%;
 }
 
 
@@ -95,7 +95,7 @@
 	width: 100%;
 	height: 100%;
 	position: relative;
-	background-color: #f0f0f0;
+	opacity: 75%;
 }
 
 .contextSelector div {

@@ -21,20 +21,6 @@ var ProjectExplorer = function (parent) {
 
         }, this)
 
-    // That function is use to change the theme in the project explorer.
-    server.fileManager.attach(this, ChangeThemeEvent, function (evt, projectExplorer) {
-        var background = propertyFromStylesheet( "." + evt.dataMap.themeClass, "background")
-        if(background == undefined){
-            background = propertyFromStylesheet( "." + evt.dataMap.themeClass, "background-color")
-        }
-        if(background != undefined){
-            projectExplorer.parent.element.style.backgroundColor = background
-        }
-
-        // Set the text color here.
-        projectExplorer.panel.element.style.color = propertyFromStylesheet( "." + evt.dataMap.themeClass, "color")
-    })
-    
     return this
 }
 

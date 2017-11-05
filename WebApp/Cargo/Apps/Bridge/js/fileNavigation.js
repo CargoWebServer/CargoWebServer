@@ -232,7 +232,7 @@ FileNavigator.prototype.setActiveTab = function (fileId) {
         // Set the tab active...
         this.tabs[fileId].element.className += " active"
         this.activeFile = this.files[fileId]
-        this.panel.element.style.display = "block"
+        this.panel.element.style.display = "table"
     }
 
     // I will generate the event so other panel will set the current file... 
