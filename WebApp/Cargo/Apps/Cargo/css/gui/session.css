@@ -2,7 +2,7 @@
 #logout_btn{
 	display: block;
 	border-radius: 1px;
-	margin: 1px;
+	margin-top: 5px;
 	padding: 5px 0px 5px 0px;
 	color: #646464;
 	cursor: pointer;
@@ -34,12 +34,9 @@
 .styled-select select {
    background: transparent;
    line-height: 1;
-   border: 0px;
-   border-radius: 0px;
    padding-top: 4px;
    padding-bottom: 4px;
    -webkit-appearance: none;
-   color: #657383;
    font-size: 8pt;
 }
 
@@ -66,8 +63,8 @@
 
 .state_select:hover{
 	cursor: pointer;
-	border-bottom: 1px solid #657383;
-	color: #657383;
+	border-bottom: 1px solid;
+	color: steelblue;
 }
 
 /** Div here act like button **/
@@ -89,8 +86,6 @@
 	min-width: 60px;
 	padding-right: 10px;
 	padding-left: 10px;
-	color: #657383;
-	font-family: Arial, Helvetica, sans-serif;
 }
 
 /** Mouse over style **/
@@ -101,22 +96,20 @@
 
 /** The panel that contain menu **/
 .session_display_panel {
+	background-color: white;
 	max-height: 500px;
     overflow-y: auto;
-	min-width: 200px;
+	min-width: 150px;
 	font-size: 10pt;
 	overflow: hidden;
-	font-family: Arial, Helvetica, sans-serif;
 	padding: 1px;
 	position: absolute;
-	background-color: white;
 	padding: 2px;
 	display: none;
-	border: 1px solid darkgrey;
 	transition: all .2s ease;
-	-webkit-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
-	-moz-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
-	box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
+	-webkit-box-shadow: -2px 2px 5px 0px;
+	-moz-box-shadow: -2px 2px 5px 0px;
+	box-shadow: -2px 2px 5px 0px;
 	z-index: 10;
 }
 
@@ -127,8 +120,8 @@
 }
 
 .active_session div{
-	display: table-cell;
-	padding-right: 10px;
+	display: inline;
+	text-align: center;
 }
 
 .active_session i{
@@ -137,23 +130,21 @@
 }
 
 .active_session span{
-	font-family: Arial, Helvetica, sans-serif;
-	color: #657383;
 	font-size: 10pt;
 }
 
 .session_state_menu{
+	background-color: white;
 	position: absolute;
 	padding-left: 10px;
 	padding-right: 10px;
 	padding-top: 2px;
 	padding-bottom: 2px;
-	background-color: white;
 	z-index: 11;
 	transition: all .2s ease;
-	-webkit-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
-	-moz-box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
-	box-shadow: -2px 2px 5px 0px rgba(0,0,0,0.25);
-	border-right: 1px solid lightslategray;
-	border-bottom: 1px solid lightslategray;
+	-webkit-box-shadow: -2px 2px 5px 0px;
+	-moz-box-shadow: -2px 2px 5px 0px;
+	box-shadow: -2px 2px 5px 0px;
+	border-right: 1px solid;
+	border-bottom: 1px solid;
 }

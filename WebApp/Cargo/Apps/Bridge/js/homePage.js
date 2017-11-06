@@ -136,6 +136,14 @@ var HomePage = function () {
         changePropertyByClassName("background-color", ".home_page", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".home_page", "." + evt.dataMap.themeClass)
 
+        changePropertyByClassName("color", ".session_panel", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background-color", ".session_display_panel", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".session_display_panel", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".session_display_panel", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background-color", ".session_state_menu", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".session_state_menu", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".session_state_menu", "." + evt.dataMap.themeClass)
+
         changePropertyByClassName("background-color", ".file_tab", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".file_tab", "." + evt.dataMap.themeClass)
 

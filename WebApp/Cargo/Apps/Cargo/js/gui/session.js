@@ -160,6 +160,7 @@ SessionPanel.prototype.setAccountInfo = function (accountInfo) {
 				// I will keep the reference to the panel...
 				this.otherSessionPanels[session.UUID] = sessionInfoPanel
 				this.otherSessionPanel.element.style.display = "inline-block"
+				this.otherSessionPanel.element.style.width = "100%"
 			}
 		}
 	}
@@ -447,7 +448,7 @@ var SessionInfoPanel = function (parent, sessionInfo, accountInfo, displayStateM
 		this.sessionState.element.onclick = function (sessionPanel, isShow) {
 			return function () {
 				if (!isShow) {
-					sessionPanel.sessionStateMenu.element.style.display = "block"
+					sessionPanel.sessionStateMenu.element.style.display = ""
 				} else {
 					sessionPanel.sessionStateMenu.element.style.display = "none"
 				}
