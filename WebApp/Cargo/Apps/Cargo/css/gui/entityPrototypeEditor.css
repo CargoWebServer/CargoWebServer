@@ -3,6 +3,7 @@
 	color: #657383;
 	padding: 10px;
 	overflow-y: auto;
+	font-size: 10pt;
 }
 
 .admin_table input{

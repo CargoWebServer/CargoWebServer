@@ -17,4 +17,5 @@
      height: 100%;
      overflow: auto;
      position: initial;
+     font: 14px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
  }
