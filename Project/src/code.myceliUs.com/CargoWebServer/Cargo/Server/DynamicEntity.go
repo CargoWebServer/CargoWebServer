@@ -71,7 +71,6 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 
 	var parentPtr Entity
 
-	log.Println(values)
 	// Set the parent uuid in that case.
 	if len(parentUuid) == 0 && values["ParentUuid"] != nil {
 		parentUuid = values["ParentUuid"].(string)
@@ -157,11 +156,12 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 	if entity == nil {
 		// Create a new dynamic entity it that case.
 		entity = new(DynamicEntity)
-		// If the object contain an id...
-		entity.setValue("UUID", values["UUID"].(string))
 
 		// keep the reference to the prototype.
 		entity.prototype = prototype
+
+		// If the object contain an id...
+		entity.setValue("UUID", values["UUID"].(string))
 
 		entity.childsUuid = make([]string, 0)
 		entity.referencesUuid = make([]string, 0)
@@ -188,19 +188,23 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 
 	// insert it into the cache.
 	this.insert(entity)
+
 	return entity, nil
 }
 
 /**
  * Thread safe function
  */
-func (this *DynamicEntity) setValue(field string, value interface{}) {
+func (this *DynamicEntity) setValue(field string, value interface{}) error {
 	this.Lock()
 	defer this.Unlock()
 	if this.object == nil {
 		this.object = make(map[string]interface{}, 0)
 	}
+
+	// Here the value is in the map.
 	this.object[field] = value
+	return nil
 }
 
 /**

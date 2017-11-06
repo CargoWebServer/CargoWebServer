@@ -11,6 +11,7 @@
 	-moz-box-shadow: 5px 5px 12px -4px;
 	box-shadow: 5px 5px 12px -4px;
 	color: #657383;
+	border: 1px solid;
 }
 
 .dialog_header{

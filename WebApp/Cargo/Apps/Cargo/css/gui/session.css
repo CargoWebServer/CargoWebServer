@@ -99,7 +99,7 @@
 	background-color: white;
 	max-height: 500px;
     overflow-y: auto;
-	min-width: 150px;
+	min-width: 200px;
 	font-size: 10pt;
 	overflow: hidden;
 	padding: 1px;
@@ -122,6 +122,7 @@
 .active_session div{
 	display: inline;
 	text-align: center;
+	margin-right: 4px;
 }
 
 .active_session i{
@@ -131,6 +132,7 @@
 
 .active_session span{
 	font-size: 10pt;
+	margin-right: 4px;
 }
 
 .session_state_menu{

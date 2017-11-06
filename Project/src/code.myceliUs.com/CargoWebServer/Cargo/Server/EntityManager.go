@@ -1,11 +1,13 @@
 package Server
 
 import (
+	"bytes"
 	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"log"
 	"reflect"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -13,6 +15,7 @@ import (
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/Utility"
+	"code.myceliUs.com/XML_Schemas"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1267,7 +1270,7 @@ func (this *EntityManager) getEntityPrototype(typeName string, storeId string) (
 	proto, err := dataStore.GetEntityPrototype(typeName)
 
 	if err != nil {
-		err = errors.New("Prototype for entity '" + typeName + "' was not found.")
+		err = errors.New("Prototype for entity '" + typeName + "' was not found." + err.Error())
 		return nil, err
 	}
 
@@ -1531,6 +1534,129 @@ func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}
 	}*/
 
 	return entities
+}
+
+/**
+ * That function is use by CreateEntity and SaveEntity it validate entity fields
+ * over it's defined restrictions.
+ */
+func applyEntityRestrictions(values map[string]interface{}) error {
+
+	prototype, err := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < len(prototype.FieldsType); i++ {
+		// Before I set the value I will test if there's a restriction on that field.
+		fieldType := prototype.FieldsType[i]
+		isArray := strings.HasPrefix(fieldType, "[]")
+		fieldType = strings.Replace(fieldType, "[]", "", -1)
+		fieldType = strings.Replace(fieldType, ":Ref", "", -1)
+		index := strings.Index(fieldType, ".")
+		if index != -1 {
+			// Here I will
+			fieldPrototype, err := GetServer().GetEntityManager().getEntityPrototype(fieldType, fieldType[0:index])
+			if err == nil {
+				// Here I will get the entity value.
+				value := values[prototype.Fields[i]]
+
+				// Apply the restriction over the value.
+				value, err = applyRestrictions(fieldPrototype, value, isArray)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+/**
+ * That function is use to apply restriction to the input value.
+ */
+func applyRestrictions(prototype *EntityPrototype, value interface{}, isArray bool) (interface{}, error) {
+	if value == nil {
+		return nil, nil
+	}
+
+	// Here I will apply restriction if there is some.
+	for i := 0; i < len(prototype.Restrictions); i++ {
+		restriction := prototype.Restrictions[i]
+		typeName := prototype.TypeName
+		if !strings.HasPrefix(typeName, "xs.") {
+			for j := 0; j < len(prototype.SuperTypeNames); i++ {
+				if strings.HasPrefix(prototype.SuperTypeNames[j], "xs.") {
+					typeName = prototype.SuperTypeNames[j]
+					break
+				}
+			}
+		}
+
+		// In case of a string...
+		if XML_Schemas.IsXsString(typeName) {
+			var str string
+			if reflect.TypeOf(value).Kind() == reflect.String {
+				str = value.(string)
+			} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
+				if value.(map[string]interface{})["M_valueOf"] != nil {
+					str = value.(map[string]interface{})["M_valueOf"].(string)
+				}
+			}
+			if restriction.Type == RestrictionType_MaxLength {
+				length, err := strconv.Atoi(restriction.Value)
+				if err != nil {
+					return nil, err
+				}
+				if len(str) > length {
+					return nil, errors.New("String dosen't respect the maximum length!")
+				}
+			} else if restriction.Type == RestrictionType_MinLength {
+				length, err := strconv.Atoi(restriction.Value)
+				if err != nil {
+					return nil, err
+				}
+				if len(str) < length {
+					return nil, errors.New("String dosen't respect the minimum length!")
+				}
+			} else if restriction.Type == RestrictionType_WhiteSpace {
+				// Here tree value can be there...
+				if restriction.Value == "preserve" {
+					// No normalization is done, the value is the ·normalized value·
+				} else if restriction.Value == "replace" {
+					// All occurrences of #x9 (tab), #xA (line feed) and #xD (carriage return) are replaced > with #x20 (space).
+					str = strings.Replace(str, "\t", " ", -1)
+					str = strings.Replace(str, "\r\n", " ", -1)
+					str = strings.Replace(str, "\n", " ", -1)
+				} else if restriction.Value == "collapse" {
+					// Subsequent to the replacements specified above under replace, contiguous sequences of #x20s are collapsed to a single #x20, and initial and/or final #x20s are deleted.
+					str = strings.TrimSpace(str)
+					re := regexp.MustCompile("  +")
+					str = string(re.ReplaceAll(bytes.TrimSpace([]byte(str)), []byte(" ")))
+				}
+
+			} else if restriction.Type == RestrictionType_Enumeration {
+				/** Nothing to do here because enumeration is the index and not the value **/
+			} else if restriction.Type == RestrictionType_Pattern {
+				/** Here I will apply the regex **/
+				match, _ := regexp.MatchString(restriction.Value, str)
+				if !match {
+					return nil, errors.New("The string \"" + str + "\" dosen't match the pattern \"" + restriction.Value + "\"")
+				}
+			}
+
+			if reflect.TypeOf(value).Kind() == reflect.String {
+				value = str // set it new value.
+			} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
+				if value.(map[string]interface{})["M_valueOf"] != nil {
+					value.(map[string]interface{})["M_valueOf"] = str
+				}
+			}
+		}
+	}
+
+	return value, nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2274,6 +2400,15 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
+
+	restrictionError := applyEntityRestrictions(values.(map[string]interface{}))
+	if restrictionError != nil {
+		log.Println("=---------------> ", restrictionError)
+		errObj := NewError(Utility.FileLine(), PROTOTYPE_RESTRICTIONS_ERROR, SERVER_ERROR_CODE, restrictionError)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
 	result, errObj := this.createEntity(parentUuid, attributeName, typeName, objectId, values)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -2335,9 +2470,19 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 //    )
 //}
 func (this *EntityManager) SaveEntity(values interface{}, typeName string, messageId string, sessionId string) interface{} {
+
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return nil
+	}
+
+	// I will test restriction before I save the entity.
+	restrictionError := applyEntityRestrictions(values.(map[string]interface{}))
+	if restrictionError != nil {
+		log.Println("=---------------> ", restrictionError)
+		errObj := NewError(Utility.FileLine(), PROTOTYPE_RESTRICTIONS_ERROR, SERVER_ERROR_CODE, restrictionError)
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}

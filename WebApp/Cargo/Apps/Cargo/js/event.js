@@ -82,6 +82,9 @@ WorkflowEvent = "WorkflowEvent"
 * @public true
 */
 var EventHub = function (channelId) {
+    if(channelId == undefined){
+        return null
+    }
 
     this.id = randomUUID();
 

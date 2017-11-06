@@ -401,6 +401,7 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "	entity.object.UUID = uuidStr\n"
 	entityConstructorStr += "	entity.object.ParentUuid = parentUuid\n"
 	entityConstructorStr += "	entity.SetInit(false)\n"
+
 	entityConstructorStr += "	this.insert(entity)\n"
 
 	if strings.HasSuffix(className, "_impl") {

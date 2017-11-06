@@ -135,6 +135,10 @@ var HomePage = function () {
         changePropertyByClassName("background", ".menu_separator", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background-color", ".home_page", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".home_page", "." + evt.dataMap.themeClass)
+        
+        changePropertyByClassName("color", ".autoCompleteDiv", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background-color", ".autoCompleteDiv", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".autoCompleteDiv", "." + evt.dataMap.themeClass)
 
         changePropertyByClassName("color", ".session_panel", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background-color", ".session_display_panel", "." + evt.dataMap.themeClass)
@@ -182,6 +186,7 @@ var HomePage = function () {
             changePropertyByClassName("color", ".data_explorer", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".security_manager_content", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".entities_header_btn.enabled", "." + evt.dataMap.themeClass + " .ace_gutter")
         } else {
             changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass)
             changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass)
@@ -219,13 +224,13 @@ var HomePage = function () {
         changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background-color", ".splitter", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background", ".splitter", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
-
         changePropertyByClassName("color", ".severConfiguration", "." + evt.dataMap.themeClass + " .ace_gutter")
- 
+        changePropertyByClassName("background-color", ".entities_header_btn", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
+        changePropertyByClassName("background", ".entities_header_btn", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
+        
         changePropertyByClassName("background-color", ".entities_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".entities_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("color", ".entities_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
-        changePropertyByClassName("color", ".entities_header_btn.enabled", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background-color", ".result_query_panel", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".result_query_panel", "." + evt.dataMap.themeClass)
 
@@ -272,7 +277,8 @@ var HomePage = function () {
         changePropertyByClassName("background-color", ".popup_div", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".popup_div", "." + evt.dataMap.themeClass)
         changePropertyByClassName("color", ".popup_div", "." + evt.dataMap.themeClass)
-        
+        changePropertyByClassName("background-color", ".popup_div", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
+        changePropertyByClassName("background-color", ".dialog", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
         changePropertyByClassName("background-color", ".login-form", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".login-form", "." + evt.dataMap.themeClass)
         changePropertyByClassName("color", ".login-form", "." + evt.dataMap.themeClass)

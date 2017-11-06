@@ -3,7 +3,7 @@
  */
 var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
     // Here I will create the content of the panel...
-    this.space = new Element(parent, { "tag": "div", "class": "admin_table", "style": "display:block;top:0px; bottom:0px; left:0px; right:0px; position: absolute; display: none;" })
+    this.space = new Element(parent, { "tag": "div", "class": "entity admin_table", "style": "display:block;top:0px; bottom:0px; left:0px; right:0px; position: absolute; display: none;" })
     this.panel = this.space.appendElement({ "tag": "div", "class": "admin_table", "style": "display:table;max-height: 250px; overflow-y:auto; width:auto; position: relative; border-collapse:separate;border-spacing:5px; text-align: left;" }).down()
     this.proto = null
 

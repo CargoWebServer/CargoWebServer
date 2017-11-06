@@ -187,11 +187,11 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     }
 
                     // Here I will append the connection button...
-                    contentView.connectBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell; color: lightgrey;" }).down()
+                    contentView.connectBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;" }).down()
                     contentView.connectBtn.appendElement({ "tag": "i", "class": "fa fa-plug" })
 
                     // Here I will append in case of sql datasotre the synchornize button.
-                    contentView.refreshBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell; color: lightgrey;" }).down()
+                    contentView.refreshBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;" }).down()
                     contentView.refreshBtn.appendElement({ "tag": "i", "class": "fa fa-refresh" })
 
                     // Now If the connection is activated...
@@ -557,7 +557,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
                 } else if (content.TYPENAME == "Config.LdapConfiguration") {
                     // Here I will append in case of sql datasotre the synchornize button.
-                    contentView.refreshBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell; color: lightgrey;" }).down()
+                    contentView.refreshBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;" }).down()
                     contentView.refreshBtn.appendElement({ "tag": "i", "class": "fa fa-refresh" })
 
                     // The refresh action.
@@ -673,19 +673,18 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
             // The new configuration button.
             this.header.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" })
 
-            this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;color: #657383;" }).down()
+            this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;" }).down()
             this.newConfigElementBtn.appendElement({ "tag": "i", "class": "fa fa-plus", "style": "" })
 
             // I will append the navigation button i that case...
-            this.previousConfigBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell; color:lightgrey;" }).down()
+            this.previousConfigBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell;" }).down()
             this.previousConfigBtn.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-left" })
 
-            this.nextConfigBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell; color:lightgrey;" }).down()
+            this.nextConfigBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn", "style": "display: table-cell;" }).down()
             this.nextConfigBtn.appendElement({ "tag": "i", "class": "fa fa-caret-square-o-right" })
 
             if (content.length > 1) {
                 this.nextConfigBtn.element.className += " enabled"
-                this.nextConfigBtn.element.style.color = "#657383"
             }
 
             // Here the configuration panel contain more than one panel...
@@ -713,22 +712,18 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
 
                         if (configurationPanel.currentIndex == configurationPanel.contentViews.length - 1) {
                             configurationPanel.nextConfigBtn.element.className = "entities_header_btn"
-                            configurationPanel.nextConfigBtn.element.style.color = "lightgrey"
                         } else {
                             configurationPanel.nextConfigBtn.element.className = "entities_header_btn enabled"
-                            configurationPanel.nextConfigBtn.element.style.color = "#657383"
                         }
 
                         configurationPanel.previousConfigBtn.element.className = "entities_header_btn enabled"
-                        configurationPanel.previousConfigBtn.element.style.color = "#657383"
                     }
                     if (configurationPanel.contentViews.length <= 1) {
                         // disable the next button
                         configurationPanel.nextConfigBtn.element.className = "entities_header_btn"
-                        configurationPanel.nextConfigBtn.element.style.color = "lightgrey"
+
                         // disable the previous button.
                         configurationPanel.previousConfigBtn.element.className = "entities_header_btn"
-                        configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
                     }
 
                 }
@@ -750,21 +745,16 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
 
                         if (configurationPanel.currentIndex == 0) {
                             configurationPanel.previousConfigBtn.element.className = "entities_header_btn"
-                            configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
                         } else {
                             configurationPanel.previousConfigBtn.element.className = "entities_header_btn enabled"
-                            configurationPanel.previousConfigBtn.element.style.color = "#657383"
                         }
                         configurationPanel.nextConfigBtn.element.className = "entities_header_btn enabled"
-                        configurationPanel.nextConfigBtn.element.style.color = "#657383"
                     }
                     if (configurationPanel.contentViews.length <= 1) {
                         // disable the next button
                         configurationPanel.nextConfigBtn.element.className = "entities_header_btn"
-                        configurationPanel.nextConfigBtn.element.style.color = "lightgrey"
                         // disable the previous button.
                         configurationPanel.previousConfigBtn.element.className = "entities_header_btn"
-                        configurationPanel.previousConfigBtn.element.style.color = "lightgrey"
                     }
                 }
             }(this)
@@ -775,7 +765,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
         } else {
             if (content != undefined) {
                 if (this.contentViews[0] == null) {
-                    this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;color: #657383;" }).down()
+                    this.newConfigElementBtn = this.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;" }).down()
                     this.newConfigElementBtn.appendElement({ "tag": "i", "class": "fa fa-plus", "style": "" })
 
                     // Set the new configuration click handler.

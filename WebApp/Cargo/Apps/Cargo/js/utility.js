@@ -610,8 +610,8 @@ function getCSSRule(ruleName) {
     var result = null;
     var find = Array.prototype.find;
 
-    find.call(document.styleSheets, styleSheet => {
-        result = find.call(styleSheet.cssRules, cssRule => {
+    find.call(document.styleSheets, function(styleSheet){
+        result = find.call(styleSheet.cssRules, function(cssRule){
             return cssRule instanceof CSSStyleRule 
                 && cssRule.selectorText.toLowerCase() == ruleName;
         });

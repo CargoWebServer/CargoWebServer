@@ -138,6 +138,7 @@
 }
 
 .entities_header_btn {
+	color: lightgray;
 	text-align: center;
 	display: none;
 	vertical-align: middle;
@@ -152,8 +153,9 @@
 }
 
 .entities_header_btn.enabled {
-	color: white;
+	color: darkgray;
 }
+
 
 .entities_header_btn.enabled:hover {
 	cursor: pointer;
