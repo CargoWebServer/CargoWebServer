@@ -916,6 +916,84 @@ func ToString(value interface{}) string {
 	return str
 }
 
+func ToInt(value interface{}) int {
+	var val int
+	if reflect.TypeOf(value).Kind() == reflect.String {
+		val, _ = strconv.Atoi(value.(string))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int {
+		val = value.(int)
+	} else if reflect.TypeOf(value).Kind() == reflect.Int8 {
+		val = int(value.(int8))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int16 {
+		val = int(value.(int16))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int32 {
+		val = int(value.(int32))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int64 {
+		val = int(value.(int64))
+	} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
+		val = int(value.(float32))
+	} else if reflect.TypeOf(value).Kind() == reflect.Float64 {
+		val = int(value.(float64))
+	} else if reflect.TypeOf(value).Kind() == reflect.Bool {
+		if value.(bool) {
+			val = 1
+		} else {
+			val = 0
+		}
+	} else {
+		log.Panicln("Value with type:", reflect.TypeOf(value).String(), "cannot be convert to integer value")
+	}
+	return val
+}
+
+func ToNumeric(value interface{}) float64 {
+	var val float64
+	if reflect.TypeOf(value).Kind() == reflect.String {
+		val, _ = strconv.ParseFloat(value.(string), 64)
+	} else if reflect.TypeOf(value).Kind() == reflect.Int {
+		val = float64(value.(int))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int8 {
+		val = float64(int(value.(int8)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int16 {
+		val = float64(int(value.(int16)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int32 {
+		val = float64(int(value.(int32)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Int64 {
+		val = float64(int(value.(int64)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
+		val = float64(int(value.(float32)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Float64 {
+		val = float64(int(value.(float64)))
+	} else if reflect.TypeOf(value).Kind() == reflect.Bool {
+		if value.(bool) {
+			val = 1.0
+		} else {
+			val = 0.0
+		}
+	} else {
+		log.Panicln("Value with type:", reflect.TypeOf(value).String(), "cannot be convert to numerical value")
+	}
+	return val
+}
+
+func Round(x float64, n int) float64 {
+	pow := math.Pow(10, float64(n))
+	if math.Abs(x*pow) > 1e17 {
+		return x
+	}
+	v, frac := math.Modf(x * pow)
+	if x > 0.0 {
+		if frac > 0.5 || (frac == 0.5 && uint64(v)%2 != 0) {
+			v += 1.0
+		}
+	} else {
+		if frac < -0.5 || (frac == -0.5 && uint64(v)%2 != 0) {
+			v -= 1.0
+		}
+	}
+	return v / pow
+}
+
 func Less(val0 interface{}, val1 interface{}) bool {
 	if val0 == nil || val1 == nil {
 		return true

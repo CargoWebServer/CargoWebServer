@@ -280,8 +280,8 @@ EntityPanel.prototype.setEntity = function (entity) {
 	// Set the reference to the panel inside the entity.
 	this.entity = entity
 
-	this.getEntity().getPanel = function(panel){
-		return function(){
+	this.getEntity().getPanel = function (panel) {
+		return function () {
 			return panel
 		}
 	}(this)
@@ -480,7 +480,7 @@ EntityPanel.prototype.initHeader = function () {
 				var entity = entityPanel.getEntity()
 				entity.NeedSave = true
 				entityPanel.saveBtn.element.id = entity.UUID + "_save_btn"
-				if (entity.exist == false && entityPanel.parentEntity != null) {
+				if ((entity.exist == false && entityPanel.parentEntity != null) || entity.UUID == undefined ) {
 					// The parent entity is know and the entity does not exist.
 					server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.parentLnk, entity.TYPENAME, entity.UUID, entity,
 						// Success callback
@@ -498,8 +498,36 @@ EntityPanel.prototype.initHeader = function () {
 							}
 						},
 						// Error callback.
-						function (result, caller) {
-
+						function (errMsg, entityPanel) {
+							var errObj = errMsg.dataMap.errorObj
+							if (errObj.M_id == "PROTOTYPE_RESTRICTIONS_ERROR") {
+								// The M_body contain a json object with the actual error information.
+								var err = JSON.parse(errObj.M_body)
+								var control = entityPanel.controls[err.field]
+								if (control.typeName != undefined) {
+									// Here the control is an entity panel.
+									for (var id in control.controls) {
+										if (id.endsWith("M_valueOf")) {
+											control.controls[id].element.style.borderColor = "red"
+											var errDisplay = control.controls[id].parentElement.prependElement({ "tag": "div", "style": "max-width: 350px;", "innerHtml": err.msg }).down()
+											control.controls[id]
+											control.controls[id].element.setSelectionRange(0, control.controls[id].element.value.length)
+											control.controls[id].element.focus() // set it he focus.
+											var errorHandler = function (errDisplay) {
+												return function () {
+													this.style.borderColor = ""
+													if (errDisplay.element.parentNode != null) {
+														errDisplay.element.parentNode.removeChild(errDisplay.element)
+													}
+													this.removeEventListener("keyup", errorHandler, true)
+												}
+											}(errDisplay)
+											control.controls[id].element.addEventListener("keyup", errorHandler, true)
+											break
+										}
+									}
+								}
+							}
 						}, entityPanel)
 				} else {
 					// Here the entity will be created of save...
@@ -518,7 +546,47 @@ EntityPanel.prototype.initHeader = function () {
 							}
 						},
 						// Error callback.
-						function () {
+						function (errMsg, caller) {
+							// Here I will get the last valid entity value and set it back on entities map
+							var entity = caller.entity
+							delete entities[entity.UUID]
+							server.entityManager.getEntityByUuid(entity.UUID,
+								function (entity, caller) {
+									// I will also set it value back in the panel.
+									var entityPanel = caller.entityPanel
+									var errObj = caller.errObj
+									if (errObj.M_id == "PROTOTYPE_RESTRICTIONS_ERROR") {
+										// The M_body contain a json object with the actual error information.
+										var err = JSON.parse(errObj.M_body)
+										var control = entityPanel.controls[err.field]
+										if (control.typeName != undefined) {
+											// Here the control is an entity panel.
+											for (var id in control.controls) {
+												if (id.endsWith("M_valueOf")) {
+													control.controls[id].element.style.borderColor = "red"
+													var errDisplay = control.controls[id].parentElement.prependElement({ "tag": "div", "style": "max-width: 350px;", "innerHtml": err.msg }).down()
+													control.controls[id]
+													control.controls[id].element.setSelectionRange(0, control.controls[id].element.value.length)
+													control.controls[id].element.focus() // set it he focus.
+													var errorHandler = function (errDisplay) {
+														return function () {
+															this.style.borderColor = ""
+															if (errDisplay.element.parentNode != null) {
+																errDisplay.element.parentNode.removeChild(errDisplay.element)
+															}
+															this.removeEventListener("keyup", errorHandler, true)
+														}
+													}(errDisplay)
+													control.controls[id].element.addEventListener("keyup", errorHandler, true)
+													break
+												}
+											}
+										}
+									}
+								},
+								function () {
+
+								}, { "entityPanel": caller, "errObj": errMsg.dataMap.errorObj })
 
 						}, entityPanel)
 				}
@@ -965,7 +1033,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 					} else {
 						// In that case I will create a new entity
-					if (/*prototype != undefined*/ prototype.PackageName != "xs") {
+						if (/*prototype != undefined*/ prototype.PackageName != "xs") {
 							var item = eval("new " + prototype.TypeName + "()")
 							item.TYPENAME = prototype.TypeName
 
@@ -1121,7 +1189,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 									entityPanel.saveBtn.element.style.display = "table-cell"
 								}
 							}
-						} else if(entityPanel.proto.Ids.indexOf(field) != -1){
+						} else if (entityPanel.proto.Ids.indexOf(field) != -1) {
 							// reset the panel value.
 							entityPanel.clear()
 
@@ -1493,9 +1561,9 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 		var baseType = getBaseTypeExtension(fieldType)
 		if (fieldType.startsWith("enum:") || control.element.tagName == "SELECT") {
 			// Here the value is an enumeration...
-			if(value.M_valueOf!=undefined){
+			if (value.M_valueOf != undefined) {
 				control.element.selectedIndex = parseInt(value.M_valueOf) - 1
-			}else{
+			} else {
 				control.element.selectedIndex = parseInt(value) - 1
 			}
 		} else if (isXsString(baseType) || isXsString(fieldType) || fieldType == "interface{}") {
@@ -1655,7 +1723,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 			input.element.style.cursor = "default"
 
 			if (results.length > 0) {
-				var prototype =getEntityPrototype(results[0].TYPENAME)
+				var prototype = getEntityPrototype(results[0].TYPENAME)
 				// get title display a readable name for the end user
 				// or the first entity id.
 				for (var i = 0; i < results.length; i++) {

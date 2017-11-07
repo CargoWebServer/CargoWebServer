@@ -1330,6 +1330,13 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 
 	// Try to cast the value as needed...
 	if reflect.TypeOf(values).String() == "map[string]interface {}" {
+
+		restrictionError := applyEntityRestrictions(values.(map[string]interface{}))
+		if restrictionError != nil {
+			errObj := NewError(Utility.FileLine(), PROTOTYPE_RESTRICTIONS_ERROR, SERVER_ERROR_CODE, restrictionError)
+			return nil, errObj
+		}
+
 		values_, err := Utility.InitializeStructure(values.(map[string]interface{}))
 		if err == nil {
 			values = values_.Interface()
@@ -1541,30 +1548,29 @@ func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}
  * over it's defined restrictions.
  */
 func applyEntityRestrictions(values map[string]interface{}) error {
+	typeName := values["TYPENAME"].(string)
 
 	prototype, err := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
-	if err != nil {
-		return err
-	}
+	if err == nil {
+		for i := 0; i < len(prototype.FieldsType); i++ {
+			// Before I set the value I will test if there's a restriction on that field.
+			fieldType := prototype.FieldsType[i]
+			isArray := strings.HasPrefix(fieldType, "[]")
+			fieldType = strings.Replace(fieldType, "[]", "", -1)
+			fieldType = strings.Replace(fieldType, ":Ref", "", -1)
+			index := strings.Index(fieldType, ".")
+			if index != -1 {
+				// Here I will
+				fieldPrototype, err := GetServer().GetEntityManager().getEntityPrototype(fieldType, fieldType[0:index])
+				if err == nil {
+					// Here I will get the entity value.
+					value := values[prototype.Fields[i]]
 
-	for i := 0; i < len(prototype.FieldsType); i++ {
-		// Before I set the value I will test if there's a restriction on that field.
-		fieldType := prototype.FieldsType[i]
-		isArray := strings.HasPrefix(fieldType, "[]")
-		fieldType = strings.Replace(fieldType, "[]", "", -1)
-		fieldType = strings.Replace(fieldType, ":Ref", "", -1)
-		index := strings.Index(fieldType, ".")
-		if index != -1 {
-			// Here I will
-			fieldPrototype, err := GetServer().GetEntityManager().getEntityPrototype(fieldType, fieldType[0:index])
-			if err == nil {
-				// Here I will get the entity value.
-				value := values[prototype.Fields[i]]
-
-				// Apply the restriction over the value.
-				value, err = applyRestrictions(fieldPrototype, value, isArray)
-				if err != nil {
-					return err
+					// Apply the restriction over the value.
+					value, err = applyRestrictions(typeName+"_"+prototype.Fields[i], fieldPrototype, value, isArray)
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -1576,7 +1582,7 @@ func applyEntityRestrictions(values map[string]interface{}) error {
 /**
  * That function is use to apply restriction to the input value.
  */
-func applyRestrictions(prototype *EntityPrototype, value interface{}, isArray bool) (interface{}, error) {
+func applyRestrictions(field string, prototype *EntityPrototype, value interface{}, isArray bool) (interface{}, error) {
 	if value == nil {
 		return nil, nil
 	}
@@ -1610,7 +1616,7 @@ func applyRestrictions(prototype *EntityPrototype, value interface{}, isArray bo
 					return nil, err
 				}
 				if len(str) > length {
-					return nil, errors.New("String dosen't respect the maximum length!")
+					return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum expected length is ` + restriction.Value + ` not ` + strconv.Itoa(len(str)) + `"}`)
 				}
 			} else if restriction.Type == RestrictionType_MinLength {
 				length, err := strconv.Atoi(restriction.Value)
@@ -1618,7 +1624,7 @@ func applyRestrictions(prototype *EntityPrototype, value interface{}, isArray bo
 					return nil, err
 				}
 				if len(str) < length {
-					return nil, errors.New("String dosen't respect the minimum length!")
+					return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum expected length is ` + restriction.Value + ` not ` + strconv.Itoa(len(str)) + `"}`)
 				}
 			} else if restriction.Type == RestrictionType_WhiteSpace {
 				// Here tree value can be there...
@@ -1642,7 +1648,10 @@ func applyRestrictions(prototype *EntityPrototype, value interface{}, isArray bo
 				/** Here I will apply the regex **/
 				match, _ := regexp.MatchString(restriction.Value, str)
 				if !match {
-					return nil, errors.New("The string \"" + str + "\" dosen't match the pattern \"" + restriction.Value + "\"")
+					var escapedRestrictionValue = restriction.Value
+					escapedRestrictionValue = strings.Replace(escapedRestrictionValue, "\\", "\\\\", -1) // Escape \ symbole
+					escapedRestrictionValue = strings.Replace(escapedRestrictionValue, "\"", "\\\"", -1) // escape " symbole
+					return nil, errors.New(`{"field":"` + field + `", "msg":"The given value dosen't match the regular expression ` + escapedRestrictionValue + `"}`)
 				}
 			}
 
@@ -1651,6 +1660,71 @@ func applyRestrictions(prototype *EntityPrototype, value interface{}, isArray bo
 			} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
 				if value.(map[string]interface{})["M_valueOf"] != nil {
 					value.(map[string]interface{})["M_valueOf"] = str
+				}
+			}
+		} else if XML_Schemas.IsXsNumeric(typeName) || XML_Schemas.IsXsMoney(typeName) {
+			numericVal := Utility.ToNumeric(value)
+			restrictionVal := Utility.ToNumeric(restriction.Value)
+			if restriction.Type == RestrictionType_MaxExclusive {
+				if numericVal >= restrictionVal {
+					return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum exclusive value is ` + restriction.Value + `"}`)
+				}
+			} else if restriction.Type == RestrictionType_MaxInclusive {
+				if numericVal > restrictionVal {
+					return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum inclusive value is ` + restriction.Value + `"}`)
+				}
+			} else if restriction.Type == RestrictionType_MinExclusive {
+				if numericVal <= restrictionVal {
+					return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum exclusive value is ` + restriction.Value + `"}`)
+				}
+			} else if restriction.Type == RestrictionType_MinInclusive {
+				if numericVal < restrictionVal {
+					return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum inclusive value is ` + restriction.Value + `"}`)
+				}
+			} else if restriction.Type == RestrictionType_FractionDigits {
+				numVal := Utility.Round(Utility.ToNumeric(value), Utility.ToInt(restriction.Value))
+				if reflect.TypeOf(value).Kind() == reflect.Float64 {
+					value = numVal // set it new value.
+				} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
+					value = float32(numVal) // set it new value.
+				} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
+					if value.(map[string]interface{})["M_valueOf"] != nil {
+						value.(map[string]interface{})["M_valueOf"] = numVal
+					}
+				}
+			} else if restriction.Type == RestrictionType_TotalDigits {
+				str := Utility.ToString(value)
+				numVal := Utility.ToNumeric(str[0:Utility.ToInt(restriction.Value)])
+				if reflect.TypeOf(value).Kind() == reflect.Float64 {
+					value = numVal // set it new value.
+				} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
+					value = float32(numVal) // set it new value.
+				} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
+					if value.(map[string]interface{})["M_valueOf"] != nil {
+						value.(map[string]interface{})["M_valueOf"] = numVal
+					}
+				}
+			}
+		} else if XML_Schemas.IsXsInt(typeName) {
+			// Here We got a numeric value...
+			intVal := Utility.ToInt(value)
+			restrictionVal := Utility.ToInt(restriction.Value)
+
+			if restriction.Type == RestrictionType_MaxExclusive {
+				if intVal >= restrictionVal {
+					return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum exclusive value is ` + restriction.Value + `"}`)
+				}
+			} else if restriction.Type == RestrictionType_MaxInclusive {
+				if intVal > restrictionVal {
+					return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum inclusive value is ` + restriction.Value + `"}`)
+				}
+			} else if restriction.Type == RestrictionType_MinExclusive {
+				if intVal <= restrictionVal {
+					return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum exclusive value is ` + restriction.Value + `"}`)
+				}
+			} else if restriction.Type == RestrictionType_MinInclusive {
+				if intVal < restrictionVal {
+					return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum inclusive value is ` + restriction.Value + `"}`)
 				}
 			}
 		}
@@ -2401,14 +2475,6 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		return nil
 	}
 
-	restrictionError := applyEntityRestrictions(values.(map[string]interface{}))
-	if restrictionError != nil {
-		log.Println("=---------------> ", restrictionError)
-		errObj := NewError(Utility.FileLine(), PROTOTYPE_RESTRICTIONS_ERROR, SERVER_ERROR_CODE, restrictionError)
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
-	}
-
 	result, errObj := this.createEntity(parentUuid, attributeName, typeName, objectId, values)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -2474,15 +2540,6 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
-	}
-
-	// I will test restriction before I save the entity.
-	restrictionError := applyEntityRestrictions(values.(map[string]interface{}))
-	if restrictionError != nil {
-		log.Println("=---------------> ", restrictionError)
-		errObj := NewError(Utility.FileLine(), PROTOTYPE_RESTRICTIONS_ERROR, SERVER_ERROR_CODE, restrictionError)
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}

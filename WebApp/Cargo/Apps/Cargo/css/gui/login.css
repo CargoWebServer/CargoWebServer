@@ -14,9 +14,10 @@ body {
 }
 
 .login-form {
+	color: #657383;
+  font: normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  background-color: white;
   opacity: 1;
-  color: black;
-  background-color: #fff;
   box-shadow: 0 0 2px, 0 2px 4px;
   position: absolute;
   top: 50%;
@@ -28,11 +29,8 @@ body {
   text-align: center;
 }
 
-.login-form input{
-  background-color: transparent;
-}
-
 .input-container {
+  color: steelblue;
   text-align: center;
   position: relative;
   display: inline-block;
@@ -84,6 +82,8 @@ input.fancy {
   padding: 3px;
   width: 230px;
   z-index: 1;
+  background-color: transparent;
+
 }
 input.fancy:focus, input.fancy.used, input.fancy:valid {
   outline: 0;
@@ -93,7 +93,6 @@ input.fancy:focus ~ .line:before, input.fancy:focus ~ .line:after, input.fancy.u
 }
 input.fancy:focus ~ .placeholder, input.fancy.used ~ .placeholder, input.fancy:valid ~ .placeholder {
   font-size: .8em;
-  color: #428bca;
   bottom: 30px;
 }
 
@@ -109,7 +108,7 @@ input.fancy:focus ~ .placeholder, input.fancy.used ~ .placeholder, input.fancy:v
   border-color: #bbb;
 }
 .button.blue {
-  color: #428bca;
+  color: steelblue;
 }
 
 .button-login {
@@ -135,7 +134,7 @@ input.fancy:focus ~ .placeholder, input.fancy.used ~ .placeholder, input.fancy:v
 
 #remember_me_label {
   font-size: .8em;
-  color: #428bca;
+  color: steelblue;
 }
 
 #username_error{

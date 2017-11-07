@@ -69,6 +69,13 @@ func getEntityPrototype(values map[string]interface{}) (*EntityPrototype, error)
  */
 func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string]interface{}) (*DynamicEntity, *CargoEntities.Error) {
 
+	// I will test restriction before I save the entity.
+	restrictionError := applyEntityRestrictions(values)
+	if restrictionError != nil {
+		errObj := NewError(Utility.FileLine(), PROTOTYPE_RESTRICTIONS_ERROR, SERVER_ERROR_CODE, restrictionError)
+		return nil, errObj
+	}
+
 	var parentPtr Entity
 
 	// Set the parent uuid in that case.
