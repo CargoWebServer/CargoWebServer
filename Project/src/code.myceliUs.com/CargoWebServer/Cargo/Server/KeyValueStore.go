@@ -186,7 +186,13 @@ func (this *KeyValueDataStore) setSuperTypeFields(prototype *EntityPrototype) {
 			// The first to fields are always the uuid, parentUuid, parentLnk and the last is the childUuids and referenced
 			for j := 3; j < len(superPrototype.Fields)-2; j++ {
 				if !Utility.Contains(prototype.Fields, superPrototype.Fields[j]) {
-					Utility.InsertStringAt(index, superPrototype.Fields[j], &prototype.Fields)
+					if superPrototype.Fields[j] == "M_valueOf" && len(prototype.ListOf) == 0 {
+						Utility.InsertStringAt(index, superPrototype.Fields[j], &prototype.Fields)
+					} else {
+						// In that case the prototype must be considere as a list of supertype.
+						Utility.InsertStringAt(index, "M_listOf", &prototype.Fields)
+					}
+
 					Utility.InsertStringAt(index, superPrototype.FieldsType[j], &prototype.FieldsType)
 					Utility.InsertBoolAt(index, superPrototype.FieldsVisibility[j], &prototype.FieldsVisibility)
 					Utility.InsertStringAt(index, superPrototype.FieldsDefaultValue[j], &prototype.FieldsDefaultValue)

@@ -1,8 +1,10 @@
 package Server
 
 import (
+	//"fmt"
 	"log"
-	//"time"
+	//"runtime"
+	"time"
 )
 
 /**
@@ -104,9 +106,14 @@ func (this *CacheManager) stop() {
 func (this *CacheManager) run() {
 	for {
 		select {
+
 		case inputEntity := <-this.inputEntityChannel:
 			// Append entity to the database.
 			this.set(inputEntity)
+			//m := &runtime.MemStats{}
+			//runtime.ReadMemStats(m)
+			//fmt.Println("Memory Acquired: ", m.Sys)
+			//fmt.Println("Memory Used    : ", m.Alloc)
 
 		case outputEntity := <-this.outputEntityChannel:
 			outputEntity_ := this.get(outputEntity.entityUuid)
@@ -115,6 +122,10 @@ func (this *CacheManager) run() {
 		case entityUuidToRemove := <-this.removeEntityChannel:
 			// The entity to remove.
 			this.remove(entityUuidToRemove)
+			//m := &runtime.MemStats{}
+			//runtime.ReadMemStats(m)
+			//fmt.Println("Memory Acquired: ", m.Sys)
+			//fmt.Println("Memory Used    : ", m.Alloc)
 
 		case done := <-this.abortedByEnvironment:
 			if done {
@@ -130,13 +141,12 @@ func (this *CacheManager) run() {
 func (this *CacheManager) set(entity Entity) {
 
 	this.entities[entity.GetUuid()] = entity
-
 	// Lifespan of entity in the cache manager is one minute.
-	/*go func(uuid string, removeEntityChannel chan string) {
-		timer := time.NewTimer(1 * time.Minute)
+	go func(uuid string, removeEntityChannel chan string) {
+		timer := time.NewTimer(30 * time.Second)
 		<-timer.C
 		removeEntityChannel <- uuid
-	}(entity.GetUuid(), this.removeEntityChannel)*/
+	}(entity.GetUuid(), this.removeEntityChannel)
 
 }
 

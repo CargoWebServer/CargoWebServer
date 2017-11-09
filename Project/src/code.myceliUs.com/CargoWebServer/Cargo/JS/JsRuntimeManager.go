@@ -203,14 +203,14 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 										panic(errors.New("Stahp"))
 									}
 								}(sessionId, wait)
-
 								// Synchronyse exec of interuption here.
 								log.Println(<-wait)
-
+								jsRuntimeManager.removeVm(sessionId)
 								return // exit the loop.
 							}
 						}
 					}
+					log.Println("--> vm loop stop for session ", sessionId)
 				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
 				callback <- []interface{}{true} // unblock the channel...
 
@@ -218,9 +218,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				callback := operationInfos.m_returns
 				sessionId := operationInfos.m_params["sessionId"].(string)
 				jsRuntimeManager.m_stopVm[sessionId] <- true // send kill
-
-				jsRuntimeManager.removeVm(sessionId)
-				callback <- []interface{}{true} // unblock the channel...
+				callback <- []interface{}{true}              // unblock the channel...
 			}
 		}
 	}(jsRuntimeManager)

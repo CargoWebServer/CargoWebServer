@@ -45,8 +45,8 @@ var EntityPrototypeEditor = function (parent, imports, baseType, initCallback) {
     // Here i will display the base type.
     this.panel.appendElement({ "tag": "div", "style": "display: table; width: 100%;", "innerHtml": "Base Type" })
         .appendElement({ "tag": "div", "style": "display: table; width: 100%;" }).down()
-        .appendElement({ "tag": "div", "id": "allSuperTypes", "style": "display: table-cell; width: 50%; min-width: 200px; height: 150px; overflow-y: auto; border: 1px solid grey;" })
-        .appendElement({ "tag": "div", "id": "superTypes", "style": "display: table-cell; width: 50%; min-width: 200px; height: 150px; overflow-y: auto; border: 1px solid grey;" })
+        .appendElement({ "tag": "div", "id": "allSuperTypes", "style": "display: table-cell; min-width: 200px; height: 150px; overflow-y: auto; border: 1px solid grey;" })
+        .appendElement({ "tag": "div", "id": "superTypes", "style": "display: table-cell; min-width: 200px; height: 150px; overflow-y: auto; border: 1px solid grey;" })
 
     this.allSuperTypes = this.panel.getChildById("allSuperTypes")
     this.superTypes = this.panel.getChildById("superTypes")
@@ -352,33 +352,63 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
         if (prototype.SuperTypeNames == undefined) {
             prototype.SuperTypeNames = []
         }
-        for (var i = 0; i < prototype.SuperTypeNames.length; i++) {
-            if (document.getElementById("superType_" + prototype.SuperTypeNames[i] + "_" + prototype.TypeName + "_row") == undefined) {
-                var superType = superTypes.appendElement({ "tag": "div", "style": "display: table-row;width: 100%;", "id": "superType_" + prototype.SuperTypeNames[i] + "_" + prototype.TypeName + "_row" }).down()
-                var removeSupertypeBtn = superType.appendElement({ "tag": "div", "style": "display: table-cell;width: 100%;", "innerHtml": prototype.SuperTypeNames[i] })
-                    .appendElement({ "tag": "div", "class": "entities_btn" }).down()
+
+        var superTypeNames = Array.from(prototype.SuperTypeNames);
+        // superTypeNames = superTypeNames.concat(prototype.ListOf)
+
+        for (var i = 0; i < superTypeNames.length; i++) {
+            if (document.getElementById("superType_" + superTypeNames[i] + "_" + prototype.TypeName + "_row") == undefined) {
+                var superType = superTypes.appendElement({ "tag": "div", "style": "display: table-row;width: 100%;", "id": "superType_" + superTypeNames[i] + "_" + prototype.TypeName + "_row" }).down()
+                superType.appendElement({ "tag": "div", "style": "display: table-cell;", "innerHtml": superTypeNames[i] })
+
+                // Heritage can be as standard extention or as a list of base type, that's only apply to basic types.
+                if (superTypeNames[i].startsWith("xs.")) {
+                    var listOfBtn = superType.appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
+                        .appendElement({ "tag": "label", "for": superTypeNames[i] + "_" + prototype.TypeName + "_listOf", "innerHtml": "list", "style": "display: inline;" })
+                        .appendElement({ "tag": "input", "name": superTypeNames[i] + "_" + prototype.TypeName + "_cardinality", "type": "checkbox", "id": superTypeNames[i] + "_" + prototype.TypeName + "_listOf", "style": "display: inline; min-width: 0px; width: auto;" }).down()
+
+                    listOfBtn.element.checked = prototype.ListOf.length > 0
+                    listOfBtn.element.onclick = function (listOf, entityPrototypeEditor) {
+                        return function () {
+                            if (this.checked) {
+                                entityPrototypeEditor.getCurrentEntityPrototype().ListOf = listOf
+                            } else {
+                                entityPrototypeEditor.getCurrentEntityPrototype().ListOf = ""
+                            }
+                            entityPrototypeEditor.setCurrentPrototype(entityPrototypeEditor.getCurrentEntityPrototype())
+                            entityPrototypeEditor.saveBtn.element.style.display = "block"
+                        }
+
+                    }(superTypeNames[i], editor)
+                }
+
+                var removeSupertypeBtn = superType.appendElement({ "tag": "div", "class": "entities_btn", "style": "text-align: right;" }).down()
                     .appendElement({ "tag": "i", "class": "fa fa-close" }).down()
 
-                if (prototype.SuperTypeNames[i] == editor.baseType) {
+                if (superTypeNames[i] == editor.baseType) {
                     removeSupertypeBtn.element.style.display = "none"
                 } else {
                     removeSupertypeBtn.element.onclick = function (editor, prototype, superTypename) {
                         return function () {
-                            prototype.SuperTypeNames.splice(prototype.SuperTypeNames.indexOf(superTypename), 1);
+                            prototype.SuperTypeNames.splice(prototype.SuperTypeNames.indexOf(prototype.SuperTypeNames), 1);
+                            if (prototype.ListOf == superTypename) {
+                                prototype.ListOf = ""
+                            }
                             editor.setCurrentPrototype(prototype)
+                            editor.saveBtn.element.style.display = "block"
                         }
-                    }(editor, prototype, prototype.SuperTypeNames[i])
+                    }(editor, prototype, superTypeNames[i])
                 }
 
                 // Here I will display the supertypes properties...
-                editor.displayPrototypeSupertypeProperties(prototype.SuperTypeNames[i], function (callback, prototype, isDone) {
+                editor.displayPrototypeSupertypeProperties(superTypeNames[i], prototype.ListOf.length > 0, function (callback, prototype, isDone) {
                     return function () {
                         if (isDone) {
                             // continue the execution here.
                             callback(prototype)
                         }
                     }
-                }(caller.callback, prototype, i == prototype.SuperTypeNames.length - 1))
+                }(caller.callback, prototype, i == superTypeNames.length - 1))
             }
         }
 
@@ -400,6 +430,7 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
                                 // Here I will append a new supertype to the prototype.
                                 appendSupertypeBtn.element.onclick = function (editor, prototype, superPrototype) {
                                     return function () {
+                                        editor.saveBtn.element.style.display = "block"
                                         // Recursively append all surpertype to a given prototype.
                                         function appendSuperPrototype(prototype, superPrototype, callback) {
                                             var callback_ = function (prototype, superPrototype, index, total, callback, callback_) {
@@ -479,11 +510,26 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
  * Set the supertype item properties.
  * The callback function is call when all propreties are display.
  */
-EntityPrototypeEditor.prototype.displayPrototypeSupertypeProperties = function (superTypeName, callback) {
+EntityPrototypeEditor.prototype.displayPrototypeSupertypeProperties = function (superTypeName, isList, callback) {
     // Here I will get All element derived from 
     server.entityManager.getEntityPrototype(superTypeName, superTypeName.split(".")[0],
         // success callback
         function (result, caller) {
+
+            for (var i = 0; i < result.Fields.length; i++) {
+                // In that particula case the entity is a list of basic type so I will reflect it in it supertype field name.
+                if (caller.isList) {
+                    if (result.Fields[i] == "M_valueOf") {
+                        result.Fields[i] = "M_listOf";
+                    }
+                } else {
+                    if (result.Fields[i] == "M_listOf") {
+                        result.Fields[i] = "M_valueOf";
+                    }
+                }
+            }
+
+            // Here I will modify the result if the prototype is a list 
             caller.editor.displayPrototypeProperties(result, false)
             if (caller.callback != undefined) {
                 caller.callback(result.Fields)
@@ -492,7 +538,7 @@ EntityPrototypeEditor.prototype.displayPrototypeSupertypeProperties = function (
         function (errObj, caller) {
 
         },
-        { "editor": this, "callback": callback })
+        { "editor": this, "isList": isList, "callback": callback })
 }
 
 /**
@@ -967,19 +1013,33 @@ EntityPrototypeEditor.prototype.appendRestriction = function () {
 
 
         // Now I will appdend the restriction type options.
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 1, "innerHtml": "enumeration" })
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 2, "innerHtml": "fraction digits" })
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 3, "innerHtml": "length" })
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 4, "innerHtml": "max exclusive" })
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 5, "innerHtml": "max inclusive" })
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 6, "innerHtml": "max length" })
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 7, "innerHtml": "min exclusive" })
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 8, "innerHtml": "min inclusive" })
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 9, "innerHtml": "min length" })
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 10, "innerHtml": "pattern" })
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 11, "innerHtml": "total digits" })
-        restrictionsTypeSelect.appendElement({ "tag": "option", "value": 12, "innerHtml": "white space" })
+        var baseType = getBaseTypeExtension(prototype.TypeName)
+        if(prototype.ListOf.length == 0){
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 1, "innerHtml": "enumeration" })
+        }
 
+        if (isXsNumeric(baseType) || isXsMoney(baseType)) {
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 2, "innerHtml": "fraction digits" })
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 11, "innerHtml": "total digits" })
+        }
+
+        if (isXsInt(baseType) || isXsNumeric(baseType) || isXsMoney(baseType)) {
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 4, "innerHtml": "max exclusive" })
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 5, "innerHtml": "max inclusive" })
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 6, "innerHtml": "max length" })
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 7, "innerHtml": "min exclusive" })
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 8, "innerHtml": "min inclusive" })
+        }
+
+        if (isXsString(baseType) || prototype.ListOf.length > 0) {
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 3, "innerHtml": "length" })
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 9, "innerHtml": "min length" })
+        }
+        
+        if (isXsString(baseType) && prototype.ListOf.length == 0) {
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 10, "innerHtml": "pattern" })
+            restrictionsTypeSelect.appendElement({ "tag": "option", "value": 12, "innerHtml": "white space" })
+        }
         // Set the focus to the input.
         restrictionsValueInput.element.focus()
 

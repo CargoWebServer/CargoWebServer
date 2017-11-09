@@ -107,6 +107,7 @@ func (this *Hub) run() {
 
 		case c := <-this.unregister:
 			delete(this.connections, c.GetUuid())
+			// Close the connection.
 			GetServer().GetEventManager().removeClosedListener()
 			GetServer().GetSessionManager().removeClosedSession()
 			GetServer().onClose(c.GetUuid())

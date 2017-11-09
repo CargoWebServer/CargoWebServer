@@ -257,7 +257,6 @@ func (this *Server) onClose(subConnectionId string) {
 		// Remove the command
 		this.removeCmd(cmds[i])
 	}
-
 }
 
 /**
