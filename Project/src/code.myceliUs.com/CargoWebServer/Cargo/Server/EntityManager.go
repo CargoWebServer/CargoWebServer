@@ -194,8 +194,9 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 	GetServer().GetDataManager().deleteData(storeId, string(query), params)
 
 	// delete it's childs.
-	for i := 0; i < len(toDelete.GetChildsPtr()); i++ {
-		toDelete.GetChildsPtr()[i].DeleteEntity()
+	for i := 0; i < len(toDelete.GetChildsUuid()); i++ {
+		child, _ := GetServer().GetEntityManager().getEntityByUuid(toDelete.GetChildsUuid()[i], false)
+		child.DeleteEntity()
 	}
 
 	// This variable will keep track of other entity to save after that entity will be
@@ -898,37 +899,6 @@ func (this *EntityManager) getEntitiesByType(typeNames []string, storeId string,
 	return entities, nil
 }
 
-/**
- * Return the list of all entity links to one entity. If we see an entity as graph it return
- * all nodes links to a given node.
- */
-func (this *EntityManager) getEntityLnkLst(entity Entity, visited *[]string, lnkLst *[]Entity) {
-
-	if len(*visited) > 0 {
-		if Utility.Contains(*visited, entity.GetUuid()) {
-			return // nothing to do here...
-		}
-	}
-
-	// append the entity...
-	if entity.Exist() {
-		*visited = append(*visited, entity.GetUuid())
-		*lnkLst = append(*lnkLst, entity)
-
-		// Append childs...
-		for _, child := range entity.GetChildsPtr() {
-			this.getEntityLnkLst(child, visited, lnkLst)
-		}
-
-		for _, ref := range entity.GetReferencesPtr() {
-			this.getEntityLnkLst(ref, visited, lnkLst)
-		}
-	} else {
-		// delete the entity...
-		//entity.DeleteEntity()
-	}
-}
-
 func (this *EntityManager) getEntityByUuid(uuid string, lazy bool) (Entity, *CargoEntities.Error) {
 
 	if !Utility.IsValidEntityReferenceName(uuid) {
@@ -1376,7 +1346,6 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	// Now I will save it parent if there one.
 	if parentPtr != nil {
 		// Set it parent.
-		entity.(Entity).SetParentPtr(parentPtr)
 		entity.(Entity).SaveEntity()
 		parentPtrTypeName := parentPtr.GetTypeName()
 		parentPtrStoreId := parentPtrTypeName[:strings.Index(parentPtrTypeName, ".")]
@@ -2993,78 +2962,6 @@ func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []
 		return nil
 	}
 	return entity.GetObject()
-}
-
-// @api 1.0
-// Retreive the list of all entity link's (dependencie) at once...
-// @param {string} uuid The of the entity that we want to retreive link's
-// @return {[]interface{}} Return the list of all entities related to one entity.
-// @scope {public}
-// @param {callback} progressCallback The function is call when chunk of response is received.
-// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
-// @param {callback} errorCallback In case of error.
-// @src
-//EntityManager.prototype.getEntityLnks = function (uuid, progressCallback, successCallback, errorCallback, caller) {
-//    // server is the client side singleton.
-//    var params = []
-//    params.push(createRpcData(uuid, "STRING", "uuid"))
-//    // Call it on the server.
-//    server.executeJsFunction(
-//        "EntityManagerGetEntityLnks", // The function to execute remotely on server
-//        params, // The parameters to pass to that function
-//        function (index, total, caller) { // The progress callback
-//            caller.progressCallback(index, total, caller)
-//        },
-//        function (results, caller) {
-//			if(caller.successCallback != undefined){
-//            	caller.successCallback(results[0], caller.caller)
-//				caller.successCallback = undefined
-//			}
-//        },
-//        function (errMsg, caller) {
-//            server.errorManager.onError(errMsg)
-//            caller.errorCallback(errMsg, caller.caller)
-//        }, // Error callback
-//        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
-//    )
-//}
-func (this *EntityManager) GetEntityLnks(uuid string, messageId string, sessionId string) []interface{} {
-	var errObj *CargoEntities.Error
-	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
-	}
-
-	// The entity to remove.
-	var entity Entity
-
-	entity, errObj = this.getEntityByUuid(uuid, false)
-	visited := make([]string, 0)
-	lnkLst := make([]Entity, 0)
-
-	if entity != nil {
-		this.getEntityLnkLst(entity, &visited, &lnkLst)
-	}
-
-	// Repport the error
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-	}
-
-	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
-	}
-
-	var entities []interface{}
-
-	for i := 0; i < len(lnkLst); i++ {
-		entities = append(entities, lnkLst[i].GetObject())
-	}
-
-	return entities
 }
 
 // @api 1.0

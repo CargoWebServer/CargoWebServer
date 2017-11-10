@@ -480,7 +480,7 @@ EntityPanel.prototype.initHeader = function () {
 				var entity = entityPanel.getEntity()
 				entity.NeedSave = true
 				entityPanel.saveBtn.element.id = entity.UUID + "_save_btn"
-				if ((entity.exist == false && entityPanel.parentEntity != null) || entity.UUID == undefined ) {
+				if ((entity.exist == false && entityPanel.parentEntity != null) || entity.UUID == undefined) {
 					// The parent entity is know and the entity does not exist.
 					server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.parentLnk, entity.TYPENAME, entity.UUID, entity,
 						// Success callback
@@ -832,7 +832,6 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 	var entityDiv = parent.appendElement({ "tag": "div", "class": "entity" }).down()
 	var id = this.proto.TypeName + "_" + field
 
-
 	// In case of a generic value....
 	if (fieldType == "xs.base64Binary") {
 		this.controls[id] = parent
@@ -842,7 +841,6 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 	// The entity label here...
 	var label = entityDiv.appendElement({ "tag": "div", id: this.proto.TypeName + "_" + field + "_lbl" }).down()
 	label.appendElement({ "tag": "span", "innerHtml": field.replace("M_", ""), "id": field.replace("M_", "") }).down()
-
 	server.languageManager.setElementText(label, field)
 
 	// Now the entity value...
@@ -853,6 +851,11 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 	fieldType = fieldType.replace("[]", "").replace(":Ref", "")
 	var prototype = getEntityPrototype(fieldType)
+	if (prototype != undefined) {
+		if (prototype.ListOf.length > 0) {
+			isArray = true;
+		}
+	}
 
 	// if there is no restriction
 	if (restrictions == undefined) {
@@ -860,6 +863,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 	}
 
 	var baseType = getBaseTypeExtension(fieldType)
+
 	// If the value is simple string...
 	if (!isArray && (isXsBaseType(baseType) || fieldType.startsWith("sqltypes.") || fieldType.startsWith("xs.") || fieldType.startsWith("enum:"))) {
 		// in case of an enum

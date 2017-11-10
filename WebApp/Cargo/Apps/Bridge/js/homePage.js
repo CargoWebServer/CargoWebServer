@@ -160,6 +160,10 @@ var HomePage = function () {
         if (evt.dataMap.isDark) {
             changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".contextSelector", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("background-color", ".contextSelector i:hover", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("background", ".contextSelector img:hover", "." + evt.dataMap.themeClass)
+
             changePropertyByClassName("color", ".navigation_div", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".vertical_menu", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".vertical_submenu", "." + evt.dataMap.themeClass)
@@ -187,11 +191,12 @@ var HomePage = function () {
             changePropertyByClassName("color", ".security_manager_content", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".entities_header_btn.enabled", "." + evt.dataMap.themeClass + " .ace_gutter")
-            changePropertyByClassName("background-color", ".contextSelector i, img", "." + evt.dataMap.themeClass, "color")
-            changePropertyByClassName("background", ".contextSelector i, img", "." + evt.dataMap.themeClass, "color")
         } else {
             changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass)
             changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".contextSelector", "." + evt.dataMap.themeClass  + " .ace_gutter")
+            changePropertyByClassName("background-color", ".contextSelector i:hover", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("background", ".contextSelector img:hover", "." + evt.dataMap.themeClass+ " .ace_gutter")
             changePropertyByClassName("color", ".navigation_div", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".vertical_menu", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".vertical_submenu", "." + evt.dataMap.themeClass + " .ace_gutter")
@@ -216,17 +221,15 @@ var HomePage = function () {
             changePropertyByClassName("background-color", ".entity option", "." + evt.dataMap.themeClass+ " .ace_gutter")
             changePropertyByClassName("background", ".entity option", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass + " .ace_gutter")
-            changePropertyByClassName("background", ".contextSelector i, img", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
-            changePropertyByClassName("background-color", ".contextSelector i, img", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         }
-        changePropertyByClassName("color", ".contextSelector i:hover", "." + evt.dataMap.themeClass)
-        changePropertyByClassName("color", ".contextSelector img:hover", "." + evt.dataMap.themeClass)
+
+        changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
+        changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
+        
         changePropertyByClassName("background-color", "#rightDiv", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background", "#rightDiv", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background-color", "#leftDiv", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background", "#leftDiv", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
-        changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
-        changePropertyByClassName("background", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background-color", ".splitter", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("background", ".splitter", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
         changePropertyByClassName("color", ".severConfiguration", "." + evt.dataMap.themeClass + " .ace_gutter")

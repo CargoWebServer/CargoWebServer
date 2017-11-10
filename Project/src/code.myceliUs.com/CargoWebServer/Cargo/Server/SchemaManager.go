@@ -1206,6 +1206,8 @@ func (this *SchemaManager) appendPrototypeList(schema *XML_Schemas.XSD_Schema, p
 			prototype.FieldsType = append(prototype.FieldsType, "[]"+p.TypeName)
 			prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+			prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "")
+			prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, "")
 		}
 	} else if len(lst.ItemType) > 0 {
 		var itemType string
@@ -1222,6 +1224,8 @@ func (this *SchemaManager) appendPrototypeList(schema *XML_Schemas.XSD_Schema, p
 			prototype.FieldsType = append(prototype.FieldsType, "[]"+itemType)
 			prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 			prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+			prototype.FieldsDefaultValue = append(prototype.FieldsDefaultValue, "[]")
+			prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, "")
 		}
 
 	}

@@ -14,8 +14,7 @@ import (
 )
 
 type ProjectManager struct {
-	activeProjects map[string]*CargoEntities.Project
-	root           string
+	root string
 }
 
 var projectManager *ProjectManager
@@ -32,7 +31,6 @@ func (this *Server) GetProjectManager() *ProjectManager {
  */
 func newProjectManager() *ProjectManager {
 	projectManager := new(ProjectManager)
-	projectManager.activeProjects = make(map[string]*CargoEntities.Project, 0)
 	projectManager.root = GetServer().GetConfigurationManager().GetApplicationDirectoryPath()
 	return projectManager
 }

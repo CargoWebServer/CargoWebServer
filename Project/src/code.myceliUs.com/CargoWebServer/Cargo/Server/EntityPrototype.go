@@ -387,10 +387,6 @@ func (this *EntityPrototype) Save(storeId string) error {
 						}
 					}
 
-					// Set the new entity prototype
-					if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-						entity.(*DynamicEntity).prototype = this
-					}
 					// Now set new fields value inside existing entities with their default
 					// value.
 					for j := 0; j < len(this.Fields); j++ {

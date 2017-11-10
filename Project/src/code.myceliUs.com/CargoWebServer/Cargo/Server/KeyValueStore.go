@@ -178,77 +178,85 @@ func (this *KeyValueDataStore) deleteValue(key string) error {
  */
 func (this *KeyValueDataStore) setSuperTypeFields(prototype *EntityPrototype) {
 	var index = 3 // The start index is after the uuid and parentUuid and the parent lnk.
-	for i := 0; i < len(prototype.SuperTypeNames); i++ {
-		superTypeName := prototype.SuperTypeNames[i]
-		superPrototype, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
-		if err == nil {
-			// I will merge the fields
-			// The first to fields are always the uuid, parentUuid, parentLnk and the last is the childUuids and referenced
-			for j := 3; j < len(superPrototype.Fields)-2; j++ {
-				if !Utility.Contains(prototype.Fields, superPrototype.Fields[j]) {
-					if superPrototype.Fields[j] == "M_valueOf" && len(prototype.ListOf) == 0 {
-						Utility.InsertStringAt(index, superPrototype.Fields[j], &prototype.Fields)
-					} else {
-						// In that case the prototype must be considere as a list of supertype.
-						Utility.InsertStringAt(index, "M_listOf", &prototype.Fields)
-					}
-
-					Utility.InsertStringAt(index, superPrototype.FieldsType[j], &prototype.FieldsType)
-					Utility.InsertBoolAt(index, superPrototype.FieldsVisibility[j], &prototype.FieldsVisibility)
-					Utility.InsertStringAt(index, superPrototype.FieldsDefaultValue[j], &prototype.FieldsDefaultValue)
-
-					// create a new index at the end...
-					if superPrototype.FieldsNillable != nil {
-						isNillable := false
-						if j < len(superPrototype.FieldsNillable) {
-							isNillable = superPrototype.FieldsNillable[j]
+	if len(prototype.ListOf) == 0 {
+		for i := 0; i < len(prototype.SuperTypeNames); i++ {
+			superTypeName := prototype.SuperTypeNames[i]
+			superPrototype, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
+			if err == nil {
+				// I will merge the fields
+				// The first to fields are always the uuid, parentUuid, parentLnk and the last is the childUuids and referenced
+				for j := 3; j < len(superPrototype.Fields)-2; j++ {
+					if !Utility.Contains(prototype.Fields, superPrototype.Fields[j]) {
+						if superPrototype.Fields[j] == "M_valueOf" && len(prototype.ListOf) == 0 {
+							Utility.InsertStringAt(index, superPrototype.Fields[j], &prototype.Fields)
 						}
-						Utility.InsertBoolAt(index, isNillable, &prototype.FieldsNillable)
-					} else {
-						prototype.FieldsNillable = append(prototype.FieldsNillable, true)
-					}
 
-					if superPrototype.FieldsDocumentation != nil {
-						documentation := ""
-						if j < len(superPrototype.FieldsDocumentation) {
-							documentation = superPrototype.FieldsDocumentation[j]
-						}
-						if index < len(prototype.FieldsDocumentation) {
-							Utility.InsertStringAt(index, documentation, &prototype.FieldsDocumentation)
+						Utility.InsertStringAt(index, superPrototype.FieldsType[j], &prototype.FieldsType)
+						Utility.InsertBoolAt(index, superPrototype.FieldsVisibility[j], &prototype.FieldsVisibility)
+						Utility.InsertStringAt(index, superPrototype.FieldsDefaultValue[j], &prototype.FieldsDefaultValue)
+
+						// create a new index at the end...
+						if superPrototype.FieldsNillable != nil {
+							isNillable := false
+							if j < len(superPrototype.FieldsNillable) {
+								isNillable = superPrototype.FieldsNillable[j]
+							}
+							Utility.InsertBoolAt(index, isNillable, &prototype.FieldsNillable)
 						} else {
-							prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, documentation)
+							prototype.FieldsNillable = append(prototype.FieldsNillable, true)
 						}
-					} else {
-						prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, "")
+
+						if superPrototype.FieldsDocumentation != nil {
+							documentation := ""
+							if j < len(superPrototype.FieldsDocumentation) {
+								documentation = superPrototype.FieldsDocumentation[j]
+							}
+							if index < len(prototype.FieldsDocumentation) {
+								Utility.InsertStringAt(index, documentation, &prototype.FieldsDocumentation)
+							} else {
+								prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, documentation)
+							}
+						} else {
+							prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, "")
+						}
+
+						index++
 					}
+				}
+				// Now the index...
+				for j := 0; j < len(superPrototype.Indexs); j++ {
+					if !Utility.Contains(prototype.Indexs, superPrototype.Indexs[j]) {
+						prototype.Indexs = append(prototype.Indexs, superPrototype.Indexs[j])
+					}
+				}
+				// Now the ids
+				for j := 0; j < len(superPrototype.Ids); j++ {
+					if !Utility.Contains(prototype.Ids, superPrototype.Ids[j]) {
+						prototype.Ids = append(prototype.Ids, superPrototype.Ids[j])
+					}
+				}
 
-					index++
-				}
-			}
-			// Now the index...
-			for j := 0; j < len(superPrototype.Indexs); j++ {
-				if !Utility.Contains(prototype.Indexs, superPrototype.Indexs[j]) {
-					prototype.Indexs = append(prototype.Indexs, superPrototype.Indexs[j])
-				}
-			}
-			// Now the ids
-			for j := 0; j < len(superPrototype.Ids); j++ {
-				if !Utility.Contains(prototype.Ids, superPrototype.Ids[j]) {
-					prototype.Ids = append(prototype.Ids, superPrototype.Ids[j])
-				}
-			}
-
-			// Now I will append the new prototype to the list of substitution group of the super type.
-			if !Utility.Contains(superPrototype.SubstitutionGroup, prototype.TypeName) {
+				// Now I will append the new prototype to the list of substitution group of the super type.
 				if !Utility.Contains(superPrototype.SubstitutionGroup, prototype.TypeName) {
-					superPrototype.SubstitutionGroup = append(superPrototype.SubstitutionGroup, prototype.TypeName)
-					// save it to it store...
-					superPrototype.Save(superPrototype.TypeName[0:strings.Index(superPrototype.TypeName, ".")])
+					if !Utility.Contains(superPrototype.SubstitutionGroup, prototype.TypeName) {
+						superPrototype.SubstitutionGroup = append(superPrototype.SubstitutionGroup, prototype.TypeName)
+						// save it to it store...
+						superPrototype.Save(superPrototype.TypeName[0:strings.Index(superPrototype.TypeName, ".")])
+					}
 				}
+			} else {
+				log.Println("error ", err)
 			}
-		} else {
-			log.Println("error ", err)
 		}
+	} else {
+		// It can not have superpetype and list of a the same time.
+		prototype.SuperTypeNames = make([]string, 0)
+		// In that particular case the entity is a list of the given type.
+		Utility.InsertStringAt(3, "M_listOf", &prototype.Fields)
+		Utility.InsertStringAt(3, "[]"+prototype.ListOf, &prototype.FieldsType)
+		Utility.InsertBoolAt(3, true, &prototype.FieldsVisibility)
+		Utility.InsertStringAt(3, "[]", &prototype.FieldsDefaultValue)
+		Utility.InsertStringAt(3, "", &prototype.FieldsDocumentation)
 	}
 
 	// reset the field orders.

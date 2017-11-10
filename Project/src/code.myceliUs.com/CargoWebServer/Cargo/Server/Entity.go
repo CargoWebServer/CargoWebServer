@@ -53,17 +53,6 @@ type Entity interface {
 	 * If the entity is created by a parent entity.
 	 */
 	GetParentPtr() Entity
-	SetParentPtr(Entity)
-
-	/**
-	 * Return the list of child entity (pointers)
-	 */
-	GetChildsPtr() []Entity
-
-	/**
-	 * Set the array of childs pointers
-	 */
-	SetChildsPtr(childsPtr []Entity)
 
 	/**
 	 * Remove child with a given uuid.
@@ -94,16 +83,6 @@ type Entity interface {
 	 * Set reference uuid
 	 */
 	SetReferencesUuid(uuid []string)
-
-	/**
-	 * Return the list of reference of an entity
-	 */
-	GetReferencesPtr() []Entity
-
-	/**
-	 * Set reference uuid
-	 */
-	SetReferencesPtr(ref []Entity)
 
 	/**
 	 * Append a reference.

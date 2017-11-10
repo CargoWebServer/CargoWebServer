@@ -8,7 +8,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	//"time"
+	"time"
+
+	// Use to see if there is memory leak remove for production.
+	"runtime/debug"
 
 	"code.myceliUs.com/Utility"
 	"github.com/robertkrimen/otto"
@@ -169,7 +172,8 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
 				// The vm processing loop...
 				go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, stopVm chan (bool), sessionId string) {
-					for {
+					done := false
+					for !done {
 						select {
 						case operationInfos := <-setVariable:
 							callback := operationInfos.m_returns
@@ -195,22 +199,35 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 							if stop {
 								// Wait until the vm is stop
 								wait := make(chan string, 1)
-								vm.Interrupt <- func(sessionId string, wait chan string) func() {
+								timer := time.NewTimer(5 * time.Second)
+
+								// Call the interupt function on the VM.
+								vm.Interrupt <- func(sessionId string, wait chan string, timer *time.Timer) func() {
 									return func() {
+										timer.Stop()
 										// Continue the processing.
 										wait <- "--> Interrupt execution of VM with id " + sessionId
 										// The panic error will actually kill the vm
 										panic(errors.New("Stahp"))
 									}
-								}(sessionId, wait)
+								}(sessionId, wait, timer)
+
+								// If nothing append for 5 second I will return.
+								go func(wait chan string, timer *time.Timer) {
+									<-timer.C
+									wait <- "--> Stop execution of VM with id " + sessionId
+								}(wait, timer)
+
 								// Synchronyse exec of interuption here.
 								log.Println(<-wait)
-								jsRuntimeManager.removeVm(sessionId)
-								return // exit the loop.
+								done = true
+								break // exit the loop.
 							}
 						}
 					}
+					jsRuntimeManager.removeVm(sessionId)
 					log.Println("--> vm loop stop for session ", sessionId)
+					debug.FreeOSMemory()
 				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
 				callback <- []interface{}{true} // unblock the channel...
 
@@ -358,9 +375,13 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 func (this *JsRuntimeManager) removeVm(sessionId string) {
 	// Remove vm ressources.
 	delete(this.m_sessions, sessionId)
+	close(this.m_executeJsFunction[sessionId])
 	delete(this.m_executeJsFunction, sessionId)
+	close(this.m_setVariable[sessionId])
 	delete(this.m_setVariable, sessionId)
+	close(this.m_stopVm[sessionId])
 	delete(this.m_stopVm, sessionId)
+
 }
 
 /**

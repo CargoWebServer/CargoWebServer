@@ -7,6 +7,7 @@ import (
 	"log"
 	"strconv"
 
+	"code.myceliUs.com/Utility"
 	"github.com/golang/protobuf/proto"
 )
 
@@ -233,30 +234,14 @@ func NewRequestMessage(id string, method string, params []*MessageData, to []con
 		// Numeric value here
 		case int, int8, int16, int32, int64:
 			*msgParam.Type = Data_INTEGER
-			/*buf := new(bytes.Buffer)
-			err = binary.Write(buf, binary.LittleEndian, val)
-			if err != nil {
-				log.Println("binary.Write failed:", err)
-				return nil, err
-			}
-			msgParam.DataBytes = buf.Bytes()*/
-
-			msgParam.DataBytes = []byte(strconv.Itoa(val.(int)))
+			msgParam.DataBytes = []byte(Utility.ToString(val))
 		// Float
 		case float32:
-			log.Println("--------------> 244 ", msgParam.Name, val)
 			*msgParam.Type = Data_DOUBLE
-			/*buf := new(bytes.Buffer)
-			err := binary.Write(buf, binary.LittleEndian, val)
-			if err != nil {
-				log.Println("binary.Write failed:", err)
-				return nil, err
-			}
-			msgParam.DataBytes = buf.Bytes()*/
-			msgParam.DataBytes = []byte(strconv.FormatFloat(float64(val), 'f', -1, 32))
+			msgParam.DataBytes = []byte(Utility.ToString(val))
 		// Bytes
 		case float64:
-			msgParam.DataBytes = []byte(strconv.FormatFloat(val, 'f', -1, 64))
+			msgParam.DataBytes = []byte(Utility.ToString(val))
 		case []byte:
 			*msgParam.Type = Data_BYTES
 			msgParam.DataBytes = []byte(val)
@@ -326,36 +311,13 @@ func NewResponseMessage(id string, results []*MessageData, to []connection) (*me
 			msgResult.DataBytes = strconv.AppendBool(msgResult.DataBytes, val)
 		// Numeric value here
 		case int, int8, int16, int32, int64:
-			/**msgResult.Type = Data_INTEGER
-			buf := new(bytes.Buffer)
-			err = binary.Write(buf, binary.LittleEndian, val)
-			if err != nil {
-				log.Println("binary.Write failed:", err)
-				return nil, err
-			}
-			msgResult.DataBytes = buf.Bytes()*/
-			msgResult.DataBytes = []byte(strconv.Itoa(val.(int)))
+			msgResult.DataBytes = []byte(Utility.ToString(val))
 		// Float
 		case float64:
-			/**msgResult.Type = Data_DOUBLE
-			buf := new(bytes.Buffer)
-			err := binary.Write(buf, binary.LittleEndian, val)
-			if err != nil {
-				log.Println("binary.Write failed:", err)
-				return nil, err
-			}
-			msgResult.DataBytes = buf.Bytes()*/
-			msgResult.DataBytes = []byte(strconv.FormatFloat(val, 'f', -1, 32))
+			msgResult.DataBytes = []byte(Utility.ToString(val))
 		case float32:
 			*msgResult.Type = Data_DOUBLE
-			/*buf := new(bytes.Buffer)
-			err := binary.Write(buf, binary.LittleEndian, val)
-			if err != nil {
-				log.Println("binary.Write failed:", err)
-				return nil, err
-			}
-			msgParam.DataBytes = buf.Bytes()*/
-			msgResult.DataBytes = []byte(strconv.FormatFloat(float64(val), 'f', -1, 32))
+			msgResult.DataBytes = []byte(Utility.ToString(val))
 		// Bytes
 		case []byte:
 			*msgResult.Type = Data_BYTES

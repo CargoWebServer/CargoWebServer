@@ -24,15 +24,11 @@ import (
 type DynamicEntity struct {
 
 	// Hard link parent->[]childs
-	parentPtr  Entity
-	childsPtr  []Entity
 	childsUuid []string
 
 	// Soft link []referenced->[]references
-	referencesPtr  []Entity
 	referencesUuid []string
 	referenced     []EntityRef
-	prototype      *EntityPrototype
 
 	/** object will be a map... **/
 	object map[string]interface{}
@@ -76,17 +72,9 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 		return nil, errObj
 	}
 
-	var parentPtr Entity
-
 	// Set the parent uuid in that case.
 	if len(parentUuid) == 0 && values["ParentUuid"] != nil {
 		parentUuid = values["ParentUuid"].(string)
-	}
-
-	// I will set it parent ptr...
-	if len(parentUuid) > 0 {
-		values["ParentUuid"] = parentUuid
-		parentPtr, _ = GetServer().GetEntityManager().getDynamicEntityByUuid(parentUuid, false)
 	}
 
 	var entity *DynamicEntity
@@ -164,9 +152,6 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 		// Create a new dynamic entity it that case.
 		entity = new(DynamicEntity)
 
-		// keep the reference to the prototype.
-		entity.prototype = prototype
-
 		// If the object contain an id...
 		entity.setValue("UUID", values["UUID"].(string))
 
@@ -174,11 +159,6 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 		entity.referencesUuid = make([]string, 0)
 		entity.referenced = make([]EntityRef, 0)
 
-	}
-
-	if parentPtr != nil {
-		// Set the parent uuid.
-		entity.SetParentPtr(parentPtr)
 	}
 
 	// Dynamic entity are not lazy by default.
@@ -229,7 +209,8 @@ func (this *DynamicEntity) getValue(field string) interface{} {
 func (this *DynamicEntity) deleteValue(field string) {
 	this.Lock()
 	defer this.Unlock()
-	fieldType := this.prototype.FieldsType[this.prototype.getFieldIndex(field)]
+	prototype := this.GetPrototype()
+	fieldType := prototype.FieldsType[prototype.getFieldIndex(field)]
 	if !strings.HasPrefix(fieldType, "[]") {
 		if strings.HasSuffix(fieldType, ":Ref") {
 			refUuid := this.object[field].(string)
@@ -257,7 +238,7 @@ func (this *DynamicEntity) setObject(obj map[string]interface{}) {
  */
 func (this *DynamicEntity) appendValue(field string, value interface{}) {
 	values := this.getValue(field)
-
+	prototype := this.GetPrototype()
 	if values == nil {
 		// Here no value aready exist.
 		if reflect.TypeOf(value).Kind() == reflect.String {
@@ -265,7 +246,7 @@ func (this *DynamicEntity) appendValue(field string, value interface{}) {
 			values.([]string)[0] = value.(string)
 			this.setValue(field, values)
 		} else if reflect.TypeOf(value).String() == "*Server.DynamicEntity" {
-			if strings.HasSuffix(this.prototype.FieldsType[this.prototype.getFieldIndex(field)], ":Ref") {
+			if strings.HasSuffix(prototype.FieldsType[prototype.getFieldIndex(field)], ":Ref") {
 				values = make([]string, 1)
 				values.([]string)[0] = value.(Entity).GetUuid()
 				this.setValue(field, values)
@@ -285,7 +266,7 @@ func (this *DynamicEntity) appendValue(field string, value interface{}) {
 			values = append(values.([]string), value.(string))
 			this.setValue(field, values)
 		} else if reflect.TypeOf(value).String() == "*Server.DynamicEntity" {
-			if strings.HasSuffix(this.prototype.FieldsType[this.prototype.getFieldIndex(field)], ":Ref") {
+			if strings.HasSuffix(prototype.FieldsType[prototype.getFieldIndex(field)], ":Ref") {
 				var isExist = false
 				for i := 0; i < len(values.([]*DynamicEntity)); i++ {
 					if value.(Entity).GetUuid() == values.(*DynamicEntity).GetUuid() {
@@ -379,10 +360,10 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 
 	var query EntityQuery
 	query.TypeName = typeName
-
+	prototype := this.GetPrototype()
 	// Here I will append the rest of the fields...
 	// append the list of fields...
-	query.Fields = append(query.Fields, this.prototype.Fields...)
+	query.Fields = append(query.Fields, prototype.Fields...)
 
 	// The index of search...
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
@@ -418,7 +399,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 		this.setValue("ParentLnk", results[0][2].(string)) // Set the parent relation.
 
 		//init the child...
-		childsUuidStr := results[0][this.prototype.getFieldIndex("childsUuid")].(string)
+		childsUuidStr := results[0][prototype.getFieldIndex("childsUuid")].(string)
 
 		if len(childsUuidStr) > 0 {
 			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
@@ -428,7 +409,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 			}
 		}
 
-		referencedStr := results[0][this.prototype.getFieldIndex("referenced")].(string)
+		referencedStr := results[0][prototype.getFieldIndex("referenced")].(string)
 		this.referenced = make([]EntityRef, 0)
 		if len(referencedStr) > 0 {
 			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
@@ -442,8 +423,8 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 		// The first tow field are uuid and parentUuid
 		// and the last tow fields are childsuuid and referenced...
 		for i := 3; i < len(results[0])-2; i++ {
-			fieldName := this.prototype.Fields[i]
-			fieldType := this.prototype.FieldsType[i]
+			fieldName := prototype.Fields[i]
+			fieldType := prototype.FieldsType[i]
 			isNull := false
 
 			if reflect.TypeOf(results[0][i]).String() == "string" {
@@ -686,12 +667,13 @@ func (this *DynamicEntity) saveEntity(path string) {
 		DynamicEntityInfo = append(DynamicEntityInfo, "")
 	}
 
+	prototype := this.GetPrototype()
 	// Now the fields of the object, from the prototype...
 	// The first tow field are uuid and parentUuid
 	// and the last tow fields are childsuuid and referenced...
-	for i := 3; i < len(this.prototype.Fields)-2; i++ {
-		fieldName := this.prototype.Fields[i]
-		fieldType := this.prototype.FieldsType[i]
+	for i := 3; i < len(prototype.Fields)-2; i++ {
+		fieldName := prototype.Fields[i]
+		fieldType := prototype.FieldsType[i]
 
 		// append the field in the query fields list.
 		query.Fields = append(query.Fields, fieldName)
@@ -1125,18 +1107,12 @@ func (this *DynamicEntity) RemoveChild(name string, uuid string) {
 	}
 
 	this.childsUuid = childsUuid
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		}
-	}
-	this.childsPtr = childsPtr
+	prototype := this.GetPrototype()
 
 	// Now I will remove it's value in the object...
-	fieldIndex := this.prototype.getFieldIndex(name)
+	fieldIndex := prototype.getFieldIndex(name)
 	if fieldIndex > -1 {
-		filedType := this.prototype.FieldsType[this.prototype.getFieldIndex(name)]
+		filedType := prototype.FieldsType[prototype.getFieldIndex(name)]
 		isArray := strings.HasPrefix(filedType, "[]")
 		if isArray {
 			childs := make([]map[string]interface{}, 0)
@@ -1158,7 +1134,7 @@ func (this *DynamicEntity) RemoveChild(name string, uuid string) {
 			this.deleteValue(name)
 		}
 	} else {
-		log.Println("--> "+this.prototype.TypeName+" dosent have field name ", name)
+		log.Println("--> "+prototype.TypeName+" dosent have field name ", name)
 	}
 
 }
@@ -1211,12 +1187,8 @@ func (this *DynamicEntity) SetParentLnk(lnk string) {
  * If the entity is created by a parent entity.
  */
 func (this *DynamicEntity) GetParentPtr() Entity {
-	return this.parentPtr
-}
-
-func (this *DynamicEntity) SetParentPtr(parent Entity) {
-	this.setValue("ParentUuid", parent.GetUuid())
-	this.parentPtr = parent
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 /**
@@ -1231,20 +1203,6 @@ func (this *DynamicEntity) GetReferencesUuid() []string {
  */
 func (this *DynamicEntity) SetReferencesUuid(uuid []string) {
 	this.referencesUuid = uuid
-}
-
-/**
- * Return the list of reference of an entity
- */
-func (this *DynamicEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-/**
- * Set reference uuid
- */
-func (this *DynamicEntity) SetReferencesPtr(ref []Entity) {
-	this.referencesPtr = ref
 }
 
 /**
@@ -1264,10 +1222,6 @@ func (this *DynamicEntity) AppendReference(reference Entity) {
 
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -1287,10 +1241,10 @@ func (this *DynamicEntity) RemoveReference(name string, reference Entity) {
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
 
 	// Now I will remove it from it it internal object to.
-	fieldType := this.prototype.FieldsType[this.prototype.getFieldIndex(name)]
+	prototype := this.GetPrototype()
+	fieldType := prototype.FieldsType[prototype.getFieldIndex(name)]
 	isArray := strings.HasPrefix(fieldType, "[]")
 	if isArray {
 		refs := make([]string, 0)
@@ -1307,26 +1261,9 @@ func (this *DynamicEntity) RemoveReference(name string, reference Entity) {
 }
 
 /**
- * Return the list of child entity
- */
-func (this *DynamicEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-/**
- * Set the array of childs ptr...
- */
-func (this *DynamicEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
-}
-
-/**
  * Append a child...
  */
 func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error {
-
-	// Set or reset the child ptr.
-	child.SetParentPtr(this)
 
 	// Append referenced.
 	child.AppendReferenced(attributeName, this)
@@ -1335,9 +1272,10 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 	child.(*DynamicEntity).setValue("ParentLnk", attributeName)
 
 	// I will retreive the field type.
-	fieldTypeIndex := this.prototype.getFieldIndex(attributeName)
+	prototype := this.GetPrototype()
+	fieldTypeIndex := prototype.getFieldIndex(attributeName)
 	if fieldTypeIndex > 0 {
-		fieldTypeName := this.prototype.FieldsType[fieldTypeIndex]
+		fieldTypeName := prototype.FieldsType[fieldTypeIndex]
 		if strings.HasPrefix(fieldTypeName, "[]") {
 			// if the array is nil...
 			if this.getValue(attributeName) == nil {
@@ -1460,27 +1398,6 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 	if Utility.Contains(this.childsUuid, child.GetUuid()) == false {
 		// Append it to the list of UUID
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		// Append it to the child
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-
-		// In that case I will update the value inside the childsPtr...
-		isExist := false
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			} else {
-				// Replace the child ptr.
-				childsPtr = append(childsPtr, child)
-				isExist = true
-			}
-		}
-		// Append the child ptr in that case...
-		if !isExist {
-			childsPtr = append(childsPtr, child)
-			this.SetChildsPtr(childsPtr)
-		}
 	}
 
 	return nil
@@ -1576,10 +1493,10 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 		this.setObject(entity.GetObject().(map[string]interface{}))
 		this.SetNeedSave(sum0 != sum1)
 	}
-
-	for i := 0; i < len(this.prototype.Fields); i++ {
-		field := this.prototype.Fields[i]
-		fieldType := this.prototype.FieldsType[i]
+	prototype := this.GetPrototype()
+	for i := 0; i < len(prototype.Fields); i++ {
+		field := prototype.Fields[i]
+		fieldType := prototype.FieldsType[i]
 		isArray := strings.HasPrefix(fieldType, "[]")
 		isRef := strings.HasSuffix(fieldType, ":Ref")
 		isBaseType := strings.HasPrefix(fieldType, "[]xs.") || strings.HasPrefix(fieldType, "xs.") || strings.HasPrefix(fieldType, "sqltypes.") || strings.HasPrefix(fieldType, "[]sqltypes.")
@@ -1702,9 +1619,9 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 			this.deleteValue(k)
 		} else {
 			// Only propertie with M_ will be set here.
-			fieldIndex := this.prototype.getFieldIndex(k)
+			fieldIndex := prototype.getFieldIndex(k)
 			if strings.HasPrefix(k, "M_") && fieldIndex != -1 {
-				fieldType := this.prototype.FieldsType[fieldIndex]
+				fieldType := prototype.FieldsType[fieldIndex]
 				isRef := strings.HasSuffix(fieldType, ":Ref")
 				isArray := strings.HasPrefix(fieldType, "[]")
 
@@ -1926,7 +1843,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 				}
 			} else {
 				if strings.HasPrefix(k, "M_") {
-					log.Println(this.prototype.TypeName, " has no field ", k)
+					log.Println(prototype.TypeName, " has no field ", k)
 				}
 			}
 		}
@@ -1937,7 +1854,9 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
  * Return the entity prototype.
  */
 func (this *DynamicEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /**
@@ -1962,12 +1881,12 @@ func (this *DynamicEntity) Exist() bool {
 	if this == nil {
 		return false
 	}
-
+	prototype := this.GetPrototype()
 	var query EntityQuery
 	query.TypeName = this.GetTypeName()
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
-	query.Fields = append(query.Fields, this.prototype.Ids...) // Get all it ids...
-	var fieldsType []interface{}                               // not use...
+	query.Fields = append(query.Fields, prototype.Ids...) // Get all it ids...
+	var fieldsType []interface{}                          // not use...
 	var params []interface{}
 	queryStr, _ := json.Marshal(query)
 	storeId := this.GetPackageName()

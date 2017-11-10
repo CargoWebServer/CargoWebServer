@@ -44,12 +44,8 @@ func generateEntity(packageId string) {
 				classStr += "/** local type **/\n"
 				classStr += "type " + packageId + "_" + class.Name + "Entity struct{\n"
 				classStr += "	/** not the object id, except for the definition **/\n"
-				classStr += "	parentPtr 			Entity\n"
-				classStr += "	childsPtr  			[]Entity\n"
 				classStr += "	childsUuid  		[]string\n"
 				classStr += "	referencesUuid  	[]string\n"
-				classStr += "	referencesPtr  	    []Entity\n"
-				classStr += "	prototype      		*EntityPrototype\n"
 				classStr += "	lazyMap      		map[string]interface{}\n"
 				classStr += "   lazy 				bool\n"
 
@@ -77,7 +73,8 @@ func generateEntity(packageId string) {
 				classStr += "}\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetParentPtr()Entity{\n"
-				classStr += "	return this.parentPtr\n"
+				classStr += "	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)\n"
+				classStr += "	return parentPtr\n"
 				classStr += "}\n\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) SetParentLnk(lnk string){\n"
@@ -87,10 +84,6 @@ func generateEntity(packageId string) {
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetParentLnk()string{\n"
 				classStr += "	return this.object.ParentLnk\n"
 				classStr += "}\n"
-
-				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) SetParentPtr(parentPtr Entity){\n"
-				classStr += "	this.parentPtr=parentPtr\n"
-				classStr += "}\n\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) AppendReferenced(name string, owner Entity){\n"
 				classStr += "	if owner.GetUuid() == this.GetUuid() {\n"
@@ -143,21 +136,12 @@ func generateEntity(packageId string) {
 				classStr += "	}\n"
 				classStr += "	// Set the new array...\n"
 				classStr += "	this.SetReferencesUuid(refsUuid)\n"
-				classStr += "	this.SetReferencesPtr(refsPtr)\n\n"
 
 				classStr += "	var removeMethode = \"Remove\" + strings.ToUpper(name[2:3]) + name[3:]\n"
 				classStr += "	params := make([]interface{}, 1)\n"
 				classStr += "	params[0] = reference.GetObject()\n"
 				classStr += "	Utility.CallMethod(this.GetObject(), removeMethode, params)\n"
 
-				classStr += "}\n\n"
-
-				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetChildsPtr() []Entity{\n"
-				classStr += "	return this.childsPtr\n"
-				classStr += "}\n\n"
-
-				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) SetChildsPtr(childsPtr[]Entity){\n"
-				classStr += "	this.childsPtr = childsPtr\n"
 				classStr += "}\n\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetChildsUuid() []string{\n"
@@ -173,24 +157,18 @@ func generateEntity(packageId string) {
 				classStr += " */\n"
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) RemoveChild(name string, uuid string) {\n"
 				classStr += " 	childsUuid := make([]string, 0)\n"
+				classStr += " 	params := make([]interface {}, 1)\n"
 				classStr += " 	for i := 0; i < len(this.GetChildsUuid()); i++ {\n"
 				classStr += " 		if this.GetChildsUuid()[i] != uuid {\n"
 				classStr += " 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])\n"
+				classStr += " 		}else{\n"
+				classStr += "			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)\n"
+				classStr += "			params[0] = entity.GetObject()\n"
 				classStr += " 		}\n"
 				classStr += " 	}\n"
 				classStr += " \n"
-				classStr += " 	this.childsUuid = childsUuid\n"
+				classStr += " this.childsUuid = childsUuid\n"
 
-				classStr += "	params := make([]interface{}, 1)\n"
-				classStr += " 	childsPtr := make([]Entity, 0)\n"
-				classStr += " 	for i := 0; i < len(this.GetChildsPtr()); i++ {\n"
-				classStr += " 		if this.GetChildsPtr()[i].GetUuid() != uuid {\n"
-				classStr += " 			childsPtr = append(childsPtr, this.GetChildsPtr()[i])\n"
-				classStr += " 		}else{\n"
-				classStr += "			params[0] = this.GetChildsPtr()[i].GetObject()\n"
-				classStr += " 		}\n"
-				classStr += " 	}\n"
-				classStr += " 	this.childsPtr = childsPtr\n\n"
 				classStr += "	var removeMethode = \"Remove\" + strings.ToUpper(name[0:1]) + name[1:]\n"
 				classStr += "	if params[0] != nil {\n"
 				classStr += "		Utility.CallMethod(this.GetObject(), removeMethode, params)\n"
@@ -203,14 +181,6 @@ func generateEntity(packageId string) {
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) SetReferencesUuid(refsUuid[]string){\n"
 				classStr += "	this.referencesUuid = refsUuid\n"
-				classStr += "}\n\n"
-
-				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetReferencesPtr() []Entity{\n"
-				classStr += "	return this.referencesPtr\n"
-				classStr += "}\n\n"
-
-				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) SetReferencesPtr(refsPtr[]Entity){\n"
-				classStr += "	this.referencesPtr = refsPtr\n"
 				classStr += "}\n\n"
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetObject() interface{}{\n"
@@ -261,7 +231,9 @@ func generateEntity(packageId string) {
 				classStr += "* Return the entity prototype.\n"
 				classStr += "*/\n"
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) GetPrototype() *EntityPrototype {\n"
-				classStr += "	return this.prototype\n"
+				classStr += "	typeName := this.GetTypeName()\n"
+				classStr += "	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, \".\")])\n"
+				classStr += "	return prototype\n"
 				classStr += "}\n"
 
 				// Entity prototype...
@@ -408,8 +380,6 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 		className = strings.Replace(className, "_impl", "", -1)
 	}
 
-	entityConstructorStr += "	entity.prototype = prototype\n"
-
 	entityConstructorStr += "	return entity\n"
 	entityConstructorStr += "}\n\n"
 
@@ -487,11 +457,7 @@ func generateAppendRefFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 
 	functionStr += "	 if index == -1 {\n"
 	functionStr += "	 	this.referencesUuid = append(this.referencesUuid, reference.GetUuid())\n"
-	functionStr += "	 	this.referencesPtr = append(this.referencesPtr, reference)\n"
-	functionStr += "	 }else if index < len(this.referencesPtr){\n"
-	functionStr += "	 	// The reference must be update in that case.\n"
-	functionStr += "	 	this.referencesPtr[index]  = reference\n"
-	functionStr += "	 }\n"
+	functionStr += "	 }"
 
 	functionStr += "}\n"
 
@@ -505,20 +471,9 @@ func generateAppendChildFunc(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 	functionStr += "	// Append child if is not there...\n"
 	functionStr += "	if !Utility.Contains(this.childsUuid, child.GetUuid()) {\n"
 	functionStr += "		this.childsUuid = append(this.childsUuid, child.GetUuid())\n"
-	functionStr += "		this.childsPtr = append(this.childsPtr, child)\n"
-	functionStr += "	} else {\n"
-	functionStr += "		childsPtr := make([]Entity, 0)\n"
-	functionStr += "		for i := 0; i < len(this.childsPtr); i++ {\n"
-	functionStr += "			if this.childsPtr[i].GetUuid() != child.GetUuid() {\n"
-	functionStr += "				childsPtr = append(childsPtr, this.childsPtr[i])\n"
-	functionStr += "			}\n"
-	functionStr += "		}\n"
-	functionStr += "		childsPtr = append(childsPtr, child)\n"
-	functionStr += "		this.SetChildsPtr(childsPtr)\n"
 	functionStr += "	}\n"
 
 	functionStr += "	// Set this as parent in the child\n"
-	functionStr += "	child.SetParentPtr(this)\n\n"
 	functionStr += "	child.SetParentLnk(\"M_\" + attributeName)\n\n"
 	functionStr += "	params := make([]interface{}, 1)\n"
 	functionStr += "	params[0] = child.GetObject()\n"
@@ -1583,8 +1538,8 @@ func generateEntitySaveFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	entitySaveStr += "	" + class.Name + "Info = append(" + class.Name + "Info, this.GetUuid())\n"
 
 	// Save it parent uuid
-	entitySaveStr += "	if this.parentPtr != nil {\n"
-	entitySaveStr += "		" + class.Name + "Info = append(" + class.Name + "Info, this.parentPtr.GetUuid())\n"
+	entitySaveStr += "	if this.GetParentPtr() != nil {\n"
+	entitySaveStr += "		" + class.Name + "Info = append(" + class.Name + "Info, this.GetParentPtr().GetUuid())\n"
 	entitySaveStr += "		" + class.Name + "Info = append(" + class.Name + "Info, this.GetParentLnk())\n"
 	entitySaveStr += "	}else{\n"
 	entitySaveStr += "		" + class.Name + "Info = append(" + class.Name + "Info, \"\")\n"

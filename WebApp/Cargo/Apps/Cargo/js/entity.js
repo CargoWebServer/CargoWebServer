@@ -690,7 +690,9 @@ function getBaseTypeExtension(typeName, isArray) {
                     return getBaseTypeExtension(prototype.SuperTypeNames[i])
                 }
             }
-        } else if (prototype.ListOf != null) {
+        } 
+        
+        if (prototype.ListOf != null) {
             if (prototype.ListOf.length > 0) {
                 if (prototype.ListOf.startsWith("xs.")) {
                     return "[]" + prototype.ListOf

@@ -18,17 +18,17 @@ func (this *EntityManager) create_CargoEntities_EntityEntityPrototype() {
 	var entityEntityProto EntityPrototype
 	entityEntityProto.TypeName = "CargoEntities.Entity"
 	entityEntityProto.IsAbstract = true
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
 	entityEntityProto.Ids = append(entityEntityProto.Ids, "UUID")
 	entityEntityProto.Fields = append(entityEntityProto.Fields, "UUID")
 	entityEntityProto.FieldsType = append(entityEntityProto.FieldsType, "xs.string")
@@ -85,12 +85,8 @@ func (this *EntityManager) create_CargoEntities_EntityEntityPrototype() {
 /** local type **/
 type CargoEntities_ParameterEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -164,7 +160,6 @@ func (this *EntityManager) NewCargoEntitiesParameterEntity(parentUuid string, ob
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -179,7 +174,8 @@ func (this *CargoEntities_ParameterEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_ParameterEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_ParameterEntity) SetParentLnk(lnk string) {
@@ -189,10 +185,6 @@ func (this *CargoEntities_ParameterEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_ParameterEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_ParameterEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_ParameterEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -241,20 +233,10 @@ func (this *CargoEntities_ParameterEntity) RemoveReference(name string, referenc
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_ParameterEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_ParameterEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_ParameterEntity) GetChildsUuid() []string {
@@ -270,24 +252,17 @@ func (this *CargoEntities_ParameterEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_ParameterEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -300,14 +275,6 @@ func (this *CargoEntities_ParameterEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_ParameterEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_ParameterEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_ParameterEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_ParameterEntity) GetObject() interface{} {
@@ -359,7 +326,9 @@ func (this *CargoEntities_ParameterEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_ParameterEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -458,8 +427,8 @@ func (this *CargoEntities_ParameterEntity) SaveEntity() {
 	var ParameterInfo []interface{}
 
 	ParameterInfo = append(ParameterInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		ParameterInfo = append(ParameterInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		ParameterInfo = append(ParameterInfo, this.GetParentPtr().GetUuid())
 		ParameterInfo = append(ParameterInfo, this.GetParentLnk())
 	} else {
 		ParameterInfo = append(ParameterInfo, "")
@@ -650,20 +619,8 @@ func (this *CargoEntities_ParameterEntity) AppendChild(attributeName string, chi
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -691,10 +648,6 @@ func (this *CargoEntities_ParameterEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -704,12 +657,8 @@ func (this *CargoEntities_ParameterEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_ActionEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -783,7 +732,6 @@ func (this *EntityManager) NewCargoEntitiesActionEntity(parentUuid string, objec
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -798,7 +746,8 @@ func (this *CargoEntities_ActionEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_ActionEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_ActionEntity) SetParentLnk(lnk string) {
@@ -808,10 +757,6 @@ func (this *CargoEntities_ActionEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_ActionEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_ActionEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_ActionEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -860,20 +805,10 @@ func (this *CargoEntities_ActionEntity) RemoveReference(name string, reference E
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_ActionEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_ActionEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_ActionEntity) GetChildsUuid() []string {
@@ -889,24 +824,17 @@ func (this *CargoEntities_ActionEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_ActionEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -919,14 +847,6 @@ func (this *CargoEntities_ActionEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_ActionEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_ActionEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_ActionEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_ActionEntity) GetObject() interface{} {
@@ -978,7 +898,9 @@ func (this *CargoEntities_ActionEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_ActionEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -1090,8 +1012,8 @@ func (this *CargoEntities_ActionEntity) SaveEntity() {
 	var ActionInfo []interface{}
 
 	ActionInfo = append(ActionInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		ActionInfo = append(ActionInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		ActionInfo = append(ActionInfo, this.GetParentPtr().GetUuid())
 		ActionInfo = append(ActionInfo, this.GetParentLnk())
 	} else {
 		ActionInfo = append(ActionInfo, "")
@@ -1398,20 +1320,8 @@ func (this *CargoEntities_ActionEntity) AppendChild(attributeName string, child 
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -1439,10 +1349,6 @@ func (this *CargoEntities_ActionEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -1452,12 +1358,8 @@ func (this *CargoEntities_ActionEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_ErrorEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -1531,7 +1433,6 @@ func (this *EntityManager) NewCargoEntitiesErrorEntity(parentUuid string, object
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -1546,7 +1447,8 @@ func (this *CargoEntities_ErrorEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_ErrorEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_ErrorEntity) SetParentLnk(lnk string) {
@@ -1556,10 +1458,6 @@ func (this *CargoEntities_ErrorEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_ErrorEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_ErrorEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_ErrorEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -1608,20 +1506,10 @@ func (this *CargoEntities_ErrorEntity) RemoveReference(name string, reference En
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_ErrorEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_ErrorEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_ErrorEntity) GetChildsUuid() []string {
@@ -1637,24 +1525,17 @@ func (this *CargoEntities_ErrorEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_ErrorEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -1667,14 +1548,6 @@ func (this *CargoEntities_ErrorEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_ErrorEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_ErrorEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_ErrorEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_ErrorEntity) GetObject() interface{} {
@@ -1726,7 +1599,9 @@ func (this *CargoEntities_ErrorEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_ErrorEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -1849,8 +1724,8 @@ func (this *CargoEntities_ErrorEntity) SaveEntity() {
 	var ErrorInfo []interface{}
 
 	ErrorInfo = append(ErrorInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		ErrorInfo = append(ErrorInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		ErrorInfo = append(ErrorInfo, this.GetParentPtr().GetUuid())
 		ErrorInfo = append(ErrorInfo, this.GetParentLnk())
 	} else {
 		ErrorInfo = append(ErrorInfo, "")
@@ -2082,20 +1957,8 @@ func (this *CargoEntities_ErrorEntity) AppendChild(attributeName string, child E
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -2123,10 +1986,6 @@ func (this *CargoEntities_ErrorEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -2136,12 +1995,8 @@ func (this *CargoEntities_ErrorEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_LogEntryEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -2215,7 +2070,6 @@ func (this *EntityManager) NewCargoEntitiesLogEntryEntity(parentUuid string, obj
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -2230,7 +2084,8 @@ func (this *CargoEntities_LogEntryEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_LogEntryEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_LogEntryEntity) SetParentLnk(lnk string) {
@@ -2240,10 +2095,6 @@ func (this *CargoEntities_LogEntryEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_LogEntryEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_LogEntryEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_LogEntryEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -2292,20 +2143,10 @@ func (this *CargoEntities_LogEntryEntity) RemoveReference(name string, reference
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_LogEntryEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_LogEntryEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_LogEntryEntity) GetChildsUuid() []string {
@@ -2321,24 +2162,17 @@ func (this *CargoEntities_LogEntryEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_LogEntryEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -2351,14 +2185,6 @@ func (this *CargoEntities_LogEntryEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_LogEntryEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_LogEntryEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_LogEntryEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_LogEntryEntity) GetObject() interface{} {
@@ -2410,7 +2236,9 @@ func (this *CargoEntities_LogEntryEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_LogEntryEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -2523,8 +2351,8 @@ func (this *CargoEntities_LogEntryEntity) SaveEntity() {
 	var LogEntryInfo []interface{}
 
 	LogEntryInfo = append(LogEntryInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		LogEntryInfo = append(LogEntryInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		LogEntryInfo = append(LogEntryInfo, this.GetParentPtr().GetUuid())
 		LogEntryInfo = append(LogEntryInfo, this.GetParentLnk())
 	} else {
 		LogEntryInfo = append(LogEntryInfo, "")
@@ -2755,20 +2583,8 @@ func (this *CargoEntities_LogEntryEntity) AppendChild(attributeName string, chil
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -2796,10 +2612,6 @@ func (this *CargoEntities_LogEntryEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -2809,12 +2621,8 @@ func (this *CargoEntities_LogEntryEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_LogEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -2888,7 +2696,6 @@ func (this *EntityManager) NewCargoEntitiesLogEntity(parentUuid string, objectId
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -2903,7 +2710,8 @@ func (this *CargoEntities_LogEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_LogEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_LogEntity) SetParentLnk(lnk string) {
@@ -2913,10 +2721,6 @@ func (this *CargoEntities_LogEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_LogEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_LogEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_LogEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -2965,20 +2769,10 @@ func (this *CargoEntities_LogEntity) RemoveReference(name string, reference Enti
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_LogEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_LogEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_LogEntity) GetChildsUuid() []string {
@@ -2994,24 +2788,17 @@ func (this *CargoEntities_LogEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_LogEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -3024,14 +2811,6 @@ func (this *CargoEntities_LogEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_LogEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_LogEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_LogEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_LogEntity) GetObject() interface{} {
@@ -3083,7 +2862,9 @@ func (this *CargoEntities_LogEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_LogEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -3182,8 +2963,8 @@ func (this *CargoEntities_LogEntity) SaveEntity() {
 	var LogInfo []interface{}
 
 	LogInfo = append(LogInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		LogInfo = append(LogInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		LogInfo = append(LogInfo, this.GetParentPtr().GetUuid())
 		LogInfo = append(LogInfo, this.GetParentLnk())
 	} else {
 		LogInfo = append(LogInfo, "")
@@ -3417,20 +3198,8 @@ func (this *CargoEntities_LogEntity) AppendChild(attributeName string, child Ent
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -3458,10 +3227,6 @@ func (this *CargoEntities_LogEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -3471,12 +3236,8 @@ func (this *CargoEntities_LogEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_ProjectEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -3550,7 +3311,6 @@ func (this *EntityManager) NewCargoEntitiesProjectEntity(parentUuid string, obje
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -3565,7 +3325,8 @@ func (this *CargoEntities_ProjectEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_ProjectEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_ProjectEntity) SetParentLnk(lnk string) {
@@ -3575,10 +3336,6 @@ func (this *CargoEntities_ProjectEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_ProjectEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_ProjectEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_ProjectEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -3627,20 +3384,10 @@ func (this *CargoEntities_ProjectEntity) RemoveReference(name string, reference 
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_ProjectEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_ProjectEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_ProjectEntity) GetChildsUuid() []string {
@@ -3656,24 +3403,17 @@ func (this *CargoEntities_ProjectEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_ProjectEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -3686,14 +3426,6 @@ func (this *CargoEntities_ProjectEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_ProjectEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_ProjectEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_ProjectEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_ProjectEntity) GetObject() interface{} {
@@ -3745,7 +3477,9 @@ func (this *CargoEntities_ProjectEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_ProjectEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -3852,8 +3586,8 @@ func (this *CargoEntities_ProjectEntity) SaveEntity() {
 	var ProjectInfo []interface{}
 
 	ProjectInfo = append(ProjectInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		ProjectInfo = append(ProjectInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		ProjectInfo = append(ProjectInfo, this.GetParentPtr().GetUuid())
 		ProjectInfo = append(ProjectInfo, this.GetParentLnk())
 	} else {
 		ProjectInfo = append(ProjectInfo, "")
@@ -4069,20 +3803,8 @@ func (this *CargoEntities_ProjectEntity) AppendChild(attributeName string, child
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -4110,10 +3832,6 @@ func (this *CargoEntities_ProjectEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -4124,9 +3842,9 @@ func (this *EntityManager) create_CargoEntities_MessageEntityPrototype() {
 	messageEntityProto.TypeName = "CargoEntities.Message"
 	messageEntityProto.IsAbstract = true
 	messageEntityProto.SuperTypeNames = append(messageEntityProto.SuperTypeNames, "CargoEntities.Entity")
-	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Error")
 	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Notification")
+	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
 	messageEntityProto.Ids = append(messageEntityProto.Ids, "UUID")
 	messageEntityProto.Fields = append(messageEntityProto.Fields, "UUID")
 	messageEntityProto.FieldsType = append(messageEntityProto.FieldsType, "xs.string")
@@ -4190,12 +3908,8 @@ func (this *EntityManager) create_CargoEntities_MessageEntityPrototype() {
 /** local type **/
 type CargoEntities_NotificationEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -4269,7 +3983,6 @@ func (this *EntityManager) NewCargoEntitiesNotificationEntity(parentUuid string,
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -4284,7 +3997,8 @@ func (this *CargoEntities_NotificationEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_NotificationEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_NotificationEntity) SetParentLnk(lnk string) {
@@ -4294,10 +4008,6 @@ func (this *CargoEntities_NotificationEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_NotificationEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_NotificationEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_NotificationEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -4346,20 +4056,10 @@ func (this *CargoEntities_NotificationEntity) RemoveReference(name string, refer
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_NotificationEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_NotificationEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_NotificationEntity) GetChildsUuid() []string {
@@ -4375,24 +4075,17 @@ func (this *CargoEntities_NotificationEntity) SetChildsUuid(childsUuid []string)
  */
 func (this *CargoEntities_NotificationEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -4405,14 +4098,6 @@ func (this *CargoEntities_NotificationEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_NotificationEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_NotificationEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_NotificationEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_NotificationEntity) GetObject() interface{} {
@@ -4464,7 +4149,9 @@ func (this *CargoEntities_NotificationEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_NotificationEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -4594,8 +4281,8 @@ func (this *CargoEntities_NotificationEntity) SaveEntity() {
 	var NotificationInfo []interface{}
 
 	NotificationInfo = append(NotificationInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		NotificationInfo = append(NotificationInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		NotificationInfo = append(NotificationInfo, this.GetParentPtr().GetUuid())
 		NotificationInfo = append(NotificationInfo, this.GetParentLnk())
 	} else {
 		NotificationInfo = append(NotificationInfo, "")
@@ -4846,20 +4533,8 @@ func (this *CargoEntities_NotificationEntity) AppendChild(attributeName string, 
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -4887,10 +4562,6 @@ func (this *CargoEntities_NotificationEntity) AppendReference(reference Entity) 
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -4900,12 +4571,8 @@ func (this *CargoEntities_NotificationEntity) AppendReference(reference Entity) 
 /** local type **/
 type CargoEntities_TextMessageEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -4979,7 +4646,6 @@ func (this *EntityManager) NewCargoEntitiesTextMessageEntity(parentUuid string, 
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -4994,7 +4660,8 @@ func (this *CargoEntities_TextMessageEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_TextMessageEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_TextMessageEntity) SetParentLnk(lnk string) {
@@ -5004,10 +4671,6 @@ func (this *CargoEntities_TextMessageEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_TextMessageEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_TextMessageEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_TextMessageEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -5056,20 +4719,10 @@ func (this *CargoEntities_TextMessageEntity) RemoveReference(name string, refere
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_TextMessageEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_TextMessageEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_TextMessageEntity) GetChildsUuid() []string {
@@ -5085,24 +4738,17 @@ func (this *CargoEntities_TextMessageEntity) SetChildsUuid(childsUuid []string) 
  */
 func (this *CargoEntities_TextMessageEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -5115,14 +4761,6 @@ func (this *CargoEntities_TextMessageEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_TextMessageEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_TextMessageEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_TextMessageEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_TextMessageEntity) GetObject() interface{} {
@@ -5174,7 +4812,9 @@ func (this *CargoEntities_TextMessageEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_TextMessageEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -5304,8 +4944,8 @@ func (this *CargoEntities_TextMessageEntity) SaveEntity() {
 	var TextMessageInfo []interface{}
 
 	TextMessageInfo = append(TextMessageInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		TextMessageInfo = append(TextMessageInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		TextMessageInfo = append(TextMessageInfo, this.GetParentPtr().GetUuid())
 		TextMessageInfo = append(TextMessageInfo, this.GetParentLnk())
 	} else {
 		TextMessageInfo = append(TextMessageInfo, "")
@@ -5556,20 +5196,8 @@ func (this *CargoEntities_TextMessageEntity) AppendChild(attributeName string, c
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -5597,10 +5225,6 @@ func (this *CargoEntities_TextMessageEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -5610,12 +5234,8 @@ func (this *CargoEntities_TextMessageEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_SessionEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -5689,7 +5309,6 @@ func (this *EntityManager) NewCargoEntitiesSessionEntity(parentUuid string, obje
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -5704,7 +5323,8 @@ func (this *CargoEntities_SessionEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_SessionEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_SessionEntity) SetParentLnk(lnk string) {
@@ -5714,10 +5334,6 @@ func (this *CargoEntities_SessionEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_SessionEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_SessionEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_SessionEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -5766,20 +5382,10 @@ func (this *CargoEntities_SessionEntity) RemoveReference(name string, reference 
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_SessionEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_SessionEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_SessionEntity) GetChildsUuid() []string {
@@ -5795,24 +5401,17 @@ func (this *CargoEntities_SessionEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_SessionEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -5825,14 +5424,6 @@ func (this *CargoEntities_SessionEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_SessionEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_SessionEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_SessionEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_SessionEntity) GetObject() interface{} {
@@ -5884,7 +5475,9 @@ func (this *CargoEntities_SessionEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_SessionEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -6003,8 +5596,8 @@ func (this *CargoEntities_SessionEntity) SaveEntity() {
 	var SessionInfo []interface{}
 
 	SessionInfo = append(SessionInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		SessionInfo = append(SessionInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		SessionInfo = append(SessionInfo, this.GetParentPtr().GetUuid())
 		SessionInfo = append(SessionInfo, this.GetParentLnk())
 	} else {
 		SessionInfo = append(SessionInfo, "")
@@ -6248,20 +5841,8 @@ func (this *CargoEntities_SessionEntity) AppendChild(attributeName string, child
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -6289,10 +5870,6 @@ func (this *CargoEntities_SessionEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -6302,12 +5879,8 @@ func (this *CargoEntities_SessionEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_RoleEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -6381,7 +5954,6 @@ func (this *EntityManager) NewCargoEntitiesRoleEntity(parentUuid string, objectI
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -6396,7 +5968,8 @@ func (this *CargoEntities_RoleEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_RoleEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_RoleEntity) SetParentLnk(lnk string) {
@@ -6406,10 +5979,6 @@ func (this *CargoEntities_RoleEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_RoleEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_RoleEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_RoleEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -6458,20 +6027,10 @@ func (this *CargoEntities_RoleEntity) RemoveReference(name string, reference Ent
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_RoleEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_RoleEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_RoleEntity) GetChildsUuid() []string {
@@ -6487,24 +6046,17 @@ func (this *CargoEntities_RoleEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_RoleEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -6517,14 +6069,6 @@ func (this *CargoEntities_RoleEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_RoleEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_RoleEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_RoleEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_RoleEntity) GetObject() interface{} {
@@ -6576,7 +6120,9 @@ func (this *CargoEntities_RoleEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_RoleEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -6678,8 +6224,8 @@ func (this *CargoEntities_RoleEntity) SaveEntity() {
 	var RoleInfo []interface{}
 
 	RoleInfo = append(RoleInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		RoleInfo = append(RoleInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		RoleInfo = append(RoleInfo, this.GetParentPtr().GetUuid())
 		RoleInfo = append(RoleInfo, this.GetParentLnk())
 	} else {
 		RoleInfo = append(RoleInfo, "")
@@ -6905,20 +6451,8 @@ func (this *CargoEntities_RoleEntity) AppendChild(attributeName string, child En
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -6946,10 +6480,6 @@ func (this *CargoEntities_RoleEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -6959,12 +6489,8 @@ func (this *CargoEntities_RoleEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_AccountEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -7038,7 +6564,6 @@ func (this *EntityManager) NewCargoEntitiesAccountEntity(parentUuid string, obje
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -7053,7 +6578,8 @@ func (this *CargoEntities_AccountEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_AccountEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_AccountEntity) SetParentLnk(lnk string) {
@@ -7063,10 +6589,6 @@ func (this *CargoEntities_AccountEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_AccountEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_AccountEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_AccountEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -7115,20 +6637,10 @@ func (this *CargoEntities_AccountEntity) RemoveReference(name string, reference 
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_AccountEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_AccountEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_AccountEntity) GetChildsUuid() []string {
@@ -7144,24 +6656,17 @@ func (this *CargoEntities_AccountEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_AccountEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -7174,14 +6679,6 @@ func (this *CargoEntities_AccountEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_AccountEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_AccountEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_AccountEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_AccountEntity) GetObject() interface{} {
@@ -7233,7 +6730,9 @@ func (this *CargoEntities_AccountEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_AccountEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -7378,8 +6877,8 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	var AccountInfo []interface{}
 
 	AccountInfo = append(AccountInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		AccountInfo = append(AccountInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		AccountInfo = append(AccountInfo, this.GetParentPtr().GetUuid())
 		AccountInfo = append(AccountInfo, this.GetParentLnk())
 	} else {
 		AccountInfo = append(AccountInfo, "")
@@ -7419,14 +6918,6 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	if !lazy_messages {
 		for i := 0; i < len(this.object.M_messages); i++ {
 			switch v := this.object.M_messages[i].(type) {
-			case *CargoEntities.TextMessage:
-				messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
-				messagesIds = append(messagesIds, messagesEntity.GetUuid())
-				messagesEntity.AppendReferenced("messages", this)
-				this.AppendChild("messages", messagesEntity)
-				if messagesEntity.NeedSave() {
-					messagesEntity.SaveEntity()
-				}
 			case *CargoEntities.Error:
 				messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
 				messagesIds = append(messagesIds, messagesEntity.GetUuid())
@@ -7437,6 +6928,14 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 				}
 			case *CargoEntities.Notification:
 				messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
+				messagesIds = append(messagesIds, messagesEntity.GetUuid())
+				messagesEntity.AppendReferenced("messages", this)
+				this.AppendChild("messages", messagesEntity)
+				if messagesEntity.NeedSave() {
+					messagesEntity.SaveEntity()
+				}
+			case *CargoEntities.TextMessage:
+				messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
 				messagesIds = append(messagesIds, messagesEntity.GetUuid())
 				messagesEntity.AppendReferenced("messages", this)
 				this.AppendChild("messages", messagesEntity)
@@ -7788,18 +7287,7 @@ func CargoEntitiesAccountExists(val string) string {
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(CargoEntitiesDB, string(queryStr), fieldsType, params)
 	if err != nil || len(results) == 0 {
-		var query EntityQuery
-		query.TypeName = "CargoEntities.Account"
-		query.Indexs = append(query.Indexs, "M_name="+val)
-		query.Fields = append(query.Fields, "UUID")
-		var fieldsType []interface{} // not use...
-		var params []interface{}
-		queryStr, _ := json.Marshal(query)
-		results, err := GetServer().GetDataManager().readData(CargoEntitiesDB, string(queryStr), fieldsType, params)
-		if err != nil || len(results) == 0 {
-			return ""
-		}
-		return results[0][0].(string)
+		return ""
 	}
 	return results[0][0].(string)
 }
@@ -7810,20 +7298,8 @@ func (this *CargoEntities_AccountEntity) AppendChild(attributeName string, child
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -7851,10 +7327,6 @@ func (this *CargoEntities_AccountEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -7864,12 +7336,8 @@ func (this *CargoEntities_AccountEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_ComputerEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -7943,7 +7411,6 @@ func (this *EntityManager) NewCargoEntitiesComputerEntity(parentUuid string, obj
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -7958,7 +7425,8 @@ func (this *CargoEntities_ComputerEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_ComputerEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_ComputerEntity) SetParentLnk(lnk string) {
@@ -7968,10 +7436,6 @@ func (this *CargoEntities_ComputerEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_ComputerEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_ComputerEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_ComputerEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -8020,20 +7484,10 @@ func (this *CargoEntities_ComputerEntity) RemoveReference(name string, reference
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_ComputerEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_ComputerEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_ComputerEntity) GetChildsUuid() []string {
@@ -8049,24 +7503,17 @@ func (this *CargoEntities_ComputerEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_ComputerEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -8079,14 +7526,6 @@ func (this *CargoEntities_ComputerEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_ComputerEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_ComputerEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_ComputerEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_ComputerEntity) GetObject() interface{} {
@@ -8138,7 +7577,9 @@ func (this *CargoEntities_ComputerEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_ComputerEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -8256,8 +7697,8 @@ func (this *CargoEntities_ComputerEntity) SaveEntity() {
 	var ComputerInfo []interface{}
 
 	ComputerInfo = append(ComputerInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		ComputerInfo = append(ComputerInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		ComputerInfo = append(ComputerInfo, this.GetParentPtr().GetUuid())
 		ComputerInfo = append(ComputerInfo, this.GetParentLnk())
 	} else {
 		ComputerInfo = append(ComputerInfo, "")
@@ -8529,20 +7970,8 @@ func (this *CargoEntities_ComputerEntity) AppendChild(attributeName string, chil
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -8570,10 +7999,6 @@ func (this *CargoEntities_ComputerEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -8583,12 +8008,8 @@ func (this *CargoEntities_ComputerEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_PermissionEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -8662,7 +8083,6 @@ func (this *EntityManager) NewCargoEntitiesPermissionEntity(parentUuid string, o
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -8677,7 +8097,8 @@ func (this *CargoEntities_PermissionEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_PermissionEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_PermissionEntity) SetParentLnk(lnk string) {
@@ -8687,10 +8108,6 @@ func (this *CargoEntities_PermissionEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_PermissionEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_PermissionEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_PermissionEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -8739,20 +8156,10 @@ func (this *CargoEntities_PermissionEntity) RemoveReference(name string, referen
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_PermissionEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_PermissionEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_PermissionEntity) GetChildsUuid() []string {
@@ -8768,24 +8175,17 @@ func (this *CargoEntities_PermissionEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_PermissionEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -8798,14 +8198,6 @@ func (this *CargoEntities_PermissionEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_PermissionEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_PermissionEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_PermissionEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_PermissionEntity) GetObject() interface{} {
@@ -8857,7 +8249,9 @@ func (this *CargoEntities_PermissionEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_PermissionEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -8958,8 +8352,8 @@ func (this *CargoEntities_PermissionEntity) SaveEntity() {
 	var PermissionInfo []interface{}
 
 	PermissionInfo = append(PermissionInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		PermissionInfo = append(PermissionInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		PermissionInfo = append(PermissionInfo, this.GetParentPtr().GetUuid())
 		PermissionInfo = append(PermissionInfo, this.GetParentLnk())
 	} else {
 		PermissionInfo = append(PermissionInfo, "")
@@ -9169,20 +8563,8 @@ func (this *CargoEntities_PermissionEntity) AppendChild(attributeName string, ch
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -9210,10 +8592,6 @@ func (this *CargoEntities_PermissionEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -9223,12 +8601,8 @@ func (this *CargoEntities_PermissionEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_FileEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -9302,7 +8676,6 @@ func (this *EntityManager) NewCargoEntitiesFileEntity(parentUuid string, objectI
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -9317,7 +8690,8 @@ func (this *CargoEntities_FileEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_FileEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_FileEntity) SetParentLnk(lnk string) {
@@ -9327,10 +8701,6 @@ func (this *CargoEntities_FileEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_FileEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_FileEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_FileEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -9379,20 +8749,10 @@ func (this *CargoEntities_FileEntity) RemoveReference(name string, reference Ent
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_FileEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_FileEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_FileEntity) GetChildsUuid() []string {
@@ -9408,24 +8768,17 @@ func (this *CargoEntities_FileEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_FileEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -9438,14 +8791,6 @@ func (this *CargoEntities_FileEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_FileEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_FileEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_FileEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_FileEntity) GetObject() interface{} {
@@ -9497,7 +8842,9 @@ func (this *CargoEntities_FileEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_FileEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -9664,8 +9011,8 @@ func (this *CargoEntities_FileEntity) SaveEntity() {
 	var FileInfo []interface{}
 
 	FileInfo = append(FileInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		FileInfo = append(FileInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		FileInfo = append(FileInfo, this.GetParentPtr().GetUuid())
 		FileInfo = append(FileInfo, this.GetParentLnk())
 	} else {
 		FileInfo = append(FileInfo, "")
@@ -10001,20 +9348,8 @@ func (this *CargoEntities_FileEntity) AppendChild(attributeName string, child En
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -10042,10 +9377,6 @@ func (this *CargoEntities_FileEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -10055,12 +9386,8 @@ func (this *CargoEntities_FileEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_UserEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -10134,7 +9461,6 @@ func (this *EntityManager) NewCargoEntitiesUserEntity(parentUuid string, objectI
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -10149,7 +9475,8 @@ func (this *CargoEntities_UserEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_UserEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_UserEntity) SetParentLnk(lnk string) {
@@ -10159,10 +9486,6 @@ func (this *CargoEntities_UserEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_UserEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_UserEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_UserEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -10211,20 +9534,10 @@ func (this *CargoEntities_UserEntity) RemoveReference(name string, reference Ent
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_UserEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_UserEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_UserEntity) GetChildsUuid() []string {
@@ -10240,24 +9553,17 @@ func (this *CargoEntities_UserEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_UserEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -10270,14 +9576,6 @@ func (this *CargoEntities_UserEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_UserEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_UserEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_UserEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_UserEntity) GetObject() interface{} {
@@ -10329,7 +9627,9 @@ func (this *CargoEntities_UserEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_UserEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -10368,13 +9668,11 @@ func (this *EntityManager) create_CargoEntities_UserEntityPrototype() {
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 4)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
 	userEntityProto.Fields = append(userEntityProto.Fields, "M_firstName")
-	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_firstName")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 5)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
 	userEntityProto.Fields = append(userEntityProto.Fields, "M_lastName")
-	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_lastName")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 6)
@@ -10390,7 +9688,6 @@ func (this *EntityManager) create_CargoEntities_UserEntityPrototype() {
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 8)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
 	userEntityProto.Fields = append(userEntityProto.Fields, "M_email")
-	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_email")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 9)
@@ -10469,8 +9766,8 @@ func (this *CargoEntities_UserEntity) SaveEntity() {
 	var UserInfo []interface{}
 
 	UserInfo = append(UserInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		UserInfo = append(UserInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		UserInfo = append(UserInfo, this.GetParentPtr().GetUuid())
 		UserInfo = append(UserInfo, this.GetParentLnk())
 	} else {
 		UserInfo = append(UserInfo, "")
@@ -10737,20 +10034,8 @@ func (this *CargoEntities_UserEntity) AppendChild(attributeName string, child En
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -10778,10 +10063,6 @@ func (this *CargoEntities_UserEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -10791,12 +10072,8 @@ func (this *CargoEntities_UserEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_GroupEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -10870,7 +10147,6 @@ func (this *EntityManager) NewCargoEntitiesGroupEntity(parentUuid string, object
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -10885,7 +10161,8 @@ func (this *CargoEntities_GroupEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_GroupEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_GroupEntity) SetParentLnk(lnk string) {
@@ -10895,10 +10172,6 @@ func (this *CargoEntities_GroupEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_GroupEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_GroupEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_GroupEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -10947,20 +10220,10 @@ func (this *CargoEntities_GroupEntity) RemoveReference(name string, reference En
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_GroupEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_GroupEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_GroupEntity) GetChildsUuid() []string {
@@ -10976,24 +10239,17 @@ func (this *CargoEntities_GroupEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_GroupEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -11006,14 +10262,6 @@ func (this *CargoEntities_GroupEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_GroupEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_GroupEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_GroupEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_GroupEntity) GetObject() interface{} {
@@ -11065,7 +10313,9 @@ func (this *CargoEntities_GroupEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_GroupEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -11172,8 +10422,8 @@ func (this *CargoEntities_GroupEntity) SaveEntity() {
 	var GroupInfo []interface{}
 
 	GroupInfo = append(GroupInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		GroupInfo = append(GroupInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		GroupInfo = append(GroupInfo, this.GetParentPtr().GetUuid())
 		GroupInfo = append(GroupInfo, this.GetParentLnk())
 	} else {
 		GroupInfo = append(GroupInfo, "")
@@ -11389,20 +10639,8 @@ func (this *CargoEntities_GroupEntity) AppendChild(attributeName string, child E
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -11430,10 +10668,6 @@ func (this *CargoEntities_GroupEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -11443,12 +10677,8 @@ func (this *CargoEntities_GroupEntity) AppendReference(reference Entity) {
 /** local type **/
 type CargoEntities_EntitiesEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -11522,7 +10752,6 @@ func (this *EntityManager) NewCargoEntitiesEntitiesEntity(parentUuid string, obj
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -11537,7 +10766,8 @@ func (this *CargoEntities_EntitiesEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *CargoEntities_EntitiesEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *CargoEntities_EntitiesEntity) SetParentLnk(lnk string) {
@@ -11547,10 +10777,6 @@ func (this *CargoEntities_EntitiesEntity) SetParentLnk(lnk string) {
 func (this *CargoEntities_EntitiesEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *CargoEntities_EntitiesEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *CargoEntities_EntitiesEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -11599,20 +10825,10 @@ func (this *CargoEntities_EntitiesEntity) RemoveReference(name string, reference
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *CargoEntities_EntitiesEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *CargoEntities_EntitiesEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *CargoEntities_EntitiesEntity) GetChildsUuid() []string {
@@ -11628,24 +10844,17 @@ func (this *CargoEntities_EntitiesEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *CargoEntities_EntitiesEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -11658,14 +10867,6 @@ func (this *CargoEntities_EntitiesEntity) GetReferencesUuid() []string {
 
 func (this *CargoEntities_EntitiesEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *CargoEntities_EntitiesEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *CargoEntities_EntitiesEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *CargoEntities_EntitiesEntity) GetObject() interface{} {
@@ -11717,7 +10918,9 @@ func (this *CargoEntities_EntitiesEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *CargoEntities_EntitiesEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -11830,8 +11033,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	var EntitiesInfo []interface{}
 
 	EntitiesInfo = append(EntitiesInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		EntitiesInfo = append(EntitiesInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		EntitiesInfo = append(EntitiesInfo, this.GetParentPtr().GetUuid())
 		EntitiesInfo = append(EntitiesInfo, this.GetParentLnk())
 	} else {
 		EntitiesInfo = append(EntitiesInfo, "")
@@ -11849,48 +11052,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	if !lazy_entities {
 		for i := 0; i < len(this.object.M_entities); i++ {
 			switch v := this.object.M_entities[i].(type) {
-			case *CargoEntities.Account:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.Computer:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
 			case *CargoEntities.User:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.File:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.Error:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.LogEntry:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -11905,8 +11068,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				if entitiesEntity.NeedSave() {
 					entitiesEntity.SaveEntity()
 				}
-			case *CargoEntities.Project:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), v.UUID, v)
+			case *CargoEntities.Error:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -11929,8 +11092,48 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				if entitiesEntity.NeedSave() {
 					entitiesEntity.SaveEntity()
 				}
+			case *CargoEntities.Computer:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.Account:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.File:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
 			case *CargoEntities.Group:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.LogEntry:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.Project:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -12118,20 +11321,7 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 						log.Println("type ", typeName, " not found!")
 						return err
 					}
-					if typeName == "CargoEntities.File" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_FileEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_FileEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.Error" {
+					if typeName == "CargoEntities.Error" {
 						if len(uuids[i]) > 0 {
 							var entitiesEntity *CargoEntities_ErrorEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
@@ -12157,19 +11347,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 							entitiesEntity.AppendReferenced("entities", this)
 							this.AppendChild("entities", entitiesEntity)
 						}
-					} else if typeName == "CargoEntities.Log" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_LogEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_LogEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
 					} else if typeName == "CargoEntities.Project" {
 						if len(uuids[i]) > 0 {
 							var entitiesEntity *CargoEntities_ProjectEntity
@@ -12177,19 +11354,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 								entitiesEntity = instance.(*CargoEntities_ProjectEntity)
 							} else {
 								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.Notification" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_NotificationEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_NotificationEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), uuids[i], nil)
 								entitiesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(entitiesEntity)
 							}
@@ -12209,6 +11373,32 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 							entitiesEntity.AppendReferenced("entities", this)
 							this.AppendChild("entities", entitiesEntity)
 						}
+					} else if typeName == "CargoEntities.Account" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_AccountEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_AccountEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.File" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_FileEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_FileEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
 					} else if typeName == "CargoEntities.Group" {
 						if len(uuids[i]) > 0 {
 							var entitiesEntity *CargoEntities_GroupEntity
@@ -12222,13 +11412,26 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 							entitiesEntity.AppendReferenced("entities", this)
 							this.AppendChild("entities", entitiesEntity)
 						}
-					} else if typeName == "CargoEntities.Account" {
+					} else if typeName == "CargoEntities.Log" {
 						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_AccountEntity
+							var entitiesEntity *CargoEntities_LogEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_AccountEntity)
+								entitiesEntity = instance.(*CargoEntities_LogEntity)
 							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.Notification" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_NotificationEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_NotificationEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), uuids[i], nil)
 								entitiesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(entitiesEntity)
 							}
@@ -12412,20 +11615,8 @@ func (this *CargoEntities_EntitiesEntity) AppendChild(attributeName string, chil
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -12453,10 +11644,6 @@ func (this *CargoEntities_EntitiesEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 

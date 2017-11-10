@@ -10,6 +10,8 @@ import (
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Server"
 	//	"github.com/skratchdot/open-golang/open"
+	"net/http/pprof"
+
 	"golang.org/x/net/websocket"
 )
 
@@ -19,17 +21,26 @@ func main() {
 	root := Server.GetServer().GetConfigurationManager().GetApplicationDirectoryPath()
 	port := Server.GetServer().GetConfigurationManager().GetServerPort()
 
+	r := http.NewServeMux()
+
+	// Register pprof handlers
+	r.HandleFunc("/debug/pprof/", pprof.Index)
+	r.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	r.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	r.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+	r.HandleFunc("/debug/pprof/trace", pprof.Trace)
+
 	// Start the web socket handler
-	http.Handle("/ws", websocket.Handler(Server.HttpHandler))
+	r.Handle("/ws", websocket.Handler(Server.HttpHandler))
 
 	// The http handler
-	http.Handle("/", http.FileServer(http.Dir(root)))
+	r.Handle("/", http.FileServer(http.Dir(root)))
 
 	// The file upload handler.
-	http.HandleFunc("/uploads", Server.FileUploadHandler)
+	r.HandleFunc("/uploads", Server.FileUploadHandler)
 
 	// The http query handler use by external http client or OAuth2
-	http.HandleFunc("/api/", Server.HttpQueryHandler)
+	r.HandleFunc("/api/", Server.HttpQueryHandler)
 
 	// Test values...
 	//	ClientId:     "1234",
@@ -37,18 +48,19 @@ func main() {
 	//	AuthorizeUrl: "http://localhost:9393/authorize",
 	//	TokenUrl:     "http://localhost:9393/token",
 	//	RedirectUrl:  "http://localhost:9393/oauth2callback"
+	// Now the server
 
 	// OAuth2 http handler's
-	http.HandleFunc("/authorize", Server.AuthorizeHandler)
-	http.HandleFunc("/token", Server.TokenHandler)
-	http.HandleFunc("/info", Server.InfoHandler)
+	r.HandleFunc("/authorize", Server.AuthorizeHandler)
+	r.HandleFunc("/token", Server.TokenHandler)
+	r.HandleFunc("/info", Server.InfoHandler)
 
 	// Client redirect address.
-	http.HandleFunc("/oauth2callback", Server.AppAuthCodeHandler)
+	r.HandleFunc("/oauth2callback", Server.AppAuthCodeHandler)
 
 	// OpenId service.
-	http.HandleFunc("/.well-known/openid-configuration", Server.DiscoveryHandler)
-	http.HandleFunc("/publickeys", Server.PublicKeysHandler)
+	r.HandleFunc("/.well-known/openid-configuration", Server.DiscoveryHandler)
+	r.HandleFunc("/publickeys", Server.PublicKeysHandler)
 
 	// In case of interuption of the program i will
 	// stop service before return.
@@ -70,7 +82,8 @@ func main() {
 
 	//open.Run("http://127.0.0.1:9393/Bridge")
 	log.Println("--> server is ready and listen at port ", port)
-	err := http.ListenAndServe(":"+strconv.Itoa(port), nil)
+
+	err := http.ListenAndServe(":"+strconv.Itoa(port), r)
 
 	if err != nil {
 		panic("ListenAndServe: " + err.Error())

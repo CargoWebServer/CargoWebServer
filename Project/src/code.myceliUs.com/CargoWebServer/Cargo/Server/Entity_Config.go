@@ -17,6 +17,7 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
@@ -24,7 +25,6 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ScheduledTask")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "UUID")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "UUID")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -73,12 +73,8 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 /** local type **/
 type Config_SmtpConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -152,7 +148,6 @@ func (this *EntityManager) NewConfigSmtpConfigurationEntity(parentUuid string, o
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -167,7 +162,8 @@ func (this *Config_SmtpConfigurationEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_SmtpConfigurationEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_SmtpConfigurationEntity) SetParentLnk(lnk string) {
@@ -177,10 +173,6 @@ func (this *Config_SmtpConfigurationEntity) SetParentLnk(lnk string) {
 func (this *Config_SmtpConfigurationEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_SmtpConfigurationEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_SmtpConfigurationEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -229,20 +221,10 @@ func (this *Config_SmtpConfigurationEntity) RemoveReference(name string, referen
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_SmtpConfigurationEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_SmtpConfigurationEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_SmtpConfigurationEntity) GetChildsUuid() []string {
@@ -258,24 +240,17 @@ func (this *Config_SmtpConfigurationEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *Config_SmtpConfigurationEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -288,14 +263,6 @@ func (this *Config_SmtpConfigurationEntity) GetReferencesUuid() []string {
 
 func (this *Config_SmtpConfigurationEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_SmtpConfigurationEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_SmtpConfigurationEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_SmtpConfigurationEntity) GetObject() interface{} {
@@ -347,7 +314,9 @@ func (this *Config_SmtpConfigurationEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_SmtpConfigurationEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -476,8 +445,8 @@ func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 	var SmtpConfigurationInfo []interface{}
 
 	SmtpConfigurationInfo = append(SmtpConfigurationInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		SmtpConfigurationInfo = append(SmtpConfigurationInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		SmtpConfigurationInfo = append(SmtpConfigurationInfo, this.GetParentPtr().GetUuid())
 		SmtpConfigurationInfo = append(SmtpConfigurationInfo, this.GetParentLnk())
 	} else {
 		SmtpConfigurationInfo = append(SmtpConfigurationInfo, "")
@@ -814,20 +783,8 @@ func (this *Config_SmtpConfigurationEntity) AppendChild(attributeName string, ch
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -855,10 +812,6 @@ func (this *Config_SmtpConfigurationEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -868,12 +821,8 @@ func (this *Config_SmtpConfigurationEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_DataStoreConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -947,7 +896,6 @@ func (this *EntityManager) NewConfigDataStoreConfigurationEntity(parentUuid stri
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -962,7 +910,8 @@ func (this *Config_DataStoreConfigurationEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_DataStoreConfigurationEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_DataStoreConfigurationEntity) SetParentLnk(lnk string) {
@@ -972,10 +921,6 @@ func (this *Config_DataStoreConfigurationEntity) SetParentLnk(lnk string) {
 func (this *Config_DataStoreConfigurationEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_DataStoreConfigurationEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_DataStoreConfigurationEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -1024,20 +969,10 @@ func (this *Config_DataStoreConfigurationEntity) RemoveReference(name string, re
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_DataStoreConfigurationEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_DataStoreConfigurationEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_DataStoreConfigurationEntity) GetChildsUuid() []string {
@@ -1053,24 +988,17 @@ func (this *Config_DataStoreConfigurationEntity) SetChildsUuid(childsUuid []stri
  */
 func (this *Config_DataStoreConfigurationEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -1083,14 +1011,6 @@ func (this *Config_DataStoreConfigurationEntity) GetReferencesUuid() []string {
 
 func (this *Config_DataStoreConfigurationEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_DataStoreConfigurationEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_DataStoreConfigurationEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_DataStoreConfigurationEntity) GetObject() interface{} {
@@ -1142,7 +1062,9 @@ func (this *Config_DataStoreConfigurationEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_DataStoreConfigurationEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -1289,8 +1211,8 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	var DataStoreConfigurationInfo []interface{}
 
 	DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.GetParentPtr().GetUuid())
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, this.GetParentLnk())
 	} else {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, "")
@@ -1686,20 +1608,8 @@ func (this *Config_DataStoreConfigurationEntity) AppendChild(attributeName strin
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -1727,10 +1637,6 @@ func (this *Config_DataStoreConfigurationEntity) AppendReference(reference Entit
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -1740,12 +1646,8 @@ func (this *Config_DataStoreConfigurationEntity) AppendReference(reference Entit
 /** local type **/
 type Config_LdapConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -1819,7 +1721,6 @@ func (this *EntityManager) NewConfigLdapConfigurationEntity(parentUuid string, o
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -1834,7 +1735,8 @@ func (this *Config_LdapConfigurationEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_LdapConfigurationEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_LdapConfigurationEntity) SetParentLnk(lnk string) {
@@ -1844,10 +1746,6 @@ func (this *Config_LdapConfigurationEntity) SetParentLnk(lnk string) {
 func (this *Config_LdapConfigurationEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_LdapConfigurationEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_LdapConfigurationEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -1896,20 +1794,10 @@ func (this *Config_LdapConfigurationEntity) RemoveReference(name string, referen
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_LdapConfigurationEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_LdapConfigurationEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_LdapConfigurationEntity) GetChildsUuid() []string {
@@ -1925,24 +1813,17 @@ func (this *Config_LdapConfigurationEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *Config_LdapConfigurationEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -1955,14 +1836,6 @@ func (this *Config_LdapConfigurationEntity) GetReferencesUuid() []string {
 
 func (this *Config_LdapConfigurationEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_LdapConfigurationEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_LdapConfigurationEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_LdapConfigurationEntity) GetObject() interface{} {
@@ -2014,7 +1887,9 @@ func (this *Config_LdapConfigurationEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_LdapConfigurationEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -2149,8 +2024,8 @@ func (this *Config_LdapConfigurationEntity) SaveEntity() {
 	var LdapConfigurationInfo []interface{}
 
 	LdapConfigurationInfo = append(LdapConfigurationInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		LdapConfigurationInfo = append(LdapConfigurationInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		LdapConfigurationInfo = append(LdapConfigurationInfo, this.GetParentPtr().GetUuid())
 		LdapConfigurationInfo = append(LdapConfigurationInfo, this.GetParentLnk())
 	} else {
 		LdapConfigurationInfo = append(LdapConfigurationInfo, "")
@@ -2385,20 +2260,8 @@ func (this *Config_LdapConfigurationEntity) AppendChild(attributeName string, ch
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -2426,10 +2289,6 @@ func (this *Config_LdapConfigurationEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -2439,12 +2298,8 @@ func (this *Config_LdapConfigurationEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2ClientEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -2518,7 +2373,6 @@ func (this *EntityManager) NewConfigOAuth2ClientEntity(parentUuid string, object
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -2533,7 +2387,8 @@ func (this *Config_OAuth2ClientEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_OAuth2ClientEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_OAuth2ClientEntity) SetParentLnk(lnk string) {
@@ -2543,10 +2398,6 @@ func (this *Config_OAuth2ClientEntity) SetParentLnk(lnk string) {
 func (this *Config_OAuth2ClientEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_OAuth2ClientEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_OAuth2ClientEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -2595,20 +2446,10 @@ func (this *Config_OAuth2ClientEntity) RemoveReference(name string, reference En
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_OAuth2ClientEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_OAuth2ClientEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_OAuth2ClientEntity) GetChildsUuid() []string {
@@ -2624,24 +2465,17 @@ func (this *Config_OAuth2ClientEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *Config_OAuth2ClientEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -2654,14 +2488,6 @@ func (this *Config_OAuth2ClientEntity) GetReferencesUuid() []string {
 
 func (this *Config_OAuth2ClientEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_OAuth2ClientEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_OAuth2ClientEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_OAuth2ClientEntity) GetObject() interface{} {
@@ -2713,7 +2539,9 @@ func (this *Config_OAuth2ClientEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_OAuth2ClientEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -2831,8 +2659,8 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	var OAuth2ClientInfo []interface{}
 
 	OAuth2ClientInfo = append(OAuth2ClientInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		OAuth2ClientInfo = append(OAuth2ClientInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		OAuth2ClientInfo = append(OAuth2ClientInfo, this.GetParentPtr().GetUuid())
 		OAuth2ClientInfo = append(OAuth2ClientInfo, this.GetParentLnk())
 	} else {
 		OAuth2ClientInfo = append(OAuth2ClientInfo, "")
@@ -3047,20 +2875,8 @@ func (this *Config_OAuth2ClientEntity) AppendChild(attributeName string, child E
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -3088,10 +2904,6 @@ func (this *Config_OAuth2ClientEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -3101,12 +2913,8 @@ func (this *Config_OAuth2ClientEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2AuthorizeEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -3180,7 +2988,6 @@ func (this *EntityManager) NewConfigOAuth2AuthorizeEntity(parentUuid string, obj
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -3195,7 +3002,8 @@ func (this *Config_OAuth2AuthorizeEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_OAuth2AuthorizeEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_OAuth2AuthorizeEntity) SetParentLnk(lnk string) {
@@ -3205,10 +3013,6 @@ func (this *Config_OAuth2AuthorizeEntity) SetParentLnk(lnk string) {
 func (this *Config_OAuth2AuthorizeEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_OAuth2AuthorizeEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_OAuth2AuthorizeEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -3257,20 +3061,10 @@ func (this *Config_OAuth2AuthorizeEntity) RemoveReference(name string, reference
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_OAuth2AuthorizeEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_OAuth2AuthorizeEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_OAuth2AuthorizeEntity) GetChildsUuid() []string {
@@ -3286,24 +3080,17 @@ func (this *Config_OAuth2AuthorizeEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *Config_OAuth2AuthorizeEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -3316,14 +3103,6 @@ func (this *Config_OAuth2AuthorizeEntity) GetReferencesUuid() []string {
 
 func (this *Config_OAuth2AuthorizeEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_OAuth2AuthorizeEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_OAuth2AuthorizeEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_OAuth2AuthorizeEntity) GetObject() interface{} {
@@ -3375,7 +3154,9 @@ func (this *Config_OAuth2AuthorizeEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_OAuth2AuthorizeEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -3496,8 +3277,8 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 	var OAuth2AuthorizeInfo []interface{}
 
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.GetParentPtr().GetUuid())
 		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.GetParentLnk())
 	} else {
 		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, "")
@@ -3725,20 +3506,8 @@ func (this *Config_OAuth2AuthorizeEntity) AppendChild(attributeName string, chil
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -3766,10 +3535,6 @@ func (this *Config_OAuth2AuthorizeEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -3779,12 +3544,8 @@ func (this *Config_OAuth2AuthorizeEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2IdTokenEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -3858,7 +3619,6 @@ func (this *EntityManager) NewConfigOAuth2IdTokenEntity(parentUuid string, objec
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -3873,7 +3633,8 @@ func (this *Config_OAuth2IdTokenEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_OAuth2IdTokenEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_OAuth2IdTokenEntity) SetParentLnk(lnk string) {
@@ -3883,10 +3644,6 @@ func (this *Config_OAuth2IdTokenEntity) SetParentLnk(lnk string) {
 func (this *Config_OAuth2IdTokenEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_OAuth2IdTokenEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_OAuth2IdTokenEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -3935,20 +3692,10 @@ func (this *Config_OAuth2IdTokenEntity) RemoveReference(name string, reference E
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_OAuth2IdTokenEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_OAuth2IdTokenEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_OAuth2IdTokenEntity) GetChildsUuid() []string {
@@ -3964,24 +3711,17 @@ func (this *Config_OAuth2IdTokenEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *Config_OAuth2IdTokenEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -3994,14 +3734,6 @@ func (this *Config_OAuth2IdTokenEntity) GetReferencesUuid() []string {
 
 func (this *Config_OAuth2IdTokenEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_OAuth2IdTokenEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_OAuth2IdTokenEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_OAuth2IdTokenEntity) GetObject() interface{} {
@@ -4053,7 +3785,9 @@ func (this *Config_OAuth2IdTokenEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_OAuth2IdTokenEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -4208,8 +3942,8 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 	var OAuth2IdTokenInfo []interface{}
 
 	OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.GetParentPtr().GetUuid())
 		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, this.GetParentLnk())
 	} else {
 		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, "")
@@ -4478,20 +4212,8 @@ func (this *Config_OAuth2IdTokenEntity) AppendChild(attributeName string, child 
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -4519,10 +4241,6 @@ func (this *Config_OAuth2IdTokenEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -4532,12 +4250,8 @@ func (this *Config_OAuth2IdTokenEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2AccessEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -4611,7 +4325,6 @@ func (this *EntityManager) NewConfigOAuth2AccessEntity(parentUuid string, object
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -4626,7 +4339,8 @@ func (this *Config_OAuth2AccessEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_OAuth2AccessEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_OAuth2AccessEntity) SetParentLnk(lnk string) {
@@ -4636,10 +4350,6 @@ func (this *Config_OAuth2AccessEntity) SetParentLnk(lnk string) {
 func (this *Config_OAuth2AccessEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_OAuth2AccessEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_OAuth2AccessEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -4688,20 +4398,10 @@ func (this *Config_OAuth2AccessEntity) RemoveReference(name string, reference En
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_OAuth2AccessEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_OAuth2AccessEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_OAuth2AccessEntity) GetChildsUuid() []string {
@@ -4717,24 +4417,17 @@ func (this *Config_OAuth2AccessEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *Config_OAuth2AccessEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -4747,14 +4440,6 @@ func (this *Config_OAuth2AccessEntity) GetReferencesUuid() []string {
 
 func (this *Config_OAuth2AccessEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_OAuth2AccessEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_OAuth2AccessEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_OAuth2AccessEntity) GetObject() interface{} {
@@ -4806,7 +4491,9 @@ func (this *Config_OAuth2AccessEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_OAuth2AccessEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -4951,8 +4638,8 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	var OAuth2AccessInfo []interface{}
 
 	OAuth2AccessInfo = append(OAuth2AccessInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		OAuth2AccessInfo = append(OAuth2AccessInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		OAuth2AccessInfo = append(OAuth2AccessInfo, this.GetParentPtr().GetUuid())
 		OAuth2AccessInfo = append(OAuth2AccessInfo, this.GetParentLnk())
 	} else {
 		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
@@ -5231,20 +4918,8 @@ func (this *Config_OAuth2AccessEntity) AppendChild(attributeName string, child E
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -5272,10 +4947,6 @@ func (this *Config_OAuth2AccessEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -5285,12 +4956,8 @@ func (this *Config_OAuth2AccessEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2RefreshEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -5364,7 +5031,6 @@ func (this *EntityManager) NewConfigOAuth2RefreshEntity(parentUuid string, objec
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -5379,7 +5045,8 @@ func (this *Config_OAuth2RefreshEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_OAuth2RefreshEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_OAuth2RefreshEntity) SetParentLnk(lnk string) {
@@ -5389,10 +5056,6 @@ func (this *Config_OAuth2RefreshEntity) SetParentLnk(lnk string) {
 func (this *Config_OAuth2RefreshEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_OAuth2RefreshEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_OAuth2RefreshEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -5441,20 +5104,10 @@ func (this *Config_OAuth2RefreshEntity) RemoveReference(name string, reference E
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_OAuth2RefreshEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_OAuth2RefreshEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_OAuth2RefreshEntity) GetChildsUuid() []string {
@@ -5470,24 +5123,17 @@ func (this *Config_OAuth2RefreshEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *Config_OAuth2RefreshEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -5500,14 +5146,6 @@ func (this *Config_OAuth2RefreshEntity) GetReferencesUuid() []string {
 
 func (this *Config_OAuth2RefreshEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_OAuth2RefreshEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_OAuth2RefreshEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_OAuth2RefreshEntity) GetObject() interface{} {
@@ -5559,7 +5197,9 @@ func (this *Config_OAuth2RefreshEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_OAuth2RefreshEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -5654,8 +5294,8 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	var OAuth2RefreshInfo []interface{}
 
 	OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.GetParentPtr().GetUuid())
 		OAuth2RefreshInfo = append(OAuth2RefreshInfo, this.GetParentLnk())
 	} else {
 		OAuth2RefreshInfo = append(OAuth2RefreshInfo, "")
@@ -5854,20 +5494,8 @@ func (this *Config_OAuth2RefreshEntity) AppendChild(attributeName string, child 
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -5895,10 +5523,6 @@ func (this *Config_OAuth2RefreshEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -5908,12 +5532,8 @@ func (this *Config_OAuth2RefreshEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2ExpiresEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -5987,7 +5607,6 @@ func (this *EntityManager) NewConfigOAuth2ExpiresEntity(parentUuid string, objec
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -6002,7 +5621,8 @@ func (this *Config_OAuth2ExpiresEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_OAuth2ExpiresEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_OAuth2ExpiresEntity) SetParentLnk(lnk string) {
@@ -6012,10 +5632,6 @@ func (this *Config_OAuth2ExpiresEntity) SetParentLnk(lnk string) {
 func (this *Config_OAuth2ExpiresEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_OAuth2ExpiresEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_OAuth2ExpiresEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -6064,20 +5680,10 @@ func (this *Config_OAuth2ExpiresEntity) RemoveReference(name string, reference E
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_OAuth2ExpiresEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_OAuth2ExpiresEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_OAuth2ExpiresEntity) GetChildsUuid() []string {
@@ -6093,24 +5699,17 @@ func (this *Config_OAuth2ExpiresEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *Config_OAuth2ExpiresEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -6123,14 +5722,6 @@ func (this *Config_OAuth2ExpiresEntity) GetReferencesUuid() []string {
 
 func (this *Config_OAuth2ExpiresEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_OAuth2ExpiresEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_OAuth2ExpiresEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_OAuth2ExpiresEntity) GetObject() interface{} {
@@ -6182,7 +5773,9 @@ func (this *Config_OAuth2ExpiresEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_OAuth2ExpiresEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -6276,8 +5869,8 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 	var OAuth2ExpiresInfo []interface{}
 
 	OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.GetParentPtr().GetUuid())
 		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, this.GetParentLnk())
 	} else {
 		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, "")
@@ -6464,20 +6057,8 @@ func (this *Config_OAuth2ExpiresEntity) AppendChild(attributeName string, child 
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -6505,10 +6086,6 @@ func (this *Config_OAuth2ExpiresEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -6518,12 +6095,8 @@ func (this *Config_OAuth2ExpiresEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_OAuth2ConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -6597,7 +6170,6 @@ func (this *EntityManager) NewConfigOAuth2ConfigurationEntity(parentUuid string,
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -6612,7 +6184,8 @@ func (this *Config_OAuth2ConfigurationEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_OAuth2ConfigurationEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_OAuth2ConfigurationEntity) SetParentLnk(lnk string) {
@@ -6622,10 +6195,6 @@ func (this *Config_OAuth2ConfigurationEntity) SetParentLnk(lnk string) {
 func (this *Config_OAuth2ConfigurationEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_OAuth2ConfigurationEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_OAuth2ConfigurationEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -6674,20 +6243,10 @@ func (this *Config_OAuth2ConfigurationEntity) RemoveReference(name string, refer
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_OAuth2ConfigurationEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_OAuth2ConfigurationEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_OAuth2ConfigurationEntity) GetChildsUuid() []string {
@@ -6703,24 +6262,17 @@ func (this *Config_OAuth2ConfigurationEntity) SetChildsUuid(childsUuid []string)
  */
 func (this *Config_OAuth2ConfigurationEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -6733,14 +6285,6 @@ func (this *Config_OAuth2ConfigurationEntity) GetReferencesUuid() []string {
 
 func (this *Config_OAuth2ConfigurationEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_OAuth2ConfigurationEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_OAuth2ConfigurationEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_OAuth2ConfigurationEntity) GetObject() interface{} {
@@ -6792,7 +6336,9 @@ func (this *Config_OAuth2ConfigurationEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_OAuth2ConfigurationEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -6981,8 +6527,8 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	var OAuth2ConfigurationInfo []interface{}
 
 	OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.GetParentPtr().GetUuid())
 		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, this.GetParentLnk())
 	} else {
 		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, "")
@@ -7526,20 +7072,8 @@ func (this *Config_OAuth2ConfigurationEntity) AppendChild(attributeName string, 
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -7567,10 +7101,6 @@ func (this *Config_OAuth2ConfigurationEntity) AppendReference(reference Entity) 
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -7580,12 +7110,8 @@ func (this *Config_OAuth2ConfigurationEntity) AppendReference(reference Entity) 
 /** local type **/
 type Config_ServiceConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -7659,7 +7185,6 @@ func (this *EntityManager) NewConfigServiceConfigurationEntity(parentUuid string
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -7674,7 +7199,8 @@ func (this *Config_ServiceConfigurationEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_ServiceConfigurationEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_ServiceConfigurationEntity) SetParentLnk(lnk string) {
@@ -7684,10 +7210,6 @@ func (this *Config_ServiceConfigurationEntity) SetParentLnk(lnk string) {
 func (this *Config_ServiceConfigurationEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_ServiceConfigurationEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_ServiceConfigurationEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -7736,20 +7258,10 @@ func (this *Config_ServiceConfigurationEntity) RemoveReference(name string, refe
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_ServiceConfigurationEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_ServiceConfigurationEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_ServiceConfigurationEntity) GetChildsUuid() []string {
@@ -7765,24 +7277,17 @@ func (this *Config_ServiceConfigurationEntity) SetChildsUuid(childsUuid []string
  */
 func (this *Config_ServiceConfigurationEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -7795,14 +7300,6 @@ func (this *Config_ServiceConfigurationEntity) GetReferencesUuid() []string {
 
 func (this *Config_ServiceConfigurationEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_ServiceConfigurationEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_ServiceConfigurationEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_ServiceConfigurationEntity) GetObject() interface{} {
@@ -7854,7 +7351,9 @@ func (this *Config_ServiceConfigurationEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_ServiceConfigurationEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -7983,8 +7482,8 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 	var ServiceConfigurationInfo []interface{}
 
 	ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.GetParentPtr().GetUuid())
 		ServiceConfigurationInfo = append(ServiceConfigurationInfo, this.GetParentLnk())
 	} else {
 		ServiceConfigurationInfo = append(ServiceConfigurationInfo, "")
@@ -8212,20 +7711,8 @@ func (this *Config_ServiceConfigurationEntity) AppendChild(attributeName string,
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -8253,10 +7740,6 @@ func (this *Config_ServiceConfigurationEntity) AppendReference(reference Entity)
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -8266,12 +7749,8 @@ func (this *Config_ServiceConfigurationEntity) AppendReference(reference Entity)
 /** local type **/
 type Config_ScheduledTaskEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -8345,7 +7824,6 @@ func (this *EntityManager) NewConfigScheduledTaskEntity(parentUuid string, objec
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -8360,7 +7838,8 @@ func (this *Config_ScheduledTaskEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_ScheduledTaskEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_ScheduledTaskEntity) SetParentLnk(lnk string) {
@@ -8370,10 +7849,6 @@ func (this *Config_ScheduledTaskEntity) SetParentLnk(lnk string) {
 func (this *Config_ScheduledTaskEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_ScheduledTaskEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_ScheduledTaskEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -8422,20 +7897,10 @@ func (this *Config_ScheduledTaskEntity) RemoveReference(name string, reference E
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_ScheduledTaskEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_ScheduledTaskEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_ScheduledTaskEntity) GetChildsUuid() []string {
@@ -8451,24 +7916,17 @@ func (this *Config_ScheduledTaskEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *Config_ScheduledTaskEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -8481,14 +7939,6 @@ func (this *Config_ScheduledTaskEntity) GetReferencesUuid() []string {
 
 func (this *Config_ScheduledTaskEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_ScheduledTaskEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_ScheduledTaskEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_ScheduledTaskEntity) GetObject() interface{} {
@@ -8540,7 +7990,9 @@ func (this *Config_ScheduledTaskEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_ScheduledTaskEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -8675,8 +8127,8 @@ func (this *Config_ScheduledTaskEntity) SaveEntity() {
 	var ScheduledTaskInfo []interface{}
 
 	ScheduledTaskInfo = append(ScheduledTaskInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		ScheduledTaskInfo = append(ScheduledTaskInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		ScheduledTaskInfo = append(ScheduledTaskInfo, this.GetParentPtr().GetUuid())
 		ScheduledTaskInfo = append(ScheduledTaskInfo, this.GetParentLnk())
 	} else {
 		ScheduledTaskInfo = append(ScheduledTaskInfo, "")
@@ -8932,20 +8384,8 @@ func (this *Config_ScheduledTaskEntity) AppendChild(attributeName string, child 
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -8973,10 +8413,6 @@ func (this *Config_ScheduledTaskEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -8986,12 +8422,8 @@ func (this *Config_ScheduledTaskEntity) AppendReference(reference Entity) {
 /** local type **/
 type Config_ApplicationConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -9065,7 +8497,6 @@ func (this *EntityManager) NewConfigApplicationConfigurationEntity(parentUuid st
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -9080,7 +8511,8 @@ func (this *Config_ApplicationConfigurationEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_ApplicationConfigurationEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_ApplicationConfigurationEntity) SetParentLnk(lnk string) {
@@ -9090,10 +8522,6 @@ func (this *Config_ApplicationConfigurationEntity) SetParentLnk(lnk string) {
 func (this *Config_ApplicationConfigurationEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_ApplicationConfigurationEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_ApplicationConfigurationEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -9142,20 +8570,10 @@ func (this *Config_ApplicationConfigurationEntity) RemoveReference(name string, 
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_ApplicationConfigurationEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_ApplicationConfigurationEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_ApplicationConfigurationEntity) GetChildsUuid() []string {
@@ -9171,24 +8589,17 @@ func (this *Config_ApplicationConfigurationEntity) SetChildsUuid(childsUuid []st
  */
 func (this *Config_ApplicationConfigurationEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -9201,14 +8612,6 @@ func (this *Config_ApplicationConfigurationEntity) GetReferencesUuid() []string 
 
 func (this *Config_ApplicationConfigurationEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_ApplicationConfigurationEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_ApplicationConfigurationEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_ApplicationConfigurationEntity) GetObject() interface{} {
@@ -9260,7 +8663,9 @@ func (this *Config_ApplicationConfigurationEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_ApplicationConfigurationEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -9359,8 +8764,8 @@ func (this *Config_ApplicationConfigurationEntity) SaveEntity() {
 	var ApplicationConfigurationInfo []interface{}
 
 	ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, this.GetParentPtr().GetUuid())
 		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, this.GetParentLnk())
 	} else {
 		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, "")
@@ -9553,20 +8958,8 @@ func (this *Config_ApplicationConfigurationEntity) AppendChild(attributeName str
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -9594,10 +8987,6 @@ func (this *Config_ApplicationConfigurationEntity) AppendReference(reference Ent
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -9607,12 +8996,8 @@ func (this *Config_ApplicationConfigurationEntity) AppendReference(reference Ent
 /** local type **/
 type Config_ServerConfigurationEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -9686,7 +9071,6 @@ func (this *EntityManager) NewConfigServerConfigurationEntity(parentUuid string,
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -9701,7 +9085,8 @@ func (this *Config_ServerConfigurationEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_ServerConfigurationEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_ServerConfigurationEntity) SetParentLnk(lnk string) {
@@ -9711,10 +9096,6 @@ func (this *Config_ServerConfigurationEntity) SetParentLnk(lnk string) {
 func (this *Config_ServerConfigurationEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_ServerConfigurationEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_ServerConfigurationEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -9763,20 +9144,10 @@ func (this *Config_ServerConfigurationEntity) RemoveReference(name string, refer
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_ServerConfigurationEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_ServerConfigurationEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_ServerConfigurationEntity) GetChildsUuid() []string {
@@ -9792,24 +9163,17 @@ func (this *Config_ServerConfigurationEntity) SetChildsUuid(childsUuid []string)
  */
 func (this *Config_ServerConfigurationEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -9822,14 +9186,6 @@ func (this *Config_ServerConfigurationEntity) GetReferencesUuid() []string {
 
 func (this *Config_ServerConfigurationEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_ServerConfigurationEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_ServerConfigurationEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_ServerConfigurationEntity) GetObject() interface{} {
@@ -9881,7 +9237,9 @@ func (this *Config_ServerConfigurationEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_ServerConfigurationEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -10046,8 +9404,8 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	var ServerConfigurationInfo []interface{}
 
 	ServerConfigurationInfo = append(ServerConfigurationInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		ServerConfigurationInfo = append(ServerConfigurationInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		ServerConfigurationInfo = append(ServerConfigurationInfo, this.GetParentPtr().GetUuid())
 		ServerConfigurationInfo = append(ServerConfigurationInfo, this.GetParentLnk())
 	} else {
 		ServerConfigurationInfo = append(ServerConfigurationInfo, "")
@@ -10317,20 +9675,8 @@ func (this *Config_ServerConfigurationEntity) AppendChild(attributeName string, 
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -10358,10 +9704,6 @@ func (this *Config_ServerConfigurationEntity) AppendReference(reference Entity) 
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
@@ -10371,12 +9713,8 @@ func (this *Config_ServerConfigurationEntity) AppendReference(reference Entity) 
 /** local type **/
 type Config_ConfigurationsEntity struct {
 	/** not the object id, except for the definition **/
-	parentPtr      Entity
-	childsPtr      []Entity
 	childsUuid     []string
 	referencesUuid []string
-	referencesPtr  []Entity
-	prototype      *EntityPrototype
 	lazyMap        map[string]interface{}
 	lazy           bool
 	referenced     []EntityRef
@@ -10450,7 +9788,6 @@ func (this *EntityManager) NewConfigConfigurationsEntity(parentUuid string, obje
 	entity.object.ParentUuid = parentUuid
 	entity.SetInit(false)
 	this.insert(entity)
-	entity.prototype = prototype
 	return entity
 }
 
@@ -10465,7 +9802,8 @@ func (this *Config_ConfigurationsEntity) GetParentUuid() string {
 	return this.object.ParentUuid
 }
 func (this *Config_ConfigurationsEntity) GetParentPtr() Entity {
-	return this.parentPtr
+	parentPtr, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetParentUuid(), true)
+	return parentPtr
 }
 
 func (this *Config_ConfigurationsEntity) SetParentLnk(lnk string) {
@@ -10475,10 +9813,6 @@ func (this *Config_ConfigurationsEntity) SetParentLnk(lnk string) {
 func (this *Config_ConfigurationsEntity) GetParentLnk() string {
 	return this.object.ParentLnk
 }
-func (this *Config_ConfigurationsEntity) SetParentPtr(parentPtr Entity) {
-	this.parentPtr = parentPtr
-}
-
 func (this *Config_ConfigurationsEntity) AppendReferenced(name string, owner Entity) {
 	if owner.GetUuid() == this.GetUuid() {
 		return
@@ -10527,20 +9861,10 @@ func (this *Config_ConfigurationsEntity) RemoveReference(name string, reference 
 	}
 	// Set the new array...
 	this.SetReferencesUuid(refsUuid)
-	this.SetReferencesPtr(refsPtr)
-
 	var removeMethode = "Remove" + strings.ToUpper(name[2:3]) + name[3:]
 	params := make([]interface{}, 1)
 	params[0] = reference.GetObject()
 	Utility.CallMethod(this.GetObject(), removeMethode, params)
-}
-
-func (this *Config_ConfigurationsEntity) GetChildsPtr() []Entity {
-	return this.childsPtr
-}
-
-func (this *Config_ConfigurationsEntity) SetChildsPtr(childsPtr []Entity) {
-	this.childsPtr = childsPtr
 }
 
 func (this *Config_ConfigurationsEntity) GetChildsUuid() []string {
@@ -10556,24 +9880,17 @@ func (this *Config_ConfigurationsEntity) SetChildsUuid(childsUuid []string) {
  */
 func (this *Config_ConfigurationsEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
+	params := make([]interface{}, 1)
 	for i := 0; i < len(this.GetChildsUuid()); i++ {
 		if this.GetChildsUuid()[i] != uuid {
 			childsUuid = append(childsUuid, this.GetChildsUuid()[i])
+		} else {
+			entity, _ := GetServer().GetEntityManager().getEntityByUuid(this.GetChildsUuid()[i], false)
+			params[0] = entity.GetObject()
 		}
 	}
 
 	this.childsUuid = childsUuid
-	params := make([]interface{}, 1)
-	childsPtr := make([]Entity, 0)
-	for i := 0; i < len(this.GetChildsPtr()); i++ {
-		if this.GetChildsPtr()[i].GetUuid() != uuid {
-			childsPtr = append(childsPtr, this.GetChildsPtr()[i])
-		} else {
-			params[0] = this.GetChildsPtr()[i].GetObject()
-		}
-	}
-	this.childsPtr = childsPtr
-
 	var removeMethode = "Remove" + strings.ToUpper(name[0:1]) + name[1:]
 	if params[0] != nil {
 		Utility.CallMethod(this.GetObject(), removeMethode, params)
@@ -10586,14 +9903,6 @@ func (this *Config_ConfigurationsEntity) GetReferencesUuid() []string {
 
 func (this *Config_ConfigurationsEntity) SetReferencesUuid(refsUuid []string) {
 	this.referencesUuid = refsUuid
-}
-
-func (this *Config_ConfigurationsEntity) GetReferencesPtr() []Entity {
-	return this.referencesPtr
-}
-
-func (this *Config_ConfigurationsEntity) SetReferencesPtr(refsPtr []Entity) {
-	this.referencesPtr = refsPtr
 }
 
 func (this *Config_ConfigurationsEntity) GetObject() interface{} {
@@ -10645,7 +9954,9 @@ func (this *Config_ConfigurationsEntity) Exist() bool {
 * Return the entity prototype.
  */
 func (this *Config_ConfigurationsEntity) GetPrototype() *EntityPrototype {
-	return this.prototype
+	typeName := this.GetTypeName()
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+	return prototype
 }
 
 /** Entity Prototype creation **/
@@ -10782,8 +10093,8 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	var ConfigurationsInfo []interface{}
 
 	ConfigurationsInfo = append(ConfigurationsInfo, this.GetUuid())
-	if this.parentPtr != nil {
-		ConfigurationsInfo = append(ConfigurationsInfo, this.parentPtr.GetUuid())
+	if this.GetParentPtr() != nil {
+		ConfigurationsInfo = append(ConfigurationsInfo, this.GetParentPtr().GetUuid())
 		ConfigurationsInfo = append(ConfigurationsInfo, this.GetParentLnk())
 	} else {
 		ConfigurationsInfo = append(ConfigurationsInfo, "")
@@ -11308,20 +10619,8 @@ func (this *Config_ConfigurationsEntity) AppendChild(attributeName string, child
 	// Append child if is not there...
 	if !Utility.Contains(this.childsUuid, child.GetUuid()) {
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
-		this.childsPtr = append(this.childsPtr, child)
-	} else {
-		childsPtr := make([]Entity, 0)
-		for i := 0; i < len(this.childsPtr); i++ {
-			if this.childsPtr[i].GetUuid() != child.GetUuid() {
-				childsPtr = append(childsPtr, this.childsPtr[i])
-			}
-		}
-		childsPtr = append(childsPtr, child)
-		this.SetChildsPtr(childsPtr)
 	}
 	// Set this as parent in the child
-	child.SetParentPtr(this)
-
 	child.SetParentLnk("M_" + attributeName)
 
 	params := make([]interface{}, 1)
@@ -11349,10 +10648,6 @@ func (this *Config_ConfigurationsEntity) AppendReference(reference Entity) {
 	}
 	if index == -1 {
 		this.referencesUuid = append(this.referencesUuid, reference.GetUuid())
-		this.referencesPtr = append(this.referencesPtr, reference)
-	} else if index < len(this.referencesPtr) {
-		// The reference must be update in that case.
-		this.referencesPtr[index] = reference
 	}
 }
 
