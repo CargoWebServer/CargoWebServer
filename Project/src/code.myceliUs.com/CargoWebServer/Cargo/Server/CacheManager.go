@@ -3,6 +3,8 @@ package Server
 import (
 	"log"
 	"time"
+	// Use to see if there is memory leak remove for production.
+	"runtime/debug"
 )
 
 /**
@@ -40,6 +42,9 @@ type CacheManager struct {
 
 	// stop processing when that variable are set to true...
 	abortedByEnvironment chan bool
+
+	// Use to free the os memory.
+	ticker *time.Ticker
 }
 
 var cacheManager *CacheManager
@@ -82,11 +87,18 @@ func (this *CacheManager) initialize() {
 
 	this.removeEntityChannel = make(chan string)
 	this.abortedByEnvironment = make(chan bool)
+	this.ticker = time.NewTicker(10 * time.Minute)
 }
 
 func (this *CacheManager) start() {
 	log.Println("--> Start CacheManager")
 	go this.run()
+
+	// Here I will compact the memory after 10 minutes...
+	for t := range this.ticker.C {
+		log.Println("--> call debug.FreeOSMemory()", t)
+		debug.FreeOSMemory()
+	}
 }
 
 func (this *CacheManager) getId() string {

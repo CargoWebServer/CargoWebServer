@@ -10,9 +10,6 @@ import (
 	"strings"
 	"time"
 
-	// Use to see if there is memory leak remove for production.
-	"runtime/debug"
-
 	"code.myceliUs.com/Utility"
 	"github.com/robertkrimen/otto"
 	_ "github.com/robertkrimen/otto/underscore"
@@ -226,8 +223,6 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 						}
 					}
 					jsRuntimeManager.removeVm(sessionId)
-					log.Println("--> vm loop stop for session ", sessionId)
-					debug.FreeOSMemory()
 				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
 				callback <- []interface{}{true} // unblock the channel...
 
