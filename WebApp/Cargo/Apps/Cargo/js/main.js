@@ -20,6 +20,7 @@
  * @version 1.0
  */
 
+
 /**
  * This global object represent a reference to the distant server.
  * @see Server
