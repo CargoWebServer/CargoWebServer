@@ -1,15 +1,15 @@
 package Server
 
 import (
-	//"fmt"
 	"log"
-	//"runtime"
-	//"time"
+	"time"
 )
 
 /**
- * I will made use of BoltDB as cache backend. The cache will store information
- * of the engine on the disk.
+ * The cache manager is simply a map of Entity accessible via channel and where
+ * entity has a limited lifespan of 10 minutes. It main purpose is to back data
+ * the time of initislisation, and also for multiple access. The real db is the
+ * KV store or the SQL store.
  */
 type CacheManager struct {
 
@@ -111,7 +111,7 @@ func (this *CacheManager) run() {
 			// Append entity to the database.
 			if inputEntity.GetTypeName() != "CargoEntities.Error" {
 				this.set(inputEntity)
-				log.Println("------> append entity: ", inputEntity.GetUuid())
+				//log.Println("------> append entity: ", inputEntity.GetUuid())
 			}
 
 		case outputEntity := <-this.outputEntityChannel:
@@ -136,6 +136,12 @@ func (this *CacheManager) run() {
 func (this *CacheManager) set(entity Entity) {
 
 	this.entities[entity.GetUuid()] = entity
+
+	go func(uuid string, lifespan time.Duration, removeChannel chan string) {
+		timer := time.NewTimer(lifespan * time.Minute)
+		<-timer.C
+		removeChannel <- uuid
+	}(entity.GetUuid(), 10, this.removeEntityChannel)
 
 }
 
