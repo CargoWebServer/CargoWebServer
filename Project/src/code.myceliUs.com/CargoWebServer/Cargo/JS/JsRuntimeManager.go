@@ -108,6 +108,7 @@ type JsRuntimeManager struct {
 	m_setVariable       map[string]OperationChannel
 	m_getVariable       map[string]OperationChannel
 	m_executeJsFunction map[string]OperationChannel
+	m_runScript         map[string]OperationChannel
 	m_stopVm            map[string]chan (bool)
 }
 
@@ -136,6 +137,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	jsRuntimeManager.m_setVariable = make(map[string]OperationChannel)
 	jsRuntimeManager.m_getVariable = make(map[string]OperationChannel)
 	jsRuntimeManager.m_executeJsFunction = make(map[string]OperationChannel)
+	jsRuntimeManager.m_runScript = make(map[string]OperationChannel)
 	jsRuntimeManager.m_stopVm = make(map[string]chan (bool))
 
 	// Load the script from the script repository...
@@ -166,9 +168,10 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				jsRuntimeManager.m_setVariable[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_getVariable[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_executeJsFunction[sessionId] = make(OperationChannel)
+				jsRuntimeManager.m_runScript[sessionId] = make(OperationChannel)
 				jsRuntimeManager.m_stopVm[sessionId] = make(chan (bool))
 				// The vm processing loop...
-				go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, stopVm chan (bool), sessionId string) {
+				go func(vm *otto.Otto, setVariable OperationChannel, getVariable OperationChannel, executeJsFunction OperationChannel, runScript OperationChannel, stopVm chan (bool), sessionId string) {
 					done := false
 					for !done {
 						select {
@@ -192,6 +195,11 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 							vm.Set("sessionId", jsFunctionInfos.m_sessionId)
 							jsFunctionInfos.m_results, jsFunctionInfos.m_err = GetJsRuntimeManager().executeJsFunction(vm, jsFunctionInfos.m_functionStr, jsFunctionInfos.m_functionParams)
 							callback <- []interface{}{jsFunctionInfos} // unblock the channel...
+						case operationInfos := <-runScript:
+							callback := operationInfos.m_returns
+							script := operationInfos.m_params["script"].(string)
+							results, err := vm.Run(script)
+							callback <- []interface{}{results, err} // unblock the channel...
 						case stop := <-stopVm:
 							if stop {
 								// Wait until the vm is stop
@@ -223,7 +231,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 						}
 					}
 					jsRuntimeManager.removeVm(sessionId)
-				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
+				}(jsRuntimeManager.m_sessions[sessionId], jsRuntimeManager.m_setVariable[sessionId], jsRuntimeManager.m_getVariable[sessionId], jsRuntimeManager.m_executeJsFunction[sessionId], jsRuntimeManager.m_runScript[sessionId], jsRuntimeManager.m_stopVm[sessionId], sessionId)
 				callback <- []interface{}{true} // unblock the channel...
 
 			case operationInfos := <-jsRuntimeManager.m_closeVm:
@@ -372,6 +380,8 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 	delete(this.m_sessions, sessionId)
 	close(this.m_executeJsFunction[sessionId])
 	delete(this.m_executeJsFunction, sessionId)
+	close(this.m_runScript[sessionId])
+	delete(this.m_runScript, sessionId)
 	close(this.m_setVariable[sessionId])
 	delete(this.m_setVariable, sessionId)
 	close(this.m_stopVm[sessionId])
@@ -476,12 +486,29 @@ func (this *JsRuntimeManager) AppendFunction(name string, function interface{}) 
 }
 
 /**
- * Run given script for a given session. Must be call from inside the JS routine.
+ * Run given script for a given session.
  */
 func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.Value, error) {
-	vm := this.getSession(sessionId)
-	results, err := vm.Run(script)
-	return results, err
+	// Protectect the map access...
+	var op OperationInfos
+	op.m_params = make(map[string]interface{})
+	op.m_params["script"] = script
+	op.m_returns = make(chan ([]interface{}))
+	this.m_runScript[sessionId] <- op
+
+	// wait for completion
+	results := <-op.m_returns
+	var value otto.Value
+	var err error
+	if results[0] != nil {
+		value = results[0].(otto.Value)
+	}
+
+	if results[1] != nil {
+		err = results[0].(error)
+	}
+
+	return value, err
 }
 
 /**

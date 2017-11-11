@@ -95,10 +95,12 @@ func (this *CacheManager) start() {
 	go this.run()
 
 	// Here I will compact the memory after 10 minutes...
-	for t := range this.ticker.C {
-		log.Println("--> call debug.FreeOSMemory()", t)
-		debug.FreeOSMemory()
-	}
+	go func(ticker *time.Ticker) {
+		for t := range ticker.C {
+			log.Println("--> call debug.FreeOSMemory()", t)
+			debug.FreeOSMemory()
+		}
+	}(this.ticker)
 }
 
 func (this *CacheManager) getId() string {
