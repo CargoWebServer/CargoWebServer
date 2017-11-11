@@ -354,7 +354,9 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
         }
 
         var superTypeNames = Array.from(prototype.SuperTypeNames);
-        // superTypeNames = superTypeNames.concat(prototype.ListOf)
+        if (prototype.ListOf.length > 0) {
+            superTypeNames = [prototype.ListOf]
+        }
 
         for (var i = 0; i < superTypeNames.length; i++) {
             if (document.getElementById("superType_" + superTypeNames[i] + "_" + prototype.TypeName + "_row") == undefined) {
@@ -480,7 +482,7 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
         }
 
         // In the case of no surpertype exist...
-        if (prototype.SuperTypeNames.length == 0) {
+        if (superTypeNames.length == 0) {
             callback(prototype)
         }
 
@@ -521,10 +523,12 @@ EntityPrototypeEditor.prototype.displayPrototypeSupertypeProperties = function (
                 if (caller.isList) {
                     if (result.Fields[i] == "M_valueOf") {
                         result.Fields[i] = "M_listOf";
+                        result.FieldsType[i] = "[]" + result.FieldsType[i];
                     }
                 } else {
                     if (result.Fields[i] == "M_listOf") {
                         result.Fields[i] = "M_valueOf";
+                        result.FieldsType[i] = result.FieldsType[i].replace("[]", "")
                     }
                 }
             }
@@ -589,8 +593,12 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
         prototype.SuperTypeNames = []
     }
     var superTypesFields = []
-    if (prototype.SuperTypeNames.length > 0) {
-        getSuperTypesFields(prototype.SuperTypeNames, superTypesFields,
+    if (prototype.SuperTypeNames.length > 0 || prototype.ListOf.length > 0) {
+        var superTypeNames = prototype.SuperTypeNames
+        if (prototype.ListOf.length > 0) {
+            superTypeNames.push(prototype.ListOf)
+        }
+        getSuperTypesFields(superTypeNames, superTypesFields,
             function (EntityPrototypeEditor, prototype, properties, isEditable) {
                 return function (superTypesFields) {
                     for (var i = 3; i < prototype.Fields.length - 2; i++) {
@@ -605,7 +613,7 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
     } else {
         for (var i = 3; i < prototype.Fields.length - 2; i++) {
             // display attributes
-            if (superTypesFields.indexOf(prototype.Fields[i]) == -1) {
+            if (superTypesFields.indexOf(prototype.Fields[i]) == -1 && prototype.Fields[i]) {
                 // Here only if the propertie is part of the entity itself and not of one of it parent.
                 this.displayPrototypePropertie(prototype, prototype.Fields[i], prototype.FieldsType[i], properties, isEditable, i)
             }
@@ -1014,7 +1022,7 @@ EntityPrototypeEditor.prototype.appendRestriction = function () {
 
         // Now I will appdend the restriction type options.
         var baseType = getBaseTypeExtension(prototype.TypeName)
-        if(prototype.ListOf.length == 0){
+        if (prototype.ListOf.length == 0) {
             restrictionsTypeSelect.appendElement({ "tag": "option", "value": 1, "innerHtml": "enumeration" })
         }
 
@@ -1035,7 +1043,7 @@ EntityPrototypeEditor.prototype.appendRestriction = function () {
             restrictionsTypeSelect.appendElement({ "tag": "option", "value": 3, "innerHtml": "length" })
             restrictionsTypeSelect.appendElement({ "tag": "option", "value": 9, "innerHtml": "min length" })
         }
-        
+
         if (isXsString(baseType) && prototype.ListOf.length == 0) {
             restrictionsTypeSelect.appendElement({ "tag": "option", "value": 10, "innerHtml": "pattern" })
             restrictionsTypeSelect.appendElement({ "tag": "option", "value": 12, "innerHtml": "white space" })

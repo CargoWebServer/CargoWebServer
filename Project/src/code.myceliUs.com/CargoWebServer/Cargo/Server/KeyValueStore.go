@@ -178,7 +178,18 @@ func (this *KeyValueDataStore) deleteValue(key string) error {
  */
 func (this *KeyValueDataStore) setSuperTypeFields(prototype *EntityPrototype) {
 	var index = 3 // The start index is after the uuid and parentUuid and the parent lnk.
-	if len(prototype.ListOf) == 0 {
+	if len(prototype.ListOf) > 0 {
+		// It can not have superpetype and list of a the same time.
+		prototype.SuperTypeNames = make([]string, 0)
+		// In that particular case the entity is a list of the given type.
+		if !Utility.Contains(prototype.Fields, "M_listOf") {
+			Utility.InsertStringAt(index, "M_listOf", &prototype.Fields)
+			Utility.InsertStringAt(index, "[]"+prototype.ListOf, &prototype.FieldsType)
+			Utility.InsertBoolAt(index, true, &prototype.FieldsVisibility)
+			Utility.InsertStringAt(index, "[]", &prototype.FieldsDefaultValue)
+			Utility.InsertStringAt(index, "", &prototype.FieldsDocumentation)
+		}
+	} else {
 		for i := 0; i < len(prototype.SuperTypeNames); i++ {
 			superTypeName := prototype.SuperTypeNames[i]
 			superPrototype, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
@@ -186,11 +197,9 @@ func (this *KeyValueDataStore) setSuperTypeFields(prototype *EntityPrototype) {
 				// I will merge the fields
 				// The first to fields are always the uuid, parentUuid, parentLnk and the last is the childUuids and referenced
 				for j := 3; j < len(superPrototype.Fields)-2; j++ {
-					if !Utility.Contains(prototype.Fields, superPrototype.Fields[j]) {
-						if superPrototype.Fields[j] == "M_valueOf" && len(prototype.ListOf) == 0 {
-							Utility.InsertStringAt(index, superPrototype.Fields[j], &prototype.Fields)
-						}
+					if !Utility.Contains(prototype.Fields, superPrototype.Fields[j]) && strings.HasPrefix(superPrototype.Fields[j], "M_") {
 
+						Utility.InsertStringAt(index, superPrototype.Fields[j], &prototype.Fields)
 						Utility.InsertStringAt(index, superPrototype.FieldsType[j], &prototype.FieldsType)
 						Utility.InsertBoolAt(index, superPrototype.FieldsVisibility[j], &prototype.FieldsVisibility)
 						Utility.InsertStringAt(index, superPrototype.FieldsDefaultValue[j], &prototype.FieldsDefaultValue)
@@ -248,15 +257,6 @@ func (this *KeyValueDataStore) setSuperTypeFields(prototype *EntityPrototype) {
 				log.Println("error ", err)
 			}
 		}
-	} else {
-		// It can not have superpetype and list of a the same time.
-		prototype.SuperTypeNames = make([]string, 0)
-		// In that particular case the entity is a list of the given type.
-		Utility.InsertStringAt(3, "M_listOf", &prototype.Fields)
-		Utility.InsertStringAt(3, "[]"+prototype.ListOf, &prototype.FieldsType)
-		Utility.InsertBoolAt(3, true, &prototype.FieldsVisibility)
-		Utility.InsertStringAt(3, "[]", &prototype.FieldsDefaultValue)
-		Utility.InsertStringAt(3, "", &prototype.FieldsDocumentation)
 	}
 
 	// reset the field orders.
@@ -446,6 +446,8 @@ func (this *KeyValueDataStore) saveEntityPrototype(prototype *EntityPrototype) e
 	}
 
 	// I will serialyse the prototype.
+	this.setSuperTypeFields(prototype)
+
 	m := new(bytes.Buffer)
 	enc := gob.NewEncoder(m)
 	err := enc.Encode(prototype)

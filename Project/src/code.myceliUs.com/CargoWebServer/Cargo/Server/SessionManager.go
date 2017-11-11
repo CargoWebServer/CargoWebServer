@@ -95,6 +95,7 @@ func (this *SessionManager) getId() string {
 
 func (this *SessionManager) start() {
 	log.Println("--> Start SessionManager")
+	this.removeClosedSession()
 }
 
 func (this *SessionManager) stop() {
@@ -125,6 +126,7 @@ func (this *SessionManager) removeClosedSession() {
 
 	for i := 0; i < len(sessions); i++ {
 		sessionId := sessions[i].GetObject().(*CargoEntities.Session).GetId()
+		log.Println("--> close session: ", sessionId)
 		if GetServer().getConnectionById(sessionId) == nil {
 			// The session is closed
 			this.closeSession(sessions[i].GetObject().(*CargoEntities.Session))

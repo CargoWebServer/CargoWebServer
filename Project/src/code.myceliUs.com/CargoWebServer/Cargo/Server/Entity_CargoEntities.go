@@ -6627,11 +6627,9 @@ func (this *CargoEntities_AccountEntity) RemoveReferenced(name string, owner Ent
 
 func (this *CargoEntities_AccountEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}

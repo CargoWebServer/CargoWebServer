@@ -453,7 +453,7 @@ HorizontalMenu.prototype.setItem = function (item) {
         for (var itemId in this.currentItem.subItems) {
             var subItem = this.currentItem.subItems[itemId]
             subItem.parent = item
-            subItem.panel = this.subMenuRow.appendElement({ "tag": "div", "class": "submenu_item", "style": "display:inline-block; padding-left:10px;padding-top: 1px; vertical-align:middle;height:20px; ", "innerHtml": subItem.name }).down()
+            subItem.panel = this.subMenuRow.appendElement({ "tag": "div", "class": "submenu_item", "style": "display:inline-block; padding-left:10px;padding-top: 4px; vertical-align:middle;height:20px; ", "innerHtml": subItem.name }).down()
             subItem.panel.element.onclick = function (menu, item) {
                 return function () {
                     menu.setItem(item)

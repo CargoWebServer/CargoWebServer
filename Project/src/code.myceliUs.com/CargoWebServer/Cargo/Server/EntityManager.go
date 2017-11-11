@@ -171,7 +171,6 @@ func (this *EntityManager) removeEntity(uuid string) {
  * That function is use to delete an entity from the store.
  */
 func (this *EntityManager) deleteEntity(toDelete Entity) {
-
 	// first of all i will remove it from the cache.
 	this.removeEntity(toDelete.GetUuid())
 

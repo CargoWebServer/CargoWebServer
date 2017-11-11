@@ -174,7 +174,7 @@ EntityPanel.prototype.init = function (proto, initCallback) {
 		var field = proto.Fields[index]
 		var fieldType = proto.FieldsType[index]
 		var fieldVisibility = proto.FieldsVisibility[index]
-		if (fieldVisibility == true) {
+		if (fieldVisibility == true && field.startsWith("M_")) {
 			this.initField(this.entitiesDiv, field, fieldType, proto.Restrictions)
 		}
 	}
@@ -1559,10 +1559,13 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 	this.maximizeBtn.element.click()
 	// Here the entity is a reference to a complex type...
 	var isRef = fieldType.endsWith(":Ref")
+	var baseType = getBaseTypeExtension(fieldType)
+	if(baseType.length > 0){
+		fieldType = baseType
+	}
 
 	// Here I will see if the type is derived basetype...
 	if (!fieldType.startsWith("[]") && !isRef) {
-		var baseType = getBaseTypeExtension(fieldType)
 		if (fieldType.startsWith("enum:") || control.element.tagName == "SELECT") {
 			// Here the value is an enumeration...
 			if (value.M_valueOf != undefined) {

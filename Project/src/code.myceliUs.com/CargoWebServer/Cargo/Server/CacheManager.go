@@ -23,7 +23,12 @@ type CacheManager struct {
 	/**
 	 * Channel used to append entity inside the entity map
 	 */
-	inputEntityChannel chan Entity
+	inputEntityChannel chan struct {
+		// The entity to input
+		entity Entity
+		// The channel to block the execution util the entity is in the map.
+		wait chan bool
+	}
 
 	/**
 	* Channel used to output entity
@@ -79,7 +84,11 @@ func (this *CacheManager) initialize() {
 
 	log.Println("--> Initialize CacheManager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
-	this.inputEntityChannel = make(chan Entity)
+	this.inputEntityChannel = make(chan struct {
+		entity Entity
+		wait   chan bool
+	})
+
 	this.outputEntityChannel = make(chan struct {
 		entityUuid          string
 		entityOutputChannel chan Entity
@@ -123,10 +132,8 @@ func (this *CacheManager) run() {
 
 		case inputEntity := <-this.inputEntityChannel:
 			// Append entity to the database.
-			if inputEntity.GetTypeName() != "CargoEntities.Error" {
-				this.set(inputEntity)
-				//log.Println("------> append entity: ", inputEntity.GetUuid())
-			}
+			this.set(inputEntity.entity)
+			inputEntity.wait <- false // Unblock the channel.
 
 		case outputEntity := <-this.outputEntityChannel:
 			outputEntity_ := this.get(outputEntity.entityUuid)
@@ -215,5 +222,15 @@ func (this *CacheManager) removeEntity(uuid string) {
  * Insert entity if it doesn't already exist. Otherwise replace current entity.
  */
 func (this *CacheManager) setEntity(entity Entity) {
-	this.inputEntityChannel <- entity
+	input := new(struct {
+		entity Entity
+		wait   chan bool
+	})
+
+	input.entity = entity
+	input.wait = make(chan bool)
+
+	this.inputEntityChannel <- *input
+	// Wait before enter other entity.
+	<-input.wait
 }
