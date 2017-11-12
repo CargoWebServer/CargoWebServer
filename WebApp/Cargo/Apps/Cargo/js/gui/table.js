@@ -260,17 +260,17 @@ Table.prototype.init = function () {
 		/* The delete entity event **/
 		server.entityManager.attach(this, DeleteEntityEvent, function (evt, table) {
 			// So here I will remove the line from the table...
-			var entity = evt.dataMap["entity"]
-			if (entities[entity.UUID] != undefined) {
-				entity = entities[entity.UUID]
+			var toDelete = evt.dataMap["entity"]
+			if (entities[toDelete.UUID] != undefined) {
+				toDelete = entities[toDelete.UUID]
 			}
 
-			if (entity.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(entity.TYPENAME) != -1) {
+			if (toDelete.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(toDelete.TYPENAME) != -1) {
 				// So here I will remove the line from the model...
 				var orderedRows = []
 				for (var i = 0; i < table.orderedRows.length; i++) {
 					var row = table.orderedRows[i]
-					if (row.id != entity.UUID) {
+					if (row.id != toDelete.UUID) {
 						orderedRows.push(row)
 					} else {
 						// remove from the display...
@@ -282,7 +282,7 @@ Table.prototype.init = function () {
 				var values = []
 				var entities_ = []
 				for (var i = 0; i < table.model.entities.length; i++) {
-					if (table.model.entities[i].UUID != entity.UUID) {
+					if (table.model.entities[i].UUID != toDelete.UUID) {
 						var entity = table.model.entities[i]
 						if (entities[entity.UUID] != undefined) {
 							entity = table.model.entities[i] = entities[entity.UUID]
@@ -305,7 +305,7 @@ Table.prototype.init = function () {
 						table.setHeader()
 					}
 					var row = table.rows[i]
-					if (row.id != entity.UUID) {
+					if (row.id != toDelete.UUID) {
 						row.index = rows.length
 						rows.push(row)
 						rowsId[row.id] = row
@@ -1230,8 +1230,6 @@ TableCell.prototype.formatValue = function (value) {
 									createItemLnk(entity, value, field, lnkDiv)
 									newLnkInput.element.parentNode.removeChild(newLnkInput.element)
 									appendObjectValue(entity, field, value)
-
-									//cell.row.saveBtn.element.style.visibility = "visible"
 									server.entityManager.saveEntity(entity)
 								}
 							}(newLnkInput, entity, field, valueDiv, cell))
