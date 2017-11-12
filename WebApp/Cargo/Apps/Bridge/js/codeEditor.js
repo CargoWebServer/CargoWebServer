@@ -408,12 +408,17 @@ CodeEditor.prototype.setActiveFile = function (fileId) {
     }
     if (this.filesPanel[fileId] !== undefined) {
         this.filesPanel[fileId].element.style.display = ""
-        var aceContent = this.filesPanel[fileId].element.getElementsByClassName("ace_content")[0]
         var header = document.getElementById("workingFilesDiv")
-        if (aceContent.style.marginTop != "0px" && aceContent.style.marginTop != "") {
-            if (header.className.indexOf(" scrolling") == -1) {
-                header.className += " scrolling"
-                header.parentNode.className += " scrolling"
+        var aceContent = this.filesPanel[fileId].element.getElementsByClassName("ace_content")[0]
+        if(aceContent != null){
+            if (aceContent.style.marginTop != "0px" && aceContent.style.marginTop != "") {
+                if (header.className.indexOf(" scrolling") == -1) {
+                    header.className += " scrolling"
+                    header.parentNode.className += " scrolling"
+                }
+            } else {
+                header.className = header.className.replaceAll(" scrolling", "")
+                header.parentNode.className = header.parentNode.className.replaceAll(" scrolling", "")
             }
         } else {
             header.className = header.className.replaceAll(" scrolling", "")
