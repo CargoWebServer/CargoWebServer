@@ -938,7 +938,10 @@ func (this *EntityManager) getEntityByUuid(uuid string, lazy bool) (Entity, *Car
 	params[0] = "" // No parent uuid needed.
 	params[1] = uuid
 	params[2] = nil
+
+	this.Lock()
 	result, err := Utility.CallMethod(this, funcName, params)
+	this.Unlock()
 
 	if err != nil {
 		// Try with dynamic entity instead.
@@ -968,7 +971,9 @@ func (this *EntityManager) getDynamicEntityByUuid(uuid string, lazy bool) (Entit
 	values["UUID"] = uuid
 
 	// here the parent uuid is not know.
+	this.Lock()
 	entity, errObj := this.newDynamicEntity("", values)
+	this.Unlock()
 
 	if errObj != nil {
 		return nil, errObj

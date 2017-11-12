@@ -15,8 +15,6 @@ import (
  * Entity security functionality.
  */
 type SecurityManager struct {
-	adminRole *CargoEntities.Role
-	guestRole *CargoEntities.Role
 }
 
 var securityManager *SecurityManager
@@ -38,14 +36,7 @@ func newSecurityManager() *SecurityManager {
 // Service functions
 ////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Initialize security related information.
- */
-func (this *SecurityManager) initialize() {
-
-	log.Println("--> Initialize Security manager")
-	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
-
+func (this *SecurityManager) createAdminRole() {
 	// Create the admin role if it doesn't exist
 	adminRoleUuid := CargoEntitiesRoleExists("adminRole")
 
@@ -55,19 +46,22 @@ func (this *SecurityManager) initialize() {
 		if errObj != nil {
 			return
 		}
+
 		adminAccount := adminAccountEntity.GetObject().(*CargoEntities.Account)
 
 		// Create adminRole
-		this.adminRole, _ = this.createRole("adminRole")
-		this.adminRole.SetAccounts(adminAccount)
-		adminRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.adminRole.GetUUID(), false)
+		adminRole, _ := this.createRole("adminRole")
+		adminRole.SetAccounts(adminAccount)
+		adminRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(adminRole.GetUUID(), false)
 		adminRoleEntity.SetNeedSave(true)
 		adminRoleEntity.SaveEntity()
-		adminAccount.SetRolesRef(this.adminRole)
+		adminAccount.SetRolesRef(adminRole)
 		adminAccountEntity.SetNeedSave(true)
 		adminAccountEntity.SaveEntity()
 	}
+}
 
+func (this *SecurityManager) createGuestRole() {
 	// Create the guest role if it doesn't exist
 	guestRoleUuid := CargoEntitiesRoleExists("guestRole")
 	if len(guestRoleUuid) == 0 {
@@ -79,17 +73,29 @@ func (this *SecurityManager) initialize() {
 		guestAccount := guestAccountEntity.GetObject().(*CargoEntities.Account)
 
 		// Create guestRole
-		this.guestRole, _ = this.createRole("guestRole")
-		this.guestRole.SetAccounts(guestAccount)
-		guestRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(this.guestRole.GetUUID(), false)
+		guestRole, _ := this.createRole("guestRole")
+		guestRole.SetAccounts(guestAccount)
+		guestRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(guestRole.GetUUID(), false)
 		guestRoleEntity.SetNeedSave(true)
 		guestRoleEntity.SaveEntity()
 
 		// Setting guestRole to guest account
-		guestAccount.SetRolesRef(this.guestRole)
+		guestAccount.SetRolesRef(guestRole)
 		guestAccountEntity.SetNeedSave(true)
 		guestAccountEntity.SaveEntity()
 	}
+}
+
+/**
+ * Initialize security related information.
+ */
+func (this *SecurityManager) initialize() {
+
+	log.Println("--> Initialize Security manager")
+	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
+
+	this.createAdminRole()
+	this.createGuestRole()
 
 }
 
@@ -427,7 +433,7 @@ func (this *SecurityManager) canExecuteAction(sessionId string, actionName strin
 	actionName = strings.Replace(actionName, "*", "", -1)
 	actionName = strings.Replace(actionName, ")", "", -1)
 
-	session := GetServer().GetSessionManager().activeSessions[sessionId]
+	session := GetServer().GetSessionManager().getActiveSessionById(sessionId)
 
 	var account *CargoEntities.Account
 	if session != nil {
@@ -479,7 +485,7 @@ func (this *SecurityManager) getEntitiesByPermission(permission *CargoEntities.P
  * Update or Delete a given entity.
  */
 func (this *SecurityManager) hasPermission(sessionId string, permissionType int, entity Entity) *CargoEntities.Error {
-	session := GetServer().GetSessionManager().activeSessions[sessionId]
+	session := GetServer().GetSessionManager().getActiveSessionById(sessionId)
 
 	var account *CargoEntities.Account
 	if session != nil {

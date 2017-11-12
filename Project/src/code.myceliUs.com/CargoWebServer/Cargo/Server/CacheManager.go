@@ -5,6 +5,7 @@ import (
 	"time"
 	// Use to see if there is memory leak remove for production.
 	"runtime/debug"
+	"strings"
 )
 
 /**
@@ -169,11 +170,15 @@ func (this *CacheManager) set(entity Entity) {
 	this.entities[entity.GetUuid()] = entity
 
 	// Remove the entity from the cache after 10 minutes.
-	go func(uuid string, lifespan time.Duration) {
-		timer := time.NewTimer(lifespan * time.Minute)
-		<-timer.C
-		GetServer().GetCacheManager().removeEntity(uuid)
-	}(entity.GetUuid(), 10)
+	// exception are Config.*, session, action and account those entities
+	// are keep in the cache until they are explicitly remove.
+	if !strings.HasPrefix(entity.GetTypeName(), "Config.") && entity.GetTypeName() != "CargoEntities.Action" && entity.GetTypeName() != "CargoEntities.Session" && entity.GetTypeName() != "CargoEntities.Account" {
+		go func(uuid string, lifespan time.Duration) {
+			timer := time.NewTimer(lifespan * time.Minute)
+			<-timer.C
+			GetServer().GetCacheManager().removeEntity(uuid)
+		}(entity.GetUuid(), 10)
+	}
 
 }
 
@@ -201,11 +206,11 @@ func (this *CacheManager) getEntity(uuid string) Entity {
 	})
 
 	outputInfo.entityOutputChannel = make(chan Entity)
+	defer close(outputInfo.entityOutputChannel)
 	outputInfo.entityUuid = uuid
 	this.outputEntityChannel <- *outputInfo
 	entity := <-outputInfo.entityOutputChannel
 
-	defer close(outputInfo.entityOutputChannel)
 	return entity
 }
 
@@ -233,6 +238,7 @@ func (this *CacheManager) removeEntity(uuid string) {
 
 	toRemove.uuid = uuid
 	toRemove.wait = make(chan bool)
+	defer close(toRemove.wait)
 	this.removeEntityChannel <- *toRemove
 	<-toRemove.wait
 }
@@ -248,6 +254,7 @@ func (this *CacheManager) setEntity(entity Entity) {
 
 	input.entity = entity
 	input.wait = make(chan bool)
+	defer close(input.wait)
 
 	this.inputEntityChannel <- *input
 	// Wait before enter other entity.

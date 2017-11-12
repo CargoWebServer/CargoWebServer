@@ -150,7 +150,7 @@ func generateEntity(packageId string) {
 				classStr += "}\n\n"
 
 				classStr += "/**\n"
-				classStr += " * Remove a chidl uuid form the list of child in an entity.\n"
+				classStr += " * Remove a child uuid form the list of child in an entity.\n"
 				classStr += " */\n"
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) RemoveChild(name string, uuid string) {\n"
 				classStr += " 	childsUuid := make([]string, 0)\n"

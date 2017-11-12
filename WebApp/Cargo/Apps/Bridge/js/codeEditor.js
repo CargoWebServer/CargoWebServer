@@ -160,7 +160,10 @@ CodeEditor.prototype.appendPrototypeEditor = function (prototype) {
         function (results, caller) {
             var namespaces = []
             for (var i = 0; i < results.M_dataStoreConfigs.length; i++) {
-                namespaces.push(results.M_dataStoreConfigs[i].M_id)
+                // Sql entities are not part of the heritage system.
+                if(results.M_dataStoreConfigs[i].M_dataStoreType == 2 && results.M_dataStoreConfigs[i].M_id != "sql_info"){
+                    namespaces.push(results.M_dataStoreConfigs[i].M_id)
+                }
             }
             var codeEditor = caller.codeEditor
             var prototype = caller.prototype

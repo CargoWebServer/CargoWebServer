@@ -229,7 +229,7 @@ func (this *AccountManager) Me(connectionId string, messageId string, sessionId 
 		return nil
 	}
 
-	session := GetServer().GetSessionManager().activeSessions[connectionId]
+	session := GetServer().GetSessionManager().getActiveSessionById(connectionId)
 
 	if session == nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The session with the id '"+connectionId+"' doesn't exist"))
@@ -243,14 +243,6 @@ func (this *AccountManager) Me(connectionId string, messageId string, sessionId 
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
-
-	/*errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
-	if errObj != nil {
-		log.Println("------> action: ", Utility.FunctionName())
-		log.Println("------> error: ", errObj)
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
-	}*/
 
 	return session.GetAccountPtr()
 }

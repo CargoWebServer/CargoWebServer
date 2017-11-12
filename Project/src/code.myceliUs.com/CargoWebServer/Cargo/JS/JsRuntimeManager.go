@@ -476,6 +476,7 @@ func (this *JsRuntimeManager) getSession(sessionId string) *otto.Otto {
 	// Protectect the map access...
 	var sessionInfo SessionInfos
 	sessionInfo.m_return = make(chan (*otto.Otto))
+	defer close(sessionInfo.m_return)
 	sessionInfo.m_sessionId = sessionId
 	this.m_getSession <- sessionInfo
 	session := <-sessionInfo.m_return
@@ -507,8 +508,8 @@ func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.V
 	op.m_params = make(map[string]interface{})
 	op.m_params["script"] = script
 	op.m_returns = make(chan ([]interface{}))
+	defer close(op.m_returns)
 	this.m_runScript[sessionId] <- op
-
 	// wait for completion
 	results := <-op.m_returns
 	var value otto.Value
@@ -533,7 +534,7 @@ func (this *JsRuntimeManager) AppendScript(script string) {
 	op.m_params = make(map[string]interface{})
 	op.m_params["script"] = script
 	op.m_returns = make(chan ([]interface{}))
-
+	defer close(op.m_returns)
 	this.m_appendScript <- op
 
 	// wait for completion
@@ -546,7 +547,7 @@ func (this *JsRuntimeManager) InitScripts(sessionId string) {
 	op.m_params = make(map[string]interface{})
 	op.m_params["sessionId"] = sessionId
 	op.m_returns = make(chan ([]interface{}))
-
+	defer close(op.m_returns)
 	this.m_initScripts <- op
 
 	// wait for completion
@@ -573,7 +574,7 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
 	op.m_params = make(map[string]interface{})
 	op.m_params["jsFunctionInfos"] = jsFunctionInfos
 	op.m_returns = make(chan ([]interface{}))
-
+	defer close(op.m_returns)
 	this.m_executeJsFunction[sessionId] <- op
 	// wait for completion
 	results := <-op.m_returns
@@ -597,7 +598,7 @@ func (this *JsRuntimeManager) SetVar(sessionId string, name string, val interfac
 	op.m_params = make(map[string]interface{})
 	op.m_params["varInfos"] = info
 	op.m_returns = make(chan ([]interface{}))
-
+	defer close(op.m_returns)
 	this.m_setVariable[sessionId] <- op
 	// wait for completion
 	<-op.m_returns
@@ -621,7 +622,7 @@ func (this *JsRuntimeManager) GetVar(sessionId string, name string) interface{} 
 	op.m_params = make(map[string]interface{})
 	op.m_params["varInfos"] = info
 	op.m_returns = make(chan ([]interface{}))
-
+	defer close(op.m_returns)
 	this.m_setVariable[sessionId] <- op
 
 	// wait for completion
@@ -640,7 +641,7 @@ func (this *JsRuntimeManager) OpenSession(sessionId string) {
 	op.m_params["sessionId"] = sessionId
 	op.m_returns = make(chan ([]interface{}))
 	this.m_createVm <- op
-
+	defer close(op.m_returns)
 	// wait for completion
 	<-op.m_returns
 	log.Println("--> vm with id", sessionId, "is now open!")
@@ -656,7 +657,7 @@ func (this *JsRuntimeManager) CloseSession(sessionId string, callback func()) {
 	op.m_params["sessionId"] = sessionId
 	op.m_returns = make(chan ([]interface{}))
 	this.m_closeVm <- op
-
+	defer close(op.m_returns)
 	// wait for completion
 	<-op.m_returns
 

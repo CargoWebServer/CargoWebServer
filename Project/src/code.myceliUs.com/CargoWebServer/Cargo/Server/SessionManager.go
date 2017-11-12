@@ -31,15 +31,9 @@ func (s Sessions) Less(i, j int) bool {
 }
 
 type SessionManager struct {
-	activeSessions map[string]*CargoEntities.Session
-
 	sessionToCloseChannel chan struct {
 		session *CargoEntities.Session
 		err     chan *CargoEntities.Error
-	}
-
-	activeSessionsChannel chan struct {
-		activeSessionsChan chan []*CargoEntities.Session
 	}
 }
 
@@ -72,15 +66,9 @@ func (this *SessionManager) initialize() {
 	log.Println("--> Initialize SessionManager")
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
-	this.activeSessions = make(map[string]*CargoEntities.Session, 0)
-
 	this.sessionToCloseChannel = make(chan struct {
 		session *CargoEntities.Session
 		err     chan *CargoEntities.Error
-	})
-
-	this.activeSessionsChannel = make(chan struct {
-		activeSessionsChan chan []*CargoEntities.Session
 	})
 
 	go this.removeClosedSession()
@@ -109,8 +97,6 @@ func (this *SessionManager) run() {
 
 	for {
 		select {
-		case activeSessionsChannel_ := <-this.activeSessionsChannel:
-			activeSessionsChannel_.activeSessionsChan <- this.getActiveSessions()
 		case sessionToClose := <-this.sessionToCloseChannel:
 			sessionToClose.err <- this.closeSession_(sessionToClose.session)
 		}
@@ -122,14 +108,13 @@ func (this *SessionManager) run() {
  */
 func (this *SessionManager) removeClosedSession() {
 
-	sessions, _ := GetServer().GetEntityManager().getEntities("CargoEntities.Session", "", CargoEntitiesDB, false)
+	sessions := this.getActiveSessions()
 
 	for i := 0; i < len(sessions); i++ {
-		sessionId := sessions[i].GetObject().(*CargoEntities.Session).GetId()
-		log.Println("--> close session: ", sessionId)
+		sessionId := sessions[i].GetId()
 		if GetServer().getConnectionById(sessionId) == nil {
 			// The session is closed
-			this.closeSession(sessions[i].GetObject().(*CargoEntities.Session))
+			this.closeSession(sessions[i])
 		}
 	}
 
@@ -161,9 +146,6 @@ func (this *SessionManager) closeSession_(session *CargoEntities.Session) *Cargo
 	eventData[1] = sessionsInfo
 
 	evt, _ := NewEvent(LogoutEvent, SessionEvent, eventData)
-
-	// Remove the session from active session
-	delete(this.activeSessions, session.GetId())
 
 	sessionEntity.DeleteEntity()
 
@@ -205,8 +187,10 @@ func (this *SessionManager) closeSession(session *CargoEntities.Session) *CargoE
 func (this *SessionManager) getActiveSessions() []*CargoEntities.Session {
 
 	var sessions []*CargoEntities.Session
-	for _, session := range this.activeSessions {
-		sessions = append(sessions, session)
+	entities, _ := GetServer().GetEntityManager().getEntities("CargoEntities.Account", "", "CargoEntities", false)
+	for i := 0; i < len(entities); i++ {
+		account := entities[i].GetObject().(*CargoEntities.Account)
+		sessions = append(sessions, account.GetSessions()...)
 	}
 
 	return sessions
@@ -336,7 +320,6 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 			session.SetAccountPtr(account)
 
 			GetServer().GetEntityManager().createEntity(account.GetUUID(), "M_sessions", "CargoEntities.Session", session.GetId(), session)
-			this.activeSessions[session.GetId()] = session
 
 			// Send session close event
 			eventData := make([]*MessageData, 2)

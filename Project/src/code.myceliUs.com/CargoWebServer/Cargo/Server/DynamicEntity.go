@@ -1116,16 +1116,18 @@ func (this *DynamicEntity) RemoveChild(name string, uuid string) {
 		isArray := strings.HasPrefix(filedType, "[]")
 		if isArray {
 			childs := make([]map[string]interface{}, 0)
-			if reflect.TypeOf(this.getValue(name)).String() == "[]map[string]interface {}" {
-				for i := 0; i < len(this.getValue(name).([]map[string]interface{})); i++ {
-					if uuid != this.getValue(name).([]map[string]interface{})[i]["UUID"] {
-						childs = append(childs, this.getValue(name).([]map[string]interface{})[i])
+			if this.getValue(name) != nil {
+				if reflect.TypeOf(this.getValue(name)).String() == "[]map[string]interface {}" {
+					for i := 0; i < len(this.getValue(name).([]map[string]interface{})); i++ {
+						if uuid != this.getValue(name).([]map[string]interface{})[i]["UUID"] {
+							childs = append(childs, this.getValue(name).([]map[string]interface{})[i])
+						}
 					}
-				}
-			} else if reflect.TypeOf(this.getValue(name)).String() == "[]interface {}" {
-				for i := 0; i < len(this.getValue(name).([]interface{})); i++ {
-					if uuid != this.getValue(name).([]interface{})[i].(map[string]interface{})["UUID"] {
-						childs = append(childs, this.getValue(name).([]interface{})[i].(map[string]interface{}))
+				} else if reflect.TypeOf(this.getValue(name)).String() == "[]interface {}" {
+					for i := 0; i < len(this.getValue(name).([]interface{})); i++ {
+						if uuid != this.getValue(name).([]interface{})[i].(map[string]interface{})["UUID"] {
+							childs = append(childs, this.getValue(name).([]interface{})[i].(map[string]interface{}))
+						}
 					}
 				}
 			}
