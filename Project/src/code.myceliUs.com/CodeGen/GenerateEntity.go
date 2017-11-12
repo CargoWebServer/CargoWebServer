@@ -125,12 +125,9 @@ func generateEntity(packageId string) {
 
 				classStr += "func(this *" + packageId + "_" + class.Name + "Entity) RemoveReference(name string, reference Entity){\n"
 				classStr += "	refsUuid := make([]string, 0)\n"
-				classStr += "	refsPtr := make([]Entity, 0)\n"
-
 				classStr += "	for i := 0; i < len(this.referencesUuid); i++ {\n"
 				classStr += "		refUuid := this.referencesUuid[i]\n"
 				classStr += "		if refUuid != reference.GetUuid() {\n"
-				classStr += "			refsPtr = append(refsPtr, reference)\n"
 				classStr += "			refsUuid = append(refsUuid, reference.GetUuid())\n"
 				classStr += "		}\n"
 				classStr += "	}\n"

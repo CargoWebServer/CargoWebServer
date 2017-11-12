@@ -469,6 +469,19 @@ func (this *JsRuntimeManager) executeJsFunction(vm *otto.Otto, functionStr strin
 	return
 }
 
+/**
+ * Run given script for a given session.
+ */
+func (this *JsRuntimeManager) getSession(sessionId string) *otto.Otto {
+	// Protectect the map access...
+	var sessionInfo SessionInfos
+	sessionInfo.m_return = make(chan (*otto.Otto))
+	sessionInfo.m_sessionId = sessionId
+	this.m_getSession <- sessionInfo
+	session := <-sessionInfo.m_return
+	return session
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // Api
 //////////////////////////////////////////////////////////////////////////////
@@ -528,6 +541,7 @@ func (this *JsRuntimeManager) AppendScript(script string) {
 }
 
 func (this *JsRuntimeManager) InitScripts(sessionId string) {
+
 	var op OperationInfos
 	op.m_params = make(map[string]interface{})
 	op.m_params["sessionId"] = sessionId
@@ -544,6 +558,9 @@ func (this *JsRuntimeManager) InitScripts(sessionId string) {
  */
 func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId string, functionStr string, functionParams []interface{}) ([]interface{}, error) {
 	// Set the function on the JS runtime...
+	if this.m_executeJsFunction[sessionId] == nil {
+		return nil, errors.New("Session " + sessionId + " is closed!")
+	}
 
 	// Put function call information into a struct.
 	var jsFunctionInfos JsFunctionInfos
@@ -558,17 +575,19 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
 	op.m_returns = make(chan ([]interface{}))
 
 	this.m_executeJsFunction[sessionId] <- op
-
 	// wait for completion
 	results := <-op.m_returns
-
 	return results[0].(JsFunctionInfos).m_results, results[0].(JsFunctionInfos).m_err
+
 }
 
 /**
  * Set variable value for a given session
  */
 func (this *JsRuntimeManager) SetVar(sessionId string, name string, val interface{}) {
+	if this.m_setVariable[sessionId] == nil {
+		return
+	}
 	// Protectect the map access...
 	var info JsVarInfos
 	info.m_name = name
@@ -580,15 +599,20 @@ func (this *JsRuntimeManager) SetVar(sessionId string, name string, val interfac
 	op.m_returns = make(chan ([]interface{}))
 
 	this.m_setVariable[sessionId] <- op
-
 	// wait for completion
 	<-op.m_returns
+
 }
 
 /**
  * Run given script for a given session.
  */
 func (this *JsRuntimeManager) GetVar(sessionId string, name string) interface{} {
+	// Nothing to do with a close channel
+	if this.m_setVariable[sessionId] == nil {
+		return nil
+	}
+
 	// Protectect the map access...
 	var info JsVarInfos
 	info.m_name = name
@@ -603,20 +627,7 @@ func (this *JsRuntimeManager) GetVar(sessionId string, name string) interface{} 
 	// wait for completion
 	results := <-op.m_returns
 	return results[0].(JsVarInfos).m_val
-}
 
-/**
- * Run given script for a given session.
- */
-func (this *JsRuntimeManager) getSession(sessionId string) *otto.Otto {
-	// Protectect the map access...
-	var sessionInfo SessionInfos
-	sessionInfo.m_return = make(chan (*otto.Otto))
-	sessionInfo.m_sessionId = sessionId
-	this.m_getSession <- sessionInfo
-	session := <-sessionInfo.m_return
-
-	return session
 }
 
 /**

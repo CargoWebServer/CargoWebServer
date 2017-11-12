@@ -43,7 +43,12 @@ type CacheManager struct {
 	/**
 	 * The channel used to remove entities
 	 */
-	removeEntityChannel chan string
+	removeEntityChannel chan struct {
+		// The entity to input
+		uuid string
+		// The channel to block the execution util the entity is in the map.
+		wait chan bool
+	}
 
 	// stop processing when that variable are set to true...
 	abortedByEnvironment chan bool
@@ -94,7 +99,11 @@ func (this *CacheManager) initialize() {
 		entityOutputChannel chan Entity
 	})
 
-	this.removeEntityChannel = make(chan string)
+	this.removeEntityChannel = make(chan struct {
+		uuid string
+		wait chan bool
+	})
+
 	this.abortedByEnvironment = make(chan bool)
 	this.ticker = time.NewTicker(10 * time.Minute)
 }
@@ -141,7 +150,8 @@ func (this *CacheManager) run() {
 
 		case entityUuidToRemove := <-this.removeEntityChannel:
 			// The entity to remove.
-			this.remove(entityUuidToRemove)
+			this.remove(entityUuidToRemove.uuid)
+			entityUuidToRemove.wait <- false
 
 		case done := <-this.abortedByEnvironment:
 			if done {
@@ -158,11 +168,12 @@ func (this *CacheManager) set(entity Entity) {
 
 	this.entities[entity.GetUuid()] = entity
 
-	go func(uuid string, lifespan time.Duration, removeChannel chan string) {
+	// Remove the entity from the cache after 10 minutes.
+	go func(uuid string, lifespan time.Duration) {
 		timer := time.NewTimer(lifespan * time.Minute)
 		<-timer.C
-		removeChannel <- uuid
-	}(entity.GetUuid(), 10, this.removeEntityChannel)
+		GetServer().GetCacheManager().removeEntity(uuid)
+	}(entity.GetUuid(), 10)
 
 }
 
@@ -215,7 +226,15 @@ func (this *CacheManager) contains(uuid string) (Entity, bool) {
  * Remove an existing entity with a given uuid.
  */
 func (this *CacheManager) removeEntity(uuid string) {
-	this.removeEntityChannel <- uuid
+	toRemove := new(struct {
+		uuid string
+		wait chan bool
+	})
+
+	toRemove.uuid = uuid
+	toRemove.wait = make(chan bool)
+	this.removeEntityChannel <- *toRemove
+	<-toRemove.wait
 }
 
 /**
