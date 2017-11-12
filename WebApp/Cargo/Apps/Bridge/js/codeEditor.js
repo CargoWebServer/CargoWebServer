@@ -103,9 +103,9 @@ var CodeEditor = function (parent) {
     server.fileManager.attach(this, ChangeThemeEvent, function (evt, codeEditor) {
         codeEditor.theme = evt.dataMap.theme
         for (var editorUuid in codeEditor.editors) {
-            if(codeEditor.editors[editorUuid].setTheme !== undefined){
+            if (codeEditor.editors[editorUuid].setTheme !== undefined) {
                 codeEditor.editors[editorUuid].setTheme(evt.dataMap.theme);
-            }else if(codeEditor.editors[editorUuid].editor.setTheme !== undefined){
+            } else if (codeEditor.editors[editorUuid].editor.setTheme !== undefined) {
                 codeEditor.editors[editorUuid].editor.setTheme(evt.dataMap.theme);
             }
         }
@@ -161,7 +161,7 @@ CodeEditor.prototype.appendPrototypeEditor = function (prototype) {
             var namespaces = []
             for (var i = 0; i < results.M_dataStoreConfigs.length; i++) {
                 // Sql entities are not part of the heritage system.
-                if(results.M_dataStoreConfigs[i].M_dataStoreType == 2 && results.M_dataStoreConfigs[i].M_id != "sql_info"){
+                if (results.M_dataStoreConfigs[i].M_dataStoreType == 2 && results.M_dataStoreConfigs[i].M_id != "sql_info") {
                     namespaces.push(results.M_dataStoreConfigs[i].M_id)
                 }
             }
@@ -291,7 +291,7 @@ CodeEditor.prototype.appendFile = function (file) {
 
     // Now I will create the file editor.
     var filePanel = this.panel.appendElement({ "tag": "xmp", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
-    
+
     var observer = new MutationObserver(function (codeEditor) {
         return function (multiRecord) {
             var record = multiRecord.pop()
@@ -302,7 +302,7 @@ CodeEditor.prototype.appendFile = function (file) {
                 localStorage.setItem("bridge_editor_theme_class", themeClass)
                 localStorage.setItem("bridge_editor_theme", codeEditor.theme)
                 codeEditor.themeClass = themeClass
-                evt = { "code": ChangeThemeEvent, "name": FileEvent, "dataMap": { "theme": codeEditor.theme, "themeClass": codeEditor.themeClass, "isDark" : isDark} }
+                evt = { "code": ChangeThemeEvent, "name": FileEvent, "dataMap": { "theme": codeEditor.theme, "themeClass": codeEditor.themeClass, "isDark": isDark } }
                 server.eventHandler.broadcastLocalEvent(evt)
             }
         }
@@ -359,6 +359,19 @@ CodeEditor.prototype.appendFile = function (file) {
         }
     }(file.M_id, file.UUID, this));
 
+    editor.session.on("changeScrollTop", function (scrollTop) {
+        var header = document.getElementById("workingFilesDiv")
+        if (scrollTop > 0) {
+            if (header.className.indexOf(" scrolling") == -1) {
+                header.className += " scrolling"
+                header.parentNode.className += " scrolling"
+            }
+        } else {
+            header.className = header.className.replaceAll(" scrolling", "")
+            header.parentNode.className = header.parentNode.className.replaceAll(" scrolling", "")
+        }
+    })
+
     this.filesPanel[file.M_id] = filePanel
     this.setActiveFile(file.M_id)
 }
@@ -370,6 +383,13 @@ CodeEditor.prototype.removeFile = function (fileId) {
         delete this.filesPanel[fileId]
         delete this.files[fileId]
         delete this.editors[fileId + "_editor"]
+
+        // If there's no more file i will reset the shadow.
+        if (Object.keys(this.files).length == 0) {
+            var header = document.getElementById("workingFilesDiv")
+            header.className = header.className.replaceAll(" scrolling", "")
+            header.parentNode.className = header.parentNode.className.replaceAll(" scrolling", "")
+        }
 
         if (this.activeFile != undefined) {
             if (this.activeFile.M_id == fileId) {
@@ -388,6 +408,17 @@ CodeEditor.prototype.setActiveFile = function (fileId) {
     }
     if (this.filesPanel[fileId] !== undefined) {
         this.filesPanel[fileId].element.style.display = ""
+        var aceContent = this.filesPanel[fileId].element.getElementsByClassName("ace_content")[0]
+        var header = document.getElementById("workingFilesDiv")
+        if (aceContent.style.marginTop != "0px" && aceContent.style.marginTop != "") {
+            if (header.className.indexOf(" scrolling") == -1) {
+                header.className += " scrolling"
+                header.parentNode.className += " scrolling"
+            }
+        } else {
+            header.className = header.className.replaceAll(" scrolling", "")
+            header.parentNode.className = header.parentNode.className.replaceAll(" scrolling", "")
+        }
     }
     this.activeFile = this.files[fileId]
 

@@ -1572,7 +1572,7 @@ func applyRestrictions(field string, prototype *EntityPrototype, value interface
 				}
 			}
 		}
-
+		log.Println(typeName, restriction)
 		// In case of a string...
 		if XML_Schemas.IsXsString(typeName) {
 			var str string

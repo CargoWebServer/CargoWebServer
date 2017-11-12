@@ -10,7 +10,6 @@ var DataExplorer = function (parent) {
     
     this.panel.element.onscroll = function (header) {
         return function () {
-            var position = this.scrollTop;
             if (this.scrollTop > 0) {
                 if (header.className.indexOf(" scrolling") == -1) {
                     header.className += " scrolling"

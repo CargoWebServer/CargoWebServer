@@ -367,7 +367,7 @@ EntityPrototypeEditor.prototype.displaySupertypes = function (prototype, callbac
                 if (superTypeNames[i].startsWith("xs.")) {
                     var listOfBtn = superType.appendElement({ "tag": "div", "style": "display: table-cell;" }).down()
                         .appendElement({ "tag": "label", "for": superTypeNames[i] + "_" + prototype.TypeName + "_listOf", "innerHtml": "list", "style": "display: inline;" })
-                        .appendElement({ "tag": "input", "name": superTypeNames[i] + "_" + prototype.TypeName + "_cardinality", "type": "checkbox", "id": superTypeNames[i] + "_" + prototype.TypeName + "_listOf", "style": "display: inline; min-width: 0px; width: auto;" }).down()
+                        .appendElement({ "tag": "input", "name": superTypeNames[i] + "_" + prototype.TypeName + "_cardinality", "type": "checkbox", "id": superTypeNames[i] + "_" + prototype.TypeName + "_listOf", "style": "display: inline; min-width: 0px; width: auto; vertical-align: middle;" }).down()
 
                     listOfBtn.element.checked = prototype.ListOf.length > 0
                     listOfBtn.element.onclick = function (listOf, entityPrototypeEditor) {

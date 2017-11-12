@@ -146,7 +146,8 @@ var HomePage = function () {
         changePropertyByClassName("color", ".session_display_panel", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background-color", ".session_state_menu", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".session_state_menu", "." + evt.dataMap.themeClass)
-        changePropertyByClassName("color", ".session_state_menu", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".session_state_menu", "." + evt.dataMap.themeClass, "color")
+        changePropertyByClassName("background-color", ".session_state_menu", "." + evt.dataMap.themeClass, "color")
 
         changePropertyByClassName("background-color", ".file_tab", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".file_tab", "." + evt.dataMap.themeClass)
@@ -155,6 +156,11 @@ var HomePage = function () {
         // I will use the gutter color for the background color of the workspace div.
         changePropertyByClassName("background-color", ".workspace_div", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".workspace_div", "." + evt.dataMap.themeClass + " .ace_gutter")
+
+        changePropertyByClassName("background-color", "#workingFilesDiv.scrolling", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", "#workingFilesDiv.scrolling", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", "#workingFilesDiv.scrolling", "." + evt.dataMap.themeClass + " .ace_gutter")
+
         changePropertyByClassName("color", ".fileNavigationBtn", "." + evt.dataMap.themeClass + " .ace_gutter")
 
         if (evt.dataMap.isDark) {
