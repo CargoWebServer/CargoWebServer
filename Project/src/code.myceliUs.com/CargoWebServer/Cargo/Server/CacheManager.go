@@ -106,7 +106,7 @@ func (this *CacheManager) initialize() {
 	})
 
 	this.abortedByEnvironment = make(chan bool)
-	this.ticker = time.NewTicker(10 * time.Minute)
+	this.ticker = time.NewTicker(1 * time.Hour)
 }
 
 func (this *CacheManager) start() {

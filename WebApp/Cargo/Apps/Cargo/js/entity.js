@@ -197,7 +197,6 @@ function resetObjectValues(object) {
             }
         }
     }
-
 }
 
 /**
@@ -418,6 +417,7 @@ function setSubObject(parent, property, values, isArray) {
                 object = eval("new " + values.TYPENAME + "()")
                 // Keep track of the parent uuid in the child.
                 object.UUID = values.UUID
+                object.ParentUuid = parent.UUID
             }
 
             // Keep track of the child uuid inside the parent.

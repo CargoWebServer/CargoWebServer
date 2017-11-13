@@ -1522,8 +1522,22 @@ func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}
  */
 func applyEntityRestrictions(values map[string]interface{}) error {
 	typeName := values["TYPENAME"].(string)
-
 	prototype, err := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
+
+	// Test restriction for the base types.
+	if prototype.getFieldIndex("M_listOf") != -1 {
+		values_, err := applyRestrictions("M_listOf", prototype, values["M_listOf"], true)
+		if err == nil {
+			values["M_listOf"] = values_
+		}
+
+	} else if prototype.getFieldIndex("M_valueOf") != -1 {
+		value_, err := applyRestrictions("M_valueOf", prototype, values["M_valueOf"], false)
+		if err == nil {
+			values["M_valueOf"] = value_
+		}
+	}
+
 	if err == nil {
 		for i := 0; i < len(prototype.FieldsType); i++ {
 			// Before I set the value I will test if there's a restriction on that field.
@@ -1549,7 +1563,7 @@ func applyEntityRestrictions(values map[string]interface{}) error {
 		}
 	}
 
-	return nil
+	return err
 }
 
 /**
@@ -1559,147 +1573,193 @@ func applyRestrictions(field string, prototype *EntityPrototype, value interface
 	if value == nil {
 		return nil, nil
 	}
+	if !isArray {
+		// Here I will apply restriction if there is some.
+		for i := 0; i < len(prototype.Restrictions); i++ {
+			restriction := prototype.Restrictions[i]
+			typeName := prototype.TypeName
+			if !strings.HasPrefix(typeName, "xs.") {
+				for j := 0; j < len(prototype.SuperTypeNames); i++ {
+					if strings.HasPrefix(prototype.SuperTypeNames[j], "xs.") {
+						typeName = prototype.SuperTypeNames[j]
+						break
+					}
+				}
+			}
+			// In case of a string...
+			if XML_Schemas.IsXsString(typeName) {
+				var str string
+				if reflect.TypeOf(value).Kind() == reflect.String {
+					str = value.(string)
+				} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
+					if value.(map[string]interface{})["M_valueOf"] != nil {
+						str = value.(map[string]interface{})["M_valueOf"].(string)
+					}
+				}
+				if restriction.Type == RestrictionType_MaxLength {
+					length, err := strconv.Atoi(restriction.Value)
+					if err != nil {
+						return nil, err
+					}
+					if len(str) > length {
+						return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum expected length is ` + restriction.Value + ` not ` + strconv.Itoa(len(str)) + `"}`)
+					}
+				} else if restriction.Type == RestrictionType_MinLength {
+					length, err := strconv.Atoi(restriction.Value)
+					if err != nil {
+						return nil, err
+					}
+					if len(str) < length {
+						return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum expected length is ` + restriction.Value + ` not ` + strconv.Itoa(len(str)) + `"}`)
+					}
+				} else if restriction.Type == RestrictionType_WhiteSpace {
+					// Here tree value can be there...
+					if restriction.Value == "preserve" {
+						// No normalization is done, the value is the ·normalized value·
+					} else if restriction.Value == "replace" {
+						// All occurrences of #x9 (tab), #xA (line feed) and #xD (carriage return) are replaced > with #x20 (space).
+						str = strings.Replace(str, "\t", " ", -1)
+						str = strings.Replace(str, "\r\n", " ", -1)
+						str = strings.Replace(str, "\n", " ", -1)
+					} else if restriction.Value == "collapse" {
+						// Subsequent to the replacements specified above under replace, contiguous sequences of #x20s are collapsed to a single #x20, and initial and/or final #x20s are deleted.
+						str = strings.TrimSpace(str)
+						re := regexp.MustCompile("  +")
+						str = string(re.ReplaceAll(bytes.TrimSpace([]byte(str)), []byte(" ")))
+					}
 
-	// Here I will apply restriction if there is some.
-	for i := 0; i < len(prototype.Restrictions); i++ {
-		restriction := prototype.Restrictions[i]
-		typeName := prototype.TypeName
-		if !strings.HasPrefix(typeName, "xs.") {
-			for j := 0; j < len(prototype.SuperTypeNames); i++ {
-				if strings.HasPrefix(prototype.SuperTypeNames[j], "xs.") {
-					typeName = prototype.SuperTypeNames[j]
-					break
+				} else if restriction.Type == RestrictionType_Enumeration {
+					/** Nothing to do here because enumeration is the index and not the value **/
+				} else if restriction.Type == RestrictionType_Pattern {
+					/** Here I will apply the regex **/
+					match, _ := regexp.MatchString(restriction.Value, str)
+					if !match {
+						var escapedRestrictionValue = restriction.Value
+						escapedRestrictionValue = strings.Replace(escapedRestrictionValue, "\\", "\\\\", -1) // Escape \ symbole
+						escapedRestrictionValue = strings.Replace(escapedRestrictionValue, "\"", "\\\"", -1) // escape " symbole
+						return nil, errors.New(`{"field":"` + field + `", "msg":"The given value dosen't match the regular expression ` + escapedRestrictionValue + `"}`)
+					}
+				}
+
+				if reflect.TypeOf(value).Kind() == reflect.String {
+					value = str // set it new value.
+				} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
+					if value.(map[string]interface{})["M_valueOf"] != nil {
+						value.(map[string]interface{})["M_valueOf"] = str
+					}
+				}
+			} else if XML_Schemas.IsXsNumeric(typeName) || XML_Schemas.IsXsMoney(typeName) {
+				numericVal := Utility.ToNumeric(value)
+				restrictionVal := Utility.ToNumeric(restriction.Value)
+				if restriction.Type == RestrictionType_MaxExclusive {
+					if numericVal >= restrictionVal {
+						return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum exclusive value is ` + restriction.Value + `"}`)
+					}
+				} else if restriction.Type == RestrictionType_MaxInclusive {
+					if numericVal > restrictionVal {
+						return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum inclusive value is ` + restriction.Value + `"}`)
+					}
+				} else if restriction.Type == RestrictionType_MinExclusive {
+					if numericVal <= restrictionVal {
+						return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum exclusive value is ` + restriction.Value + `"}`)
+					}
+				} else if restriction.Type == RestrictionType_MinInclusive {
+					if numericVal < restrictionVal {
+						return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum inclusive value is ` + restriction.Value + `"}`)
+					}
+				} else if restriction.Type == RestrictionType_FractionDigits {
+					numVal := Utility.Round(Utility.ToNumeric(value), Utility.ToInt(restriction.Value))
+					if reflect.TypeOf(value).Kind() == reflect.Float64 {
+						value = numVal // set it new value.
+					} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
+						value = float32(numVal) // set it new value.
+					} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
+						if value.(map[string]interface{})["M_valueOf"] != nil {
+							value.(map[string]interface{})["M_valueOf"] = numVal
+						}
+					}
+				} else if restriction.Type == RestrictionType_TotalDigits {
+					str := Utility.ToString(value)
+					numVal := Utility.ToNumeric(str[0:Utility.ToInt(restriction.Value)])
+					if reflect.TypeOf(value).Kind() == reflect.Float64 {
+						value = numVal // set it new value.
+					} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
+						value = float32(numVal) // set it new value.
+					} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
+						if value.(map[string]interface{})["M_valueOf"] != nil {
+							value.(map[string]interface{})["M_valueOf"] = numVal
+						}
+					}
+				}
+			} else if XML_Schemas.IsXsInt(typeName) {
+				// Here We got a numeric value...
+				intVal := Utility.ToInt(value)
+				restrictionVal := Utility.ToInt(restriction.Value)
+
+				if restriction.Type == RestrictionType_MaxExclusive {
+					if intVal >= restrictionVal {
+						return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum exclusive value is ` + restriction.Value + `"}`)
+					}
+				} else if restriction.Type == RestrictionType_MaxInclusive {
+					if intVal > restrictionVal {
+						return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum inclusive value is ` + restriction.Value + `"}`)
+					}
+				} else if restriction.Type == RestrictionType_MinExclusive {
+					if intVal <= restrictionVal {
+						return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum exclusive value is ` + restriction.Value + `"}`)
+					}
+				} else if restriction.Type == RestrictionType_MinInclusive {
+					if intVal < restrictionVal {
+						return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum inclusive value is ` + restriction.Value + `"}`)
+					}
 				}
 			}
 		}
-		log.Println(typeName, restriction)
-		// In case of a string...
-		if XML_Schemas.IsXsString(typeName) {
-			var str string
-			if reflect.TypeOf(value).Kind() == reflect.String {
-				str = value.(string)
-			} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
-				if value.(map[string]interface{})["M_valueOf"] != nil {
-					str = value.(map[string]interface{})["M_valueOf"].(string)
-				}
-			}
-			if restriction.Type == RestrictionType_MaxLength {
+	} else {
+		// Here I will test array restriction.
+		for i := 0; i < len(prototype.Restrictions); i++ {
+			restriction := prototype.Restrictions[i]
+			if restriction.Type == RestrictionType_Length || restriction.Type == RestrictionType_MinLength || restriction.Type == RestrictionType_MaxLength {
+				l := len(value.([]interface{}))
 				length, err := strconv.Atoi(restriction.Value)
-				if err != nil {
+				if err == nil {
+					if restriction.Type == RestrictionType_Length {
+						value_ := make([]interface{}, length)
+						for j := 0; j < length && j < len(value.([]interface{})); j++ {
+							value_[j] = value.([]interface{})[j]
+						}
+						return value_, nil // Trunk the array ass needed.
+					} else if restriction.Type == RestrictionType_MinLength {
+						var value_ []interface{}
+						if l < length {
+							value_ = make([]interface{}, length)
+						} else {
+							value_ = make([]interface{}, l)
+						}
+
+						for j := 0; j < len(value.([]interface{})); j++ {
+							value_[j] = value.([]interface{})[j]
+						}
+						return value_, nil // Trunk the array ass needed.
+					} else if restriction.Type == RestrictionType_MaxLength {
+						var value_ []interface{}
+						if l > length {
+							value_ = make([]interface{}, length)
+						} else {
+							value_ = make([]interface{}, l)
+						}
+
+						for j := 0; j < length && j < len(value.([]interface{})); j++ {
+							value_[j] = value.([]interface{})[j]
+						}
+						return value_, nil // Trunk the array ass needed.
+					}
+
+				} else {
 					return nil, err
 				}
-				if len(str) > length {
-					return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum expected length is ` + restriction.Value + ` not ` + strconv.Itoa(len(str)) + `"}`)
-				}
-			} else if restriction.Type == RestrictionType_MinLength {
-				length, err := strconv.Atoi(restriction.Value)
-				if err != nil {
-					return nil, err
-				}
-				if len(str) < length {
-					return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum expected length is ` + restriction.Value + ` not ` + strconv.Itoa(len(str)) + `"}`)
-				}
-			} else if restriction.Type == RestrictionType_WhiteSpace {
-				// Here tree value can be there...
-				if restriction.Value == "preserve" {
-					// No normalization is done, the value is the ·normalized value·
-				} else if restriction.Value == "replace" {
-					// All occurrences of #x9 (tab), #xA (line feed) and #xD (carriage return) are replaced > with #x20 (space).
-					str = strings.Replace(str, "\t", " ", -1)
-					str = strings.Replace(str, "\r\n", " ", -1)
-					str = strings.Replace(str, "\n", " ", -1)
-				} else if restriction.Value == "collapse" {
-					// Subsequent to the replacements specified above under replace, contiguous sequences of #x20s are collapsed to a single #x20, and initial and/or final #x20s are deleted.
-					str = strings.TrimSpace(str)
-					re := regexp.MustCompile("  +")
-					str = string(re.ReplaceAll(bytes.TrimSpace([]byte(str)), []byte(" ")))
-				}
-
-			} else if restriction.Type == RestrictionType_Enumeration {
-				/** Nothing to do here because enumeration is the index and not the value **/
-			} else if restriction.Type == RestrictionType_Pattern {
-				/** Here I will apply the regex **/
-				match, _ := regexp.MatchString(restriction.Value, str)
-				if !match {
-					var escapedRestrictionValue = restriction.Value
-					escapedRestrictionValue = strings.Replace(escapedRestrictionValue, "\\", "\\\\", -1) // Escape \ symbole
-					escapedRestrictionValue = strings.Replace(escapedRestrictionValue, "\"", "\\\"", -1) // escape " symbole
-					return nil, errors.New(`{"field":"` + field + `", "msg":"The given value dosen't match the regular expression ` + escapedRestrictionValue + `"}`)
-				}
 			}
 
-			if reflect.TypeOf(value).Kind() == reflect.String {
-				value = str // set it new value.
-			} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
-				if value.(map[string]interface{})["M_valueOf"] != nil {
-					value.(map[string]interface{})["M_valueOf"] = str
-				}
-			}
-		} else if XML_Schemas.IsXsNumeric(typeName) || XML_Schemas.IsXsMoney(typeName) {
-			numericVal := Utility.ToNumeric(value)
-			restrictionVal := Utility.ToNumeric(restriction.Value)
-			if restriction.Type == RestrictionType_MaxExclusive {
-				if numericVal >= restrictionVal {
-					return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum exclusive value is ` + restriction.Value + `"}`)
-				}
-			} else if restriction.Type == RestrictionType_MaxInclusive {
-				if numericVal > restrictionVal {
-					return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum inclusive value is ` + restriction.Value + `"}`)
-				}
-			} else if restriction.Type == RestrictionType_MinExclusive {
-				if numericVal <= restrictionVal {
-					return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum exclusive value is ` + restriction.Value + `"}`)
-				}
-			} else if restriction.Type == RestrictionType_MinInclusive {
-				if numericVal < restrictionVal {
-					return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum inclusive value is ` + restriction.Value + `"}`)
-				}
-			} else if restriction.Type == RestrictionType_FractionDigits {
-				numVal := Utility.Round(Utility.ToNumeric(value), Utility.ToInt(restriction.Value))
-				if reflect.TypeOf(value).Kind() == reflect.Float64 {
-					value = numVal // set it new value.
-				} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
-					value = float32(numVal) // set it new value.
-				} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
-					if value.(map[string]interface{})["M_valueOf"] != nil {
-						value.(map[string]interface{})["M_valueOf"] = numVal
-					}
-				}
-			} else if restriction.Type == RestrictionType_TotalDigits {
-				str := Utility.ToString(value)
-				numVal := Utility.ToNumeric(str[0:Utility.ToInt(restriction.Value)])
-				if reflect.TypeOf(value).Kind() == reflect.Float64 {
-					value = numVal // set it new value.
-				} else if reflect.TypeOf(value).Kind() == reflect.Float32 {
-					value = float32(numVal) // set it new value.
-				} else if reflect.TypeOf(value).String() == "map[string]interface {}" {
-					if value.(map[string]interface{})["M_valueOf"] != nil {
-						value.(map[string]interface{})["M_valueOf"] = numVal
-					}
-				}
-			}
-		} else if XML_Schemas.IsXsInt(typeName) {
-			// Here We got a numeric value...
-			intVal := Utility.ToInt(value)
-			restrictionVal := Utility.ToInt(restriction.Value)
-
-			if restriction.Type == RestrictionType_MaxExclusive {
-				if intVal >= restrictionVal {
-					return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum exclusive value is ` + restriction.Value + `"}`)
-				}
-			} else if restriction.Type == RestrictionType_MaxInclusive {
-				if intVal > restrictionVal {
-					return nil, errors.New(`{"field":"` + field + `", "msg":"Maximum inclusive value is ` + restriction.Value + `"}`)
-				}
-			} else if restriction.Type == RestrictionType_MinExclusive {
-				if intVal <= restrictionVal {
-					return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum exclusive value is ` + restriction.Value + `"}`)
-				}
-			} else if restriction.Type == RestrictionType_MinInclusive {
-				if intVal < restrictionVal {
-					return nil, errors.New(`{"field":"` + field + `", "msg":"Minimum inclusive value is ` + restriction.Value + `"}`)
-				}
-			}
 		}
 	}
 
@@ -2375,7 +2435,7 @@ func (this *EntityManager) SetEntity(values interface{}) {
 //EntityManager.prototype.resetEntity = function (entity) {
 //    var prototype = entityPrototypes[entity.TYPENAME]
 //    delete entities[entity.UUID]
-//    var id = entity.TYPENAME + ":"
+//    var id = entity.TYPENAME + "%"
 //    for (var i = 0; i < prototype.Ids.length; i++) {
 //        id += entity[prototype.Ids[i]]
 //        if (i < prototype.Ids.length - 1) {

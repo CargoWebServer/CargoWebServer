@@ -1291,8 +1291,23 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 		itemsTable.clear()
 		for (var i = 0; i < values.length; i++) {
 			// keep information about the parent entity...
+			if(values[i] == null) {
+				// In that case I will append the default value for the given type.
+				if (isXsId(fieldType.replace("[]", "")) || isXsString(fieldType.replace("[]", "") || isXsRef(fieldType.replace("[]", "")))) {
+					values[i] = ""
+				} else if (isXsNumeric(fieldType.replace("[]", ""))) {
+					values[i] = 0.0
+				} else if (isXsInt(fieldType.replace("[]", ""))) {
+					values[i] = 0
+				} else if (isXsTime(fieldType.replace("[]", ""))) {
+					values[i] = 0
+				} else if (isXsBoolean(fieldType.replace("[]", ""))) {
+					values[i] = false
+				}
+			}
 			values[i].ParentUuid = this.getEntity().UUID
 			values[i].parentLnk = field
+
 			if (values[i].UUID != undefined) {
 				var row = itemsTable.appendRow(values[i], values[i].UUID)
 			} else {

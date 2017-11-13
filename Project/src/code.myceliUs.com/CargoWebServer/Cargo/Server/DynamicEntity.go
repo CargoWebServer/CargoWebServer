@@ -75,6 +75,8 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 	// Set the parent uuid in that case.
 	if len(parentUuid) == 0 && values["ParentUuid"] != nil {
 		parentUuid = values["ParentUuid"].(string)
+	} else {
+		values["ParentUuid"] = parentUuid
 	}
 
 	var entity *DynamicEntity
@@ -1698,7 +1700,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 								} else if reflect.TypeOf(this.getValue(k)).String() == "[]interface {}" {
 									if len(this.getValue(k).([]interface{})) == 0 {
 										this.setValue(k, v)
-									} else {
+									} else if reflect.TypeOf(this.getValue(k).([]interface{})[0]) != nil {
 										if reflect.TypeOf(this.getValue(k).([]interface{})[0]).String() == "map[string]interface {}" {
 											if reflect.TypeOf(v).String() == "[]map[string]interface {}" {
 												for i := 0; i < len(v.([]map[string]interface{})); i++ {
@@ -1743,6 +1745,9 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 											// Replace the array with the new value.
 											this.setValue(k, v)
 										}
+									} else {
+										// Replace the array with the new value.
+										this.setValue(k, v)
 									}
 								} else if reflect.TypeOf(this.getValue(k)).String() == "[]string" {
 									this.setValue(k, v) // Replace the array of string with the new value.
