@@ -812,14 +812,31 @@ func (this *KeyValueDataStore) evaluate(typeName string, fieldName string, compa
 
 	// here for the date I will get it unix time value...
 	if fieldType == "xs.date" || fieldType == "xs.dateTime" {
-		expectedDateValue, _ := Utility.MatchISO8601_Date(expected.(string))
-		dateValue, _ := Utility.MatchISO8601_Date(value.(string))
-		if fieldType == "xs.dateTime" {
-			expected = expectedDateValue.Unix() // get the unix time for calcul
-			value = dateValue.Unix()            // get the unix time for calcul
+		expectedDateValue, err := Utility.MatchISO8601_Date(expected.(string))
+		if err == nil {
+			dateValue, _ := Utility.MatchISO8601_Date(value.(string))
+			if fieldType == "xs.dateTime" {
+				expected = expectedDateValue.Unix() // get the unix time for calcul
+				value = dateValue.Unix()            // get the unix time for calcul
+			} else {
+				expected = expectedDateValue.Truncate(24 * time.Hour).Unix() // get the unix time for calcul
+				value = dateValue.Truncate(24 * time.Hour).Unix()            // get the unix time for calcul
+			}
 		} else {
-			expected = expectedDateValue.Truncate(24 * time.Hour).Unix() // get the unix time for calcul
-			value = dateValue.Truncate(24 * time.Hour).Unix()            // get the unix time for calcul
+			// I will try with data time instead.
+			expectedDateValue, err := Utility.MatchISO8601_DateTime(expected.(string))
+			if err == nil {
+				dateValue, _ := Utility.MatchISO8601_DateTime(value.(string))
+				if fieldType == "xs.dateTime" {
+					expected = expectedDateValue.Unix() // get the unix time for calcul
+					value = dateValue.Unix()            // get the unix time for calcul
+				} else {
+					expected = expectedDateValue.Truncate(24 * time.Hour).Unix() // get the unix time for calcul
+					value = dateValue.Truncate(24 * time.Hour).Unix()            // get the unix time for calcul
+				}
+			} else {
+				return false, err
+			}
 		}
 	}
 
@@ -1041,8 +1058,13 @@ func (this *KeyValueDataStore) runQuery(ast *ast.QueryAst, fields []string) (map
 						}
 						values[indexations[i].(string)] = make(map[string]interface{}, 0)
 						for j := 0; j < len(fields); j++ {
-							index := prototype.getFieldIndex(fields[j])
-							values[indexations[i].(string)][fields[j]] = objects[index]
+							field := fields[j]
+							if field == "uuid" {
+								field = "UUID"
+							}
+							index := prototype.getFieldIndex(field)
+							log.Println(prototype.Fields)
+							values[indexations[i].(string)][field] = objects[index]
 						}
 						var isMatch bool
 						if isArray {
@@ -1177,8 +1199,12 @@ func (this *KeyValueDataStore) runQuery(ast *ast.QueryAst, fields []string) (map
 						}
 						values[indexations[i].(string)] = make(map[string]interface{}, 0)
 						for j := 0; j < len(fields); j++ {
-							index := prototype.getFieldIndex(fields[j])
-							values[indexations[i].(string)][fields[j]] = objects[index]
+							field := fields[j]
+							if field == "uuid" {
+								field = "UUID" // little help
+							}
+							index := prototype.getFieldIndex(field)
+							values[indexations[i].(string)][field] = objects[index]
 						}
 						isMatch, err := this.evaluate(typeName, fieldName, comparator, expected, values[indexations[i].(string)][fieldName])
 						if err != nil {
@@ -1325,6 +1351,11 @@ func (this *KeyValueDataStore) GetEntityPrototype(typeName string) (*EntityProto
 	} else {
 		dec := gob.NewDecoder(bytes.NewReader(data))
 		dec.Decode(prototype)
+	}
+
+	// fix...
+	if prototype.Fields[0] == "uuid" {
+		prototype.Fields[0] = "UUID" // must be upper case...
 	}
 
 	return prototype, nil

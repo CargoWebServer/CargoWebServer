@@ -215,10 +215,10 @@ func (this *EmailManager) OnEvent(evt interface{}) {
 // @param {string} id The server connection id
 // @param {string} from The email of the sender
 // @param {string} to The destination email's list
-// @param {[]interface{}} cc The carbon copy's.
+// @param {[]*server.CarbonCopy} cc The carbon copy's.
 // @param {string} title The email title.
 // @param {string} msg The message to send must be html format.
-// @param {[]interface} attachs The list of local file to upload to the server and attach to the message.
+// @param {[]*server.Attachment} attachs The list of local file to upload to the server and attach to the message.
 // @param {string} bodyType text/html or text/plain
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
@@ -226,21 +226,9 @@ func (this *EmailManager) OnEvent(evt interface{}) {
 // @param {callback} progressCallback The function is call when chunk of response is received.
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *EmailManager) SendEmail(id string, from string, to []string, cc []interface{}, subject string, body string, attachs []interface{}, bodyType string, messageId string, sessionId string) {
+func (this *EmailManager) SendEmail(id string, from string, to []string, cc []*CarbonCopy, subject string, body string, attachs []*Attachment, bodyType string, messageId string, sessionId string) {
 
 	// Initialyse the parameters object of not already intialyse.
-	var cc_ []*CarbonCopy
-	values, err := Utility.InitializeStructures(cc, "[]*Server.CarbonCopy")
-	if err == nil {
-		cc_ = values.Interface().([]*CarbonCopy)
-	}
-
-	var attachs_ []*Attachment
-	values, err = Utility.InitializeStructures(attachs, "[]*Server.Attachment")
-	if err == nil {
-		attachs_ = values.Interface().([]*Attachment)
-	}
-
 	var errObj *CargoEntities.Error
 	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -248,7 +236,7 @@ func (this *EmailManager) SendEmail(id string, from string, to []string, cc []in
 		return
 	}
 
-	errObj = this.sendEmail(id, from, to, cc_, subject, body, attachs_, bodyType)
+	errObj = this.sendEmail(id, from, to, cc, subject, body, attachs, bodyType)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
@@ -257,7 +245,7 @@ func (this *EmailManager) SendEmail(id string, from string, to []string, cc []in
 	// Wrote message success here.
 	log.Println("Message was send to ", to, " by ", from)
 	for i := 0; i < len(cc); i++ {
-		log.Println("--> cc :", cc_[i].Mail)
+		log.Println("--> cc :", cc[i].Mail)
 	}
 
 	return

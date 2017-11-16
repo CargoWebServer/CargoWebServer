@@ -395,3 +395,47 @@ Server.prototype.stop = function (successCallback, errorCallback, caller) {
         { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "server": this } // The caller
     )
 }
+
+/**
+* This little structure is use to keep the cc information.
+* @param name  Just a string can be John Doe, mr. Doe etc.
+* @param email  The email of the cc.
+* @constructor
+*/
+var CarbonCopy = function (name, email) {
+    // Hint about type name.
+    this.TYPENAME = "Server.CarbonCopy"
+
+    /**
+     * @property {string} Name The name of the carbon copy.
+     */
+    this.Name = name
+
+    /**
+     * @property {string} Mail The email addresse of the carbon copy.
+     */
+    this.Mail = email
+
+    return this
+}
+
+
+/**
+ * This structure is use in the transfer of files use in attach.
+ * @param {string} fileName  The name of the file
+ * @param {string} fileData  The file data
+ * @constructor
+ */
+var Attachment = function (fileName, fileData) {
+    this.TYPENAME = "Server.Attachment"
+    /**
+     * @property {string} FileName the name of the file attachement. It can also contain the file path on the server side,
+     * if is the case the file data will be take from this file.
+     */
+    this.FileName = fileName
+    /**
+     * @property {string} FileData The data of the file. If it's null the file data will be taked from the server side.
+     */
+    this.FileData = fileData
+    return this
+}

@@ -327,37 +327,46 @@ func (this *LdapManager) synchronizeUsers(id string) error {
 		// Specific ...
 		// here i will test if the user exist...
 		userUuid := CargoEntitiesUserExists(user.M_id)
+		if len(userUuid) == 0 {
 
-		if len(userUuid) == 0 && len(user.GetEmail()) > 0 {
-
-			// Set the uuid of the user.
-			GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", user)
-
-			// The user must be save...
 			if len(user.GetEmail()) > 0 {
-				// Create the user uuid
+				// Set the uuid of the user.
 				GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", user)
 
-				// Create the account in memory...
-				account := new(CargoEntities.Account)
-				account.M_id = accountId
-				account.M_password = "Dowty123"
-				account.M_name = user.GetId()
-				account.M_email = user.GetEmail()
+				// The user must be save...
+				if len(user.GetEmail()) > 0 {
+					// Create the user uuid
+					GetServer().GetEntityManager().NewCargoEntitiesUserEntity(cargoEntities.GetUuid(), "", user)
 
-				// Set the account uuid.
-				accontEntity, err := GetServer().GetEntityManager().createEntity(cargoEntities.GetUuid(), "M_entities", "CargoEntities.Account", accountId, account)
+					// Create the account in memory...
+					if len(accountId) > 0 {
+						account := new(CargoEntities.Account)
+						account.M_id = accountId
+						account.M_password = "Dowty123"
+						account.M_name = user.GetId()
+						account.M_email = user.GetEmail()
 
-				// Link the account and the user...
-				if err == nil {
-					userEntity, err := GetServer().GetEntityManager().createEntity(cargoEntities.GetUuid(), "M_entities", "CargoEntities.User", user.GetId(), user)
-					if err == nil {
-						log.Printf("--> Create user: ", user.GetId())
-						account.SetUserRef(user)
-						user.SetAccounts(account)
-						// Save both entity...
-						accontEntity.SaveEntity()
-						userEntity.SaveEntity()
+						// Set the account uuid.
+						accontEntity, err := GetServer().GetEntityManager().createEntity(cargoEntities.GetUuid(), "M_entities", "CargoEntities.Account", accountId, account)
+
+						// Link the account and the user...
+						if err == nil {
+							userEntity, err := GetServer().GetEntityManager().createEntity(cargoEntities.GetUuid(), "M_entities", "CargoEntities.User", user.GetId(), user)
+							if err == nil {
+								log.Println("--> Create user: ", user.GetId())
+								account.SetUserRef(user)
+								user.SetAccounts(account)
+								// Save both entity...
+								accontEntity.SaveEntity()
+								userEntity.SaveEntity()
+							} else {
+								log.Fatal("------> fail to create user!")
+							}
+						}
+					} else {
+						// save only the user here.
+						GetServer().GetEntityManager().createEntity(cargoEntities.GetUuid(), "M_entities", "CargoEntities.User", user.GetId(), user)
+						log.Println("--> User ", user.GetFirstName()+" "+user.GetLastName(), " is not active")
 					}
 				}
 			}
@@ -402,15 +411,6 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 				// Now I will retrive user inside this group...
 				membersRef, err := this.getLdapGroupMembers(id, row[j].(string))
 				if err == nil {
-					for k := 0; k < len(membersRef); k++ {
-						ids := []interface{}{membersRef[k]}
-						member, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.User", ids, false)
-						if err == nil {
-							group.SetMembersRef(member.GetObject().(*CargoEntities.User))
-							member.GetObject().(*CargoEntities.User).SetMemberOfRef(group)
-							member.SaveEntity() // save the user...
-						}
-					}
 					// if the number of members is not null...
 					if len(membersRef) > 0 {
 						groupUuid := CargoEntitiesGroupExists(group.M_id)
@@ -423,13 +423,23 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 								log.Println("--> create group ", group.GetId())
 							}
 						} else {
-
 							entity, err := GetServer().GetEntityManager().getEntityByUuid(groupUuid, false)
 							if err == nil {
 								groupEntity = entity.(*CargoEntities_GroupEntity)
 								group = groupEntity.GetObject().(*CargoEntities.Group)
 							}
 						}
+
+						for k := 0; k < len(membersRef); k++ {
+							ids := []interface{}{strings.TrimSpace(strings.ToLower(membersRef[k]))}
+							member, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.User", ids, false)
+							if err == nil {
+								group.SetMembersRef(member.GetObject().(*CargoEntities.User))
+								member.GetObject().(*CargoEntities.User).SetMemberOfRef(group)
+								member.SaveEntity() // save the user...
+							}
+						}
+						groupEntity.SaveEntity()
 					}
 				}
 

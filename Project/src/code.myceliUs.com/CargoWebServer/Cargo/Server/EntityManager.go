@@ -1808,7 +1808,6 @@ func applyRestrictions(field string, prototype *EntityPrototype, value interface
 //	},{"successCallback":successCallback, "errorCallback":errorCallback, "caller": caller})
 //}
 func (this *EntityManager) CreateEntityPrototype(storeId string, prototype interface{}, messageId string, sessionId string) *EntityPrototype {
-	log.Println("--------> try to create entity prototype in store: ", storeId)
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -2395,14 +2394,14 @@ func (this *EntityManager) OnEvent(evt interface{}) {
 //            var id_ = entity.TYPENAME + ":"
 //            for (var i = 0; i < prototype.Ids.length; i++) {
 //                var id = prototype.Ids[i]
-//                if (id == "UUID") {
+//                if (id == "UUID" || id == "uuid") {
 //					  if(entity.UUID != undefined){
 //					  	if(entities[entity.UUID] != undefined && entity.UUID.length > 0){
 //							entity.ParentLnk = entities[entity.UUID].ParentLnk
 //					  	}
 //					  	entities[entity.UUID] = entity
 //					  }
-//                } else {
+//                } else if(entity[id] != undefined) {
 //                    if (entity[id].length > 0) {
 //                        id_ += entity[id]
 //                        if (i < prototype.Ids.length - 1) {
@@ -2435,7 +2434,7 @@ func (this *EntityManager) SetEntity(values interface{}) {
 //EntityManager.prototype.resetEntity = function (entity) {
 //    var prototype = entityPrototypes[entity.TYPENAME]
 //    delete entities[entity.UUID]
-//    var id = entity.TYPENAME + "%"
+//    var id = entity.TYPENAME + ":"
 //    for (var i = 0; i < prototype.Ids.length; i++) {
 //        id += entity[prototype.Ids[i]]
 //        if (i < prototype.Ids.length - 1) {

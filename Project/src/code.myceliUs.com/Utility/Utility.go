@@ -125,7 +125,7 @@ func MatchISO8601_Date(str string) (*time.Time, error) {
 	var exp = regexp.MustCompile(ISO_8601_DATE_PATTERN)
 	match := exp.FindStringSubmatch(str)
 	if len(match) == 0 {
-		return nil, errors.New(str + " now match iso 8601")
+		return nil, errors.New(str + " not match iso 8601")
 	}
 	var year, month, day int
 	for i, name := range exp.SubexpNames() {
@@ -154,7 +154,7 @@ func MatchISO8601_DateTime(str string) (*time.Time, error) {
 	var exp = regexp.MustCompile(ISO_8601_DATE_TIME_PATTERN)
 	match := exp.FindStringSubmatch(str)
 	if len(match) == 0 {
-		return nil, errors.New(str + " now match iso 8601")
+		return nil, errors.New(str + " not match iso 8601")
 	}
 	var year, month, day, hour, minute, second, miliSecond int
 	for i, name := range exp.SubexpNames() {

@@ -359,8 +359,7 @@ func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId inte
 		row.Name = "values"
 		row.Value = data_
 		eventData[2] = row
-
-		evt, _ := NewEvent(NewRowEvent, TableEvent, eventData)
+		evt, _ := NewEvent(NewRowEvent, DataEvent, eventData)
 		GetServer().GetEventManager().BroadcastEvent(evt)
 	}
 
@@ -678,7 +677,7 @@ func (this *SqlDataStore) Update(query string, fields []interface{}, params []in
 		id.Value = Utility.ToString(params[0])
 		eventData[1] = id
 
-		evt, _ := NewEvent(UpdateRowEvent, TableEvent, eventData)
+		evt, _ := NewEvent(UpdateRowEvent, DataEvent, eventData)
 		GetServer().GetEventManager().BroadcastEvent(evt)
 	}
 
@@ -724,7 +723,7 @@ func (this *SqlDataStore) Delete(query string, params []interface{}) (err error)
 			eventData = append(eventData, id)
 		}
 
-		evt, _ := NewEvent(DeleteRowEvent, TableEvent, eventData)
+		evt, _ := NewEvent(DeleteRowEvent, DataEvent, eventData)
 		GetServer().GetEventManager().BroadcastEvent(evt)
 	}
 

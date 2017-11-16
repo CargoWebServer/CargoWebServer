@@ -26,10 +26,10 @@ function main() {
  
 */
     server.eventHandler.appendEventFilter(
-         "COLLADASchema.",
+         "CatalogSchema.",
          "EntityEvent",
          function () {
-             entitiesDump("COLLADASchema.COLLADA")
+             entitiesDump("CatalogSchema.FiltreRectangulaire")
          },
          function () { },
          undefined
@@ -159,7 +159,7 @@ function main() {
     
         })*/
 
-    LaunchImportNewSQLData_Process()
+    //LaunchImportNewSQLData_Process()
 
     /*
          server.entityManager.getEntityPrototypes("Test",

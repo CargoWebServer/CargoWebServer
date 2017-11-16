@@ -40,7 +40,7 @@ function init() {
             homePage.init(mainLayout, sessionsInfo)
         }
     }(mainLayout, homePage),
-        "safranLdap" // Put the ldap sever id here
+        "SafranLdap" // Put the ldap sever id here
     )
     // the main page...
     mainPage = new MainPage(mainLayout, loginPage)

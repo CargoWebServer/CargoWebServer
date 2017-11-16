@@ -384,6 +384,8 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 		return err
 	}
 
+	log.Println("----------> ", results)
+
 	// Initialisation of information of Interface...
 	if len(results) > 0 {
 
@@ -398,7 +400,11 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 		// Set the parent uuid...
 		this.setValue("ParentUuid", results[0][1].(string)) // Set the parent uuid.
 
-		this.setValue("ParentLnk", results[0][2].(string)) // Set the parent relation.
+		startIndex := 2
+		if prototype.getFieldIndex("ParentLnk") != -1 {
+			this.setValue("ParentLnk", results[0][2].(string)) // Set the parent relation.
+			startIndex = 3
+		}
 
 		//init the child...
 		childsUuidStr := results[0][prototype.getFieldIndex("childsUuid")].(string)
@@ -424,7 +430,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 		// Now The value from the prototype...
 		// The first tow field are uuid and parentUuid
 		// and the last tow fields are childsuuid and referenced...
-		for i := 3; i < len(results[0])-2; i++ {
+		for i := startIndex; i < len(results[0])-2; i++ {
 			fieldName := prototype.Fields[i]
 			fieldType := prototype.FieldsType[i]
 			isNull := false
@@ -645,6 +651,8 @@ func (this *DynamicEntity) saveEntity(path string) {
 		return
 	}
 
+	prototype := this.GetPrototype()
+
 	// cut the recusion here.
 	this.SetNeedSave(false)
 	this.SetInit(true)
@@ -659,7 +667,12 @@ func (this *DynamicEntity) saveEntity(path string) {
 	DynamicEntityInfo = append(DynamicEntityInfo, this.GetUuid())
 
 	query.Fields = append(query.Fields, "ParentUuid")
-	query.Fields = append(query.Fields, "ParentLnk")
+
+	startIndex := 2
+	if prototype.getFieldIndex("ParentLnk") != -1 {
+		query.Fields = append(query.Fields, "ParentLnk")
+		startIndex = 3
+	}
 
 	if len(this.GetParentUuid()) > 0 {
 		DynamicEntityInfo = append(DynamicEntityInfo, this.GetParentUuid())
@@ -669,11 +682,10 @@ func (this *DynamicEntity) saveEntity(path string) {
 		DynamicEntityInfo = append(DynamicEntityInfo, "")
 	}
 
-	prototype := this.GetPrototype()
 	// Now the fields of the object, from the prototype...
 	// The first tow field are uuid and parentUuid
 	// and the last tow fields are childsuuid and referenced...
-	for i := 3; i < len(prototype.Fields)-2; i++ {
+	for i := startIndex; i < len(prototype.Fields)-2; i++ {
 		fieldName := prototype.Fields[i]
 		fieldType := prototype.FieldsType[i]
 
@@ -1177,8 +1189,9 @@ func (this *DynamicEntity) GetParentUuid() string {
  * The name of the relation with it parent.
  */
 func (this *DynamicEntity) GetParentLnk() string {
-	if this.getValue("ParentLnk") != nil {
-		return this.getValue("ParentLnk").(string)
+	parentLnk := this.getValue("ParentLnk")
+	if parentLnk != nil {
+		return parentLnk.(string)
 	}
 	return ""
 }

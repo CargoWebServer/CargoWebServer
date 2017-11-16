@@ -146,10 +146,10 @@ Table.prototype.setModel = function (model, initCallback) {
 				// copy another header etc...
 				var widths = []
 				// Now I will wrote the code for the layout...
-				if(table.header != null){
+				if (table.header != null) {
 					table.header.maximizeBtn.element.click()
 				}
-				
+
 				if (table.parent.element.style.position == "relative") {
 					var w = table.header.buttonDiv.element.offsetWidth
 					table.header.buttonDiv.element.style.width = w + "px"
@@ -522,10 +522,10 @@ Table.prototype.getRow = function (id) {
  * Append a new row inside the table. If the row already exist it update it value.
  */
 Table.prototype.appendRow = function (values, id) {
-	if(id == undefined){
+	if (id == undefined) {
 		id = 0
 	}
-	
+
 	if (this.rowGroup == null) {
 		//this.init()
 		this.rowGroup = this.div.appendElement({ "tag": "div", "class": "table_body" }).down()
@@ -1472,15 +1472,16 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 	// I will get the cell editor related to this column...
 	var editor = this.row.table.cellEditors[this.index]
 
-	// One editor at time.
+	// One editor at time...
 	if (editor != undefined) {
 		try {
+			// Remove it from it actual parent
 			editor.element.parentNode.removeChild(editor.element)
 		} catch (err) {
 
 		}
-		delete this.row.table.cellEditors[this.index]
-		editor = null
+		// append it in it new parent.
+		this.div.element.appendChild(editor.element)
 	}
 
 	var prototype = this.row.table.model.proto
@@ -1506,137 +1507,152 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 	}
 
 	// Here is the default editor if is undefined...
-	if (editor == null) {
-		if (isXsString(type)) {
-			// Here I will put a text area..
+	if (isXsString(type)) {
+		// Here I will put a text area..
+		if (editor == null) {
 			if (value.length > 50) {
 				editor = this.div.appendElement({ "tag": "textarea", "resize": "false" }).down()
 			} else {
 				editor = this.div.appendElement({ "tag": "input" }).down()
 			}
-			editor.element.value = value
-		} else if (isXsId(type)) {
-			// Here I will put a text area..
+		}
+		editor.element.value = value
+	} else if (isXsId(type)) {
+		// Here I will put a text area..
+		if (editor == null) {
 			editor = this.div.appendElement({ "tag": "input" }).down()
-			if (value != undefined) {
-				editor.element.value = value
-			}
-		} else if (isXsRef(type)) {
-			// Here I will put a text area..
-			console.log("------> ref found!!!!")
-		} else if (isXsDate(type)) {
+		}
+		if (value != undefined) {
+			editor.element.value = value
+		}
+	} else if (isXsRef(type)) {
+		// Here I will put a text area..
+		console.log("------> ref found!!!!")
+	} else if (isXsDate(type)) {
+		if (editor == null) {
 			editor = this.div.appendElement({ "tag": "input", "type": "datetime-local", "name": "date" }).down()
-			editor.element.value = moment(value).format('YYYY-MM-DDTHH:mm:ss');
-			editor.element.step = 7
-		} else if (isXsNumeric(type)) {
+		}
+		editor.element.value = moment(value).format('YYYY-MM-DDTHH:mm:ss');
+		editor.element.step = 7
+	} else if (isXsNumeric(type)) {
+		if (editor == null) {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "0.01" }).down()
-			editor.element.value = value
-		} else if (isXsBoolean(type)) {
+		}
+		editor.element.value = value
+	} else if (isXsBoolean(type)) {
+		if (editor == null) {
 			editor = this.div.appendElement({ "tag": "input", "type": "checkbox" }).down()
-			editor.element.checked = value
-		} else if (isXsInt(type)) {
+		}
+		editor.element.checked = value
+	} else if (isXsInt(type)) {
+		if (editor == null) {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "1" }).down()
-			editor.element.value = value
-		} else if (prototype != null) {
-			// get the rentity reference from the model.
-			if (entity == null) {
-				if (this.row.table.model.entities[this.row.index].UUID.length > 0) {
-					if (entities[this.row.table.model.entities[this.row.index].UUID] != undefined) {
-						entity = entities[this.row.table.model.entities[this.row.index].UUID]
-					}
-				} else {
-					entity = this.row.table.model.entities[this.row.index]
+		}
+		editor.element.value = value
+	} else if (prototype != null) {
+		// get the rentity reference from the model.
+		if (entity == null) {
+			if (this.row.table.model.entities[this.row.index].UUID.length > 0) {
+				if (entities[this.row.table.model.entities[this.row.index].UUID] != undefined) {
+					entity = entities[this.row.table.model.entities[this.row.index].UUID]
 				}
+			} else {
+				entity = this.row.table.model.entities[this.row.index]
 			}
+		}
 
-			// If is an object...
-			var isArray = type.startsWith("[]")
-			var isRef = type.endsWith(":Ref")
-			type = type.replace("[]", "").replace(":Ref", "")
+		// If is an object...
+		var isArray = type.startsWith("[]")
+		var isRef = type.endsWith(":Ref")
+		type = type.replace("[]", "").replace(":Ref", "")
 
-			if (isRef) {
-				// if the field is an array it will be display by another array in the array...
-				if (isArray) {
-					// nothing todo here...
-					//var editor = appendRefEditor(this.div, entity, type, field)
-				} else {
+		if (isRef) {
+			// if the field is an array it will be display by another array in the array...
+			if (isArray) {
+				// nothing todo here...
+				//var editor = appendRefEditor(this.div, entity, type, field)
+			} else {
 
-					// The editor will be an input box
-					var editor = this.div.appendElement({ "tag": "input", "style": "display: inline;" }).down()
-					editor.element.value = this.valueDiv.element.innerText
+				// The editor will be an input box
+				if (editor == null) {
+					editor = this.div.appendElement({ "tag": "input", "style": "display: inline;" }).down()
+				}
 
-					// hide the lnk...
-					this.valueDiv.element.style.display = "none"
+				editor.element.value = this.valueDiv.element.innerText
 
-					// I will keep the reference of the new and delete button inside the editor itself.
-					editor.element.focus()
-					editor.element.select();
+				// hide the lnk...
+				this.valueDiv.element.style.display = "none"
 
-					// Set clear function
-					editor.clear = function () {
-						return function () {
-							editor.element.value = ""
-						}
-					}(editor)
+				// I will keep the reference of the new and delete button inside the editor itself.
+				editor.element.focus()
+				editor.element.select();
 
-					// Now i will set it autocompletion list...
-					attachAutoCompleteInput(editor, type, field, entity, [],
-						function (tableCell, entity, field, valueDiv, editor) {
-							return function (value) {
-								// Here I will set the field of the entity...
-								if (value != null) {
-									if (entity != undefined) {
-										// Show the save button
-										if (value.UUID.length > 0) {
-											value = entities[value.UUID]
-										}
-										if (document.getElementById(value.UUID + "_" + field + "_lnk") == undefined) {
+				// Set clear function
+				editor.clear = function () {
+					return function () {
+						editor.element.value = ""
+					}
+				}(editor)
 
-											appendObjectValue(entity, field, value)
+				// Now i will set it autocompletion list...
+				attachAutoCompleteInput(editor, type, field, entity, [],
+					function (tableCell, entity, field, valueDiv, editor) {
+						return function (value) {
+							// Here I will set the field of the entity...
+							if (value != null) {
+								if (entity != undefined) {
+									// Show the save button
+									if (value.UUID.length > 0) {
+										value = entities[value.UUID]
+									}
+									if (document.getElementById(value.UUID + "_" + field + "_lnk") == undefined) {
 
-											var lnkDiv = valueDiv.appendElement({ "tag": "div", "id": value.UUID + "_" + field + "_lnk", "style": "display: table-row;" }).down()
-											createItemLnk(entity, value, field, lnkDiv)
+										appendObjectValue(entity, field, value)
 
-											delete tableCell.row.table.cellEditors[tableCell.index]
+										var lnkDiv = valueDiv.appendElement({ "tag": "div", "id": value.UUID + "_" + field + "_lnk", "style": "display: table-row;" }).down()
+										createItemLnk(entity, value, field, lnkDiv)
 
-											valueDiv.element.style.display = ""
-											tableCell.row.saveBtn.element.style.visibility = "visible"
-											entity.ParentLnk = tableCell.row.table.model.entities[tableCell.row.index].ParentLnk
-											tableCell.row.table.model.entities[tableCell.row.index] = entity
-											try {
-												editor.element.parentNode.removeChild(editor.element)
-											} catch (err) {
-											}
+										delete tableCell.row.table.cellEditors[tableCell.index]
+
+										valueDiv.element.style.display = ""
+										tableCell.row.saveBtn.element.style.visibility = "visible"
+										entity.ParentLnk = tableCell.row.table.model.entities[tableCell.row.index].ParentLnk
+										tableCell.row.table.model.entities[tableCell.row.index] = entity
+										try {
+											editor.element.parentNode.removeChild(editor.element)
+										} catch (err) {
 										}
 									}
 								}
 							}
-						}(this, entity, field, this.valueDiv, editor))
+						}
+					}(this, entity, field, this.valueDiv, editor))
+			}
+		} else {
+			// Here I will get the prototype for the field type
+			var fieldPrototype = getEntityPrototype(type)
+
+			// Here it's an enumeration of value.
+			if (fieldPrototype.Restrictions != undefined) {
+				if (fieldPrototype.Restrictions.length > 0) {
+					editor = this.div.appendElement({ "tag": "select", "id": "" }).down()
+					for (var i = 0; i < fieldPrototype.Restrictions.length; i++) {
+						var restriction = fieldPrototype.Restrictions[i]
+						if (restriction.Type == 1) {
+							type = "xs.string"
+							editor.appendElement({ "tag": "option", "value": restriction.Value, "innerHtml": restriction.Value })
+						}
+					}
+
+					// Set to the current value.
+					editor.element.value = value
+
+					// Hide the value div.
+					this.valueDiv.element.style.display = "none"
 				}
 			} else {
-				// Here I will get the prototype for the field type
-				var fieldPrototype = getEntityPrototype(type)
-
-				// Here it's an enumeration of value.
-				if (fieldPrototype.Restrictions != undefined) {
-					if (fieldPrototype.Restrictions.length > 0) {
-						editor = this.div.appendElement({ "tag": "select", "id": "" }).down()
-						for (var i = 0; i < fieldPrototype.Restrictions.length; i++) {
-							var restriction = fieldPrototype.Restrictions[i]
-							if (restriction.Type == 1) {
-								type = "xs.string"
-								editor.appendElement({ "tag": "option", "value": restriction.Value, "innerHtml": restriction.Value })
-							}
-						}
-
-						// Set to the current value.
-						editor.element.value = value
-
-						// Hide the value div.
-						this.valueDiv.element.style.display = "none"
-					}
-				} else {
-					// Here the editor is an entity panel.
+				// Here the editor is an entity panel.
+				if (editor == null) {
 					editor = new EntityPanel(this.valueDiv, fieldPrototype.TypeName, function (parent, field, typeName) {
 						return function (panel) {
 							// Here I will set the actual values..
@@ -1664,11 +1680,12 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				}
 			}
 		}
-		this.row.table.cellEditors[this.index] = editor
 	}
+	this.row.table.cellEditors[this.index] = editor
+
 
 	// I will set the editor on the page...
-	if (editor != null /*&& type.startsWith("xs.")*/) {
+	if (editor != null) {
 		// When the selection change I will set the save button.
 		editor.element.onchange = function (row) {
 			return function () {

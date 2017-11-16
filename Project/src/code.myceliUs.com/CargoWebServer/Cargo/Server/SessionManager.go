@@ -258,6 +258,7 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 
 	// Verify if the account exists
 	if len(accountUuid) > 0 {
+
 		// The accout exists. It will be initialized
 		var accountEntity Entity
 		accountEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(accountUuid, false)

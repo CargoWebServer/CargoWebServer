@@ -71,7 +71,6 @@ var FilePanel = function (parent, file, filePath, fileInfo, loadCallback, readCa
 
     // Html5 file reader...
     this.reader = new FileReader();
-
     this.img = null
 
     // Closure to capture the file information.
@@ -147,11 +146,9 @@ var FilePanel = function (parent, file, filePath, fileInfo, loadCallback, readCa
                 , this
             )
         }
-
         this.fileName = this.fileInfo.M_name
         this.filePath = this.fileInfo.M_path
         this.fileMime = this.fileInfo.M_mime
-
     }
 
     // Now the delete button...
@@ -176,9 +173,10 @@ var FilePanel = function (parent, file, filePath, fileInfo, loadCallback, readCa
         return function (e) {
             e.stopPropagation()
             var confirmDialog = new Dialog(randomUUID(), undefined, true)
-            confirmDialog.setCentered()
             server.languageManager.setElementText(confirmDialog.title, "delete_dialog_title")
             confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Voulez-vous enlever le fichier " + filePanel.fileName + "?" })
+            confirmDialog.div.element.style.maxWidth = "450px"
+            confirmDialog.setCentered()
             confirmDialog.ok.element.onclick = function (dialog, filePanel) {
                 return function () {
                     // I will call delete file

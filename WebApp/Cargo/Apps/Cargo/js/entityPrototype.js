@@ -165,6 +165,13 @@ EntityPrototype.prototype.init = function (object) {
         }
     }
 
+    if (object.FieldsDefaultValue == null) {
+        object.FieldsDefaultValue = []
+        for (var i = 0; i < object.Fields.length; i++) {
+            object.FieldsDefaultValue.push("")
+        }
+    }
+
     // The type name.
     this.TypeName = object.TypeName
 
