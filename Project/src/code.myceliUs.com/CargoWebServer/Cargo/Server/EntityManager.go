@@ -238,19 +238,20 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 		}
 	}
 
-	// Now I will remove it from it parent...
-	if toDelete.GetParentPtr() != nil {
-		// First I will remove it from parent childs...
-		parent := toDelete.GetParentPtr()
-		parent.RemoveChild(toDelete.GetParentLnk(), toDelete.GetUuid())
-		toSaves = append(toSaves, parent)
+	// Now I will remove it from it parent if is not already deleted...
+	if this.isExist(toDelete.GetParentUuid()) {
+		if toDelete.GetParentPtr() != nil {
+			// First I will remove it from parent childs...
+			parent := toDelete.GetParentPtr()
+			parent.RemoveChild(toDelete.GetParentLnk(), toDelete.GetUuid())
+			toSaves = append(toSaves, parent)
+		}
 	}
 
 	// Save refeferenced entity...
 	for i := 0; i < len(toSaves); i++ {
 		// Save it only if it dosen't already deleted.
 		if toSaves[i].Exist() {
-			toSaves[i].SetNeedSave(true)
 			toSaves[i].SaveEntity()
 		}
 	}
@@ -2515,7 +2516,9 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 
 	// Here I will set the ownership of the entity.
 	session := GetServer().GetSessionManager().getActiveSessionById(sessionId)
-	this.setEntityOwner(session.GetAccountPtr(), result)
+	if session != nil {
+		this.setEntityOwner(session.GetAccountPtr(), result)
+	}
 
 	return result.GetObject()
 }

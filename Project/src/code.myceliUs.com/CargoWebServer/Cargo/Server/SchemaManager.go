@@ -1431,7 +1431,6 @@ func (this *SchemaManager) appendPrototypeRestriction(schema *XML_Schemas.XSD_Sc
 				} else if restriction.Choice != nil {
 					this.appendPrototypeChoice(schema, prototype, restriction.Choice, restriction.Choice.MinOccurs, restriction.Choice.MaxOccurs)
 				} else if restriction.Group != nil {
-					log.Println("-----------> restriction", restriction)
 					this.appendPrototypeGroup(schema, prototype, restriction.Group, restriction.Group.MinOccurs, restriction.Group.MaxOccurs)
 				} else if restriction.Sequence != nil {
 					this.appendPrototypeSequence(schema, prototype, restriction.Sequence, restriction.Sequence.MinOccurs, restriction.Sequence.MaxOccurs)

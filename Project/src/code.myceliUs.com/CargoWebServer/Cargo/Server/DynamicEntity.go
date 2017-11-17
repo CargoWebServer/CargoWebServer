@@ -384,8 +384,6 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 		return err
 	}
 
-	log.Println("----------> ", results)
-
 	// Initialisation of information of Interface...
 	if len(results) > 0 {
 
