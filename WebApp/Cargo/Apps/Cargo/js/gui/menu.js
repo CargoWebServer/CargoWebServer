@@ -38,10 +38,15 @@ var MenuItem = function (id, name, subItems, level, action, icon) {
     return this
 }
 
-/*
- * That class contain the code for vertical menu.
+/**
+ * 
+ * @param {*} parent The div where the menu will be append.
+ * @param {*} items  The list of menu Item to display in the menu.
  */
-var VerticalMenu = function (parent, items) {
+var Menu = function (parent, items) {
+    if (parent == null) {
+        return
+    }
 
     this.parent = parent
     this.panel = this.parent.appendElement({ "tag": "div", "style": "relative;" }).down()
@@ -52,6 +57,21 @@ var VerticalMenu = function (parent, items) {
     if (this.items == undefined) {
         this.items = []
     }
+}
+
+/**
+ * Append separator between menu items.
+ */
+Menu.prototype.appendSeparator = function (item) {
+    this.panel.appendElement({ "tag": "div", "class": "menu_separator" }).down()
+}
+
+/*
+ * That class contain the code for vertical menu.
+ */
+var VerticalMenu = function (parent, items) {
+
+    Menu.call(this, parent, items)
 
     // I will now initialyse the items...
     for (var i = 0; i < this.items.length; i++) {
@@ -61,16 +81,20 @@ var VerticalMenu = function (parent, items) {
     return this
 }
 
+VerticalMenu.prototype = new Menu(null);
+VerticalMenu.prototype.constructor = Menu;
+
 /*
  * Append a new Item in the menu panel...
  */
 VerticalMenu.prototype.appendItem = function (item) {
-    if(isString(item)){
+
+    if (isString(item)) {
         // In that case I will append a separator.
         this.appendSeparator()
         return
     }
-    
+
     var currentPanel = null
     if (item.level == 0) {
         // Here the menu is show in row...
@@ -165,33 +189,18 @@ VerticalMenu.prototype.appendItem = function (item) {
  * That class create a popup menu.
  */
 var PopUpMenu = function (parent, items, e) {
+
+    Menu.call(this, parent, items)
+
     // Only one menu must be display at any time.
     var popups = document.getElementsByClassName("popup_menu")
     for (var i = 0; i < popups.length; i++) {
         popups[i].parentNode.removeChild(popups[i])
     }
 
-    // The menu panel.
-    this.parent = parent
-
-    this.panel = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "popup_menu", "style": "position: absolute; z-index: 10;" })
-    var coord = getCoords(parent.element)
-
-    this.panel.element.style.top = coord.top + 19 + "px"
-    this.panel.element.style.left = coord.left + 20 + "px"
-
-    this.subItemPanel = null
-    this.currentItem = null
-
-    this.items = items
-    if (this.items == undefined) {
-        this.items = []
-    }
-
-    // I will now initialyse the items...
-    for (var i = 0; i < this.items.length; i++) {
-        this.appendItem(this.items[i])
-    }
+    this.panel.element.className = "popup_menu"
+    this.panel.element.style.position = "absolute"
+    this.panel.element.style.zIndex = "10"
 
     this.displayed = false
 
@@ -238,19 +247,23 @@ var PopUpMenu = function (parent, items, e) {
         }
     }(this, listener2)
     document.getElementsByTagName("body")[0].addEventListener("keyup", listener2);
+   
+    // I will now initialyse the items...
+    for (var i = 0; i < this.items.length; i++) {
+        this.appendItem(this.items[i])
+    }
 
     return this
 }
 
-PopUpMenu.prototype.appendSeparator = function (item) {
-    this.panel.appendElement({ "tag": "div","class":"menu_separator"}).down()
-}
+PopUpMenu.prototype = new Menu(null);
+PopUpMenu.prototype.constructor = Menu;
 
 /*
  * Append a new Item in the menu panel...
  */
 PopUpMenu.prototype.appendItem = function (item) {
-    if(isString(item)){
+    if (isString(item)) {
         // In that case I will append a separator.
         this.appendSeparator()
         return
@@ -280,7 +293,6 @@ PopUpMenu.prototype.appendItem = function (item) {
                 // Now I will offset the menu...
                 menu.currentItem = item
                 function setVisible(item) {
-
                     item.panel.element.style.display = "block"
                     if (item.parent != undefined) {
                         setVisible(item.parent)
@@ -348,11 +360,13 @@ PopUpMenu.prototype.appendItem = function (item) {
  * That class contain de the code for horizontal menu
  */
 var HorizontalMenu = function (parent, items) {
-    this.items = items
-    this.currentItem = null
 
-    // The menu panel.
-    this.panel = new Element(parent, { "tag": "div", "class": "horizontal_menu", "style": "display: table;width:100%" })
+    Menu.call(this, parent, items)
+
+    // Set specific panel properties.
+    this.panel.element.className = "horizontal_menu"
+    this.panel.element.style.display = "table"
+    this.panel.element.style.width = "100%"
 
     // The menu content...
     this.menuRow = this.panel.appendElement({ "tag": "div", "style": "display:table-row;height:60px;" }).down()
@@ -367,6 +381,9 @@ var HorizontalMenu = function (parent, items) {
 
     return this
 }
+
+HorizontalMenu.prototype = new Menu(null);
+HorizontalMenu.prototype.constructor = Menu;
 
 /*
  * Append a new Item in the menu panel...

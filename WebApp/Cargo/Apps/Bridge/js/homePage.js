@@ -355,6 +355,8 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     var newFileMenuItem = new MenuItem("new_file_menu_item", "New", { "new_project_menu_item": newProjectMenuItem }, 1)
 
     // Now the import data menu
+
+    // Xsd schema
     var importXsdSchemaMenuItem = new MenuItem("import_xsd_menu_item", "XSD schema", {}, 2, function (parent) {
         return function () {
             var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".xsd, .XSD, .Xsd", "multiple": "", "style": "display: none;" }).down()
@@ -379,6 +381,32 @@ HomePage.prototype.init = function (parent, sessionInfo) {
             fileExplorer.element.click()
         }
     }(parent), "fa fa-file-o")
+
+    // JSON schema
+    var importJsonSchemaMenuItem = new MenuItem("import_json_schema_menu_item", "JSON schema", {}, 2, function (parent) {
+        return function () {
+            var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".json, .JSON, .Json", "multiple": "", "style": "display: none;" }).down()
+            fileExplorer.element.onchange = function (bpmnExplorer) {
+                return function (evt) {
+                    var files = evt.target.files; // FileList object
+                    for (var i = 0, f; f = files[i]; i++) {
+                        var reader = new FileReader();
+                        /** I will read the file content... */
+                        reader.onload = function (file) {
+                            return function (e) {
+                                // Now I will load the content of the file.
+                                server.schemaManager.importJsonSchema(file.name, e.target.result)
+                            }
+                        }(f);
+                        reader.readAsText(f);
+                    }
+                }
+            }(this)
+            // Display the file explorer...
+            fileExplorer.element.click()
+        }
+    }(parent), "fa fa-file-o")
+
 
     var importXmlDataMenuItem = new MenuItem("import_xml_menu_item", "XML data", {}, 2, function (parent) {
         return function () {
@@ -410,7 +438,37 @@ HomePage.prototype.init = function (parent, sessionInfo) {
         }
     }(parent), "fa fa-file-o")
 
-    var importDataMenuItem = new MenuItem("import_data_menu_item", "Import", { "import_xsd_menu_item": importXsdSchemaMenuItem, "import_xml_menu_item": importXmlDataMenuItem }, 1)
+    var importJsonDataMenuItem = new MenuItem("import_json_data_menu_item", "JSON data", {}, 2, function (parent) {
+        return function () {
+            var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".json, .JSON, .Json", "multiple": "", "style": "display: none;" }).down()
+            fileExplorer.element.onchange = function (bpmnExplorer) {
+                return function (evt) {
+                    var files = evt.target.files; // FileList object
+                    for (var i = 0, f; f = files[i]; i++) {
+                        //server.dataManager.importXsdSchema(f)
+                        var reader = new FileReader();
+                        /** I will read the file content... */
+                        reader.onload = function (e) {
+                            var text = e.target.result
+                            // Now I will load the content of the file.
+                            server.dataManager.importJsonData(text,
+                                function (result, caller) {
+                                    /** Nothing todo the the action will be in the event listener. */
+                                },
+                                function (errMsg, caller) {
+
+                                }, {})
+                        };
+                        reader.readAsText(f);
+                    }
+                }
+            }(this)
+            // Display the file explorer...
+            fileExplorer.element.click()
+        }
+    }(parent), "fa fa-file-o")
+
+    var importDataMenuItem = new MenuItem("import_data_menu_item", "Import", { "import_xsd_menu_item": importXsdSchemaMenuItem,"import_json_schema_menu_item": importJsonSchemaMenuItem, "":"", "import_xml_menu_item": importXmlDataMenuItem, "import_json_data_menu_item": importJsonDataMenuItem}, 1)
 
     // The new menu in the data Menu
     var newDataMenuItem = new MenuItem("new_data_menu_item", "New", { "new_eql_query_menu_item": newEqlQueryMenuItem, "new_sql_query_menu_item": newSqlQueryMenuItem }, 1)

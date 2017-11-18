@@ -327,7 +327,7 @@ func (this *DynamicEntity) InitEntity(id string, lazy bool) error {
 	this.setValue("lazy", lazy)
 	err := this.initEntity(id, "", lazy)
 
-	log.Println("After init:", toJsonStr(this.object))
+	//log.Println("After init:", toJsonStr(this.object))
 	return err
 }
 
@@ -629,7 +629,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
  */
 func (this *DynamicEntity) SaveEntity() {
 	this.saveEntity("")
-	log.Println("After save:", toJsonStr(this.object))
+	//log.Println("After save:", toJsonStr(this.object))
 }
 
 func (this *DynamicEntity) saveEntity(path string) {
