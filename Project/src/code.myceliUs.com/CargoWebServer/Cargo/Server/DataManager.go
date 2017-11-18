@@ -1315,6 +1315,18 @@ func (this *DataManager) CreateDataStore(storeId string, storeName string, hostN
 		return
 	}
 
+	// Here I will send the event.
+	var eventDatas []*MessageData
+	evtData := new(MessageData)
+	evtData.TYPENAME = "Server.MessageData"
+	evtData.Name = "storeConfig"
+
+	storeConfigEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", []interface{}{storeId}, false)
+	evtData.Value = storeConfigEntity.GetObject()
+	eventDatas = append(eventDatas, evtData)
+	evt, _ := NewEvent(NewDataStoreEvent, DataEvent, eventDatas)
+	GetServer().GetEventManager().BroadcastEvent(evt)
+
 	store.Connect()
 }
 
@@ -1338,6 +1350,19 @@ func (this *DataManager) DeleteDataStore(storeId string, messageId string, sessi
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}
+
+	// Here I will send the event.
+	var eventDatas []*MessageData
+	evtData := new(MessageData)
+	evtData.TYPENAME = "Server.MessageData"
+	evtData.Name = "storeConfig"
+
+	storeConfigEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", []interface{}{storeId}, false)
+	evtData.Value = storeConfigEntity.GetObject()
+	eventDatas = append(eventDatas, evtData)
+	evt, _ := NewEvent(DeleteDataStoreEvent, DataEvent, eventDatas)
+	GetServer().GetEventManager().BroadcastEvent(evt)
+
 }
 
 // @api 1.0

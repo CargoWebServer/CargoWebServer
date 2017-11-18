@@ -195,6 +195,7 @@ func (self *Action) ExecuteVbScript(scriptName string, args []string) []string {
  * That function is the most important function of the framework. It use
  */
 func (self *Action) ExecuteJsFunction(funtionStr string, funtionParams ...interface{}) (results []interface{}, jsError error) {
+
 	var sessionId string
 	if self.msg.from != nil {
 		sessionId = self.msg.from.GetUuid()

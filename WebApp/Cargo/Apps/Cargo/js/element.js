@@ -411,13 +411,12 @@ Element.prototype.getChildsByClassName = function (className, childs) {
 * @stability 1
 */
 Element.prototype.getTopParent = function () {
-    var topParent = null
     if (this.parentElement != null) {
-        topParent = this.parentElement.getTopParent()
-    } else {
-        topParent = this
+        if(this.parentElement.getTopParent != undefined){
+            return this.parentElement.getTopParent()
+        }
     }
-    return topParent
+    return this
 }
 
 /**

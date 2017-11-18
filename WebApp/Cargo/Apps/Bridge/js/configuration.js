@@ -186,6 +186,13 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                         }
                     }
 
+                    // Here I will broadcast a local event, export data menue need that information.
+                    var evt = {
+                        "code": NewDataStoreEvent, "name": DataEvent,
+                        "dataMap": {"storeConfig":content}
+                    }
+                    server.eventHandler.broadcastLocalEvent(evt)
+
                     // Here I will append the connection button...
                     contentView.connectBtn = contentView.header.appendElement({ "tag": "div", "class": "entities_header_btn enabled", "style": "display: table-cell;" }).down()
                     contentView.connectBtn.appendElement({ "tag": "i", "class": "fa fa-plug" })

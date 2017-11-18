@@ -468,7 +468,35 @@ HomePage.prototype.init = function (parent, sessionInfo) {
         }
     }(parent), "fa fa-file-o")
 
-    var importDataMenuItem = new MenuItem("import_data_menu_item", "Import", { "import_xsd_menu_item": importXsdSchemaMenuItem,"import_json_schema_menu_item": importJsonSchemaMenuItem, "":"", "import_xml_menu_item": importXmlDataMenuItem, "import_json_data_menu_item": importJsonDataMenuItem}, 1)
+    // import schemas/data
+    var importDataMenuItem = new MenuItem("import_data_menu_item", "Import", { "import_xsd_menu_item": importXsdSchemaMenuItem, "import_json_schema_menu_item": importJsonSchemaMenuItem, "": "", "import_xml_menu_item": importXmlDataMenuItem, "import_json_data_menu_item": importJsonDataMenuItem }, 1, undefined, "fa fa-upload")
+
+    // Schema export
+    var exportSchemaMenuItem = new MenuItem("export_schema_menu_item", "Schema", {}, 1, undefined, "fa fa-file-o")
+    // Data export
+    var exportDataMenuItem = new MenuItem("export_data_menu_item", "Data", {}, 1, undefined, "fa fa-file-o")
+    // export schmas/data
+    var exportMenuItem = new MenuItem("export_menu_item", "Export", { "export_schema_menu_item": exportSchemaMenuItem, "export_data_menu_item": exportDataMenuItem }, 1, undefined, "fa fa-download")
+
+    server.dataManager.attach(exportSchemaMenuItem, NewDataStoreEvent, function (evt, exportSchemaMenuItem) {
+        console.log("----> event received: ", evt)
+        var storeConfig = evt.dataMap["storeConfig"]
+        // So here I will append the data store in the list of export schema.
+        var item = new MenuItem("export_schema_" + storeConfig.M_id + "_menu_item", storeConfig.M_storeName,
+            function (storeConfig) {
+                return function () {
+
+                }
+            }(storeConfig), 2, undefined, "fa fa-file-o")
+
+        // Append it to export schema menu.
+        exportSchemaMenuItem.appendItem(item)
+    })
+
+    server.dataManager.attach(exportDataMenuItem, NewDataStoreEvent, function (evt, exportDataMenuItem) {
+        // console.log("----> event received: ", evt)
+
+    })
 
     // The new menu in the data Menu
     var newDataMenuItem = new MenuItem("new_data_menu_item", "New", { "new_eql_query_menu_item": newEqlQueryMenuItem, "new_sql_query_menu_item": newSqlQueryMenuItem }, 1)
@@ -485,10 +513,11 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     var editMenuItem = new MenuItem("edit_menu", "Edit", {}, 0)
 
-    var dataMenuItem = new MenuItem("data_menu", "Data", { "import_data_menu_item": importDataMenuItem, "new_data_menu_item": newDataMenuItem }, 0)
+    var dataMenuItem = new MenuItem("data_menu", "Data", { "import_data_menu_item": importDataMenuItem, "export_menu_item": exportMenuItem, "new_data_menu_item": newDataMenuItem }, 0)
 
     // The main menu will be display in the body element, so nothing will be over it.
     this.mainMenu = new VerticalMenu(new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; top:2px;" }), [fileMenuItem, dataMenuItem, editMenuItem])
+
 
     /////////////////////////////////// workspace section  ///////////////////////////////////
     this.mainArea = this.panel.appendElement({ "tag": "div", "style": "display: table; width:100%; height:100%" }).down()

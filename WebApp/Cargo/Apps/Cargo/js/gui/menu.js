@@ -3,6 +3,8 @@
  * by the menu interface...
  */
 var MenuItem = function (id, name, subItems, level, action, icon) {
+    // The parent menu.
+    this.menu = null
 
     // Must be unique in it context...
     this.id = id
@@ -39,6 +41,15 @@ var MenuItem = function (id, name, subItems, level, action, icon) {
 }
 
 /**
+ * Append a sub menu item to an existing menu item.
+ */
+MenuItem.prototype.appendItem = function (item) {
+    item.parent = this
+    this.subItems[item.id] = item
+    this.menu.appendItem(item)
+}
+
+/**
  * 
  * @param {*} parent The div where the menu will be append.
  * @param {*} items  The list of menu Item to display in the menu.
@@ -52,6 +63,7 @@ var Menu = function (parent, items) {
     this.panel = this.parent.appendElement({ "tag": "div", "style": "relative;" }).down()
     this.subItemPanel = null
     this.currentItem = null
+    this.subMenus = {}
 
     this.items = items
     if (this.items == undefined) {
@@ -88,7 +100,6 @@ VerticalMenu.prototype.constructor = Menu;
  * Append a new Item in the menu panel...
  */
 VerticalMenu.prototype.appendItem = function (item) {
-
     if (isString(item)) {
         // In that case I will append a separator.
         this.appendSeparator()
@@ -100,14 +111,14 @@ VerticalMenu.prototype.appendItem = function (item) {
         // Here the menu is show in row...
         currentPanel = this.panel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_menu", "innerHtml": item.name }).down()
     } else {
-        // Here the menu is 
-        currentPanel = this.panel.appendElement({ "tag": "div", "class": "menu_row", "style": "display: table-row; width: 100%" }).down()
-        var iconPanel = currentPanel.appendElement({ "tag": "i", "class": item.icon + " menu_icon", "style": "display: table-cell;" }).down()
-        var subMenuPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu", "innerHtml": item.name }).down()
+        // Here the menu is
+        currentPanel = this.panel.appendElement({ "tag": "div", "class": "menu_row", "id": item.id + "_vertical_submenu_row", "style": "display: table-row; width: 100%" }).down()
+        currentPanel.appendElement({ "tag": "i", "class": item.icon + " menu_icon", "style": "display: table-cell;" }).down()
+        currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu", "innerHtml": item.name }).down()
     }
 
     // Append the subitem panel.
-    this.subItemPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu_items" }).down()
+    this.subItemPanel = currentPanel.appendElement({ "tag": "div", "id": item.id + "_vertical_submenu_items", "class": "vertical_submenu_items" }).down()
     item.panel = this.subItemPanel
 
     // Display the menu automatically...
@@ -117,19 +128,17 @@ VerticalMenu.prototype.appendItem = function (item) {
             for (var i = 0; i < subItemPanels.length; i++) {
                 subItemPanels[i].style.display = "none"
             }
-
             if (item.level > 0) {
                 // Now I will offset the menu...
                 menu.currentItem = item
                 function setVisible(item) {
-
                     item.panel.element.style.display = "block"
                     if (item.parent != undefined) {
                         setVisible(item.parent)
                     }
                     if (item.level > 0) {
                         item.panel.element.style.left = item.panel.element.parentNode.offsetWidth + "px"
-                        item.panel.element.style.top = "0px"
+                        item.panel.element.style.top = item.panel.element.parentNode.offsetTop + "px"
                     }
                     if (Object.keys(item.panel.childs).length == 0) {
                         item.panel.element.style.display = "none"
@@ -147,10 +156,9 @@ VerticalMenu.prototype.appendItem = function (item) {
         for (var key in item.subItems) {
             subItems.push(item.subItems[key])
         }
-        if (subItems.length > 0) {
-            new VerticalMenu(this.subItemPanel, subItems)
-        }
     }
+    
+    item.menu =  new VerticalMenu(this.subItemPanel, subItems)
 
     // Now the actions...
     currentPanel.element.onclick = function (menuPanel, subItemPanel) {
@@ -190,7 +198,7 @@ VerticalMenu.prototype.appendItem = function (item) {
  */
 var PopUpMenu = function (parent, items, e) {
 
-    Menu.call(this, parent, items)
+    Menu.call(this, parent.getTopParent(), items)
 
     // Only one menu must be display at any time.
     var popups = document.getElementsByClassName("popup_menu")
@@ -201,6 +209,9 @@ var PopUpMenu = function (parent, items, e) {
     this.panel.element.className = "popup_menu"
     this.panel.element.style.position = "absolute"
     this.panel.element.style.zIndex = "10"
+    var coord = getCoords(parent.element)
+    this.panel.element.style.top = coord.top + 16 + "px"
+    this.panel.element.style.left = coord.left + 24 + "px"
 
     this.displayed = false
 
@@ -247,7 +258,7 @@ var PopUpMenu = function (parent, items, e) {
         }
     }(this, listener2)
     document.getElementsByTagName("body")[0].addEventListener("keyup", listener2);
-   
+
     // I will now initialyse the items...
     for (var i = 0; i < this.items.length; i++) {
         this.appendItem(this.items[i])
@@ -317,10 +328,9 @@ PopUpMenu.prototype.appendItem = function (item) {
         for (var key in item.subItems) {
             subItems.push(item.subItems[key])
         }
-        if (subItems.length > 0) {
-            new VerticalMenu(this.subItemPanel, subItems)
-        }
     }
+    item.menu =  new PopUpMenu(this.subItemPanel, subItems)
+
 
     // Now the actions...
     currentPanel.element.onclick = function (menu, menuPanel, subItemPanel) {
@@ -389,6 +399,8 @@ HorizontalMenu.prototype.constructor = Menu;
  * Append a new Item in the menu panel...
  */
 HorizontalMenu.prototype.appendItem = function (item) {
+
+    item.menu = this
 
     // The top element...
     if (item.level == 0) {

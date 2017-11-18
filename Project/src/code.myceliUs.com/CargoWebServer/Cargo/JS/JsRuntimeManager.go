@@ -3,6 +3,7 @@ package JS
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -562,6 +563,12 @@ func (this *JsRuntimeManager) ExecuteJsFunction(messageId string, sessionId stri
 	if this.m_executeJsFunction[sessionId] == nil {
 		return nil, errors.New("Session " + sessionId + " is closed!")
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Recovered in f", r)
+		}
+	}()
 
 	// Put function call information into a struct.
 	var jsFunctionInfos JsFunctionInfos
