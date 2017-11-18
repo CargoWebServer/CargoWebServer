@@ -479,15 +479,15 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     var exportMenuItem = new MenuItem("export_menu_item", "Export", { "export_schema_menu_item": exportSchemaMenuItem, "export_data_menu_item": exportDataMenuItem }, 1, undefined, "fa fa-download")
 
     server.dataManager.attach(exportSchemaMenuItem, NewDataStoreEvent, function (evt, exportSchemaMenuItem) {
-        console.log("----> event received: ", evt)
         var storeConfig = evt.dataMap["storeConfig"]
         // So here I will append the data store in the list of export schema.
-        var item = new MenuItem("export_schema_" + storeConfig.M_id + "_menu_item", storeConfig.M_storeName,
+        var item = new MenuItem("export_schema_" + storeConfig.M_id + "_menu_item", storeConfig.M_storeName, {}, 2,
             function (storeConfig) {
                 return function () {
-
+                    // Now I will call
+                    // alert("---> export " + storeConfig.M_storeName)
                 }
-            }(storeConfig), 2, undefined, "fa fa-file-o")
+            }(storeConfig), "fa fa-file-o")
 
         // Append it to export schema menu.
         exportSchemaMenuItem.appendItem(item)

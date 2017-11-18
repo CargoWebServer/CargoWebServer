@@ -60,7 +60,7 @@ var Menu = function (parent, items) {
     }
 
     this.parent = parent
-    this.panel = this.parent.appendElement({ "tag": "div", "style": "relative;" }).down()
+    this.panel = this.parent.appendElement({ "tag": "div", "style": "position: relative; display: none;" }).down()
     this.subItemPanel = null
     this.currentItem = null
     this.subMenus = {}
@@ -106,6 +106,8 @@ VerticalMenu.prototype.appendItem = function (item) {
         return
     }
 
+    this.panel.element.style.display = ""
+
     var currentPanel = null
     if (item.level == 0) {
         // Here the menu is show in row...
@@ -118,7 +120,7 @@ VerticalMenu.prototype.appendItem = function (item) {
     }
 
     // Append the subitem panel.
-    this.subItemPanel = currentPanel.appendElement({ "tag": "div", "id": item.id + "_vertical_submenu_items", "class": "vertical_submenu_items" }).down()
+    this.subItemPanel = currentPanel.appendElement({ "tag": "div", "id": item.id + "_vertical_submenu_items", "class": "vertical_submenu_items", "style":"display: none;"}).down()
     item.panel = this.subItemPanel
 
     // Display the menu automatically...
@@ -128,6 +130,7 @@ VerticalMenu.prototype.appendItem = function (item) {
             for (var i = 0; i < subItemPanels.length; i++) {
                 subItemPanels[i].style.display = "none"
             }
+
             if (item.level > 0) {
                 // Now I will offset the menu...
                 menu.currentItem = item
@@ -140,7 +143,7 @@ VerticalMenu.prototype.appendItem = function (item) {
                         item.panel.element.style.left = item.panel.element.parentNode.offsetWidth + "px"
                         item.panel.element.style.top = item.panel.element.parentNode.offsetTop + "px"
                     }
-                    if (Object.keys(item.panel.childs).length == 0) {
+                    if (Object.keys(item.subItems).length == 0) {
                         item.panel.element.style.display = "none"
                     }
                 }
@@ -157,7 +160,7 @@ VerticalMenu.prototype.appendItem = function (item) {
             subItems.push(item.subItems[key])
         }
     }
-    
+
     item.menu =  new VerticalMenu(this.subItemPanel, subItems)
 
     // Now the actions...
@@ -190,7 +193,6 @@ VerticalMenu.prototype.appendItem = function (item) {
             }
         }
     }(currentPanel, this.subItemPanel, item)
-
 }
 
 /*
@@ -280,6 +282,8 @@ PopUpMenu.prototype.appendItem = function (item) {
         return
     }
 
+    this.panel.element.style.display = ""
+
     var currentPanel = null
 
     // Here the menu is 
@@ -329,7 +333,8 @@ PopUpMenu.prototype.appendItem = function (item) {
             subItems.push(item.subItems[key])
         }
     }
-    item.menu =  new PopUpMenu(this.subItemPanel, subItems)
+    
+    item.menu =  new VerticalMenu(this.subItemPanel, subItems)
 
 
     // Now the actions...
