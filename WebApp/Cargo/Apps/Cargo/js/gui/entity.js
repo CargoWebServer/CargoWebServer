@@ -767,7 +767,7 @@ EntityPanel.prototype.createXsControl = function (id, valueDiv, field, fieldType
 				if (control == undefined) {
 					control = valueDiv.appendElement({ "tag": "select", "id": id }).down()
 				}
-				control.appendElement({ "tag": "option", "value": i + 1, "innerHtml": restriction.Value })
+				control.appendElement({ "tag": "option", "value": restriction.Value, "innerHtml": restriction.Value })
 			}
 		}
 		return control
@@ -1122,14 +1122,16 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 						entityPanel.setEntity(entity)
 
-					} else {
+					} else if( entityPanel.getEntity()[attribute].TYPENAME != undefined) {
 						// Get the existing entity.
+						entity = entityPanel.getEntity()[attribute]
+					}else{
 						entity = entityPanel.getEntity()
 					}
 
 					/** Here it's a string **/
 					var baseType = getBaseTypeExtension(fieldType)
-					if (isXsString(baseType) || isXsId(fieldType) || isXsString(fieldType || isXsRef(fieldType))) {
+					if (isXsId(fieldType) || isXsString(fieldType || isXsRef(fieldType))) {
 						if (entity[attribute] != this.value) {
 							entity[attribute] = this.value
 							entity.NeedSave = true
@@ -1155,14 +1157,17 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 							entity[attribute] = this.checked
 							entity.NeedSave = true
 						}
-					} else if (fieldType.startsWith("enum:")) {
+					} else if (fieldType.startsWith("enum:")) { // Cargo enum not xsd extention.
 						if (entity[attribute] != this.selectedIndex + 1) {
 							entity[attribute] = this.selectedIndex + 1
 							entity.NeedSave = true
 						}
-					} else {
+					} else if (isXsBaseType(baseType)) {
 						// The field is a reference...
-
+						if (entity["M_valueOf"] != this.value) {
+							entity["M_valueOf"] = this.value
+							entity.NeedSave = true
+						}
 					}
 
 					// Display the save button if the entity has changed.
@@ -1576,7 +1581,11 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 		if (fieldType.startsWith("enum:") || control.element.tagName == "SELECT") {
 			// Here the value is an enumeration...
 			if (value.M_valueOf != undefined) {
-				control.element.selectedIndex = parseInt(value.M_valueOf) - 1
+				for(var id in control.element.options){
+					if(control.element.options[id].innerText == value.M_valueOf){
+						control.element.selectedIndex = id;
+					}
+				}
 			} else {
 				control.element.selectedIndex = parseInt(value) - 1
 			}

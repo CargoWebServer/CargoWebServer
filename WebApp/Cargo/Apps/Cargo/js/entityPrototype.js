@@ -303,14 +303,21 @@ EntityPrototype.prototype.generateConstructor = function () {
 
     // I will create the object constructor from the information
     // of the fields.
-    constructorSrc += this.PackageName + "." + this.ClassName + " = function(){\n"
+    constructorSrc += this.PackageName + "." + this.ClassName + " = function(values){\n"
 
     // Common properties share by all entity.
     constructorSrc += " this.__class__ = \"" + this.PackageName + "." + this.ClassName + "\"\n"
-    constructorSrc += " this.UUID = undefined\n"
     constructorSrc += " this.TYPENAME = \"" + this.TypeName + "\"\n"
-    constructorSrc += " this.ParentUuid = \"\"\n"
-    constructorSrc += " this.ParentLnk = \"\"\n"
+    constructorSrc += " if(values==undefined){\n"
+    constructorSrc += "     this.UUID = undefined\n"
+    constructorSrc += "     this.ParentUuid = \"\"\n"
+    constructorSrc += "     this.ParentLnk = \"\"\n"
+    constructorSrc += " }else{\n"
+    constructorSrc += "     this.UUID = values.UUID\n"
+    constructorSrc += "     this.ParentUuid = values.ParentUuid\n"
+    constructorSrc += "     this.ParentLnk = values.ParentLnk\n"
+    constructorSrc += " }\n"
+
     constructorSrc += " this.childsUuid = []\n"
     constructorSrc += " this.references = []\n"
     constructorSrc += " this.NeedSave = true\n"
@@ -329,65 +336,79 @@ EntityPrototype.prototype.generateConstructor = function () {
 
     // Fields.
     for (var i = 3; i < this.Fields.length - 2; i++) {
-        constructorSrc += " this." + normalizeFieldName(this.Fields[i])
+        var fieldName = normalizeFieldName(this.Fields[i])
         if (this.FieldsDefaultValue[i] != undefined) {
             // In case of default values...
             if (this.FieldsType[i].startsWith("[]")) {
-                constructorSrc += " = []\n"
+                constructorSrc += " this." + fieldName + " = []\n"
             } else if (isXsString(this.FieldsType[i]) || isXsRef(this.FieldsType[i]) || isXsId(this.FieldsType[i])) {
-                constructorSrc += " = \"" + this.FieldsDefaultValue[i] + "\"\n"
+                constructorSrc += " this." + fieldName + " = \"" + this.FieldsDefaultValue[i] + "\"\n"
             } else {
                 if (this.FieldsType[i].startsWith("xs.")) {
-                    constructorSrc += " = " + this.FieldsDefaultValue[i] + "\n"
+                    if(this.FieldsDefaultValue[i].length != 0){
+                    constructorSrc += " this." + fieldName + " = " + this.FieldsDefaultValue[i] + "\n"
+                    }else if(isXsNumeric(this.FieldsType[i])){
+                        constructorSrc += " this." + fieldName + " = 0.0\n"
+                    }else if(isXsBoolean(this.FieldsType[i])){
+                        constructorSrc += " this." + fieldName + " = false\n"
+                    }else if(isXsString(this.FieldsType[i])){
+                        constructorSrc += " this." + fieldName + " = \"\"\n"
+                    }else{
+                        constructorSrc += " this." + fieldName + " = null\n"
+                    }
                 } else if (this.FieldsType[i].startsWith("enum:")) {
-                    constructorSrc += " = 1\n"
+                    constructorSrc += " this." + fieldName + " = 1\n"
                 } else {
                     if (!this.FieldsType[i].endsWith(":Ref")) {
-                        constructorSrc += " =  eval(\"new " + this.FieldsType[i] + "()\")\n"
-                        constructorSrc += "this." + this.Fields[i] + ".ParentUuid = this.UUID\n"
-                        constructorSrc += "this." + this.Fields[i] + ".ParentLnk = \"" + this.FieldsType[i] + "\"\n"
+                        constructorSrc += " if( values != undefined ){\n"
+                        constructorSrc += "     this." + fieldName + " = eval(\"new " + this.FieldsType[i] + "(values." + fieldName + ")\")\n"
+                        constructorSrc += " }else{\n"
+                        constructorSrc += "     this." + fieldName + " = eval(\"new " + this.FieldsType[i] + "()\")\n"
+                        constructorSrc += "     this." + this.Fields[i] + ".ParentUuid = this.UUID\n"
+                        constructorSrc += "     this." + this.Fields[i] + ".ParentLnk = \"" + this.FieldsType[i] + "\"\n"
                         if (this.FieldsDefaultValue[i] != "null" && this.FieldsDefaultValue[i] != "undefined") {
-                            constructorSrc += " var obj = JSON.parse('" + this.FieldsDefaultValue[i] + "')\n"
-                            constructorSrc += "obj.ParentUuid = this.UUID\n"
-                            constructorSrc += "obj.ParentLnk = \"" + this.FieldsType[i] + "\"\n"
-                            constructorSrc += "this." + this.Fields[i] + ".init(obj)\n"
+                            constructorSrc += "     var obj = JSON.parse('" + this.FieldsDefaultValue[i] + "')\n"
+                            constructorSrc += "     obj.ParentUuid = this.UUID\n"
+                            constructorSrc += "     obj.ParentLnk = \"" + this.FieldsType[i] + "\"\n"
+                            constructorSrc += "     this." + this.Fields[i] + ".init(obj)\n"
                         }
+                        constructorSrc += " }\n"
                     } else {
-                        constructorSrc += " = null\n"
+                        constructorSrc += " this." + fieldName + " = null\n"
                     }
                 }
             }
         } else if (this.FieldsType[i].startsWith("[]")) {
-            constructorSrc += " = []\n"
+            constructorSrc += " this." + fieldName + " = []\n"
         } else {
             if (isXsString(this.FieldsType[i]) || isXsRef(this.FieldsType[i]) || isXsId(this.FieldsType[i])) {
-                constructorSrc += " = \"\"\n"
+                constructorSrc += " this." + fieldName + " = \"\"\n"
             } else if (isXsInt(this.FieldsType[i])) {
-                constructorSrc += " = 0\n"
+                constructorSrc += " this." + fieldName + " = 0\n"
             } else if (isXsNumeric(this.FieldsType[i])) {
-                constructorSrc += " = 0.0\n"
+                constructorSrc += " this." + fieldName + " = 0.0\n"
             } else if (isXsDate(this.FieldsType[i])) {
-                constructorSrc += " = moment().unix()\n"
+                constructorSrc += " this." + fieldName + " = moment().unix()\n"
             } else if (isXsBoolean(this.FieldsType[i])) {
-                constructorSrc += " = false\n"
+                constructorSrc += " this." + fieldName + " = false\n"
             } else if (this.FieldsType[i].startsWith("enum:")) {
-                constructorSrc += " = 1\n"
+                constructorSrc += " this." + fieldName + " = 1\n"
             } else {
                 // Object here.
                 if (!this.FieldsType[i].endsWith(":Ref")) {
-                    constructorSrc += " =  eval(\"new " + this.FieldsType[i] + "()\")\n"
-                    constructorSrc += "this." + this.Fields[i] + ".ParentUuid = this.UUID\n"
-                    constructorSrc += "this." + this.Fields[i] + ".ParentLnk = \"" + this.FieldsType[i] + "\"\n"
+                    constructorSrc += " this." + fieldName + " =  eval(\"new " + this.FieldsType[i] + "()\")\n"
+                    constructorSrc += " this." + this.Fields[i] + ".ParentUuid = this.UUID\n"
+                    constructorSrc += " this." + this.Fields[i] + ".ParentLnk = \"" + this.FieldsType[i] + "\"\n"
                     if (this.FieldsDefaultValue[i] != "null" && this.FieldsDefaultValue[i] != "undefined") {
                         constructorSrc += " var obj = JSON.parse('" + this.FieldsDefaultValue[i] + "')\n"
-                        constructorSrc += "obj.ParentUuid = this.UUID\n"
-                        constructorSrc += "obj.ParentLnk = \"" + this.FieldsType[i] + "\"\n"
-                        constructorSrc += "this." + this.Fields[i] + ".init(obj)\n"
+                        constructorSrc += " obj.ParentUuid = this.UUID\n"
+                        constructorSrc += " obj.ParentLnk = \"" + this.FieldsType[i] + "\"\n"
+                        constructorSrc += " this." + this.Fields[i] + ".init(obj)\n"
                     }
                 } else if (this.FieldsType[i].startsWith("enum:")) {
-                    constructorSrc += " = 0\n"
+                    constructorSrc += " this." + fieldName + " = 0\n"
                 } else {
-                    constructorSrc += " = null\n"
+                    constructorSrc += " this." + fieldName + " = null\n"
                 }
             }
         }

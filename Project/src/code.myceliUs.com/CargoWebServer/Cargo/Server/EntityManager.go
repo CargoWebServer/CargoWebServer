@@ -1336,7 +1336,6 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 				return nil, errObj
 			}
 		} else {
-			log.Println("--------> invalid method name:", methodName)
 			cargoError := NewError(Utility.FileLine(), TYPENAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The typeName '"+typeName+"' is does not exist."))
 			return nil, cargoError
 		}
@@ -1344,6 +1343,14 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 
 	// Set the relation name with it parent.
 	entity.(Entity).SetParentLnk(attributeName)
+
+	if this.isExist(entity.(Entity).GetUuid()) {
+		// Here because I use the New methode the value is in the cache so
+		// I need to remove it...
+		this.removeEntity(entity.(Entity).GetUuid())
+		cargoError := NewError(Utility.FileLine(), ENTITY_ALREADY_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The entity '"+entity.(Entity).GetUuid()+"' already exist!"))
+		return nil, cargoError
+	}
 
 	// Save the entity...
 	entity.(Entity).SetNeedSave(true)
@@ -1443,6 +1450,10 @@ func (this *EntityManager) removeEntityOwner(entity Entity) {
  * Return true if an entity with a given uuid exist in the store.
  */
 func (this *EntityManager) isExist(uuid string) bool {
+	if len(uuid) == 0 {
+		return false
+	}
+
 	storeId := uuid[0:strings.Index(uuid, ".")]
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	// Here the code is not nil

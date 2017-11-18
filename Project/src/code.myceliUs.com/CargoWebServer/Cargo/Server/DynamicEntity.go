@@ -126,7 +126,6 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 	if val, ok := this.contain(values["UUID"].(string)); ok {
 		if val != nil {
 			entity = val.(*DynamicEntity)
-
 			// Calculate the checksum.
 			sum0 := Utility.GetChecksum(values)
 			sum1 := entity.GetChecksum()
@@ -153,10 +152,6 @@ func (this *EntityManager) newDynamicEntity(parentUuid string, values map[string
 	if entity == nil {
 		// Create a new dynamic entity it that case.
 		entity = new(DynamicEntity)
-
-		// If the object contain an id...
-		entity.setValue("UUID", values["UUID"].(string))
-
 		entity.childsUuid = make([]string, 0)
 		entity.referencesUuid = make([]string, 0)
 		entity.referenced = make([]EntityRef, 0)
@@ -332,7 +327,7 @@ func (this *DynamicEntity) InitEntity(id string, lazy bool) error {
 	this.setValue("lazy", lazy)
 	err := this.initEntity(id, "", lazy)
 
-	//log.Println("After init:", toJsonStr(this.object))
+	log.Println("After init:", toJsonStr(this.object))
 	return err
 }
 
@@ -355,14 +350,13 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 	}
 
 	// I will set the id, (must be a uuid...)
-	this.setValue("UUID", id)
-
 	typeName := id[0:strings.Index(id, "%")]
 	packageName := typeName[0:strings.Index(typeName, ".")]
 
 	var query EntityQuery
 	query.TypeName = typeName
 	prototype := this.GetPrototype()
+
 	// Here I will append the rest of the fields...
 	// append the list of fields...
 	query.Fields = append(query.Fields, prototype.Fields...)
@@ -390,6 +384,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 		if len(results[0]) == 0 {
 			return errors.New("No value found for entity " + this.GetUuid())
 		}
+
 		// Set the common values...
 		this.setValue("TYPENAME", typeName) // Set the typeName
 
@@ -519,13 +514,11 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 															this.RemoveChild(fieldName, uuids[i])
 															this.SetNeedSave(true)
 														} else {
-															dynamicEntity.AppendReferenced(fieldName, this)
 															this.AppendChild(fieldName, dynamicEntity)
 														}
 													}
 												} else {
 													staticEntity.(Entity).InitEntity(uuids[i], lazy)
-													staticEntity.(Entity).AppendReferenced(fieldName, this)
 													this.AppendChild(fieldName, staticEntity.(Entity))
 												}
 
@@ -559,7 +552,6 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 								if Utility.IsValidEntityReferenceName(uuid) && !lazy {
 									if instance, ok := GetServer().GetEntityManager().contain(uuid); ok {
 										dynamicEntity := instance.(*DynamicEntity)
-										dynamicEntity.AppendReferenced(fieldName, this)
 										this.AppendChild(fieldName, dynamicEntity)
 									} else {
 										typeName := strings.Replace(fieldType, ":Ref", "", -1)
@@ -586,7 +578,6 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 													this.RemoveChild(fieldName, uuid)
 													this.SetNeedSave(true)
 												} else {
-													dynamicEntity.AppendReferenced(fieldName, this)
 													this.AppendChild(fieldName, dynamicEntity)
 												}
 											} else {
@@ -594,7 +585,6 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 											}
 										} else {
 											staticEntity.(Entity).InitEntity(uuid, lazy)
-											staticEntity.(Entity).AppendReferenced(fieldName, this)
 											this.AppendChild(fieldName, staticEntity.(Entity))
 										}
 									}
@@ -639,7 +629,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
  */
 func (this *DynamicEntity) SaveEntity() {
 	this.saveEntity("")
-	//log.Println("After save:", toJsonStr(this.object))
+	log.Println("After save:", toJsonStr(this.object))
 }
 
 func (this *DynamicEntity) saveEntity(path string) {
@@ -663,7 +653,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 	// General information.
 	query.Fields = append(query.Fields, "UUID")
 	DynamicEntityInfo = append(DynamicEntityInfo, this.GetUuid())
-
 	query.Fields = append(query.Fields, "ParentUuid")
 
 	startIndex := 2
@@ -803,7 +792,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 									// I will create the sub value...
 									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.GetUuid(), subValues)
 									if errObj == nil {
-										subEntity.AppendReferenced(fieldName, this)
 										this.AppendChild(fieldName, subEntity)
 										subEntityIds = append(subEntityIds, subEntity.GetUuid())
 										if subEntity.NeedSave() {
@@ -811,7 +799,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 										}
 									}
 								} else {
-									staticEntity.(Entity).AppendReferenced(fieldName, this)
 									this.AppendChild(fieldName, staticEntity.(Entity))
 									subEntityIds = append(subEntityIds, uuid)
 									if staticEntity.(Entity).NeedSave() {
@@ -849,7 +836,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 										// I will create the sub value...
 										subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.GetUuid(), subValues)
 										if errObj == nil {
-											subEntity.AppendReferenced(fieldName, this)
 											this.AppendChild(fieldName, subEntity)
 											subEntityIds = append(subEntityIds, subEntity.GetUuid())
 											if subEntity.NeedSave() {
@@ -857,7 +843,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 											}
 										}
 									} else {
-										staticEntity.(Entity).AppendReferenced(fieldName, this)
 										this.AppendChild(fieldName, staticEntity.(Entity))
 										subEntityIds = append(subEntityIds, uuid)
 										if staticEntity.(Entity).NeedSave() {
@@ -983,14 +968,13 @@ func (this *DynamicEntity) saveEntity(path string) {
 								subValues := this.getValue(fieldName).(map[string]interface{})
 
 								// I will create the sub value...
-								typeName := strings.Replace(strings.Replace(fieldType, ":Ref", "", -1), "[]", "", -1)
 								var uuid string
 								if subValues["UUID"] != nil {
 									uuid = subValues["UUID"].(string)
 								}
 
 								// I will try to create a static entity...
-								newEntityMethod := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
+								newEntityMethod := "New" + strings.Replace(fieldType, ".", "", -1) + "Entity"
 								params := make([]interface{}, 3)
 								params[0] = ""
 								params[1] = uuid
@@ -1002,7 +986,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 									// I will create the sub value...
 									subEntity, errObj := GetServer().GetEntityManager().newDynamicEntity(this.GetUuid(), subValues)
 									if errObj == nil {
-										subEntity.AppendReferenced(fieldName, this)
 										this.AppendChild(fieldName, subEntity)
 										DynamicEntityInfo = append(DynamicEntityInfo, subEntity.GetUuid())
 										if subEntity.NeedSave() {
@@ -1012,7 +995,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 										log.Println("-----> 979 error  ", errObj.GetBody())
 									}
 								} else {
-									staticEntity.(Entity).AppendReferenced(fieldName, this)
 									this.AppendChild(fieldName, staticEntity.(Entity))
 									DynamicEntityInfo = append(DynamicEntityInfo, uuid)
 									if staticEntity.(Entity).NeedSave() {
@@ -1173,7 +1155,10 @@ func (this *DynamicEntity) GetPackageName() string {
  * Each entity must have one uuid.
  */
 func (this *DynamicEntity) GetUuid() string {
-	return this.getValue("UUID").(string)
+	if this.getValue("UUID") != nil {
+		return this.getValue("UUID").(string)
+	}
+	return "" // Can be an error here.
 }
 
 func (this *DynamicEntity) GetParentUuid() string {
@@ -1285,6 +1270,9 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 
 	// Set the parent Lnk.
 	child.(*DynamicEntity).setValue("ParentLnk", attributeName)
+
+	// Set the parent UUID
+	child.(*DynamicEntity).setValue("ParentUuid", this.GetUuid())
 
 	// I will retreive the field type.
 	prototype := this.GetPrototype()

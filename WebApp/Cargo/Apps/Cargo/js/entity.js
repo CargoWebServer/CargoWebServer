@@ -397,9 +397,8 @@ function setRef(owner, property, refValue, isArray) {
  * Set object, that function call setObjectValues in this path so it's recursive.
  */
 function setSubObject(parent, property, values, isArray) {
-
-    if (values.TYPENAME == undefined || values.UUID.length == 0) {
-        return parent
+    if (values.TYPENAME == undefined || values.UUID == undefined ) {
+        return
     }
 
     server.entityManager.getEntityPrototype(values.TYPENAME, values.TYPENAME.split(".")[0],
@@ -408,16 +407,20 @@ function setSubObject(parent, property, values, isArray) {
             var property = caller.property
             var values = caller.values
             var isArray = caller.isArray
+
+            // Get the parent from the global map.
+            if (entities[parent.UUID] != undefined) {
+                parent = entities[parent.UUID]
+            }
+
             if (values.TYPENAME == "BPMN20.StartEvent") {
                 i = 0;
             }
 
             var object = entities[values.UUID]
             if (object == undefined) {
-                object = eval("new " + values.TYPENAME + "()")
-                // Keep track of the parent uuid in the child.
-                object.UUID = values.UUID
-                object.ParentUuid = parent.UUID
+                object = eval("new " + values.TYPENAME + "(values)")
+                setObjectValues(object, values)
             }
 
             // Keep track of the child uuid inside the parent.
@@ -444,14 +447,10 @@ function setSubObject(parent, property, values, isArray) {
             object.ParentUuid = parent.UUID
             object.ParentLnk = property
             server.entityManager.setEntity(object)
-
         },
         function () {
 
         }, { "parent": parent, "property": property, "values": values, "isArray": isArray })
-
-
-    return parent
 }
 
 /**
@@ -536,6 +535,21 @@ function setObjectValues(object, values) {
         }
     }
 
+    // Set the object on the global map.
+    if (values.UUID != undefined) {
+        if (values.UUID.length > 0) {
+            object.UUID = values.UUID
+            object.NeedSave = false
+            object.exist = true
+            object.IsInit = true // The object part only and not the refs...
+            object.ParentUuid = values.ParentUuid // set the parent uuid.
+            object.ParentLnk = values.ParentLnk
+    
+            // Set the initialyse object.
+            server.entityManager.setEntity(object)
+        }
+    }
+
     ////////////////////////////////////////////////////////////////////////////////
     // Generate sub-object and reference set and reset function
     for (var property in values) {
@@ -545,10 +559,10 @@ function setObjectValues(object, values) {
         if (propertyType != null) {
             // Condition...
             var isRef = propertyType.endsWith(":Ref")
-            var baseType = getBaseTypeExtension(propertyType)
+            // var baseType = getBaseTypeExtension(propertyType)
 
             // M_listOf, M_valueOf field or enumeration type contain plain value.
-            var isBaseType = isXsBaseType(baseType) || propertyType.startsWith("sqltypes.") && !propertyType.startsWith("[]sqltypes.") || propertyType.startsWith("[]xs.") || propertyType.startsWith("xs.") || property == "M_listOf" || property == "M_valueOf" || propertyType.startsWith("enum:")
+            var isBaseType = /*isXsBaseType(baseType) ||*/ propertyType.startsWith("sqltypes.") && !propertyType.startsWith("[]sqltypes.") || propertyType.startsWith("[]xs.") || propertyType.startsWith("xs.") || property == "M_listOf" || property == "M_valueOf" || propertyType.startsWith("enum:")
 
             if (values[property] != null) {
                 if (isBaseType) {
@@ -603,16 +617,16 @@ function setObjectValues(object, values) {
                             object[property] = []
                             for (var i = 0; i < values[property].length; i++) {
                                 if (isRef) {
-                                    object = setRef(object, property, values[property][i], isArray_)
+                                    setRef(object, property, values[property][i], isArray_)
                                 } else {
-                                    object = setSubObject(object, property, values[property][i], isArray_)
+                                    setSubObject(object, property, values[property][i], isArray_)
                                 }
                             }
                         } else {
                             if (isRef) {
-                                object = setRef(object, property, values[property], isArray_)
+                                setRef(object, property, values[property], isArray_)
                             } else {
-                                object = setSubObject(object, property, values[property], isArray_)
+                                setSubObject(object, property, values[property], isArray_)
                             }
                         }
                     }
@@ -620,18 +634,6 @@ function setObjectValues(object, values) {
             }
         }
     }
-
-    //////////////////////////////////////////////////////
-    // Set common values...
-    object.UUID = values.UUID
-    object.NeedSave = false
-    object.exist = true
-    object.IsInit = true // The object part only and not the refs...
-    object.ParentUuid = values.ParentUuid // set the parent uuid.
-    object.ParentLnk = values.ParentLnk
-
-    // Set the initialyse object.
-    server.entityManager.setEntity(object)
 
     // Call the init callback.
     if (object.initCallback != undefined) {
@@ -690,8 +692,8 @@ function getBaseTypeExtension(typeName, isArray) {
                     return getBaseTypeExtension(prototype.SuperTypeNames[i])
                 }
             }
-        } 
-        
+        }
+
         if (prototype.ListOf != null) {
             if (prototype.ListOf.length > 0) {
                 if (prototype.ListOf.startsWith("xs.")) {

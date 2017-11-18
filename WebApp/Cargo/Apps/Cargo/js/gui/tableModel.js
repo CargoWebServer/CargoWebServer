@@ -219,14 +219,15 @@ EntityTableModel.prototype.removeRow = function (rowIndex, callback) {
     }
 
     var parentEntity = entities[entity.ParentUuid]
-
-
-    // Now I will get the data type for that type.
-    var parentPrototype = getEntityPrototype(parentEntity.TYPENAME)
-    var field = entity.ParentLnk
-    var fieldType = parentPrototype.FieldsType[parentPrototype.getFieldIndex(field)]
-
-    var isRef = fieldType.endsWith(":Ref")
+    var isRef = false
+    if (parentEntity != null) {
+        // Now I will get the data type for that type.
+        var parentPrototype = getEntityPrototype(parentEntity.TYPENAME)
+        var field = entity.ParentLnk
+        var fieldType = parentPrototype.FieldsType[parentPrototype.getFieldIndex(field)]
+        isRef = fieldType.endsWith(":Ref")
+    }
+    
     if (isRef) {
         // I here I simple new to remove the reference from the parent 
         // entity.
@@ -320,7 +321,7 @@ EntityTableModel.prototype.appendRow = function (values) {
  */
 EntityTableModel.prototype.setValueAt = function (value, row, column) {
     var entity = this.entities[row]
-    if(entities[entity.UUID]!=undefined){
+    if (entities[entity.UUID] != undefined) {
         entity = this.entities[row] = entities[entity.UUID]
     }
     var field = "M_" + this.titles[column]
@@ -342,7 +343,7 @@ EntityTableModel.prototype.saveValue = function (row) {
     if (entity != null) {
         // Always use the entity from the enities map it contain
         // the valid data of the entity.
-        if(entities[entity.UUID] != null){
+        if (entities[entity.UUID] != null) {
             entity = row.table.model.entities[row.index] = entities[entity.UUID]
         }
 
