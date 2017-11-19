@@ -393,37 +393,13 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 		// Set the parent uuid...
 		this.setValue("ParentUuid", results[0][1].(string)) // Set the parent uuid.
 
-		startIndex := 2
-		if prototype.getFieldIndex("ParentLnk") != -1 {
-			this.setValue("ParentLnk", results[0][2].(string)) // Set the parent relation.
-			startIndex = 3
-		}
-
-		//init the child...
-		childsUuidStr := results[0][prototype.getFieldIndex("childsUuid")].(string)
-
-		if len(childsUuidStr) > 0 {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				log.Println(Utility.FileLine(), " unable to read child uuid! for entity ", this.GetUuid(), " ", childsUuidStr)
-				return err
-			}
-		}
-
-		referencedStr := results[0][prototype.getFieldIndex("referenced")].(string)
-		this.referenced = make([]EntityRef, 0)
-		if len(referencedStr) > 0 {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				log.Println("---> fail to get ref ")
-				return err
-			}
-		}
+		// The link inside it parent.
+		this.setValue("ParentLnk", results[0][2].(string)) // Set the parent relation.
 
 		// Now The value from the prototype...
 		// The first tow field are uuid and parentUuid
 		// and the last tow fields are childsuuid and referenced...
-		for i := startIndex; i < len(results[0])-2; i++ {
+		for i := 3; i < len(results[0]); i++ {
 			fieldName := prototype.Fields[i]
 			fieldType := prototype.FieldsType[i]
 			isNull := false
@@ -655,11 +631,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	DynamicEntityInfo = append(DynamicEntityInfo, this.GetUuid())
 	query.Fields = append(query.Fields, "ParentUuid")
 
-	startIndex := 2
-	if prototype.getFieldIndex("ParentLnk") != -1 {
-		query.Fields = append(query.Fields, "ParentLnk")
-		startIndex = 3
-	}
+	query.Fields = append(query.Fields, "ParentLnk")
 
 	if len(this.GetParentUuid()) > 0 {
 		DynamicEntityInfo = append(DynamicEntityInfo, this.GetParentUuid())
@@ -672,7 +644,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	// Now the fields of the object, from the prototype...
 	// The first tow field are uuid and parentUuid
 	// and the last tow fields are childsuuid and referenced...
-	for i := startIndex; i < len(prototype.Fields)-2; i++ {
+	for i := 3; i < len(prototype.Fields); i++ {
 		fieldName := prototype.Fields[i]
 		fieldType := prototype.FieldsType[i]
 
@@ -1011,26 +983,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 		} else {
 			DynamicEntityInfo = append(DynamicEntityInfo, "null")
 		}
-	}
-
-	// The childs uuid
-	query.Fields = append(query.Fields, "childsUuid")
-
-	// Finalyse save here...
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	if len(childsUuidStr) > 0 {
-		DynamicEntityInfo = append(DynamicEntityInfo, string(childsUuidStr))
-	} else {
-		DynamicEntityInfo = append(DynamicEntityInfo, "")
-	}
-
-	// The referenced
-	query.Fields = append(query.Fields, "referenced")
-	referencedStr, _ := json.Marshal(this.referenced)
-	if len(childsUuidStr) > 0 {
-		DynamicEntityInfo = append(DynamicEntityInfo, string(referencedStr))
-	} else {
-		DynamicEntityInfo = append(DynamicEntityInfo, "")
 	}
 
 	// The event data...

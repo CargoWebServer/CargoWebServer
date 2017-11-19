@@ -913,6 +913,7 @@ func (this *FileManager) RemoveFile(filePath string, messageId string, sessionId
 	}
 
 	// if the file exist in the root...
+	log.Println("--> try to remove file ", this.root+"/"+filePath)
 	if _, err := os.Stat(this.root + "/" + filePath); err == nil {
 		// TODO Throw an error if err != nil ?
 		if os.IsNotExist(err) {
@@ -920,7 +921,7 @@ func (this *FileManager) RemoveFile(filePath string, messageId string, sessionId
 		}
 	}
 
-	err := os.Remove(filePath)
+	err := os.Remove(this.root + "/" + filePath)
 	if err != nil {
 		errObj := NewError(Utility.FileLine(), FILE_DELETE_ERROR, SERVER_ERROR_CODE, err)
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -955,8 +956,8 @@ func (this *FileManager) CreateDir(dirName string, dirPath string, messageId str
 
 // @api 1.0
 // Dowload a file (not entity) from the sever.
-// @param {string} filepath The path of the directory where to create the file.
-// @param {string} filename The name of the file to create.
+// @param {string} filepath The path of the directory where the file is.
+// @param {string} filename The name of the file to download
 // @param {*Server.MimeType} mimeType The file mime type.
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
@@ -975,16 +976,8 @@ func (this *FileManager) CreateDir(dirName string, dirPath string, messageId str
 //            if (this.status == 200) {
 //                // Note: .response instead of .responseText
 //                var blob = new Blob([this.response], { type: mimeType });
-//                // I will read the file as data url...
-//                var reader = new FileReader();
-//                reader.onload = function (successCallback, caller) {
-//                    return function (e) {
-//                        var dataURL = e.target.result;
-//                        // return the success callback with the result.
-//                        successCallback(dataURL, caller)
-//                    }
-//                } (successCallback, caller)
-//                reader.readAsDataURL(blob);
+//                // return the success callback with the result.
+//                successCallback(blob, caller)
 //            }
 //        }
 //    } (successCallback, caller)

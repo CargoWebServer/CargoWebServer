@@ -321,7 +321,7 @@ Micosoft Word - Macro-Enabled Template,application/vnd.ms-word.template.macroena
 Micro CADAM Helix D&D,application/vnd.mcd,.mcd,IANA: Micro CADAM Helix D&D
 Micrografx,application/vnd.micrografx.flo,.flo,IANA: Micrografx
 Micrografx iGrafx Professional,application/vnd.micrografx.igx,.igx,IANA: Micrografx
-MICROSEC e-Szign¢,application/vnd.eszigno3+xml,.es3,IANA: MICROSEC e-Szign¢
+MICROSEC e-Szignï¿½,application/vnd.eszigno3+xml,.es3,IANA: MICROSEC e-Szignï¿½
 Microsoft Access,application/x-msaccess,.mdb,Wikipedia: Microsoft Access
 Microsoft Advanced Systems Format (ASF),video/x-ms-asf,.asf,Wikipedia: Advanced Systems Format (ASF)
 Microsoft Application,application/x-msdownload,.exe,Wikipedia: EXE
@@ -606,6 +606,7 @@ Tab Seperated Values,text/tab-separated-values,.tsv,Wikipedia: TSV
 Tagged Image File Format,image/tiff,.tiff,Wikipedia: TIFF
 Tao Intent,application/vnd.tao.intent-module-archive,.tao,IANA: Tao Intent
 Tar File (Tape Archive),application/x-tar,.tar,Wikipedia: Tar
+Tgz File (Compressed Tape Archive,application/x-tgz,.tgz,
 Tcl Script,application/x-tcl,.tcl,Wikipedia: Tcl
 TeX,application/x-tex,.tex,Wikipedia: TeX
 TeX Font Metric,application/x-tex-tfm,.tfm,Wikipedia: TeX Font Metric

@@ -334,7 +334,7 @@ func generateNewEntityFunc(packageId string, class *XML_Schemas.CMOF_OwnedMember
 	entityConstructorStr += "	}else{\n"
 	entityConstructorStr += "		if len(prototype.Ids) == 1 {\n"
 	entityConstructorStr += "			// Here there is a new entity...\n"
-	entityConstructorStr += "			uuidStr = \"Config.Configurations%\" + Utility.RandomUUID()\n"
+	entityConstructorStr += "			uuidStr = prototype.TypeName + \"%\" + Utility.RandomUUID()\n"
 	entityConstructorStr += "		} else {\n"
 	entityConstructorStr += "			var keyInfo string\n"
 	entityConstructorStr += "			if len(parentUuid) > 0{\n"
@@ -740,22 +740,6 @@ func generateEntityPrototypeFunc(packageId string, class *XML_Schemas.CMOF_Owned
 
 	// Generate the entity associations...
 	entityPrototypeStr += generateEntityAssociations(class, packageId, prototypeVar, &index)
-
-	// The childs uuid
-	entityPrototypeStr += "	" + prototypeVar + ".Fields = append(" + prototypeVar + ".Fields,\"childsUuid\")\n"
-	entityPrototypeStr += "	" + prototypeVar + ".FieldsType = append(" + prototypeVar + ".FieldsType,\"[]xs.string\")\n"
-	entityPrototypeStr += "	" + prototypeVar + ".FieldsOrder = append(" + prototypeVar + ".FieldsOrder," + strconv.Itoa(index) + ")\n"
-	entityPrototypeStr += "	" + prototypeVar + ".FieldsVisibility = append(" + prototypeVar + ".FieldsVisibility,false)\n\n"
-	entityPrototypeStr += "	" + prototypeVar + ".FieldsDefaultValue = append(" + prototypeVar + ".FieldsDefaultValue,\"[]\")\n"
-
-	index++
-
-	// The referenced
-	entityPrototypeStr += "	" + prototypeVar + ".Fields = append(" + prototypeVar + ".Fields,\"referenced\")\n"
-	entityPrototypeStr += "	" + prototypeVar + ".FieldsType = append(" + prototypeVar + ".FieldsType,\"[]EntityRef\")\n"
-	entityPrototypeStr += "	" + prototypeVar + ".FieldsOrder = append(" + prototypeVar + ".FieldsOrder," + strconv.Itoa(index) + ")\n"
-	entityPrototypeStr += "	" + prototypeVar + ".FieldsVisibility = append(" + prototypeVar + ".FieldsVisibility,false)\n"
-	entityPrototypeStr += "	" + prototypeVar + ".FieldsDefaultValue = append(" + prototypeVar + ".FieldsDefaultValue,\"[]\")\n"
 
 	entityPrototypeStr += "\n	store := GetServer().GetDataManager().getDataStore(" + packageId + "DB).(*KeyValueDataStore)\n"
 	entityPrototypeStr += "	store.SetEntityPrototype(&" + prototypeVar + ")\n"
@@ -1225,12 +1209,6 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	// Now the fields...
 	entityInitStr += generateEntityQueryFields(class, packageId)
 
-	// The child uuids...
-	entityInitStr += "	query.Fields = append(query.Fields, \"childsUuid\")\n"
-
-	// The entities that make use of this entity...
-	entityInitStr += "	query.Fields = append(query.Fields, \"referenced\")\n"
-
 	// The indexation...
 	entityInitStr += "	query.Indexs = append(query.Indexs, \"UUID=\"+this.GetUuid())\n"
 
@@ -1301,28 +1279,6 @@ func generateEntityInitFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	for _, association := range associations {
 		entityInitStr += generateEntityInitAttribute(class, association, packageId, prototypeVar, &index, true)
 	}
-
-	// The childs uuid's
-	entityInitStr += "		childsUuidStr := results[0][" + strconv.Itoa(index) + "].(string)\n"
-	entityInitStr += "		this.childsUuid = make([]string, 0)\n"
-	entityInitStr += "		if strings.HasPrefix(childsUuidStr,\"[\") && strings.HasSuffix(childsUuidStr,\"]\") {\n"
-	entityInitStr += "			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)\n"
-	entityInitStr += "			if err != nil {\n"
-	entityInitStr += "				return err\n"
-	entityInitStr += "			}\n"
-	entityInitStr += "		}\n\n"
-
-	index++
-
-	// The referenced...
-	entityInitStr += "		referencedStr := results[0][" + strconv.Itoa(index) + "].(string)\n"
-	entityInitStr += "		this.referenced = make([]EntityRef, 0)\n"
-	entityInitStr += "		if strings.HasPrefix(referencedStr,\"[\") && strings.HasSuffix(referencedStr,\"]\") {\n"
-	entityInitStr += "			err = json.Unmarshal([]byte(referencedStr), &this.referenced)\n"
-	entityInitStr += "			if err != nil {\n"
-	entityInitStr += "				return err\n"
-	entityInitStr += "			}\n"
-	entityInitStr += "		}\n\n"
 
 	entityInitStr += "	}\n\n"
 
@@ -1522,12 +1478,6 @@ func generateEntitySaveFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	// Now the fields...
 	entitySaveStr += generateEntityQueryFields(class, packageId)
 
-	// Now the child uuid...
-	entitySaveStr += "	query.Fields = append(query.Fields, \"childsUuid\")\n"
-
-	// referenced
-	entitySaveStr += "	query.Fields = append(query.Fields, \"referenced\")\n"
-
 	// I will create an array and put the value inside it...
 	entitySaveStr += "	var " + class.Name + "Info []interface{}\n\n"
 
@@ -1577,14 +1527,6 @@ func generateEntitySaveFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	for _, association := range associations {
 		entitySaveStr += generateEntitySaveEntityInfo(class, association, packageId, true)
 	}
-
-	// Save the childs uuid...
-	entitySaveStr += "	childsUuidStr, _ := json.Marshal(this.childsUuid)\n"
-	entitySaveStr += "	" + class.Name + "Info = append(" + class.Name + "Info, string(childsUuidStr))\n"
-
-	// Save the referenced
-	entitySaveStr += "	referencedStr, _ := json.Marshal(this.referenced)\n"
-	entitySaveStr += "	" + class.Name + "Info = append(" + class.Name + "Info, string(referencedStr))\n"
 
 	// The event data...
 	entitySaveStr += "	eventData := make([]*MessageData, 1)\n"

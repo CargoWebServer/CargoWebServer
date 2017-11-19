@@ -623,6 +623,27 @@ function getCSSRule(ruleName) {
 //////////////////////////////////////////////////////////////////////////
 // Array buffer conversion stuff
 //////////////////////////////////////////////////////////////////////////
+/**
+ * Work arround for large file data url.
+ * 
+ * @param {*} dataURI 
+ * @param {*} callback 
+ */
+function dataURIToBlob(dataURI, callback) {
+    var binStr = atob(dataURI.split(',')[1]),
+        len = binStr.length,
+        arr = new Uint8Array(len),
+        mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+    for (var i = 0; i < len; i++) {
+        arr[i] = binStr.charCodeAt(i);
+    }
+
+    return new Blob([arr], {
+        type: mimeString
+    });
+
+}
 
 /**
  * Covertion from an Array Buffer to a string.

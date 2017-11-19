@@ -323,7 +323,7 @@ func (this *SchemaManager) getFieldsFieldsType(prototype *EntityPrototype, path 
 
 	*path = append(*path, prototype.TypeName)
 	for i := 3; i < len(prototype.Fields)-2; i++ {
-		if prototype.Fields[i] != "UUID" && prototype.Fields[i] != "ParentUuid" && prototype.Fields[i] != "childsUuid" && prototype.Fields[i] != "referenced" {
+		if prototype.Fields[i] != "UUID" && prototype.Fields[i] != "ParentUuid" {
 			fields = append(fields, prototype.Fields[i])
 			fieldsType = append(fieldsType, prototype.FieldsType[i])
 			fieldsDefaultValue = append(fieldsDefaultValue, prototype.FieldsDefaultValue[i])

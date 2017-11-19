@@ -395,7 +395,13 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                         reader.onload = function (file) {
                             return function (e) {
                                 // Now I will load the content of the file.
-                                server.schemaManager.importJsonSchema(file.name, e.target.result)
+                                server.dataManager.importJsonSchema(e.target.result,
+                                    function (result, caller) {
+                                        /** Nothing here. */
+                                    },
+                                    function (errObj, caller) {
+                                        /** Nothing here */
+                                    }, {})
                             }
                         }(f);
                         reader.readAsText(f);
@@ -471,31 +477,93 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     // import schemas/data
     var importDataMenuItem = new MenuItem("import_data_menu_item", "Import", { "import_xsd_menu_item": importXsdSchemaMenuItem, "import_json_schema_menu_item": importJsonSchemaMenuItem, "": "", "import_xml_menu_item": importXmlDataMenuItem, "import_json_data_menu_item": importJsonDataMenuItem }, 1, undefined, "fa fa-upload")
 
-    // Schema export
-    var exportSchemaMenuItem = new MenuItem("export_schema_menu_item", "Schema", {}, 1, undefined, "fa fa-file-o")
-    // Data export
-    var exportDataMenuItem = new MenuItem("export_data_menu_item", "Data", {}, 1, undefined, "fa fa-file-o")
-    // export schmas/data
-    var exportMenuItem = new MenuItem("export_menu_item", "Export", { "export_schema_menu_item": exportSchemaMenuItem, "export_data_menu_item": exportDataMenuItem }, 1, undefined, "fa fa-download")
 
-    server.dataManager.attach(exportSchemaMenuItem, NewDataStoreEvent, function (evt, exportSchemaMenuItem) {
+    // export schmas/data
+    var exportMenuItem = new MenuItem("export_menu_item", "Export", {}, 1, undefined, "fa fa-download")
+
+    server.dataManager.attach(exportMenuItem, NewDataStoreEvent, function (evt, exportMenuItem) {
         var storeConfig = evt.dataMap["storeConfig"]
         // So here I will append the data store in the list of export schema.
-        var item = new MenuItem("export_schema_" + storeConfig.M_id + "_menu_item", storeConfig.M_storeName, {}, 2,
-            function (storeConfig) {
-                return function () {
-                    // Now I will call
-                    // alert("---> export " + storeConfig.M_storeName)
-                }
-            }(storeConfig), "fa fa-file-o")
+
+        // Schema export
+        var exportSchemaMenuItem = new MenuItem("export_schema_menu_item", "Schema", {}, 3, function (storeConfig) {
+            return function () {
+                // Now I will call
+                // alert("---> export " + storeConfig.M_storeName)
+                server.dataManager.exportSchemas(storeConfig.M_id,
+                    function (result, caller) {
+                        // Here I will create a local file from the string received and 
+                        // download it in the browser.
+                        var a = window.document.createElement('a');
+                        a.href = window.URL.createObjectURL(new Blob([result], { type: 'application/json' }));
+                        a.download = storeConfig.M_id + '.json';
+
+                        // Append anchor to body.
+                        document.body.appendChild(a);
+                        a.click();
+
+                        // Remove anchor from body
+                        document.body.removeChild(a);
+                    },
+                    function (errObj, caller) {
+
+                    }, {})
+            }
+        }(storeConfig), "fa fa-file-o")
+
+        // Data export
+        var exportDataMenuItem = new MenuItem("export_data_menu_item", "Data", {}, 3, function (storeConfig) {
+            return function () {
+                // Now I will call
+                // alert("---> export " + storeConfig.M_storeName)
+                server.dataManager.exportData(storeConfig.M_id,
+                    function (result, caller) {
+                        // Here I will create a local file from the string received and 
+                        // download it in the browser.
+                        server.fileManager.downloadFile("", result, "application/x-gz",
+                            // progress callback
+                            function (index, total, caller) {
+                            },
+                            // success callback
+                            function (result, caller) {
+                                
+                                var a = window.document.createElement('a');
+                                a.href = URL.createObjectURL(result);;
+                                a.download = storeConfig.M_id + '.gz';
+
+                                // Append anchor to body.
+                                document.body.appendChild(a);
+                                a.click();
+
+                                // Remove anchor from body
+                                document.body.removeChild(a);
+
+                                // Now  I will remove the file...
+                                server.fileManager.removeFile(caller,
+                                    // Success callback
+                                    function (result, caller) {
+
+                                    },
+                                    // Error callback
+                                    function (errObj, caller) {
+
+                                    }, {})
+                            },
+                            // error callback
+                            function (errObj, caller) {
+                            },
+                            result)
+                    },
+                    function (errObj, caller) {
+
+                    }, {})
+            }
+        }(storeConfig), "fa fa-file-o")
+
+        var item = new MenuItem("export_" + storeConfig.M_id + "_menu_item", storeConfig.M_storeName, { "export_schema_menu_item": exportSchemaMenuItem, "export_data_menu_item": exportDataMenuItem }, 2, undefined, "fa fa-file-o")
 
         // Append it to export schema menu.
-        exportSchemaMenuItem.appendItem(item)
-    })
-
-    server.dataManager.attach(exportDataMenuItem, NewDataStoreEvent, function (evt, exportDataMenuItem) {
-        // console.log("----> event received: ", evt)
-
+        exportMenuItem.appendItem(item)
     })
 
     // The new menu in the data Menu

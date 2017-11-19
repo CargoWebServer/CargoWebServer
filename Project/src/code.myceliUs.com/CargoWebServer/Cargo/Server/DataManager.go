@@ -1,6 +1,7 @@
 package Server
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"log"
@@ -9,6 +10,10 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"compress/gzip"
+
+	"io/ioutil"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
@@ -1270,6 +1275,7 @@ func (this *DataManager) Delete(storeName string, query string, parameters []int
 // @param {string} storeName The data server connection (configuration) id
 // @param {string} messageId The request id that need to access this method.
 // @param {string} sessionId The user session.
+// @return {bool} Return true if the datastore exist.
 // @scope {public}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
@@ -1355,10 +1361,9 @@ func (this *DataManager) DeleteDataStore(storeId string, messageId string, sessi
 	var eventDatas []*MessageData
 	evtData := new(MessageData)
 	evtData.TYPENAME = "Server.MessageData"
-	evtData.Name = "storeConfig"
+	evtData.Name = "storeId"
 
-	storeConfigEntity, _ := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", []interface{}{storeId}, false)
-	evtData.Value = storeConfigEntity.GetObject()
+	evtData.Value = storeId
 	eventDatas = append(eventDatas, evtData)
 	evt, _ := NewEvent(DeleteDataStoreEvent, DataEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
@@ -1408,3 +1413,162 @@ func (this *DataManager) Synchronize(storeId string, messageId string, sessionId
 		store.(*SqlDataStore).synchronize(prototypes)
 	}
 }
+
+// @api 1.0
+// DataStore infos and all it shcemas infos. It can be use to import datastore
+// infos.
+// @param {string} storeId The store id from where the informations will be exported.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {string} Return DataStore information as json format.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *DataManager) ExportSchemas(storeId string, messageId string, sessionId string) string {
+	storeConfigEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", []interface{}{storeId}, false)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return ""
+	}
+
+	storeConfig := storeConfigEntity.GetObject().(*Config.DataStoreConfiguration)
+	store := this.getDataStore(storeId)
+	prototypes, _ := store.GetEntityPrototypes()
+
+	infos := new(struct {
+		DataStoreConfig *Config.DataStoreConfiguration
+		Schemas         []*EntityPrototype
+	})
+
+	infos.DataStoreConfig = storeConfig
+	infos.Schemas = prototypes
+
+	return toJsonStr(infos)
+}
+
+// @api 1.0
+// Create schemas from inforamtion in the infos(json) string. If the datastore
+// dosent exist a new datastore in created and prototype are create in it after.
+// @param {string} jsonStr A json string with all necessary information in it.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {protected}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *DataManager) ImportJsonSchema(jsonStr string, messageId string, sessionId string) {
+
+	infos := new(struct {
+		DataStoreConfig *Config.DataStoreConfiguration
+		Schemas         []*EntityPrototype
+	})
+
+	err := json.Unmarshal([]byte(jsonStr), &infos)
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+
+	// So first of all I will test if the data store exist...
+	var store *KeyValueDataStore
+	if infos.DataStoreConfig.M_dataStoreType == Config.DataStoreType_SQL_STORE {
+		store = this.getDataStore("sql_info").(*KeyValueDataStore)
+	} else {
+		hasDataStore := this.HasDataStore(infos.DataStoreConfig.M_id, messageId, sessionId)
+		if !hasDataStore {
+			// Here I will create the new data store.
+			store_, cargoError := this.createDataStore(infos.DataStoreConfig.M_id, infos.DataStoreConfig.M_storeName, infos.DataStoreConfig.M_hostName, infos.DataStoreConfig.M_ipv4, infos.DataStoreConfig.M_port, infos.DataStoreConfig.M_dataStoreType, infos.DataStoreConfig.M_dataStoreVendor)
+			if cargoError != nil {
+				GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+			}
+			store = store_.(*KeyValueDataStore)
+		} else {
+			store = this.getDataStore(infos.DataStoreConfig.M_id).(*KeyValueDataStore)
+		}
+	}
+
+	// Prototypes will be create only if they dosent exist.
+	for i := 0; i < len(infos.Schemas); i++ {
+		prototype := infos.Schemas[i]
+		_, errObj := store.GetEntityPrototype(prototype.TypeName)
+		if errObj != nil {
+			// Here I will create the prototype.
+			prototype.Create(store.GetId())
+		} else {
+			// Here I will save it.
+			prototype.Save(store.GetId())
+		}
+	}
+}
+
+// @api 1.0
+// Return Dump the content of a data store into json string and compress it.
+// The archive contain the information of the schemas and the data it contain.
+// That function can be use to create backup of the data store.
+// @param {string} storeId The store id from where the informations will be exported.
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {string} Return A link to the created archive, the caller must delete the when done.
+// @scope {public}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *DataManager) ExportData(storeId string, messageId string, sessionId string) string {
+
+	storeConfigEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", []interface{}{storeId}, false)
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return ""
+	}
+
+	storeConfig := storeConfigEntity.GetObject().(*Config.DataStoreConfiguration)
+	store := this.getDataStore(storeId)
+	prototypes, _ := store.GetEntityPrototypes()
+
+	infos := new(struct {
+		DataStoreConfig *Config.DataStoreConfiguration
+		Schemas         []*EntityPrototype
+		Data            []interface{} // That will contain all data
+	})
+
+	infos.DataStoreConfig = storeConfig
+	infos.Schemas = prototypes
+	infos.Data = make([]interface{}, 0)
+
+	// Now the data...
+	for i := 0; i < len(prototypes); i++ {
+		entities, errObj := GetServer().GetEntityManager().getEntities(prototypes[i].TypeName, "", storeId, false)
+		if errObj == nil {
+			for j := 0; j < len(entities); j++ {
+				// append the object.
+				infos.Data = append(infos.Data, entities[j].GetObject())
+			}
+		}
+	}
+
+	var b bytes.Buffer
+	gz := gzip.NewWriter(&b)
+	if _, err := gz.Write([]byte(toJsonStr(infos))); err != nil {
+		panic(err)
+	}
+
+	if err := gz.Flush(); err != nil {
+		panic(err)
+	}
+
+	if err := gz.Close(); err != nil {
+		panic(err)
+	}
+
+	var path = GetServer().GetConfigurationManager().GetApplicationDirectoryPath() + "/" + storeId + ".gz"
+	err := ioutil.WriteFile(path, b.Bytes(), 0666)
+
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return ""
+	}
+
+	return storeId + ".gz"
+}
+
+// TODO importData

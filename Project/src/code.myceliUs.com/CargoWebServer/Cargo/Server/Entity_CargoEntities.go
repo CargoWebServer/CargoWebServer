@@ -18,17 +18,17 @@ func (this *EntityManager) create_CargoEntities_EntityEntityPrototype() {
 	var entityEntityProto EntityPrototype
 	entityEntityProto.TypeName = "CargoEntities.Entity"
 	entityEntityProto.IsAbstract = true
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
 	entityEntityProto.Ids = append(entityEntityProto.Ids, "UUID")
 	entityEntityProto.Fields = append(entityEntityProto.Fields, "UUID")
 	entityEntityProto.FieldsType = append(entityEntityProto.FieldsType, "xs.string")
@@ -62,17 +62,6 @@ func (this *EntityManager) create_CargoEntities_EntityEntityPrototype() {
 	entityEntityProto.FieldsDefaultValue = append(entityEntityProto.FieldsDefaultValue, "undefined")
 	entityEntityProto.FieldsDefaultValue = append(entityEntityProto.FieldsDefaultValue, "undefined")
 	entityEntityProto.FieldsType = append(entityEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	entityEntityProto.Fields = append(entityEntityProto.Fields, "childsUuid")
-	entityEntityProto.FieldsType = append(entityEntityProto.FieldsType, "[]xs.string")
-	entityEntityProto.FieldsOrder = append(entityEntityProto.FieldsOrder, 5)
-	entityEntityProto.FieldsVisibility = append(entityEntityProto.FieldsVisibility, false)
-
-	entityEntityProto.FieldsDefaultValue = append(entityEntityProto.FieldsDefaultValue, "[]")
-	entityEntityProto.Fields = append(entityEntityProto.Fields, "referenced")
-	entityEntityProto.FieldsType = append(entityEntityProto.FieldsType, "[]EntityRef")
-	entityEntityProto.FieldsOrder = append(entityEntityProto.FieldsOrder, 6)
-	entityEntityProto.FieldsVisibility = append(entityEntityProto.FieldsVisibility, false)
-	entityEntityProto.FieldsDefaultValue = append(entityEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&entityEntityProto)
@@ -123,7 +112,7 @@ func (this *EntityManager) NewCargoEntitiesParameterEntity(parentUuid string, ob
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -223,11 +212,9 @@ func (this *CargoEntities_ParameterEntity) RemoveReferenced(name string, owner E
 
 func (this *CargoEntities_ParameterEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -248,7 +235,7 @@ func (this *CargoEntities_ParameterEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_ParameterEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -378,17 +365,6 @@ func (this *EntityManager) create_CargoEntities_ParameterEntityPrototype() {
 	parameterEntityProto.FieldsDefaultValue = append(parameterEntityProto.FieldsDefaultValue, "undefined")
 	parameterEntityProto.FieldsDefaultValue = append(parameterEntityProto.FieldsDefaultValue, "undefined")
 	parameterEntityProto.FieldsType = append(parameterEntityProto.FieldsType, "CargoEntities.Parameter:Ref")
-	parameterEntityProto.Fields = append(parameterEntityProto.Fields, "childsUuid")
-	parameterEntityProto.FieldsType = append(parameterEntityProto.FieldsType, "[]xs.string")
-	parameterEntityProto.FieldsOrder = append(parameterEntityProto.FieldsOrder, 7)
-	parameterEntityProto.FieldsVisibility = append(parameterEntityProto.FieldsVisibility, false)
-
-	parameterEntityProto.FieldsDefaultValue = append(parameterEntityProto.FieldsDefaultValue, "[]")
-	parameterEntityProto.Fields = append(parameterEntityProto.Fields, "referenced")
-	parameterEntityProto.FieldsType = append(parameterEntityProto.FieldsType, "[]EntityRef")
-	parameterEntityProto.FieldsOrder = append(parameterEntityProto.FieldsOrder, 8)
-	parameterEntityProto.FieldsVisibility = append(parameterEntityProto.FieldsVisibility, false)
-	parameterEntityProto.FieldsDefaultValue = append(parameterEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&parameterEntityProto)
@@ -422,8 +398,6 @@ func (this *CargoEntities_ParameterEntity) SaveEntity() {
 	/** associations of Parameter **/
 	query.Fields = append(query.Fields, "M_parametersPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var ParameterInfo []interface{}
 
 	ParameterInfo = append(ParameterInfo, this.GetUuid())
@@ -445,10 +419,6 @@ func (this *CargoEntities_ParameterEntity) SaveEntity() {
 	/** Save parameters type Parameter **/
 	/** attribute Parameter has no method GetId, must be an error here...*/
 	ParameterInfo = append(ParameterInfo, "")
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	ParameterInfo = append(ParameterInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	ParameterInfo = append(ParameterInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -504,8 +474,6 @@ func (this *CargoEntities_ParameterEntity) InitEntity(id string, lazy bool) erro
 	/** associations of Parameter **/
 	query.Fields = append(query.Fields, "M_parametersPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -558,24 +526,6 @@ func (this *CargoEntities_ParameterEntity) InitEntity(id string, lazy bool) erro
 				GetServer().GetEntityManager().appendReference("parametersPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][7].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][8].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -695,7 +645,7 @@ func (this *EntityManager) NewCargoEntitiesActionEntity(parentUuid string, objec
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -795,11 +745,9 @@ func (this *CargoEntities_ActionEntity) RemoveReferenced(name string, owner Enti
 
 func (this *CargoEntities_ActionEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -820,7 +768,7 @@ func (this *CargoEntities_ActionEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_ActionEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -961,17 +909,6 @@ func (this *EntityManager) create_CargoEntities_ActionEntityPrototype() {
 	actionEntityProto.FieldsDefaultValue = append(actionEntityProto.FieldsDefaultValue, "undefined")
 	actionEntityProto.FieldsDefaultValue = append(actionEntityProto.FieldsDefaultValue, "undefined")
 	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	actionEntityProto.Fields = append(actionEntityProto.Fields, "childsUuid")
-	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "[]xs.string")
-	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 9)
-	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, false)
-
-	actionEntityProto.FieldsDefaultValue = append(actionEntityProto.FieldsDefaultValue, "[]")
-	actionEntityProto.Fields = append(actionEntityProto.Fields, "referenced")
-	actionEntityProto.FieldsType = append(actionEntityProto.FieldsType, "[]EntityRef")
-	actionEntityProto.FieldsOrder = append(actionEntityProto.FieldsOrder, 10)
-	actionEntityProto.FieldsVisibility = append(actionEntityProto.FieldsVisibility, false)
-	actionEntityProto.FieldsDefaultValue = append(actionEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&actionEntityProto)
@@ -1007,8 +944,6 @@ func (this *CargoEntities_ActionEntity) SaveEntity() {
 	/** associations of Action **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var ActionInfo []interface{}
 
 	ActionInfo = append(ActionInfo, this.GetUuid())
@@ -1081,10 +1016,6 @@ func (this *CargoEntities_ActionEntity) SaveEntity() {
 	} else {
 		ActionInfo = append(ActionInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	ActionInfo = append(ActionInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	ActionInfo = append(ActionInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -1142,8 +1073,6 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string, lazy bool) error {
 	/** associations of Action **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -1259,24 +1188,6 @@ func (this *CargoEntities_ActionEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][9].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][10].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -1396,7 +1307,7 @@ func (this *EntityManager) NewCargoEntitiesErrorEntity(parentUuid string, object
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -1496,11 +1407,9 @@ func (this *CargoEntities_ErrorEntity) RemoveReferenced(name string, owner Entit
 
 func (this *CargoEntities_ErrorEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -1521,7 +1430,7 @@ func (this *CargoEntities_ErrorEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_ErrorEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -1669,17 +1578,6 @@ func (this *EntityManager) create_CargoEntities_ErrorEntityPrototype() {
 	errorEntityProto.FieldsDefaultValue = append(errorEntityProto.FieldsDefaultValue, "undefined")
 	errorEntityProto.FieldsDefaultValue = append(errorEntityProto.FieldsDefaultValue, "undefined")
 	errorEntityProto.FieldsType = append(errorEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	errorEntityProto.Fields = append(errorEntityProto.Fields, "childsUuid")
-	errorEntityProto.FieldsType = append(errorEntityProto.FieldsType, "[]xs.string")
-	errorEntityProto.FieldsOrder = append(errorEntityProto.FieldsOrder, 9)
-	errorEntityProto.FieldsVisibility = append(errorEntityProto.FieldsVisibility, false)
-
-	errorEntityProto.FieldsDefaultValue = append(errorEntityProto.FieldsDefaultValue, "[]")
-	errorEntityProto.Fields = append(errorEntityProto.Fields, "referenced")
-	errorEntityProto.FieldsType = append(errorEntityProto.FieldsType, "[]EntityRef")
-	errorEntityProto.FieldsOrder = append(errorEntityProto.FieldsOrder, 10)
-	errorEntityProto.FieldsVisibility = append(errorEntityProto.FieldsVisibility, false)
-	errorEntityProto.FieldsDefaultValue = append(errorEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&errorEntityProto)
@@ -1719,8 +1617,6 @@ func (this *CargoEntities_ErrorEntity) SaveEntity() {
 	/** associations of Error **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var ErrorInfo []interface{}
 
 	ErrorInfo = append(ErrorInfo, this.GetUuid())
@@ -1757,10 +1653,6 @@ func (this *CargoEntities_ErrorEntity) SaveEntity() {
 	} else {
 		ErrorInfo = append(ErrorInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	ErrorInfo = append(ErrorInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	ErrorInfo = append(ErrorInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -1822,8 +1714,6 @@ func (this *CargoEntities_ErrorEntity) InitEntity(id string, lazy bool) error {
 	/** associations of Error **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -1896,24 +1786,6 @@ func (this *CargoEntities_ErrorEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][9].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][10].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -2033,7 +1905,7 @@ func (this *EntityManager) NewCargoEntitiesLogEntryEntity(parentUuid string, obj
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -2133,11 +2005,9 @@ func (this *CargoEntities_LogEntryEntity) RemoveReferenced(name string, owner En
 
 func (this *CargoEntities_LogEntryEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -2158,7 +2028,7 @@ func (this *CargoEntities_LogEntryEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_LogEntryEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -2299,17 +2169,6 @@ func (this *EntityManager) create_CargoEntities_LogEntryEntityPrototype() {
 	logEntryEntityProto.FieldsDefaultValue = append(logEntryEntityProto.FieldsDefaultValue, "undefined")
 	logEntryEntityProto.FieldsDefaultValue = append(logEntryEntityProto.FieldsDefaultValue, "undefined")
 	logEntryEntityProto.FieldsType = append(logEntryEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	logEntryEntityProto.Fields = append(logEntryEntityProto.Fields, "childsUuid")
-	logEntryEntityProto.FieldsType = append(logEntryEntityProto.FieldsType, "[]xs.string")
-	logEntryEntityProto.FieldsOrder = append(logEntryEntityProto.FieldsOrder, 8)
-	logEntryEntityProto.FieldsVisibility = append(logEntryEntityProto.FieldsVisibility, false)
-
-	logEntryEntityProto.FieldsDefaultValue = append(logEntryEntityProto.FieldsDefaultValue, "[]")
-	logEntryEntityProto.Fields = append(logEntryEntityProto.Fields, "referenced")
-	logEntryEntityProto.FieldsType = append(logEntryEntityProto.FieldsType, "[]EntityRef")
-	logEntryEntityProto.FieldsOrder = append(logEntryEntityProto.FieldsOrder, 9)
-	logEntryEntityProto.FieldsVisibility = append(logEntryEntityProto.FieldsVisibility, false)
-	logEntryEntityProto.FieldsDefaultValue = append(logEntryEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&logEntryEntityProto)
@@ -2346,8 +2205,6 @@ func (this *CargoEntities_LogEntryEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_loggerPtr")
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var LogEntryInfo []interface{}
 
 	LogEntryInfo = append(LogEntryInfo, this.GetUuid())
@@ -2387,10 +2244,6 @@ func (this *CargoEntities_LogEntryEntity) SaveEntity() {
 	} else {
 		LogEntryInfo = append(LogEntryInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	LogEntryInfo = append(LogEntryInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	LogEntryInfo = append(LogEntryInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -2449,8 +2302,6 @@ func (this *CargoEntities_LogEntryEntity) InitEntity(id string, lazy bool) error
 	query.Fields = append(query.Fields, "M_loggerPtr")
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -2522,24 +2373,6 @@ func (this *CargoEntities_LogEntryEntity) InitEntity(id string, lazy bool) error
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][8].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][9].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -2659,7 +2492,7 @@ func (this *EntityManager) NewCargoEntitiesLogEntity(parentUuid string, objectId
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -2759,11 +2592,9 @@ func (this *CargoEntities_LogEntity) RemoveReferenced(name string, owner Entity)
 
 func (this *CargoEntities_LogEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -2784,7 +2615,7 @@ func (this *CargoEntities_LogEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_LogEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -2913,17 +2744,6 @@ func (this *EntityManager) create_CargoEntities_LogEntityPrototype() {
 	logEntityProto.FieldsDefaultValue = append(logEntityProto.FieldsDefaultValue, "undefined")
 	logEntityProto.FieldsDefaultValue = append(logEntityProto.FieldsDefaultValue, "undefined")
 	logEntityProto.FieldsType = append(logEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	logEntityProto.Fields = append(logEntityProto.Fields, "childsUuid")
-	logEntityProto.FieldsType = append(logEntityProto.FieldsType, "[]xs.string")
-	logEntityProto.FieldsOrder = append(logEntityProto.FieldsOrder, 6)
-	logEntityProto.FieldsVisibility = append(logEntityProto.FieldsVisibility, false)
-
-	logEntityProto.FieldsDefaultValue = append(logEntityProto.FieldsDefaultValue, "[]")
-	logEntityProto.Fields = append(logEntityProto.Fields, "referenced")
-	logEntityProto.FieldsType = append(logEntityProto.FieldsType, "[]EntityRef")
-	logEntityProto.FieldsOrder = append(logEntityProto.FieldsOrder, 7)
-	logEntityProto.FieldsVisibility = append(logEntityProto.FieldsVisibility, false)
-	logEntityProto.FieldsDefaultValue = append(logEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&logEntityProto)
@@ -2958,8 +2778,6 @@ func (this *CargoEntities_LogEntity) SaveEntity() {
 	/** associations of Log **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var LogInfo []interface{}
 
 	LogInfo = append(LogInfo, this.GetUuid())
@@ -3003,10 +2821,6 @@ func (this *CargoEntities_LogEntity) SaveEntity() {
 	} else {
 		LogInfo = append(LogInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	LogInfo = append(LogInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	LogInfo = append(LogInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -3063,8 +2877,6 @@ func (this *CargoEntities_LogEntity) InitEntity(id string, lazy bool) error {
 	/** associations of Log **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -3137,24 +2949,6 @@ func (this *CargoEntities_LogEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][6].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][7].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -3274,7 +3068,7 @@ func (this *EntityManager) NewCargoEntitiesProjectEntity(parentUuid string, obje
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -3374,11 +3168,9 @@ func (this *CargoEntities_ProjectEntity) RemoveReferenced(name string, owner Ent
 
 func (this *CargoEntities_ProjectEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -3399,7 +3191,7 @@ func (this *CargoEntities_ProjectEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_ProjectEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -3535,17 +3327,6 @@ func (this *EntityManager) create_CargoEntities_ProjectEntityPrototype() {
 	projectEntityProto.FieldsDefaultValue = append(projectEntityProto.FieldsDefaultValue, "undefined")
 	projectEntityProto.FieldsDefaultValue = append(projectEntityProto.FieldsDefaultValue, "undefined")
 	projectEntityProto.FieldsType = append(projectEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	projectEntityProto.Fields = append(projectEntityProto.Fields, "childsUuid")
-	projectEntityProto.FieldsType = append(projectEntityProto.FieldsType, "[]xs.string")
-	projectEntityProto.FieldsOrder = append(projectEntityProto.FieldsOrder, 7)
-	projectEntityProto.FieldsVisibility = append(projectEntityProto.FieldsVisibility, false)
-
-	projectEntityProto.FieldsDefaultValue = append(projectEntityProto.FieldsDefaultValue, "[]")
-	projectEntityProto.Fields = append(projectEntityProto.Fields, "referenced")
-	projectEntityProto.FieldsType = append(projectEntityProto.FieldsType, "[]EntityRef")
-	projectEntityProto.FieldsOrder = append(projectEntityProto.FieldsOrder, 8)
-	projectEntityProto.FieldsVisibility = append(projectEntityProto.FieldsVisibility, false)
-	projectEntityProto.FieldsDefaultValue = append(projectEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&projectEntityProto)
@@ -3581,8 +3362,6 @@ func (this *CargoEntities_ProjectEntity) SaveEntity() {
 	/** associations of Project **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var ProjectInfo []interface{}
 
 	ProjectInfo = append(ProjectInfo, this.GetUuid())
@@ -3612,10 +3391,6 @@ func (this *CargoEntities_ProjectEntity) SaveEntity() {
 	} else {
 		ProjectInfo = append(ProjectInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	ProjectInfo = append(ProjectInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	ProjectInfo = append(ProjectInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -3673,8 +3448,6 @@ func (this *CargoEntities_ProjectEntity) InitEntity(id string, lazy bool) error 
 	/** associations of Project **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -3742,24 +3515,6 @@ func (this *CargoEntities_ProjectEntity) InitEntity(id string, lazy bool) error 
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][7].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][8].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -3885,17 +3640,6 @@ func (this *EntityManager) create_CargoEntities_MessageEntityPrototype() {
 	messageEntityProto.FieldsDefaultValue = append(messageEntityProto.FieldsDefaultValue, "undefined")
 	messageEntityProto.FieldsDefaultValue = append(messageEntityProto.FieldsDefaultValue, "undefined")
 	messageEntityProto.FieldsType = append(messageEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	messageEntityProto.Fields = append(messageEntityProto.Fields, "childsUuid")
-	messageEntityProto.FieldsType = append(messageEntityProto.FieldsType, "[]xs.string")
-	messageEntityProto.FieldsOrder = append(messageEntityProto.FieldsOrder, 6)
-	messageEntityProto.FieldsVisibility = append(messageEntityProto.FieldsVisibility, false)
-
-	messageEntityProto.FieldsDefaultValue = append(messageEntityProto.FieldsDefaultValue, "[]")
-	messageEntityProto.Fields = append(messageEntityProto.Fields, "referenced")
-	messageEntityProto.FieldsType = append(messageEntityProto.FieldsType, "[]EntityRef")
-	messageEntityProto.FieldsOrder = append(messageEntityProto.FieldsOrder, 7)
-	messageEntityProto.FieldsVisibility = append(messageEntityProto.FieldsVisibility, false)
-	messageEntityProto.FieldsDefaultValue = append(messageEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&messageEntityProto)
@@ -3946,7 +3690,7 @@ func (this *EntityManager) NewCargoEntitiesNotificationEntity(parentUuid string,
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -4046,11 +3790,9 @@ func (this *CargoEntities_NotificationEntity) RemoveReferenced(name string, owne
 
 func (this *CargoEntities_NotificationEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -4071,7 +3813,7 @@ func (this *CargoEntities_NotificationEntity) SetChildsUuid(childsUuid []string)
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_NotificationEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -4225,17 +3967,6 @@ func (this *EntityManager) create_CargoEntities_NotificationEntityPrototype() {
 	notificationEntityProto.FieldsDefaultValue = append(notificationEntityProto.FieldsDefaultValue, "undefined")
 	notificationEntityProto.FieldsDefaultValue = append(notificationEntityProto.FieldsDefaultValue, "undefined")
 	notificationEntityProto.FieldsType = append(notificationEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	notificationEntityProto.Fields = append(notificationEntityProto.Fields, "childsUuid")
-	notificationEntityProto.FieldsType = append(notificationEntityProto.FieldsType, "[]xs.string")
-	notificationEntityProto.FieldsOrder = append(notificationEntityProto.FieldsOrder, 10)
-	notificationEntityProto.FieldsVisibility = append(notificationEntityProto.FieldsVisibility, false)
-
-	notificationEntityProto.FieldsDefaultValue = append(notificationEntityProto.FieldsDefaultValue, "[]")
-	notificationEntityProto.Fields = append(notificationEntityProto.Fields, "referenced")
-	notificationEntityProto.FieldsType = append(notificationEntityProto.FieldsType, "[]EntityRef")
-	notificationEntityProto.FieldsOrder = append(notificationEntityProto.FieldsOrder, 11)
-	notificationEntityProto.FieldsVisibility = append(notificationEntityProto.FieldsVisibility, false)
-	notificationEntityProto.FieldsDefaultValue = append(notificationEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&notificationEntityProto)
@@ -4276,8 +4007,6 @@ func (this *CargoEntities_NotificationEntity) SaveEntity() {
 	/** associations of Notification **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var NotificationInfo []interface{}
 
 	NotificationInfo = append(NotificationInfo, this.GetUuid())
@@ -4321,10 +4050,6 @@ func (this *CargoEntities_NotificationEntity) SaveEntity() {
 	} else {
 		NotificationInfo = append(NotificationInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	NotificationInfo = append(NotificationInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	NotificationInfo = append(NotificationInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -4387,8 +4112,6 @@ func (this *CargoEntities_NotificationEntity) InitEntity(id string, lazy bool) e
 	/** associations of Notification **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -4472,24 +4195,6 @@ func (this *CargoEntities_NotificationEntity) InitEntity(id string, lazy bool) e
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][10].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][11].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -4609,7 +4314,7 @@ func (this *EntityManager) NewCargoEntitiesTextMessageEntity(parentUuid string, 
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -4709,11 +4414,9 @@ func (this *CargoEntities_TextMessageEntity) RemoveReferenced(name string, owner
 
 func (this *CargoEntities_TextMessageEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -4734,7 +4437,7 @@ func (this *CargoEntities_TextMessageEntity) SetChildsUuid(childsUuid []string) 
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_TextMessageEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -4888,17 +4591,6 @@ func (this *EntityManager) create_CargoEntities_TextMessageEntityPrototype() {
 	textMessageEntityProto.FieldsDefaultValue = append(textMessageEntityProto.FieldsDefaultValue, "undefined")
 	textMessageEntityProto.FieldsDefaultValue = append(textMessageEntityProto.FieldsDefaultValue, "undefined")
 	textMessageEntityProto.FieldsType = append(textMessageEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	textMessageEntityProto.Fields = append(textMessageEntityProto.Fields, "childsUuid")
-	textMessageEntityProto.FieldsType = append(textMessageEntityProto.FieldsType, "[]xs.string")
-	textMessageEntityProto.FieldsOrder = append(textMessageEntityProto.FieldsOrder, 10)
-	textMessageEntityProto.FieldsVisibility = append(textMessageEntityProto.FieldsVisibility, false)
-
-	textMessageEntityProto.FieldsDefaultValue = append(textMessageEntityProto.FieldsDefaultValue, "[]")
-	textMessageEntityProto.Fields = append(textMessageEntityProto.Fields, "referenced")
-	textMessageEntityProto.FieldsType = append(textMessageEntityProto.FieldsType, "[]EntityRef")
-	textMessageEntityProto.FieldsOrder = append(textMessageEntityProto.FieldsOrder, 11)
-	textMessageEntityProto.FieldsVisibility = append(textMessageEntityProto.FieldsVisibility, false)
-	textMessageEntityProto.FieldsDefaultValue = append(textMessageEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&textMessageEntityProto)
@@ -4939,8 +4631,6 @@ func (this *CargoEntities_TextMessageEntity) SaveEntity() {
 	/** associations of TextMessage **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var TextMessageInfo []interface{}
 
 	TextMessageInfo = append(TextMessageInfo, this.GetUuid())
@@ -4984,10 +4674,6 @@ func (this *CargoEntities_TextMessageEntity) SaveEntity() {
 	} else {
 		TextMessageInfo = append(TextMessageInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	TextMessageInfo = append(TextMessageInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	TextMessageInfo = append(TextMessageInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -5050,8 +4736,6 @@ func (this *CargoEntities_TextMessageEntity) InitEntity(id string, lazy bool) er
 	/** associations of TextMessage **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -5135,24 +4819,6 @@ func (this *CargoEntities_TextMessageEntity) InitEntity(id string, lazy bool) er
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][10].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][11].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -5272,7 +4938,7 @@ func (this *EntityManager) NewCargoEntitiesSessionEntity(parentUuid string, obje
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -5372,11 +5038,9 @@ func (this *CargoEntities_SessionEntity) RemoveReferenced(name string, owner Ent
 
 func (this *CargoEntities_SessionEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -5397,7 +5061,7 @@ func (this *CargoEntities_SessionEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_SessionEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -5544,17 +5208,6 @@ func (this *EntityManager) create_CargoEntities_SessionEntityPrototype() {
 	sessionEntityProto.FieldsDefaultValue = append(sessionEntityProto.FieldsDefaultValue, "undefined")
 	sessionEntityProto.FieldsDefaultValue = append(sessionEntityProto.FieldsDefaultValue, "undefined")
 	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "CargoEntities.Account:Ref")
-	sessionEntityProto.Fields = append(sessionEntityProto.Fields, "childsUuid")
-	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "[]xs.string")
-	sessionEntityProto.FieldsOrder = append(sessionEntityProto.FieldsOrder, 10)
-	sessionEntityProto.FieldsVisibility = append(sessionEntityProto.FieldsVisibility, false)
-
-	sessionEntityProto.FieldsDefaultValue = append(sessionEntityProto.FieldsDefaultValue, "[]")
-	sessionEntityProto.Fields = append(sessionEntityProto.Fields, "referenced")
-	sessionEntityProto.FieldsType = append(sessionEntityProto.FieldsType, "[]EntityRef")
-	sessionEntityProto.FieldsOrder = append(sessionEntityProto.FieldsOrder, 11)
-	sessionEntityProto.FieldsVisibility = append(sessionEntityProto.FieldsVisibility, false)
-	sessionEntityProto.FieldsDefaultValue = append(sessionEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&sessionEntityProto)
@@ -5591,8 +5244,6 @@ func (this *CargoEntities_SessionEntity) SaveEntity() {
 	/** associations of Session **/
 	query.Fields = append(query.Fields, "M_accountPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var SessionInfo []interface{}
 
 	SessionInfo = append(SessionInfo, this.GetUuid())
@@ -5636,10 +5287,6 @@ func (this *CargoEntities_SessionEntity) SaveEntity() {
 	} else {
 		SessionInfo = append(SessionInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	SessionInfo = append(SessionInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	SessionInfo = append(SessionInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -5698,8 +5345,6 @@ func (this *CargoEntities_SessionEntity) InitEntity(id string, lazy bool) error 
 	/** associations of Session **/
 	query.Fields = append(query.Fields, "M_accountPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -5780,24 +5425,6 @@ func (this *CargoEntities_SessionEntity) InitEntity(id string, lazy bool) error 
 				GetServer().GetEntityManager().appendReference("accountPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][10].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][11].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -5917,7 +5544,7 @@ func (this *EntityManager) NewCargoEntitiesRoleEntity(parentUuid string, objectI
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -6017,11 +5644,9 @@ func (this *CargoEntities_RoleEntity) RemoveReferenced(name string, owner Entity
 
 func (this *CargoEntities_RoleEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -6042,7 +5667,7 @@ func (this *CargoEntities_RoleEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_RoleEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -6175,17 +5800,6 @@ func (this *EntityManager) create_CargoEntities_RoleEntityPrototype() {
 	roleEntityProto.FieldsDefaultValue = append(roleEntityProto.FieldsDefaultValue, "undefined")
 	roleEntityProto.FieldsDefaultValue = append(roleEntityProto.FieldsDefaultValue, "undefined")
 	roleEntityProto.FieldsType = append(roleEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	roleEntityProto.Fields = append(roleEntityProto.Fields, "childsUuid")
-	roleEntityProto.FieldsType = append(roleEntityProto.FieldsType, "[]xs.string")
-	roleEntityProto.FieldsOrder = append(roleEntityProto.FieldsOrder, 7)
-	roleEntityProto.FieldsVisibility = append(roleEntityProto.FieldsVisibility, false)
-
-	roleEntityProto.FieldsDefaultValue = append(roleEntityProto.FieldsDefaultValue, "[]")
-	roleEntityProto.Fields = append(roleEntityProto.Fields, "referenced")
-	roleEntityProto.FieldsType = append(roleEntityProto.FieldsType, "[]EntityRef")
-	roleEntityProto.FieldsOrder = append(roleEntityProto.FieldsOrder, 8)
-	roleEntityProto.FieldsVisibility = append(roleEntityProto.FieldsVisibility, false)
-	roleEntityProto.FieldsDefaultValue = append(roleEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&roleEntityProto)
@@ -6219,8 +5833,6 @@ func (this *CargoEntities_RoleEntity) SaveEntity() {
 	/** associations of Role **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var RoleInfo []interface{}
 
 	RoleInfo = append(RoleInfo, this.GetUuid())
@@ -6251,10 +5863,6 @@ func (this *CargoEntities_RoleEntity) SaveEntity() {
 	} else {
 		RoleInfo = append(RoleInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	RoleInfo = append(RoleInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	RoleInfo = append(RoleInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -6310,8 +5918,6 @@ func (this *CargoEntities_RoleEntity) InitEntity(id string, lazy bool) error {
 	/** associations of Role **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -6390,24 +5996,6 @@ func (this *CargoEntities_RoleEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][7].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][8].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -6527,7 +6115,7 @@ func (this *EntityManager) NewCargoEntitiesAccountEntity(parentUuid string, obje
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -6650,7 +6238,7 @@ func (this *CargoEntities_AccountEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_AccountEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -6818,17 +6406,6 @@ func (this *EntityManager) create_CargoEntities_AccountEntityPrototype() {
 	accountEntityProto.FieldsDefaultValue = append(accountEntityProto.FieldsDefaultValue, "undefined")
 	accountEntityProto.FieldsDefaultValue = append(accountEntityProto.FieldsDefaultValue, "undefined")
 	accountEntityProto.FieldsType = append(accountEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	accountEntityProto.Fields = append(accountEntityProto.Fields, "childsUuid")
-	accountEntityProto.FieldsType = append(accountEntityProto.FieldsType, "[]xs.string")
-	accountEntityProto.FieldsOrder = append(accountEntityProto.FieldsOrder, 13)
-	accountEntityProto.FieldsVisibility = append(accountEntityProto.FieldsVisibility, false)
-
-	accountEntityProto.FieldsDefaultValue = append(accountEntityProto.FieldsDefaultValue, "[]")
-	accountEntityProto.Fields = append(accountEntityProto.Fields, "referenced")
-	accountEntityProto.FieldsType = append(accountEntityProto.FieldsType, "[]EntityRef")
-	accountEntityProto.FieldsOrder = append(accountEntityProto.FieldsOrder, 14)
-	accountEntityProto.FieldsVisibility = append(accountEntityProto.FieldsVisibility, false)
-	accountEntityProto.FieldsDefaultValue = append(accountEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&accountEntityProto)
@@ -6870,8 +6447,6 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	/** associations of Account **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var AccountInfo []interface{}
 
 	AccountInfo = append(AccountInfo, this.GetUuid())
@@ -6971,10 +6546,6 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	} else {
 		AccountInfo = append(AccountInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	AccountInfo = append(AccountInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	AccountInfo = append(AccountInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -7038,8 +6609,6 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string, lazy bool) error 
 	/** associations of Account **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -7235,24 +6804,6 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string, lazy bool) error 
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][13].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][14].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -7383,7 +6934,7 @@ func (this *EntityManager) NewCargoEntitiesComputerEntity(parentUuid string, obj
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -7483,11 +7034,9 @@ func (this *CargoEntities_ComputerEntity) RemoveReferenced(name string, owner En
 
 func (this *CargoEntities_ComputerEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -7508,7 +7057,7 @@ func (this *CargoEntities_ComputerEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_ComputerEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -7653,17 +7202,6 @@ func (this *EntityManager) create_CargoEntities_ComputerEntityPrototype() {
 	computerEntityProto.FieldsDefaultValue = append(computerEntityProto.FieldsDefaultValue, "undefined")
 	computerEntityProto.FieldsDefaultValue = append(computerEntityProto.FieldsDefaultValue, "undefined")
 	computerEntityProto.FieldsType = append(computerEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	computerEntityProto.Fields = append(computerEntityProto.Fields, "childsUuid")
-	computerEntityProto.FieldsType = append(computerEntityProto.FieldsType, "[]xs.string")
-	computerEntityProto.FieldsOrder = append(computerEntityProto.FieldsOrder, 9)
-	computerEntityProto.FieldsVisibility = append(computerEntityProto.FieldsVisibility, false)
-
-	computerEntityProto.FieldsDefaultValue = append(computerEntityProto.FieldsDefaultValue, "[]")
-	computerEntityProto.Fields = append(computerEntityProto.Fields, "referenced")
-	computerEntityProto.FieldsType = append(computerEntityProto.FieldsType, "[]EntityRef")
-	computerEntityProto.FieldsOrder = append(computerEntityProto.FieldsOrder, 10)
-	computerEntityProto.FieldsVisibility = append(computerEntityProto.FieldsVisibility, false)
-	computerEntityProto.FieldsDefaultValue = append(computerEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&computerEntityProto)
@@ -7701,8 +7239,6 @@ func (this *CargoEntities_ComputerEntity) SaveEntity() {
 	/** associations of Computer **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var ComputerInfo []interface{}
 
 	ComputerInfo = append(ComputerInfo, this.GetUuid())
@@ -7763,10 +7299,6 @@ func (this *CargoEntities_ComputerEntity) SaveEntity() {
 	} else {
 		ComputerInfo = append(ComputerInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	ComputerInfo = append(ComputerInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	ComputerInfo = append(ComputerInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -7826,8 +7358,6 @@ func (this *CargoEntities_ComputerEntity) InitEntity(id string, lazy bool) error
 	/** associations of Computer **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -7918,24 +7448,6 @@ func (this *CargoEntities_ComputerEntity) InitEntity(id string, lazy bool) error
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][9].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][10].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -8055,7 +7567,7 @@ func (this *EntityManager) NewCargoEntitiesPermissionEntity(parentUuid string, o
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -8155,11 +7667,9 @@ func (this *CargoEntities_PermissionEntity) RemoveReferenced(name string, owner 
 
 func (this *CargoEntities_PermissionEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -8180,7 +7690,7 @@ func (this *CargoEntities_PermissionEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_PermissionEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -8312,17 +7822,6 @@ func (this *EntityManager) create_CargoEntities_PermissionEntityPrototype() {
 	permissionEntityProto.FieldsDefaultValue = append(permissionEntityProto.FieldsDefaultValue, "undefined")
 	permissionEntityProto.FieldsDefaultValue = append(permissionEntityProto.FieldsDefaultValue, "undefined")
 	permissionEntityProto.FieldsType = append(permissionEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	permissionEntityProto.Fields = append(permissionEntityProto.Fields, "childsUuid")
-	permissionEntityProto.FieldsType = append(permissionEntityProto.FieldsType, "[]xs.string")
-	permissionEntityProto.FieldsOrder = append(permissionEntityProto.FieldsOrder, 7)
-	permissionEntityProto.FieldsVisibility = append(permissionEntityProto.FieldsVisibility, false)
-
-	permissionEntityProto.FieldsDefaultValue = append(permissionEntityProto.FieldsDefaultValue, "[]")
-	permissionEntityProto.Fields = append(permissionEntityProto.Fields, "referenced")
-	permissionEntityProto.FieldsType = append(permissionEntityProto.FieldsType, "[]EntityRef")
-	permissionEntityProto.FieldsOrder = append(permissionEntityProto.FieldsOrder, 8)
-	permissionEntityProto.FieldsVisibility = append(permissionEntityProto.FieldsVisibility, false)
-	permissionEntityProto.FieldsDefaultValue = append(permissionEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&permissionEntityProto)
@@ -8356,8 +7855,6 @@ func (this *CargoEntities_PermissionEntity) SaveEntity() {
 	/** associations of Permission **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var PermissionInfo []interface{}
 
 	PermissionInfo = append(PermissionInfo, this.GetUuid())
@@ -8385,10 +7882,6 @@ func (this *CargoEntities_PermissionEntity) SaveEntity() {
 	} else {
 		PermissionInfo = append(PermissionInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	PermissionInfo = append(PermissionInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	PermissionInfo = append(PermissionInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -8444,8 +7937,6 @@ func (this *CargoEntities_PermissionEntity) InitEntity(id string, lazy bool) err
 	/** associations of Permission **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -8511,24 +8002,6 @@ func (this *CargoEntities_PermissionEntity) InitEntity(id string, lazy bool) err
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][7].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][8].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -8648,7 +8121,7 @@ func (this *EntityManager) NewCargoEntitiesFileEntity(parentUuid string, objectI
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -8748,11 +8221,9 @@ func (this *CargoEntities_FileEntity) RemoveReferenced(name string, owner Entity
 
 func (this *CargoEntities_FileEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -8773,7 +8244,7 @@ func (this *CargoEntities_FileEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_FileEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -8959,17 +8430,6 @@ func (this *EntityManager) create_CargoEntities_FileEntityPrototype() {
 	fileEntityProto.FieldsDefaultValue = append(fileEntityProto.FieldsDefaultValue, "undefined")
 	fileEntityProto.FieldsDefaultValue = append(fileEntityProto.FieldsDefaultValue, "undefined")
 	fileEntityProto.FieldsType = append(fileEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	fileEntityProto.Fields = append(fileEntityProto.Fields, "childsUuid")
-	fileEntityProto.FieldsType = append(fileEntityProto.FieldsType, "[]xs.string")
-	fileEntityProto.FieldsOrder = append(fileEntityProto.FieldsOrder, 17)
-	fileEntityProto.FieldsVisibility = append(fileEntityProto.FieldsVisibility, false)
-
-	fileEntityProto.FieldsDefaultValue = append(fileEntityProto.FieldsDefaultValue, "[]")
-	fileEntityProto.Fields = append(fileEntityProto.Fields, "referenced")
-	fileEntityProto.FieldsType = append(fileEntityProto.FieldsType, "[]EntityRef")
-	fileEntityProto.FieldsOrder = append(fileEntityProto.FieldsOrder, 18)
-	fileEntityProto.FieldsVisibility = append(fileEntityProto.FieldsVisibility, false)
-	fileEntityProto.FieldsDefaultValue = append(fileEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&fileEntityProto)
@@ -9015,8 +8475,6 @@ func (this *CargoEntities_FileEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_parentDirPtr")
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var FileInfo []interface{}
 
 	FileInfo = append(FileInfo, this.GetUuid())
@@ -9085,10 +8543,6 @@ func (this *CargoEntities_FileEntity) SaveEntity() {
 	} else {
 		FileInfo = append(FileInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	FileInfo = append(FileInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	FileInfo = append(FileInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -9156,8 +8610,6 @@ func (this *CargoEntities_FileEntity) InitEntity(id string, lazy bool) error {
 	query.Fields = append(query.Fields, "M_parentDirPtr")
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -9296,24 +8748,6 @@ func (this *CargoEntities_FileEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][17].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][18].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -9433,7 +8867,7 @@ func (this *EntityManager) NewCargoEntitiesUserEntity(parentUuid string, objectI
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -9533,11 +8967,9 @@ func (this *CargoEntities_UserEntity) RemoveReferenced(name string, owner Entity
 
 func (this *CargoEntities_UserEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -9558,7 +8990,7 @@ func (this *CargoEntities_UserEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_UserEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -9719,17 +9151,6 @@ func (this *EntityManager) create_CargoEntities_UserEntityPrototype() {
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "undefined")
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "undefined")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	userEntityProto.Fields = append(userEntityProto.Fields, "childsUuid")
-	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "[]xs.string")
-	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 12)
-	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, false)
-
-	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "[]")
-	userEntityProto.Fields = append(userEntityProto.Fields, "referenced")
-	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "[]EntityRef")
-	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 13)
-	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, false)
-	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&userEntityProto)
@@ -9770,8 +9191,6 @@ func (this *CargoEntities_UserEntity) SaveEntity() {
 	/** associations of User **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var UserInfo []interface{}
 
 	UserInfo = append(UserInfo, this.GetUuid())
@@ -9809,10 +9228,6 @@ func (this *CargoEntities_UserEntity) SaveEntity() {
 	} else {
 		UserInfo = append(UserInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	UserInfo = append(UserInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	UserInfo = append(UserInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -9875,8 +9290,6 @@ func (this *CargoEntities_UserEntity) InitEntity(id string, lazy bool) error {
 	/** associations of User **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -9982,24 +9395,6 @@ func (this *CargoEntities_UserEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][12].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][13].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -10119,7 +9514,7 @@ func (this *EntityManager) NewCargoEntitiesGroupEntity(parentUuid string, object
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -10219,11 +9614,9 @@ func (this *CargoEntities_GroupEntity) RemoveReferenced(name string, owner Entit
 
 func (this *CargoEntities_GroupEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -10244,7 +9637,7 @@ func (this *CargoEntities_GroupEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_GroupEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -10380,17 +9773,6 @@ func (this *EntityManager) create_CargoEntities_GroupEntityPrototype() {
 	groupEntityProto.FieldsDefaultValue = append(groupEntityProto.FieldsDefaultValue, "undefined")
 	groupEntityProto.FieldsDefaultValue = append(groupEntityProto.FieldsDefaultValue, "undefined")
 	groupEntityProto.FieldsType = append(groupEntityProto.FieldsType, "CargoEntities.Entities:Ref")
-	groupEntityProto.Fields = append(groupEntityProto.Fields, "childsUuid")
-	groupEntityProto.FieldsType = append(groupEntityProto.FieldsType, "[]xs.string")
-	groupEntityProto.FieldsOrder = append(groupEntityProto.FieldsOrder, 7)
-	groupEntityProto.FieldsVisibility = append(groupEntityProto.FieldsVisibility, false)
-
-	groupEntityProto.FieldsDefaultValue = append(groupEntityProto.FieldsDefaultValue, "[]")
-	groupEntityProto.Fields = append(groupEntityProto.Fields, "referenced")
-	groupEntityProto.FieldsType = append(groupEntityProto.FieldsType, "[]EntityRef")
-	groupEntityProto.FieldsOrder = append(groupEntityProto.FieldsOrder, 8)
-	groupEntityProto.FieldsVisibility = append(groupEntityProto.FieldsVisibility, false)
-	groupEntityProto.FieldsDefaultValue = append(groupEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&groupEntityProto)
@@ -10426,8 +9808,6 @@ func (this *CargoEntities_GroupEntity) SaveEntity() {
 	/** associations of Group **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var GroupInfo []interface{}
 
 	GroupInfo = append(GroupInfo, this.GetUuid())
@@ -10457,10 +9837,6 @@ func (this *CargoEntities_GroupEntity) SaveEntity() {
 	} else {
 		GroupInfo = append(GroupInfo, "")
 	}
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	GroupInfo = append(GroupInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	GroupInfo = append(GroupInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -10518,8 +9894,6 @@ func (this *CargoEntities_GroupEntity) InitEntity(id string, lazy bool) error {
 	/** associations of Group **/
 	query.Fields = append(query.Fields, "M_entitiesPtr")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -10587,24 +9961,6 @@ func (this *CargoEntities_GroupEntity) InitEntity(id string, lazy bool) error {
 				GetServer().GetEntityManager().appendReference("entitiesPtr", this.object.UUID, id_)
 			}
 		}
-		childsUuidStr := results[0][7].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][8].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
@@ -10724,7 +10080,7 @@ func (this *EntityManager) NewCargoEntitiesEntitiesEntity(parentUuid string, obj
 	} else {
 		if len(prototype.Ids) == 1 {
 			// Here there is a new entity...
-			uuidStr = "Config.Configurations%" + Utility.RandomUUID()
+			uuidStr = prototype.TypeName + "%" + Utility.RandomUUID()
 		} else {
 			var keyInfo string
 			if len(parentUuid) > 0 {
@@ -10824,11 +10180,9 @@ func (this *CargoEntities_EntitiesEntity) RemoveReferenced(name string, owner En
 
 func (this *CargoEntities_EntitiesEntity) RemoveReference(name string, reference Entity) {
 	refsUuid := make([]string, 0)
-	refsPtr := make([]Entity, 0)
 	for i := 0; i < len(this.referencesUuid); i++ {
 		refUuid := this.referencesUuid[i]
 		if refUuid != reference.GetUuid() {
-			refsPtr = append(refsPtr, reference)
 			refsUuid = append(refsUuid, reference.GetUuid())
 		}
 	}
@@ -10849,7 +10203,7 @@ func (this *CargoEntities_EntitiesEntity) SetChildsUuid(childsUuid []string) {
 }
 
 /**
- * Remove a chidl uuid form the list of child in an entity.
+ * Remove a child uuid form the list of child in an entity.
  */
 func (this *CargoEntities_EntitiesEntity) RemoveChild(name string, uuid string) {
 	childsUuid := make([]string, 0)
@@ -10992,17 +10346,6 @@ func (this *EntityManager) create_CargoEntities_EntitiesEntityPrototype() {
 	entitiesEntityProto.Fields = append(entitiesEntityProto.Fields, "M_actions")
 	entitiesEntityProto.FieldsDefaultValue = append(entitiesEntityProto.FieldsDefaultValue, "[]")
 	entitiesEntityProto.FieldsType = append(entitiesEntityProto.FieldsType, "[]CargoEntities.Action")
-	entitiesEntityProto.Fields = append(entitiesEntityProto.Fields, "childsUuid")
-	entitiesEntityProto.FieldsType = append(entitiesEntityProto.FieldsType, "[]xs.string")
-	entitiesEntityProto.FieldsOrder = append(entitiesEntityProto.FieldsOrder, 10)
-	entitiesEntityProto.FieldsVisibility = append(entitiesEntityProto.FieldsVisibility, false)
-
-	entitiesEntityProto.FieldsDefaultValue = append(entitiesEntityProto.FieldsDefaultValue, "[]")
-	entitiesEntityProto.Fields = append(entitiesEntityProto.Fields, "referenced")
-	entitiesEntityProto.FieldsType = append(entitiesEntityProto.FieldsType, "[]EntityRef")
-	entitiesEntityProto.FieldsOrder = append(entitiesEntityProto.FieldsOrder, 11)
-	entitiesEntityProto.FieldsVisibility = append(entitiesEntityProto.FieldsVisibility, false)
-	entitiesEntityProto.FieldsDefaultValue = append(entitiesEntityProto.FieldsDefaultValue, "[]")
 
 	store := GetServer().GetDataManager().getDataStore(CargoEntitiesDB).(*KeyValueDataStore)
 	store.SetEntityPrototype(&entitiesEntityProto)
@@ -11037,8 +10380,6 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	query.Fields = append(query.Fields, "M_permissions")
 	query.Fields = append(query.Fields, "M_actions")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	var EntitiesInfo []interface{}
 
 	EntitiesInfo = append(EntitiesInfo, this.GetUuid())
@@ -11061,48 +10402,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	if !lazy_entities {
 		for i := 0; i < len(this.object.M_entities); i++ {
 			switch v := this.object.M_entities[i].(type) {
-			case *CargoEntities.User:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.Log:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.Error:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
 			case *CargoEntities.Notification:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.TextMessage:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.Computer:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -11117,8 +10418,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				if entitiesEntity.NeedSave() {
 					entitiesEntity.SaveEntity()
 				}
-			case *CargoEntities.File:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
+			case *CargoEntities.User:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -11133,6 +10434,22 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				if entitiesEntity.NeedSave() {
 					entitiesEntity.SaveEntity()
 				}
+			case *CargoEntities.Error:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.TextMessage:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
 			case *CargoEntities.LogEntry:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
@@ -11141,8 +10458,32 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				if entitiesEntity.NeedSave() {
 					entitiesEntity.SaveEntity()
 				}
+			case *CargoEntities.Log:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
 			case *CargoEntities.Project:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesProjectEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.Computer:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.File:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -11213,10 +10554,6 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	}
 	actionsStr, _ := json.Marshal(actionsIds)
 	EntitiesInfo = append(EntitiesInfo, string(actionsStr))
-	childsUuidStr, _ := json.Marshal(this.childsUuid)
-	EntitiesInfo = append(EntitiesInfo, string(childsUuidStr))
-	referencedStr, _ := json.Marshal(this.referenced)
-	EntitiesInfo = append(EntitiesInfo, string(referencedStr))
 	eventData := make([]*MessageData, 1)
 	msgData := new(MessageData)
 	msgData.Name = "entity"
@@ -11273,8 +10610,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 	query.Fields = append(query.Fields, "M_permissions")
 	query.Fields = append(query.Fields, "M_actions")
 
-	query.Fields = append(query.Fields, "childsUuid")
-	query.Fields = append(query.Fields, "referenced")
 	query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())
 
 	var fieldsType []interface{} // not use...
@@ -11330,7 +10665,33 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 						log.Println("type ", typeName, " not found!")
 						return err
 					}
-					if typeName == "CargoEntities.Error" {
+					if typeName == "CargoEntities.Computer" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_ComputerEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_ComputerEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.File" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_FileEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_FileEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.Error" {
 						if len(uuids[i]) > 0 {
 							var entitiesEntity *CargoEntities_ErrorEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
@@ -11350,6 +10711,19 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 								entitiesEntity = instance.(*CargoEntities_LogEntryEntity)
 							} else {
 								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.Log" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_LogEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_LogEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), uuids[i], nil)
 								entitiesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(entitiesEntity)
 							}
@@ -11382,58 +10756,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 							entitiesEntity.AppendReferenced("entities", this)
 							this.AppendChild("entities", entitiesEntity)
 						}
-					} else if typeName == "CargoEntities.Account" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_AccountEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_AccountEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.File" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_FileEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_FileEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.Group" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_GroupEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_GroupEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.Log" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_LogEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_LogEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
 					} else if typeName == "CargoEntities.Notification" {
 						if len(uuids[i]) > 0 {
 							var entitiesEntity *CargoEntities_NotificationEntity
@@ -11447,13 +10769,13 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 							entitiesEntity.AppendReferenced("entities", this)
 							this.AppendChild("entities", entitiesEntity)
 						}
-					} else if typeName == "CargoEntities.Computer" {
+					} else if typeName == "CargoEntities.Account" {
 						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_ComputerEntity
+							var entitiesEntity *CargoEntities_AccountEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_ComputerEntity)
+								entitiesEntity = instance.(*CargoEntities_AccountEntity)
 							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesComputerEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), uuids[i], nil)
 								entitiesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(entitiesEntity)
 							}
@@ -11467,6 +10789,19 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 								entitiesEntity = instance.(*CargoEntities_UserEntity)
 							} else {
 								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.Group" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_GroupEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_GroupEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
 								entitiesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(entitiesEntity)
 							}
@@ -11563,24 +10898,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 				}
 			}
 		}
-		childsUuidStr := results[0][10].(string)
-		this.childsUuid = make([]string, 0)
-		if strings.HasPrefix(childsUuidStr, "[") && strings.HasSuffix(childsUuidStr, "]") {
-			err := json.Unmarshal([]byte(childsUuidStr), &this.childsUuid)
-			if err != nil {
-				return err
-			}
-		}
-
-		referencedStr := results[0][11].(string)
-		this.referenced = make([]EntityRef, 0)
-		if strings.HasPrefix(referencedStr, "[") && strings.HasSuffix(referencedStr, "]") {
-			err = json.Unmarshal([]byte(referencedStr), &this.referenced)
-			if err != nil {
-				return err
-			}
-		}
-
 	}
 
 	// set need save to false.
