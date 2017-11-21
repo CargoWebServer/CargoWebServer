@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"compress/gzip"
-
 	"io/ioutil"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
@@ -1456,6 +1455,11 @@ func (this *DataManager) ExportSchemas(storeId string, messageId string, session
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *DataManager) ImportJsonSchema(jsonStr string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
 
 	infos := new(struct {
 		DataStoreConfig *Config.DataStoreConfiguration
@@ -1471,6 +1475,11 @@ func (this *DataManager) ImportJsonSchema(jsonStr string, messageId string, sess
 
 	// So first of all I will test if the data store exist...
 	var store *KeyValueDataStore
+	if infos.DataStoreConfig.M_ipv4 != "127.0.0.1" {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Import is permitted on local server only "+infos.DataStoreConfig.M_id+" is a remote server with addresse "+infos.DataStoreConfig.M_ipv4))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
 	if infos.DataStoreConfig.M_dataStoreType == Config.DataStoreType_SQL_STORE {
 		store = this.getDataStore("sql_info").(*KeyValueDataStore)
 	} else {
@@ -1499,6 +1508,9 @@ func (this *DataManager) ImportJsonSchema(jsonStr string, messageId string, sess
 			prototype.Save(store.GetId())
 		}
 	}
+
+	// Open connection.
+	store.Connect()
 }
 
 // @api 1.0
@@ -1512,7 +1524,7 @@ func (this *DataManager) ImportJsonSchema(jsonStr string, messageId string, sess
 // @scope {public}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *DataManager) ExportData(storeId string, messageId string, sessionId string) string {
+func (this *DataManager) ExportJsonData(storeId string, messageId string, sessionId string) string {
 
 	storeConfigEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", []interface{}{storeId}, false)
 	if errObj != nil {
@@ -1571,4 +1583,212 @@ func (this *DataManager) ExportData(storeId string, messageId string, sessionId 
 	return storeId + ".gz"
 }
 
-// TODO importData
+// @api 1.0
+// Import JSON archived data.
+// @param {string} filename The name of the file to create.
+// @param {[]byte} filedata The data to import (.gz file).
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {public}
+// @param {callback} progressCallback The function is call when chunk of response is received.
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+// @src
+//DataManager.prototype.importJsonData = function (filename, filedata, successCallback, progressCallback, errorCallback, caller) {
+//    // server is the client side singleton.
+//    var params = []
+//    // The file data (filedata) will be upload with the http protocol...
+//    params.push(createRpcData(filename, "STRING", "filename"))
+//    // Here I will create a new data form...
+//    var formData = new FormData()
+//    formData.append("multiplefiles", filedata, filename)
+//    // Use the post function to upload the file to the server.
+//    var xhr = new XMLHttpRequest()
+//    xhr.open('POST', '/uploads', true)
+//    // In case of error or success...
+//    xhr.onload = function (params, xhr) {
+//        return function (e) {
+//            if (xhr.readyState === 4) {
+//                if (xhr.status === 200) {
+//                    console.log(xhr.responseText);
+//                    // Here I will create the file...
+//                    server.executeJsFunction(
+//                        "DataManagerImportJsonData", // The function to execute remotely on server
+//                        params, // The parameters to pass to that function
+//                        function (index, total, caller) { // The progress callback
+//                            // Keep track of the file transfert.
+//                            caller.progressCallback(index, total, caller.caller)
+//                        },
+//                        function (result, caller) {
+//                            caller.successCallback(result[0], caller.caller)
+//                        },
+//                        function (errMsg, caller) {
+//                            // display the message in the console.
+//                            console.log(errMsg)
+//                            // call the immediate error callback.
+//                            caller.errorCallback(errMsg, caller.caller)
+//                            // dispatch the message.
+//                            server.errorManager.onError(errMsg)
+//                        }, // Error callback
+//                        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
+//                    )
+//                } else {
+//                    console.error(xhr.statusText);
+//                }
+//            }
+//        }
+//    } (params, xhr)
+//    // now the progress event...
+//    xhr.upload.onprogress = function (progressCallback, caller) {
+//        return function (e) {
+//            if (e.lengthComputable) {
+//                progressCallback(e.loaded, e.total, caller)
+//            }
+//        }
+//    } (progressCallback, caller)
+//    xhr.send(formData);
+//}
+func (this *DataManager) ImportJsonData(filename string, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
+	tmpPath := GetServer().GetConfigurationManager().GetTmpPath() + "/" + filename
+
+	// I will open the file form the tmp directory.
+	f, err := os.Open(tmpPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer f.Close()
+
+	gr, err := gzip.NewReader(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer gr.Close()
+
+	data, err := ioutil.ReadAll(gr)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	// here I will initialyse data.
+	infos := new(struct {
+		DataStoreConfig *Config.DataStoreConfiguration
+		Schemas         []*EntityPrototype
+		Data            []interface{} // That will contain all data
+	})
+
+	err = json.Unmarshal(data, &infos)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	// The first step will be to be sure that the store exist.
+	// So first of all I will test if the data store exist...
+	var store *KeyValueDataStore
+	if infos.DataStoreConfig.M_ipv4 != "127.0.0.1" {
+		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Import is permitted on local server only "+infos.DataStoreConfig.M_id+" is a remote server with addresse "+infos.DataStoreConfig.M_ipv4))
+		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		return
+	}
+	if infos.DataStoreConfig.M_dataStoreType == Config.DataStoreType_SQL_STORE {
+		store = this.getDataStore("sql_info").(*KeyValueDataStore)
+	} else {
+		hasDataStore := this.HasDataStore(infos.DataStoreConfig.M_id, messageId, sessionId)
+		if !hasDataStore {
+			// Here I will create the new data store.
+			store_, cargoError := this.createDataStore(infos.DataStoreConfig.M_id, infos.DataStoreConfig.M_storeName, infos.DataStoreConfig.M_hostName, infos.DataStoreConfig.M_ipv4, infos.DataStoreConfig.M_port, infos.DataStoreConfig.M_dataStoreType, infos.DataStoreConfig.M_dataStoreVendor)
+			if cargoError != nil {
+				GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+			}
+			store = store_.(*KeyValueDataStore)
+		} else {
+			store = this.getDataStore(infos.DataStoreConfig.M_id).(*KeyValueDataStore)
+		}
+	}
+
+	// Prototypes will be create only if they dosent exist.
+	for i := 0; i < len(infos.Schemas); i++ {
+		prototype := infos.Schemas[i]
+		_, errObj := store.GetEntityPrototype(prototype.TypeName)
+		if errObj != nil {
+			// Here I will create the prototype.
+			prototype.Create(store.GetId())
+		} else {
+			// Here I will save it.
+			prototype.Save(store.GetId())
+		}
+	}
+
+	// Open connection.
+	err = store.Connect()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	// Now I will save the data...
+	var entities []Entity
+	for i := 0; i < len(infos.Data); i++ {
+		values := infos.Data[i].(map[string]interface{})
+		value, err := Utility.InitializeStructure(values)
+		obj := value.Interface()
+
+		if err == nil {
+			if reflect.TypeOf(obj).String() == "map[string]interface {}" {
+				entity, err := GetServer().GetEntityManager().newDynamicEntity("", values)
+				if err != nil {
+					log.Println("---> err ", err)
+				}
+				entity.SetNeedSave(true)
+				entities = append(entities, entity)
+			} else {
+				// In that case I will create a static entity.
+				typeName := values["TYPENAME"].(string)
+
+				// Remove the suffix in that particular case.
+				if strings.HasSuffix(typeName, "_impl") {
+					typeName = strings.Replace(typeName, "_impl", "", -1)
+				}
+
+				funcName := "New" + strings.Replace(typeName, ".", "", -1) + "Entity"
+
+				params := make([]interface{}, 3)
+				params[0] = "" // No parent uuid needed.
+				params[1] = values["UUID"].(string)
+				params[2] = obj
+
+				entity, err := Utility.CallMethod(GetServer().GetEntityManager(), funcName, params)
+				if err == nil {
+					entity.(Entity).SetNeedSave(true)
+					entities = append(entities, entity.(Entity))
+				} else {
+					log.Println("---> err ", err)
+				}
+			}
+		}
+	}
+
+	// Now I can save it.
+	for i := 0; i < len(entities); i++ {
+		entities[i].SaveEntity()
+	}
+
+	// Remove it from the cach.
+	for i := 0; i < len(entities); i++ {
+		// remove it from the cache...
+		GetServer().GetEntityManager().removeEntity(entities[i].GetUuid())
+	}
+
+	// remove the tmp file if it file path is not empty... otherwise the
+	// file will bee remove latter.
+	defer os.Remove(tmpPath)
+}

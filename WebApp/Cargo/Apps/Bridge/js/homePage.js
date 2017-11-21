@@ -357,7 +357,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     // Now the import data menu
 
     // Xsd schema
-    var importXsdSchemaMenuItem = new MenuItem("import_xsd_menu_item", "XSD schema", {}, 2, function (parent) {
+    var importXsdSchemaMenuItem = new MenuItem("import_xsd_menu_item", "XSD", {}, 2, function (parent) {
         return function () {
             var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".xsd, .XSD, .Xsd", "multiple": "", "style": "display: none;" }).down()
             fileExplorer.element.onchange = function (bpmnExplorer) {
@@ -383,9 +383,9 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     }(parent), "fa fa-file-o")
 
     // JSON schema
-    var importJsonSchemaMenuItem = new MenuItem("import_json_schema_menu_item", "JSON schema", {}, 2, function (parent) {
+    var importJsonSchemaMenuItem = new MenuItem("import_json_schema_menu_item", "JSON", {}, 2, function (parent) {
         return function () {
-            var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".json, .JSON, .Json", "multiple": "", "style": "display: none;" }).down()
+            var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".json, .JSON, .Json", "style": "display: none;" }).down()
             fileExplorer.element.onchange = function (bpmnExplorer) {
                 return function (evt) {
                     var files = evt.target.files; // FileList object
@@ -414,10 +414,10 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     }(parent), "fa fa-file-o")
 
 
-    var importXmlDataMenuItem = new MenuItem("import_xml_menu_item", "XML data", {}, 2, function (parent) {
+    var importXmlDataMenuItem = new MenuItem("import_xml_menu_item", "XML", {}, 2, function (parent) {
         return function () {
-            var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".xml, .XML, .dae, .DAE", "multiple": "", "style": "display: none;" }).down()
-            fileExplorer.element.onchange = function (bpmnExplorer) {
+            var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".xml, .XML, .dae, .DAE", "style": "display: none;" }).down()
+            fileExplorer.element.onchange = function () {
                 return function (evt) {
                     var files = evt.target.files; // FileList object
                     for (var i = 0, f; f = files[i]; i++) {
@@ -444,28 +444,23 @@ HomePage.prototype.init = function (parent, sessionInfo) {
         }
     }(parent), "fa fa-file-o")
 
-    var importJsonDataMenuItem = new MenuItem("import_json_data_menu_item", "JSON data", {}, 2, function (parent) {
+    var importJsonDataMenuItem = new MenuItem("import_json_data_menu_item", "JSON", {}, 2, function (parent) {
         return function () {
-            var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".json, .JSON, .Json", "multiple": "", "style": "display: none;" }).down()
-            fileExplorer.element.onchange = function (bpmnExplorer) {
+            var fileExplorer = parent.appendElement({ "tag": "input", "type": "file", "accept": ".gz, .Gz, .GZ", "style": "display: none;" }).down()
+            fileExplorer.element.onchange = function () {
                 return function (evt) {
                     var files = evt.target.files; // FileList object
                     for (var i = 0, f; f = files[i]; i++) {
-                        //server.dataManager.importXsdSchema(f)
-                        var reader = new FileReader();
-                        /** I will read the file content... */
-                        reader.onload = function (e) {
-                            var text = e.target.result
-                            // Now I will load the content of the file.
-                            server.dataManager.importJsonData(text,
-                                function (result, caller) {
-                                    /** Nothing todo the the action will be in the event listener. */
-                                },
-                                function (errMsg, caller) {
+                        // Now I will load the content of the file.
+                        server.dataManager.importJsonData(f.name, f,
+                            function (index, total, caller) {
 
-                                }, {})
-                        };
-                        reader.readAsText(f);
+                            },
+                            function (result, caller) {
+                            },
+                            function (errMsg, caller) {
+
+                            }, {})
                     }
                 }
             }(this)
@@ -475,8 +470,10 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     }(parent), "fa fa-file-o")
 
     // import schemas/data
-    var importDataMenuItem = new MenuItem("import_data_menu_item", "Import", { "import_xsd_menu_item": importXsdSchemaMenuItem, "import_json_schema_menu_item": importJsonSchemaMenuItem, "": "", "import_xml_menu_item": importXmlDataMenuItem, "import_json_data_menu_item": importJsonDataMenuItem }, 1, undefined, "fa fa-upload")
+    var importSchemaMenuItem = new MenuItem("import_schema_menu_item", "Schema", { "import_xsd_menu_item": importXsdSchemaMenuItem, "import_json_schema_menu_item": importJsonSchemaMenuItem }, 1, undefined, "")
+    var importDataMenuItem = new MenuItem("import_data_menu_item", "Data", { "import_xml_menu_item": importXmlDataMenuItem, "import_json_data_menu_item": importJsonDataMenuItem }, 1, undefined, "")
 
+    var importMenuItem = new MenuItem("import_menu_item", "Import", { "import_schema_menu_item": importSchemaMenuItem, "import_data_menu_item": importDataMenuItem }, 1, undefined, "fa fa-upload")
 
     // export schmas/data
     var exportMenuItem = new MenuItem("export_menu_item", "Export", {}, 1, undefined, "fa fa-download")
@@ -490,7 +487,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
             return function () {
                 // Now I will call
                 // alert("---> export " + storeConfig.M_storeName)
-                server.dataManager.exportSchemas(storeConfig.M_id,
+                server.dataManager.exportJsonSchemas(storeConfig.M_id,
                     function (result, caller) {
                         // Here I will create a local file from the string received and 
                         // download it in the browser.
@@ -516,7 +513,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
             return function () {
                 // Now I will call
                 // alert("---> export " + storeConfig.M_storeName)
-                server.dataManager.exportData(storeConfig.M_id,
+                server.dataManager.exportJsonData(storeConfig.M_id,
                     function (result, caller) {
                         // Here I will create a local file from the string received and 
                         // download it in the browser.
@@ -526,7 +523,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
                             },
                             // success callback
                             function (result, caller) {
-                                
+
                                 var a = window.document.createElement('a');
                                 a.href = URL.createObjectURL(result);;
                                 a.download = storeConfig.M_id + '.gz';
@@ -581,7 +578,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     var editMenuItem = new MenuItem("edit_menu", "Edit", {}, 0)
 
-    var dataMenuItem = new MenuItem("data_menu", "Data", { "import_data_menu_item": importDataMenuItem, "export_menu_item": exportMenuItem, "new_data_menu_item": newDataMenuItem }, 0)
+    var dataMenuItem = new MenuItem("data_menu", "Data", { "import_menu_item": importMenuItem, "export_menu_item": exportMenuItem, "new_data_menu_item": newDataMenuItem }, 0)
 
     // The main menu will be display in the body element, so nothing will be over it.
     this.mainMenu = new VerticalMenu(new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; top:2px;" }), [fileMenuItem, dataMenuItem, editMenuItem])

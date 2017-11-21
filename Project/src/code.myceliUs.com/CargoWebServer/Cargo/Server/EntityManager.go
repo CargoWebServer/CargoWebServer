@@ -3060,9 +3060,7 @@ func (this *EntityManager) GenerateEntityUUID(typeName string, parentUuid string
 	if len(parentUuid) > 0 {
 		keyInfo += parentUuid + ":"
 	}
-
 	keyInfo = typeName + ":"
-
 	for i := 0; i < len(ids); i++ {
 		if reflect.TypeOf(ids[i]).Kind() == reflect.String {
 			keyInfo += ids[i].(string)

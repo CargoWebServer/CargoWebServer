@@ -1505,7 +1505,6 @@ func (this FileManager) ReadDir(path string, messageId string, sessionId string)
 func FileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	// I will
 	tmpPath := GetServer().GetConfigurationManager().GetTmpPath()
-
 	err := r.ParseMultipartForm(200000) // grab the multipart form
 	if err != nil {
 		log.Println(w, err)
@@ -1516,7 +1515,8 @@ func FileUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	//get the *fileheaders
 	files := formdata.File["multiplefiles"] // grab the filenames
-	for i, _ := range files {               // loop through the files one by one
+	log.Println("-------> ", files)
+	for i, _ := range files { // loop through the files one by one
 		file, err := files[i].Open()
 		defer file.Close()
 		if err != nil {
