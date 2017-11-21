@@ -1025,7 +1025,8 @@ func (this *Server) Start() {
 			GetServer().appendSubConnectionId(connectionId, subConnectionId)
 
 			// Here I will create the connection object...
-			conn, err = JS.GetJsRuntimeManager().RunScript(connectionId, "new Connection()")
+			// .RunScript(connectionId, "new Connection()")
+			conn, err = JS.GetJsRuntimeManager().GetSession(connectionId).Run("new Connection()")
 			if err != nil {
 				log.Println("---------> error found!", err)
 			}
@@ -1037,13 +1038,15 @@ func (this *Server) Start() {
 			service.Object().Set("conn", conn)
 
 			// I will set the open callback.
-			_, err = JS.GetJsRuntimeManager().RunScript(connectionId, "Connection.prototype.onopen = "+openCallback)
+			//.RunScript(connectionId, "Connection.prototype.onopen = "+openCallback)
+			_, err = JS.GetJsRuntimeManager().GetSession(connectionId).Run("Connection.prototype.onopen = " + openCallback)
 			if err != nil {
 				log.Println("-----> error!", err)
 			}
 
 			// Now the close callback.
-			_, err = JS.GetJsRuntimeManager().RunScript(connectionId, "Connection.prototype.onclose = "+closeCallback)
+			//.RunScript(connectionId, "Connection.prototype.onclose = "+closeCallback)
+			_, err = JS.GetJsRuntimeManager().GetSession(connectionId).Run("Connection.prototype.onclose = " + closeCallback)
 			if err != nil {
 				log.Println("-----> error!", err)
 			}
@@ -1138,7 +1141,7 @@ func (this *Server) Start() {
 				go func(intervalInfo *IntervalInfo) {
 					// Set the variable as function.
 					functionName := "callback_" + strings.Replace(intervalInfo.uuid, "-", "_", -1)
-					_, err := JS.GetJsRuntimeManager().RunScript("", "var "+functionName+"="+intervalInfo.callback)
+					_, err := JS.GetJsRuntimeManager().GetSession("").Run("var " + functionName + "=" + intervalInfo.callback)
 					// I must run the script one and at interval after it...
 					if err == nil {
 						if intervalInfo.ticker != nil {
@@ -1146,7 +1149,7 @@ func (this *Server) Start() {
 							for t := range intervalInfo.ticker.C {
 								// So here I will call the callback.
 								// The callback contain unamed function...
-								_, err := JS.GetJsRuntimeManager().RunScript("", functionName+"()")
+								_, err := JS.GetJsRuntimeManager().GetSession("").Run(functionName + "()")
 								if err != nil {
 									log.Println("---> Run interval callback error: ", err, t)
 								}

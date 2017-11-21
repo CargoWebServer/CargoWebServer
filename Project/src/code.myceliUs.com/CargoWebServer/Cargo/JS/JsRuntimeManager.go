@@ -473,7 +473,7 @@ func (this *JsRuntimeManager) executeJsFunction(vm *otto.Otto, functionStr strin
 /**
  * Run given script for a given session.
  */
-func (this *JsRuntimeManager) getSession(sessionId string) *otto.Otto {
+func (this *JsRuntimeManager) GetSession(sessionId string) *otto.Otto {
 	// Protectect the map access...
 	var sessionInfo SessionInfos
 	sessionInfo.m_return = make(chan (*otto.Otto))
