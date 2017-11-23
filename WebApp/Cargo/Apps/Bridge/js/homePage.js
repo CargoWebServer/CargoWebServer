@@ -258,6 +258,11 @@ var HomePage = function () {
         changePropertyByClassName("color", ".header_cell", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".header_cell", "." + evt.dataMap.themeClass, "border-color")
         changePropertyByClassName("background-color", ".header_cell", "." + evt.dataMap.themeClass, "border-color")
+
+        changePropertyByClassName("background-color", ".cell_value .scrolltable .header_cell", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
+        changePropertyByClassName("background", ".cell_value .scrolltable .header_cell", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
+        changePropertyByClassName("color", ".cell_value .scrolltable .header_cell", "." + evt.dataMap.themeClass + " .ace_gutter")
+        
         changePropertyByClassName("background", ".body_cell", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
         changePropertyByClassName("background-color", ".body_cell", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
         changePropertyByClassName("background", "::-webkit-scrollbar-thumb", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
@@ -299,6 +304,19 @@ var HomePage = function () {
 
         changePropertyByClassName("background-color", ".main_page", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".main_page", "." + evt.dataMap.themeClass + " .ace_gutter")
+        
+        // filter table.
+        changePropertyByClassName("color", ".entity_ref_lnk", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".filter_panel_div", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".filter_panel_div", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".filter_panel_div", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".filter_panel_buttons", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".filter_panel_buttons", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".filter_panel_buttons", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".body_cell option", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".body_cell option", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".body_cell option", "." + evt.dataMap.themeClass + " .ace_gutter")
+        
     })
 
 

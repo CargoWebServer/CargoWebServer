@@ -845,7 +845,6 @@ func (this *EntityManager) getEntities(typeName string, query *EntityQuery, stor
 
 	} else {
 		// Here I will create a new query and execute it...
-		log.Println("--------> query: ", query)
 		// I will retreive the uuid...
 		query.TypeName = typeName
 		query.Fields = []string{"UUID"} //append(query.Fields, "UUID")

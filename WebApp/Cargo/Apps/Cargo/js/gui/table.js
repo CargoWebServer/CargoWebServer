@@ -121,6 +121,20 @@ var Table = function (id, parent) {
 	return this
 }
 
+// Set the header width if it need to be set.
+Table.prototype.setHeadertWidth = function (index) {
+	// Now I will set the header size if it need to be set.
+	var w = 0
+	for (var i = 0; i < this.rows.length; i++) {
+		var cell = this.rows[i].cells[index]
+		if (cell.div.element.offsetWidth > w) {
+			w = cell.div.element.offsetWidth
+		}
+	}
+
+	this.header.cells[index].element.style.width = w - 6 + "px"
+	this.header.cells[index].element.style.minWidth = w - 6 + "px"
+}
 
 /**
  * Set the model of the table, different model are availables. (Sql, Key value etc...)
@@ -848,7 +862,7 @@ function createItemLnk(entity, value, field, valueDiv) {
 
 	// I will display the remove button on case of user want to remove the linked entity.
 	var content = valueDiv.appendElement({ "tag": "div" }).down()
-	var ref = content.appendElement({ "tag": "div", "style": "display: inline; padding-left: 3px; vertical-align: text-bottom;" }).down().appendElement({ "tag": "a", "href": "#", "title": value.TYPENAME, "innerHtml": refName }).down()
+	var ref = content.appendElement({ "tag": "div", "style": "display: inline; padding-left: 3px; vertical-align: text-bottom;" }).down().appendElement({ "tag": "a", "class": "entity_ref_lnk", "href": "#", "title": value.TYPENAME, "innerHtml": refName }).down()
 	ref.element.id = value.UUID
 	var deleteLnkButton = content.appendElement({ "tag": "div", "style": "display: inline; width: 100%;", "class": "row_button" }).down().appendElement({ "tag": "i", "class": "fa fa-trash", "style": "margin-left: 8px;" }).down()
 
@@ -1408,6 +1422,20 @@ TableCell.prototype.setValue = function (value) {
 		return
 	}
 
+	// Remove the editor if there is one.
+	var editor = this.row.table.cellEditors[this.index]
+	if (editor != undefined) {
+		try {
+			// Remove it from it actual parent
+			editor.element.parentNode.removeChild(editor.element)
+			if (editor.resetPreviousValueDiv != undefined) {
+				editor.resetPreviousValueDiv()
+			}
+		} catch (err) {
+
+		}
+	}
+
 	// Display in the div...
 	if (isObject(value)) {
 		this.valueDiv.removeAllChilds()
@@ -1464,14 +1492,24 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 	if (this.isEditable() == false) {
 		return // The cell is not editable...
 	}
-
 	var type = this.getType()
 	var value = this.getValue()
 	var parent = this.row.table.rowGroup
+	var previousWidth = this.div.element.offsetWidth
+
+	var resetPreviousValueDiv = function (width, cell) {
+		return function () {
+			var table = cell.row.table
+			table.header.cells[cell.index].element.style.width = width + "px"
+			table.header.cells[cell.index].element.style.minWidth = width + "px"
+			cell.div.element.style.width = width + "px"
+			cell.div.element.style.minWidth = width + "px"
+			cell.valueDiv.element.style.display = ""
+		}
+	}(previousWidth, this)
 
 	// I will get the cell editor related to this column...
 	var editor = this.row.table.cellEditors[this.index]
-
 	// One editor at time...
 	if (editor != undefined) {
 		try {
@@ -1482,6 +1520,8 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 		}
 		// append it in it new parent.
 		this.div.element.appendChild(editor.element)
+		editor.resetPreviousValueDiv()
+		editor.resetPreviousValueDiv = resetPreviousValueDiv
 	}
 
 	var prototype = this.row.table.model.proto
@@ -1493,23 +1533,16 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 	if (prototype != null) {
 		// I will get the field...
 		var index = this.index + 3
-		if(this.row.table.model.query != undefined){
+		if (this.row.table.model.query != undefined) {
 			field = this.row.table.model.query.Fields[this.index]
 			index = prototype.getFieldIndex(field)
 		}
-		
-		fieldType = prototype.FieldsType[index]
 
-		// The value...
-		/*if (value != null) {
-			if (value.M_valueOf != undefined) {
-				entity = value
-				value = value.M_valueOf
-				field = "M_valueOf"
-				fieldType = getBaseTypeExtension(entity.TYPENAME)
-			}
-		}*/
+		fieldType = prototype.FieldsType[index]
 	}
+
+	// Keep intial state.
+	var isNull = editor == null
 
 	// Here is the default editor if is undefined...
 	if (isXsString(type)) {
@@ -1520,12 +1553,14 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 			} else {
 				editor = this.div.appendElement({ "tag": "input" }).down()
 			}
+			editor.resetPreviousValueDiv = resetPreviousValueDiv
 		}
 		editor.element.value = value
 	} else if (isXsId(type)) {
 		// Here I will put a text area..
 		if (editor == null) {
 			editor = this.div.appendElement({ "tag": "input" }).down()
+			editor.resetPreviousValueDiv = resetPreviousValueDiv
 		}
 		if (value != undefined) {
 			editor.element.value = value
@@ -1536,22 +1571,26 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 	} else if (isXsDate(type)) {
 		if (editor == null) {
 			editor = this.div.appendElement({ "tag": "input", "type": "datetime-local", "name": "date" }).down()
+			editor.resetPreviousValueDiv = resetPreviousValueDiv
 		}
 		editor.element.value = moment(value).format('YYYY-MM-DDTHH:mm:ss');
 		editor.element.step = 7
 	} else if (isXsNumeric(type)) {
 		if (editor == null) {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "0.01" }).down()
+			editor.resetPreviousValueDiv = resetPreviousValueDiv
 		}
 		editor.element.value = value
 	} else if (isXsBoolean(type)) {
 		if (editor == null) {
 			editor = this.div.appendElement({ "tag": "input", "type": "checkbox" }).down()
+			editor.resetPreviousValueDiv = resetPreviousValueDiv
 		}
 		editor.element.checked = value
 	} else if (isXsInt(type)) {
 		if (editor == null) {
 			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "1" }).down()
+			editor.resetPreviousValueDiv = resetPreviousValueDiv
 		}
 		editor.element.value = value
 	} else if (prototype != null) {
@@ -1581,6 +1620,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				// The editor will be an input box
 				if (editor == null) {
 					editor = this.div.appendElement({ "tag": "input", "style": "display: inline;" }).down()
+					editor.resetPreviousValueDiv = resetPreviousValueDiv
 				}
 
 				editor.element.value = this.valueDiv.element.innerText
@@ -1625,6 +1665,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 										tableCell.row.table.model.entities[tableCell.row.index] = entity
 										try {
 											editor.element.parentNode.removeChild(editor.element)
+											editor.resetPreviousValueDiv()
 										} catch (err) {
 										}
 									}
@@ -1636,16 +1677,27 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 		} else {
 			// Here I will get the prototype for the field type
 			var fieldPrototype = getEntityPrototype(type)
-
 			// Here it's an enumeration of value.
 			if (fieldPrototype.Restrictions != undefined) {
 				if (fieldPrototype.Restrictions.length > 0) {
-					editor = this.div.appendElement({ "tag": "select", "id": "" }).down()
-					for (var i = 0; i < fieldPrototype.Restrictions.length; i++) {
-						var restriction = fieldPrototype.Restrictions[i]
-						if (restriction.Type == 1) {
-							type = "xs.string"
-							editor.appendElement({ "tag": "option", "value": restriction.Value, "innerHtml": restriction.Value })
+					if (editor == null) {
+						editor = this.div.appendElement({ "tag": "select", "id": "" }).down()
+						editor.resetPreviousValueDiv = resetPreviousValueDiv
+						for (var i = 0; i < fieldPrototype.Restrictions.length; i++) {
+							var restriction = fieldPrototype.Restrictions[i]
+							if (restriction.Type == 1) {
+								type = "xs.string"
+								editor.appendElement({ "tag": "option", "value": restriction.Value, "innerHtml": restriction.Value })
+							}
+						}
+					}
+					// The value...
+					if (value != null) {
+						if (value.M_valueOf != undefined) {
+							entity = value
+							value = value.M_valueOf
+							field = "M_valueOf"
+							fieldType = getBaseTypeExtension(entity.TYPENAME)
 						}
 					}
 
@@ -1657,8 +1709,8 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				}
 			} else {
 				// Here the editor is an entity panel.
-				if (editor == null) { 
-					var entityPanel = new EntityPanel(this.valueDiv, fieldPrototype.TypeName, function (parent, field, typeName) {
+				if (editor == null) {
+					var entityPanel = new EntityPanel(this.valueDiv, fieldPrototype.TypeName, function (parent, field, typeName, table, index) {
 						return function (panel) {
 							// Here I will set the actual values..
 							if (parent[field] != undefined && parent[field] != "") {
@@ -1681,24 +1733,43 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 							panel.maximizeBtn.element.click()
 							panel.header.element.style.display = "none"
 						}
-					}(entity, field, fieldPrototype.TypeName))
+					}(entity, field, fieldPrototype.TypeName, this.row.table, this.index))
 					editor = entityPanel.panel
-					editor.setEntity = function(entityPanel){
-						return function(entity){
+					editor.setEntity = function (entityPanel) {
+						return function (entity) {
 							entityPanel.setEntity(entity)
 						}
 					}(entityPanel)
-				}else{
+					editor.resetPreviousValueDiv = resetPreviousValueDiv
+				} else {
 					editor.setEntity(entity[field])
 				}
 			}
 		}
 	}
-	this.row.table.cellEditors[this.index] = editor
 
+	// Keep the editor in a map.
+	this.row.table.cellEditors[this.index] = editor
+	if (isNull) {
+		// Set the editor size...
+		if (editor.element.tagName != "SELECT") {
+			editor.element.style.width = w * 1.125 + "px"
+			if (editor.element.tagName == "TEXTAREA") {
+				editor.element.style.height = h + "px"
+			}
+
+			editor.element.style.border = "none"
+
+			editor.element.style.padding = "0px"
+			editor.element.style.margin = "2px"
+		}
+	}
 
 	// I will set the editor on the page...
 	if (editor != null) {
+		// Set the table header width
+		this.row.table.setHeadertWidth(this.index)
+
 		// When the selection change I will set the save button.
 		editor.element.onchange = function (row) {
 			return function () {
@@ -1714,14 +1785,6 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 			editor.element.select()
 		}
 
-		// Set the editor size...
-		if (isXsString(type)) {
-			editor.element.style.width = w + "px"
-			editor.element.style.height = h + "px"
-		}
-		editor.element.style.border = "none"
-		editor.element.style.padding = "0px"
-		editor.element.style.margin = "0px"
 
 		var onblur = function (self, editor, onblur, field, entity) {
 			// If the value change...
@@ -1754,7 +1817,7 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 						editor.deleteButton.element.parentNode.removeChild(editor.deleteButton.element)
 					}
 				}
-
+				editor.resetPreviousValueDiv()
 				if (this.parentNode != null) {
 					this.parentNode.removeChild(this)
 				}
@@ -1764,14 +1827,13 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				} catch (err) {
 
 				}
-
 			}
 		}(this, editor, onblur, field, entity)
 		editor.element.onblur = onblur
 
-		// If the editor is the entity panel I will
+		// In case of cell editor.
 		if (editor.element.tagName == "DIV") {
-			editor.element.addEventListener("keyup", function (editor, cell, entity, field, fieldType) {
+			var keyUpListener = function (editor, cell, entity, field, fieldType, keyUpListener) {
 				return function (evt) {
 					evt.stopPropagation()
 					if (evt.keyCode == 27) {
@@ -1779,11 +1841,30 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 						if (entity[field] == undefined) {
 							entity[field] = eval("new " + fieldType + "()")
 						}
-						cell.setValue(entity[field]) // Set the value.
+						if (cell.getValue() != entity[field]) {
+							cell.setValue(entity[field]) // Set the value.
+						}
 						cell.valueDiv.element.style.display = ""
+						document.body.removeEventListener("keyup", keyUpListener, true)
+						editor.resetPreviousValueDiv()
 					}
 				}
-			}(editor, this, entity, field, fieldPrototype.TypeName))
+			}(editor, this, entity, field, fieldPrototype.TypeName, keyUpListener)
+			document.body.addEventListener("keyup", keyUpListener, true)
+		} else {
+			editor.element.onkeyup = function (edtitor) {
+				return function (evt) {
+					if (evt.keyCode == 27) {
+						try {
+							// Remove it from it actual parent
+							editor.element.parentNode.removeChild(editor.element)
+						} catch (err) {
+
+						}
+						editor.resetPreviousValueDiv()
+					}
+				}
+			}(editor)
 		}
 	}
 }
@@ -2056,12 +2137,13 @@ var ColumnFilter = function (index, table) {
 	// The panel where the filter options reside...
 	this.filterPanelDiv = this.div.appendElement({ "tag": "div", "class": "filter_panel_div" }).down()
 
-	this.filterPanel = this.filterPanelDiv.appendElement({ "tag": "div", "class": "filter_panel" }).down()
+	this.filterPanel = this.filterPanelDiv.appendElement({ "tag": "div", "class": "filter_panel_scroll" }).down()
+		.appendElement({ "tag": "div", "class": "filter_panel" }).down()
 
 	// Now the button...
 	var filterPanelButtons = this.filterPanelDiv.appendElement({ "tag": "div", "class": "filter_panel_buttons" }).down()
 
-	this.okBtn = filterPanelButtons.appendElement({ "tag": "div", "innerHtml": "ok" }).down()
+	this.okBtn = filterPanelButtons.appendElement({ "tag": "div", "innerHtml": "ok", "style":"border-right: 1px solid;" }).down()
 	this.cancelBtn = filterPanelButtons.appendElement({ "tag": "div", "innerHtml": "cancel" }).down()
 
 	// Simply close the panel...

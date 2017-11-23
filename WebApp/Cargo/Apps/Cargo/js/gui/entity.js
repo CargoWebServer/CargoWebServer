@@ -1409,7 +1409,7 @@ EntityPanel.prototype.appendObjectRef = function (object, valueDiv, field, field
 	if (refName != undefined && refName.length > 0) {
 		valueDiv.element.style.width = "auto"
 		var ln = valueDiv.appendElement({ "tag": "div", "class": "entities_btn_container" }).down()
-		var ref = ln.appendElement({ "tag": "div" }).down().appendElement({ "tag": "a", "href": "#", "title": object.TYPENAME, "innerHtml": refName }).down()
+		var ref = ln.appendElement({ "tag": "div" }).down().appendElement({ "tag": "a", "class":"entity_ref_lnk", "href": "#", "title": object.TYPENAME, "innerHtml": refName }).down()
 		ref.element.id = object.UUID
 		var deleteLnkButton = ln.appendElement({ "tag": "div", "class": "entities_btn" }).down().appendElement({ "tag": "i", "class": "fa fa-trash" }).down()
 

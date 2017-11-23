@@ -224,28 +224,6 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
                     // init the table.
                     caller.caller.initCallback()
                     caller.caller.initCallback = undefined
-
-                    /*if (table.header != null) {
-                        table.header.maximizeBtn.element.click()
-                        table.header.exportBtn.element.style.display = "none"
-                        for (var i = 0; i < table.rows.length; i++) {
-                            // Set the new item listener...
-                            server.entityManager.attach(table, NewEntityEvent, function (evt, table) {
-                                if (evt.dataMap["entity"] != undefined) {
-                                    var entity = entities[evt.dataMap["entity"].UUID]
-                                    if (entity != undefined) {
-                                        if (entity.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(entity.TYPENAME) != -1) {
-                                            if (entity.ParentUuid != undefined && table.model.getParentUuid() != undefined) {
-                                                if (table.model.getParentUuid() == entity.ParentUuid) {
-                                                    var row = table.appendRow(entity, entity.UUID)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            })
-                        }
-                    }*/
                 }
             },
             // Error Callback
