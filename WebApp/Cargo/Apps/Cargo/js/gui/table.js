@@ -1492,18 +1492,23 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 
 	if (prototype != null) {
 		// I will get the field...
-		var field = prototype.Fields[this.index + 3]
-		var fieldType = prototype.FieldsType[this.index + 3]
+		var index = this.index + 3
+		if(this.row.table.model.query != undefined){
+			field = this.row.table.model.query.Fields[this.index]
+			index = prototype.getFieldIndex(field)
+		}
+		
+		fieldType = prototype.FieldsType[index]
 
 		// The value...
-		if (value != null) {
+		/*if (value != null) {
 			if (value.M_valueOf != undefined) {
 				entity = value
 				value = value.M_valueOf
 				field = "M_valueOf"
 				fieldType = getBaseTypeExtension(entity.TYPENAME)
 			}
-		}
+		}*/
 	}
 
 	// Here is the default editor if is undefined...
@@ -1652,8 +1657,8 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 				}
 			} else {
 				// Here the editor is an entity panel.
-				if (editor == null) {
-					editor = new EntityPanel(this.valueDiv, fieldPrototype.TypeName, function (parent, field, typeName) {
+				if (editor == null) { 
+					var entityPanel = new EntityPanel(this.valueDiv, fieldPrototype.TypeName, function (parent, field, typeName) {
 						return function (panel) {
 							// Here I will set the actual values..
 							if (parent[field] != undefined && parent[field] != "") {
@@ -1676,7 +1681,15 @@ TableCell.prototype.appendCellEditor = function (w, h) {
 							panel.maximizeBtn.element.click()
 							panel.header.element.style.display = "none"
 						}
-					}(entity, field, fieldPrototype.TypeName)).panel
+					}(entity, field, fieldPrototype.TypeName))
+					editor = entityPanel.panel
+					editor.setEntity = function(entityPanel){
+						return function(entity){
+							entityPanel.setEntity(entity)
+						}
+					}(entityPanel)
+				}else{
+					editor.setEntity(entity[field])
 				}
 			}
 		}
