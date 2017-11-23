@@ -30,24 +30,6 @@ import (
 //                              DataStore function
 ////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////
-//						Entity Query
-////////////////////////////////////////////////////////////////////////////////
-/**
- * The query is use to specifying the basic information it's like
- * the select, insert or update of sql...
- */
-type EntityQuery struct {
-	// The name of the entity
-	TypeName string
-	// The list of field to retreive, delete or modify
-	Fields []string
-	// The base index, this must be of form indexFieldName=indexFieldValue
-	Indexs []string
-	// The query to execute by the search engine.
-	Query string
-}
-
 /**
  * This function is use to retreive the position in the array of a given field.
  */
@@ -554,7 +536,7 @@ func (this *KeyValueDataStore) DeleteEntityPrototype(typeName string) error {
 	}
 
 	// I will delete all entity...
-	entities, _ := GetServer().GetEntityManager().getEntities(prototype.TypeName, "", this.m_id, false)
+	entities, _ := GetServer().GetEntityManager().getEntities(prototype.TypeName, nil, this.m_id, false)
 	for i := 0; i < len(entities); i++ {
 		entity := entities[i]
 		// remove it...

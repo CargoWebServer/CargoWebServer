@@ -78,6 +78,7 @@ func newEntityManager() *EntityManager {
 	Utility.RegisterType((*DynamicEntity)(nil))
 	Utility.RegisterType((*MessageData)(nil))
 	Utility.RegisterType((*TaskInstanceInfo)(nil))
+	Utility.RegisterType((*EntityQuery)(nil))
 
 	// References
 	entityManager.referenced = make(map[string][]EntityRef, 0)
@@ -114,7 +115,7 @@ func (this *EntityManager) initialize() {
 	}
 
 	// Force complete intialysation of action.
-	this.getEntities("CargoEntities.Action", "", "CargoEntities", false)
+	this.getEntities("CargoEntities.Action", nil, "CargoEntities", false)
 
 }
 
@@ -801,7 +802,7 @@ func (this *EntityManager) getDerivedEntityType(typeName string) ([]*EntityProto
 /**
  * Return the list of entities for a given type name.
  */
-func (this *EntityManager) getEntities(typeName string, queryStr string, storeId string, lazy bool) ([]Entity, *CargoEntities.Error) {
+func (this *EntityManager) getEntities(typeName string, query *EntityQuery, storeId string, lazy bool) ([]Entity, *CargoEntities.Error) {
 
 	var entities []Entity
 
@@ -815,7 +816,7 @@ func (this *EntityManager) getEntities(typeName string, queryStr string, storeId
 		dataStore = GetServer().GetDataManager().getDataStore("sql_info")
 	}
 
-	if len(queryStr) == 0 {
+	if query == nil {
 		values, err := dataStore.(*KeyValueDataStore).getIndexation(typeName)
 		if err != nil {
 			errObj := NewError(Utility.FileLine(), DATASTORE_INDEXATION_ERROR, SERVER_ERROR_CODE, errors.New("No indexation for type '"+typeName+"'."))
@@ -844,20 +845,17 @@ func (this *EntityManager) getEntities(typeName string, queryStr string, storeId
 
 	} else {
 		// Here I will create a new query and execute it...
-		var query EntityQuery
-		query.TypeName = typeName
-		query.Query = queryStr
-
+		log.Println("--------> query: ", query)
 		// I will retreive the uuid...
 		query.TypeName = typeName
-		query.Fields = append(query.Fields, "UUID")
-		var fieldsType []interface{} // not used
+		query.Fields = []string{"UUID"} //append(query.Fields, "UUID")
+		var fieldsType []interface{}    // not used
 		var params []interface{}
 
 		// Now I will execute the query...
-		queryStr_, _ := json.Marshal(query)
+		queryStr, _ := json.Marshal(query)
 
-		results, err := GetServer().GetDataManager().readData(storeId, string(queryStr_), fieldsType, params)
+		results, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
 		if err != nil {
 			// Create the error message
 			cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, err)
@@ -883,7 +881,7 @@ func (this *EntityManager) getEntitiesByType(typeNames []string, storeId string,
 	var entities []Entity
 
 	for i := 0; i < len(typeNames); i++ {
-		entities_, errObj := this.getEntities(typeNames[i], "", storeId, lazy)
+		entities_, errObj := this.getEntities(typeNames[i], nil, storeId, lazy)
 		if errObj != nil {
 			return entities, errObj
 		}
@@ -1222,6 +1220,8 @@ func (this *EntityManager) getEntityPrototypes(storeId string, schemaId string) 
 				prototypes = append(prototypes, protos[i])
 			}
 		}
+	} else {
+		log.Println("--->", err)
 	}
 
 	return prototypes, err
@@ -1487,6 +1487,10 @@ func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}
 				// I will get values to compare...
 				entity0 := entities[i]
 				entity1 := entities[j]
+				if entity0 == nil || entity1 == nil {
+					return false
+				}
+
 				var val0, val1 interface{}
 				if reflect.TypeOf(entity0).String() == "*Server.DynamicEntity" {
 					// Dynamic entity.
@@ -2053,7 +2057,7 @@ func (this *EntityManager) RenameEntityPrototype(typeName string, prototype inte
 	}
 
 	// So here I will get the list of all entities for that type.
-	entities, _ := this.getEntities(oldName, "", storeId, false)
+	entities, _ := this.getEntities(oldName, nil, storeId, false)
 
 	// Now I will change the prototype name
 	prototype.(*EntityPrototype).TypeName = typeName
@@ -2677,7 +2681,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 // That function is use to retreive objects with a given type.
 // @param {string} typeName The name of the type we looking for in the form packageName.typeName
 // @param {string} storeId The name of the store where the information is saved.
-// @param {string} queryStr It contain the code of a function to be executed by the server to filter specific values.
+// @param {EntityQuery} query It contain the code of a function to be executed by the server to filter specific values.
 // @param {int} offset	Results offset
 // @param {int} limit	The number of results to return. Can be use to create page of results.
 // @param {[]string} orderBy the list of field that specifie the result order.
@@ -2688,7 +2692,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 // @src
-//EntityManager.prototype.getEntities = function (typeName, storeId, queryStr, offset, limit, orderBy, asc, progressCallback, successCallback, errorCallback, caller) {
+//EntityManager.prototype.getEntities = function (typeName, storeId, query, offset, limit, orderBy, asc, progressCallback, successCallback, errorCallback, caller) {
 //    // First of all i will get the entity prototype.
 //    server.entityManager.getEntityPrototype(typeName, storeId,
 //        // The success callback.
@@ -2696,7 +2700,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //            // Set the parameters.
 //            var typeName = caller.typeName
 //            var storeId = caller.storeId
-//            var queryStr = caller.queryStr
+//            var query = caller.query
 //            var successCallback = caller.successCallback
 //            var progressCallback = caller.progressCallback
 //            var errorCallback = caller.errorCallback
@@ -2705,7 +2709,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //            var params = []
 //            params.push(createRpcData(typeName, "STRING", "typeName"))
 //            params.push(createRpcData(storeId, "STRING", "storeId"))
-//            params.push(createRpcData(queryStr, "STRING", "queryStr"))
+//            params.push(createRpcData(query, "JSON_STR", "query"))
 //            params.push(createRpcData(offset, "INTEGER", "offset"))
 //            params.push(createRpcData(limit, "INTEGER", "limit"))
 //			  params.push(createRpcData(orderBy, "JSON_STR", "orderBy", "[]string"))
@@ -2772,9 +2776,9 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //				}
 //            // dispatch the message.
 //            server.errorManager.onError(errMsg)
-//        }, { "typeName": typeName, "storeId": storeId, "queryStr": queryStr, "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback })
+//        }, { "typeName": typeName, "storeId": storeId, "query": query, "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback })
 //}
-func (this *EntityManager) GetEntities(typeName string, storeId string, queryStr string, offset int, limit int, orderBy []interface{}, asc bool, messageId string, sessionId string) []interface{} {
+func (this *EntityManager) GetEntities(typeName string, storeId string, query *EntityQuery, offset int, limit int, orderBy []interface{}, asc bool, messageId string, sessionId string) []interface{} {
 
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
@@ -2782,7 +2786,7 @@ func (this *EntityManager) GetEntities(typeName string, storeId string, queryStr
 		return nil
 	}
 
-	entities, errObj := this.getEntities(typeName, queryStr, storeId, false)
+	entities, errObj := this.getEntities(typeName, query, storeId, false)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil

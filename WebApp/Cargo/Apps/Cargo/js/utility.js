@@ -610,9 +610,9 @@ function getCSSRule(ruleName) {
     var result = null;
     var find = Array.prototype.find;
 
-    find.call(document.styleSheets, function(styleSheet){
-        result = find.call(styleSheet.cssRules, function(cssRule){
-            return cssRule instanceof CSSStyleRule 
+    find.call(document.styleSheets, function (styleSheet) {
+        result = find.call(styleSheet.cssRules, function (cssRule) {
+            return cssRule instanceof CSSStyleRule
                 && cssRule.selectorText.toLowerCase() == ruleName;
         });
         return result != null;
@@ -1156,12 +1156,14 @@ function createRpcData(variable, variableType, variableName, typeName) {
         typeName = "[]unit8"
     } else if (variableType == "JSON_STR") {
         variableType = Data_JSON_STR
-        if (variable.stringify != undefined) {
-            variableType = Data_JSON_STR
-            typeName = variable.TYPENAME
-            variable = variable.stringify()
-        } else {
-            variable = JSON.stringify(variable)
+        if (variable != null) {
+            if (variable.stringify != undefined) {
+                variableType = Data_JSON_STR
+                typeName = variable.TYPENAME
+                variable = variable.stringify()
+            } else {
+                variable = JSON.stringify(variable)
+            }
         }
     } else if (variableType == "BOOLEAN") {
         variableType = Data_BOOLEAN

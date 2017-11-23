@@ -25,7 +25,7 @@ HomePage.prototype.displayNewestPost = function () {
         .appendElement({ "tag": "div", "class": "post_preview_container" }).down()
 
     // Display the 8 last articles...
-    server.entityManager.getEntities("Blog.blog_post", "Blog", "", 0, 8, ["M_date_published"], false,
+    server.entityManager.getEntities("Blog.blog_post", "Blog", null, 0, 8, ["M_date_published"], false,
         function (index, total, caller) {
 
         },
@@ -50,7 +50,7 @@ HomePage.prototype.displayMostViewedPost = function () {
         .appendElement({ "tag": "div", "class": "post_preview_container" }).down()
 
     // Display the 8 last articles...
-    server.entityManager.getEntities("Blog.blog_post", "Blog", "", 0, 8, ["M_date_published"], false,
+    server.entityManager.getEntities("Blog.blog_post", "Blog", null, 0, 8, ["M_date_published"], false,
         function (index, total, caller) {
 
         },

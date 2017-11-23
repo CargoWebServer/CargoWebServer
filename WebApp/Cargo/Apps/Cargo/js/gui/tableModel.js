@@ -47,6 +47,7 @@ var TableModel = function (titles) {
  * @param {function} callback The function to call when the funtion has finish it's work.
  */
 TableModel.prototype.init = function (successCallback, progressCallback, errorCallback, caller) {
+
     if (successCallback != undefined) {
         successCallback(undefined, caller)
     }
@@ -162,11 +163,21 @@ var EntityTableModel = function (proto, query) {
     /* I will simply get all entities for the given type. **/
 
     // Here I will intialyse the fields and corresponding title...
-    for (var i = 0; i < this.proto.Fields.length; i++) {
-        if (proto.FieldsVisibility[i] == true) {
-            var fieldIndex = proto.FieldsOrder[i]
-            titles.push(proto.Fields[fieldIndex].replace("M_", ""))
-            this.fields.push(proto.FieldsType[fieldIndex])
+    if (this.query == null) {
+        for (var i = 0; i < this.proto.Fields.length; i++) {
+            if (proto.FieldsVisibility[i] == true) {
+                var fieldIndex = proto.FieldsOrder[i]
+                titles.push(proto.Fields[fieldIndex].replace("M_", ""))
+                this.fields.push(proto.FieldsType[fieldIndex])
+            }
+        }
+    } else {
+        for (var i = 0; i < this.query.Fields.length; i++) {
+            var fieldIndex = proto.getFieldIndex(this.query.Fields[i])
+            if (proto.FieldsVisibility[fieldIndex] == true) {
+                titles.push(proto.Fields[fieldIndex].replace("M_", ""))
+                this.fields.push(proto.FieldsType[fieldIndex])
+            }
         }
     }
 
@@ -186,11 +197,71 @@ EntityTableModel.prototype.constructor = EntityTableModel;
  * Initialisation of the table model.
  */
 EntityTableModel.prototype.init = function (successCallback, progressCallback, errorCallback, caller) {
-    // typeName string, storeId string, queryStr string, offset int, limit int, orderBy []interface{}, asc bool
-    if (caller.initCallback != undefined) {
-        caller.initCallback()
-        caller.initCallback = undefined
+
+    if (this.query != null) {
+        server.entityManager.getEntities(this.proto.TypeName, this.proto.TypeName.split(".")[0], this.query, 0, -1, [], true,
+            // Progress callback
+            function (index, total, caller) {
+                // nothing to do here
+                if (caller.progressCallback != undefined) {
+                caller.progressCallback(index, total, caller.caller)
+                }
+            },
+            // Success callack
+            function (results, caller) {
+
+                var table = caller.caller.caller
+                for (var i = 0; i < results.length; i++) {
+                    table.model.appendRow(results[i], results[i].UUID)
+                }
+
+                if(caller.successCallback!=undefined){
+                    caller.successCallback(results, caller.caller)
+                }
+
+                // typeName string, storeId string, queryStr string, offset int, limit int, orderBy []interface{}, asc bool
+                if (caller.caller.initCallback != undefined) {
+                    // init the table.
+                    caller.caller.initCallback()
+                    caller.caller.initCallback = undefined
+
+                    /*if (table.header != null) {
+                        table.header.maximizeBtn.element.click()
+                        table.header.exportBtn.element.style.display = "none"
+                        for (var i = 0; i < table.rows.length; i++) {
+                            // Set the new item listener...
+                            server.entityManager.attach(table, NewEntityEvent, function (evt, table) {
+                                if (evt.dataMap["entity"] != undefined) {
+                                    var entity = entities[evt.dataMap["entity"].UUID]
+                                    if (entity != undefined) {
+                                        if (entity.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(entity.TYPENAME) != -1) {
+                                            if (entity.ParentUuid != undefined && table.model.getParentUuid() != undefined) {
+                                                if (table.model.getParentUuid() == entity.ParentUuid) {
+                                                    var row = table.appendRow(entity, entity.UUID)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            })
+                        }
+                    }*/
+                }
+            },
+            // Error Callback
+            function (errObj, { "caller": caller }) {
+                if (caller.errorCallback != undefined) {
+                    caller.errorCallback(errObj, caller.caller)
+                }
+            }, { "successCallback": successCallback, "errorCallback": errorCallback, "progressCallback": progressCallback, "caller": caller })
+    } else {
+        // typeName string, storeId string, queryStr string, offset int, limit int, orderBy []interface{}, asc bool
+        if (caller.initCallback != undefined) {
+            caller.initCallback()
+            caller.initCallback = undefined
+        }
     }
+
 }
 
 EntityTableModel.prototype.getParentUuid = function () {
@@ -227,7 +298,7 @@ EntityTableModel.prototype.removeRow = function (rowIndex, callback) {
         var fieldType = parentPrototype.FieldsType[parentPrototype.getFieldIndex(field)]
         isRef = fieldType.endsWith(":Ref")
     }
-    
+
     if (isRef) {
         // I here I simple new to remove the reference from the parent 
         // entity.

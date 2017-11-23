@@ -70,12 +70,10 @@ func (this *ProjectManager) stop() {
 func (this *ProjectManager) synchronize() {
 	// Each directory contain an application...
 	files, _ := ioutil.ReadDir(this.root)
-
 	for _, f := range files {
 		if f.IsDir() {
 			log.Println("--> Synchronize project ", f.Name())
 			if !strings.HasPrefix(".", f.Name()) {
-
 				projectUUID := CargoEntitiesProjectExists(f.Name())
 				var project *CargoEntities.Project
 				if len(projectUUID) == 0 {
@@ -163,12 +161,7 @@ func (this *ProjectManager) Synchronize(sessionId string, messageId string) {
 // @param {callback} errorCallback In case of error.
 func (this *ProjectManager) GetAllProjects(sessionId string, messageId string) []*CargoEntities.Project {
 	projects := make([]*CargoEntities.Project, 0)
-	/*errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return projects
-	}*/
-	entities, errObj := GetServer().GetEntityManager().getEntities("CargoEntities.Project", "", "CargoEntities", false)
+	entities, errObj := GetServer().GetEntityManager().getEntities("CargoEntities.Project", nil, "CargoEntities", false)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return projects

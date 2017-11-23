@@ -14,7 +14,7 @@ var categoryTypeName = databaseName + schemaId + "blog_category"
 server.languageManager.setLanguage("en")
 
 // This is the body that will be use by all other panel.
-var bodyElement = new Element(document.getElementsByTagName("body")[0], {"tag":"div", "style":"width: 100%; height: 100%;"})
+var bodyElement = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "width: 100%; height: 100%;" })
 
 var mainPage = null
 
@@ -25,14 +25,24 @@ function main() {
 
     // get the prototypes of the blog schema.
     server.entityManager.getEntityPrototypes("sql_info",
-    // success callback
-    function(results, caller){
-        mainPage = new MainPage(bodyElement)
-    },
-    // error callback.
-    function(){
+        // success callback
+        function (results, caller) {
+            server.entityManager.getEntityPrototypes("sqltypes",
+                // success callback
+                function (results, caller) {
+                    mainPage = new MainPage(bodyElement)
+                },
+                // error callback.
+                function () {
 
-    }, 
-    // caller.
-    {} )
+                },
+                // caller.
+                {})
+        },
+        // error callback.
+        function () {
+
+        },
+        // caller.
+        {})
 }

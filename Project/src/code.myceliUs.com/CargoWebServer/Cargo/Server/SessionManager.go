@@ -187,7 +187,7 @@ func (this *SessionManager) closeSession(session *CargoEntities.Session) *CargoE
 func (this *SessionManager) getActiveSessions() []*CargoEntities.Session {
 
 	var sessions []*CargoEntities.Session
-	entities, _ := GetServer().GetEntityManager().getEntities("CargoEntities.Account", "", "CargoEntities", false)
+	entities, _ := GetServer().GetEntityManager().getEntities("CargoEntities.Account", nil, "CargoEntities", false)
 	for i := 0; i < len(entities); i++ {
 		account := entities[i].GetObject().(*CargoEntities.Account)
 		sessions = append(sessions, account.GetSessions()...)

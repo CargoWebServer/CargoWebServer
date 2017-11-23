@@ -341,7 +341,7 @@ func (this *EntityPrototype) Save(storeId string) error {
 
 			// Update local entities if the store is local.
 			if store.m_ipv4 == "127.0.0.1" { // save if is local entity prototype only.
-				entities, _ := GetServer().GetEntityManager().getEntities(prototype.TypeName, "", storeId, false)
+				entities, _ := GetServer().GetEntityManager().getEntities(prototype.TypeName, nil, storeId, false)
 
 				// Remove the fields
 				for i := 0; i < len(entities); i++ {

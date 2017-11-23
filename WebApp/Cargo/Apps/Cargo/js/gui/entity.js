@@ -1724,7 +1724,7 @@ function attachAutoCompleteInput(input, typeName, field, entityPanel, ids, onSel
 
 	// TODO use query instead of download all elements.
 
-	server.entityManager.getEntities(typeName, typeName.substring(0, typeName.indexOf(".")), "", 0, -1, [], true,
+	server.entityManager.getEntities(typeName, typeName.substring(0, typeName.indexOf(".")), null, 0, -1, [], true,
 		// Progress...
 		function () {
 

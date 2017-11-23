@@ -1548,7 +1548,7 @@ func (this *DataManager) ExportJsonData(storeId string, messageId string, sessio
 
 	// Now the data...
 	for i := 0; i < len(prototypes); i++ {
-		entities, errObj := GetServer().GetEntityManager().getEntities(prototypes[i].TypeName, "", storeId, false)
+		entities, errObj := GetServer().GetEntityManager().getEntities(prototypes[i].TypeName, nil, storeId, false)
 		if errObj == nil {
 			for j := 0; j < len(entities); j++ {
 				// append the object.
@@ -1715,6 +1715,9 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 		}
 	}
 
+	// Open connection.
+	err = store.Connect()
+
 	// Prototypes will be create only if they dosent exist.
 	for i := 0; i < len(infos.Schemas); i++ {
 		prototype := infos.Schemas[i]
@@ -1728,8 +1731,6 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 		}
 	}
 
-	// Open connection.
-	err = store.Connect()
 	if err != nil {
 		log.Println(err)
 		return

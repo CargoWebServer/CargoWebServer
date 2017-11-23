@@ -1,5 +1,26 @@
 package Server
 
+////////////////////////////////////////////////////////////////////////////////
+//						Entity Query
+////////////////////////////////////////////////////////////////////////////////
+/**
+ * The query is use to specifying the basic information it's like
+ * the select, insert or update of sql...
+ */
+type EntityQuery struct {
+	// Must be Server.EntityQuery
+	TYPENAME string
+
+	// The name of the entity
+	TypeName string
+	// The list of field to retreive, delete or modify
+	Fields []string
+	// The base index, this must be of form indexFieldName=indexFieldValue
+	Indexs []string
+	// The query to execute by the search engine.
+	Query string
+}
+
 /**
  * The entity interface regroups methods needed by a structure to be
  * saved and initialized from the key value data store.

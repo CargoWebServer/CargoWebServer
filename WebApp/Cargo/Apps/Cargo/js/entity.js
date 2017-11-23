@@ -20,6 +20,33 @@
  * @version 1.0
  */
 
+ /**
+ * The query is use to specifying the basic information it's like
+ * the select, insert or update of sql...
+ */
+var EntityQuery = function(typeName) {
+	// Must be Server.EntityQuery
+	this.TYPENAME = "Server.EntityQuery"
+
+	// The name of the entity
+    this.TypeName = typeName
+    
+	// The list of field to retreive, delete or modify
+    this.Fields = []
+    
+	// The base index, this must be of form indexFieldName=indexFieldValue
+    this.Indexs = []
+    
+	// The query to execute by the search engine.
+    this.Query = []
+    
+    // Stringnify method.
+    this.stringify = function(){
+        return JSON.stringify(this)
+    }
+}
+
+
 /**
   Restriction are expression defining limitation on the
   range of value that a variable can take. Type of restriction
@@ -51,8 +78,8 @@ var Restriction = function () {
  * Append a new object value into an entity.
  */
 function appendObjectValue(object, field, value) {
-    var fieldIndex = prototype.getFieldIndex(field)
     var prototype = getEntityPrototype(object.TYPENAME)
+    var fieldIndex = prototype.getFieldIndex(field)
     var fieldType = prototype.FieldsType[fieldIndex]
     var isArray = fieldType.startsWith("[]")
     var isRef = fieldType.endsWith(":Ref")
@@ -479,11 +506,11 @@ function setObjectValues(object, values) {
                     if (object[property] != null) {
                         if (object[property].length > 0) {
                             for (var i = 0; i < object[property].length; i++) {
-                                if (isString(object[property][i])) {
+                                if (!isString(object[property][i])) {
                                     if (isRef) {
-                                        if (object["set_" + property + "_" + object[property] + "_ref"] != undefined) {
+                                        if (object["reset_" + property + "_" + object[property] + "_ref"] != undefined) {
                                             // Call it.
-                                            object["set_" + property + "_" + object[property] + "_ref"]()
+                                            object["reset_" + property + "_" + object[property] + "_ref"]()
                                         }
                                     }
                                 }
@@ -492,11 +519,11 @@ function setObjectValues(object, values) {
                     }
                 } else {
                     if (object[property] != undefined) {
-                        if (isString(object[property])) {
+                        if (!isString(object[property])) {
                             if (isRef) {
-                                if (object["set_" + property + "_" + object[property] + "_ref"] != undefined) {
+                                if (object["reset_" + property + "_" + object[property] + "_ref"] != undefined) {
                                     // Call it.
-                                    object["set_" + property + "_" + object[property] + "_ref"]()
+                                    object["reset_" + property + "_" + object[property] + "_ref"]()
                                 }
                             }
                         }

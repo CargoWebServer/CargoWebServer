@@ -400,7 +400,7 @@ var MainPage = function (parent) {
     }(this)
 
     // Get the list of existing categories.
-    server.entityManager.getEntities(categoryTypeName, "Blog", "", 0, -1, [], true,
+    server.entityManager.getEntities(categoryTypeName, "Blog", null, 0, -1, [], true,
         // progress callback
         function (index, total, caller) {
             // Nothing to do here.

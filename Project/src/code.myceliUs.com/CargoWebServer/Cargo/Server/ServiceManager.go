@@ -262,7 +262,12 @@ func (this *ServiceManager) registerServiceActions(service Service) {
 	if err != nil {
 		// In that case i dont have access to the server code so i will get
 		// action form information in the db.
-		actions, _ := GetServer().GetEntityManager().getEntities("CargoEntities.Action", `CargoEntities.Action.M_name == /Server.`+service.getId()+`/`, "CargoEntities", false)
+		query := new(EntityQuery)
+		query.TYPENAME = "Server.EntityQuery"
+		query.TypeName = "CargoEntities.Action"
+		query.Query = `CargoEntities.Action.M_name == /Server.` + service.getId() + `/`
+
+		actions, _ := GetServer().GetEntityManager().getEntities("CargoEntities.Action", query, "CargoEntities", false)
 		for i := 0; i < len(actions); i++ {
 			action := actions[i].GetObject().(*CargoEntities.Action)
 			this.m_serviceAction[service.getId()] = append(this.m_serviceAction[service.getId()], action)

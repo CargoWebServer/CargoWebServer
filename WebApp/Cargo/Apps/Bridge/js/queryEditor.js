@@ -66,12 +66,12 @@ var QueryEditor = function (parent, file, initCallback) {
         // The file mode of the edior is simple javascript.
         this.editor.getSession().setMode("ace/mode/javascript");
     }
-    
+
     this.theme = localStorage.getItem("bridge_editor_theme")
     if (this.theme == undefined) {
         this.theme = "ace/theme/chrome"
     }
-    
+
     // Set the theme of the editor.
     this.editor.setTheme(this.theme);
 
@@ -92,7 +92,7 @@ var QueryEditor = function (parent, file, initCallback) {
  */
 QueryEditor.prototype.init = function () {
     // Now I will get the list of datastore from the server for the given type.
-    server.entityManager.getEntities("Config.DataStoreConfiguration", "Config", "", 0, -1, [], true,
+    server.entityManager.getEntities("Config.DataStoreConfiguration", "Config", null, 0, -1, [], true,
         // progress
         function () {
             // nothing here
@@ -495,7 +495,7 @@ QueryEditor.prototype.runQuery = function () {
         }
 
         eval(querySrc)
-        this.setResult(JSON.stringify(eval(queryVal)), eval(queryVal + ".Fields"), eval(queryVal + ".FieldsType"), [],"READ")
+        this.setResult(JSON.stringify(eval(queryVal)), eval(queryVal + ".Fields"), eval(queryVal + ".FieldsType"), [], "READ")
     }
 }
 
@@ -525,13 +525,33 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
         if (type == "READ") {
             this.resultQueryPanel.removeAllChilds()
             var table = new Table(this.activeDataConfig.M_id, this.resultQueryPanel)
-            var model = new SqlTableModel(this.activeDataConfig.M_id, query, fieldsType, [], fields)
-            table.setModel(model, function (table, queryEditor) {
-                return function () {
-                    // init the table.
-                    table.init()
-                }
-            }(table, this))
+            var q_ = JSON.parse(query)
+
+            // Initialyse a entity query object here.
+            var q = new EntityQuery(q_.TypeName)
+            q.Fields = q_.Fields
+            q.FieldsType = q_.FieldsType
+            q.Query = q_.Query
+            if (q_.Indexs != undefined) {
+                q.Indexs = q_.Indexs
+            }
+
+            server.entityManager.getEntityPrototype(q.TypeName, this.activeDataConfig.M_id,
+                function (prototype, caller) {
+                    var model = new EntityTableModel(prototype, q)
+                    table.setModel(model, function (table, queryEditor) {
+                        return function () {
+                            // init the table.
+                            table.parent.element.style.position = "relative"
+                            table.init()
+                        }
+                    }(table, this))
+
+                },
+                function (errObj, caller) {
+
+                }, { "q": q })
+
         }
     }
 }
