@@ -108,6 +108,10 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 	// Keep only the part past the root...
 	filePath_ := strings.Replace(filePath, this.root, "", -1)
 
+	if filePath_ == "/lib" {
+		return nil
+	}
+
 	isRoot := len(filePath_) == 0
 	if isRoot {
 		filePath_ = "CARGOROOT"
@@ -119,6 +123,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 
 	if err != nil {
 		log.Println("Dir ", filePath_, "not found!")
+
 		if isRoot {
 			dirEntity, _ = this.createDir("", "", "")
 		} else {
@@ -135,6 +140,7 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 				dirEntity, _ = this.createDir(dirName, dirPath, "")
 			}
 		}
+
 	} else {
 		// The directory already exist...
 		toDelete = make(map[string]*CargoEntities.File, 0)
@@ -224,6 +230,11 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
  */
 // TODO add the logic for db files...
 func (this *FileManager) createDir(dirName string, dirPath string, sessionId string) (*CargoEntities.File, *CargoEntities.Error) {
+	// no file entities must be created for that dir.
+	if dirPath+"/"+dirName == "/lib" {
+		cargoError := NewError(Utility.FileLine(), INVALID_DIRECTORY_PATH_ERROR, SERVER_ERROR_CODE, errors.New("lib directory can not contain file entities."))
+		return nil, cargoError
+	}
 
 	// Return the dir entity if it already exist.
 	dirId := Utility.CreateSha1Key([]byte(dirPath + "/" + dirName))
@@ -325,6 +336,11 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
  * Create a file.
  */
 func (this *FileManager) createFile(parentDir *CargoEntities.File, filename string, filepath string, filedata []byte, sessionId string, thumbnailMaxHeight int, thumbnailMaxWidth int, dbFile bool) (*CargoEntities.File, *CargoEntities.Error) {
+	// Not create files from lib directory
+	if strings.HasPrefix(filepath+"/"+filename, "/lib/") {
+		cargoError := NewError(Utility.FileLine(), INVALID_DIRECTORY_PATH_ERROR, SERVER_ERROR_CODE, errors.New("lib directory can not contain file entities."))
+		return nil, cargoError
+	}
 
 	var file *CargoEntities.File
 	var f *os.File

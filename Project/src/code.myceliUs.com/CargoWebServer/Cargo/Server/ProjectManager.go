@@ -73,7 +73,7 @@ func (this *ProjectManager) synchronize() {
 	for _, f := range files {
 		if f.IsDir() {
 			log.Println("--> Synchronize project ", f.Name())
-			if !strings.HasPrefix(".", f.Name()) {
+			if !strings.HasPrefix(".", f.Name()) && f.Name() != "lib" && f.Name() != "queries" {
 				projectUUID := CargoEntitiesProjectExists(f.Name())
 				var project *CargoEntities.Project
 				if len(projectUUID) == 0 {
