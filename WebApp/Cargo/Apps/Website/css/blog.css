@@ -4,6 +4,7 @@
 */
 .edit-button{
     position: absolute;
+    display: none;
     z-index: 4;
     left: -20px;
     top:-.75em;
@@ -128,6 +129,7 @@
 /** I will set the font to bigger size here. **/
 .cargo {
     font-size: 30px;
+    padding-bottom: 4px;
 }
 
 .cargo:hover {

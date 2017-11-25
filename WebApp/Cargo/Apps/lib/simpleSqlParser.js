@@ -514,7 +514,7 @@ module.exports={
     "build/parsimmon.browser.js",
     "build/parsimmon.browser.min.js"
   ],
-  "homepage": "https://github.com/jneen/parsimmon",
+  "HomePage": "https://github.com/jneen/parsimmon",
   "keywords": [
     "parsing",
     "parse",

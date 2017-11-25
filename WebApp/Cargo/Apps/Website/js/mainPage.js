@@ -11,6 +11,7 @@ var MainPage = function (parent) {
             "toggle-navigation": "Toggle navigation",
             "start-lnk": "Start Boostrap",
             "home-lnk": "home",
+            "tutorial-lnk": "tutorials",
             "about-lnk": "about",
             "create-lnk": "New blog",
             "contact-lnk": "Contact",
@@ -41,8 +42,8 @@ var MainPage = function (parent) {
             "register-form-emailaddress-input": "That email address is invalid",
             "register-username-input-error": "",
             // Other parts of header.
-            "blog-search-title": "Post Search",
-            "blog-categories-title": "Post Categories",
+            "blog-search-title": "Search",
+            "blog-categories-title": "Categories",
             "footer-text": "Copyright &copy; Your Website 2017",
             // The user input panel
             "Blog.dbo.blog_user": "User's",
@@ -81,6 +82,7 @@ var MainPage = function (parent) {
     // Brand and toggle get grouped for better mobile display
     this.navBar.appendElement({ "tag": "div", "class": "container", "id": "nav-container" }).down()
         .appendElement({ "tag": "div", class: "navbar-header" }).down()
+        .appendElement({"tag":"img", "src":"img/wheel.svg", "id":"cargo-home-logo", "style":"width:30px; height: 30px; margin-top: 10px;"})
         .appendElement({ "tag": "button", "type": "button", "class": "navbar-toggle", "data-toggle": "collapse", "data-target": "#bs-example-navbar-collapse-1" }).down()
         .appendElement({ "tag": "span", "class": "sr-only", "id": "toggle-navigation" }).down()
         .appendElement({ "tag": "span", "class": "icon-bar" })
@@ -95,6 +97,8 @@ var MainPage = function (parent) {
         .appendElement({ "tag": "a", "id": "create-lnk", "href": "#" }).up()
         .appendElement({ "tag": "li" }).down()
         .appendElement({ "tag": "a", "id": "home-lnk", "href": "#" }).up()
+        .appendElement({ "tag": "li" }).down()
+        .appendElement({ "tag": "a", "id": "tutorial-lnk", "href": "#" }).up()
         .appendElement({ "tag": "li" }).down()
         .appendElement({ "tag": "a", "id": "about-lnk", "href": "#" }).up().up()
         .appendElement({ "tag": "ul", "class": "nav navbar-nav navbar-right" }).down()
@@ -259,9 +263,6 @@ var MainPage = function (parent) {
     // Blog Post Content Column
     this.pageContent = this.container.appendElement({ "tag": "div", "class": "col-lg-8" }).down()
 
-    // Display general post results.
-    this.homePage = new HomePage(this.pageContent)
-
     // Blog Sidebar Widgets Column
     // The search panel.
     this.container.appendElement({ "tag": "div", "class": "col-md-4" }).down()
@@ -300,24 +301,38 @@ var MainPage = function (parent) {
     //////////////////////////////////////////////////////////////////////
     // Blog manager action.
     //////////////////////////////////////////////////////////////////////
+    
     // login
     this.loginLnk = this.navBar.getChildById("login-lnk")
     this.homeLnk = this.navBar.getChildById("home-lnk")
+    this.tutorialLnk = this.navBar.getChildById("tutorial-lnk")
+    this.homeLogoLnk = this.navBar.getChildById("cargo-home-logo")
     this.registerLnk = this.navBar.getChildById("register-lnk")
     this.userInfoLnk = this.navBar.getChildById("user-info-lnk")
     this.authorPostTitle = this.container.getChildById("blog-post-by-author")
-
+    
     // The new category button...
     this.newCategoryBtn = this.container.getChildById("new-blog-categories-btn")
     this.categoryContentDiv = this.container.getChildById("blog-categories-content")
 
-    this.homeLnk.element.onclick = function(homePage){
+    // Set the tutorial page.
+    this.tutorialPage = new TutorialPage()
+    this.tutorialLnk.element.onclick = function(tutorialPage){
         return function(){
+            tutorialPage.display(mainPage.pageContent)
+        }
+    }(this.tutorialPage)
+
+    // Set the home page.
+    this.homePage = new HomePage(this.pageContent)
+    this.homeLnk.element.onclick = this.homeLogoLnk.element.onclick =  function (homePage) {
+        return function () {
             // Display the home page in the page content area.
             mainPage.pageContent.removeAllChilds()
             mainPage.pageContent.appendElement(homePage.div)
         }
     }(this.homePage)
+
 
     this.loginLnk.element.onclick = function (registerLnk, userInfoLnk) {
         return function () {
@@ -511,6 +526,7 @@ var MainPage = function (parent) {
             server.sessionManager.login(userName, password, "",
                 function (session, caller) {
                     caller.successCallback = function (session) {
+
                         // short variable name.
                         var userInfoDropdownLnk = this.mainPage.userInfoDropdownLnk
                         var loginDropdownLnk = this.mainPage.loginDropdownLnk
@@ -545,10 +561,10 @@ var MainPage = function (parent) {
                             this.mainPage.userInfoDropDown.getChildById("middle_name").element.value = session.M_accountPtr.M_userRef.M_middle
                             this.mainPage.userInfoDropDown.getChildById("email").element.value = session.M_accountPtr.M_userRef.M_email
                             this.mainPage.userInfoDropDown.getChildById("phone").element.value = session.M_accountPtr.M_userRef.M_phone
-                        }
+                            // Display the author post inside the the side well widget.
+                            this.mainPage.displayAuthorPost()
 
-                        // Display the author post inside the the side well widget.
-                        this.mainPage.displayAuthorPost()
+                        }
 
                         // TODO display personal author page here instead of nothing...
                         this.mainPage.pageContent.removeAllChilds()
@@ -1033,7 +1049,7 @@ MainPage.prototype.setEditable = function (blogView) {
                         for (var i = 0; i < editButtons.length; i++) {
                             editButtons[i].parentNode.removeChild(editButtons[i])
                         }
-                        
+
                         $('#article-div').summernote('destroy');
                         mainPage.activePostView.post.M_article = document.getElementById("article-div").innerHTML
                         mainPage.saveActivePost()

@@ -69,7 +69,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
                         var view = configurationPanel.contentViews.splice(i, 1)[0]
                         view.panel.element.style.display = "none"
                         if (entity.TYPENAME == "Config.DataStoreConfiguration") {
-                            homepage.dataExplorer.removeDataSchema(entity.M_id)
+                            homePage.dataExplorer.removeDataSchema(entity.M_id)
                         }
                     }
                 }
@@ -87,7 +87,7 @@ var ConfigurationPanel = function (parent, title, typeName, propertyName) {
         if (evt.dataMap["entity"] !== undefined) {
             if (evt.dataMap["entity"].TYPENAME == configurationPanel.typeName) {
                 // Hide all data panel.
-                homepage.dataExplorer.hidePanels()
+                homePage.dataExplorer.hidePanels()
 
                 var entity = entities[evt.dataMap["entity"].UUID]
                 var configurationContent = configurationPanel.panel.getChildById("configurationContent")
@@ -142,7 +142,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                 // Success callback
                                 function (success, caller) {
                                     // Init the schema informations.
-                                    homepage.dataExplorer.initDataSchema(caller.entity, function (contentView) {
+                                    homePage.dataExplorer.initDataSchema(caller.entity, function (contentView) {
                                         return function () {
                                             // display the imports information here...
                                             contentView.connectBtn.element.status = "disconnected"
@@ -182,7 +182,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     if (content.UUID != undefined) {
                         if (content.UUID.length != 0) {
                             // Set only if is not a new.
-                            homepage.dataExplorer.initDataSchema(content)
+                            homePage.dataExplorer.initDataSchema(content)
                         }
                     }
 
@@ -216,7 +216,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                         // Here the data store can be reach so I will try to connect.
                                         caller.connectBtn.style.color = "lightgrey"
                                         caller.connectBtn.status = "disconnected"
-                                        homepage.dataExplorer.hidePanel(caller.entity.M_id)
+                                        homePage.dataExplorer.hidePanel(caller.entity.M_id)
                                         caller.refreshBtn.element.style.display = "none"
                                     },
                                     function (errMsg, caller) {
@@ -224,7 +224,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                         caller.connectBtn.style.color = "#8B0000"
                                         caller.connectBtn.status = "error"
                                         caller.refreshBtn.element.style.display = "none"
-                                        homepage.dataExplorer.hidePanel(caller.entity.M_id)
+                                        homePage.dataExplorer.hidePanel(caller.entity.M_id)
                                     }, { "connectBtn": this, "entity": entity, "refreshBtn": contentView.refreshBtn })
                             } else if (this.status == "disconnected") {
                                 server.dataManager.connect(entity.M_id,
@@ -233,7 +233,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                         caller.connectBtn.style.color = "#4CAF50"
                                         caller.connectBtn.status = "connected"
                                         caller.refreshBtn.element.style.display = "table-cell"
-                                        homepage.dataExplorer.showPanel(caller.entity.M_id)
+                                        homePage.dataExplorer.showPanel(caller.entity.M_id)
 
                                     },
                                     function (errMsg, caller) {
@@ -241,7 +241,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                                         caller.connectBtn.style.color = "#8B0000"
                                         caller.connectBtn.status = "error"
                                         caller.refreshBtn.element.style.display = "none"
-                                        homepage.dataExplorer.hidePanel(caller.entity.M_id)
+                                        homePage.dataExplorer.hidePanel(caller.entity.M_id)
                                     }, { "connectBtn": this, "entity": entity, "refreshBtn": contentView.refreshBtn })
                             }
 
@@ -660,7 +660,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                 var idField = contentView.getFieldControl("M_id")
 
                 // Hide the data explorer panel.
-                homepage.dataExplorer.hidePanels()
+                homePage.dataExplorer.hidePanels()
 
                 // Set focus to the id field.
                 idField.element.focus()
@@ -714,7 +714,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         configurationPanel.contentViews[configurationPanel.currentIndex].panel.element.style.display = ""
 
                         if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
-                            homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
+                            homePage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
                         }
 
                         if (configurationPanel.currentIndex == configurationPanel.contentViews.length - 1) {
@@ -747,7 +747,7 @@ ConfigurationPanel.prototype.setConfigurations = function (configurations) {
                         configurationPanel.contentViews[configurationPanel.currentIndex].panel.element.style.display = ""
 
                         if (configurationPanel.contentViews[configurationPanel.currentIndex].entity.TYPENAME == "Config.DataStoreConfiguration") {
-                            homepage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
+                            homePage.dataExplorer.setDataSchema(configurationPanel.contentViews[configurationPanel.currentIndex].entity.M_id)
                         }
 
                         if (configurationPanel.currentIndex == 0) {

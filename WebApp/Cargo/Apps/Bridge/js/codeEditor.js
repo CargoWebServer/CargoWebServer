@@ -74,7 +74,7 @@ var CodeEditor = function (parent) {
             if (codeEditor.toolbars[fileId] !== undefined) {
                 for (var i = 0; i < codeEditor.toolbars[fileId].length; i++) {
                     var toolbar = codeEditor.toolbars[fileId][i];
-                    homepage.toolbarDiv.removeElement(toolbar);
+                    homePage.toolbarDiv.removeElement(toolbar);
                 }
             }
             codeEditor.toolbars[fileId] = []

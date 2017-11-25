@@ -86,10 +86,10 @@ var HomePage = function () {
     // The toolbar div
     this.toolbarDiv = null
 
-    homepage = this
+    homePage = this
 
     // That function is use to change the theme in the project explorer.
-    server.fileManager.attach(this, ChangeThemeEvent, function (evt, homepage) {
+    server.fileManager.attach(this, ChangeThemeEvent, function (evt, HomePage) {
 
         // Change the propertie in the class iteself.
         function changePropertyByClassName(propertie, className, themeClass, propertie_) {
@@ -376,9 +376,9 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     }(".sql"), "fa fa-file-o")
 
     var newProjectMenuItem = new MenuItem("new_project_menu_item", "New Project...", {}, 1,
-        function (homepage) {
+        function (HomePage) {
             return function () {
-                homepage.createNewProject()
+                homePage.createNewProject()
             }
         }(this), "fa fa-files-o")
 

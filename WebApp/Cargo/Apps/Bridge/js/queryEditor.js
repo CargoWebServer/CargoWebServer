@@ -121,7 +121,7 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
     }
 
     // So here I will create the tool bar for the query editor.
-    this.queryToolBar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar", "id": this.file.UUID + "_toolbar" })
+    this.queryToolBar = new Element(homePage.toolbarDiv, { "tag": "div", "class": "toolbar", "id": this.file.UUID + "_toolbar" })
 
     // The datasource selection.
     this.dataSelect = this.queryToolBar.appendElement({ "tag": "div", "style": "display: table-cell; height: 100%; vertical-align: middle;" }).down()

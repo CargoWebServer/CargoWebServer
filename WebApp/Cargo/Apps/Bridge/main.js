@@ -34,11 +34,11 @@ function init() {
     homePage = new HomePage()
 
     // The login page...
-    var loginPage = new LoginPage(function (mainLayout, homePage) {
+    var loginPage = new LoginPage(function (mainLayout) {
         return function (sessionsInfo) {
             homePage.init(mainLayout, sessionsInfo)
         }
-    }(mainLayout, homePage),
+    }(mainLayout),
         "SafranLdap" // Put the ldap sever id here
     )
     // the main page...
