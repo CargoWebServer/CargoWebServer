@@ -108,7 +108,7 @@ ProjectView.prototype.createDirView = function (parent, dir, level) {
         folderDiv.shrinkBtn = folderDiv.appendElement({ "tag": "i", "class": "fa fa-caret-down", "style": "display:inline;" }).down()
 
         /** The project title. */
-        folderDiv.appendElement({ "tag": "div", "id": "folderName", "innerHtml": dir.M_name, "style": "display:inline; padding-left: 2px;" })
+        folderDiv.appendElement({ "tag": "div", "id": dir.UUID + "_folder_name", "innerHtml": dir.M_name, "style": "display:inline; padding-left: 2px;" })
 
         folderDiv.childsDiv = []
 
@@ -118,8 +118,8 @@ ProjectView.prototype.createDirView = function (parent, dir, level) {
 
         parent.childsDiv.push(folderDiv)
     } else {
-        folderDiv.getChildById("folderName").element.innerHTML = dir.M_name
-        folderDiv.getChildById("folderName").element.style.display = "inline"
+        folderDiv.getChildById(dir.UUID + "_folder_name").element.innerHTML = dir.M_name
+        folderDiv.getChildById(dir.UUID + "_folder_name").element.style.display = "inline"
     }
 
     if (dir.M_files != null) {
@@ -288,13 +288,16 @@ ProjectView.prototype.createDirView = function (parent, dir, level) {
                                     // Rename the file here.
                                     server.fileManager.renameFile(dir.UUID, this.value,
                                         // Success callback
-                                        function (result, renameDirInput) {
-                                            renameDirInput.element.parentNode.removeChild(renameDirInput.element)
+                                        function (result, caller) {
+                                            caller.renameDirInput.element.parentNode.removeChild(caller.renameDirInput.element)
+                                            caller.folderDiv.element.childNodes[2].style.display = "inline"
                                         },
                                         // Error callback
-                                        function () {
-
-                                        }, renameDirInput)
+                                        function (errObj, caller) {
+                                            caller.renameDirInput.element.parentNode.removeChild(caller.renameDirInput.element)
+                                            caller.folderDiv.element.childNodes[2].style.display = "inline"
+                                        }, {"renameDirInput":renameDirInput, "folderDiv":folderDiv})
+                                        
                                 }
                             }
                         }(renameDirInput, folderDiv, text)
@@ -381,9 +384,9 @@ ProjectView.prototype.createFileView = function (parent, file) {
         fileDiv = parent.appendElement({ "tag": "div", "style": "display: table-row; width: 100%" }).down()
             .appendElement({ "tag": "div", "class": "project_file", "style": "display: inline;", "id": file.UUID }).down()
         // Set the file title
-        fileDiv.appendElement({ "tag": "div", "id": "file_name_div", "innerHtml": file.M_name, "style": "display:inline;" })
+        fileDiv.appendElement({ "tag": "div", "id": file.UUID + "_file_name_div", "innerHtml": file.M_name, "style": "display:inline;" })
     } else {
-        fileDiv.getChildById("file_name_div").element.innerHTML = file.M_name
+        fileDiv.getChildById(file.UUID + "_file_name_div").element.innerHTML = file.M_name
     }
     fileDiv.element.firstChild.style.display = "inline"
     // Here I will set the action on the file.
@@ -438,13 +441,16 @@ ProjectView.prototype.createFileView = function (parent, file) {
                                     // Rename the file here.
                                     server.fileManager.renameFile(file.UUID, this.value,
                                         // Success callback
-                                        function (result, renameFileInput) {
-                                            renameFileInput.element.parentNode.removeChild(renameFileInput.element)
+                                        function (result, caller) {
+                                            caller.renameFileInput.element.parentNode.removeChild(caller.renameFileInput.element)
+                                            caller.fileDiv.element.firstChild.style.display = "inline"
                                         },
                                         // Error callback
-                                        function () {
-
-                                        }, renameFileInput)
+                                        function (errMsg, caller) {
+                                            caller.renameFileInput.element.parentNode.removeChild(caller.renameFileInput.element)
+                                            caller.fileDiv.element.firstChild.style.display = "inline"
+                                        }, {"renameFileInput":renameFileInput, "fileDiv":fileDiv})
+                                        
                                 }
                             }
                         }(renameFileInput, fileDiv, text)

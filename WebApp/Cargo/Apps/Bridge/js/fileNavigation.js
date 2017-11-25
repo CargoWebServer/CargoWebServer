@@ -65,7 +65,7 @@ var FileNavigator = function (parent) {
             if (file == undefined) {
                 file = evt.dataMap["bpmnDiagramInfo"]
             }
-            if (evt.dataMap["prototypeInfo"]!=undefined) {
+            if (evt.dataMap["prototypeInfo"] != undefined) {
                 file = {}
                 file.M_id = evt.dataMap["prototypeInfo"].TypeName
                 file.M_name = evt.dataMap["prototypeInfo"].TypeName
@@ -87,11 +87,16 @@ var FileNavigator = function (parent) {
             codeEditor.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn"
 
             var tab = codeEditor.tabs[fileId]
-            if (codeEditor.toSaves[fileId] != undefined) {
-                tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
+            if (tab != undefined) {
+                if (codeEditor.toSaves[fileId] != undefined) {
+                    tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
 
-                // Remove from the save map
-                delete codeEditor.toSaves[fileId]
+                    // Remove from the save map
+                    delete codeEditor.toSaves[fileId]
+                }
+                var fileNameDiv = tab.getChildById("fileNameDiv")
+                var file = entities[fileId]
+                fileNameDiv.element.innerHTML = file.M_name
             }
             // Now the file save button...
             if (Object.keys(codeEditor.toSaves).length <= 1) {
@@ -102,10 +107,6 @@ var FileNavigator = function (parent) {
                 codeEditor.saveBtn.element.style.display = "none"
                 codeEditor.saveBtn.element.title = ""
             }
-
-            var fileNameDiv = tab.getChildById("fileNameDiv")
-            var file = entities[fileId]
-            fileNameDiv.element.innerHTML = file.M_name
         }
     })
 
@@ -116,12 +117,17 @@ var FileNavigator = function (parent) {
             codeEditor.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn"
 
             var tab = codeEditor.tabs[fileId]
-            if (codeEditor.toSaves[fileId] != undefined) {
-                tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
+            if (tab != undefined) {
+                if (codeEditor.toSaves[fileId] != undefined) {
+                    tab.getChildById("fileNameDiv").element.innerHTML = codeEditor.toSaves[fileId]
 
-                // Remove from the save map
-                delete codeEditor.toSaves[fileId]
+                    // Remove from the save map
+                    delete codeEditor.toSaves[fileId]
+                }
+                var fileNameDiv = tab.getChildById("fileNameDiv")
+                fileNameDiv.element.innerHTML = evt.dataMap.entity.M_name
             }
+
             // Now the file save button...
             if (Object.keys(codeEditor.toSaves).length <= 1) {
                 codeEditor.saveAllBtn.element.style.display = "none"
@@ -132,8 +138,6 @@ var FileNavigator = function (parent) {
                 codeEditor.saveBtn.element.title = ""
             }
 
-            var fileNameDiv = tab.getChildById("fileNameDiv")
-            fileNameDiv.element.innerHTML = evt.dataMap.entity.M_name
         }
     })
 
@@ -154,7 +158,7 @@ var FileNavigator = function (parent) {
                 return
             }
 
-            
+
             // put in the list to save.
             fileNavigator.toSaves[fileId] = fileNavigator.files[fileId].M_name
 
@@ -249,9 +253,9 @@ FileNavigator.prototype.setActiveTab = function (fileId) {
         var evt
         if (this.activeFile.TYPENAME == "BPMNDI.BPMNDiagram") {
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "bpmnDiagramInfo": this.activeFile } }
-        } else if(this.activeFile.TYPENAME == "CargoEntities.File"){
+        } else if (this.activeFile.TYPENAME == "CargoEntities.File") {
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": this.activeFile } }
-        }else {
+        } else {
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "prototypeInfo": getEntityPrototype(this.activeFile.M_name) } }
         }
         server.eventHandler.broadcastLocalEvent(evt)

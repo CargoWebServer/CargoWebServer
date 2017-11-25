@@ -344,7 +344,7 @@ EntityPrototype.prototype.generateConstructor = function () {
             } else if (isXsString(this.FieldsType[i]) || isXsRef(this.FieldsType[i]) || isXsId(this.FieldsType[i])) {
                 constructorSrc += " this." + fieldName + " = \"" + this.FieldsDefaultValue[i] + "\"\n"
             } else {
-                if (this.FieldsType[i].startsWith("xs.")) {
+                if (this.FieldsType[i].startsWith("xs.") || this.FieldsType[i].startsWith("sqltypes.")) {
                     if(this.FieldsDefaultValue[i].length != 0){
                     constructorSrc += " this." + fieldName + " = " + this.FieldsDefaultValue[i] + "\n"
                     }else if(isXsNumeric(this.FieldsType[i])){

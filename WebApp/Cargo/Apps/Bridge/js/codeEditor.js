@@ -86,9 +86,6 @@ var CodeEditor = function (parent) {
         if (evt.dataMap.fileInfo !== undefined) {
             var file = evt.dataMap["fileInfo"]
             var editor = codeEditor.editors[file.UUID + "_editor"]
-            if(editor.editor != undefined){
-                editor = editor.editor 
-            }
             if (editor !== undefined) {
                 // Supend the change event propagation
                 codeEditor.quiet = true
@@ -120,9 +117,6 @@ var CodeEditor = function (parent) {
         if (evt.dataMap.entity !== undefined) {
             var file = evt.dataMap["entity"]
             var editor = codeEditor.editors[file.UUID + "_editor"]
-            if(editor.editor != undefined){
-                editor = editor.editor 
-            }
             if (editor !== undefined && file.TYPENAME == "CargoEntities.File") {
                 // Supend the change event propagation
                 codeEditor.quiet = true

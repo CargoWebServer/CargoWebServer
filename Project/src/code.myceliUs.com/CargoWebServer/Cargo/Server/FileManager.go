@@ -1226,6 +1226,9 @@ func (this *FileManager) RenameFile(uuid string, filename string, messageId stri
 			GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 			return
 		}
+	} else {
+		// nothing to do here.
+		return
 	}
 
 	fileId := Utility.CreateSha1Key([]byte(file.GetPath() + "/" + filename))

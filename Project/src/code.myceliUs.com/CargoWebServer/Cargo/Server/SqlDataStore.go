@@ -1401,13 +1401,15 @@ func createEntityFromInfo(key string, info map[string]interface{}, infos map[str
 	var parentUuid string
 	if info["ParentUuid"] != nil {
 		parentUuid = info["ParentUuid"].(string)
-		// Here I will generate the parent entity...
-		parentTypeName := parentUuid[0:strings.Index(parentUuid, "%")]
-		// Here I will retreive the parent information.
-		parentInfo := infos[parentTypeName][info["parentId"].(string)]
+		if strings.Index(parentUuid, "%") != -1 {
+			// Here I will generate the parent entity...
+			parentTypeName := parentUuid[0:strings.Index(parentUuid, "%")]
+			// Here I will retreive the parent information.
+			parentInfo := infos[parentTypeName][info["parentId"].(string)]
 
-		/* Create the parent entity first... */
-		createEntityFromInfo(info["parentId"].(string), parentInfo, infos)
+			/* Create the parent entity first... */
+			createEntityFromInfo(info["parentId"].(string), parentInfo, infos)
+		}
 	}
 
 	entity, errObj := GetServer().GetEntityManager().newDynamicEntity(parentUuid, info)

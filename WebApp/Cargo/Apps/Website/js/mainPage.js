@@ -1071,7 +1071,7 @@ MainPage.prototype.saveActivePost = function () {
  * Append a new category in the category div.
  */
 MainPage.prototype.appendCategory = function (category) {
-    if (category.UUID.length == 0) {
+    if (category.UUID != undefined) {
         // Here the category dosen't exist...
         var query = "SELECT MAX(id) FROM " + categoryTypeName
         server.dataManager.read("Blog", query, ["int"], [],
