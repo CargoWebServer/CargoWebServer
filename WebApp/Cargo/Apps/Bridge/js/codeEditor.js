@@ -85,15 +85,20 @@ var CodeEditor = function (parent) {
     server.fileManager.attach(this, UpdateFileEvent, function (evt, codeEditor) {
         if (evt.dataMap.fileInfo !== undefined) {
             var file = evt.dataMap["fileInfo"]
-            var editor = codeEditor.editors[file.M_id + "_editor"]
+            var editor = codeEditor.editors[file.UUID + "_editor"]
+            if(editor.editor != undefined){
+                editor = editor.editor 
+            }
             if (editor !== undefined) {
                 // Supend the change event propagation
                 codeEditor.quiet = true
-                var position = editor.getCursorPosition()
                 editor.setValue(decode64(file.M_data), -1)
                 editor.clearSelection()
-                editor.scrollToLine(position.row + 1, true, true, function () { });
-                editor.gotoLine(position.row + 1, position.column)
+                if (editor.getCursorPosition != undefined) {
+                    var position = editor.getCursorPosition()
+                    editor.scrollToLine(position.row + 1, true, true, function () { });
+                    editor.gotoLine(position.row + 1, position.column)
+                }
                 // Resume the chage event propagation.
                 codeEditor.quiet = false
             }
@@ -114,15 +119,20 @@ var CodeEditor = function (parent) {
     server.entityManager.attach(this, UpdateEntityEvent, function (evt, codeEditor) {
         if (evt.dataMap.entity !== undefined) {
             var file = evt.dataMap["entity"]
-            var editor = codeEditor.editors[file.M_id + "_editor"]
+            var editor = codeEditor.editors[file.UUID + "_editor"]
+            if(editor.editor != undefined){
+                editor = editor.editor 
+            }
             if (editor !== undefined && file.TYPENAME == "CargoEntities.File") {
                 // Supend the change event propagation
                 codeEditor.quiet = true
-                var position = editor.getCursorPosition()
-                editor.setValue(decode64(file.M_data), -1)
-                editor.clearSelection()
-                editor.scrollToLine(position.row + 1, true, true, function () { });
-                editor.gotoLine(position.row + 1, position.column)
+                if (editor.getCursorPosition != undefined) {
+                    var position = editor.getCursorPosition()
+                    editor.setValue(decode64(file.M_data), -1)
+                    editor.clearSelection()
+                    editor.scrollToLine(position.row + 1, true, true, function () { });
+                    editor.gotoLine(position.row + 1, position.column)
+                }
                 // Resume the chage event propagation.
                 codeEditor.quiet = false
             }
@@ -186,14 +196,14 @@ CodeEditor.prototype.appendPrototypeEditor = function (prototype) {
 
 CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
     // Here I will set the file
-    if (this.files[diagram.M_id] !== undefined) {
+    if (this.files[diagram.UUID] !== undefined) {
         // Set the tab active...
-        this.setActiveFile(diagram.M_id)
+        this.setActiveFile(diagram.UUID)
         this.diagram.canvas.initWorkspace()
         return
     }
 
-    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": diagram.M_id + "_editor" }).down()
+    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": diagram.UUID + "_editor" }).down()
 
 
     this.diagram = new SvgDiagram(filePanel, diagram)
@@ -202,9 +212,9 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
         return function () {
             codeEditor.diagram.drawDiagramElements()
 
-            codeEditor.files[diagram.M_id] = diagram
-            codeEditor.filesPanel[diagram.M_id] = filePanel
-            codeEditor.setActiveFile(diagram.M_id)
+            codeEditor.files[diagram.UUID] = diagram
+            codeEditor.filesPanel[diagram.UUID] = filePanel
+            codeEditor.setActiveFile(diagram.UUID)
 
             // Now the resize element...
             codeEditor.diagram.canvas.initWorkspace = function (workspace) {
@@ -253,21 +263,21 @@ CodeEditor.prototype.appendFile = function (file) {
 
 
     // Here I will set the file
-    if (this.files[file.M_id] != undefined) {
+    if (this.files[file.UUID] != undefined) {
         // Set the tab active...
-        this.setActiveFile(file.M_id)
+        this.setActiveFile(file.UUID)
         return
     }
 
     // Here the new file tab must be created.
-    this.files[file.M_id] = file
+    this.files[file.UUID] = file
 
     //var deleteBtn = fileToolbar.appendElement({"tag":"div"}).down()
 
     if (fileMode.length == 0) {
         if (file.M_name.endsWith(".eql") || file.M_name.endsWith(".sql")) {
             // Here I will create a query editor insted of ace editor.
-            var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_editor" }).down()
+            var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": file.UUID + "_editor" }).down()
 
             // The query editor.
             var queryEditor = new QueryEditor(filePanel, file, function (codeEditor, fileId) {
@@ -276,21 +286,34 @@ CodeEditor.prototype.appendFile = function (file) {
                     codeEditor.toolbars[fileId] = []
                     codeEditor.toolbars[fileId].push(queryEditor.queryToolBar)
                 }
-            }(this, file.M_id))
+            }(this, file.UUID))
 
             // Init the query editor.
             queryEditor.init()
 
-            this.editors[file.M_id + "_editor"] = queryEditor
-            this.filesPanel[file.M_id] = filePanel
-            this.setActiveFile(file.M_id)
+            this.editors[file.UUID + "_editor"] = queryEditor.editor
+            
+            queryEditor.editor.getSession().on('change', function (fileUUID, codeEditor) {
+                return function () {
+                    if (!codeEditor.quiet && entities[fileUUID] !== undefined) {
+                        var editor = codeEditor.editors[fileUUID + "_editor"]
+                        var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileUUID } }
+                        var file = entities[fileUUID]
+                        file.M_data = encode64(editor.getSession().getValue())
+                        server.eventHandler.broadcastLocalEvent(evt)
+                    }
+                }
+            }(file.UUID, this));
+
+            this.filesPanel[file.UUID] = filePanel
+            this.setActiveFile(file.UUID)
         }
         return
     }
 
 
     // Now I will create the file editor.
-    var filePanel = this.panel.appendElement({ "tag": "xmp", "class": "filePanel", "id": file.M_id + "_editor", "innerHtml": decode64(file.M_data) }).down()
+    var filePanel = this.panel.appendElement({ "tag": "xmp", "class": "filePanel", "id": file.UUID + "_editor", "innerHtml": decode64(file.M_data) }).down()
 
     var observer = new MutationObserver(function (codeEditor) {
         return function (multiRecord) {
@@ -316,7 +339,7 @@ CodeEditor.prototype.appendFile = function (file) {
     })
 
     ace.require("ace/ext/language_tools");
-    var editor = ace.edit(file.M_id + "_editor");
+    var editor = ace.edit(file.UUID + "_editor");
     ace.require('ace/ext/settings_menu').init(editor);
     editor.setTheme(this.theme);
     editor.getSession().setMode(fileMode);
@@ -327,7 +350,7 @@ CodeEditor.prototype.appendFile = function (file) {
         enableLiveAutocompletion: true
     });
 
-    this.editors[file.M_id + "_editor"] = editor
+    this.editors[file.UUID + "_editor"] = editor
 
     // Editor command here.
     editor.commands.addCommands([{
@@ -347,17 +370,17 @@ CodeEditor.prototype.appendFile = function (file) {
     }]);
 
     // In case of file update...
-    editor.getSession().on('change', function (fileId, fileUUID, codeEditor) {
+    editor.getSession().on('change', function (fileUUID, codeEditor) {
         return function () {
             if (!codeEditor.quiet && entities[fileUUID] !== undefined) {
-                var editor = codeEditor.editors[fileId + "_editor"]
-                var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileId } }
+                var editor = codeEditor.editors[fileUUID + "_editor"]
+                var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileUUID } }
                 var file = entities[fileUUID]
                 file.M_data = encode64(editor.getSession().getValue())
                 server.eventHandler.broadcastLocalEvent(evt)
             }
         }
-    }(file.M_id, file.UUID, this));
+    }(file.UUID, this));
 
     editor.session.on("changeScrollTop", function (scrollTop) {
         var header = document.getElementById("workingFilesDiv")
@@ -372,17 +395,17 @@ CodeEditor.prototype.appendFile = function (file) {
         }
     })
 
-    this.filesPanel[file.M_id] = filePanel
-    this.setActiveFile(file.M_id)
+    this.filesPanel[file.UUID] = filePanel
+    this.setActiveFile(file.UUID)
 }
 
-CodeEditor.prototype.removeFile = function (fileId) {
-    if (this.filesPanel[fileId] != undefined) {
+CodeEditor.prototype.removeFile = function (uuid) {
+    if (this.filesPanel[uuid] != undefined) {
         // remove the element from the panel.
-        this.panel.removeElement(this.filesPanel[fileId])
-        delete this.filesPanel[fileId]
-        delete this.files[fileId]
-        delete this.editors[fileId + "_editor"]
+        this.panel.removeElement(this.filesPanel[uuid])
+        delete this.filesPanel[uuid]
+        delete this.files[uuid]
+        delete this.editors[uuid + "_editor"]
 
         // If there's no more file i will reset the shadow.
         if (Object.keys(this.files).length == 0) {
@@ -392,7 +415,7 @@ CodeEditor.prototype.removeFile = function (fileId) {
         }
 
         if (this.activeFile != undefined) {
-            if (this.activeFile.M_id == fileId) {
+            if (this.activeFile.UUID == uuid) {
                 this.activeFile = null
             }
         }
@@ -402,15 +425,15 @@ CodeEditor.prototype.removeFile = function (fileId) {
 /**
  * Set the current file panel.
  */
-CodeEditor.prototype.setActiveFile = function (fileId) {
+CodeEditor.prototype.setActiveFile = function (uuid) {
     for (var id in this.filesPanel) {
         this.filesPanel[id].element.style.display = "none"
     }
-    if (this.filesPanel[fileId] !== undefined) {
-        this.filesPanel[fileId].element.style.display = ""
+    if (this.filesPanel[uuid] !== undefined) {
+        this.filesPanel[uuid].element.style.display = ""
         var header = document.getElementById("workingFilesDiv")
-        var aceContent = this.filesPanel[fileId].element.getElementsByClassName("ace_content")[0]
-        if(aceContent != null){
+        var aceContent = this.filesPanel[uuid].element.getElementsByClassName("ace_content")[0]
+        if (aceContent != null) {
             if (aceContent.style.marginTop != "0px" && aceContent.style.marginTop != "") {
                 if (header.className.indexOf(" scrolling") == -1) {
                     header.className += " scrolling"
@@ -425,7 +448,7 @@ CodeEditor.prototype.setActiveFile = function (fileId) {
             header.parentNode.className = header.parentNode.className.replaceAll(" scrolling", "")
         }
     }
-    this.activeFile = this.files[fileId]
+    this.activeFile = this.files[uuid]
 
     // Now the toolbar...
     var toolbars = document.getElementsByClassName("toolbar")
@@ -433,7 +456,7 @@ CodeEditor.prototype.setActiveFile = function (fileId) {
         toolbars[i].style.display = "none" // hide toolbar.
     }
 
-    if (document.getElementById(fileId + "_toolbar") != undefined) {
-        document.getElementById(fileId + "_toolbar").style.display = ""
+    if (document.getElementById(uuid + "_toolbar") != undefined) {
+        document.getElementById(uuid + "_toolbar").style.display = ""
     }
 }

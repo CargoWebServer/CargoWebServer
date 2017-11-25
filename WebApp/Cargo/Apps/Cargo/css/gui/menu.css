@@ -78,6 +78,10 @@
     background-color: white;
 }
 
+.menu_row input {
+    background-color: transparent;
+}
+
 .vertical_submenu:hover {
     cursor: pointer;
     border: 1px solid;

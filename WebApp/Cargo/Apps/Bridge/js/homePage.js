@@ -186,6 +186,8 @@ var HomePage = function () {
             changePropertyByClassName("color", ".toolbar select", "." + evt.dataMap.themeClass)
             changePropertyByClassName("background-color", ".toolbar option", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("background", ".toolbar option", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".toolbar option", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".toolbar select", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".project_explorer input", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".permission_panel input", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".entity select", "." + evt.dataMap.themeClass)
@@ -227,6 +229,7 @@ var HomePage = function () {
             changePropertyByClassName("background-color", ".entity option", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("background", ".entity option", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".dialog_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+
         }
 
         changePropertyByClassName("background-color", ".contextSelector", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
@@ -262,7 +265,7 @@ var HomePage = function () {
         changePropertyByClassName("background-color", ".cell_value .scrolltable .header_cell", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
         changePropertyByClassName("background", ".cell_value .scrolltable .header_cell", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
         changePropertyByClassName("color", ".cell_value .scrolltable .header_cell", "." + evt.dataMap.themeClass + " .ace_gutter")
-        
+
         changePropertyByClassName("background", ".body_cell", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
         changePropertyByClassName("background-color", ".body_cell", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
         changePropertyByClassName("background", "::-webkit-scrollbar-thumb", "." + evt.dataMap.themeClass + " .ace_gutter", "border-color")
@@ -304,7 +307,7 @@ var HomePage = function () {
 
         changePropertyByClassName("background-color", ".main_page", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".main_page", "." + evt.dataMap.themeClass + " .ace_gutter")
-        
+
         // filter table.
         changePropertyByClassName("color", ".entity_ref_lnk", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".filter_panel_div", "." + evt.dataMap.themeClass + " .ace_gutter")
@@ -316,7 +319,17 @@ var HomePage = function () {
         changePropertyByClassName("color", ".body_cell option", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background-color", ".body_cell option", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".body_cell option", "." + evt.dataMap.themeClass + " .ace_gutter")
-        
+        changePropertyByClassName("color", ".body_cell select", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".body_cell select", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".body_cell select", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".body_cell input", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".body_cell input", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".body_cell input", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".body_cell textarea", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".body_cell textarea", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".body_cell textarea", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".menu_row input", "." + evt.dataMap.themeClass + " .ace_gutter")
+
     })
 
 
@@ -493,7 +506,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     var importMenuItem = new MenuItem("import_menu_item", "Import", { "import_schema_menu_item": importSchemaMenuItem, "import_data_menu_item": importDataMenuItem }, 1, undefined, "fa fa-upload")
 
-    // export schmas/data
+    // export schemas/data
     var exportMenuItem = new MenuItem("export_menu_item", "Export", {}, 1, undefined, "fa fa-download")
 
     server.dataManager.attach(exportMenuItem, NewDataStoreEvent, function (evt, exportMenuItem) {
@@ -582,7 +595,170 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     })
 
     // The new menu in the data Menu
-    var newDataMenuItem = new MenuItem("new_data_menu_item", "New", { "new_eql_query_menu_item": newEqlQueryMenuItem, "new_sql_query_menu_item": newSqlQueryMenuItem }, 1)
+    var newDataMenuItem = new MenuItem("new_data_menu_item", "New", { "new_eql_query_menu_item": newEqlQueryMenuItem, "new_sql_query_menu_item": newSqlQueryMenuItem }, 2, undefined, "fa fa-magic")
+
+    // The queries menu.
+    var queriesMenuItem = new MenuItem("queries_data_menu_item", "Queries", { "new_data_menu_item": newDataMenuItem, "": "" }, 1)
+
+    // Now I will get existing queries and append it to he menu.
+    server.fileManager.getFileByPath("/queries",
+        /** Success callback */
+        function (dir, caller) {
+            function appendQueryMenu(file, parentMenu) {
+                // Here i will create the menu for that file.
+                var item = new MenuItem("export_" + file.UUID + "_menu_item", file.M_name, {}, 2,
+                    function (file) {
+                        return function () {
+                            // Here I will open the file.
+                            // - Manage the file in order that all user have the same file view.
+                            file = entities[file.UUID] // get the last version of the entity...
+                            server.fileManager.openFile(file.M_id,
+                                // Progress callback.
+                                function (index, totatl, caller) {
+
+                                },
+                                // Success callback
+                                function (result, caller) {
+
+                                },
+                                // Error callback
+                                function (errMsg, caller) {
+
+                                }, this)
+                        }
+                    }(file),
+                    "fa fa-file-o")
+
+                // I will keep the file ref in the menu item itself.
+                item.file = file
+
+                // Append it to export schema menu.
+                parentMenu.appendItem(item)
+
+                // Here I will append tow more action to the menu item.
+                var btnPanel = new Element(item.panel.parentElement.element.childNodes[1], { "tag": "div", "style": "display: table; position: absolute; top: 0px; right: 0px; z-index: 5;" })
+
+                // first the edit action to change the name of the query
+                var editBtn = btnPanel.appendElement({ "tag": "div", "class": "row_button", "id": file.UUID + "_edit_btn", "style": "display: table-cell;" }).down()
+                    .appendElement({ "tag": "i", "class": "fa fa-pencil-square-o", "style": "display: block;", "title": "Rename query" }).down()
+
+                // Here I will remove the file.
+                editBtn.element.onclick = function (file, parentMenu) {
+                    return function (evt) {
+                        evt.stopPropagation()
+                        file = entities[file.UUID]
+                        if (document.getElementById(file.UUID + "_rename_input") != undefined) {
+                            document.getElementById(file.UUID + "_rename_input").setSelectionRange(0, file.M_name.indexOf("."))
+                            document.getElementById(file.UUID + "_rename_input").focus()
+                            return
+                        }
+                        // So here I will append a input box withe the current 
+                        // file name in it.
+                        var menu = parentMenu.panel.getChildById("export_" + file.UUID + "_menu_item")
+                        var label = menu.element.childNodes[0]
+                        label.style.display = "none"
+                        var renameInput = menu.prependElement({ "tag": "input", "id": file.UUID + "_rename_input", "value": file.M_name }).down()
+                        renameInput.element.setSelectionRange(0, file.M_name.indexOf("."))
+                        renameInput.element.focus()
+                        // Stop event propagation.
+                        renameInput.element.onclick = function (evt) {
+                            evt.stopPropagation()
+                        }
+
+                        renameInput.element.onkeyup = function (label, file, menu) {
+                            return function (evt) {
+                                file = entities[file.UUID]
+                                // If the key is escape...
+                                if (evt.keyCode === 27) {
+                                    label.style.display = ""
+                                    this.parentNode.removeChild(this)
+                                } else if (evt.keyCode === 13) {
+                                    label.style.display = ""
+                                    label.innerHTML = this.value
+                                    this.parentNode.removeChild(this)
+                                    menu.id = menu.element.id = "export_" + file.UUID + "_menu_item"
+                                    file.M_name = this.value
+                                    server.fileManager.renameFile(file.UUID, this.value,
+                                        // Success callback
+                                        function (result, renameDirInput) {
+                                        },
+                                        // Error callback
+                                        function () {
+
+                                        }, {})
+                                }
+                            }
+                        }(label, file, menu)
+                    }
+                }(file, parentMenu)
+
+                // Second the delete action to remove the querie file in the /queries directory.
+                var deleteBtn = btnPanel.appendElement({ "tag": "div", "class": "row_button", "id": file.UUID + "_delete_btn", "style": "display: table-cell;" }).down()
+                    .appendElement({ "tag": "i", "class": "fa fa-trash-o", "style": "display: block;", "title": "Delete query" }).down()
+
+                // Here I will remove the file.
+                deleteBtn.element.onclick = function (file) {
+                    return function (evt) {
+                        evt.stopPropagation()
+                        // delete the query
+                        // Here I will ask the user if here realy want to remove the entity...
+                        var confirmDialog = new Dialog(randomUUID(), undefined, true)
+                        confirmDialog.div.element.style.maxWidth = "450px"
+                        confirmDialog.setCentered()
+                        server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
+                        confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete query " + file.M_name + "?" })
+
+                        confirmDialog.ok.element.onclick = function (dialog) {
+                            return function () {
+                                // I will call delete file
+                                server.fileManager.deleteFile(file.UUID, function () { dialog.close() }, function () { }, dialog)
+                            }
+                        }(confirmDialog)
+
+                    }
+                }(file)
+
+                return item
+            }
+
+            for (var i = 0; i < dir.M_files.length; i++) {
+                // Here I will create the menu item.
+                var item = appendQueryMenu(dir.M_files[i], caller.queriesMenuItem)
+
+                // Now I will connect the events...
+                server.entityManager.attach(item, UpdateEntityEvent, function (evt, menuItem) {
+                    if (evt.dataMap.entity.TYPENAME == "CargoEntities.File") {
+                        if (evt.dataMap.entity.UUID == menuItem.file.UUID) {
+                            menuItem.renameItem(evt.dataMap.entity.M_name)
+                        }
+                    }
+                })
+
+                server.entityManager.attach(caller.queriesMenuItem, NewEntityEvent, function (evt, menuItem) {
+                    if (evt.dataMap.entity.TYPENAME == "CargoEntities.File") {
+                        if (evt.dataMap.entity.M_path == "/queries") {
+                            if (menuItem.subItems["export_" + evt.dataMap.entity.UUID + "_menu_item"] == undefined) {
+                                appendQueryMenu(evt.dataMap.entity, menuItem)
+                            }
+                        }
+                    }
+                })
+
+                server.entityManager.attach(item, DeleteEntityEvent, function (evt, menuItem) {
+                    if (evt.dataMap.entity.TYPENAME == "CargoEntities.File") {
+
+                        if (evt.dataMap.entity.UUID == menuItem.file.UUID && !evt.dataMap.entity.M_isDir) {
+                            menuItem.deleteItem()
+                        }
+                    }
+                })
+
+            }
+        },
+        /** Error callback */
+        function (errObj, caller) {
+
+        }, { "queriesMenuItem": queriesMenuItem })
 
     // The preference edition menu.
     var preferencesServerItem = new MenuItem("preferences_server_menu_item", "Preferences", {}, 1,
@@ -596,7 +772,7 @@ HomePage.prototype.init = function (parent, sessionInfo) {
 
     var editMenuItem = new MenuItem("edit_menu", "Edit", {}, 0)
 
-    var dataMenuItem = new MenuItem("data_menu", "Data", { "import_menu_item": importMenuItem, "export_menu_item": exportMenuItem, "new_data_menu_item": newDataMenuItem }, 0)
+    var dataMenuItem = new MenuItem("data_menu", "Data", { "import_menu_item": importMenuItem, "export_menu_item": exportMenuItem, "queries_data_menu_item": queriesMenuItem }, 0)
 
     // The main menu will be display in the body element, so nothing will be over it.
     this.mainMenu = new VerticalMenu(new Element(document.getElementsByTagName("body")[0], { "tag": "div", "style": "position: absolute; top:2px;" }), [fileMenuItem, dataMenuItem, editMenuItem])

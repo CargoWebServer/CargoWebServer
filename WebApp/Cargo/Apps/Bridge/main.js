@@ -1,8 +1,7 @@
 /**
- * Created by Dave on 2/14/2015 ....
+ * Created by Dave on 2/14/2015.
  */
 var applicationName = document.getElementsByTagName("title")[0].text
-
 
 // Local event...
 var ChangeFileEvent = 100

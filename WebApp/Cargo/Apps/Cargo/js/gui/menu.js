@@ -50,6 +50,31 @@ MenuItem.prototype.appendItem = function (item) {
 }
 
 /**
+ * Append a sub menu item to an existing menu item.
+ */
+MenuItem.prototype.deleteItem = function () {
+    // remove it from it parent,
+    delete this.parent.subItems[this.id]
+    var menu = document.getElementById(this.id)
+    if (menu != null) {
+        menu.parentNode.parentNode.removeChild(menu.parentNode)
+    }
+}
+
+/**
+ * Append a sub menu item to an existing menu item.
+ */
+MenuItem.prototype.renameItem = function (name, id) {
+    delete this.parent.subItems[this.id]
+    this.parent.subItems[this.id] = this
+    var menu = document.getElementById(this.id)
+    if (menu != null) {
+        // set the new name.
+        menu.firstChild.innerHTML = name
+    }
+}
+
+/**
  * 
  * @param {*} parent The div where the menu will be append.
  * @param {*} items  The list of menu Item to display in the menu.
@@ -111,16 +136,19 @@ VerticalMenu.prototype.appendItem = function (item) {
     var currentPanel = null
     if (item.level == 0) {
         // Here the menu is show in row...
-        currentPanel = this.panel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_menu", "innerHtml": item.name }).down()
+        currentPanel = this.panel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_menu" }).down()
+        currentPanel.appendElement({"tag":"span", "innerHtml": item.name })
     } else {
         // Here the menu is
         currentPanel = this.panel.appendElement({ "tag": "div", "class": "menu_row", "id": item.id + "_vertical_submenu_row", "style": "display: table-row; width: 100%" }).down()
         currentPanel.appendElement({ "tag": "i", "class": item.icon + " menu_icon", "style": "display: table-cell;" }).down()
-        currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu", "innerHtml": item.name }).down()
+        currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu"}).down()
+            .appendElement({"tag":"span", "innerHtml": item.name })
+
     }
 
     // Append the subitem panel.
-    this.subItemPanel = currentPanel.appendElement({ "tag": "div", "id": item.id + "_vertical_submenu_items", "class": "vertical_submenu_items", "style":"display: none;"}).down()
+    this.subItemPanel = currentPanel.appendElement({ "tag": "div", "id": item.id + "_vertical_submenu_items", "class": "vertical_submenu_items", "style": "display: none;" }).down()
     item.panel = this.subItemPanel
 
     // Display the menu automatically...
@@ -161,7 +189,7 @@ VerticalMenu.prototype.appendItem = function (item) {
         }
     }
 
-    item.menu =  new VerticalMenu(this.subItemPanel, subItems)
+    item.menu = new VerticalMenu(this.subItemPanel, subItems)
 
     // Now the actions...
     currentPanel.element.onclick = function (menuPanel, subItemPanel) {
@@ -290,7 +318,8 @@ PopUpMenu.prototype.appendItem = function (item) {
     currentPanel = this.panel.appendElement({ "tag": "div", "class": "menu_row", "style": "display: table-row; width: 100%" }).down()
 
     var iconPanel = currentPanel.appendElement({ "tag": "i", "class": item.icon + " menu_icon", "style": "display: table-cell;" }).down()
-    var subMenuPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu", "innerHtml": item.name }).down()
+    var subMenuPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu" }).down()
+    subMenuPanel.appendElement({"tag":"span", "innerHtml": item.name})
 
     // Append the subitem panel.
     this.subItemPanel = currentPanel.appendElement({ "tag": "div", "id": item.id, "class": "vertical_submenu_items" }).down()
@@ -333,8 +362,8 @@ PopUpMenu.prototype.appendItem = function (item) {
             subItems.push(item.subItems[key])
         }
     }
-    
-    item.menu =  new VerticalMenu(this.subItemPanel, subItems)
+
+    item.menu = new VerticalMenu(this.subItemPanel, subItems)
 
 
     // Now the actions...
@@ -410,11 +439,13 @@ HorizontalMenu.prototype.appendItem = function (item) {
     // The top element...
     if (item.level == 0) {
         if (item.panel == null) {
-            item.panel = this.menuRow.appendElement({ "tag": "div", "class": "menu_item", "id": item.id, "style": "display:inline-block; padding-left:10px; padding-top: 20px; vertical-align:middle; height:40px;", "innerHtml": item.name }).down()
+            item.panel = this.menuRow.appendElement({ "tag": "div", "class": "menu_item", "id": item.id, "style": "display:inline-block; padding-left:10px; padding-top: 20px; vertical-align:middle; height:40px;" }).down()
+            itmep.panel.appendElement({"tag":"span", "innerHtml": item.name})
         }
     } else {
         if (item.parent.panel.childs[item.id] == undefined) {
-            item.panel = item.parent.panel.appendElement({ "tag": "div", "id": item.id, "style": "display:inline-block;border-left:1px solid grey; margin-left:4px; padding-left:4px; height:auto;", "innerHtml": item.name }).down()
+            item.panel = item.parent.panel.appendElement({ "tag": "div", "id": item.id, "style": "display:inline-block;border-left:1px solid grey; margin-left:4px; padding-left:4px; height:auto;" }).down()
+            itmep.panel.appendElement({"tag":"span", "innerHtml": item.name})
         }
     }
 
@@ -444,7 +475,7 @@ HorizontalMenu.prototype.appendItem = function (item) {
                 for (var i = 0; i < menu.items.length; i++) {
                     if (menu.items[i].id != item_.id) {
                         // Clear it childs...
-                        menu.items[i].panel.element.innerHTML = menu.items[i].name
+                        menu.items[i].panel.element.firstChild.innerHTML = menu.items[i].name
                     }
                 }
             }
@@ -452,7 +483,7 @@ HorizontalMenu.prototype.appendItem = function (item) {
             this.style.color = "#428bca";
             if (Object.keys(menu.subMenuRow.childs).length > 0 && item_.level == 0 && Object.keys(item_.panel.childs).length == 0) {
                 menu.subMenuRow.removeAllChilds()
-                item.panel.element.innerHTML = item_.name
+                item.panel.element.firstChild.innerHTML = item_.name
                 this.style.color = "";
                 menu.appendItem(item)
             } else {

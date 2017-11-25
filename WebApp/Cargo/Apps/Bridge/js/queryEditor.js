@@ -55,8 +55,8 @@ var QueryEditor = function (parent, file, initCallback) {
     // Init the splitter action.
     initSplitter(queryEditorSplitor, this.editQueryPanel)
 
-    var filePanel = this.editQueryPanel.appendElement({ "tag": "div", "class": "filePanel", "id": file.M_id + "_query_editor", "innerHtml": decode64(file.M_data) }).down()
-    this.editor = ace.edit(file.M_id + "_query_editor");
+    var filePanel = this.editQueryPanel.appendElement({ "tag": "div", "class": "filePanel", "id": file.UUID + "_query_editor", "innerHtml": decode64(file.M_data) }).down()
+    this.editor = ace.edit(file.UUID + "_query_editor");
 
     // In case of sql query..
     if (this.isSql) {
@@ -74,15 +74,6 @@ var QueryEditor = function (parent, file, initCallback) {
 
     // Set the theme of the editor.
     this.editor.setTheme(this.theme);
-
-    this.editor.getSession().on('change', function (fileId, fileUUID, editor) {
-        return function () {
-            var evt = { "code": ChangeFileEvent, "name": FileEvent, "dataMap": { "fileId": fileId } }
-            var file = entities[fileUUID]
-            file.M_data = encode64(editor.getSession().getValue())
-            server.eventHandler.broadcastLocalEvent(evt)
-        }
-    }(file.M_id, file.UUID, this.editor));
 
     return this
 }
@@ -130,7 +121,7 @@ QueryEditor.prototype.setDataConfigs = function (configs) {
     }
 
     // So here I will create the tool bar for the query editor.
-    this.queryToolBar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar", "id": this.file.M_id + "_toolbar" })
+    this.queryToolBar = new Element(homepage.toolbarDiv, { "tag": "div", "class": "toolbar", "id": this.file.UUID + "_toolbar" })
 
     // The datasource selection.
     this.dataSelect = this.queryToolBar.appendElement({ "tag": "div", "style": "display: table-cell; height: 100%; vertical-align: middle;" }).down()

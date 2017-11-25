@@ -35,3 +35,7 @@
 .table_header_btn_div .fa-download {
     display: none;
 }
+
+.result_query_panel .row_button .fa-trash-o {
+    display: table-cell;
+}

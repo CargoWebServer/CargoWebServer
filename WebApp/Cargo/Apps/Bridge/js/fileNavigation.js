@@ -31,9 +31,9 @@ var FileNavigator = function (parent) {
     // Now I will save the file...
     this.saveBtn.element.onclick = function (fileNavigator) {
         return function () {
-            if (fileNavigator.toSaves[fileNavigator.activeFile.M_id]) {
+            if (fileNavigator.toSaves[fileNavigator.activeFile.UUID]) {
                 // The file need to be save here...
-                fileNavigator.saveFile(fileNavigator.activeFile.M_id)
+                fileNavigator.saveFile(fileNavigator.activeFile.UUID)
             }
         }
     }(this)
@@ -73,7 +73,7 @@ var FileNavigator = function (parent) {
         }
 
         if (file !== undefined) {
-            if (file.M_id !== undefined) {
+            if (file.UUID !== undefined) {
                 // Here thats mean the file was open
                 fileNavigator.appendFile(file)
             }
@@ -82,7 +82,7 @@ var FileNavigator = function (parent) {
 
     server.fileManager.attach(this, UpdateFileEvent, function (evt, codeEditor) {
         if (evt.dataMap.fileInfo !== undefined) {
-            var fileId = evt.dataMap["fileInfo"].M_id
+            var fileId = evt.dataMap["fileInfo"].UUID
             codeEditor.saveBtn.element.title = ""
             codeEditor.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn"
 
@@ -102,12 +102,16 @@ var FileNavigator = function (parent) {
                 codeEditor.saveBtn.element.style.display = "none"
                 codeEditor.saveBtn.element.title = ""
             }
+
+            var fileNameDiv = tab.getChildById("fileNameDiv")
+            var file = entities[fileId]
+            fileNameDiv.element.innerHTML = file.M_name
         }
     })
 
     server.entityManager.attach(this, UpdateEntityEvent, function (evt, codeEditor) {
         if (evt.dataMap.entity !== undefined) {
-            var fileId = evt.dataMap.entity.M_id
+            var fileId = evt.dataMap.entity.UUID
             codeEditor.saveBtn.element.title = ""
             codeEditor.saveBtn.element.className = "fa fa-floppy-o fileNavigationBtn"
 
@@ -127,6 +131,9 @@ var FileNavigator = function (parent) {
                 codeEditor.saveBtn.element.style.display = "none"
                 codeEditor.saveBtn.element.title = ""
             }
+
+            var fileNameDiv = tab.getChildById("fileNameDiv")
+            fileNameDiv.element.innerHTML = evt.dataMap.entity.M_name
         }
     })
 
@@ -147,6 +154,7 @@ var FileNavigator = function (parent) {
                 return
             }
 
+            
             // put in the list to save.
             fileNavigator.toSaves[fileId] = fileNavigator.files[fileId].M_name
 
@@ -178,45 +186,45 @@ var FileNavigator = function (parent) {
 FileNavigator.prototype.appendFile = function (file) {
 
     if (this.activeFile != undefined) {
-        if (this.activeFile.M_id == file.M_id) {
+        if (this.activeFile.UUID == file.UUID) {
             // Nothing todo here...
             return
         }
     }
 
     // Keep the ref of the file.
-    if (this.files[file.M_id] != undefined) {
+    if (this.files[file.UUID] != undefined) {
         // Set the tab active...
-        this.setActiveTab(file.M_id)
+        this.setActiveTab(file.UUID)
         return
     }
 
     // Here the new file tab must be created.
-    this.files[file.M_id] = file
+    this.files[file.UUID] = file
 
-    this.tabs[file.M_id] = this.panel.appendElement({ "tag": "div", "class": "file_tab" }).down()
-    this.tabs[file.M_id].appendElement({ "tag": "div", "style": "display: table; height: 100%; width:100%;" }).down()
+    this.tabs[file.UUID] = this.panel.appendElement({ "tag": "div", "class": "file_tab" }).down()
+    this.tabs[file.UUID].appendElement({ "tag": "div", "style": "display: table; height: 100%; width:100%;" }).down()
         .appendElement({ "tag": "div", "id": "fileNameDiv", "style": "display: table-cell;", "innerHtml": file.M_name })
         .appendElement({ "tag": "i", "id": file.id + "_file_tab_close_btn", "class": "fa fa-times file_tab_close_btn" })
 
-    var fileCloseBtn = this.tabs[file.M_id].getChildById(file.id + "_file_tab_close_btn")
+    var fileCloseBtn = this.tabs[file.UUID].getChildById(file.id + "_file_tab_close_btn")
     if (fileCloseBtn != undefined) {
         fileCloseBtn.element.onclick = function (file) {
             return function () {
                 // Send event localy...
-                var evt = { "code": CloseEntityEvent, "name": FileEvent, "dataMap": { "fileId": file.M_id } }
+                var evt = { "code": CloseEntityEvent, "name": FileEvent, "dataMap": { "fileId": file.UUID } }
                 server.eventHandler.broadcastLocalEvent(evt)
             }
         }(file)
     }
 
-    this.setActiveTab(file.M_id)
+    this.setActiveTab(file.UUID)
 
     // now the onclick event...
-    this.tabs[file.M_id].element.onclick = function (file, fileNavigator) {
+    this.tabs[file.UUID].element.onclick = function (file, fileNavigator) {
         return function () {
-            if (fileNavigator.files[file.M_id] != undefined) {
-                fileNavigator.setActiveTab(file.M_id)
+            if (fileNavigator.files[file.UUID] != undefined) {
+                fileNavigator.setActiveTab(file.UUID)
             }
         }
     }(file, this)
@@ -274,7 +282,7 @@ FileNavigator.prototype.removeFile = function (fileId) {
     delete this.tabs[fileId]
     this.panel.removeElement(tab)
     if (this.activeFile != null) {
-        if (this.activeFile.M_id == fileId) {
+        if (this.activeFile.UUID == fileId) {
             //this.activeFile = null
             // Now I will set the active file
             if (Object.keys(this.files).length == 0) {
@@ -307,7 +315,7 @@ FileNavigator.prototype.removeFile = function (fileId) {
 FileNavigator.prototype.saveFile = function (fileId) {
 
     // Now I will save the file.
-    var file = entities["CargoEntities.File:" + fileId]
+    var file = entities[fileId]
 
     if (file.M_fileType == 2) {
         // In case of disk file.
