@@ -218,8 +218,12 @@ func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
 	// I will now remove the remaining files in the map...
 	for _, fileToDelete := range toDelete {
 		// Delete the associated entity...
-		this.deleteFile(fileToDelete.UUID)
-		log.Println("Delete file: ", fileToDelete.GetPath()+"/"+fileToDelete.GetName())
+		err := this.deleteFile(fileToDelete.UUID)
+		if err == nil {
+			log.Println("--> Delete file: ", fileToDelete.GetPath()+"/"+fileToDelete.GetName())
+		} else {
+			log.Println("---> ", err)
+		}
 	}
 
 	return dirEntity
@@ -611,15 +615,12 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
  * Delete a file with a given uuid
  */
 func (this *FileManager) deleteFile(uuid string) error {
-	fileEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity("", uuid, nil)
-	fileEntity.InitEntity(uuid, false)
-	file := fileEntity.GetObject().(*CargoEntities.File)
-
-	// Delete child files if there is some.
-	for i := 0; i < len(file.M_files); i++ {
-		// delete subfiles...
-		this.deleteFile(file.M_files[i].UUID)
+	fileEntity, err := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
+	if err != nil {
+		return errors.New(err.GetBody())
 	}
+
+	file := fileEntity.GetObject().(*CargoEntities.File)
 
 	if file.GetFileType() == CargoEntities.FileType_DiskFile {
 		var filePath string
@@ -634,26 +635,14 @@ func (this *FileManager) deleteFile(uuid string) error {
 
 		if !file.IsDir() {
 			// Remove the file from the disck
-			err := os.Remove(filePath) // The file can be already remove...
-			if err != nil {
-				return err
-			}
+			os.Remove(filePath) // The file can be already remove...
 		} else {
-			err := os.RemoveAll(filePath)
-			if err != nil {
-				return err
-			}
+			os.RemoveAll(filePath)
 		}
 	}
 
-	if file.GetParentDirPtr() != nil {
-		file.GetParentDirPtr().RemoveFiles(file)
-		parentDirEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity("", file.GetParentDirPtr().UUID, nil)
-		parentDirEntity.SaveEntity()
-	}
-
 	// Here i will remove the entity...
-	fileEntity.DeleteEntity()
+	fileEntity.DeleteEntity() // Remove all sub-entity and also remove it from it parent.
 
 	eventData := make([]*MessageData, 1)
 	fileInfo := new(MessageData)

@@ -454,7 +454,6 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 
 							// Only uuid's are accepted value's here.
 							if len(uuids) > 0 {
-								log.Println("---------> uuids found! ", uuids)
 								// Set an empty array here...
 								if Utility.IsValidEntityReferenceName(uuids[0]) && !lazy {
 									this.setValue(fieldName, make([]map[string]interface{}, 0))
@@ -611,7 +610,6 @@ func (this *DynamicEntity) SaveEntity() {
 func (this *DynamicEntity) saveEntity(path string) {
 	// Do not save if is nt necessary...
 	if !this.NeedSave() || strings.Index(path, this.GetUuid()) != -1 {
-		log.Println("Entity ", this.GetUuid(), " Not need to be save.", this.NeedSave())
 		return
 	}
 

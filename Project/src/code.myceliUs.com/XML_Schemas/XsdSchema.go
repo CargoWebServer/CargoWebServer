@@ -1353,7 +1353,7 @@ func IsXsBaseType(fieldType string) bool {
  * Helper function use to dertermine if a XS type must be considere integer.
  */
 func IsXsInt(fieldType string) bool {
-	if strings.HasSuffix(fieldType, "byte") || strings.HasSuffix(fieldType, "int") || strings.HasSuffix(fieldType, "integer") || strings.HasSuffix(fieldType, "short") || strings.HasSuffix(fieldType, "unsignedInt") || strings.HasSuffix(fieldType, "unsignedBtype") || strings.HasSuffix(fieldType, "unsignedShort") || strings.HasSuffix(fieldType, "unsignedLong") || strings.HasSuffix(fieldType, "negativeInteger") || strings.HasSuffix(fieldType, "nonNegativeInteger") || strings.HasSuffix(fieldType, "nonPositiveInteger") || strings.HasSuffix(fieldType, "positiveInteger") || strings.HasSuffix(fieldType, "tinyint") || strings.HasSuffix(fieldType, "smallint") || strings.HasSuffix(fieldType, "bigint") {
+	if strings.HasSuffix(fieldType, "int") || strings.HasSuffix(fieldType, "byte") || strings.HasSuffix(fieldType, "int") || strings.HasSuffix(fieldType, "integer") || strings.HasSuffix(fieldType, "short") || strings.HasSuffix(fieldType, "unsignedInt") || strings.HasSuffix(fieldType, "unsignedBtype") || strings.HasSuffix(fieldType, "unsignedShort") || strings.HasSuffix(fieldType, "unsignedLong") || strings.HasSuffix(fieldType, "negativeInteger") || strings.HasSuffix(fieldType, "nonNegativeInteger") || strings.HasSuffix(fieldType, "nonPositiveInteger") || strings.HasSuffix(fieldType, "positiveInteger") || strings.HasSuffix(fieldType, "tinyint") || strings.HasSuffix(fieldType, "smallint") || strings.HasSuffix(fieldType, "bigint") {
 		return true
 	}
 	return false

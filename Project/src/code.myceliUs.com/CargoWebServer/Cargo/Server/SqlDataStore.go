@@ -893,6 +893,7 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 				prototype.Fields = append(prototype.Fields, "M_"+fieldName)
 				prototype.FieldsType = append(prototype.FieldsType, fieldType.TypeName)
 				prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, "")
+				setDefaultFieldValue(prototype, fieldTypeName)
 
 				// Set as id.
 				if isId {
@@ -985,58 +986,15 @@ func (this *SqlDataStore) getSchemaId(name string) (string, error) {
 func appendField(prototype *EntityPrototype, fieldName string, fieldType string) {
 
 	if !Utility.Contains(prototype.Fields, fieldName) && Utility.IsValidVariableName(fieldName) {
-
 		prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 		prototype.FieldsNillable = append(prototype.FieldsVisibility, true)
+		prototype.Fields = append(prototype.Fields, fieldName)
+		prototype.FieldsType = append(prototype.FieldsType, fieldType)
+		prototype.FieldsVisibility = append(prototype.FieldsVisibility, true)
+		prototype.FieldsDocumentation = append(prototype.FieldsDocumentation, "")
 
-		fields := prototype.Fields
-		fieldsType := prototype.FieldsType
-		fieldsVisibility := prototype.FieldsVisibility
-		fieldsDocumentation := prototype.FieldsDocumentation
-
-		// Set empty array...
-		prototype.Fields = make([]string, len(prototype.FieldsOrder))
-		prototype.FieldsType = make([]string, len(prototype.FieldsOrder))
-		prototype.FieldsVisibility = make([]bool, len(prototype.FieldsOrder))
-		prototype.FieldsDocumentation = make([]string, len(prototype.FieldsOrder))
-
-		for i := 0; i < len(fields)-2; i++ {
-			prototype.Fields[i] = fields[i]
-			prototype.FieldsType[i] = fieldsType[i]
-			prototype.FieldsVisibility[i] = fieldsVisibility[i]
-			if len(fieldsDocumentation) > i {
-				prototype.FieldsDocumentation[i] = fieldsDocumentation[i]
-			} else {
-				prototype.FieldsDocumentation[i] = ""
-			}
-		}
-
-		lastIndex := len(prototype.FieldsOrder) - 1
-		prototype.Fields[lastIndex-2] = fieldName
-		prototype.FieldsType[lastIndex-2] = fieldType
-		prototype.FieldsVisibility[lastIndex-2] = true
-		prototype.FieldsDocumentation[lastIndex-2] = ""
-
-		// childsUuid
-		prototype.Fields[lastIndex-1] = fields[len(fields)-2]
-		prototype.FieldsType[lastIndex-1] = fieldsType[len(fields)-2]
-		prototype.FieldsVisibility[lastIndex-1] = fieldsVisibility[len(fields)-2]
-		if len(fieldsDocumentation) > len(fields)-2 {
-			prototype.FieldsDocumentation[lastIndex-1] = fieldsDocumentation[len(fields)-2]
-		} else {
-			prototype.FieldsDocumentation[lastIndex-1] = ""
-		}
-
-		// referenced
-		prototype.Fields[lastIndex] = fields[len(fields)-1]
-		prototype.FieldsType[lastIndex] = fieldsType[len(fields)-1]
-		prototype.FieldsVisibility[lastIndex] = fieldsVisibility[len(fields)-1]
-
-		if len(fieldsDocumentation) > len(fields)-1 {
-			prototype.FieldsDocumentation[lastIndex] = fieldsDocumentation[len(fields)-1]
-		} else {
-			prototype.FieldsDocumentation[lastIndex] = ""
-		}
+		// Now default value.
+		setDefaultFieldValue(prototype, fieldName)
 
 		// Save it back.
 		GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(prototype)

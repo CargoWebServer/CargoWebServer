@@ -6,15 +6,51 @@ var TutorialPage = function (parent) {
     this.postPreviews = {}
     this.newestPostDiv = null
 
+    // Events... 
+    // Delete post.
+    server.entityManager.attach(this, DeleteEntityEvent, function (evt, tutorialPage) {
+        if (evt.dataMap["entity"] !== undefined) {
+            if (tutorialPage.postPreviews[evt.dataMap["entity"].UUID] != undefined) {
+                var postPreview = tutorialPage.postPreviews[evt.dataMap["entity"].UUID]
+                delete tutorialPage.postPreviews[postPreview.UUID]
+                // Remove it from display.
+                tutorialPage.newestPostDiv.removeElement(postPreview.div)
+            }
+        }
+    })
+
+    // New post
+    server.entityManager.attach(this, NewEntityEvent, function (evt, tutorialPage) {
+        if (evt.dataMap["entity"] !== undefined) {
+            if (evt.dataMap["entity"].TYPENAME == blogPostTypeName) {
+                if (tutorialPage.postPreviews[evt.dataMap["entity"].UUID] == undefined) {
+                    tutorialPage.appendPostPreview(evt.dataMap["entity"], tutorialPage.newestPostDiv)
+                }
+            }
+        }
+    })
+
+    // Update post
+    server.entityManager.attach(this, UpdateEntityEvent, function (evt, tutorialPage) {
+        if (evt.dataMap["entity"] !== undefined) {
+            if (tutorialPage.postPreviews[evt.dataMap["entity"].UUID] != undefined) {
+                var postPreview = tutorialPage.postPreviews[evt.dataMap["entity"].UUID]
+                tutorialPage.appendPostPreview(evt.dataMap["entity"], tutorialPage.newestPostDiv)
+            }
+        }
+    })
+
     return this
 }
 
 TutorialPage.prototype.display = function (parent) {
-    mainPage.pageContent.removeAllChilds()
+    parent.removeAllChilds()
     if (this.newestPostDiv == null) {
         parent.element.style.textAlign = "center"
-        parent.appendElement({"tag":"col-xs-12"}).down()
-            .appendElement({"tag":"img", "src":"img/wheel_.svg", "style":"color: black;", "class":"cargo-turning-wheel"})
+        parent.appendElement({ "tag": "col-xs-12" }).down()
+            .appendElement({ "tag": "img", "src": "img/wheel_.svg", "style": "color: black;", "class": "cargo-turning-wheel" })
+
+        // Display the post by newest order.
         this.displayNewestPost(
             function (parent) {
                 return function (tutorialPage) {
@@ -24,6 +60,7 @@ TutorialPage.prototype.display = function (parent) {
                 }
             }(parent)
         )
+
     } else {
         parent.appendElement(this.div)
     }
@@ -81,6 +118,7 @@ TutorialPage.prototype.displayMostViewedPost = function () {
         },
         { "tutorialPage": this, "div": this.newestPostDiv })
 }
+
 /**
  * Append a post previews in the home page.
  */
@@ -94,19 +132,30 @@ TutorialPage.prototype.appendPostPreview = function (post, div) {
  */
 var PostPreview = function (parent, post) {
     this.post = post
-    this.div = parent.appendElement({ "tag": "div", "class": "post_preview" }).down()
-    this.div.appendElement({ "tag": "span", "class": "post_title", "innerHtml": post.M_title })
+ 
+    this.div = parent.getChildById(post.UUID + "_post_preview")
+    if (this.div == undefined) {
+        this.div = parent.appendElement({ "tag": "div", "class": "post_preview", "id": post.UUID + "_post_preview" }).down()
+        this.title = this.div.appendElement({ "tag": "span", "id": post.UUID + "_post_preview_title", "class": "post_title", "innerHtml": post.M_title }).down()
+        this.img = this.div.appendElement({ "tag": "img", "id": post.UUID + "_post_preview_img", "src": post.M_thumbnail }).down()
+
+    } else {
+        this.title = parent.getChildById(post.UUID + "_post_preview_title")
+        this.img = parent.getChildById(post.UUID + "_post_preview_img")
+        this.title.element.innerHTML = post.M_title
+        this.img.element.src = post.M_thumbnail
+    }
 
     // Here I will generate the post thumbnail from the content of the post
-    var img = this.div.appendElement({ "tag": "img", "src": post.M_thumbnail }).down()
-
-    img.element.onload = function (img, div) {
+    this.img.element.onload = function (img, div) {
         return function () {
             // I will set the with of the image...
-            img.element.style.height = div.element.clientHeight + "px";
-            img.element.style.width = div.element.clientWidth + "px";
+            if (div.element.clientHeight > 0 && div.element.clientWidth > 0) {
+                img.element.style.height = div.element.clientHeight + "px";
+                img.element.style.width = div.element.clientWidth + "px";
+            }
         }
-    }(img, this.div)
+    }(this.img, this.div)
 
 
     this.div.element.onclick = function () {

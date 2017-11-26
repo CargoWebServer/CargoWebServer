@@ -30,7 +30,17 @@ function main() {
             server.entityManager.getEntityPrototypes("sqltypes",
                 // success callback
                 function (results, caller) {
-                    mainPage = new MainPage(bodyElement)
+                    server.entityManager.getEntityPrototypes("Blog",
+                        // success callback
+                        function (results, caller) {
+                            mainPage = new MainPage(bodyElement)
+                        },
+                        // error callback.
+                        function () {
+
+                        },
+                        // caller.
+                        {})
                 },
                 // error callback.
                 function () {

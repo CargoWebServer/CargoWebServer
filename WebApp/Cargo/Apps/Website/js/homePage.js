@@ -6,6 +6,7 @@
 var HomePage = function (parent) {
     this.div = new Element(parent, { "tag": "div", "class": "page" })
 
+    
     // The webpages.
     this.webPage = {}
 
@@ -18,6 +19,5 @@ var HomePage = function (parent) {
 HomePage.prototype.display = function(parent){
     parent.removeAllChilds()
     parent.appendElement(this.div)
-
     
 }

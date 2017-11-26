@@ -82,7 +82,7 @@ var MainPage = function (parent) {
     // Brand and toggle get grouped for better mobile display
     this.navBar.appendElement({ "tag": "div", "class": "container", "id": "nav-container" }).down()
         .appendElement({ "tag": "div", class: "navbar-header" }).down()
-        .appendElement({"tag":"img", "src":"img/wheel.svg", "id":"cargo-home-logo", "style":"width:30px; height: 30px; margin-top: 10px;"})
+        .appendElement({ "tag": "img", "src": "img/wheel.svg", "id": "cargo-home-logo", "style": "width:30px; height: 30px; margin-top: 10px;" })
         .appendElement({ "tag": "button", "type": "button", "class": "navbar-toggle", "data-toggle": "collapse", "data-target": "#bs-example-navbar-collapse-1" }).down()
         .appendElement({ "tag": "span", "class": "sr-only", "id": "toggle-navigation" }).down()
         .appendElement({ "tag": "span", "class": "icon-bar" })
@@ -301,7 +301,7 @@ var MainPage = function (parent) {
     //////////////////////////////////////////////////////////////////////
     // Blog manager action.
     //////////////////////////////////////////////////////////////////////
-    
+
     // login
     this.loginLnk = this.navBar.getChildById("login-lnk")
     this.homeLnk = this.navBar.getChildById("home-lnk")
@@ -310,22 +310,22 @@ var MainPage = function (parent) {
     this.registerLnk = this.navBar.getChildById("register-lnk")
     this.userInfoLnk = this.navBar.getChildById("user-info-lnk")
     this.authorPostTitle = this.container.getChildById("blog-post-by-author")
-    
+
     // The new category button...
     this.newCategoryBtn = this.container.getChildById("new-blog-categories-btn")
     this.categoryContentDiv = this.container.getChildById("blog-categories-content")
 
     // Set the tutorial page.
     this.tutorialPage = new TutorialPage()
-    this.tutorialLnk.element.onclick = function(tutorialPage){
-        return function(){
+    this.tutorialLnk.element.onclick = function (tutorialPage) {
+        return function () {
             tutorialPage.display(mainPage.pageContent)
         }
     }(this.tutorialPage)
 
     // Set the home page.
     this.homePage = new HomePage(this.pageContent)
-    this.homeLnk.element.onclick = this.homeLogoLnk.element.onclick =  function (homePage) {
+    this.homeLnk.element.onclick = this.homeLogoLnk.element.onclick = function (homePage) {
         return function () {
             // Display the home page in the page content area.
             homePage.display(mainPage.pageContent)
@@ -517,6 +517,15 @@ var MainPage = function (parent) {
     // Login the user.
     this.loginBtn.element.onclick = function (mainPage, loginNameInput, loginPasswordInput) {
         return function () {
+            mainPage.pageContent.element.style.position = "relative"
+
+            var waitingDiv = new Element(document.body, { "id": "waiting-div", "tag": "div", "style": "position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background-color: rgba(0, 0, 0, 0.85); z-index: 1031; text-align: center;" })
+            var wheel = waitingDiv.appendElement({ "tag": "img", "src": "img/wheel.svg", "style": "color: black;", "class": "cargo-turning-wheel" }).down()
+
+            // I will set the position of the wheel...
+            wheel.element.style.marginTop = (waitingDiv.element.clientHeight - wheel.element.clientHeight) / 2 + "px"
+
+
             // Get the value login information from interface.
             var userName = loginNameInput.element.value
             var password = loginPasswordInput.element.value
@@ -623,6 +632,10 @@ var MainPage = function (parent) {
                         return function () {
                             loginFormUsernameError.innerHTML = ""
                             loginFormPasswordError.innerHTML = ""
+                            var waitingDiv = document.getElementById("waiting-div")
+                            if (waitingDiv != undefined) {
+                                waitingDiv.parentNode.removeChild(waitingDiv)
+                            }
                         }
                     }(loginFormUsernameError, loginFormPasswordError), 2000)
 
@@ -651,7 +664,6 @@ var MainPage = function (parent) {
                     logoutDropdownLnk.element.style.display = "none"
                     userInfoDropdownLnk.element.style.display = ""
                     newBlogLnk.element.style.display = "none"
-
                 },
                 // Error callback
                 function () { },
@@ -813,6 +825,10 @@ MainPage.prototype.displayPost = function (post) {
  * Set the content of author post.
  */
 MainPage.prototype.displayAuthorPost = function () {
+    if(this.account== null){
+        return
+    }
+
     // The list of post by an author
     if (this.authorPostDiv == null) {
         this.authorPostDiv = this.sideWellWidget.appendElement({ "tag": "div" }).down()
@@ -838,8 +854,8 @@ MainPage.prototype.displayAuthorPost = function () {
 
                     // Here I will create the link with the title if it not already exist.
                     if (document.getElementById(post.UUID + "_lnk") == undefined) {
-                        authorPostDiv.appendElement({ "tag": "div", "class": "row" }).down()
-                            .appendElement({ "tag": "div", "class": "col-md-1" }).down()
+                        var postRow = authorPostDiv.appendElement({ "tag": "div", "class": "row" }).down()
+                        postRow.appendElement({ "tag": "div", "class": "col-md-1" }).down()
                             .appendElement({ "tag": "i", "id": post.UUID + "_delete_btn", "class": "fa fa-trash-o delete-button", "style": "vertical-align: middle;" }).up()
                             .appendElement({ "tag": "a", "id": post.UUID + "_lnk", "class": "col-md-10 control-label", "innerHtml": post.M_title, "href": "#", "style": "padding-left: 5px" })
 
@@ -858,23 +874,51 @@ MainPage.prototype.displayAuthorPost = function () {
                         }(post, caller.mainPage)
 
                         var postDeleteBtn = authorPostDiv.getChildById(post.UUID + "_delete_btn")
-                        postDeleteBtn.element.onclick = function (post) {
+                        postDeleteBtn.element.onclick = function (post, postRow) {
                             return function () {
-                                console.log("-------> delete post: ", post)
-                                if (post != undefined) {
-                                    server.entityManager.removeEntity(post.UUID,
-                                        // Success callback 
-                                        function (results, caller) {
-                                            console.log("Entity was remove sucessfully")
-                                        },
-                                        // Error callback
-                                        function (errObj, caller) {
-                                            // Nothing to do here...
-                                        }, {/* no caller. */ })
-                                }
+                                var confirmDialog = new Dialog(randomUUID(), undefined, true)
+                                confirmDialog.div.element.style.maxWidth = "450px"
+                                confirmDialog.setCentered()
+                                server.languageManager.setElementText(confirmDialog.title, "delete_dialog_entity_title")
+                                confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete post \"" + post.M_title + "\"?" })
+
+                                confirmDialog.ok.element.onclick = function (dialog, post, postRow) {
+                                    return function () {
+                                        // I will call delete link button.
+                                        postRow.parentElement.removeElement(postRow)
+
+                                        // Here I will delete the post.
+                                        mainPage.pageContent.removeAllChilds()
+                                        mainPage.pageContent.element.style.textAlign = "center"
+                                        mainPage.pageContent.appendElement({ "tag": "col-xs-12" }).down()
+                                            .appendElement({ "tag": "img", "src": "img/wheel_.svg", "style": "color: black;", "class": "cargo-turning-wheel" })
+
+                                        if (post != undefined) {
+                                            server.entityManager.removeEntity(post.UUID,
+                                                // Success callback 
+                                                function (results, caller) {
+                                                    console.log("Entity was remove sucessfully")
+                                                    mainPage.pageContent.removeAllChilds()
+                                                    mainPage.pageContent.element.style.textAlign = ""
+                                                },
+                                                // Error callback
+                                                function (errObj, caller) {
+                                                    // Nothing to do here...
+                                                }, {})
+                                        }
+                                        confirmDialog.close()
+                                    }
+                                }(confirmDialog, post, postRow)
+
                             }
-                        }(post)
+                        }(post, postRow)
                     }
+                }
+
+                // Remove the waiting div...
+                var waitingDiv = document.getElementById("waiting-div")
+                if (waitingDiv != undefined) {
+                    waitingDiv.parentNode.removeChild(waitingDiv)
                 }
             },
             // Error callback.
@@ -888,6 +932,11 @@ MainPage.prototype.displayAuthorPost = function () {
  */
 MainPage.prototype.createNewPost = function (author) {
     // Here I will use the data manager to get the number of post.
+    this.pageContent.removeAllChilds()
+    this.pageContent.element.style.textAlign = "center"
+    this.pageContent.appendElement({ "tag": "col-xs-12" }).down()
+        .appendElement({ "tag": "img", "src": "img/wheel_.svg", "style": "color: black;", "class": "cargo-turning-wheel" })
+
     var query = "SELECT MAX(id) FROM " + blogPostTypeName
     server.dataManager.read("Blog", query, ["int"], [],
         // success callback
@@ -908,7 +957,10 @@ MainPage.prototype.createNewPost = function (author) {
             // The post is own by author, so if we delete an author all it's post will be deleted.
             server.entityManager.getEntityById(authorTypeName, "sql_info", [userUuid],
                 function (author, caller) {
+
                     if (author.M_id.length == 0) {
+                        caller.mainPage.pageContent.removeAllChilds()
+                        caller.mainPage.pageContent.element.style.textAlign = ""
                         return // Do nothing if the author id is not set properly.
                     }
 
@@ -935,6 +987,7 @@ MainPage.prototype.createNewPost = function (author) {
                     server.entityManager.createEntity(author.UUID, "M_FK_blog_post_blog_author", blogPostTypeName, "", post,
                         // Success callback.
                         function (post, caller) {
+                            caller.mainPage.pageContent.element.style.textAlign = ""
                             // Create a new Blog.
                             caller.mainPage.displayPost(post)
                             // Set the blog view editable.
@@ -959,6 +1012,34 @@ MainPage.prototype.createNewPost = function (author) {
 
         },
         { "mainPage": this })
+}
+
+// The author will be the logged user.
+MainPage.prototype.setEditor = function (div, saveCallback) {
+    // I made use of http://summernote.org/ Great work folk's
+
+    $("#" + div.id).summernote();
+
+    // I will append the save button to existing toolbar, it's so easy...
+    var saveBtn = new Element(document.getElementsByClassName("note-view")[0], { "tag": "button", "tabindex": -1, "type": "button", "class": "note-btn btn btn-default btn-sm btn btn-primary btn-save", "title": "save", "data-original-title": "save" })
+    saveBtn.appendElement({ "tag": "i", "class": "fa fa-floppy-o" })
+
+    // Now the save action.
+    saveBtn.element.onclick = function (saveCallback, id) {
+        return function () {
+            // Set the inner html value to the post.
+
+            // I will append a div to block editing action first and display the waiting wheel...
+            mainPage.pageContent.element.style.position = "relative"
+            var waitingDiv = mainPage.pageContent.appendElement({ "tag": "div", "style": "position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background-color: rgba(0, 0, 0, 0.15); z-index: 100; text-align: center;" }).down()
+            waitingDiv.appendElement({ "tag": "img", "src": "img/wheel_.svg", "style": "color: black;", "class": "cargo-turning-wheel" })
+
+            $("#" + id).summernote('destroy');
+            if (saveCallback != undefined) {
+                saveCallback()
+            }
+        }
+    }(saveCallback, div.id)
 }
 
 /**
@@ -999,6 +1080,10 @@ MainPage.prototype.setEditable = function (blogView) {
                     return function (evt) {
                         // Stop event propagation so we will not return direclty here...
                         evt.stopPropagation()
+                        // I will append a div to block editing action first and display the waiting wheel...
+                        mainPage.pageContent.element.style.position = "relative"
+                        var waitingDiv = mainPage.pageContent.appendElement({ "tag": "div", "style": "position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background-color: rgba(0, 0, 0, 0.15); z-index: 100; text-align: center;" }).down()
+                        waitingDiv.appendElement({ "tag": "img", "src": "img/wheel_.svg", "style": "color: black;", "class": "cargo-turning-wheel" })
 
                         // Here I will set back the text inside the h1 element.
                         div.element.innerText = inputTitle.element.value
@@ -1026,38 +1111,16 @@ MainPage.prototype.setEditable = function (blogView) {
     // Set the title.
     setEditable(blogView.titleDiv, setTitleCallback)
 
-    // The author will be the logged user.
-
     // Set the content div
     setEditable(blogView.pageContentDiv,
         function (mainPage) {
             return function (div) {
-                // I made use of http://summernote.org/ Great work folk's
-                $('#article-div').summernote();
-
-                // I will append the save button to existing toolbar, it's so easy...
-                var saveBtn = new Element(document.getElementsByClassName("note-view")[0], { "tag": "button", "tabindex": -1, "type": "button", "class": "note-btn btn btn-default btn-sm btn btn-primary btn-save", "title": "save", "data-original-title": "save" })
-                saveBtn.appendElement({ "tag": "i", "class": "fa fa-floppy-o" })
-
-                // Now the save action.
-                saveBtn.element.onclick = function (mainPage) {
-                    return function () {
-                        // Set the inner html value to the post.
-                        // Here I will remove edit button.
-                        var editButtons = document.getElementsByClassName("edit-button")
-                        for (var i = 0; i < editButtons.length; i++) {
-                            editButtons[i].parentNode.removeChild(editButtons[i])
-                        }
-
-                        $('#article-div').summernote('destroy');
-                        mainPage.activePostView.post.M_article = document.getElementById("article-div").innerHTML
-                        mainPage.saveActivePost()
-                    }
-                }(mainPage)
+                mainPage.setEditor(div, function () {
+                    mainPage.activePostView.post.M_article = document.getElementById("article-div").innerHTML.replace('<div class="edit-button" title="edit"><i class="fa fa-pencil-square"></i></div>', "")
+                    mainPage.saveActivePost()
+                })
             }
         }(this))
-
-    // Here I will use use the clock to set the time.
 }
 
 /**
@@ -1074,7 +1137,13 @@ MainPage.prototype.saveActivePost = function () {
             return function (canvas) {
                 // Save the canvas png image by default as data url.
                 post.M_thumbnail = canvas.toDataURL()
-                server.entityManager.saveEntity(post)
+                server.entityManager.saveEntity(post,
+                    function (result, caller) {
+
+                    },
+                    function () {
+
+                    }, {})
             }
         }(post),
         width: pageContent.offsetWidth,
@@ -1086,7 +1155,7 @@ MainPage.prototype.saveActivePost = function () {
  * Append a new category in the category div.
  */
 MainPage.prototype.appendCategory = function (category) {
-    if (category.UUID != undefined) {
+    if (category.UUID === undefined) {
         // Here the category dosen't exist...
         var query = "SELECT MAX(id) FROM " + categoryTypeName
         server.dataManager.read("Blog", query, ["int"], [],

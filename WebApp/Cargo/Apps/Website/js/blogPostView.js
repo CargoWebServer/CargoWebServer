@@ -186,30 +186,32 @@ var BlogPostView = function (parent, post, categoryContentDiv) {
 
     // The created div.
     this.createdDiv = this.pageContainer.getChildById("created-date")
-    
+
 
     // Format the date time to local time.
     var m = moment(this.post.M_date_published);
     this.createdDiv.element.innerHTML = " " + m.format('LLL') // Returns "February 8 2013 8:30 AM" on en-us
 
     // The page content.
-    this.pageContentDiv = new Element(this.pageContainer.getChildById("page-content"), {"tag":"div", "id":"article-div"})
+    this.pageContentDiv = new Element(this.pageContainer.getChildById("page-content"), { "tag": "div", "id": "article-div" })
     this.pageContentDiv.element.innerHTML = this.post.M_article
     // I will remove the 
 
     // I will display the comment.
-    for (var i = 0; i < post.M_FK_blog_comment_blog_post.length; i++) {
-        var comment = post.M_FK_blog_comment_blog_post[i]
-        if (isString(comment.M_FK_blog_comment_blog_user)) {
-            comment["set_M_FK_blog_comment_blog_user_" + comment.M_FK_blog_comment_blog_user + "_ref"](
-                function (blogPostView, comment, post) {
-                    return function (ref) {
-                        new BlogPostCommentView(blogPostView.commentContainer, ref, comment, post, comment.M_id)
-                    }
-                }(this, comment, post)
-            )
-        } else {
-            new BlogPostCommentView(this.commentContainer, comment.M_FK_blog_comment_blog_user, comment, post, comment.M_id)
+    if (post.M_FK_blog_comment_blog_post != undefined) {
+        for (var i = 0; i < post.M_FK_blog_comment_blog_post.length; i++) {
+            var comment = post.M_FK_blog_comment_blog_post[i]
+            if (isString(comment.M_FK_blog_comment_blog_user)) {
+                comment["set_M_FK_blog_comment_blog_user_" + comment.M_FK_blog_comment_blog_user + "_ref"](
+                    function (blogPostView, comment, post) {
+                        return function (ref) {
+                            new BlogPostCommentView(blogPostView.commentContainer, ref, comment, post, comment.M_id)
+                        }
+                    }(this, comment, post)
+                )
+            } else {
+                new BlogPostCommentView(this.commentContainer, comment.M_FK_blog_comment_blog_user, comment, post, comment.M_id)
+            }
         }
     }
 

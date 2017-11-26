@@ -331,7 +331,7 @@ EntityPrototype.prototype.generateConstructor = function () {
     }
 
     // Fields.
-    for (var i = 3; i < this.Fields.length-2; i++) {
+    for (var i = 3; i < this.Fields.length; i++) {
         var fieldName = normalizeFieldName(this.Fields[i])
         if (this.FieldsDefaultValue[i] != undefined) {
             // In case of default values...
@@ -341,15 +341,15 @@ EntityPrototype.prototype.generateConstructor = function () {
                 constructorSrc += " this." + fieldName + " = \"" + this.FieldsDefaultValue[i] + "\"\n"
             } else {
                 if (this.FieldsType[i].startsWith("xs.") || this.FieldsType[i].startsWith("sqltypes.")) {
-                    if(this.FieldsDefaultValue[i].length != 0){
-                    constructorSrc += " this." + fieldName + " = " + this.FieldsDefaultValue[i] + "\n"
-                    }else if(isXsNumeric(this.FieldsType[i])){
+                    if (this.FieldsDefaultValue[i].length != 0) {
+                        constructorSrc += " this." + fieldName + " = " + this.FieldsDefaultValue[i] + "\n"
+                    } else if (isXsNumeric(this.FieldsType[i])) {
                         constructorSrc += " this." + fieldName + " = 0.0\n"
-                    }else if(isXsBoolean(this.FieldsType[i])){
+                    } else if (isXsBoolean(this.FieldsType[i])) {
                         constructorSrc += " this." + fieldName + " = false\n"
-                    }else if(isXsString(this.FieldsType[i])){
+                    } else if (isXsString(this.FieldsType[i])) {
                         constructorSrc += " this." + fieldName + " = \"\"\n"
-                    }else{
+                    } else {
                         constructorSrc += " this." + fieldName + " = null\n"
                     }
                 } else if (this.FieldsType[i].startsWith("enum:")) {
