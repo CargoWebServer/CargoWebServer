@@ -44,7 +44,7 @@ var MainPage = function (parent) {
             // Other parts of header.
             "blog-search-title": "Search",
             "blog-categories-title": "Categories",
-            "footer-text": "Copyright &copy; Your Website 2017",
+            "footer-text": "CargoWebServer&copy; 2017",
             // The user input panel
             "Blog.dbo.blog_user": "User's",
             "Blog.blog_user": "User's",
@@ -328,8 +328,7 @@ var MainPage = function (parent) {
     this.homeLnk.element.onclick = this.homeLogoLnk.element.onclick =  function (homePage) {
         return function () {
             // Display the home page in the page content area.
-            mainPage.pageContent.removeAllChilds()
-            mainPage.pageContent.appendElement(homePage.div)
+            homePage.display(mainPage.pageContent)
         }
     }(this.homePage)
 

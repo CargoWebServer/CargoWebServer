@@ -274,10 +274,6 @@ EntityPrototype.prototype.init = function (object) {
         this.FieldsDefaultValue = object.FieldsDefaultValue
     }
 
-    // other standard fields.
-    this.appendField("childsUuid", "[]xs.string", false, this.Fields.length, false, "the array of child entities.", "[]")
-    this.appendField("referenced", "[]Server.EntityRef", false, this.Fields.length, false, "The field documentation.", "[]")
-
     // Generate the class code.
     this.generateConstructor()
 }
@@ -335,7 +331,7 @@ EntityPrototype.prototype.generateConstructor = function () {
     }
 
     // Fields.
-    for (var i = 3; i < this.Fields.length; i++) {
+    for (var i = 3; i < this.Fields.length-2; i++) {
         var fieldName = normalizeFieldName(this.Fields[i])
         if (this.FieldsDefaultValue[i] != undefined) {
             // In case of default values...

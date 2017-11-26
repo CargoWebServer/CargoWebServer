@@ -1,5 +1,6 @@
 /**
- * That will contain page of the website.
+ * Display website page.
+ * 
  * @param {*} parent 
  */
 var HomePage = function (parent) {
@@ -7,6 +8,16 @@ var HomePage = function (parent) {
 
     // The webpages.
     this.webPage = {}
-    
+
     return this
+}
+
+/**
+ * Display the page.
+ */
+HomePage.prototype.display = function(parent){
+    parent.removeAllChilds()
+    parent.appendElement(this.div)
+
+    
 }

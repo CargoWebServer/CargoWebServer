@@ -212,25 +212,6 @@ func (this *EntityPrototype) getFieldIndex(fieldName string) int {
 func (this *EntityPrototype) Create(storeId string) error {
 
 	// Append the default fields at end...
-
-	// The list of childs uuid use by this entity
-	if Utility.Contains(this.Fields, "childsUuid") == false {
-		this.Fields = append(this.Fields, "childsUuid")
-		this.FieldsOrder = append(this.FieldsOrder, len(this.FieldsOrder))
-		this.FieldsType = append(this.FieldsType, "[]xs.string")
-		this.FieldsVisibility = append(this.FieldsVisibility, false)
-		this.FieldsDefaultValue = append(this.FieldsDefaultValue, "[]")
-	}
-
-	// The list of entity referenced by this entity
-	if Utility.Contains(this.Fields, "referenced") == false {
-		this.Fields = append(this.Fields, "referenced")
-		this.FieldsOrder = append(this.FieldsOrder, len(this.FieldsOrder))
-		this.FieldsType = append(this.FieldsType, "[]EntityRef")
-		this.FieldsVisibility = append(this.FieldsVisibility, false)
-		this.FieldsDefaultValue = append(this.FieldsDefaultValue, "[]")
-	}
-
 	if len(storeId) == 0 {
 		storeId = this.TypeName[:strings.Index(this.TypeName, ".")]
 	}

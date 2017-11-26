@@ -457,7 +457,7 @@ var PrototypeTreeView = function (parent, prototype, storeType) {
     }(this)
 
     // Now the fields.
-    for (var i = 0; i < prototype.Fields.length; i++) {
+    for (var i = 0; i < prototype.Fields.length ; i++) {
         if (prototype.Fields[i].startsWith("M_")) {
             this.fieldsView[prototype.Fields[i]] = new PrototypeTreeViewField(this.fieldsPanel, prototype, prototype.Fields[i], prototype.FieldsType[i], prototype.FieldsVisibility[i], prototype.FieldsNillable[i])
         }
@@ -470,7 +470,7 @@ var PrototypeTreeView = function (parent, prototype, storeType) {
             prototypeTreeView.fieldsView = {}
             prototypeTreeView.fieldsPanel.removeAllChilds()
             prototypeTreeView.prototype = evt.dataMap.prototype // Set the updated prototype version.
-            for (var i = 0; i < prototypeTreeView.prototype.Fields.length; i++) {
+            for (var i = 0; i < prototypeTreeView.prototype.Fields.length ; i++) {
                 if (prototypeTreeView.prototype.Fields[i].startsWith("M_")) {
                     prototypeTreeView.fieldsView[prototypeTreeView.prototype.Fields[i]] = new PrototypeTreeViewField(prototypeTreeView.fieldsPanel, prototypeTreeView.prototype, prototypeTreeView.prototype.Fields[i], prototypeTreeView.prototype.FieldsType[i], prototypeTreeView.prototype.FieldsVisibility[i], prototypeTreeView.prototype.FieldsNillable[i])
                 }

@@ -601,7 +601,7 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
         getSuperTypesFields(superTypeNames, superTypesFields,
             function (EntityPrototypeEditor, prototype, properties, isEditable) {
                 return function (superTypesFields) {
-                    for (var i = 3; i < prototype.Fields.length; i++) {
+                    for (var i = 3; i < prototype.Fields.length ; i++) {
                         // display attributes
                         if (superTypesFields.indexOf(prototype.Fields[i]) == -1) {
                             // Here only if the propertie is part of the entity itself and not of one of it parent.
@@ -611,7 +611,7 @@ EntityPrototypeEditor.prototype.displayPrototypeProperties = function (prototype
                 }
             }(this, prototype, properties, isEditable))
     } else {
-        for (var i = 3; i < prototype.Fields.length; i++) {
+        for (var i = 3; i < prototype.Fields.length ; i++) {
             // display attributes
             if (superTypesFields.indexOf(prototype.Fields[i]) == -1 && prototype.Fields[i]) {
                 // Here only if the propertie is part of the entity itself and not of one of it parent.
@@ -1209,7 +1209,7 @@ EntityPrototypeEditor.prototype.setDefaultValueEditor = function (defaultValueDi
                 var subDefaultValueDiv = defaultValueDiv.appendElement({ "tag": "div", "id": id }).down()
                 if (fieldPrototype != undefined) {
                     level++
-                    for (var i = 3; i < fieldPrototype.Fields.length; i++) {
+                    for (var i = 3; i < fieldPrototype.Fields.length ; i++) {
                         // Recursively create field editor.
                         this.setDefaultValueEditor(subDefaultValueDiv, fieldPrototype, i, level, prototype.FieldsDefaultValue[index])
                     }
@@ -1240,7 +1240,7 @@ EntityPrototypeEditor.prototype.setDefaultValueEditor = function (defaultValueDi
 
 // Set the content of the FieldsDefaultValue from the value store in the editor.
 EntityPrototypeEditor.prototype.setDefaultFieldsValue = function () {
-    for (var i = 3; i < this.getCurrentEntityPrototype().Fields.length; i++) {
+    for (var i = 3; i < this.getCurrentEntityPrototype().Fields.length ; i++) {
         var fieldType = this.getCurrentEntityPrototype().FieldsType[i]
         if (fieldType.startsWith("xs.")) {
             var element = document.getElementById(this.getCurrentEntityPrototype().TypeName + "_" + this.getCurrentEntityPrototype().Fields[i] + "_editor")
@@ -1261,7 +1261,7 @@ EntityPrototypeEditor.prototype.getDefaultFieldValue = function (prototype) {
     var values = {}
     values["TYPENAME"] = prototype.TypeName
 
-    for (var i = 3; i < prototype.Fields.length; i++) {
+    for (var i = 3; i < prototype.Fields.length ; i++) {
         var fieldType = prototype.FieldsType[i]
         if (fieldType.startsWith("xs.")) {
             var element = document.getElementById(prototype.TypeName + "_" + prototype.Fields[i] + "_editor")

@@ -1,5 +1,5 @@
 /**
- * General page is the 
+ * That page display list of tutorial.
  */
 var TutorialPage = function (parent) {
     this.div = new Element(parent, { "tag": "div", "class": "page" })
@@ -12,20 +12,20 @@ var TutorialPage = function (parent) {
 TutorialPage.prototype.display = function (parent) {
     mainPage.pageContent.removeAllChilds()
     if (this.newestPostDiv == null) {
-        mainPage.pageContent.element.style.textAlign = "center"
-        mainPage.pageContent.appendElement({"tag":"col-xs-12"}).down()
+        parent.element.style.textAlign = "center"
+        parent.appendElement({"tag":"col-xs-12"}).down()
             .appendElement({"tag":"img", "src":"img/wheel_.svg", "style":"color: black;", "class":"cargo-turning-wheel"})
         this.displayNewestPost(
-            function () {
+            function (parent) {
                 return function (tutorialPage) {
-                    mainPage.pageContent.removeAllChilds()
-                    mainPage.pageContent.element.style.textAlign = ""
-                    mainPage.pageContent.appendElement(tutorialPage.div)
+                    parent.removeAllChilds()
+                    parent.element.style.textAlign = ""
+                    parent.appendElement(tutorialPage.div)
                 }
-            }()
+            }(parent)
         )
     } else {
-        mainPage.pageContent.appendElement(this.div)
+        parent.appendElement(this.div)
     }
 }
 /**
