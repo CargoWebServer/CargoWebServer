@@ -329,9 +329,9 @@ func (this *KeyValueDataStore) SetEntityPrototype(prototype *EntityPrototype) er
 	}
 
 	// Save it only once...
-	_, err := this.GetEntityPrototype(prototype.TypeName)
+	p, _ := this.GetEntityPrototype(prototype.TypeName)
 
-	if err != nil {
+	if p == nil {
 		// Here i will append super type fields...
 		this.setSuperTypeFields(prototype)
 
@@ -1324,20 +1324,20 @@ func (this *KeyValueDataStore) GetEntityPrototype(typeName string) (*EntityProto
 	}
 
 	// Local store stuff...
-	prototype := new(EntityPrototype)
+	var prototype *EntityPrototype
 
 	// Retreive the data from level db...
 	data, err := this.getValue("prototype:" + typeName)
 	if err != nil {
 		return nil, err
 	} else {
+		prototype = new(EntityPrototype)
 		dec := gob.NewDecoder(bytes.NewReader(data))
 		dec.Decode(prototype)
-	}
-
-	// fix...
-	if prototype.Fields[0] == "uuid" {
-		prototype.Fields[0] = "UUID" // must be upper case...
+		// fix...
+		if prototype.Fields[0] == "uuid" {
+			prototype.Fields[0] = "UUID" // must be upper case...
+		}
 	}
 
 	return prototype, nil
@@ -1567,7 +1567,7 @@ func (this *KeyValueDataStore) Connect() error {
 	prototypes, err := this.GetEntityPrototypes()
 	if err == nil {
 		for i := 0; i < len(prototypes); i++ {
-			JS.GetJsRuntimeManager().AppendScript(prototypes[i].generateConstructor())
+			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototypes[i].TypeName, prototypes[i].generateConstructor())
 		}
 	}
 

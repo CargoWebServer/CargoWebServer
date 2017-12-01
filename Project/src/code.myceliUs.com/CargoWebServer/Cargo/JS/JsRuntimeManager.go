@@ -84,14 +84,25 @@ type JsRuntimeManager struct {
 	/** The directory where the script is store (recursive) **/
 	m_searchDir string
 
-	/** Contain all script. **/
-	m_scripts []string
+	/** Contain script the time of loading. **/
+	m_scripts map[string]string
+
+	/** If a script is runing I keep it path here */
+	m_script string
 
 	/** Each connection has it own VM. */
 	m_sessions map[string]*otto.Otto
 
 	/** Go function interfaced in JS. **/
 	m_functions map[string]interface{}
+
+	/** Exported values for each file **/
+
+	// A module is a directory in src...
+	m_modules map[string]*otto.Object
+
+	// each file contain it own export variable.
+	m_exports map[string]*otto.Object
 
 	/**Channel use for communication with vm... **/
 
@@ -123,8 +134,17 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	// List of vm one per connection.
 	jsRuntimeManager.m_sessions = make(map[string]*otto.Otto)
 
+	// The map of script with their given path.
+	jsRuntimeManager.m_scripts = make(map[string]string)
+
 	// List of functions.
 	jsRuntimeManager.m_functions = make(map[string]interface{})
+
+	// Map of exported values.
+	// each directory in the /Scrip/src ar consider module.
+	jsRuntimeManager.m_modules = make(map[string]*otto.Object)
+	// each file contain it exports.
+	jsRuntimeManager.m_exports = make(map[string]*otto.Object)
 
 	// Initialisation of channel's.
 	jsRuntimeManager.m_appendScript = make(OperationChannel)
@@ -154,8 +174,9 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				sessionInfo.m_return <- jsRuntimeManager.m_sessions[sessionInfo.m_sessionId]
 			case operationInfos := <-jsRuntimeManager.m_appendScript:
 				callback := operationInfos.m_returns
+				path := operationInfos.m_params["path"].(string)
 				script := operationInfos.m_params["script"].(string)
-				jsRuntimeManager.appendScript(script)
+				jsRuntimeManager.appendScript(path, script)
 				callback <- []interface{}{true} // unblock the channel...
 			case operationInfos := <-jsRuntimeManager.m_initScripts:
 				callback := operationInfos.m_returns
@@ -291,7 +312,7 @@ func (this *JsRuntimeManager) appendScriptFile(filePath string) error {
 	buf := bytes.NewBuffer(nil)
 	io.Copy(buf, srcFile)
 	src := string(buf.Bytes())
-	this.appendScript(src)
+	this.appendScript(filePath, src)
 
 	return err
 }
@@ -299,21 +320,99 @@ func (this *JsRuntimeManager) appendScriptFile(filePath string) error {
 /**
  * Append a script and initialyse all vm with it.
  */
-func (this *JsRuntimeManager) appendScript(src string) {
+func (this *JsRuntimeManager) appendScript(path string, src string) {
+	if val, ok := this.m_scripts[path]; ok {
+		// append sricpt.
+		this.m_scripts[path] = src + "\n" + val
+	} else {
+		this.m_scripts[path] = src
+	}
+}
 
-	if Utility.Contains(this.m_scripts, src) == false {
-		this.m_scripts = append(this.m_scripts, src)
+/**
+ * Part of the module/exports
+ */
+func (this *JsRuntimeManager) GetExports(path string) (*otto.Object, error) {
+
+	// Here from the path information and the current running script i will
+	// return infromation conatain in the modules/export.
+	var currentPath = this.m_script
+	// First of all I will retreive the module.
+
+	// If the path begin by ./ that means the current module must be use...
+	var moduleId string
+	var dir string
+
+	if strings.HasPrefix(path, "./") {
+		// In that case I will use the current file path to locate the module.
+		strartIndex := strings.Index(filepath.ToSlash(this.m_script), "/WebApp/Cargo/Script/src/")
+		if strartIndex > 0 {
+			strartIndex += len("/WebApp/Cargo/Script/src/")
+			endIndex := strings.Index(filepath.ToSlash(this.m_script[strartIndex:]), "/")
+			if endIndex != -1 {
+				moduleId = this.m_script[strartIndex:][0:endIndex]
+			}
+			dir = this.m_script[0:strings.LastIndex(filepath.ToSlash(this.m_script), "/")]
+		}
+	} else {
+		// Here the first part of the path define the module.
+		index := strings.Index(path, "/")
+		if index == -1 {
+			moduleId = path[0:]
+		} else {
+			moduleId = path[0:index]
+		}
+		dir = this.m_searchDir + "/src"
 	}
 
-	// I will compile the script and set it in each session...
-	for scriptName, vm := range this.m_sessions {
-		script, err := vm.Compile("", src)
-		if err != nil {
-			log.Println("runtime script compilation error:", scriptName, err)
-		} else {
-			vm.Run(script)
+	// Now I will count the number of up
+	upCount := strings.Count(path, "../")
+	if upCount > 0 {
+		for i := 0; i < upCount; i++ {
+			dir = dir[0:strings.LastIndex(filepath.ToSlash(dir), "/")]
 		}
 	}
+
+	// Now I will recreate the export path from the dir ant the path.
+	exportPath := dir
+	// reconstruct the file path.
+	if dir != path {
+		if string(filepath.Separator) == "/" {
+			exportPath += "/" + strings.Replace(strings.Replace(path, "../", "", -1), "./", "", -1)
+			exportPath = strings.Replace(exportPath, "\\", "/", -1)
+		} else {
+			exportPath += "\\" + strings.Replace(strings.Replace(strings.Replace(path, "../", "", -1), "./", "", -1), "/", "\\", -1)
+			exportPath = strings.Replace(exportPath, "/", "\\", -1)
+		}
+	}
+
+	// Now I will get the export from the error...
+	exports := this.m_exports[exportPath]
+	if exports == nil {
+		// Here I need to import a file...
+		exports = this.initScript("", exportPath+".js")
+		this.m_script = currentPath // Set back the path to the file before the call.bytes
+	}
+
+	// set the global variable exports...
+	currentExportPath := currentPath
+	if strings.HasSuffix(currentExportPath, ".js") {
+		currentExportPath = currentExportPath[0 : len(currentExportPath)-3]
+	}
+
+	// If the exports is not in the path.
+	if this.m_exports[currentExportPath] == nil {
+		this.m_exports[currentExportPath], _ = this.m_sessions[""].Object("exports = {}")
+		this.m_exports[currentExportPath].Set("__path__", currentExportPath)
+		this.m_modules[moduleId].Set("exports", this.m_exports[currentExportPath]) // Set it export values.
+		exports = this.m_exports[currentExportPath]
+	}
+
+	this.m_sessions[""].Set("module", this.m_modules[moduleId])
+	this.m_sessions[""].Set("exports", this.m_exports[currentExportPath])
+
+	return exports, nil
+
 }
 
 /**
@@ -323,27 +422,114 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 	// Get the vm.
 	vm := this.m_sessions[sessionId]
 
-	// Compile the list of script...
-	for i := 0; i < len(this.m_scripts); i++ {
-		script, err := vm.Compile("", this.m_scripts[i])
-		if err == nil {
-			vm.Run(script)
-			if err != nil {
-				log.Println("runtime script compilation error:", script, err)
+	// Exported golang JS function.
+	for name, function := range this.m_functions {
+		if strings.Index(name, ".") != -1 {
+			// Thats means the function is part of a module so I will
+			// create the module if it not exist and append the funtion
+			// in it exports variable.
+			values := strings.Split(name, ".")
+			name = values[1]
+			moduleId := values[0]
+			var exportPath string
+			if string(filepath.Separator) == "/" {
+				exportPath = filepath.ToSlash(this.m_searchDir + "/src/" + moduleId)
 			} else {
-				//log.Println(sessionId, " Load: ", this.m_scripts[i])
+				exportPath = filepath.FromSlash(this.m_searchDir + "/src/" + moduleId)
 			}
 
+			if this.m_modules[moduleId] == nil {
+				this.m_modules[moduleId], _ = vm.Object("module = {}")
+			}
+
+			if this.m_exports[exportPath] == nil {
+				this.m_exports[exportPath], _ = vm.Object("exports = {}")
+				this.m_exports[exportPath].Set("__path__", exportPath)
+				this.m_modules[moduleId].Set("exports", this.m_exports[exportPath]) // Set it export values.
+			}
+
+			// Set the function in the module object.
+			this.m_exports[exportPath].Set(name, function)
+		}
+		vm.Set(name, function)
+	}
+
+	// Init srcipt.
+	for path, _ := range this.m_scripts {
+		// Start initalyse the scripts.
+		this.initScript(sessionId, path)
+	}
+}
+
+/**
+ * Set init a script.
+ */
+func (this *JsRuntimeManager) initScript(sessionId string, path string) *otto.Object {
+	vm := this.m_sessions[sessionId]
+	var exports *otto.Object
+	this.m_script = path
+
+	var moduleId string
+	strartIndex := strings.Index(filepath.ToSlash(this.m_script), "/WebApp/Cargo/Script/src/")
+	if strartIndex > 0 {
+		strartIndex += len("/WebApp/Cargo/Script/src/")
+		endIndex := strings.Index(filepath.ToSlash(this.m_script[strartIndex:]), "/")
+		if endIndex != -1 {
+			moduleId = this.m_script[strartIndex:][0:endIndex]
+		}
+	} else {
+		// Here the first part of the path define the module.
+		index := strings.Index(filepath.ToSlash(path), "/")
+		if index == -1 {
+			moduleId = path[0:]
 		} else {
-			log.Println("-------> error in script: ", this.m_scripts[i])
-			log.Println(err)
+			moduleId = path[0:index]
 		}
 	}
 
-	// Set the list of binded function.
-	for name, function := range this.m_functions {
-		vm.Set(name, function)
+	if this.m_modules[moduleId] == nil {
+		this.m_modules[moduleId], _ = vm.Object("module = {}")
 	}
+
+	exportPath := path
+	if strings.HasSuffix(exportPath, ".js") {
+		exportPath = exportPath[0 : len(exportPath)-3]
+	}
+
+	if this.m_exports[exportPath] == nil {
+		this.m_exports[exportPath], _ = vm.Object("exports = {}")
+		this.m_exports[exportPath].Set("__path__", exportPath)
+		this.m_modules[moduleId].Set("exports", this.m_exports[exportPath]) // Set it export values.
+		exports = this.m_exports[exportPath]
+	} else {
+		// Here I will return the exports
+		// set the global variable exports...
+		exports = this.m_exports[exportPath]
+	}
+
+	if src, ok := this.m_scripts[path]; ok {
+		script, err := vm.Compile("", src)
+		if err == nil {
+			// set the global variable exports...
+			vm.Set("exports", this.m_exports[exportPath])
+			// set the current module.
+			vm.Set("module", this.m_modules[moduleId])
+			// set the export as return value
+			exports = this.m_exports[exportPath]
+			_, err := vm.Run(script)
+
+			if err != nil {
+				log.Println("---> script running error:  ", path, err)
+			}
+		} else {
+			log.Println("---> script compilation error:  ", path, err)
+		}
+
+		// remove it from the map.
+		delete(this.m_scripts, path)
+	}
+
+	return exports
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -529,10 +715,11 @@ func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.V
 /**
  * Append a script to all VM's
  */
-func (this *JsRuntimeManager) AppendScript(script string) {
+func (this *JsRuntimeManager) AppendScript(path string, script string) {
 
 	var op OperationInfos
 	op.m_params = make(map[string]interface{})
+	op.m_params["path"] = path
 	op.m_params["script"] = script
 	op.m_returns = make(chan ([]interface{}))
 	defer close(op.m_returns)
@@ -542,6 +729,9 @@ func (this *JsRuntimeManager) AppendScript(script string) {
 	<-op.m_returns
 }
 
+/**
+ * Must be called once after all script are imported.
+ */
 func (this *JsRuntimeManager) InitScripts(sessionId string) {
 
 	var op OperationInfos

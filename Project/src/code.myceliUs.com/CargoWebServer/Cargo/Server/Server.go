@@ -357,9 +357,9 @@ func (this *Server) Start() {
 	this.GetServiceManager().start()
 
 	// Here I will set the services code...
-	for _, src := range this.GetServiceManager().m_serviceServerSrc {
+	for id, src := range this.GetServiceManager().m_serviceServerSrc {
 		// Server side binded functions.
-		JS.GetJsRuntimeManager().AppendScript(src)
+		JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+id, src)
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -412,6 +412,17 @@ func (this *Server) Start() {
 
 	JS.GetJsRuntimeManager().AppendFunction("capitalizeFirstLetter", func(str string) string {
 		return strings.ToUpper(str[0:1]) + str[1:]
+	})
+
+	////////////////////////////////////////////////////////////////////////////
+	// UUID
+	////////////////////////////////////////////////////////////////////////////
+	JS.GetJsRuntimeManager().AppendFunction("randomUUID", func() string {
+		return Utility.RandomUUID()
+	})
+
+	JS.GetJsRuntimeManager().AppendFunction("generateUUID", func(val string) string {
+		return Utility.GenerateUUID(val)
 	})
 
 	////////////////////////////////////////////////////////////////////////////
@@ -1077,7 +1088,7 @@ func (this *Server) Start() {
 					}()
 
 					src := string(rspMsg.msg.Rsp.Results[0].DataBytes)
-					JS.GetJsRuntimeManager().AppendScript(src)
+					JS.GetJsRuntimeManager().AppendScript("CargoWebServer", src)
 					// Call on open...
 					conn.Object().Call("onopen", service, caller)
 				}
@@ -1098,37 +1109,14 @@ func (this *Server) Start() {
 		})
 
 	////////////////////////////////////////////////////////////////////////////
+	// Node.js compatibility
+	////////////////////////////////////////////////////////////////////////////
+	// Init NodeJs functionality.
+	initNodeJs()
+
+	////////////////////////////////////////////////////////////////////////////
 	// Js runtime initialisation.
 	////////////////////////////////////////////////////////////////////////////
-
-	// Javacript initialisation here.
-	JS.GetJsRuntimeManager().OpenSession("") // Set the anonymous session.
-
-	// Append services scripts.
-	for _, src := range GetServer().GetServiceManager().m_serviceClientSrc {
-		JS.GetJsRuntimeManager().AppendScript(src)
-	}
-
-	// Initialyse the script for the default session.
-	JS.GetJsRuntimeManager().InitScripts("") // Run the script for the default session.
-
-	// Initialyse the server object here.
-	JS.GetJsRuntimeManager().RunScript("", `var entityPrototypes = {};`)
-	JS.GetJsRuntimeManager().RunScript("", `var entities = {};`)
-	JS.GetJsRuntimeManager().RunScript("", `var server = new Server("localhost", "127.0.0.1", 9393);`)
-
-	// Create an empty connection (loopback)
-	JS.GetJsRuntimeManager().RunScript("", `server.conn = new Connection()`)
-	JS.GetJsRuntimeManager().RunScript("", `server.conn.id = "127.0.0.1"`)
-
-	// Set service in the server object.
-	for serviceName, _ := range GetServer().GetServiceManager().m_serviceClientSrc {
-		log.Println("--> Load", serviceName, "service script")
-		_, err := JS.GetJsRuntimeManager().RunScript("", "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();")
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
 
 	// Now I will start the interval processing loop...
 	go func() {
@@ -1202,7 +1190,27 @@ func (this *Server) Start() {
 	defer func() {
 		// Now after all initialisation are done I will open connection with
 		// other servers.
-		this.GetDataManager().openConnections()
+		this.GetDataManager().openConnections() // That will also append entities scripts.
+
+		// Javacript initialisation here.
+		JS.GetJsRuntimeManager().OpenSession("") // Set the anonymous session.
+
+		// Append services scripts.
+		for id, src := range GetServer().GetServiceManager().m_serviceClientSrc {
+			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+id, src)
+		}
+
+		// Initialyse the script for the default session.
+		JS.GetJsRuntimeManager().InitScripts("") // Run the script for the default session.
+
+		// Set service in the server object.
+		for serviceName, _ := range GetServer().GetServiceManager().m_serviceClientSrc {
+			log.Println("--> Load", serviceName, "service script")
+			_, err := JS.GetJsRuntimeManager().RunScript("", "server."+strings.ToLower(serviceName[0:1])+serviceName[1:]+" = new "+serviceName+"();")
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
 
 		// Now I will register actions for services container.
 		activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()

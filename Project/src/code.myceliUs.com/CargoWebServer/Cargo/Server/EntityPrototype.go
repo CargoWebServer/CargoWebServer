@@ -226,7 +226,7 @@ func (this *EntityPrototype) Create(storeId string) error {
 	}
 
 	// Register it to the vm...
-	JS.GetJsRuntimeManager().AppendScript(this.generateConstructor())
+	JS.GetJsRuntimeManager().AppendScript("CargoWebServer", this.generateConstructor())
 
 	// Send event message...
 	var eventDatas []*MessageData
@@ -308,7 +308,7 @@ func (this *EntityPrototype) Save(storeId string) error {
 			return err
 		} else {
 			// Register it to the vm...
-			JS.GetJsRuntimeManager().AppendScript(this.generateConstructor())
+			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+this.TypeName, this.generateConstructor())
 
 			var eventDatas []*MessageData
 			evtData := new(MessageData)

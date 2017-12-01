@@ -418,10 +418,17 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 	// And the server side code to.
 	var serverSrc string
 
+	// Now the server side function...
+	serverSrc += "require(\"Cargo/eventHub\")\n"
+	serverSrc += "require(\"Cargo/utility\")\n\n"
+
 	var eventTypename = strings.Replace(serviceId, "Manager", "Event", -1)
 
 	// Here I will generate the javascript code use by client side.
 	clientSrc = "// ============================= " + serviceId + " ========================================\n"
+	clientSrc += "require(\"Cargo/eventHub\")\n"
+	clientSrc += "require(\"Cargo/utility\")\n\n"
+
 	serverSrc = clientSrc // same comment.
 
 	clientSrc += "\nvar " + serviceId + " = function(){\n"
@@ -654,7 +661,6 @@ func (this *ServiceManager) generateActionCode(serviceId string) {
 			}
 		}
 
-		// Now the server side function...
 		serverSrc += "function " + serviceId + name + "("
 		params_ := ""
 		if action.M_parameters != nil {

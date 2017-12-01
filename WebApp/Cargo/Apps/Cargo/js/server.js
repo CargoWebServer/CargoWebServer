@@ -439,3 +439,10 @@ var Attachment = function (fileName, fileData) {
     this.FileData = fileData
     return this
 }
+
+/**
+ * Node js import function.
+ */
+function require(moduleId){
+
+}

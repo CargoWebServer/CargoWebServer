@@ -61,14 +61,15 @@ var FileNavigator = function (parent) {
 
         if (file == undefined) {
             // local file here.
-            file = evt.dataMap["fileInfo"]
-            if (file == undefined) {
-                file = evt.dataMap["bpmnDiagramInfo"]
-            }
-            if (evt.dataMap["prototypeInfo"] != undefined) {
+            if (evt.dataMap["fileInfo"] != undefined) {
+                file = evt.dataMap["fileInfo"]
+            }else if (evt.dataMap["prototypeInfo"] != undefined) {
                 file = {}
                 file.M_id = evt.dataMap["prototypeInfo"].TypeName
                 file.M_name = evt.dataMap["prototypeInfo"].TypeName
+                file.UUID = evt.dataMap["prototypeInfo"].TypeName
+            } else if (evt.dataMap["bpmnDiagramInfo"] != undefined) {
+                file = evt.dataMap["bpmnDiagramInfo"]
             }
         }
 

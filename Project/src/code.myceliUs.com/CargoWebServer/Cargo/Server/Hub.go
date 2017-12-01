@@ -99,12 +99,6 @@ func (this *Hub) run() {
 			// Open a new session
 			JS.GetJsRuntimeManager().OpenSession(c.GetUuid())
 
-			// Set the server global variable.
-			JS.GetJsRuntimeManager().SetVar(c.GetUuid(), "server", GetServer())
-
-			// Init all scripts for the new session VM
-			JS.GetJsRuntimeManager().InitScripts(c.GetUuid())
-
 		case c := <-this.unregister:
 			delete(this.connections, c.GetUuid())
 			// Close the connection.

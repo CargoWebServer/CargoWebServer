@@ -58,6 +58,13 @@ func Contains(slice []string, item string) bool {
 	return ok
 }
 
+func Remove(s []string, index int) ([]string, error) {
+	if index >= len(s) {
+		return nil, errors.New("Out of Range Error")
+	}
+	return append(s[:index], s[index+1:]...), nil
+}
+
 //Pretty print the result.
 func PrettyPrint(b []byte) ([]byte, error) {
 	var out bytes.Buffer
