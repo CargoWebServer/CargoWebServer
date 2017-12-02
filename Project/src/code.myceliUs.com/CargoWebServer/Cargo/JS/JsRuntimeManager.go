@@ -121,9 +121,9 @@ type JsRuntimeManager struct {
 	/**Channel use for communication with vm... **/
 
 	// Contain the list of active interval JS function.
-	intervals     map[string]*IntervalInfo
-	setInterval   chan *IntervalInfo
-	clearInterval chan string
+	m_intervals     map[string]*IntervalInfo
+	m_setInterval   chan *IntervalInfo
+	m_clearInterval chan string
 
 	// Script channels
 	m_appendScript OperationChannel
@@ -181,9 +181,9 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	jsRuntimeManager.m_stopVm = make(map[string]chan (bool))
 
 	// Interval functions stuff.
-	jsRuntimeManager.intervals = make(map[string]*IntervalInfo, 0)
-	jsRuntimeManager.setInterval = make(chan *IntervalInfo, 0)
-	jsRuntimeManager.clearInterval = make(chan string, 0)
+	jsRuntimeManager.m_intervals = make(map[string]*IntervalInfo, 0)
+	jsRuntimeManager.m_setInterval = make(chan *IntervalInfo, 0)
+	jsRuntimeManager.m_clearInterval = make(chan string, 0)
 
 	////////////////////////////////////////////////////////////////////////////
 	// Javascript std function.
@@ -260,13 +260,13 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 		intervalInfo.ticker = time.NewTicker(time.Duration(interval) * time.Millisecond)
 
 		// Set the interval info.
-		GetJsRuntimeManager().setInterval <- intervalInfo
+		GetJsRuntimeManager().m_setInterval <- intervalInfo
 
 		return intervalInfo.uuid
 	})
 
 	jsRuntimeManager.appendFunction("clearInterval", func(uuid string) {
-		GetJsRuntimeManager().clearInterval <- uuid
+		GetJsRuntimeManager().m_clearInterval <- uuid
 	})
 
 	jsRuntimeManager.appendFunction("setTimeout_", func(callback string, timeout int64, sessionId string) string {
@@ -278,20 +278,20 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 		intervalInfo.timer = time.NewTimer(time.Duration(timeout) * time.Millisecond)
 
 		// Set the interval info.
-		GetJsRuntimeManager().setInterval <- intervalInfo
+		GetJsRuntimeManager().m_setInterval <- intervalInfo
 
 		return intervalInfo.uuid
 	})
 
 	jsRuntimeManager.appendFunction("clearTimeout", func(uuid string) {
-		GetJsRuntimeManager().clearInterval <- uuid
+		GetJsRuntimeManager().m_clearInterval <- uuid
 	})
 
 	////////////////////////////////////////////////////////////////////////////
 	// Node.js compatibility
 	////////////////////////////////////////////////////////////////////////////
 
-	// Init NodeJs functionality.
+	// Init NodeJs api.
 	jsRuntimeManager.initNodeJs()
 
 	// Load the script from the script repository...
@@ -301,14 +301,14 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	go func(jsRuntimeManager *JsRuntimeManager) {
 		for {
 			select {
-			case intervalInfo := <-jsRuntimeManager.setInterval:
+			case intervalInfo := <-jsRuntimeManager.m_setInterval:
 				// Keep the intervals info in the map.
-				jsRuntimeManager.intervals[intervalInfo.uuid] = intervalInfo
+				jsRuntimeManager.m_intervals[intervalInfo.uuid] = intervalInfo
 				// Wait util the timer ends...
 				go func(intervalInfo *IntervalInfo) {
 					// Set the variable as function.
 					functionName := "callback_" + strings.Replace(intervalInfo.uuid, "-", "_", -1)
-					_, err := GetJsRuntimeManager().GetSession("").Run("var " + functionName + "=" + intervalInfo.callback)
+					_, err := jsRuntimeManager.m_sessions[""].Run("var " + functionName + "=" + intervalInfo.callback)
 					// I must run the script one and at interval after it...
 					if err == nil {
 						if intervalInfo.ticker != nil {
@@ -334,9 +334,8 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 					}
 
 				}(intervalInfo)
-
-			case uuid := <-jsRuntimeManager.clearInterval:
-				intervalInfo := jsRuntimeManager.intervals[uuid]
+			case uuid := <-jsRuntimeManager.m_clearInterval:
+				intervalInfo := jsRuntimeManager.m_intervals[uuid]
 				if intervalInfo != nil {
 					if intervalInfo.ticker != nil {
 						intervalInfo.ticker.Stop()
@@ -344,10 +343,10 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 						intervalInfo.timer.Stop()
 					}
 					// Remove the interval/timeout information.
-					delete(jsRuntimeManager.intervals, uuid)
+					delete(jsRuntimeManager.m_intervals, uuid)
 				} else {
 					// In that case the uuid is a session id and not an interval id.
-					for _, intervalInfo_ := range jsRuntimeManager.intervals {
+					for _, intervalInfo_ := range jsRuntimeManager.m_intervals {
 						if intervalInfo_.sessionId == uuid {
 							if intervalInfo_.ticker != nil {
 								intervalInfo_.ticker.Stop()
@@ -355,7 +354,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 								intervalInfo_.timer.Stop()
 							}
 							// Remove the interval/timeout information.
-							delete(jsRuntimeManager.intervals, intervalInfo_.uuid)
+							delete(jsRuntimeManager.m_intervals, intervalInfo_.uuid)
 						}
 					}
 				}
@@ -530,7 +529,7 @@ func (this *JsRuntimeManager) appendScript(path string, src string) {
 /**
  * Part of the module/exports
  */
-func (this *JsRuntimeManager) GetExports(path string) (*otto.Object, error) {
+func (this *JsRuntimeManager) getExports(path string) (*otto.Object, error) {
 
 	// Here from the path information and the current running script i will
 	// return infromation conatain in the modules/export.
@@ -663,7 +662,7 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
  * Set init a script.
  */
 func (this *JsRuntimeManager) initScript(sessionId string, path string) *otto.Object {
-	vm := this.m_sessions[sessionId]
+
 	var exports *otto.Object
 	this.m_script = path
 
@@ -683,6 +682,19 @@ func (this *JsRuntimeManager) initScript(sessionId string, path string) *otto.Ob
 		} else {
 			moduleId = path[0:index]
 		}
+	}
+
+	// The vm to run the script.
+	var vm *otto.Otto
+	// All function of Cargo and CargoWebServer are public, no exports needed.
+	// require will be use to synchronize the order of initialysation in their case.
+	if moduleId == "Cargo" || moduleId == "CargoWebServer" {
+		vm = this.m_sessions[sessionId]
+	} else {
+		// Here I will run the script in a copy of the main vm. All exports will
+		// be keep in the exports map but global variables will be limited
+		// to the vm scope the time of running the script.
+		vm = this.m_sessions[""].Copy()
 	}
 
 	if this.m_modules[moduleId] == nil {
@@ -714,6 +726,7 @@ func (this *JsRuntimeManager) initScript(sessionId string, path string) *otto.Ob
 			vm.Set("module", this.m_modules[moduleId])
 			// set the export as return value
 			exports = this.m_exports[exportPath]
+
 			_, err := vm.Run(script)
 
 			if err != nil {
@@ -774,7 +787,7 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 
 	// I will also clear intervals for the
 	// the session.
-	this.clearInterval <- sessionId
+	this.m_clearInterval <- sessionId
 }
 
 /**
