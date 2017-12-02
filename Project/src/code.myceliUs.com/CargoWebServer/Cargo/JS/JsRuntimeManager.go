@@ -2,6 +2,8 @@ package JS
 
 import (
 	"bytes"
+	b64 "encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -19,6 +21,18 @@ import (
 /////////////////////////////////////////////////////////////////////////////
 // Structures used by channel.
 /////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Interval information, used by JS function setInterval to repeatedly execute
+ * a function until it ends by clearInterval
+ */
+type IntervalInfo struct {
+	sessionId string
+	uuid      string
+	callback  string
+	ticker    *time.Ticker
+	timer     *time.Timer
+}
 
 /**
  * That structure is use to manipulate Javacsript function call infromations.
@@ -106,6 +120,11 @@ type JsRuntimeManager struct {
 
 	/**Channel use for communication with vm... **/
 
+	// Contain the list of active interval JS function.
+	intervals     map[string]*IntervalInfo
+	setInterval   chan *IntervalInfo
+	clearInterval chan string
+
 	// Script channels
 	m_appendScript OperationChannel
 	m_initScripts  OperationChannel
@@ -161,6 +180,120 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	jsRuntimeManager.m_runScript = make(map[string]OperationChannel)
 	jsRuntimeManager.m_stopVm = make(map[string]chan (bool))
 
+	// Interval functions stuff.
+	jsRuntimeManager.intervals = make(map[string]*IntervalInfo, 0)
+	jsRuntimeManager.setInterval = make(chan *IntervalInfo, 0)
+	jsRuntimeManager.clearInterval = make(chan string, 0)
+
+	////////////////////////////////////////////////////////////////////////////
+	// Javascript std function.
+	////////////////////////////////////////////////////////////////////////////
+
+	// Base 64 encoding and decoding.
+	// Convert a utf8 string to a base 64 string
+	jsRuntimeManager.appendFunction("utf8_to_b64", func(data string) string {
+		sEnc := b64.StdEncoding.EncodeToString([]byte(data))
+		return sEnc
+	})
+
+	jsRuntimeManager.appendFunction("atob", func(data []byte) string {
+		str, err := b64.StdEncoding.DecodeString(string(data))
+		if err == nil {
+			return string(str)
+		} else {
+			return string(data)
+		}
+	})
+
+	jsRuntimeManager.appendFunction("btoa", func(str string) string {
+		return b64.StdEncoding.EncodeToString([]byte(str))
+	})
+
+	////////////////////////////////////////////////////////////////////////////
+	// JSON function...
+	////////////////////////////////////////////////////////////////////////////
+	jsRuntimeManager.appendFunction("stringify", func(object interface{}) string {
+		data, _ := json.Marshal(object)
+		str := string(data)
+		return str
+	})
+
+	////////////////////////////////////////////////////////////////////////////
+	// String functions...
+	////////////////////////////////////////////////////////////////////////////
+	jsRuntimeManager.appendFunction("startsWith", func(str string, val string) bool {
+		return strings.HasPrefix(str, val)
+	})
+
+	jsRuntimeManager.appendFunction("endsWith", func(str string, val string) bool {
+		return strings.HasSuffix(str, val)
+	})
+
+	jsRuntimeManager.appendFunction("replaceAll", func(str string, val string, by string) string {
+		return strings.Replace(str, val, by, -1)
+	})
+
+	jsRuntimeManager.appendFunction("capitalizeFirstLetter", func(str string) string {
+		return strings.ToUpper(str[0:1]) + str[1:]
+	})
+
+	////////////////////////////////////////////////////////////////////////////
+	// UUID
+	////////////////////////////////////////////////////////////////////////////
+	jsRuntimeManager.appendFunction("randomUUID", func() string {
+		return Utility.RandomUUID()
+	})
+
+	jsRuntimeManager.appendFunction("generateUUID", func(val string) string {
+		return Utility.GenerateUUID(val)
+	})
+
+	////////////////////////////////////////////////////////////////////////////
+	// Timeout/Interval
+	////////////////////////////////////////////////////////////////////////////
+	jsRuntimeManager.appendFunction("setInterval_", func(callback string, interval int64, sessionId string) string {
+		// The intetifier of the function.
+		intervalInfo := new(IntervalInfo)
+		intervalInfo.sessionId = sessionId
+		intervalInfo.uuid = Utility.RandomUUID()
+		intervalInfo.callback = callback
+		intervalInfo.ticker = time.NewTicker(time.Duration(interval) * time.Millisecond)
+
+		// Set the interval info.
+		GetJsRuntimeManager().setInterval <- intervalInfo
+
+		return intervalInfo.uuid
+	})
+
+	jsRuntimeManager.appendFunction("clearInterval", func(uuid string) {
+		GetJsRuntimeManager().clearInterval <- uuid
+	})
+
+	jsRuntimeManager.appendFunction("setTimeout_", func(callback string, timeout int64, sessionId string) string {
+		// The intetifier of the function.
+		intervalInfo := new(IntervalInfo)
+		intervalInfo.sessionId = sessionId
+		intervalInfo.uuid = Utility.RandomUUID()
+		intervalInfo.callback = callback
+		intervalInfo.timer = time.NewTimer(time.Duration(timeout) * time.Millisecond)
+
+		// Set the interval info.
+		GetJsRuntimeManager().setInterval <- intervalInfo
+
+		return intervalInfo.uuid
+	})
+
+	jsRuntimeManager.appendFunction("clearTimeout", func(uuid string) {
+		GetJsRuntimeManager().clearInterval <- uuid
+	})
+
+	////////////////////////////////////////////////////////////////////////////
+	// Node.js compatibility
+	////////////////////////////////////////////////////////////////////////////
+
+	// Init NodeJs functionality.
+	jsRuntimeManager.initNodeJs()
+
 	// Load the script from the script repository...
 	jsRuntimeManager.appendScriptFiles()
 
@@ -168,6 +301,64 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	go func(jsRuntimeManager *JsRuntimeManager) {
 		for {
 			select {
+			case intervalInfo := <-jsRuntimeManager.setInterval:
+				// Keep the intervals info in the map.
+				jsRuntimeManager.intervals[intervalInfo.uuid] = intervalInfo
+				// Wait util the timer ends...
+				go func(intervalInfo *IntervalInfo) {
+					// Set the variable as function.
+					functionName := "callback_" + strings.Replace(intervalInfo.uuid, "-", "_", -1)
+					_, err := GetJsRuntimeManager().GetSession("").Run("var " + functionName + "=" + intervalInfo.callback)
+					// I must run the script one and at interval after it...
+					if err == nil {
+						if intervalInfo.ticker != nil {
+							// setInterval function.
+							for t := range intervalInfo.ticker.C {
+								// So here I will call the callback.
+								// The callback contain unamed function...
+								_, err := GetJsRuntimeManager().GetSession("").Run(functionName + "()")
+								if err != nil {
+									log.Println("---> Run interval callback error: ", err, t)
+								}
+							}
+						} else if intervalInfo.timer != nil {
+							// setTimeout function
+							<-intervalInfo.timer.C
+							_, err := GetJsRuntimeManager().RunScript("", functionName+"()")
+							if err != nil {
+								log.Println("---> Run timeout callback error: ", err)
+							}
+						}
+					} else {
+						log.Println("---> Run interval callback error: ", "var "+functionName+"="+intervalInfo.callback, err)
+					}
+
+				}(intervalInfo)
+
+			case uuid := <-jsRuntimeManager.clearInterval:
+				intervalInfo := jsRuntimeManager.intervals[uuid]
+				if intervalInfo != nil {
+					if intervalInfo.ticker != nil {
+						intervalInfo.ticker.Stop()
+					} else if intervalInfo.timer != nil {
+						intervalInfo.timer.Stop()
+					}
+					// Remove the interval/timeout information.
+					delete(jsRuntimeManager.intervals, uuid)
+				} else {
+					// In that case the uuid is a session id and not an interval id.
+					for _, intervalInfo_ := range jsRuntimeManager.intervals {
+						if intervalInfo_.sessionId == uuid {
+							if intervalInfo_.ticker != nil {
+								intervalInfo_.ticker.Stop()
+							} else if intervalInfo_.timer != nil {
+								intervalInfo_.timer.Stop()
+							}
+							// Remove the interval/timeout information.
+							delete(jsRuntimeManager.intervals, intervalInfo_.uuid)
+						}
+					}
+				}
 			case functionInfo := <-jsRuntimeManager.m_setFunction:
 				jsRuntimeManager.m_functions[functionInfo.m_functionId] = functionInfo.m_function
 			case sessionInfo := <-jsRuntimeManager.m_getSession:
@@ -315,6 +506,13 @@ func (this *JsRuntimeManager) appendScriptFile(filePath string) error {
 	this.appendScript(filePath, src)
 
 	return err
+}
+
+/**
+ * Append a function in the function map.
+ */
+func (this *JsRuntimeManager) appendFunction(functionId string, function interface{}) {
+	this.m_functions[functionId] = function
 }
 
 /**
@@ -574,6 +772,9 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 	close(this.m_stopVm[sessionId])
 	delete(this.m_stopVm, sessionId)
 
+	// I will also clear intervals for the
+	// the session.
+	this.clearInterval <- sessionId
 }
 
 /**

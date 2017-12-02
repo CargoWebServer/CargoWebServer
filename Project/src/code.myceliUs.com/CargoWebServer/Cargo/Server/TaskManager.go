@@ -182,10 +182,6 @@ func (this *TaskManager) start() {
 										// Remove the command
 										GetServer().removeCmd(cmds[i])
 									}
-
-									// I will also clear intervals for the
-									// the session.
-									GetServer().clearInterval <- taskId
 								}
 							}(instancesInfos[i].TaskId))
 

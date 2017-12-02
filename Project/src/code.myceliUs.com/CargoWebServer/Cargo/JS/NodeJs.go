@@ -2,7 +2,7 @@
  * That package contain NodeJs implementation for;
  * fs The file system module.
  */
-package Server
+package JS
 
 import (
 	"bufio"
@@ -11,18 +11,16 @@ import (
 	"os"
 	utf16 "unicode/utf16"
 	//utf8 "unicode/utf8"
-
-	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"github.com/robertkrimen/otto"
 )
 
-func initNodeJs() {
+func (this *JsRuntimeManager) initNodeJs() {
 	/**
 	 * Node.js module/exports functionality.
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("require", func(identifier string) *otto.Object {
-		// resolve dependencie et return the exports.
-		exports, err := JS.GetJsRuntimeManager().GetExports(identifier)
+	this.appendFunction("require", func(identifier string) *otto.Object {
+		// resolve dependencie and return the exports.
+		exports, err := GetJsRuntimeManager().GetExports(identifier)
 		if err != nil {
 			log.Println("---> error found in require function ", err)
 		}
@@ -31,22 +29,22 @@ func initNodeJs() {
 	})
 
 	// The file system module.
-	initNodeJsFs()
+	this.initNodeJsFs()
 }
 
-func initNodeJsFs() {
+func (this *JsRuntimeManager) initNodeJsFs() {
 
 	/**
 	 * Returns true if the file exists, false otherwise.
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("fs.existsSync", func(path string) bool {
+	this.appendFunction("fs.existsSync", func(path string) bool {
 		return false
 	})
 
 	/**
 	 * Returns true if the file exists, false otherwise.
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("fs.readFileSync", func(path string, encoding string) string {
+	this.appendFunction("fs.readFileSync", func(path string, encoding string) string {
 		file, err := os.Open(path)
 		if err != nil {
 			log.Fatal(err)

@@ -14,7 +14,6 @@ import (
 
 	"strconv"
 	"strings"
-	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
@@ -30,18 +29,6 @@ import (
 var (
 	server *Server
 )
-
-/**
- * Interval information, used by JS function setInterval to repeatedly execute
- * a function until it ends by clearInterval
- */
-type IntervalInfo struct {
-	sessionId string
-	uuid      string
-	callback  string
-	ticker    *time.Ticker
-	timer     *time.Timer
-}
 
 type Server struct {
 
@@ -66,11 +53,6 @@ type Server struct {
 
 	// Contain the list of active command and their calling session.
 	sessionCmds map[string][]*exec.Cmd
-
-	// Contain the list of active interval JS function.
-	intervals     map[string]*IntervalInfo
-	setInterval   chan *IntervalInfo
-	clearInterval chan string
 }
 
 /**
@@ -110,11 +92,6 @@ func newServer() *Server {
 
 	// Active commands by session.
 	server.sessionCmds = make(map[string][]*exec.Cmd, 0)
-
-	// Interval functions stuff.
-	server.intervals = make(map[string]*IntervalInfo, 0)
-	server.setInterval = make(chan *IntervalInfo, 0)
-	server.clearInterval = make(chan string, 0)
 
 	return server
 }
@@ -239,10 +216,6 @@ func (this *Server) onClose(subConnectionId string) {
 				// Remove the command
 				GetServer().removeCmd(cmds[i])
 			}
-
-			// I will also clear intervals for the
-			// the session.
-			GetServer().clearInterval <- sessionId
 		}
 	}(subConnectionId)
 
@@ -361,108 +334,6 @@ func (this *Server) Start() {
 		// Server side binded functions.
 		JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+id, src)
 	}
-
-	////////////////////////////////////////////////////////////////////////////
-	// Javascript std function.
-	////////////////////////////////////////////////////////////////////////////
-
-	// Base 64 encoding and decoding.
-	// Convert a utf8 string to a base 64 string
-	JS.GetJsRuntimeManager().AppendFunction("utf8_to_b64", func(data string) string {
-		sEnc := b64.StdEncoding.EncodeToString([]byte(data))
-		return sEnc
-	})
-
-	JS.GetJsRuntimeManager().AppendFunction("atob", func(data []byte) string {
-		str, err := b64.StdEncoding.DecodeString(string(data))
-		if err == nil {
-			return string(str)
-		} else {
-			return string(data)
-		}
-	})
-
-	JS.GetJsRuntimeManager().AppendFunction("btoa", func(str string) string {
-		return b64.StdEncoding.EncodeToString([]byte(str))
-	})
-
-	////////////////////////////////////////////////////////////////////////////
-	// JSON function...
-	////////////////////////////////////////////////////////////////////////////
-	JS.GetJsRuntimeManager().AppendFunction("stringify", func(object interface{}) string {
-		data, _ := json.Marshal(object)
-		str := string(data)
-		return str
-	})
-
-	////////////////////////////////////////////////////////////////////////////
-	// String functions...
-	////////////////////////////////////////////////////////////////////////////
-	JS.GetJsRuntimeManager().AppendFunction("startsWith", func(str string, val string) bool {
-		return strings.HasPrefix(str, val)
-	})
-
-	JS.GetJsRuntimeManager().AppendFunction("endsWith", func(str string, val string) bool {
-		return strings.HasSuffix(str, val)
-	})
-
-	JS.GetJsRuntimeManager().AppendFunction("replaceAll", func(str string, val string, by string) string {
-		return strings.Replace(str, val, by, -1)
-	})
-
-	JS.GetJsRuntimeManager().AppendFunction("capitalizeFirstLetter", func(str string) string {
-		return strings.ToUpper(str[0:1]) + str[1:]
-	})
-
-	////////////////////////////////////////////////////////////////////////////
-	// UUID
-	////////////////////////////////////////////////////////////////////////////
-	JS.GetJsRuntimeManager().AppendFunction("randomUUID", func() string {
-		return Utility.RandomUUID()
-	})
-
-	JS.GetJsRuntimeManager().AppendFunction("generateUUID", func(val string) string {
-		return Utility.GenerateUUID(val)
-	})
-
-	////////////////////////////////////////////////////////////////////////////
-	// Timeout/Interval
-	////////////////////////////////////////////////////////////////////////////
-	JS.GetJsRuntimeManager().AppendFunction("setInterval_", func(callback string, interval int64, sessionId string) string {
-		// The intetifier of the function.
-		intervalInfo := new(IntervalInfo)
-		intervalInfo.sessionId = sessionId
-		intervalInfo.uuid = Utility.RandomUUID()
-		intervalInfo.callback = callback
-		intervalInfo.ticker = time.NewTicker(time.Duration(interval) * time.Millisecond)
-
-		// Set the interval info.
-		GetServer().setInterval <- intervalInfo
-
-		return intervalInfo.uuid
-	})
-
-	JS.GetJsRuntimeManager().AppendFunction("clearInterval", func(uuid string) {
-		GetServer().clearInterval <- uuid
-	})
-
-	JS.GetJsRuntimeManager().AppendFunction("setTimeout_", func(callback string, timeout int64, sessionId string) string {
-		// The intetifier of the function.
-		intervalInfo := new(IntervalInfo)
-		intervalInfo.sessionId = sessionId
-		intervalInfo.uuid = Utility.RandomUUID()
-		intervalInfo.callback = callback
-		intervalInfo.timer = time.NewTimer(time.Duration(timeout) * time.Millisecond)
-
-		// Set the interval info.
-		GetServer().setInterval <- intervalInfo
-
-		return intervalInfo.uuid
-	})
-
-	JS.GetJsRuntimeManager().AppendFunction("clearTimeout", func(uuid string) {
-		GetServer().clearInterval <- uuid
-	})
 
 	////////////////////////////////////////////////////////////////////////////
 	// SOM function.
@@ -1107,82 +978,6 @@ func (this *Server) Start() {
 			return conn
 
 		})
-
-	////////////////////////////////////////////////////////////////////////////
-	// Node.js compatibility
-	////////////////////////////////////////////////////////////////////////////
-	// Init NodeJs functionality.
-	initNodeJs()
-
-	////////////////////////////////////////////////////////////////////////////
-	// Js runtime initialisation.
-	////////////////////////////////////////////////////////////////////////////
-
-	// Now I will start the interval processing loop...
-	go func() {
-		for {
-			select {
-			case intervalInfo := <-GetServer().setInterval:
-				// Keep the intervals info in the map.
-				GetServer().intervals[intervalInfo.uuid] = intervalInfo
-				// Wait util the timer ends...
-				go func(intervalInfo *IntervalInfo) {
-					// Set the variable as function.
-					functionName := "callback_" + strings.Replace(intervalInfo.uuid, "-", "_", -1)
-					_, err := JS.GetJsRuntimeManager().GetSession("").Run("var " + functionName + "=" + intervalInfo.callback)
-					// I must run the script one and at interval after it...
-					if err == nil {
-						if intervalInfo.ticker != nil {
-							// setInterval function.
-							for t := range intervalInfo.ticker.C {
-								// So here I will call the callback.
-								// The callback contain unamed function...
-								_, err := JS.GetJsRuntimeManager().GetSession("").Run(functionName + "()")
-								if err != nil {
-									log.Println("---> Run interval callback error: ", err, t)
-								}
-							}
-						} else if intervalInfo.timer != nil {
-							// setTimeout function
-							<-intervalInfo.timer.C
-							_, err := JS.GetJsRuntimeManager().RunScript("", functionName+"()")
-							if err != nil {
-								log.Println("---> Run timeout callback error: ", err)
-							}
-						}
-					} else {
-						log.Println("---> Run interval callback error: ", "var "+functionName+"="+intervalInfo.callback, err)
-					}
-
-				}(intervalInfo)
-
-			case uuid := <-GetServer().clearInterval:
-				intervalInfo := GetServer().intervals[uuid]
-				if intervalInfo != nil {
-					if intervalInfo.ticker != nil {
-						intervalInfo.ticker.Stop()
-					} else if intervalInfo.timer != nil {
-						intervalInfo.timer.Stop()
-					}
-					// Remove the interval/timeout information.
-					delete(GetServer().intervals, uuid)
-				} else {
-					// In that case the uuid is a session id and not an interval id.
-					for _, intervalInfo_ := range GetServer().intervals {
-						if intervalInfo_.sessionId == uuid {
-							if intervalInfo_.ticker != nil {
-								intervalInfo_.ticker.Stop()
-							} else if intervalInfo_.timer != nil {
-								intervalInfo_.timer.Stop()
-							}
-							// Remove the interval/timeout information.
-							delete(GetServer().intervals, intervalInfo_.uuid)
-						}
-					}
-				}
-			}
-		}
-	}()
 
 	////////////////////////////////////////////////////////////////////////////
 	// Services intialisation.
