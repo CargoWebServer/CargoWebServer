@@ -308,7 +308,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				go func(intervalInfo *IntervalInfo) {
 					// Set the variable as function.
 					functionName := "callback_" + strings.Replace(intervalInfo.uuid, "-", "_", -1)
-					_, err := jsRuntimeManager.m_sessions[""].Run("var " + functionName + "=" + intervalInfo.callback)
+					_, err := jsRuntimeManager.m_sessions[intervalInfo.sessionId].Run("var " + functionName + "=" + intervalInfo.callback)
 					// I must run the script one and at interval after it...
 					if err == nil {
 						if intervalInfo.ticker != nil {
@@ -316,7 +316,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 							for t := range intervalInfo.ticker.C {
 								// So here I will call the callback.
 								// The callback contain unamed function...
-								_, err := GetJsRuntimeManager().GetSession("").Run(functionName + "()")
+								_, err := GetJsRuntimeManager().GetSession(intervalInfo.sessionId).Run(functionName + "()")
 								if err != nil {
 									log.Println("---> Run interval callback error: ", err, t)
 								}
@@ -324,7 +324,7 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 						} else if intervalInfo.timer != nil {
 							// setTimeout function
 							<-intervalInfo.timer.C
-							_, err := GetJsRuntimeManager().RunScript("", functionName+"()")
+							_, err := GetJsRuntimeManager().RunScript(intervalInfo.sessionId, functionName+"()")
 							if err != nil {
 								log.Println("---> Run timeout callback error: ", err)
 							}
@@ -651,7 +651,16 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 		vm.Set(name, function)
 	}
 
-	// Init srcipt.
+	// Init srcipts.
+	// Native Cargo script first.
+	for path, _ := range this.m_scripts {
+		// Start initalyse the scripts.
+		if strings.HasPrefix(path, "CargoWebServer") || strings.Index(path, "/WebApp/Cargo/Script/src/Cargo/") != -1 {
+			this.initScript(sessionId, path)
+		}
+	}
+
+	// Other application srcipt.
 	for path, _ := range this.m_scripts {
 		// Start initalyse the scripts.
 		this.initScript(sessionId, path)
@@ -689,12 +698,19 @@ func (this *JsRuntimeManager) initScript(sessionId string, path string) *otto.Ob
 	// All function of Cargo and CargoWebServer are public, no exports needed.
 	// require will be use to synchronize the order of initialysation in their case.
 	if moduleId == "Cargo" || moduleId == "CargoWebServer" {
+		// initialyse cargo anonymous session here, that session is the one
+		// that contain remote access code.
 		vm = this.m_sessions[sessionId]
 	} else {
-		// Here I will run the script in a copy of the main vm. All exports will
-		// be keep in the exports map but global variables will be limited
-		// to the vm scope the time of running the script.
-		vm = this.m_sessions[""].Copy()
+		// Local code session.
+		// Create new vm and run code inside it.
+		vm = otto.New()
+		for name, function := range this.m_functions {
+			// Append general scope function only. ex require, atoa, setInterval...
+			if strings.Index(name, ".") == -1 {
+				vm.Set(name, function)
+			}
+		}
 	}
 
 	if this.m_modules[moduleId] == nil {

@@ -338,7 +338,7 @@ func (this *Server) Start() {
 	////////////////////////////////////////////////////////////////////////////
 	// SOM function.
 	////////////////////////////////////////////////////////////////////////////
-	JS.GetJsRuntimeManager().AppendFunction("GetServer", func() *Server {
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.GetServer", func() *Server {
 		return GetServer()
 	})
 
@@ -522,7 +522,7 @@ func (this *Server) Start() {
 	/**
 	 * Set a ping message to the other end connection...
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("ping", func(successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.ping", func(successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
 
 		id := Utility.RandomUUID()
 		method := "Ping"
@@ -591,7 +591,7 @@ func (this *Server) Start() {
 	/**
 	 * Set a executeVbSrcript message to the other end connection...
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("executeVbSrcript", func(scriptName string, args []string, successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.executeVbSrcript", func(scriptName string, args []string, successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
 		id := Utility.RandomUUID()
 		method := "ExecuteVbScript"
 		params := make([]*MessageData, 0)
@@ -671,7 +671,7 @@ func (this *Server) Start() {
 	/**
 	 * Execute external command on the server.
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("runCmd", func(scriptName string, args []string, successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.runCmd", func(scriptName string, args []string, successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
 		id := Utility.RandomUUID()
 		method := "RunCmd"
 		params := make([]*MessageData, 0)
@@ -755,7 +755,7 @@ func (this *Server) Start() {
 	 * @param {function} errorCallback In case of error.
 	 * @param {object} caller A place to store object from the request context and get it back from the response context.
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("getServicesClientCode", func(successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.getServicesClientCode", func(successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
 		id := Utility.RandomUUID()
 		method := "GetServicesClientCode"
 		params := make([]*MessageData, 0)
@@ -820,7 +820,7 @@ func (this *Server) Start() {
 
 	})
 
-	JS.GetJsRuntimeManager().AppendFunction("stop", func(successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.stop", func(successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
 		id := Utility.RandomUUID()
 		method := "Stop"
 		params := make([]*MessageData, 0)
@@ -887,7 +887,7 @@ func (this *Server) Start() {
 	/**
 	 * Init connection is call when a Server object need to be connect on the net work.
 	 */
-	JS.GetJsRuntimeManager().AppendFunction("initConnection",
+	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.initConnection",
 		func(adress string, openCallback string, closeCallback string, connectionId string, service otto.Value, caller otto.Value) otto.Value {
 			log.Println("--> init connection with : ", adress, " session id: ", connectionId)
 

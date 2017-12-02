@@ -13,7 +13,7 @@ var catalog = null
 var homePage = null
 
 function init() {
-    
+
     // Set style informations
     cargoThemeInfos = JSON.parse(localStorage.getItem("bridge_theme_infos"))
     if (cargoThemeInfos != undefined) {
