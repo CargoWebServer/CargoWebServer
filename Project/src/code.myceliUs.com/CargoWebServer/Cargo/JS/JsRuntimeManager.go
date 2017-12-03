@@ -112,10 +112,14 @@ type JsRuntimeManager struct {
 
 	/** Exported values for each file **/
 
-	// A module is a directory in src...
-	m_modules map[string]*otto.Object
+	// Each module run in it own vm. So global variable
+	// are valid inside the module but not ouside it. Using require
+	// will made accessible from one module to another exported variable.
+	m_modulesVm map[string]*otto.Otto
 
-	// each file contain it own export variable.
+	// Those map contain module and exports variable. The map is access
+	// at initialisation time only by on thread, so no sync needed here.
+	m_modules map[string]*otto.Object
 	m_exports map[string]*otto.Object
 
 	/**Channel use for communication with vm... **/
@@ -162,6 +166,8 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 	// Map of exported values.
 	// each directory in the /Scrip/src ar consider module.
 	jsRuntimeManager.m_modules = make(map[string]*otto.Object)
+	jsRuntimeManager.m_modulesVm = make(map[string]*otto.Otto)
+
 	// each file contain it exports.
 	jsRuntimeManager.m_exports = make(map[string]*otto.Object)
 
@@ -597,16 +603,28 @@ func (this *JsRuntimeManager) getExports(path string) (*otto.Object, error) {
 		currentExportPath = currentExportPath[0 : len(currentExportPath)-3]
 	}
 
+	var vm *otto.Otto
+	if moduleId == "Cargo" || moduleId == "CargoWebServer" || moduleId == "fs" {
+		// initialyse cargo anonymous session here, that session is the one
+		// that contain remote access code.
+		vm = this.m_sessions[""]
+	} else {
+		vm = this.m_modulesVm[moduleId]
+		if vm == nil {
+			log.Panicln("------> vm is nil for ", moduleId)
+		}
+	}
+
 	// If the exports is not in the path.
 	if this.m_exports[currentExportPath] == nil {
-		this.m_exports[currentExportPath], _ = this.m_sessions[""].Object("exports = {}")
+		this.m_exports[currentExportPath], _ = vm.Object("exports = {}")
 		this.m_exports[currentExportPath].Set("__path__", currentExportPath)
 		this.m_modules[moduleId].Set("exports", this.m_exports[currentExportPath]) // Set it export values.
 		exports = this.m_exports[currentExportPath]
 	}
 
-	this.m_sessions[""].Set("module", this.m_modules[moduleId])
-	this.m_sessions[""].Set("exports", this.m_exports[currentExportPath])
+	vm.Set("module", this.m_modules[moduleId])
+	vm.Set("exports", this.m_exports[currentExportPath])
 
 	return exports, nil
 
@@ -697,20 +715,24 @@ func (this *JsRuntimeManager) initScript(sessionId string, path string) *otto.Ob
 	var vm *otto.Otto
 	// All function of Cargo and CargoWebServer are public, no exports needed.
 	// require will be use to synchronize the order of initialysation in their case.
-	if moduleId == "Cargo" || moduleId == "CargoWebServer" {
+	if moduleId == "Cargo" || moduleId == "CargoWebServer" || moduleId == "fs" {
 		// initialyse cargo anonymous session here, that session is the one
 		// that contain remote access code.
 		vm = this.m_sessions[sessionId]
 	} else {
 		// Local code session.
 		// Create new vm and run code inside it.
-		vm = otto.New()
-		for name, function := range this.m_functions {
-			// Append general scope function only. ex require, atoa, setInterval...
-			if strings.Index(name, ".") == -1 {
-				vm.Set(name, function)
+		if this.m_modulesVm[moduleId] == nil {
+			this.m_modulesVm[moduleId] = otto.New()
+			for name, function := range this.m_functions {
+				// Append general scope function only. ex require, atoa, setInterval...
+				if strings.Index(name, ".") == -1 {
+					this.m_modulesVm[moduleId].Set(name, function)
+				}
 			}
 		}
+		vm = this.m_modulesVm[moduleId]
+
 	}
 
 	if this.m_modules[moduleId] == nil {
@@ -742,9 +764,7 @@ func (this *JsRuntimeManager) initScript(sessionId string, path string) *otto.Ob
 			vm.Set("module", this.m_modules[moduleId])
 			// set the export as return value
 			exports = this.m_exports[exportPath]
-
 			_, err := vm.Run(script)
-
 			if err != nil {
 				log.Println("---> script running error:  ", path, err)
 			}
