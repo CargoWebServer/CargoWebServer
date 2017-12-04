@@ -996,7 +996,7 @@ func (this *Server) Start() {
 		}
 
 		// Initialyse the script for the default session.
-		JS.GetJsRuntimeManager().InitScripts("") // Run the script for the default session.
+		JS.GetJsRuntimeManager().InitScripts() // Run the script for the default session.
 
 		// Set service in the server object.
 		for serviceName, _ := range GetServer().GetServiceManager().m_serviceClientSrc {
