@@ -258,60 +258,6 @@ QString ServiceContainer::Ping(){
     return "pong";
 }
 
-/*QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
-    // first of all i will create a new engine...
-    QScriptEngine engine;
-
-    // Now I will put the plugin objects in the engine context.
-    for(int i=0; i < this->objects.keys().length(); i++){
-        QScriptValue objectValue = engine.newQObject(this->objects.value(this->objects.keys()[i]));
-        engine.globalObject().setProperty(this->objects.keys()[i], objectValue);
-    }
-
-    // I will now evaluate the script function...
-    QString function = params[0].toString();
-
-    // If I have the name of the function only and not it's code.
-    if( function.indexOf("function") == -1){
-        // I will find the server side code...
-        QMap<QString, QString>::const_iterator it = this->serverCodes.find(function);
-        if(it != this->serverCodes.end()){
-            function = (*it);
-        }else{
-            qDebug() << "no function found with name: " << function;
-        }
-    }
-
-    QScriptValue object = engine.evaluate("({toEvaluate:" + function + "})");
-    QScriptValue toEvaluate = object.property("toEvaluate");
-
-    QScriptValueList params_;
-    // Now I will set the function parameters...
-    for(int i= 1; i < params.length(); i++){
-        params_.append(engine.newVariant(params.at(i)));
-    }
-    qDebug() << "Try to evaluate: " << function;
-    QVariantList results;
-    try {
-        QScriptValue result = toEvaluate.call(object, params_);
-        results.push_back(result.toVariant());
-    }
-    catch (std::exception & e) {
-       // deal with it
-       qDebug()<< "Script error found!!!!" << e.what();
-       // Here I will get the exception information.
-       QJsonObject errObj;
-       errObj["TYPENAME"] = "CargoEntities.Error";
-       errObj["M_errorPath"] = "Line 313 serviceContainer.cpp";
-       errObj["M_code"] = "EXECUTE_JS_FUNCTION_ERROR";
-       errObj["M_body"] = QString(e.what());
-       results.push_back(errObj);
-    }
-
-
-    return results;
-}*/
-
 QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
     // first of all i will create a new engine...
     QJSEngine engine;

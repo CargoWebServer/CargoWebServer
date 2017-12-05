@@ -2,7 +2,7 @@ TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
 DESTDIR  = ../WebApp/Cargo/bin
-QT += network script
+QT += network qml #script
 CONFIG += c++11
 
 HEADERS += \
@@ -20,9 +20,9 @@ SOURCES += \
 
 DEFINES += PORT_NUMBER=9595
 
+unix:!macx:INCLUDEPATH += /usr/local/include
+win32:INCLUDEPATH += C:/msys64/mingw64/include
 
-INCLUDEPATH += $$PWD/include
-DEPENDPATH += $$PWD/lib
-
-win32: LIBS += -L$$PWD/lib/ -llibprotobuf
+win32: LIBS += -LC:/usr/local/lib/ -lprotobuf.dll
 unix:!macx: LIBS += -lprotobuf
+

@@ -25,7 +25,7 @@ function main() {
      )
  
 */
-    server.eventHandler.appendEventFilter(
+   /* server.eventHandler.appendEventFilter(
          "CatalogSchema.",
          "EntityEvent",
          function () {
@@ -33,7 +33,7 @@ function main() {
          },
          function () { },
          undefined
-     )
+    )*/
     
 /*
 
@@ -68,7 +68,7 @@ function main() {
 
     //entitiesDump("COLLADASchema.COLLADA")
     // entitiesDump("DT3_informations.Department")
-    // testServiceContainer()
+    testServiceContainer()
     //entitiesDump("DT3_informations.Workpoint")
 
     //entitiesDump("CargoEntities.Action")
@@ -255,17 +255,17 @@ function testServiceContainer() {
                 console.log("Service is open!")
 
                 // Now run a script...
-                function TestSayHelloPlugin(to) {
-                    var msg = SayHello.sayHelloTo(to)
+                /*function TestSayHelloPlugin(to) {
+                    var msg = SayHelloInterface.sayHelloTo(to)
                     return msg
-                }
+                }*/
 
                 var params = []
                 params.push(new RpcData({ "name": "rootPath", "type": 2, "dataBytes": utf8_to_b64("Mr. Kavalec!!!") }))
 
                 // Call it on the server.
                 service.executeJsFunction(
-                    TestSayHelloPlugin.toString(), // The function to execute remotely on server
+                    /*TestSayHelloPlugin.toString()*/ "SayHelloInterface.sayHelloTo", // The function to execute remotely on server
                     params, // The parameters to pass to that function
                     function (index, total, caller) { // The progress callback
                         // Nothing special to do here.
