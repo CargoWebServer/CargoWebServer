@@ -112,8 +112,8 @@ func (c *tcpSocketConnection) Open(host string, port int) (err error) {
 
 	if c.m_socket == nil && c.m_try < 3 {
 		c.m_try += 1
-		time.Sleep(100 * time.Millisecond)
-		c.Open(host, port)
+		time.Sleep(1 * time.Second)
+		return c.Open(host, port)
 
 	} else if c.m_try == 3 {
 		return errors.New("fail to connect with " + connectionId)
@@ -126,7 +126,7 @@ func (c *tcpSocketConnection) Open(host string, port int) (err error) {
 		go c.Reader()
 	}
 
-	return nil
+	return err
 }
 
 func (c *tcpSocketConnection) Close() {
@@ -256,21 +256,20 @@ func (c *webSocketConnection) Open(host string, port int) (err error) {
 	c.m_socket, err = websocket.Dial(origin, "", url)
 
 	if err != nil && c.m_try < 3 {
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(1 * time.Second)
 		c.m_try += 1
-		c.Open(host, port)
+		return c.Open(host, port)
 	} else if c.m_try == 3 {
 		return errors.New("fail to connect with " + origin)
 	} else if c.m_socket != nil {
 		c.m_isOpen = true
 		GetServer().GetHub().register <- c
-
 		// Start reading and writing loop's
 		go c.Writer()
 		go c.Reader()
 	}
 
-	return
+	return err
 }
 
 func (c *webSocketConnection) Close() {
