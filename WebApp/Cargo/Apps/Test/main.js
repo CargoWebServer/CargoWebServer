@@ -25,39 +25,39 @@ function main() {
      )
  
 */
-   /* server.eventHandler.appendEventFilter(
-         "CatalogSchema.",
-         "EntityEvent",
-         function () {
-             entitiesDump("CatalogSchema.FiltreRectangulaire")
-         },
-         function () { },
-         undefined
-    )*/
+    /* server.eventHandler.appendEventFilter(
+          "CatalogSchema.",
+          "EntityEvent",
+          function () {
+              entitiesDump("CatalogSchema.FiltreRectangulaire")
+          },
+          function () { },
+          undefined
+     )*/
+
+    /*
     
-/*
-
-    // utilityTests()
-    //serverTests()
-    //sessionTests()
-    //languageManagerTests()
-    //elementTests()
-
-    //accountTests()
-    //fileTests()
-
-    //dataTests()
-
-    //entityTests()
-
-    /*server.sessionManager.login("admin", "adminadmin", "localhost",
-        function () {
-            // Create the dynamic entity here.
-            testDynamicEntity()
-        },
-        function () {
-            // Nothing to do here.
-        }, {})*/
+        // utilityTests()
+        //serverTests()
+        //sessionTests()
+        //languageManagerTests()
+        //elementTests()
+    
+        //accountTests()
+        //fileTests()
+    
+        //dataTests()
+    
+        //entityTests()
+    
+        /*server.sessionManager.login("admin", "adminadmin", "localhost",
+            function () {
+                // Create the dynamic entity here.
+                testDynamicEntity()
+            },
+            function () {
+                // Nothing to do here.
+            }, {})*/
 
 
     // entityDump("item_1", "Test.Item")
@@ -250,35 +250,32 @@ function testServiceContainer() {
     // Let us open a connection to a server... the service container.
     var service = new Server("localhost", "127.0.0.1", 9494)
     service.conn = initConnection("ws://" + service.ipv4 + ":" + service.port.toString(),
-        function () {
+        function (service) {
             return function () {
                 console.log("Service is open!")
+                service.getServicesClientCode(
+                    // success callback
+                    function (results, caller) {
+                        // eval in that case contain the code to use the service.
+                        eval(results)
+                        // Xapian test...
+                        var xapian = new com.mycelius.XapianInterface(caller.service)
+                        xapian.indexCsv(
+                            "/home/dave/Documents/xapian/xapian-docsprint-master/data/states.csv",
+                            "tmp/toto",
+                            // success callback
+                            function (result, caller) {
+                                console.log(result)
+                            },
+                            // error callback
+                            function () {
 
-                // Now run a script...
-                /*function TestSayHelloPlugin(to) {
-                    var msg = SayHelloInterface.sayHelloTo(to)
-                    return msg
-                }*/
-
-                var params = []
-                params.push(new RpcData({ "name": "rootPath", "type": 2, "dataBytes": utf8_to_b64("Mr. Kavalec!!!") }))
-
-                // Call it on the server.
-                service.executeJsFunction(
-                    /*TestSayHelloPlugin.toString()*/ "SayHelloInterface.sayHelloTo", // The function to execute remotely on server
-                    params, // The parameters to pass to that function
-                    function (index, total, caller) { // The progress callback
-                        // Nothing special to do here.
+                            }, {})
                     },
-                    function (result, caller) {
-                        console.log(result[0])
+                    // error callback.
+                    function () {
 
-                    },
-                    function (errMsg, caller) {
-
-                    }, // Error callback
-                    {} // The caller
-                )
+                    }, { "service": service })
             }
         }(service),
         function () {

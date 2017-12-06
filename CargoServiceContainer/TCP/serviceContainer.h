@@ -30,9 +30,6 @@ class ServiceContainer : public QTcpServer
     // Contain metadata informations.
     QMap<QString, QJsonObject> metaInfos;
 
-    // Contain metadata informations.
-    QMap<QString, QString> serverCodes;
-
     Q_OBJECT
 public:
     explicit ServiceContainer(QObject *parent = 0);

@@ -56,6 +56,8 @@ void ServiceContainer::loadPluginObjects(){
 
 
 QString ServiceContainer::GetServicesClientCode(){
+    this->loadPluginObjects();
+
     // Here I will generate the code for the client side.
     QJsonArray actionsInfo = this->GetActionInfos();
     QString clientCode;
@@ -114,9 +116,6 @@ QString ServiceContainer::GetServicesClientCode(){
             }
 
             // The server side methode name.
-            QString serverSideMethodName = QString(packageName + "." + className + "_" +(*it).toObject()["name"].toString()).replace(".", "_");
-            QString serverCode = "function " + serverSideMethodName + "(";
-
             clientCode += packageName + "." + className + ".prototype." +(*it).toObject()["name"].toString() + "=function(";
 
             // Now the parameters...
@@ -136,7 +135,7 @@ QString ServiceContainer::GetServicesClientCode(){
             clientCode += ", caller){\n";
             // Now the function body...
             clientCode +=  "    var params = []\n";
-            QString serverCodeFunctionCall = className + "." +(*it).toObject()["name"].toString() + "(";
+            QString serverSideMethodName = className + "." +(*it).toObject()["name"].toString();
             for(QJsonArray::const_iterator it_=parameters.constBegin(); it_ != parameters.constEnd(); ++it_){
                    QString name = (*it_).toObject()["name"].toString();
                    QString typeName = (*it_).toObject()["type"].toString();
@@ -156,30 +155,10 @@ QString ServiceContainer::GetServicesClientCode(){
                    }else{
                        clientCode +=  "    params.push(createRpcData(" + name + ", \"JSON_STR\", \"" + name + "\", \""+ typeName +"\"))\n";
                    }
-
-                   // Append comma to serverCode.
-                   serverCode += name;
-                   serverCodeFunctionCall+= name;
-                   if (it_ != --parameters.constEnd()){
-                       serverCode += ", ";
-                       serverCodeFunctionCall+= ", ";
-                   }
-
             }
 
-            serverCodeFunctionCall += ")";
-
-            serverCode += "){\n";
-            // Here Is the server side code...
-            serverCode += " return " + serverCodeFunctionCall + "\n";
-
-            serverCode += "}\n";
-
-            // Save the code in the map.
-            this->serverCodes.insert(serverSideMethodName, serverCode);
-
             // Now the execute js call...
-            clientCode +=  "    executeJsFunction(\"" + serverSideMethodName + "\", params ";
+            clientCode +=  "    service.executeJsFunction(\"" + serverSideMethodName + "\", params ";
 
             // I will now append the callback...
             if(callbacks.contains("progressCallback")){
@@ -236,7 +215,6 @@ QString ServiceContainer::GetServicesClientCode(){
 
        // qDebug() << "Get client code: " << (*it).toObject()["IID"];
     }
-
     return clientCode;
 }
 
@@ -271,20 +249,9 @@ QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
 
     // I will now evaluate the script function...
     QString function = params[0].toString();
-
-    // If I have the name of the function only and not it's code.
-    if( function.indexOf("function") == -1){
-        // I will find the server side code...
-        QMap<QString, QString>::const_iterator it = this->serverCodes.find(function);
-        if(it != this->serverCodes.end()){
-            function = (*it);
-        }else{
-            qDebug() << "no function found with name: " << function;
-        }
-    }
-
     QJSValue toEvaluate = engine.evaluate(function);
     QJSValueList args;
+
     for(int i= 1; i < params.length(); i++){
         args.append(engine.toScriptValue<QVariant>(params.at(i)));
     }
