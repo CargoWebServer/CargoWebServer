@@ -4,6 +4,7 @@
 #include "gen/rpc.pb.h"
 #include <QCoreApplication>
 #include <QThreadPool>
+#include <QUuid>
 
 // Common ws/tcp code.
 #include "../session.cpp"
@@ -12,6 +13,11 @@ Session::Session(qintptr ID, QObject *parent) :
     QThread(parent)
 {
     this->socketDescriptor = ID;
+    this->id = QUuid::createUuid().toString();
+}
+
+Session::~Session(){
+    qDebug() << "session is deleted!";
 }
 
 void Session::run()
@@ -47,8 +53,9 @@ void Session::run()
     // thread will stay alive so that signal/slot to function properly
     // not dropped out in the middle when thread dies
     exec();
-}
 
+    emit end(this->id);
+}
 
 void Session::sendMessage(com::mycelius::message::Message *msg){
     QByteArray data =  serializeToByteArray(msg);

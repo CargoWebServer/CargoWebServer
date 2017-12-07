@@ -32,7 +32,7 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
 
         qDebug() << "Incomming request: " << QString::fromStdString(msg.rqst().id());
 
-        Action* action = new Action(QString::fromStdString(msg.rqst().id()), methodName);
+        Action* action = new Action(QString::fromStdString(msg.rqst().id()), methodName, this->id);
 
         // Now I will append the parameters...
         const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >&params = msg.rqst().params();

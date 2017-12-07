@@ -16,12 +16,13 @@ class Session : public QThread
 
      Q_OBJECT
 public:
+    QString id;
     explicit Session(QWebSocket* socket, QObject *parent = 0);
     ~Session();
     void run();
 
 signals:
-    //void error(QWebSocket::SocketError socketerror);
+    void end(QString);
 
 private Q_SLOTS:
     void processBinaryMessage(QByteArray);

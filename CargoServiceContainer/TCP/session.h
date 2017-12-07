@@ -7,17 +7,21 @@
 #include <QMap>
 #include <QVector>
 #include "gen/rpc.pb.h"
+
 class Session : public QThread
 {
     static int MAX_MESSAGE_SIZE;
+    Q_OBJECT
 
-     Q_OBJECT
 public:
+    QString id;
     explicit Session(qintptr ID, QObject *parent = 0);
+    ~Session();
     void run();
 
 signals:
     void error(QTcpSocket::SocketError socketerror);
+    void end(QString);
 
 public slots:
     void readyRead();

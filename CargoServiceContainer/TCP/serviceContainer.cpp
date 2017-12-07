@@ -42,6 +42,19 @@ void ServiceContainer::incomingConnection(qintptr socketDescriptor){
     // once a thread is not needed, it will be beleted later
     connect(session, SIGNAL(finished()), session, SLOT(deleteLater()));
 
+    // Need it to remove session engine from the map.
+    connect(session, SIGNAL(end(QString)), this, SLOT(onSessionEnd(QString)));
+
     // Start the session...
     session->start();
+
+    // Here I will append the js engine for that session and put object on it.
+    QJSEngine *engine = new QJSEngine();
+    QMap<QString, QObject*> objects = this->loadPluginObjects();
+    for(int i=0; i < objects.keys().length(); i++){
+        QJSValue objectValue = engine->newQObject(objects.value(objects.keys()[i]));
+        engine->globalObject().setProperty(objects.keys()[i], objectValue);
+    }
+    // Keep the reference to the engine.
+    this->engines[session->id] = engine;
 }

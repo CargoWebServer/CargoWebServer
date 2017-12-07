@@ -25,3 +25,5 @@ win32:INCLUDEPATH += C:/msys64/mingw64/include
 
 win32: LIBS += -LC:/usr/local/lib/ -lprotobuf.dll
 unix:!macx: LIBS += -lprotobuf
+
+

@@ -5,7 +5,6 @@
 #include <QObject>
 #include <QVariant>
 #include <QList>
-
 #include "gen/rpc.pb.h"
 
 /**
@@ -26,7 +25,7 @@ class Action:  public QObject, public QRunnable
     Q_OBJECT
 
 public:
-    Action(const QString& id, const QString& name);
+    Action(const QString& id, const QString& name, const QString& sessionId);
     ~Action();
     void run();
     void appendParam(QString name, QVariant value, QString typeName);
@@ -36,6 +35,11 @@ signals:
     void done(com::mycelius::message::Message*);
 
 private:
+    /**
+     * @brief sessionId The id who generate the action.
+     */
+    QString sessionId;
+
     /**
     * @brief id Must be the id of the request message.
     */

@@ -95,9 +95,10 @@ QVariant CallMethod(QObject* object, QMetaMethod metaMethod, QVariantList args)
     }
 }
 
-Action::Action(const QString& id_, const QString& name_) :
+Action::Action(const QString& id_, const QString& name_, const QString& sessionId) :
     name(name_),
-    id(id_)
+    id(id_),
+    sessionId(sessionId)
 {
 
 }
@@ -127,15 +128,12 @@ void Action::run()
 
     // Here I will recreate the action prototype from it list of parameter...
     QString prototype;
-
     if(this->name == "ExecuteJsFunction") {
         prototype = "ExecuteJsFunction(QVariantList)";
         // Append the function parameters here...
         QVariantList arg;
+        arg.append(this->sessionId);
         for(int i=0; i < this->params.size(); i++){
-            qDebug() << this->params[i]->name;
-            qDebug() << this->params[i]->typeName;
-            qDebug() << this->params[i]->value;
             arg.append(this->params[i]->value);
         }
         list.push_back(arg);

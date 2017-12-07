@@ -4,6 +4,7 @@
 #include "gen/rpc.pb.h"
 #include <QCoreApplication>
 #include <QThreadPool>
+#include <QUuid>
 
 // Common ws/tcp code.
 #include "../session.cpp"
@@ -11,6 +12,8 @@
 Session::Session(QWebSocket* socket, QObject *parent) :
     QThread(parent)
 {
+    this->id = QUuid::createUuid().toString();
+
     this->socket = socket;
 
     // connect socket and signal
@@ -26,7 +29,7 @@ Session::Session(QWebSocket* socket, QObject *parent) :
 }
 
 Session::~Session(){
-    qDebug() << "session is deleted!";
+    qDebug() << "session is " << this->id << " is deleted!";
 }
 
 void Session::run()
@@ -35,6 +38,7 @@ void Session::run()
     // thread will stay alive so that signal/slot to function properly
     // not dropped out in the middle when thread dies
     exec();
+    emit end(this->id);
 }
 
 void Session::sendMessage(com::mycelius::message::Message *msg){

@@ -261,8 +261,10 @@ function testServiceContainer() {
                         // Xapian test...
                         var xapian = new com.mycelius.XapianInterface(caller.service)
                         xapian.indexCsv(
-                            "/home/dave/Documents/xapian/xapian-docsprint-master/data/states.csv",
-                            "tmp/toto",
+                            /*"/home/dave/Documents/xapian/xapian-docsprint-master/data/states.csv"*/
+                            "C:\\Users\\mm006819\\Documents\\xapian\\xapian-docsprint-master\\data\\states.csv",
+                            "C:\\Temp\\toto.glass",
+                            "en",
                             // success callback
                             function (result, caller) {
                                 console.log(result)

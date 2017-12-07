@@ -8,6 +8,7 @@
 #include <QMap>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QJSEngine>
 
 /**
  * @brief Service Container is a TCP server. It's use to interface
@@ -19,16 +20,17 @@ class ServiceContainer : public QTcpServer
     static ServiceContainer* instance;
 
     // plugins...
-    void loadPluginObjects();
+    QMap<QString, QObject*> loadPluginObjects();
 
     // The port
     quint16 port;
 
-    // Object define by plugin...
-    QMap<QString, QObject*> objects;
-
     // Contain metadata informations.
     QMap<QString, QJsonObject> metaInfos;
+
+    // That contain the list engines assciated with their
+    // session id.
+    QMap<QString, QJSEngine*> engines;
 
     Q_OBJECT
 public:
@@ -51,7 +53,11 @@ public:
      **/
     QObject* getObjectByTypeName(QString typeName);
 
-signals:
+private Q_SLOTS:
+    /**
+     * @brief onSessionEnd function called when the session is terminated.
+     */
+    void onSessionEnd(QString);
 
 protected:
     void incomingConnection(qintptr socketDescriptor);
@@ -98,6 +104,7 @@ public Q_SLOTS:
      * @return
      */
     QJsonArray GetActionInfos();
+
 
 };
 

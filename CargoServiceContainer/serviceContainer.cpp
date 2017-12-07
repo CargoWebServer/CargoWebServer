@@ -22,14 +22,12 @@ void  ServiceContainer::setPort(quint16 port) {
     this->port = port;
 }
 
-QObject* ServiceContainer::getObjectByTypeName(QString typeName){
-    return this->objects.value(typeName);
-}
-
-void ServiceContainer::loadPluginObjects(){
+QMap<QString, QObject*> ServiceContainer::loadPluginObjects(){
 
     QDir pluginsDir(QCoreApplication::applicationDirPath());
     pluginsDir.cd("plugins");
+    // Object define by plugin...
+    QMap<QString, QObject*> objects;
 
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
@@ -40,7 +38,7 @@ void ServiceContainer::loadPluginObjects(){
             QStringList values = iid.split(".");
             QString className = values.at(values.size()-1);
 
-            this->objects.insert(className, plugin);
+            objects.insert(className, plugin);
 
             // Keep meta infos...
             this->metaInfos.insert(iid,metaData);
@@ -52,12 +50,11 @@ void ServiceContainer::loadPluginObjects(){
             qDebug() << pluginLoader.errorString();
         }
     }
+
+    return objects;
 }
 
-
 QString ServiceContainer::GetServicesClientCode(){
-    this->loadPluginObjects();
-
     // Here I will generate the code for the client side.
     QJsonArray actionsInfo = this->GetActionInfos();
     QString clientCode;
@@ -236,24 +233,26 @@ QString ServiceContainer::Ping(){
     return "pong";
 }
 
+void  ServiceContainer::onSessionEnd(QString sessionId){
+    delete this->engines[sessionId]; // Clear memory
+    this->engines.remove(sessionId); // remove from the map.
+}
+
 QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
     // first of all i will create a new engine...
-    QJSEngine engine;
     QVariantList results;
 
-    // Now I will put the plugin objects in the engine context.
-    for(int i=0; i < this->objects.keys().length(); i++){
-        QJSValue objectValue = engine.newQObject(this->objects.value(this->objects.keys()[i]));
-        engine.globalObject().setProperty(this->objects.keys()[i], objectValue);
-    }
-
     // I will now evaluate the script function...
-    QString function = params[0].toString();
-    QJSValue toEvaluate = engine.evaluate(function);
+    QString sessionId = params[0].toString();
+    QJSEngine* engine = this->engines[sessionId];
+
+    // Now I will put the plugin objects in the engine context.
+    QString function = params[1].toString();
+    QJSValue toEvaluate = engine->evaluate(function);
     QJSValueList args;
 
-    for(int i= 1; i < params.length(); i++){
-        args.append(engine.toScriptValue<QVariant>(params.at(i)));
+    for(int i= 2; i < params.length(); i++){
+        args.append(engine->toScriptValue<QVariant>(params.at(i)));
     }
     try {
         QJSValue result = toEvaluate.call(args);
@@ -272,3 +271,4 @@ QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
     }
     return results;
 }
+

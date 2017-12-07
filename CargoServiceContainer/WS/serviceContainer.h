@@ -8,6 +8,7 @@
 #include <QMap>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QJSEngine>
 
 /**
  * @brief Service Container is a TCP server. It's use to interface
@@ -42,7 +43,14 @@ Q_SIGNALS:
     void closed();
 
 private Q_SLOTS:
+    /**
+     * @brief onNewConnection function called when a connection is open.
+     */
     void onNewConnection();
+    /**
+     * @brief onSessionEnd function called when the session is terminated.
+     */
+    void onSessionEnd(QString);
 
 public Q_SLOTS:
     //////////////////////////////////////////////
@@ -87,15 +95,13 @@ public Q_SLOTS:
      */
     QJsonArray GetActionInfos();
 
+
 private:
     // plugins...
-    void loadPluginObjects();
+    QMap<QString, QObject*> loadPluginObjects();
 
     // The port
     quint16 port;
-
-    // Object define by plugin...
-    QMap<QString, QObject*> objects;
 
     // Contain metadata informations.
     QMap<QString, QJsonObject> metaInfos;
@@ -105,6 +111,10 @@ private:
 
     // The server side functions.
     QMap<QString, QString> serverCodes;
+
+    // That contain the list engines assciated with their
+    // session id.
+    QMap<QString, QJSEngine*> engines;
 
 };
 
