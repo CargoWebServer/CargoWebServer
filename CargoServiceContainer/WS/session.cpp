@@ -52,7 +52,6 @@ void Session::processBinaryMessage(QByteArray data)
     // get the information
     com::mycelius::message::Message msg;
     msg.ParseFromArray(data, data.size());
-    //qDebug() << "Message received " << QString::fromStdString(msg.id()) << msg.index() << " of " << msg.total() << " " << msg.type();
     this->processIncommingMessage(msg);
 }
 

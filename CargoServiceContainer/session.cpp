@@ -29,9 +29,6 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
     }else if(msg.type() == com::mycelius::message::Message_MessageType_REQUEST){
         // Now I will call process message from the store.
         QString methodName = QString::fromStdString(msg.rqst().method());
-
-        qDebug() << "Incomming request: " << QString::fromStdString(msg.rqst().id());
-
         Action* action = new Action(QString::fromStdString(msg.rqst().id()), methodName, this->id);
 
         // Now I will append the parameters...
@@ -91,9 +88,9 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
     }else if(msg.type() == com::mycelius::message::Message_MessageType_RESPONSE){
         // The message is a response...
         QString messageId = QString::fromStdString(msg.rsp().id());
-        qDebug() << " process pending message with id " << messageId;
+        //qDebug() << " process pending message with id " << messageId;
         if(this->pending.contains(messageId)){
-             qDebug() << " number of pending message for " << messageId << " is " << this->pending.find(messageId)->size();
+             //qDebug() << " number of pending message for " << messageId << " is " << this->pending.find(messageId)->size();
             this->processPendingMessage(messageId);
         }
 
@@ -153,7 +150,6 @@ void Session::completeProcessMessageData(com::mycelius::message::Message * msg){
     QString messageId = QString::fromStdString(msg->rsp().id());
 
     if( msg->ByteSize() < Session::MAX_MESSAGE_SIZE){
-        qDebug() << "message send directly!" << QString::fromStdString(messageId.toStdString());
         this->sendMessage(msg);
     }else{
         QByteArray messageData = serializeToByteArray(msg);

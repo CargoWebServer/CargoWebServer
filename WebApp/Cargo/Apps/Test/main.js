@@ -260,10 +260,19 @@ function testServiceContainer() {
                         eval(results)
                         // Xapian test...
                         var xapian = new com.mycelius.XapianInterface(caller.service)
-                        xapian.indexCsv(
-                            /*"/home/dave/Documents/xapian/xapian-docsprint-master/data/states.csv"*/
-                            "C:\\Users\\mm006819\\Documents\\xapian\\xapian-docsprint-master\\data\\states.csv",
-                            "C:\\Temp\\toto.glass",
+
+                        // Index csv file the file must exist on the server before that method is call.
+                        /**/
+                        var datapath = "/home/dave/Documents/xapian/xapian-docsprint-master/data/100-objects-v1.csv"
+                        var dbpath = "/tmp/toto.glass";
+
+                        // var datapath = "C:\\Users\\mm006819\\Documents\\xapian\\xapian-docsprint-master\\data\\100-objects-v1.csv"
+                        //var dbpath = "C:\\Temp\\toto.glass";
+                        
+                        /*xapian.indexCsv(
+                            datapath,
+                            dbpath,
+                            ["Q:id_NUMBER","XD:DESCRIPTION","S:TITLE"],
                             "en",
                             // success callback
                             function (result, caller) {
@@ -272,7 +281,25 @@ function testServiceContainer() {
                             // error callback
                             function () {
 
+                            }, {})*/
+                            
+                        // Search for results...
+                        xapian.search(
+                            dbpath,
+                            "pendulum clock",
+                            ["XD:DESCRIPTION","S:TITLE"],
+                            "en",
+                            0,
+                            10,
+                            // success callback
+                            function (result, caller) {
+                                console.log(result)
+                            },
+                            // error callback
+                            function () {
+
                             }, {})
+
                     },
                     // error callback.
                     function () {

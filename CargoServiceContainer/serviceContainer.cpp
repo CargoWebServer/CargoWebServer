@@ -229,7 +229,6 @@ QJsonArray ServiceContainer::GetActionInfos(){
 }
 
 QString ServiceContainer::Ping(){
-    qDebug() << "Ping received!";
     return "pong";
 }
 
