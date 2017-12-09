@@ -72,11 +72,6 @@ func newServer() *Server {
 	// Get the server address information.
 	server.addressInfo, _ = Utility.MyIP()
 
-	// if Cargoroot is not set...
-	if len(os.Getenv("CARGOROOT")) == 0 {
-		// In that case I will install the server...
-	}
-
 	// if the admin has password adminadmin I will display the setup wizard..
 	ids := []interface{}{"admin"}
 	adminAccountEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", ids, false)
@@ -151,6 +146,21 @@ func (this *Server) getConnectionById(id string) connection {
 		//Return the connection...
 		return connection
 	}
+	// The connection dosen't exist anymore...
+	return nil
+}
+
+/**
+ * Retunr a connection with a given addresse.
+ */
+func (this *Server) getConnectionByIp(ipv4 string, port int) connection {
+	// Get the conncetion with a given id if it exist...
+	for _, connection := range this.hub.connections {
+		if connection.GetAddrStr() == ipv4 && connection.GetPort() == port {
+			return connection
+		}
+	}
+
 	// The connection dosen't exist anymore...
 	return nil
 }
@@ -356,7 +366,7 @@ func (this *Server) Start() {
 		param := new(MessageData)
 		param.Name = "functionSrc"
 		param.Value = functionSrc
-
+		param.TYPENAME = "Server.MessageData"
 		// Append the params.
 		params = append(params, param)
 
@@ -1026,6 +1036,9 @@ func (this *Server) Start() {
 				GetServer().GetServiceManager().registerServiceContainerActions(config)
 			}
 		}
+
+		// Here I will initialise the search engine.
+		GetServer().GetSearchEngine().initialize()
 	}()
 }
 
@@ -1088,7 +1101,6 @@ func (this *Server) SetRootPath(path string) error {
  */
 func (this *Server) connect(address string) (connection, error) {
 
-	var conn connection
 	values := strings.Split(address, ":")
 
 	var host string
@@ -1108,6 +1120,12 @@ func (this *Server) connect(address string) (connection, error) {
 	// Open the a new connection with the server.
 	if host == this.GetConfigurationManager().GetHostName() && this.GetConfigurationManager().GetServerPort() == port {
 		return nil, errors.New("Loopback connection!")
+	}
+
+	// If a connection already exist I will use it...
+	conn := this.getConnectionByIp(address, port)
+	if conn != nil {
+		return conn, nil
 	}
 
 	// Create the new connection.
