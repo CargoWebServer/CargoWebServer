@@ -2,8 +2,11 @@ package Server
 
 import (
 	"errors"
+	"io/ioutil"
 	"log"
+	"strings"
 
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 )
@@ -64,9 +67,22 @@ func (this *SearchEngine) initialize() {
 			// Get the path of the data store.
 			path := GetServer().GetConfigurationManager().m_filePath
 			// Here I will create the db if it does not exist.
-			path += "/" + config.GetServerConfig().GetDataPath() + "/" + store.GetId() + "/" + store.GetId() + ".glass"
+			path += config.GetServerConfig().GetDataPath() + "/" + store.GetId() + "/" + store.GetId() + ".glass"
 			for k := 0; k < len(entities); k++ {
 				entity := entities[k]
+				// in the partcular case of a text file i will set it data before indexing it.
+				if entity.GetTypeName() == "CargoEntities.File" {
+					if strings.HasPrefix(entity.GetObject().(*CargoEntities.File).GetMime(), "application/") || strings.HasPrefix(entity.GetObject().(*CargoEntities.File).GetMime(), "text/") {
+						// In that case i will read the content of the file.
+						filePath := GetServer().GetConfigurationManager().m_filePath + config.GetServerConfig().GetApplicationsPath() + entity.GetObject().(*CargoEntities.File).GetPath() + "/" + entity.GetObject().(*CargoEntities.File).GetName()
+						b, err := ioutil.ReadFile(filePath) // just pass the file name
+						if err == nil {
+							entity.GetObject().(*CargoEntities.File).SetData(string(b)) // convert content to a 'string'
+						} else {
+							log.Println("------> err ", err)
+						}
+					}
+				}
 				this.IndexEntity(path, entity, "en") // The default language is english... // TODO append the paremeter language in the store.
 			}
 		}
@@ -125,25 +141,11 @@ func (this *SearchEngine) IndexEntity(dbpath string, entity Entity, language str
 	param4.TYPENAME = "Server.MessageData"
 	params = append(params, param4)
 
-	// ids.
 	param5 := new(MessageData)
-	param5.Name = "ids"
-	param5.Value = prototype.Ids
+	param5.Name = "language"
+	param5.Value = language
 	param5.TYPENAME = "Server.MessageData"
 	params = append(params, param5)
-
-	// indexs.
-	param6 := new(MessageData)
-	param6.Name = "indexs"
-	param6.Value = prototype.Indexs
-	param6.TYPENAME = "Server.MessageData"
-	params = append(params, param6)
-
-	param7 := new(MessageData)
-	param7.Name = "language"
-	param7.Value = language
-	param7.TYPENAME = "Server.MessageData"
-	params = append(params, param7)
 
 	// Use a channel to synchronize the function.
 	wait := make(chan interface{})

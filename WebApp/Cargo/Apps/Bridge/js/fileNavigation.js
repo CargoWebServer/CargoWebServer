@@ -63,13 +63,27 @@ var FileNavigator = function (parent) {
             // local file here.
             if (evt.dataMap["fileInfo"] != undefined) {
                 file = evt.dataMap["fileInfo"]
-            }else if (evt.dataMap["prototypeInfo"] != undefined) {
+            } else if (evt.dataMap["prototypeInfo"] != undefined) {
                 file = {}
                 file.M_id = evt.dataMap["prototypeInfo"].TypeName
                 file.M_name = evt.dataMap["prototypeInfo"].TypeName
                 file.UUID = evt.dataMap["prototypeInfo"].TypeName
             } else if (evt.dataMap["bpmnDiagramInfo"] != undefined) {
                 file = evt.dataMap["bpmnDiagramInfo"]
+            } else if (evt.dataMap["searchInfo"] != undefined) {
+                file = evt.dataMap["searchInfo"]
+                if (file.M_id == -1) {
+                    for (var key in fileNavigator.files) {
+                        if (fileNavigator.files[key].constructor.name == "SearchInfo" && fileNavigator.files[key].UUID != file.UUID) {
+                            if (file.M_id <= fileNavigator.files[key].M_id) {
+                                file.M_id = fileNavigator.files[key].M_id
+                            }
+                        }
+                    }
+                    file.M_id += 1
+                }
+                // Set the name of the search here...
+                file.M_name = "search " + (file.M_id + 1)
             }
         }
 
@@ -256,6 +270,8 @@ FileNavigator.prototype.setActiveTab = function (fileId) {
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "bpmnDiagramInfo": this.activeFile } }
         } else if (this.activeFile.TYPENAME == "CargoEntities.File") {
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": this.activeFile } }
+        } else if (this.activeFile.TYPENAME == "SearchInfo") {
+            evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "searchInfo": this.activeFile } }
         } else {
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "prototypeInfo": getEntityPrototype(this.activeFile.M_name) } }
         }

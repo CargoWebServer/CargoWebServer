@@ -210,7 +210,7 @@ VerticalMenu.prototype.appendItem = function (item) {
                 subItemPanel.element.style.display = "none"
             }
             if (item.action != undefined) {
-                item.action()
+                item.action(item.menu)
                 function setInvisible(item) {
                     item.panel.element.style.display = "none"
                     if (item.parent != undefined) {
@@ -385,7 +385,7 @@ PopUpMenu.prototype.appendItem = function (item) {
                 subItemPanel.element.style.display = "none"
             }
             if (item.action != undefined) {
-                item.action()
+                item.action(menu)
                 menu.panel.element.parentNode.removeChild(menu.panel.element)
                 function setInvisible(item) {
                     item.panel.element.style.display = "none"
@@ -491,7 +491,7 @@ HorizontalMenu.prototype.appendItem = function (item) {
             }
             if (item_.action != null) {
                 // Call the action...
-                item_.action()
+                item_.action(menu)
             }
         }
     }(this, item)
@@ -533,7 +533,7 @@ HorizontalMenu.prototype.setItem = function (item) {
                     }
                     if (item.action != null) {
                         // Call the action...
-                        item.action()
+                        item.action(menu)
                     }
                 }
             }(this, subItem)

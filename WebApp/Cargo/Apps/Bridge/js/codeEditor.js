@@ -63,6 +63,8 @@ var CodeEditor = function (parent) {
             if (prototype !== undefined) {
                 codeEditor.appendPrototypeEditor(prototype)
             }
+        }else if (evt.dataMap["searchInfo"] != undefined) {
+            codeEditor.appendSearchPage(evt.dataMap["searchInfo"])
         }
     })
 
@@ -147,6 +149,24 @@ var CodeEditor = function (parent) {
         }, {})*/
 
     return this
+}
+
+/**
+ * Create a new Search page.
+ */
+CodeEditor.prototype.appendSearchPage = function(searchInfo){
+    if (this.files[searchInfo.UUID] !== undefined) {
+        // Set the tab active...
+        this.setActiveFile(searchInfo.UUID)
+        return
+    }
+
+    var filePanel = this.panel.appendElement({ "tag": "div", "class": "filePanel", "id": searchInfo.UUID + "_search_div" }).down()
+    // create and display the search page.
+    new SearchPage(filePanel, searchInfo)
+    this.files[searchInfo.UUID] = searchInfo
+    this.filesPanel[searchInfo.UUID] = filePanel
+    this.setActiveFile(searchInfo.UUID)
 }
 
 /**

@@ -120,6 +120,17 @@ var HomePage = function () {
             localStorage.setItem("bridge_theme_infos", JSON.stringify(cargoThemeInfos))
         }
 
+        // Set the alpha color compoenent.
+        function setAlpha(rule, alpha) {
+            var r = getCSSRule(rule)
+            var color = r.style["color"]
+            if(color.startsWith("rgb(")){
+                color = color.replace("rgb(", "rgba(")
+                color = color.replace(")", "," + alpha + ")")
+                r.style["color"] = color
+            }
+        }
+
         // I will set class values with theme class value
         changePropertyByClassName("background-color", ".navigation_div", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".navigation_div", "." + evt.dataMap.themeClass)
@@ -161,6 +172,7 @@ var HomePage = function () {
         changePropertyByClassName("background", "#workingFilesDiv.scrolling", "." + evt.dataMap.themeClass + " .ace_gutter")
 
         changePropertyByClassName("color", "#workingFilesDiv.scrolling", "." + evt.dataMap.themeClass + " .ace_gutter", "color")
+        setAlpha("#workingFilesDiv.scrolling", .25)
         changePropertyByClassName("color", ".fileNavigationBtn", "." + evt.dataMap.themeClass + " .ace_gutter")
 
         if (evt.dataMap.isDark) {
@@ -763,14 +775,25 @@ HomePage.prototype.init = function (parent, sessionInfo) {
     // The preference edition menu.
     var preferencesServerItem = new MenuItem("preferences_server_menu_item", "Preferences", {}, 1,
         function () {
-            // 
+            // In that case I will 
         }, "fa fa-wrench")
 
     var closeServerItem = new MenuItem("close_server_menu_item", "Close server", {}, 1, function () { server.stop() }, "fa fa-power-off")
 
     var fileMenuItem = new MenuItem("file_menu", "File", { "new_file_menu_item": newFileMenuItem, "preferences_server_menu_item": preferencesServerItem, "close_server_menu_item": closeServerItem }, 0)
 
-    var editMenuItem = new MenuItem("edit_menu", "Edit", {}, 0)
+    // The queries menu.
+    var searchMenuItem = new MenuItem("search_menu_item", "Search", {}, 1,
+        function (menu) {
+            // Here I will create a new search page...
+            // Send event localy...
+            var searchInfo = new SearchInfo()
+            var evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "searchInfo": searchInfo} }
+            server.eventHandler.broadcastLocalEvent(evt)
+        }
+        , "fa fa-search")
+
+    var editMenuItem = new MenuItem("edit_menu", "Edit", { "search_menu_item": searchMenuItem }, 0)
 
     var dataMenuItem = new MenuItem("data_menu", "Data", { "import_menu_item": importMenuItem, "export_menu_item": exportMenuItem, "queries_data_menu_item": queriesMenuItem }, 0)
 

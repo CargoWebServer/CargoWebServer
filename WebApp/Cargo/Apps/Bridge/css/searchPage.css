@@ -1,0 +1,10 @@
+
+.search_btn{
+    transition: all .2s ease;
+}
+
+.search_btn:hover{
+    cursor: pointer;
+    color: steelblue;
+
+}

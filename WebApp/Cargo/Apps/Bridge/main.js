@@ -50,6 +50,12 @@ function init() {
 }
 
 /**
+ * That is a connection with the service container.
+ */
+var service = new Server("localhost", "127.0.0.1", 9494)
+var xapian = null
+
+/**
  * This function is the entry point of the application...
  */
 function main() {
@@ -81,12 +87,59 @@ function main() {
                                                     // now the prototypes...
                                                     server.entityManager.getEntityPrototypes("BPMS",
                                                         function () {
-                                                            init()
+                                                            service.conn = initConnection("ws://" + service.ipv4 + ":" + service.port.toString(),
+                                                                function (service) {
+                                                                    return function () {
+                                                                        console.log("Service is open!")
+                                                                        service.getServicesClientCode(
+                                                                            // success callback
+                                                                            function (results, caller) {
+                                                                                // eval in that case contain the code to use the service.
+                                                                                eval(results)
+                                                                                // Xapian test...
+                                                                                xapian = new com.mycelius.XapianInterface(caller.service)
+
+                                                                                init()
+                                                                            },
+                                                                            // error callback.
+                                                                            function () {
+
+                                                                            }, { "service": service })
+                                                                    }
+                                                                }(service),
+                                                                function () {
+                                                                    console.log("Service is close!")
+                                                                })
+
                                                         },
                                                         // error callback
                                                         function () {
                                                             // without bpmn
-                                                            init()
+                                                            service.conn = initConnection("ws://" + service.ipv4 + ":" + service.port.toString(),
+                                                                function (service) {
+                                                                    return function () {
+                                                                        console.log("Service is open!")
+                                                                        service.getServicesClientCode(
+                                                                            // success callback
+                                                                            function (results, caller) {
+                                                                                // eval in that case contain the code to use the service.
+                                                                                eval(results)
+                                                                                
+                                                                                // Xapian test...
+                                                                                xapian = new com.mycelius.XapianInterface(caller.service)
+
+                                                                                init()
+
+                                                                            },
+                                                                            // error callback.
+                                                                            function () {
+
+                                                                            }, { "service": service })
+                                                                    }
+                                                                }(service),
+                                                                function () {
+                                                                    console.log("Service is close!")
+                                                                })
                                                         }, {})
                                                 },
                                                 function () { },
