@@ -8,7 +8,9 @@ CONFIG += c++11
 HEADERS += \
     action.h \
     TCP/serviceContainer.h \
-    TCP/session.h
+    TCP/session.h \
+    listener.hpp \
+    event.hpp
 
 SOURCES += \
     action.cpp \
@@ -16,7 +18,8 @@ SOURCES += \
     TCP/session.cpp \
     gen/rpc.pb.cc \
     main.cpp \
-    serviceContainer.cpp
+    serviceContainer.cpp \
+    listener.cpp
 
 DEFINES += PORT_NUMBER=9595
 

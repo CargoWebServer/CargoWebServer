@@ -1,6 +1,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include "gen/rpc.pb.h"
+#include "listener.hpp"
 
 /**
  * @brief serializeToByteArray Serialyse the message to an array of bytes...
@@ -20,11 +22,9 @@ QByteArray serializeToByteArray(google::protobuf::Message *msg){
 int Session::MAX_MESSAGE_SIZE = 17740;
 
 void Session::processIncommingMessage(com::mycelius::message::Message& msg){
-
     // Now i will determine if the message is a request, a response or an event...
     if(msg.type() == com::mycelius::message::Message_MessageType_ERROR){
         // The message is an error
-
 
     }else if(msg.type() == com::mycelius::message::Message_MessageType_REQUEST){
         // Now I will call process message from the store.
@@ -141,7 +141,50 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
         delete responseMsg; // Remove the response explicitely here.
 
     }else if(msg.type() == com::mycelius::message::Message_MessageType_EVENT){
+        QString channelId = QString::fromStdString(msg.evt().name());
+        int evtNumber = msg.evt().code();
 
+        QMap<QString, QVariant> evtDataMap;
+        const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >&params =  msg.evt().evtdata();
+        for(::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >::const_iterator it = params.cbegin();
+            it != params.cend(); it++){
+            ::com::mycelius::message::Data param = *it;
+            QVariant var;
+            if(param.type() == ::com::mycelius::message::Data_DataType_DOUBLE){
+                var = QVariant(param.databytes().c_str()).toFloat();
+            }else if(param.type() == ::com::mycelius::message::Data_DataType_INTEGER){
+                var = QVariant(param.databytes().c_str()).toInt();
+            }else if(param.type() == ::com::mycelius::message::Data_DataType_BOOLEAN){
+                var = QVariant(param.databytes().c_str()).toBool();
+            }else if(param.type() == ::com::mycelius::message::Data_DataType_BYTES){
+                var = QVariant(QByteArray(param.databytes().c_str(), param.databytes().length()));
+            }else if(param.type() == ::com::mycelius::message::Data_DataType_JSON_STR){
+                // JSON object found here. It can be array or a map...
+                QString jsonStr = QVariant(QByteArray(param.databytes().c_str(), param.databytes().length())).toString();
+                QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8());
+                // From the jsonDoc...
+                if(jsonDoc.isObject()){
+                     QJsonObject jsonObject = jsonDoc.object();
+                     var = jsonObject;
+                }else if(jsonDoc.isArray()){
+                    QJsonArray jsonArray = jsonDoc.array();
+                    var = jsonArray;
+                }else if(jsonDoc.isEmpty() || jsonDoc.isNull()){
+                    //var = NULL;
+                }
+
+            }else if(param.type() == ::com::mycelius::message::Data_DataType_STRING){
+                var = QVariant(param.databytes().c_str());
+            }
+            evtDataMap[QString::fromStdString(param.name())] = var;
+        }
+
+
+        if(this->listeners.contains(channelId)){
+            for(int i=0; i < this->listeners[channelId].size(); i++){
+                this->listeners[channelId][i]->onEvent(evtNumber, evtDataMap);
+            }
+        }
     }
 }
 
@@ -207,6 +250,40 @@ void Session::processPendingMessage(QString messageId){
         delete msg;
         msg = NULL;
     }
+}
+
+void Session::registerListener(Listener* l){
+    // here I will register the listener.
+    // Here I will regirster the object...
+    std::string uuid = QUuid::createUuid().toString().toStdString();
+
+    com::mycelius::message::Message *msg = new com::mycelius::message::Message();
+    msg->set_id(uuid);
+    msg->set_index(-1);
+    msg->set_total(1);
+    msg->set_type(::com::mycelius::message::Message_MessageType_REQUEST);
+
+    com::mycelius::message::Request *rqst = new com::mycelius::message::Request();
+    rqst->set_method("RegisterListener");
+    rqst->set_id(uuid);
+    msg->set_allocated_rqst(rqst);
+
+    // Now I will set the listener channel as parameter.
+    ::com::mycelius::message::Data *channelId = rqst->add_params();
+    channelId->set_type(::com::mycelius::message::Data_DataType_STRING);
+    channelId->set_name("channelId");
+    channelId->set_databytes(l->getChannelId().toStdString());
+
+    //this->listeners.insert();
+    if(!this->listeners.contains(l->getChannelId())){
+        this->listeners[l->getChannelId()] = QList<Listener*>();
+    }
+
+    // Append the listener.
+    this->listeners[l->getChannelId()].push_back(l);
+
+    // Send the request directly here.
+    this->sendMessage(msg);
 }
 
 void Session::disconnected()

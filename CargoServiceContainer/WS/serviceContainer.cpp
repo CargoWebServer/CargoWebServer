@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QCoreApplication>
 #include <QtScript/QtScript>
+#include "listener.hpp"
 
 #include "../serviceContainer.cpp"
 
@@ -58,6 +59,11 @@ void ServiceContainer::onNewConnection(){
         for(int i=0; i < objects.keys().length(); i++){
             QJSValue objectValue = engine->newQObject(objects.value(objects.keys()[i]));
             engine->globalObject().setProperty(objects.keys()[i], objectValue);
+            // Now with a dynamic cast I will try to convert the object as a listener...
+            Listener* listener = reinterpret_cast<Listener*>(objects.value(objects.keys()[i]));
+            if(listener != NULL){
+                session->registerListener(listener);
+            }
         }
 
         // Keep the reference to the engine.

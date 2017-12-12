@@ -5,7 +5,7 @@
 #include <QCoreApplication>
 #include <QThreadPool>
 #include <QUuid>
-
+#include "gen/rpc.pb.h"
 // Common ws/tcp code.
 #include "../session.cpp"
 
@@ -54,6 +54,7 @@ void Session::run()
     // not dropped out in the middle when thread dies
     exec();
 
+    // send end of session signal.
     emit end(this->id);
 }
 

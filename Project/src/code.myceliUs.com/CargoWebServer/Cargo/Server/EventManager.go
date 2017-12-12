@@ -268,6 +268,8 @@ func (this *EventListener) onEvent(evt *Event) {
 
 		// Set the type to response
 		m.msg = new(Message)
+		uuid := Utility.RandomUUID()
+		m.msg.Id = &uuid
 		index_ := int32(-1)
 		total := int32(1)
 		m.msg.Index = &index_
@@ -303,7 +305,7 @@ type EventChannel struct {
 func (this *EventChannel) broadcastEvent(evt *Event) {
 	//log.Println("-----------> 285 ", evt)
 	for _, listener := range this.m_listeners {
-		//log.Println("----------> evt broadcast: ", evt, listener.m_id)
+		log.Println("----------> evt broadcast: ", evt, listener.m_addr.GetAddrStr(), listener.m_addr.GetPort())
 		listener.onEvent(evt)
 	}
 }

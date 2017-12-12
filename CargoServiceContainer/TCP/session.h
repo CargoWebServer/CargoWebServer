@@ -5,8 +5,11 @@
 #include <QTcpSocket>
 #include <QDebug>
 #include <QMap>
+#include <QList>
 #include <QVector>
 #include "gen/rpc.pb.h"
+
+class Listener;
 
 class Session : public QThread
 {
@@ -18,6 +21,7 @@ public:
     explicit Session(qintptr ID, QObject *parent = 0);
     ~Session();
     void run();
+    void registerListener(Listener*);
 
 signals:
     void error(QTcpSocket::SocketError socketerror);
@@ -36,6 +40,11 @@ public slots:
 private:
     QTcpSocket *socket;
     qintptr socketDescriptor;
+
+    // The map of event listener.
+    QMap<QString, QList<Listener*> > listeners;
+
+    // The map of pending message.
     QMap<QString, QList<com::mycelius::message::Message*> > pending;
 
     // Use for incomming message

@@ -5,14 +5,19 @@
 #include <QWebSocket>
 #include <QDebug>
 #include <QMap>
+#include <QList>
 #include <QVector>
 #include "gen/rpc.pb.h"
+
+class Listener;
+
 class Session : public QThread
 {
     static int MAX_MESSAGE_SIZE;
     QWebSocket *socket;
     QMap<QString, QList<com::mycelius::message::Message*> > pending;
     QMap<QString, QVector<QByteArray> > pendingMsgChunk;
+    QMap<QString, QList<Listener*> > listeners;
 
      Q_OBJECT
 public:
@@ -20,6 +25,7 @@ public:
     explicit Session(QWebSocket* socket, QObject *parent = 0);
     ~Session();
     void run();
+    void registerListener(Listener*);
 
 signals:
     void end(QString);

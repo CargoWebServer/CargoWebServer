@@ -4,8 +4,10 @@
 #include <QThreadPool>
 #include <QPluginLoader>
 #include <QDebug>
+#include <QUuid>
 #include <QCoreApplication>
 #include <QtScript/QtScript>
+#include "listener.hpp"
 
 // common tcp/ws code.
 #include "../serviceContainer.cpp"
@@ -52,8 +54,14 @@ void ServiceContainer::incomingConnection(qintptr socketDescriptor){
     QJSEngine *engine = new QJSEngine();
     QMap<QString, QObject*> objects = this->loadPluginObjects();
     for(int i=0; i < objects.keys().length(); i++){
-        QJSValue objectValue = engine->newQObject(objects.value(objects.keys()[i]));
+        QObject* object = objects.value(objects.keys()[i]);
+        QJSValue objectValue = engine->newQObject(object);
         engine->globalObject().setProperty(objects.keys()[i], objectValue);
+        // Now with a dynamic cast I will try to convert the object as a listener...
+        Listener* listener = reinterpret_cast<Listener*>(object);
+        if(listener != NULL){
+            session->registerListener(listener);
+        }
     }
     // Keep the reference to the engine.
     this->engines[session->id] = engine;

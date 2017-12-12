@@ -9,6 +9,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJSEngine>
+#include "gen/rpc.pb.h"
 
 /**
  * @brief Service Container is a TCP server. It's use to interface
@@ -39,8 +40,9 @@ public:
      **/
     QObject* getObjectByTypeName(QString typeName);
 
+
 Q_SIGNALS:
-    void closed();
+    void sendRequest(com::mycelius::message::Message*);
 
 private Q_SLOTS:
     /**

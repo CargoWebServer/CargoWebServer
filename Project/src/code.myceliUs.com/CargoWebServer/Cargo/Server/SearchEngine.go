@@ -2,12 +2,12 @@ package Server
 
 import (
 	"errors"
-	"io/ioutil"
+	//"io/ioutil"
 	"log"
-	"strings"
+	//"strings"
 
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
+	//"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	//"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 )
 
@@ -55,7 +55,7 @@ func (this *SearchEngine) initialize() {
 	log.Println("--> Initialize Search Engine")
 
 	// So here I will index values from the entity manager.
-	configEntity, _ := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
+	/*configEntity, _ := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
 	config := configEntity.GetObject().(*Config.Configurations)
 	for i := 0; i < len(config.GetDataStoreConfigs()); i++ {
 		dataStoreConfig := config.GetDataStoreConfigs()[i]
@@ -86,7 +86,7 @@ func (this *SearchEngine) initialize() {
 				this.IndexEntity(path, entity, "en") // The default language is english... // TODO append the paremeter language in the store.
 			}
 		}
-	}
+	}*/
 
 }
 
