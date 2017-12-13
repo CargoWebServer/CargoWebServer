@@ -18,17 +18,17 @@ func (this *EntityManager) create_CargoEntities_EntityEntityPrototype() {
 	var entityEntityProto EntityPrototype
 	entityEntityProto.TypeName = "CargoEntities.Entity"
 	entityEntityProto.IsAbstract = true
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Error")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Project")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Computer")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.File")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Notification")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
 	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.User")
-	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Group")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.LogEntry")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Log")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
+	entityEntityProto.SubstitutionGroup = append(entityEntityProto.SubstitutionGroup, "CargoEntities.Account")
 	entityEntityProto.Ids = append(entityEntityProto.Ids, "UUID")
 	entityEntityProto.Fields = append(entityEntityProto.Fields, "UUID")
 	entityEntityProto.FieldsType = append(entityEntityProto.FieldsType, "xs.string")
@@ -419,11 +419,18 @@ func (this *CargoEntities_ParameterEntity) SaveEntity() {
 	/** Save parameters type Parameter **/
 	/** attribute Parameter has no method GetId, must be an error here...*/
 	ParameterInfo = append(ParameterInfo, "")
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -1016,11 +1023,18 @@ func (this *CargoEntities_ActionEntity) SaveEntity() {
 	} else {
 		ActionInfo = append(ActionInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -1653,11 +1667,18 @@ func (this *CargoEntities_ErrorEntity) SaveEntity() {
 	} else {
 		ErrorInfo = append(ErrorInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -2244,11 +2265,18 @@ func (this *CargoEntities_LogEntryEntity) SaveEntity() {
 	} else {
 		LogEntryInfo = append(LogEntryInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -2821,11 +2849,18 @@ func (this *CargoEntities_LogEntity) SaveEntity() {
 	} else {
 		LogInfo = append(LogInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -3391,11 +3426,18 @@ func (this *CargoEntities_ProjectEntity) SaveEntity() {
 	} else {
 		ProjectInfo = append(ProjectInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -3597,9 +3639,9 @@ func (this *EntityManager) create_CargoEntities_MessageEntityPrototype() {
 	messageEntityProto.TypeName = "CargoEntities.Message"
 	messageEntityProto.IsAbstract = true
 	messageEntityProto.SuperTypeNames = append(messageEntityProto.SuperTypeNames, "CargoEntities.Entity")
-	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Error")
 	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Notification")
 	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.TextMessage")
+	messageEntityProto.SubstitutionGroup = append(messageEntityProto.SubstitutionGroup, "CargoEntities.Error")
 	messageEntityProto.Ids = append(messageEntityProto.Ids, "UUID")
 	messageEntityProto.Fields = append(messageEntityProto.Fields, "UUID")
 	messageEntityProto.FieldsType = append(messageEntityProto.FieldsType, "xs.string")
@@ -4050,11 +4092,18 @@ func (this *CargoEntities_NotificationEntity) SaveEntity() {
 	} else {
 		NotificationInfo = append(NotificationInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -4674,11 +4723,18 @@ func (this *CargoEntities_TextMessageEntity) SaveEntity() {
 	} else {
 		TextMessageInfo = append(TextMessageInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -5287,11 +5343,18 @@ func (this *CargoEntities_SessionEntity) SaveEntity() {
 	} else {
 		SessionInfo = append(SessionInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -5863,11 +5926,18 @@ func (this *CargoEntities_RoleEntity) SaveEntity() {
 	} else {
 		RoleInfo = append(RoleInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -6491,14 +6561,6 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	if !lazy_messages {
 		for i := 0; i < len(this.object.M_messages); i++ {
 			switch v := this.object.M_messages[i].(type) {
-			case *CargoEntities.Error:
-				messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
-				messagesIds = append(messagesIds, messagesEntity.GetUuid())
-				messagesEntity.AppendReferenced("messages", this)
-				this.AppendChild("messages", messagesEntity)
-				if messagesEntity.NeedSave() {
-					messagesEntity.SaveEntity()
-				}
 			case *CargoEntities.Notification:
 				messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
 				messagesIds = append(messagesIds, messagesEntity.GetUuid())
@@ -6509,6 +6571,14 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 				}
 			case *CargoEntities.TextMessage:
 				messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
+				messagesIds = append(messagesIds, messagesEntity.GetUuid())
+				messagesEntity.AppendReferenced("messages", this)
+				this.AppendChild("messages", messagesEntity)
+				if messagesEntity.NeedSave() {
+					messagesEntity.SaveEntity()
+				}
+			case *CargoEntities.Error:
+				messagesEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), v.UUID, v)
 				messagesIds = append(messagesIds, messagesEntity.GetUuid())
 				messagesEntity.AppendReferenced("messages", this)
 				this.AppendChild("messages", messagesEntity)
@@ -6546,11 +6616,18 @@ func (this *CargoEntities_AccountEntity) SaveEntity() {
 	} else {
 		AccountInfo = append(AccountInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -6699,7 +6776,20 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string, lazy bool) error 
 						log.Println("type ", typeName, " not found!")
 						return err
 					}
-					if typeName == "CargoEntities.Error" {
+					if typeName == "CargoEntities.TextMessage" {
+						if len(uuids[i]) > 0 {
+							var messagesEntity *CargoEntities_TextMessageEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								messagesEntity = instance.(*CargoEntities_TextMessageEntity)
+							} else {
+								messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
+								messagesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(messagesEntity)
+							}
+							messagesEntity.AppendReferenced("messages", this)
+							this.AppendChild("messages", messagesEntity)
+						}
+					} else if typeName == "CargoEntities.Error" {
 						if len(uuids[i]) > 0 {
 							var messagesEntity *CargoEntities_ErrorEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
@@ -6719,19 +6809,6 @@ func (this *CargoEntities_AccountEntity) InitEntity(id string, lazy bool) error 
 								messagesEntity = instance.(*CargoEntities_NotificationEntity)
 							} else {
 								messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), uuids[i], nil)
-								messagesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(messagesEntity)
-							}
-							messagesEntity.AppendReferenced("messages", this)
-							this.AppendChild("messages", messagesEntity)
-						}
-					} else if typeName == "CargoEntities.TextMessage" {
-						if len(uuids[i]) > 0 {
-							var messagesEntity *CargoEntities_TextMessageEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								messagesEntity = instance.(*CargoEntities_TextMessageEntity)
-							} else {
-								messagesEntity = GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), uuids[i], nil)
 								messagesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(messagesEntity)
 							}
@@ -7299,11 +7376,18 @@ func (this *CargoEntities_ComputerEntity) SaveEntity() {
 	} else {
 		ComputerInfo = append(ComputerInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -7882,11 +7966,18 @@ func (this *CargoEntities_PermissionEntity) SaveEntity() {
 	} else {
 		PermissionInfo = append(PermissionInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -8543,11 +8634,18 @@ func (this *CargoEntities_FileEntity) SaveEntity() {
 	} else {
 		FileInfo = append(FileInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -9108,14 +9206,14 @@ func (this *EntityManager) create_CargoEntities_UserEntityPrototype() {
 	/** members of User **/
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 4)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
-	userEntityProto.Fields = append(userEntityProto.Fields, "M_firstName")
 	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_firstName")
+	userEntityProto.Fields = append(userEntityProto.Fields, "M_firstName")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 5)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
-	userEntityProto.Fields = append(userEntityProto.Fields, "M_lastName")
 	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_lastName")
+	userEntityProto.Fields = append(userEntityProto.Fields, "M_lastName")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 6)
@@ -9130,8 +9228,8 @@ func (this *EntityManager) create_CargoEntities_UserEntityPrototype() {
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 8)
 	userEntityProto.FieldsVisibility = append(userEntityProto.FieldsVisibility, true)
-	userEntityProto.Fields = append(userEntityProto.Fields, "M_email")
 	userEntityProto.Indexs = append(userEntityProto.Indexs, "M_email")
+	userEntityProto.Fields = append(userEntityProto.Fields, "M_email")
 	userEntityProto.FieldsType = append(userEntityProto.FieldsType, "xs.string")
 	userEntityProto.FieldsDefaultValue = append(userEntityProto.FieldsDefaultValue, "")
 	userEntityProto.FieldsOrder = append(userEntityProto.FieldsOrder, 9)
@@ -9231,11 +9329,18 @@ func (this *CargoEntities_UserEntity) SaveEntity() {
 	} else {
 		UserInfo = append(UserInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -9840,11 +9945,18 @@ func (this *CargoEntities_GroupEntity) SaveEntity() {
 	} else {
 		GroupInfo = append(GroupInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -10405,32 +10517,16 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	if !lazy_entities {
 		for i := 0; i < len(this.object.M_entities); i++ {
 			switch v := this.object.M_entities[i].(type) {
-			case *CargoEntities.Notification:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
+			case *CargoEntities.LogEntry:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
 				if entitiesEntity.NeedSave() {
 					entitiesEntity.SaveEntity()
 				}
-			case *CargoEntities.Account:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.User:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.Group:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
+			case *CargoEntities.Log:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -10445,6 +10541,14 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				if entitiesEntity.NeedSave() {
 					entitiesEntity.SaveEntity()
 				}
+			case *CargoEntities.Notification:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
 			case *CargoEntities.TextMessage:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesTextMessageEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
@@ -10453,16 +10557,8 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				if entitiesEntity.NeedSave() {
 					entitiesEntity.SaveEntity()
 				}
-			case *CargoEntities.LogEntry:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), v.UUID, v)
-				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
-				entitiesEntity.AppendReferenced("entities", this)
-				this.AppendChild("entities", entitiesEntity)
-				if entitiesEntity.NeedSave() {
-					entitiesEntity.SaveEntity()
-				}
-			case *CargoEntities.Log:
-				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), v.UUID, v)
+			case *CargoEntities.Account:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesAccountEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -10487,6 +10583,22 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 				}
 			case *CargoEntities.File:
 				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.User:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), v.UUID, v)
+				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
+				entitiesEntity.AppendReferenced("entities", this)
+				this.AppendChild("entities", entitiesEntity)
+				if entitiesEntity.NeedSave() {
+					entitiesEntity.SaveEntity()
+				}
+			case *CargoEntities.Group:
+				entitiesEntity := GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), v.UUID, v)
 				entitiesIds = append(entitiesIds, entitiesEntity.GetUuid())
 				entitiesEntity.AppendReferenced("entities", this)
 				this.AppendChild("entities", entitiesEntity)
@@ -10557,11 +10669,18 @@ func (this *CargoEntities_EntitiesEntity) SaveEntity() {
 	}
 	actionsStr, _ := json.Marshal(actionsIds)
 	EntitiesInfo = append(EntitiesInfo, string(actionsStr))
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -10668,7 +10787,20 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 						log.Println("type ", typeName, " not found!")
 						return err
 					}
-					if typeName == "CargoEntities.Computer" {
+					if typeName == "CargoEntities.Notification" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_NotificationEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_NotificationEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.Computer" {
 						if len(uuids[i]) > 0 {
 							var entitiesEntity *CargoEntities_ComputerEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
@@ -10694,6 +10826,32 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 							entitiesEntity.AppendReferenced("entities", this)
 							this.AppendChild("entities", entitiesEntity)
 						}
+					} else if typeName == "CargoEntities.User" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_UserEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_UserEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
+					} else if typeName == "CargoEntities.Group" {
+						if len(uuids[i]) > 0 {
+							var entitiesEntity *CargoEntities_GroupEntity
+							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
+								entitiesEntity = instance.(*CargoEntities_GroupEntity)
+							} else {
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity.InitEntity(uuids[i], lazy)
+								GetServer().GetEntityManager().insert(entitiesEntity)
+							}
+							entitiesEntity.AppendReferenced("entities", this)
+							this.AppendChild("entities", entitiesEntity)
+						}
 					} else if typeName == "CargoEntities.Error" {
 						if len(uuids[i]) > 0 {
 							var entitiesEntity *CargoEntities_ErrorEntity
@@ -10701,32 +10859,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 								entitiesEntity = instance.(*CargoEntities_ErrorEntity)
 							} else {
 								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesErrorEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.LogEntry" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_LogEntryEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_LogEntryEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
-					} else if typeName == "CargoEntities.Log" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_LogEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_LogEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), uuids[i], nil)
 								entitiesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(entitiesEntity)
 							}
@@ -10759,19 +10891,6 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 							entitiesEntity.AppendReferenced("entities", this)
 							this.AppendChild("entities", entitiesEntity)
 						}
-					} else if typeName == "CargoEntities.Notification" {
-						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_NotificationEntity
-							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_NotificationEntity)
-							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesNotificationEntity(this.GetUuid(), uuids[i], nil)
-								entitiesEntity.InitEntity(uuids[i], lazy)
-								GetServer().GetEntityManager().insert(entitiesEntity)
-							}
-							entitiesEntity.AppendReferenced("entities", this)
-							this.AppendChild("entities", entitiesEntity)
-						}
 					} else if typeName == "CargoEntities.Account" {
 						if len(uuids[i]) > 0 {
 							var entitiesEntity *CargoEntities_AccountEntity
@@ -10785,26 +10904,26 @@ func (this *CargoEntities_EntitiesEntity) InitEntity(id string, lazy bool) error
 							entitiesEntity.AppendReferenced("entities", this)
 							this.AppendChild("entities", entitiesEntity)
 						}
-					} else if typeName == "CargoEntities.User" {
+					} else if typeName == "CargoEntities.LogEntry" {
 						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_UserEntity
+							var entitiesEntity *CargoEntities_LogEntryEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_UserEntity)
+								entitiesEntity = instance.(*CargoEntities_LogEntryEntity)
 							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesUserEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntryEntity(this.GetUuid(), uuids[i], nil)
 								entitiesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(entitiesEntity)
 							}
 							entitiesEntity.AppendReferenced("entities", this)
 							this.AppendChild("entities", entitiesEntity)
 						}
-					} else if typeName == "CargoEntities.Group" {
+					} else if typeName == "CargoEntities.Log" {
 						if len(uuids[i]) > 0 {
-							var entitiesEntity *CargoEntities_GroupEntity
+							var entitiesEntity *CargoEntities_LogEntity
 							if instance, ok := GetServer().GetEntityManager().contain(uuids[i]); ok {
-								entitiesEntity = instance.(*CargoEntities_GroupEntity)
+								entitiesEntity = instance.(*CargoEntities_LogEntity)
 							} else {
-								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesGroupEntity(this.GetUuid(), uuids[i], nil)
+								entitiesEntity = GetServer().GetEntityManager().NewCargoEntitiesLogEntity(this.GetUuid(), uuids[i], nil)
 								entitiesEntity.InitEntity(uuids[i], lazy)
 								GetServer().GetEntityManager().insert(entitiesEntity)
 							}

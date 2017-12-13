@@ -305,7 +305,7 @@ type EventChannel struct {
 func (this *EventChannel) broadcastEvent(evt *Event) {
 	//log.Println("-----------> 285 ", evt)
 	for _, listener := range this.m_listeners {
-		log.Println("----------> evt broadcast: ", evt, listener.m_addr.GetAddrStr(), listener.m_addr.GetPort())
+		//log.Println("----------> evt broadcast: ", evt, listener.m_addr.GetAddrStr(), listener.m_addr.GetPort())
 		listener.onEvent(evt)
 	}
 }

@@ -12,7 +12,7 @@ class Listener : public QObject
     Q_OBJECT
 public:
     explicit Listener(QObject *parent = nullptr);
-    virtual QString getChannelId()=0;
+    virtual QStringList getChannelIds()=0;
     virtual void onEvent(int evtNumber, const QMap<QString, QVariant> &evtData) = 0;
 };
 

@@ -1529,11 +1529,20 @@ func generateEntitySaveFunc(packageId string, class *XML_Schemas.CMOF_OwnedMembe
 	}
 
 	// The event data...
-	entitySaveStr += "	eventData := make([]*MessageData, 1)\n"
-	entitySaveStr += "	msgData := new(MessageData)\n"
-	entitySaveStr += "	msgData.Name = \"entity\"\n"
-	entitySaveStr += "	msgData.Value = this.GetObject()\n"
-	entitySaveStr += "	eventData[0] = msgData\n"
+	entitySaveStr += "	eventData := make([]*MessageData, 2)\n\n"
+
+	entitySaveStr += "	msgData0 := new(MessageData)\n"
+	entitySaveStr += "	msgData0.TYPENAME = \"Server.MessageData\"\n"
+	entitySaveStr += "	msgData0.Name = \"entity\"\n"
+	entitySaveStr += "	msgData0.Value = this.GetObject()\n"
+	entitySaveStr += "	eventData[0] = msgData0\n"
+
+	entitySaveStr += "	msgData1 := new(MessageData)\n"
+	entitySaveStr += "	msgData1.TYPENAME = \"Server.MessageData\"\n"
+	entitySaveStr += "	msgData1.Name = \"prototype\"\n"
+	entitySaveStr += "	msgData1.Value = this.GetPrototype()\n"
+	entitySaveStr += "	eventData[1] = msgData1\n"
+
 	entitySaveStr += "	var err error\n"
 
 	entitySaveStr += "	var evt *Event\n"

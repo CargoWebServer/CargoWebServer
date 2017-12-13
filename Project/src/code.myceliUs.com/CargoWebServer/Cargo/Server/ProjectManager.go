@@ -55,9 +55,6 @@ func (this *ProjectManager) getId() string {
 
 func (this *ProjectManager) start() {
 	log.Println("--> Start ProjectManager")
-	// First of all I will scan the application directory to see if project
-	// project exist...
-	this.synchronize()
 }
 
 func (this *ProjectManager) stop() {

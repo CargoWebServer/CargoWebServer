@@ -70,7 +70,9 @@ func (this *LdapManager) getConfigsInfo() map[string]*Config.LdapConfiguration {
 
 func (this *LdapManager) start() {
 	log.Println("--> Start LdapManager")
+}
 
+func (this *LdapManager) synchronizeAll() {
 	// configure all information from the servers...
 	for _, info := range this.getConfigsInfo() {
 		// Synchronize the list of user...

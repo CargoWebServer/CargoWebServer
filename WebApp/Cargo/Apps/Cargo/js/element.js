@@ -32,7 +32,7 @@ function createChildElement(parent, node) {
     nodeElement.parent = parent;
     nodeElement.element = node;
 
-    if (node.id != undefined) {
+    if (node.id !== undefined) {
         nodeElement.id = node.id;
     } else {
         nodeElement.id = randomUUID();

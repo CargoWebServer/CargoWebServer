@@ -1039,6 +1039,12 @@ func (this *Server) Start() {
 
 		// Here I will initialise the search engine.
 		GetServer().GetSearchEngine().initialize()
+		// Sync files
+		GetServer().GetFileManager().synchronizeAll()
+		// Sync users, computers and groups.
+		GetServer().GetLdapManager().synchronizeAll()
+		// Sync projects.
+		GetServer().GetProjectManager().synchronize()
 	}()
 }
 

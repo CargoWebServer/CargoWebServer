@@ -2,12 +2,8 @@ package Server
 
 import (
 	"errors"
-	//"io/ioutil"
 	"log"
-	//"strings"
 
-	//"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	//"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 )
 
@@ -53,41 +49,6 @@ func (this *Server) GetSearchEngine() *SearchEngine {
 func (this *SearchEngine) initialize() {
 
 	log.Println("--> Initialize Search Engine")
-
-	// So here I will index values from the entity manager.
-	/*configEntity, _ := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
-	config := configEntity.GetObject().(*Config.Configurations)
-	for i := 0; i < len(config.GetDataStoreConfigs()); i++ {
-		dataStoreConfig := config.GetDataStoreConfigs()[i]
-		store := GetServer().GetDataManager().getDataStore(dataStoreConfig.GetId())
-		prototypes, _ := store.GetEntityPrototypes()
-		for j := 0; j < len(prototypes); j++ {
-			prototype := prototypes[j]
-			entities, _ := GetServer().GetEntityManager().getEntities(prototype.TypeName, nil, store.GetId(), true)
-			// Get the path of the data store.
-			path := GetServer().GetConfigurationManager().m_filePath
-			// Here I will create the db if it does not exist.
-			path += config.GetServerConfig().GetDataPath() + "/" + store.GetId() + "/" + store.GetId() + ".glass"
-			for k := 0; k < len(entities); k++ {
-				entity := entities[k]
-				// in the partcular case of a text file i will set it data before indexing it.
-				if entity.GetTypeName() == "CargoEntities.File" {
-					if strings.HasPrefix(entity.GetObject().(*CargoEntities.File).GetMime(), "application/") || strings.HasPrefix(entity.GetObject().(*CargoEntities.File).GetMime(), "text/") {
-						// In that case i will read the content of the file.
-						filePath := GetServer().GetConfigurationManager().m_filePath + config.GetServerConfig().GetApplicationsPath() + entity.GetObject().(*CargoEntities.File).GetPath() + "/" + entity.GetObject().(*CargoEntities.File).GetName()
-						b, err := ioutil.ReadFile(filePath) // just pass the file name
-						if err == nil {
-							entity.GetObject().(*CargoEntities.File).SetData(string(b)) // convert content to a 'string'
-						} else {
-							log.Println("------> err ", err)
-						}
-					}
-				}
-				this.IndexEntity(path, entity, "en") // The default language is english... // TODO append the paremeter language in the store.
-			}
-		}
-	}*/
-
 }
 
 /**

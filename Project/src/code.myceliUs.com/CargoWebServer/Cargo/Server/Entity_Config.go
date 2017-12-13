@@ -4,12 +4,12 @@ package Server
 
 import (
 	"encoding/json"
+	//	"log"
+	"strings"
+	"unsafe"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
-	//"log"
-	"strings"
-	"unsafe"
 )
 
 /** Entity Prototype creation **/
@@ -18,14 +18,14 @@ func (this *EntityManager) create_Config_ConfigurationEntityPrototype() {
 	var configurationEntityProto EntityPrototype
 	configurationEntityProto.TypeName = "Config.Configuration"
 	configurationEntityProto.IsAbstract = true
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ScheduledTask")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
-	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.SmtpConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.DataStoreConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.LdapConfiguration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.OAuth2Configuration")
 	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServiceConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ScheduledTask")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ApplicationConfiguration")
+	configurationEntityProto.SubstitutionGroup = append(configurationEntityProto.SubstitutionGroup, "Config.ServerConfiguration")
 	configurationEntityProto.Ids = append(configurationEntityProto.Ids, "UUID")
 	configurationEntityProto.Fields = append(configurationEntityProto.Fields, "UUID")
 	configurationEntityProto.FieldsType = append(configurationEntityProto.FieldsType, "xs.string")
@@ -503,11 +503,18 @@ func (this *Config_SmtpConfigurationEntity) SaveEntity() {
 	} else {
 		SmtpConfigurationInfo = append(SmtpConfigurationInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -1255,11 +1262,18 @@ func (this *Config_DataStoreConfigurationEntity) SaveEntity() {
 	} else {
 		DataStoreConfigurationInfo = append(DataStoreConfigurationInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -1949,11 +1963,18 @@ func (this *Config_LdapConfigurationEntity) SaveEntity() {
 	} else {
 		LdapConfigurationInfo = append(LdapConfigurationInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -2541,11 +2562,18 @@ func (this *Config_OAuth2ClientEntity) SaveEntity() {
 	} else {
 		OAuth2ClientInfo = append(OAuth2ClientInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -3125,11 +3153,18 @@ func (this *Config_OAuth2AuthorizeEntity) SaveEntity() {
 		OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, "")
 	}
 	OAuth2AuthorizeInfo = append(OAuth2AuthorizeInfo, this.object.M_createdAt)
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -3758,11 +3793,18 @@ func (this *Config_OAuth2IdTokenEntity) SaveEntity() {
 	} else {
 		OAuth2IdTokenInfo = append(OAuth2IdTokenInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -4425,11 +4467,18 @@ func (this *Config_OAuth2AccessEntity) SaveEntity() {
 	} else {
 		OAuth2AccessInfo = append(OAuth2AccessInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -5022,11 +5071,18 @@ func (this *Config_OAuth2RefreshEntity) SaveEntity() {
 	} else {
 		OAuth2RefreshInfo = append(OAuth2RefreshInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -5552,11 +5608,18 @@ func (this *Config_OAuth2ExpiresEntity) SaveEntity() {
 	} else {
 		OAuth2ExpiresInfo = append(OAuth2ExpiresInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -6296,11 +6359,18 @@ func (this *Config_OAuth2ConfigurationEntity) SaveEntity() {
 	} else {
 		OAuth2ConfigurationInfo = append(OAuth2ConfigurationInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -7094,11 +7164,18 @@ func (this *Config_ServiceConfigurationEntity) SaveEntity() {
 	} else {
 		ServiceConfigurationInfo = append(ServiceConfigurationInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -7713,11 +7790,18 @@ func (this *Config_ScheduledTaskEntity) SaveEntity() {
 	} else {
 		ScheduledTaskInfo = append(ScheduledTaskInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -8293,11 +8377,18 @@ func (this *Config_ApplicationConfigurationEntity) SaveEntity() {
 	} else {
 		ApplicationConfigurationInfo = append(ApplicationConfigurationInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -8905,11 +8996,18 @@ func (this *Config_ServerConfigurationEntity) SaveEntity() {
 	} else {
 		ServerConfigurationInfo = append(ServerConfigurationInfo, "")
 	}
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {
@@ -9680,11 +9778,18 @@ func (this *Config_ConfigurationsEntity) SaveEntity() {
 	}
 	scheduledTasksStr, _ := json.Marshal(scheduledTasksIds)
 	ConfigurationsInfo = append(ConfigurationsInfo, string(scheduledTasksStr))
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+
+	msgData0 := new(MessageData)
+	msgData0.TYPENAME = "Server.MessageData"
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+	msgData1 := new(MessageData)
+	msgData1.TYPENAME = "Server.MessageData"
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 	var err error
 	var evt *Event
 	if this.Exist() == true {

@@ -984,12 +984,16 @@ func (this *DynamicEntity) saveEntity(path string) {
 	}
 
 	// The event data...
-	eventData := make([]*MessageData, 1)
-	msgData := new(MessageData)
-	msgData.TYPENAME = "Server.MessageData"
-	msgData.Name = "entity"
-	msgData.Value = this.GetObject()
-	eventData[0] = msgData
+	eventData := make([]*MessageData, 2)
+	msgData0 := new(MessageData)
+	msgData0.Name = "entity"
+	msgData0.Value = this.GetObject()
+	eventData[0] = msgData0
+
+	msgData1 := new(MessageData)
+	msgData1.Name = "prototype"
+	msgData1.Value = this.GetPrototype()
+	eventData[1] = msgData1
 
 	var evt *Event
 	var err error

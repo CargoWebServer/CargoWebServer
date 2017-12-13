@@ -729,7 +729,10 @@ var Base64 = {
         var i = 0;
 
         input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-
+        if(input.indexOf(",") > -1){
+            // If the input is an url...
+            input = input.substr(input.indexOf(","))
+        }
         while (i < input.length) {
 
             enc1 = this._keyStr.indexOf(input.charAt(i++));
@@ -830,6 +833,7 @@ function encode64(input) {
  * @results {string} the string containing the original value.
  */
 function decode64(input) {
+    
     return Base64.decode(input);
 }
 

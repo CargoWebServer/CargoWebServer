@@ -56,7 +56,7 @@ SearchPage.prototype.search = function () {
     
     xapian.search(
         dbpath,
-        this.searchInput.value,
+        this.searchInput.element.value,
         ["XD:data"],
         "en",
         0,

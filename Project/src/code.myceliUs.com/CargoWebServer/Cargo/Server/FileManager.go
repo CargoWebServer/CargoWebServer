@@ -86,14 +86,18 @@ func (this *FileManager) getId() string {
 
 func (this *FileManager) start() {
 	log.Println("--> Start FileManager")
-	// Now I will synchronize files...
-	rootDir := this.synchronize(this.root)
-	rootEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntityFromObject(rootDir)
-	rootEntity.SaveEntity()
+
 }
 
 func (this *FileManager) stop() {
 	log.Println("--> Stop FileManager")
+}
+
+func (this *FileManager) synchronizeAll() {
+	// Now I will synchronize files...
+	rootDir := this.synchronize(this.root)
+	rootEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntityFromObject(rootDir)
+	rootEntity.SaveEntity()
 }
 
 /**
@@ -501,16 +505,28 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 
 	defer f.Close()
 
+	if len(fileUuid) == 0 {
+		fileEntity, _ := GetServer().GetEntityManager().createEntity(parentDirEntity.GetUuid(), "M_files", "CargoEntities.File", fileId, file)
+		file = fileEntity.GetObject().(*CargoEntities.File)
+	}
+
 	if err == nil {
-		eventData := make([]*MessageData, 1)
+		eventData := make([]*MessageData, 2)
 		fileInfo := new(MessageData)
 		fileInfo.TYPENAME = "Server.MessageData"
 		fileInfo.Name = "fileInfo"
-		if !isNew {
+		if strings.HasPrefix(file.M_mime, "text/") || strings.HasPrefix(file.M_mime, "application/") {
 			file.SetData(base64.StdEncoding.EncodeToString(filedata))
 		}
 		fileInfo.Value = file
 		eventData[0] = fileInfo
+
+		prototypeInfo := new(MessageData)
+		prototypeInfo.TYPENAME = "Server.MessageData"
+		prototypeInfo.Name = "prototype"
+		prototypeInfo.Value, _ = GetServer().GetEntityManager().getEntityPrototype("CargoEntities.File", "CargoEntities")
+		eventData[1] = prototypeInfo
+
 		var evt *Event
 		if isNew {
 			// New file create
@@ -520,11 +536,6 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 			evt, _ = NewEvent(UpdateFileEvent, FileEvent, eventData)
 		}
 		GetServer().GetEventManager().BroadcastEvent(evt)
-	}
-
-	if len(fileUuid) == 0 {
-		GetServer().GetEntityManager().createEntity(parentDirEntity.GetUuid(), "M_files", "CargoEntities.File", fileId, file)
-		log.Println("Create entity for file: ", filepath+"/"+filename)
 	}
 
 	// Save the file.
@@ -597,12 +608,21 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 	}
 
 	if err == nil {
-		eventData := make([]*MessageData, 1)
+		if strings.HasPrefix(file.M_mime, "text/") || strings.HasPrefix(file.M_mime, "application/") {
+			file.SetData(base64.StdEncoding.EncodeToString(filedata))
+		}
+		eventData := make([]*MessageData, 2)
 		fileInfo := new(MessageData)
 		fileInfo.TYPENAME = "Server.MessageData"
 		fileInfo.Name = "fileInfo"
 		fileInfo.Value = file
 		eventData[0] = fileInfo
+
+		prototypeInfo := new(MessageData)
+		prototypeInfo.TYPENAME = "Server.MessageData"
+		prototypeInfo.Name = "prototype"
+		prototypeInfo.Value, _ = GetServer().GetEntityManager().getEntityPrototype("CargoEntities.File", "CargoEntities")
+		eventData[1] = prototypeInfo
 
 		evt, _ := NewEvent(UpdateFileEvent, FileEvent, eventData)
 		GetServer().GetEventManager().BroadcastEvent(evt)
@@ -644,12 +664,18 @@ func (this *FileManager) deleteFile(uuid string) error {
 	// Here i will remove the entity...
 	fileEntity.DeleteEntity() // Remove all sub-entity and also remove it from it parent.
 
-	eventData := make([]*MessageData, 1)
+	eventData := make([]*MessageData, 2)
 	fileInfo := new(MessageData)
 	fileInfo.TYPENAME = "Server.MessageData"
 	fileInfo.Name = "fileInfo"
 	fileInfo.Value = file
 	eventData[0] = fileInfo
+
+	prototypeInfo := new(MessageData)
+	prototypeInfo.TYPENAME = "Server.MessageData"
+	prototypeInfo.Name = "prototype"
+	prototypeInfo.Value, _ = GetServer().GetEntityManager().getEntityPrototype("CargoEntities.File", "CargoEntities")
+	eventData[1] = prototypeInfo
 
 	evt, _ := NewEvent(DeleteFileEvent, FileEvent, eventData)
 	GetServer().GetEventManager().BroadcastEvent(evt)
@@ -833,6 +859,7 @@ func (this *FileManager) createDbFile(id string, name string, mimeType string, d
 // @scope {public}
 // @src
 //FileManager.prototype.onEvent = function (evt) {
+
 //    EventHub.prototype.onEvent.call(this, evt)
 //}
 func (this *FileManager) OnEvent(evt interface{}) {

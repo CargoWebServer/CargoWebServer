@@ -179,7 +179,6 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
             evtDataMap[QString::fromStdString(param.name())] = var;
         }
 
-
         if(this->listeners.contains(channelId)){
             for(int i=0; i < this->listeners[channelId].size(); i++){
                 this->listeners[channelId][i]->onEvent(evtNumber, evtDataMap);
@@ -253,37 +252,37 @@ void Session::processPendingMessage(QString messageId){
 }
 
 void Session::registerListener(Listener* l){
-    // here I will register the listener.
-    // Here I will regirster the object...
-    std::string uuid = QUuid::createUuid().toString().toStdString();
-
-    com::mycelius::message::Message *msg = new com::mycelius::message::Message();
-    msg->set_id(uuid);
-    msg->set_index(-1);
-    msg->set_total(1);
-    msg->set_type(::com::mycelius::message::Message_MessageType_REQUEST);
-
-    com::mycelius::message::Request *rqst = new com::mycelius::message::Request();
-    rqst->set_method("RegisterListener");
-    rqst->set_id(uuid);
-    msg->set_allocated_rqst(rqst);
 
     // Now I will set the listener channel as parameter.
-    ::com::mycelius::message::Data *channelId = rqst->add_params();
-    channelId->set_type(::com::mycelius::message::Data_DataType_STRING);
-    channelId->set_name("channelId");
-    channelId->set_databytes(l->getChannelId().toStdString());
+    QStringList channelIds = l->getChannelIds();
 
-    //this->listeners.insert();
-    if(!this->listeners.contains(l->getChannelId())){
-        this->listeners[l->getChannelId()] = QList<Listener*>();
+    for(int i=0; i < channelIds.length(); i++){
+        // here I will register the listener.
+        // Here I will regirster the object...
+        std::string uuid = QUuid::createUuid().toString().toStdString();
+
+        com::mycelius::message::Message *msg = new com::mycelius::message::Message();
+        msg->set_id(uuid);
+        msg->set_index(-1);
+        msg->set_total(1);
+        msg->set_type(::com::mycelius::message::Message_MessageType_REQUEST);
+
+        com::mycelius::message::Request *rqst = new com::mycelius::message::Request();
+        rqst->set_method("RegisterListener");
+        rqst->set_id(uuid);
+        msg->set_allocated_rqst(rqst);
+        ::com::mycelius::message::Data *channelId = rqst->add_params();
+        channelId->set_type(::com::mycelius::message::Data_DataType_STRING);
+        channelId->set_name("channelId" + QString::number(i).toStdString());
+        channelId->set_databytes(channelIds[i].toStdString());
+        if(!this->listeners.contains(channelIds[i])){
+            this->listeners[channelIds[i]] = QList<Listener*>();
+        }
+        this->listeners[channelIds[i]].push_back(l);
+
+        // Send the request directly here.
+        this->sendMessage(msg);
     }
-
-    // Append the listener.
-    this->listeners[l->getChannelId()].push_back(l);
-
-    // Send the request directly here.
-    this->sendMessage(msg);
 }
 
 void Session::disconnected()
