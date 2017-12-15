@@ -1023,31 +1023,15 @@ func (this *Server) Start() {
 			log.Panicln(err)
 		}
 
+		activeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations)
+
 		// Now I will set scheduled task.
-		for i := 0; i < len(GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
-			task := GetServer().GetConfigurationManager().m_activeConfigurationsEntity.object.M_scheduledTasks[i]
+		for i := 0; i < len(activeConfigurations.M_scheduledTasks); i++ {
+			task := activeConfigurations.M_scheduledTasks[i]
 			GetTaskManager().scheduleTask(task)
 		}
 
-		activeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations)
-		// Register server listeners (channels)
-		for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
-			config := activeConfigurations.GetServiceConfigs()[i]
-			if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
-				GetServer().GetServiceManager().registerServiceListeners(config)
-			}
-		}
-
-		// Register server client code.
-		for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
-			config := activeConfigurations.GetServiceConfigs()[i]
-			if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
-				GetServer().GetServiceManager().registerServiceContainerActions(config)
-			}
-		}
-
 		// Here I will initialise the search engine.
-		GetServer().GetSearchEngine().initialize()
 		// Sync files
 		GetServer().GetFileManager().synchronizeAll()
 		// Sync users, computers and groups.

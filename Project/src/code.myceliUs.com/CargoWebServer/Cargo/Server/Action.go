@@ -115,7 +115,6 @@ func (self *Action) execute() {
  * Register a new listener with a given name.
  */
 func (self *Action) RegisterListener(name string) {
-	log.Println("-------> register listener ", name)
 	if self.msg.from.IsOpen() {
 		listener := NewEventListener(name, self.msg.from)
 		GetServer().GetEventManager().AddEventListener(listener)

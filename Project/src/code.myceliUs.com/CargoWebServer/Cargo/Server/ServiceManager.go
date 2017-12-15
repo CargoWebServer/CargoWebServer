@@ -7,13 +7,16 @@ import (
 	"go/parser"
 	"go/token"
 	"log"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
+	"github.com/mitchellh/go-ps"
 )
 
 type ServiceManager struct {
@@ -120,8 +123,11 @@ func (this *ServiceManager) registerService(service Service) {
 	this.m_servicesLst = append(this.m_servicesLst, service)
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// WS or TCP services...
+////////////////////////////////////////////////////////////////////////////////
 /**
- * Here I will register external services. (WS or TCP)
+ * Get the list of channel id's and connect listener.
  */
 func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfiguration) {
 
@@ -160,14 +166,14 @@ func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfi
 				log.Println("---> register listener: ", channels[i])
 			}
 		}
-		//caller.(chan interface{}) <- nil
+		caller.(chan interface{}) <- nil
 	}
 
 	// The error callback.
 	errorCallback := func(errMsg *message, caller interface{}) {
 		errStr := errMsg.msg.Err.Message
 		log.Println("--------> error: 169 ", errStr)
-		//caller.(chan interface{}) <- errStr
+		caller.(chan interface{}) <- errStr
 	}
 
 	rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, wait)
@@ -175,11 +181,11 @@ func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfi
 	GetServer().GetProcessor().m_sendRequest <- rqst
 
 	// I will also synchronize the methode...
-	//<-wait
+	<-wait
 }
 
 /**
- * Here I will register external services. (WS or TCP)
+ * Register the service action.
  */
 func (this *ServiceManager) registerServiceContainerActions(config *Config.ServiceConfiguration) {
 	// If the action array does not exist.
@@ -876,8 +882,62 @@ func (this *ServiceManager) RegisterAction(name string, parameters []interface{}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *ServiceManager) GetServiceActions(serviceName string, messageId string, sessionId string) []*CargoEntities.Action {
-	//for i := 0; i < len(this.m_serviceAction[serviceName]); i++ {
-	//log.Println(this.m_serviceAction[serviceName][i])
-	//}
 	return this.m_serviceAction[serviceName]
+}
+
+// @api 1.0
+// Start a service with a given name, the service configuration must exist before
+// calling that method.
+// @param {string} serviceName The name of the service
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @scope {restricted}
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+func (this *ServiceManager) StartService(name string, messageId string, sessionId string) {
+	// First of all I will get it configuration information.
+	config := GetServer().GetConfigurationManager().getServiceConfigurationById(name)
+	if config != nil {
+		if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
+			// I will test if a process exist for with that name.
+			processes, err := ps.Processes()
+			if err == nil {
+				for i := 0; i < len(processes); i++ {
+					if strings.HasPrefix(processes[i].Executable(), name) {
+						// I will get the proecess handle and kill it...
+						process, err := os.FindProcess(processes[i].Pid())
+						if err == nil {
+							process.Kill() // Kill existing process.
+						}
+					}
+				}
+
+				wait := make(chan interface{})
+
+				// Now now I will start an new process...
+				go func(config *Config.ServiceConfiguration, sessionId string, wait chan interface{}) {
+					GetServer().RunCmd(config.GetId(), []string{strconv.Itoa(config.GetPort())}, sessionId)
+					wait <- nil
+				}(config, sessionId, wait)
+
+				time.Sleep(1 * time.Second)
+
+				// So now I will connect the service listners...
+				GetServer().GetServiceManager().registerServiceListeners(config)
+
+				time.Sleep(1 * time.Second)
+
+				// And I will get the service action code.
+				GetServer().GetServiceManager().registerServiceContainerActions(config)
+
+				log.Println("--> service ", name, " is ready")
+
+				<-wait
+			} else {
+				log.Println("------------> error ", err)
+			}
+		}
+	} else {
+		log.Println("---> service not found: ", name)
+	}
 }

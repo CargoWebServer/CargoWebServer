@@ -885,12 +885,14 @@ func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.V
 	results := <-op.m_returns
 	var value otto.Value
 	var err error
+
 	if results[0] != nil {
 		value = results[0].(otto.Value)
 	}
 
 	if results[1] != nil {
-		err = results[0].(error)
+		err = results[1].(error)
+		log.Println("---> err: ", err)
 	}
 
 	return value, err

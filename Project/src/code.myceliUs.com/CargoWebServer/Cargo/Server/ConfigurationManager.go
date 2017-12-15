@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
@@ -152,11 +151,13 @@ func (this *ConfigurationManager) initialize() {
 	log.Println("--> initialyze ConfigurationManager")
 	// So here if there is no configuration...
 	configsUuid := ConfigConfigurationsExists("CARGO_DEFAULT_CONFIGURATIONS")
+	var activeConfigurations *Config.Configurations
 	if len(configsUuid) > 0 {
 		entity, _ := GetServer().GetEntityManager().getEntityByUuid(configsUuid, false)
 		this.m_activeConfigurationsEntity = entity.(*Config_ConfigurationsEntity)
+		activeConfigurations = this.m_activeConfigurationsEntity.GetObject().(*Config.Configurations)
 	} else {
-		activeConfigurations := new(Config.Configurations)
+		activeConfigurations = new(Config.Configurations)
 		activeConfigurations.M_id = "CARGO_DEFAULT_CONFIGURATIONS"
 		activeConfigurations.M_name = "Cargo Default Configurations"
 		activeConfigurations.M_version = "1.0"
@@ -171,10 +172,6 @@ func (this *ConfigurationManager) initialize() {
 		activeConfigurations.M_serverConfig.M_tcp_serviceContainerPort = 9595
 		activeConfigurations.M_serverConfig.M_hostName = "localhost"
 		activeConfigurations.M_serverConfig.M_ipv4 = "127.0.0.1"
-
-		// Here I will create the C++ service container TCP | WS
-		this.setServiceConfiguration("CargoServiceContainer_TCP", activeConfigurations.M_serverConfig.M_tcp_serviceContainerPort)
-		this.setServiceConfiguration("CargoServiceContainer_WS", activeConfigurations.M_serverConfig.M_ws_serviceContainerPort)
 
 		// Scrpit to start the service container.
 		tcpServiceContainerStart := new(Config.ScheduledTask)
@@ -209,6 +206,8 @@ func (this *ConfigurationManager) initialize() {
 		activeConfigurations.M_serverConfig.M_binPath = "/bin"
 		os.MkdirAll(this.GetBinPath(), 0777)
 
+		activeConfigurations.M_serviceConfigs = this.m_servicesConfiguration
+
 		// Where queries are store by default...
 		activeConfigurations.NeedSave = true
 
@@ -217,6 +216,9 @@ func (this *ConfigurationManager) initialize() {
 		this.m_activeConfigurationsEntity.SaveEntity()
 	}
 
+	// Set the TCP | WS
+	this.setServiceConfiguration("CargoServiceContainer_TCP", activeConfigurations.M_serverConfig.M_tcp_serviceContainerPort)
+	this.setServiceConfiguration("CargoServiceContainer_WS", activeConfigurations.M_serverConfig.M_ws_serviceContainerPort)
 }
 
 func (this *ConfigurationManager) getId() string {
@@ -231,23 +233,21 @@ func (this *ConfigurationManager) start() {
 		task := this.m_activeConfigurationsEntity.object.M_scheduledTasks[i]
 		if task.M_id == "tcpServiceContainerStart" {
 			if len(CargoEntitiesFileExists("tcpServiceContainerStart")) == 0 {
-				var script string
-				script = "function tcpServiceContainerStart(){\n"
-				script += `	GetServer().RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"], sessionId)` + "\n"
-				script += `	setInterval(function(){ GetServer().RunCmd("CargoServiceContainer_TCP", ["` + strconv.Itoa(this.GetTcpConfigurationServicePort()) + `"], sessionId)}, 1000)` + "\n"
+				script := "function tcpServiceContainerStart(){\n"
+				script += `	GetServer().GetServiceManager().StartService("CargoServiceContainer_TCP", "", "")` + "\n"
+				script += `	setInterval(function(){GetServer().GetServiceManager().StartService("CargoServiceContainer_TCP", "", "")}, 1000)` + "\n"
 				script += "}\n"
 				script += "tcpServiceContainerStart()\n"
 				GetServer().GetFileManager().createDbFile("tcpServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", script)
 			}
 		} else if task.M_id == "wsServiceContainerStart" {
 			if len(CargoEntitiesFileExists("wsServiceContainerStart")) == 0 {
-				var script string
-				script = "function wsServiceContainerStart(){\n"
-				script += `	GetServer().RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"], sessionId)` + "\n"
-				script += `	setInterval(function(){GetServer().RunCmd("CargoServiceContainer_WS", ["` + strconv.Itoa(this.GetWsConfigurationServicePort()) + `"], sessionId)}, 1000)` + "\n"
+				script := "function wsServiceContainerStart(){\n"
+				script += `	GetServer().GetServiceManager().StartService("CargoServiceContainer_WS", "", "")` + "\n"
+				script += `	setInterval(function(){GetServer().GetServiceManager().StartService("CargoServiceContainer_WS", "", "")}, 1000)` + "\n"
 				script += "}\n"
 				script += "wsServiceContainerStart()\n"
-				GetServer().GetFileManager().createDbFile("wsServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", script)
+				GetServer().GetFileManager().createDbFile("wsServiceContainerStart", "wsServiceContainerStart.js", "application/javascript", script)
 			}
 		}
 	}
@@ -440,6 +440,8 @@ func (this *ConfigurationManager) setServiceConfiguration(id string, port int) {
 	config.M_id = id
 	config.M_ipv4 = this.GetIpv4()
 	config.M_start = true
+	config.NeedSave = true
+
 	if port == -1 {
 		config.M_port = this.GetServerPort()
 	} else {
