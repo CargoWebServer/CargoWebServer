@@ -5,18 +5,6 @@
 #include "listener.hpp"
 
 /**
- * @brief serializeToByteArray Serialyse the message to an array of bytes...
- * @param msg The proto message.
- * @return
- */
-QByteArray serializeToByteArray(google::protobuf::Message *msg){
-    QByteArray ra;
-    ra.resize(msg->ByteSize());
-    msg->SerializeToArray(ra.data(),ra.size());
-    return ra;
-}
-
-/**
  * @brief Session::MAX_MESSAGE_SIZE The size must be the same on both side of the socket.
  */
 int Session::MAX_MESSAGE_SIZE = 17740;
@@ -83,8 +71,6 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
 
         // In that case the action will be execute...
         QThreadPool::globalInstance()->start(action);
-
-
     }else if(msg.type() == com::mycelius::message::Message_MessageType_RESPONSE){
         // The message is a response...
         QString messageId = QString::fromStdString(msg.rsp().id());
@@ -93,13 +79,10 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
              //qDebug() << " number of pending message for " << messageId << " is " << this->pending.find(messageId)->size();
             this->processPendingMessage(messageId);
         }
-
     }else if(msg.type() == com::mycelius::message::Message_MessageType_TRANSFER){
-
         int total = msg.total();
         int index = msg.index();
         QString messageId = QString::fromStdString(msg.id());
-
         if(this->pendingMsgChunk.contains(messageId) == true){
             // First I will insert the message inside the vector...
             QVector<QByteArray>& array = *this->pendingMsgChunk.find(messageId);
@@ -114,8 +97,14 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
 
                 // Here I will recreate the original message from the assembled data array...
                 com::mycelius::message::Message originalMessage;
-                originalMessage.ParseFromArray(originalMessageData.constData(), originalMessageData.size());
-                this->processIncommingMessage(originalMessage);
+
+                bool isCorrect = originalMessage.ParseFromArray(originalMessageData.constData(), originalMessageData.size());
+                if(isCorrect){
+                    this->processIncommingMessage(originalMessage);
+                }else{
+                    qDebug() << "Fail to recreate the original message: ";
+                    qDebug() << originalMessageData.constData();
+                }
             }
         }else{
             // Here I will store the pending message...
@@ -179,11 +168,8 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
             evtDataMap[QString::fromStdString(param.name())] = var;
         }
 
-        if(this->listeners.contains(channelId)){
-            for(int i=0; i < this->listeners[channelId].size(); i++){
-                this->listeners[channelId][i]->onEvent(evtNumber, evtDataMap);
-            }
-        }
+        // dispatch to the listeners.
+        emit this->onEvent(channelId, evtNumber, evtDataMap);
     }
 }
 
@@ -248,40 +234,6 @@ void Session::processPendingMessage(QString messageId){
         this->sendMessage(msg);
         delete msg;
         msg = NULL;
-    }
-}
-
-void Session::registerListener(Listener* l){
-
-    // Now I will set the listener channel as parameter.
-    QStringList channelIds = l->getChannelIds();
-
-    for(int i=0; i < channelIds.length(); i++){
-        // here I will register the listener.
-        // Here I will regirster the object...
-        std::string uuid = QUuid::createUuid().toString().toStdString();
-
-        com::mycelius::message::Message *msg = new com::mycelius::message::Message();
-        msg->set_id(uuid);
-        msg->set_index(-1);
-        msg->set_total(1);
-        msg->set_type(::com::mycelius::message::Message_MessageType_REQUEST);
-
-        com::mycelius::message::Request *rqst = new com::mycelius::message::Request();
-        rqst->set_method("RegisterListener");
-        rqst->set_id(uuid);
-        msg->set_allocated_rqst(rqst);
-        ::com::mycelius::message::Data *channelId = rqst->add_params();
-        channelId->set_type(::com::mycelius::message::Data_DataType_STRING);
-        channelId->set_name("channelId" + QString::number(i).toStdString());
-        channelId->set_databytes(channelIds[i].toStdString());
-        if(!this->listeners.contains(channelIds[i])){
-            this->listeners[channelIds[i]] = QList<Listener*>();
-        }
-        this->listeners[channelIds[i]].push_back(l);
-
-        // Send the request directly here.
-        this->sendMessage(msg);
     }
 }
 

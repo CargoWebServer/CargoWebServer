@@ -13,7 +13,9 @@ class Listener : public QObject
 public:
     explicit Listener(QObject *parent = nullptr);
     virtual QStringList getChannelIds()=0;
-    virtual void onEvent(int evtNumber, const QMap<QString, QVariant> &evtData) = 0;
+
+public slots:
+    virtual void onEvent(QString, int evtNumber, const QMap<QString, QVariant> &evtData) = 0;
 };
 
 #endif // LISTENER_H

@@ -31,15 +31,16 @@ ServiceContainer *ServiceContainer::getInstance()
 ServiceContainer::ServiceContainer(const QString &serverName, SslMode secureMode, QObject *parent) :
     QWebSocketServer(serverName,secureMode, parent)
 {
-    this->loadPluginObjects();
+
 }
 
 // This function is called by QTcpServer when a new connection is available.
 void ServiceContainer::onNewConnection(){
-
     // We have a new connection
     QWebSocket *socket = this->nextPendingConnection();
     if(socket != NULL){
+        // Block other thread that want ot use the engines maps.
+
         // Every new session will be run in a newly created thread
         Session *session = new Session(socket, this);
 
@@ -53,21 +54,7 @@ void ServiceContainer::onNewConnection(){
         // Start the session...
         session->start();
 
-        // Here I will append the js engine for that session and put object on it.
-        QJSEngine *engine = new QJSEngine();
-        QMap<QString, QObject*> objects = this->loadPluginObjects();
-        for(int i=0; i < objects.keys().length(); i++){
-            QJSValue objectValue = engine->newQObject(objects.value(objects.keys()[i]));
-            engine->globalObject().setProperty(objects.keys()[i], objectValue);
-            // Now with a dynamic cast I will try to convert the object as a listener...
-            Listener* listener = reinterpret_cast<Listener*>(objects.value(objects.keys()[i]));
-            if(listener != NULL){
-                session->registerListener(listener);
-            }
-        }
-
-        // Keep the reference to the engine.
-        this->engines[session->id] = engine;
+        this->setListeners(session);
     }
 }
 

@@ -1137,6 +1137,108 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 }
 
 // @api 1.0
+// Save a file on the server.
+// @param {*CargoEntities.File} file The file to save.
+// @param {string} filedata The data of the file.
+// @param {int} thumbnailMaxHeight The maximum height size of the thumbnail associated with the file (keep the ratio).
+// @param {int} thumbnailMaxWidth The maximum width size of the thumbnail associated with the file (keep the ratio).
+// @param {string} messageId The request id that need to access this method.
+// @param {string} sessionId The user session.
+// @return {*CargoEntities.File} The created file entity.
+// @scope {public}
+// @param {callback} progressCallback The function is call when chunk of response is received.
+// @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
+// @param {callback} errorCallback In case of error.
+// @src
+//FileManager.prototype.saveFile = function (file, filedata, thumbnailMaxHeight, thumbnailMaxWidth, successCallback, progressCallback, errorCallback, caller) {
+//    // server is the client side singleton.
+//    var params = []
+//    // The file data (filedata) will be upload with the http protocol...
+//    params.push(createRpcData(file, "JSON_STR", "file"))
+//    params.push(createRpcData(filepath, "STRING", "filepath"))
+//    params.push(createRpcData(thumbnailMaxHeight, "INTEGER", "thumbnailMaxHeight"))
+//    params.push(createRpcData(thumbnailMaxWidth, "INTEGER", "thumbnailMaxWidth"))
+//    // Here I will create a new data form...
+//    var formData = new FormData()
+//    formData.append("multiplefiles", filedata, filename)
+//    // Use the post function to upload the file to the server.
+//    var xhr = new XMLHttpRequest()
+//    xhr.open('POST', '/uploads', true)
+//    // In case of error or success...
+//    xhr.onload = function (params, xhr) {
+//        return function (e) {
+//            if (xhr.readyState === 4) {
+//                if (xhr.status === 200) {
+//                    console.log(xhr.responseText);
+//                    // Here I will create the file...
+//                    server.executeJsFunction(
+//                        "FileManagerSaveFile", // The function to execute remotely on server
+//                        params, // The parameters to pass to that function
+//                        function (index, total, caller) { // The progress callback
+//                            // Keep track of the file transfert.
+//                            caller.progressCallback(index, total, caller.caller)
+//                        },
+//                        function (result, caller) {
+//                            caller.successCallback(result[0], caller.caller)
+//                        },
+//                        function (errMsg, caller) {
+//                            // display the message in the console.
+//                            console.log(errMsg)
+//                            // call the immediate error callback.
+//                            caller.errorCallback(errMsg, caller.caller)
+//                            // dispatch the message.
+//                            server.errorManager.onError(errMsg)
+//                        }, // Error callback
+//                        { "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback, "errorCallback": errorCallback } // The caller
+//                    )
+//                } else {
+//                    console.error(xhr.statusText);
+//                }
+//            }
+//        }
+//    } (params, xhr)
+//    // now the progress event...
+//    xhr.upload.onprogress = function (progressCallback, caller) {
+//        return function (e) {
+//            if (e.lengthComputable) {
+//                progressCallback(e.loaded, e.total, caller)
+//            }
+//        }
+//    } (progressCallback, caller)
+//    xhr.send(formData);
+//}
+func (this *FileManager) SaveFile(file *CargoEntities.File, filepath string, thumbnailMaxHeight int64, thumbnailMaxWidth int64, messageId string, sessionId string) {
+	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
+	if errObj != nil {
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
+	tmpPath := GetServer().GetConfigurationManager().GetTmpPath() + "/" + file.GetName()
+
+	// I will open the file from the tmp directory.
+	filedata, err := ioutil.ReadFile(tmpPath)
+
+	// remove the tmp file if it file path is not empty... otherwise the
+	// file will bee remove latter.
+	defer os.Remove(tmpPath)
+
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_NOT_FOUND_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
+	err = this.saveFile(file.UUID, filedata, sessionId, int(thumbnailMaxHeight), int(thumbnailMaxWidth), file.M_fileType == CargoEntities.FileType_DbFile)
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), FILE_WRITE_ERROR, SERVER_ERROR_CODE, err)
+		GetServer().reportErrorMessage(messageId, sessionId, errObj)
+		return
+	}
+
+}
+
+// @api 1.0
 // Remove a file entity with a given uuid.
 // @param {string} uuid The file uuid.
 // @param {string} messageId The request id that need to access this method.

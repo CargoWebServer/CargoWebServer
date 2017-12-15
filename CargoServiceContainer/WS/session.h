@@ -7,7 +7,7 @@
 #include <QMap>
 #include <QList>
 #include <QVector>
-#include "gen/rpc.pb.h"
+#include "../gen/rpc.pb.h"
 
 class Listener;
 
@@ -17,7 +17,6 @@ class Session : public QThread
     QWebSocket *socket;
     QMap<QString, QList<com::mycelius::message::Message*> > pending;
     QMap<QString, QVector<QByteArray> > pendingMsgChunk;
-    QMap<QString, QList<Listener*> > listeners;
 
      Q_OBJECT
 public:
@@ -25,14 +24,16 @@ public:
     explicit Session(QWebSocket* socket, QObject *parent = 0);
     ~Session();
     void run();
-    void registerListener(Listener*);
 
 signals:
     void end(QString);
+        void onEvent(QString, int, QMap<QString, QVariant>);
 
 private Q_SLOTS:
     void processBinaryMessage(QByteArray);
     void disconnected();
+
+public Q_SLOTS:
 
     /**
      * @brief completeProcessMessageData Send back the answer to the client when the

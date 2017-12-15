@@ -9,40 +9,23 @@
 // Common ws/tcp code.
 #include "../session.cpp"
 
-Session::Session(qintptr ID, QObject *parent) :
-    QThread(parent)
+Session::Session(QTcpSocket* socket, QObject *parent) :
+    QThread(parent),
+    socket(socket)
 {
-    this->socketDescriptor = ID;
     this->id = QUuid::createUuid().toString();
 }
 
 Session::~Session(){
-    qDebug() << "session is deleted!";
 }
 
 void Session::run()
 {
-    // thread starts here
-    qDebug() << " Thread started";
-    socket = new QTcpSocket();
-
-    // set the ID
-    if(!socket->setSocketDescriptor(this->socketDescriptor))
-    {
-        // something's wrong, we just emit a signal
-        emit error(socket->error());
-        qDebug() << "error encounter! session.cpp ln 28";
-        return;
-    }
-
     // connect socket and signal
     // note - Qt::DirectConnection is used because it's multithreaded
     //        This makes the slot to be invoked immediately, when the signal is emitted.
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-
-    // We'll have multiple clients, we want to know which is which
-    //qDebug() << socketDescriptor << " Client connected";
 
     // Move the socket to the main thread so it will be accessible
     // from inside the slot...
@@ -63,6 +46,7 @@ void Session::sendMessage(com::mycelius::message::Message *msg){
     this->socket->write(data);
     this->socket->waitForBytesWritten();
 }
+
 
 void Session::readyRead()
 {

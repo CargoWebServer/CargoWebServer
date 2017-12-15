@@ -123,6 +123,64 @@ func (this *ServiceManager) registerService(service Service) {
 /**
  * Here I will register external services. (WS or TCP)
  */
+func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfiguration) {
+
+	address := GetServer().GetConfigurationManager().GetIpv4() + ":" + strconv.Itoa(config.GetPort())
+	if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() {
+		address = "ws://" + address
+	}
+
+	// I will open a connection with the service and get it list of actions.
+	conn, err := GetServer().connect(address)
+
+	if err != nil {
+		return
+	}
+
+	// So here I will request the list of actions.
+	id := Utility.RandomUUID()
+	method := "GetListeners"
+	params := make([]*MessageData, 0)
+
+	to := make([]connection, 1)
+	to[0] = conn
+
+	wait := make(chan interface{})
+
+	// The success callback.
+	successCallback := func(rspMsg *message, caller interface{}) {
+		// So here i will get the message value...
+		results := rspMsg.msg.Rsp.Results
+		channels := make([]string, 0)
+		err := json.Unmarshal(results[0].DataBytes, &channels)
+		if err == nil {
+			for i := 0; i < len(channels); i++ {
+				listener := NewEventListener(channels[i], rspMsg.from)
+				GetServer().GetEventManager().AddEventListener(listener)
+				log.Println("---> register listener: ", channels[i])
+			}
+		}
+		//caller.(chan interface{}) <- nil
+	}
+
+	// The error callback.
+	errorCallback := func(errMsg *message, caller interface{}) {
+		errStr := errMsg.msg.Err.Message
+		log.Println("--------> error: 169 ", errStr)
+		//caller.(chan interface{}) <- errStr
+	}
+
+	rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, wait)
+
+	GetServer().GetProcessor().m_sendRequest <- rqst
+
+	// I will also synchronize the methode...
+	//<-wait
+}
+
+/**
+ * Here I will register external services. (WS or TCP)
+ */
 func (this *ServiceManager) registerServiceContainerActions(config *Config.ServiceConfiguration) {
 	// If the action array does not exist.
 	if this.m_serviceAction[config.GetId()] == nil {
@@ -149,10 +207,13 @@ func (this *ServiceManager) registerServiceContainerActions(config *Config.Servi
 	to := make([]connection, 1)
 	to[0] = conn
 
+	wait := make(chan interface{})
+
 	// The success callback.
-	successCallback_ := func(rspMsg *message, caller_ interface{}) {
+	successCallback_ := func(rspMsg *message, caller interface{}) {
 		// So here i will get the message value...
 		results := rspMsg.msg.Rsp.Results
+
 		for i := 0; i < len(results); i++ {
 			infos := make([]map[string]interface{}, 0)
 			err := json.Unmarshal(results[i].DataBytes, &infos)
@@ -222,20 +283,22 @@ func (this *ServiceManager) registerServiceContainerActions(config *Config.Servi
 				}
 			}
 		}
+		caller.(chan interface{}) <- nil
 	}
 
 	// The error callback.
 	errorCallback_ := func(errMsg *message, caller interface{}) {
 		errStr := errMsg.msg.Err.Message
 		log.Println("--------> error: 207 ", errStr)
+		caller.(chan interface{}) <- errStr
 	}
 
-	rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, nil)
+	rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, wait)
 
 	GetServer().GetProcessor().m_sendRequest <- rqst
 
-	// Close the connection.
-	//conn.Close()
+	// I will also synchronize the methode...
+	<-wait
 }
 
 /**

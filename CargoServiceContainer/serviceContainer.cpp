@@ -6,6 +6,19 @@ ServiceContainer::~ServiceContainer(){
     this->close();
 }
 
+
+/**
+ * @brief serializeToByteArray Serialyse the message to an array of bytes...
+ * @param msg The proto message.
+ * @return
+ */
+QByteArray serializeToByteArray(google::protobuf::Message *msg){
+    QByteArray ra;
+    ra.resize(msg->ByteSize());
+    msg->SerializeToArray(ra.data(),ra.size());
+    return ra;
+}
+
 void ServiceContainer::startServer()
 {
     if(!this->listen(QHostAddress::Any, this->port))
@@ -26,28 +39,32 @@ QMap<QString, QObject*> ServiceContainer::loadPluginObjects(){
 
     QDir pluginsDir(QCoreApplication::applicationDirPath());
     pluginsDir.cd("plugins");
+
     // Object define by plugin...
     QMap<QString, QObject*> objects;
 
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
-        QString iid =  pluginLoader.metaData().value("IID").toString();
-        QJsonObject metaData = pluginLoader.metaData().value("MetaData").toObject();
-        QObject *plugin = pluginLoader.instance();
-        if(plugin != NULL){
-            QStringList values = iid.split(".");
-            QString className = values.at(values.size()-1);
+        if(fileName.indexOf(".dll.a") == -1){ // Do not load the lib but the dll int that particular case.
+            QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+            QString iid =  pluginLoader.metaData().value("IID").toString();
+            QJsonObject metaData = pluginLoader.metaData().value("MetaData").toObject();
+            QObject *plugin = pluginLoader.instance();
+            if(plugin != NULL){
+                QStringList values = iid.split(".");
+                if(values.size() > 0){
+                    QString className = values.at(values.size()-1);
+                    objects.insert(className, plugin);
 
-            objects.insert(className, plugin);
+                    // Keep meta infos...
+                    this->metaInfos.insert(iid,metaData);
 
-            // Keep meta infos...
-            this->metaInfos.insert(iid,metaData);
+                    // Append the plugin object.
+                    qDebug() << "Load object: " << className;
 
-            // Append the plugin object.
-            qDebug() << "Load object: " << className;
-
-        }else{
-            qDebug() << pluginLoader.errorString();
+                }else{
+                    qDebug() << pluginLoader.errorString();
+                }
+            }
         }
     }
 
@@ -216,6 +233,7 @@ QString ServiceContainer::GetServicesClientCode(){
 }
 
 QJsonArray ServiceContainer::GetActionInfos(){
+    QMutexLocker ml(&this->mutex);
     QJsonArray actionInfos;
     QMapIterator<QString, QJsonObject> i(this->metaInfos);
     while (i.hasNext()) {
@@ -233,11 +251,14 @@ QString ServiceContainer::Ping(){
 }
 
 void  ServiceContainer::onSessionEnd(QString sessionId){
+    QMutexLocker ml(&this->mutex);
     delete this->engines[sessionId]; // Clear memory
     this->engines.remove(sessionId); // remove from the map.
 }
 
 QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
+    QMutexLocker ml(&this->mutex);
+
     // first of all i will create a new engine...
     QVariantList results;
 
@@ -269,4 +290,33 @@ QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
        results.push_back(errObj);
     }
     return results;
+}
+
+void ServiceContainer::setListeners(Session* session){
+    QMutexLocker ml(&this->mutex);
+    // Here I will append the js engine for that session and put object on it.
+    QJSEngine *engine = new QJSEngine();
+    QMap<QString, QObject*> objects = this->loadPluginObjects();
+    for(int i=0; i < objects.keys().length(); i++){
+        QJSValue objectValue = engine->newQObject(objects.value(objects.keys()[i]));
+        engine->globalObject().setProperty(objects.keys()[i], objectValue);
+        // Now with a dynamic cast I will try to convert the object as a listener...
+        Listener* listener = reinterpret_cast<Listener*>(objects.value(objects.keys()[i]));
+        connect(session, SIGNAL(onEvent(QString, int, QMap<QString, QVariant>)), listener, SLOT(onEvent(QString, int, QMap<QString, QVariant>)));
+
+        // Register the listener
+        QStringList channelIds = listener->getChannelIds();
+         for(int i=0; i < channelIds.length(); i++){
+             if(!this->listeners.contains(channelIds[i])){
+                 this->listeners.push_back(channelIds[i]);
+             }
+         }
+    }
+
+    // Keep the reference to the engine.
+    this->engines[session->id] = engine;
+}
+
+QStringList ServiceContainer::GetListeners(){
+    return this->listeners;
 }

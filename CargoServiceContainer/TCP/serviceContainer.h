@@ -9,7 +9,12 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJSEngine>
-#include "gen/rpc.pb.h"
+#include <QMutex>
+#include <QMutexLocker>
+#include "../gen/rpc.pb.h"
+
+class Session;
+QByteArray serializeToByteArray(google::protobuf::Message *msg);
 
 /**
  * @brief Service Container is a TCP server. It's use to interface
@@ -23,6 +28,9 @@ class ServiceContainer : public QTcpServer
     // plugins...
     QMap<QString, QObject*> loadPluginObjects();
 
+    // Listeners.
+    void setListeners(Session* session);
+
     // The port
     quint16 port;
 
@@ -32,6 +40,12 @@ class ServiceContainer : public QTcpServer
     // That contain the list engines assciated with their
     // session id.
     QMap<QString, QJSEngine*> engines;
+
+    // The list of channel to list at.
+    QStringList listeners;
+
+    // Use it to protect engines map access.
+    QMutex mutex;
 
     Q_OBJECT
 public:
@@ -54,10 +68,7 @@ public:
      **/
     QObject* getObjectByTypeName(QString typeName);
 
-Q_SIGNALS:
-    void sendRequest(com::mycelius::message::Message*);
-
-private Q_SLOTS:
+private slots:
     /**
      * @brief onSessionEnd function called when the session is terminated.
      */
@@ -67,7 +78,7 @@ protected:
     void incomingConnection(qintptr socketDescriptor);
 
 
-public Q_SLOTS:
+public slots:
     //////////////////////////////////////////////
     // Service Container api.
     /////////////////////////////////////////////
@@ -85,7 +96,6 @@ public Q_SLOTS:
      */
     QVariantList ExecuteJsFunction(QVariantList);
 
-
     /**
      * @brief GetServicesClientCode
      * Return the client side source code to inject in the VM to be able to
@@ -93,7 +103,6 @@ public Q_SLOTS:
      * @return
      */
     QString GetServicesClientCode();
-
 
     /**
      * @brief GetActionInfos
@@ -110,6 +119,11 @@ public Q_SLOTS:
      */
     QJsonArray GetActionInfos();
 
+    /**
+     * @brief GetListeners Return the list of channel to listen at.
+     * @return
+     */
+    QStringList GetListeners();
 
 };
 

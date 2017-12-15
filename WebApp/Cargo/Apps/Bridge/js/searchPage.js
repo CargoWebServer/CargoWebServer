@@ -48,7 +48,8 @@ SearchPage.prototype.search = function () {
     /* Linux path */
     //var datapath = "/home/dave/Documents/xapian/xapian-docsprint-master/data/100-objects-v1.csv"
     //var dbpath = "/tmp/toto.glass";
-    var dbpath = "/home/dave/Documents/CargoWebServer/WebApp/Cargo/Data/CargoEntities/CargoEntities.glass"
+    // var dbpath = "/home/dave/Documents/CargoWebServer/WebApp/Cargo/Data/CargoEntities/CargoEntities.glass"
+    var dbpath = "C:\\Users\\mm006819\\Documents\\CargoWebServer\\WebApp\\Cargo\\Data\\CargoEntities\\CargoEntities.glass"
     /* Windows path */
     // var datapath = "C:\\Users\\mm006819\\Documents\\xapian\\xapian-docsprint-master\\data\\100-objects-v1.csv"
     //var dbpath = "C:\\Temp\\toto.glass";

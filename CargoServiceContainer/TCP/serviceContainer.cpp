@@ -15,7 +15,6 @@
 // Does variable will be set from the Cargo server.
 ServiceContainer* ServiceContainer::instance = 0;
 
-
 ServiceContainer *ServiceContainer::getInstance()
 {
     if(ServiceContainer::instance == 0){
@@ -27,18 +26,27 @@ ServiceContainer *ServiceContainer::getInstance()
 ServiceContainer::ServiceContainer(QObject *parent) :
     QTcpServer(parent)
 {
-    // load the server plugins.
-    this->loadPluginObjects();
 }
 
 
 // This function is called by QTcpServer when a new connection is available.
 void ServiceContainer::incomingConnection(qintptr socketDescriptor){
+
     // We have a new connection
     qDebug() << socketDescriptor << " Connecting...";
 
+    // I will create the socket here.
+    QTcpSocket* socket = new QTcpSocket();
+    // set the ID
+    if(!socket->setSocketDescriptor(socketDescriptor))
+    {
+        // something's wrong, we just emit a signal
+        qDebug() << "error encounter! TCP/serviceContainer.cpp ln 44";
+        return;
+    }
+
     // Every new session will be run in a newly created thread
-    Session *session = new Session(socketDescriptor, this);
+    Session *session = new Session(socket, this);
 
     // connect signal/slot
     // once a thread is not needed, it will be beleted later
@@ -50,19 +58,6 @@ void ServiceContainer::incomingConnection(qintptr socketDescriptor){
     // Start the session...
     session->start();
 
-    // Here I will append the js engine for that session and put object on it.
-    QJSEngine *engine = new QJSEngine();
-    QMap<QString, QObject*> objects = this->loadPluginObjects();
-    for(int i=0; i < objects.keys().length(); i++){
-        QObject* object = objects.value(objects.keys()[i]);
-        QJSValue objectValue = engine->newQObject(object);
-        engine->globalObject().setProperty(objects.keys()[i], objectValue);
-        // Now with a dynamic cast I will try to convert the object as a listener...
-        Listener* listener = reinterpret_cast<Listener*>(object);
-        if(listener != NULL){
-            session->registerListener(listener);
-        }
-    }
-    // Keep the reference to the engine.
-    this->engines[session->id] = engine;
+    this->setListeners(session);
+
 }

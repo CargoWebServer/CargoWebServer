@@ -9,7 +9,14 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJSEngine>
-#include "gen/rpc.pb.h"
+#include <QMutex>
+#include <QMutexLocker>
+
+#include "../gen/rpc.pb.h"
+
+class Session;
+
+QByteArray serializeToByteArray(google::protobuf::Message *msg);
 
 /**
  * @brief Service Container is a TCP server. It's use to interface
@@ -17,6 +24,33 @@
  */
 class ServiceContainer : public QWebSocketServer
 {
+    // The port
+    quint16 port;
+
+    // Contain metadata informations.
+    QMap<QString, QJsonObject> metaInfos;
+
+    // The instance to the server itself...
+    static ServiceContainer* instance;
+
+    // The server side functions.
+    QMap<QString, QString> serverCodes;
+
+    // That contain the list engines assciated with their
+    // session id.
+    QMap<QString, QJSEngine*> engines;
+
+    // The list of listeners.
+    QStringList listeners;
+
+    // Use it to protect engines map access.
+    QMutex mutex;
+
+    // plugins...
+    QMap<QString, QObject*> loadPluginObjects();
+
+    // Set the listener.
+    void setListeners(Session* session);
 
     Q_OBJECT
 public:
@@ -40,9 +74,6 @@ public:
      **/
     QObject* getObjectByTypeName(QString typeName);
 
-
-Q_SIGNALS:
-    void sendRequest(com::mycelius::message::Message*);
 
 private Q_SLOTS:
     /**
@@ -97,26 +128,11 @@ public Q_SLOTS:
      */
     QJsonArray GetActionInfos();
 
-
-private:
-    // plugins...
-    QMap<QString, QObject*> loadPluginObjects();
-
-    // The port
-    quint16 port;
-
-    // Contain metadata informations.
-    QMap<QString, QJsonObject> metaInfos;
-
-    // The instance to the server itself...
-    static ServiceContainer* instance;
-
-    // The server side functions.
-    QMap<QString, QString> serverCodes;
-
-    // That contain the list engines assciated with their
-    // session id.
-    QMap<QString, QJSEngine*> engines;
+    /**
+     * @brief GetListeners Return the list of channel to listen at.
+     * @return
+     */
+    QStringList GetListeners();
 
 };
 

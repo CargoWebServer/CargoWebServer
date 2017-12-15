@@ -279,7 +279,8 @@ func (this *EventListener) onEvent(evt *Event) {
 		m.msg.Evt = evt
 
 		// I will sent the event message to the listener...
-		this.m_addr.Send(m.GetBytes())
+		// Never send the message directly use the message processor for it.
+		GetServer().messageProcessor.m_outgoingChannel <- m
 	}
 }
 

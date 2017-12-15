@@ -1030,6 +1030,15 @@ func (this *Server) Start() {
 		}
 
 		activeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations)
+		// Register server listeners (channels)
+		for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
+			config := activeConfigurations.GetServiceConfigs()[i]
+			if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
+				GetServer().GetServiceManager().registerServiceListeners(config)
+			}
+		}
+
+		// Register server client code.
 		for i := 0; i < len(activeConfigurations.GetServiceConfigs()); i++ {
 			config := activeConfigurations.GetServiceConfigs()[i]
 			if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {

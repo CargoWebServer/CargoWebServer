@@ -185,6 +185,7 @@ func (this *MessageProcessor) createPendingMessages(m *message) {
 		transferMsg.msg.Id = &id
 		index_ := int32(i)
 		total := int32(count)
+
 		transferMsg.msg.Index = &index_
 		transferMsg.msg.Total = &total
 
@@ -498,12 +499,22 @@ func (this *MessageProcessor) processOutgoing(m *message) {
 			}
 		}
 
-	} else if *m.msg.Type == Message_EVENT {
+	} else if *m.msg.Type == Message_EVENT || *m.msg.Type == Message_ERROR {
 		// Event
-		log.Println("----------------------------------> ln 541 message processor want to send event message!")
-	} else if *m.msg.Type == Message_ERROR {
-		// Error
-		log.Println("----------------------------------> ln 544 message processor want to send error message!")
+		for i := 0; i < len(m.to); i++ {
+			if m.to[i] == nil {
+				// Local message here no need to send over socket.
+				this.m_incomingChannel <- m
+			} else {
+				if len(m.GetBytes()) < maxSize {
+					m.to[i].Send(m.GetBytes())
+				} else {
+					// so here I will split the message in multiple part
+					// and send it.
+					this.createPendingMessages(m)
+				}
+			}
+		}
 	} else if *m.msg.Type == Message_TRANSFER {
 		// Transfer
 		for i := 0; i < len(m.to); i++ {

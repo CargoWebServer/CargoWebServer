@@ -57,7 +57,7 @@ func (self *message) GetId() string {
 		id = self.msg.GetErr().GetId()
 	} else if *self.msg.Type == Message_EVENT {
 		// The id is the name of the event.
-		id = self.msg.GetEvt().GetName()
+		id = self.msg.GetId()
 	} else if *self.msg.Type == Message_TRANSFER {
 		// The id is the name of the event.
 		id = self.msg.GetId()

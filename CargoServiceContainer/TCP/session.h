@@ -7,9 +7,7 @@
 #include <QMap>
 #include <QList>
 #include <QVector>
-#include "gen/rpc.pb.h"
-
-class Listener;
+#include "../gen/rpc.pb.h"
 
 class Session : public QThread
 {
@@ -18,19 +16,20 @@ class Session : public QThread
 
 public:
     QString id;
-    explicit Session(qintptr ID, QObject *parent = 0);
+    explicit Session(QTcpSocket* socket, QObject *parent = 0);
     ~Session();
     void run();
-    void registerListener(Listener*);
 
 signals:
     void error(QTcpSocket::SocketError socketerror);
     void end(QString);
+    void onEvent(QString, int, QMap<QString, QVariant>);
 
-public slots:
+private slots:
     void readyRead();
     void disconnected();
 
+public slots:
     /**
      * @brief completeProcessMessageData Send back the answer to the client when the
      * action thread has finish processing the data.
@@ -39,10 +38,6 @@ public slots:
 
 private:
     QTcpSocket *socket;
-    qintptr socketDescriptor;
-
-    // The map of event listener.
-    QMap<QString, QList<Listener*> > listeners;
 
     // The map of pending message.
     QMap<QString, QList<com::mycelius::message::Message*> > pending;
@@ -59,7 +54,10 @@ private:
      */
     void processPendingMessage(QString messageId);
 
-
+    /**
+     * @brief processIncommingMessage Process incomming message.
+     * @param msg
+     */
     void processIncommingMessage(com::mycelius::message::Message& msg);
 
     /**

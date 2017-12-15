@@ -13,7 +13,6 @@ Session::Session(QWebSocket* socket, QObject *parent) :
     QThread(parent)
 {
     this->id = QUuid::createUuid().toString();
-
     this->socket = socket;
 
     // connect socket and signal
