@@ -8,6 +8,7 @@
 #include <QList>
 #include <QVector>
 #include "../gen/rpc.pb.h"
+#include "event.hpp"
 
 class Session : public QThread
 {
@@ -23,7 +24,7 @@ public:
 signals:
     void error(QTcpSocket::SocketError socketerror);
     void end(QString);
-    void onEvent(QString, int, QMap<QString, QVariant>);
+    void onEvent(const Event&);
 
 private slots:
     void readyRead();

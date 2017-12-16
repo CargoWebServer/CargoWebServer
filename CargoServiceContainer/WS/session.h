@@ -8,8 +8,7 @@
 #include <QList>
 #include <QVector>
 #include "../gen/rpc.pb.h"
-
-class Listener;
+#include "event.hpp"
 
 class Session : public QThread
 {
@@ -27,7 +26,7 @@ public:
 
 signals:
     void end(QString);
-        void onEvent(QString, int, QMap<QString, QVariant>);
+        void onEvent(const Event&);
 
 private Q_SLOTS:
     void processBinaryMessage(QByteArray);

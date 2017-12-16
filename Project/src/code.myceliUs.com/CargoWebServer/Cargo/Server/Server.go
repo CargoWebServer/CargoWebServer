@@ -22,6 +22,8 @@ import (
 	"os/exec"
 	"runtime"
 
+	"time"
+
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"github.com/robertkrimen/otto"
 )
@@ -1030,6 +1032,10 @@ func (this *Server) Start() {
 			task := activeConfigurations.M_scheduledTasks[i]
 			GetTaskManager().scheduleTask(task)
 		}
+
+		// TODO try to find a way to know when container are ready...
+		// it do the job but it's not safe...
+		time.Sleep(20 * time.Second)
 
 		// Here I will initialise the search engine.
 		// Sync files

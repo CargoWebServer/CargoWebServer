@@ -169,7 +169,9 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
         }
 
         // dispatch to the listeners.
-        emit this->onEvent(channelId, evtNumber, evtDataMap);
+        Event evt(channelId, evtNumber, evtDataMap);
+
+        emit this->onEvent(evt);
     }
 }
 

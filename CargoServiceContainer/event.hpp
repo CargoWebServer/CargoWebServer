@@ -53,4 +53,47 @@ const QString OAuth2Event = "OAuth2Event";
 const QString SchemaEvent = "SchemaEvent";
 const QString WorkflowEvent = "WorkflowEvent";
 
+/**
+ * @brief The Event struct Event that came from the network.
+ */
+struct Event {
+  // The event name is a channel id.
+  QString name;
+
+  // The event number, ex. NewTaskEvent...
+  int number;
+
+  // The event data
+  QMap<QString, QVariant> data;
+
+  // The empty constructor.
+  Event(){
+
+  }
+
+  // The event default constructor.
+  Event(QString name, int number, const QMap<QString, QVariant> &data) :
+      name(name),
+      number(number),
+      data(data)
+  {
+
+  }
+
+  Event(const Event& other):
+    name(other.name),
+    number(other.number),
+    data(other.data)
+  {
+  }
+
+  Event& operator=(const Event& other)
+  {
+      if(&other == this)
+             return *this;
+      *this = Event(other);
+  }
+
+};
+
 #endif // EVENT_HPP

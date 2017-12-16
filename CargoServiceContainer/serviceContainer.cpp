@@ -1,5 +1,7 @@
 #include <exception>
 #include <QJSEngine>
+#include <event.hpp>
+#include <QThreadPool>
 
 ServiceContainer::~ServiceContainer(){
     // close the connections.
@@ -302,7 +304,7 @@ void ServiceContainer::setListeners(Session* session){
         engine->globalObject().setProperty(objects.keys()[i], objectValue);
         // Now with a dynamic cast I will try to convert the object as a listener...
         Listener* listener = reinterpret_cast<Listener*>(objects.value(objects.keys()[i]));
-        connect(session, SIGNAL(onEvent(QString, int, QMap<QString, QVariant>)), listener, SLOT(onEvent(QString, int, QMap<QString, QVariant>)));
+        connect(session, SIGNAL(onEvent(const Event&)), listener, SLOT(onEvent(const Event&)));
 
         // Register the listener
         QStringList channelIds = listener->getChannelIds();
@@ -311,6 +313,9 @@ void ServiceContainer::setListeners(Session* session){
                  this->listeners.push_back(channelIds[i]);
              }
          }
+
+         listener->start();
+
     }
 
     // Keep the reference to the engine.
