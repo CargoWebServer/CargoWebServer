@@ -21,10 +21,12 @@ import (
 
 type ServiceManager struct {
 	// info about connection on smtp server...
-	m_services         map[string]Service
-	m_servicesLst      []Service
-	m_serviceClientSrc map[string]string
-	m_serviceServerSrc map[string]string
+	m_services           map[string]Service
+	m_servicesLst        []Service
+	m_serviceClientSrc   map[string]string
+	m_serviceServerSrc   map[string]string
+	m_remoteServicesLst  map[string]*Config.ServiceConfiguration
+	m_remoteServicesChan chan interface{}
 
 	// Keep list of action by services.
 	m_serviceAction map[string][]*CargoEntities.Action
@@ -54,6 +56,9 @@ func newServiceManager() *ServiceManager {
 	serviceManager.m_serviceClientSrc = make(map[string]string) // Keep the services sources.
 	serviceManager.m_serviceServerSrc = make(map[string]string)
 	serviceManager.m_serviceAction = make(map[string][]*CargoEntities.Action) // Keep the list of action here.
+	// Those variable are use to synchronise remote services. (service container are part of it)
+	serviceManager.m_remoteServicesLst = make(map[string]*Config.ServiceConfiguration, 0)
+	serviceManager.m_remoteServicesChan = make(chan interface{}, 0)
 
 	return serviceManager
 }
@@ -90,8 +95,8 @@ func (this *ServiceManager) start() {
 		this.registerServiceActions(this.m_servicesLst[i])
 		// Generate the service code.
 		this.generateActionCode(this.m_servicesLst[i].getId())
-
 	}
+
 	// register itself as service.
 	this.registerServiceActions(this)
 	this.generateActionCode(this.getId())
@@ -103,6 +108,15 @@ func (this *ServiceManager) start() {
 			if config.M_start == true {
 				this.m_servicesLst[i].start()
 			}
+		}
+	}
+
+	// Now the external services...
+	for i := 0; i < len(GetServer().GetConfigurationManager().m_servicesConfiguration); i++ {
+		config := GetServer().GetConfigurationManager().m_servicesConfiguration[i]
+		if config.GetHostName() != "localhost" || config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
+			this.m_remoteServicesLst[config.M_id] = config
+			config.M_start = false // In that case start means ready to listen.
 		}
 	}
 }
@@ -886,7 +900,7 @@ func (this *ServiceManager) GetServiceActions(serviceName string, messageId stri
 }
 
 // @api 1.0
-// Start a service with a given name, the service configuration must exist before
+// Start an external service with a given name, the service configuration must exist before
 // calling that method.
 // @param {string} serviceName The name of the service
 // @param {string} messageId The request id that need to access this method.
@@ -930,7 +944,19 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 				// And I will get the service action code.
 				GetServer().GetServiceManager().registerServiceContainerActions(config)
 
-				log.Println("--> service ", name, " is ready")
+				GetServer().GetServiceManager().m_remoteServicesLst[config.GetId()].M_start = true
+
+				// Now if all distant services are ready I will finalise the server
+				// initialisation.
+				for _, service := range GetServer().GetServiceManager().m_remoteServicesLst {
+					if service.M_start == false {
+						<-wait
+						return
+					}
+				}
+
+				// Finalyse the server synchronization
+				serviceManager.m_remoteServicesChan <- nil
 
 				<-wait
 			} else {

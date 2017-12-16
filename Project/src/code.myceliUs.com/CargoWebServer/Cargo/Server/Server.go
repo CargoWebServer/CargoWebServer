@@ -22,8 +22,6 @@ import (
 	"os/exec"
 	"runtime"
 
-	"time"
-
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"github.com/robertkrimen/otto"
 )
@@ -1027,23 +1025,26 @@ func (this *Server) Start() {
 
 		activeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations)
 
-		// Now I will set scheduled task.
+		// Now I will set scheduled task, service container start are
+		// coded as a script.
 		for i := 0; i < len(activeConfigurations.M_scheduledTasks); i++ {
 			task := activeConfigurations.M_scheduledTasks[i]
 			GetTaskManager().scheduleTask(task)
 		}
 
-		// TODO try to find a way to know when container are ready...
-		// it do the job but it's not safe...
-		time.Sleep(20 * time.Second)
+		// Here I will wait for remote service to finish intialyse...
+		<-this.GetServiceManager().m_remoteServicesChan
 
-		// Here I will initialise the search engine.
+		// I can now synchronize ressources...
+
 		// Sync files
-		GetServer().GetFileManager().synchronizeAll()
+		this.GetFileManager().synchronizeAll()
+
 		// Sync users, computers and groups.
-		GetServer().GetLdapManager().synchronizeAll()
+		this.GetLdapManager().synchronizeAll()
+
 		// Sync projects.
-		GetServer().GetProjectManager().synchronize()
+		this.GetProjectManager().synchronize()
 	}()
 }
 
