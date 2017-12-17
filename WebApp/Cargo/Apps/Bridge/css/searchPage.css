@@ -8,3 +8,40 @@
     color: steelblue;
 
 }
+
+.search_results{
+    display: table;
+    width: 100%;
+    border-spacing:2px 2px;
+}
+
+.search_results_header{
+    display: table-row;
+    width: 100%;
+}
+
+.search_result{
+    display: table-row;
+    width: 100%;
+}
+
+.search_result_rank{
+    display: table-cell;
+    font-weight: bold;
+}
+
+.search_result_rank:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.founded_reusult{
+    padding: 0px;
+    margin: 0px;
+    font-weight: bold;
+}
+
+.founded_reusult:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}

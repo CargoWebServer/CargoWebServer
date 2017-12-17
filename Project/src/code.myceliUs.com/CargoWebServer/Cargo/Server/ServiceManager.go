@@ -177,7 +177,6 @@ func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfi
 			for i := 0; i < len(channels); i++ {
 				listener := NewEventListener(channels[i], rspMsg.from)
 				GetServer().GetEventManager().AddEventListener(listener)
-				log.Println("---> register listener: ", channels[i])
 			}
 		}
 		caller.(chan interface{}) <- nil
@@ -186,7 +185,6 @@ func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfi
 	// The error callback.
 	errorCallback := func(errMsg *message, caller interface{}) {
 		errStr := errMsg.msg.Err.Message
-		log.Println("--------> error: 169 ", errStr)
 		caller.(chan interface{}) <- errStr
 	}
 
@@ -309,7 +307,6 @@ func (this *ServiceManager) registerServiceContainerActions(config *Config.Servi
 	// The error callback.
 	errorCallback_ := func(errMsg *message, caller interface{}) {
 		errStr := errMsg.msg.Err.Message
-		log.Println("--------> error: 207 ", errStr)
 		caller.(chan interface{}) <- errStr
 	}
 

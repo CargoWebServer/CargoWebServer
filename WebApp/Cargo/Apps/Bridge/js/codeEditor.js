@@ -50,7 +50,7 @@ var CodeEditor = function (parent) {
 
             if (file.M_data !== undefined) {
                 // Here thats mean the file was open
-                codeEditor.appendFile(file)
+                codeEditor.appendFile(file, evt.dataMap["coord"])
             }
 
         } else if (evt.dataMap["bpmnDiagramInfo"] !== undefined) {
@@ -63,7 +63,7 @@ var CodeEditor = function (parent) {
             if (prototype !== undefined) {
                 codeEditor.appendPrototypeEditor(prototype)
             }
-        }else if (evt.dataMap["searchInfo"] != undefined) {
+        } else if (evt.dataMap["searchInfo"] != undefined) {
             codeEditor.appendSearchPage(evt.dataMap["searchInfo"])
         }
     })
@@ -154,7 +154,7 @@ var CodeEditor = function (parent) {
 /**
  * Create a new Search page.
  */
-CodeEditor.prototype.appendSearchPage = function(searchInfo){
+CodeEditor.prototype.appendSearchPage = function (searchInfo) {
     if (this.files[searchInfo.UUID] !== undefined) {
         // Set the tab active...
         this.setActiveFile(searchInfo.UUID)
@@ -260,7 +260,7 @@ CodeEditor.prototype.appendBpmnDiagram = function (diagram) {
     }(this, diagram, filePanel))
 }
 
-CodeEditor.prototype.appendFile = function (file) {
+CodeEditor.prototype.appendFile = function (file, coord) {
 
     var fileMode = ""
     if (file.M_mime == "application/javascript") {
@@ -279,7 +279,7 @@ CodeEditor.prototype.appendFile = function (file) {
     // Here I will set the file
     if (this.files[file.UUID] != undefined) {
         // Set the tab active...
-        this.setActiveFile(file.UUID)
+        this.setActiveFile(file.UUID, coord)
         return
     }
 
@@ -306,7 +306,7 @@ CodeEditor.prototype.appendFile = function (file) {
             queryEditor.init()
 
             this.editors[file.UUID + "_editor"] = queryEditor.editor
-            
+
             queryEditor.editor.getSession().on('change', function (fileUUID, codeEditor) {
                 return function () {
                     if (!codeEditor.quiet && entities[fileUUID] !== undefined) {
@@ -410,7 +410,7 @@ CodeEditor.prototype.appendFile = function (file) {
     })
 
     this.filesPanel[file.UUID] = filePanel
-    this.setActiveFile(file.UUID)
+    this.setActiveFile(file.UUID, coord)
 }
 
 CodeEditor.prototype.removeFile = function (uuid) {
@@ -439,7 +439,7 @@ CodeEditor.prototype.removeFile = function (uuid) {
 /**
  * Set the current file panel.
  */
-CodeEditor.prototype.setActiveFile = function (uuid) {
+CodeEditor.prototype.setActiveFile = function (uuid, coord) {
     for (var id in this.filesPanel) {
         this.filesPanel[id].element.style.display = "none"
     }
@@ -472,5 +472,13 @@ CodeEditor.prototype.setActiveFile = function (uuid) {
 
     if (document.getElementById(uuid + "_toolbar") != undefined) {
         document.getElementById(uuid + "_toolbar").style.display = ""
+    }
+
+    // in case coord are given then I will move the editor to there.
+    if (coord != undefined) {
+        var editor = this.editors[uuid + "_editor"]
+        editor.focus();
+        editor.gotoLine(coord.ln, coord.col, true);
+        editor.renderer.scrollToRow(coord.ln);
     }
 }

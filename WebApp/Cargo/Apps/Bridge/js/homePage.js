@@ -308,6 +308,9 @@ var HomePage = function () {
         changePropertyByClassName("background", ".admin_table", "." + evt.dataMap.themeClass)
         changePropertyByClassName("color", ".admin_table", "." + evt.dataMap.themeClass)
 
+        changePropertyByClassName("background-color", ".founded_reusult", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".founded_reusult", "." + evt.dataMap.themeClass + " .ace_gutter")
+
         changePropertyByClassName("background-color", ".popup_div", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".popup_div", "." + evt.dataMap.themeClass)
         changePropertyByClassName("color", ".popup_div", "." + evt.dataMap.themeClass)

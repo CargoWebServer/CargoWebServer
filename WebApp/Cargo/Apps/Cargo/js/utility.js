@@ -944,6 +944,21 @@ String.prototype.capitalizeFirstLetter = function () {
 }
 
 /**
+ * A quick snippet to grab all the indexes of a substring within a string
+ * @param {*} string The string we looking for.
+ */
+String.prototype.indices = function(string){
+	var returns = [];
+	var position = 0;
+	while(this.indexOf(string, position) > -1){
+		var index = this.indexOf(string, position);
+		returns.push(index);
+		position = index + string.length;
+	}
+	return returns;
+}
+
+/**
  * Count the number of space in a given string.
  * @param {string} str The target string.
  * @returns {int} The number of white space. 
