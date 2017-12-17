@@ -204,8 +204,8 @@ SearchResult.prototype.displayFileResult = function (file, title, indexs, terms)
         foundedSpans[i].onclick = function (file){
             return function () {
                 var values = this.title.split(",")
-                var ln = values[0].trim().split(" ")[1] - 1
-                var col = values[1].trim().split(" ")[1] - 1
+                var ln = values[0].trim().split(" ")[1]
+                var col = values[1].trim().split(" ")[1]-1
                 // Here I will throw an event to open the file and set it current position at the given
                 // position.
                 evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file, "coord":{"ln":ln, "col":col} } }

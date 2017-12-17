@@ -479,6 +479,6 @@ CodeEditor.prototype.setActiveFile = function (uuid, coord) {
         var editor = this.editors[uuid + "_editor"]
         editor.focus();
         editor.gotoLine(coord.ln, coord.col, true);
-        editor.renderer.scrollToRow(coord.ln);
+        editor.renderer.scrollToRow(coord.ln-3); // minus 3 to see couple line before...
     }
 }
