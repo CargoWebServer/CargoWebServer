@@ -35,6 +35,9 @@ type message struct {
 	successCallback  func(rspMsg *message, caller interface{})
 	errorCallback    func(errMsg *message, caller interface{})
 	progressCallback func(tranfertMsg *message, index int, total int, caller interface{})
+
+	// use by the message processor when request are send over the network.
+	tryNb int
 }
 
 func (self *message) GetBytes() []byte {
@@ -81,6 +84,7 @@ func (self *message) GetMethod() string {
 */
 func NewMessageFromData(data []byte, from connection) (*message, error) {
 	m := new(message)
+	m.tryNb = 5
 	m.from = from
 	m.msg = &Message{}
 	err := proto.Unmarshal(data, m.msg)
@@ -157,6 +161,7 @@ func NewErrorMessage(id string, code int32, errMsg string, errData []byte, to []
 	// Create the protobuffer message...
 	m := new(message)
 	m.to = to
+	m.tryNb = 5
 
 	// Set the type to error
 	m.msg = new(Message)
@@ -185,6 +190,7 @@ func NewRequestMessage(id string, method string, params []*MessageData, to []con
 	// Create the protobuffer message...
 	m := new(message)
 
+	m.tryNb = 5
 	m.to = to
 	m.caller = caller // Keep reference to the caller.
 
@@ -273,6 +279,7 @@ func NewResponseMessage(id string, results []*MessageData, to []connection) (*me
 	// Create the protobuffer message...
 	m := new(message)
 	m.to = to
+	m.tryNb = 5
 
 	// Set the type to response
 	m.msg = new(Message)

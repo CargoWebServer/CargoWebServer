@@ -313,9 +313,6 @@ void ServiceContainer::setListeners(Session* session){
                  this->listeners.push_back(channelIds[i]);
              }
          }
-
-         listener->start();
-
     }
 
     // Keep the reference to the engine.

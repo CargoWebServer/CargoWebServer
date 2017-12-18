@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"code.myceliUs.com/Utility"
 )
@@ -27,6 +28,7 @@ type MessageProcessor struct {
 	// This map will contain chunk of message larger
 	// than the allow transfert size.
 	m_pendingMsgChunk map[string][][]byte
+
 	// The message(s) that waiting for response.
 	m_pendingMsg map[string][]*message
 
@@ -77,9 +79,22 @@ func (this *MessageProcessor) run() {
 
 		for {
 			select {
+
 			case m := <-sendRequest:
-				pendingRequest[*m.msg.Rqst.Id] = m
-				this.m_outgoingChannel <- m
+				// Set the request...
+				if m.tryNb > 0 {
+					pendingRequest[*m.msg.Rqst.Id] = m
+					this.m_outgoingChannel <- m
+					// Decrease the number of try.
+					m.tryNb--
+					// If not answer is receive from the server the request
+					// will be resend after one second.
+					go func(m *message, outgoingChannel chan (*message)) {
+						timer := time.NewTimer(time.Second)
+						<-timer.C
+						outgoingChannel <- m
+					}(m, this.m_outgoingChannel)
+				}
 
 			case m := <-receiveRequestResponse:
 				// Here I will execute the successCallback if some is define.
@@ -87,6 +102,8 @@ func (this *MessageProcessor) run() {
 				if rqst != nil {
 					// Remove the request from the list.
 					delete(pendingRequest, m.GetId())
+					m.tryNb = 0 // No more necessary...
+
 					//log.Println("---> pendingRequest", len(pendingRequest))
 					if rqst.successCallback != nil {
 						// Call the success callback.

@@ -64,6 +64,7 @@ func (self *Action) execute() {
 
 	// That function use reflection to retreive the
 	// method to call on a given object.
+	log.Println("----> execute action ", self.Name)
 	x, errMsg := Utility.CallMethod(*self, self.Name, self.Params)
 
 	// Get the session id and the message id...
@@ -136,6 +137,14 @@ func (self *Action) GetSessionId() string {
 		return self.msg.from.GetUuid()
 	}
 	return ""
+}
+
+/**
+ * Return the server root path.
+ */
+func (self *Action) GetRootPath() string {
+	log.Println("-------> Get Root path")
+	return GetServer().GetConfigurationManager().m_filePath
 }
 
 /**

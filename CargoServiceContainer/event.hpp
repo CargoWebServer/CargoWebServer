@@ -1,6 +1,8 @@
 #ifndef EVENT_HPP
 #define EVENT_HPP
 #include <QString>
+#include <QMap>
+#include <QVariant>
 
 const QString AccountEvent = "AccountEvent";
 const int AccountRegisterSuccessEvent = 0;

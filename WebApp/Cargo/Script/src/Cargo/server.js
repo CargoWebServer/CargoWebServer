@@ -116,7 +116,6 @@ Server.prototype.stop = function (successCallback, errorCallback, caller) {
     stop(successCallback, errorCallback, caller, this.conn.id)
 }
 
-
 /**
  * Create the local server object.
  */

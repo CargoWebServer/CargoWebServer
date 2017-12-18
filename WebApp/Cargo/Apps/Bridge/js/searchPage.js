@@ -7,7 +7,6 @@ var SearchInfo = function () {
     this.UUID = randomUUID();
     this.M_id = -1 // Temporary id display in the page
     this.M_name = ""
-
     return this
 }
 
@@ -24,8 +23,17 @@ var SearchPage = function (parent, searchInfo) {
     this.panel = parent.appendElement({ "tag": "div", "class": "entity admin_table", "style": "top: 0px; bottom: 0px; left: 0px; right: 0px; position: absolute;" }).down()
 
     /** The search input where the key words will be written */
-    var searchInputBar = this.panel.appendElement({ "tag": "div", "style": "display: table;" }).down()
-    this.searchInput = searchInputBar.appendElement({ "tag": "input", "style": "display: table-cell;margin: 2px; border: 1px solid;" }).down()
+    var searchInputBar = this.panel.appendElement({ "tag": "div", "style": "display: table; vertical-align: middle;" }).down()
+
+    /** The datastore selector */
+    this.datasourceSelect = searchInputBar.appendElement({"tag":"select", "style":"vertical-align: middle;"}).down()
+
+    for(var i=0; i < server.activeConfigurations.M_dataStoreConfigs.length; ++i){
+        var store = server.activeConfigurations.M_dataStoreConfigs[i]
+        this.datasourceSelect.appendElement({"tag":"option", "value":store.M_id, "innerHtml":store.M_storeName})
+    }
+
+    this.searchInput = searchInputBar.appendElement({ "tag": "input", "style": "display: table-cell;margin: 2px; border: 1px solid; vertical-align: middle;" }).down()
     this.searchBtn = searchInputBar.appendElement({ "tag": "div", "class": "search_btn", "style": "display: table-cell;margin: 2px;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-search" }).down()
 
@@ -34,9 +42,10 @@ var SearchPage = function (parent, searchInfo) {
         return function () {
             var offset = 0;
             var pageSize = 10;
+            var storeId = searchPage.datasourceSelect.element.value
             var fields = ["Xcargoentities.file.m_data:data"];
-            var dbpath = "/home/dave/Documents/CargoWebServer/WebApp/Cargo/Data/CargoEntities/CargoEntities.glass"
-
+            // var dbpath = server.root + "/Data/CargoEntities/CargoEntities.glass"
+            var dbpath = server.root + "/Data/" + storeId + "/" + storeId + ".glass"
             // Clear previous search
             searchPage.resultsPages = []
             searchPage.resultPanel.removeAllChilds()
@@ -140,8 +149,6 @@ var SearchResult = function (parent, result, indexs) {
 }
 
 SearchResult.prototype.displayData = function (result, indexs, terms, prototype) {
-
-    console.log(result)
 
     // If the entity prototype isn't null I will intialyse the entity
     // from the data received.

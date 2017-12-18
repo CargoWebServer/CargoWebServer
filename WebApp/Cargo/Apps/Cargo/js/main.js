@@ -54,6 +54,7 @@ function load() {
 
     // Open a new connection whit the web server.
     server.init(function () {
+
         // Get the session id from the server.
         server.setSessionId(function () {
 
@@ -62,33 +63,52 @@ function load() {
             // Inject service code accessors.
             server.getServicesClientCode(
                 function (results, caller) {
-                    for (var key in results) {
-                        // create the listener if is not already exist.
-                        if (server[key] == undefined) {
-                            // inject the code in the client memory
-                            eval(results[key])
+                    server.getRootPath(
+                        function (path, caller) {
+                            // set the path.
+                            server.root = path
 
-                            // Now I will create the listener
-                            var listenerName = key.charAt(0).toLowerCase() + key.slice(1);
-                            server[listenerName] = eval("new " + key + "()")
-                            server[listenerName].registerListener()
+                            for (var key in results) {
+                                // create the listener if is not already exist.
+                                if (server[key] == undefined) {
+                                    // inject the code in the client memory
+                                    eval(results[key])
 
-                            // Register prototype manager as listener.
-                            server["prototypeManager"] = new EntityPrototypeManager(PrototypeEvent)
-                            server["prototypeManager"].registerListener(PrototypeEvent)
+                                    // Now I will create the listener
+                                    var listenerName = key.charAt(0).toLowerCase() + key.slice(1);
+                                    server[listenerName] = eval("new " + key + "()")
+                                    server[listenerName].registerListener()
 
-                        }
-                    }
-                    // Go to the main entry point
-                    // Append the listener for the entity.
-                    // The session listener.
-                    server.entityManager.getEntityPrototypes("Config", function (result, caller) {
-                        server.entityManager.getEntityPrototypes("CargoEntities", function (result, initCallback) {
-                            if (main != null) {
-                                main()
+                                    // Register prototype manager as listener.
+                                    server["prototypeManager"] = new EntityPrototypeManager(PrototypeEvent)
+                                    server["prototypeManager"].registerListener(PrototypeEvent)
+                                }
                             }
-                        }, function () {/* Error callback */ }, null)
-                    }, function () {/* Error callback */ }, {})
+
+                            // Go to the main entry point
+                            // Append the listener for the entity.
+                            // The session listener.
+                            server.entityManager.getEntityPrototypes("Config", function (result, caller) {
+                                server.entityManager.getEntityPrototypes("CargoEntities", function (result, initCallback) {
+                                    /** Here I will set the list of available data source... */
+                                    server.configurationManager.getActiveConfigurations(
+                                        function (activeConfigurations) {
+                                            // Get the active configuration.
+                                            server.activeConfigurations = activeConfigurations
+                                            if (main != null) {
+                                                main()
+                                            }
+                                        },
+                                        function () {
+
+                                        }, {})
+                                }, function () {/* Error callback */ }, null)
+                            }, function () {/* Error callback */ }, {})
+                        },
+                        function (erroObj, caller) {
+
+                        },
+                        {})
                 },
                 function (errObj, caller) {
                     // Here no client service code was found.

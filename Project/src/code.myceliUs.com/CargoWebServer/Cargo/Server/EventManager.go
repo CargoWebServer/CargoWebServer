@@ -263,6 +263,7 @@ func (this *EventListener) onEvent(evt *Event) {
 		// Do stuff here...
 		// Create the protobuffer message...
 		m := new(message)
+		m.tryNb = 5
 		m.from = this.m_addr
 		m.to = append(m.to, this.m_addr)
 

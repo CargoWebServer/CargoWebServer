@@ -377,23 +377,45 @@ Server.prototype.getServicesClientCode = function (successCallback, errorCallbac
 Server.prototype.stop = function (successCallback, errorCallback, caller) {
     // server is the client side singleton...
     var params = []
-    // Call it on the server.
-    server.executeJsFunction(
-        "Stop", // The function to execute remotely on server
-        params, // The parameters to pass to that function
-        function (index, total, caller) { // The progress callback
-            // Nothing special to do here.
-        },
-        function (result, caller) {
-            //console.log(result)
-            caller.successCallback(result[0], caller.caller)
-        },
-        function (errMsg, caller) {
-            caller.server.errorManager.onError(errMsg)
-            caller.errorCallback(errMsg, caller.caller)
-        }, // Error callback
-        { "caller": caller, "successCallback": successCallback, "errorCallback": errorCallback, "server": this } // The caller
-    )
+
+    var rqst = new Request(randomUUID(), this.conn, "Stop", params,
+    // Progress callback
+    function () { },
+    // Success callback
+    function (id, results, caller) {
+        // Keep the session id...
+        caller.successCallback(results["result"], caller.caller)
+    },
+    // Error callback...
+    function (errorMsg, caller) {
+        caller.errorCallback(errorMsg, caller.caller)
+    }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
+
+    rqst.send();
+}
+
+
+/**
+ * Get the server root path. This is where the WebApp directory is located on the sever.
+ */
+Server.prototype.getRootPath = function (successCallback, errorCallback, caller) {
+    // server is the client side singleton...
+    var params = new Array();
+    
+    var rqst = new Request(randomUUID(), this.conn, "GetRootPath", params,
+    // Progress callback
+    function () { },
+    // Success callback
+    function (id, results, caller) {
+        // Keep the session id...
+        caller.successCallback(results["result"], caller.caller)
+    },
+    // Error callback...
+    function (errorMsg, caller) {
+        caller.errorCallback(errorMsg, caller.caller)
+    }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
+
+    rqst.send();
 }
 
 /**

@@ -200,6 +200,7 @@ func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfi
  * Register the service action.
  */
 func (this *ServiceManager) registerServiceContainerActions(config *Config.ServiceConfiguration) {
+
 	// If the action array does not exist.
 	if this.m_serviceAction[config.GetId()] == nil {
 		this.m_serviceAction[config.GetId()] = make([]*CargoEntities.Action, 0)
@@ -228,7 +229,8 @@ func (this *ServiceManager) registerServiceContainerActions(config *Config.Servi
 	wait := make(chan interface{})
 
 	// The success callback.
-	successCallback_ := func(rspMsg *message, caller interface{}) {
+	successCallback := func(rspMsg *message, caller interface{}) {
+
 		// So here i will get the message value...
 		results := rspMsg.msg.Rsp.Results
 
@@ -305,13 +307,12 @@ func (this *ServiceManager) registerServiceContainerActions(config *Config.Servi
 	}
 
 	// The error callback.
-	errorCallback_ := func(errMsg *message, caller interface{}) {
+	errorCallback := func(errMsg *message, caller interface{}) {
 		errStr := errMsg.msg.Err.Message
 		caller.(chan interface{}) <- errStr
 	}
 
-	rqst, _ := NewRequestMessage(id, method, params, to, successCallback_, nil, errorCallback_, wait)
-
+	rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, wait)
 	GetServer().GetProcessor().m_sendRequest <- rqst
 
 	// I will also synchronize the methode...
@@ -931,16 +932,15 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 					wait <- nil
 				}(config, sessionId, wait)
 
-				time.Sleep(1 * time.Second)
-
+				log.Println("wait 2 second to bin to start...")
+				time.Sleep(2 * time.Second) // Given time to bin to start...
 				// So now I will connect the service listners...
 				GetServer().GetServiceManager().registerServiceListeners(config)
-
-				time.Sleep(1 * time.Second)
 
 				// And I will get the service action code.
 				GetServer().GetServiceManager().registerServiceContainerActions(config)
 
+				// set the service as started.
 				GetServer().GetServiceManager().m_remoteServicesLst[config.GetId()].M_start = true
 
 				// Now if all distant services are ready I will finalise the server
