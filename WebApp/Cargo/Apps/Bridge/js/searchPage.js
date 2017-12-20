@@ -1,4 +1,4 @@
-
+// var field = "X" + prototype.TypeName.toLowerCase() + "." +prototype.Fields[j].toLowerCase() + "%:" + prototype.TypeName.split(".")[1] + "_" + prototype.Fields[j].substring(2).toLowerCase()
 /**
  * That structure contain the information about a search.
  */
@@ -8,6 +8,203 @@ var SearchInfo = function () {
     this.M_id = -1 // Temporary id display in the page
     this.M_name = ""
     return this
+}
+
+/**
+ * That panel contain information about the datasources, datatypes
+ * range and other option of the search.
+ */
+var SearchOptionsPanel = function (parent) {
+    this.panel = parent.appendElement({ "tag": "div", "id": "search_option_panel", "class": "search_options_panel" }).down()
+
+    // The panel will contain the list of all datastore... and each datastore will contain the list 
+    // of all it datatypes...
+    this.tabPanelHeader = this.panel.appendElement({ "tag": "div", "class": "search_options_panel_tab_panel_header" }).down()
+
+    // Contain the content...
+    this.tabPanelBody = this.panel.appendElement({ "tag": "div", "style": "display: table; width: 100%;" }).down()
+        .appendElement({ "tag": "div", "class": "search_options_panel_tab_panel_body" }).down()
+
+    // I will now createe the fields information as the form:
+    // Xcargoentities.file.m_data:data
+    this.tabs = {}
+
+    for (var i = 0; i < server.activeConfigurations.M_dataStoreConfigs.length; ++i) {
+        var storeId = server.activeConfigurations.M_dataStoreConfigs[i].M_id;
+        // discard some store...
+        if (storeId != "sql_info" && storeId != "xs" && storeId != "sqltypes" && storeId != "XMI_types") {
+            this.tabs[storeId] = new SearchOptionPanelStoreInfo(this, server.activeConfigurations.M_dataStoreConfigs[i])
+        }
+    }
+
+    // empty element to push tabs to left.
+    this.tabPanelHeader.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" })
+
+    this.tabs["CargoEntities"].tab.element.click() // set the default selected.
+
+    return this
+}
+
+/**
+ * That function return the list of all database to look at...
+ */
+SearchOptionsPanel.prototype.getDataStoreList = function () {
+    dbpaths = []
+    for (var id in this.tabs) {
+        if (this.tabs[id].isSelected()) {
+            // var dbpath = server.root + "/Data/" + id + "/" + storeId + ".glass"
+            dbpaths = dbpaths.concat(this.tabs[id].getSelectedDbPaths())
+        }
+    }
+    return dbpaths
+}
+
+/**
+ * That panel contain information to display the datastore information.
+ * @param {*} searchPanel 
+ * @param {*} dataStoreConfig 
+ */
+var SearchOptionPanelStoreInfo = function (searchPanel, dataStoreConfig) {
+    this.id = dataStoreConfig.M_id
+    this.tab = searchPanel.tabPanelHeader.appendElement({ "tag": "div", "style": "display: table-cell; padding-left: 1px; padding-right: 1px;" }).down()
+        .appendElement({ "tag": "div", "class": "search_options_panel_tab_panel_header_tab" }).down()
+    this.isSelectedBtn = this.tab.appendElement({ "tag": "input", "type": "checkbox" }).down()
+    this.tab.appendElement({ "tag": "span", "innerHtml": dataStoreConfig.M_storeName })
+
+    // The datasotre is selected by default.
+    this.isSelectedBtn.element.checked = true
+
+    this.searchOptionPanelDataTypeInfo = new SearchOptionPanelDataTypeInfo(searchPanel, dataStoreConfig)
+
+    // Now the actions...
+    this.tab.element.onclick = function (searchOptionPanelStoreInfo) {
+        return function () {
+            var tabs = document.getElementsByClassName("search_options_panel_tab_panel_header_tab")
+            for (var i = 0; i < tabs.length; ++i) {
+                tabs[i].className = "search_options_panel_tab_panel_header_tab" // remove active if there..
+            }
+            this.className = "search_options_panel_tab_panel_header_tab active"
+            var searchOptionPanelDataTypeInfoPanels = document.getElementsByClassName("search_option_panel_data_type_info")
+            for (var i = 0; i < searchOptionPanelDataTypeInfoPanels.length; i++) {
+                searchOptionPanelDataTypeInfoPanels[i].style.display = ""
+            }
+            searchOptionPanelStoreInfo.searchOptionPanelDataTypeInfo.panel.element.style.display = "table"
+        }
+    }(this)
+
+    return this
+}
+
+/**
+ * Return true if the datastore is selected.
+ */
+SearchOptionPanelStoreInfo.prototype.isSelected = function () {
+    return this.isSelectedBtn.element.checked
+}
+
+/**
+ * Return the list of datastore path to query
+ */
+SearchOptionPanelStoreInfo.prototype.getSelectedDbPaths = function () {
+    var dbpaths = []
+    for (var id in this.searchOptionPanelDataTypeInfo.isSelectedBtns) {
+        if (this.searchOptionPanelDataTypeInfo.isSelectedBtns[id].element.checked) {
+            var dbpath = server.root + "/Data/" + id.split(".")[0] + "/" + id + ".glass"
+            dbpaths.push(dbpath)
+        }
+    }
+    return dbpaths
+}
+
+/**
+ * That panel is use to create the query from the datatype.
+ * @param {*} searchPanel 
+ * @param {*} dataStoreConfig 
+ */
+var SearchOptionPanelDataTypeInfo = function (searchPanel, dataStoreConfig) {
+    this.id = dataStoreConfig.M_id // same id as the tab...
+    this.panel = searchPanel.tabPanelBody.appendElement({ "tag": "div", "class": "search_option_panel_data_type_info" }).down()
+    this.isSelectedBtns = {}
+
+    // So here I will display a check box to tell the user what datatypes are includes in the query.
+    // all by default.
+    var selectAllBtn = this.panel.appendElement({ "tag": "div", "style": "display: table" }).down()
+        .appendElement({ "tag": "input", "type": "checkbox", "style": "display: table-cell" }).down()
+
+    selectAllBtn.up().appendElement({ "tag": "span", "style": "display: table-cell", "innerHtml": "all" })
+    selectAllBtn.element.checked = true
+
+    // Get the list of entity prototypes for that store.
+    server.entityManager.getEntityPrototypes(dataStoreConfig.M_id,
+        function (prototypes, searchOptionPanelDataTypeInfo) {
+            for (var i = 0; i < prototypes.length; ++i) {
+                var prototype = prototypes[i]
+                searchOptionPanelDataTypeInfo.appendDataTypeInfos(prototype)
+            }
+        },
+        function () {
+
+        }, this)
+
+    return this;
+}
+
+SearchOptionPanelDataTypeInfo.prototype.appendDataTypeInfos = function (prototype) {
+    var baseType = getBaseTypeExtension(prototype.TypeName)
+    if (isXsBaseType(baseType)) {
+        return // Nothing to do with base type itself, maybe will see...
+    }
+
+    // So here I will 
+    var typeInfoDiv = this.panel.appendElement({ "tag": "div", "style": "display: table;" }).down()
+
+    /** The expand button */
+    var expandBtn = typeInfoDiv.appendElement({ "tag": "i", "class": "fa fa-caret-right", "style": "display:inline;" }).down()
+
+    /** The shrink button */
+    var shrinkBtn = typeInfoDiv.appendElement({ "tag": "i", "class": "fa fa-caret-down", "style": "display:none;" }).down()
+
+    // So here I will display the liste
+    typeInfoDiv.appendElement({ "tag": "span", "style": "display: table-cell", "innerHtml": prototype.TypeName.split(".")[1] })
+
+    var isSelectBtn = typeInfoDiv.appendElement({ "tag": "input", "type": "checkbox", "style": "display: table-cell" }).down()
+    isSelectBtn.element.checked = true
+    this.isSelectedBtns[prototype.TypeName] = isSelectBtn
+
+    // Now I will create the div where type will be displayed.
+    var typeDiv = this.panel.appendElement({ "tag": "div", "style": "display: none; padding-left: 20px; padding-bottom: 5px; border-spacing:2px 2px;" }).down()
+
+    // Hew I will append field informations.
+    for (var i = 0; i < prototype.FieldsType.length; i++) {
+        // Here only xs type can be display...
+        var fieldType = prototype.FieldsType[i]
+        var field = prototype.Fields[i]
+        if (field.startsWith("M_")) {
+            if (isXsBaseType(fieldType) || isXsBaseType(getBaseTypeExtension(fieldType))) {
+                // console.log(fieldType)
+                var fieldDiv = typeDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+                fieldDiv.appendElement({ "tag": "span", "style": "display: table-cell;", "innerHtml": field.substring(2) })
+                // Here I will append the 
+            }
+        }
+    }
+
+    // Now i will set the 
+    expandBtn.element.onclick = function (shrinkBtn, typeDiv) {
+        return function () {
+            this.style.display = "none"
+            shrinkBtn.element.style.display = "inline"
+            typeDiv.element.style.display = "table"
+        }
+    }(shrinkBtn, typeDiv)
+
+    shrinkBtn.element.onclick = function (expandBtn, typeDiv) {
+        return function () {
+            this.style.display = "none"
+            expandBtn.element.style.display = "inline"
+            typeDiv.element.style.display = "none"
+        }
+    }(expandBtn, typeDiv)
 }
 
 /**
@@ -23,17 +220,26 @@ var SearchPage = function (parent, searchInfo) {
     this.panel = parent.appendElement({ "tag": "div", "class": "entity admin_table", "style": "top: 0px; bottom: 0px; left: 0px; right: 0px; position: absolute;" }).down()
 
     /** The search input where the key words will be written */
-    var searchInputBar = this.panel.appendElement({ "tag": "div", "style": "display: table; vertical-align: middle;" }).down()
-
-    /** The datastore selector */
-    this.datasourceSelect = searchInputBar.appendElement({"tag":"select", "style":"vertical-align: middle;"}).down()
-
-    for(var i=0; i < server.activeConfigurations.M_dataStoreConfigs.length; ++i){
-        var store = server.activeConfigurations.M_dataStoreConfigs[i]
-        this.datasourceSelect.appendElement({"tag":"option", "value":store.M_id, "innerHtml":store.M_storeName})
-    }
+    var searchInputBar = this.panel.appendElement({ "tag": "div", "style": "display: table; vertical-align: middle; position: relative;" }).down()
 
     this.searchInput = searchInputBar.appendElement({ "tag": "input", "style": "display: table-cell;margin: 2px; border: 1px solid; vertical-align: middle;" }).down()
+
+    this.searchOptionsBtn = searchInputBar.appendElement({ "tag": "div", "class": "search_btn", "style": "display: table-cell;margin: 2px;" }).down()
+        .appendElement({ "tag": "i", "class": "fa fa-caret-down" }).down()
+
+    this.searchOptionPanel = new SearchOptionsPanel(searchInputBar)
+
+    // Here I will display or hide the search option panel.
+    this.searchOptionsBtn.element.onclick = function () {
+        var searchOptionPanel = document.getElementById("search_option_panel")
+        if (searchOptionPanel.style.display == "") {
+            searchOptionPanel.style.display = "table"
+        } else {
+            searchOptionPanel.style.display = ""
+        }
+    }
+
+    /** The search button */
     this.searchBtn = searchInputBar.appendElement({ "tag": "div", "class": "search_btn", "style": "display: table-cell;margin: 2px;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-search" }).down()
 
@@ -42,16 +248,16 @@ var SearchPage = function (parent, searchInfo) {
         return function () {
             var offset = 0;
             var pageSize = 10;
-            var storeId = searchPage.datasourceSelect.element.value
-            var fields = ["Xcargoentities.file.m_data:data"];
-            // var dbpath = server.root + "/Data/CargoEntities/CargoEntities.glass"
-            var dbpath = server.root + "/Data/" + storeId + "/" + storeId + ".glass"
-            // Clear previous search
+            var fields = []
+
             searchPage.resultsPages = []
             searchPage.resultPanel.removeAllChilds()
-
-            // Set the new search.
-            searchPage.search(offset, pageSize, fields, dbpath)
+            // Hide the search option panel
+            var searchOptionPanel = document.getElementById("search_option_panel")
+            searchOptionPanel.style.display = ""
+            var dbpaths = searchPage.searchOptionPanel.getDataStoreList()
+            // console.log(dbpaths)
+            searchPage.search(offset, pageSize, fields, dbpaths)
         }
     }(this)
 
@@ -82,7 +288,6 @@ SearchPage.prototype.search = function (offset, pageSize, fields, dbpath) {
         function (results, searchPage) {
             // Keep the page in memory so it can be display latter without server call...
             searchPage.resultsPages[results.offset] = new SearchResultsPage(searchPage.resultPanel, results)
-
         },
         // error callback
         function () {
@@ -157,7 +362,7 @@ SearchResult.prototype.displayData = function (result, indexs, terms, prototype)
         entity.init(result.data)
 
         // Here I will display the resuls...
-        var title = this.panel.appendElement({ "tag": "div", "style": "display: table;border-spacing:2px 2px;  padding-top: 10px;" }).down()
+        var title = this.panel.appendElement({ "tag": "div", "style": "display: table;border-spacing:2px 2px; margin-top: 5px;" }).down()
         title.appendElement({ "tag": "div", "class": "search_result_rank", "innerHtml": result.rank.toString() })
         var titles = entity.getTitles()
         if (entity.TYPENAME == "CargoEntities.File") {
@@ -173,7 +378,8 @@ SearchResult.prototype.displayData = function (result, indexs, terms, prototype)
  * @param {*} entity 
  */
 SearchResult.prototype.displayEntityResult = function (entity, title, indexs, terms) {
-    for (var i = 0; i < title.length; i++) {
+    var titles = entity.getTitles()
+    for (var i = 0; i < titles.length; i++) {
         title.appendElement({ "tag": "div", "class": "search_result_rank", "innerHtml": titles[i] })
     }
     // Now the search informations.
@@ -188,9 +394,9 @@ SearchResult.prototype.displayFileResult = function (file, title, indexs, terms)
     // Here I will display the file link...
     var filePath = file.M_path + "/" + file.M_name
     var fileLnk = title.appendElement({ "tag": "div", "class": "search_result_rank", "innerHtml": filePath }).down()
-    
-    fileLnk.element.onclick = function(file){
-        return function(){
+
+    fileLnk.element.onclick = function (file) {
+        return function () {
             // Here I will generate file open event...
             evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
             server.eventHandler.broadcastLocalEvent(evt)
@@ -208,17 +414,17 @@ SearchResult.prototype.displayFileResult = function (file, title, indexs, terms)
     // I will get element by name
     var foundedSpans = document.getElementsByName(file.UUID)
     for (var i = 0; i < foundedSpans.length; i++) {
-        foundedSpans[i].onclick = function (file){
+        foundedSpans[i].onclick = function (file) {
             return function () {
                 var values = this.title.split(",")
                 var ln = values[0].trim().split(" ")[1]
-                var col = values[1].trim().split(" ")[1]-1
+                var col = values[1].trim().split(" ")[1] - 1
                 // Here I will throw an event to open the file and set it current position at the given
                 // position.
-                evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file, "coord":{"ln":ln, "col":col} } }
+                evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file, "coord": { "ln": ln, "col": col } } }
                 server.eventHandler.broadcastLocalEvent(evt)
             }
-        } (file)
+        }(file)
     }
 }
 
@@ -231,12 +437,23 @@ SearchResult.prototype.getSnippets = function (fileUuid, text, terms, size) {
     // First of all I will find the position in text of all term...
     var positions = []
 
+    // Terms can contain field
+
     for (var i = 0; i < terms.length; i++) {
         var term = terms[i]
         // I will remove the prefix if there is some.
         if (term.match(/^[A-Z]{1}/)) {
             term = term.substring(1)
         }
+
+        // If the term start with X that's means the search was made for a given field.
+        var field = ""
+        if (term.startsWith("X")) {
+            // So here I will retreive the field.
+            field = term.split("%")[0]
+            term = term.split("%")[1]
+        }
+
         // Not case sensitve...
         positions_ = text.toLowerCase().indices(term)
         for (var j = 0; j < positions_.length; j++) {
@@ -263,7 +480,7 @@ SearchResult.prototype.getSnippets = function (fileUuid, text, terms, size) {
     var index = 0
     var col = 0
     var ln = 0
-    var snippet = ""
+    var snippet = "<pre>"
 
     for (var i = 0; i < text.length; i++) {
         startLine = i
@@ -271,21 +488,32 @@ SearchResult.prototype.getSnippets = function (fileUuid, text, terms, size) {
         var textLine = ""
         var isSnippet = false
         while (text[i] != "\n" && i < text.length) {
+
             if (positions[index] == i) {
-                textLine += "<span name='" + fileUuid + "' title='Ln " + (ln+1) + ", col " + (col+1) + "' class='founded_reusult' style='vertical-align: text-bottom; padding: 0px;'>"
+                textLine += "<span name='" + fileUuid + "' title='Ln " + (ln + 1) + ", col " + (col + 1) + "' class='founded_reusult' style='vertical-align: text-bottom; padding: 0px;'>"
             } else if (positions[index + 1] == i) {
                 textLine += "</span>"
                 index += 2
                 isSnippet = true
             }
+            // Replace specific html char...
+            if (text[i] == "&") {
+                text[i] = "&amp"
+            } else if (text[i] == "<") {
+                text[i] = "&lt"
+            } else if (text[i] == ">") {
+                text[i] = "&gt"
+            }
+
             textLine += text[i]
             col++
             i++
         }
         ln++
         if (isSnippet) {
-            snippet += "<div style='display: inline; overflow-x: hidden; padding: 0px 0px 10px 10px;'>" + textLine.trim() + "</div></br>"
+            snippet += "<code style='display: inline; overflow-x: hidden; padding-left: 15px;'>" + textLine.trim() + "</code></br>"
         }
     }
+    snippet += "</pre>"
     return snippet
 }

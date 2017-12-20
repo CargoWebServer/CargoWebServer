@@ -440,12 +440,12 @@ HorizontalMenu.prototype.appendItem = function (item) {
     if (item.level == 0) {
         if (item.panel == null) {
             item.panel = this.menuRow.appendElement({ "tag": "div", "class": "menu_item", "id": item.id, "style": "display:inline-block; padding-left:10px; padding-top: 20px; vertical-align:middle; height:40px;" }).down()
-            itmep.panel.appendElement({"tag":"span", "innerHtml": item.name})
+            item.panel.appendElement({"tag":"span", "innerHtml": item.name})
         }
     } else {
         if (item.parent.panel.childs[item.id] == undefined) {
             item.panel = item.parent.panel.appendElement({ "tag": "div", "id": item.id, "style": "display:inline-block;border-left:1px solid grey; margin-left:4px; padding-left:4px; height:auto;" }).down()
-            itmep.panel.appendElement({"tag":"span", "innerHtml": item.name})
+            item.panel.appendElement({"tag":"span", "innerHtml": item.name})
         }
     }
 

@@ -1,3 +1,9 @@
+pre{
+    font-size: 9pt;
+    font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+    width: auto;
+    margin: 0px;
+  }
 
 .search_btn{
     transition: all .2s ease;
@@ -28,6 +34,7 @@
 .search_result_rank{
     display: table-cell;
     font-weight: bold;
+    padding-left: 5px;
 }
 
 .search_result_rank:hover{
@@ -44,4 +51,66 @@
 .founded_reusult:hover{
     cursor: pointer;
     text-decoration: underline;
+}
+
+.search_options_panel{
+    position: absolute;
+    min-height: 300px;
+    min-width: 400px;
+    display: none;
+    /** depending of the input heigth **/
+    top: 23px;
+    /** depending of the input padding **/
+    left: 2px;
+
+    transition: all .2s ease;
+	-webkit-box-shadow: 2px 2px 5px 0px;
+	-moz-box-shadow: 2px 2px 5px 0px;
+	box-shadow: 2px 2px 5px 0px;
+	z-index: 10;
+}
+
+.search_options_panel_tab_panel_header{
+    width: 100%;
+    height: 20px;
+    display: table;
+}
+
+.search_options_panel_tab_panel_header_tab{
+    display: table;
+    padding: 4px;
+}
+
+.search_option_panel_data_type_info{
+    display: none;
+}
+
+.search_options_panel_tab_panel_header_tab.active {
+    border-top: 2px solid #428bca;
+}
+
+.search_options_panel_tab_panel_header_tab:hover{
+    cursor: pointer;
+}
+
+.search_options_panel_tab_panel_header_tab span input{
+    display: table-cell;
+}
+
+.search_options_panel_tab_panel_body{
+    width: 100%;
+    height: 100%;
+    display: block;
+    height: 400px;
+    min-width: 500px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.fa-caret-right:hover{
+    cursor: pointer;
+}
+
+.fa-caret-pointer:hover{
+    cursor: pointer;
 }

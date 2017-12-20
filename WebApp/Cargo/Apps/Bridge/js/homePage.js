@@ -163,10 +163,21 @@ var HomePage = function () {
         changePropertyByClassName("background-color", ".file_tab", "." + evt.dataMap.themeClass)
         changePropertyByClassName("background", ".file_tab", "." + evt.dataMap.themeClass)
 
+        changePropertyByClassName("background-color", ".search_options_panel_tab_panel_header_tab", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".search_options_panel_tab_panel_header_tab", "." + evt.dataMap.themeClass)
+
+        changePropertyByClassName("background-color", ".search_options_panel", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("background", ".search_options_panel", "." + evt.dataMap.themeClass)
+        changePropertyByClassName("color", ".search_options_panel", "." + evt.dataMap.themeClass)
+
+        // the search page.
+        changePropertyByClassName("background-color", ".search_options_panel_tab_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".search_options_panel_tab_panel_header", "." + evt.dataMap.themeClass + " .ace_gutter")
 
         // I will use the gutter color for the background color of the workspace div.
         changePropertyByClassName("background-color", ".workspace_div", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", ".workspace_div", "." + evt.dataMap.themeClass + " .ace_gutter")
+
 
         changePropertyByClassName("background-color", "#workingFilesDiv.scrolling", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("background", "#workingFilesDiv.scrolling", "." + evt.dataMap.themeClass + " .ace_gutter")
@@ -189,6 +200,7 @@ var HomePage = function () {
             changePropertyByClassName("color", ".popup_menu", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".menu_separator", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".file_tab", "." + evt.dataMap.themeClass)
+            changePropertyByClassName("color", ".search_options_panel_tab_panel_header_tab", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".panel", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".entity_panel", "." + evt.dataMap.themeClass)
             changePropertyByClassName("color", ".entity", "." + evt.dataMap.themeClass)
@@ -224,6 +236,7 @@ var HomePage = function () {
             changePropertyByClassName("color", ".popup_menu", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".menu_separator", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".file_tab", "." + evt.dataMap.themeClass + " .ace_gutter")
+            changePropertyByClassName("color", ".search_options_panel_tab_panel_header_tab", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".panel", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".entity_panel", "." + evt.dataMap.themeClass + " .ace_gutter")
             changePropertyByClassName("color", ".entity", "." + evt.dataMap.themeClass + " .ace_gutter")

@@ -64,7 +64,6 @@ func (self *Action) execute() {
 
 	// That function use reflection to retreive the
 	// method to call on a given object.
-	log.Println("----> execute action ", self.Name)
 	x, errMsg := Utility.CallMethod(*self, self.Name, self.Params)
 
 	// Get the session id and the message id...

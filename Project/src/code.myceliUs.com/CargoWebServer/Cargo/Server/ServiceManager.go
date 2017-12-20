@@ -11,7 +11,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
@@ -919,7 +918,8 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 						// I will get the proecess handle and kill it...
 						process, err := os.FindProcess(processes[i].Pid())
 						if err == nil {
-							process.Kill() // Kill existing process.
+							// process.Kill() // Kill existing process.
+							log.Println("process id ", process.Pid)
 						}
 					}
 				}
@@ -932,8 +932,6 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 					wait <- nil
 				}(config, sessionId, wait)
 
-				log.Println("wait 2 second to bin to start...")
-				time.Sleep(2 * time.Second) // Given time to bin to start...
 				// So now I will connect the service listners...
 				GetServer().GetServiceManager().registerServiceListeners(config)
 

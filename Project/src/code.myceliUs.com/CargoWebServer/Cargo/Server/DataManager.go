@@ -1423,7 +1423,7 @@ func (this *DataManager) Synchronize(storeId string, messageId string, sessionId
 // @scope {public}
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
-func (this *DataManager) ExportSchemas(storeId string, messageId string, sessionId string) string {
+func (this *DataManager) ExportJsonSchemas(storeId string, messageId string, sessionId string) string {
 	storeConfigEntity, errObj := GetServer().GetEntityManager().getEntityById("Config", "Config.DataStoreConfiguration", []interface{}{storeId}, false)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)

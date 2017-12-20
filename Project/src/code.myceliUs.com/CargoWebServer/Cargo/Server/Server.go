@@ -1045,6 +1045,7 @@ func (this *Server) Start() {
 
 		// Sync projects.
 		this.GetProjectManager().synchronize()
+
 	}()
 }
 

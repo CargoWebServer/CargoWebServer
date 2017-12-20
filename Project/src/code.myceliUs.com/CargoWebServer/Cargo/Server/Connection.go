@@ -110,9 +110,9 @@ func (c *tcpSocketConnection) Open(host string, port int) (err error) {
 		return err
 	}
 
-	if c.m_socket == nil && c.m_try < 3 {
+	if c.m_socket == nil && c.m_try < 30 {
 		c.m_try += 1
-		time.Sleep(1 * time.Second)
+		time.Sleep(500 * time.Millisecond)
 		return c.Open(host, port)
 
 	} else if c.m_try == 3 {
@@ -255,8 +255,8 @@ func (c *webSocketConnection) Open(host string, port int) (err error) {
 	origin := "ws://" + host + ":" + strconv.Itoa(port) + "/ws"
 	c.m_socket, err = websocket.Dial(origin, "", url)
 
-	if err != nil && c.m_try < 3 {
-		time.Sleep(1 * time.Second)
+	if err != nil && c.m_try < 30 {
+		time.Sleep(500 * time.Millisecond)
 		c.m_try += 1
 		return c.Open(host, port)
 	} else if c.m_try == 3 {
