@@ -532,6 +532,7 @@ var MainPage = function (parent) {
 
             // Here I will try to login in on the server.
             server.sessionManager.login(userName, password, "",
+                // success callback
                 function (session, caller) {
                     caller.successCallback = function (session) {
 
@@ -579,6 +580,8 @@ var MainPage = function (parent) {
                         if (this.mainPage.activePostView != null) {
                             // redisplay the active post to unlock category edit button's.
                             this.mainPage.displayPost(this.mainPage.activePostView.post)
+                        } else {
+                            this.mainPage.displayAuthorPost()
                         }
 
                     }
@@ -610,8 +613,13 @@ var MainPage = function (parent) {
                             }
                         }
                     }(caller, session))
-
+                    // Remove the waiting div...
+                    var waitingDiv = document.getElementById("waiting-div")
+                    if (waitingDiv != undefined) {
+                        waitingDiv.parentNode.removeChild(waitingDiv)
+                    }
                 },
+                // Error callback
                 function (errObj, caller) {
                     var err = errObj.dataMap.errorObj
                     var loginNameInput = caller.loginNameInput.element
@@ -825,7 +833,7 @@ MainPage.prototype.displayPost = function (post) {
  * Set the content of author post.
  */
 MainPage.prototype.displayAuthorPost = function () {
-    if(this.account== null){
+    if (this.account == null) {
         return
     }
 
@@ -1031,7 +1039,7 @@ MainPage.prototype.setEditor = function (div, saveCallback) {
 
             // I will append a div to block editing action first and display the waiting wheel...
             mainPage.pageContent.element.style.position = "relative"
-            var waitingDiv = mainPage.pageContent.appendElement({ "tag": "div", "style": "position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background-color: rgba(0, 0, 0, 0.15); z-index: 100; text-align: center;" }).down()
+            var waitingDiv = mainPage.pageContent.appendElement({ "tag": "div", "id": "waiting-div", "style": "position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background-color: rgba(0, 0, 0, 0.15); z-index: 100; text-align: center;" }).down()
             waitingDiv.appendElement({ "tag": "img", "src": "img/wheel_.svg", "style": "color: black;", "class": "cargo-turning-wheel" })
 
             $("#" + id).summernote('destroy');
@@ -1082,7 +1090,7 @@ MainPage.prototype.setEditable = function (blogView) {
                         evt.stopPropagation()
                         // I will append a div to block editing action first and display the waiting wheel...
                         mainPage.pageContent.element.style.position = "relative"
-                        var waitingDiv = mainPage.pageContent.appendElement({ "tag": "div", "style": "position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background-color: rgba(0, 0, 0, 0.15); z-index: 100; text-align: center;" }).down()
+                        var waitingDiv = mainPage.pageContent.appendElement({ "tag": "div", "id": "waiting-div", "style": "position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background-color: rgba(0, 0, 0, 0.15); z-index: 100; text-align: center;" }).down()
                         waitingDiv.appendElement({ "tag": "img", "src": "img/wheel_.svg", "style": "color: black;", "class": "cargo-turning-wheel" })
 
                         // Here I will set back the text inside the h1 element.
@@ -1139,7 +1147,11 @@ MainPage.prototype.saveActivePost = function () {
                 post.M_thumbnail = canvas.toDataURL()
                 server.entityManager.saveEntity(post,
                     function (result, caller) {
-
+                        // Remove the waiting div...
+                        var waitingDiv = document.getElementById("waiting-div")
+                        if (waitingDiv != undefined) {
+                            waitingDiv.parentNode.removeChild(waitingDiv)
+                        }
                     },
                     function () {
 

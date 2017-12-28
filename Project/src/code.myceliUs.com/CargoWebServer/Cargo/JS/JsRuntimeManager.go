@@ -641,7 +641,15 @@ func (this *JsRuntimeManager) initScripts() {
 	for path, _ := range this.m_scripts {
 		// Start initalyse the scripts.
 		moduleId := this.getModuleId(path)
-		if moduleId == "Cargo" || moduleId == "CargoWebServer" {
+		if moduleId == "CargoWebServer" {
+			this.initScript(path)
+		}
+	}
+
+	for path, _ := range this.m_scripts {
+		// Start initalyse the scripts.
+		moduleId := this.getModuleId(path)
+		if moduleId == "Cargo" {
 			this.initScript(path)
 		}
 	}

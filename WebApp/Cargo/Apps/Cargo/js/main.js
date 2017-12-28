@@ -32,6 +32,9 @@ var server = new Server("localhost", "127.0.0.1", 9393)
 // Amazon ec2 sever...
 //var server = new Server("www.cargowebserver.com", "54.218.110.52", 9393)
 
+// Empty language info, that object keep interface text that need to be translate.
+var languageInfo = {}
+
 // Keep the initialysed entitie in memory
 var entities = {}
 

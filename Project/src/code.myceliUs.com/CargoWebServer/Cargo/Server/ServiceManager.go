@@ -918,7 +918,7 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 						// I will get the proecess handle and kill it...
 						process, err := os.FindProcess(processes[i].Pid())
 						if err == nil {
-							// process.Kill() // Kill existing process.
+							process.Kill() // Kill existing process.
 							log.Println("process id ", process.Pid)
 						}
 					}

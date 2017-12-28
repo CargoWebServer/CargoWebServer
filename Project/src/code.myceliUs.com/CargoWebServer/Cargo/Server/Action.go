@@ -142,7 +142,6 @@ func (self *Action) GetSessionId() string {
  * Return the server root path.
  */
 func (self *Action) GetRootPath() string {
-	log.Println("-------> Get Root path")
 	return GetServer().GetConfigurationManager().m_filePath
 }
 

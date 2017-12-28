@@ -166,7 +166,7 @@ var Element = function (parent, params, callback, appendFront) {
                 }
             }
 
-            if (this.element.id.length > 0) {
+            if (this.element.id.length > 0 && server != undefined) {
                 server.languageManager.setElementText(this, this.element.id)
             }
 

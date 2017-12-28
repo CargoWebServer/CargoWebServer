@@ -817,17 +817,20 @@ func (this *EntityManager) getEntities(typeName string, query *EntityQuery, stor
 	}
 
 	if query == nil {
+
 		values, err := dataStore.(*KeyValueDataStore).getIndexation(typeName)
 		if err != nil {
 			errObj := NewError(Utility.FileLine(), DATASTORE_INDEXATION_ERROR, SERVER_ERROR_CODE, errors.New("No indexation for type '"+typeName+"'."))
 			return entities, errObj
 		}
+
 		for i := 0; i < len(values); i++ {
 			key := values[i].(string)
 			values_, err := dataStore.(*KeyValueDataStore).getValues(key)
 			if err != nil {
 				return entities, NewError(Utility.FileLine(), DATASTORE_KEY_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("No value found for key '"+key+"'."))
 			}
+
 			if len(values_) > 0 {
 				uuid := values_[0].(string)
 				entity, errObj := this.getEntityByUuid(uuid, lazy)
@@ -869,6 +872,7 @@ func (this *EntityManager) getEntities(typeName string, query *EntityQuery, stor
 			}
 		}
 	}
+
 	return entities, nil
 }
 
@@ -897,13 +901,11 @@ func (this *EntityManager) getEntitiesByType(typeNames []string, storeId string,
 }
 
 func (this *EntityManager) getEntityByUuid(uuid string, lazy bool) (Entity, *CargoEntities.Error) {
-
 	if !Utility.IsValidEntityReferenceName(uuid) {
 		return nil, NewError(Utility.FileLine(), INVALID_REFERENCE_NAME_ERROR, SERVER_ERROR_CODE, errors.New("The uuid '"+uuid+"' is not valid."))
 	}
 
 	if val, ok := this.contain(uuid); ok {
-
 		if lazy {
 			return val, nil
 		} else if !val.IsLazy() {
@@ -917,7 +919,7 @@ func (this *EntityManager) getEntityByUuid(uuid string, lazy bool) (Entity, *Car
 			return val, nil
 		}
 
-		this.removeEntity(uuid)
+		val.SetInit(false) // force reinitialisation of the value.
 		val.InitEntity(uuid, lazy)
 
 		return val, nil
@@ -944,6 +946,7 @@ func (this *EntityManager) getEntityByUuid(uuid string, lazy bool) (Entity, *Car
 	if err != nil {
 		// Try with dynamic entity instead.
 		entity, errObj := this.getDynamicEntityByUuid(uuid, lazy)
+
 		if errObj != nil {
 			return nil, errObj
 		}

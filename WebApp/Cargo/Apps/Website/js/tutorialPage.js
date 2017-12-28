@@ -131,6 +131,10 @@ TutorialPage.prototype.appendPostPreview = function (post, div) {
  * Post previews
  */
 var PostPreview = function (parent, post) {
+    if(parent ==null){
+        return null
+    }
+    
     this.post = post
  
     this.div = parent.getChildById(post.UUID + "_post_preview")

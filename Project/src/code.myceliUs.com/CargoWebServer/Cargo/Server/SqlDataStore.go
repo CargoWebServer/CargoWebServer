@@ -272,13 +272,13 @@ func (this *SqlDataStore) Ping() (err error) {
 /** Crud interface **/
 func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId interface{}, err error) {
 
-	/*err = this.Ping()
+	err = this.m_db.Ping()
 	if err != nil {
 		err = this.Connect()
 		if err != nil {
 			return nil, err
 		}
-	}*/
+	}
 
 	lastId = int64(0)
 	stmt, err := this.m_db.Prepare(query)
@@ -580,9 +580,13 @@ func isForeignKey(val string) bool {
  */
 func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []interface{}) ([][]interface{}, error) {
 
-	// TODO Try to figure out why the connection is lost...
-	// Lost of connection so I will reconnect anyway...
-	//this.Connect()
+	err := this.m_db.Ping()
+	if err != nil {
+		err = this.Connect()
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	rows, err := this.m_db.Query(query, params...)
 	if err != nil {
@@ -629,7 +633,7 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 }
 
 func (this *SqlDataStore) Update(query string, fields []interface{}, params []interface{}) (err error) {
-	err = this.Ping()
+	err = this.m_db.Ping()
 	if err != nil {
 		err = this.Connect()
 		if err != nil {
@@ -688,6 +692,14 @@ func (this *SqlDataStore) Update(query string, fields []interface{}, params []in
  * Delete data that match a given pattern.
  */
 func (this *SqlDataStore) Delete(query string, params []interface{}) (err error) {
+
+	err = this.m_db.Ping()
+	if err != nil {
+		err = this.Connect()
+		if err != nil {
+			return err
+		}
+	}
 
 	stmt, err := this.m_db.Prepare(query)
 	if err != nil {

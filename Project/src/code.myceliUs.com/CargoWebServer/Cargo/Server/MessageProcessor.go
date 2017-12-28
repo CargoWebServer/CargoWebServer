@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
+	//"time"
 
 	"code.myceliUs.com/Utility"
 )
@@ -86,14 +86,14 @@ func (this *MessageProcessor) run() {
 					pendingRequest[*m.msg.Rqst.Id] = m
 					this.m_outgoingChannel <- m
 					// Decrease the number of try.
-					m.tryNb--
+					/*m.tryNb--
 					// If not answer is receive from the server the request
 					// will be resend after one second.
 					go func(m *message, outgoingChannel chan (*message)) {
-						timer := time.NewTimer(time.Second)
+						timer := time.NewTimer(5 * time.Second)
 						<-timer.C
 						outgoingChannel <- m
-					}(m, this.m_outgoingChannel)
+					}(m, this.m_outgoingChannel)*/
 				}
 
 			case m := <-receiveRequestResponse:
