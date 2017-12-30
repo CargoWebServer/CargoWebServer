@@ -1010,7 +1010,6 @@ func (this *DynamicEntity) saveEntity(path string) {
 		queryStr, _ := json.Marshal(query)
 		err = GetServer().GetDataManager().updateData(storeId, string(queryStr), DynamicEntityInfo, params)
 	} else {
-		log.Println("-----> ", this.GetUuid(), " not exist!")
 		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
 		// Save the values for that entity.
 		queryStr, _ := json.Marshal(query)

@@ -257,7 +257,14 @@ func (this *EntityPrototype) Save(storeId string) error {
 		return err
 	}
 
-	store := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
+	var store *KeyValueDataStore
+
+	if reflect.TypeOf(GetServer().GetDataManager().getDataStore(storeId)).String() == "*Server.SqlDataStore" {
+		store = GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore)
+	} else {
+		store = GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
+	}
+
 	if store != nil {
 		// Save it inside it supertype.
 		for i := 0; i < len(this.SuperTypeNames); i++ {
@@ -464,28 +471,8 @@ func (this *EntityPrototype) generateConstructor() string {
 	constructorSrc += " this.initCallback = undefined\n"
 
 	// Fields.
-	for i := 3; i < len(this.Fields)-2; i++ {
-		constructorSrc += " this." + this.Fields[i]
-		if strings.HasPrefix(this.FieldsType[i], "[]") {
-			constructorSrc += " = undefined\n"
-		} else {
-			/*if len(this.FieldsDefaultValue[i]) != 0 { // If a default value is set...
-				constructorSrc += " = " + this.FieldsDefaultValue[i] + "\n"
-			} else*/if XML_Schemas.IsXsString(this.FieldsType[i]) {
-				constructorSrc += " = \"\"\n"
-			} else if XML_Schemas.IsXsInt(this.FieldsType[i]) || XML_Schemas.IsXsTime(this.FieldsType[i]) {
-				constructorSrc += " = 0\n"
-			} else if XML_Schemas.IsXsNumeric(this.FieldsType[i]) {
-				constructorSrc += " = 0.0\n"
-			} else if XML_Schemas.IsXsDate(this.FieldsType[i]) {
-				constructorSrc += " = new Date()\n"
-			} else if XML_Schemas.IsXsBoolean(this.FieldsType[i]) {
-				constructorSrc += " = false\n"
-			} else {
-				// Object here.
-				constructorSrc += " = undefined\n"
-			}
-		}
+	for i := 0; i < len(this.Fields); i++ {
+		setDefaultFieldValue(this, this.FieldsType[i])
 	}
 
 	// Keep the reference on the entity prototype.

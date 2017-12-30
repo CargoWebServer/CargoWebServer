@@ -1574,6 +1574,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 	// Save changed entity.
 	for id, entity := range toSave {
 		entity.SaveEntity()
+
 		delete(toSave, id)
 	}
 

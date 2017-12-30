@@ -68,11 +68,25 @@ var SearchOptionPanelStoreInfo = function (searchPanel, dataStoreConfig) {
     this.id = dataStoreConfig.M_id
     this.tab = searchPanel.tabPanelHeader.appendElement({ "tag": "div", "style": "display: table-cell; padding-left: 1px; padding-right: 1px;" }).down()
         .appendElement({ "tag": "div", "class": "search_options_panel_tab_panel_header_tab" }).down()
-    this.isSelectedBtn = this.tab.appendElement({ "tag": "input", "type": "checkbox" }).down()
+    this.isSelectedBtn = this.tab.appendElement({ "tag": "input", "type": "checkbox", "id": this.id + "_select" }).down()
+
     this.tab.appendElement({ "tag": "span", "innerHtml": dataStoreConfig.M_storeName })
 
     // The datasotre is selected by default.
     this.isSelectedBtn.element.checked = true
+
+    // Select or unselect types all a once.
+    this.isSelectedBtn.element.onclick = function (storeId) {
+        return function () {
+            var selects = document.getElementsByName(storeId + "_select")
+            for (var i = 0; i < selects.length; i++) {
+                if (selects[i].checked != this.checked) {
+                    selects[i].checked = this.checked
+
+                }
+            }
+        }
+    }(dataStoreConfig.M_id)
 
     this.searchOptionPanelDataTypeInfo = new SearchOptionPanelDataTypeInfo(searchPanel, dataStoreConfig)
 
@@ -126,14 +140,6 @@ var SearchOptionPanelDataTypeInfo = function (searchPanel, dataStoreConfig) {
     this.panel = searchPanel.tabPanelBody.appendElement({ "tag": "div", "class": "search_option_panel_data_type_info" }).down()
     this.isSelectedBtns = {}
 
-    // So here I will display a check box to tell the user what datatypes are includes in the query.
-    // all by default.
-    var selectAllBtn = this.panel.appendElement({ "tag": "div", "style": "display: table" }).down()
-        .appendElement({ "tag": "input", "type": "checkbox", "style": "display: table-cell" }).down()
-
-    selectAllBtn.up().appendElement({ "tag": "span", "style": "display: table-cell", "innerHtml": "all" })
-    selectAllBtn.element.checked = true
-
     // Get the list of entity prototypes for that store.
     server.entityManager.getEntityPrototypes(dataStoreConfig.M_id,
         function (prototypes, searchOptionPanelDataTypeInfo) {
@@ -167,9 +173,28 @@ SearchOptionPanelDataTypeInfo.prototype.appendDataTypeInfos = function (prototyp
     // So here I will display the liste
     typeInfoDiv.appendElement({ "tag": "span", "style": "display: table-cell", "innerHtml": prototype.TypeName.split(".")[1] })
 
-    var isSelectBtn = typeInfoDiv.appendElement({ "tag": "input", "type": "checkbox", "style": "display: table-cell" }).down()
+    var isSelectBtn = typeInfoDiv.appendElement({ "tag": "input", "name": prototype.TypeName.split(".")[0] + "_select", "id": prototype.TypeName + "_select", "type": "checkbox", "style": "display: table-cell" }).down()
     isSelectBtn.element.checked = true
     this.isSelectedBtns[prototype.TypeName] = isSelectBtn
+
+    isSelectBtn.element.onclick = function (typeName, isSelectedBtns) {
+        return function () {
+            var selects = document.getElementsByName(typeName + "_select")
+            for (var i = 0; i < selects.length; i++) {
+                selects[i].checked = this.checked
+            }
+            // Now I will adjust it parent...
+            var isSelectBtn = document.getElementById(typeName.split(".")[0] + "_select")
+            isSelectBtn.checked = false
+            for (var key in isSelectedBtns) {
+                if (isSelectedBtns[key].element.checked) {
+                    isSelectBtn.checked = true
+                    break
+                }
+            }
+        }
+    }(prototype.TypeName, this.isSelectedBtns)
+
 
     // Now I will create the div where type will be displayed.
     var typeDiv = this.panel.appendElement({ "tag": "div", "style": "display: none; padding-left: 20px; padding-bottom: 5px; border-spacing:2px 2px;" }).down()
@@ -183,8 +208,30 @@ SearchOptionPanelDataTypeInfo.prototype.appendDataTypeInfos = function (prototyp
             if (isXsBaseType(fieldType) || isXsBaseType(getBaseTypeExtension(fieldType))) {
                 // console.log(fieldType)
                 var fieldDiv = typeDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+                var isSelectFieldBtn = fieldDiv.appendElement({ "tag": "input", "type": "checkbox", "class":"field_checkbox", "id": prototype.TypeName.toLowerCase().replace(".", "_") + "_" + field.substring(2).toLowerCase() , "checked": "true", "name": prototype.TypeName + "_select" }).down()
                 fieldDiv.appendElement({ "tag": "span", "style": "display: table-cell;", "innerHtml": field.substring(2) })
-                // Here I will append the 
+                // Field to append in the query.
+                isSelectFieldBtn.element.onclick = function(isSelectBtn, typeName, isSelectedBtns){
+                    return function(){
+                        isSelectBtn.element.checked = false;
+                        var selects = document.getElementsByName(typeName + "_select")
+                        for (var i = 0; i < selects.length; i++) {
+                            if(selects[i].checked == true){
+                                isSelectBtn.element.checked = true
+                                break
+                            }
+                        }
+                        // Now the whole type...
+                        var isSelectBtn_ = document.getElementById(typeName.split(".")[0] + "_select")
+                        isSelectBtn_.checked = false
+                        for (var key in isSelectedBtns) {
+                            if (isSelectedBtns[key].element.checked) {
+                                isSelectBtn_.checked = true
+                                break
+                            }
+                        }
+                    }
+                }(isSelectBtn, prototype.TypeName, this.isSelectedBtns)
             }
         }
     }
@@ -249,6 +296,11 @@ var SearchPage = function (parent, searchInfo) {
             var offset = 0;
             var pageSize = 10;
             var fields = []
+            var fieldsCheckbox = document.getElementsByClassName("field_checkbox")
+            for(var i=0; i < fieldsCheckbox.length; i++){
+                // Append string like: Xcargoentities_file_data%:cargoentities_file_data
+                fields.push("X" + fieldsCheckbox[i].id + "%:" + fieldsCheckbox[i].id)
+            }
 
             searchPage.resultsPages = []
             searchPage.resultPanel.removeAllChilds()
@@ -384,6 +436,8 @@ SearchResult.prototype.displayEntityResult = function (entity, title, indexs, te
     }
     // Now the search informations.
     var founded = this.panel.appendElement({ "tag": "div", "style": "display: table; border-spacing:2px 2px" }).down()
+
+    console.log(terms)
 }
 
 /**
@@ -433,12 +487,11 @@ SearchResult.prototype.displayFileResult = function (file, title, indexs, terms)
  * @param {*} text 
  * @param {*} terms 
  */
-SearchResult.prototype.getSnippets = function (fileUuid, text, terms, size) {
+SearchResult.prototype.getSnippets = function (uuid, text, terms, size) {
     // First of all I will find the position in text of all term...
     var positions = []
 
     // Terms can contain field
-
     for (var i = 0; i < terms.length; i++) {
         var term = terms[i]
         // I will remove the prefix if there is some.
@@ -450,8 +503,8 @@ SearchResult.prototype.getSnippets = function (fileUuid, text, terms, size) {
         var field = ""
         if (term.startsWith("X")) {
             // So here I will retreive the field.
-            field = term.split("%")[0]
-            term = term.split("%")[1]
+            field = term.split("%")[0] // The field part
+            term = term.split("%")[1] // The term part.
         }
 
         // Not case sensitve...
@@ -474,9 +527,6 @@ SearchResult.prototype.getSnippets = function (fileUuid, text, terms, size) {
 
     // Now from the fouded position in text i will generate 
     // a condensate result...
-    var offset = size / 2
-    var index = 0
-    var startLine = 0;
     var index = 0
     var col = 0
     var ln = 0
@@ -490,7 +540,7 @@ SearchResult.prototype.getSnippets = function (fileUuid, text, terms, size) {
         while (text[i] != "\n" && i < text.length) {
 
             if (positions[index] == i) {
-                textLine += "<span name='" + fileUuid + "' title='Ln " + (ln + 1) + ", col " + (col + 1) + "' class='founded_reusult' style='vertical-align: text-bottom; padding: 0px;'>"
+                textLine += "<span name='" + uuid + "' title='Ln " + (ln + 1) + ", col " + (col + 1) + "' class='founded_reusult' style='vertical-align: text-bottom; padding: 0px;'>"
             } else if (positions[index + 1] == i) {
                 textLine += "</span>"
                 index += 2
