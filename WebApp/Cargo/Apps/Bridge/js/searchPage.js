@@ -393,7 +393,7 @@ var SearchResult = function (parent, result, indexs) {
         server.entityManager.getEntityPrototype(result.data.TYPENAME, result.data.TYPENAME.split(".")[0],
             // success callback 
             function (prototype, caller) {
-                caller.searchResult.displayData(caller.result, indexs, result.terms, prototype)
+                caller.searchResult.displayData(caller.result, indexs, result.terms, prototype, result.snippet)
             },
             // error callback
             function (errObj, caller) {
@@ -405,7 +405,7 @@ var SearchResult = function (parent, result, indexs) {
     return this;
 }
 
-SearchResult.prototype.displayData = function (result, indexs, terms, prototype) {
+SearchResult.prototype.displayData = function (result, indexs, terms, prototype, snippet) {
 
     // If the entity prototype isn't null I will intialyse the entity
     // from the data received.
@@ -418,9 +418,9 @@ SearchResult.prototype.displayData = function (result, indexs, terms, prototype)
         title.appendElement({ "tag": "div", "class": "search_result_rank", "innerHtml": result.rank.toString() })
         var titles = entity.getTitles()
         if (entity.TYPENAME == "CargoEntities.File") {
-            this.displayFileResult(entity, title, indexs, terms)
+            this.displayFileResult(entity, title, indexs, terms, snippet)
         } else {
-            this.displayEntityResult(entity, title, indexs, terms)
+            this.displayEntityResult(entity, title, indexs, terms, snippet)
         }
     }
 }
@@ -429,22 +429,31 @@ SearchResult.prototype.displayData = function (result, indexs, terms, prototype)
  * Generic entity search result display.
  * @param {*} entity 
  */
-SearchResult.prototype.displayEntityResult = function (entity, title, indexs, terms) {
+SearchResult.prototype.displayEntityResult = function (entity, title, indexs, terms, snippet) {
     var titles = entity.getTitles()
     for (var i = 0; i < titles.length; i++) {
         title.appendElement({ "tag": "div", "class": "search_result_rank", "innerHtml": titles[i] })
     }
     // Now the search informations.
     var founded = this.panel.appendElement({ "tag": "div", "style": "display: table; border-spacing:2px 2px" }).down()
-
-    console.log(terms)
+    
+    // So here I will display the field and that contain <b> </b>
+    for(var propertie in snippet){
+        if(snippet[propertie].indexOf("<b>") != -1){
+            // Thats means a snippet is found.
+            this.panel.appendElement({ "tag": "div", "style": "display: table; padding-left: 20px; border-spacing:2px 5px"}).down()
+                .appendElement({"tag":"div", "style":"display: table-cell", "innerHtml": "<b>"+ propertie + ": </b>" })
+                .appendElement({"tag":"div", "style":"display: table-cell", "innerHtml": snippet[propertie] })
+        }
+    }
+    console.log(snippet)
 }
 
 /**
  * Display the search result for a file.
  * @param {*} file 
  */
-SearchResult.prototype.displayFileResult = function (file, title, indexs, terms) {
+SearchResult.prototype.displayFileResult = function (file, title, indexs, terms, snippet) {
     // Here I will display the file link...
     var filePath = file.M_path + "/" + file.M_name
     var fileLnk = title.appendElement({ "tag": "div", "class": "search_result_rank", "innerHtml": filePath }).down()
@@ -460,13 +469,17 @@ SearchResult.prototype.displayFileResult = function (file, title, indexs, terms)
     // So here I will try to find the searched text in the resut.
     var text = decode64(file.M_data)
 
-    var snippets = this.getSnippets(file.UUID, text, terms, 50)
+    // var snippets = this.getSnippets(file.UUID, text, terms, 50)
+    var snippets = "<pre>" + snippet.M_data + "</pre>"
 
-    // Now the search informations.
-    var founded = this.panel.appendElement({ "tag": "div", "style": "display: table; border-spacing:2px 5px", "innerHtml": snippets }).down()
+    // Now I will display the search result.
+    this.panel.appendElement({ "tag": "div", "style": "display: table;padding-left: 20px; border-spacing:2px 5px", "innerHtml": snippets }).down()
 
+
+    // TODO from the text found in snippet.M_data I will set the index of bold field and set the on click event on it to 
+    // go at the line in text...
     // I will get element by name
-    var foundedSpans = document.getElementsByName(file.UUID)
+    /*var foundedSpans = document.getElementsByName(file.UUID)
     for (var i = 0; i < foundedSpans.length; i++) {
         foundedSpans[i].onclick = function (file) {
             return function () {
@@ -479,91 +492,5 @@ SearchResult.prototype.displayFileResult = function (file, title, indexs, terms)
                 server.eventHandler.broadcastLocalEvent(evt)
             }
         }(file)
-    }
-}
-
-/**
- * Return the text arround the found term.
- * @param {*} text 
- * @param {*} terms 
- */
-SearchResult.prototype.getSnippets = function (uuid, text, terms, size) {
-    // First of all I will find the position in text of all term...
-    var positions = []
-
-    // Terms can contain field
-    for (var i = 0; i < terms.length; i++) {
-        var term = terms[i]
-        // I will remove the prefix if there is some.
-        if (term.match(/^[A-Z]{1}/)) {
-            term = term.substring(1)
-        }
-
-        // If the term start with X that's means the search was made for a given field.
-        var field = ""
-        if (term.startsWith("X")) {
-            // So here I will retreive the field.
-            field = term.split("%")[0] // The field part
-            term = term.split("%")[1] // The term part.
-        }
-
-        // Not case sensitve...
-        positions_ = text.toLowerCase().indices(term)
-        for (var j = 0; j < positions_.length; j++) {
-            // start index
-            positions.push(positions_[j])
-            // end index...
-            positions.push(positions_[j] + term.length)
-        }
-    }
-
-    // sort array by number and not string value.
-    function sortNumber(a, b) {
-        return a - b;
-    }
-
-    // sort the array with all it values.
-    positions.sort(sortNumber)
-
-    // Now from the fouded position in text i will generate 
-    // a condensate result...
-    var index = 0
-    var col = 0
-    var ln = 0
-    var snippet = "<pre>"
-
-    for (var i = 0; i < text.length; i++) {
-        startLine = i
-        col = 0; // col
-        var textLine = ""
-        var isSnippet = false
-        while (text[i] != "\n" && i < text.length) {
-
-            if (positions[index] == i) {
-                textLine += "<span name='" + uuid + "' title='Ln " + (ln + 1) + ", col " + (col + 1) + "' class='founded_reusult' style='vertical-align: text-bottom; padding: 0px;'>"
-            } else if (positions[index + 1] == i) {
-                textLine += "</span>"
-                index += 2
-                isSnippet = true
-            }
-            // Replace specific html char...
-            if (text[i] == "&") {
-                text[i] = "&amp"
-            } else if (text[i] == "<") {
-                text[i] = "&lt"
-            } else if (text[i] == ">") {
-                text[i] = "&gt"
-            }
-
-            textLine += text[i]
-            col++
-            i++
-        }
-        ln++
-        if (isSnippet) {
-            snippet += "<code style='display: inline; overflow-x: hidden; padding-left: 15px;'>" + textLine.trim() + "</code></br>"
-        }
-    }
-    snippet += "</pre>"
-    return snippet
+    }*/
 }

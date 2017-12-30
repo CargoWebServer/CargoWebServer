@@ -918,8 +918,8 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 						// I will get the proecess handle and kill it...
 						process, err := os.FindProcess(processes[i].Pid())
 						if err == nil {
-							//process.Kill() // Kill existing process.
-							log.Println("process id ", process.Pid)
+							process.Kill() // Kill existing process.
+							//log.Println("process id ", process.Pid)
 						}
 					}
 				}
@@ -927,10 +927,10 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 				wait := make(chan interface{})
 
 				// Now now I will start an new process...
-				/*go func(config *Config.ServiceConfiguration, sessionId string, wait chan interface{}) {
+				go func(config *Config.ServiceConfiguration, sessionId string, wait chan interface{}) {
 					GetServer().RunCmd(config.GetId(), []string{strconv.Itoa(config.GetPort())}, sessionId)
 					wait <- nil
-				}(config, sessionId, wait)*/
+				}(config, sessionId, wait)
 
 				// So now I will connect the service listners...
 				GetServer().GetServiceManager().registerServiceListeners(config)
