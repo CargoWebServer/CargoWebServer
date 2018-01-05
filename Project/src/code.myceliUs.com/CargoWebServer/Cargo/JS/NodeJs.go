@@ -14,9 +14,9 @@ func (this *JsRuntimeManager) initNodeJs() {
 	/**
 	 * Node.js module/exports functionality.
 	 */
-	this.appendFunction("require", func(identifier string) *otto.Object {
+	this.appendFunction("require_", func(identifier string, sessionId string) *otto.Object {
 		// resolve dependencie and return the exports.
-		exports, err := GetJsRuntimeManager().getExports(identifier)
+		exports, err := GetJsRuntimeManager().getExports(identifier, sessionId)
 		if err != nil {
 			log.Println("---> error found in require function ", err)
 		}

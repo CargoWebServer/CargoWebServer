@@ -404,7 +404,6 @@ func (this *Server) Start() {
 				results := make([]interface{}, 0)
 				// So here i will get the message value...
 				for i := 0; i < len(rspMsg.msg.Rsp.Results); i++ {
-
 					param := rspMsg.msg.Rsp.Results[i]
 					if param.GetType() == Data_DOUBLE {
 						val, err := strconv.ParseFloat(string(param.GetDataBytes()), 64)
@@ -969,7 +968,8 @@ func (this *Server) Start() {
 					}()
 
 					src := string(rspMsg.msg.Rsp.Results[0].DataBytes)
-					JS.GetJsRuntimeManager().AppendScript("CargoWebServer", src)
+					JS.GetJsRuntimeManager().RunScript(connectionId, src)
+
 					// Call on open...
 					conn.Object().Call("onopen", service, caller)
 				}
@@ -1025,17 +1025,16 @@ func (this *Server) Start() {
 
 		activeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations)
 
-		// Now I will set scheduled task, service container start are
-		// coded as a script.
+		// Start the remote services.
+		for _, service := range GetServer().GetServiceManager().m_remoteServicesLst {
+			GetServer().GetServiceManager().StartService(service.M_id, "", "")
+		}
+
+		// Now I will run the scheduled task
 		for i := 0; i < len(activeConfigurations.M_scheduledTasks); i++ {
 			task := activeConfigurations.M_scheduledTasks[i]
 			GetTaskManager().scheduleTask(task)
 		}
-
-		// Here I will wait for remote service to finish intialyse...
-		<-this.GetServiceManager().m_remoteServicesChan
-
-		// I can now synchronize ressources...
 
 		// Sync files
 		this.GetFileManager().synchronizeAll()

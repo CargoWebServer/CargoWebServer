@@ -32,7 +32,7 @@ var SearchOptionsPanel = function (parent) {
     for (var i = 0; i < server.activeConfigurations.M_dataStoreConfigs.length; ++i) {
         var storeId = server.activeConfigurations.M_dataStoreConfigs[i].M_id;
         // discard some store...
-        if (storeId != "sql_info" && storeId != "xs" && storeId != "sqltypes" && storeId != "XMI_types") {
+        if (storeId != "sql_info" && storeId != "xs" && storeId != "sqltypes" && storeId != "XMI_types" && server.activeConfigurations.M_dataStoreConfigs[i].M_dataStoreType == 2) {
             this.tabs[storeId] = new SearchOptionPanelStoreInfo(this, server.activeConfigurations.M_dataStoreConfigs[i])
         }
     }
@@ -318,8 +318,6 @@ var SearchPage = function (parent, searchInfo) {
 
     // This will hold the results for the time of navigation.
     this.resultsPages = [];
-
-
 
     return this
 }

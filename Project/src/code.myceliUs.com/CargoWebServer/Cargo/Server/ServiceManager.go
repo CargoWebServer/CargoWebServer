@@ -20,12 +20,11 @@ import (
 
 type ServiceManager struct {
 	// info about connection on smtp server...
-	m_services           map[string]Service
-	m_servicesLst        []Service
-	m_serviceClientSrc   map[string]string
-	m_serviceServerSrc   map[string]string
-	m_remoteServicesLst  map[string]*Config.ServiceConfiguration
-	m_remoteServicesChan chan interface{}
+	m_services          map[string]Service
+	m_servicesLst       []Service
+	m_serviceClientSrc  map[string]string
+	m_serviceServerSrc  map[string]string
+	m_remoteServicesLst map[string]*Config.ServiceConfiguration
 
 	// Keep list of action by services.
 	m_serviceAction map[string][]*CargoEntities.Action
@@ -57,7 +56,6 @@ func newServiceManager() *ServiceManager {
 	serviceManager.m_serviceAction = make(map[string][]*CargoEntities.Action) // Keep the list of action here.
 	// Those variable are use to synchronise remote services. (service container are part of it)
 	serviceManager.m_remoteServicesLst = make(map[string]*Config.ServiceConfiguration, 0)
-	serviceManager.m_remoteServicesChan = make(chan interface{}, 0)
 
 	return serviceManager
 }
@@ -142,22 +140,9 @@ func (this *ServiceManager) registerService(service Service) {
 /**
  * Get the list of channel id's and connect listener.
  */
-func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfiguration) {
-
-	address := GetServer().GetConfigurationManager().GetIpv4() + ":" + strconv.Itoa(config.GetPort())
-	if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() {
-		address = "ws://" + address
-	}
-
-	// I will open a connection with the service and get it list of actions.
-	conn, err := GetServer().connect(address)
-
-	if err != nil {
-		return
-	}
+func (this *ServiceManager) registerServiceListeners(conn connection) {
 
 	// So here I will request the list of actions.
-	id := Utility.RandomUUID()
 	method := "GetListeners"
 	params := make([]*MessageData, 0)
 
@@ -165,6 +150,9 @@ func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfi
 	to[0] = conn
 
 	wait := make(chan interface{})
+
+	// Register the listener
+	log.Println("--> register listener: ", conn.GetAddrStr(), conn.GetPort())
 
 	// The success callback.
 	successCallback := func(rspMsg *message, caller interface{}) {
@@ -174,6 +162,7 @@ func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfi
 		err := json.Unmarshal(results[0].DataBytes, &channels)
 		if err == nil {
 			for i := 0; i < len(channels); i++ {
+				log.Println("---->channel: ", channels[i])
 				listener := NewEventListener(channels[i], rspMsg.from)
 				GetServer().GetEventManager().AddEventListener(listener)
 			}
@@ -187,7 +176,7 @@ func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfi
 		caller.(chan interface{}) <- errStr
 	}
 
-	rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, wait)
+	rqst, _ := NewRequestMessage(Utility.RandomUUID(), method, params, to, successCallback, nil, errorCallback, wait)
 
 	GetServer().GetProcessor().m_sendRequest <- rqst
 
@@ -198,27 +187,9 @@ func (this *ServiceManager) registerServiceListeners(config *Config.ServiceConfi
 /**
  * Register the service action.
  */
-func (this *ServiceManager) registerServiceContainerActions(config *Config.ServiceConfiguration) {
-
-	// If the action array does not exist.
-	if this.m_serviceAction[config.GetId()] == nil {
-		this.m_serviceAction[config.GetId()] = make([]*CargoEntities.Action, 0)
-	}
-
-	address := GetServer().GetConfigurationManager().GetIpv4() + ":" + strconv.Itoa(config.GetPort())
-	if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() {
-		address = "ws://" + address
-	}
-
-	// I will open a connection with the service and get it list of actions.
-	conn, err := GetServer().connect(address)
-
-	if err != nil {
-		return
-	}
+func (this *ServiceManager) registerServiceContainerActions(conn connection, id string) {
 
 	// So here I will request the list of actions.
-	id := Utility.RandomUUID()
 	method := "GetActionInfos"
 	params := make([]*MessageData, 0)
 
@@ -297,7 +268,7 @@ func (this *ServiceManager) registerServiceContainerActions(config *Config.Servi
 							action = entity.GetObject().(*CargoEntities.Action)
 							log.Println("-->Load service container action ", action.GetName(), " informations.")
 						}
-						this.m_serviceAction[config.GetId()] = append(this.m_serviceAction[config.GetId()], action)
+						this.m_serviceAction[id] = append(this.m_serviceAction[id], action)
 					}
 				}
 			}
@@ -909,7 +880,8 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 	// First of all I will get it configuration information.
 	config := GetServer().GetConfigurationManager().getServiceConfigurationById(name)
 	if config != nil {
-		if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
+		// External server.
+		if config.GetPort() != GetServer().GetConfigurationManager().GetServerPort() {
 			// I will test if a process exist for with that name.
 			processes, err := ps.Processes()
 			if err == nil {
@@ -918,42 +890,42 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 						// I will get the proecess handle and kill it...
 						process, err := os.FindProcess(processes[i].Pid())
 						if err == nil {
-							process.Kill() // Kill existing process.
-							//log.Println("process id ", process.Pid)
+							//process.Kill() // Kill existing process.
+							log.Println("Kill process ", process.Pid)
 						}
 					}
 				}
 
-				wait := make(chan interface{})
-
 				// Now now I will start an new process...
-				go func(config *Config.ServiceConfiguration, sessionId string, wait chan interface{}) {
+				/*go func(config *Config.ServiceConfiguration, sessionId string, messageId string) {
 					GetServer().RunCmd(config.GetId(), []string{strconv.Itoa(config.GetPort())}, sessionId)
-					wait <- nil
-				}(config, sessionId, wait)
+					// Restart the service.
+					GetServer().GetServiceManager().StartService(config.M_id, messageId, sessionId)
+				}(config, sessionId, messageId)*/
 
-				// So now I will connect the service listners...
-				GetServer().GetServiceManager().registerServiceListeners(config)
+				address := config.GetIpv4() + ":" + strconv.Itoa(config.GetPort())
+				if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() {
+					address = "ws://" + address
+				}
+
+				// I will open a connection with the service and get it list of actions.
+				conn, err := GetServer().connect(address)
+
+				if err != nil {
+					return
+				}
 
 				// And I will get the service action code.
-				GetServer().GetServiceManager().registerServiceContainerActions(config)
+				GetServer().GetServiceManager().registerServiceContainerActions(conn, config.GetId())
+
+				// So now I will connect the service listners for the tcp service
+				if config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
+					GetServer().GetServiceManager().registerServiceListeners(conn)
+				}
 
 				// set the service as started.
 				GetServer().GetServiceManager().m_remoteServicesLst[config.GetId()].M_start = true
 
-				// Now if all distant services are ready I will finalise the server
-				// initialisation.
-				for _, service := range GetServer().GetServiceManager().m_remoteServicesLst {
-					if service.M_start == false {
-						<-wait
-						return
-					}
-				}
-
-				// Finalyse the server synchronization
-				serviceManager.m_remoteServicesChan <- nil
-
-				<-wait
 			} else {
 				log.Println("------------> error ", err)
 			}

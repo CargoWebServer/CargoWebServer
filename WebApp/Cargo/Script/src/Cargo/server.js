@@ -1,4 +1,5 @@
 // The default session id.
+//FileManager = require("CargoWebServer/FileManager")
 
 /**
  * Connection class
@@ -47,7 +48,7 @@ var RpcData = function(values){
     /**
      * @property {string} sessionId Identify the client with the server.
      */
-    this.sessionId = null
+    this.sessionId = sessionId
 
 
 	/**
@@ -121,8 +122,11 @@ Server.prototype.stop = function (successCallback, errorCallback, caller) {
  */
 var server = new Server("localhost", "127.0.0.1", 9393);
 
+server.fileManager = new FileManager()
+
 // Export class.
 exports.server = server
+
 exports.Server = Server
 exports.RpcData = RpcData
 exports.Connection = Connection

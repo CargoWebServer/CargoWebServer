@@ -173,23 +173,6 @@ func (this *ConfigurationManager) initialize() {
 		activeConfigurations.M_serverConfig.M_hostName = "localhost"
 		activeConfigurations.M_serverConfig.M_ipv4 = "127.0.0.1"
 
-		// Scrpit to start the service container.
-		tcpServiceContainerStart := new(Config.ScheduledTask)
-		tcpServiceContainerStart.M_isActive = true
-		tcpServiceContainerStart.M_frequencyType = Config.FrequencyType_ONCE
-		tcpServiceContainerStart.M_id = "tcpServiceContainerStart"
-		tcpServiceContainerStart.M_script = "tcpServiceContainerStart"
-
-		wsServiceContainerStart := new(Config.ScheduledTask)
-		wsServiceContainerStart.M_isActive = true
-		wsServiceContainerStart.M_frequencyType = Config.FrequencyType_ONCE
-		wsServiceContainerStart.M_id = "wsServiceContainerStart"
-		wsServiceContainerStart.M_script = "wsServiceContainerStart"
-
-		// Append the newly create task into the cargo entities
-		activeConfigurations.M_scheduledTasks = append(activeConfigurations.M_scheduledTasks, tcpServiceContainerStart)
-		activeConfigurations.M_scheduledTasks = append(activeConfigurations.M_scheduledTasks, wsServiceContainerStart)
-
 		// Server folders...
 		activeConfigurations.M_serverConfig.M_applicationsPath = "/Apps"
 		os.MkdirAll(this.GetApplicationDirectoryPath(), 0777)
@@ -227,30 +210,6 @@ func (this *ConfigurationManager) getId() string {
 
 func (this *ConfigurationManager) start() {
 	log.Println("--> Start ConfigurationManager")
-
-	// First of all i will create task if they not exist...
-	for i := 0; i < len(this.m_activeConfigurationsEntity.object.M_scheduledTasks); i++ {
-		task := this.m_activeConfigurationsEntity.object.M_scheduledTasks[i]
-		if task.M_id == "tcpServiceContainerStart" {
-			if len(CargoEntitiesFileExists("tcpServiceContainerStart")) == 0 {
-				script := "function tcpServiceContainerStart(){\n"
-				script += `	GetServer().GetServiceManager().StartService("CargoServiceContainer_TCP", "", "")` + "\n"
-				script += `	setInterval(function(){GetServer().GetServiceManager().StartService("CargoServiceContainer_TCP", "", "")}, 1000)` + "\n"
-				script += "}\n"
-				script += "tcpServiceContainerStart()\n"
-				GetServer().GetFileManager().createDbFile("tcpServiceContainerStart", "tcpServiceContainerStart.js", "application/javascript", script)
-			}
-		} else if task.M_id == "wsServiceContainerStart" {
-			if len(CargoEntitiesFileExists("wsServiceContainerStart")) == 0 {
-				script := "function wsServiceContainerStart(){\n"
-				script += `	GetServer().GetServiceManager().StartService("CargoServiceContainer_WS", "", "")` + "\n"
-				script += `	setInterval(function(){GetServer().GetServiceManager().StartService("CargoServiceContainer_WS", "", "")}, 1000)` + "\n"
-				script += "}\n"
-				script += "wsServiceContainerStart()\n"
-				GetServer().GetFileManager().createDbFile("wsServiceContainerStart", "wsServiceContainerStart.js", "application/javascript", script)
-			}
-		}
-	}
 
 	// Set services configurations...
 	for i := 0; i < len(this.m_servicesConfiguration); i++ {

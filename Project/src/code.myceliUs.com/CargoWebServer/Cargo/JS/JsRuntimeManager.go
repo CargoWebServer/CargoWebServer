@@ -110,11 +110,6 @@ type JsRuntimeManager struct {
 	/** Go function interfaced in JS. **/
 	m_functions map[string]interface{}
 
-	/** Exported values for each file **/
-	// Those map contain module and exports variable. The map is access
-	// at initialisation time only by on thread, so no sync needed here.
-	m_exports map[string]*otto.Object
-
 	/**Channel use for communication with vm... **/
 
 	// Contain the list of active interval JS function.
@@ -154,9 +149,6 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 
 	// List of functions.
 	jsRuntimeManager.m_functions = make(map[string]interface{})
-
-	// each file contain it exports.
-	jsRuntimeManager.m_exports = make(map[string]*otto.Object)
 
 	// Initialisation of channel's.
 	jsRuntimeManager.m_appendScript = make(OperationChannel)
@@ -517,10 +509,9 @@ func (this *JsRuntimeManager) appendScript(path string, src string) {
 /**
  * Part of the module/exports
  */
-func (this *JsRuntimeManager) getExports(path string) (*otto.Object, error) {
+func (this *JsRuntimeManager) getExports(path string, sessionId string) (*otto.Object, error) {
 
 	// If the path begin by ./ that means the current module must be use...
-	//var moduleId string
 	var dir string
 
 	if strings.HasPrefix(path, "./") {
@@ -555,24 +546,17 @@ func (this *JsRuntimeManager) getExports(path string) (*otto.Object, error) {
 	var currentPath = this.m_script
 
 	// Here I need to import a file...
-	exports := this.initScript(exportPath + ".js")
+	exports := this.initScript(exportPath+".js", sessionId)
 
 	// Set it back...
 	this.m_script = currentPath // Set back the path to the file before the call.bytes
-
-	// Here I set back the exports variable for currentPath...
-	moduleId := this.getModuleId(currentPath)
 
 	if strings.HasSuffix(currentPath, ".js") {
 		currentPath = currentPath[0 : len(currentPath)-3]
 	}
 
-	if this.m_exports[currentPath] != nil {
-		if moduleId == "Cargo" || moduleId == "CargoWebServer" || moduleId == "fs" {
-			this.m_sessions[""].Set("exports", this.m_exports[currentPath])
-		} else {
-			this.m_sessions[moduleId].Set("exports", this.m_exports[currentPath])
-		}
+	if exports != nil {
+		this.m_sessions[sessionId].Set("exports", exports)
 	} else {
 		log.Panicln("---> no exports found for path ", currentPath)
 	}
@@ -611,6 +595,9 @@ func (this *JsRuntimeManager) initScripts() {
 	// Get the vm.
 	vm := this.m_sessions[""]
 
+	// Require here I will set the require function.
+	vm.Run("function require(moduleId){return require_(moduleId, sessionId)}")
+
 	// Exported golang JS function.
 	for name, function := range this.m_functions {
 		if strings.Index(name, ".") != -1 {
@@ -623,15 +610,14 @@ func (this *JsRuntimeManager) initScripts() {
 			var exportPath string
 			exportPath = filepath.ToSlash(this.m_searchDir + "/src/" + moduleId)
 
-			if this.m_exports[exportPath] == nil {
-				this.m_exports[exportPath], _ = vm.Object("exports = {}")
-				// Keep it path
-				this.m_exports[exportPath].Set("__path__", exportPath)
-				this.m_exports[exportPath].Set("__module_id__", moduleId)
-			}
+			exports, _ := vm.Object("exports = {}")
+
+			// Keep it path
+			exports.Set("__path__", exportPath)
+			exports.Set("__module_id__", moduleId)
 
 			// Set the function in the module object.
-			this.m_exports[exportPath].Set(name, function)
+			exports.Set(name, function)
 		}
 		vm.Set(name, function)
 	}
@@ -642,7 +628,7 @@ func (this *JsRuntimeManager) initScripts() {
 		// Start initalyse the scripts.
 		moduleId := this.getModuleId(path)
 		if moduleId == "CargoWebServer" {
-			this.initScript(path)
+			this.initScript(path, "")
 		}
 	}
 
@@ -650,71 +636,45 @@ func (this *JsRuntimeManager) initScripts() {
 		// Start initalyse the scripts.
 		moduleId := this.getModuleId(path)
 		if moduleId == "Cargo" {
-			this.initScript(path)
+			this.initScript(path, "")
 		}
 	}
 
 	// Initialyse other modules.
 	for path, _ := range this.m_scripts {
 		// Start initalyse the scripts.
-		this.initScript(path)
+		this.initScript(path, "")
 	}
 }
 
 /**
  * Set init a script.
  */
-func (this *JsRuntimeManager) initScript(path string) *otto.Object {
-
-	var sessionId string
-	sessionId = ""
-
+func (this *JsRuntimeManager) initScript(path string, sessionId string) *otto.Object {
+	vm := this.m_sessions[sessionId]
 	moduleId := this.getModuleId(path)
-	if moduleId != "Cargo" && moduleId != "CargoWebServer" && moduleId != "fs" {
-		sessionId = moduleId
-	}
-
-	var exports *otto.Object
 	this.m_script = path
-
-	// The vm to run the script.
-	vm := this.m_sessions[sessionId] // The global session is use in those case.
-	if vm == nil {
-		// The vm will be a copy of the uname session.
-		vm = this.m_sessions[""].Copy()
-		this.m_sessions[sessionId] = vm
-	}
 
 	exportPath := path
 	if strings.HasSuffix(exportPath, ".js") {
 		exportPath = exportPath[0 : len(exportPath)-3]
 	}
 
-	if this.m_exports[exportPath] != nil {
-		// Here I will return the exports
-		// set the global variable exports...
-		exports = this.m_exports[exportPath]
-	} else {
-		//log.Println("------> init ", path)
-		// create a new path
-		exports, _ = vm.Object("exports = {}")
-		exports.Set("__path__", exportPath)
-		exports.Set("__module_id__", moduleId)
+	// create a new path
+	exports, _ := vm.Object("exports = {}")
+	exports.Set("__path__", exportPath)
+	exports.Set("__module_id__", moduleId)
 
-		this.m_exports[exportPath] = exports
-		if src, ok := this.m_scripts[path]; ok {
-			script, err := vm.Compile("", src)
-			if err == nil {
-				// set the export as return value
-				_, err := vm.Run(script)
-				if err != nil {
-					log.Println("---> script running error:  ", path, err)
-				}
-			} else {
-				log.Println("---> script compilation error:  ", path, err)
+	if src, ok := this.m_scripts[path]; ok {
+		script, err := vm.Compile("", src)
+		if err == nil {
+			// set the export as return value
+			_, err := vm.Run(script)
+			if err != nil {
+				log.Println("---> script running error:  ", path, err)
 			}
-			// remove it from the map.
-			delete(this.m_scripts, path)
+		} else {
+			log.Println("---> script compilation error:  ", path, err)
 		}
 	}
 
@@ -746,6 +706,7 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 
 	// Put the sessionId variable on the global scope.
 	this.m_sessions[sessionId].Set("sessionId", sessionId)
+
 }
 
 /**
@@ -838,7 +799,7 @@ func (this *JsRuntimeManager) executeJsFunction(vm *otto.Otto, functionStr strin
 	// Return the result if there is one...
 	val, err := result.(otto.Value).Export()
 	if err != nil {
-		log.Panicln("---------> error ", err)
+		log.Panicln("---> error ", err)
 		return nil, err
 	}
 

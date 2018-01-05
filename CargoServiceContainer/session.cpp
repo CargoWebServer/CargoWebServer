@@ -18,6 +18,7 @@ void Session::processIncommingMessage(com::mycelius::message::Message& msg){
         // Now I will call process message from the store.
         QString methodName = QString::fromStdString(msg.rqst().method());
         Action* action = new Action(QString::fromStdString(msg.rqst().id()), methodName, this->id);
+        qDebug() << "new request receive " << methodName;
 
         // Now I will append the parameters...
         const ::google::protobuf::RepeatedPtrField< ::com::mycelius::message::Data >&params = msg.rqst().params();

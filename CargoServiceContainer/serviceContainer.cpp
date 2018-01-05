@@ -174,7 +174,7 @@ QString ServiceContainer::GetServicesClientCode(){
             }
 
             // Now the execute js call...
-            clientCode +=  "    service.executeJsFunction(\"" + serverSideMethodName + "\", params ";
+            clientCode +=  "    this.service.executeJsFunction(\"" + serverSideMethodName + "\", params ";
 
             // I will now append the callback...
             if(callbacks.contains("progressCallback")){
@@ -221,10 +221,7 @@ QString ServiceContainer::GetServicesClientCode(){
             }else{
                 clientCode +=  "    , undefined // Error Callback\n";
             }
-
-            clientCode +=  "    , " + caller + "\n";
-            clientCode += " , this.service.conn.id)\n";
-
+            clientCode +=  "    , " + caller + ")\n";
             clientCode += "}\n";
 
         }
@@ -294,6 +291,18 @@ QVariantList ServiceContainer::ExecuteJsFunction(QVariantList params){
     return results;
 }
 
+bool hasMethod(QObject* target, QString methoneName){
+    const QMetaObject* obj = target->metaObject();
+    QList<QMetaMethod> overloads;
+    for (int i = 0, l = obj->methodCount(); i < l; ++i) {
+        const QMetaMethod method = obj->method(i);
+        if( method.name() == methoneName )
+            return true;
+    }
+
+    return false;
+}
+
 void ServiceContainer::setListeners(Session* session){
     QMutexLocker ml(&this->mutex);
     // Here I will append the js engine for that session and put object on it.
@@ -304,15 +313,19 @@ void ServiceContainer::setListeners(Session* session){
         engine->globalObject().setProperty(objects.keys()[i], objectValue);
         // Now with a dynamic cast I will try to convert the object as a listener...
         Listener* listener = reinterpret_cast<Listener*>(objects.value(objects.keys()[i]));
-        connect(session, SIGNAL(onEvent(const Event&)), listener, SLOT(onEvent(const Event&)));
-
-        // Register the listener
-        QStringList channelIds = listener->getChannelIds();
-         for(int i=0; i < channelIds.length(); i++){
-             if(!this->listeners.contains(channelIds[i])){
-                 this->listeners.push_back(channelIds[i]);
-             }
-         }
+        // In case of listener is not null
+        if(listener != NULL){
+            if(hasMethod(listener, "onEvent")){
+                connect(session, SIGNAL(onEvent(const Event&)), listener, SLOT(onEvent(const Event&)));
+                // Register the listener
+                QStringList channelIds = listener->getChannelIds();
+                for(int i=0; i < channelIds.length(); i++){
+                    if(!this->listeners.contains(channelIds[i])){
+                        this->listeners.push_back(channelIds[i]);
+                    }
+                }
+            }
+        }
     }
 
     // Keep the reference to the engine.

@@ -247,6 +247,8 @@ func (this *TaskManager) runTask(task *Config.ScheduledTask) error {
 		script, err := b64.StdEncoding.DecodeString(dbFile.GetObject().(*CargoEntities.File).GetData())
 		// Now I will run the script...
 		if err == nil {
+			// Open a new session if none is already open.
+			JS.GetJsRuntimeManager().OpenSession(task.GetId())
 			_, err := JS.GetJsRuntimeManager().RunScript(task.GetId(), string(script))
 			if err != nil {
 				log.Println("--> script error: ", err)
@@ -313,9 +315,6 @@ func (this *TaskManager) scheduleTask(task *Config.ScheduledTask) {
 			return
 		}
 	}
-
-	// Open a new session if none exist.
-	JS.GetJsRuntimeManager().OpenSession(task.GetId())
 
 	var nextTime time.Time
 	if task.GetFrequencyType() != Config.FrequencyType_ONCE {

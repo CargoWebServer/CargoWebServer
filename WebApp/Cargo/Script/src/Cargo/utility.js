@@ -225,6 +225,7 @@ function isXsRef(fieldType) {
     return false
 }
 
+exports.createRpcData = createRpcData
 exports.JSON = JSON
 exports.isXsBaseType = isXsBaseType
 exports.isXsInt = isXsInt
