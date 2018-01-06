@@ -651,11 +651,11 @@ func (this *JsRuntimeManager) initScripts() {
 		}
 	}
 
-	// Initialyse other modules.
-	for path, _ := range this.m_scripts {
+	// Other module must be initialyse with help of require...
+	/*for path, _ := range this.m_scripts {
 		// Start initalyse the scripts.
 		this.initScript(path, sessionId)
-	}
+	}*/
 }
 
 /**
