@@ -890,18 +890,18 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 						// I will get the proecess handle and kill it...
 						process, err := os.FindProcess(processes[i].Pid())
 						if err == nil {
-							//process.Kill() // Kill existing process.
+							process.Kill() // Kill existing process.
 							log.Println("Kill process ", process.Pid)
 						}
 					}
 				}
 
 				// Now now I will start an new process...
-				/*go func(config *Config.ServiceConfiguration, sessionId string, messageId string) {
+				go func(config *Config.ServiceConfiguration, sessionId string, messageId string) {
 					GetServer().RunCmd(config.GetId(), []string{strconv.Itoa(config.GetPort())}, sessionId)
 					// Restart the service.
 					GetServer().GetServiceManager().StartService(config.M_id, messageId, sessionId)
-				}(config, sessionId, messageId)*/
+				}(config, sessionId, messageId)
 
 				address := config.GetIpv4() + ":" + strconv.Itoa(config.GetPort())
 				if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() {
