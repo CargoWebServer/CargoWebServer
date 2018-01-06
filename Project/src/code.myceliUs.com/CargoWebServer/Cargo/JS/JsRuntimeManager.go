@@ -110,9 +110,7 @@ type JsRuntimeManager struct {
 	/** Go function interfaced in JS. **/
 	m_functions map[string]interface{}
 
-	/** Exported values for each file **/
-	// Those map contain module and exports variable. The map is access
-	// at initialisation time only by on thread, so no sync needed here.
+	/** Exported values for each file for each session **/
 	m_exports map[string]map[string]*otto.Object
 
 	/**Channel use for communication with vm... **/
@@ -598,9 +596,7 @@ func (this *JsRuntimeManager) getModuleId(path string) string {
 /**
  * Initialisation of script for a newly created session.
  */
-func (this *JsRuntimeManager) initScripts() {
-
-	sessionId := "" // The default session here.
+func (this *JsRuntimeManager) initScripts(sessionId string) {
 
 	// Get the vm.
 	vm := this.m_sessions[sessionId]
@@ -719,7 +715,8 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 		this.m_sessions[sessionId] = otto.New()
 	} else {
 		// The runtime will be the base cargo runtime for each session.
-		this.m_sessions[sessionId] = this.m_sessions[""].Copy()
+		this.m_sessions[sessionId] = otto.New()
+		this.initScripts(sessionId)
 	}
 
 	// That channel is use to interrupt vm machine, it must be created before
@@ -745,6 +742,8 @@ func (this *JsRuntimeManager) removeVm(sessionId string) {
 	delete(this.m_setVariable, sessionId)
 	close(this.m_stopVm[sessionId])
 	delete(this.m_stopVm, sessionId)
+	// Remove the exports objects
+	delete(this.m_exports, sessionId)
 
 	// I will also clear intervals for the
 	// the session.
@@ -909,8 +908,8 @@ func (this *JsRuntimeManager) AppendScript(path string, script string) {
 /**
  * Must be called once after all script are imported.
  */
-func (this *JsRuntimeManager) InitScripts() {
-	this.initScripts()
+func (this *JsRuntimeManager) InitScripts(sessionId string) {
+	this.initScripts(sessionId)
 }
 
 /**
