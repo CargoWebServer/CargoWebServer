@@ -32,7 +32,7 @@ var SearchOptionsPanel = function (parent) {
     for (var i = 0; i < server.activeConfigurations.M_dataStoreConfigs.length; ++i) {
         var storeId = server.activeConfigurations.M_dataStoreConfigs[i].M_id;
         // discard some store...
-        if (storeId != "sql_info" && storeId != "xs" && storeId != "sqltypes" && storeId != "XMI_types" && server.activeConfigurations.M_dataStoreConfigs[i].M_dataStoreType == 2) {
+        if (storeId != "sql_info" && storeId != "xs" && storeId != "sqltypes" && storeId != "XMI_types") {
             this.tabs[storeId] = new SearchOptionPanelStoreInfo(this, server.activeConfigurations.M_dataStoreConfigs[i])
         }
     }
@@ -73,8 +73,10 @@ var SearchOptionPanelStoreInfo = function (searchPanel, dataStoreConfig) {
     this.tab.appendElement({ "tag": "span", "innerHtml": dataStoreConfig.M_storeName })
 
     // The datasotre is selected by default.
-    this.isSelectedBtn.element.checked = true
-
+    if(dataStoreConfig.M_dataStoreType == 2){
+        this.isSelectedBtn.element.checked = true
+    }
+    
     // Select or unselect types all a once.
     this.isSelectedBtn.element.onclick = function (storeId) {
         return function () {

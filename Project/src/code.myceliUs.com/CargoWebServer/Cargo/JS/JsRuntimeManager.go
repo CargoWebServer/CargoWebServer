@@ -600,6 +600,7 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 
 	// Get the vm.
 	vm := this.m_sessions[sessionId]
+	vm.Set("sessionId", sessionId)
 
 	// Require here I will set the require function.
 	vm.Run("function require(moduleId){return require_(moduleId, sessionId)}")
@@ -647,7 +648,7 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 		}
 	}
 
-	// Other module must be initialyse with help of require...
+	// Other module must be loaded with help of require function...
 	/*for path, _ := range this.m_scripts {
 		// Start initalyse the scripts.
 		this.initScript(path, sessionId)
@@ -722,10 +723,6 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 	// That channel is use to interrupt vm machine, it must be created before
 	// the vm start.
 	this.m_sessions[sessionId].Interrupt = make(chan func(), 1) // The buffer prevents blocking
-
-	// Put the sessionId variable on the global scope.
-	this.m_sessions[sessionId].Set("sessionId", sessionId)
-
 }
 
 /**

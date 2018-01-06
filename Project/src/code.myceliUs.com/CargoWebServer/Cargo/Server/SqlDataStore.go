@@ -262,17 +262,36 @@ func (this *SqlDataStore) GetId() string {
 func (this *SqlDataStore) Ping() (err error) {
 	if this.m_db == nil {
 		err = errors.New("No connection was found for datastore " + this.m_name)
+		log.Println(err)
 		return err
 	}
 
-	err = this.m_db.Ping()
+	errChannel := make(chan error, 0)
+	timer := time.NewTimer(5 * time.Second)
+
+	// Set timer to 5 second before give up on connection.
+	go func(errChannel chan error, dataStore DataStore, timer *time.Timer) {
+		<-timer.C
+		dataStore.Close() // Close the connection.
+		err := errors.New("Ping " + dataStore.GetId() + " failed!")
+		errChannel <- err
+	}(errChannel, this, timer)
+
+	// Try to ping the connection.
+	go func(errChannel chan error, dataStore DataStore, timer *time.Timer) {
+		errChannel <- dataStore.(*SqlDataStore).m_db.Ping()
+		timer.Stop()
+	}(errChannel, this, timer)
+
+	err = <-errChannel
+
 	return err
 }
 
 /** Crud interface **/
 func (this *SqlDataStore) Create(query string, data_ []interface{}) (lastId interface{}, err error) {
 
-	err = this.m_db.Ping()
+	err = this.Ping()
 	if err != nil {
 		err = this.Connect()
 		if err != nil {
@@ -579,15 +598,16 @@ func isForeignKey(val string) bool {
  * Read a query execute it and return the result as an array of interface...
  */
 func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []interface{}) ([][]interface{}, error) {
-
-	err := this.m_db.Ping()
+	log.Println("SqlDataStore.go line ", 601)
+	err := this.Ping()
 	if err != nil {
 		err = this.Connect()
+		log.Println("SqlDataStore.go line ", 605)
 		if err != nil {
 			return nil, err
 		}
 	}
-
+	log.Println("SqlDataStore.go line ", 610)
 	rows, err := this.m_db.Query(query, params...)
 	if err != nil {
 		log.Println(query)
@@ -595,7 +615,9 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 		log.Println("---> sql read query error:", err)
 		return nil, err
 	}
-
+	log.Println("SqlDataStore.go line ", 618)
+	log.Println(query)
+	log.Println(params)
 	defer rows.Close()
 	results := make([][]interface{}, 0, 0)
 
@@ -633,7 +655,7 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 }
 
 func (this *SqlDataStore) Update(query string, fields []interface{}, params []interface{}) (err error) {
-	err = this.m_db.Ping()
+	err = this.Ping()
 	if err != nil {
 		err = this.Connect()
 		if err != nil {
@@ -693,7 +715,7 @@ func (this *SqlDataStore) Update(query string, fields []interface{}, params []in
  */
 func (this *SqlDataStore) Delete(query string, params []interface{}) (err error) {
 
-	err = this.m_db.Ping()
+	err = this.Ping()
 	if err != nil {
 		err = this.Connect()
 		if err != nil {

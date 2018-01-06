@@ -260,7 +260,11 @@ func (this *DynamicEntity) appendValue(field string, value interface{}) {
 	} else {
 		// An array already exist in that case.
 		if reflect.TypeOf(value).Kind() == reflect.String {
-			values = append(values.([]string), value.(string))
+			if reflect.TypeOf(values).Kind().String() == "[]interface {}" {
+				values = append(values.([]interface{}), value.(string))
+			} else if reflect.TypeOf(values).Kind().String() == " []string" {
+				values = append(values.([]string), value.(string))
+			}
 			this.setValue(field, values)
 		} else if reflect.TypeOf(value).String() == "*Server.DynamicEntity" {
 			if strings.HasSuffix(prototype.FieldsType[prototype.getFieldIndex(field)], ":Ref") {
