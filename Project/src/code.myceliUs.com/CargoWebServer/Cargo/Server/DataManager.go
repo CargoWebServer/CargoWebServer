@@ -254,7 +254,6 @@ func (this *DataManager) readData(storeId string, query string, fieldsType []int
 												}
 											}
 										}
-										log.Println("------> query ", query, params)
 										// Now I will get data from sql...
 										sqlData, err := this.readData(dataBaseName, query, fieldsType, params)
 

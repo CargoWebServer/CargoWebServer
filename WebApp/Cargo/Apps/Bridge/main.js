@@ -98,12 +98,10 @@ function main() {
                                                                                 eval(results)
                                                                                 // Xapian test...
                                                                                 xapian = new com.mycelius.XapianInterface(caller.service)
-
                                                                                 init()
                                                                             },
                                                                             // error callback.
                                                                             function () {
-
                                                                             }, { "service": service })
                                                                     }
                                                                 }(service),

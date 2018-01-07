@@ -550,7 +550,6 @@ var MainPage = function (parent) {
                         userInfoDropdownLnk.element.style.display = ""
                         newBlogLnk.element.style.display = ""
                         mainPage.newCategoryBtn.element.style.display = "block"
-                        document.getElementById("blog-categories").style.display = "block"
                         mainPage.authorPostTitle.element.innerHTML = session.M_accountPtr.M_userRef.M_firstName + " " + session.M_accountPtr.M_userRef.M_lastName + " post's"
 
                         userInfoDropdownLnk.element.firstChild.innerHTML = session.M_accountPtr.M_id
@@ -670,7 +669,6 @@ var MainPage = function (parent) {
                     mainPage.account = null
 
                     // Set user interface element.
-                    document.getElementById("blog-categories").style.display = ""
                     loginDropdownLnk.element.style.display = ""
                     logoutDropdownLnk.element.style.display = "none"
                     userInfoDropdownLnk.element.style.display = ""
