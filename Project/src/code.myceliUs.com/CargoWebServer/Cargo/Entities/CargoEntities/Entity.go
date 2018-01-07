@@ -2,7 +2,7 @@
 
 package CargoEntities
 
-type Entity interface{
+type Entity interface {
 	/** Method of Entity **/
 
 	/** UUID **/
@@ -10,5 +10,4 @@ type Entity interface{
 
 	/** Id **/
 	GetId() string
-
 }

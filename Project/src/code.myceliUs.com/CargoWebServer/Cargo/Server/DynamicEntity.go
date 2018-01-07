@@ -1848,6 +1848,7 @@ func (this *DynamicEntity) Exist() bool {
 	if this == nil {
 		return false
 	}
+
 	prototype := this.GetPrototype()
 	var query EntityQuery
 	query.TypeName = this.GetTypeName()
@@ -1862,10 +1863,9 @@ func (this *DynamicEntity) Exist() bool {
 	if reflect.TypeOf(dataManager.getDataStore(storeId)).String() == "*Server.SqlDataStore" {
 		storeId = "sql_info" // Must save or update value from sql info instead.
 	}
-
 	results, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
 	if err != nil || len(results) == 0 {
-		log.Println("--------------------> Not exist: ", this.GetUuid())
+		log.Println("--> Not exist: ", this.GetUuid())
 		return false
 	}
 

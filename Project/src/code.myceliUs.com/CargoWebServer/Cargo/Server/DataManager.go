@@ -244,8 +244,6 @@ func (this *DataManager) readData(storeId string, query string, fieldsType []int
 										if len(ids) > 0 {
 											query += " WHERE "
 											for j := 0; j < len(ids); j++ {
-												// The first ids in the list of ids are always the uuid so
-												// the index is j+1
 												id := Utility.ToString(ids[j])
 												if id != "null" {
 													query += strings.Replace(prototype.Ids[j+1], "M_", "", -1) + "=?"
@@ -256,9 +254,10 @@ func (this *DataManager) readData(storeId string, query string, fieldsType []int
 												}
 											}
 										}
-
+										log.Println("------> query ", query, params)
 										// Now I will get data from sql...
 										sqlData, err := this.readData(dataBaseName, query, fieldsType, params)
+
 										if err == nil {
 											if len(sqlData) > 0 {
 												// Now I will replace the data with the retreive values.
@@ -436,7 +435,6 @@ func (this *DataManager) getRelationshipEntities(prototype *EntityPrototype, fie
  * From entity I will get references and set it.
  */
 func (this *DataManager) setEntityRelationship(storeId string, name string, ref_0 *DynamicEntity) error {
-
 	// First of all I will get the data store
 	store := this.m_dataStores[storeId]
 	if store == nil {
@@ -645,7 +643,7 @@ func (this *DataManager) setEntityReferences(uuid string, lazy bool) error {
 	// I will retreive reference fields.
 	for i := 0; i < len(prototype.FieldsType); i++ {
 		// I need to retreive the link between for example M_post_id and M_FK_blog_comment_blog_post.
-		if isForeignKey(prototype.Fields[i]) {
+		if entity.(*DynamicEntity).getValue(prototype.Fields[i]) == nil {
 			storeId := prototype.TypeName[0:strings.Index(prototype.TypeName, ".")]
 			this.setEntityRelationship(storeId, prototype.Fields[i], entity.(*DynamicEntity))
 		}

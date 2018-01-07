@@ -11,8 +11,6 @@ import (
  * of he's information.
  */
 func NewDataStore(info *Config.DataStoreConfiguration) (DataStore, error) {
-	var err error
-
 	if info.M_dataStoreType == Config.DataStoreType_SQL_STORE {
 		dataStore, err := NewSqlDataStore(info)
 		return dataStore, err
@@ -22,7 +20,6 @@ func NewDataStore(info *Config.DataStoreConfiguration) (DataStore, error) {
 	} else {
 		return nil, errors.New("No data store type was given")
 	}
-	return nil, err
 }
 
 /**

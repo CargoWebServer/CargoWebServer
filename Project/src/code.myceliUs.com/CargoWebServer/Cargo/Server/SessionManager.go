@@ -357,7 +357,6 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 
 		return nil
 	}
-	return nil
 }
 
 // @api 1.0

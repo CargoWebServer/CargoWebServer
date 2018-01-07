@@ -1,4 +1,3 @@
-// Action
 package Server
 
 import (
@@ -49,37 +48,37 @@ func newAction(name string, msg *message) *Action {
 /**
  * Send a response to the caller of Action.
  */
-func (self *Action) sendResponse(result []*MessageData) {
+func (action *Action) sendResponse(result []*MessageData) {
 	// Respond back to the source...
 	to := make([]connection, 1)
-	to[0] = self.msg.from
-	resultMsg, _ := NewResponseMessage(self.msg.GetId(), result, to)
+	to[0] = action.msg.from
+	resultMsg, _ := NewResponseMessage(action.msg.GetId(), result, to)
 	GetServer().GetProcessor().appendResponse(resultMsg)
 }
 
 /**
  * Execute the Action iteself...
  */
-func (self *Action) execute() {
+func (action *Action) execute() {
 
 	// That function use reflection to retreive the
 	// method to call on a given object.
-	x, errMsg := Utility.CallMethod(*self, self.Name, self.Params)
+	x, errMsg := Utility.CallMethod(*action, action.Name, action.Params)
 
-	// Get the session id and the message id...
-	var sessionId string
-	if self.msg.from != nil {
-		sessionId = self.msg.from.GetUuid()
+	//sessionID Get the session id and the message id...
+	var sessionID string
+	if action.msg.from != nil {
+		sessionID = action.msg.from.GetUuid()
 	}
 
-	messageId := self.msg.GetId()
+	messageID := action.msg.GetId()
 
 	if errMsg != nil {
 		err := errMsg.(error)
 
 		// Create the error object.
 		cargoError := NewError(Utility.FileLine(), ACTION_EXECUTE_ERROR, SERVER_ERROR_CODE, err)
-		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+		GetServer().reportErrorMessage(messageID, sessionID, cargoError)
 		return
 	}
 
@@ -104,7 +103,7 @@ func (self *Action) execute() {
 	// Set the result and put in the
 	result := make([]*MessageData, 1)
 	result[0] = r
-	self.sendResponse(result)
+	action.sendResponse(result)
 }
 
 ////////////////////////////////////////////////////////////////////////////////

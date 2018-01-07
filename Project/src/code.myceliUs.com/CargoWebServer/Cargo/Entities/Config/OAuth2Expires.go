@@ -2,11 +2,11 @@
 
 package Config
 
-import(
+import (
 	"encoding/xml"
 )
 
-type OAuth2Expires struct{
+type OAuth2Expires struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -20,12 +20,11 @@ type OAuth2Expires struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of OAuth2Expires **/
-	M_id string
+	M_id        string
 	M_expiresAt int64
-
 
 	/** Associations **/
 	m_parentPtr *OAuth2Configuration
@@ -35,26 +34,27 @@ type OAuth2Expires struct{
 
 /** Xml parser for OAuth2Expires **/
 type XsdOAuth2Expires struct {
-	XMLName xml.Name	`xml:"oauth2Expires"`
-	M_id	string	`xml:"id,attr"`
-	M_expiresAt	int64	`xml:"expiresAt,attr"`
-
+	XMLName     xml.Name `xml:"oauth2Expires"`
+	M_id        string   `xml:"id,attr"`
+	M_expiresAt int64    `xml:"expiresAt,attr"`
 }
+
 /** UUID **/
-func (this *OAuth2Expires) GetUUID() string{
+func (this *OAuth2Expires) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *OAuth2Expires) GetId() string{
+func (this *OAuth2Expires) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *OAuth2Expires) SetId(ref interface{}){
+func (this *OAuth2Expires) SetId(ref interface{}) {
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
+		if this.IsInit == true {
+			this.NeedSave = true
 		}
 	}
 }
@@ -62,15 +62,16 @@ func (this *OAuth2Expires) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** ExpiresAt **/
-func (this *OAuth2Expires) GetExpiresAt() int64{
+func (this *OAuth2Expires) GetExpiresAt() int64 {
 	return this.M_expiresAt
 }
 
 /** Init reference ExpiresAt **/
-func (this *OAuth2Expires) SetExpiresAt(ref interface{}){
+func (this *OAuth2Expires) SetExpiresAt(ref interface{}) {
 	if this.M_expiresAt != ref.(int64) {
 		this.M_expiresAt = ref.(int64)
-		if this.IsInit == true {			this.NeedSave = true
+		if this.IsInit == true {
+			this.NeedSave = true
 		}
 	}
 }
@@ -78,22 +79,24 @@ func (this *OAuth2Expires) SetExpiresAt(ref interface{}){
 /** Remove reference ExpiresAt **/
 
 /** Parent **/
-func (this *OAuth2Expires) GetParentPtr() *OAuth2Configuration{
+func (this *OAuth2Expires) GetParentPtr() *OAuth2Configuration {
 	return this.m_parentPtr
 }
 
 /** Init reference Parent **/
-func (this *OAuth2Expires) SetParentPtr(ref interface{}){
+func (this *OAuth2Expires) SetParentPtr(ref interface{}) {
 	if _, ok := ref.(string); ok {
 		if this.M_parentPtr != ref.(string) {
 			this.M_parentPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
+			if this.IsInit == true {
+				this.NeedSave = true
 			}
 		}
-	}else{
+	} else {
 		if this.M_parentPtr != ref.(Configuration).GetUUID() {
 			this.M_parentPtr = ref.(Configuration).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
+			if this.IsInit == true {
+				this.NeedSave = true
 			}
 		}
 		this.m_parentPtr = ref.(*OAuth2Configuration)
@@ -101,9 +104,9 @@ func (this *OAuth2Expires) SetParentPtr(ref interface{}){
 }
 
 /** Remove reference Parent **/
-func (this *OAuth2Expires) RemoveParentPtr(ref interface{}){
+func (this *OAuth2Expires) RemoveParentPtr(ref interface{}) {
 	toDelete := ref.(Configuration)
-	if this.m_parentPtr!= nil {
+	if this.m_parentPtr != nil {
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""

@@ -3,8 +3,9 @@
 package CargoEntities
 
 type OsType int
-const(
-	OsType_Unknown OsType = 1+iota
+
+const (
+	OsType_Unknown OsType = 1 + iota
 	OsType_Linux
 	OsType_Windows7
 	OsType_Windows8

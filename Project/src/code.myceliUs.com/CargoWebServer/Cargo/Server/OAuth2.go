@@ -273,7 +273,7 @@ func (this *OAuth2Manager) start() {
 
 	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
-		log.Println("failed to parse key: %v", err)
+		log.Println("failed to parse key: ", key, err)
 		return
 	}
 
@@ -287,7 +287,7 @@ func (this *OAuth2Manager) start() {
 
 	this.m_jwtSigner, err = jose.NewSigner(jose.RS256, privateKey)
 	if err != nil {
-		log.Println("failed to create jwtSigner: %v", err)
+		log.Println("failed to create jwtSigner:", this.m_jwtSigner, err)
 		return
 	}
 
@@ -670,7 +670,6 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 					log.Println("594 -----------> access refuse")
 					errObj := NewError(Utility.FileLine(), ACCESS_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("Access denied to get resource with scope "+scope+" for client with id "+clientId))
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
-					return nil
 				}
 
 				delete(channels, msgId)
@@ -688,7 +687,6 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 			closeAuthorizeDialog()
 			errObj := NewError(Utility.FileLine(), AUTHORIZATION_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("Authorization denied to get resource with scope "+scope+" for client with id "+clientId))
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
-			return nil
 		}
 	}
 	return nil

@@ -44,7 +44,7 @@ func (self *message) GetBytes() []byte {
 	data, err := proto.Marshal(self.msg)
 	if err != nil {
 		// t.Fatal("marshaling error: ", err)
-		log.Printf("Error: ", err)
+		log.Println("Error: ", err)
 	}
 	return data
 }

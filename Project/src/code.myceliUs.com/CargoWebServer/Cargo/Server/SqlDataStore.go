@@ -598,16 +598,13 @@ func isForeignKey(val string) bool {
  * Read a query execute it and return the result as an array of interface...
  */
 func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []interface{}) ([][]interface{}, error) {
-	log.Println("SqlDataStore.go line ", 601)
 	err := this.Ping()
 	if err != nil {
 		err = this.Connect()
-		log.Println("SqlDataStore.go line ", 605)
 		if err != nil {
 			return nil, err
 		}
 	}
-	log.Println("SqlDataStore.go line ", 610)
 	rows, err := this.m_db.Query(query, params...)
 	if err != nil {
 		log.Println(query)
@@ -615,9 +612,6 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 		log.Println("---> sql read query error:", err)
 		return nil, err
 	}
-	log.Println("SqlDataStore.go line ", 618)
-	log.Println(query)
-	log.Println(params)
 	defer rows.Close()
 	results := make([][]interface{}, 0, 0)
 

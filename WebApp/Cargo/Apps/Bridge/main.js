@@ -1,7 +1,7 @@
 /**
  * Created by Dave Courtois on 2/14/2015.
  */
-var applicationName = document.getElementsByTagName("title")[0].text
+var applicationName = document.getElementsByTagName("title")[0].text;
 
 // Local event...
 var ChangeFileEvent = 100
@@ -16,7 +16,7 @@ function init() {
 
     // Set style informations
     cargoThemeInfos = JSON.parse(localStorage.getItem("bridge_theme_infos"))
-    if (cargoThemeInfos != undefined) {
+    if (cargoThemeInfos !== undefined) {
         for (var ruleName in cargoThemeInfos) {
             var rule = getCSSRule(ruleName)
             for (property in cargoThemeInfos[ruleName]) {

@@ -31,6 +31,7 @@ type Hub struct {
 	abortedByEnvironment chan bool
 }
 
+// NewHub Create a new Hub
 func NewHub() *Hub {
 
 	h := new(Hub)
@@ -88,33 +89,32 @@ func NewHub() *Hub {
 	return h
 }
 
-func (this *Hub) run() {
+func (h *Hub) run() {
 	for {
 		select {
-		case c := <-this.register:
-			this.connections[c.GetUuid()] = c
+		case c := <-h.register:
+			h.connections[c.GetUuid()] = c
 
 			// initialyse js interpreter for the new connection.
 
 			// Open a new session
 			JS.GetJsRuntimeManager().OpenSession(c.GetUuid())
 
-		case c := <-this.unregister:
-			delete(this.connections, c.GetUuid())
+		case c := <-h.unregister:
+			delete(h.connections, c.GetUuid())
 			// Close the connection.
 			GetServer().GetEventManager().removeClosedListener()
 			GetServer().GetSessionManager().removeClosedSession()
 			GetServer().onClose(c.GetUuid())
 
-		case msg := <-this.receivedMsg:
+		case msg := <-h.receivedMsg:
 			GetServer().GetProcessor().m_incomingChannel <- msg
 
-		case done := <-this.abortedByEnvironment:
+		case done := <-h.abortedByEnvironment:
 			if done {
+				h.ticker.Stop()
 				return
 			}
 		}
 	}
-
-	this.ticker.Stop()
 }

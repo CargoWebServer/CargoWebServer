@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	// The configuration db
+	//ConfigDB The configuration db
 	ConfigDB = "Config"
 )
 

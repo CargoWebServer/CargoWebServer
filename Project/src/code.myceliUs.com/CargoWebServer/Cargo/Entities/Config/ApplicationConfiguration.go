@@ -2,11 +2,11 @@
 
 package Config
 
-import(
+import (
 	"encoding/xml"
 )
 
-type ApplicationConfiguration struct{
+type ApplicationConfiguration struct {
 
 	/** The entity UUID **/
 	UUID string
@@ -20,14 +20,13 @@ type ApplicationConfiguration struct{
 	NeedSave bool
 
 	/** If the entity is fully initialyse **/
-	IsInit   bool
+	IsInit bool
 
 	/** members of Configuration **/
 	M_id string
 
 	/** members of ApplicationConfiguration **/
 	M_indexPage string
-
 
 	/** Associations **/
 	m_parentPtr *Configurations
@@ -37,29 +36,29 @@ type ApplicationConfiguration struct{
 
 /** Xml parser for ApplicationConfiguration **/
 type XsdApplicationConfiguration struct {
-	XMLName xml.Name	`xml:"applicationConfiguration"`
+	XMLName xml.Name `xml:"applicationConfiguration"`
 	/** Configuration **/
-	M_id	string	`xml:"id,attr"`
+	M_id string `xml:"id,attr"`
 
-
-	M_indexPage	string	`xml:"indexPage,attr"`
-
+	M_indexPage string `xml:"indexPage,attr"`
 }
+
 /** UUID **/
-func (this *ApplicationConfiguration) GetUUID() string{
+func (this *ApplicationConfiguration) GetUUID() string {
 	return this.UUID
 }
 
 /** Id **/
-func (this *ApplicationConfiguration) GetId() string{
+func (this *ApplicationConfiguration) GetId() string {
 	return this.M_id
 }
 
 /** Init reference Id **/
-func (this *ApplicationConfiguration) SetId(ref interface{}){
+func (this *ApplicationConfiguration) SetId(ref interface{}) {
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
+		if this.IsInit == true {
+			this.NeedSave = true
 		}
 	}
 }
@@ -67,15 +66,16 @@ func (this *ApplicationConfiguration) SetId(ref interface{}){
 /** Remove reference Id **/
 
 /** IndexPage **/
-func (this *ApplicationConfiguration) GetIndexPage() string{
+func (this *ApplicationConfiguration) GetIndexPage() string {
 	return this.M_indexPage
 }
 
 /** Init reference IndexPage **/
-func (this *ApplicationConfiguration) SetIndexPage(ref interface{}){
+func (this *ApplicationConfiguration) SetIndexPage(ref interface{}) {
 	if this.M_indexPage != ref.(string) {
 		this.M_indexPage = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
+		if this.IsInit == true {
+			this.NeedSave = true
 		}
 	}
 }
@@ -83,22 +83,24 @@ func (this *ApplicationConfiguration) SetIndexPage(ref interface{}){
 /** Remove reference IndexPage **/
 
 /** Parent **/
-func (this *ApplicationConfiguration) GetParentPtr() *Configurations{
+func (this *ApplicationConfiguration) GetParentPtr() *Configurations {
 	return this.m_parentPtr
 }
 
 /** Init reference Parent **/
-func (this *ApplicationConfiguration) SetParentPtr(ref interface{}){
+func (this *ApplicationConfiguration) SetParentPtr(ref interface{}) {
 	if _, ok := ref.(string); ok {
 		if this.M_parentPtr != ref.(string) {
 			this.M_parentPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
+			if this.IsInit == true {
+				this.NeedSave = true
 			}
 		}
-	}else{
+	} else {
 		if this.M_parentPtr != ref.(*Configurations).GetUUID() {
 			this.M_parentPtr = ref.(*Configurations).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
+			if this.IsInit == true {
+				this.NeedSave = true
 			}
 		}
 		this.m_parentPtr = ref.(*Configurations)
@@ -106,9 +108,9 @@ func (this *ApplicationConfiguration) SetParentPtr(ref interface{}){
 }
 
 /** Remove reference Parent **/
-func (this *ApplicationConfiguration) RemoveParentPtr(ref interface{}){
+func (this *ApplicationConfiguration) RemoveParentPtr(ref interface{}) {
 	toDelete := ref.(*Configurations)
-	if this.m_parentPtr!= nil {
+	if this.m_parentPtr != nil {
 		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""

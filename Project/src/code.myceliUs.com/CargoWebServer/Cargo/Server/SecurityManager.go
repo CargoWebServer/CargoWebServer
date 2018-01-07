@@ -37,7 +37,7 @@ func newSecurityManager() *SecurityManager {
 ////////////////////////////////////////////////////////////////////////////////
 
 func (this *SecurityManager) createAdminRole() {
-	// Create the admin role if it doesn't exist
+	//adminRoleUuid Create the admin role if it doesn't exist
 	adminRoleUuid := CargoEntitiesRoleExists("adminRole")
 
 	if len(adminRoleUuid) == 0 {

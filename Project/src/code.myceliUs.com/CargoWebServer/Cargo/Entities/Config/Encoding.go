@@ -3,8 +3,9 @@
 package Config
 
 type Encoding int
-const(
-	Encoding_UTF8 Encoding = 1+iota
+
+const (
+	Encoding_UTF8 Encoding = 1 + iota
 	Encoding_WINDOWS_1250
 	Encoding_WINDOWS_1251
 	Encoding_WINDOWS_1252
