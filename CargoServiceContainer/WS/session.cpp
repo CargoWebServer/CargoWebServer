@@ -1,6 +1,7 @@
 #include "session.h"
 #include "action.h"
 #include "serviceContainer.h"
+#include "messageprocessor.hpp"
 #include "gen/rpc.pb.h"
 #include <QCoreApplication>
 #include <QThreadPool>
@@ -29,6 +30,10 @@ Session::Session(QWebSocket* socket, QObject *parent) :
 
 Session::~Session(){
     qDebug() << "session is " << this->id << " is deleted!";
+    if(this->socket != NULL){
+        disconnect(this->socket, &QWebSocket::binaryMessageReceived, this, &Session::processBinaryMessage);
+        disconnect(this->socket, &QWebSocket::disconnected, this, &Session::disconnected);
+    }
 }
 
 void Session::run()
@@ -40,22 +45,18 @@ void Session::run()
     emit end(this->id);
 }
 
-void Session::sendMessage(com::mycelius::message::Message *msg){
-    // Send messsage back.
-    QByteArray data =  serializeToByteArray(msg);
-    this->socket->sendBinaryMessage(data);
+void Session::sendMessage(const QByteArray& data, QString sessionId){
+    if(this->id == sessionId){
+        // Send messsage back.
+        this->socket->sendBinaryMessage(data);
+    }
 }
 
 void Session::processBinaryMessage(QByteArray data)
 {
     // get the information
     com::mycelius::message::Message msg;
-    msg.ParseFromArray(data, data.size());
-    this->processIncommingMessage(msg);
+    if(msg.ParseFromArray(data, data.size())){
+        emit messageReceived(data, this->id);
+    }
 }
-
-
-/*if(this->socket != NULL){
-    disconnect(this->socket, &QWebSocket::binaryMessageReceived, this, &Session::processBinaryMessage);
-    disconnect(this->socket, &QWebSocket::disconnected, this, &Session::disconnected);
-}*/

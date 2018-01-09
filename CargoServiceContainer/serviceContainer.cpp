@@ -9,18 +9,6 @@ ServiceContainer::~ServiceContainer(){
 }
 
 
-/**
- * @brief serializeToByteArray Serialyse the message to an array of bytes...
- * @param msg The proto message.
- * @return
- */
-QByteArray serializeToByteArray(google::protobuf::Message *msg){
-    QByteArray ra;
-    ra.resize(msg->ByteSize());
-    msg->SerializeToArray(ra.data(),ra.size());
-    return ra;
-}
-
 void ServiceContainer::startServer()
 {
     if(!this->listen(QHostAddress::Any, this->port))
@@ -29,6 +17,8 @@ void ServiceContainer::startServer()
     }
     else
     {
+        // Start the message processor.
+        this->messageProcessor = new MessageProcessor();
         qDebug() << "Listening to port " << this->port << "...";
     }
 }
@@ -316,7 +306,7 @@ void ServiceContainer::setListeners(Session* session){
         // In case of listener is not null
         if(listener != NULL){
             if(hasMethod(listener, "onEvent")){
-                connect(session, SIGNAL(onEvent(const Event&)), listener, SLOT(onEvent(const Event&)));
+                connect(this->messageProcessor, SIGNAL(onEvent(const Event&)), listener, SLOT(onEvent(const Event&)));
                 // Register the listener
                 QStringList channelIds = listener->getChannelIds();
                 for(int i=0; i < channelIds.length(); i++){

@@ -10,7 +10,8 @@ HEADERS += \
     TCP/serviceContainer.h \
     TCP/session.h \
     listener.hpp \
-    event.hpp
+    event.hpp \
+    messageprocessor.hpp
 
 SOURCES += \
     action.cpp \
@@ -19,7 +20,8 @@ SOURCES += \
     gen/rpc.pb.cc \
     main.cpp \
     serviceContainer.cpp \
-    listener.cpp
+    listener.cpp \
+    messageprocessor.cpp
 
 DEFINES += PORT_NUMBER=9595
 

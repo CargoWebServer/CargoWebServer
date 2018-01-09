@@ -13,10 +13,9 @@
 #include <QMutexLocker>
 
 #include "../gen/rpc.pb.h"
+#include "messageprocessor.hpp"
 
 class Session;
-
-QByteArray serializeToByteArray(google::protobuf::Message *msg);
 
 /**
  * @brief Service Container is a TCP server. It's use to interface
@@ -42,6 +41,9 @@ class ServiceContainer : public QWebSocketServer
 
     // The list of listeners.
     QStringList listeners;
+
+    // The message processor.
+    MessageProcessor* messageProcessor;
 
     // Use it to protect engines map access.
     QMutex mutex;

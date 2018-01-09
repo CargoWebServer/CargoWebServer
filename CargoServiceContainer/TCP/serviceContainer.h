@@ -12,9 +12,9 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include "../gen/rpc.pb.h"
+#include "messageprocessor.hpp"
 
 class Session;
-QByteArray serializeToByteArray(google::protobuf::Message *msg);
 
 /**
  * @brief Service Container is a TCP server. It's use to interface
@@ -46,6 +46,9 @@ class ServiceContainer : public QTcpServer
 
     // Use it to protect engines map access.
     QMutex mutex;
+
+    // The message processor.
+    MessageProcessor* messageProcessor;
 
     Q_OBJECT
 public:

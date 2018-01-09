@@ -8,14 +8,17 @@ CONFIG += c++11
 HEADERS += \
     action.h \
     WS/serviceContainer.h \
-    WS/session.h
+    WS/session.h \
+    messageprocessor.h \
+    messageprocessor.hpp
 
 SOURCES += \
     action.cpp \
     WS/serviceContainer.cpp \
     WS/session.cpp \
     gen/rpc.pb.cc \
-    main.cpp
+    main.cpp \
+    messageprocessor.cpp
 
 DEFINES += PORT_NUMBER=9494 WS
 

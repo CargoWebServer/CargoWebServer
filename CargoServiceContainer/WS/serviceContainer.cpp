@@ -51,6 +51,13 @@ void ServiceContainer::onNewConnection(){
         // Need it to remove session engine from the map.
         connect(session, SIGNAL(end(QString)), this, SLOT(onSessionEnd(QString)));
 
+        // Here I will connect the message processor and the session to make message processor process the received message.
+        connect(session, SIGNAL(messageReceived(const QByteArray&, QString)), this->messageProcessor, SLOT(processIncommingMessage(const QByteArray&, QString)));
+
+        // When the message is process a response will be emit.
+        // Here I will connect the message processor and the session to make message processor process the received message.
+        connect(this->messageProcessor, SIGNAL(sendResponse(const QByteArray&, QString)), session, SLOT(sendMessage(const QByteArray&, QString)));
+
         // Start the session...
         session->start();
 

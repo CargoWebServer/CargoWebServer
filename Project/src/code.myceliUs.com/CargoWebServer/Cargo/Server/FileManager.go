@@ -518,6 +518,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 		if strings.HasPrefix(file.M_mime, "text/") || strings.HasPrefix(file.M_mime, "application/") {
 			file.SetData(base64.StdEncoding.EncodeToString(filedata))
 		}
+
 		fileInfo.Value = file
 		eventData[0] = fileInfo
 
@@ -535,7 +536,9 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 			// Existing file was update
 			evt, _ = NewEvent(UpdateFileEvent, FileEvent, eventData)
 		}
+
 		GetServer().GetEventManager().BroadcastEvent(evt)
+
 	}
 
 	// Save the file.
@@ -1652,8 +1655,7 @@ func FileUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	//get the *fileheaders
 	files := formdata.File["multiplefiles"] // grab the filenames
-	log.Println("-------> ", files)
-	for i, _ := range files { // loop through the files one by one
+	for i, _ := range files {               // loop through the files one by one
 		file, err := files[i].Open()
 		defer file.Close()
 		if err != nil {

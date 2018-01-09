@@ -29,6 +29,7 @@ public:
     ~Action();
     void run();
     void appendParam(QString name, QVariant value, QString typeName);
+    QString getId(){return this->id;}
 
 signals:
     /** That signal is emit when the action is completed **/

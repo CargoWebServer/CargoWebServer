@@ -41,12 +41,12 @@ void Session::run()
     emit end(this->id);
 }
 
-void Session::sendMessage(com::mycelius::message::Message *msg){
-    QByteArray data =  serializeToByteArray(msg);
-    this->socket->write(data);
-    this->socket->waitForBytesWritten();
+void Session::sendMessage(const QByteArray& data, QString sessionId){
+    if(this->id == sessionId){
+        this->socket->write(data);
+        this->socket->waitForBytesWritten();
+    }
 }
-
 
 void Session::readyRead()
 {
@@ -61,10 +61,14 @@ void Session::readyRead()
             this->socket->waitForReadyRead(); // alternatively, store the buffer and wait for the next readyRead()
             buffer.append(this->socket->read(dataSize - buffer.size())); // append the remaining bytes of the message
         }
-        com::mycelius::message::Message msg;
-        msg.ParseFromArray(buffer, buffer.size());
-        if(msg.id().length() > 0){
-            this->processIncommingMessage(msg);
+        try{
+            com::mycelius::message::Message msg;
+            if(msg.ParseFromArray(buffer, buffer.size())){
+                emit messageReceived(buffer, this->id);
+            }
+        }catch(const std::exception& e){
+            qDebug() << "Protobuf error read!";
+            qDebug() << e.what();
         }
     }
 }
