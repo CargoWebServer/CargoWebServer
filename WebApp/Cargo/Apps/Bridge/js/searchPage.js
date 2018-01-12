@@ -73,10 +73,10 @@ var SearchOptionPanelStoreInfo = function (searchPanel, dataStoreConfig) {
     this.tab.appendElement({ "tag": "span", "innerHtml": dataStoreConfig.M_storeName })
 
     // The datasotre is selected by default.
-    if(dataStoreConfig.M_dataStoreType == 2){
+    if (dataStoreConfig.M_dataStoreType == 2) {
         this.isSelectedBtn.element.checked = true
     }
-    
+
     // Select or unselect types all a once.
     this.isSelectedBtn.element.onclick = function (storeId) {
         return function () {
@@ -213,21 +213,21 @@ SearchOptionPanelDataTypeInfo.prototype.appendDataTypeInfos = function (prototyp
             if (isXsBaseType(fieldType) || isXsBaseType(getBaseTypeExtension(fieldType))) {
                 // console.log(fieldType)
                 var fieldDiv = typeDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
-                var fieldId = prototype.TypeName.toLowerCase().replace(".", "_") + "_" + field.substring(2).toLowerCase() 
-                var isSelectFieldBtn = fieldDiv.appendElement({ "tag": "input", "type": "checkbox", "class":"field_checkbox", "id": fieldId, "name": prototype.TypeName + "_select" }).down()
+                var fieldId = prototype.TypeName.toLowerCase().replace(".", "_") + "_" + field.substring(2).toLowerCase()
+                var isSelectFieldBtn = fieldDiv.appendElement({ "tag": "input", "type": "checkbox", "class": "field_checkbox", "id": fieldId, "name": prototype.TypeName + "_select" }).down()
                 fieldDiv.appendElement({ "tag": "span", "style": "display: table-cell;", "innerHtml": field.substring(2) })
                 this.isSelectedFieldBtns[prototype.TypeName + "_select"].push(isSelectFieldBtn);
-                if(this.isSelectedBtns[prototype.TypeName].element.checked){
+                if (this.isSelectedBtns[prototype.TypeName].element.checked) {
                     isSelectFieldBtn.element.checked = true
                 }
 
                 // Field to append in the query.
-                isSelectFieldBtn.element.onclick = function(isSelectBtn, typeName, isSelectedBtns){
-                    return function(){
+                isSelectFieldBtn.element.onclick = function (isSelectBtn, typeName, isSelectedBtns) {
+                    return function () {
                         isSelectBtn.element.checked = false;
                         var selects = document.getElementsByName(typeName + "_select")
                         for (var i = 0; i < selects.length; i++) {
-                            if(selects[i].checked == true){
+                            if (selects[i].checked == true) {
                                 isSelectBtn.element.checked = true
                                 break
                             }
@@ -308,14 +308,14 @@ var SearchPage = function (parent, searchInfo) {
             var pageSize = 10;
             var fields = []
             // Now I will append the list of selected fields for each selected types.
-            for(var tabId in searchPage.searchOptionPanel.tabs){
+            for (var tabId in searchPage.searchOptionPanel.tabs) {
                 var tab = searchPage.searchOptionPanel.tabs[tabId]
-                for(var btnId  in tab.searchOptionPanelDataTypeInfo.isSelectedBtns){
+                for (var btnId in tab.searchOptionPanelDataTypeInfo.isSelectedBtns) {
                     var isSelectedBtn = tab.searchOptionPanelDataTypeInfo.isSelectedBtns[btnId]
-                    if(isSelectedBtn.element.checked){
+                    if (isSelectedBtn.element.checked) {
                         var isSelectedFieldBtns = tab.searchOptionPanelDataTypeInfo.isSelectedFieldBtns[isSelectedBtn.element.id]
-                        for(var i=0; i < isSelectedFieldBtns.length; i++){
-                            if(isSelectedFieldBtns[i].element.checked){
+                        for (var i = 0; i < isSelectedFieldBtns.length; i++) {
+                            if (isSelectedFieldBtns[i].element.checked) {
                                 fields.push("X" + isSelectedFieldBtns[i].id + "%:" + isSelectedFieldBtns[i].id)
                             }
                         }
@@ -455,14 +455,30 @@ SearchResult.prototype.displayEntityResult = function (entity, title, indexs, te
     }
     // Now the search informations.
     var founded = this.panel.appendElement({ "tag": "div", "style": "display: table; border-spacing:2px 2px" }).down()
-    
+
     // So here I will display the field and that contain <b> </b>
-    for(var propertie in snippet){
-        if(snippet[propertie].indexOf("<b>") != -1){
-            // Thats means a snippet is found.
-            this.panel.appendElement({ "tag": "div", "style": "display: table; padding-left: 20px; border-spacing:2px 5px"}).down()
-                .appendElement({"tag":"div", "style":"display: table-cell", "innerHtml": "<b>"+ propertie + ": </b>" })
-                .appendElement({"tag":"div", "style":"display: table-cell", "innerHtml": snippet[propertie] })
+    function appendSnippet(panel, propertie, value) {
+        // Thats means a snippet is found.
+        panel.appendElement({ "tag": "div", "style": "display: table; padding-left: 20px; border-spacing:2px 5px" }).down()
+            .appendElement({ "tag": "div", "style": "display: table-cell", "innerHtml": "<b>" + propertie + ": </b>" })
+            .appendElement({ "tag": "div", "style": "display: table-cell", "innerHtml": value })
+    }
+
+    for (var propertie in snippet) {
+        if (isString(snippet[propertie])) {
+            if (snippet[propertie].indexOf("<b>") != -1) {
+                // Thats means a snippet is found.
+                appendSnippet(this.panel, propertie, snippet[propertie])
+            }
+        }else if(isArray(snippet[propertie])){
+            for(var i=0; i < snippet[propertie].length; i++){
+                if (isString(snippet[propertie][i])) {
+                    if (snippet[propertie][i].indexOf("<b>") != -1) {
+                        // Thats means a snippet is found.
+                        appendSnippet(this.panel, propertie, snippet[propertie][i])
+                    }
+                }
+            }
         }
     }
 }
