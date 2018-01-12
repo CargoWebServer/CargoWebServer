@@ -62,8 +62,7 @@
 				<xsd:attribute name="ipv4" type="xsd:string" />
 				<xsd:attribute name="hostName" type="xsd:string" />
 				<xsd:attribute name="serverPort" type="xsd:integer" />
-				<xsd:attribute name="ws_serviceContainerPort" type="xsd:integer" />
-				<xsd:attribute name="tcp_serviceContainerPort" type="xsd:integer" />
+				<xsd:attribute name="serviceContainerPort" type="xsd:integer" />
 				<xsd:attribute name="applicationsPath" type="xsd:string" />
 				<xsd:attribute name="dataPath" type="xsd:string" />
 				<xsd:attribute name="scriptsPath" type="xsd:string" />

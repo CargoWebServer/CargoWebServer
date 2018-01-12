@@ -7,7 +7,7 @@
 #include <QMap>
 #include <QList>
 #include <QVector>
-#include "../gen/rpc.pb.h"
+#include "gen/rpc.pb.h"
 
 class Session : public QThread
 {
@@ -33,7 +33,7 @@ public Q_SLOTS:
      * @brief sendMessage Utility function to send a message to other end of the socket
      * @param msg
      */
-    void sendMessage(const QByteArray& data, QString id);
+    void sendMessage(const QByteArray& data, QString sessionId);
 
 };
 

@@ -26,10 +26,10 @@ type MessageData struct {
  * the myceliUs.Message.
  */
 type message struct {
-	from   connection
-	to     []connection // One ore more destinnation for a message...
-	msg    *Message     // The underlying message...
-	caller interface{}  // a generic pointer holder.
+	from   *WebSocketConnection
+	to     []*WebSocketConnection // One ore more destinnation for a message...
+	msg    *Message               // The underlying message...
+	caller interface{}            // a generic pointer holder.
 
 	// asynchronous execution...
 	successCallback  func(rspMsg *message, caller interface{})
@@ -82,7 +82,7 @@ func (self *message) GetMethod() string {
   Create a new Message from message data. The Message structure is generate
   by google protobuffer.
 */
-func NewMessageFromData(data []byte, from connection) (*message, error) {
+func NewMessageFromData(data []byte, from *WebSocketConnection) (*message, error) {
 	m := new(message)
 	m.tryNb = 5
 	m.from = from
@@ -157,7 +157,7 @@ func NewEvent(code int32, name string, eventData []*MessageData) (*Event, error)
 /**
  * Create a new error message to be sent over the network in a response to a request.
  */
-func NewErrorMessage(id string, code int32, errMsg string, errData []byte, to []connection) *message {
+func NewErrorMessage(id string, code int32, errMsg string, errData []byte, to []*WebSocketConnection) *message {
 	// Create the protobuffer message...
 	m := new(message)
 	m.to = to
@@ -185,7 +185,7 @@ func NewErrorMessage(id string, code int32, errMsg string, errData []byte, to []
 /**
  * Create a request to send.
  */
-func NewRequestMessage(id string, method string, params []*MessageData, to []connection, successCallback func(rspMsg *message, caller interface{}), progressCallback func(rspMsg *message, index int, total int, caller interface{}), errorCallback func(errMsg *message, caller interface{}), caller interface{}) (*message, error) {
+func NewRequestMessage(id string, method string, params []*MessageData, to []*WebSocketConnection, successCallback func(rspMsg *message, caller interface{}), progressCallback func(rspMsg *message, index int, total int, caller interface{}), errorCallback func(errMsg *message, caller interface{}), caller interface{}) (*message, error) {
 
 	// Create the protobuffer message...
 	m := new(message)
@@ -274,7 +274,7 @@ func NewRequestMessage(id string, method string, params []*MessageData, to []con
 /**
  * Create a resonpse to a request. The data contain the action result.
  */
-func NewResponseMessage(id string, results []*MessageData, to []connection) (*message, error) {
+func NewResponseMessage(id string, results []*MessageData, to []*WebSocketConnection) (*message, error) {
 
 	// Create the protobuffer message...
 	m := new(message)

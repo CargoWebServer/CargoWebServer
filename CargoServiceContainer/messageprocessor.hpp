@@ -6,7 +6,9 @@
 #include <QMap>
 #include "gen/rpc.pb.h"
 #include "event.hpp"
-#include "action.h"
+#include "action.hpp"
+#include "session.hpp"
+
 
 /**
  * @brief serializeToByteArray Serialyse the message to an array of bytes...

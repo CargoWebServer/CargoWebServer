@@ -49,14 +49,7 @@ var RpcData = function(values){
      * @property {string} sessionId Identify the client with the server.
      */
     this.sessionId = sessionId
-
-
-	/**
-	 * @property {string} The socket connection.
-	 */
-	this.conn = null
-	 
-	 
+ 
 	return this
  }
  
@@ -121,7 +114,6 @@ Server.prototype.stop = function (successCallback, errorCallback, caller) {
  * Create the local server object.
  */
 var server = new Server("localhost", "127.0.0.1", 9393);
-
 server.fileManager = new FileManager()
 
 // Export class.

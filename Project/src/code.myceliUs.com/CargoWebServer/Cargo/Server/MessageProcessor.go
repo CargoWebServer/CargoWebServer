@@ -479,7 +479,7 @@ func (this *MessageProcessor) processIncomming(m *message) {
 
 		// Here I will send back an empty response to tell the other end
 		// that the message is process in order to continue the transfer.
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = m.from
 		result := make([]*MessageData, 0)
 		resultMsg, _ := NewResponseMessage(messageId, result, to)
@@ -548,7 +548,6 @@ func (this *MessageProcessor) processOutgoing(m *message) {
  * Process pending message one by one.
  */
 func (this *MessageProcessor) processPendingMessage(id string) {
-
 	msg := this.popPendingMessages(id)
 	if msg != nil {
 		this.m_outgoingChannel <- msg

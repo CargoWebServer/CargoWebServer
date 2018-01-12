@@ -142,12 +142,12 @@ func (this *OAuth2Client) GetExtra() []uint8 {
 
 /** Init reference Extra **/
 func (this *OAuth2Client) SetExtra(ref interface{}) {
-	//if this.M_extra != ref.([]uint8) {
+
 	this.M_extra = ref.([]uint8)
 	if this.IsInit == true {
 		this.NeedSave = true
 	}
-	//}
+
 }
 
 /** Remove reference Extra **/

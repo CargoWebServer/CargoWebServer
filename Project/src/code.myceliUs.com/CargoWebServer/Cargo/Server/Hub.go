@@ -12,17 +12,17 @@ import (
 
 type Hub struct {
 	// Registered connections.
-	connections map[string]connection
+	connections map[string]*WebSocketConnection
 
 	// Inbound messages from the connections.
 	// At this stage the message are just binairy data.
 	receivedMsg chan *message
 
 	// Register requests from the connections.
-	register chan connection
+	register chan *WebSocketConnection
 
 	// Unregister requests from connections.
-	unregister chan connection
+	unregister chan *WebSocketConnection
 
 	// Ticker to ping the connection...
 	ticker *time.Ticker
@@ -36,10 +36,10 @@ func NewHub() *Hub {
 
 	h := new(Hub)
 	h.abortedByEnvironment = make(chan bool)
-	h.connections = make(map[string]connection)
+	h.connections = make(map[string]*WebSocketConnection)
 	h.receivedMsg = make(chan *message)
-	h.register = make(chan connection)
-	h.unregister = make(chan connection)
+	h.register = make(chan *WebSocketConnection)
+	h.unregister = make(chan *WebSocketConnection)
 
 	// So here I will send empty message to keep socket alive
 	// and clear the session if the connection is close...
@@ -55,7 +55,7 @@ func NewHub() *Hub {
 							id := Utility.RandomUUID()
 							method := "Ping"
 							params := make([]*MessageData, 0)
-							to := make([]connection, 1)
+							to := make([]*WebSocketConnection, 1)
 							to[0] = conn
 							successCallback := func(rspMsg *message, caller interface{}) {
 								//log.Println("success!!!")

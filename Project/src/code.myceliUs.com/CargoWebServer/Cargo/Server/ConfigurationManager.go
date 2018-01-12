@@ -168,8 +168,7 @@ func (this *ConfigurationManager) initialize() {
 		activeConfigurations.M_serverConfig.NeedSave = true
 		activeConfigurations.M_serverConfig.M_id = "CARGO_DEFAULT_SERVER"
 		activeConfigurations.M_serverConfig.M_serverPort = 9393
-		activeConfigurations.M_serverConfig.M_ws_serviceContainerPort = 9494
-		activeConfigurations.M_serverConfig.M_tcp_serviceContainerPort = 9595
+		activeConfigurations.M_serverConfig.M_serviceContainerPort = 9494
 		activeConfigurations.M_serverConfig.M_hostName = "localhost"
 		activeConfigurations.M_serverConfig.M_ipv4 = "127.0.0.1"
 
@@ -199,9 +198,8 @@ func (this *ConfigurationManager) initialize() {
 		this.m_activeConfigurationsEntity.SaveEntity()
 	}
 
-	// Set the TCP | WS
-	this.setServiceConfiguration("CargoServiceContainer_TCP", activeConfigurations.M_serverConfig.M_tcp_serviceContainerPort)
-	this.setServiceConfiguration("CargoServiceContainer_WS", activeConfigurations.M_serverConfig.M_ws_serviceContainerPort)
+	// Set the service container configuration
+	this.setServiceConfiguration("CargoServiceContainer", activeConfigurations.M_serverConfig.M_serviceContainerPort)
 }
 
 func (this *ConfigurationManager) getId() string {
@@ -374,20 +372,12 @@ func (this *ConfigurationManager) GetServerPort() int {
 /**
  * Cargo service container port.
  */
-func (this *ConfigurationManager) GetWsConfigurationServicePort() int {
+func (this *ConfigurationManager) GetConfigurationServicePort() int {
 	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
 	if err != nil {
 		return 9494
 	}
-	return activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_ws_serviceContainerPort
-}
-
-func (this *ConfigurationManager) GetTcpConfigurationServicePort() int {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
-		return 9595
-	}
-	return activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_tcp_serviceContainerPort
+	return activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_serviceContainerPort
 }
 
 /**

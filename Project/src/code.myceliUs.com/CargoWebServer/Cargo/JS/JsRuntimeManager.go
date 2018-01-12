@@ -358,7 +358,15 @@ func NewJsRuntimeManager(searchDir string) *JsRuntimeManager {
 				path := operationInfos.m_params["path"].(string)
 				script := operationInfos.m_params["script"].(string)
 				jsRuntimeManager.appendScript(path, script)
+				// In case the script must be run...
+				if operationInfos.m_params["run"].(bool) {
+					for _, session := range jsRuntimeManager.m_sessions {
+						session.Run(script)
+					}
+				}
+
 				callback <- []interface{}{true} // unblock the channel...
+
 			case operationInfos := <-jsRuntimeManager.m_createVm:
 				callback := operationInfos.m_returns
 				sessionId := operationInfos.m_params["sessionId"].(string)
@@ -678,7 +686,6 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) *otto.Ob
 		// set the global variable exports...
 		exports = this.m_exports[sessionId][exportPath]
 	} else {
-		log.Println("------> path ", path)
 		// create a new path
 		exports, _ = vm.Object("exports = {}")
 		exports.Set("__path__", exportPath)
@@ -715,9 +722,8 @@ func (this *JsRuntimeManager) createVm(sessionId string) {
 	if sessionId == "" {
 		this.m_sessions[sessionId] = otto.New()
 	} else {
-		// The runtime will be the base cargo runtime for each session.
-		this.m_sessions[sessionId] = otto.New()
-		this.initScripts(sessionId)
+		// Each new session will be a copy of the base session at start.
+		this.m_sessions[sessionId] = this.m_sessions[""].Copy()
 	}
 
 	// That channel is use to interrupt vm machine, it must be created before
@@ -880,6 +886,7 @@ func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.V
 	if results[1] != nil {
 		err = results[1].(error)
 		log.Println("---> err: ", err)
+		log.Println("--> script: ", script)
 	}
 
 	return value, err
@@ -888,12 +895,13 @@ func (this *JsRuntimeManager) RunScript(sessionId string, script string) (otto.V
 /**
  * Append a script to all VM's
  */
-func (this *JsRuntimeManager) AppendScript(path string, script string) {
+func (this *JsRuntimeManager) AppendScript(path string, script string, run bool) {
 
 	var op OperationInfos
 	op.m_params = make(map[string]interface{})
 	op.m_params["path"] = path
 	op.m_params["script"] = script
+	op.m_params["run"] = run
 	op.m_returns = make(chan ([]interface{}))
 	defer close(op.m_returns)
 	this.m_appendScript <- op

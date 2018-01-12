@@ -175,7 +175,7 @@ type EventListener struct {
 	// the type of event, use by channel
 	m_eventName string
 	// the listener addresse...
-	m_addr connection
+	m_addr *WebSocketConnection
 
 	m_filters []string
 
@@ -220,7 +220,7 @@ func (this *EventListener) GetFilter(index int) string {
 /**
  * Create a new listener with a given name...
  */
-func NewEventListener(eventName string, conn connection) *EventListener {
+func NewEventListener(eventName string, conn *WebSocketConnection) *EventListener {
 	listner := new(EventListener)
 	listner.m_addr = conn
 	listner.m_eventName = eventName

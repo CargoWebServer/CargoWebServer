@@ -140,7 +140,7 @@ func (this *Server) initialize() {
 /**
  * Return a connection with a given id.
  */
-func (this *Server) getConnectionById(id string) connection {
+func (this *Server) getConnectionById(id string) *WebSocketConnection {
 	// Get the conncetion with a given id if it exist...
 	if connection, ok := this.hub.connections[id]; ok {
 		//Return the connection...
@@ -153,10 +153,10 @@ func (this *Server) getConnectionById(id string) connection {
 /**
  * Retunr a connection with a given addresse.
  */
-func (this *Server) getConnectionByIp(ipv4 string, port int) connection {
+func (this *Server) getConnectionByIp(ipv4 string, port int) *WebSocketConnection {
 	// Get the conncetion with a given id if it exist...
 	for _, connection := range this.hub.connections {
-		if connection.GetAddrStr() == ipv4 && connection.GetPort() == port {
+		if connection.GetHostname() == ipv4 && connection.GetPort() == port {
 			return connection
 		}
 	}
@@ -301,7 +301,7 @@ func (this *Server) startHub() {
 func (this *Server) reportErrorMessage(messageId string, sessionId string, errorObject *CargoEntities.Error) {
 	conn := this.getConnectionById(sessionId)
 	if conn != nil {
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = conn
 		errorObjectStr, _ := json.Marshal(errorObject)
 		errMsg := NewErrorMessage(messageId, int32(errorObject.GetCode()), errorObject.GetBody(), errorObjectStr, to)
@@ -342,7 +342,7 @@ func (this *Server) Start() {
 	// Here I will set the services code...
 	for id, src := range this.GetServiceManager().m_serviceServerSrc {
 		// Server side binded functions.
-		JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+id, src)
+		JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+id, src, false)
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -356,11 +356,12 @@ func (this *Server) Start() {
 	 * Made other connection side execute JS code.
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("executeJsFunction", func(functionSrc string, functionParams []otto.Value, progressCallback string, successCallback string, errorCallback string, caller otto.Value, subConnectionId string) {
+
 		id := Utility.RandomUUID()
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = GetServer().getConnectionById(subConnectionId)
 
 		param := new(MessageData)
@@ -537,7 +538,7 @@ func (this *Server) Start() {
 		method := "Ping"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = GetServer().getConnectionById(subConnectionId)
 
 		// The success callback.
@@ -618,7 +619,7 @@ func (this *Server) Start() {
 		params = append(params, param0)
 		params = append(params, param1)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = GetServer().getConnectionById(subConnectionId)
 
 		// The success callback.
@@ -697,7 +698,7 @@ func (this *Server) Start() {
 		params = append(params, param0)
 		params = append(params, param1)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = GetServer().getConnectionById(subConnectionId)
 
 		// The success callback.
@@ -769,7 +770,7 @@ func (this *Server) Start() {
 		method := "GetServicesClientCode"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = GetServer().getConnectionById(subConnectionId)
 
 		// The success callback.
@@ -834,7 +835,7 @@ func (this *Server) Start() {
 		method := "Stop"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = GetServer().getConnectionById(subConnectionId)
 
 		// The success callback.
@@ -897,11 +898,23 @@ func (this *Server) Start() {
 	 * Init connection is call when a Server object need to be connect on the net work.
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.initConnection",
-		func(adress string, openCallback string, closeCallback string, connectionId string, service otto.Value, caller otto.Value) otto.Value {
-			log.Println("--> init connection with : ", adress, " session id: ", connectionId)
+		func(address string, openCallback string, closeCallback string, connectionId string, service otto.Value, caller otto.Value) otto.Value {
+
+			log.Println("--> init connection with : ", address, " session id: ", connectionId)
+			values := strings.Split(address, ":")
+			var host string
+			var port int
+			// Address can be ws://127.0.0.1:9393 or simply 127.0.0.1:9393
+			if len(values) == 3 {
+				host = strings.Replace(values[1], "//", "", -1)
+				port, _ = strconv.Atoi(values[2])
+			} else if len(values) == 2 {
+				host = values[0]
+				port, _ = strconv.Atoi(values[1])
+			}
 
 			// Get the new connection id.
-			subConnection, err := GetServer().connect(adress)
+			subConnection, err := GetServer().connect(host, port)
 
 			// The new created connection Js object.
 			var conn otto.Value
@@ -950,7 +963,7 @@ func (this *Server) Start() {
 
 			method := "GetServicesClientCode"
 			params := make([]*MessageData, 0)
-			to := make([]connection, 1)
+			to := make([]*WebSocketConnection, 1)
 			to[0] = subConnection
 
 			successCallback := func(connectionId string, conn otto.Value, service otto.Value) func(rspMsg *message, caller interface{}) {
@@ -1002,11 +1015,11 @@ func (this *Server) Start() {
 
 		// Append services scripts.
 		for id, src := range GetServer().GetServiceManager().m_serviceClientSrc {
-			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+id, src)
+			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+id, src, false)
 		}
 
 		// Initialyse the script for the default session.
-		JS.GetJsRuntimeManager().InitScripts("") // Run the script for the default session.
+		JS.GetJsRuntimeManager().InitScripts("") // Initialyse the base session.
 
 		// Set service in the server object.
 		for serviceName, _ := range GetServer().GetServiceManager().m_serviceClientSrc {
@@ -1105,28 +1118,14 @@ func (this *Server) SetRootPath(path string) error {
 /**
  * Open a new connection with server on the network...
  */
-func (this *Server) connect(address string) (connection, error) {
-
-	values := strings.Split(address, ":")
-
-	var host string
-	var socket string
-	var port int
-
-	if len(values) == 3 {
-		socket = values[0]
-		host = strings.Replace(values[1], "//", "", -1)
-		port, _ = strconv.Atoi(values[2])
-	} else if len(values) == 2 {
-		socket = "tcp"
-		host = values[0]
-		port, _ = strconv.Atoi(values[1])
-	}
+func (this *Server) connect(host string, port int) (*WebSocketConnection, error) {
 
 	// Open the a new connection with the server.
 	if host == this.GetConfigurationManager().GetHostName() && this.GetConfigurationManager().GetServerPort() == port {
 		return nil, errors.New("Loopback connection!")
 	}
+
+	address := "ws://" + host + ":" + strconv.Itoa(port)
 
 	// If a connection already exist I will use it...
 	conn := this.getConnectionByIp(address, port)
@@ -1135,11 +1134,7 @@ func (this *Server) connect(address string) (connection, error) {
 	}
 
 	// Create the new connection.
-	if socket == "ws" {
-		conn = NewWebSocketConnection()
-	} else {
-		conn = NewTcpSocketConnection()
-	}
+	conn = NewWebSocketConnection()
 
 	err := conn.Open(host, port)
 	if err != nil {

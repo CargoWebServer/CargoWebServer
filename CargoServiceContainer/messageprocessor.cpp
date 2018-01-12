@@ -6,7 +6,7 @@
 #include <QDebug>
 #include "gen/rpc.pb.h"
 #include "listener.hpp"
-#include "action.h"
+#include "action.hpp"
 
 /**
  * @brief Session::MAX_MESSAGE_SIZE The size must be the same on both side of the socket.
@@ -70,9 +70,9 @@ void MessageProcessor::processIncommingMessage(const QByteArray& data, QString s
                 QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8());
                 // From the jsonDoc...
                 if(jsonDoc.isObject()){
-                     QJsonObject jsonObject = jsonDoc.object();
-                     var = jsonObject;
-                     action->appendParam(QString::fromStdString(param.name()), var, "QJsonObject");
+                    QJsonObject jsonObject = jsonDoc.object();
+                    var = jsonObject;
+                    action->appendParam(QString::fromStdString(param.name()), var, "QJsonObject");
 
                 }else if(jsonDoc.isArray()){
                     QJsonArray jsonArray = jsonDoc.array();
@@ -100,7 +100,7 @@ void MessageProcessor::processIncommingMessage(const QByteArray& data, QString s
         // The message is a response...
         QString messageId = QString::fromStdString(msg.rsp().id());
         if(this->pending.contains(messageId)){
-             //qDebug() << " number of pending message for " << messageId << " is " << this->pending.find(messageId)->size();
+            //qDebug() << " number of pending message for " << messageId << " is " << this->pending.find(messageId)->size();
             this->processPendingMessage(messageId);
         }
     }else if(msg.type() == com::mycelius::message::Message_MessageType_TRANSFER){
@@ -115,9 +115,11 @@ void MessageProcessor::processIncommingMessage(const QByteArray& data, QString s
                 // All chuck are received here...
                 QByteArray originalMessageData;
                 for(QVector<QByteArray>::iterator it = array.begin(); it != array.end(); ++it){
-                    originalMessageData = originalMessageData + *it;
+                    originalMessageData.append(*it);
                 }
+
                 this->pendingMsgChunk.remove(messageId);
+                // qDebug() << "Remove message: " << messageId << " pending count: " << this->pendingMsgChunk.count();
 
                 // Here I will recreate the original message from the assembled data array...
                 com::mycelius::message::Message originalMessage;
@@ -129,27 +131,30 @@ void MessageProcessor::processIncommingMessage(const QByteArray& data, QString s
                 }
             }
         }else{
+            // qDebug() << "Append message " << messageId << index << ":" << total;
             // Here I will store the pending message...
             QVector<QByteArray> container;
             container.resize(total);
-            container[0] = QByteArray(msg.data().c_str(), msg.data().size());
+            container[index] = QByteArray(msg.data().c_str(), msg.data().size());
             this->pendingMsgChunk.insert(messageId, container);
         }
 
-        // Here I will send back the response...
-        com::mycelius::message::Message responseMsg;
-        responseMsg.set_type(com::mycelius::message::Message_MessageType_RESPONSE);
-        responseMsg.set_id(messageId.toStdString());
-        responseMsg.set_index(-1);
-        responseMsg.set_total(1);
+        // The last message does not need to send respond back.
+        if( index != total - 1){
+            // Here I will send back the response...
+            com::mycelius::message::Message responseMsg;
+            responseMsg.set_type(com::mycelius::message::Message_MessageType_RESPONSE);
+            responseMsg.set_id(messageId.toStdString());
+            responseMsg.set_index(-1);
+            responseMsg.set_total(1);
 
-        // allocated message is a pointer manage by the protobuffer.
-        com::mycelius::message::Response *rsp = new com::mycelius::message::Response();
-        rsp->set_id(messageId.toStdString());
-        responseMsg.set_allocated_rsp(rsp);
+            // allocated message is a pointer manage by the protobuffer.
+            com::mycelius::message::Response *rsp = new com::mycelius::message::Response();
+            rsp->set_id(messageId.toStdString());
+            responseMsg.set_allocated_rsp(rsp);
 
-        // Response was sent to the server.
-        this->sendMessage(responseMsg);
+            this->sendMessage(responseMsg);
+        }
 
     }else if(msg.type() == com::mycelius::message::Message_MessageType_EVENT){
         QString channelId = QString::fromStdString(msg.evt().name());
@@ -175,8 +180,8 @@ void MessageProcessor::processIncommingMessage(const QByteArray& data, QString s
                 QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8());
                 // From the jsonDoc...
                 if(jsonDoc.isObject()){
-                     QJsonObject jsonObject = jsonDoc.object();
-                     var = jsonObject;
+                    QJsonObject jsonObject = jsonDoc.object();
+                    var = jsonObject;
                 }else if(jsonDoc.isArray()){
                     QJsonArray jsonArray = jsonDoc.array();
                     var = jsonArray;
@@ -250,7 +255,7 @@ void MessageProcessor::processPendingMessage(QString messageId){
         com::mycelius::message::Message msg = this->pending.find(messageId)->at(0);
         this->pending.find(messageId)->pop_front();
         if(this->pending.find(messageId)->length() == 0){
-             this->pending.remove(messageId);
+            this->pending.remove(messageId);
         }
         // Send the next message pending message.
         this->sendMessage(msg);

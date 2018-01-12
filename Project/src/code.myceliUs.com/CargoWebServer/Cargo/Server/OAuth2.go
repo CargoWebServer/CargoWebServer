@@ -572,7 +572,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 		data.Name = "authorizationLnk"
 		data.Value = authorizationLnk
 		params[0] = data
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = GetServer().getConnectionById(sessionId)
 
 		// synchronize the routine with a channel...
@@ -615,7 +615,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 			var method string
 			method = "closeAuthorizeDialog"
 			params := make([]*MessageData, 0)
-			to := make([]connection, 1)
+			to := make([]*WebSocketConnection, 1)
 			to[0] = GetServer().getConnectionById(sessionId)
 			oauth2AuthorizeEnd, err := NewRequestMessage(Utility.RandomUUID(), method, params, to, nil, nil, nil, nil)
 			if err == nil {
@@ -636,7 +636,7 @@ func (this *OAuth2Manager) GetResource(clientId string, scope string, query stri
 			params[0].Name = "idTokenUuid"
 			params[0].Value = idTokenUuid
 
-			to := make([]connection, 1)
+			to := make([]*WebSocketConnection, 1)
 			to[0] = GetServer().getConnectionById(sessionId)
 			oauth2AuthorizeEnd, err := NewRequestMessage(Utility.RandomUUID(), method, params, to, nil, nil, nil, nil)
 			if err == nil {
@@ -1314,7 +1314,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 				server.FinishAuthorizeRequest(resp, r, ar)
 
 				// Here I will create an error message...
-				to := make([]connection, 1)
+				to := make([]*WebSocketConnection, 1)
 				to[0] = GetServer().getConnectionById(sessionId)
 				var errData []byte
 				authorizationDenied := NewErrorMessage(messageId, 1, "Permission Denied by user", errData, to)
@@ -1386,7 +1386,7 @@ func AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		data.Name = "code"
 		data.Value = resp.Output["code"]
 		results[0] = data
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = GetServer().getConnectionById(sessionId)
 		authorizationAccept, _ := NewResponseMessage(messageId, results, to)
 
@@ -1533,7 +1533,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		// The authorization fail!
 		log.Println("--------> create access error.")
 		errorDescription := r.Form.Get("error_description")
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = GetServer().getConnectionById(sessionId)
 		var errData []byte
 		accessDenied := NewErrorMessage(messageId, 1, errorDescription, errData, to)
@@ -1565,7 +1565,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 			data1.Value = idTokenUuid
 			results[1] = data1
 
-			to := make([]connection, 2)
+			to := make([]*WebSocketConnection, 2)
 			to[0] = GetServer().getConnectionById(sessionId)
 			accessGrantResp, _ := NewResponseMessage(messageId, results, to)
 			GetServer().GetProcessor().m_incomingChannel <- accessGrantResp
@@ -1580,7 +1580,7 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			// send error
 			log.Println("--------> access error: ", err)
-			to := make([]connection, 1)
+			to := make([]*WebSocketConnection, 1)
 			to[0] = GetServer().getConnectionById(sessionId)
 			var errData []byte
 			accessDenied := NewErrorMessage(messageId, 1, err.Error(), errData, to)

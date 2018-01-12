@@ -2,32 +2,33 @@ TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
 DESTDIR  = ../WebApp/Cargo/bin
-QT += network qml #script
+QT += websockets qml #script
 CONFIG += c++11
 
 HEADERS += \
-    action.h \
-    TCP/serviceContainer.h \
-    TCP/session.h \
-    listener.hpp \
+    action.hpp \
     event.hpp \
-    messageprocessor.hpp
+    listener.hpp \
+    messageprocessor.hpp \
+    serviceContainer.hpp \
+    session.hpp \
+    gen/rpc.pb.h
 
 SOURCES += \
     action.cpp \
-    TCP/serviceContainer.cpp \
-    TCP/session.cpp \
-    gen/rpc.pb.cc \
-    main.cpp \
-    serviceContainer.cpp \
     listener.cpp \
-    messageprocessor.cpp
+    main.cpp \
+    messageprocessor.cpp \
+    serviceContainer.cpp \
+    session.cpp \
+    gen/rpc.pb.cc
 
-DEFINES += PORT_NUMBER=9595
+DEFINES += PORT_NUMBER=9494 WS
 
 unix:!macx:INCLUDEPATH += /usr/local/include
 win32:INCLUDEPATH += C:/msys64/mingw64/include
 
 win32: LIBS += -LC:/usr/local/lib/ -lprotobuf.dll
 unix:!macx: LIBS += -lprotobuf
+
 

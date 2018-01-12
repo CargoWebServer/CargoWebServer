@@ -247,7 +247,7 @@ func (this *SqlDataStore) Connect() error {
 	prototypes, err := this.GetEntityPrototypes()
 	if err == nil {
 		for i := 0; i < len(prototypes); i++ {
-			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototypes[i].TypeName, prototypes[i].generateConstructor())
+			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototypes[i].TypeName, prototypes[i].generateConstructor(), true)
 		}
 	}
 

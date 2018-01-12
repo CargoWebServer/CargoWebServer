@@ -226,7 +226,7 @@ func (this *EntityPrototype) Create(storeId string) error {
 	}
 
 	// Register it to the vm...
-	JS.GetJsRuntimeManager().AppendScript("CargoWebServer", this.generateConstructor())
+	JS.GetJsRuntimeManager().AppendScript("CargoWebServer", this.generateConstructor(), true)
 
 	// Send event message...
 	var eventDatas []*MessageData
@@ -315,7 +315,7 @@ func (this *EntityPrototype) Save(storeId string) error {
 			return err
 		} else {
 			// Register it to the vm...
-			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+this.TypeName, this.generateConstructor())
+			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+this.TypeName, this.generateConstructor(), true)
 
 			var eventDatas []*MessageData
 			evtData := new(MessageData)
@@ -470,9 +470,17 @@ func (this *EntityPrototype) generateConstructor() string {
 	constructorSrc += " this.exist = false\n"
 	constructorSrc += " this.initCallback = undefined\n"
 
-	// Fields.
-	for i := 0; i < len(this.Fields); i++ {
-		setDefaultFieldValue(this, this.FieldsType[i])
+	// Create field and set her initial values.
+	for i := 3; i < len(this.Fields); i++ {
+		if len(this.FieldsDefaultValue[i]) != 0 {
+			constructorSrc += " this." + this.Fields[i] + " = " + this.FieldsDefaultValue[i] + "\n"
+		} else {
+			if strings.HasPrefix(this.FieldsType[i], "[]") {
+				constructorSrc += " this." + this.Fields[i] + " = []\n"
+			} else {
+				constructorSrc += " this." + this.Fields[i] + " = null\n"
+			}
+		}
 	}
 
 	// Keep the reference on the entity prototype.

@@ -32,7 +32,7 @@ var SearchOptionsPanel = function (parent) {
     for (var i = 0; i < server.activeConfigurations.M_dataStoreConfigs.length; ++i) {
         var storeId = server.activeConfigurations.M_dataStoreConfigs[i].M_id;
         // discard some store...
-        if (storeId != "sql_info" && storeId != "xs" && storeId != "sqltypes" && storeId != "XMI_types") {
+        if (storeId != "sql_info" && storeId != "xs" && storeId != "sqltypes" && storeId != "XMI_types" && server.activeConfigurations.M_dataStoreConfigs[i].M_dataStoreType == 2) {
             this.tabs[storeId] = new SearchOptionPanelStoreInfo(this, server.activeConfigurations.M_dataStoreConfigs[i])
         }
     }
@@ -141,6 +141,7 @@ var SearchOptionPanelDataTypeInfo = function (searchPanel, dataStoreConfig) {
     this.id = dataStoreConfig.M_id // same id as the tab...
     this.panel = searchPanel.tabPanelBody.appendElement({ "tag": "div", "class": "search_option_panel_data_type_info" }).down()
     this.isSelectedBtns = {}
+    this.isSelectedFieldBtns = {}
 
     // Get the list of entity prototypes for that store.
     server.entityManager.getEntityPrototypes(dataStoreConfig.M_id,
@@ -173,7 +174,7 @@ SearchOptionPanelDataTypeInfo.prototype.appendDataTypeInfos = function (prototyp
     var shrinkBtn = typeInfoDiv.appendElement({ "tag": "i", "class": "fa fa-caret-down", "style": "display:none;" }).down()
 
     // So here I will display the liste
-    typeInfoDiv.appendElement({ "tag": "span", "style": "display: table-cell", "innerHtml": prototype.TypeName.split(".")[1] })
+    typeInfoDiv.appendElement({ "tag": "span", "style": "display: table-cell", "innerHtml": prototype.TypeName.split(".")[prototype.TypeName.split(".").length - 1] })
 
     var isSelectBtn = typeInfoDiv.appendElement({ "tag": "input", "name": prototype.TypeName.split(".")[0] + "_select", "id": prototype.TypeName + "_select", "type": "checkbox", "style": "display: table-cell" }).down()
     isSelectBtn.element.checked = true
@@ -201,6 +202,8 @@ SearchOptionPanelDataTypeInfo.prototype.appendDataTypeInfos = function (prototyp
     // Now I will create the div where type will be displayed.
     var typeDiv = this.panel.appendElement({ "tag": "div", "style": "display: none; padding-left: 20px; padding-bottom: 5px; border-spacing:2px 2px;" }).down()
 
+    this.isSelectedFieldBtns[prototype.TypeName + "_select"] = []
+
     // Hew I will append field informations.
     for (var i = 0; i < prototype.FieldsType.length; i++) {
         // Here only xs type can be display...
@@ -210,8 +213,14 @@ SearchOptionPanelDataTypeInfo.prototype.appendDataTypeInfos = function (prototyp
             if (isXsBaseType(fieldType) || isXsBaseType(getBaseTypeExtension(fieldType))) {
                 // console.log(fieldType)
                 var fieldDiv = typeDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
-                var isSelectFieldBtn = fieldDiv.appendElement({ "tag": "input", "type": "checkbox", "class":"field_checkbox", "id": prototype.TypeName.toLowerCase().replace(".", "_") + "_" + field.substring(2).toLowerCase() , "checked": "true", "name": prototype.TypeName + "_select" }).down()
+                var fieldId = prototype.TypeName.toLowerCase().replace(".", "_") + "_" + field.substring(2).toLowerCase() 
+                var isSelectFieldBtn = fieldDiv.appendElement({ "tag": "input", "type": "checkbox", "class":"field_checkbox", "id": fieldId, "name": prototype.TypeName + "_select" }).down()
                 fieldDiv.appendElement({ "tag": "span", "style": "display: table-cell;", "innerHtml": field.substring(2) })
+                this.isSelectedFieldBtns[prototype.TypeName + "_select"].push(isSelectFieldBtn);
+                if(this.isSelectedBtns[prototype.TypeName].element.checked){
+                    isSelectFieldBtn.element.checked = true
+                }
+
                 // Field to append in the query.
                 isSelectFieldBtn.element.onclick = function(isSelectBtn, typeName, isSelectedBtns){
                     return function(){
@@ -298,10 +307,20 @@ var SearchPage = function (parent, searchInfo) {
             var offset = 0;
             var pageSize = 10;
             var fields = []
-            var fieldsCheckbox = document.getElementsByClassName("field_checkbox")
-            for(var i=0; i < fieldsCheckbox.length; i++){
-                // Append string like: Xcargoentities_file_data%:cargoentities_file_data
-                fields.push("X" + fieldsCheckbox[i].id + "%:" + fieldsCheckbox[i].id)
+            // Now I will append the list of selected fields for each selected types.
+            for(var tabId in searchPage.searchOptionPanel.tabs){
+                var tab = searchPage.searchOptionPanel.tabs[tabId]
+                for(var btnId  in tab.searchOptionPanelDataTypeInfo.isSelectedBtns){
+                    var isSelectedBtn = tab.searchOptionPanelDataTypeInfo.isSelectedBtns[btnId]
+                    if(isSelectedBtn.element.checked){
+                        var isSelectedFieldBtns = tab.searchOptionPanelDataTypeInfo.isSelectedFieldBtns[isSelectedBtn.element.id]
+                        for(var i=0; i < isSelectedFieldBtns.length; i++){
+                            if(isSelectedFieldBtns[i].element.checked){
+                                fields.push("X" + isSelectedFieldBtns[i].id + "%:" + isSelectedFieldBtns[i].id)
+                            }
+                        }
+                    }
+                }
             }
 
             searchPage.resultsPages = []
@@ -446,7 +465,6 @@ SearchResult.prototype.displayEntityResult = function (entity, title, indexs, te
                 .appendElement({"tag":"div", "style":"display: table-cell", "innerHtml": snippet[propertie] })
         }
     }
-    console.log(snippet)
 }
 
 /**

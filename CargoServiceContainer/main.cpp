@@ -1,11 +1,7 @@
 #include <QCoreApplication>
 #include <QDebug>
+#include "serviceContainer.hpp"
 
-#ifdef WS {
-    #include "WS/serviceContainer.h"
-#else
-    #include "TCP/serviceContainer.h"
-#endif
 
 #include <iostream>
 

@@ -310,7 +310,7 @@ func (this *SessionManager) Login(accountName string, psswd string, serverId str
 			//Set the computer reference.
 			connection := GetServer().getConnectionById(sessionId)
 			if connection != nil {
-				addr := connection.GetAddrStr()
+				addr := connection.GetHostname()
 				computer, err := GetServer().GetLdapManager().getComputerByIp(addr)
 				if err == nil {
 					session.SetComputerRef(computer)

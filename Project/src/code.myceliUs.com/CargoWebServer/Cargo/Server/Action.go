@@ -50,7 +50,7 @@ func newAction(name string, msg *message) *Action {
  */
 func (action *Action) sendResponse(result []*MessageData) {
 	// Respond back to the source...
-	to := make([]connection, 1)
+	to := make([]*WebSocketConnection, 1)
 	to[0] = action.msg.from
 	resultMsg, _ := NewResponseMessage(action.msg.GetId(), result, to)
 	GetServer().GetProcessor().appendResponse(resultMsg)

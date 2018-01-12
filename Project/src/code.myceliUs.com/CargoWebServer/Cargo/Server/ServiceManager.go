@@ -7,7 +7,6 @@ import (
 	"go/parser"
 	"go/token"
 	"log"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -15,7 +14,6 @@ import (
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
-	"github.com/mitchellh/go-ps"
 )
 
 type ServiceManager struct {
@@ -111,7 +109,7 @@ func (this *ServiceManager) start() {
 	// Now the external services...
 	for i := 0; i < len(GetServer().GetConfigurationManager().m_servicesConfiguration); i++ {
 		config := GetServer().GetConfigurationManager().m_servicesConfiguration[i]
-		if config.GetHostName() != "localhost" || config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() || config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
+		if config.GetHostName() != "localhost" || config.GetPort() == GetServer().GetConfigurationManager().GetConfigurationServicePort() {
 			this.m_remoteServicesLst[config.M_id] = config
 			config.M_start = false // In that case start means ready to listen.
 		}
@@ -140,19 +138,19 @@ func (this *ServiceManager) registerService(service Service) {
 /**
  * Get the list of channel id's and connect listener.
  */
-func (this *ServiceManager) registerServiceListeners(conn connection) {
+func (this *ServiceManager) registerServiceListeners(conn *WebSocketConnection) {
 
 	// So here I will request the list of actions.
 	method := "GetListeners"
 	params := make([]*MessageData, 0)
 
-	to := make([]connection, 1)
+	to := make([]*WebSocketConnection, 1)
 	to[0] = conn
 
 	wait := make(chan interface{})
 
 	// Register the listener
-	log.Println("--> register listener: ", conn.GetAddrStr(), conn.GetPort())
+	log.Println("--> register listener: ", conn.GetHostname(), conn.GetPort())
 
 	// The success callback.
 	successCallback := func(rspMsg *message, caller interface{}) {
@@ -187,13 +185,13 @@ func (this *ServiceManager) registerServiceListeners(conn connection) {
 /**
  * Register the service action.
  */
-func (this *ServiceManager) registerServiceContainerActions(conn connection, id string) {
+func (this *ServiceManager) registerServiceContainerActions(conn *WebSocketConnection, id string) {
 
 	// So here I will request the list of actions.
 	method := "GetActionInfos"
 	params := make([]*MessageData, 0)
 
-	to := make([]connection, 1)
+	to := make([]*WebSocketConnection, 1)
 	to[0] = conn
 
 	wait := make(chan interface{})
@@ -883,53 +881,32 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 		// External server.
 		if config.GetPort() != GetServer().GetConfigurationManager().GetServerPort() {
 			// I will test if a process exist for with that name.
-			processes, err := ps.Processes()
-			if err == nil {
-				for i := 0; i < len(processes); i++ {
-					if strings.HasPrefix(processes[i].Executable(), name) {
-						// I will get the proecess handle and kill it...
-						process, err := os.FindProcess(processes[i].Pid())
-						if err == nil {
-							process.Kill() // Kill existing process.
-							log.Println("Kill process ", process.Pid)
-						}
-					}
-				}
 
-				// Now now I will start an new process...
-				go func(config *Config.ServiceConfiguration, sessionId string, messageId string) {
-					GetServer().RunCmd(config.GetId(), []string{strconv.Itoa(config.GetPort())}, sessionId)
-					// Restart the service.
-					GetServer().GetServiceManager().StartService(config.M_id, messageId, sessionId)
-				}(config, sessionId, messageId)
+			// Now now I will start an new process...
+			go func(config *Config.ServiceConfiguration, sessionId string, messageId string) {
+				GetServer().RunCmd(config.GetId(), []string{strconv.Itoa(config.GetPort())}, sessionId)
+				// Restart the service.
+				GetServer().GetServiceManager().StartService(config.M_id, messageId, sessionId)
+			}(config, sessionId, messageId)
 
-				address := config.GetIpv4() + ":" + strconv.Itoa(config.GetPort())
-				if config.GetPort() == GetServer().GetConfigurationManager().GetWsConfigurationServicePort() {
-					address = "ws://" + address
-				}
+			// I will open a connection with the service and get it list of actions.
+			conn, err := GetServer().connect(config.GetIpv4(), config.GetPort())
 
-				// I will open a connection with the service and get it list of actions.
-				conn, err := GetServer().connect(address)
-
-				if err != nil {
-					return
-				}
-
-				// And I will get the service action code.
-				GetServer().GetServiceManager().registerServiceContainerActions(conn, config.GetId())
-
-				// So now I will connect the service listners for the tcp service
-				if config.GetPort() == GetServer().GetConfigurationManager().GetTcpConfigurationServicePort() {
-					GetServer().GetServiceManager().registerServiceListeners(conn)
-				}
-
-				// set the service as started.
-				GetServer().GetServiceManager().m_remoteServicesLst[config.GetId()].M_start = true
-
-			} else {
-				log.Println("------------> error ", err)
+			if err != nil {
+				return
 			}
+
+			// And I will get the service action code.
+			GetServer().GetServiceManager().registerServiceContainerActions(conn, config.GetId())
+
+			// So now I will connect the service listners for the tcp service
+			GetServer().GetServiceManager().registerServiceListeners(conn)
+
+			// set the service as started.
+			GetServer().GetServiceManager().m_remoteServicesLst[config.GetId()].M_start = true
+
 		}
+
 	} else {
 		log.Println("---> service not found: ", name)
 	}

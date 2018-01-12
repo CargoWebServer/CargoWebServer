@@ -1,5 +1,5 @@
-#include "action.h"
-#include "WS/serviceContainer.h"
+#include "action.hpp"
+#include "serviceContainer.hpp"
 
 // The Qt stuff here...
 #include <QDebug>

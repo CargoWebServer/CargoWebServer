@@ -2,7 +2,7 @@
 
 package Config
 
-type Configuration interface {
+type Configuration interface{
 	/** Method of Configuration **/
 
 	/** UUID **/
@@ -10,4 +10,5 @@ type Configuration interface {
 
 	/** Id **/
 	GetId() string
+
 }

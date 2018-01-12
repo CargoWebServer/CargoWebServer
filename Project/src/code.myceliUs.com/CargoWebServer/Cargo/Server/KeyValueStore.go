@@ -59,7 +59,7 @@ type KeyValueDataStore struct {
 	m_id string
 
 	// In case of remote store
-	m_conn connection
+	m_conn *WebSocketConnection
 
 	m_port int
 
@@ -261,7 +261,7 @@ func (this *KeyValueDataStore) SetEntityPrototype(prototype *EntityPrototype) er
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
@@ -360,7 +360,7 @@ func (this *KeyValueDataStore) saveEntityPrototype(prototype *EntityPrototype) e
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
@@ -452,7 +452,7 @@ func (this *KeyValueDataStore) DeleteEntityPrototype(typeName string) error {
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
@@ -1256,7 +1256,7 @@ func (this *KeyValueDataStore) GetEntityPrototype(typeName string) (*EntityProto
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
@@ -1364,7 +1364,7 @@ func (this *KeyValueDataStore) GetEntityPrototypes() ([]*EntityPrototype, error)
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
@@ -1474,7 +1474,7 @@ func (this *KeyValueDataStore) Connect() error {
 
 		// Here I will connect to a remote server.
 		var err error
-		this.m_conn, err = GetServer().connect("ws://" + this.m_ipv4 + ":" + strconv.Itoa(this.m_port))
+		this.m_conn, err = GetServer().connect(this.m_ipv4, this.m_port)
 
 		if err != nil {
 			return err
@@ -1488,7 +1488,7 @@ func (this *KeyValueDataStore) Connect() error {
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
@@ -1567,7 +1567,7 @@ func (this *KeyValueDataStore) Connect() error {
 	prototypes, err := this.GetEntityPrototypes()
 	if err == nil {
 		for i := 0; i < len(prototypes); i++ {
-			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototypes[i].TypeName, prototypes[i].generateConstructor())
+			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototypes[i].TypeName, prototypes[i].generateConstructor(), true)
 		}
 	}
 
@@ -1593,7 +1593,7 @@ func (this *KeyValueDataStore) Ping() error {
 		method := "Ping"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = this.m_conn
 
 		// The channel will be use to wait for results.
@@ -1654,7 +1654,7 @@ func (this *KeyValueDataStore) Create(queryStr string, entity []interface{}) (la
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
@@ -1775,7 +1775,7 @@ func (this *KeyValueDataStore) Read(queryStr string, fieldsType []interface{}, p
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
@@ -1963,7 +1963,7 @@ func (this *KeyValueDataStore) Update(queryStr string, fields []interface{}, par
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
@@ -2135,7 +2135,7 @@ func (this *KeyValueDataStore) Delete(queryStr string, params []interface{}) (er
 		method := "ExecuteJsFunction"
 		params := make([]*MessageData, 0)
 
-		to := make([]connection, 1)
+		to := make([]*WebSocketConnection, 1)
 		to[0] = this.m_conn
 
 		param0 := new(MessageData)
