@@ -883,11 +883,11 @@ func (this *ServiceManager) StartService(name string, messageId string, sessionI
 			// I will test if a process exist for with that name.
 
 			// Now now I will start an new process...
-			/*go func(config *Config.ServiceConfiguration, sessionId string, messageId string) {
+			go func(config *Config.ServiceConfiguration, sessionId string, messageId string) {
 				GetServer().RunCmd(config.GetId(), []string{strconv.Itoa(config.GetPort())}, sessionId)
 				// Restart the service.
 				GetServer().GetServiceManager().StartService(config.M_id, messageId, sessionId)
-			}(config, sessionId, messageId)*/
+			}(config, sessionId, messageId)
 
 			// I will open a connection with the service and get it list of actions.
 			conn, err := GetServer().connect(config.GetIpv4(), config.GetPort())

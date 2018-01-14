@@ -159,10 +159,6 @@ var SearchOptionPanelDataTypeInfo = function (searchPanel, dataStoreConfig) {
 }
 
 SearchOptionPanelDataTypeInfo.prototype.appendDataTypeInfos = function (prototype) {
-    var baseType = getBaseTypeExtension(prototype.TypeName)
-    if (isXsBaseType(baseType)) {
-        return // Nothing to do with base type itself, maybe will see...
-    }
 
     // So here I will 
     var typeInfoDiv = this.panel.appendElement({ "tag": "div", "style": "display: table;" }).down()

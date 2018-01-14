@@ -1,0 +1,116 @@
+* {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+header {
+  padding: 1em;
+}
+
+.navbar {
+    display: inherit;
+    color: white;
+    padding: 2px 10px 2px 10px;
+}
+
+.navbar .toggle, .navbar .brand {
+  display: inline-block;
+}
+
+.navbar .link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+  margin-left: 10px;
+}
+
+.navbar .link:hover, .navbar .link:active, .navbar .toggle:hover {
+    cursor: pointer;
+    color: rgba(255,255,255,.75);
+}
+
+.navbar .brand {
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.navbar .brand  img {
+   width: 32px;
+   height: 32px;
+   margin: 10px;
+}
+
+.navbar .brand  span{
+    text-decoration: underline;
+}
+
+.navbar .brand  span:hover{
+    cursor: pointer;
+    color: rgba(255,255,255,.75);
+}
+
+.navbar .toggle {
+  vertical-align: middle;
+}
+
+@media (min-width: 48em) {
+  .navbar {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+  }
+  .navbar .left, .navbar .right {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-flex: 1;
+        -ms-flex: 1;
+            flex: 1;
+  }
+  .navbar .link {
+    width: auto;
+  }
+  
+  .navbar .right {
+    -webkit-box-pack: end;
+        -ms-flex-pack: end;
+            justify-content: flex-end;
+  }
+  .navbar .toggle {
+    display: none;
+  }
+}
+.navbar div {
+  display: none;
+}
+
+@media (min-width: 48em) {
+  .navbar div {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+  }
+}
+
+@media (max-width: 48em) {
+  .navbar .link {
+    padding: 5px;
+    margin-left: 0px;
+    width:  auto;
+    border: 1px solid transparent;
+  }
+  
+  .navbar.active .toggle {
+    cursor: pointer;
+  }
+  
+  .navbar.active div {
+    display: block;
+  }
+  
+  .navbar .link:hover {
+    border: 1px solid rgba(255,255,255,.75);;
+  }
+}

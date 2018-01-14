@@ -90,7 +90,7 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 }
 
 func (this *SqlDataStore) Connect() error {
-
+	//log.Println("-----> connect: ", this.GetId())
 	// The error message.
 	var err error
 	var connectionString string
@@ -242,15 +242,24 @@ func (this *SqlDataStore) Connect() error {
 	}
 
 	this.m_db, err = sql.Open(driver, connectionString)
+	if err != nil {
+		return err
+	}
+
+	// Try to ping the sql server to be sure the connection is open.
+	err = this.Ping()
+	if err != nil {
+		return err
+	}
 
 	// Generate js class definitions.
 	prototypes, err := this.GetEntityPrototypes()
+
 	if err == nil {
 		for i := 0; i < len(prototypes); i++ {
 			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototypes[i].TypeName, prototypes[i].generateConstructor(), true)
 		}
 	}
-
 	return err
 }
 
