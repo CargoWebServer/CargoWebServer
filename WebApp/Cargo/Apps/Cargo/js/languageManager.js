@@ -74,9 +74,11 @@ LanguageManager.prototype.registerElementText = function (element, textId) {
 		this.textElements[textId] = []
 	}
 	if (isArray(this.textElements[textId])) {
-		this.textElements[textId].push(element)
-		// update the element in the array.
-		this.elements[element.id] = element
+		if(this.elements[element.id] == undefined){
+			this.textElements[textId].push(element)
+		}
+					// update the element in the array.
+					this.elements[element.id] = element
 	}
 
 }
@@ -90,7 +92,7 @@ LanguageManager.prototype.setLanguage = function (language) {
 	for (var textElementsId in this.textElements) {
 		for (var i = 0; i < this.textElements[textElementsId].length; i++) {
 			var element = this.textElements[textElementsId][i]
-			if (text != undefined) {
+			if (element != undefined) {
 				this.setElementText(element, textElementsId)
 			}
 		}

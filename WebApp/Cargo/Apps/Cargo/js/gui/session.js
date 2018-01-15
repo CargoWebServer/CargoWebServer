@@ -39,10 +39,10 @@ var SessionPanel = function (parent, sessionInfo) {
 	/* Now the button **/
 	this.nameDisplay = this.div.appendElement({ "tag": "span" }).down()
 
-	this.notificationBtn = this.div.appendElement({ "tag": "div", "class": "innactive" }).down()
+	this.notificationBtn = this.div.appendElement({ "tag": "div", "class": "innactive", "style":"display: table-cell;" }).down()
 	this.notificationBtn.appendElement({ "tag": "i", "class": "fa fa-bell" })
 
-	this.userSessionBtn = this.div.appendElement({ "tag": "div", "class": "active" }).down()
+	this.userSessionBtn = this.div.appendElement({ "tag": "div", "class": "active", "style":"display: table-cell;" }).down()
 	this.userSessionBtn.appendElement({ "tag": "i", "class": "fa fa-user" })
 
 	// Contain information about the current session...
@@ -67,7 +67,7 @@ var SessionPanel = function (parent, sessionInfo) {
 	this.setAccountInfo(sessionInfo.M_accountPtr)
 
 	// Set the user information.
-	if (sessionInfo.M_accountPtr.M_userRef.length > 0){
+	if (isObject(sessionInfo.M_accountPtr.M_userRef)){
 		// Set the user information if founded.
 		this.setUserInfo(sessionInfo.M_accountPtr.M_userRef)
 	} else {
@@ -85,7 +85,7 @@ var SessionPanel = function (parent, sessionInfo) {
 				var viewportOffset = userSessionBtn.element.parentNode.getBoundingClientRect();
 				var top = viewportOffset.bottom
 				var left = viewportOffset.right - sessionDisplayPanel.element.offsetWidth
-				sessionDisplayPanel.element.style.top = top + "px"
+				sessionDisplayPanel.element.style.top = top + 1 + "px"
 				sessionDisplayPanel.element.style.left = left + "px"
 
 			} else {
@@ -105,7 +105,7 @@ var SessionPanel = function (parent, sessionInfo) {
 				var viewportOffset = userSessionBtn.element.parentNode.getBoundingClientRect();
 				var top = viewportOffset.bottom
 				var left = viewportOffset.right - notificationsDisplayPanel.element.offsetWidth
-				notificationsDisplayPanel.element.style.top = top + "px"
+				notificationsDisplayPanel.element.style.top = top + 1 + "px"
 				notificationsDisplayPanel.element.style.left = left + "px"
 			} else {
 				notificationsDisplayPanel.element.style.display = "none"
@@ -338,7 +338,7 @@ var SessionInfoPanel = function (parent, sessionInfo, accountInfo, displayStateM
 		}
 
 		// Here I will create the list of available state here...
-		this.sessionStateMenu = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "session_state_menu" })
+		this.sessionStateMenu = new Element(document.getElementsByTagName("body")[0], { "tag": "div", "class": "session_state_menu", "style":"display: none;" })
 		this.sessionStateMenu.element.onclick = function () {
 			this.style.display = "none"
 		}
