@@ -6,7 +6,7 @@ var LanguageSelector = function(parent, languages, callback){
 
     this.languages = languages;
 
-    this.panel = parent.appendElement({"tag":"div", "class":"language-selector", "style":"display: table-cell;"}).down()
+    this.panel = parent.appendElement({"tag":"div", "class":"language-selector", "style":"display: table-cell; vertical-align: middle;"}).down()
     
     this.currentLanguageDiv = this.panel.appendElement({"tag":"div", "style":"display: table; border-spacing:2px 2px; position: relative;"}).down()
     this.flagDiv = this.currentLanguageDiv.appendElement({"tag":"div", "style":"display: table-cell;"}).down()
