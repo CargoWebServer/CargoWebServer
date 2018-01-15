@@ -34,7 +34,7 @@ var SessionPanel = function (parent, sessionInfo) {
 	this.accountInfo = null
 
 	/* The div content **/
-	this.div = parent.appendElement({ "tag": "div", "class": "session_panel" }).down()
+	this.div = parent.appendElement({ "tag": "div", "class": "session_panel","style":"display: table-cell; vertical-align: middle;" }).down()
 
 	/* Now the button **/
 	this.nameDisplay = this.div.appendElement({ "tag": "span" }).down()
@@ -82,10 +82,13 @@ var SessionPanel = function (parent, sessionInfo) {
 		return function () {
 			if (sessionDisplayPanel.element.style.display != "block") {
 				sessionDisplayPanel.element.style.display = "block"
-				var viewportOffset = userSessionBtn.element.parentNode.getBoundingClientRect();
-				var top = viewportOffset.bottom
-				var left = viewportOffset.right - sessionDisplayPanel.element.offsetWidth
+				var coord = getCoords(userSessionBtn.element)
+				var top = coord.top + userSessionBtn.element.offsetHeight 
+				var left = coord.left - sessionDisplayPanel.element.offsetWidth  + userSessionBtn.element.offsetWidth
 				sessionDisplayPanel.element.style.top = top + 1 + "px"
+				if(left < 0){
+					left = 0;
+				}
 				sessionDisplayPanel.element.style.left = left + "px"
 
 			} else {
@@ -102,10 +105,13 @@ var SessionPanel = function (parent, sessionInfo) {
 		return function () {
 			if (notificationsDisplayPanel.element.style.display != "block") {
 				notificationsDisplayPanel.element.style.display = "block"
-				var viewportOffset = userSessionBtn.element.parentNode.getBoundingClientRect();
-				var top = viewportOffset.bottom
-				var left = viewportOffset.right - notificationsDisplayPanel.element.offsetWidth
+				var coord = getCoords(userSessionBtn.element)
+				var top = coord.top + userSessionBtn.element.offsetHeight 
+				var left = coord.left - notificationsDisplayPanel.element.offsetWidth  + userSessionBtn.element.offsetWidth
 				notificationsDisplayPanel.element.style.top = top + 1 + "px"
+				if(left < 0){
+					left = 0;
+				}
 				notificationsDisplayPanel.element.style.left = left + "px"
 			} else {
 				notificationsDisplayPanel.element.style.display = "none"
@@ -121,10 +127,13 @@ var SessionPanel = function (parent, sessionInfo) {
 		return function () {
 			if (settingsDisplayPanel.element.style.display != "block") {
 				settingsDisplayPanel.element.style.display = "block"
-				var viewportOffset = userSessionBtn.element.parentNode.getBoundingClientRect();
-				var top = viewportOffset.bottom
-				var left = viewportOffset.right - settingsDisplayPanel.element.offsetWidth
-				settingsDisplayPanel.element.style.top = top + "px"
+				var coord = getCoords(userSessionBtn.element)
+				var top = coord.top + userSessionBtn.element.offsetHeight 
+				var left = coord.left - settingsDisplayPanel.element.offsetWidth  + userSessionBtn.element.offsetWidth
+				settingsDisplayPanel.element.style.top = top + 1 + "px"
+				if(left < 0){
+					left = 0;
+				}
 				settingsDisplayPanel.element.style.left = left + "px"
 			} else {
 				settingsDisplayPanel.element.style.display = "none"
