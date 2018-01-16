@@ -13,7 +13,7 @@ var MainPage = function(parent, loginPage){
 	this.loginPage = loginPage
 
     // Set the login page into the layout
-	this.panel.moveChildElements( [this.loginPage.loginDiv])
+	this.panel.moveChildElements( [this.loginPage.panel])
  
     // Set the focus to the element...
     this.loginPage.usernameInput.element.value = ""

@@ -2,7 +2,7 @@
  * The text contain in the page...
  */
 
-var languageInfo = {
+var loginTxt = {
 	"en": {
 		"Username": "Username",
 		"Password": "Password",
@@ -18,7 +18,7 @@ var languageInfo = {
 }
 
 // Set the text...
-server.languageManager.appendLanguageInfo(languageInfo)
+server.languageManager.appendLanguageInfo(loginTxt)
 
 /*
  * The login page.
@@ -34,7 +34,7 @@ var LoginPage = function (loginCallback, serverId) {
 	this.loginCallback = loginCallback
 
 	// Here I will create the content...
-	this.loginDiv = new Element(null, {
+	this.panel = new Element(null, {
 		"tag": "div",
 		"class": "login_page",
 		"style": "width: 100%; height: 100%; padding-top: 0px; overflow:hidden;",
@@ -42,7 +42,7 @@ var LoginPage = function (loginCallback, serverId) {
 		"draggable": "false"
 	})
 
-	this.loginDiv.appendElement({ "tag": "div", "class": "login-form" }).down()
+	this.panel.appendElement({ "tag": "div", "class": "login-form" }).down()
 
 		// The username input...
 		.appendElement({ "tag": "div", "class": "input-container" }).down()
@@ -73,20 +73,20 @@ var LoginPage = function (loginCallback, serverId) {
 		.appendElement({ "tag": "button", "id": "login_button", "type": "reset", "class": "button blue button-login" }).down()
 
 	// Get the reference...
-	this.loginButton = this.loginDiv.getChildById("login_button")
-	this.rememeberMe = this.loginDiv.getChildById("remember_me")
-	this.usernameInput = this.loginDiv.getChildById("username_input")
-	this.passwordInput = this.loginDiv.getChildById("password_input")
+	this.loginButton = this.panel.getChildById("login_button")
+	this.rememeberMe = this.panel.getChildById("remember_me")
+	this.usernameInput = this.panel.getChildById("username_input")
+	this.passwordInput = this.panel.getChildById("password_input")
 
 	// Set the text...
-	server.languageManager.setElementText(this.loginDiv.getChildById("username_label"), "Username")
-	server.languageManager.setElementText(this.loginDiv.getChildById("password_label"), "Password")
-	server.languageManager.setElementText(this.loginDiv.getChildById("remember_me_label"), "RememberMe")
+	server.languageManager.setElementText(this.panel.getChildById("username_label"), "Username")
+	server.languageManager.setElementText(this.panel.getChildById("password_label"), "Password")
+	server.languageManager.setElementText(this.panel.getChildById("remember_me_label"), "RememberMe")
 	server.languageManager.setElementText(this.loginButton, "Login")
 
 	// The error display element...
-	this.usernameError = this.loginDiv.getChildById("username_error")
-	this.passwordError = this.loginDiv.getChildById("password_error")
+	this.usernameError = this.panel.getChildById("username_error")
+	this.passwordError = this.panel.getChildById("password_error")
 
 	// The login success event...
 	server.sessionManager.attach(this, LoginEvent, function (evt, loginPanel) {

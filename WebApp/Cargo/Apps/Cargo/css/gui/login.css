@@ -14,6 +14,7 @@ body {
 }
 
 .login-form {
+  z-index: 100;
 	color: #657383;
   font: normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
   background-color: white;
@@ -98,7 +99,7 @@ input.fancy:focus ~ .placeholder, input.fancy.used ~ .placeholder, input.fancy:v
 
 .button {
   display: block;
-  padding: 10px;
+  padding: 5px;
   color: #646464;
   cursor: pointer;
   transition: all .2s ease;

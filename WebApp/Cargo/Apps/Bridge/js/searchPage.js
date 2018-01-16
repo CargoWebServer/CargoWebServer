@@ -271,10 +271,10 @@ var SearchPage = function (parent, searchInfo) {
     this.searchInfo = searchInfo
 
     /** The panel who will display the search result. */
-    this.panel = parent.appendElement({ "tag": "div", "class": "entity admin_table", "style": "top: 0px; bottom: 0px; left: 0px; right: 0px; position: absolute;" }).down()
+    this.panel = parent.appendElement({ "tag": "div", "class": "entity admin_table", "style": "display: flex; flex-direction: column; top: 0px; bottom: 0px; left: 0px; right: 0px; position: absolute; overflow: hidden;" }).down()
 
     /** The search input where the key words will be written */
-    var searchInputBar = this.panel.appendElement({ "tag": "div", "style": "display: table; vertical-align: middle; position: relative;" }).down()
+    var searchInputBar = this.panel.appendElement({ "tag": "div", "style": "display: table; flex-basis: 30px; vertical-align: middle; position: relative;" }).down()
 
     this.searchInput = searchInputBar.appendElement({ "tag": "input", "style": "display: table-cell;margin: 2px; border: 1px solid; vertical-align: middle;" }).down()
 
@@ -331,7 +331,7 @@ var SearchPage = function (parent, searchInfo) {
     }(this)
 
     /** The search result row. */
-    this.resultPanel = this.panel.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
+    this.resultPanel = this.panel.appendElement({ "tag": "div", "style" : "flex-grow: 1; position: relative; display: flex;" }).down()
 
     // This will hold the results for the time of navigation.
     this.resultsPages = [];
@@ -380,7 +380,9 @@ var SearchResultsPage = function (parent, results) {
     this.searchResultsHeader.appendElement({ "tag": "span", "innerHtml": headerText })
 
     // Now I will display the list of results...
-    this.searchResultsPanel = this.panel.appendElement({ "tag": "div", "style": "display: table; border-spacing:2px 2px;" }).down()
+    this.searchResultsPanel = this.panel.appendElement({"tag":"div", "class":"search_results_content"}).down()
+        .appendElement({"tag":"div", "style":"position: absolute; top: 0px; left: 0px; right: 0px; top: 0px; bottom: 0px;"}).down()
+        .appendElement({ "tag": "div", "style": "display: table; border-spacing:2px 2px;" }).down()
 
     this.searchResults = []
 

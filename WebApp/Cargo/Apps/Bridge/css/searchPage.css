@@ -16,14 +16,32 @@ pre{
 }
 
 .search_results{
-    display: table;
-    width: 100%;
-    border-spacing:2px 2px;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
 }
 
 .search_results_header{
-    display: table-row;
-    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-basis: 25px;
+    vertical-align: middle;
+    border-bottom:  1px solid lightgray;
+}
+
+.search_results_content{
+    display: flex;
+    flex-grow: 1;
+    position: relative;
+    overflow-y: auto;
+}
+
+.search_results_navigation{
+    border-top:  1px solid lightgray;
+    flex-basis: 30px;
+    vertical-align: middle;
+    display: flex;
+    align-items: center;
 }
 
 .search_result{
