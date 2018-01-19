@@ -16,31 +16,47 @@ pre{
 }
 
 .search_results{
-    display: flex;
+    display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
     flex-grow: 1;
     flex-direction: column;
 }
 
 .search_results_header{
-    display: flex;
+    display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
     align-items: center;
     flex-basis: 25px;
     vertical-align: middle;
-    border-bottom:  1px solid lightgray;
+    border-bottom:  1px solid;
 }
 
 .search_results_content{
-    display: flex;
+    display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
     flex-grow: 1;
     position: relative;
     overflow-y: auto;
 }
 
 .search_results_navigation{
-    border-top:  1px solid lightgray;
+    border-top:  1px solid;
     flex-basis: 30px;
     vertical-align: middle;
-    display: flex;
+    display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
     align-items: center;
 }
 

@@ -8460,6 +8460,7 @@ func (this *EntityManager) create_CargoEntities_FileEntityPrototype() {
 	fileEntityProto.FieldsOrder = append(fileEntityProto.FieldsOrder, 5)
 	fileEntityProto.FieldsVisibility = append(fileEntityProto.FieldsVisibility, true)
 	fileEntityProto.Fields = append(fileEntityProto.Fields, "M_path")
+	fileEntityProto.Indexs = append(fileEntityProto.Indexs, "M_path")
 	fileEntityProto.FieldsType = append(fileEntityProto.FieldsType, "xs.string")
 	fileEntityProto.FieldsDefaultValue = append(fileEntityProto.FieldsDefaultValue, "")
 	fileEntityProto.FieldsOrder = append(fileEntityProto.FieldsOrder, 6)

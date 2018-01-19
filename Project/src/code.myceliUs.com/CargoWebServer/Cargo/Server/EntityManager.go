@@ -714,6 +714,10 @@ func (this *EntityManager) getEntityById(storeId string, typeName string, ids []
 	}
 
 	prototype, err := this.getEntityPrototype(typeName, storeId)
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), PROTOTYPE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Type name '"+typeName+"' does not exist."))
+		return nil, cargoError
+	}
 
 	var results [][]interface{}
 	if err == nil {
@@ -745,6 +749,14 @@ func (this *EntityManager) getEntityById(storeId string, typeName string, ids []
 
 	// In that case not information are found.
 	if len(results) == 0 {
+		// Before I will give up I will try to find value with sub-type.
+		subTypes := prototype.SubstitutionGroup
+		for i := 0; i < len(subTypes); i++ {
+			entities, errObj := this.getEntityById(storeId, subTypes[i], ids, lazy)
+			if errObj == nil {
+				return entities, nil
+			}
+		}
 		// Here I will send a an error...
 		var id string
 		for i := 0; i < len(ids); i++ {

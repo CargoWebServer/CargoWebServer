@@ -128,7 +128,7 @@ func (this *DataManager) openConnections() {
 func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfiguration) {
 	store, err := NewDataStore(config)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 	}
 	this.m_dataStores[store.GetId()] = store
 	store.Connect()
@@ -502,7 +502,7 @@ func (this *DataManager) setEntityRelationship(storeId string, name string, ref_
 			data, err := store.Read(query, fieldsType, params)
 
 			if err != nil {
-				log.Println(err)
+				//log.Println(err)
 				return err
 			}
 
@@ -1671,7 +1671,7 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 
 	data, err := ioutil.ReadAll(gr)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		return
 	}
 
@@ -1684,7 +1684,7 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 
 	err = json.Unmarshal(data, &infos)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		return
 	}
 
@@ -1729,7 +1729,7 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 	}
 
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		return
 	}
 

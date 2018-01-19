@@ -9,8 +9,11 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	utf16 "unicode/utf16"
 	//utf8 "unicode/utf8"
+
+	"code.myceliUs.com/Utility"
 )
 
 func (this *JsRuntimeManager) initNodeJsFs() {
@@ -25,7 +28,7 @@ func (this *JsRuntimeManager) initNodeJsFs() {
 	/**
 	 * Returns true if the file exists, false otherwise.
 	 */
-	this.appendFunction("fs.readFileSync", func(path string, encoding string) string {
+	this.appendFunction("fs.readFileSync", func(path string, encoding string) []byte {
 		file, err := os.Open(path)
 		if err != nil {
 			log.Fatal(err)
@@ -49,12 +52,50 @@ func (this *JsRuntimeManager) initNodeJsFs() {
 				if err != nil {
 					log.Println(err)
 				}
-				text = string(b) // convert content to a 'string'
-
+				// text = string(b) // convert content to a 'string'
+				return b
 			}
 
 		}
 
-		return text
+		return nil
 	})
+
+	/**
+	 * Returns true if the file exists, false otherwise.
+	 */
+	this.appendFunction("fs.copyFileSync", func(src string, dst string) {
+		// I will create the directory before and the file after.
+		if strings.Index(dst, "\\") != -1 {
+			os.MkdirAll(dst[0:strings.LastIndex(dst, "\\")], 0777)
+		} else if strings.Index(dst, "/") != -1 {
+			os.MkdirAll(dst[0:strings.LastIndex(dst, "/")], 0777)
+		}
+		err := Utility.CopyFile(src, dst)
+		if err != nil {
+			log.Println("---> ", err)
+			return
+		}
+	})
+
+	/**
+	 * Return the stats of a file for a give path.
+	 */
+	this.appendFunction("fs.fstatSync", func(path string) map[string]interface{} {
+		stats, err := os.Stat(path)
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
+
+		values := make(map[string]interface{}, 0)
+		values["Mode"] = stats.Mode()
+		values["Time"] = stats.ModTime().Unix()
+		values["Size"] = stats.Size()
+		values["Sys"] = stats.Sys()
+		values["Name"] = stats.Name()
+
+		return values
+	})
+
 }

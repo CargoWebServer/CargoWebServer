@@ -149,7 +149,7 @@ func (this *SchemaManager) initialize() {
 			port := serverConfig.GetServerPort()
 			store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
 			if errObj != nil {
-				log.Println(errObj.GetBody())
+				//log.Println(errObj.GetBody())
 			}
 		}
 

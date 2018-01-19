@@ -358,6 +358,14 @@ var HomePage = function () {
         changePropertyByClassName("background", ".body_cell textarea", "." + evt.dataMap.themeClass + " .ace_gutter")
         changePropertyByClassName("color", ".menu_row input", "." + evt.dataMap.themeClass + " .ace_gutter")
 
+        
+        changePropertyByClassName("color", ".search_results_header", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("color", ".search_results_navigation", "." + evt.dataMap.themeClass + " .ace_gutter")
+
+        changePropertyByClassName("color", ".page-selector-panel div", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("border-color", ".page-selector-panel div", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background-color", ".page-selector-panel div", "." + evt.dataMap.themeClass + " .ace_gutter")
+        changePropertyByClassName("background", ".page-selector-panel div", "." + evt.dataMap.themeClass + " .ace_gutter")
     })
 
 

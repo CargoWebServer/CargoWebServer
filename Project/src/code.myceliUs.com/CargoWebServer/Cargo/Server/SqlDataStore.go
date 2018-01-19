@@ -271,7 +271,7 @@ func (this *SqlDataStore) GetId() string {
 func (this *SqlDataStore) Ping() (err error) {
 	if this.m_db == nil {
 		err = errors.New("No connection was found for datastore " + this.m_name)
-		log.Println(err)
+		//log.Println(err)
 		return err
 	}
 
@@ -616,8 +616,6 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 	}
 	rows, err := this.m_db.Query(query, params...)
 	if err != nil {
-		log.Println(query)
-		log.Println(params)
 		log.Println("---> sql read query error:", err)
 		return nil, err
 	}
@@ -736,7 +734,7 @@ func (this *SqlDataStore) Delete(query string, params []interface{}) (err error)
 
 	_, err = stmt.Exec(params...)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 	}
 
 	startIndex := strings.Index(strings.ToUpper(query), "FROM") + 5 // 5 is the len of INTO and one space...

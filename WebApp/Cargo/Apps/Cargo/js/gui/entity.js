@@ -8,7 +8,7 @@
  * fashion. If the name is not found in that list, the original
  * name is use instead... 
  */
-var languageInfo = {
+var entityPanelTextInfo = {
 	"en": {
 		"M_firstName": "First Name",
 		"M_lastName": "Last name",
@@ -26,7 +26,7 @@ var languageInfo = {
 }
 
 // Set the language informtion here...
-server.languageManager.appendLanguageInfo(languageInfo)
+server.languageManager.appendLanguageInfo(entityPanelTextInfo)
 
 /**
  * That panel i use to navigate in information.

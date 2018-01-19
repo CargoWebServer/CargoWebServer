@@ -235,6 +235,9 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
     } else {
         // typeName string, storeId string, queryStr string, offset int, limit int, orderBy []interface{}, asc bool
         if (caller.initCallback != undefined) {
+            for (var i = 0; i < this.entities.length; i++) {
+                this.appendRow(this.entities[i], this.entities[i].UUID)
+            }
             caller.initCallback()
             caller.initCallback = undefined
         }
@@ -327,7 +330,12 @@ EntityTableModel.prototype.appendRow = function (values) {
         return []
     }
 
-    this.entities.push(values)
+
+    if(!objectPropInArray(this.entities, "UUID", values.UUID)){
+        this.entities.push(values)
+    }
+    
+
     var isListOf_ = isListOf(this.proto.TypeName)
     var objectValues = []
     var prototype = values.getPrototype()

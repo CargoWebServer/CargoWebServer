@@ -479,8 +479,6 @@ func PublicKeysHandler(w http.ResponseWriter, r *http.Request) {
 //    )
 //}
 func (this *OAuth2Manager) GetResource(clientId string, scope string, query string, idTokenUuid string, accessUuid string, messageId string, sessionId string) interface{} {
-	log.Println("scope: ", scope)
-
 	var access *Config.OAuth2Access
 	// I will get the client...
 	ids := []interface{}{clientId}

@@ -161,7 +161,7 @@ func isIndex(className string, attributeName string) bool {
 		}
 	}
 
-	if strings.ToUpper(attributeName) == "NAME" {
+	if strings.ToUpper(attributeName) == "NAME" || strings.ToUpper(attributeName) == "FIRSTNAME" || strings.ToUpper(attributeName) == "LASTNAME" || strings.ToUpper(attributeName) == "EMAIL" || strings.ToUpper(attributeName) == "PATH" {
 		return true
 	}
 

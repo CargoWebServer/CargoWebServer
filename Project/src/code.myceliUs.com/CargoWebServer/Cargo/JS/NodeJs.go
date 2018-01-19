@@ -20,7 +20,6 @@ func (this *JsRuntimeManager) initNodeJs() {
 		if err != nil {
 			log.Println("---> error found in require function ", err)
 		}
-
 		return exports
 	})
 

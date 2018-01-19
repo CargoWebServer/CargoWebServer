@@ -60,7 +60,8 @@ server.languageManager.appendLanguageInfo(languageInfo)
  * A table to display tabular data, extend the html table functinality.
  * 
  * @constructor
- * @param titles The list of table headers
+ * @param id The table id
+ * @param parent The container.
  */
 var Table = function (id, parent) {
 
@@ -155,72 +156,6 @@ Table.prototype.setModel = function (model, initCallback) {
 			if (caller.initCallback != undefined) {
 				caller.initCallback()
 				caller.initCallback = undefined
-				// Because html table suck with the header position vs scroll 
-				// I do some little hack to fix it without weird stuff like 
-				// copy another header etc...
-				var widths = []
-				// Now I will wrote the code for the layout...
-				if (table.header != null) {
-					table.header.maximizeBtn.element.click()
-				}
-
-				if (table.parent.element.style.position == "relative") {
-					var w = table.header.buttonDiv.element.offsetWidth
-					table.header.buttonDiv.element.style.width = w + "px"
-					table.header.buttonDiv.element.style.minWidth = w + "px"
-
-					for (var i = 0; i < table.header.cells.length; i++) {
-						var w = table.header.cells[i].element.offsetWidth
-						table.header.cells[i].element.style.width = w + "px"
-						table.header.cells[i].element.style.minWidth = w + "px"
-						widths.push(w)
-					}
-
-					// Now the table body...
-					for (var i = 0; i < table.rows.length; i++) {
-						for (var j = 0; j < table.rows[i].cells.length; j++) {
-							var cell = table.rows[i].cells[j]
-							cell.div.element.style.width = widths[j] + "px"
-							cell.div.element.style.minWidth = widths[j] + "px"
-						}
-					}
-
-					// The table header.
-					table.header.div.element.style.position = "absolute"
-					table.header.div.element.style.left = "2px"
-
-					// Now the table body
-					table.rowGroup.element.style.position = "absolute"
-					table.rowGroup.element.style.overflowX = "hidden"
-					table.rowGroup.element.style.overflowY = "auto"
-					table.rowGroup.element.style.left = "10px"
-					table.rowGroup.element.style.top = table.header.div.element.offsetHeight + 2 + "px"
-
-					// Now the height of the panel...
-					table.rowGroup.element.style.height = (table.parent.element.offsetHeight - table.header.div.element.offsetHeight) - 15 + "px"
-
-					// Here the scrolling event.
-					table.rowGroup.element.onscroll = function (header) {
-						return function () {
-							var position = this.scrollTop;
-							if (this.scrollTop > 0) {
-								header.className = "table_header scrolling"
-							} else {
-								header.className = "table_header"
-							}
-						}
-					}(table.header.div.element)
-
-					// Now the resize event.
-					window.addEventListener('resize',
-						function (table) {
-							return function () {
-
-								table.rowGroup.element.style.height = (table.parent.element.offsetHeight - table.header.div.element.offsetHeight) - 15 + "px"
-							}
-						}(table), true);
-				}
-
 			}
 		},
 		// The progress callback...
@@ -267,6 +202,7 @@ Table.prototype.init = function () {
 			this.rowsId[data[0]] = this.rows[i]
 		}
 	}
+
 	// In the case of sql table I will connect the listener here...
 	// New connection of the event listeners...
 	if (this.model.constructor === EntityTableModel) {
@@ -414,6 +350,71 @@ Table.prototype.init = function () {
 		})
 	}
 
+	// Because html table suck with the header position vs scroll 
+	// I do some little hack to fix it without weird stuff like 
+	// copy another header etc...
+	var widths = []
+
+	// Now I will wrote the code for the layout...
+	if (this.header != null) {
+		this.header.maximizeBtn.element.click()
+	}
+
+	if (this.parent.element.style.position == "relative") {
+		var w = this.header.buttonDiv.element.offsetWidth
+		this.header.buttonDiv.element.style.width = w + "px"
+		this.header.buttonDiv.element.style.minWidth = w + "px"
+
+		for (var i = 0; i < this.header.cells.length; i++) {
+			var w = this.header.cells[i].element.offsetWidth
+			this.header.cells[i].element.style.width = w + "px"
+			this.header.cells[i].element.style.minWidth = w + "px"
+			widths.push(w)
+		}
+
+		// Now the table body...
+		for (var i = 0; i < this.rows.length; i++) {
+			for (var j = 0; j < this.rows[i].cells.length; j++) {
+				var cell = this.rows[i].cells[j]
+				cell.div.element.style.width = widths[j] + "px"
+				cell.div.element.style.minWidth = widths[j] + "px"
+			}
+		}
+
+		// The table header.
+		this.header.div.element.style.position = "absolute"
+		this.header.div.element.style.left = "2px"
+
+		// Now the table body
+		this.rowGroup.element.style.position = "absolute"
+		this.rowGroup.element.style.overflowX = "hidden"
+		this.rowGroup.element.style.overflowY = "auto"
+		this.rowGroup.element.style.left = "10px"
+		this.rowGroup.element.style.top = this.header.div.element.offsetHeight + 2 + "px"
+
+		// Now the height of the panel...
+		this.rowGroup.element.style.height = (this.parent.element.offsetHeight - this.header.div.element.offsetHeight) - 15 + "px"
+
+		// Here the scrolling event.
+		this.rowGroup.element.onscroll = function (header) {
+			return function () {
+				var position = this.scrollTop;
+				if (this.scrollTop > 0) {
+					header.className = "table_header scrolling"
+				} else {
+					header.className = "table_header"
+				}
+			}
+		}(this.header.div.element)
+
+		// Now the resize event.
+		window.addEventListener('resize',
+			function (table) {
+				return function () {
+					table.rowGroup.element.style.height = (table.parent.element.offsetHeight - table.header.div.element.offsetHeight) - 15 + "px"
+				}
+			}(this), true);
+	}
 	// Refresh the parent table.
 	this.refresh()
 }
@@ -2143,7 +2144,7 @@ var ColumnFilter = function (index, table) {
 	// Now the button...
 	var filterPanelButtons = this.filterPanelDiv.appendElement({ "tag": "div", "class": "filter_panel_buttons" }).down()
 
-	this.okBtn = filterPanelButtons.appendElement({ "tag": "div", "innerHtml": "ok", "style":"border-right: 1px solid;" }).down()
+	this.okBtn = filterPanelButtons.appendElement({ "tag": "div", "innerHtml": "ok", "style": "border-right: 1px solid;" }).down()
 	this.cancelBtn = filterPanelButtons.appendElement({ "tag": "div", "innerHtml": "cancel" }).down()
 
 	// Simply close the panel...

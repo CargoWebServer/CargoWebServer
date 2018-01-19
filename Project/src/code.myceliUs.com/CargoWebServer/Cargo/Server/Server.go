@@ -308,7 +308,7 @@ func (this *Server) reportErrorMessage(messageId string, sessionId string, error
 		conn.Send(errMsg.GetBytes())
 	}
 	// Display the error on the server console.
-	log.Println(errorObject.GetBody())
+	//log.Println(errorObject.GetBody())
 }
 
 /**

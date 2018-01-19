@@ -271,7 +271,7 @@ var SearchPage = function (parent, searchInfo) {
     this.searchInfo = searchInfo
 
     /** The panel who will display the search result. */
-    this.panel = parent.appendElement({ "tag": "div", "class": "entity admin_table", "style": "display: flex; flex-direction: column; top: 0px; bottom: 0px; left: 0px; right: 0px; position: absolute; overflow: hidden;" }).down()
+    this.panel = parent.appendElement({ "tag": "div", "class": "entity admin_table", "style": "display: flex; flex-direction: column; top: 0px; bottom: 0px; left: 0px; right: 0px; padding-bottom: 0px; position: absolute; overflow: hidden;" }).down()
 
     /** The search input where the key words will be written */
     var searchInputBar = this.panel.appendElement({ "tag": "div", "style": "display: table; flex-basis: 30px; vertical-align: middle; position: relative;" }).down()
@@ -297,6 +297,37 @@ var SearchPage = function (parent, searchInfo) {
     this.searchBtn = searchInputBar.appendElement({ "tag": "div", "class": "search_btn", "style": "display: table-cell;margin: 2px;" }).down()
         .appendElement({ "tag": "i", "class": "fa fa-search" }).down()
 
+    /** The search result row. */
+    this.resultPanel = this.panel.appendElement({ "tag": "div", "style": "flex-grow: 1; position: relative; display: flex;" }).down()
+
+    /** The serch result panel */
+    this.searchResultsPage = new SearchResultsPage(this.resultPanel,function(searchPage){
+        return function(offset, pageSize){
+            var fields = []
+            // Now I will append the list of selected fields for each selected types.
+            for (var tabId in searchPage.searchOptionPanel.tabs) {
+                var tab = searchPage.searchOptionPanel.tabs[tabId]
+                for (var btnId in tab.searchOptionPanelDataTypeInfo.isSelectedBtns) {
+                    var isSelectedBtn = tab.searchOptionPanelDataTypeInfo.isSelectedBtns[btnId]
+                    if (isSelectedBtn.element.checked) {
+                        var isSelectedFieldBtns = tab.searchOptionPanelDataTypeInfo.isSelectedFieldBtns[isSelectedBtn.element.id]
+                        for (var i = 0; i < isSelectedFieldBtns.length; i++) {
+                            if (isSelectedFieldBtns[i].element.checked) {
+                                fields.push("X" + isSelectedFieldBtns[i].id + "%:" + isSelectedFieldBtns[i].id)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Hide the search option panel
+            var searchOptionPanel = document.getElementById("search_option_panel")
+            searchOptionPanel.style.display = ""
+            var dbpaths = searchPage.searchOptionPanel.getDataStoreList()
+            searchPage.search(offset, pageSize, fields, dbpaths)
+        }
+    }(this))
+
     /** Now the action. */
     this.searchBtn.element.onclick = function (searchPage) {
         return function () {
@@ -319,22 +350,16 @@ var SearchPage = function (parent, searchInfo) {
                 }
             }
 
-            searchPage.resultsPages = []
-            searchPage.resultPanel.removeAllChilds()
+            // searchPage.resultPanel.removeAllChilds()
+
             // Hide the search option panel
             var searchOptionPanel = document.getElementById("search_option_panel")
             searchOptionPanel.style.display = ""
             var dbpaths = searchPage.searchOptionPanel.getDataStoreList()
-            // console.log(dbpaths)
             searchPage.search(offset, pageSize, fields, dbpaths)
+
         }
     }(this)
-
-    /** The search result row. */
-    this.resultPanel = this.panel.appendElement({ "tag": "div", "style" : "flex-grow: 1; position: relative; display: flex;" }).down()
-
-    // This will hold the results for the time of navigation.
-    this.resultsPages = [];
 
     return this
 }
@@ -354,7 +379,8 @@ SearchPage.prototype.search = function (offset, pageSize, fields, dbpath) {
         // success callback
         function (results, searchPage) {
             // Keep the page in memory so it can be display latter without server call...
-            searchPage.resultsPages[results.offset] = new SearchResultsPage(searchPage.resultPanel, results)
+            // new SearchResultsPage(searchPage.resultPanel, searchPage.search)
+            searchPage.searchResultsPage.displayResults(results)
         },
         // error callback
         function () {
@@ -363,35 +389,49 @@ SearchPage.prototype.search = function (offset, pageSize, fields, dbpath) {
 
 }
 
-/**
- * That class contain the reuslt of search.
- */
-var SearchResultsPage = function (parent, results) {
-    this.panel = parent.appendElement({ "tag": "div", "class": "search_results" }).down()
+var SearchResultsPage = function (parent, search) {
+
+    // The result content.
+    this.panel = new Element(parent, { "tag": "div", "class": "search_results" })
 
     // Here I will display the result header...
     this.searchResultsHeader = this.panel.appendElement({ "tag": "div", "class": "search_results_header" }).down()
 
-    // So here I will display a line with general seach info...
+    this.headerMessage = this.searchResultsHeader.appendElement({ "tag": "span" }).down()
+
+    // Now I will display the list of results...
+    this.searchResultsPanel = this.panel.appendElement({ "tag": "div", "class": "search_results_content" }).down()
+        .appendElement({ "tag": "div", "style": "position: absolute; top: 0px; left: 0px; right: 0px; top: 0px; bottom: 0px;" }).down()
+        .appendElement({ "tag": "div", "style": "display: table; border-spacing:2px 2px; width: 100%;" }).down()
+
+    // The footer.
+    this.searchResultsNavigation = this.panel.appendElement({ "tag": "div", "class": "search_results_navigation" }).down()
+
+    // The page selector.
+    this.pageSelector = new PageSelector(this.searchResultsNavigation, search)
+
+    return this;
+}
+
+SearchResultsPage.prototype.displayResults = function (results) {
+    // results.offset, results.estimate,  results.pagesize,
     var headerText = "No results found for \"" + results.query + "\""
     if (results.estimate > 0) {
         headerText = "About " + results.estimate + " results " + " (" + results.elapsedTime / 1000 + "seconds)"
     }
-    this.searchResultsHeader.appendElement({ "tag": "span", "innerHtml": headerText })
 
-    // Now I will display the list of results...
-    this.searchResultsPanel = this.panel.appendElement({"tag":"div", "class":"search_results_content"}).down()
-        .appendElement({"tag":"div", "style":"position: absolute; top: 0px; left: 0px; right: 0px; top: 0px; bottom: 0px;"}).down()
-        .appendElement({ "tag": "div", "style": "display: table; border-spacing:2px 2px;" }).down()
-
-    this.searchResults = []
-
+    // Set the display message.
+    this.headerMessage.element.innerHTML = headerText;
+    this.searchResultsPanel.removeAllChilds()
     for (var i = 0; i < results.results.length; i++) {
-        this.searchResults[i] = new SearchResult(this.searchResultsPanel, results.results[i], results.indexs)
+        new SearchResult(this.searchResultsPanel, results.results[i], results.indexs)
     }
 
-    return this;
+    // Now the navigator part.
+    this.pageSelector.setResults(results.offset, results.estimate, results.pagesize)
 }
+
+
 
 /**
  * That class display a single result.
@@ -468,8 +508,8 @@ SearchResult.prototype.displayEntityResult = function (entity, title, indexs, te
                 // Thats means a snippet is found.
                 appendSnippet(this.panel, propertie, snippet[propertie])
             }
-        }else if(isArray(snippet[propertie])){
-            for(var i=0; i < snippet[propertie].length; i++){
+        } else if (isArray(snippet[propertie])) {
+            for (var i = 0; i < snippet[propertie].length; i++) {
                 if (isString(snippet[propertie][i])) {
                     if (snippet[propertie][i].indexOf("<b>") != -1) {
                         // Thats means a snippet is found.

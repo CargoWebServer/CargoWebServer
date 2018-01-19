@@ -360,6 +360,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 
 	// The user wants to save the data into a physical file.
 	// File id's
+	log.Println("----> ", filepath+"/"+filename)
 	fileId := Utility.CreateSha1Key([]byte(filepath + "/" + filename))
 	fileUuid := CargoEntitiesFileExists(fileId)
 

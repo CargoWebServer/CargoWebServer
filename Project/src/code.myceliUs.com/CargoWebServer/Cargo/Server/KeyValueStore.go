@@ -1045,7 +1045,6 @@ func (this *KeyValueDataStore) runQuery(ast *ast.QueryAst, fields []string) (map
 								field = "UUID"
 							}
 							index := prototype.getFieldIndex(field)
-							log.Println(prototype.Fields)
 							values[indexations[i].(string)][field] = objects[index]
 						}
 						var isMatch bool

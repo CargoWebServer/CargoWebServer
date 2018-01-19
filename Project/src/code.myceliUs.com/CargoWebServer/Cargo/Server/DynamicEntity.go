@@ -1761,8 +1761,6 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 											val := Utility.ToString(v)
 											this.setValue(k, val)
 										} else {
-											log.Println("-------------> k value", this.getValue(k))
-											log.Println("-------------> v", v)
 											log.Panicln("---------> Convertion error: from ", reflect.TypeOf(this.getValue(k)).Kind(), " to ", reflect.TypeOf(v).Kind())
 										}
 									}

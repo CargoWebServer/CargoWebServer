@@ -1,0 +1,67 @@
+
+/* Generic tab panel */
+.tab-panel{
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/** The tab header. **/
+.tab-panel-header{
+    display: flex;
+    min-height: 32px;
+    width: 100%;
+
+}
+
+.tab-panel-content{
+    height: 100%;
+    border-top: 1px solid lightgray;
+    overflow-y: auto;
+}
+
+/** The first level div **/
+.tab-panel-content > div{
+    display: none;
+}
+
+.tab-panel-content > div.active{
+    display: block;
+}
+
+.tab-panel-tabs-div{
+    display: flex;
+    flex-grow: 1;
+}
+
+.tab-panel-tabs-div:hover{
+    cursor: pointer;
+}
+
+.tab-panel-tabs-div div{
+    background-color: white;
+    align-items: center;
+    display: table-cell;
+    margin-right: 2px;
+    padding: 2px;
+    color: #212529;
+}
+
+.tab-panel-tabs-div .tab-panel-close-btn{
+    visibility: hidden;
+}
+
+.tab-panel-tabs-div > div{
+    border: 1px solid transparent;
+}
+
+.tab-panel-tabs-div > div.active{
+    border-top: 2px solid steelblue;
+}
+
+.tab-panel-btn{
+    flex-basis: 30px;
+    display: none;
+}
+

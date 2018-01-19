@@ -633,6 +633,7 @@ func (this *JsRuntimeManager) initScripts(sessionId string) {
 			}
 
 			// Set the function in the module object.
+			log.Println("-> ", exportPath, name)
 			this.m_exports[sessionId][exportPath].Set(name, function)
 		}
 		vm.Set(name, function)
