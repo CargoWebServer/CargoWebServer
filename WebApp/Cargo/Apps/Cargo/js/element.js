@@ -235,9 +235,7 @@ Element.prototype.appendElement = function (e) {
         this.childs[e.id] = e
         this.lastChild = e
         if (e.element.innerHTML != undefined) {
-            if (e.element.innerHTML.length > 0) {
-                this.element.appendChild(e.element)
-            }
+            this.element.appendChild(e.element)
         }
 
     } else {

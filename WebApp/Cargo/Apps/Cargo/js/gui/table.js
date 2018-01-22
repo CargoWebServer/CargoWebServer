@@ -22,7 +22,7 @@
  */
 
 
-var languageInfo = {
+var tableTextInfo = {
 	"en": {
 		"month_1": "january",
 		"month_2": "febuary",
@@ -54,7 +54,7 @@ var languageInfo = {
 }
 
 // Set the text...
-server.languageManager.appendLanguageInfo(languageInfo)
+server.languageManager.appendLanguageInfo(tableTextInfo)
 
 /**
  * A table to display tabular data, extend the html table functinality.
@@ -82,21 +82,17 @@ var Table = function (id, parent) {
 	// The model contain the data to be display.
 	this.model = null
 
-	// The cells editor, date, int, string... 
-	this.cellEditors = []
-
-	// The row...
+	// The body
 	this.rowGroup = null
 
 	// The array of row...
 	this.rows = []
-	this.rowsId = {}
+
+	// The column width...
+	this.columnsWidth = [];
 
 	/* the order of row **/
 	this.orderedRows = []
-
-	// The column formater formater...
-	this.columnFormater = new ColumnFormater()
 
 	// Format
 	this.filterFormat = "YYYY-MM-DD"
@@ -122,21 +118,6 @@ var Table = function (id, parent) {
 	return this
 }
 
-// Set the header width if it need to be set.
-Table.prototype.setHeadertWidth = function (index) {
-	// Now I will set the header size if it need to be set.
-	var w = 0
-	for (var i = 0; i < this.rows.length; i++) {
-		var cell = this.rows[i].cells[index]
-		if (cell.div.element.offsetWidth > w) {
-			w = cell.div.element.offsetWidth
-		}
-	}
-
-	this.header.cells[index].element.style.width = w - 6 + "px"
-	this.header.cells[index].element.style.minWidth = w - 6 + "px"
-}
-
 /**
  * Set the model of the table, different model are availables. (Sql, Key value etc...)
  * @param model
@@ -144,7 +125,9 @@ Table.prototype.setHeadertWidth = function (index) {
  */
 Table.prototype.setModel = function (model, initCallback) {
 
+	// Link both side of the relation.
 	this.model = model
+	model.table = this
 
 	// Initialyse the table model.
 	this.model.init(
@@ -188,233 +171,17 @@ Table.prototype.init = function () {
 		for (var j = 0; j < this.model.getColumnCount(); j++) {
 			if (this.header == null) {
 				this.setHeader()
+				this.header.numberOfRowLabel.element.innerHTML = this.model.getRowCount();
 			}
 			var value = this.model.getValueAt(i, j)
 			data.push(value)
 		}
 
 		// If the model contain entities I will set the row id and set map entry.
-		if (this.model.entities != undefined) {
-			this.rows[i] = new TableRow(this, i, data, this.model.entities[i].UUID)
-			this.rowsId[this.model.entities[i].UUID] = this.rows[i]
-		} else {
-			this.rows[i] = new TableRow(this, i, data)
-			this.rowsId[data[0]] = this.rows[i]
-		}
+		this.rows[i] = new TableRow(this, i, data)
 	}
 
-	// In the case of sql table I will connect the listener here...
-	// New connection of the event listeners...
-	if (this.model.constructor === EntityTableModel) {
 
-		/* The delete entity event **/
-		server.entityManager.attach(this, DeleteEntityEvent, function (evt, table) {
-			// So here I will remove the line from the table...
-			var toDelete = evt.dataMap["entity"]
-			if (entities[toDelete.UUID] != undefined) {
-				toDelete = entities[toDelete.UUID]
-			}
-
-			if (toDelete.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(toDelete.TYPENAME) != -1) {
-				// So here I will remove the line from the model...
-				var orderedRows = []
-				for (var i = 0; i < table.orderedRows.length; i++) {
-					var row = table.orderedRows[i]
-					if (row.id != toDelete.UUID) {
-						orderedRows.push(row)
-					} else {
-						// remove from the display...
-						row.div.element.parentNode.removeChild(row.div.element)
-					}
-				}
-
-				// Now set the model values and entities.
-				var values = []
-				var entities_ = []
-				for (var i = 0; i < table.model.entities.length; i++) {
-					if (table.model.entities[i].UUID != toDelete.UUID) {
-						var entity = table.model.entities[i]
-						if (entities[entity.UUID] != undefined) {
-							entity = table.model.entities[i] = entities[entity.UUID]
-						}
-						entities_.push(entity)
-						values.push(table.model.values[i])
-					}
-				}
-				// Set the values...
-				table.model.values = values
-				table.model.entities = entities_
-
-				table.orderedRows = orderedRows
-
-				var rows = []
-				var rowsId = {}
-
-				for (var i = 0; i < table.rows.length; i++) {
-					if (table.header == null) {
-						table.setHeader()
-					}
-					var row = table.rows[i]
-					if (row.id != toDelete.UUID) {
-						row.index = rows.length
-						rows.push(row)
-						rowsId[row.id] = row
-					} else {
-						// remove from the display...
-						if (row.div.element.parentNode != null) {
-							row.div.element.parentNode.removeChild(row.div.element)
-						}
-					}
-				}
-
-				table.rowsId = rowsId
-				table.rows = rows
-				table.refresh()
-			}
-		})
-
-		// The new entity event...
-		server.entityManager.attach(this, NewEntityEvent, function (evt, table) {
-			if (evt.dataMap["entity"] != undefined) {
-				var entity = entities[evt.dataMap["entity"].UUID]
-				if (entity != undefined) {
-					if (entity.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(entity.TYPENAME) != -1) {
-						if (entity.ParentUuid != undefined && table.model.getParentUuid() != undefined) {
-							if (table.model.getParentUuid() == entity.ParentUuid) {
-								var row = table.appendRow(entity, entity.UUID)
-								row.table.model.entities[row.index] = entity
-								row.saveBtn.element.style.visibility = "hidden"
-							}
-						}
-					}
-				}
-			}
-		})
-
-		// The update entity event.
-		server.entityManager.attach(this, UpdateEntityEvent, function (evt, table) {
-			if (evt.dataMap["entity"] != undefined) {
-				var entity = entities[evt.dataMap["entity"].UUID]
-				if (entity != undefined) {
-					if (entity.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(entity.TYPENAME) != -1) {
-						if (entity.ParentUuid != undefined && table.model.getParentUuid() != undefined) {
-							if (table.model.getParentUuid() == entity.ParentUuid) {
-								var row = table.appendRow(entity, entity.UUID)
-								row.table.model.entities[row.index] = entity
-								row.saveBtn.element.style.visibility = "hidden"
-							}
-						}
-					}
-				}
-			}
-		})
-
-	} else if (this.model.constructor === SqlTableModel) {
-
-		/* The delete row event **/
-		server.dataManager.attach(this, DeleteRowEvent, function (evt, table) {
-			// So here I will remove the line from the table...
-			if (evt.dataMap.tableName == table.id) {
-				// So here I will remove the line from the model...F
-				table.model.removeRow(evt.dataMap.id_0)
-
-				var orderedRows = []
-				for (var rowIndex in table.orderedRows) {
-					var row = table.orderedRows[rowIndex]
-					if (row.id != evt.dataMap.id_0) {
-						orderedRows.push(row)
-					} else {
-						// remove from the display...
-						row.div.element.parentNode.removeChild(row.div.element)
-					}
-				}
-
-				table.orderedRows = orderedRows
-
-				var rows = []
-				for (var rowIndex in table.rows) {
-					var row = table.rows[rowIndex]
-					if (row.id != evt.dataMap.id_0) {
-						row.index = rows.length
-						rows.push(row)
-					} else {
-						// remove from the display...
-						if (row.div.element.parentNode != null) {
-							row.div.element.parentNode.removeChild(row.div.element)
-						}
-					}
-				}
-				table.rows = rows
-				table.refresh()
-			}
-		})
-	}
-
-	// Because html table suck with the header position vs scroll 
-	// I do some little hack to fix it without weird stuff like 
-	// copy another header etc...
-	var widths = []
-
-	// Now I will wrote the code for the layout...
-	if (this.header != null) {
-		this.header.maximizeBtn.element.click()
-	}
-
-	if (this.parent.element.style.position == "relative") {
-		var w = this.header.buttonDiv.element.offsetWidth
-		this.header.buttonDiv.element.style.width = w + "px"
-		this.header.buttonDiv.element.style.minWidth = w + "px"
-
-		for (var i = 0; i < this.header.cells.length; i++) {
-			var w = this.header.cells[i].element.offsetWidth
-			this.header.cells[i].element.style.width = w + "px"
-			this.header.cells[i].element.style.minWidth = w + "px"
-			widths.push(w)
-		}
-
-		// Now the table body...
-		for (var i = 0; i < this.rows.length; i++) {
-			for (var j = 0; j < this.rows[i].cells.length; j++) {
-				var cell = this.rows[i].cells[j]
-				cell.div.element.style.width = widths[j] + "px"
-				cell.div.element.style.minWidth = widths[j] + "px"
-			}
-		}
-
-		// The table header.
-		this.header.div.element.style.position = "absolute"
-		this.header.div.element.style.left = "2px"
-
-		// Now the table body
-		this.rowGroup.element.style.position = "absolute"
-		this.rowGroup.element.style.overflowX = "hidden"
-		this.rowGroup.element.style.overflowY = "auto"
-		this.rowGroup.element.style.left = "10px"
-		this.rowGroup.element.style.top = this.header.div.element.offsetHeight + 2 + "px"
-
-		// Now the height of the panel...
-		this.rowGroup.element.style.height = (this.parent.element.offsetHeight - this.header.div.element.offsetHeight) - 15 + "px"
-
-		// Here the scrolling event.
-		this.rowGroup.element.onscroll = function (header) {
-			return function () {
-				var position = this.scrollTop;
-				if (this.scrollTop > 0) {
-					header.className = "table_header scrolling"
-				} else {
-					header.className = "table_header"
-				}
-			}
-		}(this.header.div.element)
-
-		// Now the resize event.
-		window.addEventListener('resize',
-			function (table) {
-				return function () {
-					table.rowGroup.element.style.height = (table.parent.element.offsetHeight - table.header.div.element.offsetHeight) - 15 + "px"
-				}
-			}(this), true);
-	}
 	// Refresh the parent table.
 	this.refresh()
 }
@@ -427,7 +194,6 @@ Table.prototype.clear = function () {
 	if (this.rows.length > 0) {
 		this.model.removeAllValues()
 		this.rows = []
-		this.rowsId = {}
 		this.rowGroup.element.innerHTML = ""
 		this.div.element.style.display = "none"
 		this.header.minimizeBtn.element.click()
@@ -442,7 +208,6 @@ Table.prototype.clear = function () {
 		this.header.div.element.parentNode.removeChild(this.header.div.element)
 		this.header = null
 	}
-
 }
 
 /**
@@ -520,17 +285,16 @@ Table.prototype.refresh = function () {
  * Return a row with a given id.
  */
 Table.prototype.getRow = function (id) {
-	if (this.rowsId[id] == undefined) {
-		// Here it can be a new row...
-		for (i = 0; i < this.rows.length; i++) {
-			if (this.rows[i].id === "") {
-				this.rows[i].id = id
-				this.rowsId[id] = this.rows[i]
-				break
+	// Function that dermine if the rows array already contain a given row.
+	var hasRow = function (id) {
+		return function (row) {
+			if (row.id === id) {
+				return row;
 			}
+			return null;
 		}
-	}
-	return this.rowsId[id]
+	}(id)
+	return this.rows.find(hasRow)
 }
 
 /**
@@ -552,31 +316,7 @@ Table.prototype.appendRow = function (values, id) {
 		// append the value in the model and update the table.
 		var data = this.model.appendRow(values)
 		row = new TableRow(this, this.rows.length, data, id)
-		this.rows[this.rows.length] = row
-		this.rowsId[id] = row
-
-		// Set the update listener for each row entity...
-		if (id.length > 0) {
-			if (this.model.constructor === EntityTableModel) {
-				server.entityManager.attach(this, UpdateEntityEvent, function (evt, table) {
-					if (evt.dataMap["entity"] != undefined) {
-						var entity = entities[evt.dataMap["entity"].UUID]
-						if (entity != undefined) {
-							for (var i = 0; i < table.model.entities.length; i++) {
-								if (table.model.entities[i] != undefined) {
-									if (table.model.entities[i].UUID == entity.UUID) {
-										row = row.table.appendRow(entity, entity.UUID)
-										entity.ParentLnk = row.table.model.entities[row.index].ParentLnk
-										row.table.model.entities[row.index] = entity
-										row.saveBtn.element.style.visibility = "hidden"
-									}
-								}
-							}
-						}
-					}
-				})
-			}
-		}
+		this.rows.push(row)
 	} else {
 		// Here i will update the values...
 		for (var i = 0; i < row.cells.length; i++) {
@@ -585,12 +325,6 @@ Table.prototype.appendRow = function (values, id) {
 			cell.setValue(this.model.values[this.rows.indexOf(row)][i])
 		}
 	}
-
-	// Display the table.
-	if (this.header == null) {
-		this.setHeader()
-	}
-	this.header.maximizeBtn.element.click()
 
 	return row
 }
@@ -638,7 +372,7 @@ var TableHeader = function (table) {
 	this.minimizeBtn = this.buttonDiv.appendElement({ "tag": "div", "class": "table_header_size_btn" }).down()
 	this.minimizeBtn.appendElement({ "tag": "i", "class": "fa fa-minus-square-o" })
 
-	this.numberOfRowLabel = this.buttonDiv.appendElement({ "tag": "div", "class": "number_of_row_label", "style": "display: none;" }).down()
+	this.numberOfRowLabel = this.buttonDiv.appendElement({ "tag": "div", "class": "number_of_row_label" }).down()
 
 	this.maximizeBtn.element.onclick = function (rowGroup, minimizeBtn, numberOfRowLabel) {
 		return function () {
@@ -653,7 +387,7 @@ var TableHeader = function (table) {
 		return function () {
 			this.style.display = "none"
 			if (rowGroup != null) {
-				rowGroup.element.style.display = "none"
+				rowGroup.element.style.display = ""
 			}
 			maximizeBtn.element.style.display = "table-cell"
 			if (table.rows.length > 0) {
@@ -666,6 +400,7 @@ var TableHeader = function (table) {
 	}(this.table.rowGroup, this.maximizeBtn, this.numberOfRowLabel, this.table)
 
 	this.minimizeBtn.element.click()
+	this.numberOfRowLabel.element.style.display = ""
 
 	// I will create the header cell...
 	for (var i = 0; i < table.model.getColumnCount(); i++) {
@@ -790,610 +525,57 @@ var TableRow = function (table, index, data, id) {
  * The table cell.
  * @param {Row} row The parent Row
  * @param {int} index The cell index.
- * @param {*} value The value of the cell. 
+ * @param {*} value The value of the cell.
  * @constructor
  */
 var TableCell = function (row, index, value) {
 	this.index = index
 	this.row = row
 	this.div = row.div.appendElement({ "tag": "div", "class": "body_cell" }).down()
-	this.valueDiv = this.div.appendElement({ "tag": "div", "class": "cell_value" }).down()
+	this.valueDiv = null
+
+	// The object that display the data value in the cell
+	this.renderer = new TableCellRenderer();
+
+	// The object to 
+	this.editor = new TableCellEditor(function (cell) {
+		return function () {
+			// Here I will remove the cell editor from the cell div.
+			cell.div.element.removeChild(cell.editor.editor.element);
+			cell.valueDiv.element.style.display = "";
+			cell.setValue(cell.editor.editor.element.value);
+		}
+	}(this));
 
 	if (value != null) {
-		var formatedValue
-		if (isObject(value)) {
-			if (value.M_valueOf != undefined) {
-				formatedValue = this.formatValue(value.M_valueOf)
-			} else {
-				formatedValue = this.formatValue(value)
+		// get the formated value
+		var fieldType = this.row.table.model.getColumnClass(this.index);
+		var formatedValue = this.renderer.render(value, fieldType);
+		if (formatedValue != undefined) {
+			if (formatedValue.element.tagName == "IMG") {
+				this.div.element.style.textAlign = "center";
 			}
-		} else {
-			formatedValue = this.formatValue(value)
-		}
-
-		if (formatedValue == undefined) {
-			return
-		}
-
-		if (formatedValue.constructor === Table) {
-			this.valueDiv.appendElement(formatedValue.div)
-		} else if (formatedValue.constructor === EntityPanel) {
-			this.valueDiv.appendElement(formatedValue.panel)
-		} else if (formatedValue.element != null) {
-			this.valueDiv.appendElement(formatedValue)
-		} else {
-			this.valueDiv.element.innerHTML = formatedValue
+			this.valueDiv = this.div.appendElement(formatedValue).down()
 		}
 	}
 
-	// Now the click event...
+	// Now the double click event...
 	this.div.element.ondblclick = function (cell) {
 		return function (e) {
 			e.stopPropagation()
-			cell.appendCellEditor(this.offsetWidth, this.offsetHeight)
+			cell.setCellEditor()
 		}
 	}(this)
-}
 
-// create an item link...
-function createItemLnk(entity, value, field, valueDiv) {
-	// Be sure we point to the map entity
-	if (entities[entity.UUID] != undefined) {
-		entity = entities[entity.UUID]
-	}
-
-	// Remove the content if any...
-	valueDiv.element.innerHTML = ""
-	var prototype = getEntityPrototype(value.TYPENAME)
-
-	var titles = []
-	if (value.getTitles != undefined) {
-		titles = value.getTitles()
-	} else {
-		titles = ["lnk"]
-	}
-
-	var refName = ""
-	for (var j = 0; j < titles.length; j++) {
-		refName += titles[j]
-		if (j < titles.length - 1) {
-			refName += " "
-		}
-	}
-
-	// I will display the remove button on case of user want to remove the linked entity.
-	var content = valueDiv.appendElement({ "tag": "div" }).down()
-	var ref = content.appendElement({ "tag": "div", "style": "display: inline; padding-left: 3px; vertical-align: text-bottom;" }).down().appendElement({ "tag": "a", "class": "entity_ref_lnk", "href": "#", "title": value.TYPENAME, "innerHtml": refName }).down()
-	ref.element.id = value.UUID
-	var deleteLnkButton = content.appendElement({ "tag": "div", "style": "display: inline; width: 100%;", "class": "row_button" }).down().appendElement({ "tag": "i", "class": "fa fa-trash", "style": "margin-left: 8px;" }).down()
-
-	ref.element.onclick = function (entity, ref, valueDiv, field) {
-		return function () {
-			// Here I ill display the entity panel...
-			if (ref.subEntityPanel == undefined) {
-				ref.subEntityPanel = new EntityPanel(valueDiv, entity.TYPENAME,
-					// The init callback. 
-					function (entityPanel) {
-						entityPanel.setEntity(entities[entity.UUID])
-					},
-					undefined, true, entity, field)
-			} else {
-				if (ref.subEntityPanel.panel.element.style.display == "none") {
-					ref.subEntityPanel.panel.element.style.display = ""
-				} else {
-					ref.subEntityPanel.panel.element.style.display = "none"
-				}
+	// The click event is use to edit array ...
+	if (this.getType().startsWith("[]")) {
+		this.div.element.onclick = function (cell) {
+			return function (e) {
+				e.stopPropagation()
+				cell.setArrayCellEditor()
 			}
-		}
-	}(value, ref, valueDiv, field)
-
-	// Now the delete action...
-	deleteLnkButton.element.onclick = function (entityUuid, object, field, content) {
-		return function () {
-			var entity = entities[entityUuid]
-			removeObjectValue(entity, field, object)
-			server.entityManager.saveEntity(entity,
-				function (result, content) {
-					// nothing to do here.
-					if (content.element.parentNode != null) {
-						content.element.parentNode.removeChild(content.element)
-					}
-				},
-				function (result, caller) {
-					// nothing to here.
-				},
-				content)
-		}
-	}(entity.UUID, value, field, content)
-	return content
-}
-
-/**
- * Fromat the content of the cell in respect of the value.
- * @param {} value The value to display in the cell.
- */
-TableCell.prototype.formatValue = function (value) {
-
-	// Format the cell value before display...
-	var fieldType = this.row.table.model.getColumnClass(this.index)
-	if (fieldType == undefined) {
-		return value
+		}(this)
 	}
-
-	// In case of a reference string...
-	if (fieldType.endsWith("string") && this.row.table.model.constructor === EntityTableModel) {
-		if (isObjectReference(value)) {
-			// In that case I will create the link object to reach the 
-			// reference...
-			fieldType = value.split("%")[0] + ":Ref"
-		}
-	}
-
-	// Binary string here.
-	if (fieldType.endsWith("base64Binary")) {
-		if (isString(value)) {
-			try {
-				value = JSON.parse(value);
-			} catch (e) {
-				/** Nothing here */
-			}
-		}
-
-		if (isString(value)) {
-			fieldType = "xs.string"
-		} else {
-			if (isArray(value)) {
-				for (var i = 0; i < value.length; i++) {
-					if (isObject(value[i])) {
-						fieldType = "[]" + value[i].TYPENAME + ":Ref"
-					} else if (isString(value[i])) {
-						fieldType = "xs.string"
-					}
-					// TODO do other types here...
-				}
-			} else {
-				if (isObject(value)) {
-					if (value.TYPENAME != undefined) {
-						fieldType = value.TYPENAME + ":Ref"
-					}
-				}
-			}
-		}
-	}
-
-	// if is extension of a base type.
-	var baseType = fieldType
-	if (!baseType.startsWith('[]xs.')) {
-		baseType = getBaseTypeExtension(fieldType)
-	}
-
-	var field = "M_" + this.row.table.model.titles[this.index]
-	var isArray_ = fieldType.startsWith("[]")
-	var formater = this.row.table.columnFormater
-	var isRef = fieldType.endsWith(":Ref")
-
-	fieldType = fieldType.replace("[]", "")
-
-	// if its xs type... 
-	var isBaseType = isXsBaseType(fieldType) || isXsBaseType(baseType) || field == "M_valueOf" || field == "M_listOf"
-	if (isBaseType) {
-		if (!isArray_) {
-			if (isXsDate(fieldType) || isXsDate(baseType)) {
-				value = formater.formatDate(value);
-				this.valueDiv.element.className = "xs_date"
-			} else if (isXsNumeric(fieldType) || isXsNumeric(baseType)) {
-				this.valueDiv.element.className = "xs_number"
-				if (isXsMoney(fieldType) || fieldType.indexOf("Price") != -1) {
-					value = formater.formatReal(value, 2)
-				} else {
-					value = formater.formatReal(value, 3)
-				}
-			} else if (isXsId(fieldType) || isXsId(baseType)) {
-				// here I have an entity now I need to know if is an abstact entity or not.
-				var entity = entities[this.row.table.model.entities[this.row.index].UUID]
-				if (entity == undefined) {
-					// In case of newly created entity.
-					entity = this.row.table.model.entities[this.row.index]
-				}
-				var entityType = entity.__class__
-				var entityPrototype = getEntityPrototype(entityType)
-				if (entityPrototype.IsAbstract) {
-					// Here I will treat it as a reference.
-					var field = "M_" + this.row.table.model.titles[this.index]
-					server.entityManager.getEntityByUuid(entity.UUID,
-						function (result, caller) {
-							var entity = caller.entity
-							if (entities[entity.UUID] != undefined) {
-								entity = entities[entity.UUID]
-							}
-							caller.createItemLnk(entity, result, caller.field, caller.valueDiv)
-						}, function () {
-
-						}, { "valueDiv": this.valueDiv, "field": field, "createItemLnk": createItemLnk, "entity": entity })
-					// Here will create an indermine 
-					if (entities[entity.UUID] == undefined) {
-						return new Element(null, { "tag": "progress", "innerHtml": "Unknown" })// return here...
-					}
-					return new Element(null, { "tag": "div", "innerHtml": "" })
-				} else {
-					// simply set the id as input...
-					this.valueDiv.element.className = "xs_id"
-					value = formater.formatString(value)
-				}
-
-			} else if (isXsRef(fieldType)) {
-				// Here I will put a text area..
-				this.valueDiv.element.className = "xs_ref"
-			} else if (isXsInt(fieldType)) {
-				this.valueDiv.element.className = "xs_number"
-			} else if (isXsBoolean(fieldType)) {
-				this.valueDiv.element.className = "xs_bool"
-			} else if (isXsString(fieldType)) {
-				this.valueDiv.element.className = "xs_string"
-				value = formater.formatString(value)
-			} else {
-				value = formater.formatString(value)
-			}
-		} else {
-			var content = this.valueDiv.getChildById(field + "_content")
-			if (content != undefined) {
-				return content
-			}
-
-			content = new Element(this.valueDiv, { "tag": "div", "style": "display: table-row;", "id": field + "_content" })
-			var newLnkButton = content.appendElement({ "tag": "div", "class": "new_row_button row_button", "id": field + "_plus_btn" }).down()
-			newLnkButton.appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
-
-			// A generic table.
-			var tableModel = new TableModel(["index", "values"])
-			tableModel.fields = ["xs.int", baseType.replace("[]", "")]
-			tableModel.editable[1] = true
-			var entity = entities[this.row.table.model.entities[this.row.index].UUID]
-			var itemTable = new Table(randomUUID(), content)
-
-			itemTable.setModel(tableModel, function (table, items, entity, field) {
-				return function () {
-					for (var i = 0; i < items.length; i++) {
-						row = table.appendRow([i + 1, items[i]], i /*entity.UUID*/)
-						// The delete row action...
-						row.deleteBtn.element.onclick = function (entity, field, row) {
-							return function () {
-								// Here I will simply remove the element 
-								// The entity must contain a list of field...
-								if (isString(entity)) {
-									entity = entities[entity]
-								}
-								if (entity[field] != undefined) {
-									entity[field].splice(row.index, 1)
-									entity.NeedSave = true
-									server.entityManager.saveEntity(entity)
-								}
-							}
-						}(entity, field, row)
-
-						// The save row action
-						row.saveBtn.element.onclick = function (entity, field, row) {
-							return function () {
-								// Here I will simply remove the element 
-								// The entity must contain a list of field...
-								if (isString(entity)) {
-									entity = entities[entity]
-								}
-								if (entity[field] != undefined) {
-									entity[field][row.index] = row.table.model.getValueAt(row.index, 1)
-									entity.NeedSave = true
-									server.entityManager.saveEntity(entity,
-										function (result, caller) {
-											caller.style.visibility = "hidden"
-										},
-										function () {
-
-										}, this)
-								}
-							}
-						}(entity, field, row)
-
-					}
-					table.refresh()
-				}
-			}(itemTable, value, this.row.table.model.entities[this.row.index].UUID, field))
-
-			// Here the new value...
-			newLnkButton.element.onclick = function (itemTable, entity, field, fieldType) {
-				return function () {
-					if (isString(entity)) {
-						entity = entities[entity]
-					}
-					var newRow = itemTable.appendRow([entity[field].length + 1, "0"], entity[field].length)
-					newRow.saveBtn.element.style.visibility = "visible"
-					simulate(newRow.cells[entity[field].length, 1].div.element, "dblclick");
-
-					newRow.deleteBtn.element.onclick = function (entity, field, row) {
-						return function () {
-							// Here I will simply remove the element 
-							// The entity must contain a list of field...
-							if (entity[field] != undefined) {
-								entity[field].splice(row.index, 1)
-								entity.NeedSave = true
-								server.entityManager.saveEntity(entity)
-							}
-						}
-					}(entity, field, newRow)
-
-					// The save row action
-					newRow.saveBtn.element.onclick = function (entity, field, row) {
-						return function () {
-							// Here I will simply remove the element 
-							// The entity must contain a list of field...
-							if (entity[field] != undefined) {
-								entity[field][row.index] = row.table.model.getValueAt(row.index, 1)
-								entity.NeedSave = true
-								if (entity.UUID != "") {
-									server.entityManager.saveEntity(entity,
-										function (result, caller) {
-											caller.style.visibility = "hidden"
-										},
-										function () {
-
-										}, this)
-								} else {
-									// Here the entity dosent exist...
-									server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity.TYPENAME, "", entity,
-										function (result, caller) {
-											caller.style.visibility = "hidden"
-										},
-										function () {
-
-										}, this)
-								}
-							}
-						}
-					}(entity, field, newRow)
-				}
-			}(itemTable, this.row.table.model.entities[this.row.index].UUID, field, fieldType)
-			return itemTable
-		}
-	} else {
-		if (isArray_) {
-			var entity = entities[this.row.table.model.entities[this.row.index].UUID]
-			if (entity == undefined) {
-				// In case of newly created entity.
-				entity = this.row.table.model.entities[this.row.index]
-			}
-
-			if (isRef) {
-
-				// In that case the array contain a list of reference.
-				// An entity table...
-				var prototype = getEntityPrototype(fieldType.replace("[]", "").replace(":Ref", ""))
-				var field = "M_" + this.row.table.model.titles[this.index]
-
-				var content = this.valueDiv.getChildById(field + "_content")
-				if (content != undefined) {
-					return content
-				}
-
-				content = new Element(this.valueDiv, { "tag": "div", "id": field + "_content", "style": "display: block;" })
-				// The append link button...
-				var newLnkButton = content.appendElement({ "tag": "div", "class": "new_row_button row_button", "id": field + "_plus_btn" }).down()
-				newLnkButton.appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
-
-				var valueDiv = content.appendElement({ "tag": "div", "style": "display: table-cell; width: 100%;" }).down().appendElement({ "tag": "div", "style": "display: table;" })
-				for (var i = 0; i < value.length; i++) {
-					var lnkDiv = valueDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
-					var uuid
-					if (isObject(value[i])) {
-						uuid = value[i].UUID
-					} else {
-						uuid = value[i]
-					}
-
-					var entity = this.row.table.model.entities[this.row.index]
-					entity = entities[entity.UUID]
-
-					if (uuid.length > 0 && isObjectReference(uuid)) {
-						if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
-							// In that case the value is a generic entity from arrary of byte so I will 
-							// create the function here.
-							// Here I must implement the set and reset function 
-							if (value[i].UUID != undefined) {
-								setRef(entity, field, value[i].UUID, false)
-							} else {
-								// In that case the reference is a string...
-								setRef(entity, field, value[i], false)
-							}
-						}
-
-						entity["set_" + field + "_" + uuid + "_ref"](
-							function (entity, field, valueDiv, createItemLnk) {
-								return function (ref) {
-									createItemLnk(entity, ref, field, valueDiv)
-								}
-							}(entity, field, lnkDiv, createItemLnk)
-						)
-					}
-				}
-
-				newLnkButton.element.onclick = function (valueDiv, entity, fieldType, field, cell) {
-					return function () {
-						var newLnkInput = valueDiv.getChildById("new_" + field + "_input_lnk")
-
-						if (newLnkInput != undefined) {
-							// remove from the layout
-							if (newLnkInput.element.parentNode) {
-								newLnkInput.element.parentNode.removeChild(newLnkInput.element)
-							}
-						}
-
-						// Now  i will create the new input box...
-						newLnkInput = valueDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down().appendElement({ "tag": "input", "id": "new_" + field + "_input_lnk", "style": "width: auto;" }).down()
-
-						// Now i will set it autocompletion list...
-						attachAutoCompleteInput(newLnkInput, fieldType, field, valueDiv, entity.getTitles(),
-							function (newLnkInput, entity, field, valueDiv, cell) {
-								return function (value) {
-									// I will get the value from the entity manager...
-									if (value.UUID.length > 0) {
-										value = entities[value.UUID]
-									}
-
-									if (entities[entity.UUID] != undefined) {
-										entity = entities[entity.UUID]
-									}
-
-									var lnkDiv = valueDiv.appendElement({ "tag": "div", "style": "display: table-row;" }).down()
-									createItemLnk(entity, value, field, lnkDiv)
-									newLnkInput.element.parentNode.removeChild(newLnkInput.element)
-									appendObjectValue(entity, field, value)
-									server.entityManager.saveEntity(entity)
-								}
-							}(newLnkInput, entity, field, valueDiv, cell))
-
-						newLnkInput.element.focus()
-						newLnkInput.element.select();
-					}
-				}(valueDiv, entity, prototype.TypeName, field, this)
-
-				return content
-			} else {
-				// Here i will append an array inside the array.
-				// The append link button...
-				var content = this.valueDiv.getChildById(field + "_content")
-				if (content != undefined) {
-					return content
-				}
-
-				content = new Element(this.valueDiv, { "tag": "div", "style": "display: table-row;", "id": field + "_content" })
-				var newLnkButton = content.appendElement({ "tag": "div", "class": "new_row_button row_button", "id": field + "_plus_btn" }).down()
-				newLnkButton.appendElement({ "tag": "i", "class": "fa fa-plus" }).down()
-				var prototype = getEntityPrototype(fieldType.replace("[]", ""))
-
-				if (value.length > 0) {
-					// An entity table...
-					var itemsTableModel = new EntityTableModel(prototype)
-					var itemTable = new Table(randomUUID(), content)
-
-					// Keep the table reference in the entity.
-					entity[field + "_table"] = itemTable
-
-					itemTable.setModel(itemsTableModel, function (itemsTable, values, field) {
-						return function () {
-							itemsTable.init() // connect events...
-							for (var i = 0; i < values.length; i++) {
-								if (values[i].UUID != undefined) {
-									values[i].ParentLnk = field
-									itemsTable.appendRow(values[i], values[i].UUID)
-								} else {
-									itemsTable.model.fields[0] = fieldType
-									itemsTable.appendRow(values[i], i)
-								}
-							}
-						}
-					}(itemTable, value, field))
-				}
-
-				// Here I will append a new entity as a table row.
-				newLnkButton.element.onclick = function (itemTable, entity, field, fieldType, content) {
-					return function () {
-						var item = eval("new " + fieldType + "()")
-						item.UUID = fieldType + "%" + randomUUID()
-						item.TYPENAME = fieldType
-
-						// I will push the item
-						if (entity[field] == undefined) {
-							entity[field] = []
-						}
-
-						entity[field].push(item)
-
-						// Set the parent uuid.
-						item.ParentUuid = entity.UUID
-						item.ParentLnk = field
-
-						if (itemTable == undefined) {
-							itemTable = entity[field + "_table"]
-						}
-						if (itemTable == undefined) {
-							var itemTable = new Table(randomUUID(), content)
-							var itemsTableModel = new EntityTableModel(getEntityPrototype(fieldType))
-							itemTable.setModel(itemsTableModel, function (table, item) {
-								return function () {
-									newRow = itemTable.appendRow(item, item.UUID)
-									newRow.saveBtn.element.style.visibility = "visible"
-								}
-							}(itemTable, item))
-
-						} else {
-							newRow = itemTable.appendRow(item, item.UUID)
-							newRow.saveBtn.element.style.visibility = "visible"
-						}
-
-					}
-				}(itemTable, entity, field, fieldType, content)
-
-				return itemTable
-			}
-		} else {
-			if (isRef) {
-				// The item panel contain the item lnk and the entity panel.
-				var field = "M_" + this.row.table.model.titles[this.index]
-				var content = this.valueDiv.getChildById(value)
-				if (content == undefined) {
-					content = new Element(this.valueDiv, { "tag": "div", "style": "display: block;", "id": value })
-				}
-
-				var uuid
-				if (isObject(value)) {
-					uuid = value.UUID
-				} else {
-					uuid = value
-				}
-
-				var entity = this.row.table.model.entities[this.row.index]
-				if (entity != undefined) {
-					entity = entities[entity.UUID]
-					if (uuid != undefined && entity != undefined) {
-						if (uuid.length > 0 && isObjectReference(uuid)) {
-							// TODO use setRef(owner, property, refValue, isArray) insted
-							if (entity["set_" + field + "_" + uuid + "_ref"] == undefined) {
-								// In that case the value is a generic entity from arrary of byte so I will 
-								// create the function here.
-								// Here I must implement the set and reset function 
-								if (value.UUID != undefined) {
-									setRef(entity, field, value.UUID, false)
-								} else {
-									// In that case the reference is a string...
-									setRef(entity, field, value, false)
-								}
-							}
-
-							entity["set_" + field + "_" + uuid + "_ref"](
-								function (entity, field, valueDiv, createItemLnk) {
-									return function (ref) {
-										createItemLnk(entity, ref, field, valueDiv)
-									}
-								}(entity, field, content, createItemLnk)
-							)
-						}
-					}
-				}
-
-				return content
-			} else {
-				// Here i will display a entity panel.
-				return new EntityPanel(this.valueDiv, fieldType.replace("[]", "").replace(":Ref", ""),
-					// The init callback. 
-					function (entity) {
-						return function (panel) {
-							panel.setEntity(entity)
-						}
-					}(value),
-					undefined, true, undefined, "")
-			}
-		}
-	}
-
-	return value
 }
 
 /**
@@ -1418,47 +600,26 @@ TableCell.prototype.getValue = function () {
  * @param {} value The value to set.
  */
 TableCell.prototype.setValue = function (value) {
+
 	if (this.valueDiv.element.innerHTML == value) {
 		// if the value is the same I dont need to change it.
 		return
 	}
 
-	// Remove the editor if there is one.
-	var editor = this.row.table.cellEditors[this.index]
-	if (editor != undefined) {
-		try {
-			// Remove it from it actual parent
-			editor.element.parentNode.removeChild(editor.element)
-			if (editor.resetPreviousValueDiv != undefined) {
-				editor.resetPreviousValueDiv()
-			}
-		} catch (err) {
-
-		}
-	}
-
-	// Display in the div...
-	if (isObject(value)) {
-		this.valueDiv.removeAllChilds()
-		this.valueDiv.element.innerHTML = ""
-		if (value.M_valueOf != undefined) {
-			this.valueDiv.element.innerHTML = this.formatValue(value.M_valueOf)
-		} else {
-			var formated = this.formatValue(value)
-			if (formated != undefined) {
-				this.valueDiv.appendElement(this.formatValue(formated))
-			}
-		}
-	} else {
-		var formated = this.formatValue(value)
-		if (isObject(formated)) {
-			this.valueDiv.removeAllChilds()
-			this.valueDiv.element.innerHTML = ""
-			this.valueDiv.appendElement(formated)
-		} else {
-			this.valueDiv.element.innerHTML = formated
+	// Get the formated value.
+	var fieldType = this.row.table.model.getColumnClass(this.index);
+	var formated = this.renderer.render(value, fieldType)
+	if (formated != undefined) {
+		// Special rule for IMG element...
+		if (formated.element.tagName == "IMG") {
+			this.div.element.style.textAlign = "center";
 		}
 
+		// Remove the content of the div.
+		this.div.removeAllChilds();
+
+		// Set it value.
+		this.valueDiv = this.div.appendElement(formated).down();
 	}
 
 	// Set the value div visible.
@@ -1485,417 +646,53 @@ TableCell.prototype.isEditable = function () {
 /**
  * Depending of the data type it return the correct cell editor.
  */
-TableCell.prototype.appendCellEditor = function (w, h) {
-	var column = this.index
-	var row = this.row.index
-	var width = this.row.table.header.getColumnWidth(column)
-
+TableCell.prototype.setCellEditor = function () {
+	// Set the editor...
 	if (this.isEditable() == false) {
 		return // The cell is not editable...
 	}
-	var type = this.getType()
-	var value = this.getValue()
-	var parent = this.row.table.rowGroup
-	var previousWidth = this.div.element.offsetWidth
 
-	var resetPreviousValueDiv = function (width, cell) {
-		return function () {
-			var table = cell.row.table
-			table.header.cells[cell.index].element.style.width = width + "px"
-			table.header.cells[cell.index].element.style.minWidth = width + "px"
-			cell.div.element.style.width = width + "px"
-			cell.div.element.style.minWidth = width + "px"
-			cell.valueDiv.element.style.display = ""
-		}
-	}(previousWidth, this)
+	// Here the cell is editable so I will display the cell editor.
+	this.editor.edit(this.getValue(), this.getType());
 
-	// I will get the cell editor related to this column...
-	var editor = this.row.table.cellEditors[this.index]
-	// One editor at time...
-	if (editor != undefined) {
-		try {
-			// Remove it from it actual parent
-			editor.element.parentNode.removeChild(editor.element)
-		} catch (err) {
+	// Hide the cell renderer div...
+	this.valueDiv.element.style.display = "none"
 
-		}
-		// append it in it new parent.
-		this.div.element.appendChild(editor.element)
-		editor.resetPreviousValueDiv()
-		editor.resetPreviousValueDiv = resetPreviousValueDiv
+	// Append the editor...
+	this.div.appendElement(this.editor.editor);
+	if (this.editor.editor.element.type != "number") {
+		this.editor.editor.element.setSelectionRange(0, this.editor.editor.element.value.length)
 	}
-
-	var prototype = this.row.table.model.proto
-
-	var entity = null
-	var field
-	var fieldType
-
-	if (prototype != null) {
-		// I will get the field...
-		var index = this.index + 3
-		if (this.row.table.model.query != undefined) {
-			field = this.row.table.model.query.Fields[this.index]
-			index = prototype.getFieldIndex(field)
-		}
-
-		fieldType = prototype.FieldsType[index]
-	}
-
-	// Keep intial state.
-	var isNull = editor == null
-
-	// Here is the default editor if is undefined...
-	if (isXsString(type)) {
-		// Here I will put a text area..
-		if (editor == null) {
-			if (value.length > 50) {
-				editor = this.div.appendElement({ "tag": "textarea", "resize": "false" }).down()
-			} else {
-				editor = this.div.appendElement({ "tag": "input" }).down()
-			}
-			editor.resetPreviousValueDiv = resetPreviousValueDiv
-		}
-		editor.element.value = value
-	} else if (isXsId(type)) {
-		// Here I will put a text area..
-		if (editor == null) {
-			editor = this.div.appendElement({ "tag": "input" }).down()
-			editor.resetPreviousValueDiv = resetPreviousValueDiv
-		}
-		if (value != undefined) {
-			editor.element.value = value
-		}
-	} else if (isXsRef(type)) {
-		// Here I will put a text area..
-		console.log("------> ref found!!!!")
-	} else if (isXsDate(type)) {
-		if (editor == null) {
-			editor = this.div.appendElement({ "tag": "input", "type": "datetime-local", "name": "date" }).down()
-			editor.resetPreviousValueDiv = resetPreviousValueDiv
-		}
-		editor.element.value = moment(value).format('YYYY-MM-DDTHH:mm:ss');
-		editor.element.step = 7
-	} else if (isXsNumeric(type)) {
-		if (editor == null) {
-			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "0.01" }).down()
-			editor.resetPreviousValueDiv = resetPreviousValueDiv
-		}
-		editor.element.value = value
-	} else if (isXsBoolean(type)) {
-		if (editor == null) {
-			editor = this.div.appendElement({ "tag": "input", "type": "checkbox" }).down()
-			editor.resetPreviousValueDiv = resetPreviousValueDiv
-		}
-		editor.element.checked = value
-	} else if (isXsInt(type)) {
-		if (editor == null) {
-			editor = this.div.appendElement({ "tag": "input", "type": "number", "step": "1" }).down()
-			editor.resetPreviousValueDiv = resetPreviousValueDiv
-		}
-		editor.element.value = value
-	} else if (prototype != null) {
-		// get the rentity reference from the model.
-		if (entity == null) {
-			if (this.row.table.model.entities[this.row.index].UUID.length > 0) {
-				if (entities[this.row.table.model.entities[this.row.index].UUID] != undefined) {
-					entity = entities[this.row.table.model.entities[this.row.index].UUID]
-				}
-			} else {
-				entity = this.row.table.model.entities[this.row.index]
-			}
-		}
-
-		// If is an object...
-		var isArray = type.startsWith("[]")
-		var isRef = type.endsWith(":Ref")
-		type = type.replace("[]", "").replace(":Ref", "")
-
-		if (isRef) {
-			// if the field is an array it will be display by another array in the array...
-			if (isArray) {
-				// nothing todo here...
-				//var editor = appendRefEditor(this.div, entity, type, field)
-			} else {
-
-				// The editor will be an input box
-				if (editor == null) {
-					editor = this.div.appendElement({ "tag": "input", "style": "display: inline;" }).down()
-					editor.resetPreviousValueDiv = resetPreviousValueDiv
-				}
-
-				editor.element.value = this.valueDiv.element.innerText
-
-				// hide the lnk...
-				this.valueDiv.element.style.display = "none"
-
-				// I will keep the reference of the new and delete button inside the editor itself.
-				editor.element.focus()
-				editor.element.select();
-
-				// Set clear function
-				editor.clear = function () {
-					return function () {
-						editor.element.value = ""
-					}
-				}(editor)
-
-				// Now i will set it autocompletion list...
-				attachAutoCompleteInput(editor, type, field, entity, [],
-					function (tableCell, entity, field, valueDiv, editor) {
-						return function (value) {
-							// Here I will set the field of the entity...
-							if (value != null) {
-								if (entity != undefined) {
-									// Show the save button
-									if (value.UUID.length > 0) {
-										value = entities[value.UUID]
-									}
-									if (document.getElementById(value.UUID + "_" + field + "_lnk") == undefined) {
-
-										appendObjectValue(entity, field, value)
-
-										var lnkDiv = valueDiv.appendElement({ "tag": "div", "id": value.UUID + "_" + field + "_lnk", "style": "display: table-row;" }).down()
-										createItemLnk(entity, value, field, lnkDiv)
-
-										delete tableCell.row.table.cellEditors[tableCell.index]
-
-										valueDiv.element.style.display = ""
-										tableCell.row.saveBtn.element.style.visibility = "visible"
-										entity.ParentLnk = tableCell.row.table.model.entities[tableCell.row.index].ParentLnk
-										tableCell.row.table.model.entities[tableCell.row.index] = entity
-										try {
-											editor.element.parentNode.removeChild(editor.element)
-											editor.resetPreviousValueDiv()
-										} catch (err) {
-										}
-									}
-								}
-							}
-						}
-					}(this, entity, field, this.valueDiv, editor))
-			}
-		} else {
-			// Here I will get the prototype for the field type
-			var fieldPrototype = getEntityPrototype(type)
-			// Here it's an enumeration of value.
-			if (fieldPrototype.Restrictions != undefined) {
-				if (fieldPrototype.Restrictions.length > 0) {
-					if (editor == null) {
-						editor = this.div.appendElement({ "tag": "select", "id": "" }).down()
-						editor.resetPreviousValueDiv = resetPreviousValueDiv
-						for (var i = 0; i < fieldPrototype.Restrictions.length; i++) {
-							var restriction = fieldPrototype.Restrictions[i]
-							if (restriction.Type == 1) {
-								type = "xs.string"
-								editor.appendElement({ "tag": "option", "value": restriction.Value, "innerHtml": restriction.Value })
-							}
-						}
-					}
-					// The value...
-					if (value != null) {
-						if (value.M_valueOf != undefined) {
-							entity = value
-							value = value.M_valueOf
-							field = "M_valueOf"
-							fieldType = getBaseTypeExtension(entity.TYPENAME)
-						}
-					}
-
-					// Set to the current value.
-					editor.element.value = value
-
-					// Hide the value div.
-					this.valueDiv.element.style.display = "none"
-				}
-			} else {
-				// Here the editor is an entity panel.
-				if (editor == null) {
-					var entityPanel = new EntityPanel(this.valueDiv, fieldPrototype.TypeName, function (parent, field, typeName, table, index) {
-						return function (panel) {
-							// Here I will set the actual values..
-							if (parent[field] != undefined && parent[field] != "") {
-								panel.setEntity(parent[field])
-							} else {
-								// Here the entity dosent already exist so I will create it...
-								var entity = eval("new " + typeName + "()")
-								entity.ParentLnk = field
-								server.entityManager.createEntity(parent.UUID, field, entity.TYPENAME, "", entity,
-									function (result, caller) {
-										// Set the newly created entity.
-										caller.entityPanel.setEntity(result)
-										caller.parent[caller.field] = result
-										entities[caller.parent.UUID] = caller.parent
-									},
-									function () {
-
-									}, { "entityPanel": panel, "parent": parent, "field": field })
-							}
-							panel.maximizeBtn.element.click()
-							panel.header.element.style.display = "none"
-						}
-					}(entity, field, fieldPrototype.TypeName, this.row.table, this.index))
-					editor = entityPanel.panel
-					editor.setEntity = function (entityPanel) {
-						return function (entity) {
-							entityPanel.setEntity(entity)
-						}
-					}(entityPanel)
-					editor.resetPreviousValueDiv = resetPreviousValueDiv
-				} else {
-					editor.setEntity(entity[field])
-				}
-			}
-		}
-	}
-
-	// Keep the editor in a map.
-	this.row.table.cellEditors[this.index] = editor
-	if (isNull) {
-		// Set the editor size...
-		if (editor.element.tagName != "SELECT") {
-			editor.element.style.width = w * 1.125 + "px"
-			if (editor.element.tagName == "TEXTAREA") {
-				editor.element.style.height = h + "px"
-			}
-
-			editor.element.style.border = "none"
-
-			editor.element.style.padding = "0px"
-			editor.element.style.margin = "2px"
-		}
-	}
-
-	// I will set the editor on the page...
-	if (editor != null) {
-		// Set the table header width
-		this.row.table.setHeadertWidth(this.index)
-
-		// When the selection change I will set the save button.
-		editor.element.onchange = function (row) {
-			return function () {
-				row.saveBtn.element.style.visibility = "visible"
-			}
-		}(this.row)
-
-		this.div.appendElement(editor)
-		this.valueDiv.element.style.display = "none"
-
-		editor.element.focus()
-		if (editor.element.select != undefined) {
-			editor.element.select()
-		}
-
-
-		var onblur = function (self, editor, onblur, field, entity) {
-			// If the value change...
-			return function () {
-				var value
-				if (this.type == "checkbox") {
-					value = this.checked
-				} else {
-					value = this.value
-				}
-
-				if (self.value != value) {
-					if (entity != undefined) {
-						entity[field] = value
-						entity.NeedSave = true
-						self.setValue(value)
-						// set the table entity.
-						if (self.row.table.model.entities[self.row.index].TYPENAME == entity.TYPENAME) {
-							self.row.table.model.entities[self.row.index] = entity
-						} else if (entity.ParentUuid == self.row.table.model.entities[self.row.index].UUID) {
-							self.row.table.model.entities[self.row.index][entity.ParentLnk] = entity
-						}
-					} else {
-						self.setValue(value)
-					}
-
-				}
-				if (editor.deleteButton != null) {
-					if (editor.deleteButton.element.parentNode != null) {
-						editor.deleteButton.element.parentNode.removeChild(editor.deleteButton.element)
-					}
-				}
-				editor.resetPreviousValueDiv()
-				if (this.parentNode != null) {
-					this.parentNode.removeChild(this)
-				}
-				self.valueDiv.element.style.display = ""
-				try {
-					editor.element.parentNode.removeChild(editor.element)
-				} catch (err) {
-
-				}
-			}
-		}(this, editor, onblur, field, entity)
-		editor.element.onblur = onblur
-
-		// In case of cell editor.
-		if (editor.element.tagName == "DIV") {
-			var keyUpListener = function (editor, cell, entity, field, fieldType, keyUpListener) {
-				return function (evt) {
-					evt.stopPropagation()
-					if (evt.keyCode == 27) {
-						editor.element.style.display = "none"
-						if (entity[field] == undefined) {
-							entity[field] = eval("new " + fieldType + "()")
-						}
-						if (cell.getValue() != entity[field]) {
-							cell.setValue(entity[field]) // Set the value.
-						}
-						cell.valueDiv.element.style.display = ""
-						document.body.removeEventListener("keyup", keyUpListener, true)
-						editor.resetPreviousValueDiv()
-					}
-				}
-			}(editor, this, entity, field, fieldPrototype.TypeName, keyUpListener)
-			document.body.addEventListener("keyup", keyUpListener, true)
-		} else {
-			editor.element.onkeyup = function (edtitor) {
-				return function (evt) {
-					if (evt.keyCode == 27) {
-						try {
-							// Remove it from it actual parent
-							editor.element.parentNode.removeChild(editor.element)
-						} catch (err) {
-
-						}
-						editor.resetPreviousValueDiv()
-					}
-				}
-			}(editor)
-		}
-	}
+	this.editor.editor.element.focus();
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//  The column formater...
-//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Column formater.
- * @constructor
+ * That function is use to display the delete button and append button for array.
  */
-var ColumnFormater = function () {
-	return this
+TableCell.prototype.setArrayCellEditor = function () {
+	console.log("--> I'm an array bitch!")
+	console.log("div ", this.div);
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//  Various value formating function.
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Format a date.
  * @param {date} value The date to format.
  * @param {format} format A string containing the format to apply, YYYY-MM-DD HH:mm:ss is the default.
  */
-ColumnFormater.prototype.formatDate = function (value, format) {
-
+function formatDate(value) {
 	// Try to convert from a unix time.
 	var date = new Date(value * 1000)
 	if ((date instanceof Date && !isNaN(date.valueOf()))) {
 		value = date
 	}
 
-	format = typeof format !== 'undefined' ? format : 'YYYY-MM-DD HH:mm:ss'
+	// Here I will use the browser 
+	var format = 'YYYY-MM-DD HH:mm:ss';
+
 	value = moment(value).format(format);
 	return value
 }
@@ -1905,7 +702,7 @@ ColumnFormater.prototype.formatDate = function (value, format) {
  * @param {real} value The number to format.
  * @param {int} digits The number of digits after the point.
  */
-ColumnFormater.prototype.formatReal = function (value, digits) {
+function formatReal(value, digits) {
 	if (digits == undefined) {
 		digits = 2
 	}
@@ -1917,7 +714,7 @@ ColumnFormater.prototype.formatReal = function (value, digits) {
  * Format a string to be display in a input or text area control.
  * @param {string} value The string to format.
  */
-ColumnFormater.prototype.formatString = function (value) {
+function formatString(value) {
 	if (value == null) {
 		return ""
 	}
@@ -1925,6 +722,256 @@ ColumnFormater.prototype.formatString = function (value) {
 		value = value.replace(/\r\n|\r|\n/g, "<br />")
 	}
 	return value
+}
+
+/**
+ * Format boolean value.
+ * @param {*} value 
+ */
+function formatBoolean(value) {
+	if (value == 1) {
+		return "true";
+	} else if (value == 0) {
+		return "false";
+	}
+	return value.toString();
+}
+
+// Format the value
+function formatValue(value, typeName) {
+	// Here I will display basic types.
+	if (isString(value)) {
+		// remove empty values.
+		if (value.startsWith("data:image/")) {
+			// In that case I got a picture so I will create an image from it.
+			var img = new Element(null, { "tag": "img", "src": value })
+			return img;
+		}
+		formatedValue = formatString(value);
+
+	} else if (isBoolean(value)) {
+		formatedValue = formatBoolean(value);
+	} else if (isInt(value)) {
+		// In case of a date.
+		if (isXsDate(typeName)) {
+			formatedValue = formatDate(value);
+		} else {
+			// Int are numeric value with 0 digit.
+			formatedValue = formatReal(value, 0);
+		}
+	} else if (isNumeric(value)) {
+		if (isXsMoney(typeName) || typeName.indexOf("Price") != -1) {
+			formatedValue = formatReal(value, 2)
+		} else {
+			formatedValue = formatReal(value, 3)
+		}
+	}
+
+	return formatedValue
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//  The cell editor...
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * That function will overide default edit function. It take a value as parameter and create 
+ * the editor that can edit it content.
+ */
+var editFcts = {}
+
+var TableCellEditor = function (onblur) {
+	// The underlying element.
+	this.editor = null;
+
+	// The on blur event listener.
+	this.onblur = onblur
+
+	return this
+}
+
+TableCellEditor.prototype.edit = function (value, typeName) {
+
+	if (editFcts[typeName] != null) {
+		// Here the function will create a custom editor for a given type.
+		this.editor = editFcts[typeName](value)
+		if (this.editor != null) {
+			this.editor.element.onblur = this.onblur;
+		}
+		return;
+	}
+
+	// If the editor does not already exist I will initialyse it.
+	if (isString(value)) {
+		if (isXsString(typeName)) {
+			// Here I will put a text area..
+			if (this.editor == null) {
+				if (value.length > 50) {
+					this.editor = new Element(null, { "tag": "textarea", "resize": "false" })
+				} else {
+					this.editor = new Element(null, { "tag": "input" })
+				}
+			}
+			// Set the string value.
+			this.editor.element.value = formatString(value);
+
+		} else if (isXsId(typeName)) {
+			// Here I will put a text area..
+			if (this.editor == null) {
+				this.editor = new Element(null, { "tag": "input" })
+			}
+			if (value != undefined) {
+				this.editor.element.value = value;
+			}
+		} else if (isXsRef(typeName)) {
+			// Here I will put a text area..
+			console.log("------> ref found!!!!")
+		}
+	} else if (isBoolean(value)) {
+		if (this.editor == null) {
+			this.editor = new Element(null, { "tag": "input", "type": "checkbox" });
+		}
+		this.editor.element.checked = value;
+	} else if (isInt(value)) {
+		// In case of a date.
+		if (isXsDate(typeName)) {
+			if (this.editor == null) {
+				this.editor = new Element(null, { "tag": "input", "type": "datetime-local", "name": "date" });
+			}
+			this.editor.element.value = moment(value).format('YYYY-MM-DDTHH:mm:ss');
+			this.editor.element.step = 7
+		} else {
+			if (this.editor == null) {
+				this.editor = new Element(null, { "tag": "input", "type": "number", "step": "1" });
+			}
+			this.editor.element.value = value;
+		}
+	} else if (isNumeric(value)) {
+		if (this.editor == null) {
+			this.editor = new Element(null, { "tag": "input", "type": "number", "step": "0.01" });
+		}
+		this.editor.element.value = value;
+	} else if (isArray(value)) {
+		// Here the value is an array...
+
+	} else if (isEntity(value)) {
+		// Here the value is an array...
+
+	}
+
+	// Set the on blur event.
+	if (this.editor != null) {
+		this.editor.element.onblur = this.onblur;
+	}
+}
+
+TableCellEditor.prototype.getValue = function () {
+
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//  The cell renderer...
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Column formater.
+ * @constructor
+ */
+var TableCellRenderer = function () {
+	return this
+}
+
+// You can overide default render function by setting the rendering 
+// function for a given type. The function must take a value as parameter and
+// return an element.
+// Here is an example to render the type xs.ID differently...
+// renderFcts["xs.ID"] = function(value){
+//	return new Element(null, {"tag":"div", "innerHtml":"Test " + value});
+// }
+var renderFcts = {};
+
+/**
+ * Fromat the content of the cell in respect of the value.
+ * @param {} value The value to display in the cell.
+ */
+TableCellRenderer.prototype.render = function (value, fieldType) {
+	// Depending of the data type I will call the appropriate formater...
+	var formatedValue = null;
+
+	if (renderFcts[fieldType] != undefined) {
+		// In that case I will use the overide function to render the cell.
+		return renderFcts[fieldType](value)
+	}
+
+
+	// I will us Javasript type to determine how I will display the data...
+	if (isArray(value)) {
+		// Format array create it own element.
+		var div = this.renderArray(value, fieldType);
+		return div;
+	} else if (isObject(value)) {
+		formatedValue = this.renderEntity(value, fieldType);
+	} else {
+		formatedValue = formatValue(value, fieldType);
+		if (isObjectReference(formatedValue)) {
+			// Here the value represent an object reference.
+
+		} else {
+			// Here I will create the 
+			if (formatedValue != null) {
+				return new Element(null, { "tag": "div", "class": fieldType.replaceAll(".", "_"), "innerHtml": formatedValue });
+			}
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Render array.
+ */
+TableCellRenderer.prototype.renderArray = function (values, typeName) {
+	// So here I will create an array inside an array...
+	if (values.length > 0) {
+		// I will use the first element of the array to determine how i will 
+		// create that new array.
+		if (values[0].getPrototype != undefined) {
+			// Here I got an array of entities.
+			var model = null;
+			var div = new Element(null, { "tag": "div" });
+
+			model = new EntityTableModel(values[0].getPrototype());
+			model.entities = values;
+			div.element.className = "entity_sub-table";
+			var table = new Table(randomUUID(), div)
+			table.setModel(model, function (table) {
+				return function () {
+					// init the table.
+					table.init()
+				}
+			}(table))
+		} else {
+			// Here the div contain a table of values.
+			var div = new Element(null, { "tag": "div", "style": "display: table; width: 100%;" });
+			for (var i = 0; i < values.length; i++) {
+				var row = div.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
+				var formatedValue = this.render(values[i], typeName.replace("[]", ""));
+				if (formatedValue != undefined) {
+					formatedValue.element.style.display = "table-cell"
+					formatedValue.element.style.width = "100%";
+					row.appendElement(formatedValue)
+				}
+			}
+		}
+		return div;
+	}
+}
+
+/**
+ * Format entity.
+ */
+TableCellRenderer.prototype.renderEntity = function (value, typeName) {
+	// Here I will get 
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2007,7 +1054,6 @@ var ColumnSorter = function (index, table) {
  * @params values The values to sort.
  */
 ColumnSorter.prototype.sortValues = function (values) {
-
 	// Sort each array...
 	values.sort(function (sorter) {
 		return function (row1, row2) {
@@ -2248,49 +1294,42 @@ ColumnFilter.prototype.isActive = function () {
 ColumnFilter.prototype.getValues = function () {
 	var values = new Array()
 	for (var i = 0; i < this.table.model.getRowCount(); i++) {
-		// Get unique value...
-		var value = this.table.model.getValueAt(i, this.index)
-		var formater = this.table.columnFormater
-		if (isXsDate(this.type)) {
-			value = formater.formatDate(value, this.table.filterFormat);
-		} else if (isXsNumeric(this.type) || isXsMoney(this.type)) {
-			var precision = 2
-			if (!isXsMoney(this.type)) {
-				precision = 3
+		// single value
+		if (!this.type.startsWith("[]")) {
+			// Get unique value...
+			var value = this.table.model.getValueAt(i, this.index)
+			value = formatValue(value, this.type)
+			var j = 0
+			for (j = 0; j < values.length; j++) {
+				if (values[j] == value) {
+					break
+				}
 			}
-			value = parseFloat(formater.formatReal(value, precision))
-		} else if (isXsString(this.type)) {
-			value = formater.formatString(value)
-		} else if (isXsInt(this.type)) {
-			value = parseInt(value)
-		} else if (isXsBoolean(this.type)) {
-			if (value == "true") {
-				value = true
-			} else {
-				value = false
-			}
-		} else if (isXsBinary(this.type)) {
-			console.log("Binary value found")
-		} else if (isXsTime(this.type)) {
-			value = parseInt(value)
-		}
-
-		var j = 0
-		for (j = 0; j < values.length; j++) {
-			if (values[j] == value) {
-				break
+			// replace existing value if already there...
+			values[j] = value
+		} else {
+			// multiple values
+			var values_ = this.table.model.getValueAt(i, this.index)
+			for (var j = 0; j < values_.length; j++) {
+				value = formatValue(values_[j], this.type)
+				var k = 0
+				for (k = 0; k < values.length; k++) {
+					if (values[k] == value) {
+						break
+					}
+				}
+				// replace existing value if already there...
+				values[k] = value
 			}
 		}
-		// replace existing value if already there...
-		values[j] = value
-	}
-
-	if (this.type == "int" || this.type == "real" || this.type == "float") {
-		values.sort(function sortNumber(a, b) {
-			return a - b;
-		})
-	} else {
-		values.sort()
+		// In case of integer number.
+		if (this.type == "int" || this.type == "real" || this.type == "float") {
+			values.sort(function sortNumber(a, b) {
+				return a - b;
+			})
+		} else {
+			values.sort()
+		}
 	}
 
 	return values
@@ -2307,9 +1346,8 @@ ColumnFilter.prototype.initFilterPanel = function () {
 		var values = this.getValues()
 		// So here I will create the list of values with checkbox...
 		for (var i = 0; i < values.length; i++) {
-
 			// I will append all the value independently...
-			this.appendFilter(values[i])
+			this.appendFilter(values[i].toString())
 		}
 	} else {
 

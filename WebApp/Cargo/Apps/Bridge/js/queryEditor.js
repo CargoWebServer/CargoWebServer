@@ -35,25 +35,27 @@ var QueryEditor = function (parent, file, initCallback) {
     this.isEql = file.M_name.endsWith(".eql") || file.M_name.endsWith(".EQL")
 
     this.panel = parent.appendElement({ "tag": "div", "class": "query_editor" }).down()
-    this.mainArea = this.panel.appendElement({ "tag": "div", "style": "display: table; width:100%; height:100%" }).down()
 
     // So the panel will be divide in tow parts...
     // The query panel.
-    var splitArea1 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-row; position: relative; with:100%; height: auto;" }).down()
-
+    var splitArea1 = this.panel.appendElement({ "tag": "div", "class":"query_editor_splitter_area" }).down()
+    
     // The edition panel.
     this.editQueryPanel = new Element(splitArea1, { "tag": "div", "class": "edit_query_panel" })
 
     // The splitter.
-    var queryEditorSplitor = this.mainArea.appendElement({ "tag": "div", "class": "splitter horizontal", "id": "query_editor_splitor" }).down()
+    var queryEditorSplitor = splitArea1.appendElement({ "tag": "div", "class": "splitter horizontal", "id": "query_editor_splitter" }).down()
+    queryEditorSplitor.element.style.bottom = "0px"; // set the position of the splitter...
+    splitArea1.element.style.flexBasis = "50%"; // Set the initial size of the area
+    splitArea1.element.style.paddingBottom = queryEditorSplitor.element.offsetHeight + "px"; // compensate for the height of the slitter (position absolute...)
 
     // The result panel.
-    var splitArea2 = this.mainArea.appendElement({ "tag": "div", "style": "display: table-row; position: relative; width: 100%; height:100%;" }).down()
-
-    this.resultQueryPanel = new Element(splitArea2, { "tag": "div", "class": "result_query_panel", "style": "position: relative;" })
+    var splitArea2 = this.panel.appendElement({ "tag": "div",  "class":"query_editor_splitter_area"}).down()
+    splitArea2.element.style.flexGrow = 1;
+    this.resultQueryPanel = new Element(splitArea2, { "tag": "div", "class": "result_query_panel" })
 
     // Init the splitter action.
-    initSplitter(queryEditorSplitor, this.editQueryPanel)
+    initSplitter(queryEditorSplitor, splitArea1)
 
     var filePanel = this.editQueryPanel.appendElement({ "tag": "div", "class": "filePanel", "id": file.UUID + "_query_editor", "innerHtml": decode64(file.M_data) }).down()
     this.editor = ace.edit(file.UUID + "_query_editor");
@@ -533,8 +535,8 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                     table.setModel(model, function (table, queryEditor) {
                         return function () {
                             // init the table.
-                            table.parent.element.style.position = "relative"
                             table.init()
+                            table.header.maximizeBtn.element.click()
                         }
                     }(table, this))
 

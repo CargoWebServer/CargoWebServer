@@ -1,27 +1,36 @@
 /** occupy the workspace **/
 .query_editor{
+    display: flex;
+    flex-direction: column;
+    width:100%; 
+    height:100%;
+    background-color: transparent;
+    font: 14px Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
+}
+
+#query_editor_splitter{
+    display: flex;
+}
+
+.query_editor_splitter_area {
+    position: relative;
+    display: flex;
+    /*flex-basis: 50%;*/
+    overflow: hidden;
+}
+
+.edit_query_panel{
+    width: 100%;
+    overflow: hidden;
+}
+
+.result_query_panel{
     position: absolute;
     top: 0px;
     bottom: 0px;
     left: 0px;
     right: 0px;
-    background-color: transparent;
-    font: 14px Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
-}
-
-.edit_query_panel{
-    display: table-cell;
-    width: 100%;
-    height: 50%;
-    position: relative;
-}
-
-.result_query_panel{
-    display: table-cell;
-    width: 100%;
-    height: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow: auto;
 }
 
 .table_header.scrolling{   
@@ -37,5 +46,5 @@
 }
 
 .result_query_panel .row_button .fa-trash-o {
-    display: table-cell;
+    display: /*table-cell*/ none;
 }

@@ -27,7 +27,8 @@
  * @param titles The list of table headers
  */
 var TableModel = function (titles) {
-
+    // The table that use this model.
+    this.table = null
     // The titles to display in the headers, this must follow the fields...
     this.titles = titles
     this.values = []
@@ -204,7 +205,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
             function (index, total, caller) {
                 // nothing to do here
                 if (caller.progressCallback != undefined) {
-                caller.progressCallback(index, total, caller.caller)
+                    caller.progressCallback(index, total, caller.caller)
                 }
             },
             // Success callack
@@ -215,7 +216,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
                     table.model.appendRow(results[i], results[i].UUID)
                 }
 
-                if(caller.successCallback!=undefined){
+                if (caller.successCallback != undefined) {
                     caller.successCallback(results, caller.caller)
                 }
 
@@ -242,6 +243,92 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
             caller.initCallback = undefined
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Event listener connection here.
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /* The delete entity event **/
+    server.entityManager.attach(this, DeleteEntityEvent, function (evt, table) {
+        // So here I will remove the line from the table...
+        var toDelete = evt.dataMap["entity"]
+        if (entities[toDelete.UUID] != undefined) {
+            toDelete = entities[toDelete.UUID]
+        }
+
+        if (toDelete.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(toDelete.TYPENAME) != -1) {
+            // So here I will remove the line from the model...
+            var orderedRows = []
+            for (var i = 0; i < table.orderedRows.length; i++) {
+                var row = table.orderedRows[i]
+                if (row.id != toDelete.UUID) {
+                    orderedRows.push(row)
+                } else {
+                    // remove from the display...
+                    row.div.element.parentNode.removeChild(row.div.element)
+                }
+            }
+
+            // Now set the model values and entities.
+            var values = []
+            var entities_ = []
+            for (var i = 0; i < table.model.entities.length; i++) {
+                if (table.model.entities[i].UUID != toDelete.UUID) {
+                    var entity = table.model.entities[i]
+                    if (entities[entity.UUID] != undefined) {
+                        entity = table.model.entities[i] = entities[entity.UUID]
+                    }
+                    entities_.push(entity)
+                    values.push(table.model.values[i])
+                }
+            }
+            // Set the values...
+            table.model.values = values
+            table.model.entities = entities_
+
+            table.orderedRows = orderedRows
+
+            var rows = []
+
+            for (var i = 0; i < table.rows.length; i++) {
+                if (table.header == null) {
+                    table.setHeader()
+                }
+                var row = table.rows[i]
+                if (row.id != toDelete.UUID) {
+                    row.index = rows.length
+                    rows.push(row)
+                } else {
+                    // remove from the display...
+                    if (row.div.element.parentNode != null) {
+                        row.div.element.parentNode.removeChild(row.div.element)
+                    }
+                }
+            }
+
+            table.rows = rows
+            table.refresh()
+        }
+    })
+
+    // The new entity event...
+    server.entityManager.attach(this, NewEntityEvent, function (evt, model) {
+        if (evt.dataMap["entity"] != undefined) {
+            var entity = entities[evt.dataMap["entity"].UUID]
+            if (entity != undefined) {
+                if (entity.TYPENAME == model.proto.TypeName || model.proto.SubstitutionGroup.indexOf(entity.TYPENAME) != -1) {
+                    if (entity.ParentUuid != undefined && model.getParentUuid() != undefined) {
+                        if (model.getParentUuid() == entity.ParentUuid) {
+                            /*var row = table.appendRow(entity, entity.UUID)
+                            row.table.model.entities[row.index] = entity
+                            row.saveBtn.element.style.visibility = "hidden"
+                            */
+                        }
+                    }
+                }
+            }
+        }
+    })
 
 }
 
@@ -331,10 +418,10 @@ EntityTableModel.prototype.appendRow = function (values) {
     }
 
 
-    if(!objectPropInArray(this.entities, "UUID", values.UUID)){
+    if (!objectPropInArray(this.entities, "UUID", values.UUID)) {
         this.entities.push(values)
     }
-    
+
 
     var isListOf_ = isListOf(this.proto.TypeName)
     var objectValues = []
@@ -366,6 +453,24 @@ EntityTableModel.prototype.appendRow = function (values) {
             this.values.push(objectValues)
         }
     }
+
+    // Set the update listener for each row entity...
+    server.entityManager.attach(this, UpdateEntityEvent, function (evt, model) {
+        if (evt.dataMap["entity"] != undefined) {
+            var entity = entities[evt.dataMap["entity"].UUID]
+            if (entity != undefined) {
+                for (var i = 0; i < model.entities.length; i++) {
+                    if (model.entities[i] != undefined) {
+                        if (model.entities[i].UUID == entity.UUID) {
+                            model.entities[i] = entity
+                            model.table.refresh();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    })
 
     return objectValues
 }
@@ -493,6 +598,44 @@ SqlTableModel.prototype.init = function (successCallback, progressCallback, erro
             server.errorManager.onError(errMsg)
         },
         { "tableModel": this, "caller": caller, "successCallback": successCallback, "progressCallback": progressCallback })
+
+    /* The delete row event **/
+    server.dataManager.attach(this, DeleteRowEvent, function (evt, table) {
+        // So here I will remove the line from the table...
+        if (evt.dataMap.tableName == table.id) {
+            // So here I will remove the line from the model...F
+            table.model.removeRow(evt.dataMap.id_0)
+
+            var orderedRows = []
+            for (var rowIndex in table.orderedRows) {
+                var row = table.orderedRows[rowIndex]
+                if (row.id != evt.dataMap.id_0) {
+                    orderedRows.push(row)
+                } else {
+                    // remove from the display...
+                    row.div.element.parentNode.removeChild(row.div.element)
+                }
+            }
+
+            table.orderedRows = orderedRows
+
+            var rows = []
+            for (var rowIndex in table.rows) {
+                var row = table.rows[rowIndex]
+                if (row.id != evt.dataMap.id_0) {
+                    row.index = rows.length
+                    rows.push(row)
+                } else {
+                    // remove from the display...
+                    if (row.div.element.parentNode != null) {
+                        row.div.element.parentNode.removeChild(row.div.element)
+                    }
+                }
+            }
+            table.rows = rows
+            table.refresh()
+        }
+    })
 }
 
 
