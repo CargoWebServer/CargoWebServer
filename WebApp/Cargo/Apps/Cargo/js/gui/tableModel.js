@@ -249,17 +249,17 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /* The delete entity event **/
-    server.entityManager.attach(this, DeleteEntityEvent, function (evt, table) {
+    server.entityManager.attach(this, DeleteEntityEvent, function (evt, model) {
         // So here I will remove the line from the table...
-        var toDelete = evt.dataMap["entity"]
+        /*var toDelete = evt.dataMap["entity"]
         if (entities[toDelete.UUID] != undefined) {
             toDelete = entities[toDelete.UUID]
         }
 
-        if (toDelete.TYPENAME == table.model.proto.TypeName || table.model.proto.SubstitutionGroup.indexOf(toDelete.TYPENAME) != -1) {
+        if (toDelete.TYPENAME == model.proto.TypeName || model.proto.SubstitutionGroup.indexOf(toDelete.TYPENAME) != -1) {
             // So here I will remove the line from the model...
             var orderedRows = []
-            for (var i = 0; i < table.orderedRows.length; i++) {
+            for (var i = 0; i < model.table.orderedRows.length; i++) {
                 var row = table.orderedRows[i]
                 if (row.id != toDelete.UUID) {
                     orderedRows.push(row)
@@ -272,29 +272,29 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
             // Now set the model values and entities.
             var values = []
             var entities_ = []
-            for (var i = 0; i < table.model.entities.length; i++) {
-                if (table.model.entities[i].UUID != toDelete.UUID) {
-                    var entity = table.model.entities[i]
+            for (var i = 0; i < model.entities.length; i++) {
+                if (model.entities[i].UUID != toDelete.UUID) {
+                    var entity = model.entities[i]
                     if (entities[entity.UUID] != undefined) {
-                        entity = table.model.entities[i] = entities[entity.UUID]
+                        entity = model.entities[i] = entities[entity.UUID]
                     }
                     entities_.push(entity)
-                    values.push(table.model.values[i])
+                    values.push(model.values[i])
                 }
             }
             // Set the values...
-            table.model.values = values
-            table.model.entities = entities_
+            model.values = values
+            model.entities = entities_
 
-            table.orderedRows = orderedRows
+            model.table.orderedRows = orderedRows
 
             var rows = []
 
-            for (var i = 0; i < table.rows.length; i++) {
-                if (table.header == null) {
-                    table.setHeader()
+            for (var i = 0; i < model.table.rows.length; i++) {
+                if (model.table.header == null) {
+                    model.table.setHeader()
                 }
-                var row = table.rows[i]
+                var row = model.table.rows[i]
                 if (row.id != toDelete.UUID) {
                     row.index = rows.length
                     rows.push(row)
@@ -306,9 +306,9 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
                 }
             }
 
-            table.rows = rows
-            table.refresh()
-        }
+            model.table.rows = rows
+            model.table.refresh()
+        }*/
     })
 
     // The new entity event...
@@ -388,7 +388,7 @@ EntityTableModel.prototype.removeRow = function (rowIndex, callback) {
 
             var index = prototype.Indexs[1] // 0 is the uuid...
 
-            confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entity.getTitles() + "?" })
+            confirmDialog.content.appendElement({ "tag": "span", "innerHtml": "Do you want to delete entity " + entity.getTitles()[0] + "?" })
             confirmDialog.ok.element.onclick = function (dialog, entity, model) {
                 return function () {
                     // I will call delete file

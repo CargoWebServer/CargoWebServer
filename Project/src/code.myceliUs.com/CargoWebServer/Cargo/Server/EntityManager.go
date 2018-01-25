@@ -172,6 +172,7 @@ func (this *EntityManager) removeEntity(uuid string) {
  * That function is use to delete an entity from the store.
  */
 func (this *EntityManager) deleteEntity(toDelete Entity) {
+	log.Println(toDelete)
 	// first of all i will remove it from the cache.
 	this.removeEntity(toDelete.GetUuid())
 
@@ -245,7 +246,8 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 			// First I will remove it from parent childs...
 			parent := toDelete.GetParentPtr()
 			parent.RemoveChild(toDelete.GetParentLnk(), toDelete.GetUuid())
-			toSaves = append(toSaves, parent)
+			parent.SetNeedSave(true)
+			parent.SaveEntity()
 		}
 	}
 
@@ -1319,7 +1321,6 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 
 	// Try to cast the value as needed...
 	if reflect.TypeOf(values).String() == "map[string]interface {}" {
-
 		restrictionError := applyEntityRestrictions(values.(map[string]interface{}))
 		if restrictionError != nil {
 			errObj := NewError(Utility.FileLine(), PROTOTYPE_RESTRICTIONS_ERROR, SERVER_ERROR_CODE, restrictionError)
@@ -1357,13 +1358,10 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 
 	// Set the relation name with it parent.
 	entity.(Entity).SetParentLnk(attributeName)
-
 	if this.isExist(entity.(Entity).GetUuid()) {
 		// Here because I use the New methode the value is in the cache so
 		// I need to remove it...
 		this.removeEntity(entity.(Entity).GetUuid())
-		cargoError := NewError(Utility.FileLine(), ENTITY_ALREADY_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The entity '"+entity.(Entity).GetUuid()+"' already exist!"))
-		return nil, cargoError
 	}
 
 	// Save the entity...
@@ -1382,7 +1380,6 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		} else {
 			// Append the child into it parent and save it.
 			parentPtr.AppendChild(attributeName, entity.(Entity))
-
 			// Set need save at true.
 			parentPtr.SetNeedSave(true)
 			parentPtr.SaveEntity()

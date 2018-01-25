@@ -1527,6 +1527,11 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 
 						if v == nil && this.getValue(field) != nil {
 							toRemove = this.getValue(field).(string)
+							if reflect.TypeOf(this.getValue(field)).String() == "map[string]interface {}" {
+								toRemove = this.getValue(field).(map[string]interface{})["UUID"].(string)
+							} else if reflect.TypeOf(this.getValue(field)).String() == "string" {
+								toRemove = this.getValue(field).(string)
+							}
 						} else if v != nil && this.getValue(field) != nil {
 							if reflect.TypeOf(this.getValue(field)).String() == "map[string]interface {}" {
 								if v.(map[string]interface{})["UUID"] != this.getValue(field) {
@@ -1762,6 +1767,8 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 											this.setValue(k, val)
 										} else {
 											log.Panicln("---------> Convertion error: from ", reflect.TypeOf(this.getValue(k)).Kind(), " to ", reflect.TypeOf(v).Kind())
+											log.Println("-----> ", this.getValue(k))
+											log.Println("-----> ", v)
 										}
 									}
 

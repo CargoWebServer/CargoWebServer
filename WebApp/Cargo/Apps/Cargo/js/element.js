@@ -258,18 +258,20 @@ Element.prototype.appendElement = function (e) {
 * @stability 1
 */
 Element.prototype.prependElement = function (e) {
+    if(e == null){
+        return
+    }
+    
     if (e.element != undefined) {
         e.parentElement = this
         this.childs[e.id] = e
         this.lastChild = e
         if (e.element.innerHTML != undefined) {
-            if (e.element.innerHTML.length > 0) {
-                if (this.element.childNodes.length > 0) {
-                    var firstChild = this.element.childNodes[0]
-                    this.element.insertBefore(e.element, firstChild)
-                } else {
-                    this.element.appendChild(e.element)
-                }
+            if (this.element.childNodes.length > 0) {
+                var firstChild = this.element.childNodes[0]
+                this.element.insertBefore(e.element, firstChild)
+            } else {
+                this.element.appendChild(e.element)
             }
         }
 
@@ -390,7 +392,7 @@ Element.prototype.getChildsByClassName = function (className, childs) {
         childs = []
     }
 
-    if (this.element.className == className) {
+    if (this.element.className.indexOf(className) != -1) {
         childs.push(this)
     }
 
@@ -410,7 +412,7 @@ Element.prototype.getChildsByClassName = function (className, childs) {
 */
 Element.prototype.getTopParent = function () {
     if (this.parentElement != null) {
-        if(this.parentElement.getTopParent != undefined){
+        if (this.parentElement.getTopParent != undefined) {
             return this.parentElement.getTopParent()
         }
     }

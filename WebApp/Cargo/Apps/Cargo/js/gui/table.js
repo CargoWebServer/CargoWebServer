@@ -485,7 +485,7 @@ var TableRow = function (table, index, data, id) {
 
 	this.div = table.rowGroup.appendElement({ "tag": "div", "class": "table_row", "id": this.id }).down()
 
-	this.saveBtn = this.div.appendElement({ "tag": "div", "class": "row_button", "style": "visibility: hidden;", "id": id + "_delete_btn" }).down()
+	this.saveBtn = this.div.appendElement({ "tag": "div", "class": "row_button save_row_btn", "style": "visibility: hidden;", "id": this.id + "_save_btn" }).down()
 		.appendElement({ "tag": "i", "class": "fa fa-floppy-o" }).down()
 
 	this.saveBtn.element.onclick = function (row) {
@@ -502,7 +502,7 @@ var TableRow = function (table, index, data, id) {
 	}
 
 	// The delete button.
-	this.deleteBtn = this.div.appendElement({ "tag": "div", "class": "row_button", "id": id + "_delete_btn" }).down()
+	this.deleteBtn = this.div.appendElement({ "tag": "div", "style": "visibility: hidden;", "class": "row_button delete_row_btn", "id": this.id + "_delete_btn" }).down()
 		.appendElement({ "tag": "i", "class": "fa fa-trash-o" }).down()
 
 	// Now the action...
@@ -535,15 +535,15 @@ var TableCell = function (row, index, value) {
 	this.valueDiv = null
 
 	// The object that display the data value in the cell
-	this.renderer = new TableCellRenderer();
+	this.renderer = new TableCellRenderer(this);
 
 	// The object to 
-	this.editor = new TableCellEditor(function (cell) {
+	this.editor = new TableCellEditor(this, function (cell) {
 		return function () {
 			// Here I will remove the cell editor from the cell div.
 			cell.div.element.removeChild(cell.editor.editor.element);
 			cell.valueDiv.element.style.display = "";
-			cell.setValue(cell.editor.editor.element.value);
+			cell.setValue(cell.editor.getValue());
 		}
 	}(this));
 
@@ -559,20 +559,28 @@ var TableCell = function (row, index, value) {
 		}
 	}
 
-	// Now the double click event...
-	this.div.element.ondblclick = function (cell) {
-		return function (e) {
-			e.stopPropagation()
-			cell.setCellEditor()
-		}
-	}(this)
-
 	// The click event is use to edit array ...
 	if (this.getType().startsWith("[]")) {
-		this.div.element.onclick = function (cell) {
+		// On mouse enter I will append the functionality to edit cells...
+		this.div.element.onmouseenter = function (cell) {
 			return function (e) {
 				e.stopPropagation()
 				cell.setArrayCellEditor()
+			}
+		}(this)
+
+		this.div.element.onmouseleave = function (cell) {
+			return function (e) {
+				e.stopPropagation()
+				cell.resetArrayCellEditor()
+			}
+		}(this)
+	} else {
+		// Now the double click event...
+		this.div.element.ondblclick = function (cell) {
+			return function (e) {
+				e.stopPropagation()
+				cell.setCellEditor()
 			}
 		}(this)
 	}
@@ -600,10 +608,15 @@ TableCell.prototype.getValue = function () {
  * @param {} value The value to set.
  */
 TableCell.prototype.setValue = function (value) {
-
-	if (this.valueDiv.element.innerHTML == value) {
-		// if the value is the same I dont need to change it.
+	if (this.valueDiv == undefined) {
 		return
+	}
+
+	if (!isArray(value)) {
+		if (this.valueDiv.element.innerHTML == value) {
+			// if the value is the same I dont need to change it.
+			return
+		}
 	}
 
 	// Get the formated value.
@@ -646,32 +659,197 @@ TableCell.prototype.isEditable = function () {
 /**
  * Depending of the data type it return the correct cell editor.
  */
-TableCell.prototype.setCellEditor = function () {
+TableCell.prototype.setCellEditor = function (index) {
 	// Set the editor...
 	if (this.isEditable() == false) {
 		return // The cell is not editable...
 	}
 
-	// Here the cell is editable so I will display the cell editor.
-	this.editor.edit(this.getValue(), this.getType());
+	if (index == undefined) {
+		// Here the cell is editable so I will display the cell editor.
+		this.editor.edit(this.getValue(), this.getType());
 
-	// Hide the cell renderer div...
-	this.valueDiv.element.style.display = "none"
+		// Hide the cell renderer div...
+		this.valueDiv.element.style.display = "none"
+		// Append the editor...
+		this.div.appendElement(this.editor.editor);
+	} else {
+		// So the the cell editor is in the row...
+		var row = this.valueDiv.childs[Object.keys(this.valueDiv.childs)[index]]
+		if (row == undefined) {
+			row = this.valueDiv.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
+		}
+		// I will hide the actual value...
+		var valueDiv = row.element.firstChild;
 
-	// Append the editor...
-	this.div.appendElement(this.editor.editor);
-	if (this.editor.editor.element.type != "number") {
-		this.editor.editor.element.setSelectionRange(0, this.editor.editor.element.value.length)
+		// Here the cell is editable so I will display the cell editor.
+		this.editor.edit(this.getValue()[index], this.getType().replace("[]", ""), function (row, cell, index) {
+			return function () {
+				// get the value from the editor and set it in the cell
+				var values = cell.getValue()
+				// must not use the closure directly...
+				values[index] = cell.editor.getValue();
+				cell.setValue(values);
+				row.element.removeChild(row.element.firstChild)
+				if (row.element.firstChild != undefined) {
+					row.element.firstChild.style.display = "";
+				}
+				cell.row.table.refresh();
+			}
+		}(row, this, index));
+
+		row.prependElement(this.editor.editor);
 	}
-	this.editor.editor.element.focus();
+	if (this.editor.editor != null) {
+		if (this.editor.editor.element.type != "number") {
+			this.editor.editor.element.setSelectionRange(0, this.editor.editor.element.value.length)
+		}
+		if (valueDiv != undefined) {
+			valueDiv.style.display = "none";
+		}
+		this.editor.editor.element.focus();
+	}
 }
 
 /**
  * That function is use to display the delete button and append button for array.
  */
 TableCell.prototype.setArrayCellEditor = function () {
-	console.log("--> I'm an array bitch!")
-	console.log("div ", this.div);
+	if (this.div.getChildById("appendRowBtn") == undefined) {
+		// First of all I will append the append row button
+		this.div.element.style.position = "relative";
+		this.div.element.style.display = "table-cell";
+		this.div.element.style.paddingRight = "17px";
+
+		this.div.appendElement({ "tag": "div", "class": "row_button", "id": "appendRowBtn", "style": "position: absolute; top: 0px; right: 0px;" }).down()
+			.appendElement({ "tag": "i", "class": "fa fa-plus" });
+		var appendRowBtn = this.div.getChildById("appendRowBtn");
+
+		appendRowBtn.element.onclick = function (cell) {
+			return function (evt) {
+				evt.stopPropagation();
+				if (cell.valueDiv == undefined) {
+					cell.valueDiv = cell.div.appendElement({ "tag": "div", "style": "display: table; width: 100%;" }).down();
+				}
+
+				// Here I will append a new cell and set it editor.
+				var values = cell.getValue();
+				var typeName = cell.getType().replace("[]", "");
+				// Depending of the values type I will append different value...
+				if (isXsString(typeName)) {
+					values.push("");
+				} else if (isXsInt(typeName)) {
+					values.push(0);
+				} else if (isXsNumeric(typeName)) {
+					values.push(0.0);
+				} else if (isXsBoolean(typeName)) {
+					values.push(false);
+				} else if (typeName.endsWith(":Ref")) {
+					// Here I will push an empty string...
+					values.push("");
+				} else {
+					// Asynch here...
+					var parentEntity = cell.row.table.model.entities[cell.row.index];
+					var parentLnk = "M_" + cell.row.table.model.titles[cell.index]
+
+					// Here I will test if is an entity prototype and if it is I will create an new object of that type.
+					server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
+						// success callback.
+						function (prototype, caller) {
+							// so here I will create an new entity inside it parent.
+							var entity = eval("new " + prototype.TypeName + "()")
+							entity.ParentLnk = caller.parentLnk
+							var entity = eval("new " + typeName + "()");
+							entity.ParentLnk = caller.parentLnk;
+							entity.ParentUuid = parentEntity.UUID;
+							var cell = caller.cell;
+							var values = caller.values;
+							values.push(entity);
+							cell.setValue(values);
+							cell.row.table.refresh();
+							cell.setCellEditor(values.length - 1);
+
+							/*server.entityManager.createEntity(caller.parentEntity.UUID, entity.ParentLnk , entity.TYPENAME, "", entity,
+								function (result, caller) {
+									console.log("---> entity was created ", result)
+								},
+								function () {
+
+								}, {})*/
+						},
+						// error callback.
+						function (errObj, caller) {
+
+						}, { "parentEntity": parentEntity, "parentLnk": parentLnk, "cell": cell, "values": values })
+
+				}
+
+				// Set the cell editor as needed...
+				if (value.length > 0) {
+					cell.setValue(values);
+					cell.row.table.refresh();
+					cell.setCellEditor(values.length - 1);
+				}
+			}
+		}(this)
+
+		// Now I will append the delete button to each existing row.
+		if (this.valueDiv != undefined) {
+			if (this.valueDiv.element.className == "entity_sub-table") {
+				// in that case the value div contain a sub table of entitie so I will will simply display their 
+				// delete button...
+				var deleteBtns = this.valueDiv.element.getElementsByClassName("delete_row_btn");
+				for (var i = 0; i < deleteBtns.length; i++) {
+					deleteBtns[i].style.visibility = "visible";
+				}
+			} else {
+				var index = 0;
+				for (var id in this.valueDiv.childs) {
+					var row = this.valueDiv.childs[id]
+					var deleteBtn = row.appendElement({ "tag": "div", "class": "row_button delete_row_btn", "style": "vertical-align: top;" }).down()
+						.appendElement({ "tag": "i", "class": "fa fa-trash" }).down();
+					deleteBtn.element.onclick = function (cell, index, table, row) {
+						return function () {
+							// remove the row from the interface.
+							table.removeElement(row)
+							var values = cell.getValue();
+							values.splice(index, 1);
+							cell.setValue(values);
+							cell.row.table.refresh();
+						}
+					}(this, index, this.valueDiv, row)
+					index++;
+				}
+			}
+		}
+	}
+
+
+}
+
+/**
+ * Remove the array cell edition control.
+ */
+TableCell.prototype.resetArrayCellEditor = function () {
+	// So here I will remove the array edition control...
+	var appendRowBtn = this.div.getChildById("appendRowBtn")
+	if (appendRowBtn != undefined) {
+		this.div.removeElement(appendRowBtn);
+	}
+
+	if (this.valueDiv != null) {
+		if (this.valueDiv.element.className == "entity_sub-table") {
+			var deleteBtns = this.valueDiv.element.getElementsByClassName("delete_row_btn");
+			for (var i = 0; i < deleteBtns.length; i++) {
+				deleteBtns[i].style.visibility = "hidden";
+			}
+		} else {
+			var deleteBtns = this.div.getChildsByClassName("delete_row_btn")
+			for (var i = 0; i < deleteBtns.length; i++) {
+				deleteBtns[i].parentElement.removeElement(deleteBtns[i]);
+			}
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -780,7 +958,10 @@ function formatValue(value, typeName) {
  */
 var editFcts = {}
 
-var TableCellEditor = function (onblur) {
+var TableCellEditor = function (cell, onblur) {
+	// The parent cell.
+	this.cell = cell
+
 	// The underlying element.
 	this.editor = null;
 
@@ -790,7 +971,7 @@ var TableCellEditor = function (onblur) {
 	return this
 }
 
-TableCellEditor.prototype.edit = function (value, typeName) {
+TableCellEditor.prototype.edit = function (value, typeName, onblur) {
 
 	if (editFcts[typeName] != null) {
 		// Here the function will create a custom editor for a given type.
@@ -823,9 +1004,71 @@ TableCellEditor.prototype.edit = function (value, typeName) {
 			if (value != undefined) {
 				this.editor.element.value = value;
 			}
-		} else if (isXsRef(typeName)) {
-			// Here I will put a text area..
-			console.log("------> ref found!!!!")
+		} else if (typeName.endsWith(":Ref") || isXsRef(typeName)) {
+			// In that case is a reference.
+			// The editor will be an input box
+			if (this.editor == null) {
+				this.editor = new Element(null, { "tag": "input", "style": "display: inline;", "id": randomUUID() });
+			}
+
+			// Here I will use the data manager to get the list of id, index and uuid...
+			var typeName = typeName.split(":")[0] // Remove the :Ref
+			server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
+				// success callback.
+				function (prototype, caller) {
+					var q = {};
+					q.TypeName = prototype.TypeName;
+					q.Fields = [];
+					var fieldsType = [];
+					for (var i = 0; i < prototype.Ids.length; i++) {
+						q.Fields.push(prototype.Ids[i])
+						fieldsType.push(prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[i])]);
+					}
+					server.dataManager.read(prototype.TypeName.split(".")[0], JSON.stringify(q), fieldsType, [],
+						// success callback
+						function (results, caller) {
+							var results = results[0];
+							var elementLst = [];
+							var idUuid = {};
+							for (var i = 0; i < results.length; i++) {
+								elementLst.push(results[i][1])
+								idUuid[results[i][1]] = results[i][0]
+								if (caller.value == results[i][0]) {
+									caller.editor.editor.element.value = results[i][1];
+								}
+							}
+							// I will attach the autocomplete box.
+							attachAutoComplete(caller.editor.editor, elementLst, true,
+								function (caller, idUuid) {
+									return function (id) {
+										caller.editor.editor.element.value = id;
+										caller.editor.getValue = function (idUuid) {
+											return function () {
+												return idUuid[id];
+											}
+										}(idUuid)
+										caller.onblur(); // Call the onblur function
+									}
+								}(caller, idUuid));
+						},
+						// progress callback
+						function (index, total, caller) {
+
+						},
+						// error callback
+						function (errObj, caller) {
+
+						}, caller
+					)
+
+				},
+				// error callback
+				function (errObj, caller) {
+
+				}, { "editor": this, "onblur": onblur, "value": value })
+			// I will cancel the onblur event and call it when the data will be select.
+			onblur = null;
+			this.onblur = null;
 		}
 	} else if (isBoolean(value)) {
 		if (this.editor == null) {
@@ -851,22 +1094,22 @@ TableCellEditor.prototype.edit = function (value, typeName) {
 			this.editor = new Element(null, { "tag": "input", "type": "number", "step": "0.01" });
 		}
 		this.editor.element.value = value;
-	} else if (isArray(value)) {
-		// Here the value is an array...
-
-	} else if (isEntity(value)) {
-		// Here the value is an array...
-
+	} else if (isObject(value)) {
+		console.log("---> edit object!")
 	}
 
 	// Set the on blur event.
 	if (this.editor != null) {
-		this.editor.element.onblur = this.onblur;
+		if (onblur != undefined) {
+			this.editor.element.onblur = onblur;
+		} else {
+			this.editor.element.onblur = this.onblur;
+		}
 	}
 }
 
 TableCellEditor.prototype.getValue = function () {
-
+	return this.editor.element.value;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -877,7 +1120,9 @@ TableCellEditor.prototype.getValue = function () {
  * Column formater.
  * @constructor
  */
-var TableCellRenderer = function () {
+var TableCellRenderer = function (cell) {
+	// The parent cell.
+	this.cell = cell;
 	return this
 }
 
@@ -915,7 +1160,24 @@ TableCellRenderer.prototype.render = function (value, fieldType) {
 		formatedValue = formatValue(value, fieldType);
 		if (isObjectReference(formatedValue)) {
 			// Here the value represent an object reference.
+			var lnk = new Element(null, { "tag": "a", "href": "#", "class": fieldType.replaceAll(".", "_") });
+			server.entityManager.getEntityByUuid(formatedValue,
+				function (entity, caller) {
+					var titles = entity.getTitles();
+					if (titles.length > 0) {
+						caller.element.innerHTML = titles[0]
+						caller.element.onclick = function (entity) {
+							return function (evt) {
+								evt.stopPropagation();
+							}
+						}(entity)
+					}
+				},
+				function (errObj, lnk) {
 
+				}, lnk)
+
+			return lnk;
 		} else {
 			// Here I will create the 
 			if (formatedValue != null) {
@@ -935,33 +1197,49 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 	if (values.length > 0) {
 		// I will use the first element of the array to determine how i will 
 		// create that new array.
-		if (values[0].getPrototype != undefined) {
-			// Here I got an array of entities.
-			var model = null;
-			var div = new Element(null, { "tag": "div" });
-
-			model = new EntityTableModel(values[0].getPrototype());
-			model.entities = values;
-			div.element.className = "entity_sub-table";
-			var table = new Table(randomUUID(), div)
-			table.setModel(model, function (table) {
-				return function () {
-					// init the table.
-					table.init()
-				}
-			}(table))
-		} else {
-			// Here the div contain a table of values.
-			var div = new Element(null, { "tag": "div", "style": "display: table; width: 100%;" });
+		var div = new Element(null, { "tag": "div" });
+		typeName = typeName.replace("[]", "")
+		if (typeName.startsWith("xs.") || typeName.endsWith(":Ref")) {
+			div = new Element(null, { "tag": "div", "style": "display: table; width: 100%;" });
 			for (var i = 0; i < values.length; i++) {
 				var row = div.appendElement({ "tag": "div", "style": "display: table-row; width: 100%;" }).down()
 				var formatedValue = this.render(values[i], typeName.replace("[]", ""));
 				if (formatedValue != undefined) {
 					formatedValue.element.style.display = "table-cell"
+					formatedValue.element.style.verticalAlign = "middle";
 					formatedValue.element.style.width = "100%";
 					row.appendElement(formatedValue)
+					// Now I will set the double click event for the subvalue.
+					formatedValue.element.ondblclick = function (renderer, index) {
+						return function (e) {
+							e.stopPropagation()
+							renderer.cell.setCellEditor(index)
+						}
+					}(this, i)
 				}
 			}
+		} else {
+			// Here I will asynchronously get all items of that types.
+			server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
+				/** The success callback */
+				function (prototype, caller) {
+					// Here I got an array of entities.
+					var model = null;
+					model = new EntityTableModel(prototype);
+					model.entities = values;
+					div.element.className = "entity_sub-table";
+					var table = new Table(randomUUID(), div)
+					table.setModel(model, function (table) {
+						return function () {
+							// init the table.
+							table.init()
+						}
+					}(table))
+				},
+				/** The error callva */
+				function (errObj, caller) {
+					// Here the div contain a table of values.
+				}, div)
 		}
 		return div;
 	}
@@ -1266,11 +1544,6 @@ var ColumnFilter = function (index, table) {
 		return function () {
 			if (filter.filterPanelDiv.element.style.display != "block") {
 				filter.filterPanelDiv.element.style.display = "block"
-				/*var rect1 = localToGlobal(filter.filterPanelDiv.element)
-				var rect2 = localToGlobal(filter.table.div.element)
-				if (rect1.right > rect2.right) {
-					filter.filterPanelDiv.element.style.right = "0px"
-				}*/
 			} else {
 				filter.filterPanelDiv.element.style.display = "none"
 			}

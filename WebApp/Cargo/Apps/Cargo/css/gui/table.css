@@ -35,8 +35,8 @@
 }
 
 .body_cell{
-    vertical-align: middle;
-    text-align: center;
+    vertical-align: text-top;
+    text-align: left;
     background-color: transparent;
     display: table-cell;
     border-right: 1px solid;

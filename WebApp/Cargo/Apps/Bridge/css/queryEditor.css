@@ -37,14 +37,6 @@
     box-shadow: 0 2px 4px 0,0 2px 10px 0 !important;
  }
 
- .row_button .fa-trash-o {
-    display: none;
-}
-
 .table_header_btn_div .fa-download {
     display: none;
-}
-
-.result_query_panel .row_button .fa-trash-o {
-    display: /*table-cell*/ none;
 }
