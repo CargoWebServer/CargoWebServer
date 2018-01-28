@@ -1507,7 +1507,7 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 								}
 							}
 						} else {
-							log.Println("---------> wrong references types object.")
+							log.Println("---------> wrong references types object.", reflect.TypeOf(this.getValue(field)).String())
 						}
 
 						// Set the references links...

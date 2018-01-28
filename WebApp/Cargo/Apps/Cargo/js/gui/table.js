@@ -769,6 +769,7 @@ TableCell.prototype.setArrayCellEditor = function () {
 							cell.row.table.refresh();
 							cell.setCellEditor(values.length - 1);
 
+
 							/*server.entityManager.createEntity(caller.parentEntity.UUID, entity.ParentLnk , entity.TYPENAME, "", entity,
 								function (result, caller) {
 									console.log("---> entity was created ", result)
@@ -787,8 +788,20 @@ TableCell.prototype.setArrayCellEditor = function () {
 				// Set the cell editor as needed...
 				if (value.length > 0) {
 					cell.setValue(values);
+					// Do display the cell button here.
+					cell.row.saveBtn.element.style.visibility = "hidden";
 					cell.row.table.refresh();
 					cell.setCellEditor(values.length - 1);
+					// maximize the table
+					var maximizeBtn = cell.valueDiv.element.getElementsByClassName("table_header_size_btn")[1];
+					maximizeBtn.click();
+					// set in edit mode the first cell.
+					var rows = cell.valueDiv.element.getElementsByClassName("table_row");
+					var firstLastRowCell = rows[rows.length - 1].getElementsByClassName("body_cell")[0];
+					// Set the editor for the first cell.
+					var clickEvent = document.createEvent('MouseEvents');
+					clickEvent.initEvent('dblclick', true, true);
+					firstLastRowCell.dispatchEvent(clickEvent);
 				}
 			}
 		}(this)

@@ -1350,7 +1350,7 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 			if errObj != nil {
 				return nil, errObj
 			}
-		} else {
+		} else if reflect.TypeOf(values).String() != "*Server.DynamicEntity" {
 			cargoError := NewError(Utility.FileLine(), TYPENAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The typeName '"+typeName+"' is does not exist."))
 			return nil, cargoError
 		}
@@ -1358,9 +1358,9 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 
 	// Set the relation name with it parent.
 	entity.(Entity).SetParentLnk(attributeName)
+
+	// if the entity aleready exist I will simply save it new value.
 	if this.isExist(entity.(Entity).GetUuid()) {
-		// Here because I use the New methode the value is in the cache so
-		// I need to remove it...
 		this.removeEntity(entity.(Entity).GetUuid())
 	}
 
@@ -1549,6 +1549,9 @@ func (this *EntityManager) sortEntities(entities []Entity, orderBy []interface{}
  */
 func applyEntityRestrictions(values map[string]interface{}) error {
 	typeName := values["TYPENAME"].(string)
+	if strings.Index(typeName, ".") == -1 {
+		return errors.New("Wrong type name format! " + typeName)
+	}
 	prototype, err := GetServer().GetEntityManager().getEntityPrototype(typeName, typeName[0:strings.Index(typeName, ".")])
 
 	// Test restriction for the base types.
