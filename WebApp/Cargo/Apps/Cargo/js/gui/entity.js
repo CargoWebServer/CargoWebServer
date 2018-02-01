@@ -1081,7 +1081,7 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 										// Here I will simply remove the element 
 										// The entity must contain a list of field...
 										if (entity[field] != undefined) {
-											entity[field][row.index] = row.table.model.getValueAt(row.index, 1)
+											entity[field][row.index] = row.table.getModel().getValueAt(row.index, 1)
 											entity.NeedSave = true
 											server.entityManager.saveEntity(entity,
 												function (result, caller) {
@@ -1346,7 +1346,7 @@ EntityPanel.prototype.appendObjects = function (itemsTable, values, field, field
 						}
 
 						if (entity[field] != undefined) {
-							entity[field][row.index] = row.table.model.getValueAt(row.index, 1)
+							entity[field][row.index] = row.table.getModel().getValueAt(row.index, 1)
 							entity.NeedSave = true
 							if (entity.UUID != "") {
 								server.entityManager.saveEntity(entity,

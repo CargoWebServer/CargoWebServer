@@ -172,7 +172,7 @@ func (this *EntityManager) removeEntity(uuid string) {
  * That function is use to delete an entity from the store.
  */
 func (this *EntityManager) deleteEntity(toDelete Entity) {
-	log.Println(toDelete)
+
 	// first of all i will remove it from the cache.
 	this.removeEntity(toDelete.GetUuid())
 
@@ -235,6 +235,7 @@ func (this *EntityManager) deleteEntity(toDelete Entity) {
 				}
 			}
 			if !isExist {
+				refOwner.SetNeedSave(true)
 				toSaves = append(toSaves, refOwner)
 			}
 		}
@@ -1380,8 +1381,8 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		} else {
 			// Append the child into it parent and save it.
 			parentPtr.AppendChild(attributeName, entity.(Entity))
-			// Set need save at true.
 			parentPtr.SetNeedSave(true)
+			// Set need save at true.
 			parentPtr.SaveEntity()
 		}
 	} else {

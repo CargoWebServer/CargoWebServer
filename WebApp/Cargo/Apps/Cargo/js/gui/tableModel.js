@@ -20,6 +20,9 @@
  * @version 1.0
  */
 
+// I made use of that map to store model reference.
+var models = {}
+
 /**
  * This is an abstract class that help to connect the table with the data to display
  * by the Table class.
@@ -27,6 +30,9 @@
  * @param titles The list of table headers
  */
 var TableModel = function (titles) {
+
+    this.id = randomUUID()
+
     // The table that use this model.
     this.table = null
     // The titles to display in the headers, this must follow the fields...
@@ -40,6 +46,10 @@ var TableModel = function (titles) {
             this.editable[i] = false
         }
     }
+
+    // keep it in the model map.
+    models[this.id] = this
+
     return this
 }
 
@@ -187,6 +197,11 @@ var EntityTableModel = function (proto, query) {
      */
     this.entities = []
 
+    /**
+     * If the it's a propertie of a parent entity
+     */
+    this.parentLnk = null
+
     return this
 }
 
@@ -213,7 +228,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
 
                 var table = caller.caller.caller
                 for (var i = 0; i < results.length; i++) {
-                    table.model.appendRow(results[i], results[i].UUID)
+                    table.getModel().appendRow(results[i], results[i].UUID)
                 }
 
                 if (caller.successCallback != undefined) {
@@ -251,16 +266,19 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
     /* The delete entity event **/
     server.entityManager.attach(this, DeleteEntityEvent, function (evt, model) {
         // So here I will remove the line from the table...
-        /*var toDelete = evt.dataMap["entity"]
+        var toDelete = evt.dataMap["entity"]
         if (entities[toDelete.UUID] != undefined) {
             toDelete = entities[toDelete.UUID]
+            // remove it from the map.
+            delete entities[toDelete.UUID]
         }
 
         if (toDelete.TYPENAME == model.proto.TypeName || model.proto.SubstitutionGroup.indexOf(toDelete.TYPENAME) != -1) {
             // So here I will remove the line from the model...
             var orderedRows = []
             for (var i = 0; i < model.table.orderedRows.length; i++) {
-                var row = table.orderedRows[i]
+                var row = model.table.orderedRows[i]
+
                 if (row.id != toDelete.UUID) {
                     orderedRows.push(row)
                 } else {
@@ -270,45 +288,32 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
             }
 
             // Now set the model values and entities.
-            var values = []
             var entities_ = []
+            var rows = []
+
             for (var i = 0; i < model.entities.length; i++) {
+                var row = model.table.rows[i]
                 if (model.entities[i].UUID != toDelete.UUID) {
                     var entity = model.entities[i]
                     if (entities[entity.UUID] != undefined) {
                         entity = model.entities[i] = entities[entity.UUID]
                     }
                     entities_.push(entity)
-                    values.push(model.values[i])
-                }
-            }
-            // Set the values...
-            model.values = values
-            model.entities = entities_
-
-            model.table.orderedRows = orderedRows
-
-            var rows = []
-
-            for (var i = 0; i < model.table.rows.length; i++) {
-                if (model.table.header == null) {
-                    model.table.setHeader()
-                }
-                var row = model.table.rows[i]
-                if (row.id != toDelete.UUID) {
-                    row.index = rows.length
+                    row.id = entity.UUID
+                    row.index = rows.length;
                     rows.push(row)
                 } else {
-                    // remove from the display...
                     if (row.div.element.parentNode != null) {
                         row.div.element.parentNode.removeChild(row.div.element)
                     }
                 }
             }
-
+            // Set the values...
+            model.entities = entities_
+            model.table.orderedRows = orderedRows
             model.table.rows = rows
             model.table.refresh()
-        }*/
+        }
     })
 
     // The new entity event...
@@ -317,14 +322,11 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
             var entity = entities[evt.dataMap["entity"].UUID]
             if (entity != undefined) {
                 if (entity.TYPENAME == model.proto.TypeName || model.proto.SubstitutionGroup.indexOf(entity.TYPENAME) != -1) {
-                    if (entity.ParentUuid != undefined && model.getParentUuid() != undefined) {
-                        if (model.getParentUuid() == entity.ParentUuid) {
-                            /*var row = table.appendRow(entity, entity.UUID)
-                            row.table.model.entities[row.index] = entity
-                            row.saveBtn.element.style.visibility = "hidden"
-                            */
-                        }
+                    // If the object does not exist in the array.
+                    if (!objectPropInArray(model.entities, "UUID", entity.UUID)) {
+                        model.entities.push(entity)
                     }
+                    var row = model.table.appendRow(entity, entity.UUID)
                 }
             }
         }
@@ -332,24 +334,17 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
 
 }
 
-EntityTableModel.prototype.getParentUuid = function () {
-    if (this.entities.length > 0) {
-        return this.entities[0].ParentUuid
-    }
-    return undefined
-}
 
 /**
  * Remove all the element from the talbe.
  */
 EntityTableModel.prototype.removeAllValues = function () {
     this.entities = []
-    this.values = []
 }
 
 /**
- * Remove a row whit a given id from the model.
- * @param {string} The id of the row to remove.
+ * Remove a row whit a given index from the model.
+ * @param {string} The index of the row to remove.
  */
 EntityTableModel.prototype.removeRow = function (rowIndex, callback) {
     var entity = this.entities[rowIndex]
@@ -417,11 +412,9 @@ EntityTableModel.prototype.appendRow = function (values) {
         return []
     }
 
-
     if (!objectPropInArray(this.entities, "UUID", values.UUID)) {
         this.entities.push(values)
     }
-
 
     var isListOf_ = isListOf(this.proto.TypeName)
     var objectValues = []
@@ -461,18 +454,35 @@ EntityTableModel.prototype.appendRow = function (values) {
             if (entity != undefined) {
                 for (var i = 0; i < model.entities.length; i++) {
                     if (model.entities[i] != undefined) {
-                        if (model.entities[i].UUID == entity.UUID) {
-                            model.entities[i] = entity
-                            model.table.refresh();
-                            break;
+                        if (model.entities[i].TYPENAME == entity.TYPENAME) {
+                            if (model.entities[i].UUID == entity.UUID) {
+                                model.entities[i] = entity
+                                // Replace the value of the existing row with the entity value.
+                                var row = model.table.appendRow(entity, entity.UUID)
+                                row.saveBtn.element.style.visibility = "hidden";
+                                break;
+                            }
                         }
                     }
                 }
             }
         }
     })
-
     return objectValues
+}
+
+/**
+ * Get the value of a cell.
+ * @param row The row index.
+ * @param column The colum index.
+ */
+EntityTableModel.prototype.getValueAt = function (row, column) {
+    var entity = this.entities[row]
+    if (entities[entity.UUID] != undefined) {
+        entity = this.entities[row] = entities[entity.UUID]
+    }
+    var field = "M_" + this.titles[column]
+    return entity[field]
 }
 
 /**
@@ -483,16 +493,18 @@ EntityTableModel.prototype.appendRow = function (values) {
  */
 EntityTableModel.prototype.setValueAt = function (value, row, column) {
     var entity = this.entities[row]
-    if (entities[entity.UUID] != undefined) {
-        entity = this.entities[row] = entities[entity.UUID]
+    if (entities.UUID != undefined) {
+        if (entities[entity.UUID] != undefined) {
+            entity = this.entities[row] = entities[entity.UUID]
+        }
     }
     var field = "M_" + this.titles[column]
-    if (value[field] != undefined) {
-        entity[field] = value[field]
-        this.values[row][column] = value[field]
-    } else {
-        entity[field] = value
-        this.values[row][column] = value
+    if (entity != undefined) {
+        if (value[field] != undefined) {
+            entity[field] = value[field]
+        } else {
+            entity[field] = value
+        }
     }
 }
 
@@ -500,27 +512,33 @@ EntityTableModel.prototype.setValueAt = function (value, row, column) {
  * Save the value contain at a given row.
  */
 EntityTableModel.prototype.saveValue = function (row) {
-    var entity = row.table.model.entities[row.index]
+    var entity = row.table.getModel().entities[row.index]
     // Here I will save the entity...
     if (entity != null) {
         // Always use the entity from the enities map it contain
         // the valid data of the entity.
         if (entities[entity.UUID] != null) {
-            entity = row.table.model.entities[row.index] = entities[entity.UUID]
+            entity = row.table.getModel().entities[row.index] = entities[entity.UUID]
         }
 
         entity.NeedSave = true
         if (entity.exist == false) {
+
             // Remove the tmp entity...
+            // remove the row use at creation time.
+            row.div.parentElement.removeElement(row.div);
+            // remove the temp entity
+            row.table.getModel().entities.pop(row.index)
+
             server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity.TYPENAME, entity.M_id, entity,
                 // Success callback
-                function (entity, table) {
+                function (entity, row) {
 
                 },
                 // Error callback.
                 function (result, caller) {
 
-                }, row.table)
+                }, row)
         } else {
             server.entityManager.saveEntity(entity,
                 function (result, row) {
@@ -604,7 +622,7 @@ SqlTableModel.prototype.init = function (successCallback, progressCallback, erro
         // So here I will remove the line from the table...
         if (evt.dataMap.tableName == table.id) {
             // So here I will remove the line from the model...F
-            table.model.removeRow(evt.dataMap.id_0)
+            table.getModel().removeRow(evt.dataMap.id_0)
 
             var orderedRows = []
             for (var rowIndex in table.orderedRows) {

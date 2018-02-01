@@ -614,6 +614,7 @@ func (this *DynamicEntity) SaveEntity() {
 func (this *DynamicEntity) saveEntity(path string) {
 	// Do not save if is nt necessary...
 	if !this.NeedSave() || strings.Index(path, this.GetUuid()) != -1 {
+
 		return
 	}
 
@@ -1034,6 +1035,7 @@ func (this *DynamicEntity) saveEntity(path string) {
 	} else {
 		log.Println(Utility.FileLine(), "Fail to save entity ", err)
 	}
+	//log.Println("--------> save entity ", this.GetObject())
 
 }
 
@@ -1072,12 +1074,16 @@ func (this *DynamicEntity) RemoveChild(name string, uuid string) {
 					for i := 0; i < len(this.getValue(name).([]map[string]interface{})); i++ {
 						if uuid != this.getValue(name).([]map[string]interface{})[i]["UUID"] {
 							childs = append(childs, this.getValue(name).([]map[string]interface{})[i])
+						} else {
+							this.SetNeedSave(true)
 						}
 					}
 				} else if reflect.TypeOf(this.getValue(name)).String() == "[]interface {}" {
 					for i := 0; i < len(this.getValue(name).([]interface{})); i++ {
 						if uuid != this.getValue(name).([]interface{})[i].(map[string]interface{})["UUID"] {
 							childs = append(childs, this.getValue(name).([]interface{})[i].(map[string]interface{}))
+						} else {
+							this.SetNeedSave(true)
 						}
 					}
 				}
@@ -1358,6 +1364,8 @@ func (this *DynamicEntity) AppendChild(attributeName string, child Entity) error
 	if Utility.Contains(this.childsUuid, child.GetUuid()) == false {
 		// Append it to the list of UUID
 		this.childsUuid = append(this.childsUuid, child.GetUuid())
+		// Set need save.
+		this.SetNeedSave(true)
 	}
 
 	return nil

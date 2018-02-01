@@ -126,11 +126,12 @@ var Table = function (id, parent) {
 Table.prototype.setModel = function (model, initCallback) {
 
 	// Link both side of the relation.
-	this.model = model
+	this.modelId = model.id
+
 	model.table = this
 
 	// Initialyse the table model.
-	this.model.init(
+	this.getModel().init(
 		// Success callback...
 		function (results, caller) {
 			//caller.caller.init()
@@ -156,6 +157,11 @@ Table.prototype.setModel = function (model, initCallback) {
 
 }
 
+
+Table.prototype.getModel = function () {
+	return models[this.modelId];
+}
+
 /**
  * Initialyse the table.
  */
@@ -166,21 +172,20 @@ Table.prototype.init = function () {
 		this.rowGroup = this.div.appendElement({ "tag": "div", "class": "table_body" }).down()
 	}
 
-	for (var i = 0; i < this.model.getRowCount(); i++) {
+	for (var i = 0; i < this.getModel().getRowCount(); i++) {
 		var data = []
-		for (var j = 0; j < this.model.getColumnCount(); j++) {
+		for (var j = 0; j < this.getModel().getColumnCount(); j++) {
 			if (this.header == null) {
 				this.setHeader()
-				this.header.numberOfRowLabel.element.innerHTML = this.model.getRowCount();
+				this.header.numberOfRowLabel.element.innerHTML = this.getModel().getRowCount();
 			}
-			var value = this.model.getValueAt(i, j)
+			var value = this.getModel().getValueAt(i, j)
 			data.push(value)
 		}
 
 		// If the model contain entities I will set the row id and set map entry.
 		this.rows[i] = new TableRow(this, i, data)
 	}
-
 
 	// Refresh the parent table.
 	this.refresh()
@@ -192,7 +197,7 @@ Table.prototype.init = function () {
 Table.prototype.clear = function () {
 
 	if (this.rows.length > 0) {
-		this.model.removeAllValues()
+		this.getModel().removeAllValues()
 		this.rows = []
 		this.rowGroup.element.innerHTML = ""
 		this.div.element.style.display = "none"
@@ -286,15 +291,13 @@ Table.prototype.refresh = function () {
  */
 Table.prototype.getRow = function (id) {
 	// Function that dermine if the rows array already contain a given row.
-	var hasRow = function (id) {
-		return function (row) {
-			if (row.id === id) {
-				return row;
-			}
-			return null;
+	for(var i=0; i < this.rows.length; i++){
+		if(this.rows[i].id == id){
+			return this.rows[i]
 		}
-	}(id)
-	return this.rows.find(hasRow)
+	}
+
+	return null
 }
 
 /**
@@ -314,15 +317,15 @@ Table.prototype.appendRow = function (values, id) {
 	var row = this.getRow(id)
 	if (row == undefined) {
 		// append the value in the model and update the table.
-		var data = this.model.appendRow(values)
+		var data = this.getModel().appendRow(values)
 		row = new TableRow(this, this.rows.length, data, id)
 		this.rows.push(row)
 	} else {
 		// Here i will update the values...
 		for (var i = 0; i < row.cells.length; i++) {
 			var cell = row.cells[i]
-			this.model.setValueAt(values, this.rows.indexOf(row), i)
-			cell.setValue(this.model.values[this.rows.indexOf(row)][i])
+			this.getModel().setValueAt(values, this.rows.indexOf(row), i)
+			cell.setValue(this.getModel().getValueAt(this.rows.indexOf(row), i))
 		}
 	}
 
@@ -403,8 +406,8 @@ var TableHeader = function (table) {
 	this.numberOfRowLabel.element.style.display = ""
 
 	// I will create the header cell...
-	for (var i = 0; i < table.model.getColumnCount(); i++) {
-		var title = table.model.getColumnName(i)
+	for (var i = 0; i < table.getModel().getColumnCount(); i++) {
+		var title = table.getModel().getColumnName(i)
 		var cell = this.div.appendElement({ "tag": "div", "class": "header_cell" }).down()
 
 		var cellContent = cell.appendElement({ "tag": "div", "class": "cell_content" }).down()
@@ -432,9 +435,9 @@ var TableHeader = function (table) {
 	this.exportBtn.element.onclick = function (table) {
 		return function () {
 			// I will create csv file from the model values.
-			var rows = table.model.values
+			var rows = table.getModel().values
 			if (table.exportCallback != null) {
-				rows.unshift(table.model.titles)
+				rows.unshift(table.getModel().titles)
 				table.exportCallback(rows)
 			}
 		}
@@ -480,7 +483,11 @@ var TableRow = function (table, index, data, id) {
 	this.deleteBtn = null
 
 	if (this.id == undefined) {
-		this.id = data[0] // The first data must be the id...
+		if(table.getModel().entities != undefined){
+			this.id = table.getModel().entities[index].UUID
+		}else{
+			this.id = data[0] // The first data must be the id...
+		}
 	}
 
 	this.div = table.rowGroup.appendElement({ "tag": "div", "class": "table_row", "id": this.id }).down()
@@ -491,7 +498,7 @@ var TableRow = function (table, index, data, id) {
 	this.saveBtn.element.onclick = function (row) {
 		return function () {
 			this.style.visibility = "hidden"
-			row.table.model.saveValue(row)
+			row.table.getModel().saveValue(row)
 		}
 	}(this)
 
@@ -509,7 +516,7 @@ var TableRow = function (table, index, data, id) {
 	this.deleteBtn.element.onclick = function (self, id, deleteCallback) {
 		return function () {
 			// here I will delete the row...
-			self.table.model.removeRow(self.index)
+			self.table.getModel().removeRow(self.index)
 
 			// Call the delete callback function...
 			if (deleteCallback != null) {
@@ -549,7 +556,7 @@ var TableCell = function (row, index, value) {
 
 	if (value != null) {
 		// get the formated value
-		var fieldType = this.row.table.model.getColumnClass(this.index);
+		var fieldType = this.row.table.getModel().getColumnClass(this.index);
 		var formatedValue = this.renderer.render(value, fieldType);
 		if (formatedValue != undefined) {
 			if (formatedValue.element.tagName == "IMG") {
@@ -591,7 +598,7 @@ var TableCell = function (row, index, value) {
  * @returns {string} The data type.
  */
 TableCell.prototype.getType = function () {
-	return this.row.table.model.getColumnClass(this.index)
+	return this.row.table.getModel().getColumnClass(this.index)
 }
 
 /**
@@ -599,7 +606,7 @@ TableCell.prototype.getType = function () {
  * @returns {*} Return the value contain in a cell
  */
 TableCell.prototype.getValue = function () {
-	value = this.row.table.model.getValueAt(this.row.index, this.index)
+	value = this.row.table.getModel().getValueAt(this.row.index, this.index)
 	return value
 }
 
@@ -620,7 +627,7 @@ TableCell.prototype.setValue = function (value) {
 	}
 
 	// Get the formated value.
-	var fieldType = this.row.table.model.getColumnClass(this.index);
+	var fieldType = this.row.table.getModel().getColumnClass(this.index);
 	var formated = this.renderer.render(value, fieldType)
 	if (formated != undefined) {
 		// Special rule for IMG element...
@@ -642,7 +649,7 @@ TableCell.prototype.setValue = function (value) {
 	this.row.saveBtn.element.style.visibility = "visible"
 
 	// Set in the model.
-	this.row.table.model.setValueAt(value, this.row.index, this.index)
+	this.row.table.getModel().setValueAt(value, this.row.index, this.index)
 
 	// Refresh the table.
 	this.row.table.refresh()
@@ -653,7 +660,7 @@ TableCell.prototype.setValue = function (value) {
  * returns {bool} True if the cell can be edit.
  */
 TableCell.prototype.isEditable = function () {
-	return this.row.table.model.isCellEditable(this.index)
+	return this.row.table.getModel().isCellEditable(this.index)
 }
 
 /**
@@ -749,8 +756,8 @@ TableCell.prototype.setArrayCellEditor = function () {
 					values.push("");
 				} else {
 					// Asynch here...
-					var parentEntity = cell.row.table.model.entities[cell.row.index];
-					var parentLnk = "M_" + cell.row.table.model.titles[cell.index]
+					var parentEntity = cell.row.table.getModel().entities[cell.row.index];
+					var parentLnk = "M_" + cell.row.table.getModel().titles[cell.index]
 
 					// Here I will test if is an entity prototype and if it is I will create an new object of that type.
 					server.entityManager.getEntityPrototype(typeName, typeName.split(".")[0],
@@ -763,25 +770,16 @@ TableCell.prototype.setArrayCellEditor = function () {
 							entity.ParentLnk = caller.parentLnk;
 							entity.ParentUuid = parentEntity.UUID;
 							var cell = caller.cell;
-							var values = caller.values;
+							var values = cell.getValue();
 							values.push(entity);
 							cell.setValue(values);
 							cell.row.table.refresh();
 							cell.setCellEditor(values.length - 1);
-
-
-							/*server.entityManager.createEntity(caller.parentEntity.UUID, entity.ParentLnk , entity.TYPENAME, "", entity,
-								function (result, caller) {
-									console.log("---> entity was created ", result)
-								},
-								function () {
-
-								}, {})*/
 						},
 						// error callback.
 						function (errObj, caller) {
 
-						}, { "parentEntity": parentEntity, "parentLnk": parentLnk, "cell": cell, "values": values })
+						}, { "parentEntity": parentEntity, "parentLnk": parentLnk, "cell": cell })
 
 				}
 
@@ -794,14 +792,18 @@ TableCell.prototype.setArrayCellEditor = function () {
 					cell.setCellEditor(values.length - 1);
 					// maximize the table
 					var maximizeBtn = cell.valueDiv.element.getElementsByClassName("table_header_size_btn")[1];
-					maximizeBtn.click();
+					if (maximizeBtn != undefined) {
+						maximizeBtn.click();
+					}
 					// set in edit mode the first cell.
 					var rows = cell.valueDiv.element.getElementsByClassName("table_row");
-					var firstLastRowCell = rows[rows.length - 1].getElementsByClassName("body_cell")[0];
-					// Set the editor for the first cell.
-					var clickEvent = document.createEvent('MouseEvents');
-					clickEvent.initEvent('dblclick', true, true);
-					firstLastRowCell.dispatchEvent(clickEvent);
+					if (rows.length > 0) {
+						var firstLastRowCell = rows[rows.length - 1].getElementsByClassName("body_cell")[0];
+						// Set the editor for the first cell.
+						var clickEvent = document.createEvent('MouseEvents');
+						clickEvent.initEvent('dblclick', true, true);
+						firstLastRowCell.dispatchEvent(clickEvent);
+					}
 				}
 			}
 		}(this)
@@ -1240,8 +1242,8 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 					var model = null;
 					model = new EntityTableModel(prototype);
 					model.entities = values;
-					div.element.className = "entity_sub-table";
-					var table = new Table(randomUUID(), div)
+					caller.div.element.className = "entity_sub-table";
+					var table = new Table(randomUUID(), caller.div)
 					table.setModel(model, function (table) {
 						return function () {
 							// init the table.
@@ -1252,7 +1254,7 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 				/** The error callva */
 				function (errObj, caller) {
 					// Here the div contain a table of values.
-				}, div)
+				}, { "div": div, "cell": this.cell })
 		}
 		return div;
 	}
@@ -1350,8 +1352,8 @@ ColumnSorter.prototype.sortValues = function (values) {
 		return function (row1, row2) {
 			var colIndex = sorter.index
 
-			var value1 = sorter.table.model.getValueAt(row1.index, colIndex)
-			var value2 = sorter.table.model.getValueAt(row2.index, colIndex)
+			var value1 = sorter.table.getModel().getValueAt(row1.index, colIndex)
+			var value2 = sorter.table.getModel().getValueAt(row2.index, colIndex)
 
 			if (typeof value1 == "string") {
 				value1.trim().toUpperCase()
@@ -1382,8 +1384,8 @@ ColumnSorter.prototype.sortValues = function (values) {
 	if (this.childSorter != null) {
 		var sameValueIndex = -1
 		for (var i = 1; i < values.length; i++) {
-			var value1 = this.table.model.getValueAt(values[i - 1].index, this.index)
-			var value2 = this.table.model.getValueAt(values[i].index, this.index)
+			var value1 = this.table.getModel().getValueAt(values[i - 1].index, this.index)
+			var value2 = this.table.getModel().getValueAt(values[i].index, this.index)
 			if (value1 === value2) {
 				if (sameValueIndex == -1) {
 					sameValueIndex = i - 1
@@ -1458,7 +1460,7 @@ var ColumnFilter = function (index, table) {
 	/* The parent element **/
 	this.index = index
 	this.table = table
-	this.type = table.model.getColumnClass(this.index)
+	this.type = table.getModel().getColumnClass(this.index)
 
 	// Keep the current list of filter...
 	this.filters = {}
@@ -1525,7 +1527,7 @@ var ColumnFilter = function (index, table) {
 				var values = []
 				for (var i = 0; i < filter.table.rows.length; i++) {
 					if (filter.table.rows[i].div.element.style.display != "none") {
-						values.push(filter.table.model.getValueAt(i, filter.index))
+						values.push(filter.table.getModel().getValueAt(i, filter.index))
 					}
 				}
 				filter.filterCallback(values)
@@ -1579,11 +1581,11 @@ ColumnFilter.prototype.isActive = function () {
  */
 ColumnFilter.prototype.getValues = function () {
 	var values = new Array()
-	for (var i = 0; i < this.table.model.getRowCount(); i++) {
+	for (var i = 0; i < this.table.getModel().getRowCount(); i++) {
 		// single value
 		if (!this.type.startsWith("[]")) {
 			// Get unique value...
-			var value = this.table.model.getValueAt(i, this.index)
+			var value = this.table.getModel().getValueAt(i, this.index)
 			value = formatValue(value, this.type)
 			var j = 0
 			for (j = 0; j < values.length; j++) {
@@ -1595,7 +1597,7 @@ ColumnFilter.prototype.getValues = function () {
 			values[j] = value
 		} else {
 			// multiple values
-			var values_ = this.table.model.getValueAt(i, this.index)
+			var values_ = this.table.getModel().getValueAt(i, this.index)
 			for (var j = 0; j < values_.length; j++) {
 				value = formatValue(values_[j], this.type)
 				var k = 0
@@ -1627,7 +1629,7 @@ ColumnFilter.prototype.getValues = function () {
 ColumnFilter.prototype.initFilterPanel = function () {
 
 	// First of all I wil get the list of value...
-	var type = this.table.model.getColumnClass(this.index)
+	var type = this.table.getModel().getColumnClass(this.index)
 	if (!isXsDate(this.type)) {
 		var values = this.getValues()
 		// So here I will create the list of values with checkbox...
@@ -1837,7 +1839,7 @@ ColumnFilter.prototype.hasFilter = function () {
  * Apply the value as filter...
  */
 ColumnFilter.prototype.filterValues = function () {
-	var type = this.table.model.getColumnClass(this.index)
+	var type = this.table.getModel().getColumnClass(this.index)
 
 	// The list of values...
 	if (this.hasFilter()) {
@@ -1850,7 +1852,7 @@ ColumnFilter.prototype.filterValues = function () {
 	// Now I will apply the filters on each row of the table...
 	for (var i = 0; i < this.table.rows.length; i++) {
 		var row = this.table.rows[i]
-		var cellValue = this.table.model.getValueAt(i, this.index)
+		var cellValue = this.table.getModel().getValueAt(i, this.index)
 		var isShow = false
 		if (isXsDate(this.type)) {
 			// Now filters are apply...
