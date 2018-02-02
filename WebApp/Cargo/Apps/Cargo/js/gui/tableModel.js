@@ -167,7 +167,6 @@ var EntityTableModel = function (proto, query) {
     }
 
     this.query = query
-
     var titles = []
     TableModel.call(this, titles);
 
@@ -243,7 +242,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
                 }
             },
             // Error Callback
-            function (errObj, { "caller": caller }) {
+            function (errObj, caller) {
                 if (caller.errorCallback != undefined) {
                     caller.errorCallback(errObj, caller.caller)
                 }
@@ -262,8 +261,6 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Event listener connection here.
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    /* The delete entity event **/
     server.entityManager.attach(this, DeleteEntityEvent, function (evt, model) {
         // So here I will remove the line from the table...
         var toDelete = evt.dataMap["entity"]
@@ -278,7 +275,6 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
             var orderedRows = []
             for (var i = 0; i < model.table.orderedRows.length; i++) {
                 var row = model.table.orderedRows[i]
-
                 if (row.id != toDelete.UUID) {
                     orderedRows.push(row)
                 } else {
@@ -308,6 +304,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
                     }
                 }
             }
+
             // Set the values...
             model.entities = entities_
             model.table.orderedRows = orderedRows
@@ -318,6 +315,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
 
     // The new entity event...
     server.entityManager.attach(this, NewEntityEvent, function (evt, model) {
+        model = models[model.id]
         if (evt.dataMap["entity"] != undefined) {
             var entity = entities[evt.dataMap["entity"].UUID]
             if (entity != undefined) {
@@ -325,13 +323,35 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
                     // If the object does not exist in the array.
                     if (!objectPropInArray(model.entities, "UUID", entity.UUID)) {
                         model.entities.push(entity)
+                        var row = model.table.appendRow(entity, entity.UUID)
                     }
-                    var row = model.table.appendRow(entity, entity.UUID)
                 }
             }
         }
     })
 
+    // Set the update listener for each row entity...
+    server.entityManager.attach(this, UpdateEntityEvent, function (evt, model) {
+        model = models[model.id]
+        if (evt.dataMap["entity"] != undefined) {
+            var entity = entities[evt.dataMap["entity"].UUID]
+            if (entity != undefined) {
+                for (var i = 0; i < model.entities.length; i++) {
+                    if (model.entities[i] != undefined) {
+                        if (model.entities[i].TYPENAME == entity.TYPENAME) {
+                            if (model.entities[i].UUID == entity.UUID) {
+                                model.entities[i] = entity;
+                                // Replace the value of the existing row with the entity value.
+                                var row = model.table.appendRow(entity, entity.UUID)
+                                row.saveBtn.element.style.visibility = "hidden";
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
 }
 
 
@@ -447,27 +467,6 @@ EntityTableModel.prototype.appendRow = function (values) {
         }
     }
 
-    // Set the update listener for each row entity...
-    server.entityManager.attach(this, UpdateEntityEvent, function (evt, model) {
-        if (evt.dataMap["entity"] != undefined) {
-            var entity = entities[evt.dataMap["entity"].UUID]
-            if (entity != undefined) {
-                for (var i = 0; i < model.entities.length; i++) {
-                    if (model.entities[i] != undefined) {
-                        if (model.entities[i].TYPENAME == entity.TYPENAME) {
-                            if (model.entities[i].UUID == entity.UUID) {
-                                model.entities[i] = entity
-                                // Replace the value of the existing row with the entity value.
-                                var row = model.table.appendRow(entity, entity.UUID)
-                                row.saveBtn.element.style.visibility = "hidden";
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    })
     return objectValues
 }
 
@@ -478,6 +477,10 @@ EntityTableModel.prototype.appendRow = function (values) {
  */
 EntityTableModel.prototype.getValueAt = function (row, column) {
     var entity = this.entities[row]
+    if(entity == undefined){
+        return null;
+    }
+
     if (entities[entity.UUID] != undefined) {
         entity = this.entities[row] = entities[entity.UUID]
     }
@@ -513,6 +516,7 @@ EntityTableModel.prototype.setValueAt = function (value, row, column) {
  */
 EntityTableModel.prototype.saveValue = function (row) {
     var entity = row.table.getModel().entities[row.index]
+
     // Here I will save the entity...
     if (entity != null) {
         // Always use the entity from the enities map it contain
@@ -522,13 +526,10 @@ EntityTableModel.prototype.saveValue = function (row) {
         }
 
         entity.NeedSave = true
-        if (entity.exist == false) {
+        // I must remove the temporary object it will be recreated when the NewEntity event will be received.
+        this.entities.pop(row.index)
 
-            // Remove the tmp entity...
-            // remove the row use at creation time.
-            row.div.parentElement.removeElement(row.div);
-            // remove the temp entity
-            row.table.getModel().entities.pop(row.index)
+        if (entity.exist == false) {
 
             server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity.TYPENAME, entity.M_id, entity,
                 // Success callback

@@ -1031,11 +1031,9 @@ func (this *DynamicEntity) saveEntity(path string) {
 		// resolved reference pointing to this entity and not already append...
 		GetServer().GetEntityManager().saveReferenced(this)
 		GetServer().GetEntityManager().setReferences(this)
-
 	} else {
 		log.Println(Utility.FileLine(), "Fail to save entity ", err)
 	}
-	//log.Println("--------> save entity ", this.GetObject())
 
 }
 
@@ -1514,8 +1512,20 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 									}
 								}
 							}
+						} else if reflect.TypeOf(this.getValue(field)).String() == "[]interface {}" {
+							for i := 0; i < len(this.getValue(field).([]interface{})); i++ {
+								if !Utility.Contains(v_, this.getValue(field).([]interface{})[i].(string)) {
+									toRemove := this.getValue(field).([]interface{})[i].(string)
+									ref, err := GetServer().GetEntityManager().getEntityByUuid(toRemove, false)
+									if err == nil {
+										this.RemoveReference(field, ref)
+										ref.RemoveReferenced(field, this)
+									}
+								}
+							}
 						} else {
 							log.Println("---------> wrong references types object.", reflect.TypeOf(this.getValue(field)).String())
+
 						}
 
 						// Set the references links...

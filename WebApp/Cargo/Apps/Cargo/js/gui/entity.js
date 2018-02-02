@@ -872,7 +872,8 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 			if (fieldPrototype != undefined) {
 				if (fieldPrototype.Restrictions != undefined) {
 					// Set the restriction here.
-					restrictions = fieldPrototype.Restrictions
+					
+					//restrictions.concat(fieldPrototype.Restrictions)
 				}
 			}
 		}
@@ -1586,8 +1587,10 @@ EntityPanel.prototype.setFieldValue = function (control, field, fieldType, value
 						control.element.selectedIndex = id;
 					}
 				}
-			} else {
+			} else if(isInt(value)) {
 				control.element.selectedIndex = parseInt(value) - 1
+			} else if(isString(value)){
+				control.element.value = value
 			}
 		} else if (isXsString(baseType) || isXsString(fieldType) || fieldType == "interface{}") {
 			control.element.value = value

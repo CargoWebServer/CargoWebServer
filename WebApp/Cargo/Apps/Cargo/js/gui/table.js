@@ -179,12 +179,26 @@ Table.prototype.init = function () {
 				this.setHeader()
 				this.header.numberOfRowLabel.element.innerHTML = this.getModel().getRowCount();
 			}
+
 			var value = this.getModel().getValueAt(i, j)
 			data.push(value)
 		}
 
 		// If the model contain entities I will set the row id and set map entry.
-		this.rows[i] = new TableRow(this, i, data)
+		var row = new TableRow(this, i, data);
+		if (row.id != undefined) {
+			this.rows.push(row)
+		} else {
+			// In that case I will set the save callback to remove the row at save time.
+			var onSave = row.saveBtn.element.onclick
+			row.saveBtn.element.onclick = function (onSave, row) {
+				return function () {
+					row.div.parentElement.removeElement(row.div)
+					onSave()
+				}
+			}(onSave, row)
+		}
+
 	}
 
 	// Refresh the parent table.
@@ -204,9 +218,9 @@ Table.prototype.clear = function () {
 		this.header.minimizeBtn.element.click()
 
 		// Detach the listener.
-		server.entityManager.detach(this, UpdateEntityEvent)
-		server.entityManager.detach(this, NewEntityEvent)
-		server.entityManager.detach(this, DeleteEntityEvent)
+		server.entityManager.detach(this.getModel(), UpdateEntityEvent)
+		server.entityManager.detach(this.getModel(), NewEntityEvent)
+		server.entityManager.detach(this.getModel(), DeleteEntityEvent)
 	}
 
 	if (this.header != null) {
@@ -291,8 +305,8 @@ Table.prototype.refresh = function () {
  */
 Table.prototype.getRow = function (id) {
 	// Function that dermine if the rows array already contain a given row.
-	for(var i=0; i < this.rows.length; i++){
-		if(this.rows[i].id == id){
+	for (var i = 0; i < this.rows.length; i++) {
+		if (this.rows[i].id == id) {
 			return this.rows[i]
 		}
 	}
@@ -305,11 +319,10 @@ Table.prototype.getRow = function (id) {
  */
 Table.prototype.appendRow = function (values, id) {
 	if (id == undefined) {
-		id = 0
+		return null
 	}
 
 	if (this.rowGroup == null) {
-		//this.init()
 		this.rowGroup = this.div.appendElement({ "tag": "div", "class": "table_body" }).down()
 	}
 
@@ -483,9 +496,9 @@ var TableRow = function (table, index, data, id) {
 	this.deleteBtn = null
 
 	if (this.id == undefined) {
-		if(table.getModel().entities != undefined){
+		if (table.getModel().entities != undefined) {
 			this.id = table.getModel().entities[index].UUID
-		}else{
+		} else {
 			this.id = data[0] // The first data must be the id...
 		}
 	}
@@ -497,7 +510,7 @@ var TableRow = function (table, index, data, id) {
 
 	this.saveBtn.element.onclick = function (row) {
 		return function () {
-			this.style.visibility = "hidden"
+			row.saveBtn.element.style.visibility = "hidden"
 			row.table.getModel().saveValue(row)
 		}
 	}(this)
@@ -550,7 +563,13 @@ var TableCell = function (row, index, value) {
 			// Here I will remove the cell editor from the cell div.
 			cell.div.element.removeChild(cell.editor.editor.element);
 			cell.valueDiv.element.style.display = "";
-			cell.setValue(cell.editor.getValue());
+			var value = cell.editor.getValue();
+			// In case of select box the value return is convert to string by default.
+			// so I need to but it back to integer.
+			if (cell.getType().startsWith("enum:")) {
+				value = parseInt(value)
+			}
+			cell.setValue(value)
 		}
 	}(this));
 
@@ -615,7 +634,7 @@ TableCell.prototype.getValue = function () {
  * @param {} value The value to set.
  */
 TableCell.prototype.setValue = function (value) {
-	if (this.valueDiv == undefined) {
+	if (this.valueDiv == undefined && value == null) {
 		return
 	}
 
@@ -643,7 +662,9 @@ TableCell.prototype.setValue = function (value) {
 	}
 
 	// Set the value div visible.
-	this.valueDiv.element.style.display = ""
+	if (this.valueDiv != undefined) {
+		this.valueDiv.element.style.display = ""
+	}
 
 	// Set save button visible.
 	this.row.saveBtn.element.style.visibility = "visible"
@@ -668,7 +689,7 @@ TableCell.prototype.isEditable = function () {
  */
 TableCell.prototype.setCellEditor = function (index) {
 	// Set the editor...
-	if (this.isEditable() == false) {
+	if (this.isEditable() == false /*|| this.editor.editor != null*/) {
 		return // The cell is not editable...
 	}
 
@@ -708,7 +729,7 @@ TableCell.prototype.setCellEditor = function (index) {
 		row.prependElement(this.editor.editor);
 	}
 	if (this.editor.editor != null) {
-		if (this.editor.editor.element.type != "number") {
+		if (this.editor.editor.element.type != "number" && this.editor.editor.element.type != "select-one" && this.editor.editor.element.value != null) {
 			this.editor.editor.element.setSelectionRange(0, this.editor.editor.element.value.length)
 		}
 		if (valueDiv != undefined) {
@@ -766,14 +787,11 @@ TableCell.prototype.setArrayCellEditor = function () {
 							// so here I will create an new entity inside it parent.
 							var entity = eval("new " + prototype.TypeName + "()")
 							entity.ParentLnk = caller.parentLnk
-							var entity = eval("new " + typeName + "()");
-							entity.ParentLnk = caller.parentLnk;
-							entity.ParentUuid = parentEntity.UUID;
+							entity.ParentUuid = caller.parentEntity.UUID;
 							var cell = caller.cell;
 							var values = cell.getValue();
 							values.push(entity);
 							cell.setValue(values);
-							cell.row.table.refresh();
 							cell.setCellEditor(values.length - 1);
 						},
 						// error callback.
@@ -949,14 +967,24 @@ function formatValue(value, typeName) {
 		if (isXsDate(typeName)) {
 			formatedValue = formatDate(value);
 		} else {
-			// Int are numeric value with 0 digit.
-			formatedValue = formatReal(value, 0);
+			if (typeName.startsWith("enum:")) {
+				// In that case I will create a select box.
+				// enum:FileType_DbFile:FileType_DiskFile
+				formatedValue = typeName.split(":")[value].split("_")[1]
+			} else {
+				// Int are numeric value with 0 digit.
+				formatedValue = formatReal(value, 0);
+			}
 		}
 	} else if (isNumeric(value)) {
 		if (isXsMoney(typeName) || typeName.indexOf("Price") != -1) {
 			formatedValue = formatReal(value, 2)
 		} else {
 			formatedValue = formatReal(value, 3)
+		}
+	} else if (isObject(value)) {
+		if (value.M_valueOf != null) {
+			formatedValue = value.M_valueOf
 		}
 	}
 
@@ -987,6 +1015,9 @@ var TableCellEditor = function (cell, onblur) {
 }
 
 TableCellEditor.prototype.edit = function (value, typeName, onblur) {
+	if (this.editor != null) {
+		return;
+	}
 
 	if (editFcts[typeName] != null) {
 		// Here the function will create a custom editor for a given type.
@@ -1099,10 +1130,22 @@ TableCellEditor.prototype.edit = function (value, typeName, onblur) {
 			this.editor.element.value = moment(value).format('YYYY-MM-DDTHH:mm:ss');
 			this.editor.element.step = 7
 		} else {
-			if (this.editor == null) {
-				this.editor = new Element(null, { "tag": "input", "type": "number", "step": "1" });
+			if (typeName.startsWith("enum:")) {
+				// In that case I will create a select box.
+				// enum:FileType_DbFile:FileType_DiskFile
+				var values = typeName.split(":");
+				this.editor = new Element(null, { "tag": "select" });
+				for (var i = 1; i < values.length; i++) {
+					this.editor.appendElement({ "tag": "option", "value": i, "innerHtml": values[i].split("_")[1] });
+				}
+				this.editor.element.value = parseInt(value);
+			} else {
+				// Here I case of enumeration values...
+				if (this.editor == null) {
+					this.editor = new Element(null, { "tag": "input", "type": "number", "step": "1" });
+				}
+				this.editor.element.value = value;
 			}
-			this.editor.element.value = value;
 		}
 	} else if (isNumeric(value)) {
 		if (this.editor == null) {
@@ -1110,7 +1153,26 @@ TableCellEditor.prototype.edit = function (value, typeName, onblur) {
 		}
 		this.editor.element.value = value;
 	} else if (isObject(value)) {
-		console.log("---> edit object!")
+		if (value.TYPENAME != undefined) {
+			this.editor = new Element(null, { "tag": "div" })
+			var panel = new EntityPanel(this.editor, typeName.replace("[]", "").replace(":Ref", ""),
+				// The init callback. 
+				function (entity) {
+					return function (panel) {
+						panel.setEntity(entity)
+					}
+				}(value),
+				undefined, true, undefined, "")
+
+			// Here on mouse leave I will set the value.
+			this.editor.element.onmouseleave = function (panel, cell, editor) {
+				return function () {
+					// In that case I will set the value of the renderer.
+					cell.setValue(panel.entity)
+				}
+			}(panel, this.cell, this.editor)
+			return;
+		}
 	}
 
 	// Set the on blur event.
@@ -1150,6 +1212,26 @@ var TableCellRenderer = function (cell) {
 // }
 var renderFcts = {};
 
+// Exemple of special renderer...
+renderFcts["CatalogSchema.DimensionType"] = function (value) {
+	// So here I will return the string that contain the unit of measure.
+	var str = value.M_valueOf + " " + value.M_unitOfMeasure.M_valueOf
+	return new Element(null, { "tag": "div", "innerHtml": str });
+}
+
+// Special cell renderer...
+renderFcts["CatalogSchema.FiltreSorte"] = function (value) {
+	// So here I will return the string that contain the unit of measure.
+	var str = value.M_valueOf
+	return new Element(null, { "tag": "div", "innerHtml": str });
+}
+
+renderFcts["CatalogSchema.FiltreSecteur"] = function (value) {
+	// So here I will return the string that contain the unit of measure.
+	var str = value.M_valueOf
+	return new Element(null, { "tag": "div", "innerHtml": str });
+}
+
 /**
  * Fromat the content of the cell in respect of the value.
  * @param {} value The value to display in the cell.
@@ -1163,14 +1245,13 @@ TableCellRenderer.prototype.render = function (value, fieldType) {
 		return renderFcts[fieldType](value)
 	}
 
-
 	// I will us Javasript type to determine how I will display the data...
 	if (isArray(value)) {
 		// Format array create it own element.
 		var div = this.renderArray(value, fieldType);
 		return div;
 	} else if (isObject(value)) {
-		formatedValue = this.renderEntity(value, fieldType);
+		return this.renderEntity(value, fieldType);
 	} else {
 		formatedValue = formatValue(value, fieldType);
 		if (isObjectReference(formatedValue)) {
@@ -1257,6 +1338,10 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 				}, { "div": div, "cell": this.cell })
 		}
 		return div;
+	} else {
+		// Here empty array.
+		var div = new Element(null, { "tag": "div" });
+		return div;
 	}
 }
 
@@ -1264,7 +1349,21 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
  * Format entity.
  */
 TableCellRenderer.prototype.renderEntity = function (value, typeName) {
-	// Here I will get 
+	// So here I will render an entity.
+	if (value.TYPENAME != undefined) {
+		var valueDiv = new Element(null, { "tag": "div" })
+
+		new EntityPanel(valueDiv, typeName.replace("[]", "").replace(":Ref", ""),
+			// The init callback. 
+			function (entity) {
+				return function (panel) {
+					panel.setEntity(entity)
+				}
+			}(value),
+			undefined, true, undefined, "")
+
+		return valueDiv;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1353,8 +1452,15 @@ ColumnSorter.prototype.sortValues = function (values) {
 			var colIndex = sorter.index
 
 			var value1 = sorter.table.getModel().getValueAt(row1.index, colIndex)
-			var value2 = sorter.table.getModel().getValueAt(row2.index, colIndex)
+			if (value1.M_valueOf != undefined) {
+				value1 = value1.M_valueOf
+			}
 
+			var value2 = sorter.table.getModel().getValueAt(row2.index, colIndex)
+			if (value2.M_valueOf != undefined) {
+				value2 = value2.M_valueOf
+			}
+			
 			if (typeof value1 == "string") {
 				value1.trim().toUpperCase()
 			}
@@ -1797,7 +1903,7 @@ ColumnFilter.prototype.initFilterPanel = function () {
 
 /**
  * Append new filter value.
- * @param the filter value.
+ * @param value the filter value.
  */
 ColumnFilter.prototype.appendFilter = function (value) {
 	if (value != "" && value != undefined) {
@@ -1853,6 +1959,10 @@ ColumnFilter.prototype.filterValues = function () {
 	for (var i = 0; i < this.table.rows.length; i++) {
 		var row = this.table.rows[i]
 		var cellValue = this.table.getModel().getValueAt(i, this.index)
+		if (cellValue.M_valueOf != undefined) {
+			cellValue = cellValue.M_valueOf
+		}
+
 		var isShow = false
 		if (isXsDate(this.type)) {
 			// Now filters are apply...

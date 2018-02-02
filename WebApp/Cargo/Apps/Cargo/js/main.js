@@ -70,7 +70,6 @@ function load() {
                         function (path, caller) {
                             // set the path.
                             server.root = path
-
                             for (var key in results) {
                                 // create the listener if is not already exist.
                                 if (server[key] == undefined) {
@@ -99,6 +98,7 @@ function load() {
                                             // Get the active configuration.
                                             server.activeConfigurations = activeConfigurations
                                             if (main != null) {
+                                                // Here I will connect a listener to keep entities up to date.
                                                 main()
                                             }
                                         },
@@ -116,8 +116,6 @@ function load() {
                 function (errObj, caller) {
                     // Here no client service code was found.
                 }, {})
-
-
         })
 
     },  // onOpen callback
