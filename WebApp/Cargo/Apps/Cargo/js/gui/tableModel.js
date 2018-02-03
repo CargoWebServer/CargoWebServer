@@ -324,6 +324,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
                     if (!objectPropInArray(model.entities, "UUID", entity.UUID)) {
                         model.entities.push(entity)
                         var row = model.table.appendRow(entity, entity.UUID)
+                        model.table.refresh()
                     }
                 }
             }
@@ -466,6 +467,9 @@ EntityTableModel.prototype.appendRow = function (values) {
             this.values.push(objectValues)
         }
     }
+
+    this.table.setHeader();
+    this.table.refresh();
 
     return objectValues
 }

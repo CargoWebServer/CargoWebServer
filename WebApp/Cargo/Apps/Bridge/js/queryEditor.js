@@ -536,7 +536,9 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
                         return function () {
                             // init the table.
                             table.init()
-                            table.header.maximizeBtn.element.click()
+                            if(table.header!=null){
+                                table.header.maximizeBtn.element.click()
+                            }
                         }
                     }(table, this))
 

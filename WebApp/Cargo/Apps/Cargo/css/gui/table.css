@@ -35,6 +35,7 @@
 }
 
 .body_cell{
+    color: #212529;
     vertical-align: text-top;
     text-align: left;
     background-color: transparent;
@@ -45,6 +46,7 @@
     height: 100%;
     padding: 2px 5px 2px 5px;
     min-height: 20px;
+    font: 16px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 }
 
 .body_cell input{
@@ -193,6 +195,7 @@
     display: table-cell;
     vertical-align: middle;
     margin: 2px;
+    padding-left: 5px;
 }
 
 .filter_panel div:hover{
@@ -216,7 +219,6 @@
     width: 50%;
     height: 26px;
     text-align: center;
-    padding-top: 5px;
     vertical-align: middle;
 }
 
@@ -239,9 +241,14 @@
     vertical-align: middle;
 }
 
+.fa-download {
+    display: none;
+}
+
 .row_button{
     display: table-cell;
     vertical-align: middle;
+    text-align: center;
     min-width: 16px;
 }
 
@@ -285,7 +292,7 @@
     background-color:steelblue;
     border: 1px solid;
     font-size: 8pt;
-    min-width: 1em;
+    min-width: 2em;
     text-align: center; 
     padding: 2px; 
 }

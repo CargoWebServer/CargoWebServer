@@ -175,7 +175,7 @@ Table.prototype.init = function () {
 	for (var i = 0; i < this.getModel().getRowCount(); i++) {
 		var data = []
 		for (var j = 0; j < this.getModel().getColumnCount(); j++) {
-			if (this.header == null) {
+			if (i == 0 && j == 0) {
 				this.setHeader()
 				this.header.numberOfRowLabel.element.innerHTML = this.getModel().getRowCount();
 			}
@@ -716,7 +716,7 @@ TableCell.prototype.setCellEditor = function (index) {
 
 		// Here the cell is editable so I will display the cell editor.
 		this.editor.index = index
-		this.editor.edit(this.getValue()[index], this.getType().replace("[]", ""), function (row, cell) {
+		this.editor.edit(this.getValue()[index], this.getType(), function (row, cell) {
 			return function () {
 				// get the value from the editor and set it in the cell
 				var values = cell.getValue()
@@ -1028,6 +1028,8 @@ TableCellEditor.prototype.edit = function (value, typeName, onblur) {
 	if (this.editor != null) {
 		return;
 	}
+	var isArray = typeName.startsWith("[]")
+	typeName = typeName.replace("[]", "")
 
 	if (editFcts[typeName] != null) {
 		// Here the function will create a custom editor for a given type.
@@ -1164,13 +1166,15 @@ TableCellEditor.prototype.edit = function (value, typeName, onblur) {
 		this.editor.element.value = value;
 	} else if (isObject(value)) {
 		if (value.TYPENAME != undefined) {
-			if (value.TYPENAME.endsWith(":Ref")) {
+			if (!isArray) {
 				this.editor = new Element(null, { "tag": "div" })
 				var panel = new EntityPanel(this.editor, typeName.replace("[]", "").replace(":Ref", ""),
 					// The init callback. 
 					function (entity) {
 						return function (panel) {
 							panel.setEntity(entity)
+							panel.header.element.style.display = "none";
+
 						}
 					}(value),
 					undefined, true, undefined, "")
@@ -1347,7 +1351,7 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 				/** The error callva */
 				function (errObj, caller) {
 					// Here the div contain a table of values.
-				}, { "div": div, "cell": this.cell, "values":values})
+				}, { "div": div, "cell": this.cell, "values": values })
 		}
 		return div;
 	} else {
@@ -1365,11 +1369,12 @@ TableCellRenderer.prototype.renderEntity = function (value, typeName) {
 	if (value.TYPENAME != undefined) {
 		var valueDiv = new Element(null, { "tag": "div" })
 
-		new EntityPanel(valueDiv, typeName.replace("[]", "").replace(":Ref", ""),
+		var panel = new EntityPanel(valueDiv, typeName.replace("[]", "").replace(":Ref", ""),
 			// The init callback. 
 			function (entity) {
 				return function (panel) {
 					panel.setEntity(entity)
+					panel.header.element.style.display = "none";
 				}
 			}(value),
 			undefined, true, undefined, "")
@@ -2002,9 +2007,18 @@ ColumnFilter.prototype.filterValues = function () {
 			}
 		} else {
 			for (var filter in this.filters) {
-				if (filter == cellValue) {
-					isShow = true
-					break
+				if (isArray(cellValue)) {
+					for (var j = 0; j < cellValue.length; j++) {
+						if (filter == cellValue[j]) {
+							isShow = true
+							break
+						}
+					}
+				} else {
+					if (filter == cellValue) {
+						isShow = true
+						break
+					}
 				}
 			}
 		}
