@@ -477,7 +477,7 @@ EntityTableModel.prototype.appendRow = function (values) {
  */
 EntityTableModel.prototype.getValueAt = function (row, column) {
     var entity = this.entities[row]
-    if(entity == undefined){
+    if (entity == undefined) {
         return null;
     }
 
@@ -485,7 +485,28 @@ EntityTableModel.prototype.getValueAt = function (row, column) {
         entity = this.entities[row] = entities[entity.UUID]
     }
     var field = "M_" + this.titles[column]
-    return entity[field]
+    var value = entity[field]
+    if (isArray(value)) {
+        // remove previously deleted values.
+        for (var i = 0; i < value.length; i++) {
+            if (isObject(value[i])) {
+                if (value[i].UUID != undefined) {
+                    if (entities[value[i].UUID] == null) {
+                        value.splice(i, 1)
+                    }
+                }
+            }
+        }
+    }
+
+    // in case of array.
+    if (value == null) {
+        if (this.proto.FieldsType[fields].startsWith("[]")) {
+            value = [];
+        }
+    }
+
+    return value
 }
 
 /**
@@ -526,10 +547,9 @@ EntityTableModel.prototype.saveValue = function (row) {
         }
 
         entity.NeedSave = true
-        // I must remove the temporary object it will be recreated when the NewEntity event will be received.
-        this.entities.pop(row.index)
-
         if (entity.exist == false) {
+            // I must remove the temporary object it will be recreated when the NewEntity event will be received.
+            this.entities.pop(row.index)
 
             server.entityManager.createEntity(entity.ParentUuid, entity.ParentLnk, entity.TYPENAME, entity.M_id, entity,
                 // Success callback

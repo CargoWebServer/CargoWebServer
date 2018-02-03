@@ -1209,9 +1209,17 @@ func (this *DynamicEntity) RemoveReference(name string, reference Entity) {
 	isArray := strings.HasPrefix(fieldType, "[]")
 	if isArray {
 		refs := make([]string, 0)
-		for i := 0; i < len(this.getValue(name).([]string)); i++ {
-			if reference.GetUuid() != this.getValue(name).([]string)[i] {
-				refs = append(refs, this.getValue(name).([]string)[i])
+		if reflect.TypeOf(this.getValue(name)).String() == "[]interface {}" {
+			for i := 0; i < len(this.getValue(name).([]interface{})); i++ {
+				if reference.GetUuid() != this.getValue(name).([]interface{})[i].(string) {
+					refs = append(refs, this.getValue(name).([]interface{})[i].(string))
+				}
+			}
+		} else if reflect.TypeOf(this.getValue(name)).String() == "[]string" {
+			for i := 0; i < len(this.getValue(name).([]string)); i++ {
+				if reference.GetUuid() != this.getValue(name).([]string)[i] {
+					refs = append(refs, this.getValue(name).([]string)[i])
+				}
 			}
 		}
 		this.setValue(name, refs)

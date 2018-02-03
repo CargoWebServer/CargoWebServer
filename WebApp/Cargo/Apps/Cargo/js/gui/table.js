@@ -198,7 +198,6 @@ Table.prototype.init = function () {
 				}
 			}(onSave, row)
 		}
-
 	}
 
 	// Refresh the parent table.
@@ -333,6 +332,10 @@ Table.prototype.appendRow = function (values, id) {
 		var data = this.getModel().appendRow(values)
 		row = new TableRow(this, this.rows.length, data, id)
 		this.rows.push(row)
+		if (this.rows.length == 1) {
+			this.setHeader();
+		}
+
 	} else {
 		// Here i will update the values...
 		for (var i = 0; i < row.cells.length; i++) {
@@ -341,7 +344,8 @@ Table.prototype.appendRow = function (values, id) {
 			cell.setValue(this.getModel().getValueAt(this.rows.indexOf(row), i))
 		}
 	}
-
+	// set the number of row in the header control.
+	this.header.numberOfRowLabel.element.innerHTML = this.rows.length
 	return row
 }
 
@@ -711,20 +715,23 @@ TableCell.prototype.setCellEditor = function (index) {
 		var valueDiv = row.element.firstChild;
 
 		// Here the cell is editable so I will display the cell editor.
-		this.editor.edit(this.getValue()[index], this.getType().replace("[]", ""), function (row, cell, index) {
+		this.editor.index = index
+		this.editor.edit(this.getValue()[index], this.getType().replace("[]", ""), function (row, cell) {
 			return function () {
 				// get the value from the editor and set it in the cell
 				var values = cell.getValue()
 				// must not use the closure directly...
-				values[index] = cell.editor.getValue();
+				values[cell.editor.index] = cell.editor.getValue();
 				cell.setValue(values);
-				row.element.removeChild(row.element.firstChild)
 				if (row.element.firstChild != undefined) {
-					row.element.firstChild.style.display = "";
+					row.element.removeChild(row.element.firstChild)
+					if (row.element.firstChild != undefined) {
+						row.element.firstChild.style.display = "";
+					}
 				}
 				cell.row.table.refresh();
 			}
-		}(row, this, index));
+		}(row, this));
 
 		row.prependElement(this.editor.editor);
 	}
@@ -774,6 +781,9 @@ TableCell.prototype.setArrayCellEditor = function () {
 					values.push(false);
 				} else if (typeName.endsWith(":Ref")) {
 					// Here I will push an empty string...
+					if (values == undefined) {
+						values = [] // empty array.
+					}
 					values.push("");
 				} else {
 					// Asynch here...
@@ -792,7 +802,7 @@ TableCell.prototype.setArrayCellEditor = function () {
 							var values = cell.getValue();
 							values.push(entity);
 							cell.setValue(values);
-							cell.setCellEditor(values.length - 1);
+							//cell.setCellEditor(values.length - 1);
 						},
 						// error callback.
 						function (errObj, caller) {
@@ -802,7 +812,7 @@ TableCell.prototype.setArrayCellEditor = function () {
 				}
 
 				// Set the cell editor as needed...
-				if (value.length > 0) {
+				if (values.length > 0) {
 					cell.setValue(values);
 					// Do display the cell button here.
 					cell.row.saveBtn.element.style.visibility = "hidden";
@@ -1154,23 +1164,25 @@ TableCellEditor.prototype.edit = function (value, typeName, onblur) {
 		this.editor.element.value = value;
 	} else if (isObject(value)) {
 		if (value.TYPENAME != undefined) {
-			this.editor = new Element(null, { "tag": "div" })
-			var panel = new EntityPanel(this.editor, typeName.replace("[]", "").replace(":Ref", ""),
-				// The init callback. 
-				function (entity) {
-					return function (panel) {
-						panel.setEntity(entity)
-					}
-				}(value),
-				undefined, true, undefined, "")
+			if (value.TYPENAME.endsWith(":Ref")) {
+				this.editor = new Element(null, { "tag": "div" })
+				var panel = new EntityPanel(this.editor, typeName.replace("[]", "").replace(":Ref", ""),
+					// The init callback. 
+					function (entity) {
+						return function (panel) {
+							panel.setEntity(entity)
+						}
+					}(value),
+					undefined, true, undefined, "")
 
-			// Here on mouse leave I will set the value.
-			this.editor.element.onmouseleave = function (panel, cell, editor) {
-				return function () {
-					// In that case I will set the value of the renderer.
-					cell.setValue(panel.entity)
-				}
-			}(panel, this.cell, this.editor)
+				// Here on mouse leave I will set the value.
+				this.editor.element.onmouseleave = function (panel, cell, editor) {
+					return function () {
+						// In that case I will set the value of the renderer.
+						cell.setValue(panel.entity)
+					}
+				}(panel, this.cell, this.editor)
+			}
 			return;
 		}
 	}
@@ -1322,7 +1334,7 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 					// Here I got an array of entities.
 					var model = null;
 					model = new EntityTableModel(prototype);
-					model.entities = values;
+					model.entities = caller.values;
 					caller.div.element.className = "entity_sub-table";
 					var table = new Table(randomUUID(), caller.div)
 					table.setModel(model, function (table) {
@@ -1335,7 +1347,7 @@ TableCellRenderer.prototype.renderArray = function (values, typeName) {
 				/** The error callva */
 				function (errObj, caller) {
 					// Here the div contain a table of values.
-				}, { "div": div, "cell": this.cell })
+				}, { "div": div, "cell": this.cell, "values":values})
 		}
 		return div;
 	} else {
@@ -1460,7 +1472,7 @@ ColumnSorter.prototype.sortValues = function (values) {
 			if (value2.M_valueOf != undefined) {
 				value2 = value2.M_valueOf
 			}
-			
+
 			if (typeof value1 == "string") {
 				value1.trim().toUpperCase()
 			}
