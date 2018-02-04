@@ -505,7 +505,7 @@ EntityTableModel.prototype.getValueAt = function (row, column) {
 
     // in case of array.
     if (value == null) {
-        if (this.proto.FieldsType[fields].startsWith("[]")) {
+        if (this.proto.FieldsType[this.proto.getFieldIndex(field)].startsWith("[]")) {
             value = [];
         }
     }

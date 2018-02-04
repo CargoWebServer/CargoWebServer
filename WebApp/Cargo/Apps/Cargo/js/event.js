@@ -185,7 +185,7 @@ EventHub.prototype.onEvent = function (evt) {
                     observers[i].updateFunctions[this.id + "_" + evt.code](evt, observers[i])
                 } else {
                     if (Object.keys(observers[i].updateFunctions).length == 0) {
-                        this.observers[eventId].pop(observers[i])
+                        this.observers[evt.code].pop(observers[i])
                     }
                 }
             }

@@ -527,7 +527,7 @@ var TableRow = function (table, index, data, id) {
 
 	// The delete button.
 	this.deleteBtn = this.div.appendElement({ "tag": "div", "style": "visibility: hidden;", "class": "row_button delete_row_btn", "id": this.id + "_delete_btn" }).down()
-		.appendElement({ "tag": "i", "class": "fa fa-trash-o" }).down()
+	this.deleteBtn.appendElement({ "tag": "i", "class": "fa fa-trash-o" }).down()
 
 	// Now the action...
 	this.deleteBtn.element.onclick = function (self, id, deleteCallback) {
@@ -541,6 +541,24 @@ var TableRow = function (table, index, data, id) {
 			}
 		}
 	}(this, data[0], this.table.deleteRowCallback)
+
+	this.div.element.onmouseenter = function (deleteBtn, table) {
+		return function (evt) {
+			evt.stopPropagation()
+			var deleteBtns = table.div.element.getElementsByClassName("row_button delete_row_btn")
+			for (var i = 0; i < deleteBtns.length; i++) {
+				deleteBtns[i].style.visibility = "hidden"
+			}
+			deleteBtn.element.style.visibility = "visible"
+		}
+	}(this.deleteBtn, this.table)
+
+	this.table.div.element.onmouseleave = function () {
+		var deleteBtns = this.getElementsByClassName("row_button delete_row_btn")
+		for (var i = 0; i < deleteBtns.length; i++) {
+			deleteBtns[i].style.visibility = "hidden"
+		}
+	}
 
 	return this
 }
@@ -736,7 +754,7 @@ TableCell.prototype.setCellEditor = function (index) {
 		row.prependElement(this.editor.editor);
 	}
 	if (this.editor.editor != null) {
-		if (this.editor.editor.element.type != "number" && this.editor.editor.element.type != "select-one" && this.editor.editor.element.value != null) {
+		if (this.editor.editor.element.type != "checkbox" && this.editor.editor.element.type != "number" && this.editor.editor.element.type != "select-one" && this.editor.editor.element.value != null) {
 			this.editor.editor.element.setSelectionRange(0, this.editor.editor.element.value.length)
 		}
 		if (valueDiv != undefined) {
@@ -802,7 +820,6 @@ TableCell.prototype.setArrayCellEditor = function () {
 							var values = cell.getValue();
 							values.push(entity);
 							cell.setValue(values);
-							//cell.setCellEditor(values.length - 1);
 						},
 						// error callback.
 						function (errObj, caller) {
@@ -1202,6 +1219,11 @@ TableCellEditor.prototype.edit = function (value, typeName, onblur) {
 }
 
 TableCellEditor.prototype.getValue = function () {
+	if(this.editor.element.tagName == "INPUT"){
+		if(this.editor.element.type == "checkbox"){
+			return this.editor.element.checked
+		}
+	}
 	return this.editor.element.value;
 }
 

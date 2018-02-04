@@ -1220,7 +1220,7 @@ function contains(arr, obj) {
  */
 function objectPropInArray(list, prop, val) {
     if (list.length > 0) {
-        for (i in list) {
+        for (var i =0; i < list.length; i++) {
             if (list[i][prop] === val) {
                 return true;
             }

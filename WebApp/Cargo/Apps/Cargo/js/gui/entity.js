@@ -1039,12 +1039,16 @@ EntityPanel.prototype.initField = function (parent, field, fieldType, restrictio
 
 							// Set the parent uuid.
 							item.ParentUuid = entityPanel.getEntity().UUID
-							item.parentLnk = field
+							item.ParentLnk = field
 
 							if (isArray) {
-								var itemTable = entityPanel.controls[id]
-								var row = itemTable.appendRow(item, item.UUID)
-								row.saveBtn.element.style.visibility = "visible"
+								var itemTable = entityPanel.controls[id];
+								//var row = itemTable.appendRow(item, item.UUID);
+								var data = itemTable.getModel().appendRow(item)
+								row = new TableRow(itemTable, itemTable.rows.length, data, undefined)
+								row.saveBtn.element.style.visibility = "visible";
+								itemTable.header.maximizeBtn.element.click();
+								row.cells[0].setCellEditor();
 							} else {
 
 							}

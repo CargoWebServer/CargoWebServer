@@ -68,7 +68,7 @@ function main() {
 
     //entitiesDump("COLLADASchema.COLLADA")
     // entitiesDump("DT3_informations.Department")
-    testServiceContainer()
+    // testServiceContainer()
     //entitiesDump("DT3_informations.Workpoint")
 
     //entitiesDump("CargoEntities.Action")
@@ -210,26 +210,27 @@ function main() {
      */
 
     // Google OAuth
-    /*server.securityManager.getResource("1010681964660.apps.googleusercontent.com", "profile", "", 
+    /*server.oAuth2Manager.getResource("1010681964660.apps.googleusercontent.com", "profile", "", 
     function(result, caller){
     }, 
     function(errMsg, caller){
     }, {})*/
 
     // Facebook
-    /*server.securityManager.getResource("821916804492503", "public_profile user_posts", "https://graph.facebook.com/v2.5/me/feed?limit=25", 
+    /*server.oAuth2Manager.getResource("821916804492503", "public_profile user_posts", "https://graph.facebook.com/v2.5/me/feed?limit=25", 
     function(results, caller){
         console.log("found results: ", results)
     },
     function(errMsg, caller){
     }, {})*/
 
-    /* server.securityManager.getResource("1234", "openid profile email", "", 
+     server.oAuth2Manager.getResource("1234", "openid profile email", "", 
      function(results, caller){
          console.log("found results: ", results)
      },
      function(errMsg, caller){
-     }, {})*/
+     }, {})
+     
     /*
          var query = {}
          query.TypeName = "Proactive.AnalyseResult"

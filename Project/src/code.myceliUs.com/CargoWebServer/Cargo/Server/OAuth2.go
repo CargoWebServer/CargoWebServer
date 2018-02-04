@@ -1,5 +1,11 @@
 /**
  * That file contain the code for OAuth2 service.
+ * As exemple...
+ * id: 			1234
+ * secret: 		aabbccdd
+ * redirect: 	http://localhost:9393/oauth2callback
+ * token: 		http://localhost:9393/token
+ * authorize: 	http://localhost:9393/authorize
  */
 
 package Server
@@ -1596,7 +1602,8 @@ func AppAuthCodeHandler(w http.ResponseWriter, r *http.Request) {
 * exemple of use.
 
   Get all entity prototype from CargoEntities
-  http://localhost:9393/api/Server/EntityManager/GetEntityPrototypes?p0=CargoEntities
+  ** note the access_token can change over time.
+  http://localhost:9393/api/Server/EntityManager/GetEntityPrototypes?storeId=CargoEntities&access_token=vVe1XIPXSXu5LWu-ZRwtuQ
 
   Get an entity object with a given uuid.
   * Note because % is in the uuid string it must be escape with %25 so here
@@ -1613,7 +1620,7 @@ func HttpQueryHandler(w http.ResponseWriter, r *http.Request) {
 	// The action to be execute.
 	var errObj *CargoEntities.Error
 	var action *CargoEntities.Action
-
+	log.Println("----> ids: ", ids)
 	// I will get the action entity from the values.
 	if len(ids) == 3 {
 		var entity Entity

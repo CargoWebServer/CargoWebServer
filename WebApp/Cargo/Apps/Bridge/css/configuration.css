@@ -16,6 +16,10 @@
     color: steelblue;
 }
 
+#configurationContent .body_cell {
+    font-size: 10pt;
+}
+
 #changeAdminPwdBtn{
     display: inline; 
     margin-right: 4px;

@@ -69,7 +69,6 @@ var EntityQuery = function(typeName) {
 var Restriction = function () {
     // The the of the restriction (Facet)
     this.Type
-
     // The value.
     this.Value
 }
