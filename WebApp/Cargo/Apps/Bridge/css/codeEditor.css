@@ -4,12 +4,16 @@
  */
  .codeEditor{
      position: absolute;
-     top: 22px;
-     bottom: 1px;
+     top: 31px;
+     bottom: 0px;
      left: 0px;
      right: 0px;
      background-color: transparent;
      overflow: hidden;
+ }
+
+ .codeEditor .ace_editor {
+    position: initial;
  }
 
  .filePanel{
