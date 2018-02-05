@@ -4,22 +4,22 @@
 var applicationName = document.getElementsByTagName("title")[0].text;
 
 // Local event...
-var ChangeFileEvent = 100
-var ChangeThemeEvent = 101
+var ChangeFileEvent = 100;
+var ChangeThemeEvent = 101;
 
 // Set the address here
-var mainPage = null
-var catalog = null
-var homePage = null
+var mainPage = null;
+var catalog = null;
+var homePage = null;
 
 function init() {
 
     // Set style informations
-    cargoThemeInfos = JSON.parse(localStorage.getItem("bridge_theme_infos"))
+    cargoThemeInfos = JSON.parse(localStorage.getItem("bridge_theme_infos"));
     if (cargoThemeInfos !== undefined) {
         for (var ruleName in cargoThemeInfos) {
             var rule = getCSSRule(ruleName)
-            for (property in cargoThemeInfos[ruleName]) {
+            for (var property in cargoThemeInfos[ruleName]) {
                 rule.style[property] = cargoThemeInfos[ruleName][property]
             }
         }
@@ -95,10 +95,10 @@ function main() {
                                                                             // success callback
                                                                             function (results, caller) {
                                                                                 // eval in that case contain the code to use the service.
-                                                                                eval(results)
+                                                                                eval(results);
                                                                                 // Xapian test...
-                                                                                xapian = new com.mycelius.XapianInterface(caller.service)
-                                                                                init()
+                                                                                xapian = new com.mycelius.XapianInterface(caller.service);
+                                                                                init();
                                                                             },
                                                                             // error callback.
                                                                             function () {

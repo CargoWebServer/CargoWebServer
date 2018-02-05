@@ -1253,7 +1253,15 @@ var renderFcts = {};
 // Exemple of special renderer...
 renderFcts["CatalogSchema.DimensionType"] = function (value) {
 	// So here I will return the string that contain the unit of measure.
-	var str = value.M_valueOf + " " + value.M_unitOfMeasure.M_valueOf
+	var str = value.M_valueOf 
+	
+	if(value.M_unitOfMeasure.M_valueOf == "IN (inch)"){
+		str += '"'
+	}else if(value.M_unitOfMeasure.M_valueOf == "FT (feet)"){
+		str += "'"
+	}else{
+		str += " " + value.M_unitOfMeasure.M_valueOf
+	}
 	return new Element(null, { "tag": "div", "innerHtml": str });
 }
 

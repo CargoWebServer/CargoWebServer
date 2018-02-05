@@ -24,13 +24,13 @@ PageSelector.prototype.setResults = function (index, total, pagesize) {
     this.panel.removeAllChilds();
 
     // The current page number.
-    var pageNumber = Math.round(index / pagesize);
+    var pageNumber = parseInt(index / pagesize);
 
     // The total number of page.
-    var numberPages = Math.round(total / pagesize + .5);
+    var numberPages = parseInt(total / pagesize + .5);
 
     // The start index.
-    var startIndex = Math.round(pageNumber / this.max);
+    var startIndex = parseInt(pageNumber / this.max);
 
     for (var i = 0; i < this.max; i++) {
         if (i + (startIndex * this.max) < numberPages) {
@@ -54,7 +54,7 @@ PageSelector.prototype.setResults = function (index, total, pagesize) {
     // Now I will append the button to navigate from batch of page...
 
     // Move Foward...
-    if (Math.round(numberPages / this.max + .5) > 1 && startIndex <= Math.round(numberPages / this.max + .5) - 1) {
+    if (parseInt(numberPages / this.max + .5) > 1 && startIndex < parseInt(numberPages / this.max + .5) - 1) {
         var moveNext = this.panel.appendElement({ "tag": "div" }).down()
         moveNext.appendElement({ "tag": "i", "class": "fa fa-angle-right" }).down()
         var nextIndex = ((startIndex + 1) * this.max * pagesize)
@@ -64,7 +64,7 @@ PageSelector.prototype.setResults = function (index, total, pagesize) {
             }
         }(this.search, nextIndex, pagesize)
 
-        if (Math.round(numberPages / this.max + .5) > 1) {
+        if (parseInt(numberPages / this.max + .5) > 2) {
             var moveLast = this.panel.appendElement({ "tag": "div" }).down()
             moveLast.appendElement({ "tag": "i", "class": "fa fa-angle-double-right" }).down()
             moveLast.element.onclick = function (search, index, pagesize) {

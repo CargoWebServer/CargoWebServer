@@ -17,6 +17,7 @@ var languageInfo = {
     }
 }
 
+
 server.languageManager.appendLanguageInfo(languageInfo)
 
 /**

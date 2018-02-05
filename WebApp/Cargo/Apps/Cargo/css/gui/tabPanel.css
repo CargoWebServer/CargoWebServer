@@ -32,7 +32,13 @@
 
 .tab-panel-tabs-div{
     display: flex;
-    flex-grow: 1;
+    border-spacing: 2px;
+    border-collapse: separate;
+}
+
+.tab-div{
+    display: flex;
+    margin-right: 2px;
 }
 
 .tab-panel-tabs-div:hover{
@@ -40,20 +46,15 @@
 }
 
 .tab-panel-tabs-div div{
+    display: table-cell;
     background-color: white;
     align-items: center;
-    display: table-cell;
-    margin-right: 2px;
     padding: 2px;
     color: #212529;
 }
 
 .tab-panel-tabs-div .tab-panel-close-btn{
     visibility: hidden;
-}
-
-.tab-panel-tabs-div > div{
-    border: 1px solid transparent;
 }
 
 .tab-panel-tabs-div > div.active{

@@ -28,14 +28,14 @@ var TabPanel = function(parent){
  * Append a new Tab panel
  */
 TabPanel.prototype.appendTab = function(id){
-    var header =  this.tabsDiv.appendElement({"tag":"div", "id":id + "_tab"}).down();
+    var header =  this.tabsDiv.appendElement({"tag":"div", "id":id + "_tab", "class":"tab-div"}).down();
     var title = header.appendElement({"tag":"div"}).down();
     var closeBtn = header.appendElement({"tag":"div", "class":"tab-panel-close-btn"}).down()
     closeBtn.appendElement({"tag":"i", "class":"fa fa-times"})
     var content = this.content.appendElement({"tag":"div", "id":id+"_content"}).down();
 
     if(Object.keys(this.tabs).length == 0){
-        header.element.className = "active"
+        header.element.className = "tab-div active"
     }
 
     var tab = {"title":title, "content":content}
@@ -56,10 +56,10 @@ TabPanel.prototype.appendTab = function(id){
     header.element.onclick = function(content, tabs){
         return function(){
             for(var id in tabs){
-                tabs[id].title.parentElement.element.className = "";
+                tabs[id].title.parentElement.element.className = "tab-div";
                 tabs[id].content.element.className = "";
             }
-            this.className = "active";
+            this.className = "tab-div active";
             content.element.className = "active";
         }
     }(content,  this.tabs)
