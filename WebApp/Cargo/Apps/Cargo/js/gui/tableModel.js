@@ -39,7 +39,7 @@ var TableModel = function (titles) {
     this.titles = titles
     this.values = []
     this.fields = []
-    this.editable = {}
+    this.editable = []
 
     if (this.titles != null) {
         for (var i = 0; i < this.titles.length; i++) {
@@ -179,6 +179,7 @@ var EntityTableModel = function (proto, query) {
                 var fieldIndex = proto.FieldsOrder[i]
                 titles.push(proto.Fields[fieldIndex].replace("M_", ""))
                 this.fields.push(proto.FieldsType[fieldIndex])
+                this.editable.push(false)
             }
         }
     } else {
@@ -187,6 +188,7 @@ var EntityTableModel = function (proto, query) {
             if (proto.FieldsVisibility[fieldIndex] == true) {
                 titles.push(proto.Fields[fieldIndex].replace("M_", ""))
                 this.fields.push(proto.FieldsType[fieldIndex])
+                this.editable.push(false)
             }
         }
     }
@@ -752,6 +754,16 @@ SqlTableModel.prototype.saveValue = function (row) {
 
         },
         {})
+}
+
+
+/**
+ * Get the value of a cell.
+ * @param row The row index.
+ * @param column The colum index.
+ */
+SqlTableModel.prototype.getValueAt = function (row, column) {
+    return this.values[row][column]
 }
 
 /**

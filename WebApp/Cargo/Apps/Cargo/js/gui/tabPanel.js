@@ -33,11 +33,6 @@ TabPanel.prototype.appendTab = function(id){
     var closeBtn = header.appendElement({"tag":"div", "class":"tab-panel-close-btn"}).down()
     closeBtn.appendElement({"tag":"i", "class":"fa fa-times"})
     var content = this.content.appendElement({"tag":"div", "id":id+"_content"}).down();
-
-    if(Object.keys(this.tabs).length == 0){
-        header.element.className = "tab-div active"
-    }
-
     var tab = {"title":title, "content":content}
     this.tabs[id] = tab;
     header.element.onmouseover = function(closeBtn){
@@ -64,5 +59,9 @@ TabPanel.prototype.appendTab = function(id){
         }
     }(content,  this.tabs)
 
+    if(Object.keys(this.tabs).length == 1){
+        header.element.className = "tab-div active"
+        header.element.click()
+    }
     return tab;
 }

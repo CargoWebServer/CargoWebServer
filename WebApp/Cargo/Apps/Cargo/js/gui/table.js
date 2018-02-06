@@ -355,6 +355,7 @@ Table.prototype.appendRow = function (values, id) {
 Table.prototype.setHeader = function () {
 	if (this.header == null) {
 		this.header = new TableHeader(this)
+		server.languageManager.setLanguage()
 	}
 }
 
@@ -433,8 +434,8 @@ var TableHeader = function (table) {
 		cellContent.appendElement(sorter.div)
 
 		// Set the title
-		cellContent.appendElement({ "tag": "div", "class": "cell_content", "innerHtml": title })
-
+		cellContent.appendElement({ "tag": "div", "class": "cell_content"}).down()
+			.appendElement({ "tag": "span", "style":"padding-left: 5px; padding-right: 5px;", "id":title + "_tbl_header", "innerHtml": title })
 		// The colum filters...
 		var filter = new ColumnFilter(i, table)
 		cellContent.appendElement(filter.div)
@@ -768,6 +769,10 @@ TableCell.prototype.setCellEditor = function (index) {
  * That function is use to display the delete button and append button for array.
  */
 TableCell.prototype.setArrayCellEditor = function () {
+	if (this.isEditable() == false /*|| this.editor.editor != null*/) {
+		return // The cell is not editable...
+	}
+	
 	if (this.div.getChildById("appendRowBtn") == undefined) {
 		// First of all I will append the append row button
 		this.div.element.style.position = "relative";

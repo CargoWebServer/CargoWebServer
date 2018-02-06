@@ -126,7 +126,7 @@
 
 /** The sorter **/
 .column_sorter {
-    /*color: lightgrey;*/
+    width: 1em;
     display: table-cell;
 }
 
@@ -146,7 +146,6 @@
 
 /** The column filter **/
 .column_filter{
-   /*color: lightgrey;*/
    display: table-cell;
    width: 1em;
 }

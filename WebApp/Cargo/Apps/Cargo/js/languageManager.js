@@ -74,13 +74,15 @@ LanguageManager.prototype.registerElementText = function (element, textId) {
 		this.textElements[textId] = []
 	}
 	if (isArray(this.textElements[textId])) {
-		if(this.elements[element.id] == undefined){
-			this.textElements[textId].push(element)
+		if (element.uuid == undefined) {
+			element.uuid = randomUUID()
+			if (this.elements[element.uuid] == undefined) {
+				this.textElements[textId].push(element)
+			}
+			// update the element in the array.
+			this.elements[element.uuid] = element
 		}
-					// update the element in the array.
-					this.elements[element.id] = element
 	}
-
 }
 
 /**
@@ -88,7 +90,9 @@ LanguageManager.prototype.registerElementText = function (element, textId) {
  * @param {} language The language to set. {'fr', 'en', 'sp'.}
  */
 LanguageManager.prototype.setLanguage = function (language) {
-	this.language = language
+	if(language!= undefined){
+		this.language = language
+	}
 	for (var textElementsId in this.textElements) {
 		for (var i = 0; i < this.textElements[textElementsId].length; i++) {
 			var element = this.textElements[textElementsId][i]
@@ -106,7 +110,7 @@ LanguageManager.prototype.setLanguage = function (language) {
  */
 LanguageManager.prototype.setElementText = function (element, textId) {
 	// Create the language if not already exist.
-	if(this.languageInfo[this.language] == undefined){
+	if (this.languageInfo[this.language] == undefined) {
 		this.languageInfo[this.language] = {}
 	}
 
@@ -115,18 +119,19 @@ LanguageManager.prototype.setElementText = function (element, textId) {
 	}
 
 	this.registerElementText(element, textId)
-	if (this.elements[element.id].element != undefined) {
-		if (this.elements[element.id].element.tagName == "SPAN") {
-			this.elements[element.id].element.textContent = this.languageInfo[this.language][textId]
-		} else if (this.elements[element.id].element.tagName == "INPUT") {
-			if (this.elements[element.id].element.getAttribute("data-match-error") != null) {
+
+	if (this.elements[element.uuid].element != undefined) {
+		if (this.elements[element.uuid].element.tagName == "SPAN") {
+			this.elements[element.uuid].element.textContent = this.languageInfo[this.language][textId]
+		} else if (this.elements[element.uuid].element.tagName == "INPUT") {
+			if (this.elements[element.uuid].element.getAttribute("data-match-error") != null) {
 				// Set the error text here.
-				this.elements[element.id].element.attributes["data-match-error"].nodeValue = this.languageInfo[this.language][textId]
-			}else{
-				this.elements[element.id].setAttribute("value", this.languageInfo[this.language][textId])
+				this.elements[element.uuid].element.attributes["data-match-error"].nodeValue = this.languageInfo[this.language][textId]
+			} else {
+				this.elements[element.uuid].setAttribute("value", this.languageInfo[this.language][textId])
 			}
 		} else {
-			this.elements[element.id].setAttribute("innerHTML", this.languageInfo[this.language][textId])
+			this.elements[element.uuid].setAttribute("innerHTML", this.languageInfo[this.language][textId])
 		}
 	}
 }

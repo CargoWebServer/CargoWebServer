@@ -52,7 +52,8 @@ function init() {
 /**
  * That is a connection with the service container.
  */
-var service = new Server("localhost", "127.0.0.1", 9494)
+// var service = new Server("localhost", "127.0.0.1", 9494)
+var service = new Server("mon176", "10.67.44.31", 9494)
 var xapian = null
 
 /**
