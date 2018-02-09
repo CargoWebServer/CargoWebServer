@@ -8650,6 +8650,7 @@ func (this *CargoEntities_FileEntity) SaveEntity() {
 	var err error
 	var evt *Event
 	if this.Exist() == true {
+		log.Println("--------> update entity event: ", this.GetUuid())
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 		var params []interface{}
 		query.Indexs = append(query.Indexs, "UUID="+this.GetUuid())

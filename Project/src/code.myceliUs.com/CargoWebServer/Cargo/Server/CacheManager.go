@@ -200,6 +200,7 @@ func (this *CacheManager) remove(uuid string) {
  * Gets an entity with a given uuid from the entitiesMap
  */
 func (this *CacheManager) getEntity(uuid string) Entity {
+
 	outputInfo := new(struct {
 		entityUuid          string
 		entityOutputChannel chan Entity

@@ -532,6 +532,7 @@ QueryEditor.prototype.setResult = function (query, fields, fieldsType, param, ty
             server.entityManager.getEntityPrototype(q.TypeName, this.activeDataConfig.M_id,
                 function (prototype, caller) {
                     var model = new EntityTableModel(prototype, q)
+                  
                     table.setModel(model, function (table, queryEditor) {
                         return function () {
                             // init the table.

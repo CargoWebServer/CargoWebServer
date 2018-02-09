@@ -242,6 +242,7 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
                     caller.caller.initCallback()
                     caller.caller.initCallback = undefined
                 }
+                server.languageManager.setLanguage()
             },
             // Error Callback
             function (errObj, caller) {
@@ -257,8 +258,25 @@ EntityTableModel.prototype.init = function (successCallback, progressCallback, e
             }
             caller.initCallback()
             caller.initCallback = undefined
+            server.languageManager.setLanguage()
         }
     }
+
+    // Now the edit permission...
+    if (server.sessionId != undefined) {
+        server.accountManager.me(server.sessionId,
+            function (result, caller) {
+                if(result.M_id == "admin"){
+                    for (var i = 0; i < caller.editable.length; i++) {
+                        caller.editable[i] = true;
+                    }
+                }
+            }, function (errObj, caller) {
+
+            }, this)
+    }
+
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Event listener connection here.

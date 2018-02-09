@@ -90,7 +90,7 @@ LanguageManager.prototype.registerElementText = function (element, textId) {
  * @param {} language The language to set. {'fr', 'en', 'sp'.}
  */
 LanguageManager.prototype.setLanguage = function (language) {
-	if(language!= undefined){
+	if (language != undefined) {
 		this.language = language
 	}
 	for (var textElementsId in this.textElements) {
@@ -98,6 +98,19 @@ LanguageManager.prototype.setLanguage = function (language) {
 			var element = this.textElements[textElementsId][i]
 			if (element != undefined) {
 				this.setElementText(element, textElementsId)
+			}
+		}
+	}
+
+	// each language has it class of div (ex fr, en )
+	// if it not correspond to the active language it will not be displayed.
+	for (var l in this.languageInfo) {
+		var elements = document.getElementsByClassName(l)
+		for (var i = 0; i < elements.length; i++) {
+			if (l != this.language) {
+				elements[i].style.display = "none";
+			} else {
+				elements[i].style.display = "";
 			}
 		}
 	}

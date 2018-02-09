@@ -481,7 +481,7 @@ func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) int
 	}
 
 	/////////////////////////// string ////////////////////////////////
-	if strings.HasSuffix(sqlTypeName, "nchar") || strings.HasSuffix(sqlTypeName, "varchar") || strings.HasSuffix(sqlTypeName, "nvarchar") || strings.HasSuffix(sqlTypeName, "text") || strings.HasSuffix(sqlTypeName, "ntext") {
+	if strings.HasSuffix(sqlTypeName, "string") || strings.HasSuffix(sqlTypeName, "nchar") || strings.HasSuffix(sqlTypeName, "varchar") || strings.HasSuffix(sqlTypeName, "nvarchar") || strings.HasSuffix(sqlTypeName, "text") || strings.HasSuffix(sqlTypeName, "ntext") {
 		var val string
 
 		switch value.(type) {
@@ -494,7 +494,6 @@ func (this *SqlDataStore) castSqlType(sqlTypeName string, value interface{}) int
 				val = value.(string)
 			}
 		}
-
 		// If values need decoding.
 		if this.m_textEncoding == Config.Encoding_ISO8859_1 {
 			val, _ = Utility.DecodeISO8859_1(val)
@@ -639,6 +638,7 @@ func (this *SqlDataStore) Read(query string, fieldsType []interface{}, params []
 		result := make([]interface{}, 0, 0)
 		for i := 0; i < len(fields); i++ {
 			if fields[i] != nil {
+
 				val := this.castSqlType(fieldsType[i].(string), fields[i])
 				result = append(result, val)
 			} else {

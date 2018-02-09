@@ -481,7 +481,7 @@ func (this *KeyValueDataStore) DeleteEntityPrototype(typeName string) error {
 		// The success callback.
 		successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
 			return func(rspMsg *message, caller interface{}) {
-				log.Println("---------> entity protoype deleted!")
+				log.Println("---> entity protoype deleted!")
 				// update success
 				resultsChan <- nil
 			}
@@ -545,7 +545,7 @@ func (this *KeyValueDataStore) DeleteEntityPrototype(typeName string) error {
 
 	// remove the prototype itself...
 	this.deleteValue("prototype:" + prototype.TypeName)
-	log.Println("----> prototype: " + prototype.TypeName + "was deleted!")
+	log.Println("---> prototype: " + prototype.TypeName + "was deleted!")
 	return nil
 }
 

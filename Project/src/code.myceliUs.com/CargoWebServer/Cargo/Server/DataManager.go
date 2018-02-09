@@ -179,8 +179,7 @@ func (this *DataManager) readData(storeId string, query string, fieldsType []int
 		return data, err
 	}
 
-	// In case of SQL data, the data we found will be use to get
-	// sql data in a second pass.
+	////////////////////////////// SQL /////////////////////////////////////////
 	if storeId == "sql_info" && err == nil {
 		if len(data) > 0 {
 			if len(data[0]) > 0 {
@@ -294,6 +293,8 @@ func (this *DataManager) readData(storeId string, query string, fieldsType []int
 
 	return data, err
 }
+
+////////////////////////////// SQL /////////////////////////////////////////
 
 // One to many relationship
 func (this *DataManager) setOneToManyEntityRelationship(name string, src *DynamicEntity, dest *DynamicEntity, isRef bool) {
@@ -669,6 +670,7 @@ func (this *DataManager) createData(storeName string, query string, d []interfac
 		return
 	}
 
+	////////////////////////////// SQL /////////////////////////////////////////
 	// In the case of sql data I also need to save the information in the database.
 	if storeName == "sql_info" && len(d) > 0 {
 		if reflect.TypeOf(d[0]).Kind() == reflect.String {
@@ -768,6 +770,7 @@ func (this *DataManager) deleteData(storeName string, query string, params []int
 		return errors.New("Data store " + storeName + " does not exist.")
 	}
 
+	////////////////////////////// SQL /////////////////////////////////////////
 	// Now if the entity has sql backend.
 	if storeName == "sql_info" {
 
@@ -932,7 +935,6 @@ func (this *DataManager) updateData(storeName string, query string, fields []int
 
 func (this *DataManager) createDataStore(storeId string, storeName string, hostName string, ipv4 string, port int, storeType Config.DataStoreType, storeVendor Config.DataStoreVendor) (DataStore, *CargoEntities.Error) {
 
-	log.Println("------> create store id:", storeId, "name:", storeName, "host:", hostName, "ipv4:", ipv4, "port:", port, "type:", storeType, "vendor:", storeVendor)
 	if !Utility.IsValidVariableName(storeId) {
 		cargoError := NewError(Utility.FileLine(), INVALID_VARIABLE_NAME_ERROR, SERVER_ERROR_CODE, errors.New("The storeId '"+storeId+"' is not valid."))
 		return nil, cargoError
@@ -1009,7 +1011,7 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 
 	if this.getDataStore(storeId) == nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The storeId '"+storeId+"' doesn't exist."))
-		log.Println("------> Store with id", storeId, "dosen't exist!")
+		log.Println("---> Store with id", storeId, "dosen't exist!")
 		return cargoError
 	}
 
@@ -1031,7 +1033,7 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_ERROR, SERVER_ERROR_CODE, errors.New("Failed to delete directory '"+filePath+"' with error '"+err.Error()+"'."))
-		log.Println("------> Fail to remove ", storeId, err)
+		log.Println("---> Fail to remove ", storeId, err)
 		return cargoError
 	}
 
@@ -1127,7 +1129,6 @@ func (this *DataManager) Connect(storeName string, messageId string, sessionId s
 
 	// I will get it entity prototypes.
 	store.GetEntityPrototypes()
-
 }
 
 // @api 1.0
@@ -1363,7 +1364,6 @@ func (this *DataManager) DeleteDataStore(storeId string, messageId string, sessi
 	eventDatas = append(eventDatas, evtData)
 	evt, _ := NewEvent(DeleteDataStoreEvent, DataEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
-
 }
 
 // @api 1.0
@@ -1696,6 +1696,7 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return
 	}
+
 	if infos.DataStoreConfig.M_dataStoreType == Config.DataStoreType_SQL_STORE {
 		store = this.getDataStore("sql_info").(*KeyValueDataStore)
 	} else {

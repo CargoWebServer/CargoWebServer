@@ -2627,6 +2627,7 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 	entity, err := Utility.CallMethod(this, funcName, params)
 
 	if err != nil {
+
 		// I will try with dynamic entity insted...
 		var errObj *CargoEntities.Error
 		entity, errObj = this.newDynamicEntity("", values.(map[string]interface{}))
@@ -3101,18 +3102,4 @@ func (this *EntityManager) GenerateEntityUUID(typeName string, parentUuid string
 	}
 	// Return the uuid from the input information.
 	return Utility.GenerateUUID(keyInfo)
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// XSD/XML Schemas...
-////////////////////////////////////////////////////////////////////////////////
-
-func (this *EntityManager) generateXsdSchema(schemaId string, filePath string) (*EntityPrototype, error) {
-
-	/** First of all I will generate the javascript file **/
-	// Execute the command...
-
-	// First of all I will
-
-	return nil, nil
 }

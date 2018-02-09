@@ -25,6 +25,7 @@ import (
 	"unsafe"
 
 	"github.com/pborman/uuid"
+	"github.com/robertkrimen/otto"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
@@ -284,6 +285,25 @@ func GetChecksum(values interface{}) string {
 	} else if reflect.TypeOf(values).String() == "[]string" {
 		for i := 0; i < len(values.([]string)); i++ {
 			checksum += GetChecksum(values.([]string)[i])
+		}
+	} else if reflect.TypeOf(values).String() == "otto.Value" { // Call from JS...
+		val := values.(otto.Value)
+		// In that case I will use otto functionality to convert the value...
+		if val.IsBoolean() {
+			boolVal, _ := val.ToBoolean()
+			checksum += ToString(boolVal)
+		} else if val.IsNumber() {
+			floatVal, _ := val.ToFloat()
+			checksum += ToString(floatVal)
+		} else if val.IsString() {
+			strVal, _ := val.ToString()
+			checksum += ToString(strVal)
+		} else if val.IsObject() {
+			obj, err := val.Export()
+			if err == nil {
+				// Use a recursion here...
+				checksum += GetChecksum(obj)
+			}
 		}
 	} else {
 		// here the value must be a single value...

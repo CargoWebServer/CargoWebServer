@@ -266,7 +266,7 @@ func (this *EntityPrototype) Save(storeId string) error {
 	}
 
 	if store != nil {
-		// Save it inside it supertype.
+		// Save it inside it supertype in substitution-group.
 		for i := 0; i < len(this.SuperTypeNames); i++ {
 			superTypeName := this.SuperTypeNames[i]
 			superType, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
@@ -305,7 +305,6 @@ func (this *EntityPrototype) Save(storeId string) error {
 				if err != nil {
 					return err
 				}
-
 			}
 		}
 

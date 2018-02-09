@@ -377,6 +377,10 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 
 	queryStr, _ := json.Marshal(query)
 	results, err := GetServer().GetDataManager().readData(storeId, string(queryStr), fieldsType, params)
+	
+	// Test get the entity directly...
+	var entityData = GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore).getValue(this.GetUuid())
+	
 	if err != nil {
 		log.Println(Utility.FileLine(), "--> No object found for entity ", id, " ", err)
 		return err
@@ -420,7 +424,7 @@ func (this *DynamicEntity) initEntity(id string, path string, lazy bool) error {
 						values := make([]interface{}, 0)
 						err := json.Unmarshal([]byte(results[0][i].(string)), &values)
 						if err != nil {
-							log.Println("fail to get value --------->", results[0][i].(string))
+							log.Println("fail to get value ", results[0][i].(string), " for field ", typeName, ".", fieldName)
 						} else {
 							this.setValue(fieldName, values)
 						}
@@ -1560,8 +1564,8 @@ func (this *DynamicEntity) SetObjectValues(values map[string]interface{}) {
 							}
 						} else if v != nil && this.getValue(field) != nil {
 							if reflect.TypeOf(this.getValue(field)).String() == "map[string]interface {}" {
-								if v.(map[string]interface{})["UUID"] != this.getValue(field) {
-									toRemove = this.getValue(field).(string)
+								if v.(map[string]interface{})["UUID"] != this.getValue(field).(map[string]interface{})["UUID"] {
+									toRemove = this.getValue(field).(map[string]interface{})["UUID"].(string)
 								}
 							} else if reflect.TypeOf(this.getValue(field)).String() == "string" {
 								if v != this.getValue(field) {
