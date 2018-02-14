@@ -19,9 +19,6 @@ type Parameter struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Parameter **/
 	M_name string
 	M_type string
@@ -42,10 +39,51 @@ type XsdParameter struct {
 	M_isArray	bool	`xml:"isArray,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *Parameter) GetUUID() string{
+func (this *Parameter) GetUuid() string{
 	return this.UUID
 }
+func (this *Parameter) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *Parameter) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	return ids
+}
+
+/** The type name **/
+func (this *Parameter) GetTypeName() string{
+	this.TYPENAME = "CargoEntities.Parameter"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *Parameter) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *Parameter) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Parameter) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *Parameter) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *Parameter) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Name **/
 func (this *Parameter) GetName() string{
@@ -56,8 +94,7 @@ func (this *Parameter) GetName() string{
 func (this *Parameter) SetName(ref interface{}){
 	if this.M_name != ref.(string) {
 		this.M_name = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -72,8 +109,7 @@ func (this *Parameter) GetType() string{
 func (this *Parameter) SetType(ref interface{}){
 	if this.M_type != ref.(string) {
 		this.M_type = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -88,8 +124,7 @@ func (this *Parameter) IsArray() bool{
 func (this *Parameter) SetIsArray(ref interface{}){
 	if this.M_isArray != ref.(bool) {
 		this.M_isArray = ref.(bool)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -105,14 +140,12 @@ func (this *Parameter) SetParametersPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_parametersPtr != ref.(string) {
 			this.M_parametersPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_parametersPtr != ref.(*Parameter).GetUUID() {
-			this.M_parametersPtr = ref.(*Parameter).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_parametersPtr != ref.(*Parameter).GetUuid() {
+			this.M_parametersPtr = ref.(*Parameter).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_parametersPtr = ref.(*Parameter)
 	}
@@ -122,7 +155,7 @@ func (this *Parameter) SetParametersPtr(ref interface{}){
 func (this *Parameter) RemoveParametersPtr(ref interface{}){
 	toDelete := ref.(*Parameter)
 	if this.m_parametersPtr!= nil {
-		if toDelete.GetUUID() == this.m_parametersPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_parametersPtr.GetUuid() {
 			this.m_parametersPtr = nil
 			this.M_parametersPtr = ""
 			this.NeedSave = true

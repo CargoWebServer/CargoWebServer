@@ -14,8 +14,8 @@ func NewDataStore(info *Config.DataStoreConfiguration) (DataStore, error) {
 	if info.M_dataStoreType == Config.DataStoreType_SQL_STORE {
 		dataStore, err := NewSqlDataStore(info)
 		return dataStore, err
-	} else if info.M_dataStoreType == Config.DataStoreType_KEY_VALUE_STORE {
-		dataStore, err := NewKeyValueDataStore(info)
+	} else if info.M_dataStoreType == Config.DataStoreType_GRAPH_STORE {
+		dataStore, err := NewGraphStore(info)
 		return dataStore, err
 	} else {
 		return nil, errors.New("No data store type was given")
@@ -63,6 +63,16 @@ type DataStore interface {
 	 * Open the data store connection.
 	 */
 	Connect() error
+
+	/**
+	 * Create a new entity prototype.
+	 */
+	CreateEntityPrototype(prototype *EntityPrototype) error
+
+	/**
+	 * Save entity prototype.
+	 */
+	SaveEntityPrototype(prototype *EntityPrototype) error
 
 	/**
 	 * Return the list of all entity prototypes from a dataStore

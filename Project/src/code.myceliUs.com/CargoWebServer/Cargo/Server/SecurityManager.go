@@ -38,51 +38,48 @@ func newSecurityManager() *SecurityManager {
 
 func (this *SecurityManager) createAdminRole() {
 	//adminRoleUuid Create the admin role if it doesn't exist
-	adminRoleUuid := CargoEntitiesRoleExists("adminRole")
-
-	if len(adminRoleUuid) == 0 {
+	entity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{"adminRole"})
+	if entity == nil {
 		ids := []interface{}{"admin"}
-		adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", ids, false)
+		adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", ids)
 		if errObj != nil {
 			return
 		}
 
-		adminAccount := adminAccountEntity.GetObject().(*CargoEntities.Account)
+		adminAccount := adminAccountEntity.(*CargoEntities.Account)
 
 		// Create adminRole
 		adminRole, _ := this.createRole("adminRole")
 		adminRole.SetAccounts(adminAccount)
-		adminRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(adminRole.GetUUID(), false)
-		adminRoleEntity.SetNeedSave(true)
-		adminRoleEntity.SaveEntity()
 		adminAccount.SetRolesRef(adminRole)
-		adminAccountEntity.SetNeedSave(true)
-		adminAccountEntity.SaveEntity()
+
+		GetServer().GetEntityManager().saveEntity(adminRole)
+		GetServer().GetEntityManager().saveEntity(adminAccount)
+
 	}
 }
 
 func (this *SecurityManager) createGuestRole() {
 	// Create the guest role if it doesn't exist
-	guestRoleUuid := CargoEntitiesRoleExists("guestRole")
-	if len(guestRoleUuid) == 0 {
+	entity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{"guestRole"})
+	if entity == nil {
 		ids := []interface{}{"guest"}
-		guestAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", ids, false)
+		guestAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", ids)
 		if errObj != nil {
 			return
 		}
-		guestAccount := guestAccountEntity.GetObject().(*CargoEntities.Account)
+		guestAccount := guestAccountEntity.(*CargoEntities.Account)
 
 		// Create guestRole
 		guestRole, _ := this.createRole("guestRole")
 		guestRole.SetAccounts(guestAccount)
-		guestRoleEntity, _ := GetServer().GetEntityManager().getEntityByUuid(guestRole.GetUUID(), false)
-		guestRoleEntity.SetNeedSave(true)
-		guestRoleEntity.SaveEntity()
 
 		// Setting guestRole to guest account
 		guestAccount.SetRolesRef(guestRole)
-		guestAccountEntity.SetNeedSave(true)
-		guestAccountEntity.SaveEntity()
+
+		GetServer().GetEntityManager().saveEntity(guestRole)
+		GetServer().GetEntityManager().saveEntity(guestAccount)
+
 	}
 }
 
@@ -120,16 +117,15 @@ func (this *SecurityManager) stop() {
 func (this *SecurityManager) createRole(id string) (*CargoEntities.Role, *CargoEntities.Error) {
 
 	// Create the role with this id if it doesn't exist
-	uuid := CargoEntitiesRoleExists(id)
 	var role *CargoEntities.Role
-	cargoEntities := server.GetEntityManager().getCargoEntities()
+	entity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{id})
 
-	if len(uuid) == 0 {
+	if entity == nil {
 		role = new(CargoEntities.Role)
 		role.SetId(id)
-		GetServer().GetEntityManager().NewCargoEntitiesRoleEntity(cargoEntities.GetUuid(), "", role)
+
 		// Create the role.
-		GetServer().GetEntityManager().createEntity(cargoEntities.GetUuid(), "M_roles", "CargoEntities.Role", id, role)
+		GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_roles", "CargoEntities.Role", id, role)
 	} else {
 		// Create the error message
 		cargoError := NewError(Utility.FileLine(), ROLE_ID_ALEADY_EXISTS_ERROR, SERVER_ERROR_CODE, errors.New("The role id '"+id+"' is already attibuted to an existing role entity."))
@@ -144,8 +140,7 @@ func (this *SecurityManager) createRole(id string) (*CargoEntities.Role, *CargoE
  */
 func (this *SecurityManager) getRole(id string) (*CargoEntities.Role, *CargoEntities.Error) {
 	var role *CargoEntities.Role
-	roleUuid := CargoEntitiesRoleExists(id)
-	roleEntity, err := GetServer().GetEntityManager().getEntityByUuid(roleUuid, false)
+	roleEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{id})
 
 	if err != nil {
 		// Create the error message
@@ -153,7 +148,7 @@ func (this *SecurityManager) getRole(id string) (*CargoEntities.Role, *CargoEnti
 		return nil, cargoError
 	}
 
-	role = roleEntity.GetObject().(*CargoEntities.Role)
+	role = roleEntity.(*CargoEntities.Role)
 
 	return role, nil
 }
@@ -162,9 +157,7 @@ func (this *SecurityManager) getRole(id string) (*CargoEntities.Role, *CargoEnti
  * Delete a role with a given id.
  */
 func (this *SecurityManager) deleteRole(id string) *CargoEntities.Error {
-	uuid := CargoEntitiesRoleExists(id)
-
-	roleEntity, err := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
+	roleEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{id})
 	if err != nil {
 		// Create the error message
 		cargoError := NewError(Utility.FileLine(), ROLE_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The role id '"+id+"' does not correspond to an existing role entity."))
@@ -186,39 +179,28 @@ func (this *SecurityManager) deleteRole(id string) *CargoEntities.Error {
  */
 func (this *SecurityManager) appendAccount(roleId string, accountId string) *CargoEntities.Error {
 
-	roleUuid := CargoEntitiesRoleExists(roleId)
-	accountUuid := CargoEntitiesAccountExists(accountId)
+	accountEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{accountId})
+	if err != nil {
+		return err
+	}
+
+	roleEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{roleId})
+	if err != nil {
+		return err
+	}
 
 	// Verify if the role doesn't already have the account
 	if !(this.hasAccount(roleId, accountId)) {
 		// Get the role entity
-		roleEntity, err := GetServer().GetEntityManager().getEntityByUuid(roleUuid, false)
-		if err == nil {
-			role := roleEntity.GetObject().(*CargoEntities.Role)
-			// Get the account entity
-			accountEntity, err := GetServer().GetEntityManager().getEntityByUuid(accountUuid, false)
-			if err == nil {
-				account := accountEntity.GetObject().(*CargoEntities.Account)
-				// Set the account to the role
-				role.SetAccounts(account)
-				account.SetRolesRef(role)
-				roleEntity.SetNeedSave(true)
-				roleEntity.SaveEntity()
-				accountEntity.SaveEntity()
-			} else {
-				// Create the error message
-				cargoError := NewError(Utility.FileLine(), ACCOUNT_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The account id '"+accountId+"' does not correspond to an existing account entity."))
+		role := roleEntity.(*CargoEntities.Role)
+		account := accountEntity.(*CargoEntities.Account)
 
-				// Return the uuid of the created error in the err return param.
-				return cargoError
-			}
-		} else {
-			// Create the error message
-			cargoError := NewError(Utility.FileLine(), ROLE_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The role id '"+roleId+"' does not correspond to an existing role entity."))
+		// Set the account to the role
+		role.SetAccounts(account)
+		account.SetRolesRef(role)
 
-			// Return the uuid of the created error in the err return param.
-			return cargoError
-		}
+		GetServer().GetEntityManager().saveEntity(roleEntity)
+		GetServer().GetEntityManager().saveEntity(accountEntity)
 	}
 
 	return nil
@@ -229,18 +211,20 @@ func (this *SecurityManager) appendAccount(roleId string, accountId string) *Car
  */
 func (this *SecurityManager) hasAccount(roleId string, accountId string) bool {
 
-	roleUuid := CargoEntitiesRoleExists(roleId)
-	accountUuid := CargoEntitiesAccountExists(accountId)
+	accountEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{accountId})
+	if err != nil {
+		return false
+	}
 
-	if (len(accountUuid) != 0) && (len(roleUuid) != 0) {
-		roleEntity, err := GetServer().GetEntityManager().getEntityByUuid(roleUuid, false)
-		if err == nil {
-			role := roleEntity.GetObject().(*CargoEntities.Role)
-			for i := 0; i < len(role.M_accounts); i++ {
-				if role.M_accounts[i] == accountUuid {
-					return true
-				}
-			}
+	roleEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{roleId})
+	if err != nil {
+		return false
+	}
+
+	role := roleEntity.(*CargoEntities.Role)
+	for i := 0; i < len(role.M_accounts); i++ {
+		if role.M_accounts[i] == accountEntity.GetUuid() {
+			return true
 		}
 	}
 
@@ -252,26 +236,32 @@ func (this *SecurityManager) hasAccount(roleId string, accountId string) bool {
  */
 func (this *SecurityManager) removeAccount(roleId string, accountId string) *CargoEntities.Error {
 
-	roleUuid := CargoEntitiesRoleExists(roleId)
-	accountUuid := CargoEntitiesAccountExists(accountId)
+	accountEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{accountId})
+	if err != nil {
+		return err
+	}
+
+	roleEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{roleId})
+	if err != nil {
+		return err
+	}
 
 	// Verify if the role has the account
 	if this.hasAccount(roleId, accountId) {
 		// Get the role entity
-		roleEntity, err := GetServer().GetEntityManager().getEntityByUuid(roleUuid, false)
-		if err == nil {
-			role := roleEntity.GetObject().(*CargoEntities.Role)
-			// Get the account entity
-			accountEntity, err := GetServer().GetEntityManager().getEntityByUuid(accountUuid, false)
-			if err == nil {
-				account := accountEntity.GetObject().(*CargoEntities.Account)
-				// Remove the account from the role
-				role.RemoveAccounts(account)
-				roleEntity.SaveEntity()
-				account.RemoveRolesRef(role)
-				accountEntity.SaveEntity()
-			}
-		}
+
+		role := roleEntity.(*CargoEntities.Role)
+		// Get the account entity
+
+		account := accountEntity.(*CargoEntities.Account)
+
+		// Remove the account from the role
+		role.RemoveAccounts(account)
+		account.RemoveRolesRef(role)
+
+		GetServer().GetEntityManager().saveEntity(roleEntity)
+		GetServer().GetEntityManager().saveEntity(accountEntity)
+
 	} else {
 		// Create the error message
 		cargoError := NewError(Utility.FileLine(), ROLE_DOESNT_HAVE_ACCOUNT_ERROR, SERVER_ERROR_CODE, errors.New("The account with the id '"+accountId+"' is not related to the role with the id '"+roleId+"'."))
@@ -290,40 +280,29 @@ func (this *SecurityManager) removeAccount(roleId string, accountId string) *Car
  * Append a new action to a given role. Do nothing if the action is already in the role
  */
 func (this *SecurityManager) appendAction(roleId string, actionName string) *CargoEntities.Error {
-	roleUuid := CargoEntitiesRoleExists(roleId)
-	actionUuid := CargoEntitiesActionExists(actionName)
+
+	actionEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Action", "CargoEntities", []interface{}{actionName})
+	if err != nil {
+		return err
+	}
+
+	roleEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{roleId})
+	if err != nil {
+		return err
+	}
 
 	// Verify if the role doesn't already have the account
 	if !(this.hasAction(roleId, actionName)) {
-		// Get the role entity
-		roleEntity, err := GetServer().GetEntityManager().getEntityByUuid(roleUuid, false)
-		if err == nil {
-			role := roleEntity.GetObject().(*CargoEntities.Role)
-			// Get the account entity
-			actionEntity, err := GetServer().GetEntityManager().getEntityByUuid(actionUuid, false)
-			if err == nil {
-				action := actionEntity.GetObject().(*CargoEntities.Action)
-				// Set the account to the role
-				role.SetActions(action)
 
-				// Save the entities.
-				roleEntity.SaveEntity()
-				actionEntity.SaveEntity()
+		role := roleEntity.(*CargoEntities.Role)
+		// Get the account entity
+		action := actionEntity.(*CargoEntities.Action)
+		// Set the account to the role
+		role.SetActions(action)
 
-			} else {
-				// Create the error message
-				cargoError := NewError(Utility.FileLine(), ACTION_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The action name '"+actionName+"' does not correspond to an existing action entity."))
-
-				// Return the uuid of the created error in the err return param.
-				return cargoError
-			}
-		} else {
-			// Create the error message
-			cargoError := NewError(Utility.FileLine(), ROLE_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The role id '"+roleId+"' does not correspond to an existing role entity."))
-
-			// Return the uuid of the created error in the err return param.
-			return cargoError
-		}
+		// Save the entities.
+		GetServer().GetEntityManager().saveEntity(roleEntity)
+		GetServer().GetEntityManager().saveEntity(actionEntity)
 	}
 
 	return nil
@@ -334,18 +313,20 @@ func (this *SecurityManager) appendAction(roleId string, actionName string) *Car
  */
 func (this *SecurityManager) hasAction(roleId string, actionName string) bool {
 
-	roleUuid := CargoEntitiesRoleExists(roleId)
-	actionUuid := CargoEntitiesActionExists(actionName)
+	actionEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Action", "CargoEntities", []interface{}{actionName})
+	if err != nil {
+		return false
+	}
 
-	if (len(actionUuid) != 0) && (len(roleUuid) != 0) {
-		roleEntity, err := GetServer().GetEntityManager().getEntityByUuid(roleUuid, false)
-		if err == nil {
-			role := roleEntity.GetObject().(*CargoEntities.Role)
-			for i := 0; i < len(role.M_actions); i++ {
-				if role.M_actions[i] == actionUuid {
-					return true
-				}
-			}
+	roleEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{roleId})
+	if err != nil {
+		return false
+	}
+
+	role := roleEntity.(*CargoEntities.Role)
+	for i := 0; i < len(role.M_actions); i++ {
+		if role.M_actions[i] == actionEntity.GetUuid() {
+			return true
 		}
 	}
 
@@ -357,31 +338,28 @@ func (this *SecurityManager) hasAction(roleId string, actionName string) bool {
  */
 func (this *SecurityManager) removeAction(roleId string, actionName string) *CargoEntities.Error {
 
-	roleUuid := CargoEntitiesRoleExists(roleId)
+	actionEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Action", "CargoEntities", []interface{}{actionName})
+	if err != nil {
+		return err
+	}
+
+	roleEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Role", "CargoEntities", []interface{}{roleId})
+	if err != nil {
+		return err
+	}
 
 	// Verify if the role has the action
 	if this.hasAction(roleId, actionName) {
 		// Get the role entity
-		roleEntity, err := GetServer().GetEntityManager().getEntityByUuid(roleUuid, false)
-		if err == nil {
-			role := roleEntity.GetObject().(*CargoEntities.Role)
-			// Get the account entity
-			actionUuid := CargoEntitiesActionExists(actionName)
-			actionEntity, err := GetServer().GetEntityManager().getEntityByUuid(actionUuid, false)
-			if err == nil {
-				action := actionEntity.GetObject().(*CargoEntities.Action)
-				// Remove the account from the role
-				role.RemoveActions(action)
-				roleEntity.SaveEntity()
-			} else {
-				cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The action with name '"+actionName+"' dosent exist."))
-				return cargoError
-			}
-		} else {
-			// If the role does not exist.
-			cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The role with the id '"+roleId+"' dosent exist."))
-			return cargoError
-		}
+
+		role := roleEntity.(*CargoEntities.Role)
+		// Get the account entity
+		action := actionEntity.(*CargoEntities.Action)
+
+		// Remove the account from the role
+		role.RemoveActions(action)
+		GetServer().GetEntityManager().saveEntity(roleEntity)
+
 	} else {
 		// Create the error message
 		cargoError := NewError(Utility.FileLine(), ROLE_DOESNT_HAVE_ACTION_ERROR, SERVER_ERROR_CODE, errors.New("The action with the name '"+actionName+"' is not related to the role with the id '"+roleId+"'."))
@@ -410,16 +388,12 @@ func (this *SecurityManager) canExecuteAction(sessionId string, actionName strin
 	actionName = strings.Replace(actionName, "(", "", -1)
 
 	// Here is the list of function where no permission apply...
-	actionUuid := CargoEntitiesActionExists(actionName)
-	if len(actionUuid) == 0 {
-		// Create the error message
-		cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The action with the name '"+actionName+"' dosen't exist!"))
-		// Return the uuid of the created error in the err return param.
-		return cargoError
+	actionEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Action", "CargoEntities", []interface{}{actionName})
+	if err != nil {
+		return err
 	}
 
-	actionEntity, _ := GetServer().GetEntityManager().getEntityByUuid(actionUuid, true)
-	action := actionEntity.GetObject().(*CargoEntities.Action)
+	action := actionEntity.(*CargoEntities.Action)
 
 	// if the action is public or hidden no validation is required.
 	if action.GetAccessType() == CargoEntities.AccessType_Hidden || action.GetAccessType() == CargoEntities.AccessType_Public {
@@ -434,7 +408,6 @@ func (this *SecurityManager) canExecuteAction(sessionId string, actionName strin
 	actionName = strings.Replace(actionName, ")", "", -1)
 
 	session := GetServer().GetSessionManager().getActiveSessionById(sessionId)
-
 	var account *CargoEntities.Account
 	if session != nil {
 		account = session.GetAccountPtr()
@@ -491,8 +464,9 @@ func (this *SecurityManager) hasPermission(sessionId string, permissionType int,
 	if session != nil {
 		account = session.GetAccountPtr()
 		owner := GetServer().GetEntityManager().getEntityOwner(entity)
+
 		if owner != nil {
-			if owner.GetUUID() == account.GetUUID() {
+			if owner.GetUuid() == account.GetUuid() {
 				// Owner has all entity permission.
 				return nil
 			}
@@ -542,22 +516,16 @@ func (this *SecurityManager) hasPermission(sessionId string, permissionType int,
  * Append a new action to a given role. Do nothing if the action is already in the role
  */
 func (this *SecurityManager) appendPermission(accountId string, permissionType int, pattern string) *CargoEntities.Error {
-	accountUuid := CargoEntitiesAccountExists(accountId)
-	accountEntity, err := GetServer().GetEntityManager().getEntityByUuid(accountUuid, false)
+
+	accountEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{accountId})
 
 	if err == nil {
 		// Get or create the permission.
-		permissionUuid := CargoEntitiesPermissionExists(pattern)
-		var permissionEntity *CargoEntities_PermissionEntity
+		permissionEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Permission", "CargoEntities", []interface{}{pattern})
 		var permission *CargoEntities.Permission
 
-		if len(permissionUuid) > 0 {
-			entity, errObj := GetServer().GetEntityManager().getEntityByUuid(permissionUuid, false)
-			if errObj != nil {
-				return errObj
-			}
-			permissionEntity = entity.(*CargoEntities_PermissionEntity)
-			permission = permissionEntity.GetObject().(*CargoEntities.Permission)
+		if permissionEntity != nil {
+			permission = permissionEntity.(*CargoEntities.Permission)
 			permission.SetTypes(permissionType)
 			permission.SetId(pattern)
 		} else {
@@ -566,26 +534,21 @@ func (this *SecurityManager) appendPermission(accountId string, permissionType i
 			permission.TYPENAME = "CargoEntities.Permission"
 			permission.SetId(pattern)
 			permission.SetTypes(permissionType)
+
 			// Set the uuid
-			GetServer().GetEntityManager().NewCargoEntitiesPermissionEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "", permission)
-			var errObj *CargoEntities.Error
-			entity, errObj := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_permissions", "CargoEntities.Permission", "", permission)
+			entity, errObj := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_permissions", "CargoEntities.Permission", "", permission)
 			if errObj != nil {
 				return errObj
 			}
-			permissionEntity = entity.(*CargoEntities_PermissionEntity)
-			permission = permissionEntity.GetObject().(*CargoEntities.Permission)
+			permission = entity.(*CargoEntities.Permission)
 		}
 
 		// Append the account ref to the
-		permission.SetAccountsRef(accountEntity.GetObject().(*CargoEntities.Account))
-		accountEntity.GetObject().(*CargoEntities.Account).SetPermissionsRef(permission)
+		permission.SetAccountsRef(accountEntity.(*CargoEntities.Account))
+		accountEntity.(*CargoEntities.Account).SetPermissionsRef(permission)
 
-		//accountEntity.SaveEntity()
-		//permissionEntity.SaveEntity()
-
-		// Save the entity...
-		GetServer().GetEntityManager().getCargoEntities().SaveEntity()
+		GetServer().GetEntityManager().saveEntity(permission)
+		GetServer().GetEntityManager().saveEntity(accountEntity)
 
 	} else {
 		// Account error
@@ -603,22 +566,16 @@ func (this *SecurityManager) appendPermission(accountId string, permissionType i
  */
 func (this *SecurityManager) removePermission(accountId string, pattern string) *CargoEntities.Error {
 
-	accountUuid := CargoEntitiesAccountExists(accountId)
-	accountEntity, err := GetServer().GetEntityManager().getEntityByUuid(accountUuid, false)
+	accountEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{accountId})
 
 	if err == nil {
-		account := accountEntity.GetObject().(*CargoEntities.Account)
+		account := accountEntity.(*CargoEntities.Account)
 
 		// Get or create the permission.
-		permissionUuid := CargoEntitiesPermissionExists(pattern)
-		var permissionEntity *CargoEntities_PermissionEntity
+		permissionEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Permission", "CargoEntities", []interface{}{pattern})
 		var permission *CargoEntities.Permission
-		if len(permissionUuid) > 0 {
-			entity, errObj := GetServer().GetEntityManager().getEntityByUuid(permissionUuid, false)
-			if errObj != nil {
-				return errObj
-			}
-			permissionEntity = entity.(*CargoEntities_PermissionEntity)
+		if permissionEntity != nil {
+			permission = permissionEntity.(*CargoEntities.Permission)
 		} else {
 			cargoError := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The permission with pattern '"+pattern+"' does not correspond to an existing account entity."))
 			// Return the uuid of the created error in the err return param.
@@ -626,19 +583,18 @@ func (this *SecurityManager) removePermission(accountId string, pattern string) 
 		}
 
 		// Remove the permission
-		permission = permissionEntity.GetObject().(*CargoEntities.Permission)
 		account.RemovePermissionsRef(permission)
 		permission.RemoveAccountsRef(account)
 
 		// Save the account
-		accountEntity.SaveEntity()
+		GetServer().GetEntityManager().saveEntity(accountEntity)
 
 		// Save or delete the permission.
 		if len(permission.M_accountsRef) == 0 {
 			// if the permission is not used anymore I will delete it
-			permissionEntity.DeleteEntity()
+			GetServer().GetEntityManager().deleteEntity(permission)
 		} else {
-			permissionEntity.SaveEntity()
+			GetServer().GetEntityManager().saveEntity(permission)
 		}
 	}
 	return nil
@@ -871,13 +827,13 @@ func (this *SecurityManager) CanExecuteAction(actionName string, sessionId strin
 // @param {callback} errorCallback In case of error.
 func (this *SecurityManager) ChangeAdminPassword(pwd string, newPwd string, messageId string, sessionId string) {
 	ids := []interface{}{"admin"}
-	adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", ids, false)
+	adminAccountEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", ids)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 	}
 
 	// If the actual password dosent match the password.
-	account := adminAccountEntity.GetObject().(*CargoEntities.Account)
+	account := adminAccountEntity.(*CargoEntities.Account)
 	if account.GetPassword() != pwd {
 		errObj = NewError(Utility.FileLine(), PERMISSION_DENIED_ERROR, SERVER_ERROR_CODE, errors.New("Wrong password!"))
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
@@ -887,5 +843,5 @@ func (this *SecurityManager) ChangeAdminPassword(pwd string, newPwd string, mess
 	account.SetPassword(newPwd)
 
 	// I will save the entity.
-	adminAccountEntity.SaveEntity()
+	GetServer().GetEntityManager().saveEntity(adminAccountEntity)
 }

@@ -7,13 +7,13 @@
 	<xsd:simpleType name="tDataStoreType">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="SQL_STORE"/>
-			<xsd:enumeration value="KEY_VALUE_STORE"/>
+			<xsd:enumeration value="GRAPH_STORE"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 
 	<xsd:simpleType name="tDataStoreVendor">
 		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="MYCELIUS"/>
+			<xsd:enumeration value="CAYLEY"/>
 			<xsd:enumeration value="MYSQL"/>
 			<xsd:enumeration value="MSSQL"/>
 		</xsd:restriction>

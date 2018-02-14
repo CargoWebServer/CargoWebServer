@@ -4,10 +4,6 @@ import "fmt"
 import "strings"
 import "log"
 import "code.myceliUs.com/Utility"
-import "code.myceliUs.com/CargoWebServer/Cargo/JS"
-import "code.myceliUs.com/XML_Schemas"
-import "strconv"
-import "reflect"
 
 /**
  * Restrictions for Datatypes
@@ -192,6 +188,101 @@ func NewEntityPrototype() *EntityPrototype {
 }
 
 /**
+ * That function is use to create an extension of a given prototype.
+ */
+func (this *EntityPrototype) setSuperTypeFields() {
+	var index = 3 // The start index is after the uuid and parentUuid and the parent lnk.
+	if len(this.ListOf) > 0 {
+		// It can not have superpetype and list of a the same time.
+		this.SuperTypeNames = make([]string, 0)
+		// In that particular case the entity is a list of the given type.
+		if !Utility.Contains(this.Fields, "M_listOf") {
+			Utility.InsertStringAt(index, "M_listOf", &this.Fields)
+			Utility.InsertStringAt(index, "[]"+this.ListOf, &this.FieldsType)
+			Utility.InsertBoolAt(index, true, &this.FieldsVisibility)
+			Utility.InsertStringAt(index, "[]", &this.FieldsDefaultValue)
+			Utility.InsertStringAt(index, "", &this.FieldsDocumentation)
+		}
+	} else {
+		for i := 0; i < len(this.SuperTypeNames); i++ {
+			superTypeName := this.SuperTypeNames[i]
+			superPrototype, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
+			if err == nil {
+				// I will merge the fields
+				// The first to fields are always the uuid, parentUuid, parentLnk and the last is the childUuids and referenced
+				for j := 3; j < len(superPrototype.Fields)-2; j++ {
+					if !Utility.Contains(this.Fields, superPrototype.Fields[j]) && strings.HasPrefix(superPrototype.Fields[j], "M_") {
+
+						Utility.InsertStringAt(index, superPrototype.Fields[j], &this.Fields)
+						Utility.InsertStringAt(index, superPrototype.FieldsType[j], &this.FieldsType)
+						Utility.InsertBoolAt(index, superPrototype.FieldsVisibility[j], &this.FieldsVisibility)
+						Utility.InsertStringAt(index, superPrototype.FieldsDefaultValue[j], &this.FieldsDefaultValue)
+
+						// create a new index at the end...
+						if superPrototype.FieldsNillable != nil {
+							isNillable := false
+							if j < len(superPrototype.FieldsNillable) {
+								isNillable = superPrototype.FieldsNillable[j]
+							}
+							Utility.InsertBoolAt(index, isNillable, &this.FieldsNillable)
+						} else {
+							this.FieldsNillable = append(this.FieldsNillable, true)
+						}
+
+						if superPrototype.FieldsDocumentation != nil {
+							documentation := ""
+							if j < len(superPrototype.FieldsDocumentation) {
+								documentation = superPrototype.FieldsDocumentation[j]
+							}
+							if index < len(this.FieldsDocumentation) {
+								Utility.InsertStringAt(index, documentation, &this.FieldsDocumentation)
+							} else {
+								this.FieldsDocumentation = append(this.FieldsDocumentation, documentation)
+							}
+						} else {
+							this.FieldsDocumentation = append(this.FieldsDocumentation, "")
+						}
+
+						index++
+					}
+				}
+				// Now the index...
+				for j := 0; j < len(superPrototype.Indexs); j++ {
+					if !Utility.Contains(this.Indexs, superPrototype.Indexs[j]) {
+						this.Indexs = append(this.Indexs, superPrototype.Indexs[j])
+					}
+				}
+				// Now the ids
+				for j := 0; j < len(superPrototype.Ids); j++ {
+					if !Utility.Contains(this.Ids, superPrototype.Ids[j]) {
+						this.Ids = append(this.Ids, superPrototype.Ids[j])
+					}
+				}
+
+				// Now I will append the new prototype to the list of substitution group of the super type.
+				if !Utility.Contains(superPrototype.SubstitutionGroup, this.TypeName) {
+					if !Utility.Contains(superPrototype.SubstitutionGroup, this.TypeName) {
+						superPrototype.SubstitutionGroup = append(superPrototype.SubstitutionGroup, this.TypeName)
+						// save it to it store...
+						store := GetServer().GetDataManager().getDataStore(superTypeName[0:strings.Index(superTypeName, ".")])
+						store.SaveEntityPrototype(superPrototype)
+					}
+				}
+			} else {
+				log.Println("error ", err)
+			}
+		}
+	}
+
+	// reset the field orders.
+	this.FieldsOrder = make([]int, len(this.Fields))
+	for i := 0; i < len(this.Fields); i++ {
+		this.FieldsOrder[i] = i
+	}
+
+}
+
+/**
  * This function is use to retreive the position in the array of a given field.
  */
 func (this *EntityPrototype) getFieldIndex(fieldName string) int {
@@ -204,236 +295,6 @@ func (this *EntityPrototype) getFieldIndex(fieldName string) int {
 		}
 	}
 	return -1
-}
-
-/**
- * Save the new entity prototype in the data store.
- */
-func (this *EntityPrototype) Create(storeId string) error {
-
-	// Append the default fields at end...
-	if len(storeId) == 0 {
-		storeId = this.TypeName[:strings.Index(this.TypeName, ".")]
-	}
-
-	store := GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
-	if store != nil {
-		err := store.SetEntityPrototype(this)
-		if err != nil {
-			log.Println("Fail to save entity prototype ", this.TypeName, " in store id ", storeId)
-			return err
-		}
-	}
-
-	// Register it to the vm...
-	JS.GetJsRuntimeManager().AppendScript("CargoWebServer", this.generateConstructor(), true)
-
-	// Send event message...
-	var eventDatas []*MessageData
-	evtData := new(MessageData)
-	evtData.TYPENAME = "Server.MessageData"
-	evtData.Name = "prototype"
-
-	evtData.Value = this
-	eventDatas = append(eventDatas, evtData)
-	evt, _ := NewEvent(NewPrototypeEvent, PrototypeEvent, eventDatas)
-	GetServer().GetEventManager().BroadcastEvent(evt)
-
-	return nil
-
-}
-
-/**
- * Save the new entity prototype in the data store.
- */
-func (this *EntityPrototype) Save(storeId string) error {
-	if len(storeId) == 0 {
-		storeId = this.TypeName[:strings.Index(this.TypeName, ".")]
-	}
-
-	// Get information of the previous entity prototype.
-	prototype, err := GetServer().GetEntityManager().getEntityPrototype(this.TypeName, storeId)
-	if err != nil {
-		return err
-	}
-
-	var store *KeyValueDataStore
-
-	if reflect.TypeOf(GetServer().GetDataManager().getDataStore(storeId)).String() == "*Server.SqlDataStore" {
-		store = GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore)
-	} else {
-		store = GetServer().GetDataManager().getDataStore(storeId).(*KeyValueDataStore)
-	}
-
-	if store != nil {
-		// Save it inside it supertype in substitution-group.
-		for i := 0; i < len(this.SuperTypeNames); i++ {
-			superTypeName := this.SuperTypeNames[i]
-			superType, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
-			if err == nil {
-				if !Utility.Contains(superType.SubstitutionGroup, this.TypeName) {
-					superType.SubstitutionGroup = append(superType.SubstitutionGroup, this.TypeName)
-					// Save the superType.
-					err := superType.Save(superTypeName[0:strings.Index(superTypeName, ".")])
-					if err != nil {
-						return err
-					}
-				}
-			} else {
-				return err
-			}
-		}
-
-		// I will remove it from substitution group as neeeded...
-		for i := 0; i < len(prototype.SuperTypeNames); i++ {
-			if !Utility.Contains(this.SuperTypeNames, prototype.SuperTypeNames[i]) {
-				// Here I will remove the prototype from superType substitution group.
-				superTypeName := prototype.SuperTypeNames[i]
-				superType, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
-				if err != nil {
-					return err
-				}
-
-				substitutionGroup := make([]string, 0)
-				for j := 0; j < len(superType.SubstitutionGroup); j++ {
-					if superType.SubstitutionGroup[j] != prototype.TypeName {
-						substitutionGroup = append(substitutionGroup, superType.SubstitutionGroup[j])
-					}
-				}
-				superType.SubstitutionGroup = substitutionGroup
-				err = superType.Save(superTypeName[0:strings.Index(superTypeName, ".")])
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		err := store.saveEntityPrototype(this)
-		if err != nil {
-			log.Println("Fail to save entity prototype ", this.TypeName, " in store id ", storeId)
-			return err
-		} else {
-			// Register it to the vm...
-			JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+this.TypeName, this.generateConstructor(), true)
-
-			var eventDatas []*MessageData
-			evtData := new(MessageData)
-			evtData.TYPENAME = "Server.MessageData"
-			evtData.Name = "prototype"
-
-			evtData.Value = this
-			eventDatas = append(eventDatas, evtData)
-			evt, _ := NewEvent(UpdatePrototypeEvent, PrototypeEvent, eventDatas)
-			GetServer().GetEventManager().BroadcastEvent(evt)
-
-			// Update local entities if the store is local.
-			if store.m_ipv4 == "127.0.0.1" { // save if is local entity prototype only.
-				entities, _ := GetServer().GetEntityManager().getEntities(prototype.TypeName, nil, storeId, false)
-
-				// Remove the fields
-				for i := 0; i < len(entities); i++ {
-					entity := entities[i] // Must be a dynamic entity.
-
-					// remove it...
-					for j := 0; j < len(this.FieldsToDelete); j++ {
-						field := prototype.Fields[this.FieldsToDelete[j]]
-						if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-							// Dynamic entity.
-							entity.(*DynamicEntity).deleteValue(field)
-						}
-
-						entity.SetNeedSave(true)
-						entity.SaveEntity() // Must be save before doing something else.
-					}
-
-					// update it...
-					for j := 0; j < len(this.FieldsToUpdate); j++ {
-						values := strings.Split(this.FieldsToUpdate[j], ":")
-						if len(values) == 2 {
-							indexFrom := prototype.getFieldIndex(values[0])
-							indexTo := this.getFieldIndex(values[1])
-							if indexFrom > -1 && indexTo > -1 {
-								if values[0] != values[1] {
-									if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-										// Set the new value with the old one
-										entity.(*DynamicEntity).setValue(values[1], entity.(*DynamicEntity).getValue(values[0]))
-										// Delete the old one.
-										entity.(*DynamicEntity).deleteValue(values[0])
-									}
-
-									entity.SetNeedSave(true)
-									prototype.Fields[indexFrom] = values[1]
-								}
-								var fieldTypeTo = prototype.FieldsType[indexTo]
-								var fieldTypeFrom = this.FieldsType[indexFrom]
-								if fieldTypeFrom != fieldTypeTo {
-									log.Println("------> change field type from ", fieldTypeFrom, "with", fieldTypeTo)
-									// TODO set conversion rules here for each possible types.
-								}
-							}
-						}
-					}
-
-					// Now set new fields value inside existing entities with their default
-					// value.
-					for j := 0; j < len(this.Fields); j++ {
-						if !Utility.Contains(prototype.Fields, this.Fields[j]) {
-							// I that case I will set the new field value inside the prototype.
-							var value interface{}
-							if strings.HasPrefix(this.FieldsType[j], "[]") {
-								value = "undefined"
-							} else {
-								if XML_Schemas.IsXsString(this.FieldsType[j]) {
-									value = this.FieldsDefaultValue[j]
-								} else if XML_Schemas.IsXsInt(this.FieldsType[j]) || XML_Schemas.IsXsTime(this.FieldsType[j]) {
-									value, _ = strconv.ParseInt(this.FieldsDefaultValue[j], 10, 64)
-								} else if XML_Schemas.IsXsNumeric(this.FieldsType[j]) {
-									value, _ = strconv.ParseFloat(this.FieldsDefaultValue[j], 64)
-								} else if XML_Schemas.IsXsDate(this.FieldsType[j]) {
-									value = Utility.MakeTimestamp()
-								} else if XML_Schemas.IsXsBoolean(this.FieldsType[j]) {
-									if this.FieldsDefaultValue[j] == "false" {
-										value = false
-									} else {
-										value = true
-									}
-								} else {
-									// Object here.
-									value = "undefined"
-								}
-							}
-							entity.SetNeedSave(true)
-							if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
-								entity.(*DynamicEntity).setValue(this.Fields[j], value)
-							}
-						}
-					}
-
-					// Save the entity.
-					entity.SaveEntity()
-				}
-
-				// Now the indexation key for ids and indexs...
-				for i := 0; i < len(this.FieldsToUpdate); i++ {
-					values := strings.Split(this.FieldsToUpdate[i], ":")
-					if len(values) == 2 {
-						if Utility.Contains(this.Indexs, values[1]) || Utility.Contains(this.Ids, values[1]) {
-							oldKey := this.TypeName + ":" + values[0]
-							newKey := this.TypeName + ":" + values[1]
-							indexations, err := store.getValue(oldKey)
-							if err == nil {
-								// Here I will remove the oldKey...
-								store.deleteValue(oldKey)
-								store.setValue([]byte(newKey), indexations)
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return nil
 }
 
 /**

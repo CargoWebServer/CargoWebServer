@@ -19,9 +19,6 @@ type Computer struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Entity **/
 	M_id string
 
@@ -51,10 +48,52 @@ type XsdComputer struct {
 	M_ipv4	string	`xml:"ipv4,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *Computer) GetUUID() string{
+func (this *Computer) GetUuid() string{
 	return this.UUID
 }
+func (this *Computer) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *Computer) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *Computer) GetTypeName() string{
+	this.TYPENAME = "CargoEntities.Computer"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *Computer) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *Computer) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Computer) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *Computer) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *Computer) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *Computer) GetId() string{
@@ -65,8 +104,7 @@ func (this *Computer) GetId() string{
 func (this *Computer) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -81,8 +119,7 @@ func (this *Computer) GetName() string{
 func (this *Computer) SetName(ref interface{}){
 	if this.M_name != ref.(string) {
 		this.M_name = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -97,8 +134,7 @@ func (this *Computer) GetIpv4() string{
 func (this *Computer) SetIpv4(ref interface{}){
 	if this.M_ipv4 != ref.(string) {
 		this.M_ipv4 = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -113,8 +149,7 @@ func (this *Computer) GetOsType() OsType{
 func (this *Computer) SetOsType(ref interface{}){
 	if this.M_osType != ref.(OsType) {
 		this.M_osType = ref.(OsType)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -129,8 +164,7 @@ func (this *Computer) GetPlatformType() PlatformType{
 func (this *Computer) SetPlatformType(ref interface{}){
 	if this.M_platformType != ref.(PlatformType) {
 		this.M_platformType = ref.(PlatformType)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -146,14 +180,12 @@ func (this *Computer) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_entitiesPtr != ref.(string) {
 			this.M_entitiesPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
-			this.M_entitiesPtr = ref.(*Entities).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
+			this.M_entitiesPtr = ref.(*Entities).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
@@ -163,7 +195,7 @@ func (this *Computer) SetEntitiesPtr(ref interface{}){
 func (this *Computer) RemoveEntitiesPtr(ref interface{}){
 	toDelete := ref.(*Entities)
 	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
 			this.NeedSave = true

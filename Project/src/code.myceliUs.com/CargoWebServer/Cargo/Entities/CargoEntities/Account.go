@@ -19,9 +19,6 @@ type Account struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Entity **/
 	M_id string
 
@@ -65,10 +62,52 @@ type XsdAccount struct {
 	M_email	string	`xml:"email,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *Account) GetUUID() string{
+func (this *Account) GetUuid() string{
 	return this.UUID
 }
+func (this *Account) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *Account) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *Account) GetTypeName() string{
+	this.TYPENAME = "CargoEntities.Account"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *Account) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *Account) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Account) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *Account) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *Account) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *Account) GetId() string{
@@ -79,8 +118,7 @@ func (this *Account) GetId() string{
 func (this *Account) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -95,8 +133,7 @@ func (this *Account) GetName() string{
 func (this *Account) SetName(ref interface{}){
 	if this.M_name != ref.(string) {
 		this.M_name = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -111,8 +148,7 @@ func (this *Account) GetPassword() string{
 func (this *Account) SetPassword(ref interface{}){
 	if this.M_password != ref.(string) {
 		this.M_password = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -127,8 +163,7 @@ func (this *Account) GetEmail() string{
 func (this *Account) SetEmail(ref interface{}){
 	if this.M_email != ref.(string) {
 		this.M_email = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -144,7 +179,7 @@ func (this *Account) SetSessions(ref interface{}){
 	isExist := false
 	var sessionss []*Session
 	for i:=0; i<len(this.M_sessions); i++ {
-		if this.M_sessions[i].GetUUID() != ref.(*Session).GetUUID() {
+		if this.M_sessions[i].GetUuid() != ref.(*Session).GetUuid() {
 			sessionss = append(sessionss, this.M_sessions[i])
 		} else {
 			isExist = true
@@ -153,8 +188,7 @@ func (this *Account) SetSessions(ref interface{}){
 	}
 	if !isExist {
 		sessionss = append(sessionss, ref.(*Session))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_sessions = sessionss
 	}
 }
@@ -164,7 +198,7 @@ func (this *Account) RemoveSessions(ref interface{}){
 	toDelete := ref.(*Session)
 	sessions_ := make([]*Session, 0)
 	for i := 0; i < len(this.M_sessions); i++ {
-		if toDelete.GetUUID() != this.M_sessions[i].GetUUID() {
+		if toDelete.GetUuid() != this.M_sessions[i].GetUuid() {
 			sessions_ = append(sessions_, this.M_sessions[i])
 		}else{
 			this.NeedSave = true
@@ -183,7 +217,7 @@ func (this *Account) SetMessages(ref interface{}){
 	isExist := false
 	var messagess []Message
 	for i:=0; i<len(this.M_messages); i++ {
-		if this.M_messages[i].(Entity).GetUUID() != ref.(Entity).GetUUID() {
+		if this.M_messages[i].(Entity).GetUuid() != ref.(Entity).GetUuid() {
 			messagess = append(messagess, this.M_messages[i])
 		} else {
 			isExist = true
@@ -192,8 +226,7 @@ func (this *Account) SetMessages(ref interface{}){
 	}
 	if !isExist {
 		messagess = append(messagess, ref.(Message))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_messages = messagess
 	}
 }
@@ -203,7 +236,7 @@ func (this *Account) RemoveMessages(ref interface{}){
 	toDelete := ref.(Entity)
 	messages_ := make([]Message, 0)
 	for i := 0; i < len(this.M_messages); i++ {
-		if toDelete.GetUUID() != this.M_messages[i].(Entity).GetUUID() {
+		if toDelete.GetUuid() != this.M_messages[i].(Entity).GetUuid() {
 			messages_ = append(messages_, this.M_messages[i])
 		}else{
 			this.NeedSave = true
@@ -222,14 +255,12 @@ func (this *Account) SetUserRef(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_userRef != ref.(string) {
 			this.M_userRef = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_userRef != ref.(Entity).GetUUID() {
-			this.M_userRef = ref.(Entity).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_userRef != ref.(Entity).GetUuid() {
+			this.M_userRef = ref.(Entity).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_userRef = ref.(*User)
 	}
@@ -239,7 +270,7 @@ func (this *Account) SetUserRef(ref interface{}){
 func (this *Account) RemoveUserRef(ref interface{}){
 	toDelete := ref.(Entity)
 	if this.m_userRef!= nil {
-		if toDelete.GetUUID() == this.m_userRef.GetUUID() {
+		if toDelete.GetUuid() == this.m_userRef.GetUuid() {
 			this.m_userRef = nil
 			this.M_userRef = ""
 			this.NeedSave = true
@@ -261,25 +292,23 @@ func (this *Account) SetRolesRef(ref interface{}){
 			}
 		}
 		this.M_rolesRef = append(this.M_rolesRef, ref.(string))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}else{
 		for i:=0; i < len(this.m_rolesRef); i++ {
-			if this.m_rolesRef[i].GetUUID() == ref.(*Role).GetUUID() {
+			if this.m_rolesRef[i].GetUuid() == ref.(*Role).GetUuid() {
 				return
 			}
 		}
 		isExist := false
 		for i:=0; i < len(this.M_rolesRef); i++ {
-			if this.M_rolesRef[i] == ref.(*Role).GetUUID() {
+			if this.M_rolesRef[i] == ref.(*Role).GetUuid() {
 				isExist = true
 			}
 		}
 		this.m_rolesRef = append(this.m_rolesRef, ref.(*Role))
 	if !isExist {
-		this.M_rolesRef = append(this.M_rolesRef, ref.(*Role).GetUUID())
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.M_rolesRef = append(this.M_rolesRef, ref.(*Role).GetUuid())
+		this.NeedSave = true
 	}
 	}
 }
@@ -290,7 +319,7 @@ func (this *Account) RemoveRolesRef(ref interface{}){
 	rolesRef_ := make([]*Role, 0)
 	rolesRefUuid := make([]string, 0)
 	for i := 0; i < len(this.m_rolesRef); i++ {
-		if toDelete.GetUUID() != this.m_rolesRef[i].GetUUID() {
+		if toDelete.GetUuid() != this.m_rolesRef[i].GetUuid() {
 			rolesRef_ = append(rolesRef_, this.m_rolesRef[i])
 			rolesRefUuid = append(rolesRefUuid, this.M_rolesRef[i])
 		}else{
@@ -315,25 +344,23 @@ func (this *Account) SetPermissionsRef(ref interface{}){
 			}
 		}
 		this.M_permissionsRef = append(this.M_permissionsRef, ref.(string))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}else{
 		for i:=0; i < len(this.m_permissionsRef); i++ {
-			if this.m_permissionsRef[i].GetUUID() == ref.(*Permission).GetUUID() {
+			if this.m_permissionsRef[i].GetUuid() == ref.(*Permission).GetUuid() {
 				return
 			}
 		}
 		isExist := false
 		for i:=0; i < len(this.M_permissionsRef); i++ {
-			if this.M_permissionsRef[i] == ref.(*Permission).GetUUID() {
+			if this.M_permissionsRef[i] == ref.(*Permission).GetUuid() {
 				isExist = true
 			}
 		}
 		this.m_permissionsRef = append(this.m_permissionsRef, ref.(*Permission))
 	if !isExist {
-		this.M_permissionsRef = append(this.M_permissionsRef, ref.(*Permission).GetUUID())
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.M_permissionsRef = append(this.M_permissionsRef, ref.(*Permission).GetUuid())
+		this.NeedSave = true
 	}
 	}
 }
@@ -344,7 +371,7 @@ func (this *Account) RemovePermissionsRef(ref interface{}){
 	permissionsRef_ := make([]*Permission, 0)
 	permissionsRefUuid := make([]string, 0)
 	for i := 0; i < len(this.m_permissionsRef); i++ {
-		if toDelete.GetUUID() != this.m_permissionsRef[i].GetUUID() {
+		if toDelete.GetUuid() != this.m_permissionsRef[i].GetUuid() {
 			permissionsRef_ = append(permissionsRef_, this.m_permissionsRef[i])
 			permissionsRefUuid = append(permissionsRefUuid, this.M_permissionsRef[i])
 		}else{
@@ -365,14 +392,12 @@ func (this *Account) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_entitiesPtr != ref.(string) {
 			this.M_entitiesPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
-			this.M_entitiesPtr = ref.(*Entities).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
+			this.M_entitiesPtr = ref.(*Entities).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
@@ -382,7 +407,7 @@ func (this *Account) SetEntitiesPtr(ref interface{}){
 func (this *Account) RemoveEntitiesPtr(ref interface{}){
 	toDelete := ref.(*Entities)
 	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
 			this.NeedSave = true

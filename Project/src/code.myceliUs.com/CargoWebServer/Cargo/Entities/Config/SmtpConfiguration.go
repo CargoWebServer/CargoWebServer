@@ -19,9 +19,6 @@ type SmtpConfiguration struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Configuration **/
 	M_id string
 
@@ -55,10 +52,52 @@ type XsdSmtpConfiguration struct {
 	M_textEncoding	string	`xml:"textEncoding,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *SmtpConfiguration) GetUUID() string{
+func (this *SmtpConfiguration) GetUuid() string{
 	return this.UUID
 }
+func (this *SmtpConfiguration) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *SmtpConfiguration) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *SmtpConfiguration) GetTypeName() string{
+	this.TYPENAME = "Config.SmtpConfiguration"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *SmtpConfiguration) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *SmtpConfiguration) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *SmtpConfiguration) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *SmtpConfiguration) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *SmtpConfiguration) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *SmtpConfiguration) GetId() string{
@@ -69,8 +108,7 @@ func (this *SmtpConfiguration) GetId() string{
 func (this *SmtpConfiguration) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -85,8 +123,7 @@ func (this *SmtpConfiguration) GetTextEncoding() Encoding{
 func (this *SmtpConfiguration) SetTextEncoding(ref interface{}){
 	if this.M_textEncoding != ref.(Encoding) {
 		this.M_textEncoding = ref.(Encoding)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -101,8 +138,7 @@ func (this *SmtpConfiguration) GetHostName() string{
 func (this *SmtpConfiguration) SetHostName(ref interface{}){
 	if this.M_hostName != ref.(string) {
 		this.M_hostName = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -117,8 +153,7 @@ func (this *SmtpConfiguration) GetIpv4() string{
 func (this *SmtpConfiguration) SetIpv4(ref interface{}){
 	if this.M_ipv4 != ref.(string) {
 		this.M_ipv4 = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -133,8 +168,7 @@ func (this *SmtpConfiguration) GetPort() int{
 func (this *SmtpConfiguration) SetPort(ref interface{}){
 	if this.M_port != ref.(int) {
 		this.M_port = ref.(int)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -149,8 +183,7 @@ func (this *SmtpConfiguration) GetUser() string{
 func (this *SmtpConfiguration) SetUser(ref interface{}){
 	if this.M_user != ref.(string) {
 		this.M_user = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -165,8 +198,7 @@ func (this *SmtpConfiguration) GetPwd() string{
 func (this *SmtpConfiguration) SetPwd(ref interface{}){
 	if this.M_pwd != ref.(string) {
 		this.M_pwd = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -182,14 +214,12 @@ func (this *SmtpConfiguration) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_parentPtr != ref.(string) {
 			this.M_parentPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_parentPtr != ref.(*Configurations).GetUUID() {
-			this.M_parentPtr = ref.(*Configurations).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_parentPtr != ref.(*Configurations).GetUuid() {
+			this.M_parentPtr = ref.(*Configurations).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_parentPtr = ref.(*Configurations)
 	}
@@ -199,7 +229,7 @@ func (this *SmtpConfiguration) SetParentPtr(ref interface{}){
 func (this *SmtpConfiguration) RemoveParentPtr(ref interface{}){
 	toDelete := ref.(*Configurations)
 	if this.m_parentPtr!= nil {
-		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
 			this.NeedSave = true

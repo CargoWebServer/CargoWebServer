@@ -6,7 +6,7 @@ type Configuration interface{
 	/** Method of Configuration **/
 
 	/** UUID **/
-	GetUUID() string
+	GetUuid() string
 
 	/** Id **/
 	GetId() string

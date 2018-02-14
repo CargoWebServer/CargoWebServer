@@ -19,9 +19,6 @@ type Session struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Session **/
 	M_id string
 	M_startTime int64
@@ -50,10 +47,52 @@ type XsdSession struct {
 	M_statutTime	int64	`xml:"statutTime,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *Session) GetUUID() string{
+func (this *Session) GetUuid() string{
 	return this.UUID
 }
+func (this *Session) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *Session) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *Session) GetTypeName() string{
+	this.TYPENAME = "CargoEntities.Session"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *Session) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *Session) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Session) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *Session) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *Session) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *Session) GetId() string{
@@ -64,8 +103,7 @@ func (this *Session) GetId() string{
 func (this *Session) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -80,8 +118,7 @@ func (this *Session) GetStartTime() int64{
 func (this *Session) SetStartTime(ref interface{}){
 	if this.M_startTime != ref.(int64) {
 		this.M_startTime = ref.(int64)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -96,8 +133,7 @@ func (this *Session) GetEndTime() int64{
 func (this *Session) SetEndTime(ref interface{}){
 	if this.M_endTime != ref.(int64) {
 		this.M_endTime = ref.(int64)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -112,8 +148,7 @@ func (this *Session) GetStatusTime() int64{
 func (this *Session) SetStatusTime(ref interface{}){
 	if this.M_statusTime != ref.(int64) {
 		this.M_statusTime = ref.(int64)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -128,8 +163,7 @@ func (this *Session) GetSessionState() SessionState{
 func (this *Session) SetSessionState(ref interface{}){
 	if this.M_sessionState != ref.(SessionState) {
 		this.M_sessionState = ref.(SessionState)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -145,14 +179,12 @@ func (this *Session) SetComputerRef(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_computerRef != ref.(string) {
 			this.M_computerRef = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_computerRef != ref.(Entity).GetUUID() {
-			this.M_computerRef = ref.(Entity).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_computerRef != ref.(Entity).GetUuid() {
+			this.M_computerRef = ref.(Entity).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_computerRef = ref.(*Computer)
 	}
@@ -162,7 +194,7 @@ func (this *Session) SetComputerRef(ref interface{}){
 func (this *Session) RemoveComputerRef(ref interface{}){
 	toDelete := ref.(Entity)
 	if this.m_computerRef!= nil {
-		if toDelete.GetUUID() == this.m_computerRef.GetUUID() {
+		if toDelete.GetUuid() == this.m_computerRef.GetUuid() {
 			this.m_computerRef = nil
 			this.M_computerRef = ""
 			this.NeedSave = true
@@ -180,14 +212,12 @@ func (this *Session) SetAccountPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_accountPtr != ref.(string) {
 			this.M_accountPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_accountPtr != ref.(Entity).GetUUID() {
-			this.M_accountPtr = ref.(Entity).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_accountPtr != ref.(Entity).GetUuid() {
+			this.M_accountPtr = ref.(Entity).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_accountPtr = ref.(*Account)
 	}
@@ -197,7 +227,7 @@ func (this *Session) SetAccountPtr(ref interface{}){
 func (this *Session) RemoveAccountPtr(ref interface{}){
 	toDelete := ref.(Entity)
 	if this.m_accountPtr!= nil {
-		if toDelete.GetUUID() == this.m_accountPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_accountPtr.GetUuid() {
 			this.m_accountPtr = nil
 			this.M_accountPtr = ""
 			this.NeedSave = true

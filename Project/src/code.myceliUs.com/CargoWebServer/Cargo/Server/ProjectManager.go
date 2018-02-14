@@ -71,27 +71,23 @@ func (this *ProjectManager) synchronize() {
 		if f.IsDir() {
 			log.Println("--> Synchronize project ", f.Name())
 			if !strings.HasPrefix(".", f.Name()) && f.Name() != "lib" && f.Name() != "queries" {
-				projectUUID := CargoEntitiesProjectExists(f.Name())
-				var project *CargoEntities.Project
-				if len(projectUUID) == 0 {
-
-					project = new(CargoEntities.Project)
+				projectEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Project", "CargoEntities", []interface{}{f.Name()})
+				if err != nil {
+					project := new(CargoEntities.Project)
 					project.SetName(f.Name())
 					project.SetId(f.Name())
-					cargoEntities := server.GetEntityManager().getCargoEntities()
 
 					// first of all i will see if the project exist...
-					_, err := GetServer().GetEntityManager().createEntity(cargoEntities.GetUuid(), "M_entities", "CargoEntities.Project", f.Name(), project)
+					projectEntity, err := GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Project", f.Name(), project)
 
 					// Here I will synchronyse the project...
 					if err == nil {
-						this.synchronizeProject(project, this.root+"/"+f.Name())
+						this.synchronizeProject(projectEntity.(*CargoEntities.Project), this.root+"/"+f.Name())
 					}
 				} else {
-					projectEntity, _ := GetServer().GetEntityManager().getEntityByUuid(projectUUID, false)
-					this.synchronizeProject(projectEntity.GetObject().(*CargoEntities.Project), this.root+"/"+f.Name())
+					this.synchronizeProject(projectEntity.(*CargoEntities.Project), this.root+"/"+f.Name())
 					// Save as needed.
-					projectEntity.SaveEntity()
+					GetServer().GetEntityManager().saveEntity(projectEntity)
 				}
 			}
 		}
@@ -107,9 +103,9 @@ func (this *ProjectManager) synchronizeProject(project *CargoEntities.Project, p
 	ids := []interface{}{Utility.CreateSha1Key([]byte("/" + project.GetId()))}
 
 	// I will keep reference to the project directory only...
-	file, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", ids, false) // get the first file level only...
+	file, err := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", ids) // get the first file level only...
 	if err == nil {
-		project.SetFilesRef(file.GetObject())
+		project.SetFilesRef(file)
 	}
 }
 
@@ -158,7 +154,7 @@ func (this *ProjectManager) Synchronize(sessionId string, messageId string) {
 // @param {callback} errorCallback In case of error.
 func (this *ProjectManager) GetAllProjects(sessionId string, messageId string) []*CargoEntities.Project {
 	projects := make([]*CargoEntities.Project, 0)
-	entities, errObj := GetServer().GetEntityManager().getEntities("CargoEntities.Project", nil, "CargoEntities", false)
+	entities, errObj := GetServer().GetEntityManager().getEntities("CargoEntities.Project", "CargoEntities", nil)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return projects
@@ -166,7 +162,7 @@ func (this *ProjectManager) GetAllProjects(sessionId string, messageId string) [
 
 	// Here I will parse the list of entities retreived...
 	for i := 0; i < len(entities); i++ {
-		projects = append(projects, entities[i].GetObject().(*CargoEntities.Project))
+		projects = append(projects, entities[i].(*CargoEntities.Project))
 	}
 	return projects
 }

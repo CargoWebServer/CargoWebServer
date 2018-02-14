@@ -19,9 +19,6 @@ type Configurations struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Configurations **/
 	M_id string
 	M_name string
@@ -53,10 +50,52 @@ type XsdConfigurations struct {
 	M_version	string	`xml:"version,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *Configurations) GetUUID() string{
+func (this *Configurations) GetUuid() string{
 	return this.UUID
 }
+func (this *Configurations) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *Configurations) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *Configurations) GetTypeName() string{
+	this.TYPENAME = "Config.Configurations"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *Configurations) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *Configurations) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Configurations) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *Configurations) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *Configurations) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *Configurations) GetId() string{
@@ -67,8 +106,7 @@ func (this *Configurations) GetId() string{
 func (this *Configurations) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -83,8 +121,7 @@ func (this *Configurations) GetName() string{
 func (this *Configurations) SetName(ref interface{}){
 	if this.M_name != ref.(string) {
 		this.M_name = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -99,8 +136,7 @@ func (this *Configurations) GetVersion() string{
 func (this *Configurations) SetVersion(ref interface{}){
 	if this.M_version != ref.(string) {
 		this.M_version = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -115,15 +151,14 @@ func (this *Configurations) GetServerConfig() *ServerConfiguration{
 func (this *Configurations) SetServerConfig(ref interface{}){
 	if this.M_serverConfig != ref.(*ServerConfiguration) {
 		this.M_serverConfig = ref.(*ServerConfiguration)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
 /** Remove reference ServerConfig **/
 func (this *Configurations) RemoveServerConfig(ref interface{}){
 	toDelete := ref.(Configuration)
-	if toDelete.GetUUID() == this.M_serverConfig.GetUUID() {
+	if toDelete.GetUuid() == this.M_serverConfig.GetUuid() {
 		this.M_serverConfig = nil
 		this.NeedSave = true
 	}
@@ -138,15 +173,14 @@ func (this *Configurations) GetOauth2Configuration() *OAuth2Configuration{
 func (this *Configurations) SetOauth2Configuration(ref interface{}){
 	if this.M_oauth2Configuration != ref.(*OAuth2Configuration) {
 		this.M_oauth2Configuration = ref.(*OAuth2Configuration)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
 /** Remove reference Oauth2Configuration **/
 func (this *Configurations) RemoveOauth2Configuration(ref interface{}){
 	toDelete := ref.(Configuration)
-	if toDelete.GetUUID() == this.M_oauth2Configuration.GetUUID() {
+	if toDelete.GetUuid() == this.M_oauth2Configuration.GetUuid() {
 		this.M_oauth2Configuration = nil
 		this.NeedSave = true
 	}
@@ -162,7 +196,7 @@ func (this *Configurations) SetServiceConfigs(ref interface{}){
 	isExist := false
 	var serviceConfigss []*ServiceConfiguration
 	for i:=0; i<len(this.M_serviceConfigs); i++ {
-		if this.M_serviceConfigs[i].GetUUID() != ref.(Configuration).GetUUID() {
+		if this.M_serviceConfigs[i].GetUuid() != ref.(Configuration).GetUuid() {
 			serviceConfigss = append(serviceConfigss, this.M_serviceConfigs[i])
 		} else {
 			isExist = true
@@ -171,8 +205,7 @@ func (this *Configurations) SetServiceConfigs(ref interface{}){
 	}
 	if !isExist {
 		serviceConfigss = append(serviceConfigss, ref.(*ServiceConfiguration))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_serviceConfigs = serviceConfigss
 	}
 }
@@ -182,7 +215,7 @@ func (this *Configurations) RemoveServiceConfigs(ref interface{}){
 	toDelete := ref.(Configuration)
 	serviceConfigs_ := make([]*ServiceConfiguration, 0)
 	for i := 0; i < len(this.M_serviceConfigs); i++ {
-		if toDelete.GetUUID() != this.M_serviceConfigs[i].GetUUID() {
+		if toDelete.GetUuid() != this.M_serviceConfigs[i].GetUuid() {
 			serviceConfigs_ = append(serviceConfigs_, this.M_serviceConfigs[i])
 		}else{
 			this.NeedSave = true
@@ -201,7 +234,7 @@ func (this *Configurations) SetDataStoreConfigs(ref interface{}){
 	isExist := false
 	var dataStoreConfigss []*DataStoreConfiguration
 	for i:=0; i<len(this.M_dataStoreConfigs); i++ {
-		if this.M_dataStoreConfigs[i].GetUUID() != ref.(Configuration).GetUUID() {
+		if this.M_dataStoreConfigs[i].GetUuid() != ref.(Configuration).GetUuid() {
 			dataStoreConfigss = append(dataStoreConfigss, this.M_dataStoreConfigs[i])
 		} else {
 			isExist = true
@@ -210,8 +243,7 @@ func (this *Configurations) SetDataStoreConfigs(ref interface{}){
 	}
 	if !isExist {
 		dataStoreConfigss = append(dataStoreConfigss, ref.(*DataStoreConfiguration))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_dataStoreConfigs = dataStoreConfigss
 	}
 }
@@ -221,7 +253,7 @@ func (this *Configurations) RemoveDataStoreConfigs(ref interface{}){
 	toDelete := ref.(Configuration)
 	dataStoreConfigs_ := make([]*DataStoreConfiguration, 0)
 	for i := 0; i < len(this.M_dataStoreConfigs); i++ {
-		if toDelete.GetUUID() != this.M_dataStoreConfigs[i].GetUUID() {
+		if toDelete.GetUuid() != this.M_dataStoreConfigs[i].GetUuid() {
 			dataStoreConfigs_ = append(dataStoreConfigs_, this.M_dataStoreConfigs[i])
 		}else{
 			this.NeedSave = true
@@ -240,7 +272,7 @@ func (this *Configurations) SetSmtpConfigs(ref interface{}){
 	isExist := false
 	var smtpConfigss []*SmtpConfiguration
 	for i:=0; i<len(this.M_smtpConfigs); i++ {
-		if this.M_smtpConfigs[i].GetUUID() != ref.(Configuration).GetUUID() {
+		if this.M_smtpConfigs[i].GetUuid() != ref.(Configuration).GetUuid() {
 			smtpConfigss = append(smtpConfigss, this.M_smtpConfigs[i])
 		} else {
 			isExist = true
@@ -249,8 +281,7 @@ func (this *Configurations) SetSmtpConfigs(ref interface{}){
 	}
 	if !isExist {
 		smtpConfigss = append(smtpConfigss, ref.(*SmtpConfiguration))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_smtpConfigs = smtpConfigss
 	}
 }
@@ -260,7 +291,7 @@ func (this *Configurations) RemoveSmtpConfigs(ref interface{}){
 	toDelete := ref.(Configuration)
 	smtpConfigs_ := make([]*SmtpConfiguration, 0)
 	for i := 0; i < len(this.M_smtpConfigs); i++ {
-		if toDelete.GetUUID() != this.M_smtpConfigs[i].GetUUID() {
+		if toDelete.GetUuid() != this.M_smtpConfigs[i].GetUuid() {
 			smtpConfigs_ = append(smtpConfigs_, this.M_smtpConfigs[i])
 		}else{
 			this.NeedSave = true
@@ -279,7 +310,7 @@ func (this *Configurations) SetLdapConfigs(ref interface{}){
 	isExist := false
 	var ldapConfigss []*LdapConfiguration
 	for i:=0; i<len(this.M_ldapConfigs); i++ {
-		if this.M_ldapConfigs[i].GetUUID() != ref.(Configuration).GetUUID() {
+		if this.M_ldapConfigs[i].GetUuid() != ref.(Configuration).GetUuid() {
 			ldapConfigss = append(ldapConfigss, this.M_ldapConfigs[i])
 		} else {
 			isExist = true
@@ -288,8 +319,7 @@ func (this *Configurations) SetLdapConfigs(ref interface{}){
 	}
 	if !isExist {
 		ldapConfigss = append(ldapConfigss, ref.(*LdapConfiguration))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_ldapConfigs = ldapConfigss
 	}
 }
@@ -299,7 +329,7 @@ func (this *Configurations) RemoveLdapConfigs(ref interface{}){
 	toDelete := ref.(Configuration)
 	ldapConfigs_ := make([]*LdapConfiguration, 0)
 	for i := 0; i < len(this.M_ldapConfigs); i++ {
-		if toDelete.GetUUID() != this.M_ldapConfigs[i].GetUUID() {
+		if toDelete.GetUuid() != this.M_ldapConfigs[i].GetUuid() {
 			ldapConfigs_ = append(ldapConfigs_, this.M_ldapConfigs[i])
 		}else{
 			this.NeedSave = true
@@ -318,7 +348,7 @@ func (this *Configurations) SetApplicationConfigs(ref interface{}){
 	isExist := false
 	var applicationConfigss []*ApplicationConfiguration
 	for i:=0; i<len(this.M_applicationConfigs); i++ {
-		if this.M_applicationConfigs[i].GetUUID() != ref.(Configuration).GetUUID() {
+		if this.M_applicationConfigs[i].GetUuid() != ref.(Configuration).GetUuid() {
 			applicationConfigss = append(applicationConfigss, this.M_applicationConfigs[i])
 		} else {
 			isExist = true
@@ -327,8 +357,7 @@ func (this *Configurations) SetApplicationConfigs(ref interface{}){
 	}
 	if !isExist {
 		applicationConfigss = append(applicationConfigss, ref.(*ApplicationConfiguration))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_applicationConfigs = applicationConfigss
 	}
 }
@@ -338,7 +367,7 @@ func (this *Configurations) RemoveApplicationConfigs(ref interface{}){
 	toDelete := ref.(Configuration)
 	applicationConfigs_ := make([]*ApplicationConfiguration, 0)
 	for i := 0; i < len(this.M_applicationConfigs); i++ {
-		if toDelete.GetUUID() != this.M_applicationConfigs[i].GetUUID() {
+		if toDelete.GetUuid() != this.M_applicationConfigs[i].GetUuid() {
 			applicationConfigs_ = append(applicationConfigs_, this.M_applicationConfigs[i])
 		}else{
 			this.NeedSave = true
@@ -357,7 +386,7 @@ func (this *Configurations) SetScheduledTasks(ref interface{}){
 	isExist := false
 	var scheduledTaskss []*ScheduledTask
 	for i:=0; i<len(this.M_scheduledTasks); i++ {
-		if this.M_scheduledTasks[i].GetUUID() != ref.(Configuration).GetUUID() {
+		if this.M_scheduledTasks[i].GetUuid() != ref.(Configuration).GetUuid() {
 			scheduledTaskss = append(scheduledTaskss, this.M_scheduledTasks[i])
 		} else {
 			isExist = true
@@ -366,8 +395,7 @@ func (this *Configurations) SetScheduledTasks(ref interface{}){
 	}
 	if !isExist {
 		scheduledTaskss = append(scheduledTaskss, ref.(*ScheduledTask))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_scheduledTasks = scheduledTaskss
 	}
 }
@@ -377,7 +405,7 @@ func (this *Configurations) RemoveScheduledTasks(ref interface{}){
 	toDelete := ref.(Configuration)
 	scheduledTasks_ := make([]*ScheduledTask, 0)
 	for i := 0; i < len(this.M_scheduledTasks); i++ {
-		if toDelete.GetUUID() != this.M_scheduledTasks[i].GetUUID() {
+		if toDelete.GetUuid() != this.M_scheduledTasks[i].GetUuid() {
 			scheduledTasks_ = append(scheduledTasks_, this.M_scheduledTasks[i])
 		}else{
 			this.NeedSave = true

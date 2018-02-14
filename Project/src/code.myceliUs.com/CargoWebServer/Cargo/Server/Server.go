@@ -16,7 +16,6 @@ import (
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/Utility"
 	//"github.com/skratchdot/open-golang/open"
 	"os/exec"
@@ -74,9 +73,9 @@ func newServer() *Server {
 
 	// if the admin has password adminadmin I will display the setup wizard..
 	ids := []interface{}{"admin"}
-	adminAccountEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.Account", ids, false)
+	adminAccountEntity, err := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", ids)
 	if err == nil {
-		adminAccount := adminAccountEntity.GetObject().(*CargoEntities.Account)
+		adminAccount := adminAccountEntity.(*CargoEntities.Account)
 		if adminAccount.GetPassword() == "adminadmin" {
 			//open.Run("http://127.0.0.1:9393")
 		}
@@ -99,10 +98,6 @@ func (this *Server) initialize() {
 	// Must be call first.
 	this.GetConfigurationManager()
 	this.GetServiceManager()
-
-	// Start the cache manager.
-	this.GetCacheManager().initialize()
-	this.GetCacheManager().start()
 
 	// The basic services.
 	this.GetServiceManager().registerService(this.GetEventManager())
@@ -1031,12 +1026,7 @@ func (this *Server) Start() {
 		}
 
 		// Now I will register actions for services container.
-		activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
-		if err != nil {
-			log.Panicln(err)
-		}
-
-		activeConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations)
+		activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
 
 		// Start the remote services.
 		for _, service := range GetServer().GetServiceManager().m_remoteServicesLst {

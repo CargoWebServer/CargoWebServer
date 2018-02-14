@@ -19,9 +19,6 @@ type Error struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Entity **/
 	M_id string
 
@@ -57,10 +54,52 @@ type XsdError struct {
 	M_errorPath	string	`xml:"errorPath,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *Error) GetUUID() string{
+func (this *Error) GetUuid() string{
 	return this.UUID
 }
+func (this *Error) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *Error) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *Error) GetTypeName() string{
+	this.TYPENAME = "CargoEntities.Error"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *Error) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *Error) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Error) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *Error) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *Error) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *Error) GetId() string{
@@ -71,8 +110,7 @@ func (this *Error) GetId() string{
 func (this *Error) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -87,8 +125,7 @@ func (this *Error) GetBody() string{
 func (this *Error) SetBody(ref interface{}){
 	if this.M_body != ref.(string) {
 		this.M_body = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -103,8 +140,7 @@ func (this *Error) GetErrorPath() string{
 func (this *Error) SetErrorPath(ref interface{}){
 	if this.M_errorPath != ref.(string) {
 		this.M_errorPath = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -119,8 +155,7 @@ func (this *Error) GetCode() int{
 func (this *Error) SetCode(ref interface{}){
 	if this.M_code != ref.(int) {
 		this.M_code = ref.(int)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -136,14 +171,12 @@ func (this *Error) SetAccountRef(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_accountRef != ref.(string) {
 			this.M_accountRef = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_accountRef != ref.(Entity).GetUUID() {
-			this.M_accountRef = ref.(Entity).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_accountRef != ref.(Entity).GetUuid() {
+			this.M_accountRef = ref.(Entity).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_accountRef = ref.(*Account)
 	}
@@ -153,7 +186,7 @@ func (this *Error) SetAccountRef(ref interface{}){
 func (this *Error) RemoveAccountRef(ref interface{}){
 	toDelete := ref.(Entity)
 	if this.m_accountRef!= nil {
-		if toDelete.GetUUID() == this.m_accountRef.GetUUID() {
+		if toDelete.GetUuid() == this.m_accountRef.GetUuid() {
 			this.m_accountRef = nil
 			this.M_accountRef = ""
 			this.NeedSave = true
@@ -171,14 +204,12 @@ func (this *Error) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_entitiesPtr != ref.(string) {
 			this.M_entitiesPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
-			this.M_entitiesPtr = ref.(*Entities).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
+			this.M_entitiesPtr = ref.(*Entities).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
@@ -188,7 +219,7 @@ func (this *Error) SetEntitiesPtr(ref interface{}){
 func (this *Error) RemoveEntitiesPtr(ref interface{}){
 	toDelete := ref.(*Entities)
 	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
 			this.NeedSave = true

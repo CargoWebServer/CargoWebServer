@@ -6,7 +6,7 @@ type Message interface{
 	/** Method of Message **/
 
 	/** UUID **/
-	GetUUID() string
+	GetUuid() string
 
 	/** Body **/
 	GetBody() string

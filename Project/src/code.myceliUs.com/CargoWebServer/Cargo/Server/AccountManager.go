@@ -45,9 +45,8 @@ func (this *AccountManager) initialize() {
 	GetServer().GetConfigurationManager().setServiceConfiguration(this.getId(), -1)
 
 	// Create the admin account if it doesn't exist
-	adminUuid := CargoEntitiesAccountExists("admin")
-	entities := GetServer().GetEntityManager().getCargoEntities()
-	if len(adminUuid) == 0 {
+	admin, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{"admin"})
+	if admin == nil {
 		// Create the account in memory.
 		account := new(CargoEntities.Account)
 		account.M_id = "admin"
@@ -55,12 +54,12 @@ func (this *AccountManager) initialize() {
 		account.M_name = "admin"
 		account.NeedSave = true
 		account.M_email = ""
-		GetServer().GetEntityManager().createEntity(entities.GetUuid(), "M_entities", "CargoEntities.Account", "admin", account)
+		GetServer().GetEntityManager().CreateEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Account", "admin", account, "", "")
 	}
 
 	// Create the guest account if it doesn't exist
-	guestUuid := CargoEntitiesAccountExists("guest")
-	if len(guestUuid) == 0 {
+	guest, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{"guest"})
+	if guest == nil {
 		// Create the account in memory.
 		account := new(CargoEntities.Account)
 		account.M_id = "guest"
@@ -68,7 +67,7 @@ func (this *AccountManager) initialize() {
 		account.M_name = "guest"
 		account.M_email = ""
 		account.NeedSave = true
-		GetServer().GetEntityManager().createEntity(entities.GetUuid(), "M_entities", "CargoEntities.Account", "guest", account)
+		GetServer().GetEntityManager().CreateEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Account", "guest", account, "", "")
 	}
 
 }
@@ -121,9 +120,8 @@ func (this *AccountManager) Register(name string, password string, email string,
 
 	// The email address must be written in lower case.
 	email = strings.ToLower(email)
-
-	accountUuid := CargoEntitiesAccountExists(name)
-	if len(accountUuid) == 0 {
+	account, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{name})
+	if account == nil {
 		// Create the account in memory.
 		account := new(CargoEntities.Account)
 		account.M_id = name
@@ -133,7 +131,7 @@ func (this *AccountManager) Register(name string, password string, email string,
 		account.NeedSave = true
 
 		// Append the newly create account into the cargo entities
-		GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntities().GetUuid(), "M_entities", "CargoEntities.Account", name, account)
+		GetServer().GetEntityManager().CreateEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.Account", name, account, "", "")
 		return account
 	} else {
 		// Create the error message
@@ -162,21 +160,14 @@ func (this *AccountManager) GetAccountById(id string, messageId string, sessionI
 		return nil
 	}
 
-	accountUuid := CargoEntitiesAccountExists(id)
-	if len(accountUuid) == 0 {
+	account, cargoError := GetServer().GetEntityManager().getEntityById("CargoEntities.Account", "CargoEntities", []interface{}{id})
+	if cargoError != nil {
 		// Create the error message
-		cargoError := NewError(Utility.FileLine(), ACCOUNT_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The account '"+id+"' doesn't exist"))
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
 
-	accountEntity, errObj := server.GetEntityManager().getEntityByUuid(accountUuid, false)
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
-	}
-
-	return accountEntity.GetObject().(*CargoEntities.Account)
+	return account.(*CargoEntities.Account)
 }
 
 // @api 1.0
@@ -195,21 +186,14 @@ func (this *AccountManager) GetUserById(id string, messageId string, sessionId s
 		return nil
 	}
 
-	userUuid := CargoEntitiesUserExists(id)
-	if len(userUuid) == 0 {
+	user, cargoError := GetServer().GetEntityManager().getEntityById("CargoEntities.User", "CargoEntities", []interface{}{id})
+	if cargoError != nil {
 		// Create the error message
-		cargoError := NewError(Utility.FileLine(), USER_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The user with the id '"+id+"' doesn't exist"))
 		GetServer().reportErrorMessage(messageId, sessionId, cargoError)
 		return nil
 	}
 
-	userEntity, errObj := server.GetEntityManager().getEntityByUuid(userUuid, false)
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
-	}
-
-	return userEntity.GetObject().(*CargoEntities.User)
+	return user.(*CargoEntities.User)
 }
 
 // @api 1.0

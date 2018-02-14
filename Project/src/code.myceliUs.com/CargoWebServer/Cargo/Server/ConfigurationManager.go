@@ -1,7 +1,6 @@
 package Server
 
 import (
-	"errors"
 	"log"
 	"os"
 	"path/filepath"
@@ -30,7 +29,7 @@ type ConfigurationManager struct {
 	m_filePath string
 
 	// the active configurations...
-	m_activeConfigurationsEntity *Config_ConfigurationsEntity
+	m_activeConfigurations *Config.Configurations
 
 	// The list of service configurations...
 	m_servicesConfiguration []*Config.ServiceConfiguration
@@ -93,7 +92,8 @@ func newConfigurationManager() *ConfigurationManager {
 
 	// The list of default datastore.
 	configurationManager.m_datastoreConfiguration = make([]*Config.DataStoreConfiguration, 0)
-	//serverConfig := configurationManager.m_activeConfigurationsEntity.GetObject().(*Config.Configurations).GetServerConfig()
+
+	// Default parameters...
 	hostName := "localhost" //serverConfig.GetHostName()
 	ipv4 := "127.0.0.1"     //serverConfig.GetIpv4()
 	port := 9393            //serverConfig.GetServerPort()
@@ -105,8 +105,8 @@ func newConfigurationManager() *ConfigurationManager {
 	cargoConfigDB.M_hostName = hostName
 	cargoConfigDB.M_ipv4 = ipv4
 	cargoConfigDB.M_port = port
-	cargoConfigDB.M_dataStoreVendor = Config.DataStoreVendor_MYCELIUS
-	cargoConfigDB.M_dataStoreType = Config.DataStoreType_KEY_VALUE_STORE
+	cargoConfigDB.M_dataStoreVendor = Config.DataStoreVendor_CAYLEY
+	cargoConfigDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	cargoConfigDB.NeedSave = true
 	configurationManager.appendDefaultDataStoreConfiguration(cargoConfigDB)
 
@@ -117,8 +117,8 @@ func newConfigurationManager() *ConfigurationManager {
 	cargoEntitiesDB.M_hostName = hostName
 	cargoEntitiesDB.M_ipv4 = ipv4
 	cargoEntitiesDB.M_port = port
-	cargoEntitiesDB.M_dataStoreVendor = Config.DataStoreVendor_MYCELIUS
-	cargoEntitiesDB.M_dataStoreType = Config.DataStoreType_KEY_VALUE_STORE
+	cargoEntitiesDB.M_dataStoreVendor = Config.DataStoreVendor_CAYLEY
+	cargoEntitiesDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	cargoEntitiesDB.NeedSave = true
 	configurationManager.appendDefaultDataStoreConfiguration(cargoEntitiesDB)
 
@@ -129,8 +129,8 @@ func newConfigurationManager() *ConfigurationManager {
 	sqlInfoDB.M_hostName = hostName
 	sqlInfoDB.M_ipv4 = ipv4
 	sqlInfoDB.M_port = port
-	sqlInfoDB.M_dataStoreVendor = Config.DataStoreVendor_MYCELIUS
-	sqlInfoDB.M_dataStoreType = Config.DataStoreType_KEY_VALUE_STORE
+	sqlInfoDB.M_dataStoreVendor = Config.DataStoreVendor_CAYLEY
+	sqlInfoDB.M_dataStoreType = Config.DataStoreType_GRAPH_STORE
 	sqlInfoDB.NeedSave = true
 	configurationManager.appendDefaultDataStoreConfiguration(sqlInfoDB)
 
@@ -150,56 +150,58 @@ func newConfigurationManager() *ConfigurationManager {
 func (this *ConfigurationManager) initialize() {
 	log.Println("--> initialyze ConfigurationManager")
 	// So here if there is no configuration...
-	configsUuid := ConfigConfigurationsExists("CARGO_DEFAULT_CONFIGURATIONS")
-	var activeConfigurations *Config.Configurations
-	if len(configsUuid) > 0 {
-		entity, _ := GetServer().GetEntityManager().getEntityByUuid(configsUuid, false)
-		this.m_activeConfigurationsEntity = entity.(*Config_ConfigurationsEntity)
-		activeConfigurations = this.m_activeConfigurationsEntity.GetObject().(*Config.Configurations)
+	entity, cargoError := GetServer().GetEntityManager().getEntityById("Config.Configurations", "Config", []interface{}{"CARGO_DEFAULT_CONFIGURATIONS"})
+	if cargoError == nil {
+		this.m_activeConfigurations = entity.(*Config.Configurations)
 	} else {
-		activeConfigurations = new(Config.Configurations)
-		activeConfigurations.M_id = "CARGO_DEFAULT_CONFIGURATIONS"
-		activeConfigurations.M_name = "Cargo Default Configurations"
-		activeConfigurations.M_version = "1.0"
+		this.m_activeConfigurations = new(Config.Configurations)
+		this.m_activeConfigurations.M_id = "CARGO_DEFAULT_CONFIGURATIONS"
+		this.m_activeConfigurations.M_name = "Cargo Default Configurations"
+		this.m_activeConfigurations.M_version = "1.0"
+
+		// Where queries are store by default...
+		this.m_activeConfigurations.NeedSave = true
+
+		// Create the configuration entity from the configuration and save it.
+		GetServer().GetEntityManager().saveEntity(this.m_activeConfigurations)
+
+		this.m_activeConfigurations.M_serviceConfigs = this.m_servicesConfiguration
 
 		// Now the default server configuration...
 		// Sever default values...
-		activeConfigurations.M_serverConfig = new(Config.ServerConfiguration)
-		activeConfigurations.M_serverConfig.NeedSave = true
-		activeConfigurations.M_serverConfig.M_id = "CARGO_DEFAULT_SERVER"
-		activeConfigurations.M_serverConfig.M_serverPort = 9393
-		activeConfigurations.M_serverConfig.M_serviceContainerPort = 9494
-		activeConfigurations.M_serverConfig.M_hostName = "localhost"
-		activeConfigurations.M_serverConfig.M_ipv4 = "127.0.0.1"
+		var serverConfig = new(Config.ServerConfiguration)
+		serverConfig = new(Config.ServerConfiguration)
+		serverConfig.NeedSave = true
+		serverConfig.M_id = "CARGO_DEFAULT_SERVER"
+		serverConfig.M_serverPort = 9393
+		serverConfig.M_serviceContainerPort = 9494
+		serverConfig.M_hostName = "localhost"
+		serverConfig.M_ipv4 = "127.0.0.1"
+		this.m_activeConfigurations.M_serverConfig = serverConfig
 
-		// Server folders...
-		activeConfigurations.M_serverConfig.M_applicationsPath = "/Apps"
 		os.MkdirAll(this.GetApplicationDirectoryPath(), 0777)
-		activeConfigurations.M_serverConfig.M_dataPath = "/Data"
 		os.MkdirAll(this.GetDataPath(), 0777)
-		activeConfigurations.M_serverConfig.M_definitionsPath = "/Definitions"
 		os.MkdirAll(this.GetDefinitionsPath(), 0777)
-		activeConfigurations.M_serverConfig.M_scriptsPath = "/Script"
 		os.MkdirAll(this.GetScriptPath(), 0777)
-		activeConfigurations.M_serverConfig.M_schemasPath = "/Schemas"
 		os.MkdirAll(this.GetSchemasPath(), 0777)
-		activeConfigurations.M_serverConfig.M_tmpPath = "/tmp"
 		os.MkdirAll(this.GetTmpPath(), 0777)
-		activeConfigurations.M_serverConfig.M_binPath = "/bin"
 		os.MkdirAll(this.GetBinPath(), 0777)
 
-		activeConfigurations.M_serviceConfigs = this.m_servicesConfiguration
+		// Server folders...
+		serverConfig.M_applicationsPath = "/Apps"
+		serverConfig.M_dataPath = "/Data"
+		serverConfig.M_definitionsPath = "/Definitions"
+		serverConfig.M_scriptsPath = "/Script"
+		serverConfig.M_schemasPath = "/Schemas"
+		serverConfig.M_tmpPath = "/tmp"
+		serverConfig.M_binPath = "/bin"
 
-		// Where queries are store by default...
-		activeConfigurations.NeedSave = true
+		GetServer().GetEntityManager().createEntity(this.m_activeConfigurations.GetUuid(), "M_serverConfig", "Config.ServerConfiguration", serverConfig.GetId(), serverConfig)
 
-		// Create the configuration entity from the configuration and save it.
-		this.m_activeConfigurationsEntity = GetServer().GetEntityManager().NewConfigConfigurationsEntity("", "", activeConfigurations)
-		this.m_activeConfigurationsEntity.SaveEntity()
 	}
 
 	// Set the service container configuration
-	this.setServiceConfiguration("CargoServiceContainer", activeConfigurations.M_serverConfig.M_serviceContainerPort)
+	this.setServiceConfiguration("CargoServiceContainer", this.m_activeConfigurations.M_serverConfig.M_serviceContainerPort)
 }
 
 func (this *ConfigurationManager) getId() string {
@@ -208,36 +210,21 @@ func (this *ConfigurationManager) getId() string {
 
 func (this *ConfigurationManager) start() {
 	log.Println("--> Start ConfigurationManager")
-
 	// Set services configurations...
 	for i := 0; i < len(this.m_servicesConfiguration); i++ {
-		serviceUuid := ConfigServiceConfigurationExists(this.m_servicesConfiguration[i].GetId())
-		if len(serviceUuid) == 0 {
+		_, err := GetServer().GetEntityManager().getEntityById("Config.ServiceConfiguration", "Config", []interface{}{this.m_servicesConfiguration[i].GetId()})
+		if err != nil {
 			// Set the new config...
-			activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-			activeConfiguration := activeConfigurationEntity.GetObject().(*Config.Configurations)
-			if err == nil {
-				activeConfiguration.SetServiceConfigs(this.m_servicesConfiguration[i])
-				this.m_activeConfigurationsEntity.SaveEntity()
-			} else {
-				log.Panicln(err)
-			}
+			GetServer().GetEntityManager().createEntity(this.m_activeConfigurations.GetUuid(), "M_serviceConfigs", "Config.ServiceConfiguration", this.m_servicesConfiguration[i].GetId(), this.m_servicesConfiguration[i])
 		}
 	}
 
 	// Set datastores configuration.
 	for i := 0; i < len(this.m_datastoreConfiguration); i++ {
-		storeUuid := ConfigDataStoreConfigurationExists(this.m_datastoreConfiguration[i].GetId())
-		if len(storeUuid) == 0 {
+		_, err := GetServer().GetEntityManager().getEntityById("Config.DataStoreConfiguration", "Config", []interface{}{this.m_datastoreConfiguration[i].GetId()})
+		if err != nil {
 			// Set the new config...
-			activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-			activeConfiguration := activeConfigurationEntity.GetObject().(*Config.Configurations)
-			if err == nil {
-				activeConfiguration.SetDataStoreConfigs(this.m_datastoreConfiguration[i])
-				this.m_activeConfigurationsEntity.SaveEntity()
-			} else {
-				log.Panicln(err)
-			}
+			GetServer().GetEntityManager().createEntity(this.m_activeConfigurations.GetUuid(), "M_dataStoreConfigs", "Config.DataStoreConfiguration", this.m_datastoreConfiguration[i].GetId(), this.m_datastoreConfiguration[i])
 		}
 	}
 }
@@ -247,35 +234,14 @@ func (this *ConfigurationManager) stop() {
 }
 
 /**
- * Return the active configuration.
- */
-func (this *ConfigurationManager) getActiveConfigurationsEntity() (*Config_ConfigurationsEntity, error) {
-	if this.m_activeConfigurationsEntity != nil {
-		activeConfigurationsEntity, err := GetServer().GetEntityManager().getEntityByUuid(this.m_activeConfigurationsEntity.GetUuid(), false)
-		if err != nil {
-			return nil, errors.New(err.GetBody())
-		}
-		return activeConfigurationsEntity.(*Config_ConfigurationsEntity), nil
-	}
-
-	return nil, errors.New("no active configuration found!")
-}
-
-/**
  * Return the OAuth2 configuration entity.
  */
-func (this *ConfigurationManager) getOAuthConfigurationEntity() *Config_OAuth2ConfigurationEntity {
-	configurationsEntity, err := this.getActiveConfigurationsEntity()
-	if err == nil {
-		configurations := configurationsEntity.GetObject().(*Config.Configurations)
-		oauthConfigurationEntity, err := GetServer().GetEntityManager().getEntityByUuid(configurations.GetOauth2Configuration().GetUUID(), false)
-		if err == nil {
-			return oauthConfigurationEntity.(*Config_OAuth2ConfigurationEntity)
-		}
-	}
+func (this *ConfigurationManager) getOAuthConfigurationEntity() *Config.OAuth2Configuration {
 
-	// Panic here.
-	log.Panicln(err)
+	oauthConfiguration, err := GetServer().GetEntityManager().getEntityByUuid(this.m_activeConfigurations.GetOauth2Configuration().GetUuid())
+	if err == nil {
+		return oauthConfiguration.(*Config.OAuth2Configuration)
+	}
 
 	return nil
 }
@@ -284,100 +250,89 @@ func (this *ConfigurationManager) getOAuthConfigurationEntity() *Config_OAuth2Co
  * Server configuration values...
  */
 func (this *ConfigurationManager) GetApplicationDirectoryPath() string {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
+	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/Apps"
 	}
 
-	return this.m_filePath + activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_applicationsPath
+	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_applicationsPath
 }
 
 func (this *ConfigurationManager) GetDataPath() string {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
+	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/Data"
 	}
-	return this.m_filePath + activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_dataPath
+	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_dataPath
 }
 
 func (this *ConfigurationManager) GetScriptPath() string {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
+	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/Script"
 	}
-	return this.m_filePath + activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_scriptsPath
+	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_scriptsPath
 }
 
 func (this *ConfigurationManager) GetDefinitionsPath() string {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
+	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/Definitions"
 	}
-	return this.m_filePath + activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_definitionsPath
+	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_definitionsPath
 }
 
 func (this *ConfigurationManager) GetSchemasPath() string {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
+	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/Schemas"
 	}
-	return this.m_filePath + activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_schemasPath
+	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_schemasPath
 }
 
 func (this *ConfigurationManager) GetTmpPath() string {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
+	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/tmp"
 	}
-	return this.m_filePath + activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_tmpPath
+	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_tmpPath
 }
 
 func (this *ConfigurationManager) GetBinPath() string {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
+	if this.m_activeConfigurations == nil {
 		return this.m_filePath + "/bin"
 	}
-	return this.m_filePath + activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_binPath
+	return this.m_filePath + this.m_activeConfigurations.M_serverConfig.M_binPath
 }
 
 func (this *ConfigurationManager) GetHostName() string {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
+	if this.m_activeConfigurations == nil {
 		return "localhost"
 	}
 	// Default port...
-	return activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_hostName
+	return this.m_activeConfigurations.M_serverConfig.M_hostName
 }
 
 func (this *ConfigurationManager) GetIpv4() string {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
+	if this.m_activeConfigurations == nil {
 		return "127.0.0.1"
 	}
 	// Default port...
-	return activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_ipv4
+	return this.m_activeConfigurations.M_serverConfig.M_ipv4
 }
 
 /**
  * Cargo server port.
  **/
 func (this *ConfigurationManager) GetServerPort() int {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
+	if this.m_activeConfigurations == nil {
 		return 9393
 	}
-	return activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_serverPort
+	return this.m_activeConfigurations.M_serverConfig.M_serverPort
 }
 
 /**
  * Cargo service container port.
  */
 func (this *ConfigurationManager) GetConfigurationServicePort() int {
-	activeConfigurationEntity, err := this.getActiveConfigurationsEntity()
-	if err != nil {
+	if this.m_activeConfigurations == nil {
 		return 9494
 	}
-	return activeConfigurationEntity.GetObject().(*Config.Configurations).M_serverConfig.M_serviceContainerPort
+	return this.m_activeConfigurations.M_serverConfig.M_serviceContainerPort
 }
 
 /**
@@ -399,6 +354,7 @@ func (this *ConfigurationManager) setServiceConfiguration(id string, port int) {
 
 	config.M_hostName = this.GetHostName()
 	this.m_servicesConfiguration = append(this.m_servicesConfiguration, config)
+
 	return
 }
 
@@ -414,10 +370,9 @@ func (this *ConfigurationManager) appendDefaultDataStoreConfiguration(config *Co
  */
 func (this *ConfigurationManager) appendDataStoreConfiguration(config *Config.DataStoreConfiguration) {
 	// Save the data store.
-	activeConfigurationsEntity, err := this.getActiveConfigurationsEntity()
-	if err == nil {
-		activeConfigurationsEntity.GetObject().(*Config.Configurations).SetDataStoreConfigs(config)
-		activeConfigurationsEntity.SaveEntity()
+	if this.m_activeConfigurations != nil {
+		this.m_activeConfigurations.SetDataStoreConfigs(config)
+		GetServer().GetEntityManager().saveEntity(this.m_activeConfigurations)
 	} else {
 		// append in the list of configuration store and save it latter...
 		this.m_datastoreConfiguration = append(this.m_datastoreConfiguration, config)
@@ -498,7 +453,7 @@ func (this *ConfigurationManager) CancelTask(uuid string, messageId string, sess
 // @param {callback} successCallback The function is call in case of success and the result parameter contain objects we looking for.
 // @param {callback} errorCallback In case of error.
 func (this *ConfigurationManager) GetActiveConfigurations(messageId string, sessionId string) *Config.Configurations {
-	return this.m_activeConfigurationsEntity.GetObject().(*Config.Configurations)
+	return this.m_activeConfigurations
 }
 
 // @api 1.0

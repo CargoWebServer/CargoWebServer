@@ -19,9 +19,6 @@ type ServerConfiguration struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Configuration **/
 	M_id string
 
@@ -65,10 +62,52 @@ type XsdServerConfiguration struct {
 	M_binPath	string	`xml:"binPath,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *ServerConfiguration) GetUUID() string{
+func (this *ServerConfiguration) GetUuid() string{
 	return this.UUID
 }
+func (this *ServerConfiguration) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *ServerConfiguration) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *ServerConfiguration) GetTypeName() string{
+	this.TYPENAME = "Config.ServerConfiguration"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *ServerConfiguration) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *ServerConfiguration) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *ServerConfiguration) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *ServerConfiguration) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *ServerConfiguration) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *ServerConfiguration) GetId() string{
@@ -79,8 +118,7 @@ func (this *ServerConfiguration) GetId() string{
 func (this *ServerConfiguration) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -95,8 +133,7 @@ func (this *ServerConfiguration) GetHostName() string{
 func (this *ServerConfiguration) SetHostName(ref interface{}){
 	if this.M_hostName != ref.(string) {
 		this.M_hostName = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -111,8 +148,7 @@ func (this *ServerConfiguration) GetIpv4() string{
 func (this *ServerConfiguration) SetIpv4(ref interface{}){
 	if this.M_ipv4 != ref.(string) {
 		this.M_ipv4 = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -127,8 +163,7 @@ func (this *ServerConfiguration) GetServerPort() int{
 func (this *ServerConfiguration) SetServerPort(ref interface{}){
 	if this.M_serverPort != ref.(int) {
 		this.M_serverPort = ref.(int)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -143,8 +178,7 @@ func (this *ServerConfiguration) GetServiceContainerPort() int{
 func (this *ServerConfiguration) SetServiceContainerPort(ref interface{}){
 	if this.M_serviceContainerPort != ref.(int) {
 		this.M_serviceContainerPort = ref.(int)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -159,8 +193,7 @@ func (this *ServerConfiguration) GetApplicationsPath() string{
 func (this *ServerConfiguration) SetApplicationsPath(ref interface{}){
 	if this.M_applicationsPath != ref.(string) {
 		this.M_applicationsPath = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -175,8 +208,7 @@ func (this *ServerConfiguration) GetDataPath() string{
 func (this *ServerConfiguration) SetDataPath(ref interface{}){
 	if this.M_dataPath != ref.(string) {
 		this.M_dataPath = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -191,8 +223,7 @@ func (this *ServerConfiguration) GetScriptsPath() string{
 func (this *ServerConfiguration) SetScriptsPath(ref interface{}){
 	if this.M_scriptsPath != ref.(string) {
 		this.M_scriptsPath = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -207,8 +238,7 @@ func (this *ServerConfiguration) GetDefinitionsPath() string{
 func (this *ServerConfiguration) SetDefinitionsPath(ref interface{}){
 	if this.M_definitionsPath != ref.(string) {
 		this.M_definitionsPath = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -223,8 +253,7 @@ func (this *ServerConfiguration) GetSchemasPath() string{
 func (this *ServerConfiguration) SetSchemasPath(ref interface{}){
 	if this.M_schemasPath != ref.(string) {
 		this.M_schemasPath = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -239,8 +268,7 @@ func (this *ServerConfiguration) GetTmpPath() string{
 func (this *ServerConfiguration) SetTmpPath(ref interface{}){
 	if this.M_tmpPath != ref.(string) {
 		this.M_tmpPath = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -255,8 +283,7 @@ func (this *ServerConfiguration) GetBinPath() string{
 func (this *ServerConfiguration) SetBinPath(ref interface{}){
 	if this.M_binPath != ref.(string) {
 		this.M_binPath = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -272,14 +299,12 @@ func (this *ServerConfiguration) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_parentPtr != ref.(string) {
 			this.M_parentPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_parentPtr != ref.(*Configurations).GetUUID() {
-			this.M_parentPtr = ref.(*Configurations).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_parentPtr != ref.(*Configurations).GetUuid() {
+			this.M_parentPtr = ref.(*Configurations).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_parentPtr = ref.(*Configurations)
 	}
@@ -289,7 +314,7 @@ func (this *ServerConfiguration) SetParentPtr(ref interface{}){
 func (this *ServerConfiguration) RemoveParentPtr(ref interface{}){
 	toDelete := ref.(*Configurations)
 	if this.m_parentPtr!= nil {
-		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
 			this.NeedSave = true

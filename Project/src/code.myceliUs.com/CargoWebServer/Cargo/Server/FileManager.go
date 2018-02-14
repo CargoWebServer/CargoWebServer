@@ -96,8 +96,7 @@ func (this *FileManager) stop() {
 func (this *FileManager) synchronizeAll() {
 	// Now I will synchronize files...
 	rootDir := this.synchronize(this.root)
-	rootEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntityFromObject(rootDir)
-	rootEntity.SaveEntity()
+	GetServer().GetEntityManager().saveEntity(rootDir)
 }
 
 /**
@@ -105,7 +104,6 @@ func (this *FileManager) synchronizeAll() {
  * disck with their related information in the db.
  */
 func (this *FileManager) synchronize(filePath string) *CargoEntities.File {
-
 	// That will contain the list of file that no more exist in a dir...
 	var toDelete map[string]*CargoEntities.File
 
@@ -246,14 +244,10 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 
 	// Return the dir entity if it already exist.
 	dirId := Utility.CreateSha1Key([]byte(dirPath + "/" + dirName))
-	dirUuid := CargoEntitiesFileExists(dirId)
 
-	if len(dirUuid) > 0 {
-		dirEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(dirUuid, false)
-		if errObj == nil {
-			return dirEntity.GetObject().(*CargoEntities.File), nil
-		}
-		return nil, errObj
+	dirEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", []interface{}{dirId})
+	if errObj == nil {
+		return dirEntity.(*CargoEntities.File), nil
 	}
 
 	// If the dir is the root dir
@@ -287,11 +281,10 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 	// The parent directory
 
 	// Retreive the perentDirEntity, put the file in it and save the parent
-	var parentDir *CargoEntities.File
 	parentDirEntityId := Utility.CreateSha1Key([]byte(parentDirPath))
-	parentDirUuid := CargoEntitiesFileExists(parentDirEntityId)
+	parentDir, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", []interface{}{parentDirEntityId})
 
-	if len(parentDirUuid) == 0 {
+	if parentDir == nil {
 		// Here I will create the parent directory...
 		index := strings.LastIndex(parentDirPath, "/")
 		var cargoError *CargoEntities.Error
@@ -304,9 +297,6 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 		if cargoError != nil {
 			return nil, cargoError
 		}
-	} else {
-		parentDirEntity, _ := GetServer().GetEntityManager().getEntityByUuid(parentDirUuid, false)
-		parentDir = parentDirEntity.GetObject().(*CargoEntities.File)
 	}
 
 	// The directory entity.
@@ -318,24 +308,20 @@ func (this *FileManager) createDir(dirName string, dirPath string, sessionId str
 	dir.SetFileType(CargoEntities.FileType_DiskFile)
 
 	// Set the cargo entities object.
-	entities := GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities)
+	entities := GetServer().GetEntityManager().getCargoEntities()
 	dir.SetEntitiesPtr(entities)
 
 	if parentDir != nil {
-		// Get the parent dir information.
-		parentDirUuid = parentDir.GetUUID()
-
 		// That will set the uuid
-		dirEntity, _ := GetServer().GetEntityManager().createEntity(parentDirUuid, "M_files", "CargoEntities.File", dir.GetId(), dir)
-		dir = dirEntity.GetObject().(*CargoEntities.File)
+		dirEntity, _ := GetServer().GetEntityManager().createEntity(parentDir.GetUuid(), "M_files", "CargoEntities.File", dir.GetId(), dir)
+		dir = dirEntity.(*CargoEntities.File)
 		dir.SetParentDirPtr(parentDir)
 		dir.SetEntitiesPtr(entities)
-		dirEntity.SaveEntity()
-
-	} else {
-		dirEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity("", "", dir)
-		dirEntity.SaveEntity()
 	}
+
+	// Save the dir.
+	GetServer().GetEntityManager().saveEntity(dir)
+
 	return dir, nil
 
 }
@@ -358,27 +344,21 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 	// Use to determine if the file already exist or not.
 	isNew := true
 
-	// The user wants to save the data into a physical file.
-	// File id's
-	log.Println("----> ", filepath+"/"+filename)
-	fileId := Utility.CreateSha1Key([]byte(filepath + "/" + filename))
-	fileUuid := CargoEntitiesFileExists(fileId)
-
-	parentDirEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(parentDir.GetUUID(), false)
+	parentDirEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(parentDir.GetUuid())
 	if errObj != nil {
 		return nil, errObj
 	}
 
 	// I will retreive the file.
-	if len(fileUuid) > 0 {
+	fileId := Utility.CreateSha1Key([]byte(filepath + "/" + filename))
+	fileEntity, _ := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", []interface{}{fileId})
+
+	if fileEntity != nil {
 		isNew = false
-		entity, cargoError := GetServer().GetEntityManager().getEntityByUuid(fileUuid, false)
-		if cargoError != nil {
-			return nil, cargoError
-		}
-		file = entity.GetObject().(*CargoEntities.File)
+		file = fileEntity.(*CargoEntities.File)
 		log.Println("Get entity for file: ", filepath+"/"+filename)
 	} else {
+		log.Println("Create entity for file: ", filepath+"/"+filename)
 		file = new(CargoEntities.File)
 		file.SetId(fileId)
 	}
@@ -386,7 +366,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 	// Disk file.
 	if !dbFile {
 		// Here I will get the parent put the file in it and save it.
-		parentDir := parentDirEntity.GetObject().(*CargoEntities.File)
+		parentDir := parentDirEntity.(*CargoEntities.File)
 		file.SetParentDirPtr(parentDir)
 		parentDir.SetFiles(file)
 
@@ -464,7 +444,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 	file.SetChecksum(checksum)
 
 	// Set the entity object.
-	entities := GetServer().GetEntityManager().getCargoEntities().GetObject().(*CargoEntities.Entities)
+	entities := GetServer().GetEntityManager().getCargoEntities()
 	file.SetEntitiesPtr(entities)
 
 	var thumbnail string
@@ -506,9 +486,10 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 
 	defer f.Close()
 
-	if len(fileUuid) == 0 {
+	// Create the file if is new, genereate it uuid...
+	if isNew {
 		fileEntity, _ := GetServer().GetEntityManager().createEntity(parentDirEntity.GetUuid(), "M_files", "CargoEntities.File", fileId, file)
-		file = fileEntity.GetObject().(*CargoEntities.File)
+		file = fileEntity.(*CargoEntities.File) // cast...
 	}
 
 	if err == nil {
@@ -543,7 +524,7 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
 	}
 
 	// Save the file.
-	parentDirEntity.SaveEntity()
+	GetServer().GetEntityManager().saveEntity(parentDirEntity)
 
 	return file, nil
 }
@@ -553,15 +534,10 @@ func (this *FileManager) createFile(parentDir *CargoEntities.File, filename stri
  */
 func (this *FileManager) getFileById(id string) (*CargoEntities.File, *CargoEntities.Error) {
 	ids := []interface{}{id}
-	fileEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", ids, false)
-
-	if errObj == nil {
-		// Initialize it's content.
-		fileEntity.InitEntity(fileEntity.GetUuid(), false)
-		file := fileEntity.GetObject().(*CargoEntities.File)
-		return file, nil
+	fileEntity, errObj := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", ids)
+	if fileEntity != nil {
+		return fileEntity.(*CargoEntities.File), errObj
 	}
-
 	return nil, errObj
 }
 
@@ -586,15 +562,14 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 	os.Remove(f_.Name())
 
 	// I will retreive the file, the uuid must exist in that case.
-	fileEntity := GetServer().GetEntityManager().NewCargoEntitiesFileEntity("", uuid, nil)
-	file := fileEntity.GetObject().(*CargoEntities.File)
+	fileEntity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
+	file := fileEntity.(*CargoEntities.File)
 
 	if file.GetChecksum() != checksum {
 		if !dbFile {
 			// Save the data to the disck...
 			filename := file.GetName()
 			filepath := file.GetPath()
-			log.Println("--> write file ln 617", this.root+filepath+"/"+filename)
 			err = ioutil.WriteFile(this.root+"/"+filepath+"/"+filename, filedata, 0644)
 			if err != nil {
 				return err
@@ -604,7 +579,7 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 			file.SetData(filedata)
 		}
 		file.SetChecksum(checksum)
-		fileEntity.SaveEntity()
+		GetServer().GetEntityManager().saveEntity(fileEntity)
 		log.Println("---------> save file ", file.GetName())
 	} else {
 		file.NeedSave = false // Not need to be save...
@@ -639,12 +614,12 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
  * Delete a file with a given uuid
  */
 func (this *FileManager) deleteFile(uuid string) error {
-	fileEntity, err := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
+	fileEntity, err := GetServer().GetEntityManager().getEntityByUuid(uuid)
 	if err != nil {
 		return errors.New(err.GetBody())
 	}
 
-	file := fileEntity.GetObject().(*CargoEntities.File)
+	file := fileEntity.(*CargoEntities.File)
 
 	if file.GetFileType() == CargoEntities.FileType_DiskFile {
 		var filePath string
@@ -666,7 +641,7 @@ func (this *FileManager) deleteFile(uuid string) error {
 	}
 
 	// Here i will remove the entity...
-	fileEntity.DeleteEntity() // Remove all sub-entity and also remove it from it parent.
+	GetServer().GetEntityManager().deleteEntity(fileEntity)
 
 	eventData := make([]*MessageData, 2)
 	fileInfo := new(MessageData)
@@ -845,10 +820,9 @@ func (this *FileManager) createDbFile(id string, name string, mimeType string, d
 	dbFile.M_id = id
 	dbFile.M_name = name
 	dbFile.M_mime = mimeType
-	entities := GetServer().GetEntityManager().getCargoEntities()
 
 	// Create the file.
-	GetServer().GetEntityManager().createEntity(entities.GetUuid(), "M_entities", "CargoEntities.File", id, dbFile)
+	GetServer().GetEntityManager().createEntity(GetServer().GetEntityManager().getCargoEntitiesUuid(), "M_entities", "CargoEntities.File", id, dbFile)
 
 	return dbFile
 }
@@ -1305,11 +1279,9 @@ func (this *FileManager) DeleteFile(uuid string, messageId string, sessionId str
 func (this *FileManager) IsFileExist(filename string, filepath string, messageId string, sessionId string) bool {
 
 	fileId := Utility.CreateSha1Key([]byte(filepath + "/" + filename))
-	fileUuid := CargoEntitiesFileExists(fileId)
-	if len(fileUuid) > 0 {
-		return true
-	}
-	return false
+	_, err := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", []interface{}{fileId})
+
+	return err == nil
 }
 
 // @api 1.0
@@ -1323,14 +1295,14 @@ func (this *FileManager) IsFileExist(filename string, filepath string, messageId
 // @param {callback} errorCallback In case of error.
 func (this *FileManager) RenameFile(uuid string, filename string, messageId string, sessionId string) {
 
-	fileEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
+	fileEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(uuid)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
 	}
 
 	// Change the file id and the fileName.
-	file := fileEntity.GetObject().(*CargoEntities.File)
+	file := fileEntity.(*CargoEntities.File)
 
 	var path string
 	if file.GetParentDirPtr() != nil {
@@ -1357,12 +1329,12 @@ func (this *FileManager) RenameFile(uuid string, filename string, messageId stri
 	file.SetPath(path)
 	file.SetId(fileId)
 	file.SetName(filename)
-	fileEntity.SaveEntity()
+	GetServer().GetEntityManager().saveEntity(fileEntity)
 
 	// Here If the file is a directory I must change all it child path to...
 	if file.IsDir() {
 		for i := 0; i < len(file.GetFiles()); i++ {
-			this.RenameFile(file.GetFiles()[i].GetUUID(), file.GetFiles()[i].GetName(), messageId, sessionId)
+			this.RenameFile(file.GetFiles()[i].GetUuid(), file.GetFiles()[i].GetName(), messageId, sessionId)
 		}
 	}
 

@@ -558,19 +558,17 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				refSetter += "			}\n"
 				refSetter += "		}\n"
 				refSetter += "		this.M_" + attribute.Name + ref + " = append(this.M_" + attribute.Name + ref + ", ref.(string))\n"
-				refSetter += "		if this.IsInit == true {"
-				refSetter += "			this.NeedSave = true\n"
-				refSetter += "		}\n"
+				refSetter += "		this.NeedSave = true\n"
 				refSetter += "	}else{\n"
 				if (isRef || attribute.IsComposite == "true") && classesMap[typeName_] != nil {
 					refSetter += "		for i:=0; i < len(this.m_" + attribute.Name + ref + "); i++ {\n"
-					refSetter += "			if this.m_" + attribute.Name + ref + "[i].GetUUID() == ref.(" + typeName + ").GetUUID() {\n"
+					refSetter += "			if this.m_" + attribute.Name + ref + "[i].GetUuid() == ref.(" + typeName + ").GetUuid() {\n"
 					refSetter += "				return\n"
 					refSetter += "			}\n"
 					refSetter += "		}\n"
 					refSetter += "		isExist := false\n"
 					refSetter += "		for i:=0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
-					refSetter += "			if this.M_" + attribute.Name + ref + "[i] == ref.(" + typeName + ").GetUUID() {\n"
+					refSetter += "			if this.M_" + attribute.Name + ref + "[i] == ref.(" + typeName + ").GetUuid() {\n"
 					refSetter += "				isExist = true\n"
 					refSetter += "			}\n"
 					refSetter += "		}\n"
@@ -586,10 +584,8 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 						cast = "*" + cast
 					}
 					refSetter += "	if !isExist {\n"
-					refSetter += "		this.M_" + attribute.Name + ref + " = append(this.M_" + attribute.Name + ref + ", ref.(" + cast + ").GetUUID())\n"
-					refSetter += "		if this.IsInit == true {"
-					refSetter += "			this.NeedSave = true\n"
-					refSetter += "		}\n"
+					refSetter += "		this.M_" + attribute.Name + ref + " = append(this.M_" + attribute.Name + ref + ", ref.(" + cast + ").GetUuid())\n"
+					refSetter += "		this.NeedSave = true\n"
 					refSetter += "	}\n"
 				}
 				refSetter += "	}\n"
@@ -615,9 +611,9 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 							cast = "*" + cast
 						}
 						if isInterface {
-							refSetter += "		if this.M_" + attribute.Name + "[i].(" + cast + ").GetUUID() != ref.(" + cast + ").GetUUID() {\n"
+							refSetter += "		if this.M_" + attribute.Name + "[i].(" + cast + ").GetUuid() != ref.(" + cast + ").GetUuid() {\n"
 						} else {
-							refSetter += "		if this.M_" + attribute.Name + "[i].GetUUID() != ref.(" + cast + ").GetUUID() {\n"
+							refSetter += "		if this.M_" + attribute.Name + "[i].GetUuid() != ref.(" + cast + ").GetUuid() {\n"
 						}
 
 					} else {
@@ -635,9 +631,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 
 				refSetter += "	if !isExist {\n"
 				refSetter += "		" + attribute.Name + "s = append(" + attribute.Name + "s, ref.(" + typeName + "))\n"
-				refSetter += "		if this.IsInit == true {"
-				refSetter += "			this.NeedSave = true\n"
-				refSetter += "		}\n"
+				refSetter += "		this.NeedSave = true\n"
 				refSetter += "		this.M_" + attribute.Name + " = " + attribute.Name + "s\n"
 				refSetter += "	}\n"
 			}
@@ -646,9 +640,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				refSetter += "	if _, ok := ref.(string); ok {\n"
 				refSetter += "		if this.M_" + attribute.Name + ref + " != ref.(string) {\n"
 				refSetter += "			this.M_" + attribute.Name + ref + " = ref.(string)\n"
-				refSetter += "			if this.IsInit == true {"
-				refSetter += "				this.NeedSave = true\n"
-				refSetter += "			}\n"
+				refSetter += "			this.NeedSave = true\n"
 				refSetter += "		}\n"
 				refSetter += "	}else{\n"
 
@@ -660,19 +652,15 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					if isPointer && !isInterfaceCast {
 						cast = "*" + cast
 					}
-					refSetter += "		if this.M_" + attribute.Name + ref + " != ref.(" + cast + ").GetUUID() {\n"
-					refSetter += "			this.M_" + attribute.Name + ref + " = ref.(" + cast + ").GetUUID()\n"
-					refSetter += "			if this.IsInit == true {"
-					refSetter += "				this.NeedSave = true\n"
-					refSetter += "			}\n"
+					refSetter += "		if this.M_" + attribute.Name + ref + " != ref.(" + cast + ").GetUuid() {\n"
+					refSetter += "			this.M_" + attribute.Name + ref + " = ref.(" + cast + ").GetUuid()\n"
+					refSetter += "			this.NeedSave = true\n"
 					refSetter += "		}\n"
 				} else {
 					hasUtility[packName+"."+ownerName] = true
-					refSetter += "		if this.M_" + attribute.Name + ref + " != ref.(Utility.Referenceable).GetUUID() {\n"
-					refSetter += "			this.M_" + attribute.Name + ref + " = ref.(Utility.Referenceable).GetUUID()\n"
-					refSetter += "			if this.IsInit == true {"
-					refSetter += "				this.NeedSave = true\n"
-					refSetter += "			}\n"
+					refSetter += "		if this.M_" + attribute.Name + ref + " != ref.(Utility.Referenceable).GetUuid() {\n"
+					refSetter += "			this.M_" + attribute.Name + ref + " = ref.(Utility.Referenceable).GetUuid()\n"
+					refSetter += "			this.NeedSave = true\n"
 					refSetter += "		}\n"
 				}
 
@@ -682,9 +670,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 			} else {
 				refSetter += "	if this.M_" + attribute.Name + ref + " != ref.(" + typeName + ") {\n"
 				refSetter += "		this.M_" + attribute.Name + ref + " = ref.(" + typeName + ")\n"
-				refSetter += "		if this.IsInit == true {"
-				refSetter += "			this.NeedSave = true\n"
-				refSetter += "		}\n"
+				refSetter += "		this.NeedSave = true\n"
 				refSetter += "	}\n"
 			}
 		}
@@ -724,9 +710,9 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					refRemover += "	for i := 0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
 
 					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-						refRemover += "		if toDelete.GetUUID() != this.M_" + attribute.Name + ref + "[i].(" + cast + ").GetUUID() {\n"
+						refRemover += "		if toDelete.GetUuid() != this.M_" + attribute.Name + ref + "[i].(" + cast + ").GetUuid() {\n"
 					} else {
-						refRemover += "		if toDelete.GetUUID() != this.M_" + attribute.Name + ref + "[i].GetUUID() {\n"
+						refRemover += "		if toDelete.GetUuid() != this.M_" + attribute.Name + ref + "[i].GetUuid() {\n"
 					}
 					refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.M_" + attribute.Name + ref + "[i])\n"
 					refRemover += "		}else{\n"
@@ -740,9 +726,9 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 
 					refRemover += "	for i := 0; i < len(this.m_" + attribute.Name + ref + "); i++ {\n"
 					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-						refRemover += "		if toDelete.GetUUID() != this.m_" + attribute.Name + ref + "[i].(" + cast + ").GetUUID() {\n"
+						refRemover += "		if toDelete.GetUuid() != this.m_" + attribute.Name + ref + "[i].(" + cast + ").GetUuid() {\n"
 					} else {
-						refRemover += "		if toDelete.GetUUID() != this.m_" + attribute.Name + ref + "[i].GetUUID() {\n"
+						refRemover += "		if toDelete.GetUuid() != this.m_" + attribute.Name + ref + "[i].GetUuid() {\n"
 					}
 
 					refRemover += "			" + attribute.Name + ref + "_ = append(" + attribute.Name + ref + "_, this.m_" + attribute.Name + ref + "[i])\n"
@@ -761,9 +747,9 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 				if len(attribute.IsComposite) > 0 {
 					// The attribute is not an array...
 					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-						refRemover += "	if toDelete.GetUUID() == this.M_" + attribute.Name + ref + ".(" + cast + ").GetUUID() {\n"
+						refRemover += "	if toDelete.GetUuid() == this.M_" + attribute.Name + ref + ".(" + cast + ").GetUuid() {\n"
 					} else {
-						refRemover += "	if toDelete.GetUUID() == this.M_" + attribute.Name + ref + ".GetUUID() {\n"
+						refRemover += "	if toDelete.GetUuid() == this.M_" + attribute.Name + ref + ".GetUuid() {\n"
 					}
 					refRemover += "		this.M_" + attribute.Name + ref + " = nil\n"
 					refRemover += "		this.NeedSave = true\n"
@@ -771,9 +757,9 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 					// The attribute is not an array...
 					refRemover += "	if this.m_" + attribute.Name + ref + "!= nil {\n"
 					if Utility.Contains(abstractClassLst, typeName_) || Utility.Contains(superClassesLst, typeName_) {
-						refRemover += "		if toDelete.GetUUID() == this.m_" + attribute.Name + ref + ".(" + cast + ").GetUUID() {\n"
+						refRemover += "		if toDelete.GetUuid() == this.m_" + attribute.Name + ref + ".(" + cast + ").GetUuid() {\n"
 					} else {
-						refRemover += "		if toDelete.GetUUID() == this.m_" + attribute.Name + ref + ".GetUUID() {\n"
+						refRemover += "		if toDelete.GetUuid() == this.m_" + attribute.Name + ref + ".GetUuid() {\n"
 					}
 					refRemover += "			this.m_" + attribute.Name + ref + " = nil\n"
 					refRemover += "			this.M_" + attribute.Name + ref + " = \"\"\n"
@@ -843,7 +829,7 @@ func generateGoInterfaceCode(packageId string, class *XML_Schemas.CMOF_OwnedMemb
 	}
 
 	classStr += "	/** UUID **/\n"
-	classStr += "	GetUUID() string\n\n"
+	classStr += "	GetUuid() string\n\n"
 	for j := 0; j < len(class.Attributes); j++ {
 		attribute := class.Attributes[j]
 		if attribute.Type == "cmof:Property" {
@@ -887,8 +873,6 @@ func generateGoClassCode(packageId string) {
 				classStr += "	ParentLnk string\n"
 				classStr += "	/** If the entity value has change... **/\n"
 				classStr += "	NeedSave bool\n\n"
-				classStr += "	/** If the entity is fully initialyse **/\n"
-				classStr += "	IsInit   bool\n\n"
 
 				superClasses = getSuperClasses(class.Name)
 				for j := 0; j < len(superClasses); j++ {
@@ -924,11 +908,71 @@ func generateGoClassCode(packageId string) {
 					classStr += xmlParserStr
 				}
 
-				classStr += "/** UUID **/\n"
+				classStr += "/***************** Entity **************************/\n\n"
 
-				classStr += "func (this *" + className + ") GetUUID() string{\n"
+				classStr += "/** UUID **/\n"
+				classStr += "func (this *" + className + ") GetUuid() string{\n"
 				classStr += "	return this.UUID\n"
 				classStr += "}\n"
+
+				classStr += "func (this *" + className + ") SetUuid(uuid string){\n"
+				classStr += "	this.UUID = uuid\n"
+				classStr += "}\n\n"
+
+				classStr += "/** Return the array of entity id's without it uuid **/\n"
+				classStr += "func (this *" + className + ") Ids() []interface{} {\n"
+				classStr += "	ids := make([]interface{}, 0)\n"
+
+				superClasses := getSuperClasses(class.Name)
+				for j := 0; j < len(superClasses); j++ {
+					superClass := classesMap[superClasses[j]]
+					for k := 0; k < len(superClass.Attributes); k++ {
+						attribute := superClass.Attributes[k]
+						if isId(superClass.Name, attribute.Name) {
+							classStr += "	ids = append(ids, this.M_" + attribute.Name + ")\n"
+						}
+					}
+				}
+
+				// So here I will
+				for j := 0; j < len(class.Attributes); j++ {
+					attribute := class.Attributes[j]
+					if isId(class.Name, attribute.Name) {
+						classStr += "	ids = append(ids, this.M_" + attribute.Name + ")\n"
+					}
+				}
+
+				classStr += "	return ids\n"
+				classStr += "}\n\n"
+
+				classStr += "/** The type name **/\n"
+				classStr += "func (this *" + className + ") GetTypeName() string{\n"
+				classStr += "	this.TYPENAME = \"" + packageId + "." + className + "\"\n"
+				classStr += "	return this.TYPENAME\n"
+				classStr += "}\n\n"
+
+				classStr += "/** Return the entity parent UUID **/\n"
+				classStr += "func (this *" + className + ") GetParentUuid() string{\n"
+				classStr += "	return this.ParentUuid\n"
+				classStr += "}\n\n"
+
+				classStr += "/** Set it parent UUID **/\n"
+				classStr += "func (this *" + className + ") SetParentUuid(parentUuid string){\n"
+				classStr += "	this.ParentUuid = parentUuid\n"
+				classStr += "}\n\n"
+
+				classStr += "/** Return it relation with it parent, only one parent is possible by entity. **/\n"
+				classStr += "func (this *" + className + ") GetParentLnk() string{\n"
+				classStr += "	return this.ParentLnk\n"
+				classStr += "}\n"
+				classStr += "func (this *" + className + ") SetParentLnk(parentLnk string){\n"
+				classStr += "	this.ParentLnk = parentLnk\n"
+				classStr += "}\n\n"
+
+				classStr += "/** Evaluate if an entity needs to be saved. **/\n"
+				classStr += "func (this *" + className + ") IsNeedSave() bool{\n"
+				classStr += "	return this.NeedSave\n"
+				classStr += "}\n\n"
 
 				// Now the method...
 				// The superclass methode...

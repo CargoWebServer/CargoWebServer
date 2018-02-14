@@ -19,9 +19,6 @@ type TextMessage struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Entity **/
 	M_id string
 
@@ -62,10 +59,52 @@ type XsdTextMessage struct {
 	M_creationTime	int64	`xml:"creationTime,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *TextMessage) GetUUID() string{
+func (this *TextMessage) GetUuid() string{
 	return this.UUID
 }
+func (this *TextMessage) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *TextMessage) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *TextMessage) GetTypeName() string{
+	this.TYPENAME = "CargoEntities.TextMessage"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *TextMessage) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *TextMessage) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *TextMessage) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *TextMessage) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *TextMessage) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *TextMessage) GetId() string{
@@ -76,8 +115,7 @@ func (this *TextMessage) GetId() string{
 func (this *TextMessage) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -92,8 +130,7 @@ func (this *TextMessage) GetBody() string{
 func (this *TextMessage) SetBody(ref interface{}){
 	if this.M_body != ref.(string) {
 		this.M_body = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -108,8 +145,7 @@ func (this *TextMessage) GetCreationTime() int64{
 func (this *TextMessage) SetCreationTime(ref interface{}){
 	if this.M_creationTime != ref.(int64) {
 		this.M_creationTime = ref.(int64)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -125,14 +161,12 @@ func (this *TextMessage) SetFromRef(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_fromRef != ref.(string) {
 			this.M_fromRef = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_fromRef != ref.(Entity).GetUUID() {
-			this.M_fromRef = ref.(Entity).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_fromRef != ref.(Entity).GetUuid() {
+			this.M_fromRef = ref.(Entity).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_fromRef = ref.(*Account)
 	}
@@ -142,7 +176,7 @@ func (this *TextMessage) SetFromRef(ref interface{}){
 func (this *TextMessage) RemoveFromRef(ref interface{}){
 	toDelete := ref.(Entity)
 	if this.m_fromRef!= nil {
-		if toDelete.GetUUID() == this.m_fromRef.GetUUID() {
+		if toDelete.GetUuid() == this.m_fromRef.GetUuid() {
 			this.m_fromRef = nil
 			this.M_fromRef = ""
 			this.NeedSave = true
@@ -160,14 +194,12 @@ func (this *TextMessage) SetToRef(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_toRef != ref.(string) {
 			this.M_toRef = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_toRef != ref.(Entity).GetUUID() {
-			this.M_toRef = ref.(Entity).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_toRef != ref.(Entity).GetUuid() {
+			this.M_toRef = ref.(Entity).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_toRef = ref.(*Account)
 	}
@@ -177,7 +209,7 @@ func (this *TextMessage) SetToRef(ref interface{}){
 func (this *TextMessage) RemoveToRef(ref interface{}){
 	toDelete := ref.(Entity)
 	if this.m_toRef!= nil {
-		if toDelete.GetUUID() == this.m_toRef.GetUUID() {
+		if toDelete.GetUuid() == this.m_toRef.GetUuid() {
 			this.m_toRef = nil
 			this.M_toRef = ""
 			this.NeedSave = true
@@ -194,8 +226,7 @@ func (this *TextMessage) GetTitle() string{
 func (this *TextMessage) SetTitle(ref interface{}){
 	if this.M_title != ref.(string) {
 		this.M_title = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -211,14 +242,12 @@ func (this *TextMessage) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_entitiesPtr != ref.(string) {
 			this.M_entitiesPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
-			this.M_entitiesPtr = ref.(*Entities).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
+			this.M_entitiesPtr = ref.(*Entities).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
@@ -228,7 +257,7 @@ func (this *TextMessage) SetEntitiesPtr(ref interface{}){
 func (this *TextMessage) RemoveEntitiesPtr(ref interface{}){
 	toDelete := ref.(*Entities)
 	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
 			this.NeedSave = true

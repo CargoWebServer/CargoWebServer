@@ -5,17 +5,16 @@
 	<!-- The data store type... -->
 	<ownedMember xmi:type="cmof:Enumeration" xmi:id="DataStoreType" name="DataStoreType">
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreType-SQL_STORE" name="SQL_STORE" classifier="DataStoreType" enumeration="DataStoreType"/>
-      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreType-KEY_VALUE_STORE" name="KEY_VALUE_STORE" classifier="DataStoreType" enumeration="DataStoreType"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreType-GRAPH_STORE" name="GRAPH_STORE" classifier="DataStoreType" enumeration="DataStoreType"/>
 	</ownedMember>
 	
 
 	<!-- The data store product id... -->
 	<ownedMember xmi:type="cmof:Enumeration" xmi:id="DataStoreVendor" name="DataStoreVendor">
-      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-MYCELIUS" name="MYCELIUS" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
+      <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-CAYLEY" name="CAYLEY" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-MYSQL" name="MYSQL" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
       <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-MSSQL" name="MSSQL" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
 	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-ODBC" name="ODBC" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
-	  <ownedLiteral xmi:type="cmof:EnumerationLiteral" xmi:id="DataStoreVendor-KNOWLEDGEBASE" name="KNOWLEDGEBASE" classifier="DataStoreVendor" enumeration="DataStoreVendor"/>
 	</ownedMember>
 	
 	<ownedMember xmi:type="cmof:Enumeration" xmi:id="Encoding" name="Encoding">

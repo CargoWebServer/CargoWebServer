@@ -19,9 +19,6 @@ type ServiceConfiguration struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Configuration **/
 	M_id string
 
@@ -55,10 +52,52 @@ type XsdServiceConfiguration struct {
 	M_start	bool	`xml:"start,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *ServiceConfiguration) GetUUID() string{
+func (this *ServiceConfiguration) GetUuid() string{
 	return this.UUID
 }
+func (this *ServiceConfiguration) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *ServiceConfiguration) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *ServiceConfiguration) GetTypeName() string{
+	this.TYPENAME = "Config.ServiceConfiguration"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *ServiceConfiguration) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *ServiceConfiguration) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *ServiceConfiguration) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *ServiceConfiguration) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *ServiceConfiguration) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *ServiceConfiguration) GetId() string{
@@ -69,8 +108,7 @@ func (this *ServiceConfiguration) GetId() string{
 func (this *ServiceConfiguration) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -85,8 +123,7 @@ func (this *ServiceConfiguration) GetHostName() string{
 func (this *ServiceConfiguration) SetHostName(ref interface{}){
 	if this.M_hostName != ref.(string) {
 		this.M_hostName = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -101,8 +138,7 @@ func (this *ServiceConfiguration) GetIpv4() string{
 func (this *ServiceConfiguration) SetIpv4(ref interface{}){
 	if this.M_ipv4 != ref.(string) {
 		this.M_ipv4 = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -117,8 +153,7 @@ func (this *ServiceConfiguration) GetPort() int{
 func (this *ServiceConfiguration) SetPort(ref interface{}){
 	if this.M_port != ref.(int) {
 		this.M_port = ref.(int)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -133,8 +168,7 @@ func (this *ServiceConfiguration) GetUser() string{
 func (this *ServiceConfiguration) SetUser(ref interface{}){
 	if this.M_user != ref.(string) {
 		this.M_user = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -149,8 +183,7 @@ func (this *ServiceConfiguration) GetPwd() string{
 func (this *ServiceConfiguration) SetPwd(ref interface{}){
 	if this.M_pwd != ref.(string) {
 		this.M_pwd = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -165,8 +198,7 @@ func (this *ServiceConfiguration) GetStart() bool{
 func (this *ServiceConfiguration) SetStart(ref interface{}){
 	if this.M_start != ref.(bool) {
 		this.M_start = ref.(bool)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -182,14 +214,12 @@ func (this *ServiceConfiguration) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_parentPtr != ref.(string) {
 			this.M_parentPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_parentPtr != ref.(*Configurations).GetUUID() {
-			this.M_parentPtr = ref.(*Configurations).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_parentPtr != ref.(*Configurations).GetUuid() {
+			this.M_parentPtr = ref.(*Configurations).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_parentPtr = ref.(*Configurations)
 	}
@@ -199,7 +229,7 @@ func (this *ServiceConfiguration) SetParentPtr(ref interface{}){
 func (this *ServiceConfiguration) RemoveParentPtr(ref interface{}){
 	toDelete := ref.(*Configurations)
 	if this.m_parentPtr!= nil {
-		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
 			this.NeedSave = true

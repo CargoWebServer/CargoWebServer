@@ -19,9 +19,6 @@ type ScheduledTask struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Configuration **/
 	M_id string
 
@@ -57,10 +54,52 @@ type XsdScheduledTask struct {
 	M_offsets	int	`xml:"offsets,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *ScheduledTask) GetUUID() string{
+func (this *ScheduledTask) GetUuid() string{
 	return this.UUID
 }
+func (this *ScheduledTask) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *ScheduledTask) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *ScheduledTask) GetTypeName() string{
+	this.TYPENAME = "Config.ScheduledTask"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *ScheduledTask) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *ScheduledTask) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *ScheduledTask) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *ScheduledTask) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *ScheduledTask) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *ScheduledTask) GetId() string{
@@ -71,8 +110,7 @@ func (this *ScheduledTask) GetId() string{
 func (this *ScheduledTask) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -87,8 +125,7 @@ func (this *ScheduledTask) IsActive() bool{
 func (this *ScheduledTask) SetIsActive(ref interface{}){
 	if this.M_isActive != ref.(bool) {
 		this.M_isActive = ref.(bool)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -103,8 +140,7 @@ func (this *ScheduledTask) GetScript() string{
 func (this *ScheduledTask) SetScript(ref interface{}){
 	if this.M_script != ref.(string) {
 		this.M_script = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -119,8 +155,7 @@ func (this *ScheduledTask) GetStartTime() int64{
 func (this *ScheduledTask) SetStartTime(ref interface{}){
 	if this.M_startTime != ref.(int64) {
 		this.M_startTime = ref.(int64)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -135,8 +170,7 @@ func (this *ScheduledTask) GetExpirationTime() int64{
 func (this *ScheduledTask) SetExpirationTime(ref interface{}){
 	if this.M_expirationTime != ref.(int64) {
 		this.M_expirationTime = ref.(int64)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -151,8 +185,7 @@ func (this *ScheduledTask) GetFrequency() int{
 func (this *ScheduledTask) SetFrequency(ref interface{}){
 	if this.M_frequency != ref.(int) {
 		this.M_frequency = ref.(int)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -167,8 +200,7 @@ func (this *ScheduledTask) GetFrequencyType() FrequencyType{
 func (this *ScheduledTask) SetFrequencyType(ref interface{}){
 	if this.M_frequencyType != ref.(FrequencyType) {
 		this.M_frequencyType = ref.(FrequencyType)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -193,8 +225,7 @@ func (this *ScheduledTask) SetOffsets(ref interface{}){
 	}
 	if !isExist {
 		offsetss = append(offsetss, ref.(int))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_offsets = offsetss
 	}
 }
@@ -211,14 +242,12 @@ func (this *ScheduledTask) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_parentPtr != ref.(string) {
 			this.M_parentPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_parentPtr != ref.(*Configurations).GetUUID() {
-			this.M_parentPtr = ref.(*Configurations).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_parentPtr != ref.(*Configurations).GetUuid() {
+			this.M_parentPtr = ref.(*Configurations).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_parentPtr = ref.(*Configurations)
 	}
@@ -228,7 +257,7 @@ func (this *ScheduledTask) SetParentPtr(ref interface{}){
 func (this *ScheduledTask) RemoveParentPtr(ref interface{}){
 	toDelete := ref.(*Configurations)
 	if this.m_parentPtr!= nil {
-		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
 			this.NeedSave = true

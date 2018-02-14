@@ -13,8 +13,7 @@ import (
 func NewError(errorPath string, errorId string, errorCode int, err error) *CargoEntities.Error {
 
 	// Create a error object.
-	errorEntity := GetServer().GetEntityManager().NewCargoEntitiesErrorEntity("", "", nil)
-	errorObject := errorEntity.GetObject().(*CargoEntities.Error)
+	errorObject := new(CargoEntities.Error)
 	errorObject.SetErrorPath(errorPath)
 	errorObject.SetId(errorId)
 
@@ -43,6 +42,9 @@ const (
 	// Error Code
 	SERVER_ERROR_CODE = 0
 	CLIENT_ERROR_CODE = 1
+
+	// If the function is no yet implemented.
+	NOT_IMPLEMENTED_ERROR = "NOT_IMPLEMENTED_ERROR"
 
 	// Generic errors
 	LDAP_ERROR                    = "LDAP_ERROR"
@@ -112,9 +114,12 @@ const (
 	ENTITY_ID_DOESNT_EXIST_ERROR      = "ENTITY_ID_DOESNT_EXIST_ERROR"
 	PROTOTYPE_CREATION_ERROR          = "PROTOTYPE_CREATION_ERROR"
 	PROTOTYPE_UPDATE_ERROR            = "PROTOTYPE_UPDATE_ERROR"
+	PROTOTYPE_DELETE_ERROR            = "PROTOTYPE_DELETE_ERROR"
 	ATTRIBUTE_NAME_DOESNT_EXIST_ERROR = "ATTRIBUTE_NAME_DOESNT_EXIST_ERROR"
 	TYPENAME_DOESNT_EXIST_ERROR       = "TYPENAME_DOESNT_EXIST_ERROR"
 	ENTITY_ALREADY_EXIST_ERROR        = "ENTITY_ALREADY_EXIST_ERROR"
+	ENTITY_TO_QUADS_ERROR             = "ENTITY_TO_QUADS_ERROR"
+	ENTITY_CREATION_ERROR             = "ENTITY_CREATION_ERROR"
 
 	// OAuth2 errors.
 	REGISTER_CLIENT_ERROR      = "REGISTER_CLIENT_ERROR"

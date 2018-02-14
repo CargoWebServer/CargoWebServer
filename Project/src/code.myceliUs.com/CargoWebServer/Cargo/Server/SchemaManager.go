@@ -134,20 +134,16 @@ func (this *SchemaManager) initialize() {
 		}*/
 
 		// Set the schema id with the store id values...
-
 		store := GetServer().GetDataManager().getDataStore(schema.Id)
 		if store == nil {
 			// I will create the new store here...
-			activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
-			if err != nil {
-				log.Panicln(err)
-			}
+			activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
 			var errObj *CargoEntities.Error
-			serverConfig := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetServerConfig()
+			serverConfig := activeConfigurations.GetServerConfig()
 			hostName := serverConfig.GetHostName()
 			ipv4 := serverConfig.GetIpv4()
 			port := serverConfig.GetServerPort()
-			store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
+			store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_GRAPH_STORE, Config.DataStoreVendor_CAYLEY)
 			if errObj != nil {
 				//log.Println(errObj.GetBody())
 			}
@@ -183,7 +179,9 @@ func (this *SchemaManager) initialize() {
 		}
 
 		// Here i will save the prototype...
-		prototype.Create("")
+		storeId := prototype.TypeName[0:strings.Index(prototype.TypeName, ".")]
+		store := GetServer().GetDataManager().getDataStore(storeId)
+		store.CreateEntityPrototype(prototype)
 
 		// Print the list of prototypes...
 		//prototype.Print()
@@ -265,16 +263,13 @@ func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Er
 	store := GetServer().GetDataManager().getDataStore(schema.Id)
 	if store == nil {
 		// I will create the new store here...
-		activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
-		if err != nil {
-			log.Panicln(err)
-		}
+		activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
 		var errObj *CargoEntities.Error
-		serverConfig := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetServerConfig()
+		serverConfig := activeConfigurations.GetServerConfig()
 		hostName := serverConfig.GetHostName()
 		ipv4 := serverConfig.GetIpv4()
 		port := serverConfig.GetServerPort()
-		store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
+		store, errObj = GetServer().GetDataManager().createDataStore(schema.Id, schema.Id, hostName, ipv4, port, Config.DataStoreType_GRAPH_STORE, Config.DataStoreVendor_CAYLEY)
 		if errObj != nil {
 			return errObj
 		}
@@ -299,7 +294,7 @@ func (this *SchemaManager) importSchema(schemasXsdPath string) *CargoEntities.Er
 			prototype.FieldsOrder = append(prototype.FieldsOrder, i)
 		}
 		// Here i will save the prototype...
-		prototype.Create("")
+		store.CreateEntityPrototype(prototype)
 
 		// Print the list of prototypes...
 		//prototype.Print()
@@ -1614,7 +1609,7 @@ type XmlDocumentHandler struct {
 	SchemaId string
 
 	/** Keep entities reference here... **/
-	references map[string]*DynamicEntity
+	references map[string]Entity
 
 	/** Contain the stack of element currently process. **/
 	objects Utility.Stack
@@ -1624,13 +1619,6 @@ type XmlDocumentHandler struct {
 
 	// The last property to set
 	lastProperty string
-}
-
-/**
- * Init the content of the entity from the content of the element.
- */
-func (this *XmlDocumentHandler) InitElement(entity *DynamicEntity, element *XML_Schemas.XSD_Element) {
-
 }
 
 /**
@@ -1703,11 +1691,9 @@ func (this *XmlDocumentHandler) EndDocument() {
 		object := this.globalObjects[i]
 		compactObject(object)
 		object["NeedSave"] = true
-		entity, errObj := GetServer().GetEntityManager().newDynamicEntity("", object)
-		if errObj == nil {
-			entity.SaveEntity()
-
-		}
+		entity := new(DynamicEntity)
+		entity.setObject(object)
+		GetServer().GetEntityManager().saveEntity(entity)
 	}
 }
 

@@ -19,9 +19,6 @@ type LdapConfiguration struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Configuration **/
 	M_id string
 
@@ -57,10 +54,52 @@ type XsdLdapConfiguration struct {
 	M_searchBase	string	`xml:"searchBase,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *LdapConfiguration) GetUUID() string{
+func (this *LdapConfiguration) GetUuid() string{
 	return this.UUID
 }
+func (this *LdapConfiguration) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *LdapConfiguration) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *LdapConfiguration) GetTypeName() string{
+	this.TYPENAME = "Config.LdapConfiguration"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *LdapConfiguration) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *LdapConfiguration) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *LdapConfiguration) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *LdapConfiguration) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *LdapConfiguration) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *LdapConfiguration) GetId() string{
@@ -71,8 +110,7 @@ func (this *LdapConfiguration) GetId() string{
 func (this *LdapConfiguration) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -87,8 +125,7 @@ func (this *LdapConfiguration) GetHostName() string{
 func (this *LdapConfiguration) SetHostName(ref interface{}){
 	if this.M_hostName != ref.(string) {
 		this.M_hostName = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -103,8 +140,7 @@ func (this *LdapConfiguration) GetIpv4() string{
 func (this *LdapConfiguration) SetIpv4(ref interface{}){
 	if this.M_ipv4 != ref.(string) {
 		this.M_ipv4 = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -119,8 +155,7 @@ func (this *LdapConfiguration) GetPort() int{
 func (this *LdapConfiguration) SetPort(ref interface{}){
 	if this.M_port != ref.(int) {
 		this.M_port = ref.(int)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -135,8 +170,7 @@ func (this *LdapConfiguration) GetUser() string{
 func (this *LdapConfiguration) SetUser(ref interface{}){
 	if this.M_user != ref.(string) {
 		this.M_user = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -151,8 +185,7 @@ func (this *LdapConfiguration) GetPwd() string{
 func (this *LdapConfiguration) SetPwd(ref interface{}){
 	if this.M_pwd != ref.(string) {
 		this.M_pwd = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -167,8 +200,7 @@ func (this *LdapConfiguration) GetDomain() string{
 func (this *LdapConfiguration) SetDomain(ref interface{}){
 	if this.M_domain != ref.(string) {
 		this.M_domain = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -183,8 +215,7 @@ func (this *LdapConfiguration) GetSearchBase() string{
 func (this *LdapConfiguration) SetSearchBase(ref interface{}){
 	if this.M_searchBase != ref.(string) {
 		this.M_searchBase = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -200,14 +231,12 @@ func (this *LdapConfiguration) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_parentPtr != ref.(string) {
 			this.M_parentPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_parentPtr != ref.(*Configurations).GetUUID() {
-			this.M_parentPtr = ref.(*Configurations).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_parentPtr != ref.(*Configurations).GetUuid() {
+			this.M_parentPtr = ref.(*Configurations).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_parentPtr = ref.(*Configurations)
 	}
@@ -217,7 +246,7 @@ func (this *LdapConfiguration) SetParentPtr(ref interface{}){
 func (this *LdapConfiguration) RemoveParentPtr(ref interface{}){
 	toDelete := ref.(*Configurations)
 	if this.m_parentPtr!= nil {
-		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
 			this.NeedSave = true

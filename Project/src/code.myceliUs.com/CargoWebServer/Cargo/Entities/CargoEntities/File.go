@@ -19,9 +19,6 @@ type File struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Entity **/
 	M_id string
 
@@ -68,10 +65,52 @@ type XsdFile struct {
 	M_fileType	string	`xml:"fileType,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *File) GetUUID() string{
+func (this *File) GetUuid() string{
 	return this.UUID
 }
+func (this *File) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *File) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *File) GetTypeName() string{
+	this.TYPENAME = "CargoEntities.File"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *File) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *File) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *File) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *File) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *File) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *File) GetId() string{
@@ -82,8 +121,7 @@ func (this *File) GetId() string{
 func (this *File) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -98,8 +136,7 @@ func (this *File) GetName() string{
 func (this *File) SetName(ref interface{}){
 	if this.M_name != ref.(string) {
 		this.M_name = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -114,8 +151,7 @@ func (this *File) GetPath() string{
 func (this *File) SetPath(ref interface{}){
 	if this.M_path != ref.(string) {
 		this.M_path = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -130,8 +166,7 @@ func (this *File) GetSize() int{
 func (this *File) SetSize(ref interface{}){
 	if this.M_size != ref.(int) {
 		this.M_size = ref.(int)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -146,8 +181,7 @@ func (this *File) GetModeTime() int64{
 func (this *File) SetModeTime(ref interface{}){
 	if this.M_modeTime != ref.(int64) {
 		this.M_modeTime = ref.(int64)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -162,8 +196,7 @@ func (this *File) IsDir() bool{
 func (this *File) SetIsDir(ref interface{}){
 	if this.M_isDir != ref.(bool) {
 		this.M_isDir = ref.(bool)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -178,8 +211,7 @@ func (this *File) GetChecksum() string{
 func (this *File) SetChecksum(ref interface{}){
 	if this.M_checksum != ref.(string) {
 		this.M_checksum = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -194,8 +226,7 @@ func (this *File) GetData() string{
 func (this *File) SetData(ref interface{}){
 	if this.M_data != ref.(string) {
 		this.M_data = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -210,8 +241,7 @@ func (this *File) GetThumbnail() string{
 func (this *File) SetThumbnail(ref interface{}){
 	if this.M_thumbnail != ref.(string) {
 		this.M_thumbnail = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -226,8 +256,7 @@ func (this *File) GetMime() string{
 func (this *File) SetMime(ref interface{}){
 	if this.M_mime != ref.(string) {
 		this.M_mime = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -243,7 +272,7 @@ func (this *File) SetFiles(ref interface{}){
 	isExist := false
 	var filess []*File
 	for i:=0; i<len(this.M_files); i++ {
-		if this.M_files[i].GetUUID() != ref.(Entity).GetUUID() {
+		if this.M_files[i].GetUuid() != ref.(Entity).GetUuid() {
 			filess = append(filess, this.M_files[i])
 		} else {
 			isExist = true
@@ -252,8 +281,7 @@ func (this *File) SetFiles(ref interface{}){
 	}
 	if !isExist {
 		filess = append(filess, ref.(*File))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_files = filess
 	}
 }
@@ -263,7 +291,7 @@ func (this *File) RemoveFiles(ref interface{}){
 	toDelete := ref.(Entity)
 	files_ := make([]*File, 0)
 	for i := 0; i < len(this.M_files); i++ {
-		if toDelete.GetUUID() != this.M_files[i].GetUUID() {
+		if toDelete.GetUuid() != this.M_files[i].GetUuid() {
 			files_ = append(files_, this.M_files[i])
 		}else{
 			this.NeedSave = true
@@ -281,8 +309,7 @@ func (this *File) GetFileType() FileType{
 func (this *File) SetFileType(ref interface{}){
 	if this.M_fileType != ref.(FileType) {
 		this.M_fileType = ref.(FileType)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -298,14 +325,12 @@ func (this *File) SetParentDirPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_parentDirPtr != ref.(string) {
 			this.M_parentDirPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_parentDirPtr != ref.(Entity).GetUUID() {
-			this.M_parentDirPtr = ref.(Entity).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_parentDirPtr != ref.(Entity).GetUuid() {
+			this.M_parentDirPtr = ref.(Entity).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_parentDirPtr = ref.(*File)
 	}
@@ -315,7 +340,7 @@ func (this *File) SetParentDirPtr(ref interface{}){
 func (this *File) RemoveParentDirPtr(ref interface{}){
 	toDelete := ref.(Entity)
 	if this.m_parentDirPtr!= nil {
-		if toDelete.GetUUID() == this.m_parentDirPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_parentDirPtr.GetUuid() {
 			this.m_parentDirPtr = nil
 			this.M_parentDirPtr = ""
 			this.NeedSave = true
@@ -333,14 +358,12 @@ func (this *File) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_entitiesPtr != ref.(string) {
 			this.M_entitiesPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
-			this.M_entitiesPtr = ref.(*Entities).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
+			this.M_entitiesPtr = ref.(*Entities).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
@@ -350,7 +373,7 @@ func (this *File) SetEntitiesPtr(ref interface{}){
 func (this *File) RemoveEntitiesPtr(ref interface{}){
 	toDelete := ref.(*Entities)
 	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
 			this.NeedSave = true

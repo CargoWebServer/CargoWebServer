@@ -38,14 +38,16 @@ ProjectExplorer.prototype.initProjects = function (projectsInfo) {
 var ProjectView = function (parent, project) {
     this.parent = parent
     this.panel = parent.appendElement({ "tag": "div", "class": "project_view" }).down()
-
+    console.log(project)
     if (project.M_filesRef != undefined) {
         if (project.M_filesRef.length == 1) {
             project["set_M_filesRef_" + project.M_filesRef + "_ref"](
                 function (panel, project) {
                     return function (ref) {
                         var projectView = panel.initFilesView(panel.panel, project.M_filesRef[0], 0)
-                        projectView.shrinkBtn.element.click()
+                        if(projectView.shrinkBtn != undefined){
+                            projectView.shrinkBtn.element.click()
+                        }
                     }
                 }(this, project)
             )

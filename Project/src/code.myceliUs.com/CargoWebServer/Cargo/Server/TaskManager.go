@@ -242,9 +242,9 @@ func (this *TaskManager) runTask(task *Config.ScheduledTask) error {
 		return nil // Nothing to do here.
 	}
 
-	dbFile, err := GetServer().GetEntityManager().getEntityById("CargoEntities", "CargoEntities.File", []interface{}{task.M_script}, false)
+	dbFile, err := GetServer().GetEntityManager().getEntityById("CargoEntities.File", "CargoEntities", []interface{}{task.M_script})
 	if err == nil {
-		script, err := b64.StdEncoding.DecodeString(dbFile.GetObject().(*CargoEntities.File).GetData())
+		script, err := b64.StdEncoding.DecodeString(dbFile.(*CargoEntities.File).GetData())
 		// Now I will run the script...
 		if err == nil {
 			// Open a new session if none is already open.
@@ -298,10 +298,6 @@ func (this *TaskManager) getTaskInstancesInfos() []*TaskInstanceInfo {
  */
 func (this *TaskManager) scheduleTask(task *Config.ScheduledTask) {
 
-	// Here I will get the entity for the task.
-	entity := GetServer().GetEntityManager().NewConfigScheduledTaskEntityFromObject(task)
-	entity.GetObject().(*Config.ScheduledTask).SetIsActive(task.M_isActive)
-
 	// first of all I will test if the task is active.
 	if task.IsActive() == false {
 		return // Nothing to do here.
@@ -311,7 +307,7 @@ func (this *TaskManager) scheduleTask(task *Config.ScheduledTask) {
 	if task.M_expirationTime > 0 {
 		if task.M_expirationTime < time.Now().Unix() {
 			// The task has expire!
-			entity.GetObject().(*Config.ScheduledTask).SetIsActive(false)
+			task.SetIsActive(false)
 			return
 		}
 	}
@@ -366,28 +362,28 @@ func (this *TaskManager) scheduleTask(task *Config.ScheduledTask) {
 		}
 
 		// Set it start time...
-		entity.GetObject().(*Config.ScheduledTask).SetStartTime(nextTime.Unix())
+		task.SetStartTime(nextTime.Unix())
 
 	} else {
-		if entity.GetObject().(*Config.ScheduledTask).GetStartTime() == 0 {
+		if task.GetStartTime() == 0 {
 			// Run the task directly in that case.
 			this.m_setScheduledTasksChan <- task
 			return // nothing more to do...
 		} else {
-			startTime := time.Unix(entity.GetObject().(*Config.ScheduledTask).GetStartTime(), 0)
+			startTime := time.Unix(task.GetStartTime(), 0)
 			if startTime.Sub(time.Now()) < 0 {
 				// innactivate the task in that case.
-				entity.GetObject().(*Config.ScheduledTask).SetIsActive(false)
+				task.SetIsActive(false)
 			}
 		}
 	}
 
 	// Save modification.
-	entity.SaveEntity()
+	GetServer().GetEntityManager().saveEntity(task)
 
 	// Process the task.
-	startTime := time.Unix(entity.GetObject().(*Config.ScheduledTask).GetStartTime(), 0)
+	startTime := time.Unix(task.GetStartTime(), 0)
 	if startTime.Sub(time.Now()) >= 0 {
-		this.m_setScheduledTasksChan <- entity.GetObject().(*Config.ScheduledTask)
+		this.m_setScheduledTasksChan <- task
 	}
 }

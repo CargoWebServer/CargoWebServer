@@ -82,7 +82,7 @@ func NewSqlDataStore(info *Config.DataStoreConfiguration) (*SqlDataStore, error)
 	store.m_associations = make(map[string]bool, 0)
 	store.m_refInfos = make(map[string][][]string, 0)
 
-	if store.m_vendor == Config.DataStoreVendor_MYCELIUS {
+	if store.m_vendor == Config.DataStoreVendor_CAYLEY {
 		return nil, errors.New("Mycelius is a Key value store not sql.")
 	}
 
@@ -106,7 +106,6 @@ func (this *SqlDataStore) Connect() error {
 		connectionString += "driver=mssql"
 		//connectionString += "encrypt=false;"
 		driver = "mssql"
-
 	} else if this.m_vendor == Config.DataStoreVendor_MYSQL {
 		/** Connect to oracle MySql server here... **/
 		connectionString += this.m_user + ":"
@@ -776,6 +775,22 @@ func (this *SqlDataStore) Close() error {
 }
 
 /**
+ * Create a new entity prototype.
+ */
+func (this *SqlDataStore) CreateEntityPrototype(prototype *EntityPrototype) error {
+	store_ := GetServer().GetDataManager().getDataStore("sql_info")
+	return store_.CreateEntityPrototype(prototype)
+}
+
+/**
+ * Save entity prototype.
+ */
+func (this *SqlDataStore) SaveEntityPrototype(prototype *EntityPrototype) error {
+	store_ := GetServer().GetDataManager().getDataStore("sql_info")
+	return store_.SaveEntityPrototype(prototype)
+}
+
+/**
  * Return the prototypes for all accessible table of a database.
  */
 func (this *SqlDataStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
@@ -844,15 +859,12 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 	// If the data store is not found.
 	store := GetServer().GetDataManager().m_dataStores["sql_info"]
 	if store == nil {
-		activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
-		if err != nil {
-			log.Panicln(err)
-		}
-		serverConfig := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetServerConfig()
+
+		serverConfig := GetServer().GetConfigurationManager().m_activeConfigurations.GetServerConfig()
 		hostName := serverConfig.GetHostName()
 		ipv4 := serverConfig.GetIpv4()
 		port := serverConfig.GetServerPort()
-		store, _ = GetServer().GetDataManager().createDataStore("sql_info", "sql_info", hostName, ipv4, port, Config.DataStoreType_KEY_VALUE_STORE, Config.DataStoreVendor_MYCELIUS)
+		store, _ = GetServer().GetDataManager().createDataStore("sql_info", "sql_info", hostName, ipv4, port, Config.DataStoreType_GRAPH_STORE, Config.DataStoreVendor_CAYLEY)
 	} else {
 		prototype, err = store.GetEntityPrototype(schemaId + "." + id)
 		if err == nil {
@@ -947,7 +959,8 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 	}
 
 	// Create the new prototype in sql_info store.
-	prototype.Create("sql_info")
+	store_ := GetServer().GetDataManager().getDataStore("sql_info")
+	store_.CreateEntityPrototype(prototype)
 
 	return prototype, err
 }
@@ -1032,7 +1045,7 @@ func appendField(prototype *EntityPrototype, fieldName string, fieldType string)
 		setDefaultFieldValue(prototype, fieldName)
 
 		// Save it back.
-		GetServer().GetDataManager().getDataStore("sql_info").(*KeyValueDataStore).saveEntityPrototype(prototype)
+		GetServer().GetDataManager().getDataStore("sql_info").(*GraphStore).SaveEntityPrototype(prototype)
 	}
 }
 
@@ -1405,14 +1418,11 @@ func createEntityFromInfo(key string, info map[string]interface{}, infos map[str
 		}
 	}
 
-	entity, errObj := GetServer().GetEntityManager().newDynamicEntity(parentUuid, info)
+	entity := new(DynamicEntity)
+	entity.SetParentUuid(parentUuid)
+	entity.setObject(info)
 
-	if errObj == nil {
-		// Save the entity.
-		return entity
-	}
-
-	return nil
+	return entity
 }
 
 /**
@@ -1574,12 +1584,12 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 			uuid := generateUuid(key, info, entityInfos)
 			// Generate the uuid and the parentUuid for a given entity.
 			if toSave[uuid] == nil {
-				if !entityManager.isExist(uuid) {
+				if !GetServer().GetEntityManager().isEntityExist(uuid) {
 					entity := createEntityFromInfo(key, info, entityInfos)
 					toSave[uuid] = entity
 				} else {
-					entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid, false)
-					if entity.NeedSave() {
+					entity, _ := GetServer().GetEntityManager().getEntityByUuid(uuid)
+					if entity.IsNeedSave() {
 						toSave[uuid] = entity
 					}
 				}
@@ -1596,8 +1606,7 @@ func (this *SqlDataStore) synchronize(prototypes []*EntityPrototype) error {
 
 	// Save changed entity.
 	for id, entity := range toSave {
-		entity.SaveEntity()
-
+		GetServer().GetEntityManager().saveEntity(entity)
 		delete(toSave, id)
 	}
 

@@ -19,9 +19,6 @@ type Action struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Action **/
 	M_name string
 	M_doc string
@@ -43,10 +40,52 @@ type XsdAction struct {
 	M_doc	string	`xml:"doc,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *Action) GetUUID() string{
+func (this *Action) GetUuid() string{
 	return this.UUID
 }
+func (this *Action) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *Action) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_name)
+	return ids
+}
+
+/** The type name **/
+func (this *Action) GetTypeName() string{
+	this.TYPENAME = "CargoEntities.Action"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *Action) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *Action) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Action) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *Action) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *Action) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Name **/
 func (this *Action) GetName() string{
@@ -57,8 +96,7 @@ func (this *Action) GetName() string{
 func (this *Action) SetName(ref interface{}){
 	if this.M_name != ref.(string) {
 		this.M_name = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -73,8 +111,7 @@ func (this *Action) GetDoc() string{
 func (this *Action) SetDoc(ref interface{}){
 	if this.M_doc != ref.(string) {
 		this.M_doc = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -90,7 +127,7 @@ func (this *Action) SetParameters(ref interface{}){
 	isExist := false
 	var parameterss []*Parameter
 	for i:=0; i<len(this.M_parameters); i++ {
-		if this.M_parameters[i].GetUUID() != ref.(*Parameter).GetUUID() {
+		if this.M_parameters[i].GetUuid() != ref.(*Parameter).GetUuid() {
 			parameterss = append(parameterss, this.M_parameters[i])
 		} else {
 			isExist = true
@@ -99,8 +136,7 @@ func (this *Action) SetParameters(ref interface{}){
 	}
 	if !isExist {
 		parameterss = append(parameterss, ref.(*Parameter))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_parameters = parameterss
 	}
 }
@@ -110,7 +146,7 @@ func (this *Action) RemoveParameters(ref interface{}){
 	toDelete := ref.(*Parameter)
 	parameters_ := make([]*Parameter, 0)
 	for i := 0; i < len(this.M_parameters); i++ {
-		if toDelete.GetUUID() != this.M_parameters[i].GetUUID() {
+		if toDelete.GetUuid() != this.M_parameters[i].GetUuid() {
 			parameters_ = append(parameters_, this.M_parameters[i])
 		}else{
 			this.NeedSave = true
@@ -129,7 +165,7 @@ func (this *Action) SetResults(ref interface{}){
 	isExist := false
 	var resultss []*Parameter
 	for i:=0; i<len(this.M_results); i++ {
-		if this.M_results[i].GetUUID() != ref.(*Parameter).GetUUID() {
+		if this.M_results[i].GetUuid() != ref.(*Parameter).GetUuid() {
 			resultss = append(resultss, this.M_results[i])
 		} else {
 			isExist = true
@@ -138,8 +174,7 @@ func (this *Action) SetResults(ref interface{}){
 	}
 	if !isExist {
 		resultss = append(resultss, ref.(*Parameter))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_results = resultss
 	}
 }
@@ -149,7 +184,7 @@ func (this *Action) RemoveResults(ref interface{}){
 	toDelete := ref.(*Parameter)
 	results_ := make([]*Parameter, 0)
 	for i := 0; i < len(this.M_results); i++ {
-		if toDelete.GetUUID() != this.M_results[i].GetUUID() {
+		if toDelete.GetUuid() != this.M_results[i].GetUuid() {
 			results_ = append(results_, this.M_results[i])
 		}else{
 			this.NeedSave = true
@@ -167,8 +202,7 @@ func (this *Action) GetAccessType() AccessType{
 func (this *Action) SetAccessType(ref interface{}){
 	if this.M_accessType != ref.(AccessType) {
 		this.M_accessType = ref.(AccessType)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -184,14 +218,12 @@ func (this *Action) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_entitiesPtr != ref.(string) {
 			this.M_entitiesPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
-			this.M_entitiesPtr = ref.(*Entities).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
+			this.M_entitiesPtr = ref.(*Entities).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
@@ -201,7 +233,7 @@ func (this *Action) SetEntitiesPtr(ref interface{}){
 func (this *Action) RemoveEntitiesPtr(ref interface{}){
 	toDelete := ref.(*Entities)
 	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
 			this.NeedSave = true

@@ -19,9 +19,6 @@ type OAuth2Access struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of OAuth2Access **/
 	M_id string
 	m_client *OAuth2Client
@@ -61,10 +58,52 @@ type XsdOAuth2Access struct {
 	M_createdAt 	int64	`xml:"createdAt ,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *OAuth2Access) GetUUID() string{
+func (this *OAuth2Access) GetUuid() string{
 	return this.UUID
 }
+func (this *OAuth2Access) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *OAuth2Access) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *OAuth2Access) GetTypeName() string{
+	this.TYPENAME = "Config.OAuth2Access"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *OAuth2Access) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *OAuth2Access) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *OAuth2Access) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *OAuth2Access) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *OAuth2Access) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *OAuth2Access) GetId() string{
@@ -75,8 +114,7 @@ func (this *OAuth2Access) GetId() string{
 func (this *OAuth2Access) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -92,14 +130,12 @@ func (this *OAuth2Access) SetClient(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_client != ref.(string) {
 			this.M_client = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_client != ref.(*OAuth2Client).GetUUID() {
-			this.M_client = ref.(*OAuth2Client).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_client != ref.(*OAuth2Client).GetUuid() {
+			this.M_client = ref.(*OAuth2Client).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_client = ref.(*OAuth2Client)
 	}
@@ -109,7 +145,7 @@ func (this *OAuth2Access) SetClient(ref interface{}){
 func (this *OAuth2Access) RemoveClient(ref interface{}){
 	toDelete := ref.(*OAuth2Client)
 	if this.m_client!= nil {
-		if toDelete.GetUUID() == this.m_client.GetUUID() {
+		if toDelete.GetUuid() == this.m_client.GetUuid() {
 			this.m_client = nil
 			this.M_client = ""
 			this.NeedSave = true
@@ -126,8 +162,7 @@ func (this *OAuth2Access) GetAuthorize() string{
 func (this *OAuth2Access) SetAuthorize(ref interface{}){
 	if this.M_authorize != ref.(string) {
 		this.M_authorize = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -142,8 +177,7 @@ func (this *OAuth2Access) GetPrevious() string{
 func (this *OAuth2Access) SetPrevious(ref interface{}){
 	if this.M_previous != ref.(string) {
 		this.M_previous = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -159,14 +193,12 @@ func (this *OAuth2Access) SetRefreshToken(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_refreshToken != ref.(string) {
 			this.M_refreshToken = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_refreshToken != ref.(*OAuth2Refresh).GetUUID() {
-			this.M_refreshToken = ref.(*OAuth2Refresh).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_refreshToken != ref.(*OAuth2Refresh).GetUuid() {
+			this.M_refreshToken = ref.(*OAuth2Refresh).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_refreshToken = ref.(*OAuth2Refresh)
 	}
@@ -176,7 +208,7 @@ func (this *OAuth2Access) SetRefreshToken(ref interface{}){
 func (this *OAuth2Access) RemoveRefreshToken(ref interface{}){
 	toDelete := ref.(*OAuth2Refresh)
 	if this.m_refreshToken!= nil {
-		if toDelete.GetUUID() == this.m_refreshToken.GetUUID() {
+		if toDelete.GetUuid() == this.m_refreshToken.GetUuid() {
 			this.m_refreshToken = nil
 			this.M_refreshToken = ""
 			this.NeedSave = true
@@ -193,8 +225,7 @@ func (this *OAuth2Access) GetExpiresIn() int64{
 func (this *OAuth2Access) SetExpiresIn(ref interface{}){
 	if this.M_expiresIn != ref.(int64) {
 		this.M_expiresIn = ref.(int64)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -209,8 +240,7 @@ func (this *OAuth2Access) GetScope() string{
 func (this *OAuth2Access) SetScope(ref interface{}){
 	if this.M_scope != ref.(string) {
 		this.M_scope = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -225,8 +255,7 @@ func (this *OAuth2Access) GetRedirectUri() string{
 func (this *OAuth2Access) SetRedirectUri(ref interface{}){
 	if this.M_redirectUri != ref.(string) {
 		this.M_redirectUri = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -242,14 +271,12 @@ func (this *OAuth2Access) SetUserData(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_userData != ref.(string) {
 			this.M_userData = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_userData != ref.(*OAuth2IdToken).GetUUID() {
-			this.M_userData = ref.(*OAuth2IdToken).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_userData != ref.(*OAuth2IdToken).GetUuid() {
+			this.M_userData = ref.(*OAuth2IdToken).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_userData = ref.(*OAuth2IdToken)
 	}
@@ -259,7 +286,7 @@ func (this *OAuth2Access) SetUserData(ref interface{}){
 func (this *OAuth2Access) RemoveUserData(ref interface{}){
 	toDelete := ref.(*OAuth2IdToken)
 	if this.m_userData!= nil {
-		if toDelete.GetUUID() == this.m_userData.GetUUID() {
+		if toDelete.GetUuid() == this.m_userData.GetUuid() {
 			this.m_userData = nil
 			this.M_userData = ""
 			this.NeedSave = true
@@ -276,8 +303,7 @@ func (this *OAuth2Access) GetCreatedAt() int64{
 func (this *OAuth2Access) SetCreatedAt(ref interface{}){
 	if this.M_createdAt != ref.(int64) {
 		this.M_createdAt = ref.(int64)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -293,14 +319,12 @@ func (this *OAuth2Access) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_parentPtr != ref.(string) {
 			this.M_parentPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_parentPtr != ref.(Configuration).GetUUID() {
-			this.M_parentPtr = ref.(Configuration).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_parentPtr != ref.(Configuration).GetUuid() {
+			this.M_parentPtr = ref.(Configuration).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_parentPtr = ref.(*OAuth2Configuration)
 	}
@@ -310,7 +334,7 @@ func (this *OAuth2Access) SetParentPtr(ref interface{}){
 func (this *OAuth2Access) RemoveParentPtr(ref interface{}){
 	toDelete := ref.(Configuration)
 	if this.m_parentPtr!= nil {
-		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
 			this.NeedSave = true

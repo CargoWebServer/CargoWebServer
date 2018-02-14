@@ -73,12 +73,9 @@ func (this *EmailManager) initialize() {
 
 	this.m_infos = make(map[string]*Config.SmtpConfiguration, 0)
 
-	activeConfigurationsEntity, err := GetServer().GetConfigurationManager().getActiveConfigurationsEntity()
-	if err != nil {
-		log.Panicln(err)
-	}
+	activeConfigurations := GetServer().GetConfigurationManager().m_activeConfigurations
 
-	smtpConfigurations := activeConfigurationsEntity.GetObject().(*Config.Configurations).GetSmtpConfigs()
+	smtpConfigurations := activeConfigurations.GetSmtpConfigs()
 
 	// Smtp server configuration...
 	for i := 0; i < len(smtpConfigurations); i++ {

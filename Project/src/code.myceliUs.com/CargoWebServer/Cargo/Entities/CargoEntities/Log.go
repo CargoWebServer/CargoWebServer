@@ -19,9 +19,6 @@ type Log struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Entity **/
 	M_id string
 
@@ -46,10 +43,52 @@ type XsdLog struct {
 	M_creationTime	int64	`xml:"creationTime,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *Log) GetUUID() string{
+func (this *Log) GetUuid() string{
 	return this.UUID
 }
+func (this *Log) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *Log) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *Log) GetTypeName() string{
+	this.TYPENAME = "CargoEntities.Log"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *Log) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *Log) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Log) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *Log) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *Log) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *Log) GetId() string{
@@ -60,8 +99,7 @@ func (this *Log) GetId() string{
 func (this *Log) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -77,7 +115,7 @@ func (this *Log) SetEntries(ref interface{}){
 	isExist := false
 	var entriess []*LogEntry
 	for i:=0; i<len(this.M_entries); i++ {
-		if this.M_entries[i].GetUUID() != ref.(Entity).GetUUID() {
+		if this.M_entries[i].GetUuid() != ref.(Entity).GetUuid() {
 			entriess = append(entriess, this.M_entries[i])
 		} else {
 			isExist = true
@@ -86,8 +124,7 @@ func (this *Log) SetEntries(ref interface{}){
 	}
 	if !isExist {
 		entriess = append(entriess, ref.(*LogEntry))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 		this.M_entries = entriess
 	}
 }
@@ -97,7 +134,7 @@ func (this *Log) RemoveEntries(ref interface{}){
 	toDelete := ref.(Entity)
 	entries_ := make([]*LogEntry, 0)
 	for i := 0; i < len(this.M_entries); i++ {
-		if toDelete.GetUUID() != this.M_entries[i].GetUUID() {
+		if toDelete.GetUuid() != this.M_entries[i].GetUuid() {
 			entries_ = append(entries_, this.M_entries[i])
 		}else{
 			this.NeedSave = true
@@ -116,14 +153,12 @@ func (this *Log) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_entitiesPtr != ref.(string) {
 			this.M_entitiesPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
-			this.M_entitiesPtr = ref.(*Entities).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
+			this.M_entitiesPtr = ref.(*Entities).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
@@ -133,7 +168,7 @@ func (this *Log) SetEntitiesPtr(ref interface{}){
 func (this *Log) RemoveEntitiesPtr(ref interface{}){
 	toDelete := ref.(*Entities)
 	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
 			this.NeedSave = true

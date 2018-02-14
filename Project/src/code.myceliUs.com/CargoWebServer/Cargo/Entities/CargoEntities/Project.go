@@ -19,9 +19,6 @@ type Project struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of Entity **/
 	M_id string
 
@@ -49,10 +46,52 @@ type XsdProject struct {
 	M_name	string	`xml:"name,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *Project) GetUUID() string{
+func (this *Project) GetUuid() string{
 	return this.UUID
 }
+func (this *Project) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *Project) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *Project) GetTypeName() string{
+	this.TYPENAME = "CargoEntities.Project"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *Project) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *Project) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *Project) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *Project) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *Project) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *Project) GetId() string{
@@ -63,8 +102,7 @@ func (this *Project) GetId() string{
 func (this *Project) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -79,8 +117,7 @@ func (this *Project) GetName() string{
 func (this *Project) SetName(ref interface{}){
 	if this.M_name != ref.(string) {
 		this.M_name = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -100,25 +137,23 @@ func (this *Project) SetFilesRef(ref interface{}){
 			}
 		}
 		this.M_filesRef = append(this.M_filesRef, ref.(string))
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}else{
 		for i:=0; i < len(this.m_filesRef); i++ {
-			if this.m_filesRef[i].GetUUID() == ref.(*File).GetUUID() {
+			if this.m_filesRef[i].GetUuid() == ref.(*File).GetUuid() {
 				return
 			}
 		}
 		isExist := false
 		for i:=0; i < len(this.M_filesRef); i++ {
-			if this.M_filesRef[i] == ref.(*File).GetUUID() {
+			if this.M_filesRef[i] == ref.(*File).GetUuid() {
 				isExist = true
 			}
 		}
 		this.m_filesRef = append(this.m_filesRef, ref.(*File))
 	if !isExist {
-		this.M_filesRef = append(this.M_filesRef, ref.(Entity).GetUUID())
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.M_filesRef = append(this.M_filesRef, ref.(Entity).GetUuid())
+		this.NeedSave = true
 	}
 	}
 }
@@ -129,7 +164,7 @@ func (this *Project) RemoveFilesRef(ref interface{}){
 	filesRef_ := make([]*File, 0)
 	filesRefUuid := make([]string, 0)
 	for i := 0; i < len(this.m_filesRef); i++ {
-		if toDelete.GetUUID() != this.m_filesRef[i].GetUUID() {
+		if toDelete.GetUuid() != this.m_filesRef[i].GetUuid() {
 			filesRef_ = append(filesRef_, this.m_filesRef[i])
 			filesRefUuid = append(filesRefUuid, this.M_filesRef[i])
 		}else{
@@ -150,14 +185,12 @@ func (this *Project) SetEntitiesPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_entitiesPtr != ref.(string) {
 			this.M_entitiesPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_entitiesPtr != ref.(*Entities).GetUUID() {
-			this.M_entitiesPtr = ref.(*Entities).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_entitiesPtr != ref.(*Entities).GetUuid() {
+			this.M_entitiesPtr = ref.(*Entities).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_entitiesPtr = ref.(*Entities)
 	}
@@ -167,7 +200,7 @@ func (this *Project) SetEntitiesPtr(ref interface{}){
 func (this *Project) RemoveEntitiesPtr(ref interface{}){
 	toDelete := ref.(*Entities)
 	if this.m_entitiesPtr!= nil {
-		if toDelete.GetUUID() == this.m_entitiesPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_entitiesPtr.GetUuid() {
 			this.m_entitiesPtr = nil
 			this.M_entitiesPtr = ""
 			this.NeedSave = true

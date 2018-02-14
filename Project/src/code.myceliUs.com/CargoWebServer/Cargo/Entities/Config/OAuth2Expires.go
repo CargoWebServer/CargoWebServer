@@ -19,9 +19,6 @@ type OAuth2Expires struct{
 	/** If the entity value has change... **/
 	NeedSave bool
 
-	/** If the entity is fully initialyse **/
-	IsInit   bool
-
 	/** members of OAuth2Expires **/
 	M_id string
 	M_expiresAt int64
@@ -40,10 +37,52 @@ type XsdOAuth2Expires struct {
 	M_expiresAt	int64	`xml:"expiresAt,attr"`
 
 }
+/***************** Entity **************************/
+
 /** UUID **/
-func (this *OAuth2Expires) GetUUID() string{
+func (this *OAuth2Expires) GetUuid() string{
 	return this.UUID
 }
+func (this *OAuth2Expires) SetUuid(uuid string){
+	this.UUID = uuid
+}
+
+/** Return the array of entity id's without it uuid **/
+func (this *OAuth2Expires) Ids() []interface{} {
+	ids := make([]interface{}, 0)
+	ids = append(ids, this.M_id)
+	return ids
+}
+
+/** The type name **/
+func (this *OAuth2Expires) GetTypeName() string{
+	this.TYPENAME = "Config.OAuth2Expires"
+	return this.TYPENAME
+}
+
+/** Return the entity parent UUID **/
+func (this *OAuth2Expires) GetParentUuid() string{
+	return this.ParentUuid
+}
+
+/** Set it parent UUID **/
+func (this *OAuth2Expires) SetParentUuid(parentUuid string){
+	this.ParentUuid = parentUuid
+}
+
+/** Return it relation with it parent, only one parent is possible by entity. **/
+func (this *OAuth2Expires) GetParentLnk() string{
+	return this.ParentLnk
+}
+func (this *OAuth2Expires) SetParentLnk(parentLnk string){
+	this.ParentLnk = parentLnk
+}
+
+/** Evaluate if an entity needs to be saved. **/
+func (this *OAuth2Expires) IsNeedSave() bool{
+	return this.NeedSave
+}
+
 
 /** Id **/
 func (this *OAuth2Expires) GetId() string{
@@ -54,8 +93,7 @@ func (this *OAuth2Expires) GetId() string{
 func (this *OAuth2Expires) SetId(ref interface{}){
 	if this.M_id != ref.(string) {
 		this.M_id = ref.(string)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -70,8 +108,7 @@ func (this *OAuth2Expires) GetExpiresAt() int64{
 func (this *OAuth2Expires) SetExpiresAt(ref interface{}){
 	if this.M_expiresAt != ref.(int64) {
 		this.M_expiresAt = ref.(int64)
-		if this.IsInit == true {			this.NeedSave = true
-		}
+		this.NeedSave = true
 	}
 }
 
@@ -87,14 +124,12 @@ func (this *OAuth2Expires) SetParentPtr(ref interface{}){
 	if _, ok := ref.(string); ok {
 		if this.M_parentPtr != ref.(string) {
 			this.M_parentPtr = ref.(string)
-			if this.IsInit == true {				this.NeedSave = true
-			}
+			this.NeedSave = true
 		}
 	}else{
-		if this.M_parentPtr != ref.(Configuration).GetUUID() {
-			this.M_parentPtr = ref.(Configuration).GetUUID()
-			if this.IsInit == true {				this.NeedSave = true
-			}
+		if this.M_parentPtr != ref.(Configuration).GetUuid() {
+			this.M_parentPtr = ref.(Configuration).GetUuid()
+			this.NeedSave = true
 		}
 		this.m_parentPtr = ref.(*OAuth2Configuration)
 	}
@@ -104,7 +139,7 @@ func (this *OAuth2Expires) SetParentPtr(ref interface{}){
 func (this *OAuth2Expires) RemoveParentPtr(ref interface{}){
 	toDelete := ref.(Configuration)
 	if this.m_parentPtr!= nil {
-		if toDelete.GetUUID() == this.m_parentPtr.GetUUID() {
+		if toDelete.GetUuid() == this.m_parentPtr.GetUuid() {
 			this.m_parentPtr = nil
 			this.M_parentPtr = ""
 			this.NeedSave = true
