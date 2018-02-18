@@ -9,14 +9,15 @@ import (
 	"log"
 	"os"
 	"reflect"
-	"strconv"
+	//"strconv"
 	"strings"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
 	"code.myceliUs.com/CargoWebServer/Cargo/JS"
 	"code.myceliUs.com/Utility"
-	"code.myceliUs.com/XML_Schemas"
+	"github.com/boltdb/bolt"
+	//"code.myceliUs.com/XML_Schemas"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,6 +51,9 @@ type GraphStore struct {
 	// In case of local sotre
 	/** The store path **/
 	m_path string
+
+	// The data will be store in bolt db.
+	m_db *bolt.DB
 }
 
 func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err error) {
@@ -69,7 +73,7 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 	if store.m_ipv4 == "127.0.0.1" {
 		store.m_path = GetServer().GetConfigurationManager().GetDataPath() + "/" + store.m_id
 		if _, err := os.Stat(store.m_path); os.IsNotExist(err) {
-			os.Mkdir(store.m_path, 066)
+			os.Mkdir(store.m_path, 777)
 		}
 	}
 
@@ -77,6 +81,10 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 		log.Println("open:", err)
 	}
 
+	store.m_db, err = bolt.Open(store.m_path+"/"+store.m_id+".db", 0600, nil)
+	if err != nil {
+		log.Println("fail to create db:", err)
+	}
 	return
 }
 
@@ -162,8 +170,11 @@ func (this *GraphStore) CreateEntityPrototype(prototype *EntityPrototype) error 
 
 	// Save it only once...
 	_, err := this.GetEntityPrototype(prototype.TypeName)
-
+	log.Println("---> Create ", prototype.TypeName)
 	if err != nil {
+		// Set the new prototype.
+		this.m_prototypes[prototype.TypeName] = prototype
+
 		// Here i will append super type fields...
 		prototype.setSuperTypeFields()
 
@@ -201,6 +212,7 @@ func (this *GraphStore) CreateEntityPrototype(prototype *EntityPrototype) error 
 		} else {
 			return err
 		}
+
 	}
 
 	return nil
@@ -290,27 +302,11 @@ func (this *GraphStore) SaveEntityPrototype(prototype *EntityPrototype) error {
 		return err
 	}
 
+	// Set the new prototype.
+	this.m_prototypes[prototype.TypeName] = prototype
+
 	// I will serialyse the prototype.
 	prototype.setSuperTypeFields()
-
-	// Save it inside it supertype in substitution-group.
-	for i := 0; i < len(prototype.SuperTypeNames); i++ {
-		superTypeName := prototype.SuperTypeNames[i]
-		superType, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
-		if err == nil {
-			if !Utility.Contains(superType.SubstitutionGroup, prototype.TypeName) {
-				superType.SubstitutionGroup = append(superType.SubstitutionGroup, prototype.TypeName)
-				// Save the superType.
-				store := GetServer().GetDataManager().getDataStore(superTypeName[0:strings.Index(superTypeName, ".")])
-				err = store.SaveEntityPrototype(superType)
-				if err != nil {
-					return err
-				}
-			}
-		} else {
-			return err
-		}
-	}
 
 	// I will remove it from substitution group as neeeded...
 	for i := 0; i < len(prototype_.SuperTypeNames); i++ {
@@ -342,7 +338,7 @@ func (this *GraphStore) SaveEntityPrototype(prototype *EntityPrototype) error {
 	JS.GetJsRuntimeManager().AppendScript("CargoWebServer/"+prototype.TypeName, prototype.generateConstructor(), true)
 
 	// Update local entities if the store is local.
-	entities, _ := GetServer().GetEntityManager().getEntities(prototype_.TypeName, this.m_id, nil)
+	/*entities, _ := GetServer().GetEntityManager().getEntities(prototype_.TypeName, this.m_id, nil)
 
 	// Remove the fields
 	for i := 0; i < len(entities); i++ {
@@ -422,7 +418,7 @@ func (this *GraphStore) SaveEntityPrototype(prototype *EntityPrototype) error {
 
 		// Save the entity.
 		GetServer().GetEntityManager().saveEntity(entity)
-	}
+	}*/
 
 	file, err := os.Create(this.m_path + "/" + prototype.TypeName + ".gob")
 	defer file.Close()
@@ -764,11 +760,8 @@ func (this *GraphStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	for _, info := range files {
 		if strings.HasSuffix(info.Name(), ".gob") {
-			file, err := os.Open(this.m_path + "/" + info.Name())
-			defer file.Close()
 			if err == nil {
 				prototype, err := this.GetEntityPrototype(strings.Split(info.Name(), ".gob")[0])
 				if err == nil {
@@ -1047,85 +1040,7 @@ func (this *GraphStore) Create(queryStr string, quads []interface{}) (lastId int
 		return results, nil
 	}
 
-	// External services must be ready...
-	if GetServer().GetServiceManager().m_isReady == false {
-		return nil, nil
-	}
-
-	// Here I will get the connection whit the service port.
-	port := GetServer().GetConfigurationManager().m_activeConfigurations.GetServerConfig().GetServiceContainerPort()
-	address := "127.0.0.1"
-	conn := GetServer().getConnectionByIp(address, port)
-	if conn == nil {
-		return nil, nil //errors.New("connection with service container is close!")
-	}
-	if !conn.IsOpen() {
-		return nil, nil
-	}
-
-	// I will use execute JS function to get the list of entity prototypes.
-	id := Utility.RandomUUID()
-	method := "ExecuteJsFunction"
-	params := make([]*MessageData, 0)
-	to := make([]*WebSocketConnection, 1)
-	to[0] = conn
-
-	param0 := new(MessageData)
-	param0.TYPENAME = "Server.MessageData"
-	param0.Name = "functionSrc"
-	param0.Value = `TripleStoreInterface.load`
-
-	param1 := new(MessageData)
-	param1.TYPENAME = "Server.MessageData"
-	param1.Name = "path"
-	param1.Value = this.m_path
-
-	param2 := new(MessageData)
-	param2.TYPENAME = "Server.MessageData"
-	param2.Name = "storeId"
-	param2.Value = this.m_id
-
-	param3 := new(MessageData)
-	param3.TYPENAME = "Server.MessageData"
-	param3.Name = "data"
-	param3.Value = quads
-
-	// Append the params.
-	params = append(params, param0)
-	params = append(params, param1)
-	params = append(params, param2)
-	params = append(params, param3)
-
-	// The channel will be use to wait for results.
-	resultsChan := make(chan interface{})
-
-	// The success callback.
-	successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
-		return func(rspMsg *message, caller interface{}) {
-			// So here I will marchal the values from a json string and
-			//log.Println("----> success!")
-			resultsChan <- nil
-			log.Println("----> success!")
-		}
-	}(resultsChan)
-
-	// The error callback.
-	errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
-		return func(errMsg *message, caller interface{}) {
-			log.Println("----> error!")
-			//resultsChan <- errMsg.msg.Err.Message
-
-		}
-	}(resultsChan)
-
-	rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
-
-	go func(rqst *message) {
-		log.Println("-------> send request: ", rqst.GetId())
-		GetServer().GetProcessor().m_sendRequest <- rqst
-	}(rqst)
-
-	<-resultsChan
+	// TODO implement it.
 
 	return
 }
@@ -1336,87 +1251,7 @@ func (this *GraphStore) Update(queryStr string, fields []interface{}, params []i
 	}
 
 	// TODO implement it...
-	/*
-		var query EntityQuery
-		json.Unmarshal([]byte(queryStr), &query)
 
-		// now i will retreive the protoype for this entity...
-		prototype, err := this.GetEntityPrototype(query.TypeName)
-		if err != nil {
-			return err
-		}
-
-		fieldsType := make([]interface{}, 0)
-		results, err := this.Read(string(queryStr), fieldsType, params)
-
-		if err != nil {
-			return err
-		}
-
-		// Here I will create a map of field and index...
-		fieldIds := make(map[string]int, 0)
-		for i := 0; i < len(prototype.Ids); i++ {
-			fieldIds[prototype.Ids[i]] = i
-		}
-
-		fieldIndexs := make(map[string]int, 0)
-		for i := 0; i < len(prototype.Indexs); i++ {
-			fieldIndexs[prototype.Indexs[i]] = i
-		}
-
-		for i := 0; i < len(results); i++ {
-			// The actual uuid...
-			uuid := this.getKey(prototype, results[i])
-
-			// get the actual values...
-			var entity []interface{}
-			entity, err = this.getValues(uuid)
-
-			if err != nil {
-				return
-			}
-
-			// Remove existing indexation
-			old_indexationKeys := this.getIndexationKeys(prototype, entity)
-			for j := 0; j < len(old_indexationKeys); j++ {
-				this.deleteIndexation(old_indexationKeys[j], uuid)
-			}
-
-			// Update the entity values...
-			for j := 0; j < len(fields); j++ {
-				field := query.Fields[j]
-				value := fields[j] // The new value to insert...
-				// Now I will replace the value of the field...
-				index := prototype.getFieldIndex(field)
-				if index != -1 {
-					if index >= len(entity) {
-						entity = append(entity, value)
-					} else {
-						entity[index] = value
-					}
-				}
-			}
-
-			// Create the new indexations.
-			new_indexationKeys := this.getIndexationKeys(prototype, entity)
-			for j := 0; j < len(new_indexationKeys); j++ {
-				this.appendIndexation(new_indexationKeys[j], uuid)
-			}
-
-			// And save the entity data..
-			var data bytes.Buffer
-			enc := gob.NewEncoder(&data)
-			enc.Encode(entity)
-
-			// Here I will save the data into the database...
-			err = this.setValue([]byte(uuid), data.Bytes())
-			if err != nil {
-				log.Println("encode:", err)
-				return
-			}
-		}
-		return
-	*/
 	return
 }
 
@@ -1511,64 +1346,7 @@ func (this *GraphStore) Delete(queryStr string, params []interface{}) (err error
 	}
 
 	// TODO implement it
-	/*
-		// First of all i will init the query...
-		var query EntityQuery
-		json.Unmarshal([]byte(queryStr), &query)
 
-		// now i will retreive the protoype for this entity...
-		prototype, err := this.GetEntityPrototype(query.TypeName)
-		if err != nil {
-			return err
-		}
-
-		// Here I will create a map of field and index...
-		fieldsIndex := make(map[string]int, 0)
-		for i := 0; i < len(prototype.Ids); i++ {
-			query.Fields = append(query.Fields, prototype.Ids[i])
-			index := len(fieldsIndex)
-			fieldsIndex[prototype.Ids[i]] = index
-		}
-
-		for i := 0; i < len(prototype.Indexs); i++ {
-			query.Fields = append(query.Fields, prototype.Indexs[i])
-			index := len(fieldsIndex)
-			fieldsIndex[prototype.Indexs[i]] = index
-		}
-
-		// Here I will retreive the list of element to delete...
-		fieldsType := make([]interface{}, 0)
-		queryStr_, _ := json.Marshal(query)
-		results, err := this.Read(string(queryStr_), fieldsType, params)
-
-		for i := 0; i < len(results); i++ {
-			// I will get the entity and remove it...
-			uuid := this.getKey(prototype, results[i])
-
-			// get the actual entity
-			var entity []interface{}
-			entity, err = this.getValues(uuid)
-
-			// I will retreive it list of indexation key.
-			indexationKeys := this.getIndexationKeys(prototype, entity)
-			for j := 0; j < len(indexationKeys); j++ {
-				this.deleteIndexation(indexationKeys[j], uuid)
-			}
-
-			err = this.deleteValue(uuid)
-			if err != nil {
-				//val, _ := this.getValue(uuid)
-				log.Println("------------> fail to delete " + uuid)
-			}
-
-			val, err := this.getValue(uuid)
-			if err == nil {
-				log.Println("------------> fail to delete ", uuid, ":", string(val))
-			}
-		}
-
-		return err
-	*/
 	return
 }
 
@@ -1586,6 +1364,7 @@ func (this *GraphStore) Close() error {
 	}
 
 	// Close the datastore.
-	// TODO clear ressources here...
+	this.m_db.Close()
+
 	return nil
 }

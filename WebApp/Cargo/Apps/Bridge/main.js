@@ -55,6 +55,7 @@ function init() {
  var service = new Server("localhost", "127.0.0.1", 9494)
 //var service = new Server("mon176", "10.67.44.31", 9494)
 var xapian = null
+var tripleStore = null
 
 /**
  * This function is the entry point of the application...
@@ -97,8 +98,9 @@ function main() {
                                                                             function (results, caller) {
                                                                                 // eval in that case contain the code to use the service.
                                                                                 eval(results);
-                                                                                // Xapian test...
+                                                                                // service containter objects.
                                                                                 xapian = new com.mycelius.XapianInterface(caller.service);
+                                                                                tripleStore = new com.mycelius.TripleStoreInterface(caller.service);
                                                                                 init();
                                                                             },
                                                                             // error callback.
@@ -123,10 +125,18 @@ function main() {
                                                                             function (results, caller) {
                                                                                 // eval in that case contain the code to use the service.
                                                                                 eval(results)
-                                                                                
-                                                                                // Xapian test...
+                                                                                // service containter objects.
                                                                                 xapian = new com.mycelius.XapianInterface(caller.service)
+                                                                                tripleStore = new com.mycelius.TripleStoreInterface(caller.service);
 
+                                                                                // test dump...
+                                                                                tripleStore.sayHelloTo("Dave", 
+                                                                                function(result, caller){
+                                                                                    console.log(result)
+                                                                                },
+                                                                                function(errObj, caller){
+
+                                                                                }, {})
                                                                                 init()
 
                                                                             },

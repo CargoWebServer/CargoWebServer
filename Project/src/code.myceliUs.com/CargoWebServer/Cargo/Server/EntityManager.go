@@ -390,8 +390,14 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 }
 
 /**
- * Recursively generate Quad from structure values.
+ * Recursively generate Triple's from structure values.
  */
+type Triple struct {
+	s interface{}
+	p interface{}
+	o interface{}
+}
+
 func ToTriples(values map[string]interface{}) ([]interface{}, error) {
 	triples := make([]interface{}, 0)
 	var uuid string
@@ -418,15 +424,11 @@ func ToTriples(values map[string]interface{}) ([]interface{}, error) {
 							if strings.HasSuffix(fieldType, ":Ref") {
 								if reflect.TypeOf(v).String() == "[]interface {}" {
 									for i := 0; i < len(v.([]interface{})); i++ {
-										triples = append(triples, "<#"+uuid+">")
-										triples = append(triples, "<#"+k+">")
-										triples = append(triples, "<#"+v.([]interface{})[i].(string)+">")
+										triples = append(triples, Triple{uuid, k, v.([]interface{})[i]})
 									}
 								} else if reflect.TypeOf(v).String() == "[]string" {
 									for i := 0; i < len(v.([]string)); i++ {
-										triples = append(triples, "<#"+uuid+">")
-										triples = append(triples, "<#"+k+">")
-										triples = append(triples, "<#"+v.([]string)[i]+">")
+										triples = append(triples, Triple{uuid, k, v.([]string)[i]})
 									}
 								}
 							} else {
@@ -448,9 +450,7 @@ func ToTriples(values map[string]interface{}) ([]interface{}, error) {
 								} else {
 									str, err := json.Marshal(v)
 									if err == nil {
-										triples = append(triples, "<#"+uuid+">")
-										triples = append(triples, "<#"+k+">")
-										triples = append(triples, `"`+string(str)+`"`)
+										triples = append(triples, Triple{uuid, k, str})
 									}
 								}
 
@@ -458,21 +458,15 @@ func ToTriples(values map[string]interface{}) ([]interface{}, error) {
 						} else {
 							if strings.HasSuffix(fieldType, ":Ref") {
 								if len(v.(string)) > 0 {
-									triples = append(triples, "<#"+uuid+">")
-									triples = append(triples, "<#"+k+">")
-									triples = append(triples, "<#"+v.(string)+">")
+									triples = append(triples, Triple{uuid, k, v.(string)})
 								}
 							} else {
 								if reflect.TypeOf(v).Kind() == reflect.String {
 									if len(v.(string)) > 0 {
-										triples = append(triples, "<#"+uuid+">")
-										triples = append(triples, "<#"+k+">")
-										triples = append(triples, `"`+v.(string)+`"`)
+										triples = append(triples, Triple{uuid, k, v})
 									}
 								} else {
-									triples = append(triples, "<#"+uuid+">")
-									triples = append(triples, "<#"+k+">")
-									triples = append(triples, v)
+									triples = append(triples, Triple{uuid, k, v})
 								}
 							}
 						}
@@ -481,6 +475,7 @@ func ToTriples(values map[string]interface{}) ([]interface{}, error) {
 			}
 		}
 	}
+	log.Println("---> ", triples)
 	return triples, nil
 }
 
@@ -593,9 +588,6 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 
 func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	typeName := entity.GetTypeName() // Set the type name if not already set...
-	storeId := typeName[0:strings.Index(typeName, ".")]
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
-
 	// Here I will set the uuid if is not already set
 	if len(entity.GetUuid()) == 0 {
 		uuid := this.GenerateEntityUUID(typeName, entity.GetParentUuid(), entity.Ids(), "", "")
@@ -617,6 +609,10 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 	// Here I will set the entity on the cache...
 	this.m_setEntityChan <- entity
+
+	storeId := typeName[0:strings.Index(typeName, ".")]
+
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 
 	var triples []interface{}
 	triples, err = ToTriples(values)
