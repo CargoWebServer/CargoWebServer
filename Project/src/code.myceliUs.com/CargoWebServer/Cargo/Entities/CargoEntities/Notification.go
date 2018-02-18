@@ -18,6 +18,8 @@ type Notification struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Entity **/
 	M_id string
@@ -105,6 +107,10 @@ func (this *Notification) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *Notification) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *Notification) GetId() string{
@@ -138,7 +144,16 @@ func (this *Notification) SetBody(ref interface{}){
 
 /** FromRef **/
 func (this *Notification) GetFromRef() *Account{
+	if this.m_fromRef == nil {
+		entity, err := this.getEntityByUuid(this.M_fromRef)
+		if err == nil {
+			this.m_fromRef = entity.(*Account)
+		}
+	}
 	return this.m_fromRef
+}
+func (this *Notification) GetFromRefStr() string{
+	return this.M_fromRef
 }
 
 /** Init reference FromRef **/
@@ -171,7 +186,16 @@ func (this *Notification) RemoveFromRef(ref interface{}){
 
 /** ToRef **/
 func (this *Notification) GetToRef() *Account{
+	if this.m_toRef == nil {
+		entity, err := this.getEntityByUuid(this.M_toRef)
+		if err == nil {
+			this.m_toRef = entity.(*Account)
+		}
+	}
 	return this.m_toRef
+}
+func (this *Notification) GetToRefStr() string{
+	return this.M_toRef
 }
 
 /** Init reference ToRef **/
@@ -234,7 +258,16 @@ func (this *Notification) SetCode(ref interface{}){
 
 /** Entities **/
 func (this *Notification) GetEntitiesPtr() *Entities{
+	if this.m_entitiesPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+		if err == nil {
+			this.m_entitiesPtr = entity.(*Entities)
+		}
+	}
 	return this.m_entitiesPtr
+}
+func (this *Notification) GetEntitiesPtrStr() string{
+	return this.M_entitiesPtr
 }
 
 /** Init reference Entities **/

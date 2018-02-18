@@ -18,6 +18,8 @@ type Role struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Role **/
 	M_id string
@@ -87,6 +89,10 @@ func (this *Role) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *Role) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *Role) GetId() string{
@@ -105,7 +111,19 @@ func (this *Role) SetId(ref interface{}){
 
 /** Accounts **/
 func (this *Role) GetAccounts() []*Account{
+	if this.m_accounts == nil {
+		this.m_accounts = make([]*Account, 0)
+		for i := 0; i < len(this.M_accounts); i++ {
+			entity, err := this.getEntityByUuid(this.M_accounts[i])
+			if err == nil {
+				this.m_accounts = append(this.m_accounts, entity.(*Account))
+			}
+		}
+	}
 	return this.m_accounts
+}
+func (this *Role) GetAccountsStr() []string{
+	return this.M_accounts
 }
 
 /** Init reference Accounts **/
@@ -157,7 +175,19 @@ func (this *Role) RemoveAccounts(ref interface{}){
 
 /** Actions **/
 func (this *Role) GetActions() []*Action{
+	if this.m_actions == nil {
+		this.m_actions = make([]*Action, 0)
+		for i := 0; i < len(this.M_actions); i++ {
+			entity, err := this.getEntityByUuid(this.M_actions[i])
+			if err == nil {
+				this.m_actions = append(this.m_actions, entity.(*Action))
+			}
+		}
+	}
 	return this.m_actions
+}
+func (this *Role) GetActionsStr() []string{
+	return this.M_actions
 }
 
 /** Init reference Actions **/
@@ -209,7 +239,16 @@ func (this *Role) RemoveActions(ref interface{}){
 
 /** Entities **/
 func (this *Role) GetEntitiesPtr() *Entities{
+	if this.m_entitiesPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+		if err == nil {
+			this.m_entitiesPtr = entity.(*Entities)
+		}
+	}
 	return this.m_entitiesPtr
+}
+func (this *Role) GetEntitiesPtrStr() string{
+	return this.M_entitiesPtr
 }
 
 /** Init reference Entities **/

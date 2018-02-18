@@ -18,6 +18,8 @@ type Account struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Entity **/
 	M_id string
@@ -108,6 +110,10 @@ func (this *Account) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *Account) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *Account) GetId() string{
@@ -247,7 +253,16 @@ func (this *Account) RemoveMessages(ref interface{}){
 
 /** UserRef **/
 func (this *Account) GetUserRef() *User{
+	if this.m_userRef == nil {
+		entity, err := this.getEntityByUuid(this.M_userRef)
+		if err == nil {
+			this.m_userRef = entity.(*User)
+		}
+	}
 	return this.m_userRef
+}
+func (this *Account) GetUserRefStr() string{
+	return this.M_userRef
 }
 
 /** Init reference UserRef **/
@@ -280,7 +295,19 @@ func (this *Account) RemoveUserRef(ref interface{}){
 
 /** RolesRef **/
 func (this *Account) GetRolesRef() []*Role{
+	if this.m_rolesRef == nil {
+		this.m_rolesRef = make([]*Role, 0)
+		for i := 0; i < len(this.M_rolesRef); i++ {
+			entity, err := this.getEntityByUuid(this.M_rolesRef[i])
+			if err == nil {
+				this.m_rolesRef = append(this.m_rolesRef, entity.(*Role))
+			}
+		}
+	}
 	return this.m_rolesRef
+}
+func (this *Account) GetRolesRefStr() []string{
+	return this.M_rolesRef
 }
 
 /** Init reference RolesRef **/
@@ -332,7 +359,19 @@ func (this *Account) RemoveRolesRef(ref interface{}){
 
 /** PermissionsRef **/
 func (this *Account) GetPermissionsRef() []*Permission{
+	if this.m_permissionsRef == nil {
+		this.m_permissionsRef = make([]*Permission, 0)
+		for i := 0; i < len(this.M_permissionsRef); i++ {
+			entity, err := this.getEntityByUuid(this.M_permissionsRef[i])
+			if err == nil {
+				this.m_permissionsRef = append(this.m_permissionsRef, entity.(*Permission))
+			}
+		}
+	}
 	return this.m_permissionsRef
+}
+func (this *Account) GetPermissionsRefStr() []string{
+	return this.M_permissionsRef
 }
 
 /** Init reference PermissionsRef **/
@@ -384,7 +423,16 @@ func (this *Account) RemovePermissionsRef(ref interface{}){
 
 /** Entities **/
 func (this *Account) GetEntitiesPtr() *Entities{
+	if this.m_entitiesPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+		if err == nil {
+			this.m_entitiesPtr = entity.(*Entities)
+		}
+	}
 	return this.m_entitiesPtr
+}
+func (this *Account) GetEntitiesPtrStr() string{
+	return this.M_entitiesPtr
 }
 
 /** Init reference Entities **/

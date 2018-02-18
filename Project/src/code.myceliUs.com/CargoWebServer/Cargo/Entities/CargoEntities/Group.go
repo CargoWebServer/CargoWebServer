@@ -18,6 +18,8 @@ type Group struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Entity **/
 	M_id string
@@ -92,6 +94,10 @@ func (this *Group) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *Group) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *Group) GetId() string{
@@ -125,7 +131,19 @@ func (this *Group) SetName(ref interface{}){
 
 /** MembersRef **/
 func (this *Group) GetMembersRef() []*User{
+	if this.m_membersRef == nil {
+		this.m_membersRef = make([]*User, 0)
+		for i := 0; i < len(this.M_membersRef); i++ {
+			entity, err := this.getEntityByUuid(this.M_membersRef[i])
+			if err == nil {
+				this.m_membersRef = append(this.m_membersRef, entity.(*User))
+			}
+		}
+	}
 	return this.m_membersRef
+}
+func (this *Group) GetMembersRefStr() []string{
+	return this.M_membersRef
 }
 
 /** Init reference MembersRef **/
@@ -177,7 +195,16 @@ func (this *Group) RemoveMembersRef(ref interface{}){
 
 /** Entities **/
 func (this *Group) GetEntitiesPtr() *Entities{
+	if this.m_entitiesPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+		if err == nil {
+			this.m_entitiesPtr = entity.(*Entities)
+		}
+	}
 	return this.m_entitiesPtr
+}
+func (this *Group) GetEntitiesPtrStr() string{
+	return this.M_entitiesPtr
 }
 
 /** Init reference Entities **/

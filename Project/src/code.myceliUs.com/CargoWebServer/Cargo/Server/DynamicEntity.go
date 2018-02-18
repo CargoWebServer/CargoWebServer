@@ -168,6 +168,10 @@ func (this *DynamicEntity) GetUuid() string {
 	return "" // Can be an error here.
 }
 
+func (this *DynamicEntity) SetEntityGetter(func(uuid string) (interface{}, error)) {
+
+}
+
 /**
  * Return the array of id's for a given entity, it not contain it UUID.
  */

@@ -18,6 +18,8 @@ type File struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Entity **/
 	M_id string
@@ -111,6 +113,10 @@ func (this *File) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *File) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *File) GetId() string{
@@ -317,7 +323,16 @@ func (this *File) SetFileType(ref interface{}){
 
 /** ParentDir **/
 func (this *File) GetParentDirPtr() *File{
+	if this.m_parentDirPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_parentDirPtr)
+		if err == nil {
+			this.m_parentDirPtr = entity.(*File)
+		}
+	}
 	return this.m_parentDirPtr
+}
+func (this *File) GetParentDirPtrStr() string{
+	return this.M_parentDirPtr
 }
 
 /** Init reference ParentDir **/
@@ -350,7 +365,16 @@ func (this *File) RemoveParentDirPtr(ref interface{}){
 
 /** Entities **/
 func (this *File) GetEntitiesPtr() *Entities{
+	if this.m_entitiesPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+		if err == nil {
+			this.m_entitiesPtr = entity.(*Entities)
+		}
+	}
 	return this.m_entitiesPtr
+}
+func (this *File) GetEntitiesPtrStr() string{
+	return this.M_entitiesPtr
 }
 
 /** Init reference Entities **/

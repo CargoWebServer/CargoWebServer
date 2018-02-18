@@ -18,6 +18,8 @@ type Session struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Session **/
 	M_id string
@@ -93,6 +95,10 @@ func (this *Session) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *Session) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *Session) GetId() string{
@@ -171,7 +177,16 @@ func (this *Session) SetSessionState(ref interface{}){
 
 /** ComputerRef **/
 func (this *Session) GetComputerRef() *Computer{
+	if this.m_computerRef == nil {
+		entity, err := this.getEntityByUuid(this.M_computerRef)
+		if err == nil {
+			this.m_computerRef = entity.(*Computer)
+		}
+	}
 	return this.m_computerRef
+}
+func (this *Session) GetComputerRefStr() string{
+	return this.M_computerRef
 }
 
 /** Init reference ComputerRef **/
@@ -204,7 +219,16 @@ func (this *Session) RemoveComputerRef(ref interface{}){
 
 /** Account **/
 func (this *Session) GetAccountPtr() *Account{
+	if this.m_accountPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_accountPtr)
+		if err == nil {
+			this.m_accountPtr = entity.(*Account)
+		}
+	}
 	return this.m_accountPtr
+}
+func (this *Session) GetAccountPtrStr() string{
+	return this.M_accountPtr
 }
 
 /** Init reference Account **/

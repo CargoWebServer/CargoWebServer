@@ -18,6 +18,8 @@ type Parameter struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Parameter **/
 	M_name string
@@ -84,6 +86,10 @@ func (this *Parameter) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *Parameter) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Name **/
 func (this *Parameter) GetName() string{
@@ -132,7 +138,16 @@ func (this *Parameter) SetIsArray(ref interface{}){
 
 /** Parameters **/
 func (this *Parameter) GetParametersPtr() *Parameter{
+	if this.m_parametersPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_parametersPtr)
+		if err == nil {
+			this.m_parametersPtr = entity.(*Parameter)
+		}
+	}
 	return this.m_parametersPtr
+}
+func (this *Parameter) GetParametersPtrStr() string{
+	return this.M_parametersPtr
 }
 
 /** Init reference Parameters **/

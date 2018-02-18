@@ -18,6 +18,8 @@ type User struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Entity **/
 	M_id string
@@ -103,6 +105,10 @@ func (this *User) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *User) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *User) GetId() string{
@@ -196,7 +202,19 @@ func (this *User) SetEmail(ref interface{}){
 
 /** MemberOfRef **/
 func (this *User) GetMemberOfRef() []*Group{
+	if this.m_memberOfRef == nil {
+		this.m_memberOfRef = make([]*Group, 0)
+		for i := 0; i < len(this.M_memberOfRef); i++ {
+			entity, err := this.getEntityByUuid(this.M_memberOfRef[i])
+			if err == nil {
+				this.m_memberOfRef = append(this.m_memberOfRef, entity.(*Group))
+			}
+		}
+	}
 	return this.m_memberOfRef
+}
+func (this *User) GetMemberOfRefStr() []string{
+	return this.M_memberOfRef
 }
 
 /** Init reference MemberOfRef **/
@@ -248,7 +266,19 @@ func (this *User) RemoveMemberOfRef(ref interface{}){
 
 /** Accounts **/
 func (this *User) GetAccounts() []*Account{
+	if this.m_accounts == nil {
+		this.m_accounts = make([]*Account, 0)
+		for i := 0; i < len(this.M_accounts); i++ {
+			entity, err := this.getEntityByUuid(this.M_accounts[i])
+			if err == nil {
+				this.m_accounts = append(this.m_accounts, entity.(*Account))
+			}
+		}
+	}
 	return this.m_accounts
+}
+func (this *User) GetAccountsStr() []string{
+	return this.M_accounts
 }
 
 /** Init reference Accounts **/
@@ -300,7 +330,16 @@ func (this *User) RemoveAccounts(ref interface{}){
 
 /** Entities **/
 func (this *User) GetEntitiesPtr() *Entities{
+	if this.m_entitiesPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+		if err == nil {
+			this.m_entitiesPtr = entity.(*Entities)
+		}
+	}
 	return this.m_entitiesPtr
+}
+func (this *User) GetEntitiesPtrStr() string{
+	return this.M_entitiesPtr
 }
 
 /** Init reference Entities **/

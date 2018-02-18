@@ -18,6 +18,8 @@ type LogEntry struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Entity **/
 	M_id string
@@ -95,6 +97,10 @@ func (this *LogEntry) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *LogEntry) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *LogEntry) GetId() string{
@@ -128,7 +134,16 @@ func (this *LogEntry) SetCreationTime(ref interface{}){
 
 /** EntityRef **/
 func (this *LogEntry) GetEntityRef() Entity{
+	if this.m_entityRef == nil {
+		entity, err := this.getEntityByUuid(this.M_entityRef)
+		if err == nil {
+			this.m_entityRef = entity.(Entity)
+		}
+	}
 	return this.m_entityRef
+}
+func (this *LogEntry) GetEntityRefStr() string{
+	return this.M_entityRef
 }
 
 /** Init reference EntityRef **/
@@ -161,7 +176,16 @@ func (this *LogEntry) RemoveEntityRef(ref interface{}){
 
 /** Logger **/
 func (this *LogEntry) GetLoggerPtr() *Log{
+	if this.m_loggerPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_loggerPtr)
+		if err == nil {
+			this.m_loggerPtr = entity.(*Log)
+		}
+	}
 	return this.m_loggerPtr
+}
+func (this *LogEntry) GetLoggerPtrStr() string{
+	return this.M_loggerPtr
 }
 
 /** Init reference Logger **/
@@ -194,7 +218,16 @@ func (this *LogEntry) RemoveLoggerPtr(ref interface{}){
 
 /** Entities **/
 func (this *LogEntry) GetEntitiesPtr() *Entities{
+	if this.m_entitiesPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+		if err == nil {
+			this.m_entitiesPtr = entity.(*Entities)
+		}
+	}
 	return this.m_entitiesPtr
+}
+func (this *LogEntry) GetEntitiesPtrStr() string{
+	return this.M_entitiesPtr
 }
 
 /** Init reference Entities **/

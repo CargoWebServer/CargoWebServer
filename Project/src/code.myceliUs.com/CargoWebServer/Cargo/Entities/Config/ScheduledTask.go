@@ -18,6 +18,8 @@ type ScheduledTask struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Configuration **/
 	M_id string
@@ -100,6 +102,10 @@ func (this *ScheduledTask) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *ScheduledTask) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *ScheduledTask) GetId() string{
@@ -234,7 +240,16 @@ func (this *ScheduledTask) SetOffsets(ref interface{}){
 
 /** Parent **/
 func (this *ScheduledTask) GetParentPtr() *Configurations{
+	if this.m_parentPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_parentPtr)
+		if err == nil {
+			this.m_parentPtr = entity.(*Configurations)
+		}
+	}
 	return this.m_parentPtr
+}
+func (this *ScheduledTask) GetParentPtrStr() string{
+	return this.M_parentPtr
 }
 
 /** Init reference Parent **/

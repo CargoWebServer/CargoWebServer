@@ -64,4 +64,10 @@ type Entity interface {
 	 * Evaluate if an entity needs to be saved.
 	 */
 	IsNeedSave() bool
+
+	/**
+	 * Set the function GetEntityByUuid as a pointer. The entity manager can't
+	 * be access by Entities package...
+	 */
+	SetEntityGetter(func(uuid string) (interface{}, error))
 }

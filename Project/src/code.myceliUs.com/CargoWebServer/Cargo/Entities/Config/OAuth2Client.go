@@ -18,6 +18,8 @@ type OAuth2Client struct {
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string) (interface{}, error)
 
 	/** members of OAuth2Client **/
 	M_id               string
@@ -86,6 +88,11 @@ func (this *OAuth2Client) SetParentLnk(parentLnk string) {
 /** Evaluate if an entity needs to be saved. **/
 func (this *OAuth2Client) IsNeedSave() bool {
 	return this.NeedSave
+}
+
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *OAuth2Client) SetEntityGetter(fct func(uuid string) (interface{}, error)) {
+	this.getEntityByUuid = fct
 }
 
 /** Id **/
@@ -180,7 +187,16 @@ func (this *OAuth2Client) SetExtra(ref interface{}) {
 
 /** Parent **/
 func (this *OAuth2Client) GetParentPtr() *OAuth2Configuration {
+	if this.m_parentPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_parentPtr)
+		if err == nil {
+			this.m_parentPtr = entity.(*OAuth2Configuration)
+		}
+	}
 	return this.m_parentPtr
+}
+func (this *OAuth2Client) GetParentPtrStr() string {
+	return this.M_parentPtr
 }
 
 /** Init reference Parent **/

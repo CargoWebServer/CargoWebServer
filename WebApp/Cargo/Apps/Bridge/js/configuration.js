@@ -190,7 +190,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                     // Here I will broadcast a local event, export data menue need that information.
                     var evt = {
                         "code": NewDataStoreEvent, "name": DataEvent,
-                        "dataMap": {"storeConfig":content}
+                        "dataMap": { "storeConfig": content }
                     }
                     server.eventHandler.broadcastLocalEvent(evt)
 
@@ -390,7 +390,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 
                     // Keep the reference in the content.
                     var actionsDiv = parent
-                        .appendElement({ "tag": "div", "id": content.UUID + "_actions_div", "style": "position:absolute; left: 0px; bottom: 0px; overflow-y: auto; overflow-x: hidden;"}).down()
+                        .appendElement({ "tag": "div", "id": content.UUID + "_actions_div", "style": "position:absolute; left: 0px; bottom: 0px; overflow-y: auto; overflow-x: hidden;" }).down()
 
                     // set the scrolling shadow...
                     actionsDiv.element.onscroll = function (header) {
@@ -500,53 +500,33 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
                         return function () {
                             var entity = entityPanel.entity
                             if (entity.UUID != undefined) {
-                                var query = {}
-                                query.TypeName = "CargoEntities.File"
-                                query.Fields = ["M_id"]
-                                query.Query = 'CargoEntities.File.M_id == "' + entity.M_id + '"'
-
-                                server.dataManager.read("CargoEntities", JSON.stringify(query), [], [],
-                                    function (results, caller) {
-                                        if (results[0].length == 0) {
-                                            // here I will create an open file event to open the code editor.
-                                            var file = new CargoEntities.File()
-                                            file.M_id = caller.entity.M_id
-                                            file.M_name = caller.entity.M_id + ".js"
-                                            file.M_isDir = false
-                                            file.M_fileType = 1
-                                            file.M_mime = "application/javascript"
-                                            file.M_modeTime = Date.now()
-
-                                            server.entityManager.saveEntity(file,
-                                                function (file, caller) {
-                                                    caller.entity.M_script = file.M_id
-                                                    server.entityManager.saveEntity(caller.entity) // Save the entity...
-                                                    evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
-                                                    server.eventHandler.broadcastLocalEvent(evt)
-                                                },
-                                                function () {
-
-                                                }, caller)
-                                        } else {
-                                            server.entityManager.getEntityById("CargoEntities.File", "CargoEntities", [results[0][0][0]],
-                                                function (file, caller) {
-                                                    caller.entity.M_script = file.M_id
-                                                    server.entityManager.saveEntity(caller.entity) // Save the entity...
-                                                    evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
-                                                    server.eventHandler.broadcastLocalEvent(evt)
-                                                },
-                                                function () {
-
-                                                }, caller)
-
-                                        }
+                                server.entityManager.getEntityById("CargoEntities.File", "CargoEntities", [entity.M_id],
+                                    function (file, caller) {
+                                        caller.entity.M_script = file.M_id
+                                        server.entityManager.saveEntity(caller.entity) // Save the entity...
+                                        evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
+                                        server.eventHandler.broadcastLocalEvent(evt)
                                     },
-                                    function (index, total, caller) {
+                                    function (errObj, caller) {
+                                        var file = new CargoEntities.File()
+                                        file.M_id = caller.entity.M_id
+                                        file.M_name = caller.entity.M_id + ".js"
+                                        file.M_isDir = false
+                                        file.M_fileType = 1
+                                        file.M_mime = "application/javascript"
+                                        file.M_modeTime = Date.now()
 
-                                    },
-                                    function (errMsg, caller) {
+                                        server.entityManager.saveEntity(file,
+                                            function (file, caller) {
+                                                caller.entity.M_script = file.M_id
+                                                server.entityManager.saveEntity(caller.entity) // Save the entity...
+                                                evt = { "code": OpenEntityEvent, "name": FileEvent, "dataMap": { "fileInfo": file } }
+                                                server.eventHandler.broadcastLocalEvent(evt)
+                                            },
+                                            function () {
 
-                                    }, { "entity": entity })
+                                            }, caller)
+                                    },  { "entity": entity })
                             } else {
                                 // In that case the script must be save...
                                 server.entityManager.createEntity(entityPanel.parentEntity.UUID, entityPanel.parentLnk, entity.TYPENAME, entity.UUID, entity,
@@ -627,7 +607,7 @@ ConfigurationPanel.prototype.setConfiguration = function (configurationContent, 
 ConfigurationPanel.prototype.setConfigurations = function (configurations) {
 
     // So here I will create the configuration selector...
-    this.header = this.panel.appendElement({ "tag": "div", "class":"panel entity" }).down()
+    this.header = this.panel.appendElement({ "tag": "div", "class": "panel entity" }).down()
     this.configurationSelect = this.header
         .appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;", "innerHtml": "Configurations" })
         .appendElement({ "tag": "div", "style": "display: table-cell; vertical-align: middle;" }).down()

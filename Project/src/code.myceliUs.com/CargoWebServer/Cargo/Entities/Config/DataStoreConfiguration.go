@@ -18,6 +18,8 @@ type DataStoreConfiguration struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Configuration **/
 	M_id string
@@ -104,6 +106,10 @@ func (this *DataStoreConfiguration) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *DataStoreConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *DataStoreConfiguration) GetId() string{
@@ -257,7 +263,16 @@ func (this *DataStoreConfiguration) SetPort(ref interface{}){
 
 /** Parent **/
 func (this *DataStoreConfiguration) GetParentPtr() *Configurations{
+	if this.m_parentPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_parentPtr)
+		if err == nil {
+			this.m_parentPtr = entity.(*Configurations)
+		}
+	}
 	return this.m_parentPtr
+}
+func (this *DataStoreConfiguration) GetParentPtrStr() string{
+	return this.M_parentPtr
 }
 
 /** Init reference Parent **/

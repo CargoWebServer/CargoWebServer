@@ -18,6 +18,8 @@ type OAuth2Refresh struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of OAuth2Refresh **/
 	M_id string
@@ -84,6 +86,10 @@ func (this *OAuth2Refresh) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *OAuth2Refresh) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *OAuth2Refresh) GetId() string{
@@ -102,7 +108,16 @@ func (this *OAuth2Refresh) SetId(ref interface{}){
 
 /** Access **/
 func (this *OAuth2Refresh) GetAccess() *OAuth2Access{
+	if this.m_access == nil {
+		entity, err := this.getEntityByUuid(this.M_access)
+		if err == nil {
+			this.m_access = entity.(*OAuth2Access)
+		}
+	}
 	return this.m_access
+}
+func (this *OAuth2Refresh) GetAccessStr() string{
+	return this.M_access
 }
 
 /** Init reference Access **/
@@ -135,7 +150,16 @@ func (this *OAuth2Refresh) RemoveAccess(ref interface{}){
 
 /** Parent **/
 func (this *OAuth2Refresh) GetParentPtr() *OAuth2Configuration{
+	if this.m_parentPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_parentPtr)
+		if err == nil {
+			this.m_parentPtr = entity.(*OAuth2Configuration)
+		}
+	}
 	return this.m_parentPtr
+}
+func (this *OAuth2Refresh) GetParentPtrStr() string{
+	return this.M_parentPtr
 }
 
 /** Init reference Parent **/

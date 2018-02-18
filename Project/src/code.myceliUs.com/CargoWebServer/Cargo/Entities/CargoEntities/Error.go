@@ -18,6 +18,8 @@ type Error struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Entity **/
 	M_id string
@@ -100,6 +102,10 @@ func (this *Error) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *Error) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *Error) GetId() string{
@@ -163,7 +169,16 @@ func (this *Error) SetCode(ref interface{}){
 
 /** AccountRef **/
 func (this *Error) GetAccountRef() *Account{
+	if this.m_accountRef == nil {
+		entity, err := this.getEntityByUuid(this.M_accountRef)
+		if err == nil {
+			this.m_accountRef = entity.(*Account)
+		}
+	}
 	return this.m_accountRef
+}
+func (this *Error) GetAccountRefStr() string{
+	return this.M_accountRef
 }
 
 /** Init reference AccountRef **/
@@ -196,7 +211,16 @@ func (this *Error) RemoveAccountRef(ref interface{}){
 
 /** Entities **/
 func (this *Error) GetEntitiesPtr() *Entities{
+	if this.m_entitiesPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+		if err == nil {
+			this.m_entitiesPtr = entity.(*Entities)
+		}
+	}
 	return this.m_entitiesPtr
+}
+func (this *Error) GetEntitiesPtrStr() string{
+	return this.M_entitiesPtr
 }
 
 /** Init reference Entities **/

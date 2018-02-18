@@ -18,6 +18,8 @@ type OAuth2Expires struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of OAuth2Expires **/
 	M_id string
@@ -83,6 +85,10 @@ func (this *OAuth2Expires) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *OAuth2Expires) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *OAuth2Expires) GetId() string{
@@ -116,7 +122,16 @@ func (this *OAuth2Expires) SetExpiresAt(ref interface{}){
 
 /** Parent **/
 func (this *OAuth2Expires) GetParentPtr() *OAuth2Configuration{
+	if this.m_parentPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_parentPtr)
+		if err == nil {
+			this.m_parentPtr = entity.(*OAuth2Configuration)
+		}
+	}
 	return this.m_parentPtr
+}
+func (this *OAuth2Expires) GetParentPtrStr() string{
+	return this.M_parentPtr
 }
 
 /** Init reference Parent **/

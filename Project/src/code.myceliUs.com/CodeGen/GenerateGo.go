@@ -507,6 +507,7 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 		getter += typeName
 	} else {
 		getter += "Get" + methodName + ref + "() "
+
 		if attribute.Upper == "*" {
 			getter += "[]"
 		}
@@ -524,12 +525,40 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 		isRef := IsRef(attribute)
 
 		if isRef && attribute.Name != "other" {
+			// Here the reference are not initialyse at first...
+			if attribute.Upper == "*" {
+				getter += "	if this.m_" + attribute.Name + ref + " == nil {\n"
+				getter += "		this.m_" + attribute.Name + ref + " = make([]" + typeName + ", 0)\n"
+				getter += "		for i := 0; i < len(this.M_" + attribute.Name + ref + "); i++ {\n"
+				getter += "			entity, err := this.getEntityByUuid(this.M_" + attribute.Name + ref + "[i])\n"
+				getter += "			if err == nil {\n"
+				getter += "				this.m_" + attribute.Name + ref + " = append(this.m_" + attribute.Name + ref + ", entity.(" + typeName + "))\n"
+				getter += "			}\n"
+				getter += "		}\n"
+				getter += "	}\n"
+			} else {
+				getter += "	if this.m_" + attribute.Name + ref + " == nil {\n"
+				getter += "		entity, err := this.getEntityByUuid(this.M_" + attribute.Name + ref + ")\n"
+				getter += "		if err == nil {\n"
+				getter += "			this.m_" + attribute.Name + ref + " = entity.(" + typeName + ")\n"
+				getter += "		}\n"
+				getter += "	}\n"
+			}
 			getter += "	return this.m_" + attribute.Name + ref + "\n"
 		} else {
 			getter += "	return this.M_" + attribute.Name + ref + "\n"
 		}
 
 		getter += "}\n"
+		if isRef && attribute.Name != "other" {
+			if attribute.Upper == "*" {
+				getter += "func (this *" + ownerName + ") Get" + methodName + ref + "Str() []string{\n"
+			} else {
+				getter += "func (this *" + ownerName + ") Get" + methodName + ref + "Str() string{\n"
+			}
+			getter += "	return this.M_" + attribute.Name + ref + "\n"
+			getter += "}\n"
+		}
 
 		methodStr = "\n/** " + methodName + " **/\n" + getter
 
@@ -872,7 +901,9 @@ func generateGoClassCode(packageId string) {
 				classStr += "	/** The relation name with the parent. **/\n"
 				classStr += "	ParentLnk string\n"
 				classStr += "	/** If the entity value has change... **/\n"
-				classStr += "	NeedSave bool\n\n"
+				classStr += "	NeedSave bool\n"
+				classStr += "	/** Get entity by uuid function **/\n"
+				classStr += "	getEntityByUuid func(string)(interface{}, error)\n\n"
 
 				superClasses = getSuperClasses(class.Name)
 				for j := 0; j < len(superClasses); j++ {
@@ -973,6 +1004,11 @@ func generateGoClassCode(packageId string) {
 				classStr += "func (this *" + className + ") IsNeedSave() bool{\n"
 				classStr += "	return this.NeedSave\n"
 				classStr += "}\n\n"
+
+				classStr += "/** Give access to entity manager GetEntityByUuid function from Entities package. **/\n"
+				classStr += "func (this *" + className + ") SetEntityGetter(fct func(uuid string)(interface{}, error)){\n"
+				classStr += "	this.getEntityByUuid = fct\n"
+				classStr += "}\n"
 
 				// Now the method...
 				// The superclass methode...

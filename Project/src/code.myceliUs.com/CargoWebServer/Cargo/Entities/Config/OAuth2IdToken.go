@@ -18,6 +18,8 @@ type OAuth2IdToken struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of OAuth2IdToken **/
 	M_issuer string
@@ -104,6 +106,10 @@ func (this *OAuth2IdToken) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *OAuth2IdToken) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Issuer **/
 func (this *OAuth2IdToken) GetIssuer() string{
@@ -137,7 +143,16 @@ func (this *OAuth2IdToken) SetId(ref interface{}){
 
 /** Client **/
 func (this *OAuth2IdToken) GetClient() *OAuth2Client{
+	if this.m_client == nil {
+		entity, err := this.getEntityByUuid(this.M_client)
+		if err == nil {
+			this.m_client = entity.(*OAuth2Client)
+		}
+	}
 	return this.m_client
+}
+func (this *OAuth2IdToken) GetClientStr() string{
+	return this.M_client
 }
 
 /** Init reference Client **/
@@ -305,7 +320,16 @@ func (this *OAuth2IdToken) SetLocal(ref interface{}){
 
 /** Parent **/
 func (this *OAuth2IdToken) GetParentPtr() *OAuth2Configuration{
+	if this.m_parentPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_parentPtr)
+		if err == nil {
+			this.m_parentPtr = entity.(*OAuth2Configuration)
+		}
+	}
 	return this.m_parentPtr
+}
+func (this *OAuth2IdToken) GetParentPtrStr() string{
+	return this.M_parentPtr
 }
 
 /** Init reference Parent **/

@@ -18,6 +18,8 @@ type Project struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Entity **/
 	M_id string
@@ -92,6 +94,10 @@ func (this *Project) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *Project) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *Project) GetId() string{
@@ -125,7 +131,19 @@ func (this *Project) SetName(ref interface{}){
 
 /** FilesRef **/
 func (this *Project) GetFilesRef() []*File{
+	if this.m_filesRef == nil {
+		this.m_filesRef = make([]*File, 0)
+		for i := 0; i < len(this.M_filesRef); i++ {
+			entity, err := this.getEntityByUuid(this.M_filesRef[i])
+			if err == nil {
+				this.m_filesRef = append(this.m_filesRef, entity.(*File))
+			}
+		}
+	}
 	return this.m_filesRef
+}
+func (this *Project) GetFilesRefStr() []string{
+	return this.M_filesRef
 }
 
 /** Init reference FilesRef **/
@@ -177,7 +195,16 @@ func (this *Project) RemoveFilesRef(ref interface{}){
 
 /** Entities **/
 func (this *Project) GetEntitiesPtr() *Entities{
+	if this.m_entitiesPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+		if err == nil {
+			this.m_entitiesPtr = entity.(*Entities)
+		}
+	}
 	return this.m_entitiesPtr
+}
+func (this *Project) GetEntitiesPtrStr() string{
+	return this.M_entitiesPtr
 }
 
 /** Init reference Entities **/

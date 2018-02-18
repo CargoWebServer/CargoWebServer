@@ -30,9 +30,11 @@ type EntityInfo struct {
 }
 
 type EntityManager struct {
-
 	// Cache the entitie in memory...
 	m_entities map[string]Entity
+
+	// Map of entity (reverse) references in cache
+	m_entitiesRefs map[string]map[string][]string
 
 	// Access the tow map via those channel...
 	m_setEntityChan    chan Entity
@@ -41,6 +43,15 @@ type EntityManager struct {
 }
 
 var entityManager *EntityManager
+
+// Function to be use a function pointer.
+var getEntityFct = func(uuid string) (interface{}, error) {
+	entity, err := entityManager.getEntityByUuid(uuid)
+	if err != nil {
+		return nil, errors.New(err.GetBody())
+	}
+	return entity, nil
+}
 
 func (this *Server) GetEntityManager() *EntityManager {
 	if entityManager == nil {
@@ -70,13 +81,14 @@ func newEntityManager() *EntityManager {
 
 	// The Cache...
 	entityManager.m_entities = make(map[string]Entity, 0)
+	entityManager.m_entitiesRefs = make(map[string]map[string][]string)
 
 	// Cache accessor.
 	entityManager.m_getEntityChan = make(chan EntityInfo, 0)
 	entityManager.m_removeEntityChan = make(chan Entity, 0)
 	entityManager.m_setEntityChan = make(chan Entity, 0)
 
-	// Cachen processing loop...
+	// Cache processing loop...
 	go func() {
 		entityManager := GetServer().GetEntityManager()
 		for {
@@ -113,18 +125,124 @@ func newEntityManager() *EntityManager {
 					entityInfo.entities <- nil
 				}
 			case entity := <-entityManager.m_removeEntityChan:
-				if len(entity.Ids()) > 0 {
-					id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
-					delete(entityManager.m_entities, id)
+
+				// If the entity was referenced by entity in the cache
+				// I will remove it from this entity
+				ref := entityManager.m_entitiesRefs[entity.GetUuid()]
+				if ref != nil {
+					for field, uuids := range ref {
+						for i := 0; i < len(uuids); i++ {
+							// Only entities in the case must be updates.
+							if entityManager.m_entities[uuids[i]] != nil {
+								// In that case the entity referenced is in the
+								// cache map so I need to update it.
+								entity_ := entityManager.m_entities[uuids[i]]
+								prototype, _ := entityManager.getEntityPrototype(entity_.GetTypeName(), strings.Split(entity_.GetTypeName(), ".")[0])
+								if reflect.TypeOf(entity_).String() == "*Server.DynamicEntity" {
+									refs_ := entity_.(*DynamicEntity).getValue(field)
+									if refs_ != nil {
+										refs := make([]string, 0)
+										for j := 0; j < len(refs_.([]string)); j++ {
+											if refs_.([]string)[j] != entity.GetUuid() {
+												refs = append(refs, refs_.([]string)[j])
+											}
+										}
+										entity_.(*DynamicEntity).setValue(field, refs)
+									}
+								} else {
+									removeName := strings.Replace(field, "M_", "", -1)
+									removeName = "Remove" + strings.ToUpper(removeName[0:1]) + removeName[1:] + "Ref"
+									params := make([]interface{}, 1)
+									params[0] = entity
+									_, err := Utility.CallMethod(entity_, removeName, params)
+									if err == nil {
+										// Here I will send update entity event...
+										log.Println("--------> remove ref ", entity_.GetUuid(), field, entity.GetUuid())
+									}
+								}
+
+								// Sent the update event.
+								eventData := make([]*MessageData, 2)
+								msgData0 := new(MessageData)
+								msgData0.Name = "entity"
+								if reflect.TypeOf(entity_).String() == "*Server.DynamicEntity" {
+									msgData0.Value = entity_.(*DynamicEntity).getObject()
+								} else {
+									msgData0.Value = entity_
+								}
+								eventData[0] = msgData0
+
+								msgData1 := new(MessageData)
+								msgData1.Name = "prototype"
+								msgData1.Value = prototype
+								eventData[1] = msgData1
+
+								evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventData)
+								GetServer().GetEventManager().BroadcastEvent(evt)
+							}
+						}
+					}
+
+					// Remove it from the map.
+					if len(entity.Ids()) > 0 {
+						id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
+						delete(entityManager.m_entities, id)
+					}
+					delete(entityManager.m_entities, entity.GetUuid())
 				}
-				delete(entityManager.m_entities, entity.GetUuid())
 
 			case entity := <-entityManager.m_setEntityChan:
+				// Append in the map:
+				// Set it entity getter.
+				entity.SetEntityGetter(getEntityFct)
+				// By id
 				if len(entity.Ids()) > 0 {
 					id := entityManager.GenerateEntityUUID(entity.GetTypeName(), "", entity.Ids(), "", "")
 					entityManager.m_entities[id] = entity
 				}
+				// By uuid
 				entityManager.m_entities[entity.GetUuid()] = entity
+
+				// Keep track of reverse references releationship. (referenced by)
+				prototype, _ := entityManager.getEntityPrototype(entity.GetTypeName(), strings.Split(entity.GetTypeName(), ".")[0])
+				for i := 0; i < len(prototype.Fields); i++ {
+					if strings.HasSuffix(prototype.FieldsType[i], ":Ref") {
+						refs := make([]string, 0)
+						var refs_ interface{}
+						var err interface{}
+						if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+							refs_ = entity.(*DynamicEntity).getValue(prototype.Fields[i])
+						} else {
+							getterName := strings.Replace(prototype.Fields[i], "M_", "", -1)
+							getterName = "Get" + strings.ToUpper(getterName[0:1]) + getterName[1:] + "Str"
+							refs_, err = Utility.CallMethod(entity, getterName, []interface{}{})
+						}
+						if err == nil {
+							if reflect.TypeOf(refs_).Kind() == reflect.String {
+								refs = append(refs, refs_.(string))
+							} else if reflect.TypeOf(refs_).String() == "[]string" {
+								refs = refs_.([]string)
+							} else if reflect.TypeOf(refs_).String() == "[]interface {}" {
+								for j := 0; j < len(refs_.([]interface{})); j++ {
+									refs = append(refs, refs_.([]interface{})[j].(string))
+								}
+							}
+
+							// Now I go the reference i will keep it in the map.
+							for j := 0; j < len(refs); j++ {
+								if entityManager.m_entitiesRefs[refs[j]] == nil {
+									entityManager.m_entitiesRefs[refs[j]] = make(map[string][]string, 0)
+								}
+								if entityManager.m_entitiesRefs[refs[j]][prototype.Fields[i]] == nil {
+									entityManager.m_entitiesRefs[refs[j]][prototype.Fields[i]] = make([]string, 0)
+								}
+								if !Utility.Contains(entityManager.m_entitiesRefs[refs[j]][prototype.Fields[i]], entity.GetUuid()) {
+									entityManager.m_entitiesRefs[refs[j]][prototype.Fields[i]] = append(entityManager.m_entitiesRefs[refs[j]][prototype.Fields[i]], entity.GetUuid())
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}()
@@ -256,7 +374,6 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 	}
 
 	// TODO get the entity from the data store.
-	log.Println("------> get entity ", typeName, storeId, ids)
 
 	// So here I will retreive the entity uuid from the entity id.
 	var query EntityQuery
@@ -267,7 +384,7 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	store.Read(string(queryStr), []interface{}{}, []interface{}{})
 
-	errObj := NewError(Utility.FileLine(), NOT_IMPLEMENTED_ERROR, SERVER_ERROR_CODE, errors.New("EntityManager.GetEntityById is not implemented!"))
+	errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
 
 	return nil, errObj
 }
@@ -275,36 +392,96 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 /**
  * Recursively generate Quad from structure values.
  */
-func ToQuads(values map[string]interface{}) ([]interface{}, error) {
-	quads := make([]interface{}, 0)
+func ToTriples(values map[string]interface{}) ([]interface{}, error) {
+	triples := make([]interface{}, 0)
 	var uuid string
 	if values["UUID"] != nil {
 		uuid = values["UUID"].(string)
 		typeName := values["TYPENAME"].(string)
+		storeId := typeName[0:strings.Index(typeName, ".")]
+		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
+
 		for k, v := range values {
 			if v != nil {
 				if reflect.TypeOf(v).String() == "map[string]interface {}" {
-					quads_, err := ToQuads(v.(map[string]interface{}))
+					triples_, err := ToTriples(v.(map[string]interface{}))
 					if err == nil {
-						quads = append(quads, quads_...)
+						triples = append(triples, triples_...)
 					} else {
-						return quads, err
+						return triples, err
 					}
 				} else {
-					if k != "NeedSave" {
-						// Here I will append attribute...
-						quad := make([]interface{}, 4)
-						quad[0] = uuid
-						quad[1] = k
-						quad[2] = v
-						quad[3] = typeName // The contex will be the type name.
-						quads = append(quads, quad)
+					if strings.HasPrefix(k, "M_") {
+						fieldType := prototype.FieldsType[prototype.getFieldIndex(k)]
+						if strings.HasPrefix(fieldType, "[]") {
+							// In case of array...
+							if strings.HasSuffix(fieldType, ":Ref") {
+								if reflect.TypeOf(v).String() == "[]interface {}" {
+									for i := 0; i < len(v.([]interface{})); i++ {
+										triples = append(triples, "<#"+uuid+">")
+										triples = append(triples, "<#"+k+">")
+										triples = append(triples, "<#"+v.([]interface{})[i].(string)+">")
+									}
+								} else if reflect.TypeOf(v).String() == "[]string" {
+									for i := 0; i < len(v.([]string)); i++ {
+										triples = append(triples, "<#"+uuid+">")
+										triples = append(triples, "<#"+k+">")
+										triples = append(triples, "<#"+v.([]string)[i]+">")
+									}
+								}
+							} else {
+
+								if reflect.TypeOf(v).String() == "[]interface {}" {
+									if len(v.([]interface{})) > 0 {
+										if reflect.TypeOf(v.([]interface{})[0]).String() == "map[string]interface {}" {
+											// Sub-object..
+											for i := 0; i < len(v.([]interface{})); i++ {
+												triples_, err := ToTriples(v.([]interface{})[i].(map[string]interface{}))
+												if err == nil {
+													triples = append(triples, triples_...)
+												} else {
+													return triples, err
+												}
+											}
+										}
+									}
+								} else {
+									str, err := json.Marshal(v)
+									if err == nil {
+										triples = append(triples, "<#"+uuid+">")
+										triples = append(triples, "<#"+k+">")
+										triples = append(triples, `"`+string(str)+`"`)
+									}
+								}
+
+							}
+						} else {
+							if strings.HasSuffix(fieldType, ":Ref") {
+								if len(v.(string)) > 0 {
+									triples = append(triples, "<#"+uuid+">")
+									triples = append(triples, "<#"+k+">")
+									triples = append(triples, "<#"+v.(string)+">")
+								}
+							} else {
+								if reflect.TypeOf(v).Kind() == reflect.String {
+									if len(v.(string)) > 0 {
+										triples = append(triples, "<#"+uuid+">")
+										triples = append(triples, "<#"+k+">")
+										triples = append(triples, `"`+v.(string)+`"`)
+									}
+								} else {
+									triples = append(triples, "<#"+uuid+">")
+									triples = append(triples, "<#"+k+">")
+									triples = append(triples, v)
+								}
+							}
+						}
 					}
 				}
 			}
 		}
 	}
-	return quads, nil
+	return triples, nil
 }
 
 /**
@@ -369,9 +546,13 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	// Here I will set the entity on the cache...
 	this.m_setEntityChan <- entity
 
+	if GetServer().GetServiceManager().m_isReady == false {
+		return entity, nil
+	}
+
 	// Now I will call the meth
-	var quads []interface{}
-	quads, err = ToQuads(values)
+	var triples []interface{}
+	triples, err = ToTriples(values)
 
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
@@ -382,7 +563,7 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	store := GetServer().GetDataManager().getDataStore(storeId)
 
 	// So here I will simply append the quads in the database...
-	_, err = store.Create("", quads)
+	_, err = store.Create("", triples)
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 		return nil, cargoError
@@ -437,8 +618,8 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// Here I will set the entity on the cache...
 	this.m_setEntityChan <- entity
 
-	var quads []interface{}
-	quads, err = ToQuads(values)
+	var triples []interface{}
+	triples, err = ToTriples(values)
 
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
@@ -449,7 +630,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	store := GetServer().GetDataManager().getDataStore(storeId)
 
 	// So here I will simply append the quads in the database...
-	err = store.Update("", quads, []interface{}{})
+	err = store.Update("", triples, []interface{}{})
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 		return cargoError
@@ -1431,7 +1612,7 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 //                            entity.init(result[0][i])
 //                        }
 //                    }
-//                    if (result[0] == null) {
+//                    if (result[0] == null || result[0].length==0) {
 //                        if( caller.successCallback != undefined){
 //                        	caller.successCallback(entities, caller.caller)
 //                            caller.successCallback = undefined
@@ -1706,7 +1887,7 @@ func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []
 		return nil
 	}
 
-	entity, errObj := this.getEntityById(storeId, typeName, ids)
+	entity, errObj := this.getEntityById(typeName, storeId, ids)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil

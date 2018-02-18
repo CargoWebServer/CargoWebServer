@@ -26,6 +26,9 @@ type ServiceManager struct {
 
 	// Keep list of action by services.
 	m_serviceAction map[string][]*CargoEntities.Action
+
+	// if all services are intialyse that variable will be set to true.
+	m_isReady bool
 }
 
 var serviceManager *ServiceManager
@@ -180,6 +183,9 @@ func (this *ServiceManager) registerServiceListeners(conn *WebSocketConnection) 
 
 	// I will also synchronize the methode...
 	<-wait
+
+	// Services are now avalaible.
+	this.m_isReady = true
 }
 
 /**

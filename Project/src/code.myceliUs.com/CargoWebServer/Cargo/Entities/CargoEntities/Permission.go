@@ -18,6 +18,8 @@ type Permission struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Permission **/
 	M_id string
@@ -86,6 +88,10 @@ func (this *Permission) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *Permission) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *Permission) GetId() string{
@@ -119,7 +125,19 @@ func (this *Permission) SetTypes(ref interface{}){
 
 /** AccountsRef **/
 func (this *Permission) GetAccountsRef() []*Account{
+	if this.m_accountsRef == nil {
+		this.m_accountsRef = make([]*Account, 0)
+		for i := 0; i < len(this.M_accountsRef); i++ {
+			entity, err := this.getEntityByUuid(this.M_accountsRef[i])
+			if err == nil {
+				this.m_accountsRef = append(this.m_accountsRef, entity.(*Account))
+			}
+		}
+	}
 	return this.m_accountsRef
+}
+func (this *Permission) GetAccountsRefStr() []string{
+	return this.M_accountsRef
 }
 
 /** Init reference AccountsRef **/
@@ -171,7 +189,16 @@ func (this *Permission) RemoveAccountsRef(ref interface{}){
 
 /** Entities **/
 func (this *Permission) GetEntitiesPtr() *Entities{
+	if this.m_entitiesPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+		if err == nil {
+			this.m_entitiesPtr = entity.(*Entities)
+		}
+	}
 	return this.m_entitiesPtr
+}
+func (this *Permission) GetEntitiesPtrStr() string{
+	return this.M_entitiesPtr
 }
 
 /** Init reference Entities **/

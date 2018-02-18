@@ -45,6 +45,8 @@ type GraphStore struct {
 
 	m_user string
 
+	m_prototypes map[string]*EntityPrototype
+
 	// In case of local sotre
 	/** The store path **/
 	m_path string
@@ -61,6 +63,7 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 	store.m_pwd = info.M_pwd
 	store.m_hostName = info.M_hostName
 	store.m_storeName = info.M_storeName
+	store.m_prototypes = make(map[string]*EntityPrototype, 0)
 
 	// if the store is a local store.
 	if store.m_ipv4 == "127.0.0.1" {
@@ -198,7 +201,6 @@ func (this *GraphStore) CreateEntityPrototype(prototype *EntityPrototype) error 
 		} else {
 			return err
 		}
-
 	}
 
 	return nil
@@ -657,18 +659,21 @@ func (this *GraphStore) GetEntityPrototype(typeName string) (*EntityPrototype, e
 
 		return nil, results.(error) // return an error message instead.
 	}
-
-	// Local store stuff...
-	var prototype *EntityPrototype
-	prototype = new(EntityPrototype)
-	file, err := os.Open(this.m_path + "/" + typeName + ".gob")
-	defer file.Close()
-	if err == nil {
-		decoder := gob.NewDecoder(file)
-		err = decoder.Decode(prototype)
+	if this.m_prototypes[typeName] != nil {
+		return this.m_prototypes[typeName], nil
+	} else {
+		// Local store stuff...
+		var prototype *EntityPrototype
+		prototype = new(EntityPrototype)
+		file, err := os.Open(this.m_path + "/" + typeName + ".gob")
+		defer file.Close()
+		if err == nil {
+			decoder := gob.NewDecoder(file)
+			err = decoder.Decode(prototype)
+		}
+		return prototype, err
 	}
 
-	return prototype, err
 }
 
 /**
@@ -765,10 +770,7 @@ func (this *GraphStore) GetEntityPrototypes() ([]*EntityPrototype, error) {
 			file, err := os.Open(this.m_path + "/" + info.Name())
 			defer file.Close()
 			if err == nil {
-				var prototype *EntityPrototype
-				prototype = new(EntityPrototype)
-				decoder := gob.NewDecoder(file)
-				err = decoder.Decode(prototype)
+				prototype, err := this.GetEntityPrototype(strings.Split(info.Name(), ".gob")[0])
 				if err == nil {
 					prototypes = append(prototypes, prototype)
 				}
@@ -1045,9 +1047,85 @@ func (this *GraphStore) Create(queryStr string, quads []interface{}) (lastId int
 		return results, nil
 	}
 
-	for i := 0; i < len(quads); i++ {
-		// q := quads[i].([]interface{})
+	// External services must be ready...
+	if GetServer().GetServiceManager().m_isReady == false {
+		return nil, nil
 	}
+
+	// Here I will get the connection whit the service port.
+	port := GetServer().GetConfigurationManager().m_activeConfigurations.GetServerConfig().GetServiceContainerPort()
+	address := "127.0.0.1"
+	conn := GetServer().getConnectionByIp(address, port)
+	if conn == nil {
+		return nil, nil //errors.New("connection with service container is close!")
+	}
+	if !conn.IsOpen() {
+		return nil, nil
+	}
+
+	// I will use execute JS function to get the list of entity prototypes.
+	id := Utility.RandomUUID()
+	method := "ExecuteJsFunction"
+	params := make([]*MessageData, 0)
+	to := make([]*WebSocketConnection, 1)
+	to[0] = conn
+
+	param0 := new(MessageData)
+	param0.TYPENAME = "Server.MessageData"
+	param0.Name = "functionSrc"
+	param0.Value = `TripleStoreInterface.load`
+
+	param1 := new(MessageData)
+	param1.TYPENAME = "Server.MessageData"
+	param1.Name = "path"
+	param1.Value = this.m_path
+
+	param2 := new(MessageData)
+	param2.TYPENAME = "Server.MessageData"
+	param2.Name = "storeId"
+	param2.Value = this.m_id
+
+	param3 := new(MessageData)
+	param3.TYPENAME = "Server.MessageData"
+	param3.Name = "data"
+	param3.Value = quads
+
+	// Append the params.
+	params = append(params, param0)
+	params = append(params, param1)
+	params = append(params, param2)
+	params = append(params, param3)
+
+	// The channel will be use to wait for results.
+	resultsChan := make(chan interface{})
+
+	// The success callback.
+	successCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+		return func(rspMsg *message, caller interface{}) {
+			// So here I will marchal the values from a json string and
+			//log.Println("----> success!")
+			resultsChan <- nil
+			log.Println("----> success!")
+		}
+	}(resultsChan)
+
+	// The error callback.
+	errorCallback := func(resultsChan chan interface{}) func(*message, interface{}) {
+		return func(errMsg *message, caller interface{}) {
+			log.Println("----> error!")
+			//resultsChan <- errMsg.msg.Err.Message
+
+		}
+	}(resultsChan)
+
+	rqst, _ := NewRequestMessage(id, method, params, to, successCallback, nil, errorCallback, nil)
+
+	go func(rqst *message) {
+		log.Println("-------> send request: ", rqst.GetId())
+		GetServer().GetProcessor().m_sendRequest <- rqst
+	}(rqst)
+
+	<-resultsChan
 
 	return
 }
@@ -1149,6 +1227,11 @@ func (this *GraphStore) Read(queryStr string, fieldsType []interface{}, params [
 		return results.([][]interface{}), nil
 	}
 
+	// External services must be ready...
+	if GetServer().GetServiceManager().m_isReady == false {
+		return nil, errors.New("remote service are not ready")
+	}
+
 	// First of all i will init the query...
 	var q EntityQuery
 	json.Unmarshal([]byte(queryStr), &q)
@@ -1245,6 +1328,11 @@ func (this *GraphStore) Update(queryStr string, fields []interface{}, params []i
 		}
 
 		return nil
+	}
+
+	// External services must be ready...
+	if GetServer().GetServiceManager().m_isReady == false {
+		return errors.New("remote service are not ready")
 	}
 
 	// TODO implement it...
@@ -1416,6 +1504,12 @@ func (this *GraphStore) Delete(queryStr string, params []interface{}) (err error
 
 		return nil
 	}
+
+	// External services must be ready...
+	if GetServer().GetServiceManager().m_isReady == false {
+		return errors.New("remote service are not ready")
+	}
+
 	// TODO implement it
 	/*
 		// First of all i will init the query...

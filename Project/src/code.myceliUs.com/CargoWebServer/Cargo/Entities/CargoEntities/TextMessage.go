@@ -18,6 +18,8 @@ type TextMessage struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of Entity **/
 	M_id string
@@ -105,6 +107,10 @@ func (this *TextMessage) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *TextMessage) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *TextMessage) GetId() string{
@@ -153,7 +159,16 @@ func (this *TextMessage) SetCreationTime(ref interface{}){
 
 /** FromRef **/
 func (this *TextMessage) GetFromRef() *Account{
+	if this.m_fromRef == nil {
+		entity, err := this.getEntityByUuid(this.M_fromRef)
+		if err == nil {
+			this.m_fromRef = entity.(*Account)
+		}
+	}
 	return this.m_fromRef
+}
+func (this *TextMessage) GetFromRefStr() string{
+	return this.M_fromRef
 }
 
 /** Init reference FromRef **/
@@ -186,7 +201,16 @@ func (this *TextMessage) RemoveFromRef(ref interface{}){
 
 /** ToRef **/
 func (this *TextMessage) GetToRef() *Account{
+	if this.m_toRef == nil {
+		entity, err := this.getEntityByUuid(this.M_toRef)
+		if err == nil {
+			this.m_toRef = entity.(*Account)
+		}
+	}
 	return this.m_toRef
+}
+func (this *TextMessage) GetToRefStr() string{
+	return this.M_toRef
 }
 
 /** Init reference ToRef **/
@@ -234,7 +258,16 @@ func (this *TextMessage) SetTitle(ref interface{}){
 
 /** Entities **/
 func (this *TextMessage) GetEntitiesPtr() *Entities{
+	if this.m_entitiesPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_entitiesPtr)
+		if err == nil {
+			this.m_entitiesPtr = entity.(*Entities)
+		}
+	}
 	return this.m_entitiesPtr
+}
+func (this *TextMessage) GetEntitiesPtrStr() string{
+	return this.M_entitiesPtr
 }
 
 /** Init reference Entities **/

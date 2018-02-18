@@ -18,6 +18,8 @@ type OAuth2Access struct{
 	ParentLnk string
 	/** If the entity value has change... **/
 	NeedSave bool
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string)(interface{}, error)
 
 	/** members of OAuth2Access **/
 	M_id string
@@ -104,6 +106,10 @@ func (this *OAuth2Access) IsNeedSave() bool{
 	return this.NeedSave
 }
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *OAuth2Access) SetEntityGetter(fct func(uuid string)(interface{}, error)){
+	this.getEntityByUuid = fct
+}
 
 /** Id **/
 func (this *OAuth2Access) GetId() string{
@@ -122,7 +128,16 @@ func (this *OAuth2Access) SetId(ref interface{}){
 
 /** Client **/
 func (this *OAuth2Access) GetClient() *OAuth2Client{
+	if this.m_client == nil {
+		entity, err := this.getEntityByUuid(this.M_client)
+		if err == nil {
+			this.m_client = entity.(*OAuth2Client)
+		}
+	}
 	return this.m_client
+}
+func (this *OAuth2Access) GetClientStr() string{
+	return this.M_client
 }
 
 /** Init reference Client **/
@@ -185,7 +200,16 @@ func (this *OAuth2Access) SetPrevious(ref interface{}){
 
 /** RefreshToken **/
 func (this *OAuth2Access) GetRefreshToken() *OAuth2Refresh{
+	if this.m_refreshToken == nil {
+		entity, err := this.getEntityByUuid(this.M_refreshToken)
+		if err == nil {
+			this.m_refreshToken = entity.(*OAuth2Refresh)
+		}
+	}
 	return this.m_refreshToken
+}
+func (this *OAuth2Access) GetRefreshTokenStr() string{
+	return this.M_refreshToken
 }
 
 /** Init reference RefreshToken **/
@@ -263,7 +287,16 @@ func (this *OAuth2Access) SetRedirectUri(ref interface{}){
 
 /** UserData **/
 func (this *OAuth2Access) GetUserData() *OAuth2IdToken{
+	if this.m_userData == nil {
+		entity, err := this.getEntityByUuid(this.M_userData)
+		if err == nil {
+			this.m_userData = entity.(*OAuth2IdToken)
+		}
+	}
 	return this.m_userData
+}
+func (this *OAuth2Access) GetUserDataStr() string{
+	return this.M_userData
 }
 
 /** Init reference UserData **/
@@ -311,7 +344,16 @@ func (this *OAuth2Access) SetCreatedAt(ref interface{}){
 
 /** Parent **/
 func (this *OAuth2Access) GetParentPtr() *OAuth2Configuration{
+	if this.m_parentPtr == nil {
+		entity, err := this.getEntityByUuid(this.M_parentPtr)
+		if err == nil {
+			this.m_parentPtr = entity.(*OAuth2Configuration)
+		}
+	}
 	return this.m_parentPtr
+}
+func (this *OAuth2Access) GetParentPtrStr() string{
+	return this.M_parentPtr
 }
 
 /** Init reference Parent **/
