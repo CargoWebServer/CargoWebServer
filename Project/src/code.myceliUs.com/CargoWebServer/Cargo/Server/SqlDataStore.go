@@ -857,7 +857,7 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 	}
 
 	// If the data store is not found.
-	store := GetServer().GetDataManager().m_dataStores["sql_info"]
+	store := GetServer().GetDataManager().getDataStore("sql_info")
 	if store == nil {
 
 		serverConfig := GetServer().GetConfigurationManager().m_activeConfigurations.GetServerConfig()

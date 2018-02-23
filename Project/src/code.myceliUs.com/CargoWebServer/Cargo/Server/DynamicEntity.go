@@ -38,8 +38,7 @@ func (this *DynamicEntity) setValue(field string, value interface{}) error {
 
 	// Here the value is in the map.
 	this.object[field] = value
-	this.setValue("NeedSave", true)
-
+	this.object["NeedSave"] = true
 	return nil
 }
 
@@ -110,7 +109,7 @@ func (this *DynamicEntity) appendValue(field string, value interface{}) {
 
 /**
  * This is function is use to remove a child entity from it parent.
- * To remove other field type simply set the new array with setValue function.
+ * To remove other field type simply call 'setValue' with the new array values.
  */
 func (this *DynamicEntity) removeValue(field string, uuid interface{}) {
 	this.Lock()

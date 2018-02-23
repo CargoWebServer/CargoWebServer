@@ -346,6 +346,10 @@ func (this *EntityPrototype) generateConstructor() string {
 	// Keep the reference on the entity prototype.
 	constructorSrc += " return this\n"
 	constructorSrc += "}\n"
+
+	log.Println("----> generate constructor: ", this.TypeName)
+
+
 	return constructorSrc
 }
 

@@ -58,7 +58,6 @@ var RpcData = function(values){
   */
  Server.prototype.init = function (onOpenConnectionCallback, onCloseConnectionCallback, caller) {
 	var address = this.ipv4 + ":" + this.port.toString()
-
 	// The connection will be set on the sever side.
 	initConnection(address, onOpenConnectionCallback, onCloseConnectionCallback, sessionId, this, caller)
  }

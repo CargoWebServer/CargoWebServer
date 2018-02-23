@@ -890,8 +890,6 @@ func (this *Server) Start() {
 	 */
 	JS.GetJsRuntimeManager().AppendFunction("CargoWebServer.initConnection",
 		func(address string, openCallback string, closeCallback string, connectionId string, service otto.Value, caller otto.Value) otto.Value {
-
-			log.Println("--> init connection with : ", address, " session id: ", connectionId)
 			values := strings.Split(address, ":")
 			var host string
 			var port int
@@ -920,7 +918,6 @@ func (this *Server) Start() {
 			GetServer().appendSubConnectionId(connectionId, subConnectionId)
 
 			// Here I will create the connection object...
-			// .RunScript(connectionId, "new Connection()")
 			conn, err = JS.GetJsRuntimeManager().GetSession(connectionId).Run("new Connection()")
 			if err != nil {
 				log.Println("---------> error found!", err)

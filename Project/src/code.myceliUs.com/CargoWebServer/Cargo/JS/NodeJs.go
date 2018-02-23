@@ -15,7 +15,6 @@ func (this *JsRuntimeManager) initNodeJs() {
 	 * Node.js module/exports functionality.
 	 */
 	this.appendFunction("require_", func(identifier string, sessionId string) *otto.Object {
-		log.Println("--->call require: ", identifier, " for session ", sessionId)
 		// resolve dependencie and return the exports.
 		exports, err := GetJsRuntimeManager().getExports(identifier, sessionId)
 		if err != nil {

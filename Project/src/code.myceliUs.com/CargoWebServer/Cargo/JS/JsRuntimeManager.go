@@ -686,8 +686,6 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) *otto.Ob
 		// Here I will return the exports
 		// set the global variable exports...
 		exports = this.m_exports[sessionId][exportPath]
-		log.Println("-----> init script  ", path, " from ", sessionId)
-		log.Println("-----> ", this.m_scripts[path])
 	} else {
 		// create a new path
 		exports, _ = vm.Object("exports = {}")
@@ -707,6 +705,7 @@ func (this *JsRuntimeManager) initScript(path string, sessionId string) *otto.Ob
 			}
 		}
 	}
+
 	return exports
 }
 

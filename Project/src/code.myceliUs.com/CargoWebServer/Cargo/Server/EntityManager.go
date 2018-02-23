@@ -842,7 +842,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		entity.SetUuid(uuid)
 		entity.SetEntityGetter(getEntityFct)
 	}
-
 	var values map[string]interface{}
 
 	var err error
@@ -856,7 +855,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 			return cargoError
 		}
 	}
-
 	// Here I will set the entity on the cache...
 	this.m_setEntityChan <- entity
 
@@ -867,7 +865,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
 		return cargoError
 	}
-
 	storeId := typeName[0:strings.Index(typeName, ".")]
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 
@@ -900,7 +897,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	} else {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 	}
-
 	// Remove unchanged triples
 	for j := 0; j < len(triples) && len(triples) > 0; j++ {
 		for i := 0; i < len(existingTriples) && len(existingTriples) > 0; i++ {
@@ -913,7 +909,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 			}
 		}
 	}
-
 	// Delete obsolete triple...
 	if len(existingTriples) > 0 {
 		toDelete := make([]interface{}, 0)
@@ -926,7 +921,6 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 			return cargoError
 		}
 	}
-
 	// Save the changed/new triples.
 	if len(triples) > 0 {
 		_, err = store.Create("", triples)
@@ -1818,7 +1812,6 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 			} else {
 				entity := new(DynamicEntity)
 				entity.setObject(values.(map[string]interface{}))
-				log.Println("-----> entity: ", entity)
 				errObj = this.saveEntity(entity)
 				if errObj != nil {
 					log.Println(errObj.GetBody())
@@ -1859,44 +1852,28 @@ func (this *EntityManager) RemoveEntity(uuid string, messageId string, sessionId
 		return
 	}
 
-	errObj = NewError(Utility.FileLine(), NOT_IMPLEMENTED_ERROR, SERVER_ERROR_CODE, errors.New("EntityManager.RemoveEntity is not implemented!"))
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-	}
-
 	// The entity to remove.
-	/*var entity Entity
-
-	// validate the action. TODO active it latter...
-	errObj = GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return // exit here.
-	}
-
-	entity, errObj = this.getEntityByUuid(uuid, false)
-	if errObj != nil {
-		entity, errObj = this.getDynamicEntityByUuid(uuid, false)
-	}
+	var entity Entity
+	entity, errObj = this.getEntityByUuid(uuid)
 
 	if entity != nil {
 		// validate over the entity TODO active it latter...
-		//errObj = GetServer().GetSecurityManager().hasPermission(sessionId, CargoEntities.PermissionType_Delete, entity)
+		/*errObj = GetServer().GetSecurityManager().hasPermission(sessionId, CargoEntities.PermissionType_Delete, entity)
 		if errObj != nil {
 			GetServer().reportErrorMessage(messageId, sessionId, errObj)
 			return // exit here.
-		}
+		}*/
 
 		// Suppress the enitity...
-		entity.DeleteEntity()
+		errObj := this.deleteEntity(entity)
+		if errObj == nil {
+			return
+		}
 
-		// exit here.
-		return
 	}
 
 	// Repport the error
 	GetServer().reportErrorMessage(messageId, sessionId, errObj)
-	*/
 
 }
 

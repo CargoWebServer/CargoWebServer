@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"reflect"
-	"sync"
 
 	"compress/gzip"
 	"io/ioutil"
@@ -31,10 +30,8 @@ type DataManager struct {
 	/** This contain connection to know dataStore **/
 	m_dataStores map[string]DataStore
 
-	/**
-	 * Use to protected the entitiesMap access...
-	 */
-	sync.RWMutex
+	/** That channel is use to access the dataStores map **/
+	m_dataStoreChan chan map[string]interface{}
 }
 
 var dataManager *DataManager
@@ -54,6 +51,32 @@ func newDataManager() *DataManager {
 	// Register dynamic type here...
 	dataManager := new(DataManager)
 	dataManager.m_dataStores = make(map[string]DataStore)
+
+	dataManager.m_dataStoreChan = make(chan map[string]interface{}, 0)
+	// Concurrency...
+	go func() {
+		for {
+			select {
+			case op := <-dataManager.m_dataStoreChan:
+				if op["op"] == "getDataStore" {
+					storeId := op["storeId"].(string)
+					op["store"].(chan DataStore) <- dataManager.m_dataStores[storeId]
+				} else if op["op"] == "getDataStores" {
+					stores := make([]DataStore, 0)
+					for _, store := range dataManager.m_dataStores {
+						stores = append(stores, store)
+					}
+					op["stores"].(chan []DataStore) <- stores
+				} else if op["op"] == "setDataStore" {
+					store := op["store"].(DataStore)
+					dataManager.m_dataStores[store.GetId()] = store
+				} else if op["op"] == "removeDataStore" {
+					storeId := op["storeId"].(string)
+					delete(dataManager.m_dataStores, storeId)
+				}
+			}
+		}
+	}()
 
 	/** Now I will initialyse data store one by one... **/
 	defaultStoreConfigurations := GetServer().GetConfigurationManager().getDefaultDataStoreConfigurations()
@@ -79,14 +102,15 @@ func (this *DataManager) initialize() {
 
 	log.Println("--> initialyze DataManager")
 	for i := 0; i < len(storeConfigurations); i++ {
-		if this.m_dataStores[storeConfigurations[i].GetId()] == nil {
+		if this.getDataStore(storeConfigurations[i].GetId()) == nil {
 			store, err := NewDataStore(storeConfigurations[i])
 			if err != nil {
 			} else {
-				this.m_dataStores[store.GetId()] = store
+				this.setDataStore(store)
 			}
 		}
 	}
+
 }
 
 func (this *DataManager) getId() string {
@@ -107,11 +131,11 @@ func (this *DataManager) stop() {
 ////////////////////////////////////////////////////////////////////////////////
 
 func (this *DataManager) openConnections() {
-	for _, store := range this.m_dataStores {
-		err := store.Connect()
+	for i := 0; i < len(this.getDataStores()); i++ {
+		err := this.getDataStores()[i].Connect()
 		// Call get entity prototype once to initialyse entity prototypes.
 		if err == nil {
-			store.GetEntityPrototypes()
+			this.getDataStores()[i].GetEntityPrototypes()
 		}
 	}
 }
@@ -121,7 +145,9 @@ func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfigur
 	if err != nil {
 		log.Println(err)
 	}
-	this.m_dataStores[store.GetId()] = store
+
+	this.setDataStore(store)
+
 	store.Connect()
 }
 
@@ -129,27 +155,39 @@ func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfigur
  * Access a store with here given name...
  */
 func (this *DataManager) getDataStore(id string) DataStore {
-	this.Lock()
-	defer this.Unlock()
-	store := this.m_dataStores[id]
-	return store
+	arguments := make(map[string]interface{})
+	arguments["op"] = "getDataStore"
+	arguments["storeId"] = id
+	result := make(chan DataStore)
+	arguments["store"] = result
+	this.m_dataStoreChan <- arguments
+	return <-result
+}
+
+func (this *DataManager) getDataStores() []DataStore {
+	arguments := make(map[string]interface{})
+	arguments["op"] = "getDataStores"
+	result := make(chan []DataStore)
+	arguments["stores"] = result
+	this.m_dataStoreChan <- arguments
+	return <-result
+}
+
+func (this *DataManager) setDataStore(store DataStore) {
+	arguments := make(map[string]interface{})
+	arguments["op"] = "setDataStore"
+	arguments["store"] = store
+	this.m_dataStoreChan <- arguments
 }
 
 /**
  * Remove a dataStore from the map
  */
 func (this *DataManager) removeDataStore(id string) {
-	this.Lock()
-	defer this.Unlock()
-
-	// Close the connection.
-	this.m_dataStores[id].Close()
-
-	// Remove data. Deadlock error.
-	this.m_dataStores[id].DeleteEntityPrototypes()
-
-	// Delete the reference from the map.
-	delete(this.m_dataStores, id)
+	arguments := make(map[string]interface{})
+	arguments["storeId"] = id
+	arguments["op"] = "removeDataStore"
+	this.m_dataStoreChan <- arguments
 }
 
 /**
@@ -269,9 +307,7 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 	store, err := NewDataStore(storeConfig)
 	if err == nil {
 		// Append the new dataStore configuration.
-		this.Lock()
-		this.m_dataStores[storeId] = store
-		this.Unlock()
+		this.setDataStore(store)
 		err := store.Connect()
 
 		// Create entity prototypes.
@@ -308,13 +344,16 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 	if errObj == nil {
 		errObj = GetServer().GetEntityManager().deleteEntity(dataStore)
 		if errObj != nil {
+			log.Println("---> err ", errObj.GetBody())
 			return errObj
 		}
+
+	} else {
+		return errObj
 	}
 
 	// Remove the storeObject from the storeMap
 	this.removeDataStore(storeId)
-
 	// Delete the directory
 	filePath := GetServer().GetConfigurationManager().GetDataPath() + "/" + storeId
 	err := os.RemoveAll(filePath)
@@ -324,15 +363,11 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 		log.Println("---> Fail to remove ", storeId, err)
 		return cargoError
 	}
-
 	return nil
 
 }
 
 func (this *DataManager) close() {
-	this.Lock()
-	defer this.Unlock()
-
 	// Close the data manager.
 	for _, v := range this.m_dataStores {
 		v.Close()
@@ -645,7 +680,6 @@ func (this *DataManager) DeleteDataStore(storeId string, messageId string, sessi
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return
 	}
-
 	errObj = this.deleteDataStore(storeId)
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
