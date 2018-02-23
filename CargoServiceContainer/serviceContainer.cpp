@@ -100,12 +100,9 @@ QMap<QString, QObject*> ServiceContainer::loadPluginObjects(){
 
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         if(fileName.indexOf(".dll.a") == -1){ // Do not load the lib but the dll int that particular case.
-            qDebug() << "try to load " << fileName;
             QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
             QString iid =  pluginLoader.metaData().value("IID").toString();
-            qDebug() << "try to load " << fileName << " iid " << iid;
             QJsonObject metaData = pluginLoader.metaData().value("MetaData").toObject();
-            //qDebug() << "meta data " << metaData;
             QObject *plugin = pluginLoader.instance();
             if(plugin != NULL){
                 QStringList values = iid.split(".");
@@ -122,8 +119,6 @@ QMap<QString, QObject*> ServiceContainer::loadPluginObjects(){
                 }else{
                     qDebug() << pluginLoader.errorString();
                 }
-            }else{
-                qDebug() << "fail to load " << fileName;
             }
         }
     }

@@ -105,6 +105,9 @@ func (this *OAuth2IdToken) SetParentLnk(parentLnk string){
 func (this *OAuth2IdToken) IsNeedSave() bool{
 	return this.NeedSave
 }
+func (this *OAuth2IdToken) ResetNeedSave(){
+	this.NeedSave=false
+}
 
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *OAuth2IdToken) SetEntityGetter(fct func(uuid string)(interface{}, error)){

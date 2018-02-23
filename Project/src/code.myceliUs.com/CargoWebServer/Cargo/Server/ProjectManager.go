@@ -4,13 +4,12 @@
 package Server
 
 import (
-	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
-	"code.myceliUs.com/Utility"
-	//"bytes"
-	//"encoding/xml"
 	"io/ioutil"
 	"log"
 	"strings"
+
+	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
+	"code.myceliUs.com/Utility"
 )
 
 type ProjectManager struct {
@@ -65,6 +64,7 @@ func (this *ProjectManager) stop() {
  * Synchronize all the project from application root directory.
  */
 func (this *ProjectManager) synchronize() {
+	log.Println("---> synchronize projects")
 	// Each directory contain an application...
 	files, _ := ioutil.ReadDir(this.root)
 	for _, f := range files {

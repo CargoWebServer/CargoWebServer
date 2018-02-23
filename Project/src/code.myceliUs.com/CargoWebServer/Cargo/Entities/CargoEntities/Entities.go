@@ -97,6 +97,9 @@ func (this *Entities) SetParentLnk(parentLnk string){
 func (this *Entities) IsNeedSave() bool{
 	return this.NeedSave
 }
+func (this *Entities) ResetNeedSave(){
+	this.NeedSave=false
+}
 
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *Entities) SetEntityGetter(fct func(uuid string)(interface{}, error)){

@@ -70,6 +70,7 @@ func (this *LdapManager) start() {
 }
 
 func (this *LdapManager) synchronizeAll() {
+
 	// configure all information from the servers...
 	for _, info := range this.getConfigsInfo() {
 		// Synchronize the list of user...
@@ -380,7 +381,7 @@ func (this *LdapManager) synchronizeUsers(id string) error {
  * This Get the LDAP groups from the DB...
  */
 func (this *LdapManager) synchronizeGroups(id string) error {
-
+	// log.Println("--> Synchronize Groups")
 	var base_dn string = "OU=Groups," + this.getConfigsInfo()[id].M_searchBase
 	var filter string = "(objectClass=group)"
 	var attributes []string = []string{"name", "distinguishedName"}
@@ -397,6 +398,7 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 		// Here I will get the user in the group...
 		row := results[i]
 		group := new(CargoEntities.Group)
+
 		for j := 0; j < len(row); j++ {
 			// Print the result...
 			if attributes[j] == "distinguishedName" {
@@ -427,6 +429,8 @@ func (this *LdapManager) synchronizeGroups(id string) error {
 								GetServer().GetEntityManager().saveEntity(member)
 							}
 						}
+					} else {
+						group = nil
 					}
 				}
 
@@ -528,6 +532,7 @@ func (this *LdapManager) getComputerByIp(ip string) (*CargoEntities.Computer, *C
  * Synchronize the computers from ldap information.
  */
 func (this *LdapManager) synchronizeComputers(id string) error {
+
 	// This is the list of computer.
 	var base_dn string = "OU=Computers," + this.getConfigsInfo()[id].M_searchBase
 	var filter string = "(objectClass=computer)"
@@ -606,11 +611,14 @@ func (this *LdapManager) synchronizeComputers(id string) error {
 			if computerEntity != nil {
 				computer = computerEntity.(*CargoEntities.Computer)
 			}
-			log.Println("--> create computer ", computer.GetId())
+			log.Println("----> create computer ", computer.GetId())
 		} else {
 			// Call save on Entities...
+			computer.UUID = computerEntity.GetUuid()
+			computer.ParentUuid = computerEntity.GetParentUuid()
+			computer.ParentLnk = computerEntity.GetParentLnk()
 			GetServer().GetEntityManager().saveEntity(computer)
-
+			// log.Println("----> save computer ", computer.GetId())
 		}
 	}
 

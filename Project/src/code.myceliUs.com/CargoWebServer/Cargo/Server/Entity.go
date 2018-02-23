@@ -66,6 +66,11 @@ type Entity interface {
 	IsNeedSave() bool
 
 	/**
+	 * Set the need save state to false.
+	 */
+	ResetNeedSave()
+
+	/**
 	 * Set the function GetEntityByUuid as a pointer. The entity manager can't
 	 * be access by Entities package...
 	 */

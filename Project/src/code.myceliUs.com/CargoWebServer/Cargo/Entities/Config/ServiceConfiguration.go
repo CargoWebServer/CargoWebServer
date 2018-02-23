@@ -99,6 +99,9 @@ func (this *ServiceConfiguration) SetParentLnk(parentLnk string){
 func (this *ServiceConfiguration) IsNeedSave() bool{
 	return this.NeedSave
 }
+func (this *ServiceConfiguration) ResetNeedSave(){
+	this.NeedSave=false
+}
 
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *ServiceConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){

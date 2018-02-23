@@ -105,6 +105,9 @@ func (this *DataStoreConfiguration) SetParentLnk(parentLnk string){
 func (this *DataStoreConfiguration) IsNeedSave() bool{
 	return this.NeedSave
 }
+func (this *DataStoreConfiguration) ResetNeedSave(){
+	this.NeedSave=false
+}
 
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *DataStoreConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){

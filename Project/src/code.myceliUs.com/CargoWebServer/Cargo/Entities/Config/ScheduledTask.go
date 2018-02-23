@@ -101,6 +101,9 @@ func (this *ScheduledTask) SetParentLnk(parentLnk string){
 func (this *ScheduledTask) IsNeedSave() bool{
 	return this.NeedSave
 }
+func (this *ScheduledTask) ResetNeedSave(){
+	this.NeedSave=false
+}
 
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *ScheduledTask) SetEntityGetter(fct func(uuid string)(interface{}, error)){

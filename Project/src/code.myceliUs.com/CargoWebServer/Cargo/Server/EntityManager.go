@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	//"code.myceliUs.com/CargoWebServer/Cargo/Entities/Config"
@@ -18,6 +19,9 @@ import (
 ////////////////////////////////////////////////////////////////////////////////
 //						Entity Manager
 ////////////////////////////////////////////////////////////////////////////////
+
+// The entity are keep in memory for ten minutes.
+var timeOutDuration = time.Duration(10)
 
 // Struct use to tranfer internal informations about entity
 type EntityInfo struct {
@@ -33,6 +37,10 @@ type EntityManager struct {
 	// Cache the entitie in memory...
 	m_entities map[string]Entity
 
+	// That map will contain the list of timer. Object are keep in map
+	// for a certain delay and remove after to save memory usage...
+	m_timeout map[string]*time.Timer
+
 	// Map of entity (reverse) references in cache
 	m_entitiesRefs map[string]map[string][]string
 
@@ -45,13 +53,7 @@ type EntityManager struct {
 var entityManager *EntityManager
 
 // Function to be use a function pointer.
-var getEntityFct = func(uuid string) (interface{}, error) {
-	entity, err := entityManager.getEntityByUuid(uuid)
-	if err != nil {
-		return nil, errors.New(err.GetBody())
-	}
-	return entity, nil
-}
+var getEntityFct func(uuid string) (interface{}, error)
 
 func (this *Server) GetEntityManager() *EntityManager {
 	if entityManager == nil {
@@ -78,10 +80,23 @@ func newEntityManager() *EntityManager {
 	Utility.RegisterType((*MessageData)(nil))
 	Utility.RegisterType((*TaskInstanceInfo)(nil))
 	Utility.RegisterType((*EntityQuery)(nil))
+	Utility.RegisterType((*Triple)(nil))
+
+	// Set the get Entity function
+	getEntityFct = func(uuid string) (interface{}, error) {
+		entity, err := entityManager.getEntityByUuid(uuid)
+		if err != nil {
+			return nil, errors.New(err.GetBody())
+		}
+		return entity, nil
+	}
 
 	// The Cache...
 	entityManager.m_entities = make(map[string]Entity, 0)
 	entityManager.m_entitiesRefs = make(map[string]map[string][]string)
+
+	// The timeout function
+	entityManager.m_timeout = make(map[string]*time.Timer, 0)
 
 	// Cache accessor.
 	entityManager.m_getEntityChan = make(chan EntityInfo, 0)
@@ -117,6 +132,8 @@ func newEntityManager() *EntityManager {
 					// Here I will append the list of entities in the results.
 					for _, entity := range entityManager.m_entities {
 						if entity.GetTypeName() == entityInfo.typeName {
+							// Reset the time of the timer.
+							entityManager.m_timeout[entity.GetUuid()].Reset(timeOutDuration * time.Minute)
 							entities = append(entities, entity)
 						}
 					}
@@ -157,7 +174,7 @@ func newEntityManager() *EntityManager {
 									_, err := Utility.CallMethod(entity_, removeName, params)
 									if err == nil {
 										// Here I will send update entity event...
-										log.Println("--------> remove ref ", entity_.GetUuid(), field, entity.GetUuid())
+										log.Println("--> remove ref ", entity_.GetUuid(), field, entity.GetUuid())
 									}
 								}
 
@@ -189,6 +206,10 @@ func newEntityManager() *EntityManager {
 						delete(entityManager.m_entities, id)
 					}
 					delete(entityManager.m_entities, entity.GetUuid())
+
+					// Remove it timer...
+					delete(entityManager.m_timeout, entity.GetUuid())
+
 				}
 
 			case entity := <-entityManager.m_setEntityChan:
@@ -243,6 +264,20 @@ func newEntityManager() *EntityManager {
 						}
 					}
 				}
+
+				// Set the entity timeout function...
+				timer := time.NewTimer(timeOutDuration * time.Minute)
+				entityManager.m_timeout[entity.GetUuid()] = timer
+				go func() {
+					<-timer.C
+					// Remove the entity from the map.
+					entityManager.m_removeEntityChan <- entity
+					if entity.IsNeedSave() {
+						// Save the entity as needed...
+						entityManager.saveEntity(entity)
+					}
+				}()
+
 			}
 		}
 	}()
@@ -280,6 +315,183 @@ func (this *EntityManager) start() {
 
 func (this *EntityManager) stop() {
 	log.Println("--> Stop EntityManager")
+}
+
+type Triple struct {
+	Subject   string
+	Predicate string
+	Object    interface{}
+
+	// True if the object must be indexed...
+	IsIndex bool
+}
+
+/**
+ * Create a map[string] interface{} from array of triples.
+ */
+func FromTriples(values [][]interface{}) map[string]interface{} {
+
+	obj := make(map[string]interface{}, 0)
+	var typeName string
+	if len(values) > 0 {
+		typeName = strings.Split(values[0][0].(string), "%")[0]
+	} else {
+		return nil
+	}
+
+	storeId := strings.Split(typeName, ".")[0]
+	prototype, _ := entityManager.getEntityPrototype(typeName, storeId)
+	obj["TYPENAME"] = typeName
+
+	for i := 0; i < len(values); i++ {
+		propertie := strings.Split(values[i][1].(string), ":")[1]
+		value := values[i][2]
+		filedIndex := prototype.getFieldIndex(propertie)
+		if filedIndex != -1 {
+			fieldType := prototype.FieldsType[filedIndex]
+			if strings.HasPrefix(fieldType, "[]") {
+				if strings.HasSuffix(fieldType, ":Ref") {
+					// In case of a reference I will create an array.
+					if obj[propertie] == nil {
+						obj[propertie] = make([]string, 0)
+					}
+					if Utility.IsValidEntityReferenceName(value.(string)) {
+						obj[propertie] = append(obj[propertie].([]string), value.(string))
+					}
+				} else {
+					if strings.HasPrefix(fieldType, "[]xs.") {
+						// simple type the values are contain inside
+					} else {
+						if Utility.IsValidEntityReferenceName(value.(string)) {
+							// So here I will get the value from the store.
+							_, err := GetServer().GetEntityManager().getEntityByUuid(value.(string))
+							if err == nil {
+								if obj[propertie+"_tmp_"] == nil {
+									obj[propertie+"_tmp_"] = make([]string, 0)
+								}
+								obj[propertie+"_tmp_"] = append(obj[propertie+"_tmp_"].([]string), value.(string))
+							}
+						}
+					}
+				}
+			} else {
+				// Set the value...
+				if strings.HasSuffix(fieldType, ":Ref") {
+					obj[propertie] = value
+				} else {
+					if strings.HasPrefix(fieldType, "xs.") {
+						obj[propertie] = value
+					} else {
+						if reflect.TypeOf(value).Kind() == reflect.String {
+							if Utility.IsValidEntityReferenceName(value.(string)) {
+								_, err := GetServer().GetEntityManager().getEntityByUuid(values[i][2].(string))
+								if err == nil {
+									obj[propertie+"_tmp_"] = values[i][2].(string)
+								}
+							} else {
+								obj[propertie] = value
+							}
+						} else {
+							obj[propertie] = value
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return obj
+}
+
+/**
+ * Recursively generate Triple from structure values.
+ */
+func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
+	var uuid string
+	if values["UUID"] != nil {
+		uuid = values["UUID"].(string)
+		typeName := values["TYPENAME"].(string)
+		prototype, _ := entityManager.getEntityPrototype(typeName, strings.Split(typeName, ".")[0])
+		for k, v := range values {
+			fieldIndex := prototype.getFieldIndex(k)
+			if fieldIndex != -1 {
+				fieldType := prototype.FieldsType[fieldIndex]
+				fieldType_ := strings.Replace(fieldType, "[]", "", -1)
+				fieldType_ = strings.Replace(fieldType_, ":Ref", "", -1)
+				if strings.HasPrefix(fieldType_, "enum:") {
+					//ex: enum:AccessType_Hidden:AccessType_Public:AccessType_Restricted Here the type will be AccessType
+					fieldType_ = strings.Split(fieldType_, ":")[1]
+					fieldType_ = strings.Split(fieldType_, "_")[0]
+				}
+
+				if v != nil {
+					isIndex := Utility.Contains(prototype.Ids, k)
+					if !isIndex {
+						isIndex = Utility.Contains(prototype.Indexs, k)
+					}
+
+					if strings.HasSuffix(fieldType, ":Ref") {
+						if strings.HasPrefix(fieldType, "[]") {
+							if reflect.TypeOf(v).String() == "[]string" {
+								for i := 0; i < len(v.([]string)); i++ {
+									*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, v.([]string)[i], isIndex})
+								}
+							} else if reflect.TypeOf(v).String() == "[]interface {}" {
+								for i := 0; i < len(v.([]interface{})); i++ {
+									*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, v.([]interface{})[i].(string), isIndex})
+								}
+							}
+						} else {
+							*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, v.(string), isIndex})
+						}
+
+					} else {
+						if strings.HasPrefix(fieldType, "[]") {
+							if reflect.TypeOf(v).String() == "[]map[string]interface {}" {
+								for i := 0; i < len(v.([]map[string]interface{})); i++ {
+									if v.([]map[string]interface{})[0]["TYPENAME"] == nil {
+										ToTriples(v.([]map[string]interface{})[i], triples)
+									}
+								}
+							} else if reflect.TypeOf(v).String() == "[]interface {}" {
+								if len(v.([]interface{})) > 0 {
+									if reflect.TypeOf(v.([]interface{})[0]).String() == "map[string]interface {}" {
+										if v.([]interface{})[0].(map[string]interface{})["TYPENAME"] == nil {
+											for i := 0; i < len(v.([]interface{})); i++ {
+												ToTriples(v.([]interface{})[i].(map[string]interface{}), triples)
+											}
+										}
+									} else {
+										// a regular array here.
+										str, err := json.Marshal(v)
+										if err == nil {
+											*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, string(str), isIndex})
+										}
+									}
+								}
+							} else {
+								str, err := json.Marshal(v)
+								if err == nil {
+									*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, string(str), isIndex})
+								}
+							}
+						} else {
+							if reflect.TypeOf(v).String() == "map[string]interface {}" {
+								if v.(map[string]interface{})["TYPENAME"] == nil {
+									ToTriples(v.(map[string]interface{}), triples)
+								}
+							} else {
+								// Here I will append attribute...
+								*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, v, isIndex})
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 // Return the default Cargo Entities, create it if is not already exist.
@@ -342,7 +554,8 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 
 func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.Error) {
 	var info EntityInfo
-	info.typeName = strings.Split(uuid, "%")[0]
+	typeName := strings.Split(uuid, "%")[0]
+	info.typeName = typeName
 	info.uuid = uuid
 	info.entities = make(chan []Entity)
 	this.m_getEntityChan <- info
@@ -354,11 +567,118 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	}
 
 	// Todo get the entity from the datastore.
+	storeId := typeName[0:strings.Index(typeName, ".")]
 
-	return nil, nil
+	// So now I will retreive the list of values associated with that uuid.
+	query := "( " + uuid + " ,? ,? )"
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	results, err := store.Read(query, []interface{}{}, []interface{}{})
+	if err != nil {
+		log.Println(err)
+		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
+		return nil, errObj
+	}
+
+	// Create a triple...
+	values := FromTriples(results)
+	obj, err := Utility.InitializeStructure(values)
+
+	// So here I will retreive the entity uuid from the entity id.
+	// prototype, _ := this.getEntityPrototype(typeName, storeId)
+	var entity Entity
+
+	if err == nil {
+		entity = obj.Interface().(Entity)
+		entity.SetEntityGetter(getEntityFct)
+		// Set the entity in the cache
+		this.m_setEntityChan <- entity
+
+		// Append it sub entity...
+		for k, v := range values {
+			if strings.HasSuffix(k, "_tmp_") {
+				if reflect.TypeOf(v).Kind() == reflect.String {
+					subEntity, errObj := this.getEntityByUuid(v.(string))
+					if errObj == nil {
+						attributeName := k[0 : len(k)-5]
+						setMethodName := strings.Replace(attributeName, "M_", "", -1)
+						setMethodName = "Set" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
+						params := make([]interface{}, 1)
+						params[0] = subEntity
+						_, err_ := Utility.CallMethod(entity, setMethodName, params)
+						if err_ != nil {
+							cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
+							return nil, cargoError
+						}
+					}
+				} else {
+					for i := 0; i < len(v.([]string)); i++ {
+						subEntity, errObj := this.getEntityByUuid(v.([]string)[i])
+						if errObj == nil {
+							attributeName := k[0 : len(k)-5]
+							setMethodName := strings.Replace(attributeName, "M_", "", -1)
+							setMethodName = "Set" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
+							params := make([]interface{}, 1)
+							params[0] = subEntity
+							_, err_ := Utility.CallMethod(entity, setMethodName, params)
+							if err_ != nil {
+								cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
+								return nil, cargoError
+							}
+						}
+					}
+
+				}
+			}
+		}
+
+	} else {
+		// Dynamic entity here.
+		entity = new(DynamicEntity)
+		entity.SetEntityGetter(getEntityFct)
+
+		for k, v := range values {
+			if strings.HasSuffix(k, "_tmp_") {
+				if reflect.TypeOf(v).Kind() == reflect.String {
+					subEntity, errObj := this.getEntityByUuid(v.(string))
+					if errObj == nil {
+						values[k[0:len(k)-5]] = subEntity.(*DynamicEntity).getObject()
+					}
+				} else {
+					for i := 0; i < len(v.([]string)); i++ {
+						subEntity, errObj := this.getEntityByUuid(v.([]string)[i])
+						if errObj == nil {
+							if values[k[0:len(k)-5]] == nil {
+								values[k[0:len(k)-5]] = make([]interface{}, 0)
+							}
+
+							values[k[0:len(k)-5]] = append(values[k[0:len(k)-5]].([]interface{}), subEntity.(*DynamicEntity).getObject())
+
+						}
+					}
+				}
+
+				// Remove the _tmp_ propertie from the values.
+				delete(values, k)
+			}
+		}
+
+		// Set the values in the object.
+		entity.(*DynamicEntity).setObject(values)
+
+		// set the entity in the cache.
+		this.m_setEntityChan <- entity
+	}
+
+	entity.ResetNeedSave()
+
+	return entity, nil
 }
 
 func (this *EntityManager) getEntityById(typeName string, storeId string, ids []interface{}) (Entity, *CargoEntities.Error) {
+	if len(ids) == 0 {
+		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
+		return nil, errObj
+	}
 
 	// First I will get a look in the cash to see if the entity is already initialyse...
 	var info EntityInfo
@@ -373,116 +693,39 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 		return entities[0], nil
 	}
 
-	// TODO get the entity from the data store.
-
 	// So here I will retreive the entity uuid from the entity id.
-	var query EntityQuery
-	query.TYPENAME = typeName
-	queryStr, _ := json.Marshal(query)
+	prototype, _ := this.getEntityPrototype(typeName, storeId)
+
+	// First of all I will get the uuid...
+	fieldType := prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[1])]
+	fieldType = strings.Replace(fieldType, "[]", "", -1)
+	fieldType = strings.Replace(fieldType, ":Ref", "", -1)
+	query := "( ?, " + fieldType + ":" + prototype.Ids[1] + ", " + ids[0].(string) + ")"
 
 	// Make the query over the store...
 	store := GetServer().GetDataManager().getDataStore(storeId)
-	store.Read(string(queryStr), []interface{}{}, []interface{}{})
-
-	errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
-
-	return nil, errObj
-}
-
-/**
- * Recursively generate Triple's from structure values.
- */
-type Triple struct {
-	s interface{}
-	p interface{}
-	o interface{}
-}
-
-func ToTriples(values map[string]interface{}) ([]interface{}, error) {
-	triples := make([]interface{}, 0)
-	var uuid string
-	if values["UUID"] != nil {
-		uuid = values["UUID"].(string)
-		typeName := values["TYPENAME"].(string)
-		storeId := typeName[0:strings.Index(typeName, ".")]
-		prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
-
-		for k, v := range values {
-			if v != nil {
-				if reflect.TypeOf(v).String() == "map[string]interface {}" {
-					triples_, err := ToTriples(v.(map[string]interface{}))
-					if err == nil {
-						triples = append(triples, triples_...)
-					} else {
-						return triples, err
-					}
-				} else {
-					if strings.HasPrefix(k, "M_") {
-						fieldType := prototype.FieldsType[prototype.getFieldIndex(k)]
-						if strings.HasPrefix(fieldType, "[]") {
-							// In case of array...
-							if strings.HasSuffix(fieldType, ":Ref") {
-								if reflect.TypeOf(v).String() == "[]interface {}" {
-									for i := 0; i < len(v.([]interface{})); i++ {
-										triples = append(triples, Triple{uuid, k, v.([]interface{})[i]})
-									}
-								} else if reflect.TypeOf(v).String() == "[]string" {
-									for i := 0; i < len(v.([]string)); i++ {
-										triples = append(triples, Triple{uuid, k, v.([]string)[i]})
-									}
-								}
-							} else {
-
-								if reflect.TypeOf(v).String() == "[]interface {}" {
-									if len(v.([]interface{})) > 0 {
-										if reflect.TypeOf(v.([]interface{})[0]).String() == "map[string]interface {}" {
-											// Sub-object..
-											for i := 0; i < len(v.([]interface{})); i++ {
-												triples_, err := ToTriples(v.([]interface{})[i].(map[string]interface{}))
-												if err == nil {
-													triples = append(triples, triples_...)
-												} else {
-													return triples, err
-												}
-											}
-										}
-									}
-								} else {
-									str, err := json.Marshal(v)
-									if err == nil {
-										triples = append(triples, Triple{uuid, k, str})
-									}
-								}
-
-							}
-						} else {
-							if strings.HasSuffix(fieldType, ":Ref") {
-								if len(v.(string)) > 0 {
-									triples = append(triples, Triple{uuid, k, v.(string)})
-								}
-							} else {
-								if reflect.TypeOf(v).Kind() == reflect.String {
-									if len(v.(string)) > 0 {
-										triples = append(triples, Triple{uuid, k, v})
-									}
-								} else {
-									triples = append(triples, Triple{uuid, k, v})
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+	results, err := store.Read(query, []interface{}{}, []interface{}{})
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
+		return nil, errObj
 	}
-	log.Println("---> ", triples)
-	return triples, nil
+
+	uuid := results[0][0].(string)
+	query = "( " + uuid + " ,? ,? )"
+	results, err = store.Read(query, []interface{}{}, []interface{}{})
+	if err != nil {
+		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
+		return nil, errObj
+	}
+
+	return this.getEntityByUuid(uuid)
 }
 
 /**
  * Create an new entity.
  */
 func (this *EntityManager) createEntity(parentUuid string, attributeName string, typeName string, objectId string, entity Entity) (Entity, *CargoEntities.Error) {
+
 	// Set the entity values here.
 	entity.GetTypeName() // Set the type name if not already set...
 	entity.SetParentLnk(attributeName)
@@ -491,6 +734,7 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	// Here I will set the uuid if is not already set
 	uuid := this.GenerateEntityUUID(typeName, parentUuid, entity.Ids(), "", "")
 	entity.SetUuid(uuid)
+	entity.SetEntityGetter(getEntityFct)
 
 	storeId := typeName[0:strings.Index(typeName, ".")]
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
@@ -541,23 +785,22 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	// Here I will set the entity on the cache...
 	this.m_setEntityChan <- entity
 
-	if GetServer().GetServiceManager().m_isReady == false {
-		return entity, nil
-	}
-
 	// Now I will call the meth
-	var triples []interface{}
-	triples, err = ToTriples(values)
-
+	triples := make([]interface{}, 0)
+	err = ToTriples(values, &triples)
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
 		return nil, cargoError
 	}
 
+	// I will also append the parent relationship...
+	parentLnkTriple := Triple{entity.GetParentUuid(), entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid(), false}
+	triples = append(triples, parentLnkTriple)
+
 	// Now entity are quadify I will save it in the graph store.
 	store := GetServer().GetDataManager().getDataStore(storeId)
 
-	// So here I will simply append the quads in the database...
+	// So here I will simply append the triples in the database...
 	_, err = store.Create("", triples)
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
@@ -582,19 +825,26 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 
 	evt, _ := NewEvent(NewEntityEvent, EntityEvent, eventData)
 	GetServer().GetEventManager().BroadcastEvent(evt)
-
+	entity.ResetNeedSave()
 	return entity, nil
 }
 
 func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
+	if entity.IsNeedSave() == false {
+		return nil
+	}
+
 	typeName := entity.GetTypeName() // Set the type name if not already set...
+
 	// Here I will set the uuid if is not already set
 	if len(entity.GetUuid()) == 0 {
 		uuid := this.GenerateEntityUUID(typeName, entity.GetParentUuid(), entity.Ids(), "", "")
 		entity.SetUuid(uuid)
+		entity.SetEntityGetter(getEntityFct)
 	}
 
 	var values map[string]interface{}
+
 	var err error
 
 	if reflect.TypeOf(values).String() == "*Server.DynamicEntity" {
@@ -610,29 +860,17 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	// Here I will set the entity on the cache...
 	this.m_setEntityChan <- entity
 
-	storeId := typeName[0:strings.Index(typeName, ".")]
-
-	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
-
-	var triples []interface{}
-	triples, err = ToTriples(values)
-
+	// Here is the triple to be saved.
+	triples := make([]interface{}, 0)
+	err = ToTriples(values, &triples)
 	if err != nil {
 		cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
 		return cargoError
 	}
 
-	// Now entity are quadify I will save it in the graph store.
-	store := GetServer().GetDataManager().getDataStore(storeId)
+	storeId := typeName[0:strings.Index(typeName, ".")]
+	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 
-	// So here I will simply append the quads in the database...
-	err = store.Update("", triples, []interface{}{})
-	if err != nil {
-		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
-		return cargoError
-	}
-
-	// The event data...
 	eventData := make([]*MessageData, 2)
 	msgData0 := new(MessageData)
 	msgData0.Name = "entity"
@@ -648,9 +886,59 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	msgData1.Value = prototype
 	eventData[1] = msgData1
 
-	evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventData)
-	GetServer().GetEventManager().BroadcastEvent(evt)
+	// Now I will get the triple from the triple store and I will process triple
+	// to be append, remove or update.
+	// So now I will retreive the list of values associated with that uuid.
+	query := "( " + entity.GetUuid() + " ,? ,? )"
 
+	// Now entity are quadify I will save it in the graph store.
+	store := GetServer().GetDataManager().getDataStore(storeId)
+	existingTriples, err := store.Read(query, []interface{}{}, []interface{}{})
+	var evt *Event
+	if len(existingTriples) == 0 {
+		evt, _ = NewEvent(NewEntityEvent, EntityEvent, eventData)
+	} else {
+		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
+	}
+
+	// Remove unchanged triples
+	for j := 0; j < len(triples) && len(triples) > 0; j++ {
+		for i := 0; i < len(existingTriples) && len(existingTriples) > 0; i++ {
+			if triples[j].(Triple).Subject == existingTriples[i][0].(string) && triples[j].(Triple).Predicate == existingTriples[i][1].(string) && triples[j].(Triple).Object == existingTriples[i][2] {
+				existingTriples = append(existingTriples[0:i], existingTriples[i+1:]...)
+				triples = append(triples[0:j], triples[j+1:]...)
+				j--
+				i--
+				break
+			}
+		}
+	}
+
+	// Delete obsolete triple...
+	if len(existingTriples) > 0 {
+		toDelete := make([]interface{}, 0)
+		for i := 0; i < len(existingTriples); i++ {
+			toDelete = append(toDelete, Triple{existingTriples[i][0].(string), existingTriples[i][1].(string), existingTriples[i][2], false})
+		}
+		_, err = store.Create("", toDelete)
+		if err != nil {
+			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+			return cargoError
+		}
+	}
+
+	// Save the changed/new triples.
+	if len(triples) > 0 {
+		_, err = store.Create("", triples)
+		if err != nil {
+			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+			return cargoError
+		}
+	}
+
+	// Send update entity event here.
+	GetServer().GetEventManager().BroadcastEvent(evt)
+	entity.ResetNeedSave()
 	return nil
 }
 
@@ -678,13 +966,40 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 				cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
 				return cargoError
 			}
-
-			//log.Println("-------> entity ", entity.GetUuid(), " is now remove from ", parent.GetUuid())
 		}
 	}
 
 	// remove it from the cache.
 	this.m_removeEntityChan <- entity
+
+	var values map[string]interface{}
+	var err error
+
+	if reflect.TypeOf(values).String() == "*Server.DynamicEntity" {
+		values = entity.(*DynamicEntity).getObject()
+	} else {
+		values, err = Utility.ToMap(entity)
+		if err != nil {
+			cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
+			return cargoError
+		}
+	}
+
+	triples := make([]interface{}, 0)
+	err = ToTriples(values, &triples)
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
+		return cargoError
+	}
+
+	storeId := entity.GetTypeName()[0:strings.Index(entity.GetTypeName(), ".")]
+	store := GetServer().GetDataManager().getDataStore(storeId)
+
+	err = store.Delete("", triples)
+	if err != nil {
+		cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+		return cargoError
+	}
 
 	// Send event message...
 	var eventDatas []*MessageData
@@ -700,8 +1015,6 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	eventDatas = append(eventDatas, evtData)
 	evt, _ := NewEvent(DeleteEntityEvent, EntityEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
-
-	// TODO remove it from the database.
 
 	return nil
 }
@@ -1131,12 +1444,6 @@ func (this *EntityManager) RenameEntityPrototype(typeName string, prototype inte
 //}
 func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string, sessionId string) []*EntityPrototype {
 
-	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
-	}
-
 	if strings.Index(storeId, ".") > 0 {
 		storeId = storeId[0:strings.Index(storeId, ".")]
 	}
@@ -1208,11 +1515,6 @@ func (this *EntityManager) GetEntityPrototypes(storeId string, messageId string,
 //    )
 //}
 func (this *EntityManager) GetEntityPrototype(typeName string, storeId string, messageId string, sessionId string) *EntityPrototype {
-	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
-	}
 
 	proto, err := this.getEntityPrototype(typeName, storeId)
 	if err != nil {
@@ -1399,19 +1701,50 @@ func (this *EntityManager) CreateEntity(parentUuid string, attributeName string,
 		return nil
 	}
 
-	result, errObj := this.createEntity(parentUuid, attributeName, typeName, objectId, values.(Entity))
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
+	if reflect.TypeOf(values).String() == "map[string]interface {}" {
+		obj, err := Utility.InitializeStructure(values.(map[string]interface{}))
+		if err == nil {
+			// Here I will take assumption I got an entity...
+			// Now I will save the entity.
+			if reflect.TypeOf(obj.Interface()).String() == "Server.Entity" {
+				_, errObj = this.createEntity(parentUuid, attributeName, typeName, objectId, obj.Interface().(Entity))
+				if errObj != nil {
+					GetServer().reportErrorMessage(messageId, sessionId, errObj)
+					return nil
+				}
+				return obj.Interface().(Entity)
+			} else {
+				entity := new(DynamicEntity)
+				entity.setObject(values.(map[string]interface{}))
+				_, errObj = this.createEntity(parentUuid, attributeName, typeName, objectId, entity)
+				if errObj != nil {
+					GetServer().reportErrorMessage(messageId, sessionId, errObj)
+					return nil
+				}
+				return entity.getObject()
+			}
+		} else {
+			errObj = NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
+		}
+	} else {
+		result, errObj := this.createEntity(parentUuid, attributeName, typeName, objectId, values.(Entity))
+		if errObj != nil {
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
+		}
+		return result
 	}
 
-	// Here I will set the ownership of the entity.
-	session := GetServer().GetSessionManager().getActiveSessionById(sessionId)
-	if session != nil {
-		// this.setEntityOwner(session.GetAccountPtr(), result)
-	}
+	/*
+		result, errObj := this.createEntity(parentUuid, attributeName, typeName, objectId, values.(Entity))
+		if errObj != nil {
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
+		}
+	*/
 
-	return result
 }
 
 // @api 1.0
@@ -1470,14 +1803,44 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 		return nil
 	}
 
-	// Now I will save the entity.
-	errObj = this.saveEntity(values.(Entity))
-	if errObj != nil {
-		GetServer().reportErrorMessage(messageId, sessionId, errObj)
-		return nil
+	if reflect.TypeOf(values).String() == "map[string]interface {}" {
+		obj, err := Utility.InitializeStructure(values.(map[string]interface{}))
+		if err == nil {
+			// Here I will take assumption I got an entity...
+			// Now I will save the entity.
+			if reflect.TypeOf(obj.Interface()).String() == "Server.Entity" {
+				errObj = this.saveEntity(obj.Interface().(Entity))
+				if errObj != nil {
+					GetServer().reportErrorMessage(messageId, sessionId, errObj)
+					return nil
+				}
+				return obj.Interface().(Entity)
+			} else {
+				entity := new(DynamicEntity)
+				entity.setObject(values.(map[string]interface{}))
+				log.Println("-----> entity: ", entity)
+				errObj = this.saveEntity(entity)
+				if errObj != nil {
+					log.Println(errObj.GetBody())
+					GetServer().reportErrorMessage(messageId, sessionId, errObj)
+					return nil
+				}
+				return entity.getObject()
+			}
+		} else {
+			errObj = NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
+		}
+	} else {
+		errObj = this.saveEntity(values.(Entity))
+		if errObj != nil {
+			GetServer().reportErrorMessage(messageId, sessionId, errObj)
+			return nil
+		}
+		return values.(Entity)
 	}
 
-	return values.(Entity)
 }
 
 // @api 1.0

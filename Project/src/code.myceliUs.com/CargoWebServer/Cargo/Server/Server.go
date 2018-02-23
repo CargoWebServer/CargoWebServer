@@ -307,10 +307,6 @@ func (this *Server) reportErrorMessage(messageId string, sessionId string, error
 }
 
 /**
- *
- */
-
-/**
  * Get the server singleton.
  */
 func GetServer() *Server {

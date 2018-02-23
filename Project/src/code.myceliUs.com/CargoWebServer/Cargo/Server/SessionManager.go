@@ -109,7 +109,6 @@ func (this *SessionManager) run() {
 func (this *SessionManager) removeClosedSession() {
 
 	sessions := this.getActiveSessions()
-
 	for i := 0; i < len(sessions); i++ {
 		sessionId := sessions[i].GetId()
 		if GetServer().getConnectionById(sessionId) == nil {
@@ -117,12 +116,15 @@ func (this *SessionManager) removeClosedSession() {
 			this.closeSession(sessions[i])
 		}
 	}
-
 }
 
 func (this *SessionManager) closeSession_(session *CargoEntities.Session) *CargoEntities.Error {
 	// Delete the session entity
-	sessionEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(session.UUID)
+	if !Utility.IsValidEntityReferenceName(session.GetUuid()) {
+		return NewError(Utility.FileLine(), SESSION_UUID_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("The session with uuid '"+session.UUID+"' was not found."))
+	}
+
+	sessionEntity, errObj := GetServer().GetEntityManager().getEntityByUuid(session.GetUuid())
 
 	if errObj != nil {
 		return NewError(Utility.FileLine(), SESSION_UUID_NOT_FOUND_ERROR, SERVER_ERROR_CODE, errors.New("The session with uuid '"+session.UUID+"' was not found."))

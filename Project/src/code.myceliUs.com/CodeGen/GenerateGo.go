@@ -507,7 +507,6 @@ func generateGoMethodCode(attribute *XML_Schemas.CMOF_OwnedAttribute, owner *XML
 		getter += typeName
 	} else {
 		getter += "Get" + methodName + ref + "() "
-
 		if attribute.Upper == "*" {
 			getter += "[]"
 		}
@@ -1003,6 +1002,9 @@ func generateGoClassCode(packageId string) {
 				classStr += "/** Evaluate if an entity needs to be saved. **/\n"
 				classStr += "func (this *" + className + ") IsNeedSave() bool{\n"
 				classStr += "	return this.NeedSave\n"
+				classStr += "}\n"
+				classStr += "func (this *" + className + ") ResetNeedSave(){\n"
+				classStr += "	this.NeedSave=false\n"
 				classStr += "}\n\n"
 
 				classStr += "/** Give access to entity manager GetEntityByUuid function from Entities package. **/\n"

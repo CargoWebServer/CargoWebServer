@@ -16,6 +16,9 @@ type DynamicEntity struct {
 	/** object will be a map... **/
 	object map[string]interface{}
 
+	/** Get entity by uuid function **/
+	getEntityByUuid func(string) (interface{}, error)
+
 	/**
 	 * Use to protected the ressource access...
 	 */
@@ -168,8 +171,16 @@ func (this *DynamicEntity) GetUuid() string {
 	return "" // Can be an error here.
 }
 
-func (this *DynamicEntity) SetEntityGetter(func(uuid string) (interface{}, error)) {
+/**
+ * Each entity must have one uuid.
+ */
+func (this *DynamicEntity) ResetNeedSave() {
+	this.setValue("NeedSave", false)
+}
 
+/** Give access to entity manager GetEntityByUuid function from Entities package. **/
+func (this *DynamicEntity) SetEntityGetter(fct func(uuid string) (interface{}, error)) {
+	this.getEntityByUuid = fct
 }
 
 /**

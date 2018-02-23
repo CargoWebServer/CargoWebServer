@@ -934,7 +934,6 @@ func (this *SqlDataStore) GetEntityPrototype(id string) (*EntityPrototype, error
 		isId := values[i][3].(bool)
 		// So here I will create new field...
 		if fieldType != nil {
-
 			if !Utility.Contains(prototype.Fields, "M_"+fieldName) && Utility.IsValidVariableName(fieldName) {
 				prototype.FieldsOrder = append(prototype.FieldsOrder, len(prototype.FieldsOrder))
 				prototype.Fields = append(prototype.Fields, "M_"+fieldName)
@@ -1003,7 +1002,6 @@ func (this *SqlDataStore) getSchemaId(name string) (string, error) {
 
 	if this.m_vendor == Config.DataStoreVendor_ODBC {
 		var query string
-
 		query = "SELECT SCHEMA_NAME(schema_id)"
 		query += "AS SchemaTable "
 		query += "FROM sys.tables "
@@ -1232,7 +1230,6 @@ func (this *SqlDataStore) setRefs() error {
 
 	// Keep association values temporary...
 	associations := make(map[string][][]interface{}, 0)
-
 	if len(values) > 0 {
 		for i := 0; i < len(values); i++ {
 			refName := values[i][0].(string)
@@ -1314,6 +1311,7 @@ func (this *SqlDataStore) setRefs() error {
 		for i := 0; i < len(associations_); i++ {
 			refName := associations_[i][0].(string)
 			trg, _ := GetServer().GetEntityManager().getEntityPrototype(associations_[i][1].(*EntityPrototype).TypeName, "sql_info")
+			log.Println("---> ", trg)
 			if !Utility.Contains(associativeTable.Fields, "M_"+refName) {
 				fieldType := trg.TypeName
 				fieldType = fieldType + ":Ref" // Associative table contain only references.

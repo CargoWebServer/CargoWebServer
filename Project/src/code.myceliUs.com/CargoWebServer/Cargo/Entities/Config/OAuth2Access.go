@@ -105,6 +105,9 @@ func (this *OAuth2Access) SetParentLnk(parentLnk string){
 func (this *OAuth2Access) IsNeedSave() bool{
 	return this.NeedSave
 }
+func (this *OAuth2Access) ResetNeedSave(){
+	this.NeedSave=false
+}
 
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *OAuth2Access) SetEntityGetter(fct func(uuid string)(interface{}, error)){

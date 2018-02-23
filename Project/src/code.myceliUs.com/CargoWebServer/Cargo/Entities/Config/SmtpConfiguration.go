@@ -99,6 +99,9 @@ func (this *SmtpConfiguration) SetParentLnk(parentLnk string){
 func (this *SmtpConfiguration) IsNeedSave() bool{
 	return this.NeedSave
 }
+func (this *SmtpConfiguration) ResetNeedSave(){
+	this.NeedSave=false
+}
 
 /** Give access to entity manager GetEntityByUuid function from Entities package. **/
 func (this *SmtpConfiguration) SetEntityGetter(fct func(uuid string)(interface{}, error)){

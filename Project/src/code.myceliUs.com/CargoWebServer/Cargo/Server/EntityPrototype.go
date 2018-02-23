@@ -205,10 +205,8 @@ func (this *EntityPrototype) setSuperTypeFields() {
 		}
 	} else {
 		for i := 0; i < len(this.SuperTypeNames); i++ {
-
 			superTypeName := this.SuperTypeNames[i]
 			superPrototype, err := GetServer().GetEntityManager().getEntityPrototype(superTypeName, superTypeName[0:strings.Index(superTypeName, ".")])
-
 			if err == nil {
 				// I will merge the fields
 				// The first to fields are always the uuid, parentUuid, parentLnk and the last is the childUuids and referenced
@@ -266,7 +264,6 @@ func (this *EntityPrototype) setSuperTypeFields() {
 					if !Utility.Contains(superPrototype.SubstitutionGroup, this.TypeName) {
 						superPrototype.SubstitutionGroup = append(superPrototype.SubstitutionGroup, this.TypeName)
 						// save it to it store...
-						log.Println("------> save ", superTypeName)
 						store := GetServer().GetDataManager().getDataStore(superTypeName[0:strings.Index(superTypeName, ".")])
 						store.SaveEntityPrototype(superPrototype)
 					}
