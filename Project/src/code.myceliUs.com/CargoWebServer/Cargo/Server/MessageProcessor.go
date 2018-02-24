@@ -144,8 +144,7 @@ func (this *MessageProcessor) run() {
 }
 
 /**
- * That function determine the max message size, it limit the size of message
- * transfert over the network.
+ * That function determine the max message size
  */
 func getMaxMessageSize() int {
 	return 17740

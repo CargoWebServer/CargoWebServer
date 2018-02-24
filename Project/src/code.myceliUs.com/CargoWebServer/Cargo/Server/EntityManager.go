@@ -238,7 +238,7 @@ func newEntityManager() *EntityManager {
 							getterName = "Get" + strings.ToUpper(getterName[0:1]) + getterName[1:] + "Str"
 							refs_, err = Utility.CallMethod(entity, getterName, []interface{}{})
 						}
-						if err == nil {
+						if err == nil && refs_ != nil {
 							if reflect.TypeOf(refs_).Kind() == reflect.String {
 								refs = append(refs, refs_.(string))
 							} else if reflect.TypeOf(refs_).String() == "[]string" {
@@ -344,7 +344,7 @@ func FromTriples(values [][]interface{}) map[string]interface{} {
 	obj["TYPENAME"] = typeName
 
 	for i := 0; i < len(values); i++ {
-		propertie := strings.Split(values[i][1].(string), ":")[1]
+		propertie := strings.Split(values[i][1].(string), ":")[2]
 		value := values[i][2]
 		filedIndex := prototype.getFieldIndex(propertie)
 		if filedIndex != -1 {
@@ -418,6 +418,8 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 				fieldType := prototype.FieldsType[fieldIndex]
 				fieldType_ := strings.Replace(fieldType, "[]", "", -1)
 				fieldType_ = strings.Replace(fieldType_, ":Ref", "", -1)
+
+				// Satic entity enum type.
 				if strings.HasPrefix(fieldType_, "enum:") {
 					//ex: enum:AccessType_Hidden:AccessType_Public:AccessType_Restricted Here the type will be AccessType
 					fieldType_ = strings.Split(fieldType_, ":")[1]
@@ -434,15 +436,15 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 						if strings.HasPrefix(fieldType, "[]") {
 							if reflect.TypeOf(v).String() == "[]string" {
 								for i := 0; i < len(v.([]string)); i++ {
-									*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, v.([]string)[i], isIndex})
+									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]string)[i], isIndex})
 								}
 							} else if reflect.TypeOf(v).String() == "[]interface {}" {
 								for i := 0; i < len(v.([]interface{})); i++ {
-									*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, v.([]interface{})[i].(string), isIndex})
+									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]interface{})[i].(string), isIndex})
 								}
 							}
 						} else {
-							*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, v.(string), isIndex})
+							*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.(string), isIndex})
 						}
 
 					} else {
@@ -465,14 +467,14 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 										// a regular array here.
 										str, err := json.Marshal(v)
 										if err == nil {
-											*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, string(str), isIndex})
+											*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str), isIndex})
 										}
 									}
 								}
 							} else {
 								str, err := json.Marshal(v)
 								if err == nil {
-									*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, string(str), isIndex})
+									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, string(str), isIndex})
 								}
 							}
 						} else {
@@ -482,7 +484,7 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 								}
 							} else {
 								// Here I will append attribute...
-								*triples = append(*triples, Triple{uuid, fieldType_ + ":" + k, v, isIndex})
+								*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v, isIndex})
 							}
 						}
 					}
@@ -587,7 +589,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	// prototype, _ := this.getEntityPrototype(typeName, storeId)
 	var entity Entity
 
-	if err == nil {
+	if reflect.TypeOf(obj.Interface()).String() != "map[string]interface {}" {
 		entity = obj.Interface().(Entity)
 		entity.SetEntityGetter(getEntityFct)
 		// Set the entity in the cache
@@ -635,7 +637,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 		// Dynamic entity here.
 		entity = new(DynamicEntity)
 		entity.SetEntityGetter(getEntityFct)
-
+		entity.(*DynamicEntity).setObject(values)
 		for k, v := range values {
 			if strings.HasSuffix(k, "_tmp_") {
 				if reflect.TypeOf(v).Kind() == reflect.String {
@@ -662,9 +664,6 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 			}
 		}
 
-		// Set the values in the object.
-		entity.(*DynamicEntity).setObject(values)
-
 		// set the entity in the cache.
 		this.m_setEntityChan <- entity
 	}
@@ -676,7 +675,7 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 
 func (this *EntityManager) getEntityById(typeName string, storeId string, ids []interface{}) (Entity, *CargoEntities.Error) {
 	if len(ids) == 0 {
-		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
+		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("No ids given!"))
 		return nil, errObj
 	}
 
@@ -700,25 +699,92 @@ func (this *EntityManager) getEntityById(typeName string, storeId string, ids []
 	fieldType := prototype.FieldsType[prototype.getFieldIndex(prototype.Ids[1])]
 	fieldType = strings.Replace(fieldType, "[]", "", -1)
 	fieldType = strings.Replace(fieldType, ":Ref", "", -1)
-	query := "( ?, " + fieldType + ":" + prototype.Ids[1] + ", " + ids[0].(string) + ")"
-
+	query := "( ?, " + typeName + ":" + fieldType + ":" + prototype.Ids[1] + ", " + ids[0].(string) + ")"
+	log.Println("---->  ", query)
 	// Make the query over the store...
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(query, []interface{}{}, []interface{}{})
 	if err != nil {
-		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
+		var idsStr string
+		for i := 0; i < len(ids); i++ {
+			idsStr += Utility.ToString(ids[i])
+			if i < len(ids)-1 && i > 0 {
+				idsStr += ", "
+			}
+		}
+		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity with id(s) "+idsStr))
+		log.Println(errObj.GetBody())
 		return nil, errObj
 	}
 
 	uuid := results[0][0].(string)
-	query = "( " + uuid + " ,? ,? )"
-	results, err = store.Read(query, []interface{}{}, []interface{}{})
-	if err != nil {
-		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
-		return nil, errObj
-	}
+
+	// log.Println("----> found entity: ", uuid)
 
 	return this.getEntityByUuid(uuid)
+}
+
+func (this *EntityManager) setParent(entity Entity, triples *[]interface{}) *CargoEntities.Error {
+	var parent Entity
+	var cargoError *CargoEntities.Error
+	var parentPrototype *EntityPrototype
+	// Get values as map[string]interface{} and also set the entity in it parent.
+	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+		parent, cargoError = this.getEntityByUuid(entity.GetParentUuid())
+		if cargoError != nil {
+			return cargoError
+		}
+
+		parentPrototype, _ = GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
+		fieldType := parentPrototype.FieldsType[parentPrototype.getFieldIndex(entity.GetParentLnk())]
+		if strings.HasPrefix(fieldType, "[]") {
+			parent.(*DynamicEntity).appendValue(entity.GetParentLnk(), entity.(*DynamicEntity).getObject())
+		} else {
+			parent.(*DynamicEntity).setValue(entity.GetParentLnk(), entity.(*DynamicEntity).getObject())
+		}
+	} else {
+
+		parent, cargoError = this.getEntityByUuid(entity.GetParentUuid())
+		if cargoError != nil {
+			return cargoError
+		}
+		parentPrototype, _ = GetServer().GetEntityManager().getEntityPrototype(parent.GetTypeName(), parent.GetTypeName()[0:strings.Index(parent.GetTypeName(), ".")])
+		setMethodName := strings.Replace(entity.GetParentLnk(), "M_", "", -1)
+		setMethodName = "Set" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
+		params := make([]interface{}, 1)
+		params[0] = entity
+		_, err_ := Utility.CallMethod(parent, setMethodName, params)
+		if err_ != nil {
+			log.Println("fail to call method ", setMethodName, " on ", parent)
+			cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
+			return cargoError
+		}
+	}
+
+	// I will also append the parent relationship...
+	parentLnkTriple := Triple{parent.GetUuid(), parent.GetTypeName() + ":" + entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid(), false}
+	*triples = append(*triples, parentLnkTriple)
+
+	// The event data...
+	eventData := make([]*MessageData, 2)
+	msgData0 := new(MessageData)
+	msgData0.Name = "entity"
+	if reflect.TypeOf(parent).String() == "*Server.DynamicEntity" {
+		msgData0.Value = parent.(*DynamicEntity).getObject()
+	} else {
+		msgData0.Value = parent
+	}
+	eventData[0] = msgData0
+
+	msgData1 := new(MessageData)
+	msgData1.Name = "prototype"
+	msgData1.Value = parentPrototype
+	eventData[1] = msgData1
+
+	evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventData)
+	GetServer().GetEventManager().BroadcastEvent(evt)
+
+	return nil
 }
 
 /**
@@ -743,38 +809,11 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	// if not already set.
 	var values map[string]interface{}
 	var err error
-	// Get values as map[string]interface{} and also set the entity in it parent.
-	if reflect.TypeOf(values).String() == "*Server.DynamicEntity" {
-		parent, cargoError := this.getEntityByUuid(parentUuid)
-		if cargoError != nil {
-			return nil, cargoError
-		}
 
-		fieldType := prototype.FieldsType[prototype.getFieldIndex(attributeName)]
-		if strings.HasPrefix(fieldType, "[]") {
-			parent.(*DynamicEntity).appendValue(attributeName, entity.(*DynamicEntity).getObject())
-		} else {
-			parent.(*DynamicEntity).setValue(attributeName, entity.(*DynamicEntity).getObject())
-		}
+	// Get values as map[string]interface{} and also set the entity in it parent.
+	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
 		values = entity.(*DynamicEntity).getObject()
 	} else {
-
-		parent, cargoError := this.getEntityByUuid(parentUuid)
-		if cargoError != nil {
-			return nil, cargoError
-		}
-
-		setMethodName := strings.Replace(attributeName, "M_", "", -1)
-		setMethodName = "Set" + strings.ToUpper(setMethodName[0:1]) + setMethodName[1:]
-		params := make([]interface{}, 1)
-		params[0] = entity
-		_, err_ := Utility.CallMethod(parent, setMethodName, params)
-		if err_ != nil {
-			log.Println("fail to call method ", setMethodName, " on ", parent)
-			cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
-			return nil, cargoError
-		}
-
 		values, err = Utility.ToMap(entity)
 		if err != nil {
 			cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
@@ -793,9 +832,11 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 		return nil, cargoError
 	}
 
-	// I will also append the parent relationship...
-	parentLnkTriple := Triple{entity.GetParentUuid(), entity.GetTypeName() + ":" + entity.GetParentLnk(), entity.GetUuid(), false}
-	triples = append(triples, parentLnkTriple)
+	// I will set the entity parent.
+	cargoError := this.setParent(entity, &triples)
+	if cargoError != nil {
+		return nil, cargoError
+	}
 
 	// Now entity are quadify I will save it in the graph store.
 	store := GetServer().GetDataManager().getDataStore(storeId)
@@ -826,6 +867,7 @@ func (this *EntityManager) createEntity(parentUuid string, attributeName string,
 	evt, _ := NewEvent(NewEntityEvent, EntityEvent, eventData)
 	GetServer().GetEventManager().BroadcastEvent(evt)
 	entity.ResetNeedSave()
+
 	return entity, nil
 }
 
@@ -846,7 +888,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 
 	var err error
 
-	if reflect.TypeOf(values).String() == "*Server.DynamicEntity" {
+	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
 		values = entity.(*DynamicEntity).getObject()
 	} else {
 		values, err = Utility.ToMap(entity)
@@ -865,6 +907,15 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		cargoError := NewError(Utility.FileLine(), ENTITY_TO_QUADS_ERROR, SERVER_ERROR_CODE, err)
 		return cargoError
 	}
+
+	// Set parent entity stuff...
+	if len(entity.GetParentUuid()) > 0 {
+		cargoError := this.setParent(entity, &triples)
+		if cargoError != nil {
+			return cargoError
+		}
+	}
+
 	storeId := typeName[0:strings.Index(typeName, ".")]
 	prototype, _ := GetServer().GetEntityManager().getEntityPrototype(typeName, storeId)
 
@@ -897,6 +948,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 	} else {
 		evt, _ = NewEvent(UpdateEntityEvent, EntityEvent, eventData)
 	}
+
 	// Remove unchanged triples
 	for j := 0; j < len(triples) && len(triples) > 0; j++ {
 		for i := 0; i < len(existingTriples) && len(existingTriples) > 0; i++ {
@@ -909,6 +961,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 			}
 		}
 	}
+
 	// Delete obsolete triple...
 	if len(existingTriples) > 0 {
 		toDelete := make([]interface{}, 0)
@@ -921,6 +974,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 			return cargoError
 		}
 	}
+
 	// Save the changed/new triples.
 	if len(triples) > 0 {
 		_, err = store.Create("", triples)
@@ -961,6 +1015,20 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 				return cargoError
 			}
 		}
+
+		// Update the parent here.
+		var eventDatas []*MessageData
+		evtData := new(MessageData)
+		evtData.TYPENAME = "Server.MessageData"
+		evtData.Name = "entity"
+		if reflect.TypeOf(parent).String() == "*Server.DynamicEntity" {
+			evtData.Value = parent.(*DynamicEntity).getObject()
+		} else {
+			evtData.Value = parent
+		}
+		eventDatas = append(eventDatas, evtData)
+		evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventDatas)
+		GetServer().GetEventManager().BroadcastEvent(evt)
 	}
 
 	// remove it from the cache.
@@ -1005,7 +1073,6 @@ func (this *EntityManager) deleteEntity(entity Entity) *CargoEntities.Error {
 	} else {
 		evtData.Value = entity
 	}
-
 	eventDatas = append(eventDatas, evtData)
 	evt, _ := NewEvent(DeleteEntityEvent, EntityEvent, eventDatas)
 	GetServer().GetEventManager().BroadcastEvent(evt)
@@ -2123,6 +2190,10 @@ func (this *EntityManager) GetEntityByUuid(uuid string, messageId string, sessio
 		return nil
 	}
 
+	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+		return entity.(*DynamicEntity).getObject()
+	}
+
 	return entity
 }
 
@@ -2228,6 +2299,11 @@ func (this *EntityManager) GetEntityById(typeName string, storeId string, ids []
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)
 		return nil
 	}
+
+	if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+		return entity.(*DynamicEntity).getObject()
+	}
+
 	return entity
 }
 

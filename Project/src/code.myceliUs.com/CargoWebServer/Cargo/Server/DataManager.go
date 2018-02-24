@@ -51,7 +51,6 @@ func newDataManager() *DataManager {
 	// Register dynamic type here...
 	dataManager := new(DataManager)
 	dataManager.m_dataStores = make(map[string]DataStore)
-
 	dataManager.m_dataStoreChan = make(chan map[string]interface{}, 0)
 	// Concurrency...
 	go func() {
@@ -152,7 +151,7 @@ func (this *DataManager) appendDefaultDataStore(config *Config.DataStoreConfigur
 }
 
 /**
- * Access a store with here given name...
+ * Access Map functions...
  */
 func (this *DataManager) getDataStore(id string) DataStore {
 	arguments := make(map[string]interface{})
@@ -180,9 +179,6 @@ func (this *DataManager) setDataStore(store DataStore) {
 	this.m_dataStoreChan <- arguments
 }
 
-/**
- * Remove a dataStore from the map
- */
 func (this *DataManager) removeDataStore(id string) {
 	arguments := make(map[string]interface{})
 	arguments["storeId"] = id
@@ -1090,6 +1086,7 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 
 	// Now I can save it.
 	for i := 0; i < len(entities); i++ {
+		//log.Println("---> create: ", entities[i])
 		GetServer().GetEntityManager().saveEntity(entities[i])
 	}
 

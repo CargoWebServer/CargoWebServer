@@ -78,7 +78,7 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 	if store.m_ipv4 == "127.0.0.1" {
 		store.m_path = GetServer().GetConfigurationManager().GetDataPath() + "/" + store.m_id
 		if _, err := os.Stat(store.m_path); os.IsNotExist(err) {
-			os.Mkdir(store.m_path, 777)
+			os.Mkdir(store.m_path, 0700)
 		}
 	}
 
@@ -87,7 +87,7 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 	}
 
 	// Now I will open the db.
-	store.m_index, err = bolt.Open(store.m_path+"/"+store.m_id+".db", 0777, nil)
+	store.m_index, err = bolt.Open(store.m_path+"/"+store.m_id+".db", 0700, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -1060,6 +1060,7 @@ func (this *GraphStore) Create(queryStr string, triples []interface{}) (lastId i
 
 	// So here I will index the triple...
 	for i := 0; i < len(triples); i++ {
+		//log.Println("---> save triple: ", triples[i])
 		// This will contain the value of the triple.
 		triple := triples[i].(Triple)
 		data, err := json.Marshal(&triple)
@@ -1135,8 +1136,9 @@ func (this *GraphStore) index(key string, uuid string, bucketId string) error {
 func (this *GraphStore) removeIndex(key string, uuid string, bucketId string) error {
 	return this.m_index.Update(func(key string, uuid string, bucketId string) func(tx *bolt.Tx) error {
 		return func(tx *bolt.Tx) error {
-			b, err := tx.CreateBucketIfNotExists([]byte(bucketId))
-			if err == nil {
+			b := tx.Bucket([]byte(bucketId))
+			var err error
+			if b != nil {
 				v := b.Get([]byte(key))
 				v = []byte(strings.Replace(string(v), ":"+uuid, "", -1))
 				v = []byte(strings.Replace(string(v), uuid, "", -1))
