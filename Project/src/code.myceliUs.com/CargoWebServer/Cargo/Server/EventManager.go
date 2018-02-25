@@ -5,7 +5,6 @@ import (
 
 	"log"
 	"regexp"
-	"sync"
 
 	"code.myceliUs.com/CargoWebServer/Cargo/Entities/CargoEntities"
 	"code.myceliUs.com/Utility"
@@ -73,8 +72,8 @@ type EventManager struct {
 	m_channels     map[string]*EventChannel
 	m_eventDataMap map[*Event]string
 
-	// Use it to synchronize ressources.
-	sync.Mutex
+	// Concurent map access.
+	m_opChannel chan map[string]interface{}
 }
 
 var eventManager *EventManager
@@ -92,6 +91,85 @@ func (this *Server) GetEventManager() *EventManager {
 func newEventManager() *EventManager {
 	eventManager := new(EventManager)
 	eventManager.m_channels = make(map[string]*EventChannel, 0)
+	eventManager.m_opChannel = make(chan map[string]interface{}, 0)
+
+	// Concurrency...
+	go func() {
+		for {
+			select {
+			case op := <-eventManager.m_opChannel:
+				if op["op"] == "appendEventData" {
+					dataStr := op["dataStr"].(string)
+					evt := op["evt"].(*Event)
+					if eventManager.m_eventDataMap != nil {
+						eventManager.m_eventDataMap[evt] = dataStr
+					}
+				} else if op["op"] == "getEventData" {
+					op["result"].(chan string) <- eventManager.m_eventDataMap[op["evt"].(*Event)]
+				} else if op["op"] == "removeClosedListener" {
+					for _, channel := range eventManager.m_channels {
+						for _, listener := range channel.m_listeners {
+							if listener.m_addr.IsOpen() == false {
+								channel.removeEventListener(listener)
+							}
+						}
+						if len(channel.m_listeners) == 0 {
+							delete(eventManager.m_channels, channel.m_eventName)
+						}
+					}
+				} else if op["op"] == "BroadcastEvent" {
+					evt := op["evt"].(*Event)
+					channel := eventManager.m_channels[evt.GetName()]
+					if channel != nil {
+						channel.broadcastEvent(evt)
+					}
+					delete(eventManager.m_eventDataMap, evt)
+				} else if op["op"] == "BroadcastEventTo" {
+					evt := op["evt"].(*Event)
+					to := op["to"].(*CargoEntities.Account)
+					channel := eventManager.m_channels[evt.GetName()]
+					if channel != nil {
+						channel.broadcastEventTo(evt, to)
+					}
+				} else if op["op"] == "AddEventListener" {
+					listener := op["listener"].(*EventListener)
+					channel := eventManager.m_channels[listener.getEventName()]
+
+					if eventManager.m_channels[listener.getEventName()] == nil {
+						channel = new(EventChannel)
+						channel.m_eventName = listener.getEventName()
+						channel.m_listeners = make(map[string]*EventListener, 0)
+						eventManager.m_channels[channel.m_eventName] = channel
+					}
+
+					// append the listener
+					channel.m_listeners[listener.getId()] = listener
+				} else if op["op"] == "RemoveEventListener" {
+					id := op["id"].(string)
+					name := op["name"].(string)
+
+					// Remove the listener
+					listener := eventManager.m_channels[name].m_listeners[id]
+					eventManager.m_channels[name].removeEventListener(listener)
+
+					// if the channel is empty remove the channel...
+					if len(eventManager.m_channels) == 0 {
+						delete(eventManager.m_channels, name)
+					}
+				} else if op["op"] == "AppendEventFilter" {
+					filter := op["filter"].(string)
+					channelId := op["channelId"].(string)
+					sessionId := op["sessionId"].(string)
+					if eventManager.m_channels[channelId] != nil {
+						listener := eventManager.m_channels[channelId].m_listeners[sessionId]
+						if listener != nil {
+							listener.appendFilter(filter)
+						}
+					}
+				}
+			}
+		}
+	}()
 	return eventManager
 }
 
@@ -125,41 +203,33 @@ func (this *EventManager) stop() {
  * 	Append event data to the m_eventDataMap
  */
 func (this *EventManager) appendEventData(evt *Event, dataStr string) {
-	this.Lock()
-	defer this.Unlock()
-
-	// No event need to be sent if the map is not initialyse...
-	if this.m_eventDataMap != nil {
-		this.m_eventDataMap[evt] = dataStr
-	}
+	arguments := make(map[string]interface{})
+	arguments["op"] = "appendEventData"
+	arguments["dataStr"] = dataStr
+	arguments["evt"] = evt
+	this.m_opChannel <- arguments
 }
 
 /**
  * 	Get an event string
  */
 func (this *EventManager) getEventData(evt *Event) string {
-	this.Lock()
-	defer this.Unlock()
-	return this.m_eventDataMap[evt]
+	arguments := make(map[string]interface{})
+	arguments["op"] = "getEventData"
+	arguments["evt"] = evt
+	result := make(chan string)
+	arguments["result"] = result
+	this.m_opChannel <- arguments
+	return <-result
 }
 
 /**
  * Remove close listener when one connection is close...
  */
 func (this *EventManager) removeClosedListener() {
-	this.Lock()
-	defer this.Unlock()
-
-	for _, channel := range this.m_channels {
-		for _, listener := range channel.m_listeners {
-			if listener.m_addr.IsOpen() == false {
-				channel.removeEventListener(listener)
-			}
-		}
-		if len(channel.m_listeners) == 0 {
-			delete(this.m_channels, channel.m_eventName)
-		}
-	}
+	arguments := make(map[string]interface{})
+	arguments["op"] = "removeClosedListener"
+	this.m_opChannel <- arguments
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,42 +249,7 @@ type EventListener struct {
 
 	m_filters []string
 
-	sync.Mutex
-}
-
-/**
- * Append a new filter
- */
-func (this *EventListener) appendFilter(filter string) {
-	this.Lock()
-	defer this.Unlock()
-	if !Utility.Contains(this.m_filters, filter) {
-		this.m_filters = append(this.m_filters, filter)
-	}
-}
-
-/**
- * Remove a filter
- */
-func (this *EventListener) removeFilter(filter string) {
-	this.Lock()
-	defer this.Unlock()
-	var filters []string
-	for _, f := range this.m_filters {
-		if f != filter {
-			filters = append(filters, f)
-		}
-	}
-	this.m_filters = filters
-}
-
-/**
- * Get a filter by index
- */
-func (this *EventListener) GetFilter(index int) string {
-	this.Lock()
-	defer this.Unlock()
-	return this.m_filters[index]
+	m_opChannel chan map[string]interface{}
 }
 
 /**
@@ -225,7 +260,68 @@ func NewEventListener(eventName string, conn *WebSocketConnection) *EventListene
 	listner.m_addr = conn
 	listner.m_eventName = eventName
 	listner.m_id = conn.GetUuid()
+
+	listner.m_opChannel = make(chan map[string]interface{}, 0)
+
+	// Concurrency...
+	go func() {
+		for {
+			select {
+			case op := <-listner.m_opChannel:
+				if op["op"] == "appendFilter" {
+					filter := op["filter"].(string)
+					if !Utility.Contains(listner.m_filters, filter) {
+						listner.m_filters = append(listner.m_filters, filter)
+					}
+				} else if op["op"] == "removeFilter" {
+					filter := op["filter"].(string)
+					var filters []string
+					for _, f := range listner.m_filters {
+						if f != filter {
+							filters = append(filters, f)
+						}
+					}
+					listner.m_filters = filters
+				} else if op["op"] == "GetFilter" {
+					op["result"].(chan string) <- listner.m_filters[op["index"].(int)]
+				}
+			}
+		}
+	}()
 	return listner
+}
+
+/**
+ * Append a new filter
+ */
+func (this *EventListener) appendFilter(filter string) {
+	arguments := make(map[string]interface{})
+	arguments["op"] = "appendFilter"
+	arguments["filter"] = filter
+	this.m_opChannel <- arguments
+}
+
+/**
+ * Remove a filter
+ */
+func (this *EventListener) removeFilter(filter string) {
+	arguments := make(map[string]interface{})
+	arguments["op"] = "removeFilter"
+	arguments["filter"] = filter
+	this.m_opChannel <- arguments
+}
+
+/**
+ * Get a filter by index
+ */
+func (this *EventListener) GetFilter(index int) string {
+	arguments := make(map[string]interface{})
+	arguments["op"] = "GetFilter"
+	arguments["index"] = index
+	result := make(chan string)
+	arguments["result"] = result
+	this.m_opChannel <- arguments
+	return <-result
 }
 
 // The uuid
@@ -355,14 +451,10 @@ func (this *EventManager) OnEvent(evt interface{}) {
 // @scope {hidden}
 func (this *EventManager) BroadcastEvent(evt *Event) {
 	// Broadcast event over listener over the channel.
-	this.Lock()
-	defer this.Unlock()
-
-	channel := this.m_channels[evt.GetName()]
-	if channel != nil {
-		channel.broadcastEvent(evt)
-	}
-	delete(this.m_eventDataMap, evt)
+	arguments := make(map[string]interface{})
+	arguments["op"] = "BroadcastEvent"
+	arguments["evt"] = evt
+	this.m_opChannel <- arguments
 }
 
 // @api 1.0
@@ -371,13 +463,12 @@ func (this *EventManager) BroadcastEvent(evt *Event) {
 // @param {*CargoEntities.Account} to The target account
 // @scope {hidden}
 func (this *EventManager) BroadcastEventTo(evt *Event, to *CargoEntities.Account) {
-	this.Lock()
-	defer this.Unlock()
 	// Broadcast event over listener over the channel.
-	channel := this.m_channels[evt.GetName()]
-	if channel != nil {
-		channel.broadcastEventTo(evt, to)
-	}
+	arguments := make(map[string]interface{})
+	arguments["op"] = "BroadcastEventTo"
+	arguments["evt"] = evt
+	arguments["to"] = to
+	this.m_opChannel <- arguments
 }
 
 // @api 1.0
@@ -385,20 +476,11 @@ func (this *EventManager) BroadcastEventTo(evt *Event, to *CargoEntities.Account
 // @param {*Server.EventListener} The event listener to append.
 // @scope {public}
 func (this *EventManager) AddEventListener(listener *EventListener) {
-	this.Lock()
-	defer this.Unlock()
 	// Create the channel if is not exist
-	channel := this.m_channels[listener.getEventName()]
-
-	if this.m_channels[listener.getEventName()] == nil {
-		channel = new(EventChannel)
-		channel.m_eventName = listener.getEventName()
-		channel.m_listeners = make(map[string]*EventListener, 0)
-		this.m_channels[channel.m_eventName] = channel
-	}
-
-	// append the listener
-	channel.m_listeners[listener.getId()] = listener
+	arguments := make(map[string]interface{})
+	arguments["op"] = "AddEventListener"
+	arguments["listener"] = listener
+	this.m_opChannel <- arguments
 }
 
 // @api 1.0
@@ -407,16 +489,11 @@ func (this *EventManager) AddEventListener(listener *EventListener) {
 // @param {string} name The name of the channel where the listner lisen to.
 // @scope {public}
 func (this *EventManager) RemoveEventListener(id string, name string) {
-	this.Lock()
-	defer this.Unlock()
-	// Remove the listener
-	listener := this.m_channels[name].m_listeners[id]
-	this.m_channels[name].removeEventListener(listener)
-
-	// if the channel is empty remove the channel...
-	if len(this.m_channels) == 0 {
-		delete(this.m_channels, name)
-	}
+	arguments := make(map[string]interface{})
+	arguments["op"] = "RemoveEventListener"
+	arguments["id"] = id
+	arguments["name"] = name
+	this.m_opChannel <- arguments
 }
 
 // @api 1.0
@@ -454,10 +531,10 @@ func (this *EventManager) BroadcastEventData(eventNumber int64, channelId string
 // @scope {public}
 func (this *EventManager) AppendEventFilter(filter string, channelId string, messageId string, sessionId string) {
 	//log.Println("append event filter ", filter, " for type ", eventType, " to session ", sessionId)
-	if this.m_channels[channelId] != nil {
-		listener := this.m_channels[channelId].m_listeners[sessionId]
-		if listener != nil {
-			listener.appendFilter(filter)
-		}
-	}
+	arguments := make(map[string]interface{})
+	arguments["op"] = "AppendEventFilter"
+	arguments["filter"] = filter
+	arguments["channelId"] = channelId
+	arguments["sessionId"] = sessionId
+	this.m_opChannel <- arguments
 }

@@ -1030,16 +1030,14 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 	if infos.DataStoreConfig.M_dataStoreType == Config.DataStoreType_SQL_STORE {
 		store = this.getDataStore("sql_info")
 	} else {
-		hasDataStore := this.HasDataStore(infos.DataStoreConfig.M_id, messageId, sessionId)
-		if !hasDataStore {
-			// Here I will create the new data store.
+		store = this.getDataStore(infos.DataStoreConfig.M_id)
+		if store == nil {
 			var cargoError *CargoEntities.Error
 			store, cargoError = this.createDataStore(infos.DataStoreConfig.M_id, infos.DataStoreConfig.M_storeName, infos.DataStoreConfig.M_hostName, infos.DataStoreConfig.M_ipv4, infos.DataStoreConfig.M_port, infos.DataStoreConfig.M_dataStoreType, infos.DataStoreConfig.M_dataStoreVendor)
 			if cargoError != nil {
 				GetServer().reportErrorMessage(messageId, sessionId, cargoError)
+				return
 			}
-		} else {
-			store = this.getDataStore(infos.DataStoreConfig.M_id)
 		}
 	}
 
