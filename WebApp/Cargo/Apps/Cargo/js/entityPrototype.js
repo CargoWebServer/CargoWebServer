@@ -4,8 +4,7 @@
  * other data source like xml schema. It's also possible to create at runtime
  * new kind of entity and make query over it.
  * </br>note: Fields, FieldsType, FieldsDocumentation, FieldsNillable and FieldsOrder 
- * must have the same number of elements.
- * @constructor 
+ * must have the same number of elements. * @constructor 
  */
 var EntityPrototype = function () {
     /**

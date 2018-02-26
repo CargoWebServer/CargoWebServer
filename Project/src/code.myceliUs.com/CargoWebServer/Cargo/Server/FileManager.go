@@ -572,15 +572,21 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 			filepath := file.GetPath()
 			err = ioutil.WriteFile(this.root+"/"+filepath+"/"+filename, filedata, 0644)
 			if err != nil {
+				log.Println("---> fail to write file: ", this.root+"/"+filepath+"/"+filename, err)
 				return err
 			}
 		} else {
 			// Set the new data...
 			file.SetData(filedata)
 		}
+
 		file.SetChecksum(checksum)
-		GetServer().GetEntityManager().saveEntity(fileEntity)
-		log.Println("---------> save file ", file.GetName())
+		file.NeedSave = true
+		err := GetServer().GetEntityManager().saveEntity(file)
+		if err != nil {
+			log.Println("---> save file error ", err)
+		}
+
 	} else {
 		file.NeedSave = false // Not need to be save...
 		return nil
@@ -602,7 +608,6 @@ func (this *FileManager) saveFile(uuid string, filedata []byte, sessionId string
 		prototypeInfo.Name = "prototype"
 		prototypeInfo.Value, _ = GetServer().GetEntityManager().getEntityPrototype("CargoEntities.File", "CargoEntities")
 		eventData[1] = prototypeInfo
-
 		evt, _ := NewEvent(UpdateFileEvent, FileEvent, eventData)
 		GetServer().GetEventManager().BroadcastEvent(evt)
 	}
@@ -837,7 +842,6 @@ func (this *FileManager) createDbFile(id string, name string, mimeType string, d
 // @scope {public}
 // @src
 //FileManager.prototype.onEvent = function (evt) {
-
 //    EventHub.prototype.onEvent.call(this, evt)
 //}
 func (this *FileManager) OnEvent(evt interface{}) {
@@ -1133,12 +1137,11 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 //    var params = []
 //    // The file data (filedata) will be upload with the http protocol...
 //    params.push(createRpcData(file, "JSON_STR", "file"))
-//    params.push(createRpcData(filepath, "STRING", "filepath"))
 //    params.push(createRpcData(thumbnailMaxHeight, "INTEGER", "thumbnailMaxHeight"))
 //    params.push(createRpcData(thumbnailMaxWidth, "INTEGER", "thumbnailMaxWidth"))
 //    // Here I will create a new data form...
 //    var formData = new FormData()
-//    formData.append("multiplefiles", filedata, filename)
+//    formData.append("multiplefiles", filedata, file.M_name)
 //    // Use the post function to upload the file to the server.
 //    var xhr = new XMLHttpRequest()
 //    xhr.open('POST', '/uploads', true)
@@ -1185,7 +1188,7 @@ func (this *FileManager) CreateFile(filename string, filepath string, thumbnailM
 //    } (progressCallback, caller)
 //    xhr.send(formData);
 //}
-func (this *FileManager) SaveFile(file *CargoEntities.File, filepath string, thumbnailMaxHeight int64, thumbnailMaxWidth int64, messageId string, sessionId string) {
+func (this *FileManager) SaveFile(file *CargoEntities.File, thumbnailMaxHeight int64, thumbnailMaxWidth int64, messageId string, sessionId string) {
 	errObj := GetServer().GetSecurityManager().canExecuteAction(sessionId, Utility.FunctionName())
 	if errObj != nil {
 		GetServer().reportErrorMessage(messageId, sessionId, errObj)

@@ -79,7 +79,7 @@ var Server = function (hostName, ipv4, port) {
  * @param {function} onConnectionOpenCallback That function is call when the connection is open and ready to be use.
  * @param {function} onConnectionCloseCallback That function is call when the connection is close with the server. 
  */
-Server.prototype.init = function(onConnectionOpenCallback, onConnectionCloseCallback){
+Server.prototype.init = function (onConnectionOpenCallback, onConnectionCloseCallback) {
     // Initialisation of the connection.
     this.conn = initConnection("ws://" + this.ipv4 + ":" + this.port.toString() + "/ws", onConnectionOpenCallback, onConnectionCloseCallback)
 }
@@ -191,12 +191,10 @@ Server.prototype.handleMessage = function (conn, data) {
         // Now I will save the message.
         pendingMessage[msg.id][msg.index] = msg
 
-        if (pendingRequest[msg.id] == undefined) {
-            return // nothing to do here.
-        }
-
-        if (pendingRequest[msg.id].progressCallback != null) {
-            pendingRequest[msg.id].progressCallback(msg.index, msg.total, pendingRequest[msg.id].caller)
+        if (pendingRequest[msg.id] != undefined) {
+            if (pendingRequest[msg.id].progressCallback != null) {
+                pendingRequest[msg.id].progressCallback(msg.index, msg.total, pendingRequest[msg.id].caller)
+            }
         }
 
         // I will now create the answer for that transfer message and send it back
@@ -230,7 +228,7 @@ Server.prototype.handleMessage = function (conn, data) {
                         console.log("File data cannot be read!!!")
                     }
                 }
-            } (this);
+            }(this);
 
             fileReader.readAsArrayBuffer(new Blob(data));
         }
@@ -379,17 +377,17 @@ Server.prototype.stop = function (successCallback, errorCallback, caller) {
     var params = []
 
     var rqst = new Request(randomUUID(), this.conn, "Stop", params,
-    // Progress callback
-    function () { },
-    // Success callback
-    function (id, results, caller) {
-        // Keep the session id...
-        caller.successCallback(results["result"], caller.caller)
-    },
-    // Error callback...
-    function (errorMsg, caller) {
-        caller.errorCallback(errorMsg, caller.caller)
-    }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
+        // Progress callback
+        function () { },
+        // Success callback
+        function (id, results, caller) {
+            // Keep the session id...
+            caller.successCallback(results["result"], caller.caller)
+        },
+        // Error callback...
+        function (errorMsg, caller) {
+            caller.errorCallback(errorMsg, caller.caller)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
 
     rqst.send();
 }
@@ -401,19 +399,19 @@ Server.prototype.stop = function (successCallback, errorCallback, caller) {
 Server.prototype.getRootPath = function (successCallback, errorCallback, caller) {
     // server is the client side singleton...
     var params = new Array();
-    
+
     var rqst = new Request(randomUUID(), this.conn, "GetRootPath", params,
-    // Progress callback
-    function () { },
-    // Success callback
-    function (id, results, caller) {
-        // Keep the session id...
-        caller.successCallback(results["result"], caller.caller)
-    },
-    // Error callback...
-    function (errorMsg, caller) {
-        caller.errorCallback(errorMsg, caller.caller)
-    }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
+        // Progress callback
+        function () { },
+        // Success callback
+        function (id, results, caller) {
+            // Keep the session id...
+            caller.successCallback(results["result"], caller.caller)
+        },
+        // Error callback...
+        function (errorMsg, caller) {
+            caller.errorCallback(errorMsg, caller.caller)
+        }, { "successCallback": successCallback, "errorCallback": errorCallback, "caller": caller });
 
     rqst.send();
 }
@@ -465,6 +463,6 @@ var Attachment = function (fileName, fileData) {
 /**
  * Node js import function.
  */
-function require(moduleId){
+function require(moduleId) {
 
 }

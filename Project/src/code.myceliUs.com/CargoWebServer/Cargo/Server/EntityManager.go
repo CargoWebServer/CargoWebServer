@@ -21,7 +21,7 @@ import (
 ////////////////////////////////////////////////////////////////////////////////
 
 // The entity are keep in memory for ten minutes.
-var timeOutDuration = time.Duration(1)
+var timeOutDuration = time.Duration(10)
 
 // Struct use to tranfer internal informations about entity
 type EntityInfo struct {
@@ -454,9 +454,16 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 					} else {
 						if strings.HasPrefix(fieldType, "[]") {
 							if reflect.TypeOf(v).String() == "[]map[string]interface {}" {
-								for i := 0; i < len(v.([]map[string]interface{})); i++ {
+								if len(v.([]map[string]interface{})) > 0 {
 									if v.([]map[string]interface{})[0]["TYPENAME"] == nil {
-										ToTriples(v.([]map[string]interface{})[i], triples)
+										for i := 0; i < len(v.([]map[string]interface{})); i++ {
+											ToTriples(v.([]map[string]interface{})[i], triples)
+										}
+									} else {
+										fieldType_ := v.([]map[string]interface{})[0]["TYPENAME"].(string)
+										for i := 0; i < len(v.([]map[string]interface{})); i++ {
+											*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]map[string]interface{})[i]["UUID"].(string), isIndex})
+										}
 									}
 								}
 							} else if reflect.TypeOf(v).String() == "[]interface {}" {
@@ -465,6 +472,11 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 										if v.([]interface{})[0].(map[string]interface{})["TYPENAME"] == nil {
 											for i := 0; i < len(v.([]interface{})); i++ {
 												ToTriples(v.([]interface{})[i].(map[string]interface{}), triples)
+											}
+										} else {
+											fieldType_ := v.([]interface{})[0].(map[string]interface{})["TYPENAME"].(string)
+											for i := 0; i < len(v.([]interface{})); i++ {
+												*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.([]interface{})[i].(map[string]interface{})["UUID"].(string), isIndex})
 											}
 										}
 									} else {
@@ -485,9 +497,20 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 							if reflect.TypeOf(v).String() == "map[string]interface {}" {
 								if v.(map[string]interface{})["TYPENAME"] == nil {
 									ToTriples(v.(map[string]interface{}), triples)
+								} else {
+									fieldType_ := v.(map[string]interface{})["TYPENAME"].(string)
+									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.(map[string]interface{})["UUID"].(string), isIndex})
 								}
 							} else {
 								// Here I will append attribute...
+
+								// Dont save the file disk data into the entity...
+								if typeName == "CargoEntities.File" {
+									if values["M_fileType"].(float64) == 2 {
+										values["M_data"] = ""
+									}
+								}
+
 								*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v, isIndex})
 							}
 						}
@@ -547,7 +570,6 @@ func (this *EntityManager) getEntities(typeName string, storeId string, query *E
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(q, []interface{}{}, []interface{}{})
 	if err != nil {
-		log.Println(err)
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
 		return nil, errObj
 	}
@@ -585,7 +607,6 @@ func (this *EntityManager) getEntityByUuid(uuid string) (Entity, *CargoEntities.
 	store := GetServer().GetDataManager().getDataStore(storeId)
 	results, err := store.Read(query, []interface{}{}, []interface{}{})
 	if err != nil {
-		log.Println(err)
 		errObj := NewError(Utility.FileLine(), ENTITY_ID_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("Fail to retreive entity by id "))
 		return nil, errObj
 	}
@@ -890,6 +911,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		entity.SetUuid(uuid)
 		entity.SetEntityGetter(getEntityFct)
 	}
+
 	var values map[string]interface{}
 
 	var err error
@@ -974,7 +996,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		for i := 0; i < len(existingTriples); i++ {
 			toDelete = append(toDelete, Triple{existingTriples[i][0].(string), existingTriples[i][1].(string), existingTriples[i][2], false})
 		}
-		_, err = store.Create("", toDelete)
+		err = store.Delete("", toDelete)
 		if err != nil {
 			cargoError := NewError(Utility.FileLine(), ENTITY_CREATION_ERROR, SERVER_ERROR_CODE, err)
 			return cargoError
@@ -990,6 +1012,7 @@ func (this *EntityManager) saveEntity(entity Entity) *CargoEntities.Error {
 		}
 	}
 
+	//log.Println("--> triples ", existingTriples)
 	// Send update entity event here.
 	GetServer().GetEventManager().BroadcastEvent(evt)
 	entity.ResetNeedSave()
@@ -1887,7 +1910,6 @@ func (this *EntityManager) SaveEntity(values interface{}, typeName string, messa
 				entity.setObject(values.(map[string]interface{}))
 				errObj = this.saveEntity(entity)
 				if errObj != nil {
-					log.Println(errObj.GetBody())
 					GetServer().reportErrorMessage(messageId, sessionId, errObj)
 					return nil
 				}

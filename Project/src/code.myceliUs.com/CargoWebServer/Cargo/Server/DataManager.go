@@ -280,7 +280,7 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 		storeConfig.M_ipv4 = ipv4
 		storeConfig.M_hostName = hostName
 		storeConfig.M_port = port
-
+		storeConfig.NeedSave = true
 		configEntity := GetServer().GetConfigurationManager().m_activeConfigurations
 		storeConfigEntity, err_ = GetServer().GetEntityManager().createEntity(configEntity.GetUuid(), "M_dataStoreConfigs", "Config.DataStoreConfiguration", storeId, storeConfig)
 		if err_ != nil {
@@ -296,7 +296,11 @@ func (this *DataManager) createDataStore(storeId string, storeName string, hostN
 		storeConfig.M_ipv4 = ipv4
 		storeConfig.M_hostName = hostName
 		storeConfig.M_port = port
-		GetServer().GetEntityManager().saveEntity(storeConfig)
+		storeConfig.NeedSave = true
+		err := GetServer().GetEntityManager().saveEntity(storeConfig)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Create the store here.
@@ -327,11 +331,16 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 		return cargoError
 	}
 
+	store := this.getDataStore(storeId)
 	if this.getDataStore(storeId) == nil {
 		cargoError := NewError(Utility.FileLine(), DATASTORE_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, errors.New("The storeId '"+storeId+"' doesn't exist."))
 		log.Println("---> Store with id", storeId, "dosen't exist!")
 		return cargoError
 	}
+
+	// Here I will remove all prototype.
+	store.DeleteEntityPrototypes()
+	store.Close()
 
 	// Delete the dataStore configuration
 	dataStore, errObj := GetServer().GetEntityManager().getEntityById("Config.DataStoreConfiguration", "Config", []interface{}{storeId})
@@ -350,6 +359,7 @@ func (this *DataManager) deleteDataStore(storeId string) *CargoEntities.Error {
 
 	// Remove the storeObject from the storeMap
 	this.removeDataStore(storeId)
+
 	// Delete the directory
 	filePath := GetServer().GetConfigurationManager().GetDataPath() + "/" + storeId
 	err := os.RemoveAll(filePath)
@@ -1043,7 +1053,6 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 
 	// Open connection.
 	err = store.Connect()
-
 	// Prototypes will be create only if they dosent exist.
 	for i := 0; i < len(infos.Schemas); i++ {
 		prototype := infos.Schemas[i]
@@ -1056,12 +1065,10 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 			store.SaveEntityPrototype(prototype)
 		}
 	}
-
 	if err != nil {
 		//log.Println(err)
 		return
 	}
-
 	// Now I will save the data...
 	var entities []Entity
 	for i := 0; i < len(infos.Data); i++ {
@@ -1087,7 +1094,6 @@ func (this *DataManager) ImportJsonData(filename string, messageId string, sessi
 		//log.Println("---> create: ", entities[i])
 		GetServer().GetEntityManager().saveEntity(entities[i])
 	}
-
 	// remove the tmp file if it file path is not empty... otherwise the
 	// file will bee remove latter.
 	defer os.Remove(tmpPath)

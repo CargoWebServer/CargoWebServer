@@ -527,10 +527,11 @@ func (this *GraphStore) DeleteEntityPrototype(typeName string) error {
 		return nil
 	}
 
-	prototype, err := this.GetEntityPrototype(typeName)
+	prototype := this.m_prototypes[typeName]
 	// The prototype does not exist.
-	if err != nil {
-		return err
+	if prototype == nil {
+		// not exist so no need to be removed...
+		return nil
 	}
 
 	// Remove substitution group from it parent.
@@ -559,9 +560,8 @@ func (this *GraphStore) DeleteEntityPrototype(typeName string) error {
 		GetServer().GetEntityManager().deleteEntity(entity)
 	}
 
-	err = os.Remove(this.m_path + "/" + prototype.TypeName + ".gob")
-
 	delete(this.m_prototypes, typeName)
+	err := os.Remove(this.m_path + "/" + prototype.TypeName + ".gob")
 
 	return err
 }
@@ -570,18 +570,97 @@ func (this *GraphStore) DeleteEntityPrototype(typeName string) error {
  * Remove all prototypes.
  */
 func (this *GraphStore) DeleteEntityPrototypes() error {
-	prototypes, err := this.GetEntityPrototypes()
-	if err != nil {
-		return err
-	}
+	if this.m_ipv4 == "127.0.0.1" {
+		for typeName, prototype := range this.m_prototypes {
+			// Remove substitution group from it parent.
+			for i := 0; i < len(prototype.SuperTypeNames); i++ {
+				storeId := prototype.SuperTypeNames[i][0:strings.Index(prototype.SuperTypeNames[i], ".")]
+				if storeId != this.m_id {
+					superPrototype, err := GetServer().GetEntityManager().getEntityPrototype(prototype.SuperTypeNames[i], storeId)
+					if err == nil {
+						substitutionGroup := make([]string, 0)
+						for j := 0; j < len(superPrototype.SubstitutionGroup); j++ {
+							if superPrototype.SubstitutionGroup[j] != typeName {
+								substitutionGroup = append(substitutionGroup, superPrototype.SubstitutionGroup[j])
+							}
+						}
+						// Save the prototype.
+						superPrototype.SubstitutionGroup = substitutionGroup
+						store := GetServer().GetDataManager().getDataStore(storeId)
+						store.SaveEntityPrototype(superPrototype)
+					}
+				}
+			}
 
-	for i := 0; i < len(prototypes); i++ {
-		err := this.DeleteEntityPrototype(prototypes[i].TypeName)
-		if err != nil {
-			return err
+			// Remove the entity from the cache and send delete event.
+			entities, _ := GetServer().GetEntityManager().getEntities(typeName, this.m_id, nil)
+			for i := 0; i < len(entities); i++ {
+				entity := entities[i]
+				// remove it from the cache...
+				if len(entity.GetParentUuid()) > 0 {
+					if !strings.HasPrefix(entity.GetParentUuid(), this.m_id) {
+						// I will get the parent uuid link.
+						parent, err := GetServer().GetEntityManager().getEntityByUuid(entity.GetParentUuid())
+						if err != nil {
+							return errors.New(err.GetBody())
+						}
+
+						// Here I will remove it from it parent...
+						// Get values as map[string]interface{} and also set the entity in it parent.
+						if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+							parent.(*DynamicEntity).removeValue(entity.GetParentLnk(), entity.GetUuid())
+						} else {
+							removeMethode := strings.Replace(entity.GetParentLnk(), "M_", "", -1)
+							removeMethode = "Remove" + strings.ToUpper(removeMethode[0:1]) + removeMethode[1:]
+							params := make([]interface{}, 1)
+							params[0] = entity
+							_, err_ := Utility.CallMethod(parent, removeMethode, params)
+							if err_ != nil {
+								cargoError := NewError(Utility.FileLine(), ATTRIBUTE_NAME_DOESNT_EXIST_ERROR, SERVER_ERROR_CODE, err_.(error))
+								return errors.New(cargoError.GetBody())
+							}
+						}
+
+						// Update the parent here.
+						var eventDatas []*MessageData
+						evtData := new(MessageData)
+						evtData.TYPENAME = "Server.MessageData"
+						evtData.Name = "entity"
+						if reflect.TypeOf(parent).String() == "*Server.DynamicEntity" {
+							evtData.Value = parent.(*DynamicEntity).getObject()
+						} else {
+							evtData.Value = parent
+						}
+						eventDatas = append(eventDatas, evtData)
+						evt, _ := NewEvent(UpdateEntityEvent, EntityEvent, eventDatas)
+						GetServer().GetEventManager().BroadcastEvent(evt)
+					}
+				}
+				GetServer().GetEntityManager().m_removeEntityChan <- entity
+
+				// Send event message...
+				var eventDatas []*MessageData
+				evtData := new(MessageData)
+				evtData.TYPENAME = "Server.MessageData"
+				evtData.Name = "entity"
+				if reflect.TypeOf(entity).String() == "*Server.DynamicEntity" {
+					evtData.Value = entity.(*DynamicEntity).getObject()
+				} else {
+					evtData.Value = entity
+				}
+
+				eventDatas = append(eventDatas, evtData)
+				evt, _ := NewEvent(DeleteEntityEvent, EntityEvent, eventDatas)
+				GetServer().GetEventManager().BroadcastEvent(evt)
+
+			}
+		}
+
+		// Remove all prototypes from the map.
+		for typeName, _ := range this.m_prototypes {
+			delete(this.m_prototypes, typeName)
 		}
 	}
-
 	return nil
 }
 
@@ -1060,7 +1139,6 @@ func (this *GraphStore) Create(queryStr string, triples []interface{}) (lastId i
 
 	// So here I will index the triple...
 	for i := 0; i < len(triples); i++ {
-		//log.Println("---> save triple: ", triples[i])
 		// This will contain the value of the triple.
 		triple := triples[i].(Triple)
 		data, err := json.Marshal(&triple)
@@ -1521,6 +1599,7 @@ func (this *GraphStore) Delete(queryStr string, triples []interface{}) (err erro
 
 	// Remove the list of obsolete triples from the datastore.
 	for i := 0; i < len(triples); i++ {
+		// log.Println("remove triple: ", triples[i])
 		data, err := json.Marshal(&triples[i])
 		uuid := Utility.GenerateUUID(string(data))
 		if err == nil {

@@ -349,19 +349,32 @@ FileNavigator.prototype.saveFile = function (fileId) {
             f.name = f.M_name
             f.lastModifiedDate = new Date(0);
         }
-
-        server.fileManager.createFile(file.M_name, file.M_path, f, 256, 256, false,
-            // Success callback
-            function (result, caller) {
-                server.entityManager.saveEntity(caller)
-            },
-            // Progress callback
-            function (index, total, caller) {
-            },
-            // Error callback
-            function (errMsg, caller) {
-            },
-            file)
+        if (file.UUID.length == 0) {
+            server.fileManager.createFile(file.M_name, file.M_path, f, 256, 256, false,
+                // Success callback
+                function (result, caller) {
+                    //server.entityManager.saveEntity(caller)
+                },
+                // Progress callback
+                function (index, total, caller) {
+                },
+                // Error callback
+                function (errMsg, caller) {
+                },
+                /*file*/ {})
+        } else {
+            server.fileManager.saveFile(file, f, 256, 256,
+                // Success callback
+                function (result, caller) {
+                },
+                // Progress callback
+                function (index, total, caller) {
+                },
+                // Error callback
+                function (errMsg, caller) {
+                },
+                null)
+        }
 
     } else {
         // In case of db file

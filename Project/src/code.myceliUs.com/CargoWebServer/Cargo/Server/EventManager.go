@@ -377,6 +377,7 @@ func (this *EventListener) onEvent(evt *Event) {
 
 		// I will sent the event message to the listener...
 		// Never send the message directly use the message processor for it.
+		log.Println("--> broadcast evt ", *m.msg.Id, " to ", this.m_addr.GetPort())
 		GetServer().messageProcessor.m_outgoingChannel <- m
 	}
 }
@@ -401,9 +402,7 @@ type EventChannel struct {
  * This funtion is use to broadcast the event over listener...
  */
 func (this *EventChannel) broadcastEvent(evt *Event) {
-	//log.Println("-----------> 285 ", evt)
 	for _, listener := range this.m_listeners {
-		//log.Println("----------> evt broadcast: ", evt, listener.m_addr.GetAddrStr(), listener.m_addr.GetPort())
 		listener.onEvent(evt)
 	}
 }

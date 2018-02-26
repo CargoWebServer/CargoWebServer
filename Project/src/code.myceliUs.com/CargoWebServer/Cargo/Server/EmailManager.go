@@ -97,16 +97,6 @@ func (this *EmailManager) stop() {
 }
 
 /**
- * Validate email
- */
-func (this *EmailManager) ValidateEmail(email string) (isValid bool) {
-	// TODO implement it...
-	isValid = true
-
-	return
-}
-
-/**
  * Send mail... The server id is the authentification id...
  */
 func (this *EmailManager) sendEmail(id string, from string, to []string, cc []*CarbonCopy, subject string, body string, attachs []*Attachment, bodyType string) (errObj *CargoEntities.Error) {
