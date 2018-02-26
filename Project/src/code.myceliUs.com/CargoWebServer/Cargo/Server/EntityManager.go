@@ -21,7 +21,7 @@ import (
 ////////////////////////////////////////////////////////////////////////////////
 
 // The entity are keep in memory for ten minutes.
-var timeOutDuration = time.Duration(10)
+var timeOutDuration = time.Duration(1)
 
 // Struct use to tranfer internal informations about entity
 type EntityInfo struct {
@@ -502,15 +502,13 @@ func ToTriples(values map[string]interface{}, triples *[]interface{}) error {
 									*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v.(map[string]interface{})["UUID"].(string), isIndex})
 								}
 							} else {
-								// Here I will append attribute...
-
 								// Dont save the file disk data into the entity...
 								if typeName == "CargoEntities.File" {
 									if values["M_fileType"].(float64) == 2 {
 										values["M_data"] = ""
 									}
 								}
-
+								// Here I will append attribute...
 								*triples = append(*triples, Triple{uuid, typeName + ":" + fieldType_ + ":" + k, v, isIndex})
 							}
 						}

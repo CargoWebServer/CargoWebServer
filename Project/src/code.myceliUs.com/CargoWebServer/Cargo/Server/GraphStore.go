@@ -78,7 +78,7 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 	if store.m_ipv4 == "127.0.0.1" {
 		store.m_path = GetServer().GetConfigurationManager().GetDataPath() + "/" + store.m_id
 		if _, err := os.Stat(store.m_path); os.IsNotExist(err) {
-			os.Mkdir(store.m_path, 0700)
+			os.Mkdir(store.m_path, 0644)
 		}
 	}
 
@@ -87,7 +87,7 @@ func NewGraphStore(info *Config.DataStoreConfiguration) (store *GraphStore, err 
 	}
 
 	// Now I will open the db.
-	store.m_index, err = bolt.Open(store.m_path+"/"+store.m_id+".db", 0700, nil)
+	store.m_index, err = bolt.Open(store.m_path+"/"+store.m_id+".db", 0644, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
